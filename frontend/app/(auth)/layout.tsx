@@ -7,7 +7,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
     const siteConfig = await getSiteConfig();
 
     return (
-        <div className="h-screen flex flex-col bg-content1">
+        <div className="h-screen flex flex-col">
             <nav className="w-full max-w-md p-6 fixed top-0">
                 <div className="flex items-center justify-center">
                     <div className="flex items-center space-x-2">

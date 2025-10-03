@@ -162,7 +162,7 @@ const AnalyticsDashboard: React.FC = () => {
                     <input className="border rounded px-2 py-1" type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} />
                 </div>
             </div>
-            <div className="mb-8 bg-content1 rounded shadow p-4">
+            <div className="mb-8 bg-secondary rounded shadow p-4">
                 <h2 className="text-lg font-semibold mb-2">Activity Heatmap (Hour x Day)</h2>
                 <div className="overflow-x-auto">
                     <table className="min-w-full text-center">
@@ -194,7 +194,7 @@ const AnalyticsDashboard: React.FC = () => {
             <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                     <h2 className="text-lg font-semibold mb-2">Per-User Breakdown</h2>
-                    <table className="min-w-full bg-content1 rounded shadow">
+                    <table className="min-w-full bg-secondary rounded shadow">
                         <thead>
                             <tr>
                                 <th className="px-4 py-2">User ID</th>
@@ -217,7 +217,7 @@ const AnalyticsDashboard: React.FC = () => {
                 </div>
                 <div>
                     <h2 className="text-lg font-semibold mb-2">Per-Product Breakdown</h2>
-                    <table className="min-w-full bg-content1 rounded shadow">
+                    <table className="min-w-full bg-secondary rounded shadow">
                         <thead>
                             <tr>
                                 <th className="px-4 py-2">Product ID</th>
@@ -241,7 +241,7 @@ const AnalyticsDashboard: React.FC = () => {
             </div>
             <h2 className="text-xl font-semibold mb-2">Recent Interactions</h2>
             <div className="overflow-x-auto">
-                <table className="min-w-full bg-content1 rounded shadow">
+                <table className="min-w-full bg-secondary rounded shadow">
                     <thead>
                         <tr>
                             <th className="px-4 py-2">ID</th>

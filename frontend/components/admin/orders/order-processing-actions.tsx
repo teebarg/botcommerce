@@ -94,7 +94,7 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
             {order.payment_status !== "SUCCESS" && (
                 <Dialog open={paymentState.isOpen} onOpenChange={paymentState.setOpen}>
                     <DialogTrigger asChild>
-                        <Button className="flex-1 w-full" variant="luxury">
+                        <Button className="flex-1 w-full" variant="emerald">
                             Update Payment
                         </Button>
                     </DialogTrigger>

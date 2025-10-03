@@ -53,7 +53,7 @@ export default function AccountPageLayout({ dashboard }: { dashboard?: React.Rea
                     </div>
                 </div>
             </div>
-            <div className="bg-content2 md:hidden" data-testid="mobile-account-nav">
+            <div className="bg-secondary md:hidden" data-testid="mobile-account-nav">
                 <div className="text-base">
                     <ul className="flex justify-between px-6">
                         {navLinks.map((link, idx: number) => (
@@ -74,7 +74,7 @@ export default function AccountPageLayout({ dashboard }: { dashboard?: React.Rea
                     </ul>
                 </div>
             </div>
-            <div className="flex-1 h-full max-w-7xl mx-auto bg-content1 flex flex-col rounded-md md:px-8">
+            <div className="flex-1 h-full max-w-7xl mx-auto flex flex-col rounded-md md:px-8">
                 <div className="md:flex md:gap-4 py-4 md:py-12">
                     <div className="md:min-w-60">{session?.user && <AccountNav />}</div>
                     <div className="md:flex-1">{dashboard}</div>

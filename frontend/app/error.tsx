@@ -23,7 +23,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
 
     return (
         <div className="flex items-center justify-center h-screen">
-            <div className="max-w-lg mx-auto bg-content1 rounded-lg shadow-lg overflow-hidden">
+            <div className="max-w-lg mx-auto bg-secondary rounded-lg shadow-lg overflow-hidden">
                 <div className="px-6 py-8 flex flex-col items-center">
                     <h1 className="text-4xl font-bold mb-2">500</h1>
                     <p className="text-xl mb-4">Internal Server Error</p>

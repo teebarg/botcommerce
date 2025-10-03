@@ -61,7 +61,7 @@ const RecentOrdersList = () => {
                     </TableHeader>
                     <TableBody>
                         {orders?.map((order: Order, idx: number) => (
-                            <TableRow key={idx} className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted even:bg-background">
+                            <TableRow key={idx} className="odd:bg-background">
                                 <TableCell className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">{idx + 1}</TableCell>
                                 <TableCell className="whitespace-nowrap px-3 py-4 text-sm">{order.order_number}</TableCell>
                                 <TableCell className="font-medium">

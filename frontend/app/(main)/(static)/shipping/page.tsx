@@ -106,11 +106,11 @@ const ShippingPage = () => (
                             },
                         ].map((faq, index: number) => (
                             <details key={index} className="group">
-                                <summary className="flex justify-between items-center cursor-pointer p-4 bg-content1 rounded-lg hover:bg-content2 transition-colors">
+                                <summary className="flex justify-between items-center cursor-pointer p-4 rounded-lg hover:bg-content2 transition-colors">
                                     <span className="font-medium">{faq.q}</span>
                                     <span className="text-gray-400 group-open:rotate-180 transition-transform">▼</span>
                                 </summary>
-                                <div className="p-4 text-muted-foreground bg-content1 border-t border-divider">{faq.a}</div>
+                                <div className="p-4 text-muted-foreground border-t border-divider">{faq.a}</div>
                             </details>
                         ))}
                     </div>

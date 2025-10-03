@@ -9,7 +9,7 @@ interface BrandItemProps {
 
 const BrandItem: React.FC<BrandItemProps> = ({ brand }) => {
     return (
-        <div className="border border-default rounded-lg overflow-hidden bg-secondary flex items-center py-4 px-3">
+        <div className="border border-border rounded-lg overflow-hidden bg-secondary flex items-center py-4 px-3">
             <div className="flex-1 flex items-center">
                 <h3 className="font-medium">{brand.name}</h3>
                 <Badge className="ml-1" variant={brand.is_active ? "emerald" : "destructive"}>

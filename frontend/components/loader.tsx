@@ -10,7 +10,7 @@ const WaveLoader: React.FC<{ className?: string }> = ({ className }) => {
                     key={idx}
                     className="w-1 h-8 rounded-full animate-wave"
                     style={{
-                        background: "linear-gradient(to top, var(--default-400), var(--default-600))",
+                        background: "linear-gradient(to top, var(--input), var(--border))",
                         animationDelay: `${idx * 0.1}s`,
                         animationDuration: "1.2s",
                     }}
@@ -39,7 +39,7 @@ const DotsLoader: React.FC = () => {
 
 export default function PageLoader() {
     return (
-        <div className="fixed inset-0 bg-content1 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div className="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center">
             <div className="flex flex-col items-center space-y-6">
                 <WaveLoader />
                 <div className="text-center space-y-2">

@@ -170,15 +170,15 @@ const NewsletterSection: React.FC = () => {
                             <div className="mt-6 pt-6 border-t border-divider">
                                 <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
                                     <div className="flex items-center gap-1">
-                                        <CheckCircle className="h-3 w-3 text-secondary" />
+                                        <CheckCircle className="h-3 w-3 text-accent" />
                                         <span>No spam</span>
                                     </div>
                                     <div className="flex items-center gap-1">
-                                        <CheckCircle className="h-3 w-3 text-secondary" />
+                                        <CheckCircle className="h-3 w-3 text-accent" />
                                         <span>Unsubscribe anytime</span>
                                     </div>
                                     <div className="flex items-center gap-1">
-                                        <CheckCircle className="h-3 w-3 text-secondary" />
+                                        <CheckCircle className="h-3 w-3 text-accent" />
                                         <span>Privacy protected</span>
                                     </div>
                                 </div>

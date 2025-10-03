@@ -20,7 +20,7 @@ export default function CarouselBannerList() {
 
     return (
         <ClientOnly>
-            <div className="bg-card rounded-2xl shadow-sm border border-default-100 p-6 mb-6">
+            <div className="bg-card rounded-2xl shadow-sm border p-6 mb-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold">Banner Management</h1>
@@ -46,7 +46,7 @@ export default function CarouselBannerList() {
                 {banners && banners?.map((banner: CarouselBanner, idx: number) => <BannerItem key={idx} banner={banner} />)}
                 {isLoading && <ComponentLoader className="h-[200px]" />}
                 {!isLoading && banners?.length === 0 && (
-                    <div className="bg-card rounded-2xl shadow-sm border border-default-200 p-12 text-center">
+                    <div className="bg-card rounded-2xl shadow-sm border border-border p-12 text-center">
                         <div className="text-muted-foreground mb-4">
                             <Upload className="w-12 h-12 mx-auto" />
                         </div>

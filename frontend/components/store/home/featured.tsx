@@ -22,7 +22,7 @@ export default function Featured() {
             <ProductsCarousel isLoading={isLoading} products={data?.products || []} />
             <div className="text-center">
                 <LocalizedClientLink
-                    className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-10 py-4 rounded-full font-bold text-lg hover:from-yellow-500 hover:to-orange-600 transition-all duration-300 transform hover:scale-105"
+                    className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-10 py-4 mt-4 rounded-full font-bold text-lg hover:from-yellow-500 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 inline-block"
                     href="/collections/trending"
                 >
                     Visit Shop

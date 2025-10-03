@@ -29,7 +29,7 @@ const CategoryImage: React.FC<{ image: string | undefined; categoryId: number }>
                     <img alt={image || "placeholder"} className="cursor-pointer w-full h-full object-cover" src={image || "/placeholder.jpg"} />
                 </div>
             </DialogTrigger>
-            <DialogContent className="bg-content1">
+            <DialogContent>
                 <DialogHeader className="sr-only">
                     <DialogTitle>Update Category Image</DialogTitle>
                 </DialogHeader>
@@ -124,7 +124,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                             </div>
                         )}
                         {hasChanges && (
-                            <Button disabled={reorderCategories.isPending} size="lg" variant="luxury" onClick={saveOrder}>
+                            <Button disabled={reorderCategories.isPending} size="lg" variant="indigo" onClick={saveOrder}>
                                 <Save size={16} />
                                 <span>{reorderCategories.isPending ? "Saving..." : "Save Order"}</span>
                             </Button>

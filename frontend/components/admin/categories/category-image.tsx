@@ -110,7 +110,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
                         </Button>
                     </div>
                     {isDeleting && (
-                        <div className="absolute inset-0 bg-default-500 bg-opacity-50 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-secondary bg-opacity-50 flex items-center justify-center">
                             <span className="text-white">Deleting...</span>
                         </div>
                     )}

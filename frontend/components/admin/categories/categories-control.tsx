@@ -76,7 +76,7 @@ const CategoryAction: React.FC<Props> = ({ category, index, categoriesLength, on
                 <DialogTrigger>
                     <Trash2 className="text-rose-500 h-5 w-5 cursor-pointer" />
                 </DialogTrigger>
-                <DialogContent className="bg-content1">
+                <DialogContent>
                     <DialogHeader className="sr-only">
                         <DialogTitle>Delete Category</DialogTitle>
                     </DialogHeader>

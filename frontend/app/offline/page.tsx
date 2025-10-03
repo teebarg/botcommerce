@@ -33,9 +33,8 @@ const OfflinePage = () => {
     };
 
     return (
-        <div className="bg-linear-to-b from-default-50 to-default-100 flex items-center justify-center p-4 flex-1">
-            <div className="max-w-md w-full bg-content1 rounded-2xl shadow-xl p-8 text-center">
-                {/* Animation Container */}
+        <div className="bg-linear-to-b from-background/20 to-secondary/20 flex items-center justify-center p-4 flex-1">
+            <div className="max-w-md w-full rounded-2xl shadow-xl p-8 text-center">
                 <div className={cn("mb-8 relative", { "animate-bounce": showAnimation })}>
                     <div className="relative">
                         <WifiOff className="w-24 h-24 mx-auto text-muted-foreground" strokeWidth={1.5} />

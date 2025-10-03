@@ -272,7 +272,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                             <span aria-hidden="true" className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" />
                                             <div className="relative flex space-x-3">
                                                 <div>
-                                                    <span className="h-8 w-8 rounded-full bg-violet-600 flex items-center justify-center ring-8 ring-content1">
+                                                    <span className="h-8 w-8 rounded-full bg-violet-600 flex items-center justify-center ring-8 ring-secondary">
                                                         <Clock className="h-5 w-5 text-white" />
                                                     </span>
                                                 </div>
@@ -303,7 +303,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                                         <span
                                                             className={
                                                                 orderStatusMap[evt.to_status as keyof typeof orderStatusMap].color +
-                                                                " h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-content1"
+                                                                " h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-secondary"
                                                             }
                                                         >
                                                             {orderStatusMap[evt.to_status as keyof typeof orderStatusMap].icon}

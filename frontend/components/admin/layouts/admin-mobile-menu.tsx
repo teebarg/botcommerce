@@ -45,8 +45,8 @@ const AdminMobileMenu: React.FC = () => {
     ];
 
     return (
-        <div className="h-full bg-content1 rounded-[inherit] overflow-hidden overflow-y-auto">
-            <div className="p-4 bg-accent text-gray-800 sticky top-safe z-10">
+        <div className="h-full rounded-[inherit] overflow-hidden overflow-y-auto">
+            <div className="p-4 bg-accent text-gray-100 sticky top-safe z-10">
                 <div className="flex items-center space-x-3">
                     <Avatar>
                         <AvatarImage src={session?.user?.image!} />
@@ -57,15 +57,15 @@ const AdminMobileMenu: React.FC = () => {
                         <div className="font-medium">
                             {session?.user?.first_name} {session?.user?.last_name}
                         </div>
-                        <div className="text-xs text-gray-700">{session?.user?.email}</div>
+                        <div className="text-xs text-gray-300">{session?.user?.email}</div>
                     </div>
                 </div>
             </div>
 
-            <div className="p-4 border-b border-content2">
+            <div className="p-4 border-b">
                 <div className="relative">
                     <input
-                        className="w-full py-2 pl-8 pr-4 bg-content1 rounded-lg text-sm focus:outline-none border"
+                        className="w-full py-2 pl-8 pr-4 bg-background rounded-lg text-sm focus:outline-none border"
                         placeholder="Search..."
                         type="text"
                     />
@@ -92,7 +92,7 @@ const AdminMobileMenu: React.FC = () => {
                 ))}
             </nav>
 
-            <div className="p-4 border-t border-content2 sticky bottom-0 bg-content1">
+            <div className="p-4 border-t sticky bottom-0 bg-background">
                 <button className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors w-full p-2">
                     <LogOut size={20} />
                     <span>Logout</span>

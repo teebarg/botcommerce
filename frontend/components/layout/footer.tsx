@@ -90,7 +90,7 @@ export default function Footer() {
                                 <div className="hidden md:block">
                                     <div>
                                         <h3 className="text-base font-semibold">Collections</h3>
-                                        <ul className="mt-2 space-y-2">
+                                        <ul className="mt-2 space-y-2 text-muted-foreground" data-testid="footer-collections">
                                             {collections?.slice(0, 6).map((c: any, idx: number) => (
                                                 <li key={idx}>
                                                     <LocalizedClientLink

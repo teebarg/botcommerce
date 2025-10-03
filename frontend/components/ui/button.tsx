@@ -12,7 +12,7 @@ const buttonVariants = cva(
     {
         variants: {
             variant: {
-                default: "bg-content3 text-foreground hover:bg-content3/90",
+                default: "bg-background text-foreground hover:bg-background/90 border border-muted-foreground",
                 destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
                 outline: "border border-gray-300 bg-background",
                 primary: "bg-primary text-primary-foreground hover:bg-primary/90",
@@ -22,14 +22,10 @@ const buttonVariants = cva(
                 warning: "bg-warning text-white hover:bg-warning/90",
                 success: "bg-success text-white hover:bg-success/90",
                 emerald: "bg-emerald-700 text-white hover:bg-emerald-800",
-                bordered: "bg-transparent border-2 border-primary text-primary hover:bg-primary-500 hover:text-white",
+                bordered: "bg-transparent border-2 border-primary text-primary hover:bg-primary-500",
                 borderedSecondary: "bg-transparent border-2 border-secondary text-secondary hover:bg-secondary-500 hover:text-white",
                 indigo: "bg-indigo-500 text-white hover:bg-indigo-600",
-                luxury: "bg-luxury text-luxury-foreground hover:bg-luxury/90 shadow-luxury transition-all duration-300 transform hover:scale-105",
                 accent: "bg-accent text-accent-foreground transition-all duration-300 transform hover:scale-105 font-semibold",
-                hero: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-elegant transition-all duration-500 transform hover:scale-110 hover:shadow-luxury border border-border/20",
-                elegant:
-                    "bg-transparent border-2 border-elegant text-elegant hover:bg-elegant hover:text-elegant-foreground transition-all duration-300",
                 transparent: "!bg-transparent !hover:bg-transparent",
             },
             size: {
@@ -40,7 +36,7 @@ const buttonVariants = cva(
                 lg: "h-12 rounded-md px-8 text-base font-normal min-w-32",
                 xl: "h-14 rounded-lg px-12 text-base",
                 icon: "p-2",
-                iconOnly: "h-auto w-auto bg-transparent hover:bg-transparent",
+                iconOnly: "h-auto w-auto bg-transparent hover:bg-transparent border-none",
             },
         },
         defaultVariants: {

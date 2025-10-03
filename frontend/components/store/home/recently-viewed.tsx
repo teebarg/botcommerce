@@ -24,7 +24,7 @@ export default function RecentlyViewedSection({ limit = 5, showBanner = true }: 
             {showBanner && (
                 <PromotionalBanner
                     btnClass="text-purple-600"
-                    outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-9xl"
+                    outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-8xl"
                     subtitle="Get up to 50% OFF on select products."
                     title="Big Sale on Top Brands!"
                 />

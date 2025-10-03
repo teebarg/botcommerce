@@ -33,8 +33,7 @@ function cleanMarkdown(md: string) {
 const ConversationViewer: React.FC<{ conversation: Conversation; onClose: () => void }> = ({ conversation, onClose }) => {
     return (
         <div className="flex-1 flex flex-col max-h-[80vh] md:max-h-none md:h-[calc(100vh-1.5rem)]">
-            {/* Conversation Header */}
-            <div className="bg-content1p border-b border-default-200 py-4 px-1 md:px-4">
+            <div className="bg-background border-b border-border py-4 px-1 md:px-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                         <button className="lg:hidden p-2 text-muted-foreground hover:bg-muted/20 rounded-lg" onClick={onClose}>

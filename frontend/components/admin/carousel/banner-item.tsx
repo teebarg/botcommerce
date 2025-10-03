@@ -98,7 +98,7 @@ const BannerItem: React.FC<BannerItemProps> = ({ banner }) => {
                                 </div>
                             </div>
 
-                            <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-default-400">
+                            <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t">
                                 <div className={cn("text-xs text-muted-foreground", banner.is_active && "dark:text-green-50 text-green-500")}>
                                     Updated: {formatDate(banner.updated_at)}
                                 </div>
