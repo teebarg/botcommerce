@@ -26,7 +26,7 @@ const ChatsCard = ({ conversation, actions }: CustomerCardProps) => {
                     <h3 className="m-0 text-lg">Conversation #{conversation.id}</h3>
                     {getStatusBadge(conversation.status)}
                 </div>
-                <div className="text-base text-default-500 space-y-1">
+                <div className="text-base text-muted-foreground space-y-1">
                     <p>UUID: {conversation.conversation_uuid}</p>
                     <p>User: {conversation.user_id || "Anonymous"}</p>
                     <p>Messages: {conversation.messages?.length}</p>

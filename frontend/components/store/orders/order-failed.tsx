@@ -25,9 +25,9 @@ const FailedPayment: React.FC<OrderConfirmationProps> = ({ order, onRetry, onCon
                         <AlertCircle className="w-12 h-12 text-red-600" />
                     </div>
 
-                    <h2 className="text-2xl font-bold text-default-900 mb-2">Payment Failed</h2>
+                    <h2 className="text-2xl font-bold mb-2">Payment Failed</h2>
 
-                    <p className="text-default-600">We were unable to process your payment. Please check your payment details and try again.</p>
+                    <p className="text-muted-foreground">We were unable to process your payment. Please check your payment details and try again.</p>
                 </div>
             </FadeInComponent>
 

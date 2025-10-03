@@ -29,9 +29,9 @@ const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShoppi
                         <ShoppingBag className="w-12 h-12 text-yellow-600" />
                     </div>
 
-                    <h2 className="text-2xl font-bold text-default-900">Pickup Order</h2>
+                    <h2 className="text-2xl font-bold">Pickup Order</h2>
 
-                    <p className="text-default-600">Please visit our store to complete your order.</p>
+                    <p className="text-muted-foreground">Please visit our store to complete your order.</p>
                 </div>
             </FadeInComponent>
 
@@ -41,14 +41,14 @@ const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShoppi
 
             <FadeInComponent delay="100ms">
                 <div className="bg-card rounded-xl shadow-sm p-4 mb-6">
-                    <h3 className="text-lg font-medium text-default-900 mb-4">Collection Point</h3>
+                    <h3 className="text-lg font-medium mb-4">Collection Point</h3>
                     <div className="space-y-1">
                         <div className="flex justify-between">
-                            <span className="text-default-500 text-sm">Address</span>
+                            <span className="text-muted-foreground text-sm">Address</span>
                             <span className="font-medium">{settings?.address}</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="text-default-500 text-sm">Opening Hours</span>
+                            <span className="text-muted-foreground text-sm">Opening Hours</span>
                             <span className="font-medium">Mon-Sat: 9am - 6pm</span>
                         </div>
                     </div>

@@ -70,8 +70,8 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                                 <div className="flex items-center gap-3">
                                     <div className="shrink-0 mt-0.5 text-accent">{paymentInfoMap[item.provider_id]?.icon}</div>
                                     <div className="text-left">
-                                        <div className="font-medium text-default-900">{paymentInfoMap[item.provider_id]?.title}</div>
-                                        <div className="text-sm text-default-500">{paymentInfoMap[item.provider_id]?.description}</div>
+                                        <div className="font-medium">{paymentInfoMap[item.provider_id]?.title}</div>
+                                        <div className="text-sm text-muted-foreground">{paymentInfoMap[item.provider_id]?.description}</div>
                                     </div>
                                 </div>
                             </RadioGroupItem>

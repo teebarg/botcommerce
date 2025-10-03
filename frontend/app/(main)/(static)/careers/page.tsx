@@ -47,7 +47,7 @@ const CareerOpportunities = async () => {
                     ) : (
                         <div className="mt-12">
                             <h3 className="text-2xl font-semibold mb-4 text-foreground">No Current Openings</h3>
-                            <p className="text-default-500 mb-6">
+                            <p className="text-muted-foreground mb-6">
                                 {`We don't have any open positions at the moment, but we're always on the lookout for talent. Please check back later or
                                 submit your resume for future opportunities.`}
                             </p>
@@ -60,7 +60,7 @@ const CareerOpportunities = async () => {
 
                 <div className="mt-12 text-center">
                     <h2 className="text-2xl font-semibold mb-4 text-foreground">{`Don't see the right fit?`}</h2>
-                    <p className="text-default-500 mb-6">
+                    <p className="text-muted-foreground mb-6">
                         {`We're always interested in hearing from talented individuals. Send us your resume, and we'll keep you in mind for future
                         opportunities.`}
                     </p>

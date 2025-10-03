@@ -68,9 +68,9 @@ export default function ErrorPage() {
                         <AlertTriangle className="text-orange-600" size={32} />
                     </div>
 
-                    <h2 className="text-2xl font-bold text-default-900 mb-3">{errorContent.title}</h2>
-                    <p className="text-default-500 text-lg mb-4">{errorContent.message}</p>
-                    <p className="text-sm text-default-500 mb-8">{errorContent.details}</p>
+                    <h2 className="text-2xl font-bold mb-3">{errorContent.title}</h2>
+                    <p className="text-muted-foreground text-lg mb-4">{errorContent.message}</p>
+                    <p className="text-sm text-muted-foreground mb-8">{errorContent.details}</p>
 
                     <div className="space-y-4">
                         <Button className="w-full" variant="emerald" onClick={() => window.history.back()}>
@@ -84,7 +84,7 @@ export default function ErrorPage() {
             <Separator />
 
             <div className="mt-6 text-center">
-                <p className="text-sm text-default-500">
+                <p className="text-sm text-muted-foreground">
                     Still having trouble?{" "}
                     <a className="text-emerald-600 hover:text-emerald-700 font-medium" href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`}>
                         Contact support

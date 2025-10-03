@@ -68,7 +68,7 @@ export default function InfiniteScrollClient({ initialSearchParams, initialData 
                 {isFetchingNextPage && (
                     <div className="flex flex-col items-center justify-center text-blue-600">
                         <Loader className="h-8 w-8 animate-spin mb-2" />
-                        <p className="text-sm font-medium text-default-500">Loading more products...</p>
+                        <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
                     </div>
                 )}
             </div>

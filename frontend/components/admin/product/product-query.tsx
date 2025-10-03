@@ -36,7 +36,7 @@ export function ProductQuery({ collections, selectedCollections }: ProductQueryP
     return (
         <div className="relative mb-4">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="text-default-500" size={18} />
+                <Search className="text-muted-foreground" size={18} />
             </div>
             <input
                 className="pl-10 pr-12 py-2 w-full border border-default-200 rounded-lg focus:outline-none"
@@ -48,7 +48,7 @@ export function ProductQuery({ collections, selectedCollections }: ProductQueryP
             <Dialog open={filterState.isOpen} onOpenChange={filterState.setOpen}>
                 <DialogTrigger asChild>
                     <Button className="absolute inset-y-0 right-0 pr-3" size="iconOnly">
-                        <SlidersHorizontal className="text-default-500 h-5 w-5" />
+                        <SlidersHorizontal className="text-muted-foreground h-5 w-5" />
                     </Button>
                 </DialogTrigger>
                 <DialogContent className="bg-content1">

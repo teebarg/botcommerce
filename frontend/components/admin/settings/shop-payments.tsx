@@ -66,8 +66,8 @@ const BankDetailComponent: React.FC<BankDetailsProps> = ({ bank }) => {
         <div className="flex items-center justify-between p-4 bg-content1 rounded-lg">
             <div>
                 <h3 className="font-medium text-sm">{bank.bank_name}</h3>
-                <p className="text-default-900 font-semibold">{bank.account_name}</p>
-                <p className="text-default-700">{bank.account_number}</p>
+                <p className="font-semibold">{bank.account_name}</p>
+                <p className="text-muted-foreground">{bank.account_number}</p>
             </div>
             <Button
                 aria-label="delete"
@@ -110,7 +110,7 @@ export function ShopPayments({ settings }: ShopPaymentsProps) {
                         <div key={idx} className="flex items-center justify-between p-4 bg-content1 rounded-lg">
                             <div>
                                 <h3 className="font-medium">{feature.label}</h3>
-                                <p className="text-sm text-default-500">{feature.description}</p>
+                                <p className="text-sm text-muted-foreground">{feature.description}</p>
                             </div>
                             <Switch
                                 checked={isEnabled}
@@ -143,9 +143,9 @@ export function ShopPayments({ settings }: ShopPaymentsProps) {
                     })}
                     {bankDetails?.length === 0 && (
                         <div className="flex flex-col items-center justify-center  md:col-span-2">
-                            <Exclamation className="w-14 h-14 text-default-500 mb-2" />
-                            <p className="text-default-800 font-semibold">No bank details found</p>
-                            <p className="text-default-500 text-sm">Add bank details to enable bank transfer payments</p>
+                            <Exclamation className="w-14 h-14 text-muted-foreground mb-2" />
+                            <p className="font-semibold">No bank details found</p>
+                            <p className="text-muted-foreground text-sm">Add bank details to enable bank transfer payments</p>
                         </div>
                     )}
                 </div>

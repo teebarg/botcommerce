@@ -27,8 +27,8 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                     Back to Orders
                 </Button>
                 <div>
-                    <h2 className="text-2xl font-bold text-default-900">Order Details</h2>
-                    <p className="text-default-600">{order.order_number}</p>
+                    <h2 className="text-2xl font-bold">Order Details</h2>
+                    <p className="text-muted-foreground">{order.order_number}</p>
                 </div>
             </div>
 
@@ -57,13 +57,13 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                                                 )}
                                             </div>
                                             <div className="flex-1">
-                                                <h4 className="font-medium text-default-900">{item.name}</h4>
-                                                <p className="text-sm text-default-700">Quantity: {item.quantity}</p>
+                                                <h4 className="font-medium">{item.name}</h4>
+                                                <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
                                                 {item.variant && (item.variant.size || item.variant.color || item.variant.measurement) && (
                                                     <div className="flex flex-wrap gap-1.5 mb-2 mt-4">
                                                         {item.variant.color && (
                                                             <div className="flex items-center gap-1">
-                                                                <span className="text-xs text-default-600">Color:</span>
+                                                                <span className="text-xs text-muted-foreground">Color:</span>
                                                                 <Badge className="text-sm px-2 py-0.5" variant="outline">
                                                                     {item.variant.color}
                                                                 </Badge>
@@ -71,7 +71,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                                                         )}
                                                         {item.variant.size && (
                                                             <div className="flex items-center gap-1">
-                                                                <span className="text-xs text-default-600">Size:</span>
+                                                                <span className="text-xs text-muted-foreground">Size:</span>
                                                                 <Badge className="text-sm px-2 py-0.5" variant="outline">
                                                                     {item.variant.size}
                                                                 </Badge>
@@ -79,7 +79,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                                                         )}
                                                         {item.variant.measurement && (
                                                             <div className="flex items-center gap-1">
-                                                                <span className="text-xs text-default-600">Measurement:</span>
+                                                                <span className="text-xs text-muted-foreground">Measurement:</span>
                                                                 <Badge className="text-sm px-2 py-0.5" variant="outline">
                                                                     {item.variant.measurement}
                                                                 </Badge>
@@ -89,7 +89,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                                                 )}
                                             </div>
                                             <div className="text-right">
-                                                <p className="font-medium text-default-900">{currency(item.price)}</p>
+                                                <p className="font-medium">{currency(item.price)}</p>
                                             </div>
                                         </div>
                                         {idx < order.order_items.length - 1 && <Separator className="mt-4" />}
@@ -106,17 +106,17 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                         </CardHeader>
                         <CardContent className="space-y-3">
                             <div className="flex justify-between text-sm">
-                                <span className="text-default-700">Subtotal</span>
-                                <span className="text-default-900">{currency(order.total)}</span>
+                                <span className="text-muted-foreground">Subtotal</span>
+                                <span className="text-foreground">{currency(order.total)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-default-700">Shipping</span>
-                                <span className="text-default-900">{currency(order.shipping_fee)}</span>
+                                <span className="text-muted-foreground">Shipping</span>
+                                <span className="text-foreground">{currency(order.shipping_fee)}</span>
                             </div>
                             <Separator />
                             <div className="flex justify-between font-medium">
-                                <span className="text-default-800">Total</span>
-                                <span className="text-default-900">{currency(order.total)}</span>
+                                <span className="text-foreground">Total</span>
+                                <span className="text-foreground">{currency(order.total)}</span>
                             </div>
                         </CardContent>
                     </Card>
@@ -130,19 +130,19 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                         <CardContent>
                             {order.shipping_method === "PICKUP" ? (
                                 <div className="text-sm space-y-1">
-                                    <p className="font-medium text-default-900">{settings?.address}</p>
-                                    <p className="text-default-700">Open Mon-Sat: 9am - 6pm</p>
+                                    <p className="font-medium text-foreground">{settings?.address}</p>
+                                    <p className="text-muted-foreground">Open Mon-Sat: 9am - 6pm</p>
                                 </div>
                             ) : (
                                 <div className="text-sm space-y-1">
-                                    <p className="font-medium text-default-900">
+                                    <p className="font-medium text-foreground">
                                         {order.shipping_address?.first_name} {order.shipping_address?.last_name}
                                     </p>
-                                    <p className="text-default-700">{order.shipping_address?.address_1}</p>
-                                    <p className="text-default-700">
+                                    <p className="text-muted-foreground">{order.shipping_address?.address_1}</p>
+                                    <p className="text-muted-foreground">
                                         {order.shipping_address?.city}, {order.shipping_address?.state}
                                     </p>
-                                    <p className="text-default-700">{order.shipping_address?.phone}</p>
+                                    <p className="text-muted-foreground">{order.shipping_address?.phone}</p>
                                 </div>
                             )}
                         </CardContent>

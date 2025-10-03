@@ -23,8 +23,8 @@ export default function CarouselBannerList() {
             <div className="bg-card rounded-2xl shadow-sm border border-default-100 p-6 mb-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-default-900">Banner Management</h1>
-                        <p className="text-default-600">Manage your homepage carousel banners</p>
+                        <h1 className="text-2xl font-bold">Banner Management</h1>
+                        <p className="text-muted-foreground">Manage your homepage carousel banners</p>
                     </div>
                     <Overlay
                         open={addState.isOpen}
@@ -47,11 +47,11 @@ export default function CarouselBannerList() {
                 {isLoading && <ComponentLoader className="h-[200px]" />}
                 {!isLoading && banners?.length === 0 && (
                     <div className="bg-card rounded-2xl shadow-sm border border-default-200 p-12 text-center">
-                        <div className="text-default-400 mb-4">
+                        <div className="text-muted-foreground mb-4">
                             <Upload className="w-12 h-12 mx-auto" />
                         </div>
-                        <h3 className="text-lg font-medium text-default-900 mb-2">No banners yet</h3>
-                        <p className="text-default-600 mb-6">Create your first banner to get started</p>
+                        <h3 className="text-lg font-medium mb-2">No banners yet</h3>
+                        <p className="text-muted-foreground mb-6">Create your first banner to get started</p>
                     </div>
                 )}
             </div>

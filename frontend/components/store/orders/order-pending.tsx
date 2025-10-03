@@ -31,9 +31,9 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
                         <Clock className="w-12 h-12 text-orange-600" />
                     </div>
 
-                    <h2 className="text-2xl font-bold text-default-900 mb-2">Payment Pending</h2>
+                    <h2 className="text-2xl font-bold mb-2">Payment Pending</h2>
 
-                    <p className="text-default-700">{`We're waiting for your payment. Please complete the payment with the details below:`}</p>
+                    <p className="text-muted-foreground">{`We're waiting for your payment. Please complete the payment with the details below:`}</p>
                 </div>
             </FadeInComponent>
 

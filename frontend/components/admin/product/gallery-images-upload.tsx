@@ -37,7 +37,7 @@ export function GalleryImagesUpload() {
             >
                 {({ open }) => {
                     return (
-                        <Button variant="default" onClick={() => open()}>
+                        <Button variant="outline" onClick={() => open()}>
                             Upload Images
                         </Button>
                     );

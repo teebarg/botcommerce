@@ -40,7 +40,7 @@ const StoreNavbar = async () => {
                                 <HeartFilled className="h-8 w-8 text-accent" />
                             </LocalizedClientLink>
                         ) : (
-                            <Heart className="h-8 w-8 text-default-700" />
+                            <Heart className="h-8 w-8 text-muted-foreground" />
                         )}
                     </div>
                     <GetApp />

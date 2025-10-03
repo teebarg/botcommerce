@@ -86,11 +86,11 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
     return (
         <React.Fragment>
             <div className="w-full max-w-6xl mx-auto p-2 md:p-4 space-y-6">
-                <div className="bg-gradient-to-r from-primary to-accent rounded-2xl p-8 text-default-200">
+                <div className="bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 rounded-2xl p-8">
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                         <div>
                             <h1 className="text-3xl font-bold mb-2">Product Categories</h1>
-                            <p className="text-primary-100 text-lg">Organize and manage your product catalog with ease</p>
+                            <p className="text-muted-foreground text-lg">Organize and manage your product catalog with ease</p>
                             <div className="flex items-center gap-4 mt-4 text-sm">
                                 <span className="bg-white/20 px-3 py-1 rounded-full">{categories?.length || 0} Categories</span>
                                 <span className="bg-white/20 px-3 py-1 rounded-full">
@@ -117,8 +117,8 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                 <div className="space-y-4">
                     <div className="sticky top-16 z-10 bg-background space-y-2">
                         {hasChanges && (
-                            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                                <p className="text-sm text-yellow-800">
+                            <div className="mt-4 p-3 bg-accent/20 border border-accent/20 rounded-md">
+                                <p className="text-sm text-accent">
                                     {`You have unsaved changes. Click "Save Order" to apply the new category order.`}
                                 </p>
                             </div>
@@ -133,7 +133,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                     {(categories || []).map((category: Category, idx: number) => (
                         <div
                             key={idx}
-                            className="bg-card rounded-2xl shadow-sm border border-divider overflow-hidden hover:shadow-md transition-shadow"
+                            className="bg-secondary rounded-2xl shadow-sm border border-divider overflow-hidden hover:shadow-md transition-shadow"
                         >
                             <div className="group">
                                 <div className="py-4 px-2">
@@ -143,7 +143,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-start justify-between gap-4">
                                                 <div className="min-w-0 flex-1">
-                                                    <h3 className="text-xl font-semibold text-default-900 mb-2 truncate">{category.name}</h3>
+                                                    <h3 className="text-xl font-semibold mb-2 truncate">{category.name}</h3>
                                                     <div className="flex flex-wrap items-center gap-3">
                                                         <Badge variant={category.is_active ? "emerald" : "destructive"}>
                                                             {category.is_active ? "Active" : "Inactive"}
@@ -181,7 +181,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                                 </div>
 
                                 {category?.subcategories && category?.subcategories?.length > 0 && expandedCategories.includes(category.id) && (
-                                    <div className="border-t border-divider bg-content2">
+                                    <div className="border-t border-divider bg-card">
                                         <div className="p-6 space-y-4">
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                                 {category?.subcategories?.map((subcategory, idx: number) => (
@@ -193,7 +193,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                                                             <CategoryImage categoryId={subcategory.id} image={subcategory.image} />
 
                                                             <div className="flex-1 min-w-0">
-                                                                <h4 className="font-medium text-default-900 truncate mb-1">{subcategory.name}</h4>
+                                                                <h4 className="font-medium truncate mb-1">{subcategory.name}</h4>
                                                                 <Badge variant={subcategory.is_active ? "emerald" : "destructive"} />
                                                             </div>
                                                             <CategoryAction
@@ -223,8 +223,8 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <FileImage className="w-8 h-8 text-gray-400" />
                         </div>
-                        <h3 className="text-xl font-semibold text-default-900 mb-2">No categories yet</h3>
-                        <p className="text-default-500 mb-6 max-w-md mx-auto">
+                        <h3 className="text-xl font-semibold mb-2">No categories yet</h3>
+                        <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                             Start organizing your products by creating your first category. You can add images and subcategories to make navigation
                             easier.
                         </p>

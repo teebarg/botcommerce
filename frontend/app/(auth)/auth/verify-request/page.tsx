@@ -15,9 +15,9 @@ export default function VerifyRequestPage() {
                         <Mail className="text-accent" size={24} />
                     </div>
 
-                    <h2 className="text-2xl font-bold text-default-800 mb-3">Check your email</h2>
+                    <h2 className="text-2xl font-bold mb-3">Check your email</h2>
 
-                    <p className="text-default-500 mb-2">We&apos;ve sent a magic link to your email</p>
+                    <p className="text-muted-foreground mb-2">We&apos;ve sent a magic link to your email</p>
 
                     <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-8">
                         <div className="flex items-start gap-3">
@@ -41,8 +41,8 @@ export default function VerifyRequestPage() {
             <Separator />
 
             <div className="mt-6 bg-secondary rounded-lg p-4">
-                <h3 className="font-medium text-default-800 mb-2">Having trouble?</h3>
-                <ul className="text-sm text-default-500 space-y-1">
+                <h3 className="font-medium mb-2">Having trouble?</h3>
+                <ul className="text-sm text-muted-foreground space-y-1">
                     <li>• Check your spam or junk folder</li>
                     <li>• Make sure the email address is correct</li>
                     <li>• Try resending the link if it&apos;s been a few minutes</li>

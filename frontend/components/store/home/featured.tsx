@@ -15,9 +15,9 @@ export default function Featured() {
             <div className="text-center">
                 <div className="flex items-center justify-center mb-2">
                     <TrendingUp className="text-orange-500 mr-2" size={32} />
-                    <h2 className="text-4xl font-bold text-default-900 font-outfit">Featured products</h2>
+                    <h2 className="text-4xl font-bold font-outfit">Featured products</h2>
                 </div>
-                <p className="text-xl text-default-600">Handpicked selections from our premium collection</p>
+                <p className="text-xl text-muted-foreground">Handpicked selections from our premium collection</p>
             </div>
             <ProductsCarousel isLoading={isLoading} products={data?.products || []} />
             <div className="text-center">

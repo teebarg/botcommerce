@@ -18,29 +18,29 @@ const HelpCenterPage = () => {
                         <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
                             <MessageCircle className="h-6 w-6 text-blue-600" />
                         </div>
-                        <h3 className="text-xl font-semibold text-default-foreground mb-2">Contact Support</h3>
-                        <p className="text-default-600">Get in touch with our support team for personalized help</p>
+                        <h3 className="text-xl font-semibold mb-2">Contact Support</h3>
+                        <p className="text-muted-foreground">Get in touch with our support team for personalized help</p>
                     </div>
 
                     <div className="bg-content1 p-8 rounded-xl shadow-sm border border-divider hover:shadow-md transition-shadow cursor-pointer group">
                         <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-200 transition-colors">
                             <Package className="h-6 w-6 text-green-600" />
                         </div>
-                        <h3 className="text-xl font-semibold text-default-foreground mb-2">Returns & Exchanges</h3>
-                        <p className="text-default-600">Learn about our return policy and start a return</p>
+                        <h3 className="text-xl font-semibold mb-2">Returns & Exchanges</h3>
+                        <p className="text-muted-foreground">Learn about our return policy and start a return</p>
                     </div>
 
                     <div className="bg-content1 p-8 rounded-xl shadow-sm border border-divider hover:shadow-md transition-shadow cursor-pointer group">
                         <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-purple-200 transition-colors">
                             <Truck className="h-6 w-6 text-purple-600" />
                         </div>
-                        <h3 className="text-xl font-semibold text-default-foreground mb-2">Shipping Info</h3>
-                        <p className="text-default-600">Track orders and learn about shipping options</p>
+                        <h3 className="text-xl font-semibold mb-2">Shipping Info</h3>
+                        <p className="text-muted-foreground">Track orders and learn about shipping options</p>
                     </div>
                 </div>
 
                 <div className="bg-content1 rounded-xl shadow-sm border border-divider p-8">
-                    <h2 className="text-2xl font-bold text-default-foreground mb-6">Frequently Asked Questions</h2>
+                    <h2 className="text-2xl font-bold mb-6">Frequently Asked Questions</h2>
                     <div className="space-y-4">
                         {[
                             { q: "How do I track my order?", a: "You can track your order using the tracking number sent to your email." },
@@ -50,10 +50,10 @@ const HelpCenterPage = () => {
                         ].map((faq, index) => (
                             <details key={index} className="group">
                                 <summary className="flex justify-between items-center cursor-pointer p-4 bg-content2 rounded-lg transition-colors">
-                                    <span className="font-medium text-default-foreground">{faq.q}</span>
-                                    <span className="text-default-600 group-open:rotate-180 transition-transform">▼</span>
+                                    <span className="font-medium">{faq.q}</span>
+                                    <span className="text-muted-foreground group-open:rotate-180 transition-transform">▼</span>
                                 </summary>
-                                <div className="p-4 text-default-600 bg-content2 border-t border-divider">{faq.a}</div>
+                                <div className="p-4 text-muted-foreground bg-content2 border-t border-divider">{faq.a}</div>
                             </details>
                         ))}
                     </div>

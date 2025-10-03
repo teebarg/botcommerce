@@ -43,7 +43,7 @@ export default function PageLoader() {
             <div className="flex flex-col items-center space-y-6">
                 <WaveLoader />
                 <div className="text-center space-y-2">
-                    <div className="text-sm font-medium text-default-700">Loading</div>
+                    <div className="text-sm font-medium text-muted-foreground">Loading</div>
                     <DotsLoader />
                 </div>
             </div>

@@ -23,7 +23,7 @@ const CartTotals: React.FC = () => {
             <div>
                 <dl className="flex flex-col gap-2 py-4">
                     <div className="flex justify-between">
-                        <dt className="text-sm text-default-500">
+                        <dt className="text-sm text-muted-foreground">
                             <span className="flex gap-x-1 items-center">
                                 Subtotal
                                 <Tooltip>
@@ -36,23 +36,23 @@ const CartTotals: React.FC = () => {
                                 </Tooltip>
                             </span>
                         </dt>
-                        <dd className="text-sm font-semibold text-default-900">
+                        <dd className="text-sm font-semibold">
                             <span data-testid="cart-subtotal" data-value={subtotal || 0}>
                                 {currency(subtotal || 0)}
                             </span>
                         </dd>
                     </div>
                     <div className="flex justify-between">
-                        <dt className="text-sm text-default-500">Delivery</dt>
-                        <dd className="text-sm font-semibold text-default-900">
+                        <dt className="text-sm text-muted-foreground">Delivery</dt>
+                        <dd className="text-sm font-semibold">
                             <span data-testid="cart-shipping" data-value={cart.shipping_fee || 0}>
                                 {currency(cart.shipping_fee)}
                             </span>
                         </dd>
                     </div>
                     <div className="flex justify-between">
-                        <dt className="text-sm text-default-500">Taxes</dt>
-                        <dd className="text-sm font-semibold text-default-900">
+                        <dt className="text-sm text-muted-foreground">Taxes</dt>
+                        <dd className="text-sm font-semibold">
                             <span data-testid="cart-taxes" data-value={tax || 0}>
                                 {currency(tax)}
                             </span>
@@ -60,7 +60,7 @@ const CartTotals: React.FC = () => {
                     </div>
                     {!!discount_total && (
                         <div className="flex justify-between">
-                            <dt className="text-sm text-default-500">Discount</dt>
+                            <dt className="text-sm text-muted-foreground">Discount</dt>
                             <dd className="text-sm font-semibold text-success">
                                 <span className="text-blue-500" data-testid="cart-discount" data-value={discount_total || 0}>
                                     - {currency(discount_total)}
@@ -71,8 +71,8 @@ const CartTotals: React.FC = () => {
 
                     <Separator className="my-2" />
                     <div className="flex justify-between">
-                        <dt className="text-sm font-semibold text-default-500">Total</dt>
-                        <dd className="text-sm font-semibold text-default-900">
+                        <dt className="text-sm font-semibold text-muted-foreground">Total</dt>
+                        <dd className="text-sm font-semibold">
                             <span className="text-lg" data-testid="cart-total" data-value={total}>
                                 {currency(total)}
                             </span>

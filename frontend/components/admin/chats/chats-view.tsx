@@ -101,11 +101,6 @@ const ChatsView: React.FC = () => {
             <div key="mobile" className="md:hidden">
                 <div className="pb-4">
                     <div>
-                        {/* <div className="relative mb-2 py-4 flex justify-end">
-                                <button className="flex items-center bg-content1 rounded-md p-4" onClick={() => setFilterOpen(true)}>
-                                    <SlidersHorizontal className="text-default-500" size={18} />
-                                </button>
-                            </div> */}
                         <div>
                             {isLoading ? (
                                 <ComponentLoader className="h-[calc(100vh-200px)]" />
@@ -118,7 +113,7 @@ const ChatsView: React.FC = () => {
 
                         {conversations?.length === 0 && (
                             <div className="text-center py-10">
-                                <p className="text-default-500">No conversation found</p>
+                                <p className="text-muted-foreground">No conversation found</p>
                             </div>
                         )}
                     </div>

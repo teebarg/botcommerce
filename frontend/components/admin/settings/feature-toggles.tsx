@@ -63,7 +63,7 @@ export function FeatureToggles({ toggles }: FeatureTogglesProps) {
                     <div key={feature.key} className="flex items-center justify-between p-4 bg-content1 rounded-lg">
                         <div>
                             <h3 className="font-medium">{feature.label}</h3>
-                            <p className="text-sm text-default-500">{feature.description}</p>
+                            <p className="text-sm text-muted-foreground">{feature.description}</p>
                         </div>
                         <Switch
                             checked={isEnabled}

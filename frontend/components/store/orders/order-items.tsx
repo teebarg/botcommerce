@@ -11,8 +11,8 @@ const OrderItems: React.FC<{ items: OrderItem[]; showDetails: boolean }> = ({ it
     return (
         <div className="bg-card rounded-xl shadow-sm overflow-hidden mb-6">
             <div className="flex justify-between items-center p-4 cursor-pointer" onClick={() => setExpanded(!expanded)}>
-                <h3 className="text-lg font-medium text-default-900">Order Items ({items.length})</h3>
-                <button className="text-default-500 hover:text-default-700">{expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}</button>
+                <h3 className="text-lg font-medium">Order Items ({items.length})</h3>
+                <button className="text-muted-foreground">{expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}</button>
             </div>
 
             {expanded && (

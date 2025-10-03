@@ -48,10 +48,10 @@ const OrderView: React.FC = () => {
         <div className="px-4 md:px-10 py-8">
             <div className="mb-6 flex flex-col">
                 <h1 className="text-2xl font-medium">Order view</h1>
-                <p className="text-default-500 text-sm">Manage your orders.</p>
+                <p className="text-muted-foreground text-sm">Manage your orders.</p>
             </div>
-            <div key="table" className="md:block hidden">
-                <OrderFilters />
+            <OrderFilters />
+            <div key="table" className="md:block hidden bg-secondary mt-4">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -79,7 +79,7 @@ const OrderView: React.FC = () => {
                             </TableRow>
                         ) : (
                             orders?.map((order: Order, idx: number) => (
-                                <TableRow key={idx}>
+                                <TableRow key={idx} className="odd:bg-background">
                                     <TableCell className="font-semibold">{order.order_number}</TableCell>
                                     <TableCell>{format(new Date(order.created_at), "MMM d, yyyy")}</TableCell>
                                     <TableCell>
@@ -124,7 +124,7 @@ const OrderView: React.FC = () => {
 
                         {orders?.length === 0 && (
                             <div className="text-center py-8">
-                                <p className="text-default-500">No orders found</p>
+                                <p className="text-muted-foreground">No orders found</p>
                             </div>
                         )}
                     </div>

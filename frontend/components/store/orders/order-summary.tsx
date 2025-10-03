@@ -10,9 +10,7 @@ const OrderSummary: React.FC<{ order: Order }> = ({ order }) => {
             <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                     <span className="text-muted-foreground">Payment Method</span>
-                    <span className="font-semibold">
-                        {order.payment_method === "CASH_ON_DELIVERY" ? "Pickup" : order.payment_method}
-                    </span>
+                    <span className="font-semibold">{order.payment_method === "CASH_ON_DELIVERY" ? "Pickup" : order.payment_method}</span>
                 </div>
 
                 <div className="flex justify-between">

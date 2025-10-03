@@ -58,17 +58,17 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
 
                         <div className="flex-1">
                             <div className="flex items-center gap-3">
-                                <h3 className="text-lg font-bold text-default-800">{option.name}</h3>
+                                <h3 className="text-lg font-bold">{option.name}</h3>
                                 <Badge variant={option.is_active ? "emerald" : "destructive"}>{option.is_active ? "Active" : "Inactive"}</Badge>
                             </div>
 
-                            <p className="text-default-500 mb-2">{option.description}</p>
+                            <p className="text-muted-foreground mb-2">{option.description}</p>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className="flex items-center gap-2 text-sm">
                                     <span className="font-medium text-green-600">{currency(option.amount)}</span>
                                 </div>
-                                <div className="flex items-center gap-2 text-sm text-default-500">
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                     <Clock className="w-4 h-4" />
                                     <span className="font-medium">{option.duration}</span>
                                 </div>

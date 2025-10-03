@@ -143,8 +143,8 @@ export function FilterSidebar({ facets }: Props) {
                                     key={cat.id}
                                     className={cn("justify-between bg-card h-12", active && "bg-indigo-500 hover:bg-indigo-600 text-white")}
                                     size="sm"
-                                    onClick={() => onToggleCategory(cat.slug)}
                                     variant={active ? "indigo" : "outline"}
+                                    onClick={() => onToggleCategory(cat.slug)}
                                 >
                                     {cat.name}
                                     <span className={cn("", !facets && "hidden")}>({facets?.category_slugs?.[cat.slug] || 0})</span>

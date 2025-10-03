@@ -69,7 +69,7 @@ const AdminMobileMenu: React.FC = () => {
                         placeholder="Search..."
                         type="text"
                     />
-                    <Search className="absolute left-2 top-2.5 text-default-500" size={16} />
+                    <Search className="absolute left-2 top-2.5 text-muted-foreground" size={16} />
                 </div>
             </div>
 
@@ -84,10 +84,10 @@ const AdminMobileMenu: React.FC = () => {
                         href={item.href}
                     >
                         <div className="flex items-center space-x-3">
-                            <span className={pathname === item.href ? "text-accent" : "text-default-500"}>{item.icon}</span>
+                            <span className={pathname === item.href ? "text-accent" : "text-muted-foreground"}>{item.icon}</span>
                             <span>{item.label}</span>
                         </div>
-                        <ChevronRight className={pathname === item.href ? "text-accent" : "text-default-500"} size={16} />
+                        <ChevronRight className={pathname === item.href ? "text-accent" : "text-muted-foreground"} size={16} />
                     </Link>
                 ))}
             </nav>

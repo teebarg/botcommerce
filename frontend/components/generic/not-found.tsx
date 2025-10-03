@@ -80,7 +80,7 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
     return (
         <div
             className={cn(
-                "transition-all duration-300 bg-linear-to-br from-background to-content1 flex items-center justify-center px-4 py-24 w-full",
+                "transition-all duration-300 bg-linear-to-br from-background to-secondary flex items-center justify-center px-4 py-24 w-full",
                 className
             )}
         >
@@ -93,8 +93,8 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
                         </div>
                     </div>
 
-                    <h1 className="text-2xl font-bold mb-3 transition-colors text-default-900">{currentScenario.title}</h1>
-                    <p className="mb-8 leading-relaxed transition-colors text-default-500">{currentScenario.description}</p>
+                    <h1 className="text-2xl font-bold mb-3">{currentScenario.title}</h1>
+                    <p className="mb-8 leading-relaxed text-muted-foreground">{currentScenario.description}</p>
 
                     <div className="space-y-3">
                         <Button className="w-full" size="lg" variant="primary" onClick={handlePrimaryAction}>
@@ -107,8 +107,8 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
                         </Button>
                     </div>
 
-                    <div className="mt-6 pt-6 border-t transition-colors border-divider">
-                        <p className="text-sm transition-colors text-default-500">
+                    <div className="mt-6 pt-6 border-t border-divider">
+                        <p className="text-sm text-muted-foreground">
                             Need help?{" "}
                             <a className="font-medium transition-colors text-blue-500 hover:text-blue-600" href={`mailto:${settings?.contact_email}`}>
                                 Contact our support team

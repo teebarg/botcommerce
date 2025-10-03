@@ -38,14 +38,14 @@ const OfflinePage = () => {
                 {/* Animation Container */}
                 <div className={cn("mb-8 relative", { "animate-bounce": showAnimation })}>
                     <div className="relative">
-                        <WifiOff className="w-24 h-24 mx-auto text-default-500" strokeWidth={1.5} />
-                        <CloudOff className="w-12 h-12 absolute -bottom-2 -right-2 text-default-500" strokeWidth={1.5} />
+                        <WifiOff className="w-24 h-24 mx-auto text-muted-foreground" strokeWidth={1.5} />
+                        <CloudOff className="w-12 h-12 absolute -bottom-2 -right-2 text-muted-foreground" strokeWidth={1.5} />
                     </div>
                 </div>
 
-                <h1 className="text-3xl font-bold text-default-800 mb-4">{`You're Offline`}</h1>
+                <h1 className="text-3xl font-bold mb-4">{`You're Offline`}</h1>
 
-                <p className="text-default-500 mb-8">
+                <p className="text-muted-foreground mb-8">
                     {`It seems you've lost your internet connection. Don't worry - your data is safe and you can still access previously loaded content.`}
                 </p>
 
@@ -54,9 +54,9 @@ const OfflinePage = () => {
                     {isRetrying ? "Retrying..." : "Try Again"}
                 </Button>
 
-                <div className="mt-8 pt-8 border-t border-default-200">
-                    <h2 className="text-sm font-semibold text-default-500 mb-4">{`While you're offline, you can:`}</h2>
-                    <ul className="text-sm text-default-500 space-y-2">
+                <div className="mt-8 pt-8 border-t border-divider">
+                    <h2 className="text-sm font-semibold mb-4">{`While you're offline, you can:`}</h2>
+                    <ul className="text-sm text-muted-foreground space-y-2">
                         <li>• View previously loaded content</li>
                         <li>• Use cached features</li>
                         <li>• Check your internet connection</li>

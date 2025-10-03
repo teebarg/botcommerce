@@ -22,8 +22,8 @@ const OrderCard = ({ order }: { order: Order }) => {
             <CardHeader className="pb-4">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <CardTitle className="text-lg font-semibold text-default-900">{order.order_number}</CardTitle>
-                        <div className="flex items-center gap-4 mt-2 text-sm text-default-700">
+                        <CardTitle className="text-lg font-semibold">{order.order_number}</CardTitle>
+                        <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                             <div className="flex items-center gap-1">
                                 <Calendar className="h-4 w-4" />
                                 {formatDate(order.created_at)}
@@ -68,9 +68,9 @@ const OrderCard = ({ order }: { order: Order }) => {
                     {order.order_items.length > 6 && (
                         <div className="flex flex-col items-center justify-center">
                             <div className="w-16 h-16 bg-content2 rounded-lg flex items-center justify-center mb-2">
-                                <span className="text-sm font-medium text-default-500">+{order.order_items.length - 6}</span>
+                                <span className="text-sm font-medium text-muted-foreground">+{order.order_items.length - 6}</span>
                             </div>
-                            <span className="text-xs text-default-400">more</span>
+                            <span className="text-xs text-muted-foreground">more</span>
                         </div>
                     )}
                 </div>

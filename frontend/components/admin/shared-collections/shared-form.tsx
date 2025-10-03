@@ -52,10 +52,10 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
     };
 
     return (
-        <div className="px-4 pt-4 overflow-y-auto">
+        <div className="px-4 pt-4 overflow-y-auto bg-secondary h-full">
             <Form {...form}>
                 <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
-                    <Card className="border-0 bg-card/50 backdrop-blur-sm">
+                    <Card className="border-none bg-secondary">
                         <CardContent className="space-y-6">
                             <div className="grid md:grid-cols-2 gap-6">
                                 <FormField

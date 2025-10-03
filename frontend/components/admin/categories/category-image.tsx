@@ -95,9 +95,9 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
             >
                 <input {...getInputProps()} />
                 <div className="flex flex-col items-center gap-2">
-                    <Upload className="w-8 h-8 text-default-500" />
-                    <p className="text-default-600">{isDragActive ? "Drop the image here" : "Drag & drop image or click to upload"}</p>
-                    <p className="text-sm text-default-400">(Max 5MB, JPG/PNG/GIF only)</p>
+                    <Upload className="w-8 h-8 text-muted-foreground" />
+                    <p>{isDragActive ? "Drop the image here" : "Drag & drop image or click to upload"}</p>
+                    <p className="text-sm text-muted-foreground">(Max 5MB, JPG/PNG/GIF only)</p>
                 </div>
             </div>
 
@@ -117,9 +117,9 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
                 </div>
             )}
 
-            {!initialImage && <p className="text-center text-default-500">No image uploaded yet</p>}
+            {!initialImage && <p className="text-center text-muted-foreground">No image uploaded yet</p>}
 
-            <div className="text-xs text-default-500">
+            <div className="text-xs text-muted-foreground">
                 <p>• Recommended image size: 1000 x 1000 pixels</p>
             </div>
         </div>

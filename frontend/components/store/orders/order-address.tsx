@@ -12,7 +12,7 @@ const OrderAddress: React.FC<{ order: Order }> = ({ order }) => {
         return (
             <div className="bg-secondary rounded-xl shadow-sm p-4 mb-6">
                 <div className="flex items-start mb-3">
-                    <MapPin className="w-5 h-5 text-default-500 mt-0.5" />
+                    <MapPin className="w-5 h-5 text-muted-foreground mt-0.5" />
                     <div className="ml-3">
                         <p className="font-medium">Collection Point</p>
                         <p className="text-sm text-muted-foreground">{settings?.address}</p>
@@ -28,7 +28,7 @@ const OrderAddress: React.FC<{ order: Order }> = ({ order }) => {
     return (
         <div className="bg-secondary rounded-xl shadow-sm p-4 mb-6">
             <div className="flex items-start mb-3">
-                <MapPin className="w-5 h-5 text-default-500 mt-0.5" />
+                <MapPin className="w-5 h-5 text-muted-foreground mt-0.5" />
                 <div className="ml-3">
                     <h3 className="font-medium">Shipping Address</h3>
                     <div className="mt-1 text-sm text-muted-foreground">
@@ -44,7 +44,7 @@ const OrderAddress: React.FC<{ order: Order }> = ({ order }) => {
             </div>
 
             <div className="flex items-start">
-                <Truck className="w-5 h-5 text-default-500 mt-0.5" />
+                <Truck className="w-5 h-5 text-muted-foreground mt-0.5" />
                 <div className="ml-3">
                     <h3 className="font-medium">Delivery</h3>
                     <p className="mt-1 text-sm text-muted-foreground">Estimated delivery: {option?.duration}</p>

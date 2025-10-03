@@ -6,8 +6,8 @@ const ReturnsPage = () => (
     <div>
         <div className="bg-content1">
             <div className="max-w-4xl mx-auto px-4 py-8">
-                <h1 className="text-3xl font-bold text-default-foreground">Returns & Exchanges</h1>
-                <p className="text-default-600 mt-1">Easy returns within 30 days of purchase</p>
+                <h1 className="text-3xl font-bold">Returns & Exchanges</h1>
+                <p className="text-muted-foreground mt-1">Easy returns within 30 days of purchase</p>
             </div>
         </div>
 
@@ -28,15 +28,15 @@ const ReturnsPage = () => (
                 </div>
 
                 <div className="bg-content2 rounded-xl shadow-sm border border-divider p-8">
-                    <h2 className="text-xl font-semibold text-default-900 mb-6">Return Process</h2>
+                    <h2 className="text-xl font-semibold mb-6">Return Process</h2>
                     <div className="space-y-6">
                         <div className="flex items-start">
                             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
                                 <span className="text-blue-600 font-semibold text-sm">1</span>
                             </div>
                             <div>
-                                <h3 className="font-semibold text-default-foreground">Initiate Return</h3>
-                                <p className="text-default-600">Fill out the return form above with your order details</p>
+                                <h3 className="font-semibold">Initiate Return</h3>
+                                <p className="text-muted-foreground">Fill out the return form above with your order details</p>
                             </div>
                         </div>
                         <div className="flex items-start">
@@ -44,8 +44,8 @@ const ReturnsPage = () => (
                                 <span className="text-blue-600 font-semibold text-sm">2</span>
                             </div>
                             <div>
-                                <h3 className="font-semibold text-default-foreground">Print Label</h3>
-                                <p className="text-default-600">{`We'll email you a prepaid return shipping label`}</p>
+                                <h3 className="font-semibold">Print Label</h3>
+                                <p className="text-muted-foreground">{`We'll email you a prepaid return shipping label`}</p>
                             </div>
                         </div>
                         <div className="flex items-start">
@@ -53,8 +53,8 @@ const ReturnsPage = () => (
                                 <span className="text-blue-600 font-semibold text-sm">3</span>
                             </div>
                             <div>
-                                <h3 className="font-semibold text-default-foreground">Ship Item</h3>
-                                <p className="text-default-600">Package the item and drop it off at any shipping location</p>
+                                <h3 className="font-semibold">Ship Item</h3>
+                                <p className="text-muted-foreground">Package the item and drop it off at any shipping location</p>
                             </div>
                         </div>
                         <div className="flex items-start">
@@ -62,8 +62,8 @@ const ReturnsPage = () => (
                                 <span className="text-blue-600 font-semibold text-sm">4</span>
                             </div>
                             <div>
-                                <h3 className="font-semibold text-default-foreground">Get Refund</h3>
-                                <p className="text-default-600">Receive your refund within 3-5 business days after we receive the item</p>
+                                <h3 className="font-semibold">Get Refund</h3>
+                                <p className="text-muted-foreground">Receive your refund within 3-5 business days after we receive the item</p>
                             </div>
                         </div>
                     </div>

@@ -91,7 +91,7 @@ const CustomerView: React.FC = () => {
                                     </TableRow>
                                 ) : (
                                     users?.map((user: User, idx: number) => (
-                                        <TableRow key={idx} className="even:bg-background">
+                                        <TableRow key={idx} className="odd:bg-background">
                                             <TableCell className="font-medium">{idx + 1}</TableCell>
                                             <TableCell>
                                                 <div>
@@ -122,7 +122,7 @@ const CustomerView: React.FC = () => {
                         <div>
                             <div className="relative mb-4 bg-content1 rounded-md">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Search className="text-default-500" size={18} />
+                                    <Search className="text-muted-foreground" size={18} />
                                 </div>
                                 <input
                                     className="pl-10 pr-12 py-2 w-full border border-divider rounded-lg focus:outline-none"
@@ -132,7 +132,7 @@ const CustomerView: React.FC = () => {
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
                                 <button className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setFilterOpen(true)}>
-                                    <SlidersHorizontal className="text-default-500" size={18} />
+                                    <SlidersHorizontal className="text-muted-foreground" size={18} />
                                 </button>
                             </div>
                             <div className="mt-4 py-2">
@@ -145,7 +145,7 @@ const CustomerView: React.FC = () => {
 
                             {users?.length === 0 && (
                                 <div className="text-center py-10">
-                                    <p className="text-default-500">No users found</p>
+                                    <p className="text-muted-foreground">No users found</p>
                                 </div>
                             )}
                         </div>

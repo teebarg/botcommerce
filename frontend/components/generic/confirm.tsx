@@ -24,13 +24,13 @@ const Confirm: React.FC<Props> = ({ title = "Confirm?", content, onConfirm, onCl
                     <div className="flex">
                         <div className="flex items-center">
                             <div className="flex grow flex-col gap-1">
-                                <h2 className="text-lg font-semibold leading-6 text-default-900 font-outfit">{title}</h2>
+                                <h2 className="text-lg font-semibold leading-6 font-outfit">{title}</h2>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div>
-                    <p className="text-sm text-default-500 mt-2 font-medium">
+                    <p className="text-sm text-muted-foreground mt-2 font-medium">
                         {content ??
                             "Are you sure you want to delete this item? All of your data will be permanently removed from our servers forever. This action cannot be undone."}
                     </p>

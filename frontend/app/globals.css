@@ -392,9 +392,9 @@
     --destructive: hsl(0 74% 50%);
     --destructive-foreground: hsl(210 40% 96%);
 
-    --border: hsl(223 29% 25%);
+    /* --border: hsl(223 29% 25%);
     --input: hsl(223 29% 25%);
-    --ring: hsl(217 91% 60%);
+    --ring: hsl(217 91% 60%); */
 
 
     /* --foreground: #fafafa;
@@ -449,9 +449,9 @@
     --destructive-foreground: #ffffff; */
 
     --divider: #27272a;
-    /* --ring: #3b82f6;
+    --ring: #3b82f6;
     --border: #27272a;
-    --input: #18181b; */
+    --input: #18181b;
     /* --radius: 0.5rem; */
 
     /* Fashion-specific design tokens for dark mode */
@@ -511,7 +511,6 @@
         pointer-events: none;
         /* modern + iOS fallback */
         height: env(safe-area-inset-top);
-        height: constant(safe-area-inset-top);
         background: black;
     }
 }
