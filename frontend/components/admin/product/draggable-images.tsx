@@ -164,7 +164,7 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-6 bg-content1 rounded-lg shadow-lg">
+        <div className="max-w-4xl mx-auto p-6 rounded-lg shadow-lg">
             <h2 className="text-xl font-bold">Image Gallery</h2>
             <p className="mb-4 text-muted-foreground">Drag and drop images to reorder them</p>
 

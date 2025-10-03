@@ -85,11 +85,11 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
             )}
         >
             <div className="max-w-md w-full text-center">
-                <div className="rounded-2xl shadow-xl p-8 border transition-all duration-300 bg-content1 border-divider">
+                <div className="rounded-2xl shadow-xl p-8 border transition-all duration-300 bg-secondary border-divider">
                     <div className="mb-6 flex justify-center">
                         <div className="relative">
                             <div className="absolute inset-0 rounded-full blur-xl opacity-70 animate-pulse transition-colors bg-linear-to-r from-blue-100 to-purple-100" />
-                            <div className="relative rounded-full p-4 shadow-lg transition-colors bg-content2">{currentScenario.icon}</div>
+                            <div className="relative rounded-full p-4 shadow-lg transition-colors">{currentScenario.icon}</div>
                         </div>
                     </div>
 

@@ -47,7 +47,7 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-8">
-                    <div className="flex flex-col items-center space-y-2 p-4 bg-content2 rounded-lg">
+                    <div className="flex flex-col items-center space-y-2 p-4 bg-secondary rounded-lg">
                         <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                             <Star className="w-6 h-6 text-primary" />
                         </div>
@@ -55,7 +55,7 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
                         <span className="text-xs text-muted-foreground text-center">Share your honest opinion</span>
                     </div>
 
-                    <div className="flex flex-col items-center space-y-2 p-4 bg-content2 rounded-lg">
+                    <div className="flex flex-col items-center space-y-2 p-4 bg-secondary rounded-lg">
                         <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                             <MessageSquare className="w-6 h-6 text-primary" />
                         </div>
@@ -63,7 +63,7 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
                         <span className="text-xs text-muted-foreground text-center">Show the product in action</span>
                     </div>
 
-                    <div className="flex flex-col items-center space-y-2 p-4 bg-content2 rounded-lg">
+                    <div className="flex flex-col items-center space-y-2 p-4 bg-secondary rounded-lg">
                         <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                             <Users className="w-6 h-6 text-primary" />
                         </div>

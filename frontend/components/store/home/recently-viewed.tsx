@@ -18,7 +18,7 @@ export default function RecentlyViewedSection({ limit = 5, showBanner = true }: 
 
     return (
         <>
-            <div className="bg-content3 py-8">
+            <div className="py-8 px-2">
                 <ProductsCarousel description="Your recent browsing history" products={data || []} title="Recently Viewed" />
             </div>
             {showBanner && (

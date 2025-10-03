@@ -119,7 +119,7 @@ const InputOtp: React.FC<Props> = ({ email, onVerify, onResend, onEditEmail }) =
 
     return (
         <React.Fragment>
-            <div className="w-100 shadow-lg bg-content1">
+            <div className="w-100 shadow-lg">
                 <div className="flex flex-col gap-8 text-center px-9 py-8">
                     <div>
                         <div className="flex flex-col gap-1 items-stretch justify-start">

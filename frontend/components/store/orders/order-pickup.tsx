@@ -22,7 +22,7 @@ const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShoppi
     const { settings } = useStoreSettings();
 
     return (
-        <div className="w-full max-w-3xl mx-auto bg-content2 rounded-xl px-2 md:px-6 py-6">
+        <div className="w-full max-w-3xl mx-auto rounded-xl px-2 md:px-6 py-6">
             <FadeInComponent>
                 <div className="text-center mb-6">
                     <div className="inline-flex items-center justify-center w-20 h-20 bg-yellow-100 rounded-full mb-4 animate-pulse">

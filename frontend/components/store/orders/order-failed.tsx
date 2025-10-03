@@ -18,7 +18,7 @@ type OrderConfirmationProps = {
 
 const FailedPayment: React.FC<OrderConfirmationProps> = ({ order, onRetry, onContinueShopping }) => {
     return (
-        <div className="w-full max-w-2xl mx-auto bg-content2 rounded-xl px-2 md:px-6 py-6 md:py-12">
+        <div className="w-full max-w-2xl mx-auto rounded-xl px-2 md:px-6 py-6 md:py-12">
             <FadeInComponent>
                 <div className="text-center mb-6">
                     <div className="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-4 animate-pulse">
@@ -32,7 +32,7 @@ const FailedPayment: React.FC<OrderConfirmationProps> = ({ order, onRetry, onCon
             </FadeInComponent>
 
             <FadeInComponent delay="200ms">
-                <div className="bg-content1 rounded-xl shadow-sm p-4 mb-6">
+                <div className="bg-secondary rounded-xl shadow-sm p-4 mb-6">
                     <h3 className="font-medium text-red-800 mb-3">Possible Reasons</h3>
                     <ul className="space-y-2 text-red-700 text-sm">
                         <li className="flex items-start">

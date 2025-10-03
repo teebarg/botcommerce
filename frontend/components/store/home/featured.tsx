@@ -11,7 +11,7 @@ export default function Featured() {
     const { data, isLoading } = useProductSearch({ collections: "featured", limit: 10 });
 
     return (
-        <div className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-content1 dark:to-content2 py-8">
+        <div className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-background dark:to-secondary py-8 px-2">
             <div className="text-center">
                 <div className="flex items-center justify-center mb-2">
                     <TrendingUp className="text-orange-500 mr-2" size={32} />

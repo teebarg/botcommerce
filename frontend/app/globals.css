@@ -182,15 +182,6 @@
     @apply text-blue-500 hover:text-blue-600;
 }
 
-/* .gradient-overlay {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 197, 253, 0.05) 100%);
-}
-
-.dark .gradient-overlay {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(30, 64, 175, 0.1) 100%);
-} */
-
-
 @layer base {
     * {
         @apply border-border;

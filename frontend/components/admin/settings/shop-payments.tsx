@@ -63,7 +63,7 @@ const BankDetailComponent: React.FC<BankDetailsProps> = ({ bank }) => {
     };
 
     return (
-        <div className="flex items-center justify-between p-4 bg-content1 rounded-lg">
+        <div className="flex items-center justify-between p-4 bg-card rounded-lg">
             <div>
                 <h3 className="font-medium text-sm">{bank.bank_name}</h3>
                 <p className="font-semibold">{bank.account_name}</p>
@@ -100,14 +100,14 @@ export function ShopPayments({ settings }: ShopPaymentsProps) {
     };
 
     return (
-        <div className="space-y-8 py-4">
-            <div className="space-y-4">
+        <div className="space-y-8">
+            <div className="space-y-4 bg-secondary px-2 py-4">
                 {defaultFeatures.map((feature, idx: number) => {
                     const existingToggle = settings.find((t) => t.key === feature.key);
                     const isEnabled = existingToggle ? existingToggle.value === "true" : false;
 
                     return (
-                        <div key={idx} className="flex items-center justify-between p-4 bg-content1 rounded-lg">
+                        <div key={idx} className="flex items-center justify-between p-4 bg-background rounded-lg">
                             <div>
                                 <h3 className="font-medium">{feature.label}</h3>
                                 <p className="text-sm text-muted-foreground">{feature.description}</p>
@@ -121,7 +121,7 @@ export function ShopPayments({ settings }: ShopPaymentsProps) {
                     );
                 })}
             </div>
-            <div>
+            <div className="bg-secondary px-2 py-4">
                 <div className="flex items-center justify-between">
                     <h3 className="font-medium">Bank Details</h3>
                     <Overlay

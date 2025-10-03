@@ -40,14 +40,12 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
             <div className="py-4 rounded-md">
                 <div className="space-y-2">
                     {variants?.map((variant: ProductVariant, idx: number) => (
-                        <div key={idx} className="flex flex-col gap-2 rounded-md p-2 bg-content2">
+                        <div key={idx} className="flex flex-col gap-2 rounded-md p-2 bg-secondary">
                             <p className="text-sm font-medium">Sku: {variant.sku}</p>
                             <p className="text-sm font-medium">Price: {currency(variant.price)}</p>
                             <p className={cn("text-sm font-medium", variant.size ? "" : "hidden")}>Size: {variant.size}</p>
                             <p className={cn("text-sm font-medium", variant.color ? "" : "hidden")}>Color: {variant.color}</p>
-                            <p className={cn("text-sm font-medium ", variant.measurement ? "" : "hidden")}>
-                                Measurement: {variant.measurement}
-                            </p>
+                            <p className={cn("text-sm font-medium ", variant.measurement ? "" : "hidden")}>Measurement: {variant.measurement}</p>
                             <p className="text-sm font-medium">Inventory: {variant.inventory}</p>
                             <p className="text-sm font-medium">
                                 <Badge variant={variant.status === "IN_STOCK" ? "emerald" : "destructive"}>{variant.status}</Badge>

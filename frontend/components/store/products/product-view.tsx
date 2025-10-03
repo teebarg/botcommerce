@@ -159,7 +159,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                     {session?.user?.isAdmin && product?.variants?.length ? (
                         <div className="flex flex-col gap-2 mt-4">
                             {product.variants.map((v) => (
-                                <div key={v.id} className="flex lg:flex-row items-center justify-between text-sm gap-2 bg-content1 p-2">
+                                <div key={v.id} className="flex lg:flex-row items-center justify-between text-sm gap-2 bg-secondary p-2">
                                     <div className="flex flex-col md:flex-row md:items-center gap-3">
                                         <span>SKU: {v.sku}</span>
                                         <span>Inventory: {v.inventory}</span>

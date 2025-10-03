@@ -291,7 +291,9 @@ const ProfilePage: React.FC = () => {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="px-4 py-3 rounded-lg bg-content1 text-muted-foreground">Password is hidden for security reasons</div>
+                                    <div className="px-4 py-3 rounded-lg bg-secondary text-muted-foreground">
+                                        Password is hidden for security reasons
+                                    </div>
                                 )}
                             </form>
                         </Form>

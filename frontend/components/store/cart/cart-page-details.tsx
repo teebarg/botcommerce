@@ -29,14 +29,14 @@ const CartPageDetails: React.FC = () => {
                     <EmptyCartMessage />
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-[1fr_360px] gap-x-8 pt-4">
-                        <div className="flex flex-col bg-content1 p-4 gap-y-6 rounded-md">
+                        <div className="flex flex-col bg-secondary p-4 gap-y-6 rounded-md">
                             {!session && <SignInPrompt callbackUrl={pathname} />}
                             <CartItems />
                         </div>
                         <div className="relative hidden md:block">
                             <div className="flex flex-col gap-y-8 sticky top-12">
                                 {cart && (
-                                    <div className="bg-content1 px-6 py-0 md:py-6 rounded-md">
+                                    <div className="bg-secondary px-6 py-0 md:py-6 rounded-md">
                                         <Summary />
                                     </div>
                                 )}

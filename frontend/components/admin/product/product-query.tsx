@@ -51,7 +51,7 @@ export function ProductQuery({ collections, selectedCollections }: ProductQueryP
                         <SlidersHorizontal className="text-muted-foreground h-5 w-5" />
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="bg-content1">
+                <DialogContent>
                     <DialogHeader className="sr-only">
                         <DialogTitle>Filter Products</DialogTitle>
                     </DialogHeader>

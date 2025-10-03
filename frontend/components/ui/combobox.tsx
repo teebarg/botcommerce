@@ -143,7 +143,7 @@ const MultiSelectCombobox: React.FC<MultiSelectComboboxProps> = ({
                                     key={idx}
                                     className={`relative flex cursor-pointer select-none items-center px-3 py-2 ${
                                         isSelected ? "text-blue-700" : "text-foreground"
-                                    } hover:bg-content1`}
+                                    } hover:bg-secondary`}
                                     onClick={() => toggleOption(option)}
                                 >
                                     <div className="flex items-center gap-2">

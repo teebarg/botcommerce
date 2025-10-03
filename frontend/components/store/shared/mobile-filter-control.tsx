@@ -19,22 +19,32 @@ export default function MobileFilterControl({ facets, setViewMode, viewMode }: P
     const editState = useOverlayTriggerState({});
 
     return (
-        <div className="sticky top-16 z-30 bg-content2 border-b border-border mb-6 lg:hidden py-4 px-4 -mx-2">
+        <div className="sticky top-16 z-30 bg-background border-b border-border mb-6 lg:hidden py-4 px-4 -mx-2">
             <div className="flex items-center justify-center gap-2">
-                <div className="rounded-full p-1 flex items-center gap-2 bg-gray-300 dark:bg-content3 flex-1">
-                    <div className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "grid" && "bg-content1")}>
+                <div className="rounded-full p-1 flex items-center gap-2 bg-secondary flex-1">
+                    <div
+                        className={cn(
+                            "rounded-full flex flex-1 items-center justify-center py-2 ease-in transition-all duration-500",
+                            viewMode === "grid" && "bg-accent"
+                        )}
+                    >
                         <Button size="iconOnly" onClick={() => setViewMode("grid")}>
-                            <LayoutDashboard className="h-6 w-6" />
+                            <LayoutDashboard className={cn("h-6 w-6", viewMode === "grid" && "text-accent-foreground")} />
                         </Button>
                     </div>
-                    <div className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "list" && "bg-content1")}>
+                    <div
+                        className={cn(
+                            "rounded-full flex flex-1 items-center justify-center py-2 ease-in transition-all duration-500",
+                            viewMode === "list" && "bg-accent"
+                        )}
+                    >
                         <Button size="iconOnly" onClick={() => setViewMode("list")}>
-                            <RectangleVertical className="h-6 w-6" />
+                            <RectangleVertical className={cn("h-6 w-6", viewMode === "list" && "text-accent-foreground")} />
                         </Button>
                     </div>
                 </div>
 
-                <div className="rounded-full py-1 bg-gray-300 dark:bg-content3 flex-1 flex justify-center">
+                <div className="rounded-full py-1 bg-secondary flex-1 flex justify-center">
                     <Overlay
                         open={editState.isOpen}
                         title="Edit Brand"

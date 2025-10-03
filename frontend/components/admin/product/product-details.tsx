@@ -122,9 +122,9 @@ export function ProductDetails() {
                             <div
                                 key={`${product.id}-${idx}`}
                                 ref={isLast ? (lastElementRef as any) : undefined}
-                                className="relative bg-content1 border border-divider rounded-lg shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow"
+                                className="relative bg-card border border-divider rounded-lg shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow"
                             >
-                                <div className="relative aspect-product w-full bg-content1 overflow-hidden">
+                                <div className="relative aspect-product w-full bg-card overflow-hidden">
                                     <img
                                         alt={product.name}
                                         className="object-cover"

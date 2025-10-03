@@ -4,7 +4,7 @@ import { MessageCircle, Package, Truck } from "lucide-react";
 
 const HelpCenterPage = () => {
     return (
-        <div className="bg-content2">
+        <div>
             <div className="bg-gradient-to-br from-primary to-secondary text-white">
                 <div className="max-w-4xl mx-auto px-4 py-20 text-center">
                     <h1 className="text-4xl font-bold mb-2">How can we help you?</h1>

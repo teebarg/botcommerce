@@ -40,7 +40,7 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
             <div className="w-full">
                 <Input
                     required
-                    className="bg-content2"
+                    className=""
                     data-testid="email-input"
                     label="Email address"
                     name="email"

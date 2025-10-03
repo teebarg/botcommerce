@@ -54,13 +54,13 @@ export function FeatureToggles({ toggles }: FeatureTogglesProps) {
     };
 
     return (
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 py-8 px-2 bg-secondary">
             {defaultFeatures.map((feature) => {
                 const existingToggle = toggles.find((t) => t.key === feature.key);
                 const isEnabled = existingToggle ? existingToggle.value === "true" : false;
 
                 return (
-                    <div key={feature.key} className="flex items-center justify-between p-4 bg-content1 rounded-lg">
+                    <div key={feature.key} className="flex items-center justify-between p-4 bg-background rounded-lg">
                         <div>
                             <h3 className="font-medium">{feature.label}</h3>
                             <p className="text-sm text-muted-foreground">{feature.description}</p>

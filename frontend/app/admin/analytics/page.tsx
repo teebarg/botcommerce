@@ -181,7 +181,7 @@ const AnalyticsDashboard: React.FC = () => {
                                 <tr key={d}>
                                     <td className="px-2 py-1 font-bold">{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d]}</td>
                                     {row.map((val, h) => (
-                                        <td key={h} className={`px-2 py-1 ${val > 0 ? "bg-blue-400" : "bg-content3"}`}>
+                                        <td key={h} className={`px-2 py-1 ${val > 0 ? "bg-blue-400" : "bg-gray-500"}`}>
                                             {val || ""}
                                         </td>
                                     ))}

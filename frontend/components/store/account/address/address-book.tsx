@@ -71,7 +71,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false }) 
                     <DialogTrigger>
                         <Trash2 className="text-rose-500 h-5 w-5 cursor-pointer" />
                     </DialogTrigger>
-                    <DialogContent className="bg-content1">
+                    <DialogContent>
                         <DialogHeader className="sr-only">
                             <DialogTitle>Delete Category</DialogTitle>
                         </DialogHeader>

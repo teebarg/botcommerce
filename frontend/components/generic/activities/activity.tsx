@@ -49,7 +49,7 @@ const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
     };
 
     return (
-        <div className="px-6 py-4 hover:bg-content1 transition-colors duration-150">
+        <div className="px-6 py-4">
             <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-3 flex-1">
                     <div className="flex-shrink-0 mt-0.5">

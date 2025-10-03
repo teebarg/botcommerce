@@ -68,7 +68,10 @@ export function SocialShare({ catalog, className }: SocialShareProps) {
         <Popover>
             <PopoverTrigger asChild>
                 <Button
-                    className={cn("h-10 w-10 rounded-full bg-accent backdrop-blur-sm hover:bg-content3 hover:scale-110 active:scale-95", className)}
+                    className={cn(
+                        "h-10 w-10 rounded-full text-accent-foreground bg-accent backdrop-blur-sm hover:bg-accent/10 hover:scale-110 active:scale-95",
+                        className
+                    )}
                     size="icon"
                     variant="ghost"
                 >

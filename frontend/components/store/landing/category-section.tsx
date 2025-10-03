@@ -30,9 +30,9 @@ const CategoriesSection: React.FC = () => {
                                     >
                                         <div className="relative w-24 h-24 rounded-full flex items-center justify-center mb-2 overflow-hidden">
                                             <img
-                                                alt=""
+                                                alt={category.name}
                                                 aria-hidden="true"
-                                                className="object-cover rounded-full"
+                                                className="object-cover rounded-full h-full w-full"
                                                 src={category.image || "/placeholder.jpg"}
                                             />
                                         </div>
@@ -46,9 +46,9 @@ const CategoriesSection: React.FC = () => {
                                     <Link key={idx} prefetch className="flex flex-col items-center" href={`/collections?cat_ids=${category.slug}`}>
                                         <div className="relative w-32 h-32 rounded-full flex items-center justify-center mb-3 overflow-hidden transition-transform hover:scale-105">
                                             <img
-                                                alt=""
+                                                alt={category.name}
                                                 aria-hidden="true"
-                                                className="object-cover rounded-full w-32 h-32"
+                                                className="object-cover rounded-full h-full w-full"
                                                 src={category.image || "/placeholder.jpg"}
                                             />
                                         </div>

@@ -44,7 +44,7 @@ const OrderItem: React.FC<{ order: Order }> = ({ order }) => {
                 open={state.isOpen}
                 sheetClassName="min-w-[70vw]"
                 trigger={
-                    <div className="shadow-lg bg-content2 flex justify-between items-center p-4 rounded-lg cursor-pointer">
+                    <div className="shadow-lg flex justify-between items-center p-4 rounded-lg cursor-pointer">
                         <div className="grid grid-cols-3 grid-rows-2 text-sm gap-x-4 flex-1">
                             <span className="font-semibold">Date placed</span>
                             <span className="font-semibold">Order number</span>

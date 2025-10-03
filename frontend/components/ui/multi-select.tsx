@@ -108,7 +108,7 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                                 return (
                                     <div
                                         key={option.value}
-                                        className={`flex cursor-pointer items-center px-3 py-2 hover:bg-content1 ${isSelected ? "" : ""}`}
+                                        className={`flex cursor-pointer items-center px-3 py-2 ${isSelected ? "" : ""}`}
                                         onClick={() => toggleItem(option)}
                                     >
                                         <div

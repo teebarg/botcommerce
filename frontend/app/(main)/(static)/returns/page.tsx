@@ -27,7 +27,7 @@ const ReturnsPage = () => (
                     </div>
                 </div>
 
-                <div className="bg-content2 rounded-xl shadow-sm border border-divider p-8">
+                <div className="bg-secondary rounded-xl shadow-sm  p-8">
                     <h2 className="text-xl font-semibold mb-6">Return Process</h2>
                     <div className="space-y-6">
                         <div className="flex items-start">

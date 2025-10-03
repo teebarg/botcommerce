@@ -18,7 +18,7 @@ const OrderCard = ({ order }: { order: Order }) => {
     }, [order]);
 
     return (
-        <Card className="hover:shadow-lg transition-all duration-300 border-0 shadow-md bg-background">
+        <Card className="shadow-md bg-secondary">
             <CardHeader className="pb-4">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
@@ -67,7 +67,7 @@ const OrderCard = ({ order }: { order: Order }) => {
                     ))}
                     {order.order_items.length > 6 && (
                         <div className="flex flex-col items-center justify-center">
-                            <div className="w-16 h-16 bg-content2 rounded-lg flex items-center justify-center mb-2">
+                            <div className="w-16 h-16 rounded-lg flex items-center justify-center mb-2">
                                 <span className="text-sm font-medium text-muted-foreground">+{order.order_items.length - 6}</span>
                             </div>
                             <span className="text-xs text-muted-foreground">more</span>
