@@ -116,7 +116,7 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
                     <div aria-label="Carousel controls" className="hidden md:flex items-center gap-3" role="group">
                         <Button
                             aria-label="Scroll collections backward"
-                            className="h-12 w-12 rounded-full bg-white hover:bg-white/90 text-gray-500"
+                            className="h-12 w-12 rounded-full text-gray-500 border border-gray-500"
                             disabled={scrollState.activeIndex <= 0}
                             size="icon"
                             onClick={() => scrollToIndex(scrollState.activeIndex - 1)}
@@ -125,7 +125,7 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
                         </Button>
                         <Button
                             aria-label="Scroll collections forward"
-                            className="h-12 w-12 rounded-full bg-white hover:bg-white/90 text-gray-500"
+                            className="h-12 w-12 rounded-full text-gray-500 border border-gray-500"
                             disabled={scrollState.activeIndex >= products.length - 1}
                             size="icon"
                             onClick={() => scrollToIndex(scrollState.activeIndex + 1)}

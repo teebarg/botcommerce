@@ -50,7 +50,9 @@ const OrderView: React.FC = () => {
                 <h1 className="text-2xl font-medium">Order view</h1>
                 <p className="text-muted-foreground text-sm">Manage your orders.</p>
             </div>
-            <OrderFilters />
+            <div className="md:block hidden">
+                <OrderFilters />
+            </div>
             <div key="table" className="md:block hidden bg-secondary mt-4">
                 <Table>
                     <TableHeader>

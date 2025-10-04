@@ -193,22 +193,19 @@
 }
 
 :root {
-    /* Base background & text */
     --background: hsl(0 0% 100%);
     --foreground: hsl(222 47% 11%);
 
-    /* Cards & popovers */
     --card: hsl(0 0% 100%);
     --card-foreground: hsl(222 47% 11%);
 
     --popover: hsl(0 0% 100%);
     --popover-foreground: hsl(222 47% 11%);
 
-    /* 🎨 Brand Colors */
-    --primary: hsl(221 83% 53%); /* Vibrant Blue (brand color) */
-    --primary-foreground: hsl(0 0% 100%); /* White text on primary */
+    --primary: hsl(221 83% 53%);
+    --primary-foreground: hsl(0 0% 100%);
 
-    --secondary: hsl(220 14% 96%); /* Soft gray background */
+    --secondary: hsl(220 14% 96%);
     --secondary-foreground: hsl(222 47% 11%); /* Dark text on secondary */
 
     --accent: hsl(14 90% 58%); /* Orange for highlights/alerts */
