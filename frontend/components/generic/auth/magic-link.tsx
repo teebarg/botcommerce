@@ -40,12 +40,12 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
             <div className="w-full">
                 <Input
                     required
-                    className="bg-content2"
+                    className=""
                     data-testid="email-input"
                     label="Email address"
                     name="email"
                     placeholder="Enter your email address"
-                    startContent={<Mail className="text-default-500" />}
+                    startContent={<Mail className="text-muted-foreground" />}
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}

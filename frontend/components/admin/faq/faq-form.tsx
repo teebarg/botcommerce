@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FAQ } from "@/schemas";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useCreateFaq, useUpdateFaq } from "@/lib/hooks/useFaq";
 
@@ -61,7 +61,7 @@ export function FaqForm({ faq, onCancel }: FaqFormProps) {
     };
 
     return (
-        <div className="py-6 px-3">
+        <div className="py-6 px-3 bg-secondary h-full">
             <h2 className="text-xl font-semibold mb-4">{faq ? "Edit FAQ" : "Create New FAQ"}</h2>
 
             <Form {...form}>
@@ -107,12 +107,9 @@ export function FaqForm({ faq, onCancel }: FaqFormProps) {
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        <SelectGroup>
-                                            <SelectLabel>Category</SelectLabel>
-                                            <SelectItem value="general">General</SelectItem>
-                                            <SelectItem value="payment">Payment</SelectItem>
-                                            <SelectItem value="shipping">Shipping</SelectItem>
-                                        </SelectGroup>
+                                        <SelectItem value="general">General</SelectItem>
+                                        <SelectItem value="payment">Payment</SelectItem>
+                                        <SelectItem value="shipping">Shipping</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />
@@ -136,7 +133,7 @@ export function FaqForm({ faq, onCancel }: FaqFormProps) {
                     />
 
                     <div className="flex justify-end space-x-2">
-                        <Button className="min-w-32" type="button" variant="outline" onClick={onCancel}>
+                        <Button className="min-w-32" type="button" variant="destructive" onClick={onCancel}>
                             Cancel
                         </Button>
                         <Button disabled={loading} isLoading={loading} type="submit" variant="primary">

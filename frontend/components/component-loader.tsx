@@ -13,7 +13,7 @@ const WaveLoader: React.FC<{ className?: string }> = ({ className }) => {
                     key={i}
                     className="w-1 h-8 rounded-full animate-wave"
                     style={{
-                        background: "linear-gradient(to top, var(--default-400), var(--default-600))",
+                        background: "linear-gradient(to top, var(--input), var(--border))",
                         animationDelay: `${i * 0.1}s`,
                         animationDuration: "1.2s",
                     }}
@@ -26,7 +26,7 @@ const WaveLoader: React.FC<{ className?: string }> = ({ className }) => {
 const ComponentLoader: React.FC<{ className?: string }> = ({ className }) => {
     return (
         <ClientOnly>
-            <div className={cn("dark:bg-content1/80 bg-default-200 backdrop-blur-sm z-50 flex items-center justify-center", className)}>
+            <div className={cn("bg-secondary backdrop-blur-sm z-50 flex items-center justify-center", className)}>
                 <div className="flex flex-col items-center space-y-6">
                     <WaveLoader />
                 </div>

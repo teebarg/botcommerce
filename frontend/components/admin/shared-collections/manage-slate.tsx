@@ -49,8 +49,12 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
                     <div className="mb-4">
                         <h4 className="font-medium mb-2">Product:</h4>
                         <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                            <div key={product.id} className="relative w-12 h-12 rounded-md bg-content3 overflow-hidden p-2">
-                                <img alt={product.name} className="object-contain" src={product.images?.[0]?.image || "/placeholder.jpg"} />
+                            <div key={product.id} className="relative w-16 h-16 rounded-md overflow-hidden">
+                                <img
+                                    alt={product.name}
+                                    className="object-contain h-full w-full"
+                                    src={product.images?.[0]?.image || "/placeholder.jpg"}
+                                />
                             </div>
                             <div>
                                 <p className="font-medium text-sm">{product.name}</p>
@@ -107,7 +111,7 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ catalog, product }) => 
     };
 
     return (
-        <Card className="border">
+        <Card className="bg-secondary">
             <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">

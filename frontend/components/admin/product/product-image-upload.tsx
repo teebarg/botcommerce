@@ -93,7 +93,7 @@ export function ImageUpload({ images, onImagesChange, isLoading = false, showUpl
                     <p className="text-xs text-muted-foreground mt-2">Supports JPG, PNG, WebP up to 5MB each</p>
                     {isLoading && (
                         <div className="mb-4 mt-2">
-                            <div className="w-full bg-default-200 rounded-full h-2.5">
+                            <div className="w-full bg-border rounded-full h-2.5">
                                 <div
                                     className="bg-blue-500 h-2.5 rounded-full transition-all duration-200 animate-pulse"
                                     style={{ width: `${52}%` }}

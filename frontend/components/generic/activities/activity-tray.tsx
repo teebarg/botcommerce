@@ -14,7 +14,7 @@ const ActivityTray: React.FC = () => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <button className="inline-flex items-center text-default-500 cursor-pointer outline-none">
+                <button className="inline-flex items-center text-muted-foreground cursor-pointer outline-none">
                     <Bell size={22} />
                 </button>
             </DropdownMenuTrigger>

@@ -40,7 +40,7 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
     }
 
     return (
-        <Card className="w-full shadow-elegant animate-fade-in">
+        <Card className="w-full animate-fade-in mt-4">
             <CardHeader className="text-center">
                 <CardTitle className="text-2xl font-semibold flex items-center justify-center space-x-2">
                     <MapPin className="h-6 w-6 text-accent" />
@@ -66,7 +66,7 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
 
                     {addressOption === "existing" && (
                         <div className="space-y-3">
-                            <Label className="text-base font-medium">Select Address</Label>
+                            <Label className="text-base font-medium block">Select Address</Label>
                             <RadioGroup value={selectedAddressId} onValueChange={setSelectedAddressId}>
                                 {addresses.map((addr: Address, idx: number) => (
                                     <AddressCard key={idx} address={addr} addresses={addresses} selectedAddress={selectedAddress} />
@@ -76,16 +76,16 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
                     )}
 
                     {addressOption === "new" && (
-                        <div className="space-y-6 border-t pt-6">
+                        <div className="space-y-6 border-t pt-6 bg-secondary">
                             <ShippingAddressForm onClose={() => setAddressOption("existing")} />
                         </div>
                     )}
 
                     {canContinue && addressOption === "existing" && (
                         <div className="flex justify-end pt-4">
-                            <Button className="flex items-center gap-2" size="lg" variant="luxury" onClick={handleContinue}>
+                            <Button size="lg" variant="accent" onClick={handleContinue}>
                                 Continue to Payment
-                                <ArrowRight className="h-4 w-4" />
+                                <ArrowRight className="h-4 w-4 ml-2" />
                             </Button>
                         </div>
                     )}

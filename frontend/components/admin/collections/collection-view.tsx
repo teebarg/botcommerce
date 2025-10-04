@@ -39,7 +39,7 @@ const CollectionView: React.FC<Props> = ({ search }) => {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
                 <div>
                     <h1 className="text-2xl font-medium">Collections</h1>
-                    <p className="text-default-500 text-sm">Manage your collections</p>
+                    <p className="text-muted-foreground text-sm">Manage your collections</p>
                 </div>
                 <div className="flex w-full items-center gap-2 sm:w-auto">
                     <div className="relative w-full sm:w-64">
@@ -48,7 +48,7 @@ const CollectionView: React.FC<Props> = ({ search }) => {
                     <CreateCollection />
                 </div>
             </div>
-            <div className="md:block hidden">
+            <div className="md:block hidden bg-secondary">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -66,7 +66,7 @@ const CollectionView: React.FC<Props> = ({ search }) => {
                     </TableHeader>
                     <TableBody>
                         {collections?.map((collection: Collection, idx: number) => (
-                            <TableRow key={idx} className="even:bg-content1">
+                            <TableRow key={idx} className="odd:bg-background">
                                 <TableCell>{idx + 1}</TableCell>
                                 <TableCell className="flex-1">
                                     <div className="font-bold truncate min-w-72">{collection?.name}</div>
@@ -84,7 +84,7 @@ const CollectionView: React.FC<Props> = ({ search }) => {
                         ))}
                         {collections?.length === 0 && (
                             <TableRow>
-                                <TableCell className="text-center py-4 text-lg text-default-500" colSpan={5}>
+                                <TableCell className="text-center py-4 text-lg text-muted-foreground" colSpan={5}>
                                     No collections found.
                                 </TableCell>
                             </TableRow>
@@ -99,8 +99,8 @@ const CollectionView: React.FC<Props> = ({ search }) => {
                     </div>
 
                     {collections?.length === 0 && (
-                        <div className="text-center py-8 bg-content1 rounded-lg">
-                            <p className="text-default-700">No collections found</p>
+                        <div className="text-center py-8 bg-background rounded-lg">
+                            <p className="text-muted-foreground">No collections found</p>
                         </div>
                     )}
                 </div>

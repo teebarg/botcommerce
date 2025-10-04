@@ -28,7 +28,7 @@ export const Navbar = ({ children, className }: { children: React.ReactNode; cla
             <nav
                 className={cn(
                     "flex z-30 w-full items-center justify-center data-[menu-open=true]:border-none sticky top-safe inset-x-0 backdrop-blur-lg",
-                    "data-[menu-open=true]:backdrop-blur-xl backdrop-saturate-150 my-2 h-auto py-1.5",
+                    "data-[menu-open=true]:backdrop-blur-xl backdrop-saturate-150 h-auto py-1.5",
                     className
                 )}
                 data-menu-open={expanded}

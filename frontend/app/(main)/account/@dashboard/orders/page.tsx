@@ -18,7 +18,7 @@ export default function Orders() {
         <div className="w-full px-2" data-testid="orders-page-wrapper">
             <div className="mb-8">
                 <h1 className="text-2xl">Orders</h1>
-                <p className="text-sm text-default-700">
+                <p className="text-sm text-muted-foreground">
                     View your previous orders and their status. You can also create returns or exchanges for your orders if needed.
                 </p>
             </div>

@@ -35,7 +35,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false }) 
 
     return (
         <div
-            className={cn("border border-default-300 rounded-lg p-5 min-h-[200px] h-full w-full flex flex-col justify-between transition-colors", {
+            className={cn("border border-border rounded-lg p-5 min-h-[200px] h-full w-full flex flex-col justify-between transition-colors", {
                 "border-primary": isActive,
             })}
             data-testid="address-container"
@@ -71,7 +71,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false }) 
                     <DialogTrigger>
                         <Trash2 className="text-rose-500 h-5 w-5 cursor-pointer" />
                     </DialogTrigger>
-                    <DialogContent className="bg-content1">
+                    <DialogContent>
                         <DialogHeader className="sr-only">
                             <DialogTitle>Delete Category</DialogTitle>
                         </DialogHeader>

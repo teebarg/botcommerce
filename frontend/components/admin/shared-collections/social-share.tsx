@@ -15,7 +15,6 @@ export function SocialShare({ catalog, className }: SocialShareProps) {
     const targetUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/shared/${catalog.slug}`;
     const shareUrl = encodeURIComponent(targetUrl);
     const shareText = encodeURIComponent(`Check out this amazing ${catalog.title}`);
-    const shareTitle = encodeURIComponent(catalog.title);
 
     const socialLinks = [
         {
@@ -70,7 +69,7 @@ export function SocialShare({ catalog, className }: SocialShareProps) {
             <PopoverTrigger asChild>
                 <Button
                     className={cn(
-                        "h-10 w-10 rounded-full text-default-800 hover:text-default-900 bg-content2 backdrop-blur-sm hover:bg-content3 hover:scale-110 active:scale-95",
+                        "h-10 w-10 rounded-full text-accent-foreground bg-accent backdrop-blur-sm hover:bg-accent/10 hover:scale-110 active:scale-95",
                         className
                     )}
                     size="icon"

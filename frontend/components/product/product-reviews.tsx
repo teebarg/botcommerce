@@ -40,7 +40,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id, productName }) => {
     if (data?.reviews?.length === 0) {
         return (
             <div className="max-w-7xl mx-auto px-4 py-12">
-                <p className="text-default-700 mt-2 mb-6 text-center font-semibold">Customer Reviews & Ratings</p>
+                <p className="mt-2 mb-6 text-center font-semibold">Customer Reviews & Ratings</p>
                 <ProductReviewsZeroState productName={productName} product_id={product_id} />
             </div>
         );

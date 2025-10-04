@@ -67,13 +67,13 @@ export default async function SharedPage({ params, searchParams }: { params: Par
     if (!catalog || error) return notFound();
 
     return (
-        <div className="bg-content2">
+        <div>
             <div className="max-w-8xl mx-auto w-full py-4 px-1.5 lg:px-0">
                 <SharedCollectionVisitTracker slug={slug} />
                 <div className="flex lg:flex-row flex-col lg:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold">{catalog.title}</h1>
-                        {catalog.description && <p className="text-lg text-default-600">{catalog.description}</p>}
+                        {catalog.description && <p className="text-lg text-muted-foreground">{catalog.description}</p>}
                     </div>
                     <div className="flex justify-end">
                         <ShareButton />

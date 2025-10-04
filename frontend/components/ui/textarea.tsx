@@ -5,10 +5,9 @@ import { cn } from "@/lib/utils";
 export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
     error?: string;
     label?: string;
-    color?: "bg-background" | "bg-content1" | "bg-content2";
 }
 
-const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, error, label, color = "bg-content1", ...props }, ref) => {
+const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, error, label, ...props }, ref) => {
     const id = React.useId();
 
     return (
@@ -21,10 +20,9 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ classNa
             <textarea
                 ref={ref}
                 className={cn(
-                    "w-full min-h-[60px] border border-divider rounded-lg resize-none shadow-sm",
+                    "w-full min-h-[60px] rounded-lg resize-none shadow-sm bg-background",
                     "flex px-3 py-2 text-sm placeholder:text-muted-foreground transition-colors",
                     "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
-                    color,
                     className
                 )}
                 id={id}

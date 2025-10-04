@@ -33,8 +33,8 @@ const UserCounter: React.FC<UserCounterProps> = ({ icon, label, count, trend, co
                     <span className={`text-xs font-medium ${trendColorClasses[color]}`}>{trend}</span>
                 </div>
                 <div className="space-y-1">
-                    <p className="text-2xl font-bold text-default-900 animate-pulse">{count}</p>
-                    <p className="text-sm text-default-600 dark:text-default-800 font-medium">{label}</p>
+                    <p className="text-2xl font-bold animate-pulse">{count}</p>
+                    <p className="text-sm text-muted-foreground font-medium">{label}</p>
                 </div>
             </CardContent>
         </Card>

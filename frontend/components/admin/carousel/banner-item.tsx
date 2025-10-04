@@ -40,14 +40,14 @@ const BannerItem: React.FC<BannerItemProps> = ({ banner }) => {
         <div
             key={banner.id}
             className={cn(
-                "bg-content1 rounded-2xl shadow-sm transition-all duration-200 hover:shadow-md",
-                banner.is_active ? "bg-emerald-100 dark:bg-emerald-700 text-default-800" : ""
+                "bg-card rounded-2xl shadow-sm transition-all duration-200 hover:shadow-md",
+                banner.is_active ? "bg-emerald-100 dark:bg-emerald-700 text-foreground" : ""
             )}
         >
             <div className="p-6">
                 <div className="flex flex-col lg:flex-row gap-6">
                     <div className="lg:w-80 flex-shrink-0">
-                        <div className="relative rounded-xl overflow-hidden bg-default-200 aspect-[2/1]">
+                        <div className="relative rounded-xl overflow-hidden aspect-[2/1]">
                             {banner.image ? (
                                 <>
                                     <img alt={banner.title} className="object-cover" src={banner.image} />
@@ -79,10 +79,10 @@ const BannerItem: React.FC<BannerItemProps> = ({ banner }) => {
                     <div className="flex-1 min-w-0">
                         <div className="flex flex-col h-full">
                             <div className="flex-1">
-                                <h3 className="text-xl font-bold text-default-900 truncate">{banner.title}</h3>
-                                {banner.subtitle && <p className="text-lg text-default-700">{banner.subtitle}</p>}
-                                {banner.description && <p className="text-default-700 line-clamp-2 mb-4">{banner.description}</p>}
-                                <div className="flex flex-wrap gap-4 text-sm text-default-700">
+                                <h3 className="text-xl font-bold truncate">{banner.title}</h3>
+                                {banner.subtitle && <p className="text-lg text-muted-foreground">{banner.subtitle}</p>}
+                                {banner.description && <p className="text-muted-foreground line-clamp-2 mb-4">{banner.description}</p>}
+                                <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                                     {banner.buttonText && (
                                         <span className="flex items-center gap-1">
                                             <span className="w-2 h-2 bg-blue-800 rounded-full" />
@@ -98,8 +98,8 @@ const BannerItem: React.FC<BannerItemProps> = ({ banner }) => {
                                 </div>
                             </div>
 
-                            <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-default-400">
-                                <div className={cn("text-xs text-default-500", banner.is_active && "dark:text-green-50 text-green-500")}>
+                            <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t">
+                                <div className={cn("text-xs text-muted-foreground", banner.is_active && "dark:text-green-50 text-green-500")}>
                                     Updated: {formatDate(banner.updated_at)}
                                 </div>
                                 <div className="flex items-center">

@@ -16,8 +16,8 @@ export default function SignInPage() {
                     <div className="inline-flex items-center justify-center w-12 h-12 bg-accent/10 rounded-full mb-4">
                         <Mail className="text-accent" size={24} />
                     </div>
-                    <h2 className="text-2xl font-bold text-default-800 mb-2">Welcome back</h2>
-                    <p className="text-default-500">Enter your email to receive a magic link</p>
+                    <h2 className="text-2xl font-bold mb-2">Welcome back</h2>
+                    <p className="text-muted-foreground">Enter your email to receive a magic link</p>
                 </div>
 
                 <MagicLinkForm />

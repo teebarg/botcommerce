@@ -20,7 +20,7 @@ const ReviewItem = ({ review }: ReviewListProps) => {
                                 <Star key={i} className={i < review?.rating ? "fill-warning text-warning" : "text-gray-300"} size={16} />
                             ))}
                         </div>
-                        <p className="text-sm text-default-500 mt-1">Product ID: {review?.product_id}</p>
+                        <p className="text-sm text-muted-foreground mt-1">Product ID: {review?.product_id}</p>
                     </div>
                     <span
                         className={`text-xs px-2 py-1 rounded-full ${
@@ -31,8 +31,8 @@ const ReviewItem = ({ review }: ReviewListProps) => {
                     </span>
                 </div>
 
-                <p className="mt-2 text-sm text-default-900">{review?.comment}</p>
-                <p className="mt-2 text-xs text-default-500 mb-4">Posted on {new Date(review?.created_at).toLocaleDateString()}</p>
+                <p className="mt-2 text-sm">{review?.comment}</p>
+                <p className="mt-2 text-xs text-muted-foreground mb-4">Posted on {new Date(review?.created_at).toLocaleDateString()}</p>
                 <ReviewActions review={review} />
             </Card>
         </div>

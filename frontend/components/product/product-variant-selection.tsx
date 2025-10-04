@@ -45,7 +45,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
         <div className="space-y-6 mt-4">
             {sizes?.length > 0 && (
                 <div className="space-y-3">
-                    <h3 className="text-sm font-medium text-default-800">Size</h3>
+                    <h3 className="text-sm font-medium">Size</h3>
                     <div className="flex flex-wrap gap-2">
                         {sizes?.map((size) => {
                             if (!size) {
@@ -58,11 +58,11 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                                 <button
                                     key={size}
                                     className={cn(
-                                        "px-6 py-2 text-sm font-medium border border-default-300 rounded-md transition-all duration-200",
+                                        "px-6 py-2 text-sm font-medium border border-border rounded-md transition-all duration-200",
                                         isSelected
                                             ? "bg-teal-800 text-white"
                                             : available
-                                              ? "bg-card text-default-800"
+                                              ? "bg-card"
                                               : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
                                     )}
                                     disabled={!available}
@@ -78,7 +78,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
 
             {colors.length > 0 && (
                 <div className="space-y-3">
-                    <h3 className="text-sm font-medium text-default-800">Color</h3>
+                    <h3 className="text-sm font-medium">Color</h3>
                     <div className="flex flex-wrap gap-3">
                         {colors.map((color) => {
                             if (!color) {
@@ -92,22 +92,18 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                                     key={color}
                                     className={cn(
                                         "relative p-0.5 rounded-full border-2 transition-all duration-200",
-                                        isSelected
-                                            ? "border-teal-700"
-                                            : available
-                                              ? "border-default-300 hover:border-default-400"
-                                              : "border-default-200 cursor-not-allowed opacity-60"
+                                        isSelected ? "border-teal-700" : available ? "" : "cursor-not-allowed opacity-60"
                                     )}
                                     disabled={!available}
                                     onClick={() => available && toggleColorSelect(color)}
                                 >
                                     <div
-                                        className={cn("w-10 h-10 rounded-full border border-default-200", !available && "opacity-50")}
+                                        className={cn("w-10 h-10 rounded-full border border-border", !available && "opacity-50")}
                                         style={{ backgroundColor: color.toLowerCase() }}
                                     />
                                     {!available && (
                                         <div className="absolute inset-0 flex items-center justify-center">
-                                            <div className="w-6 h-0.5 bg-default-400 rotate-45" />
+                                            <div className="w-6 h-0.5 bg-card rotate-45" />
                                         </div>
                                     )}
                                 </button>
@@ -119,7 +115,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
 
             {measurements?.length > 0 && (
                 <div className="space-y-3">
-                    <h3 className="text-sm font-medium text-default-800">Measurement</h3>
+                    <h3 className="text-sm font-medium">Measurement</h3>
                     <div className="flex flex-wrap gap-2">
                         {measurements?.map((measurement) => {
                             if (!measurement) {
@@ -132,11 +128,11 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                                 <button
                                     key={measurement}
                                     className={cn(
-                                        "px-6 py-2 text-sm font-medium border border-default-300 rounded-md transition-all duration-200",
+                                        "px-6 py-2 text-sm font-medium border border-border rounded-md transition-all duration-200",
                                         isSelected
                                             ? "bg-teal-800 text-white"
                                             : available
-                                              ? "bg-card text-default-800"
+                                              ? "bg-card"
                                               : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
                                     )}
                                     disabled={!available}
@@ -154,13 +150,13 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <div className="flex justify-between items-center">
                         <div>
-                            <p className="text-sm font-medium text-default-900">Selected Variant</p>
-                            <p className="text-xs text-default-600">SKU: {selectedVariant.sku}</p>
+                            <p className="text-sm font-medium">Selected Variant</p>
+                            <p className="text-xs text-muted-foreground">SKU: {selectedVariant.sku}</p>
                         </div>
                         <div className="text-right">
-                            <p className="text-lg font-bold text-default-900">{currency(selectedVariant.price)}</p>
+                            <p className="text-lg font-bold">{currency(selectedVariant.price)}</p>
                             {selectedVariant.old_price > 0 && (
-                                <p className="text-sm text-default-500 line-through">{currency(selectedVariant.old_price)}</p>
+                                <p className="text-sm text-muted-foreground line-through">{currency(selectedVariant.old_price)}</p>
                             )}
                         </div>
                     </div>
@@ -174,7 +170,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
             )}
 
             <div className="flex items-center gap-4">
-                <label className="text-sm font-medium text-default-900">Quantity:</label>
+                <label className="text-sm font-medium">Quantity:</label>
                 <div className="flex items-center border rounded-md">
                     <Button size="sm" variant="ghost" onClick={() => setQuantity(Math.max(1, quantity - 1))}>
                         -

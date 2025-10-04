@@ -65,8 +65,8 @@ const RangeSlider: React.FC<SliderProps> = ({ label, defaultValue = [0, 1000], m
         <div className="flex flex-col w-full max-w-md mx-auto mb-4">
             {label && (
                 <div className="flex justify-between text-sm mb-2">
-                    <label className="text-default-600 font-medium">{label}</label>
-                    <output className="text-default-800 font-semibold">
+                    <label className="text-muted-foreground font-medium">{label}</label>
+                    <output className="text-foreground font-semibold">
                         ₦{values[0]} - ₦{values[1]}
                     </output>
                 </div>

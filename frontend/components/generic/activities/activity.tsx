@@ -49,7 +49,7 @@ const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
     };
 
     return (
-        <div className="px-6 py-4 hover:bg-content1 transition-colors duration-150">
+        <div className="px-6 py-4">
             <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-3 flex-1">
                     <div className="flex-shrink-0 mt-0.5">
@@ -58,11 +58,11 @@ const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
 
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
-                            <p className="text-sm font-medium text-default-900 truncate max-w-[200px]">{activity.description}</p>
+                            <p className="text-sm font-medium truncate max-w-[200px]">{activity.description}</p>
                             <StatusBadge activityType={activity.activity_type} isSuccess={activity.is_success} />
                         </div>
 
-                        <div className="flex items-center text-xs text-default-500 mb-3">
+                        <div className="flex items-center text-xs text-muted-foreground mb-3">
                             <span className="font-medium">{settings?.shop_name}</span>
                             <span className="mx-2">•</span>
                             <span>{formatDistanceToNow(new Date(activity.created_at))}</span>
@@ -104,7 +104,7 @@ const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
                 <div className="flex-shrink-0 ml-4">
                     <Button aria-label="Remove activity" disabled={isPending} size="icon" variant="ghost" onClick={() => removeActivity(activity.id)}>
                         {isPending ? (
-                            <div className="animate-spin h-4 w-4 border-2 border-default-200 border-t-red-500 rounded-full" />
+                            <div className="animate-spin h-4 w-4 border-2 border-border border-t-red-500 rounded-full" />
                         ) : (
                             <Trash2 className="text-red-500" size={16} />
                         )}
@@ -117,21 +117,21 @@ const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
 
 const ActivityView: React.FC<Props> = ({ activities }) => {
     return (
-        <div className="bg-background rounded-lg shadow-sm border border-default-200">
+        <div className="bg-background rounded-lg shadow-sm border border-border">
             <div className="px-6 py-4">
-                <h2 className="text-xl font-semibold text-default-900 flex items-center gap-2">
-                    <Clock className="text-default-500" size={20} />
+                <h2 className="text-xl font-semibold flex items-center gap-2">
+                    <Clock className="text-muted-foreground" size={20} />
                     Recent Activity
                 </h2>
             </div>
             <Separator />
 
-            <div className="divide-y divide-default-200">
+            <div className="divide-y divide-border">
                 {!activities || activities.length === 0 ? (
                     <div className="px-6 py-12 text-center">
-                        <Clock className="mx-auto h-12 w-12 text-default-400" />
-                        <h3 className="mt-2 text-sm font-medium text-default-900">No activity yet</h3>
-                        <p className="mt-1 text-sm text-default-500">Your recent activities will appear here.</p>
+                        <Clock className="mx-auto h-12 w-12 text-muted-foreground" />
+                        <h3 className="mt-2 text-sm font-medium">No activity yet</h3>
+                        <p className="mt-1 text-sm text-muted-foreground">Your recent activities will appear here.</p>
                     </div>
                 ) : (
                     activities.map((item, idx: number) => <ActivityViewItem key={idx} activity={item} />)

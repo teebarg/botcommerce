@@ -1,8 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useRef, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { useEffect, useRef } from "react";
 import { LayoutDashboard, RectangleVertical } from "lucide-react";
 
 import { GalleryCard } from "./product-gallery-card";
@@ -104,7 +103,7 @@ export function ProductImageGallery() {
         <div className="px-4 py-8">
             <div className="mb-8">
                 <h3 className="text-lg font-semibold">Image Gallery</h3>
-                <p className="text-sm text-default-500">Manage your product images.</p>
+                <p className="text-sm text-muted-foreground">Manage your product images.</p>
             </div>
             <div className="mb-8 max-w-xl flex gap-2">
                 <GalleryImagesUpload />
@@ -117,14 +116,14 @@ export function ProductImageGallery() {
                 <ComponentLoader />
             ) : (
                 <div>
-                    <div className="lg:hidden mb-4 sticky top-16 z-40 bg-content2 -mx-4 px-4 py-4 flex gap-2">
-                        <div className="rounded-full p-1 flex items-center gap-2 bg-gray-300 dark:bg-content3 w-1/2">
-                            <div className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "grid" && "bg-content1")}>
+                    <div className="lg:hidden mb-4 sticky top-16 z-40 bg-background -mx-4 px-4 py-4 flex gap-2">
+                        <div className="rounded-full p-1 flex items-center gap-2 bg-secondary w-1/2">
+                            <div className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "grid" && "bg-background")}>
                                 <Button size="iconOnly" onClick={() => setViewMode("grid")}>
                                     <LayoutDashboard className="h-6 w-6" />
                                 </Button>
                             </div>
-                            <div className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "list" && "bg-content1")}>
+                            <div className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "list" && "bg-background")}>
                                 <Button size="iconOnly" onClick={() => setViewMode("list")}>
                                     <RectangleVertical className="h-6 w-6" />
                                 </Button>

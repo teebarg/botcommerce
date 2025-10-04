@@ -31,7 +31,7 @@ const BrandView: React.FC = () => {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
                 <div>
                     <h1 className="text-2xl font-medium">Brands</h1>
-                    <p className="text-default-500 text-sm">Manage your brands</p>
+                    <p className="text-muted-foreground text-sm">Manage your brands</p>
                 </div>
                 <div className="flex w-full items-center gap-2 sm:w-auto">
                     <div className="relative w-full sm:w-64">
@@ -40,7 +40,7 @@ const BrandView: React.FC = () => {
                     <CreateBrand />
                 </div>
             </div>
-            <div className="md:block hidden">
+            <div className="md:block hidden bg-secondary rounded p-4">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -58,7 +58,7 @@ const BrandView: React.FC = () => {
                     </TableHeader>
                     <TableBody>
                         {brands?.map((brand: Brand, idx: number) => (
-                            <TableRow key={idx} className="even:bg-content1">
+                            <TableRow key={idx} className="odd:bg-background">
                                 <TableCell>{idx + 1}</TableCell>
                                 <TableCell className="flex-1">
                                     <div className="font-bold truncate min-w-72">{brand?.name}</div>
@@ -74,7 +74,7 @@ const BrandView: React.FC = () => {
                         ))}
                         {brands?.length === 0 && (
                             <TableRow>
-                                <TableCell className="text-center py-4 text-lg text-default-500" colSpan={5}>
+                                <TableCell className="text-center py-4 text-lg text-muted-foreground" colSpan={5}>
                                     No brands found.
                                 </TableCell>
                             </TableRow>
@@ -87,8 +87,8 @@ const BrandView: React.FC = () => {
                     <div className="flex flex-col gap-3">{brands?.map((brand: Brand, idx: number) => <BrandItem key={idx} brand={brand} />)}</div>
 
                     {brands?.length === 0 && (
-                        <div className="text-center py-8 bg-content1 rounded-lg">
-                            <p className="text-default-500">No brands found</p>
+                        <div className="text-center py-8 bg-secondary rounded-lg">
+                            <p>No brands found</p>
                         </div>
                     )}
                 </div>

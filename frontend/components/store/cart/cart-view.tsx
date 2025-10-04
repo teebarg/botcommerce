@@ -55,7 +55,7 @@ const CartView: React.FC<Props> = () => {
                             <Shield />
                             <p>Security & Privacy</p>
                         </div>
-                        <div className="flex gap-4 text-default-500 text-sm">
+                        <div className="flex gap-4 text-muted-foreground text-sm">
                             <p>Safe payments</p>
                             <p>Secure personal details</p>
                         </div>

@@ -24,7 +24,7 @@ export function SettingsPage() {
                 <Tabs defaultValue="shop-details">
                     <TabsList className="mb-4">
                         <TabsTrigger value="shop-details">Shop Details</TabsTrigger>
-                        <TabsTrigger value="details">Details</TabsTrigger>
+                        <TabsTrigger value="details">Features</TabsTrigger>
                         <TabsTrigger value="payments">Payments</TabsTrigger>
                         <TabsTrigger value="delivery">Delivery</TabsTrigger>
                     </TabsList>

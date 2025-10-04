@@ -11,13 +11,13 @@ import { Badge } from "@/components/ui/badge";
 const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
     return (
         <div className="flex gap-3">
-            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-content2 ring-1 ring-default-100">
+            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-card ring-1 ring-border">
                 <img alt={item.name} className="object-cover w-full h-full rounded-lg" src={item?.image || "/placeholder.jpg"} />
             </div>
 
             <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-start mb-1">
-                    <h3 className="font-semibold text-default-900 line-clamp-2 leading-tight text-md">{item.name}</h3>
+                    <h3 className="font-semibold line-clamp-2 leading-tight text-md">{item.name}</h3>
                 </div>
 
                 {item.variant && (item.variant.size || item.variant.color || item.variant.measurement) && (
@@ -27,7 +27,7 @@ const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
                         {item.variant.color && (
                             <Badge variant="gray">
                                 <div
-                                    className="w-2.5 h-2.5 rounded-full border border-default-300 mr-1"
+                                    className="w-2.5 h-2.5 rounded-full border border-border mr-1"
                                     style={{ backgroundColor: item.variant.color.toLowerCase() }}
                                 />
                                 {item.variant.color}
@@ -38,12 +38,12 @@ const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
                 )}
 
                 <div className="flex items-center gap-2 mb-2">
-                    <span className="font-bold text-default-900 text-xl">{currency(Number(item.price) || 0)}</span>
+                    <span className="font-bold text-xl">{currency(Number(item.price) || 0)}</span>
                 </div>
 
                 <CartControl item={item} />
 
-                <p className="text-xs text-default-500 mt-1">Subtotal: {currency((Number(item.price) || 0) * item.quantity)}</p>
+                <p className="text-xs text-muted-foreground mt-1">Subtotal: {currency((Number(item.price) || 0) * item.quantity)}</p>
             </div>
         </div>
     );

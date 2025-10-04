@@ -14,7 +14,7 @@ const Spinner: React.FC<Props> = ({ size = "sm", color = "primary", className })
         default: "border-b-default",
         primary: "border-b-primary",
         secondary: "border-b-secondary",
-        danger: "border-b-danger",
+        danger: "border-b-destructive",
         warning: "border-b-warning",
         success: "border-b-success",
     };

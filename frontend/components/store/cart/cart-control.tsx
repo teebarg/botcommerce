@@ -32,25 +32,25 @@ const CartControl: React.FC<Props> = ({ item }) => {
     return (
         <ClientOnly>
             <div className="flex items-center justify-between">
-                <div className="flex items-center bg-background rounded-full border border-default-100 overflow-hidden">
+                <div className="flex items-center bg-background rounded-full overflow-hidden">
                     <button
-                        className="p-2 hover:bg-default-100 transition-colors disabled:opacity-50"
+                        className="p-2 hover:bg-secondary transition-colors disabled:opacity-50"
                         disabled={item.quantity <= 1}
                         onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
                     >
-                        <Minus className="h-4 w-4 text-default-600" />
+                        <Minus className="h-4 w-4 text-muted-foreground" />
                     </button>
 
                     <div className="px-2 py-1.5 min-w-[2rem] text-center">
-                        <span className="text-xs font-medium text-default-900">{updateQuantity.isPending ? "..." : item.quantity}</span>
+                        <span className="text-xs font-medium text-foreground">{updateQuantity.isPending ? "..." : item.quantity}</span>
                     </div>
 
                     <button
-                        className="p-2 hover:bg-default-100 transition-colors disabled:opacity-50"
+                        className="p-2 hover:bg-secondary transition-colors disabled:opacity-50"
                         disabled={updateQuantity.isPending || (item.variant?.inventory && item.quantity >= item.variant.inventory)}
                         onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
                     >
-                        <Plus className="h-4 w-4 text-default-600" />
+                        <Plus className="h-4 w-4 text-muted-foreground" />
                     </button>
                 </div>
 

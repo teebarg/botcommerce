@@ -33,19 +33,19 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = (props) => {
     }
 
     if (!order) {
-        return <div className="flex items-center justify-center py-12 px-2 bg-content1">Order not found</div>;
+        return <div className="flex items-center justify-center py-12 px-2 bg-secondary">Order not found</div>;
     }
 
     if (order?.payment_method === "CASH_ON_DELIVERY") {
         return (
-            <div className="min-h-screen flex items-center justify-center px-2 bg-content1">
+            <div className="min-h-screen flex items-center justify-center px-2">
                 <OrderPickup onContinueShopping={onContinueShopping} {...props} order={order} />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-2 bg-content1">
+        <div className="min-h-screen flex items-center justify-center px-2">
             {order?.payment_status === "SUCCESS" && <SuccessConfirmation onContinueShopping={onContinueShopping} {...props} order={order} />}
             {order?.payment_status === "PENDING" && <PendingPayment onContinueShopping={onContinueShopping} {...props} order={order} />}
             {order?.payment_status === "FAILED" && <FailedPayment onContinueShopping={onContinueShopping} {...props} order={order} />}

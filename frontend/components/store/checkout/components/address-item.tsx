@@ -57,7 +57,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
     return (
         <div
             className={`relative p-4 rounded-xl cursor-pointer transition-all duration-300 group overflow-hidden ${
-                isSelected ? "ring-2 ring-accent bg-accent/10" : "border border-divider bg-content2 hover:border-accent/50 hover:shadow-md"
+                isSelected ? "ring-2 ring-accent bg-accent/10" : "border border-divider bg-secondary hover:border-accent/50 hover:shadow-md"
             }`}
             onClick={() => !isSelected && handleSelect(address.id)}
         >
@@ -75,24 +75,24 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                 <div className="flex items-center gap-3 mb-3">
                     <div
                         className={`p-2.5 rounded-lg transition-colors ${
-                            isSelected ? "bg-accent text-white" : "bg-content1 text-default-500 group-hover:bg-accent/50"
+                            isSelected ? "bg-accent text-white" : "bg-secondary text-muted-foreground group-hover:bg-accent/50"
                         }`}
                     >
                         {getTypeIcon(address.address_type)}
                     </div>
                     <div>
-                        <h3 className="font-semibold text-default-800 text-lg">{address.label}</h3>
-                        <p className="text-default-500 text-sm">{address?.first_name + " " + address?.last_name}</p>
+                        <h3 className="font-semibold text-lg">{address.label}</h3>
+                        <p className="text-muted-foreground text-sm">{address?.first_name + " " + address?.last_name}</p>
                     </div>
                 </div>
 
                 <div className="space-y-0.5 text-sm">
-                    <p className="text-default-800 font-medium">{address.address_1}</p>
-                    <p className="text-default-500">
+                    <p className="text-foreground font-medium">{address.address_1}</p>
+                    <p className="text-muted-foreground">
                         {address.city}, {address.state}
                     </p>
                     {address.phone && (
-                        <p className="flex items-center gap-2 text-default-500 mt-2">
+                        <p className="flex items-center gap-2 text-muted-foreground mt-2">
                             <Phone className="w-3.5 h-3.5" />
                             <span>{address.phone}</span>
                         </p>
@@ -107,7 +107,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                     title="Address"
                     trigger={
                         <Button
-                            className="text-default-500 hover:text-blue-600 hover:bg-blue-50"
+                            className="text-muted-foreground hover:text-blue-600 hover:bg-blue-50"
                             size="icon"
                             variant="ghost"
                             onClick={(e) => e.stopPropagation()}
@@ -122,7 +122,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                 <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                     <DialogTrigger asChild>
                         <Button
-                            className="text-default-500 hover:text-red-600 hover:bg-red-50"
+                            className="text-muted-foreground hover:text-red-600 hover:bg-red-50"
                             size="icon"
                             variant="ghost"
                             onClick={(e) => e.stopPropagation()}

@@ -95,7 +95,7 @@ export function ShopDetailsForm({ settings }: ShopDetailsProps) {
                 {defaultShopDetails.map((detail, idx: number) => {
                     return (
                         <div key={idx} className={cn("", detail.type === "textarea" ? "md:col-span-2" : "")}>
-                            <label className="text-sm text-default-500">{detail.label}</label>
+                            <label className="text-sm text-muted-foreground">{detail.label}</label>
                             {detail.type === "textarea" ? (
                                 <Textarea
                                     placeholder={`Enter ${detail.label.toLowerCase()}`}

@@ -33,18 +33,18 @@ const ProductFilter = ({ collections, selectedCollections, onApplyFilters, onClo
 
     return (
         <React.Fragment>
-            <p className="px-4 text-default-500 text-sm font-medium">Filter products by collections</p>
+            <p className="px-4 text-muted-foreground text-sm font-medium">Filter products by collections</p>
             <Separator />
             <div className="flex-1 overflow-auto p-4">
                 {collections?.length && (
                     <div className="mb-6">
-                        <h3 className="font-medium text-default-900 mb-3">Collections</h3>
+                        <h3 className="font-medium mb-3">Collections</h3>
                         <div className="flex flex-wrap gap-2">
                             {collections?.map((collection: Collection, idx: number) => (
                                 <button
                                     key={idx}
                                     className={`px-3 py-1.5 rounded-full text-sm ${
-                                        tempCollections.includes(collection.id) ? "bg-indigo-500 text-white" : "bg-content3 text-default-800"
+                                        tempCollections.includes(collection.id) ? "bg-indigo-500 text-white" : "bg-card text-foreground"
                                     }`}
                                     onClick={() => handleToggleCollection(collection.id)}
                                 >

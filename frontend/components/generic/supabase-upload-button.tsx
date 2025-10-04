@@ -135,8 +135,8 @@ export default function SupabaseUploader({
 
     return (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 bottom-0">
-            <div className="bg-content2 rounded-lg shadow-lg w-full md:max-w-2xl h-[100vh] md:h-[75vh] flex flex-col">
-                <div className="flex justify-between items-center border-b px-4 py-4 bg-content1">
+            <div className="rounded-lg shadow-lg w-full md:max-w-2xl h-[100vh] md:h-[75vh] flex flex-col">
+                <div className="flex justify-between items-center border-b px-4 py-4 bg-secondary">
                     <h2 className="font-semibold">Upload Queue</h2>
                     <button onClick={onClose}>✕</button>
                 </div>
@@ -208,7 +208,7 @@ export default function SupabaseUploader({
                     </div>
                 </div>
 
-                <div className="border-t px-4 py-4 flex justify-between bg-content1">
+                <div className="border-t px-4 py-4 flex justify-between bg-secondary">
                     <Button variant="indigo" onClick={() => document.getElementById("fileInput")?.click()}>
                         Upload more
                     </Button>

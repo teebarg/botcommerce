@@ -82,7 +82,7 @@ export function AccordionTrigger({ children, value, className }: { children: Rea
                 </div>
                 <span
                     aria-hidden={isExpanded}
-                    className="text-default-500 transition-transform rotate-0 data-[open=true]:-rotate-90 rtl:-rotate-180 rtl:data-[open=true]:-rotate-90"
+                    className="text-muted-foreground transition-transform rotate-0 data-[open=true]:-rotate-90 rtl:-rotate-180 rtl:data-[open=true]:-rotate-90"
                     data-open={isExpanded}
                 >
                     <ChevronDown

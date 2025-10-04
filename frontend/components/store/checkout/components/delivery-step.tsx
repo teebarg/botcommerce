@@ -46,7 +46,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
     }
 
     return (
-        <Card className="w-full shadow-elegant animate-fade-in">
+        <Card className="w-full shadow-accent animate-fade-in">
             <CardHeader className="text-center">
                 <CardTitle className="text-xl md:text-2xl font-semibold">How would you like to receive your order?</CardTitle>
                 <CardDescription className="text-sm md:text-base">Choose between home delivery or store pickup</CardDescription>
@@ -95,7 +95,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
                 </RadioGroup>
                 {canContinue && (
                     <div className="flex justify-end pt-4">
-                        <Button className="flex items-center gap-2" size="lg" variant="luxury" onClick={handleContinue}>
+                        <Button className="flex items-center gap-2" size="lg" variant="accent" onClick={handleContinue}>
                             {cart.shipping_method === "PICKUP" ? "Continue to Payment" : "Continue to Address"}
                             <ArrowRight className="h-4 w-4" />
                         </Button>

@@ -50,7 +50,7 @@ const OrderNotes: React.FC<OrderNotesProp> = ({ order }) => {
 
     if (order.order_notes) {
         return (
-            <div className="py-8 px-4 bg-content1 rounded-xl">
+            <div className="py-8 px-4 bg-emerald-50 rounded-xl">
                 <h2 className="text-lg font-semibold">Notes</h2>
                 <p className="text-sm text-muted-foreground">{order.order_notes}</p>
             </div>
@@ -58,7 +58,7 @@ const OrderNotes: React.FC<OrderNotesProp> = ({ order }) => {
     }
 
     return (
-        <Card className="border-0 shadow-lg bg-content1 mb-4">
+        <Card className="border-0 shadow-lg bg-secondary mb-4">
             <CardHeader>
                 <CardTitle className="text-xl font-semibold">Add Order Notes</CardTitle>
                 <p className="text-sm text-muted-foreground">Add special instructions, delivery preferences, or any other notes for your order.</p>

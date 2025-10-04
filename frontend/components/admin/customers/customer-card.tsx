@@ -15,38 +15,36 @@ const CustomerCard = ({ user, actions }: CustomerCardProps) => {
     const totalSpent = user.orders?.reduce((total: number, order: Order) => total + order.total, 0) || 0;
 
     return (
-        <Card className="mb-3 overflow-hidden hover:shadow-md transition-shadow">
-            <div className="p-4">
-                <div className="flex justify-between items-start">
-                    <div>
-                        <h3 className="font-medium text-lg">{fullName}</h3>
-                        <p className="text-sm text-default-500">{user.email}</p>
-                    </div>
-
-                    {actions}
+        <Card className="mb-3 overflow-hidden hover:shadow-md transition-shadow bg-secondary p-4">
+            <div className="flex justify-between items-start">
+                <div>
+                    <h3 className="font-medium text-lg">{fullName}</h3>
+                    <p className="text-sm text-muted-foreground">{user.email}</p>
                 </div>
 
-                <div className="mt-4 grid grid-cols-2 gap-3">
-                    <div className="flex items-center text-sm">
-                        <ShoppingBag className="mr-1 text-default-500" size={14} />
-                        <span>{user.orders?.length} orders</span>
-                    </div>
-                    <div className="flex items-center text-sm">
-                        <CreditCard className="mr-1 text-default-500" size={14} />
-                        <span>{currency(totalSpent)}</span>
-                    </div>
-                    {/* {user.addresses?.[0]?.phone && (
+                {actions}
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-3">
+                <div className="flex items-center text-sm">
+                    <ShoppingBag className="mr-1 text-muted-foreground" size={14} />
+                    <span>{user.orders?.length} orders</span>
+                </div>
+                <div className="flex items-center text-sm">
+                    <CreditCard className="mr-1 text-muted-foreground" size={14} />
+                    <span>{currency(totalSpent)}</span>
+                </div>
+                {/* {user.addresses?.[0]?.phone && (
                         <div className="flex items-center text-sm">
                             <Phone className="mr-1" size={14} />
                             <span>{user.addresses?.[0]?.phone}</span>
                         </div>
                     )} */}
-                    {user.orders?.[0]?.created_at && (
-                        <div className="flex items-center text-sm">
-                            <span className="text-xs text-default-500">Last order: {formatDate(user.orders?.[0].created_at)}</span>
-                        </div>
-                    )}
-                </div>
+                {user.orders?.[0]?.created_at && (
+                    <div className="flex items-center text-sm">
+                        <span className="text-xs text-muted-foreground">Last order: {formatDate(user.orders?.[0].created_at)}</span>
+                    </div>
+                )}
             </div>
         </Card>
     );
