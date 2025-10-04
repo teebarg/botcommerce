@@ -1,8 +1,7 @@
 "use client";
 
-import { Facebook, Twitter, WhatsApp } from "nui-react-icons";
+import { Facebook, Twitter, Instagram } from "lucide-react";
 import Link from "next/link";
-import { Instagram } from "lucide-react";
 
 import LocalizedClientLink from "@/components/ui/link";
 import { Category } from "@/schemas/product";
@@ -11,6 +10,7 @@ import { useCollections } from "@/lib/hooks/useCollection";
 import { Separator } from "@/components/ui/separator";
 import ClientOnly from "@/components/generic/client-only";
 import { useStoreSettings } from "@/providers/store-provider";
+import { WhatsApp } from "nui-react-icons";
 
 const company = [
     {
@@ -59,29 +59,49 @@ export default function Footer() {
 
     return (
         <ClientOnly>
-            <footer className="flex w-full flex-col pb-20 md:pb-12 bg-card text-card-foreground border-t border-divider">
+            <footer className="flex w-full flex-col pb-20 md:pb-12 border-t border-border/50">
                 <div className="hidden md:block mx-auto max-w-7xl px-6 pb-8 pt-8 sm:pt-24 lg:px-8 md:pt-32">
                     <div className="hidden md:grid md:grid-cols-3 md:gap-8">
                         <div className="md:pr-8">
-                            <div className="flex items-center justify-start">
-                                <span className="text-3xl font-semibold text-primary">{settings?.shop_name}</span>
-                            </div>
+                            <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                                {settings?.shop_name}
+                            </h3>
                             <p className="text-sm text-foreground">
                                 {`We are a dedicated online store offering a wide range of high-quality and fun products for kids. Our mission is to bring
                             joy and happiness to every child's life.`}
                             </p>
                             <div className="flex space-x-6 mt-4">
-                                <Link aria-label="Twitter" href={`https://web.facebook.com/profile.php?id=${settings?.facebook}`} target="_blank">
-                                    <Facebook className="text-muted-foreground hover:text-primary transition-colors" size={34} />
+                                <Link
+                                    aria-label="Twitter"
+                                    href={`https://web.facebook.com/profile.php?id=${settings?.facebook}`}
+                                    className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                                    target="_blank"
+                                >
+                                    <Facebook className="text-primary" />
                                 </Link>
-                                <Link aria-label="Instagram" href={`https://www.instagram.com/${settings?.instagram}`} target="_blank">
-                                    <Instagram className="text-muted-foreground hover:text-primary transition-colors" size={34} />
+                                <Link
+                                    aria-label="Instagram"
+                                    href={`https://www.instagram.com/${settings?.instagram}`}
+                                    className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                                    target="_blank"
+                                >
+                                    <Instagram className="text-primary" />
                                 </Link>
-                                <Link aria-label="Tiktok" href={`https://www.tiktok.com/@${settings?.tiktok}`} target="_blank">
-                                    <WhatsApp className="text-muted-foreground hover:text-primary transition-colors" size={30} />
+                                <Link
+                                    aria-label="Tiktok"
+                                    href={`https://www.tiktok.com/@${settings?.tiktok}`}
+                                    className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                                    target="_blank"
+                                >
+                                    <WhatsApp className="text-primary" />
                                 </Link>
-                                <Link aria-label="X" href={`https://x.com/${settings?.twitter}`} target="_blank">
-                                    <Twitter className="text-muted-foreground hover:text-primary transition-colors" size={34} />
+                                <Link
+                                    aria-label="X"
+                                    href={`https://x.com/${settings?.twitter}`}
+                                    className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                                    target="_blank"
+                                >
+                                    <Twitter className="text-primary" />
                                 </Link>
                             </div>
                         </div>

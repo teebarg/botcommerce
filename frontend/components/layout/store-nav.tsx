@@ -18,7 +18,7 @@ const StoreNavbar = async () => {
     const siteConfig = await getSiteConfig();
 
     return (
-        <NavigationBar className="my-2 hidden md:flex">
+        <NavigationBar className="hidden md:flex bg-background">
             <NavbarContent className="flex flex-1 max-w-8xl mx-auto">
                 <NavbarBrand className="flex items-center font-semibold">
                     <LocalizedClientLink className="text-3xl block" href="/">

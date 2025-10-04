@@ -193,37 +193,58 @@
 }
 
 :root {
+    /* --background: hsl(0 0% 100%);
+    --foreground: hsl(222 47% 11%); */
+
     --background: hsl(0 0% 100%);
-    --foreground: hsl(222 47% 11%);
+    --foreground: hsl(0 0% 9%);
+
+    /* --card: hsl(0 0% 100%);
+    --card-foreground: hsl(222 47% 11%); */
 
     --card: hsl(0 0% 100%);
-    --card-foreground: hsl(222 47% 11%);
+    --card-foreground: hsl(0 0% 9%);
+
+    /* --popover: hsl(0 0% 100%);
+    --popover-foreground: hsl(222 47% 11%); */
 
     --popover: hsl(0 0% 100%);
-    --popover-foreground: hsl(222 47% 11%);
+    --popover-foreground: hsl(0 0% 9%);
 
-    --primary: hsl(221 83% 53%);
+    /* --primary: hsl(221 83% 53%);
+    --primary-foreground: hsl(0 0% 100%); */
+
+    --primary: hsl(219 100% 53%);
     --primary-foreground: hsl(0 0% 100%);
 
-    --secondary: hsl(220 14% 96%);
-    --secondary-foreground: hsl(222 47% 11%); /* Dark text on secondary */
+    /* --secondary: hsl(220 14% 96%);
+    --secondary-foreground: hsl(222 47% 11%); */
 
-    --accent: hsl(14 90% 58%); /* Orange for highlights/alerts */
+    --secondary: hsl(0 0% 96%);
+    --secondary-foreground: hsl(0 0% 9%);
+
+    --accent: hsl(14 90% 58%);
     --accent-foreground: hsl(0 0% 100%);
 
     /* System colors */
-    --muted: hsl(220 14% 96%);
-    --muted-foreground: hsl(215 16% 47%);
+    /* --muted: hsl(220 14% 96%);
+    --muted-foreground: hsl(215 16% 47%); */
 
-    --destructive: hsl(0 84% 60%); /* Red for errors */
+    --muted: hsl(0 0% 96%);
+    --muted-foreground: hsl(0 0% 45%);
+
+    --destructive: hsl(0 84.2% 60.2%);
     --destructive-foreground: hsl(0 0% 100%);
 
-    --border: hsl(220 13% 91%);
+    /* --border: hsl(220 13% 91%);
     --input: hsl(220 13% 91%);
-    --ring: hsl(221 83% 53%);
+    --ring: hsl(221 83% 53%); */
 
-    /* Radius for buttons/cards */
-    --radius: 0.75rem;
+    --border: hsl(0 0% 90%);
+    --input: hsl(0 0% 90%);
+    --ring: hsl(219 100% 53%);
+
+    --radius: 0.5rem;
 
     --success: #10b981;
     --success-foreground: #ffffff;
@@ -234,6 +255,8 @@
 
     /* Shadows */
     --shadow-accent: 0 10px 30px -10px var(--accent) / 0.3;
+    --shadow-glow: 0 0 30px hsl(219 100% 53% / 0.2);
+    --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.1);
 
     --sidebar: hsl(0 0% 98%);
     --sidebar-foreground: hsl(240 5.3% 26.1%);
@@ -298,6 +321,8 @@
 
     /* Dark mode shadows */
     --shadow-accent: 0 10px 30px -10px var(--accent) / 0.4;
+    --shadow-glow: 0 0 30px hsl(219 100% 53% / 0.2);
+    --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.3);
 
     --sidebar: hsl(240 5.9% 10%);
     --sidebar-foreground: hsl(240 4.8% 95.9%);
