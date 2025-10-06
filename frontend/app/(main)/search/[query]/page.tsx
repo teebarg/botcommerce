@@ -43,7 +43,7 @@ export default async function SearchResults({ params, searchParams }: { params: 
 
     return (
         <div className="container mx-auto mt-4 py-4 px-1">
-            <div className="flex justify-between border-b border-divider w-full items-center px-4 mb-4">
+            <div className="flex justify-between border-b border-input w-full items-center px-4 mb-4">
                 <div className="flex flex-col items-start">
                     <p className="text-muted-foreground">Search Results for:</p>
                     <h4>{decodeURI(query)}</h4>

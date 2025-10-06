@@ -44,7 +44,7 @@ const OnlineUsersWidget: React.FC = () => {
                 <UserCounter color="orange" count={active} icon={<TrendingUp className="h-5 w-5" />} label="Active Now" trend="+5%" />
             </div>
 
-            <Card className="shadow-lg border-0 bg-secondary">
+            <Card className="shadow-lg border-0 bg-card">
                 <CardHeader className="pb-4">
                     <CardTitle className="text-xl font-semibold flex items-center gap-2">
                         <ActivityIndicator />
@@ -54,7 +54,7 @@ const OnlineUsersWidget: React.FC = () => {
                 <CardContent>
                     <div className="space-y-3 max-h-96 overflow-y-auto">
                         {sessions.map((user: Session, idx: number) => (
-                            <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-card">
+                            <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-secondary">
                                 <div className="flex items-center gap-3">
                                     <UserAvatar user={user} />
                                     <div>

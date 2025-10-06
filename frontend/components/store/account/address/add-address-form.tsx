@@ -54,7 +54,7 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
     };
 
     return (
-        <div className="px-2 md:px-4 py-8">
+        <div className="px-2 md:px-4 py-8 bg-card">
             <h2 className="text-lg font-semibold mb-4">Add new address</h2>
             <Form {...form}>
                 <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -211,7 +211,7 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
                         <Button aria-label="cancel" data-testid="cancel-button" type="button" variant="destructive" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button aria-label="save" data-testid="save-button" isLoading={createAddress.isPending} type="submit" variant="primary">
+                        <Button aria-label="save" data-testid="save-button" isLoading={createAddress.isPending} type="submit">
                             Save
                         </Button>
                     </div>

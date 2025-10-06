@@ -96,7 +96,7 @@ const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShoppi
 
             <FadeInComponent delay="700ms">
                 <div className="mt-6">
-                    <Button className="w-full" size="lg" variant="primary" onClick={onContinueShopping}>
+                    <Button className="w-full" size="lg" onClick={onContinueShopping}>
                         Continue Shopping
                         <ArrowRight className="ml-2 w-4 h-4" />
                     </Button>

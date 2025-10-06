@@ -22,7 +22,7 @@ const FaqView: React.FC = () => {
                     sheetClassName="min-w-[450px]"
                     title="Add New FAQ"
                     trigger={
-                        <Button variant="primary" onClick={state.open}>
+                        <Button onClick={state.open}>
                             <Plus className="w-4 h-4 mr-2" />
                             Add New FAQ
                         </Button>

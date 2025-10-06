@@ -46,7 +46,7 @@ const AdminMobileMenu: React.FC = () => {
 
     return (
         <div className="h-full rounded-[inherit] overflow-hidden overflow-y-auto">
-            <div className="p-4 bg-accent text-gray-100 sticky top-safe z-10">
+            <div className="p-4 bg-primary text-primary-foreground sticky top-safe z-10">
                 <div className="flex items-center space-x-3">
                     <Avatar>
                         <AvatarImage src={session?.user?.image!} />
@@ -79,15 +79,15 @@ const AdminMobileMenu: React.FC = () => {
                         key={idx}
                         prefetch
                         className={`flex items-center justify-between w-full p-3 text-left transition-colors ${
-                            pathname === item.href ? "bg-accent/50" : ""
+                            pathname === item.href ? "bg-primary/20 text-primary" : ""
                         }`}
                         href={item.href}
                     >
                         <div className="flex items-center space-x-3">
-                            <span className={pathname === item.href ? "text-accent" : "text-muted-foreground"}>{item.icon}</span>
+                            <span className={pathname === item.href ? "text-primary" : "text-muted-foreground"}>{item.icon}</span>
                             <span>{item.label}</span>
                         </div>
-                        <ChevronRight className={pathname === item.href ? "text-accent" : "text-muted-foreground"} size={16} />
+                        <ChevronRight className={pathname === item.href ? "text-primary" : "text-muted-foreground"} size={16} />
                     </Link>
                 ))}
             </nav>

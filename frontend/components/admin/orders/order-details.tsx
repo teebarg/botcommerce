@@ -42,7 +42,7 @@ const orderStatusMap = {
     PROCESSING: {
         icon: <RefreshCw className="h-5 w-5 text-white" />,
         label: "Processing",
-        color: "bg-accent",
+        color: "bg-contrast",
     },
     SHIPPED: {
         icon: <Package className="h-5 w-5 text-white" />,
@@ -98,7 +98,7 @@ const OrderItemCard: React.FC<{ orderItem: OrderItem; orderId: number }> = ({ or
             </div>
             <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                 <DialogTrigger>
-                    <div className="font-semibold bg-destructive text-white px-4 py-2 rounded-md cursor-pointer">Return item</div>
+                    <div className="font-semibold bg-destructive text-white px-4 py-2 rounded-md cursor-pointer">Return</div>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader className="sr-only">
@@ -147,7 +147,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                 <OrderItemCard key={idx} orderId={order.id} orderItem={item} />
                             ))}
                         </div>
-                        <div className="border-t border-divider px-6 py-4">
+                        <div className="border-t border-input px-6 py-4">
                             <div className="flex justify-between text-sm font-medium">
                                 <p>Subtotal</p>
                                 <p className="font-semibold">{currency(order.subtotal)}</p>
@@ -168,7 +168,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                     </div>
 
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-divider px-6 py-4">
+                        <div className="border-b border-input px-6 py-4">
                             <h2 className="text-lg font-medium flex items-center">
                                 <User className="w-5 h-5 mr-2 text-muted-foreground" />
                                 Customer Information
@@ -200,7 +200,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                     </div>
 
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-divider px-6 py-4">
+                        <div className="border-b border-input px-6 py-4">
                             <h2 className="text-lg font-medium flex items-center">
                                 <CreditCard className="w-5 h-5 mr-2 text-muted-foreground" />
                                 Payment Information
@@ -219,7 +219,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                     </div>
 
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-divider px-6 py-4">
+                        <div className="border-b border-input px-6 py-4">
                             <h2 className="text-lg font-medium flex items-center">
                                 <Truck className="w-5 h-5 mr-2 text-muted-foreground" />
                                 Shipping Information
@@ -242,7 +242,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
 
                 <div className="space-y-6">
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-divider px-6 py-4">
+                        <div className="border-b border-input px-6 py-4">
                             <h2 className="text-lg font-medium">Actions</h2>
                         </div>
                         <div className="p-6 space-y-4">
@@ -261,7 +261,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                     </div>
 
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden pb-6">
-                        <div className="border-b border-divider px-6 py-4">
+                        <div className="border-b border-input px-6 py-4">
                             <h2 className="text-lg font-medium">Order Timeline</h2>
                         </div>
                         <div className="p-6">

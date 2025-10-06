@@ -53,7 +53,7 @@ const OrderView: React.FC = () => {
             <div className="md:block hidden">
                 <OrderFilters />
             </div>
-            <div key="table" className="md:block hidden bg-secondary mt-4">
+            <div key="table" className="md:block hidden bg-card mt-4">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -110,7 +110,7 @@ const OrderView: React.FC = () => {
                             <Search className="text-gray-400" size={18} />
                         </div>
                         <input
-                            className="pl-10 pr-4 py-2 w-full border border-divider rounded-lg focus:outline-none"
+                            className="pl-10 pr-4 py-2 w-full border border-input rounded-lg focus:outline-none"
                             placeholder="Search orders..."
                             type="text"
                             value={searchParams.get("search") ?? ""}

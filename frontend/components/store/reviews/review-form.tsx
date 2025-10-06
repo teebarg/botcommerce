@@ -148,13 +148,7 @@ export const ReviewForm = ({ onClose, productName, product_id }: ReviewFormProps
                         <Button className="flex-1" type="button" variant="outline" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button
-                            className="flex-1"
-                            disabled={!formState.isValid || addReview.isPending}
-                            isLoading={addReview.isPending}
-                            type="submit"
-                            variant="indigo"
-                        >
+                        <Button className="flex-1" disabled={!formState.isValid || addReview.isPending} isLoading={addReview.isPending} type="submit">
                             Submit Review
                         </Button>
                     </div>

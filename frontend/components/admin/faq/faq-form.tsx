@@ -61,7 +61,7 @@ export function FaqForm({ faq, onCancel }: FaqFormProps) {
     };
 
     return (
-        <div className="py-6 px-3 bg-secondary h-full">
+        <div className="py-6 px-3 bg-card h-full">
             <h2 className="text-xl font-semibold mb-4">{faq ? "Edit FAQ" : "Create New FAQ"}</h2>
 
             <Form {...form}>
@@ -136,7 +136,7 @@ export function FaqForm({ faq, onCancel }: FaqFormProps) {
                         <Button className="min-w-32" type="button" variant="destructive" onClick={onCancel}>
                             Cancel
                         </Button>
-                        <Button disabled={loading} isLoading={loading} type="submit" variant="primary">
+                        <Button disabled={loading} isLoading={loading} type="submit">
                             {faq ? "Update FAQ" : "Create FAQ"}
                         </Button>
                     </div>

@@ -56,7 +56,7 @@ export default function CustomerForm({ user, onClose }: ReviewFormProps) {
     }
 
     return (
-        <div className="mx-auto w-full py-6 px-2">
+        <div className="mx-auto w-full h-full py-6 px-2 bg-card">
             <h3 className="text-lg font-medium mb-4">Update Customer</h3>
             <Form {...form}>
                 <form className="space-y-6 h-full flex-1" onSubmit={form.handleSubmit(onSubmit)}>
@@ -142,7 +142,7 @@ export default function CustomerForm({ user, onClose }: ReviewFormProps) {
                                 <Button className="min-w-32" type="button" variant="destructive" onClick={() => onClose?.()}>
                                     Close
                                 </Button>
-                                <Button className="min-w-32" disabled={loading} isLoading={loading} type="submit" variant="primary">
+                                <Button className="min-w-32" disabled={loading} isLoading={loading} type="submit">
                                     {user?.id ? "Update" : "Create"}
                                 </Button>
                             </div>

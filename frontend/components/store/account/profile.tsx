@@ -135,7 +135,7 @@ const ProfilePage: React.FC = () => {
                             </div>
                         </div>
                         {editingSection !== "profile" && (
-                            <Button className="mt-2 md:mt-0" variant="primary" onClick={() => handleEdit("profile")}>
+                            <Button className="mt-2 md:mt-0" onClick={() => handleEdit("profile")}>
                                 Edit
                             </Button>
                         )}
@@ -190,7 +190,7 @@ const ProfilePage: React.FC = () => {
 
                                 {editingSection === "profile" && (
                                     <div className="flex space-x-3 mt-6">
-                                        <Button disabled={isPending} isLoading={isPending} type="submit" variant="primary">
+                                        <Button disabled={isPending} isLoading={isPending} type="submit">
                                             Save Changes
                                         </Button>
                                         <Button type="button" variant="outline" onClick={handleCancel}>
@@ -214,7 +214,7 @@ const ProfilePage: React.FC = () => {
                                 </div>
                             </div>
                             {editingSection !== "password" && (
-                                <Button className="mt-2 md:mt-0" variant="primary" onClick={() => handleEdit("password")}>
+                                <Button className="mt-2 md:mt-0" onClick={() => handleEdit("password")}>
                                     Change Password
                                 </Button>
                             )}
@@ -282,7 +282,7 @@ const ProfilePage: React.FC = () => {
                                         />
 
                                         <div className="flex space-x-3 mt-6">
-                                            <Button disabled={isPending} isLoading={isPending} type="submit" variant="primary">
+                                            <Button disabled={isPending} isLoading={isPending} type="submit">
                                                 Update Password
                                             </Button>
                                             <Button type="button" variant="outline" onClick={handleCancel}>

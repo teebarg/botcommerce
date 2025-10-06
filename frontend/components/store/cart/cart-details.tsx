@@ -46,7 +46,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
                             <ShoppingCart className="h-24 w-24 text-muted-foreground mb-4" />
                             <p className="text-foreground font-semibold text-2xl">Your cart is empty</p>
                             <p className="text-muted-foreground">Add items to your cart to view them here.</p>
-                            <Button className="mt-4 rounded-full" variant="primary" onClick={onClose}>
+                            <Button className="mt-4 rounded-full" onClick={onClose}>
                                 Continue Shopping
                             </Button>
                         </div>
@@ -77,7 +77,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
                             <span>{currency(cart?.total || 0)}</span>
                         </div>
                         {path !== "/checkout" && (
-                            <BtnLink className="w-full rounded-full font-medium mt-4" href="/checkout" size="lg" variant="primary">
+                            <BtnLink className="w-full rounded-full font-medium mt-4" href="/checkout" size="lg">
                                 Checkout
                             </BtnLink>
                         )}

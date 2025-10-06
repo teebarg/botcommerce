@@ -153,15 +153,7 @@ const SignUpForm: React.FC<Props> = () => {
                         </LocalizedClientLink>
                         .
                     </span>
-                    <Button
-                        aria-label="join us"
-                        className="w-full mt-6"
-                        data-testid="register-button"
-                        isLoading={isPending}
-                        size="lg"
-                        type="submit"
-                        variant="primary"
-                    >
+                    <Button aria-label="join us" className="w-full mt-6" data-testid="register-button" isLoading={isPending} size="lg" type="submit">
                         Join Us
                     </Button>
                 </form>

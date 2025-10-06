@@ -106,10 +106,10 @@ export function ProductDetails() {
                 )}
 
                 <div className="flex justify-between mb-4">
-                    <Button className="text-xs" size="sm" variant="indigo" onClick={handleManageCollections}>
+                    <Button className="text-xs" size="sm" onClick={handleManageCollections}>
                         Collections
                     </Button>
-                    <Button className="text-xs" size="sm" variant="indigo" onClick={handleManageCategories}>
+                    <Button className="text-xs" size="sm" onClick={handleManageCategories}>
                         Categories
                     </Button>
                 </div>
@@ -122,7 +122,7 @@ export function ProductDetails() {
                             <div
                                 key={`${product.id}-${idx}`}
                                 ref={isLast ? (lastElementRef as any) : undefined}
-                                className="relative bg-card border border-divider rounded-lg shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow"
+                                className="relative bg-card border border-input rounded-lg shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow"
                             >
                                 <div className="relative aspect-product w-full bg-card overflow-hidden">
                                     <img

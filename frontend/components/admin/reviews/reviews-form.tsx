@@ -80,7 +80,7 @@ const UpdateReviewForm: React.FC<Props> = ({ onClose, review }) => {
                         <Button aria-label="cancel" className="min-w-32" type="button" variant="destructive" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button aria-label="update" className="min-w-32" isLoading={isPending} type="submit" variant="primary">
+                        <Button aria-label="update" className="min-w-32" isLoading={isPending} type="submit">
                             Update
                         </Button>
                     </div>

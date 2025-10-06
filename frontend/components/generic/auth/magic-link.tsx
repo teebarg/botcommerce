@@ -57,7 +57,6 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
                     isLoading={loading}
                     size="md"
                     type="button"
-                    variant="primary"
                     onClick={handleEmailSignIn}
                 >
                     Send Magic Link

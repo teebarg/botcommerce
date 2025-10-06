@@ -62,7 +62,7 @@ const CustomerView: React.FC = () => {
                     <CustomerCreateGuest />
                 </div>
                 <>
-                    <div key="table" className="md:block hidden bg-secondary">
+                    <div key="table" className="md:block hidden bg-card">
                         <CustomerFilter open={filterOpen} onOpenChange={setFilterOpen} />
                         <Table>
                             <TableHeader>
@@ -102,7 +102,7 @@ const CustomerView: React.FC = () => {
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <Badge variant={user.role == "ADMIN" ? "secondary" : "default"}>{user.role}</Badge>
+                                                <Badge variant={user.role == "ADMIN" ? "contrast" : "default"}>{user.role}</Badge>
                                             </TableCell>
                                             <TableCell>{getStatusBadge(user.status as Status)}</TableCell>
                                             <TableCell>{user.orders?.length}</TableCell>
@@ -125,7 +125,7 @@ const CustomerView: React.FC = () => {
                                     <Search className="text-muted-foreground" size={18} />
                                 </div>
                                 <input
-                                    className="pl-10 pr-12 py-2 w-full border border-divider rounded-lg focus:outline-none"
+                                    className="pl-10 pr-12 py-2 w-full border border-input rounded-lg focus:outline-none"
                                     placeholder="Search customers..."
                                     type="text"
                                     value={searchQuery}

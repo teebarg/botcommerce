@@ -28,8 +28,8 @@ export default function SharedCollectionList() {
                     sheetClassName="min-w-[450px]"
                     title="Add New Catalog"
                     trigger={
-                        <Button variant="primary" onClick={state.open}>
-                            <Plus className="w-4 h-4 mr-2" />
+                        <Button onClick={state.open}>
+                            <Plus className="w-4 h-4" />
                             Add New
                         </Button>
                     }

@@ -49,7 +49,7 @@ export default function Wishlist() {
                         <p className="text-muted-foreground max-w-sm mx-auto">Explore our luxury collection to add items</p>
                     </div>
 
-                    <BtnLink href="/collections" size="lg" variant="primary">
+                    <BtnLink href="/collections" size="lg">
                         Explore Collection
                     </BtnLink>
                 </div>

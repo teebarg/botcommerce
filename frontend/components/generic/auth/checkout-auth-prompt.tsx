@@ -31,7 +31,7 @@ const CheckoutLoginPrompt: React.FC = () => {
                     <div className="flex items-center justify-center">
                         <Dialog>
                             <DialogTrigger asChild>
-                                <Button variant="primary">Sign in to continue</Button>
+                                <Button>Sign in to continue</Button>
                             </DialogTrigger>
                             <DialogContent>
                                 <DialogHeader>

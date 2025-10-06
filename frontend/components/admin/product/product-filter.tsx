@@ -60,7 +60,7 @@ const ProductFilter = ({ collections, selectedCollections, onApplyFilters, onClo
                 <Button className="flex-1" variant="destructive" onClick={handleReset}>
                     Reset
                 </Button>
-                <Button className="flex-1" variant="primary" onClick={handleApply}>
+                <Button className="flex-1" onClick={handleApply}>
                     Apply Filters
                 </Button>
             </div>

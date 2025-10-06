@@ -9,7 +9,7 @@ interface CollectionItemProps {
 
 const CollectionItem = ({ collection }: CollectionItemProps) => {
     return (
-        <div className="border border-divider rounded-lg overflow-hidden bg-card flex">
+        <div className="border border-input rounded-lg overflow-hidden bg-card flex">
             <img alt={collection.name} className="object-cover rounded" height={100} src="/placeholder.jpg" width={100} />
             <div className="p-3 flex-1">
                 <div className="flex items-center justify-between">

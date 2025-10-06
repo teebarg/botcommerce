@@ -35,7 +35,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false }) 
 
     return (
         <div
-            className={cn("border border-border rounded-lg p-5 min-h-[200px] h-full w-full flex flex-col justify-between transition-colors", {
+            className={cn("bg-card border border-border rounded-lg p-5 min-h-[200px] h-full w-full flex flex-col justify-between transition-colors", {
                 "border-primary": isActive,
             })}
             data-testid="address-container"
@@ -103,7 +103,7 @@ const AddressBook: React.FC = () => {
                     sheetClassName="min-w-[30vw]"
                     title="Add new address"
                     trigger={
-                        <Button variant="primary" onClick={addState.open}>
+                        <Button onClick={addState.open}>
                             <Plus className="h-5 w-5" />
                             <span className="font-semibold">Add new address</span>
                         </Button>

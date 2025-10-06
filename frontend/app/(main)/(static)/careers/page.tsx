@@ -38,9 +38,7 @@ const CareerOpportunities = async () => {
                                 <div key={index} className="bg-card rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300">
                                     <h3 className="text-xl font-semibold mb-2 text-foreground">{job.title}</h3>
                                     <p className="mb-4 text-foreground">{job.location}</p>
-                                    <BtnLink href="" variant="primary">
-                                        Learn More
-                                    </BtnLink>
+                                    <BtnLink href="">Learn More</BtnLink>
                                 </div>
                             ))}
                         </div>
@@ -51,7 +49,7 @@ const CareerOpportunities = async () => {
                                 {`We don't have any open positions at the moment, but we're always on the lookout for talent. Please check back later or
                                 submit your resume for future opportunities.`}
                             </p>
-                            <BtnLink href="#" size="lg" variant="primary">
+                            <BtnLink href="#" size="lg">
                                 Submit Your Resume
                             </BtnLink>
                         </div>

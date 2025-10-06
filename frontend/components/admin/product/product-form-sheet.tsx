@@ -261,7 +261,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                 <Button variant="destructive" onClick={onClose}>
                     Close
                 </Button>
-                <Button disabled={isDisabled} isLoading={isPending} variant="indigo" onClick={handleSubmit}>
+                <Button disabled={isDisabled} isLoading={isPending} onClick={handleSubmit}>
                     Save
                 </Button>
             </div>

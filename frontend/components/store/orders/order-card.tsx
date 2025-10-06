@@ -18,7 +18,7 @@ const OrderCard = ({ order }: { order: Order }) => {
     }, [order]);
 
     return (
-        <Card className="shadow-md bg-secondary">
+        <Card className="shadow-md bg-card">
             <CardHeader className="pb-4">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
@@ -41,7 +41,7 @@ const OrderCard = ({ order }: { order: Order }) => {
                             open={state.isOpen}
                             sheetClassName="min-w-[70vw]"
                             trigger={
-                                <Button className="flex items-center gap-2" size="sm" variant="indigo">
+                                <Button className="flex items-center gap-2" size="sm">
                                     <Eye className="h-4 w-4" />
                                     <span className="hidden sm:inline">See details</span>
                                 </Button>

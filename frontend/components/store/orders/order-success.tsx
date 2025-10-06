@@ -65,7 +65,7 @@ const SuccessConfirmation: React.FC<OrderConfirmationProps> = ({ order, onContin
                         <ArrowRight className="ml-2 w-4 h-4" />
                     </Button> */}
 
-                    <Button className="w-full" size="lg" variant="primary" onClick={onContinueShopping}>
+                    <Button className="w-full" size="lg" onClick={onContinueShopping}>
                         Continue Shopping
                     </Button>
                 </div>

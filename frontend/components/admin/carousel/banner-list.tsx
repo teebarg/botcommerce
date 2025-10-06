@@ -30,7 +30,7 @@ export default function CarouselBannerList() {
                         open={addState.isOpen}
                         title="Add Banner"
                         trigger={
-                            <Button size="lg" variant="primary">
+                            <Button size="lg">
                                 <Plus className="w-5 h-5" />
                                 Add Banner
                             </Button>

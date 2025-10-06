@@ -42,7 +42,7 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
             </FadeInComponent>
 
             <FadeInComponent delay="100ms">
-                <div className="bg-secondary rounded-xl shadow-sm p-4 mb-6 mt-4">
+                <div className="bg-emerald-100/20 rounded-xl shadow-sm p-4 mb-6 mt-4">
                     <h3 className="text-lg font-medium mb-4">Bank Transfer Details</h3>
                     <div className="space-y-1">
                         <div className="flex items-center justify-between">
@@ -67,12 +67,12 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
 
             {order?.payment_method === "BANK_TRANSFER" && (
                 <FadeInComponent delay="200ms">
-                    <div className="mb-8 p-6 bg-gradient-to-r from-secondary/20 to-accent/20 border border-orange-200 rounded-2xl">
+                    <div className="mb-8 p-6 bg-contrast/10 rounded-2xl">
                         <div className="flex items-center justify-center gap-2 mb-4">
-                            <AlertCircle className="w-5 h-5 text-accent" />
-                            <span className="font-medium text-accent">Payment Pending</span>
+                            <AlertCircle className="w-6 h-6 text-contrast" />
+                            <span className="font-semibold">Payment Pending</span>
                         </div>
-                        <p className="text-sm text-accent mb-4">
+                        <p className="text-sm text-muted-foreground mb-4">
                             Your order is currently pending payment. Please complete your bank transfer using the details provided.
                         </p>
                         <div className="p-4 bg-secondary rounded-lg">
@@ -110,7 +110,7 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
 
             <FadeInComponent delay="700ms">
                 <div className="mt-6">
-                    <Button className="w-full" size="lg" variant="primary" onClick={onContinueShopping}>
+                    <Button className="w-full" size="lg" onClick={onContinueShopping}>
                         Continue Shopping
                         <ArrowRight className="ml-2 w-4 h-4" />
                     </Button>

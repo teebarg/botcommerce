@@ -23,7 +23,7 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
             label: string;
             nextStatus: OrderStatus | null;
             actionLabel: string;
-            variant: "default" | "destructive" | "outline" | "secondary" | "success" | "warning" | "accent";
+            variant: "default" | "destructive" | "outline" | "secondary" | "success" | "warning" | "contrast";
         }
     > = {
         REFUNDED: {
@@ -41,11 +41,11 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
             variant: "warning",
         },
         PROCESSING: {
-            color: "bg-accent text-accent-foreground",
+            color: "bg-contrast text-contrast-foreground",
             label: "Processing",
             nextStatus: "SHIPPED" as const,
             actionLabel: "Order Packed",
-            variant: "accent",
+            variant: "contrast",
         },
         SHIPPED: {
             color: "bg-blue-100 text-blue-700",
@@ -137,7 +137,6 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
                                         aria-label="confirm"
                                         className="min-w-36"
                                         isLoading={isPending}
-                                        variant="indigo"
                                         onClick={() => handleStatusChange(order.id, config.nextStatus)}
                                     >
                                         Confirm

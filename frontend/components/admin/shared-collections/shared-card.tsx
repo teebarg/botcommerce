@@ -9,7 +9,7 @@ import { DBCatalog } from "@/schemas";
 import { formatDate } from "@/lib/utils";
 
 export const SharedCard: React.FC<{ catalog: DBCatalog }> = ({ catalog }) => (
-    <Card className="group hover:shadow-lg transition-all duration-200 bg-secondary">
+    <Card className="group hover:shadow-lg transition-all duration-200">
         <CardHeader className="pb-3">
             <div className="flex items-start justify-between">
                 <div className="space-y-1 flex-1">

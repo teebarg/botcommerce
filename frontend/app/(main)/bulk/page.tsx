@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Package, Truck, Users, CheckCircle, Phone, Mail, MapPin } from "lucide-react";
+import { Package, Truck, Users, CheckCircle, Phone, Mail, MapPin, Dot } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -121,7 +121,7 @@ const BulkPurchase: React.FC = () => {
         <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/10">
             <section className="relative py-20 px-4">
                 <div className="max-w-6xl mx-auto text-center">
-                    <Badge className="mb-4" variant="secondary">
+                    <Badge className="mb-4" variant="contrast">
                         Wholesale & Bulk Orders
                     </Badge>
                     <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary via-primary/80 to-accent bg-clip-text text-transparent mb-6">
@@ -160,9 +160,9 @@ const BulkPurchase: React.FC = () => {
                                 return (
                                     <Card
                                         key={idx}
-                                        className={`cursor-pointer transition-all duration-200 hover:shadow-lg border-2 ${
-                                            isSelected ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
-                                        } ${option.popular ? "ring-2 ring-accent/20" : ""}`}
+                                        className={`cursor-pointer transition-all duration-200 hover:shadow-lg border-1 ${
+                                            isSelected ? "border-primary/40 bg-primary/5" : "border-border hover:border-primary/30"
+                                        } ${option.popular ? "ring-1 ring-accent/20" : ""}`}
                                         onClick={() => handleBulkTypeSelect(option.id)}
                                     >
                                         <CardHeader className="pb-4">
@@ -170,7 +170,7 @@ const BulkPurchase: React.FC = () => {
                                                 <div className="flex items-center gap-3">
                                                     <div
                                                         className={`p-2 rounded-lg ${
-                                                            isSelected ? "bg-primary text-primary-foreground" : "bg-secondary"
+                                                            isSelected ? "bg-primary text-primary-foreground" : "bg-background"
                                                         }`}
                                                     >
                                                         <IconComponent className="w-5 h-5" />
@@ -181,7 +181,7 @@ const BulkPurchase: React.FC = () => {
                                                     </div>
                                                 </div>
                                                 {option.popular && (
-                                                    <Badge className="bg-accent text-accent-foreground" variant="default">
+                                                    <Badge className="bg-contrast text-contrast-foreground" variant="default">
                                                         Popular
                                                     </Badge>
                                                 )}
@@ -212,7 +212,7 @@ const BulkPurchase: React.FC = () => {
                                 <div className="grid gap-3">
                                     {benefits.map((benefit, index) => (
                                         <div key={index} className="flex items-center gap-3">
-                                            <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                                            <Dot className="w-4 h-4 text-contrast flex-shrink-0" />
                                             <span className="text-sm">{benefit}</span>
                                         </div>
                                     ))}
@@ -313,13 +313,7 @@ const BulkPurchase: React.FC = () => {
                                             <p className="text-sm text-muted-foreground">* Please select a bulk option above</p>
                                         )}
 
-                                        <Button
-                                            className="w-full"
-                                            disabled={!form.watch("bulkType") || isSubmitting}
-                                            size="lg"
-                                            type="submit"
-                                            variant="indigo"
-                                        >
+                                        <Button className="w-full" disabled={!form.watch("bulkType") || isSubmitting} size="lg" type="submit">
                                             {isSubmitting ? "Submitting..." : "Submit Interest & Get Quote"}
                                         </Button>
                                     </form>

@@ -188,13 +188,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                 </Button>
             ) : (
                 <div className="flex items-center gap-4 mt-4">
-                    <Button
-                        className="w-auto"
-                        disabled={loading || !selectedVariant || outOfStock}
-                        size="lg"
-                        variant="primary"
-                        onClick={handleAddToCart}
-                    >
+                    <Button className="w-auto" disabled={loading || !selectedVariant || outOfStock} size="lg" onClick={handleAddToCart}>
                         {loading ? "Adding to cart..." : outOfStock ? "Out of Stock" : "Add to Cart"}
                     </Button>
                     <Button

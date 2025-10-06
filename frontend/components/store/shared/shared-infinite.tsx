@@ -95,9 +95,7 @@ export default function SharedInfinite({ slug, initialCatalog, initialSearchPara
                             <p className="text-muted-foreground mb-6 max-w-md">
                                 {`We couldn't find any products matching your search criteria. Try adjusting your filters or search terms.`}
                             </p>
-                            <Button variant="indigo" onClick={onClearAll}>
-                                Clear all filters
-                            </Button>
+                            <Button onClick={onClearAll}>Clear all filters</Button>
                         </div>
                     )}
 

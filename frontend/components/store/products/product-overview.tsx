@@ -179,7 +179,7 @@ const ProductOverview: React.FC<{
                                 <button
                                     key={idx}
                                     className={cn(
-                                        "relative w-10 h-10 rounded-full transition-all border border-divider focus:outline-hidden",
+                                        "relative w-10 h-10 rounded-full transition-all border border-input focus:outline-hidden",
                                         "ring-offset-1 data-[state=checked]:ring-2 data-[state=checked]:ring-blue-500",
                                         {
                                             "cursor-not-allowed opacity-60": !available,
@@ -314,7 +314,6 @@ const ProductOverview: React.FC<{
                             disabled={loading || !selectedVariant || outOfStock}
                             isLoading={loading}
                             size="lg"
-                            variant="indigo"
                             onClick={handleAddToCartAndTrack}
                         >
                             <ShoppingCart className="w-5 h-5 relative z-10 hover:rotate-12 transition-transform duration-300 mr-2" />

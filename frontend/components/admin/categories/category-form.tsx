@@ -70,7 +70,7 @@ const CategoryForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
     };
 
     return (
-        <div className="mx-auto w-full px-2 py-6">
+        <div className="mx-auto w-full px-2 py-6 bg-card h-full">
             <h2 className="text-xl font-semibold mb-4">{isCreate ? "Create Category" : "Update Category"}</h2>
             <Form {...form}>
                 <form className="h-full flex flex-col" onSubmit={handleSubmit(onSubmit)}>
@@ -92,7 +92,7 @@ const CategoryForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
                             control={control}
                             name="is_active"
                             render={({ field }) => (
-                                <FormItem className="flex items-center justify-between rounded-lg border border-divider px-4 py-2">
+                                <FormItem className="flex items-center justify-between rounded-lg border border-input px-4 py-2">
                                     <div className="space-y-0.5">
                                         <FormLabel>Active</FormLabel>
                                     </div>
@@ -105,10 +105,10 @@ const CategoryForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
                         {/* {hasParent && parent_id && <input type="hidden" {...form.register("parent_id", { value: parent_id })} />} */}
                     </div>
                     <div className="flex items-center justify-end space-x-2 mt-6">
-                        <Button aria-label="cancel" className="min-w-32" disabled={isPending} type="button" variant="outline" onClick={onClose}>
+                        <Button aria-label="cancel" className="min-w-32" disabled={isPending} type="button" variant="destructive" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button aria-label="submit" className="min-w-32" isLoading={isPending} type="submit" variant="primary">
+                        <Button aria-label="submit" className="min-w-32" isLoading={isPending} type="submit">
                             {isCreate ? "Submit" : "Update"}
                         </Button>
                     </div>

@@ -66,7 +66,7 @@ export function ProductReview({ product }: ProductReviewProps) {
                             <p className="text-sm text-muted-foreground">No images uploaded</p>
                         )}
                     </Card>
-                    <Card className="p-4 bg-accent/30 border border-primary/20">
+                    <Card className="p-4 bg-contrast/20 border border-primary/20">
                         <h4 className="font-medium text-card-foreground mb-4">Product Details</h4>
                         <div>
                             {product.name && (
@@ -78,7 +78,7 @@ export function ProductReview({ product }: ProductReviewProps) {
                             <Label className="text-xs font-medium text-muted-foreground">Categories</Label>
                             <div className="flex flex-wrap gap-2 mb-4">
                                 {product.categories.map((category, idx: number) => (
-                                    <Badge key={idx} className="text-xs" variant="primary">
+                                    <Badge key={idx} className="text-xs">
                                         {category.label}
                                     </Badge>
                                 ))}

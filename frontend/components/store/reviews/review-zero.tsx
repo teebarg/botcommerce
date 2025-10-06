@@ -79,7 +79,7 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
                             sheetClassName="min-w-120"
                             title="Write the First Review"
                             trigger={
-                                <Button className="w-full md:w-auto px-8" variant="indigo">
+                                <Button className="w-full md:w-auto px-8">
                                     Write the First Review
                                 </Button>
                             }

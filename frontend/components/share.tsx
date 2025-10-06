@@ -62,12 +62,12 @@ export default function ShareButton() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="accent">
+                <Button variant="contrast">
                     <Share2 className="h-4 w-4 mr-1" />
                     Share
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64 p-2 shadow-hover border-primary/10 bg-secondary">
+            <DropdownMenuContent align="end" className="w-64 p-2 shadow-hover bg-secondary">
                 <div className="px-2 py-1.5 mb-2">
                     <h4 className="text-sm font-semibold text-foreground">Share Product</h4>
                     <p className="text-xs text-muted-foreground">Share with your friends</p>
@@ -84,8 +84,8 @@ export default function ShareButton() {
                 </DropdownMenuItem>
 
                 <DropdownMenuItem className="gap-3 p-3 rounded-lg group" onClick={handleNativeShare}>
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/30">
-                        <Smartphone className="h-4 w-4 text-accent-foreground" />
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-contrast/10">
+                        <Smartphone className="h-4 w-4 text-contrast" />
                     </div>
                     <div className="flex flex-col">
                         <span className="font-medium text-foreground">More</span>

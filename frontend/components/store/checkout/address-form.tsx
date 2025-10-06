@@ -246,7 +246,6 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
                             data-testid="submit-address-button"
                             isLoading={updateCartDetails.isPending}
                             type="submit"
-                            variant="primary"
                         >
                             Create
                         </Button>

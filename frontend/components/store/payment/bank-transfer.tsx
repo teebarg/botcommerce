@@ -27,7 +27,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({ amount }) => {
 
     return (
         <div className="space-y-4 border-t pt-6">
-            <div className="p-4 bg-accent/10 rounded-lg">
+            <div className="p-4 bg-contrast/10 rounded-lg">
                 <h4 className="font-medium mb-3 flex items-center space-x-2">
                     <Banknote className="h-4 w-4" />
                     <span>Bank Transfer Details</span>
@@ -50,7 +50,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({ amount }) => {
                         </div>
                     </div>
                 </div>
-                <div className="mt-3 p-3 bg-background rounded border-l-4 border-accent">
+                <div className="mt-3 p-3 bg-background rounded border-l-4 border-contrast">
                     <p className="text-sm text-muted-foreground">
                         Please include the order number in your transfer description. Your order will be processed once payment is received (1-3
                         business days).
@@ -63,7 +63,6 @@ const BankTransfer: React.FC<BankTransferProps> = ({ amount }) => {
                 disabled={completeCart.isPending}
                 isLoading={completeCart.isPending}
                 size="lg"
-                variant="accent"
                 onClick={onPaymentCompleted}
             >
                 Pay {currency(amount)} via Bank Transfer

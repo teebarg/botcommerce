@@ -90,7 +90,7 @@ const RecentOrdersList = () => {
             <div className="rounded-lg shadow-sm overflow-hidden md:hidden">
                 <div className="space-y-2">
                     {orders?.map((order: Order, idx: number) => (
-                        <div key={idx} className="p-4 bg-secondary">
+                        <div key={idx} className="p-4 bg-card">
                             <div className="flex justify-between items-center mb-2 mt-2">
                                 <span className="font-medium">{order.order_number}</span>
                                 <PaymentStatusBadge status={order.payment_status} />

@@ -75,7 +75,6 @@ export function ShopSocialForm({ settings }: ShopDetailsProps) {
                     disabled={syncShopDetailsMutation.isPending}
                     isLoading={syncShopDetailsMutation.isPending}
                     type="button"
-                    variant="primary"
                     onClick={handleUpdate}
                 >
                     Save Changes

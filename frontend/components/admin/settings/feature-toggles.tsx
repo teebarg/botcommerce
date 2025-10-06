@@ -54,7 +54,7 @@ export function FeatureToggles({ toggles }: FeatureTogglesProps) {
     };
 
     return (
-        <div className="space-y-4 py-8 px-2 bg-secondary">
+        <div className="space-y-4 py-8 px-2 bg-card">
             {defaultFeatures.map((feature) => {
                 const existingToggle = toggles.find((t) => t.key === feature.key);
                 const isEnabled = existingToggle ? existingToggle.value === "true" : false;

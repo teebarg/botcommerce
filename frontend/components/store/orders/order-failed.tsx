@@ -76,7 +76,7 @@ const FailedPayment: React.FC<OrderConfirmationProps> = ({ order, onRetry, onCon
                         <CreditCard className="mr-2 w-5 h-5" />
                         Try Payment Again
                     </button>
-                    <Button className="w-full" size="lg" variant="primary" onClick={onContinueShopping}>
+                    <Button className="w-full" size="lg" onClick={onContinueShopping}>
                         Continue Shopping
                     </Button>
                 </div>

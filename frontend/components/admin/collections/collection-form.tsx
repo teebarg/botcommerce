@@ -72,7 +72,7 @@ const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
     };
 
     return (
-        <div className="mx-auto w-full py-6 px-2 bg-secondary h-full">
+        <div className="mx-auto w-full py-6 px-2 bg-card h-full">
             <h3 className="text-lg font-medium mb-4">{isCreate ? "Create Collection" : "Update Collection"}</h3>
             <Form {...form}>
                 <form className="h-full flex flex-col" onSubmit={handleSubmit(onSubmit)}>
@@ -92,7 +92,7 @@ const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
                             control={control}
                             name="is_active"
                             render={({ field }) => (
-                                <FormItem className="flex items-center justify-between rounded-lg border border-divider px-4 py-2">
+                                <FormItem className="flex items-center justify-between rounded-lg border border-input px-4 py-2">
                                     <div className="space-y-0.5">
                                         <FormLabel>Active</FormLabel>
                                     </div>
@@ -113,7 +113,6 @@ const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
                             disabled={isPending}
                             isLoading={isPending}
                             type="submit"
-                            variant="primary"
                         >
                             {isCreate ? "Submit" : "Update"}
                         </Button>

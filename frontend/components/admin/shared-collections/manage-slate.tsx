@@ -30,16 +30,7 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
     }
 
     return (
-        <Overlay
-            open={state.isOpen}
-            title="Manage Catalogs"
-            trigger={
-                <Button size="sm" variant="indigo">
-                    Catalogs
-                </Button>
-            }
-            onOpenChange={state.setOpen}
-        >
+        <Overlay open={state.isOpen} title="Manage Catalogs" trigger={<Button size="sm">Catalogs</Button>} onOpenChange={state.setOpen}>
             <div className="bg-background overflow-auto">
                 <div className="p-4">
                     <h3 className="text-lg font-semibold">Manage Catalogs</h3>
@@ -48,7 +39,7 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
                 <div className="p-4">
                     <div className="mb-4">
                         <h4 className="font-medium mb-2">Product:</h4>
-                        <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                        <div className="flex items-center gap-3 p-3 bg-card rounded-lg">
                             <div key={product.id} className="relative w-16 h-16 rounded-md overflow-hidden">
                                 <img
                                     alt={product.name}
@@ -111,7 +102,7 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ catalog, product }) => 
     };
 
     return (
-        <Card className="bg-secondary">
+        <Card className="bg-card">
             <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -140,7 +131,7 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ catalog, product }) => 
                                 variant="destructive"
                                 onClick={handleRemoveFromCollection}
                             >
-                                <Trash2 className="h-3 w-3 mr-1" />
+                                <Trash2 className="h-3 w-3" />
                                 Remove
                             </Button>
                         </div>
@@ -150,10 +141,9 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ catalog, product }) => 
                             disabled={!catalog.is_active || addProductMutation.isPending}
                             isLoading={addProductMutation.isPending}
                             size="sm"
-                            variant="indigo"
                             onClick={handleAddToCollection}
                         >
-                            <Plus className="h-3 w-3 mr-1" />
+                            <Plus className="h-3 w-3" />
                             Add
                         </Button>
                     )}

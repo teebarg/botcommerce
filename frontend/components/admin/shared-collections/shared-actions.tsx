@@ -34,17 +34,16 @@ const SharedActions: React.FC<Props> = ({ item }) => {
 
     return (
         <div className="relative flex items-center justify-end gap-2 mt-4">
-            <Button size="icon" variant="indigo" onClick={() => router.push(`/shared/${item.slug}`)}>
-                <Eye className="h-5 w-5" />
+            <Button size="icon" className="bg-primary/10" variant="ghost" onClick={() => router.push(`/shared/${item.slug}`)}>
+                <Eye className="h-5 w-5 text-primary" />
             </Button>
             <Overlay
                 open={editState.isOpen}
                 sheetClassName="min-w-150"
                 title="Edit Shared Collection"
                 trigger={
-                    <Button>
-                        <Edit className="h-5 w-5 mr-1" />
-                        Edit
+                    <Button className="bg-contrast/10" variant="ghost">
+                        <Edit className="h-5 w-5 text-contrast" />
                     </Button>
                 }
                 onOpenChange={editState.setOpen}

@@ -78,7 +78,7 @@ const OrderNotes: React.FC<OrderNotesProp> = ({ order }) => {
                     <p className="text-xs text-muted-foreground">{notes.length}/500 characters</p>
                 </div>
 
-                <Button className="w-full" disabled={!notes.trim() || isLoading} variant="primary" onClick={handleSaveNote}>
+                <Button className="w-full" disabled={!notes.trim() || isLoading} onClick={handleSaveNote}>
                     <Save className="w-4 h-4 mr-2" />
                     {isLoading ? "Saving..." : "Save Note"}
                 </Button>

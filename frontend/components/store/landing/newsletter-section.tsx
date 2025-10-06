@@ -64,7 +64,7 @@ const NewsletterSection: React.FC = () => {
     if (isSubscribed) {
         return (
             <section className="py-16">
-                <div className="bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 max-w-5xl mx-auto text-center rounded-2xl border border-divider p-8 shadow-lg">
+                <div className="bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 max-w-5xl mx-auto text-center rounded-2xl border border-input p-8 shadow-lg">
                     <div className="mb-6">
                         <div className="w-16 h-16 bg-success rounded-full flex items-center justify-center mx-auto mb-4">
                             <CheckCircle className="h-8 w-8 text-secondary" />
@@ -76,7 +76,7 @@ const NewsletterSection: React.FC = () => {
                     </div>
 
                     <div className="bg-card rounded-lg p-4 mb-6 w-fit mx-auto">
-                        <Badge className="mb-2" variant="primary">
+                        <Badge className="mb-2">
                             Welcome Bonus
                         </Badge>
                         <p className="text-sm text-muted-foreground">
@@ -97,7 +97,7 @@ const NewsletterSection: React.FC = () => {
             <div className="container mx-auto px-4">
                 <div className="max-w-5xl mx-auto">
                     <div className="text-center mb-12">
-                        <div className="inline-flex items-center gap-2 bg-card rounded-full px-4 py-2 border border-divider mb-4">
+                        <div className="inline-flex items-center gap-2 bg-card rounded-full px-4 py-2 border border-input mb-4">
                             <Mail className="h-4 w-4 text-primary" />
                             <span className="text-sm font-medium text-foreground">Newsletter</span>
                         </div>
@@ -111,7 +111,7 @@ const NewsletterSection: React.FC = () => {
                         {benefits.map((benefit, idx: number) => (
                             <div
                                 key={idx}
-                                className="bg-secondary rounded-lg border border-divider p-6 text-center hover:shadow-md transition-shadow"
+                                className="bg-card rounded-lg border border-input p-6 text-center hover:shadow-md transition-shadow"
                             >
                                 <div className={`w-12 h-12 ${benefit.bgColor} rounded-lg flex items-center justify-center mx-auto mb-4`}>
                                     <benefit.icon className={`h-6 w-6 ${benefit.color}`} />
@@ -122,7 +122,7 @@ const NewsletterSection: React.FC = () => {
                         ))}
                     </div>
 
-                    <div className="bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 rounded-2xl border border-divider p-8 shadow-lg">
+                    <div className="bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 rounded-2xl border border-input p-8 shadow-lg">
                         <div className="max-w-md mx-auto">
                             <div className="text-center mb-6">
                                 <h3 className="text-xl font-semibold mb-2">Subscribe Now</h3>
@@ -156,7 +156,6 @@ const NewsletterSection: React.FC = () => {
                                             isLoading={isPending}
                                             size="lg"
                                             type="submit"
-                                            variant="primary"
                                         >
                                             <div className="flex items-center gap-2">
                                                 <Mail className="h-4 w-4" />
@@ -167,7 +166,7 @@ const NewsletterSection: React.FC = () => {
                                 </form>
                             </Form>
 
-                            <div className="mt-6 pt-6 border-t border-divider">
+                            <div className="mt-6 pt-6 border-t border-input">
                                 <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
                                     <div className="flex items-center gap-1">
                                         <CheckCircle className="h-3 w-3 text-accent" />

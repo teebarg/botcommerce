@@ -31,7 +31,7 @@ export function ProductInventory() {
                 <p className="text-sm text-muted-foreground">Manage your product inventory and stock levels. Scroll down to load more products.</p>
             </div>
             <div className="flex flex-wrap gap-2 mb-2">
-                <Button variant="primary" onClick={() => router.push("/admin/products/create")}>
+                <Button onClick={() => router.push("/admin/products/create")}>
                     Create Product
                 </Button>
                 <Button

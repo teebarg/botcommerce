@@ -23,10 +23,10 @@ export function ContactSection() {
                 <div className="grid lg:grid-cols-2 gap-12">
                     <div className="space-y-8">
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-card p-6 rounded-lg border border-divider">
+                            <div className="bg-card p-6 rounded-lg border border-input">
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className="p-2 bg-accent/10 rounded-lg">
-                                        <MapPin className="h-5 w-5 text-accent" />
+                                    <div className="p-2 bg-primary/10 rounded-lg">
+                                        <MapPin className="h-5 w-5 text-primary" />
                                     </div>
                                     <h3 className="font-semibold">Visit Us</h3>
                                 </div>
@@ -37,30 +37,30 @@ export function ContactSection() {
                                 </p>
                             </div>
 
-                            <div className="bg-card p-6 rounded-lg border border-divider">
+                            <div className="bg-card p-6 rounded-lg border border-input">
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className="p-2 bg-accent/10 rounded-lg">
-                                        <Phone className="h-5 w-5 text-accent" />
+                                    <div className="p-2 bg-primary/10 rounded-lg">
+                                        <Phone className="h-5 w-5 text-primary" />
                                     </div>
                                     <h3 className="font-semibold">Call Us</h3>
                                 </div>
                                 <p className="text-muted-foreground text-sm">{settings?.contact_phone}</p>
                             </div>
 
-                            <div className="bg-secondary p-6 rounded-lg border border-divider">
+                            <div className="bg-card p-6 rounded-lg border border-input">
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className="p-2 bg-accent/10 rounded-lg">
-                                        <Mail className="h-5 w-5 text-accent" />
+                                    <div className="p-2 bg-primary/10 rounded-lg">
+                                        <Mail className="h-5 w-5 text-primary" />
                                     </div>
                                     <h3 className="font-semibold">Email Us</h3>
                                 </div>
                                 <p className="text-muted-foreground text-sm">{settings?.contact_email}</p>
                             </div>
 
-                            <div className="bg-secondary p-6 rounded-lg border border-divider">
+                            <div className="bg-card p-6 rounded-lg border border-input">
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className="p-2 bg-warning/10 rounded-lg">
-                                        <Clock className="h-5 w-5 text-warning" />
+                                    <div className="p-2 bg-primary/10 rounded-lg">
+                                        <Clock className="h-5 w-5 text-primary" />
                                     </div>
                                     <h3 className="font-semibold">Hours</h3>
                                 </div>
@@ -72,8 +72,8 @@ export function ContactSection() {
                             </div>
                         </div>
 
-                        <div className="bg-card rounded-lg border border-divider overflow-hidden">
-                            <div className="p-4 border-b border-divider">
+                        <div className="bg-card rounded-lg border border-input overflow-hidden">
+                            <div className="p-4 border-b border-input">
                                 <h3 className="font-semibold flex items-center gap-2">
                                     <MapPin className="h-5 w-5 text-primary" />
                                     Our Location

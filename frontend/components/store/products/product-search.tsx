@@ -222,7 +222,7 @@ const ProductSearchClient: React.FC<ProductSearchProps> = ({
                                 )}
 
                                 {showSuggestions && (
-                                    <div className={`p-2 border-divider ${data?.products?.length ? "border-t" : ""}`}>
+                                    <div className={`p-2 border-input ${data?.products?.length ? "border-t" : ""}`}>
                                         <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wide flex items-center gap-2 text-muted-foreground">
                                             <Clock className="w-3 h-3" />
                                             Suggestions

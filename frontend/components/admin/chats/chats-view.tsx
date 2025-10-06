@@ -112,7 +112,7 @@ const ChatsView: React.FC = () => {
                         </div>
 
                         {conversations?.length === 0 && (
-                            <div className="text-center py-10">
+                            <div className="text-center py-10 bg-card">
                                 <p className="text-muted-foreground">No conversation found</p>
                             </div>
                         )}

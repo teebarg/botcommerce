@@ -17,7 +17,7 @@ const CreateCollection: React.FC<Props> = () => {
             open={state.isOpen}
             title="Create Collection"
             trigger={
-                <Button variant="primary" onClick={state.open}>
+                <Button onClick={state.open}>
                     Create Collection
                 </Button>
             }

@@ -117,14 +117,14 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                 <div className="space-y-4">
                     <div className="sticky top-16 z-10 bg-background space-y-2">
                         {hasChanges && (
-                            <div className="mt-4 p-3 bg-accent/20 border border-accent/20 rounded-md">
-                                <p className="text-sm text-accent">
+                            <div className="mt-4 p-3 bg-contrast/20 border border-contrast/20 rounded-md">
+                                <p className="text-sm text-contrast">
                                     {`You have unsaved changes. Click "Save Order" to apply the new category order.`}
                                 </p>
                             </div>
                         )}
                         {hasChanges && (
-                            <Button disabled={reorderCategories.isPending} size="lg" variant="indigo" onClick={saveOrder}>
+                            <Button disabled={reorderCategories.isPending} size="lg" onClick={saveOrder}>
                                 <Save size={16} />
                                 <span>{reorderCategories.isPending ? "Saving..." : "Save Order"}</span>
                             </Button>
@@ -133,7 +133,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                     {(categories || []).map((category: Category, idx: number) => (
                         <div
                             key={idx}
-                            className="bg-secondary rounded-2xl shadow-sm border border-divider overflow-hidden hover:shadow-md transition-shadow"
+                            className="bg-card rounded-2xl shadow-sm border border-input overflow-hidden hover:shadow-md transition-shadow"
                         >
                             <div className="group">
                                 <div className="py-4 px-2">
@@ -181,13 +181,13 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                                 </div>
 
                                 {category?.subcategories && category?.subcategories?.length > 0 && expandedCategories.includes(category.id) && (
-                                    <div className="border-t border-divider bg-card">
+                                    <div className="border-t border-input bg-card">
                                         <div className="p-6 space-y-4">
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                                 {category?.subcategories?.map((subcategory, idx: number) => (
                                                     <div
                                                         key={idx}
-                                                        className="bg-card rounded-xl p-4 border border-divider hover:shadow-sm transition-shadow group"
+                                                        className="bg-card rounded-xl p-4 border border-input hover:shadow-sm transition-shadow group"
                                                     >
                                                         <div className="flex items-center gap-3">
                                                             <CategoryImage categoryId={subcategory.id} image={subcategory.image} />
@@ -206,7 +206,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                                                 ))}
                                             </div>
 
-                                            <Button className="w-full md:w-auto" variant="primary">
+                                            <Button className="w-full md:w-auto">
                                                 <Plus className="w-5 h-5" />
                                                 Add Subcategory
                                             </Button>
@@ -219,7 +219,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                 </div>
 
                 {(!categories || categories.length === 0) && (
-                    <div className="bg-card rounded-2xl p-12 text-center border-2 border-dashed border-divider">
+                    <div className="bg-card rounded-2xl p-12 text-center border-2 border-dashed border-input">
                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <FileImage className="w-8 h-8 text-gray-400" />
                         </div>
@@ -228,7 +228,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                             Start organizing your products by creating your first category. You can add images and subcategories to make navigation
                             easier.
                         </p>
-                        <Button className="w-full md:w-auto" variant="primary">
+                        <Button className="w-full md:w-auto">
                             <Plus className="w-5 h-5" />
                             Create First Category
                         </Button>

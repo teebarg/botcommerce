@@ -55,7 +55,7 @@ const EditAddressForm: React.FC<EditAddressProps> = ({ address, isActive = false
     };
 
     return (
-        <div className="px-2 md:px-4 py-8">
+        <div className="px-2 md:px-4 py-8 bg-card">
             <h2 className="text-lg font-semibold mb-4">Edit address</h2>
             <Form {...form}>
                 <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -193,7 +193,7 @@ const EditAddressForm: React.FC<EditAddressProps> = ({ address, isActive = false
                         <Button aria-label="cancel" data-testid="cancel-button" type="button" variant="destructive" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button aria-label="update" data-testid="save-button" isLoading={updateAddress.isPending} type="submit" variant="primary">
+                        <Button aria-label="update" data-testid="save-button" isLoading={updateAddress.isPending} type="submit">
                             Update
                         </Button>
                     </div>

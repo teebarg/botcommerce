@@ -53,7 +53,7 @@ const OfflinePage = () => {
                     {isRetrying ? "Retrying..." : "Try Again"}
                 </Button>
 
-                <div className="mt-8 pt-8 border-t border-divider">
+                <div className="mt-8 pt-8 border-t border-input">
                     <h2 className="text-sm font-semibold mb-4">{`While you're offline, you can:`}</h2>
                     <ul className="text-sm text-muted-foreground space-y-2">
                         <li>• View previously loaded content</li>

@@ -34,7 +34,7 @@ const NoProductsFound = ({ searchQuery = "", onClearSearch = () => {}, onGoHome 
                 <p className="text-muted-foreground mb-6 text-sm">Try adjusting your search or browse our suggested categories below.</p>
 
                 <div className="flex flex-wrap justify-center gap-3 mb-8">
-                    <Button aria-label="clear search" startContent={<RefreshCcw className="w-4 h-4" />} variant="primary" onClick={onClearSearch}>
+                    <Button aria-label="clear search" startContent={<RefreshCcw className="w-4 h-4" />} onClick={onClearSearch}>
                         Clear Search
                     </Button>
 

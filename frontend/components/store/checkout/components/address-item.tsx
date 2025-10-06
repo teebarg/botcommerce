@@ -57,14 +57,14 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
     return (
         <div
             className={`relative p-4 rounded-xl cursor-pointer transition-all duration-300 group overflow-hidden ${
-                isSelected ? "ring-2 ring-accent bg-accent/10" : "border border-divider bg-secondary hover:border-accent/50 hover:shadow-md"
+                isSelected ? "ring-2 ring-primary/20 bg-primary/10" : "border border-input bg-secondary hover:border-primary/50 hover:shadow-md"
             }`}
             onClick={() => !isSelected && handleSelect(address.id)}
         >
             <div className="absolute top-3 right-3 flex items-center gap-2">
                 <div
                     className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
-                        isSelected ? "border-accent bg-accent shadow-sm" : "border-divider group-hover:border-accent/50"
+                        isSelected ? "border-primary bg-primary shadow-sm" : "border-input group-hover:border-primary/50"
                     }`}
                 >
                     {isSelected && <Check className="w-4 h-4 text-white" />}
@@ -75,7 +75,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                 <div className="flex items-center gap-3 mb-3">
                     <div
                         className={`p-2.5 rounded-lg transition-colors ${
-                            isSelected ? "bg-accent text-white" : "bg-secondary text-muted-foreground group-hover:bg-accent/50"
+                            isSelected ? "bg-primary text-white" : "bg-secondary text-muted-foreground group-hover:bg-primary/10"
                         }`}
                     >
                         {getTypeIcon(address.address_type)}

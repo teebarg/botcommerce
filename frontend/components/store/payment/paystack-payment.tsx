@@ -40,9 +40,9 @@ export function PaystackPayment({ cartNumber, amount }: PaystackPaymentProps) {
 
     return (
         <div className="space-y-4 border-t pt-6">
-            <div className="p-4 bg-accent/10 rounded-lg">
+            <div className="p-4 bg-contrast/10 rounded-lg">
                 <h4 className="font-medium mb-3 flex items-center space-x-2">
-                    <Globe className="h-4 w-4" />
+                    <Globe className="h-4 w-4 text-contrast" />
                     <span>Paystack Payment</span>
                 </h4>
                 <div className="space-y-3">
@@ -63,7 +63,7 @@ export function PaystackPayment({ cartNumber, amount }: PaystackPaymentProps) {
                     </div>
                 </div>
             </div>
-            <Button className="w-full" disabled={loading} isLoading={loading} size="lg" variant="accent" onClick={handlePayment}>
+            <Button className="w-full" disabled={loading} isLoading={loading} size="lg" onClick={handlePayment}>
                 Pay {currency(amount)} Now
             </Button>
             <div className="mt-4 flex items-center justify-center text-xs text-muted-foreground">

@@ -17,7 +17,7 @@ const CreateBrand: React.FC<Props> = () => {
             open={state.isOpen}
             title="Create Brand"
             trigger={
-                <Button variant="primary" onClick={state.open}>
+                <Button onClick={state.open}>
                     Create Brand
                 </Button>
             }

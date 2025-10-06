@@ -260,7 +260,7 @@ export function ProductCreator() {
                         <Button className="w-full" variant="success" onClick={() => window.location.reload()}>
                             Create Another Product
                         </Button>
-                        <Button className="w-full" variant="indigo" onClick={() => router.push("/admin/products")}>
+                        <Button className="w-full" onClick={() => router.push("/admin/products")}>
                             Go To Products
                         </Button>
                     </div>
@@ -328,7 +328,7 @@ export function ProductCreator() {
                         )}
                     </div>
 
-                    <div className="flex justify-between items-center px-6 sm:px-8 py-6 border-t border-border bg-accent/30">
+                    <div className="flex justify-between items-center px-6 sm:px-8 py-6 border-t border-border bg-contrast/20">
                         <Button className="flex items-center gap-2" disabled={currentStep === 1} variant="outline" onClick={handlePrevious}>
                             <ArrowLeft className="w-4 h-4" />
                             Previous

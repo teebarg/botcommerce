@@ -47,7 +47,7 @@ export default function ContactForm() {
     };
 
     return (
-        <div className="bg-secondary rounded-lg border border-divider md:p-8 p-4">
+        <div className="bg-card rounded-lg border border-input md:p-8 p-4">
             <div className="mb-6">
                 <h3 className="text-xl font-semibold mb-2">Send us a Message</h3>
                 <p className="text-muted-foreground text-sm">{`Fill out the form below and we'll get back to you within 24 hours.`}</p>
@@ -105,7 +105,7 @@ export default function ContactForm() {
                                     <FormLabel>Subject</FormLabel>
                                     <FormControl>
                                         <Select required onValueChange={(value) => field.onChange(value)}>
-                                            <SelectTrigger className="border-divider focus:border-primary">
+                                            <SelectTrigger className="border-input focus:border-primary">
                                                 <SelectValue placeholder="Select a subject" />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -155,7 +155,7 @@ export default function ContactForm() {
                     />
 
                     <div className="flex flex-col sm:flex-row gap-4">
-                        <Button aria-label="submit" className="flex-1" disabled={isPending} isLoading={isPending} type="submit" variant="primary">
+                        <Button aria-label="submit" className="flex-1" disabled={isPending} isLoading={isPending} type="submit">
                             <Send className="h-4 w-4 mr-2" />
                             Send Message
                         </Button>
@@ -164,7 +164,7 @@ export default function ContactForm() {
                         </Button>
                     </div>
 
-                    <p className="text-xs text-muted-foreground text-center">
+                    <p className="text-xs text-muted-foreground">
                         By submitting this form, you agree to our privacy policy and terms of service.
                     </p>
                 </form>

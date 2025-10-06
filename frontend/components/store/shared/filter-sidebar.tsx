@@ -111,18 +111,18 @@ export function FilterSidebar({ facets }: Props) {
     };
 
     return (
-        <div className="px-6 h-full overflow-y-auto bg-secondary relative">
-            <div className="flex items-center justify-between mb-6 sticky top-0 z-10 py-4 bg-secondary">
+        <div className="px-6 h-full overflow-y-auto bg-secondary dark:bg-secondary/30 relative">
+            <div className="flex items-center justify-between mb-4 sticky top-0 z-10 py-4 bg-secondary dark:bg-secondary/5">
                 <h2 className="font-semibold text-lg">FILTER & SORT</h2>
-                <Button className="text-accent px-0 justify-end mr-4" variant="transparent" onClick={onClearAll}>
+                <Button className="text-primary px-0 justify-end hover:bg-transparent" variant="ghost" onClick={onClearAll}>
                     Clear All
                 </Button>
             </div>
 
             <div className="mb-6">
                 <Button
-                    className="justify-between w-full p-0 font-semibold mb-3"
-                    variant="transparent"
+                    className="justify-between w-full p-0 font-semibold mb-3 hover:bg-transparent"
+                    variant="ghost"
                     onClick={() => toggleSection("categories" as any)}
                 >
                     CATEGORIES
@@ -141,9 +141,9 @@ export function FilterSidebar({ facets }: Props) {
                             return (
                                 <Button
                                     key={cat.id}
-                                    className={cn("justify-between bg-card h-12", active && "bg-indigo-500 hover:bg-indigo-600 text-white")}
+                                    className={cn("justify-between bg-card h-12", active && "bg-primary hover:bg-primary/90 text-white")}
                                     size="sm"
-                                    variant={active ? "indigo" : "outline"}
+                                    variant={active ? "primary" : "outline"}
                                     onClick={() => onToggleCategory(cat.slug)}
                                 >
                                     {cat.name}
@@ -156,7 +156,11 @@ export function FilterSidebar({ facets }: Props) {
             </div>
 
             <div className="mb-6">
-                <Button className="justify-between w-full p-0 font-semibold mb-3" variant="transparent" onClick={() => toggleSection("price" as any)}>
+                <Button
+                    className="justify-between w-full p-0 font-semibold mb-3 hover:bg-transparent"
+                    variant="ghost"
+                    onClick={() => toggleSection("price" as any)}
+                >
                     PRICE RANGE
                     {(openSections as any) && (openSections as any).price ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </Button>
@@ -175,8 +179,8 @@ export function FilterSidebar({ facets }: Props) {
 
             <div className="mb-6">
                 <Button
-                    className="justify-between w-full p-0 font-semibold mb-3 bg-transparent hover:bg-transparent"
-                    variant="default"
+                    className="justify-between w-full p-0 font-semibold mb-3 hover:bg-transparent"
+                    variant="ghost"
                     onClick={() => toggleSection("sort")}
                 >
                     SORT BY
@@ -208,7 +212,11 @@ export function FilterSidebar({ facets }: Props) {
             </div>
 
             <div className="mb-6">
-                <Button className="justify-between w-full p-0 font-semibold mb-3" variant="transparent" onClick={() => toggleSection("size")}>
+                <Button
+                    className="justify-between w-full p-0 font-semibold mb-3 hover:bg-transparent"
+                    variant="ghost"
+                    onClick={() => toggleSection("size")}
+                >
                     SIZE
                     {openSections.size ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </Button>
@@ -221,12 +229,9 @@ export function FilterSidebar({ facets }: Props) {
                             return (
                                 <Button
                                     key={size}
-                                    className={cn(
-                                        "h-12 text-base bg-card hover:bg-indigo-400 hover:text-white",
-                                        active && "bg-indigo-500 text-white"
-                                    )}
+                                    className={cn("h-12 text-base bg-card hover:bg-primary/90 hover:text-white", active && "bg-primary text-white")}
                                     size="sm"
-                                    variant={active ? "indigo" : "outline"}
+                                    variant={active ? "primary" : "outline"}
                                     onClick={() => onToggleSize(size)}
                                 >
                                     UK {size}
@@ -239,7 +244,11 @@ export function FilterSidebar({ facets }: Props) {
             </div>
 
             <div className="mb-6">
-                <Button className="justify-between w-full p-0 font-semibold mb-3" variant="transparent" onClick={() => toggleSection("color")}>
+                <Button
+                    className="justify-between w-full p-0 font-semibold mb-3 hover:bg-transparent"
+                    variant="ghost"
+                    onClick={() => toggleSection("color")}
+                >
                     COLOR
                     {openSections.color ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </Button>
@@ -260,7 +269,7 @@ export function FilterSidebar({ facets }: Props) {
                                     onClick={() => onToggleColor(color)}
                                 >
                                     <div
-                                        className={cn("w-8 h-8 rounded-full border border-border", active && "ring-2 ring-indigo-500 ring-offset-2")}
+                                        className={cn("w-8 h-8 rounded-full border border-border", active && "ring-2 ring-primary ring-offset-2")}
                                         style={{ backgroundColor: color }}
                                     />
                                     <Label className="text-center text-sm" htmlFor={color}>
@@ -273,8 +282,8 @@ export function FilterSidebar({ facets }: Props) {
                     </div>
                 )}
             </div>
-            <div className="flex justify-center sticky bottom-0 px-4 py-4 bg-secondary">
-                <Button className="w-full rounded-full py-6" variant="indigo" onClick={onApply}>
+            <div className="flex justify-center sticky bottom-0 px-4 py-4 bg-secondary dark:bg-secondary/5">
+                <Button className="w-full rounded-full py-6" onClick={onApply}>
                     Apply
                 </Button>
             </div>

@@ -154,7 +154,7 @@ export default function BannerForm({ banner, onClose }: BannerFormProps) {
                         <Button type="button" variant="destructive" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button disabled={formState.isSubmitting} isLoading={formState.isSubmitting} type="submit" variant="primary">
+                        <Button disabled={formState.isSubmitting} isLoading={formState.isSubmitting} type="submit">
                             {banner ? "Update" : "Create"}
                         </Button>
                     </div>

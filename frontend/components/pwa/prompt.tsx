@@ -88,7 +88,7 @@ const InstallPrompt: React.FC = () => {
                             <h3 className="font-semibold mb-1">Install Our App</h3>
                             <p className="text-sm text-muted-foreground mb-3">Get faster checkout, exclusive offers and real-time order tracking</p>
 
-                            <Button aria-label="install" className="w-full space-x-2" variant="primary" onClick={handleInstall}>
+                            <Button aria-label="install" className="w-full space-x-2" onClick={handleInstall}>
                                 <span>Add to Home Screen</span>
                             </Button>
                         </div>

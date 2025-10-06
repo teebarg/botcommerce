@@ -10,7 +10,7 @@ interface OrderCardProps {
 
 const OrderCard = ({ order, actions }: OrderCardProps) => {
     return (
-        <div className="bg-secondary rounded-lg shadow-sm overflow-hidden mb-3">
+        <div className="bg-card rounded-lg shadow-sm overflow-hidden mb-3">
             <div className="p-4">
                 <div className="flex items-center justify-between mb-3">
                     <h3 className="font-medium">{order.order_number}</h3>

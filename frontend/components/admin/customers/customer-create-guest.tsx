@@ -40,9 +40,9 @@ export default function CustomerCreateGuest() {
     return (
         <Dialog open={createState.isOpen} onOpenChange={createState.setOpen}>
             <DialogTrigger asChild>
-                <Button variant="indigo">Create Guest User</Button>
+                <Button>Create Guest User</Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="bg-card">
                 <DialogHeader>
                     <DialogTitle>Create Guest User</DialogTitle>
                 </DialogHeader>
@@ -78,7 +78,7 @@ export default function CustomerCreateGuest() {
                             <Button type="button" variant="destructive" onClick={() => createState.close()}>
                                 Cancel
                             </Button>
-                            <Button disabled={isPending} isLoading={isPending} type="submit" variant="primary">
+                            <Button disabled={isPending} isLoading={isPending} type="submit">
                                 Create
                             </Button>
                         </div>

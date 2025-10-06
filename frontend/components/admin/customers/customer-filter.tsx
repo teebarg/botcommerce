@@ -106,10 +106,10 @@ const CustomerFilter = ({ open, onOpenChange }: CustomerFilterProps) => {
                 </div>
 
                 <DialogFooter className="flex sm:justify-between gap-2">
-                    <Button variant="warning" onClick={handleReset}>
+                    <Button variant="contrast" onClick={handleReset}>
                         Reset
                     </Button>
-                    <Button variant="primary" onClick={handleApply}>
+                    <Button onClick={handleApply}>
                         Apply Filters
                     </Button>
                 </DialogFooter>

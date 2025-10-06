@@ -102,7 +102,6 @@ const AnalyticsDashboard: React.FC = () => {
             <h1 className="text-3xl font-bold mb-6">User Interaction Analytics</h1>
             <div className="mb-4 flex justify-end gap-2">
                 <Button
-                    variant="indigo"
                     onClick={() => {
                         const columns = ["id", "user_id", "product_id", "type", "timestamp", "metadata"];
                         const csv = toCSV(filtered!, columns);

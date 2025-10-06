@@ -11,8 +11,8 @@ export default function VerifyRequestPage() {
         <div>
             <div className="p-4 md:p-8">
                 <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-accent/10 rounded-full mb-6">
-                        <Mail className="text-accent" size={24} />
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-contrast/10 rounded-full mb-6">
+                        <Mail className="text-contrast" size={24} />
                     </div>
 
                     <h2 className="text-2xl font-bold mb-3">Check your email</h2>
@@ -40,7 +40,7 @@ export default function VerifyRequestPage() {
 
             <Separator />
 
-            <div className="mt-6 bg-secondary rounded-lg p-4">
+            <div className="mt-6 bg-contrast/5 rounded-lg p-4">
                 <h3 className="font-medium mb-2">Having trouble?</h3>
                 <ul className="text-sm text-muted-foreground space-y-1">
                     <li>• Check your spam or junk folder</li>

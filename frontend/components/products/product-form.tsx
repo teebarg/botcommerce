@@ -165,7 +165,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
                                 <Button className="min-w-32" type="button" variant="destructive" onClick={() => onClose()}>
                                     Close
                                 </Button>
-                                <Button className="min-w-32" disabled={isPending} isLoading={isPending} type="submit" variant="primary">
+                                <Button className="min-w-32" disabled={isPending} isLoading={isPending} type="submit">
                                     {product?.id ? "Update" : "Create"}
                                 </Button>
                             </div>

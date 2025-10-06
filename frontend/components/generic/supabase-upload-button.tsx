@@ -145,8 +145,8 @@ export default function SupabaseUploader({
                     <div className={cn("", files.length > 0 ? "hidden" : "")}>
                         <Card
                             className={cn(
-                                "border-2 border-dashed border-indigo-500 transition-all duration-smooth cursor-pointer hover:border-indigo-400",
-                                isDragOver ? "border-primary bg-accent/50 scale-[1.02]" : ""
+                                "border-2 border-dashed border-primary/20 transition-all duration-smooth cursor-pointer hover:border-primary/30",
+                                isDragOver ? "border-primary/40 scale-[1.02]" : ""
                             )}
                             onClick={openFileDialog}
                             onDragLeave={handleDragLeave}
@@ -155,8 +155,8 @@ export default function SupabaseUploader({
                         >
                             <div className="px-8 py-4 text-center">
                                 <div className="flex justify-center mb-4">
-                                    <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center">
-                                        <Upload className="w-6 h-6 text-white" />
+                                    <div className="w-12 h-12 bg-contrast/10 rounded-full flex items-center justify-center">
+                                        <Upload className="w-6 h-6 text-contrast" />
                                     </div>
                                 </div>
                                 <h3 className="text-lg font-medium text-card-foreground">Drop your images here</h3>
@@ -209,7 +209,7 @@ export default function SupabaseUploader({
                 </div>
 
                 <div className="border-t px-4 py-4 flex justify-between bg-secondary">
-                    <Button variant="indigo" onClick={() => document.getElementById("fileInput")?.click()}>
+                    <Button onClick={() => document.getElementById("fileInput")?.click()}>
                         Upload more
                     </Button>
                     <Button disabled={isUploading} isLoading={isUploading} variant="emerald" onClick={handleDone}>

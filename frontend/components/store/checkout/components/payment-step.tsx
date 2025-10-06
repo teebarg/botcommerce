@@ -36,7 +36,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
         <Card className="animate-fade-in w-full">
             <CardHeader>
                 <CardTitle className="text-2xl font-semibold flex items-center space-x-2">
-                    <CreditCard className="h-6 w-6 text-accent" />
+                    <CreditCard className="h-6 w-6 text-primary" />
                     <span>Payment Details</span>
                 </CardTitle>
                 <CardDescription>Choose your payment method and complete your order</CardDescription>
@@ -68,7 +68,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                                 variant="card"
                             >
                                 <div className="flex items-center gap-3">
-                                    <div className="shrink-0 mt-0.5 text-accent">{paymentInfoMap[item.provider_id]?.icon}</div>
+                                    <div className="shrink-0 mt-0.5 text-primary">{paymentInfoMap[item.provider_id]?.icon}</div>
                                     <div className="text-left">
                                         <div className="font-medium">{paymentInfoMap[item.provider_id]?.title}</div>
                                         <div className="text-sm text-muted-foreground">{paymentInfoMap[item.provider_id]?.description}</div>

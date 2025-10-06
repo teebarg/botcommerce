@@ -101,11 +101,7 @@ export const ReviewsList = ({ data, productName, product_id, hasPurchased, hasRe
                                 open={state.isOpen}
                                 sheetClassName="min-w-120"
                                 title="Write the First Review"
-                                trigger={
-                                    <Button className="w-full md:w-auto px-8" variant="indigo">
-                                        Write a Review
-                                    </Button>
-                                }
+                                trigger={<Button className="w-full md:w-auto px-8">Write a Review</Button>}
                                 onOpenChange={state.setOpen}
                             >
                                 <ReviewForm productName={productName} product_id={product_id} onClose={state.close} />

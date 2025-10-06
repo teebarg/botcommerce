@@ -185,7 +185,7 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({ productId, vari
                                     Cancel
                                 </Button>
                             )}
-                            <Button className="min-w-32" disabled={loading} isLoading={loading} type="submit" variant="indigo">
+                            <Button className="min-w-32" disabled={loading} isLoading={loading} type="submit">
                                 {variant ? "Update" : "Create"}
                             </Button>
                         </div>

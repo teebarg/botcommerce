@@ -43,7 +43,7 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
         <Card className="w-full animate-fade-in mt-4">
             <CardHeader className="text-center">
                 <CardTitle className="text-2xl font-semibold flex items-center justify-center space-x-2">
-                    <MapPin className="h-6 w-6 text-accent" />
+                    <MapPin className="h-6 w-6 text-primary" />
                     <span>Shipping Address</span>
                 </CardTitle>
                 <CardDescription>Enter your delivery address details</CardDescription>
@@ -83,7 +83,7 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
 
                     {canContinue && addressOption === "existing" && (
                         <div className="flex justify-end pt-4">
-                            <Button size="lg" variant="accent" onClick={handleContinue}>
+                            <Button size="lg" onClick={handleContinue}>
                                 Continue to Payment
                                 <ArrowRight className="h-4 w-4 ml-2" />
                             </Button>

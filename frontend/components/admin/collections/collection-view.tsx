@@ -43,12 +43,12 @@ const CollectionView: React.FC<Props> = ({ search }) => {
                 </div>
                 <div className="flex w-full items-center gap-2 sm:w-auto">
                     <div className="relative w-full sm:w-64">
-                        <Input className="w-full" placeholder="Search collections..." startContent={<Search />} type="search" />
+                        <Input className="w-full bg-card" placeholder="Search collections..." startContent={<Search />} type="search" />
                     </div>
                     <CreateCollection />
                 </div>
             </div>
-            <div className="md:block hidden bg-secondary">
+            <div className="md:block hidden bg-card">
                 <Table>
                     <TableHeader>
                         <TableRow>

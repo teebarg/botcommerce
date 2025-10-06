@@ -6,7 +6,7 @@ import { currency } from "@/lib/utils";
 
 const ShippingPage = () => (
     <div>
-        <div className="bg-secondary border-b border-divider">
+        <div className="bg-card border-b border-input">
             <div className="max-w-5xl mx-auto px-4 py-8">
                 <h1 className="text-3xl font-bold">Shipping Information</h1>
                 <p className="text-muted-foreground mt-2">Everything you need to know about shipping and delivery</p>
@@ -15,21 +15,21 @@ const ShippingPage = () => (
 
         <div className="max-w-5xl mx-auto px-4 py-12">
             <div className="space-y-8">
-                <div className="bg-secondary rounded-xl shadow-sm p-8">
+                <div className="bg-card rounded-xl shadow-sm p-8">
                     <h2 className="text-2xl font-bold mb-6">Track Your Order</h2>
                     <div className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium mb-2">Tracking Number</label>
                             <div className="flex gap-4">
                                 <Input className="flex-1 w-full" placeholder="Enter tracking number" type="text" />
-                                <Button variant="primary">Track Order</Button>
+                                <Button className="min-w-32">Track Order</Button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-8">
-                    <div className="bg-secondary rounded-xl shadow-sm p-8">
+                    <div className="bg-card rounded-xl shadow-sm p-8">
                         <h3 className="text-xl font-semibold mb-4">Shipping Options</h3>
                         <div className="space-y-4">
                             <div className="flex justify-between items-center p-4 border border-gray-200 rounded-lg">
@@ -56,7 +56,7 @@ const ShippingPage = () => (
                         </div>
                     </div>
 
-                    <div className="bg-secondary rounded-xl shadow-sm p-8">
+                    <div className="bg-card rounded-xl shadow-sm p-8">
                         <h3 className="text-xl font-semibold mb-4">International Shipping</h3>
                         <div className="space-y-4">
                             <div className="flex items-start">
@@ -84,7 +84,7 @@ const ShippingPage = () => (
                     </div>
                 </div>
 
-                <div className="bg-secondary rounded-xl shadow-sm p-8">
+                <div className="bg-card rounded-xl shadow-sm p-8">
                     <h2 className="text-xl font-semibold mb-6">Shipping FAQ</h2>
                     <div className="space-y-4">
                         {[
@@ -110,7 +110,7 @@ const ShippingPage = () => (
                                     <span className="font-medium">{faq.q}</span>
                                     <span className="text-gray-400 group-open:rotate-180 transition-transform">▼</span>
                                 </summary>
-                                <div className="p-4 text-muted-foreground border-t border-divider">{faq.a}</div>
+                                <div className="p-4 text-muted-foreground border-t border-input bg-secondary">{faq.a}</div>
                             </details>
                         ))}
                     </div>

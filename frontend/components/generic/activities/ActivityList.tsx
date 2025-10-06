@@ -37,7 +37,7 @@ const ActivityListItem: React.FC<{ activity: Activity }> = ({ activity }) => {
     };
 
     return (
-        <div className="group bg-secondary rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
+        <div className="group bg-card rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
             <div className="p-4 sm:p-6">
                 <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center space-x-3">
@@ -95,8 +95,8 @@ export const ActivityList: React.FC<ActivityListProps> = ({ activities }) => {
     if (!activities.length) {
         return (
             <div className="text-center py-12 bg-secondary">
-                <div className="w-16 h-16 mx-auto mb-4 bg-accent/50 rounded-full flex items-center justify-center">
-                    <ActivityIcon className="w-8 h-8 text-muted-foreground" />
+                <div className="w-16 h-16 mx-auto mb-4 bg-contrast/10 rounded-full flex items-center justify-center">
+                    <ActivityIcon className="w-8 h-8 text-contrast" />
                 </div>
                 <h3 className="text-xl font-medium">No activities yet</h3>
                 <p className="text-muted-foreground">Activities will appear here</p>

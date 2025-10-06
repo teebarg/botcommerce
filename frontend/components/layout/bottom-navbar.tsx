@@ -41,13 +41,13 @@ const ButtonNav = async ({ className }: { className?: string }) => {
         >
             {nav.map((item: NavLink, idx: number) => (
                 <div key={idx} className="flex flex-col items-center text-xs">
-                    <LocalizedClientLink active="bg-indigo-500 text-white rounded-xl" className={cn("p-1.5")} href={item.href}>
+                    <LocalizedClientLink active="bg-primary text-white rounded-xl" className="p-1.5" href={item.href}>
                         {item.icon}
                     </LocalizedClientLink>
                     {item.label}
                 </div>
             ))}
-            <span className="flex flex-col items-center gap-1.5 text-xs">
+            <span className="flex flex-col items-center text-xs">
                 <CartComponent />
                 Cart
             </span>
