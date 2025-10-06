@@ -2,6 +2,7 @@
 
 import { Facebook, Twitter, Instagram } from "lucide-react";
 import Link from "next/link";
+import { WhatsApp } from "nui-react-icons";
 
 import LocalizedClientLink from "@/components/ui/link";
 import { Category } from "@/schemas/product";
@@ -10,7 +11,6 @@ import { useCollections } from "@/lib/hooks/useCollection";
 import { Separator } from "@/components/ui/separator";
 import ClientOnly from "@/components/generic/client-only";
 import { useStoreSettings } from "@/providers/store-provider";
-import { WhatsApp } from "nui-react-icons";
 
 const company = [
     {
@@ -73,32 +73,32 @@ export default function Footer() {
                             <div className="flex space-x-6 mt-4">
                                 <Link
                                     aria-label="Twitter"
-                                    href={`https://web.facebook.com/profile.php?id=${settings?.facebook}`}
                                     className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                                    href={`https://web.facebook.com/profile.php?id=${settings?.facebook}`}
                                     target="_blank"
                                 >
                                     <Facebook className="text-primary" />
                                 </Link>
                                 <Link
                                     aria-label="Instagram"
-                                    href={`https://www.instagram.com/${settings?.instagram}`}
                                     className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                                    href={`https://www.instagram.com/${settings?.instagram}`}
                                     target="_blank"
                                 >
                                     <Instagram className="text-primary" />
                                 </Link>
                                 <Link
                                     aria-label="Tiktok"
-                                    href={`https://www.tiktok.com/@${settings?.tiktok}`}
                                     className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                                    href={`https://www.tiktok.com/@${settings?.tiktok}`}
                                     target="_blank"
                                 >
                                     <WhatsApp className="text-primary" />
                                 </Link>
                                 <Link
                                     aria-label="X"
-                                    href={`https://x.com/${settings?.twitter}`}
                                     className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                                    href={`https://x.com/${settings?.twitter}`}
                                     target="_blank"
                                 >
                                     <Twitter className="text-primary" />

@@ -26,9 +26,9 @@ const CartComponent: React.FC = () => {
             sheetClassName="min-w-[450px]"
             title="Cart"
             trigger={
-                <Button size="iconOnly">
-                    <ShoppingCart className="w-7 h-7" />
-                    <span className="absolute -top-2 -right-2 bg-accent text-accent-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                <Button size="icon" variant="ghost">
+                    <ShoppingCart className="w-6 h-6" />
+                    <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center">
                         {totalItems.toString()}
                     </span>
                 </Button>

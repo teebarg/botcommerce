@@ -12,7 +12,7 @@ const HeroSection: React.FC = () => {
         <div className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0 z-0">
                 <img alt="Fashion Hero" className="w-full h-full object-cover opacity-90 dark:opacity-75" src="/hero.jpg" />
-                <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background"></div>
+                <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
             </div>
 
             <div className="absolute top-20 left-10 animate-float">
@@ -45,15 +45,15 @@ const HeroSection: React.FC = () => {
 
                         <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
                             <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-accent" />
+                                <div className="w-2 h-2 rounded-full bg-primary/50" />
                                 <span>Premium Quality</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-accent" />
+                                <div className="w-2 h-2 rounded-full bg-primary/50" />
                                 <span>Sustainable Fashion</span>
                             </div>
                             <div className="hidden lg:flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-accent" />
+                                <div className="w-2 h-2 rounded-full bg-primary/50" />
                                 <span>Global Shipping</span>
                             </div>
                         </div>
@@ -102,8 +102,8 @@ const HeroSection: React.FC = () => {
                                         <h3 className="font-semibold text-card-foreground">Spring Collection</h3>
                                         <p className="text-sm text-muted-foreground">Limited Edition</p>
                                     </div>
-                                    <div className="bg-accent/10 px-3 py-1 rounded-full">
-                                        <span className="text-xs font-medium text-accent">30% OFF</span>
+                                    <div className="bg-primary/10 px-3 py-1 rounded-full">
+                                        <span className="text-xs font-medium text-primary">30% OFF</span>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-3 gap-3">

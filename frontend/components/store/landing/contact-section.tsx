@@ -10,7 +10,7 @@ export function ContactSection() {
     const { settings } = useStoreSettings();
 
     return (
-        <section className="py-16">
+        <section className="py-16 bg-gradient-to-b from-card/30 to-background">
             <div className="max-w-8xl mx-auto px-4">
                 <div className="text-center mb-12">
                     <h2 className="text-3xl font-bold mb-2">Get in Touch</h2>
@@ -23,7 +23,7 @@ export function ContactSection() {
                 <div className="grid lg:grid-cols-2 gap-12">
                     <div className="space-y-8">
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-secondary p-6 rounded-lg border border-divider">
+                            <div className="bg-card p-6 rounded-lg border border-divider">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="p-2 bg-accent/10 rounded-lg">
                                         <MapPin className="h-5 w-5 text-accent" />
@@ -37,7 +37,7 @@ export function ContactSection() {
                                 </p>
                             </div>
 
-                            <div className="bg-secondary p-6 rounded-lg border border-divider">
+                            <div className="bg-card p-6 rounded-lg border border-divider">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="p-2 bg-accent/10 rounded-lg">
                                         <Phone className="h-5 w-5 text-accent" />
