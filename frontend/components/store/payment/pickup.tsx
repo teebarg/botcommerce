@@ -44,13 +44,7 @@ const Pickup: React.FC<PickupProps> = ({ amount }) => {
                 </div>
             </div>
 
-            <Button
-                className="w-full"
-                disabled={completeCart.isPending}
-                isLoading={completeCart.isPending}
-                size="lg"
-                onClick={onPaymentCompleted}
-            >
+            <Button className="w-full" disabled={completeCart.isPending} isLoading={completeCart.isPending} size="lg" onClick={onPaymentCompleted}>
                 Confirm Order for Pickup
             </Button>
         </div>

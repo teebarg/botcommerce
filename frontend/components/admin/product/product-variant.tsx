@@ -182,11 +182,7 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    {variant.size && (
-                                                        <Badge className="text-xs">
-                                                            {variant.size}
-                                                        </Badge>
-                                                    )}
+                                                    {variant.size && <Badge className="text-xs">{variant.size}</Badge>}
                                                     {variant.color && (
                                                         <Badge className="text-xs" variant="secondary">
                                                             {variant.color}

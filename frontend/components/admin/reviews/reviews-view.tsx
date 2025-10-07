@@ -45,7 +45,7 @@ const ReviewView: React.FC = () => {
                     <p className="text-muted-foreground text-sm">Manage your product reviews</p>
                 </div>
                 <div className="flex w-full items-center gap-2 md:w-auto mb-4">
-                    <Input placeholder="Search reviews..." startContent={<Search />} type="search" wrapperClass="flex-1" />
+                    <Input className="bg-card" placeholder="Search reviews..." startContent={<Search />} type="search" wrapperClass="flex-1" />
                 </div>
             </div>
             <div className="md:block hidden">

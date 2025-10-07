@@ -23,7 +23,7 @@ const FaqView: React.FC = () => {
                     title="Add New FAQ"
                     trigger={
                         <Button onClick={state.open}>
-                            <Plus className="w-4 h-4 mr-2" />
+                            <Plus className="w-4 h-4" />
                             Add New FAQ
                         </Button>
                     }

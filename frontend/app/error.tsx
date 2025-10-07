@@ -31,9 +31,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
                         Oops! Something went wrong on our end. We apologize for the inconvenience.
                     </p>
                     <div className="flex items-center">
-                        <BtnLink href="/">
-                            Go back to homepage
-                        </BtnLink>
+                        <BtnLink href="/">Go back to homepage</BtnLink>
                         <Button aria-label="try again" className="block ml-4" variant="destructive" onClick={() => reset()}>
                             Try again
                         </Button>

@@ -58,13 +58,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({ amount }) => {
                 </div>
             </div>
 
-            <Button
-                className="w-full"
-                disabled={completeCart.isPending}
-                isLoading={completeCart.isPending}
-                size="lg"
-                onClick={onPaymentCompleted}
-            >
+            <Button className="w-full" disabled={completeCart.isPending} isLoading={completeCart.isPending} size="lg" onClick={onPaymentCompleted}>
                 Pay {currency(amount)} via Bank Transfer
             </Button>
             <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">

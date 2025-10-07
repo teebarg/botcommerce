@@ -59,7 +59,7 @@ const Terms = async () => {
             </div>
 
             <div className="mt-8 text-center">
-                <BtnLink href="/" size="lg" className="min-w-32">
+                <BtnLink className="min-w-32" href="/" size="lg">
                     Back Home
                 </BtnLink>
             </div>

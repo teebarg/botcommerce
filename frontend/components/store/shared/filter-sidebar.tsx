@@ -143,7 +143,7 @@ export function FilterSidebar({ facets }: Props) {
                                     key={cat.id}
                                     className={cn("justify-between bg-card h-12", active && "bg-primary hover:bg-primary/90 text-white")}
                                     size="sm"
-                                    variant={active ? "primary" : "outline"}
+                                    variant={active ? "default" : "outline"}
                                     onClick={() => onToggleCategory(cat.slug)}
                                 >
                                     {cat.name}
@@ -231,7 +231,7 @@ export function FilterSidebar({ facets }: Props) {
                                     key={size}
                                     className={cn("h-12 text-base bg-card hover:bg-primary/90 hover:text-white", active && "bg-primary text-white")}
                                     size="sm"
-                                    variant={active ? "primary" : "outline"}
+                                    variant={active ? "default" : "outline"}
                                     onClick={() => onToggleSize(size)}
                                 >
                                     UK {size}

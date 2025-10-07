@@ -310,12 +310,7 @@ const ProductOverview: React.FC<{
                     </div>
 
                     <div className={cn("flex gap-3 flex-row")}>
-                        <Button
-                            disabled={loading || !selectedVariant || outOfStock}
-                            isLoading={loading}
-                            size="lg"
-                            onClick={handleAddToCartAndTrack}
-                        >
+                        <Button disabled={loading || !selectedVariant || outOfStock} isLoading={loading} size="lg" onClick={handleAddToCartAndTrack}>
                             <ShoppingCart className="w-5 h-5 relative z-10 hover:rotate-12 transition-transform duration-300 mr-2" />
                             <span className="relative z-10">{outOfStock ? "Out of Stock" : "Add to Cart"}</span>
                         </Button>

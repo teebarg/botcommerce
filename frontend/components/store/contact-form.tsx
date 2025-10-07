@@ -164,9 +164,7 @@ export default function ContactForm() {
                         </Button>
                     </div>
 
-                    <p className="text-xs text-muted-foreground">
-                        By submitting this form, you agree to our privacy policy and terms of service.
-                    </p>
+                    <p className="text-xs text-muted-foreground">By submitting this form, you agree to our privacy policy and terms of service.</p>
                 </form>
             </Form>
         </div>

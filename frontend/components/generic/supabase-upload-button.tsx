@@ -209,9 +209,7 @@ export default function SupabaseUploader({
                 </div>
 
                 <div className="border-t px-4 py-4 flex justify-between bg-secondary">
-                    <Button onClick={() => document.getElementById("fileInput")?.click()}>
-                        Upload more
-                    </Button>
+                    <Button onClick={() => document.getElementById("fileInput")?.click()}>Upload more</Button>
                     <Button disabled={isUploading} isLoading={isUploading} variant="emerald" onClick={handleDone}>
                         Done
                     </Button>

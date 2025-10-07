@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 
 const ReturnsPage = () => (
     <div>
-        <div className="bg-secondary">
+        <div className="bg-card">
             <div className="max-w-4xl mx-auto px-4 py-8">
                 <h1 className="text-3xl font-bold">Returns & Exchanges</h1>
                 <p className="text-muted-foreground mt-1">Easy returns within 30 days of purchase</p>
@@ -27,7 +27,7 @@ const ReturnsPage = () => (
                     </div>
                 </div>
 
-                <div className="bg-secondary rounded-xl shadow-sm  p-8">
+                <div className="bg-card rounded-xl shadow-sm  p-8">
                     <h2 className="text-xl font-semibold mb-6">Return Process</h2>
                     <div className="space-y-6">
                         <div className="flex items-start">

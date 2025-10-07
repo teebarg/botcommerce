@@ -130,8 +130,8 @@ const DeliveryOverview: React.FC = () => {
                     open={addState.isOpen}
                     title="Add Delivery Option"
                     trigger={
-                        <Button size="lg">
-                            <Plus className="mr-2 h-4 w-4" />
+                        <Button size="md">
+                            <Plus className="h-4 w-4" />
                             Add Option
                         </Button>
                     }

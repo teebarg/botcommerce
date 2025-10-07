@@ -41,7 +41,7 @@ const FaqActions = ({ faq }: FaqActionsProps) => {
                 open={editState.isOpen}
                 title="Edit FAQ"
                 trigger={
-                    <Button size="icon" variant="ghost" className="bg-blue-50/80 text-blue-800">
+                    <Button className="bg-blue-50/80 text-blue-800" size="icon" variant="ghost">
                         <Pencil className="h-5 w-5" />
                     </Button>
                 }
@@ -56,7 +56,7 @@ const FaqActions = ({ faq }: FaqActionsProps) => {
             </Overlay>
             <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                 <DialogTrigger asChild>
-                    <Button size="icon" variant="ghost" className="bg-red-50 text-red-800" onClick={() => setFaqToDelete(faq.id)}>
+                    <Button className="bg-red-50 text-red-800" size="icon" variant="ghost" onClick={() => setFaqToDelete(faq.id)}>
                         <Trash2 className="h-5 w-5" />
                     </Button>
                 </DialogTrigger>

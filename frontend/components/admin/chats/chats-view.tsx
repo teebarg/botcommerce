@@ -51,7 +51,7 @@ const ChatsView: React.FC = () => {
         <div className="px-2 md:px-10 py-8">
             <h3 className="text-2xl font-medium">Conversations view</h3>
             <p className="text-muted-foreground text-sm mb-4">Manage your conversations.</p>
-            <div key="table" className="md:block hidden bg-secondary">
+            <div key="table" className="md:block hidden bg-card">
                 <CustomerFilter open={filterOpen} onOpenChange={setFilterOpen} />
                 <Table>
                     <TableHeader>

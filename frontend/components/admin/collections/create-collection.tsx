@@ -16,11 +16,7 @@ const CreateCollection: React.FC<Props> = () => {
         <Overlay
             open={state.isOpen}
             title="Create Collection"
-            trigger={
-                <Button onClick={state.open}>
-                    Create Collection
-                </Button>
-            }
+            trigger={<Button onClick={state.open}>Create Collection</Button>}
             onOpenChange={state.setOpen}
         >
             <CollectionForm type="create" onClose={state.close} />

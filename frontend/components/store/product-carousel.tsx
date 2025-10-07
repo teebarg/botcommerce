@@ -116,18 +116,20 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
                     <div aria-label="Carousel controls" className="hidden md:flex items-center gap-3" role="group">
                         <Button
                             aria-label="Scroll collections backward"
-                            className="h-12 w-12 rounded-full text-gray-800 dark:text-gray-100 border border-border"
+                            className="h-12 w-12 rounded-full text-gray-800 dark:text-gray-100 border border-gray-600 dark:border-gray-200"
                             disabled={scrollState.activeIndex <= 0}
                             size="icon"
+                            variant="ghost"
                             onClick={() => scrollToIndex(scrollState.activeIndex - 1)}
                         >
                             <ChevronLeft className="h-5 w-5" strokeWidth={1.5} />
                         </Button>
                         <Button
                             aria-label="Scroll collections forward"
-                            className="h-12 w-12 rounded-full text-gray-800 dark:text-gray-100 border border-border"
+                            className="h-12 w-12 rounded-full text-gray-800 dark:text-gray-100 border border-gray-600 dark:border-gray-200"
                             disabled={scrollState.activeIndex >= products.length - 1}
                             size="icon"
+                            variant="ghost"
                             onClick={() => scrollToIndex(scrollState.activeIndex + 1)}
                         >
                             <ChevronRight className="h-5 w-5" strokeWidth={1.5} />

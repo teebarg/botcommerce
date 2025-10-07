@@ -20,11 +20,11 @@ const CareerOpportunities = async () => {
     ];
 
     return (
-        <div className="bg-background">
+        <div>
             <div className="max-w-6xl mx-auto px-4 py-12">
                 <h1 className="text-4xl font-bold text-center mb-8 text-foreground">Career Opportunities at {siteConfig.name}</h1>
 
-                <div className="bg-secondary rounded-lg shadow-lg p-8 mb-8">
+                <div className="bg-card rounded-lg shadow-lg p-8 mb-8">
                     <h2 className="text-2xl font-semibold mb-4">Join Our Team</h2>
                     <p className="mb-4">
                         {`At ${siteConfig.name}, we're always looking for passionate individuals to join our growing family. We offer exciting career

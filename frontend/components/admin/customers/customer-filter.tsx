@@ -109,9 +109,7 @@ const CustomerFilter = ({ open, onOpenChange }: CustomerFilterProps) => {
                     <Button variant="contrast" onClick={handleReset}>
                         Reset
                     </Button>
-                    <Button onClick={handleApply}>
-                        Apply Filters
-                    </Button>
+                    <Button onClick={handleApply}>Apply Filters</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

@@ -76,9 +76,7 @@ const NewsletterSection: React.FC = () => {
                     </div>
 
                     <div className="bg-card rounded-lg p-4 mb-6 w-fit mx-auto">
-                        <Badge className="mb-2">
-                            Welcome Bonus
-                        </Badge>
+                        <Badge className="mb-2">Welcome Bonus</Badge>
                         <p className="text-sm text-muted-foreground">
                             Use code <span className="font-outfit font-bold text-foreground text-lg">WELCOME15</span> for 15% off your first order
                         </p>
@@ -109,10 +107,7 @@ const NewsletterSection: React.FC = () => {
 
                     <div className="grid md:grid-cols-3 gap-6 mb-12">
                         {benefits.map((benefit, idx: number) => (
-                            <div
-                                key={idx}
-                                className="bg-card rounded-lg border border-input p-6 text-center hover:shadow-md transition-shadow"
-                            >
+                            <div key={idx} className="bg-card rounded-lg border border-input p-6 text-center hover:shadow-md transition-shadow">
                                 <div className={`w-12 h-12 ${benefit.bgColor} rounded-lg flex items-center justify-center mx-auto mb-4`}>
                                     <benefit.icon className={`h-6 w-6 ${benefit.color}`} />
                                 </div>
@@ -150,13 +145,7 @@ const NewsletterSection: React.FC = () => {
                                                 </FormItem>
                                             )}
                                         />
-                                        <Button
-                                            className="w-full"
-                                            disabled={!form.formState.isValid}
-                                            isLoading={isPending}
-                                            size="lg"
-                                            type="submit"
-                                        >
+                                        <Button className="w-full" disabled={!form.formState.isValid} isLoading={isPending} size="lg" type="submit">
                                             <div className="flex items-center gap-2">
                                                 <Mail className="h-4 w-4" />
                                                 Subscribe & Get 15% Off
