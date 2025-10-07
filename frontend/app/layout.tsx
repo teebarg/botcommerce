@@ -112,7 +112,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style" />
             </head>
             <body>
-                <ProgressBar className="h-1 bg-primary">
+                <ProgressBar className="h-1 bg-primary/30">
                     <div className="relative flex flex-col min-h-screen">
                         <PushNotificationManager />
                         <PushPermission />
