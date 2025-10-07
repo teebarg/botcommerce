@@ -14,8 +14,9 @@ import { isFirstWhatsAppMessage, markFirstWhatsAppMessageSent } from "@/lib/util
 export const useProductVariant = (product: Product | ProductSearch) => {
     const { cart } = useCart();
     const { settings } = useStoreSettings();
-    const { mutate: addToCart, isPending: creating } = useAddToCart();
+    const { mutateAsync: addToCart, isPending: creating } = useAddToCart();
     const { mutateAsync: updateQuantity, isPending: updating } = useChangeCartQuantity();
+    const [isAdded, setIsAdded] = useState<boolean>(false);
 
     const loading = creating || updating;
 
@@ -134,14 +135,20 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         if (!selectedVariant) return;
 
         if (variantInCart) {
-            await updateQuantity({ item_id: variantInCart.id, quantity: variantInCart.quantity + quantity });
+            updateQuantity({ item_id: variantInCart.id, quantity: variantInCart.quantity + quantity }).then(() => {
+                setIsAdded(true);
+            });
+            setTimeout(() => setIsAdded(false), 3000);
 
             return;
         }
         addToCart({
             variant_id: selectedVariant.id,
             quantity,
+        }).then(() => {
+            setIsAdded(true);
         });
+        setTimeout(() => setIsAdded(false), 3000);
     };
 
     const handleWhatsAppPurchase = (e: React.MouseEvent) => {
@@ -197,6 +204,7 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         handleWhatsAppPurchase,
         priceInfo,
         loading,
+        isAdded,
         outOfStock: product?.variants?.length == 0 || product?.variants?.every((v) => v.inventory <= 0),
     };
 };

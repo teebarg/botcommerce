@@ -1,5 +1,5 @@
 import React from "react";
-import { ShoppingCart } from "lucide-react";
+import { Check, ShoppingCart } from "lucide-react";
 import { useSession } from "next-auth/react";
 
 import { ProductSearch } from "@/schemas";
@@ -10,7 +10,7 @@ import { UserInteractionType, useTrackUserInteraction } from "@/lib/hooks/useUse
 const ProductActions: React.FC<{
     product: ProductSearch;
 }> = ({ product }) => {
-    const { selectedVariant, handleAddToCart, handleWhatsAppPurchase, loading, outOfStock } = useProductVariant(product);
+    const { selectedVariant, handleAddToCart, handleWhatsAppPurchase, loading, outOfStock, isAdded } = useProductVariant(product);
 
     const { data: session } = useSession();
     const trackInteraction = useTrackUserInteraction();
@@ -39,8 +39,15 @@ const ProductActions: React.FC<{
                     "Adding..."
                 ) : (
                     <>
-                        <ShoppingCart className="w-5 h-5" />
-                        Add
+                        <span className={`flex items-center transition-all duration-300 ${isAdded ? "opacity-0 scale-75" : "opacity-100 scale-100"}`}>
+                            <ShoppingCart className="h-5 w-5 mr-2" />
+                            Add
+                        </span>
+                        <span
+                            className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${isAdded ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}
+                        >
+                            <Check className="h-5 w-5 animate-scale-in" />
+                        </span>
                     </>
                 )}
             </Button>

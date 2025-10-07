@@ -8,6 +8,12 @@ import { Button } from "@/components/ui/button";
 const HeroSection: React.FC = () => {
     const router = useRouter();
 
+    const handleRoute = (path: string) => {
+        document.startViewTransition(() => {
+            router.push(path);
+        });
+    };
+
     return (
         <div className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0 z-0">
@@ -59,7 +65,7 @@ const HeroSection: React.FC = () => {
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-4 pt-2">
-                            <Button className="group" size="xl" onClick={() => router.push("/collections")}>
+                            <Button className="group" size="xl" onClick={() => handleRoute("/collections")}>
                                 Shop Collection
                                 <ArrowRight className="w-5 h-5 ml-1 transition-transform group-hover:translate-x-1" />
                             </Button>
@@ -67,7 +73,7 @@ const HeroSection: React.FC = () => {
                                 className="group border-primary/50 hover:bg-primary/10"
                                 size="xl"
                                 variant="outline"
-                                onClick={() => router.push("/bulk")}
+                                onClick={() => handleRoute("/bulk")}
                             >
                                 Bulk Purchase
                                 <Sparkles className="w-5 h-5 ml-1 transition-transform group-hover:rotate-12" />
