@@ -118,8 +118,8 @@ const ProfilePage: React.FC = () => {
             <div className="border-border border-b transition-colors duration-300">
                 <div className="max-w-5xl mx-auto py-4 flex justify-between items-center">
                     <div>
-                        <h1 className="text-2xl font-bold text-default-800">Profile Settings</h1>
-                        <p className="text-sm text-default-600 mt-1">Manage your account information and preferences</p>
+                        <h1 className="text-2xl font-bold">Profile Settings</h1>
+                        <p className="text-sm text-muted-foreground mt-1">Manage your account information and preferences</p>
                     </div>
                 </div>
             </div>
@@ -130,12 +130,12 @@ const ProfilePage: React.FC = () => {
                         <div className="flex items-center space-x-3">
                             <User className="w-5 h-5" />
                             <div>
-                                <h3 className={`text-lg font-semibold text-default-900`}>Profile Information</h3>
-                                <p className={`text-sm text-default-500`}>Update your personal details</p>
+                                <h3 className="text-lg font-semibold">Profile Information</h3>
+                                <p className="text-sm text-muted-foreground">Update your personal details</p>
                             </div>
                         </div>
                         {editingSection !== "profile" && (
-                            <Button className="mt-2 md:mt-0" variant="primary" onClick={() => handleEdit("profile")}>
+                            <Button className="mt-2 md:mt-0" onClick={() => handleEdit("profile")}>
                                 Edit
                             </Button>
                         )}
@@ -156,9 +156,7 @@ const ProfilePage: React.FC = () => {
                                                     {editingSection === "profile" ? (
                                                         <Input placeholder="Enter first name" {...field} />
                                                     ) : (
-                                                        <div className="px-4 py-3 rounded-lg text-default-700 bg-content2">
-                                                            {field.value || "Not set"}
-                                                        </div>
+                                                        <div className="px-4 py-3 rounded-lg text-foreground bg-card">{field.value || "Not set"}</div>
                                                     )}
                                                 </FormControl>
                                                 <FormMessage />
@@ -176,9 +174,7 @@ const ProfilePage: React.FC = () => {
                                                     {editingSection === "profile" ? (
                                                         <Input placeholder="Enter last name" {...field} />
                                                     ) : (
-                                                        <div className="px-4 py-3 rounded-lg text-default-700 bg-content2">
-                                                            {field.value || "Not set"}
-                                                        </div>
+                                                        <div className="px-4 py-3 rounded-lg text-foreground bg-card">{field.value || "Not set"}</div>
                                                     )}
                                                 </FormControl>
                                                 <FormMessage />
@@ -188,13 +184,13 @@ const ProfilePage: React.FC = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-default-500 mb-2">Email Address</label>
-                                    <div className="px-4 py-3 rounded-lg text-default-700 bg-content2">{session?.user?.email}</div>
+                                    <label className="block text-sm font-medium text-muted-foreground mb-2">Email Address</label>
+                                    <div className="px-4 py-3 rounded-lg text-foreground bg-card">{session?.user?.email}</div>
                                 </div>
 
                                 {editingSection === "profile" && (
                                     <div className="flex space-x-3 mt-6">
-                                        <Button disabled={isPending} isLoading={isPending} type="submit" variant="primary">
+                                        <Button disabled={isPending} isLoading={isPending} type="submit">
                                             Save Changes
                                         </Button>
                                         <Button type="button" variant="outline" onClick={handleCancel}>
@@ -213,12 +209,12 @@ const ProfilePage: React.FC = () => {
                             <div className="flex items-center space-x-3">
                                 <Lock className={`w-5 h-5`} />
                                 <div>
-                                    <h3 className="text-lg font-semibold text-default-900">Password</h3>
-                                    <p className="text-sm text-default-500">Update your password to keep your account secure</p>
+                                    <h3 className="text-lg font-semibold">Password</h3>
+                                    <p className="text-sm text-muted-foreground">Update your password to keep your account secure</p>
                                 </div>
                             </div>
                             {editingSection !== "password" && (
-                                <Button className="mt-2 md:mt-0" variant="primary" onClick={() => handleEdit("password")}>
+                                <Button className="mt-2 md:mt-0" onClick={() => handleEdit("password")}>
                                     Change Password
                                 </Button>
                             )}
@@ -244,7 +240,7 @@ const ProfilePage: React.FC = () => {
                                                                 {...field}
                                                             />
                                                             <button
-                                                                className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-default-500 hover:text-default-700`}
+                                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
                                                                 type="button"
                                                                 onClick={() => setShowPassword(!showPassword)}
                                                             >
@@ -286,7 +282,7 @@ const ProfilePage: React.FC = () => {
                                         />
 
                                         <div className="flex space-x-3 mt-6">
-                                            <Button disabled={isPending} isLoading={isPending} type="submit" variant="primary">
+                                            <Button disabled={isPending} isLoading={isPending} type="submit">
                                                 Update Password
                                             </Button>
                                             <Button type="button" variant="outline" onClick={handleCancel}>
@@ -295,7 +291,9 @@ const ProfilePage: React.FC = () => {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="px-4 py-3 rounded-lg bg-content1 text-default-500">Password is hidden for security reasons</div>
+                                    <div className="px-4 py-3 rounded-lg bg-secondary text-muted-foreground">
+                                        Password is hidden for security reasons
+                                    </div>
                                 )}
                             </form>
                         </Form>

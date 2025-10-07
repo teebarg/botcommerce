@@ -171,7 +171,7 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
                         <Button type="button" variant="outline" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button disabled={form.formState.isSubmitting} isLoading={form.formState.isSubmitting} type="submit" variant="primary">
+                        <Button disabled={form.formState.isSubmitting} isLoading={form.formState.isSubmitting} type="submit">
                             {initialData ? "Update" : "Create"}
                         </Button>
                     </div>

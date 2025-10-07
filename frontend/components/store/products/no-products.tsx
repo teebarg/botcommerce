@@ -22,19 +22,19 @@ const NoProductsFound = ({ searchQuery = "", onClearSearch = () => {}, onGoHome 
             </div>
 
             <div className="text-center max-w-md mx-auto">
-                <h2 className="text-2xl font-bold text-default-900">No Products Found</h2>
+                <h2 className="text-2xl font-bold">No Products Found</h2>
 
                 {searchQuery && (
-                    <p className="text-default-600 mb-2">
+                    <p className="text-muted-foreground mb-2">
                         {`We couldn't find any products matching`}
-                        <span className="font-medium text-default-900 mx-1">{`"${searchQuery}"`}</span>
+                        <span className="font-medium text-foreground mx-1">{`"${searchQuery}"`}</span>
                     </p>
                 )}
 
-                <p className="text-default-600 mb-6 text-sm">Try adjusting your search or browse our suggested categories below.</p>
+                <p className="text-muted-foreground mb-6 text-sm">Try adjusting your search or browse our suggested categories below.</p>
 
                 <div className="flex flex-wrap justify-center gap-3 mb-8">
-                    <Button aria-label="clear search" startContent={<RefreshCcw className="w-4 h-4" />} variant="primary" onClick={onClearSearch}>
+                    <Button aria-label="clear search" startContent={<RefreshCcw className="w-4 h-4" />} onClick={onClearSearch}>
                         Clear Search
                     </Button>
 
@@ -44,7 +44,7 @@ const NoProductsFound = ({ searchQuery = "", onClearSearch = () => {}, onGoHome 
                 </div>
 
                 <div className="space-y-4">
-                    <h3 className="text-sm font-semibold text-default-900">Popular Categories</h3>
+                    <h3 className="text-sm font-semibold">Popular Categories</h3>
 
                     <div className="flex flex-wrap justify-center gap-2">
                         {collections?.slice(0, 4).map((collection: Collection, idx: number) => (
@@ -57,8 +57,8 @@ const NoProductsFound = ({ searchQuery = "", onClearSearch = () => {}, onGoHome 
 
                 <Separator />
                 <div className="mt-8 pt-6">
-                    <h3 className="text-sm font-semibold text-default-900 mb-3">Search Tips</h3>
-                    <ul className="text-sm text-default-500 space-y-2">
+                    <h3 className="text-sm font-semibold mb-3">Search Tips</h3>
+                    <ul className="text-sm text-muted-foreground space-y-2">
                         <li>• Check for spelling mistakes</li>
                         <li>• Try using more general keywords</li>
                         <li>• Browse by category instead</li>

@@ -102,7 +102,6 @@ const AnalyticsDashboard: React.FC = () => {
             <h1 className="text-3xl font-bold mb-6">User Interaction Analytics</h1>
             <div className="mb-4 flex justify-end gap-2">
                 <Button
-                    variant="indigo"
                     onClick={() => {
                         const columns = ["id", "user_id", "product_id", "type", "timestamp", "metadata"];
                         const csv = toCSV(filtered!, columns);
@@ -162,7 +161,7 @@ const AnalyticsDashboard: React.FC = () => {
                     <input className="border rounded px-2 py-1" type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} />
                 </div>
             </div>
-            <div className="mb-8 bg-content1 rounded shadow p-4">
+            <div className="mb-8 bg-secondary rounded shadow p-4">
                 <h2 className="text-lg font-semibold mb-2">Activity Heatmap (Hour x Day)</h2>
                 <div className="overflow-x-auto">
                     <table className="min-w-full text-center">
@@ -181,7 +180,7 @@ const AnalyticsDashboard: React.FC = () => {
                                 <tr key={d}>
                                     <td className="px-2 py-1 font-bold">{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d]}</td>
                                     {row.map((val, h) => (
-                                        <td key={h} className={`px-2 py-1 ${val > 0 ? "bg-blue-400" : "bg-content3"}`}>
+                                        <td key={h} className={`px-2 py-1 ${val > 0 ? "bg-blue-400" : "bg-gray-500"}`}>
                                             {val || ""}
                                         </td>
                                     ))}
@@ -194,7 +193,7 @@ const AnalyticsDashboard: React.FC = () => {
             <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                     <h2 className="text-lg font-semibold mb-2">Per-User Breakdown</h2>
-                    <table className="min-w-full bg-content1 rounded shadow">
+                    <table className="min-w-full bg-secondary rounded shadow">
                         <thead>
                             <tr>
                                 <th className="px-4 py-2">User ID</th>
@@ -217,7 +216,7 @@ const AnalyticsDashboard: React.FC = () => {
                 </div>
                 <div>
                     <h2 className="text-lg font-semibold mb-2">Per-Product Breakdown</h2>
-                    <table className="min-w-full bg-content1 rounded shadow">
+                    <table className="min-w-full bg-secondary rounded shadow">
                         <thead>
                             <tr>
                                 <th className="px-4 py-2">Product ID</th>
@@ -241,7 +240,7 @@ const AnalyticsDashboard: React.FC = () => {
             </div>
             <h2 className="text-xl font-semibold mb-2">Recent Interactions</h2>
             <div className="overflow-x-auto">
-                <table className="min-w-full bg-content1 rounded shadow">
+                <table className="min-w-full bg-secondary rounded shadow">
                     <thead>
                         <tr>
                             <th className="px-4 py-2">ID</th>

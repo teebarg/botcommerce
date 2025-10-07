@@ -16,15 +16,15 @@ interface UserAvatarProps {
 const UserAvatar: React.FC<UserAvatarProps> = ({ user }) => {
     return (
         <div className="relative">
-            <Avatar className="h-10 w-10 border-2 border-content3 shadow-sm">
+            <Avatar className="h-10 w-10 border-2 border-accent shadow-sm">
                 <AvatarFallback className={`text-white font-semibold text-sm ${user.email !== "Unknown" ? "bg-purple-500" : "bg-gray-400"}`}>
                     {user.email !== "Unknown" ? "US" : "G"}
                 </AvatarFallback>
             </Avatar>
-            <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-content3 bg-green-400 animate-pulse" />
+            <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-green-400 animate-pulse" />
 
             {user.email !== "Unknown" && (
-                <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-blue-500 border-2 border-content3 flex items-center justify-center">
+                <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-blue-500 border-2 border-gary-900 flex items-center justify-center">
                     <div className="h-1.5 w-1.5 rounded-full bg-white" />
                 </div>
             )}

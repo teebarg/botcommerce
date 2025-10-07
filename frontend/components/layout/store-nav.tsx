@@ -18,7 +18,7 @@ const StoreNavbar = async () => {
     const siteConfig = await getSiteConfig();
 
     return (
-        <NavigationBar className="my-2 hidden md:flex">
+        <NavigationBar className="hidden md:flex bg-background">
             <NavbarContent className="flex flex-1 max-w-8xl mx-auto">
                 <NavbarBrand className="flex items-center font-semibold">
                     <LocalizedClientLink className="text-3xl block" href="/">
@@ -37,10 +37,10 @@ const StoreNavbar = async () => {
                     <div className="hidden md:flex">
                         {session ? (
                             <LocalizedClientLink aria-label="go to wishlist" href={"/wishlist"}>
-                                <HeartFilled className="h-8 w-8 text-accent" />
+                                <HeartFilled className="h-8 w-8 text-primary" />
                             </LocalizedClientLink>
                         ) : (
-                            <Heart className="h-8 w-8 text-default-700" />
+                            <Heart className="h-8 w-8 text-muted-foreground" />
                         )}
                     </div>
                     <GetApp />

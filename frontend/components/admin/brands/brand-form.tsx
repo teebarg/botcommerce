@@ -93,7 +93,7 @@ const BrandForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, curre
                             control={control}
                             name="is_active"
                             render={({ field }) => (
-                                <FormItem className="flex items-center justify-between rounded-lg border border-divider px-4 py-2">
+                                <FormItem className="flex items-center justify-between rounded-lg border border-input px-4 py-2">
                                     <div className="space-y-0.5">
                                         <FormLabel>Active</FormLabel>
                                     </div>
@@ -108,7 +108,7 @@ const BrandForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, curre
                         <Button aria-label="cancel" className="min-w-32" disabled={isPending} type="button" variant="outline" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button aria-label="submit" className="min-w-32" isLoading={isPending} type="submit" variant="primary">
+                        <Button aria-label="submit" className="min-w-32" isLoading={isPending} type="submit">
                             {isCreate ? "Submit" : "Update"}
                         </Button>
                     </div>

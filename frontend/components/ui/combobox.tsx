@@ -101,10 +101,9 @@ const MultiSelectCombobox: React.FC<MultiSelectComboboxProps> = ({
                             </span>
                         ))
                     ) : (
-                        <span className="text-default-500">{placeholder}</span>
+                        <span className="text-muted-foreground">{placeholder}</span>
                     )}
 
-                    {/* Search input that appears when dropdown is open */}
                     {isOpen && (
                         <input
                             autoFocus
@@ -143,8 +142,8 @@ const MultiSelectCombobox: React.FC<MultiSelectComboboxProps> = ({
                                 <div
                                     key={idx}
                                     className={`relative flex cursor-pointer select-none items-center px-3 py-2 ${
-                                        isSelected ? "text-blue-700" : "text-default-900"
-                                    } hover:bg-content1`}
+                                        isSelected ? "text-blue-700" : "text-foreground"
+                                    } hover:bg-secondary`}
                                     onClick={() => toggleOption(option)}
                                 >
                                     <div className="flex items-center gap-2">
@@ -160,7 +159,7 @@ const MultiSelectCombobox: React.FC<MultiSelectComboboxProps> = ({
                             );
                         })
                     ) : (
-                        <div className="relative cursor-default select-none items-center px-3 py-2 text-default-500">No options found.</div>
+                        <div className="relative cursor-default select-none items-center px-3 py-2 text-muted-foreground">No options found.</div>
                     )}
                 </div>
             )}

@@ -142,7 +142,7 @@ const SignUpForm: React.FC<Props> = () => {
                             )}
                         />
                     </div>
-                    <span className="text-center text-default-500 text-xs mt-6">
+                    <span className="text-center text-muted-foreground text-xs mt-6">
                         By creating an account, you agree to {settings?.shop_name} Store&apos;s{" "}
                         <LocalizedClientLink className="underline" href="/content/privacy-policy">
                             Privacy Policy
@@ -153,15 +153,7 @@ const SignUpForm: React.FC<Props> = () => {
                         </LocalizedClientLink>
                         .
                     </span>
-                    <Button
-                        aria-label="join us"
-                        className="w-full mt-6"
-                        data-testid="register-button"
-                        isLoading={isPending}
-                        size="lg"
-                        type="submit"
-                        variant="primary"
-                    >
+                    <Button aria-label="join us" className="w-full mt-6" data-testid="register-button" isLoading={isPending} size="lg" type="submit">
                         Join Us
                     </Button>
                 </form>

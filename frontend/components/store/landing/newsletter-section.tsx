@@ -63,70 +63,65 @@ const NewsletterSection: React.FC = () => {
 
     if (isSubscribed) {
         return (
-            <section className="py-16 bg-gradient-to-br from-secondary/5 to-primary/5">
-                <div className="container mx-auto px-4">
-                    <div className="max-w-2xl mx-auto text-center">
-                        <div className="bg-content1 rounded-2xl border border-divider p-8 shadow-lg">
-                            <div className="mb-6">
-                                <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <CheckCircle className="h-8 w-8 text-secondary" />
-                                </div>
-                                <h2 className="text-2xl font-bold text-default-foreground mb-2">Welcome to the Club! 🎉</h2>
-                                <p className="text-default-600">
-                                    {`You're now subscribed to our newsletter. Check your inbox for a welcome email with your exclusive discount code!`}
-                                </p>
-                            </div>
-
-                            <div className="bg-content2 rounded-lg p-4 mb-6">
-                                <Badge className="bg-secondary text-secondary-foreground mb-2">Welcome Bonus</Badge>
-                                <p className="text-sm text-default-600">
-                                    Use code <span className="font-mono font-bold text-default-foreground">WELCOME15</span> for 15% off your first
-                                    order
-                                </p>
-                            </div>
-
-                            <Button className="border-divider hover:bg-content2" variant="outline" onClick={() => setIsSubscribed(false)}>
-                                Subscribe Another Email
-                            </Button>
+            <section className="py-16">
+                <div className="bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 max-w-5xl mx-auto text-center rounded-2xl border border-input p-8 shadow-lg">
+                    <div className="mb-6">
+                        <div className="w-16 h-16 bg-success rounded-full flex items-center justify-center mx-auto mb-4">
+                            <CheckCircle className="h-8 w-8 text-secondary" />
                         </div>
+                        <h2 className="text-2xl font-bold mb-2">Welcome to the Club! 🎉</h2>
+                        <p className="text-muted-foreground">
+                            {`You're now subscribed to our newsletter. Check your inbox for a welcome email with your exclusive discount code!`}
+                        </p>
                     </div>
+
+                    <div className="bg-card rounded-lg p-4 mb-6 w-fit mx-auto">
+                        <Badge className="mb-2">Welcome Bonus</Badge>
+                        <p className="text-sm text-muted-foreground">
+                            Use code <span className="font-outfit font-bold text-foreground text-lg">WELCOME15</span> for 15% off your first order
+                        </p>
+                    </div>
+
+                    <Button variant="accent" onClick={() => setIsSubscribed(false)}>
+                        Subscribe Another Email
+                    </Button>
                 </div>
             </section>
         );
     }
 
     return (
-        <section className="py-12 bg-gradient-to-br from-primary/5 to-accent/5">
+        <section className="py-12">
             <div className="container mx-auto px-4">
-                <div className="max-w-4xl mx-auto">
+                <div className="max-w-5xl mx-auto">
                     <div className="text-center mb-12">
-                        <div className="inline-flex items-center gap-2 bg-content1 rounded-full px-4 py-2 border border-divider mb-4">
+                        <div className="inline-flex items-center gap-2 bg-card rounded-full px-4 py-2 border border-input mb-4">
                             <Mail className="h-4 w-4 text-primary" />
-                            <span className="text-sm font-medium text-default-foreground">Newsletter</span>
+                            <span className="text-sm font-medium text-foreground">Newsletter</span>
                         </div>
-                        <h2 className="text-3xl font-bold text-default-foreground mb-2">Stay in the Loop</h2>
-                        <p className="text-default-600 text-lg max-w-2xl mx-auto">
+                        <h2 className="text-3xl font-bold mb-2">Stay in the Loop</h2>
+                        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
                             Join over 5,000+ subscribers and get exclusive deals, product updates, and insider tips delivered straight to your inbox.
                         </p>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-6 mb-12">
                         {benefits.map((benefit, idx: number) => (
-                            <div key={idx} className="bg-content1 rounded-lg border border-divider p-6 text-center hover:shadow-md transition-shadow">
+                            <div key={idx} className="bg-card rounded-lg border border-input p-6 text-center hover:shadow-md transition-shadow">
                                 <div className={`w-12 h-12 ${benefit.bgColor} rounded-lg flex items-center justify-center mx-auto mb-4`}>
                                     <benefit.icon className={`h-6 w-6 ${benefit.color}`} />
                                 </div>
-                                <h3 className="font-semibold text-default-foreground mb-2">{benefit.title}</h3>
-                                <p className="text-sm text-default-600">{benefit.description}</p>
+                                <h3 className="font-semibold mb-2">{benefit.title}</h3>
+                                <p className="text-sm text-muted-foreground">{benefit.description}</p>
                             </div>
                         ))}
                     </div>
 
-                    <div className="bg-content1 rounded-2xl border border-divider p-8 shadow-lg">
+                    <div className="bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 rounded-2xl border border-input p-8 shadow-lg">
                         <div className="max-w-md mx-auto">
                             <div className="text-center mb-6">
-                                <h3 className="text-xl font-semibold text-default-foreground mb-2">Subscribe Now</h3>
-                                <p className="text-default-600 text-sm">Get your first exclusive discount code instantly!</p>
+                                <h3 className="text-xl font-semibold mb-2">Subscribe Now</h3>
+                                <p className="text-muted-foreground text-sm">Get your first exclusive discount code instantly!</p>
                             </div>
 
                             <Form {...form}>
@@ -139,9 +134,9 @@ const NewsletterSection: React.FC = () => {
                                                 <FormItem className="flex-1">
                                                     <FormControl>
                                                         <Input
-                                                            className="bg-content2 h-12"
+                                                            className="h-12"
                                                             placeholder="Enter your email address"
-                                                            startContent={<Mail className="text-default-500 pointer-events-none shrink-0" />}
+                                                            startContent={<Mail className="text-muted-foreground pointer-events-none shrink-0" />}
                                                             type="email"
                                                             {...field}
                                                         />
@@ -150,14 +145,7 @@ const NewsletterSection: React.FC = () => {
                                                 </FormItem>
                                             )}
                                         />
-                                        <Button
-                                            className="w-full"
-                                            disabled={!form.formState.isValid}
-                                            isLoading={isPending}
-                                            size="lg"
-                                            type="submit"
-                                            variant="primary"
-                                        >
+                                        <Button className="w-full" disabled={!form.formState.isValid} isLoading={isPending} size="lg" type="submit">
                                             <div className="flex items-center gap-2">
                                                 <Mail className="h-4 w-4" />
                                                 Subscribe & Get 15% Off
@@ -167,18 +155,18 @@ const NewsletterSection: React.FC = () => {
                                 </form>
                             </Form>
 
-                            <div className="mt-6 pt-6 border-t border-divider">
-                                <div className="flex items-center justify-center gap-4 text-xs text-default-500">
+                            <div className="mt-6 pt-6 border-t border-input">
+                                <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
                                     <div className="flex items-center gap-1">
-                                        <CheckCircle className="h-3 w-3 text-secondary" />
+                                        <CheckCircle className="h-3 w-3 text-accent" />
                                         <span>No spam</span>
                                     </div>
                                     <div className="flex items-center gap-1">
-                                        <CheckCircle className="h-3 w-3 text-secondary" />
+                                        <CheckCircle className="h-3 w-3 text-accent" />
                                         <span>Unsubscribe anytime</span>
                                     </div>
                                     <div className="flex items-center gap-1">
-                                        <CheckCircle className="h-3 w-3 text-secondary" />
+                                        <CheckCircle className="h-3 w-3 text-accent" />
                                         <span>Privacy protected</span>
                                     </div>
                                 </div>

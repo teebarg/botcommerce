@@ -80,24 +80,24 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
     return (
         <div
             className={cn(
-                "transition-all duration-300 bg-linear-to-br from-background to-content1 flex items-center justify-center px-4 py-24 w-full",
+                "transition-all duration-300 bg-linear-to-br from-background to-secondary flex items-center justify-center px-4 py-24 w-full",
                 className
             )}
         >
             <div className="max-w-md w-full text-center">
-                <div className="rounded-2xl shadow-xl p-8 border transition-all duration-300 bg-content1 border-divider">
+                <div className="rounded-2xl shadow-xl p-8 border transition-all duration-300 bg-secondary border-input">
                     <div className="mb-6 flex justify-center">
                         <div className="relative">
                             <div className="absolute inset-0 rounded-full blur-xl opacity-70 animate-pulse transition-colors bg-linear-to-r from-blue-100 to-purple-100" />
-                            <div className="relative rounded-full p-4 shadow-lg transition-colors bg-content2">{currentScenario.icon}</div>
+                            <div className="relative rounded-full p-4 shadow-lg transition-colors">{currentScenario.icon}</div>
                         </div>
                     </div>
 
-                    <h1 className="text-2xl font-bold mb-3 transition-colors text-default-900">{currentScenario.title}</h1>
-                    <p className="mb-8 leading-relaxed transition-colors text-default-500">{currentScenario.description}</p>
+                    <h1 className="text-2xl font-bold mb-3">{currentScenario.title}</h1>
+                    <p className="mb-8 leading-relaxed text-muted-foreground">{currentScenario.description}</p>
 
                     <div className="space-y-3">
-                        <Button className="w-full" size="lg" variant="primary" onClick={handlePrimaryAction}>
+                        <Button className="w-full" size="lg" onClick={handlePrimaryAction}>
                             {currentScenario.primaryAction}
                         </Button>
 
@@ -107,8 +107,8 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
                         </Button>
                     </div>
 
-                    <div className="mt-6 pt-6 border-t transition-colors border-divider">
-                        <p className="text-sm transition-colors text-default-500">
+                    <div className="mt-6 pt-6 border-t border-input">
+                        <p className="text-sm text-muted-foreground">
                             Need help?{" "}
                             <a className="font-medium transition-colors text-blue-500 hover:text-blue-600" href={`mailto:${settings?.contact_email}`}>
                                 Contact our support team

@@ -62,19 +62,19 @@ export default function ShareButton() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="destructive">
+                <Button variant="contrast">
                     <Share2 className="h-4 w-4 mr-1" />
                     Share
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64 p-2 shadow-hover border-primary/10 bg-content1 backdrop-blur-sm">
+            <DropdownMenuContent align="end" className="w-64 p-2 shadow-hover bg-secondary">
                 <div className="px-2 py-1.5 mb-2">
                     <h4 className="text-sm font-semibold text-foreground">Share Product</h4>
                     <p className="text-xs text-muted-foreground">Share with your friends</p>
                 </div>
 
                 <DropdownMenuItem className="gap-3 p-3 rounded-lg group" onClick={handleCopyUrl}>
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
                         <Copy className="h-4 w-4 text-primary" />
                     </div>
                     <div className="flex flex-col">
@@ -84,8 +84,8 @@ export default function ShareButton() {
                 </DropdownMenuItem>
 
                 <DropdownMenuItem className="gap-3 p-3 rounded-lg group" onClick={handleNativeShare}>
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/30 group-hover:bg-accent/50 transition-colors">
-                        <Smartphone className="h-4 w-4 text-accent-foreground" />
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-contrast/10">
+                        <Smartphone className="h-4 w-4 text-contrast" />
                     </div>
                     <div className="flex flex-col">
                         <span className="font-medium text-foreground">More</span>
@@ -99,7 +99,7 @@ export default function ShareButton() {
                 </div>
 
                 <DropdownMenuItem className="gap-3 p-3 rounded-lg group" onClick={() => handleSocialShare("twitter")}>
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1DA1F2]/10 group-hover:bg-[#1DA1F2]/20 transition-colors">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1DA1F2]/10">
                         <Twitter className="h-4 w-4 text-[#1DA1F2]" />
                     </div>
                     <div className="flex flex-col">
@@ -109,7 +109,7 @@ export default function ShareButton() {
                 </DropdownMenuItem>
 
                 <DropdownMenuItem className="gap-3 p-3 rounded-lg group" onClick={() => handleSocialShare("facebook")}>
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1877F2]/10 group-hover:bg-[#1877F2]/20 transition-colors">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1877F2]/10">
                         <Facebook className="h-4 w-4 text-[#1877F2]" />
                     </div>
                     <div className="flex flex-col">

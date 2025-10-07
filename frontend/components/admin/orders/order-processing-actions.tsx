@@ -23,11 +23,11 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
             label: string;
             nextStatus: OrderStatus | null;
             actionLabel: string;
-            variant: "default" | "destructive" | "outline" | "secondary" | "success" | "warning";
+            variant: "default" | "destructive" | "outline" | "secondary" | "success" | "warning" | "contrast";
         }
     > = {
         REFUNDED: {
-            color: "bg-danger/20 text-danger",
+            color: "bg-destructive/20 text-destructive",
             label: "Refunded",
             nextStatus: null,
             actionLabel: "",
@@ -41,11 +41,11 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
             variant: "warning",
         },
         PROCESSING: {
-            color: "bg-primary/20 text-primary",
+            color: "bg-contrast text-contrast-foreground",
             label: "Processing",
             nextStatus: "SHIPPED" as const,
             actionLabel: "Order Packed",
-            variant: "secondary",
+            variant: "contrast",
         },
         SHIPPED: {
             color: "bg-blue-100 text-blue-700",
@@ -69,7 +69,7 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
             variant: "destructive",
         },
         CANCELED: {
-            color: "bg-danger/20 text-danger",
+            color: "bg-destructive/20 text-destructive",
             label: "Cancelled",
             nextStatus: null,
             actionLabel: "",
@@ -94,11 +94,11 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
             {order.payment_status !== "SUCCESS" && (
                 <Dialog open={paymentState.isOpen} onOpenChange={paymentState.setOpen}>
                     <DialogTrigger asChild>
-                        <Button className="flex-1 w-full" variant="luxury">
+                        <Button className="flex-1 w-full" variant="emerald">
                             Update Payment
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="bg-content1">
+                    <DialogContent>
                         <DialogHeader className="sr-only">
                             <DialogTitle>Update Payment Status</DialogTitle>
                         </DialogHeader>
@@ -118,15 +118,17 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
                             {config.actionLabel}
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="bg-content1">
+                    <DialogContent>
                         <DialogHeader className="sr-only">
                             <DialogTitle>Update Order Status</DialogTitle>
                         </DialogHeader>
                         <div className="mx-auto w-full">
                             <div>
-                                <h2 className="text-lg font-semibold leading-6 text-default-900">Update Order Status</h2>
+                                <h2 className="text-lg font-semibold leading-6">Update Order Status</h2>
                                 <Separator />
-                                <p className="text-sm text-default-500 mt-2 font-medium">Are you sure you want to change the status of this order?</p>
+                                <p className="text-sm text-muted-foreground mt-2 font-medium">
+                                    Are you sure you want to change the status of this order?
+                                </p>
                                 <div className="flex justify-end gap-2 mt-8">
                                     <Button aria-label="close" className="min-w-36" variant="destructive" onClick={stateState.close}>
                                         Close
@@ -135,7 +137,6 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
                                         aria-label="confirm"
                                         className="min-w-36"
                                         isLoading={isPending}
-                                        variant="indigo"
                                         onClick={() => handleStatusChange(order.id, config.nextStatus)}
                                     >
                                         Confirm

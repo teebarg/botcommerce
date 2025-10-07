@@ -44,7 +44,7 @@ const CollectionActions: React.FC<Props> = ({ collection }) => {
             </Overlay>
             <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
                 <DialogTrigger>
-                    <Trash2 className="h-5 w-5 text-danger cursor-pointer" />
+                    <Trash2 className="h-5 w-5 text-destructive cursor-pointer" />
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader className="sr-only">

@@ -75,8 +75,8 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({ productId, vari
 
     return (
         <div>
-            <p className="text-default-500 mt-8 font-semibold">Manage variant</p>
-            <div className="bg-content2 p-4 rounded-lg">
+            <p className="text-muted-foreground mt-8 font-semibold">Manage variant</p>
+            <div className="p-4 rounded-lg">
                 <Form {...form}>
                     <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -185,7 +185,7 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({ productId, vari
                                     Cancel
                                 </Button>
                             )}
-                            <Button className="min-w-32" disabled={loading} isLoading={loading} type="submit" variant="indigo">
+                            <Button className="min-w-32" disabled={loading} isLoading={loading} type="submit">
                                 {variant ? "Update" : "Create"}
                             </Button>
                         </div>

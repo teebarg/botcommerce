@@ -76,8 +76,8 @@ const InstallPrompt: React.FC = () => {
     return (
         <ClientOnly>
             <div className="fixed bottom-4 left-4 right-4 md:max-w-100 z-50">
-                <div className="bg-content2 rounded-lg shadow-xl p-8">
-                    <button aria-label="cancel" className="absolute top-2 right-2 text-default-500 hover:text-default-500/50" onClick={handleClose}>
+                <div className="rounded-lg shadow-xl p-8">
+                    <button aria-label="cancel" className="absolute top-2 right-2 text-muted-foreground" onClick={handleClose}>
                         <Cancel className="h-6 w-6" />
                     </button>
 
@@ -85,10 +85,10 @@ const InstallPrompt: React.FC = () => {
                         <div className="bg-blue-500 p-3 rounded-full">{/* <ShoppingBag className="w-6 h-6 text-white" /> */}</div>
 
                         <div className="flex-1">
-                            <h3 className="font-semibold text-default-900 mb-1">Install Our App</h3>
-                            <p className="text-sm text-default-500 mb-3">Get faster checkout, exclusive offers and real-time order tracking</p>
+                            <h3 className="font-semibold mb-1">Install Our App</h3>
+                            <p className="text-sm text-muted-foreground mb-3">Get faster checkout, exclusive offers and real-time order tracking</p>
 
-                            <Button aria-label="install" className="w-full space-x-2" variant="primary" onClick={handleInstall}>
+                            <Button aria-label="install" className="w-full space-x-2" onClick={handleInstall}>
                                 <span>Add to Home Screen</span>
                             </Button>
                         </div>

@@ -44,7 +44,7 @@ export function ProductActions({ product }: ProductActionsProps) {
             <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                 <DialogTrigger asChild>
                     <Button size="icon" variant="ghost">
-                        <Trash2 className="h-5 w-5 text-danger" />
+                        <Trash2 className="h-5 w-5 text-destructive" />
                     </Button>
                 </DialogTrigger>
                 <DialogContent>

@@ -21,9 +21,9 @@ export function FaqList({ faqs, isLoading }: FaqListProps) {
 
     if (faqs.length === 0) {
         return (
-            <Card>
+            <Card className="bg-card">
                 <CardContent className="py-8">
-                    <p className="text-center text-default-500">No FAQs found</p>
+                    <p className="text-center text-muted-foreground">No FAQs found</p>
                 </CardContent>
             </Card>
         );
@@ -32,14 +32,14 @@ export function FaqList({ faqs, isLoading }: FaqListProps) {
     return (
         <div className="space-y-4">
             {faqs.map((faq: FAQ, idx: number) => (
-                <Card key={idx} className="group hover:border-divider bg-content1">
+                <Card key={idx} className="group hover:border-input bg-card">
                     <CardHeader>
                         <div className="flex items-start justify-between gap-4">
                             <div className="flex-1 min-w-0">
-                                <h3 className="text-lg font-semibold text-default-900 leading-tight mb-2">{faq.question}</h3>
+                                <h3 className="text-lg font-semibold leading-tight mb-2">{faq.question}</h3>
                                 <div className="flex items-center gap-3">
                                     {faq.category && (
-                                        <Badge variant="yellow">
+                                        <Badge variant="blue">
                                             <Tag className="w-3 h-3 mr-1" />
                                             {faq.category}
                                         </Badge>
@@ -57,7 +57,7 @@ export function FaqList({ faqs, isLoading }: FaqListProps) {
 
                     <CardContent>
                         <div className="prose prose-sm max-w-none">
-                            <p className="text-default-700 leading-relaxed m-0">{faq.answer}</p>
+                            <p className="text-muted-foreground leading-relaxed m-0">{faq.answer}</p>
                         </div>
                     </CardContent>
                 </Card>

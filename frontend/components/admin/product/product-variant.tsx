@@ -160,7 +160,7 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
                         </div>
                     </div>
 
-                    <Button className="w-full" disabled={newVariant.price < 2} variant="indigo" onClick={addVariant}>
+                    <Button className="w-full" disabled={newVariant.price < 2} onClick={addVariant}>
                         <Plus className="w-4 h-4 mr-2" />
                         Add Variant
                     </Button>
@@ -182,11 +182,7 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    {variant.size && (
-                                                        <Badge className="text-xs" variant="primary">
-                                                            {variant.size}
-                                                        </Badge>
-                                                    )}
+                                                    {variant.size && <Badge className="text-xs">{variant.size}</Badge>}
                                                     {variant.color && (
                                                         <Badge className="text-xs" variant="secondary">
                                                             {variant.color}

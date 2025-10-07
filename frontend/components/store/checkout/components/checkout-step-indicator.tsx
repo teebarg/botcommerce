@@ -40,7 +40,7 @@ const CheckoutStepIndicator: React.FC<CheckoutStepIndicatorProps> = ({ currentSt
     const steps: CheckoutStep[] = ["delivery", "address", "payment"];
 
     return (
-        <div className="w-full bg-background border border-border rounded-lg py-4 px-1 mb-6 sticky top-16 z-10">
+        <div className="w-full bg-secondary border border-border rounded-lg py-4 px-1 mb-6 sticky top-16 z-10">
             <div className="flex items-center justify-between">
                 {steps.map((step: CheckoutStep, index: number) => {
                     const config = stepConfig[step];
@@ -54,21 +54,21 @@ const CheckoutStepIndicator: React.FC<CheckoutStepIndicatorProps> = ({ currentSt
                             <div className="flex flex-col items-center">
                                 <button
                                     className={cn(
-                                        "flex flex-col items-center gap-1 px-2 py-3 rounded-lg transition-all duration-200 text-default-500",
-                                        isClickable ? "hover:bg-secondary/50 cursor-pointer" : "opacity-50 cursor-not-allowed",
-                                        isActive && "bg-secondary text-accent"
+                                        "flex flex-col items-center gap-1 px-2 py-3 rounded-lg transition-all duration-200 text-muted-foreground",
+                                        isClickable ? "cursor-pointer" : "opacity-50 cursor-not-allowed",
+                                        isActive && "bg-primary/10 text-primary"
                                     )}
                                     disabled={!isClickable}
                                     onClick={() => isClickable && onStepClick(step)}
                                 >
                                     <div className="relative">
                                         {isCompleted ? (
-                                            <CheckCircle className="h-6 w-6 text-accent" />
+                                            <CheckCircle className="h-6 w-6 text-primary" />
                                         ) : (
                                             <div
                                                 className={cn(
                                                     "h-6 w-6 rounded-full flex items-center justify-center",
-                                                    isActive ? "border-primary bg-accent/50 text-white" : "border-muted-foreground"
+                                                    isActive ? "border-primary bg-primary text-white" : "border-muted-foreground"
                                                 )}
                                             >
                                                 {isActive ? <Icon className="h-3 w-3" /> : <Circle className="h-4 w-4" />}
@@ -76,7 +76,7 @@ const CheckoutStepIndicator: React.FC<CheckoutStepIndicatorProps> = ({ currentSt
                                         )}
                                     </div>
                                     <div className="text-center">
-                                        <div className={cn("text-sm font-medium", isActive && "", isCompleted && "text-accent")}>{config.title}</div>
+                                        <div className={cn("text-sm font-medium", isActive && "", isCompleted && "text-primary")}>{config.title}</div>
                                         <div className="text-xs text-muted-foreground hidden sm:block">{config.description}</div>
                                     </div>
                                 </button>

@@ -31,7 +31,6 @@ const CatalogItem: React.FC<{ catalog: Shared; selectedProductIds: number[] }> =
                     disabled={!catalog.is_active || isAdding || selectedProductIds.length === 0}
                     isLoading={isAdding}
                     size="sm"
-                    variant="indigo"
                     onClick={async () => {
                         await bulkAddToCatalog({ collectionId: catalog.id, productIds: selectedProductIds });
                     }}

@@ -12,10 +12,10 @@ const CategoriesSection: React.FC = () => {
 
     return (
         <ClientOnly>
-            <div className="bg-content2">
+            <div className="bg-gradient-to-b from-background to-card/30">
                 <div className="max-w-8xl mx-auto px-4 py-8 w-full text-center">
                     <h2 className="text-4xl font-bold mb-1 mt-6">Shop by category</h2>
-                    <p className="text-default-600 text-lg mb-8">Discover our wide range of products across different categories</p>
+                    <p className="text-muted-foreground text-lg mb-8">Discover our wide range of products across different categories</p>
                     {isLoading ? (
                         <ComponentLoader className="h-48" />
                     ) : (
@@ -30,9 +30,9 @@ const CategoriesSection: React.FC = () => {
                                     >
                                         <div className="relative w-24 h-24 rounded-full flex items-center justify-center mb-2 overflow-hidden">
                                             <img
-                                                alt=""
+                                                alt={category.name}
                                                 aria-hidden="true"
-                                                className="object-cover rounded-full"
+                                                className="object-cover rounded-full h-full w-full"
                                                 src={category.image || "/placeholder.jpg"}
                                             />
                                         </div>
@@ -46,9 +46,9 @@ const CategoriesSection: React.FC = () => {
                                     <Link key={idx} prefetch className="flex flex-col items-center" href={`/collections?cat_ids=${category.slug}`}>
                                         <div className="relative w-32 h-32 rounded-full flex items-center justify-center mb-3 overflow-hidden transition-transform hover:scale-105">
                                             <img
-                                                alt=""
+                                                alt={category.name}
                                                 aria-hidden="true"
-                                                className="object-cover rounded-full w-32 h-32"
+                                                className="object-cover rounded-full h-full w-full"
                                                 src={category.image || "/placeholder.jpg"}
                                             />
                                         </div>

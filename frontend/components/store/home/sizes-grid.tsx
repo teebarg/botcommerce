@@ -57,7 +57,7 @@ const SizesGrid = () => {
     const router = useRouter();
 
     return (
-        <section className="py-16 bg-secondary/30 px-4 md:px-2">
+        <section className="py-16 px-4 md:px-2">
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-12">
                     <h2 className="text-4xl font-bold mb-3">Shop by Size</h2>

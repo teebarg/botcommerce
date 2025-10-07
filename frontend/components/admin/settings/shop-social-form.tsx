@@ -59,7 +59,7 @@ export function ShopSocialForm({ settings }: ShopDetailsProps) {
                 {defaultShopDetails.map((detail, idx: number) => {
                     return (
                         <div key={idx}>
-                            <label className="text-sm text-default-500">{detail.label}</label>
+                            <label className="text-sm text-muted-foreground">{detail.label}</label>
                             <Input
                                 placeholder={`Enter ${detail.label.toLowerCase()}`}
                                 type="text"
@@ -75,7 +75,6 @@ export function ShopSocialForm({ settings }: ShopDetailsProps) {
                     disabled={syncShopDetailsMutation.isPending}
                     isLoading={syncShopDetailsMutation.isPending}
                     type="button"
-                    variant="primary"
                     onClick={handleUpdate}
                 >
                     Save Changes

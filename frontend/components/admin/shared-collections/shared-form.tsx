@@ -52,10 +52,10 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
     };
 
     return (
-        <div className="px-4 pt-4 overflow-y-auto">
+        <div className="px-4 py-4 overflow-y-auto bg-card h-full">
             <Form {...form}>
                 <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
-                    <Card className="border-0 bg-card/50 backdrop-blur-sm">
+                    <Card className="border-none">
                         <CardContent className="space-y-6">
                             <div className="grid md:grid-cols-2 gap-6">
                                 <FormField
@@ -90,7 +90,7 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
                                 name="is_active"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg">
+                                        <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
                                             <div className="space-y-1">
                                                 <FormLabel>Active Status</FormLabel>
                                                 <p className="text-sm text-muted-foreground">Make this collection visible to others</p>
@@ -105,14 +105,14 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
                             />
                         </CardContent>
                     </Card>
-                    <div className="flex justify-end gap-2 bottom-0 sticky z-10 bg-background py-2">
+                    <div className="flex justify-end gap-2">
                         {onClose && (
                             <Button type="button" variant="destructive" onClick={onClose}>
                                 Cancel
                             </Button>
                         )}
-                        <Button disabled={isLoading || !form.watch("title")} isLoading={isLoading} type="submit" variant="indigo">
-                            <Save className="h-5 w-5 mr-1" />
+                        <Button disabled={isLoading || !form.watch("title")} isLoading={isLoading} type="submit">
+                            <Save className="h-5 w-5" />
                             {current ? "Update" : "Create"}
                         </Button>
                     </div>

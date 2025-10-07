@@ -36,8 +36,8 @@ export default function Wishlist() {
 
             {wishlists.length > 0 ? (
                 <div>
-                    <h1 className="text-2xl font-bold text-center text-default-900 mt-4">Your Wishlist</h1>
-                    <p className="text-center text-default-500">Curate your luxury collection.</p>
+                    <h1 className="text-2xl font-bold text-center mt-4">Your Wishlist</h1>
+                    <p className="text-center text-muted-foreground">Curate your luxury collection.</p>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 lg:gap-8 mt-6 px-1">
                         {wishlists?.map((item: WishItem, idx: number) => <WishlistItem key={idx} {...item.product} />)}
                     </div>
@@ -45,11 +45,11 @@ export default function Wishlist() {
             ) : (
                 <div className="flex flex-col justify-center items-center gap-4 mt-4 py-8">
                     <div className="space-y-2 text-center mb-4">
-                        <h2 className="text-2xl font-semibold tracking-tight text-default-900">Your Wishlist is Empty</h2>
-                        <p className="text-default-500 max-w-sm mx-auto">Explore our luxury collection to add items</p>
+                        <h2 className="text-2xl font-semibold tracking-tight text-foreground">Your Wishlist is Empty</h2>
+                        <p className="text-muted-foreground max-w-sm mx-auto">Explore our luxury collection to add items</p>
                     </div>
 
-                    <BtnLink href="/collections" size="lg" variant="primary">
+                    <BtnLink href="/collections" size="lg">
                         Explore Collection
                     </BtnLink>
                 </div>

@@ -45,8 +45,8 @@ const AdminMobileMenu: React.FC = () => {
     ];
 
     return (
-        <div className="h-full bg-content1 rounded-[inherit] overflow-hidden overflow-y-auto">
-            <div className="p-4 bg-accent text-gray-800 sticky top-safe z-10">
+        <div className="h-full rounded-[inherit] overflow-hidden overflow-y-auto">
+            <div className="p-4 bg-primary text-primary-foreground sticky top-safe z-10">
                 <div className="flex items-center space-x-3">
                     <Avatar>
                         <AvatarImage src={session?.user?.image!} />
@@ -57,19 +57,19 @@ const AdminMobileMenu: React.FC = () => {
                         <div className="font-medium">
                             {session?.user?.first_name} {session?.user?.last_name}
                         </div>
-                        <div className="text-xs text-gray-700">{session?.user?.email}</div>
+                        <div className="text-xs text-gray-300">{session?.user?.email}</div>
                     </div>
                 </div>
             </div>
 
-            <div className="p-4 border-b border-content2">
+            <div className="p-4 border-b">
                 <div className="relative">
                     <input
-                        className="w-full py-2 pl-8 pr-4 bg-content1 rounded-lg text-sm focus:outline-none border"
+                        className="w-full py-2 pl-8 pr-4 bg-background rounded-lg text-sm focus:outline-none border"
                         placeholder="Search..."
                         type="text"
                     />
-                    <Search className="absolute left-2 top-2.5 text-default-500" size={16} />
+                    <Search className="absolute left-2 top-2.5 text-muted-foreground" size={16} />
                 </div>
             </div>
 
@@ -79,20 +79,20 @@ const AdminMobileMenu: React.FC = () => {
                         key={idx}
                         prefetch
                         className={`flex items-center justify-between w-full p-3 text-left transition-colors ${
-                            pathname === item.href ? "bg-accent/50" : ""
+                            pathname === item.href ? "bg-primary/20 text-primary" : ""
                         }`}
                         href={item.href}
                     >
                         <div className="flex items-center space-x-3">
-                            <span className={pathname === item.href ? "text-accent" : "text-default-500"}>{item.icon}</span>
+                            <span className={pathname === item.href ? "text-primary" : "text-muted-foreground"}>{item.icon}</span>
                             <span>{item.label}</span>
                         </div>
-                        <ChevronRight className={pathname === item.href ? "text-accent" : "text-default-500"} size={16} />
+                        <ChevronRight className={pathname === item.href ? "text-primary" : "text-muted-foreground"} size={16} />
                     </Link>
                 ))}
             </nav>
 
-            <div className="p-4 border-t border-content2 sticky bottom-0 bg-content1">
+            <div className="p-4 border-t sticky bottom-0 bg-background">
                 <button className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors w-full p-2">
                     <LogOut size={20} />
                     <span>Logout</span>

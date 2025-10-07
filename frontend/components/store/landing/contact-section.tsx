@@ -10,11 +10,11 @@ export function ContactSection() {
     const { settings } = useStoreSettings();
 
     return (
-        <section className="py-16 bg-content2">
+        <section className="py-16 bg-gradient-to-b from-card/30 to-background">
             <div className="max-w-8xl mx-auto px-4">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl font-bold text-default-foreground mb-2">Get in Touch</h2>
-                    <p className="text-default-600 max-w-2xl mx-auto">
+                    <h2 className="text-3xl font-bold mb-2">Get in Touch</h2>
+                    <p className="text-muted-foreground max-w-2xl mx-auto">
                         {`Have questions about our products or need support? We're here to help. Visit our store or reach out through any of the
                         channels below.`}
                     </p>
@@ -23,48 +23,48 @@ export function ContactSection() {
                 <div className="grid lg:grid-cols-2 gap-12">
                     <div className="space-y-8">
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-content1 p-6 rounded-lg border border-divider">
+                            <div className="bg-card p-6 rounded-lg border border-input">
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className="p-2 bg-accent/10 rounded-lg">
-                                        <MapPin className="h-5 w-5 text-accent" />
+                                    <div className="p-2 bg-primary/10 rounded-lg">
+                                        <MapPin className="h-5 w-5 text-primary" />
                                     </div>
-                                    <h3 className="font-semibold text-default-foreground">Visit Us</h3>
+                                    <h3 className="font-semibold">Visit Us</h3>
                                 </div>
-                                <p className="text-default-600 text-sm">
+                                <p className="text-muted-foreground text-sm">
                                     {settings?.address}
                                     <br />
                                     Lagos, Nigeria
                                 </p>
                             </div>
 
-                            <div className="bg-content1 p-6 rounded-lg border border-divider">
+                            <div className="bg-card p-6 rounded-lg border border-input">
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className="p-2 bg-accent/10 rounded-lg">
-                                        <Phone className="h-5 w-5 text-accent" />
+                                    <div className="p-2 bg-primary/10 rounded-lg">
+                                        <Phone className="h-5 w-5 text-primary" />
                                     </div>
-                                    <h3 className="font-semibold text-default-foreground">Call Us</h3>
+                                    <h3 className="font-semibold">Call Us</h3>
                                 </div>
-                                <p className="text-default-600 text-sm">{settings?.contact_phone}</p>
+                                <p className="text-muted-foreground text-sm">{settings?.contact_phone}</p>
                             </div>
 
-                            <div className="bg-content1 p-6 rounded-lg border border-divider">
+                            <div className="bg-card p-6 rounded-lg border border-input">
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className="p-2 bg-accent/10 rounded-lg">
-                                        <Mail className="h-5 w-5 text-accent" />
+                                    <div className="p-2 bg-primary/10 rounded-lg">
+                                        <Mail className="h-5 w-5 text-primary" />
                                     </div>
-                                    <h3 className="font-semibold text-default-foreground">Email Us</h3>
+                                    <h3 className="font-semibold">Email Us</h3>
                                 </div>
-                                <p className="text-default-600 text-sm">{settings?.contact_email}</p>
+                                <p className="text-muted-foreground text-sm">{settings?.contact_email}</p>
                             </div>
 
-                            <div className="bg-content1 p-6 rounded-lg border border-divider">
+                            <div className="bg-card p-6 rounded-lg border border-input">
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className="p-2 bg-warning/10 rounded-lg">
-                                        <Clock className="h-5 w-5 text-warning" />
+                                    <div className="p-2 bg-primary/10 rounded-lg">
+                                        <Clock className="h-5 w-5 text-primary" />
                                     </div>
-                                    <h3 className="font-semibold text-default-foreground">Hours</h3>
+                                    <h3 className="font-semibold">Hours</h3>
                                 </div>
-                                <p className="text-default-600 text-sm">
+                                <p className="text-muted-foreground text-sm">
                                     Mon-Fri: 9AM-6PM
                                     <br />
                                     Sat: 10AM-5PM
@@ -72,9 +72,9 @@ export function ContactSection() {
                             </div>
                         </div>
 
-                        <div className="bg-content1 rounded-lg border border-divider overflow-hidden">
-                            <div className="p-4 border-b border-divider">
-                                <h3 className="font-semibold text-default-foreground flex items-center gap-2">
+                        <div className="bg-card rounded-lg border border-input overflow-hidden">
+                            <div className="p-4 border-b border-input">
+                                <h3 className="font-semibold flex items-center gap-2">
                                     <MapPin className="h-5 w-5 text-primary" />
                                     Our Location
                                 </h3>

@@ -18,21 +18,21 @@ type OrderConfirmationProps = {
 
 const FailedPayment: React.FC<OrderConfirmationProps> = ({ order, onRetry, onContinueShopping }) => {
     return (
-        <div className="w-full max-w-2xl mx-auto bg-content2 rounded-xl px-2 md:px-6 py-6 md:py-12">
+        <div className="w-full max-w-2xl mx-auto rounded-xl px-2 md:px-6 py-6 md:py-12">
             <FadeInComponent>
                 <div className="text-center mb-6">
                     <div className="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-4 animate-pulse">
                         <AlertCircle className="w-12 h-12 text-red-600" />
                     </div>
 
-                    <h2 className="text-2xl font-bold text-default-900 mb-2">Payment Failed</h2>
+                    <h2 className="text-2xl font-bold mb-2">Payment Failed</h2>
 
-                    <p className="text-default-600">We were unable to process your payment. Please check your payment details and try again.</p>
+                    <p className="text-muted-foreground">We were unable to process your payment. Please check your payment details and try again.</p>
                 </div>
             </FadeInComponent>
 
             <FadeInComponent delay="200ms">
-                <div className="bg-content1 rounded-xl shadow-sm p-4 mb-6">
+                <div className="bg-secondary rounded-xl shadow-sm p-4 mb-6">
                     <h3 className="font-medium text-red-800 mb-3">Possible Reasons</h3>
                     <ul className="space-y-2 text-red-700 text-sm">
                         <li className="flex items-start">
@@ -76,7 +76,7 @@ const FailedPayment: React.FC<OrderConfirmationProps> = ({ order, onRetry, onCon
                         <CreditCard className="mr-2 w-5 h-5" />
                         Try Payment Again
                     </button>
-                    <Button className="w-full" size="lg" variant="primary" onClick={onContinueShopping}>
+                    <Button className="w-full" size="lg" onClick={onContinueShopping}>
                         Continue Shopping
                     </Button>
                 </div>

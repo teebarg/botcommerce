@@ -8,13 +8,13 @@ import { buttonVariants } from "@/components/ui/button";
 
 interface BtnLinkProps {
     children: React.ReactNode;
-    variant?: "primary" | "secondary" | "default" | "destructive" | "warning" | "success" | "emerald" | "bordered" | "borderedSecondary";
+    variant?: "secondary" | "default" | "destructive" | "warning" | "success" | "emerald" | "bordered";
     size?: "sm" | "lg" | "icon" | "iconOnly";
     className?: string;
     href: string;
 }
 
-const BtnLink: React.FC<BtnLinkProps> = ({ size = "sm", variant = "primary", href, className, children, ...props }) => {
+const BtnLink: React.FC<BtnLinkProps> = ({ size = "sm", variant = "default", href, className, children, ...props }) => {
     return (
         <LocalizedClientLink
             className={cn(

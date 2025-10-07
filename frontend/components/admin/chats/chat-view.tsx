@@ -33,11 +33,10 @@ function cleanMarkdown(md: string) {
 const ConversationViewer: React.FC<{ conversation: Conversation; onClose: () => void }> = ({ conversation, onClose }) => {
     return (
         <div className="flex-1 flex flex-col max-h-[80vh] md:max-h-none md:h-[calc(100vh-1.5rem)]">
-            {/* Conversation Header */}
-            <div className="bg-content1p border-b border-default-200 py-4 px-1 md:px-4">
+            <div className="bg-background border-b border-border py-4 px-1 md:px-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                        <button className="lg:hidden p-2 text-default-500 hover:text-default-600 hover:bg-default-100 rounded-lg" onClick={onClose}>
+                        <button className="lg:hidden p-2 text-muted-foreground hover:bg-muted/20 rounded-lg" onClick={onClose}>
                             <ArrowLeft size={20} />
                         </button>
 
@@ -50,10 +49,10 @@ const ConversationViewer: React.FC<{ conversation: Conversation; onClose: () => 
                         </div>
 
                         <div>
-                            <h2 className="font-medium text-default-900 flex items-center">
+                            <h2 className="font-medium flex items-center">
                                 {!conversation.user ? (
                                     <>
-                                        <span className="text-default-600">Anonymous</span>
+                                        <span className="text-muted-foreground">Anonymous</span>
                                         <span className="ml-2 px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">Guest</span>
                                     </>
                                 ) : (
@@ -62,7 +61,7 @@ const ConversationViewer: React.FC<{ conversation: Conversation; onClose: () => 
                                     </>
                                 )}
                             </h2>
-                            <div className="flex items-center space-x-4 text-sm text-default-500 mt-1">
+                            <div className="flex items-center space-x-4 text-sm text-muted-foreground mt-1">
                                 {!conversation.user ? (
                                     <span className="flex items-center">
                                         <Eye className="mr-1" size={14} />
@@ -82,7 +81,7 @@ const ConversationViewer: React.FC<{ conversation: Conversation; onClose: () => 
 
                     <div className="flex items-center space-x-1">
                         <StatusBadge status={conversation.status} />
-                        <button className="p-2 text-default-500 hover:text-default-600 hover:bg-default-100 rounded-lg">
+                        <button className="p-2 text-muted-foreground hover:bg-muted/20 rounded-lg">
                             <MoreVertical size={20} />
                         </button>
                     </div>

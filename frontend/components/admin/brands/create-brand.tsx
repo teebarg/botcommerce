@@ -13,16 +13,7 @@ const CreateBrand: React.FC<Props> = () => {
     const state = useOverlayTriggerState({});
 
     return (
-        <Overlay
-            open={state.isOpen}
-            title="Create Brand"
-            trigger={
-                <Button variant="primary" onClick={state.open}>
-                    Create Brand
-                </Button>
-            }
-            onOpenChange={state.setOpen}
-        >
+        <Overlay open={state.isOpen} title="Create Brand" trigger={<Button onClick={state.open}>Create Brand</Button>} onOpenChange={state.setOpen}>
             <BrandForm onClose={state.close} />
         </Overlay>
     );

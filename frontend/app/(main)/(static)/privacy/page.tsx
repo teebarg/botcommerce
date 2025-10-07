@@ -17,7 +17,7 @@ const Privacy = async () => {
         <div className="max-w-6xl mx-auto px-4 py-12">
             <h1 className="text-3xl font-bold mb-8 text-center text-foreground">Privacy Policy</h1>
 
-            <div className="bg-content1 rounded-lg shadow-lg p-8 mb-8">
+            <div className="bg-card rounded-lg shadow-lg p-8 mb-8">
                 <h2 className="text-xl font-semibold mb-4 text-foreground">Your Privacy Matters</h2>
                 <p className="mb-4 text-foreground">
                     At {siteConfig.name}, we are committed to protecting your privacy and ensuring the security of your personal information. This
@@ -56,7 +56,7 @@ const Privacy = async () => {
             </div>
 
             <div className="mt-8 text-center">
-                <BtnLink href="/" size="lg" variant="primary">
+                <BtnLink href="/" size="lg">
                     Back Home
                 </BtnLink>
             </div>

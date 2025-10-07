@@ -93,7 +93,7 @@ const WaveLoader: React.FC<{ className?: string }> = ({ className }) => {
                     key={i}
                     className="w-1 h-8 rounded-full animate-wave"
                     style={{
-                        background: "linear-gradient(to top, hsl(var(--default-400)), hsl(var(--default-600)))",
+                        background: "linear-gradient(to top, var(--input), var(--border))",
                         animationDelay: `${i * 0.1}s`,
                         animationDuration: "1.2s",
                     }}
@@ -107,11 +107,11 @@ const MinimalProgressBar: React.FC<{
     progress: number;
 }> = ({ progress }) => {
     return (
-        <div className="w-48 h-0.5 bg-default-200 rounded-full overflow-hidden">
+        <div className="w-48 h-0.5 bg-border rounded-full overflow-hidden">
             <div
                 className="h-full rounded-full transition-all duration-300 ease-out"
                 style={{
-                    background: "linear-gradient(to right, hsl(var(--default-500)), hsl(var(--default-400)))",
+                    background: "linear-gradient(to right, var(--border), var(--input))",
                     width: `${progress}%`,
                 }}
             />

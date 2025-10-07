@@ -22,8 +22,8 @@ interface PriceLabelProps {
 export const PriceLabel: React.FC<PriceLabelProps> = ({
     priceInfo,
     className,
-    priceClassName = "text-default-900",
-    oldPriceClassName = "text-default-500",
+    priceClassName = "text-foreground",
+    oldPriceClassName = "text-muted-foreground",
 }) => {
     const { minPrice, maxPrice, maxCompareAtPrice, hasDiscount, allDiscounted } = priceInfo;
 
@@ -32,7 +32,7 @@ export const PriceLabel: React.FC<PriceLabelProps> = ({
             return (
                 <div className="flex items-center space-x-2">
                     <span className={cn("text-xl font-bold", priceClassName)}>{currency(minPrice)}</span>
-                    <span className={cn("line-through text-default-500", oldPriceClassName)}>{currency(maxCompareAtPrice!)}</span>
+                    <span className={cn("line-through text-muted-foreground", oldPriceClassName)}>{currency(maxCompareAtPrice!)}</span>
                 </div>
             );
         }

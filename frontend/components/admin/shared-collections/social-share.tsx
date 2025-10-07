@@ -15,7 +15,6 @@ export function SocialShare({ catalog, className }: SocialShareProps) {
     const targetUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/shared/${catalog.slug}`;
     const shareUrl = encodeURIComponent(targetUrl);
     const shareText = encodeURIComponent(`Check out this amazing ${catalog.title}`);
-    const shareTitle = encodeURIComponent(catalog.title);
 
     const socialLinks = [
         {
@@ -69,19 +68,16 @@ export function SocialShare({ catalog, className }: SocialShareProps) {
         <Popover>
             <PopoverTrigger asChild>
                 <Button
-                    className={cn(
-                        "h-10 w-10 rounded-full text-default-800 hover:text-default-900 bg-content2 backdrop-blur-sm hover:bg-content3 hover:scale-110 active:scale-95",
-                        className
-                    )}
+                    className={cn("h-10 w-10 rounded-full bg-contrast/10 backdrop-blur-sm hover:bg-contrast/20", className)}
                     size="icon"
                     variant="ghost"
                 >
-                    <Share className="h-5 w-5" />
+                    <Share className="h-5 w-5 text-contrast" />
                 </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="p-0 relative">
-                <div className="p-4">
-                    <h4 className="font-semibold mb-3 text-center">Share this collection</h4>
+                <div className="px-4 py-6">
+                    <h4 className="font-semibold mb-3">Share this collection</h4>
 
                     <div className="flex gap-2 mb-3 mt-4">
                         {socialLinks.map((social, idx: number) => (
@@ -92,13 +88,13 @@ export function SocialShare({ catalog, className }: SocialShareProps) {
                     </div>
 
                     <div className="flex gap-2 mt-4">
-                        <Button className="w-full" variant="warning" onClick={copyToClipboard}>
-                            <Link className="h-5 w-5 mr-1" />
+                        <Button className="w-full" variant="outline" onClick={copyToClipboard}>
+                            <Link className="h-5 w-5" />
                             <span className="text-xs">Copy Link</span>
                         </Button>
 
-                        <Button className="w-full" variant="emerald" onClick={handleNativeShare}>
-                            <Share className="h-5 w-5 mr-1" />
+                        <Button className="w-full" onClick={handleNativeShare}>
+                            <Share className="h-5 w-5" />
                             <span className="text-xs">More</span>
                         </Button>
                     </div>

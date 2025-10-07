@@ -68,7 +68,7 @@ const PaymentStatusManager: React.FC<PaymentStatusManagerProps> = ({ id, current
     const hasChanges = selectedStatus !== currentStatus;
 
     return (
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-md bg-inherit border-0">
             <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2 text-lg">
                     <CreditCard className="h-5 w-5" />

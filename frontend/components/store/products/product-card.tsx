@@ -35,7 +35,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             showCloseButton={false}
             title="Details"
             trigger={
-                <div className="group relative bg-content1 rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
+                <div className="group relative bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
                     <div className="relative aspect-[3/4] overflow-hidden">
                         <img
                             alt={product.name}
@@ -70,24 +70,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     </div>
 
                     <div className="py-4 px-2 space-y-2">
-                        {/* <div className="hidden lg:flex items-center gap-2">
-                            <p
-                                className={cn(
-                                    "hidden text-default-500 font-medium",
-                                    product.variants?.length && product.variants?.[0].size && "inline-block"
-                                )}
-                            >
-                                UK: {product.variants?.[0].size}
-                            </p>
-                            <p
-                                className={cn(
-                                    "hidden text-default-500 font-medium",
-                                    product.variants?.length && product.variants?.[0].color && "inline-block"
-                                )}
-                            >
-                                Color: {product.variants?.[0].color}
-                            </p>
-                        </div> */}
                         <PriceLabel priceInfo={priceInfo} />
                         <ProductActions product={product} />
                     </div>

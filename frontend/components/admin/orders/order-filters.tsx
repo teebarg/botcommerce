@@ -57,7 +57,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = () => {
                     <div className="relative">
                         <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
-                            className="pl-8"
+                            className="pl-8 bg-card"
                             placeholder="Search orders..."
                             value={filters.search}
                             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
@@ -79,12 +79,12 @@ const OrderFilters: React.FC<OrderFiltersProps> = () => {
                         </SelectContent>
                     </Select>
                     <DateRangePicker className="w-[300px]" placeholder="Filter by date" value={dateRange} onChange={setDateRange} />
-                    <Button size="md" variant="indigo" onClick={applyFilters}>
-                        <Filter className="h-4 w-4 mr-2" />
+                    <Button size="md" onClick={applyFilters}>
+                        <Filter className="h-4 w-4" />
                         Apply Filters
                     </Button>
                     <Button size="md" variant="warning" onClick={clearFilters}>
-                        <X className="h-4 w-4 mr-2" />
+                        <X className="h-4 w-4" />
                         Clear Filters
                     </Button>
                 </div>
@@ -101,7 +101,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = () => {
                 {[
                     { status: "PENDING", label: "PENDING", color: "bg-warning" },
                     { status: "PROCESSING", label: "PROCESSING", color: "bg-primary" },
-                    { status: "SHIPPED", label: "PACKED", color: "bg-blue-500" },
+                    { status: "SHIPPED", label: "PACKED ORDERS", color: "bg-blue-500" },
                     { status: "DELIVERED", label: "DELIVERED", color: "bg-green-500" },
                     { status: "REFUNDED", label: "REFUNDED", color: "bg-gray-100" },
                 ].map((item: { status: string; label: string; color: string }, idx: number) => (

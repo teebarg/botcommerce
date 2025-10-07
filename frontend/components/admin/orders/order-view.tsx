@@ -48,10 +48,12 @@ const OrderView: React.FC = () => {
         <div className="px-4 md:px-10 py-8">
             <div className="mb-6 flex flex-col">
                 <h1 className="text-2xl font-medium">Order view</h1>
-                <p className="text-default-500 text-sm">Manage your orders.</p>
+                <p className="text-muted-foreground text-sm">Manage your orders.</p>
             </div>
-            <div key="table" className="md:block hidden">
+            <div className="md:block hidden">
                 <OrderFilters />
+            </div>
+            <div key="table" className="md:block hidden bg-card mt-4">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -79,7 +81,7 @@ const OrderView: React.FC = () => {
                             </TableRow>
                         ) : (
                             orders?.map((order: Order, idx: number) => (
-                                <TableRow key={idx}>
+                                <TableRow key={idx} className="odd:bg-background">
                                     <TableCell className="font-semibold">{order.order_number}</TableCell>
                                     <TableCell>{format(new Date(order.created_at), "MMM d, yyyy")}</TableCell>
                                     <TableCell>
@@ -103,12 +105,12 @@ const OrderView: React.FC = () => {
             </div>
             <div key="mobile" className="md:hidden">
                 <div className="pb-4">
-                    <div className="relative mb-4 bg-content2">
+                    <div className="relative mb-4">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <Search className="text-gray-400" size={18} />
                         </div>
                         <input
-                            className="pl-10 pr-4 py-2 w-full border border-divider rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary bg-content1"
+                            className="pl-10 pr-4 py-2 w-full border border-input rounded-lg focus:outline-none"
                             placeholder="Search orders..."
                             type="text"
                             value={searchParams.get("search") ?? ""}
@@ -124,7 +126,7 @@ const OrderView: React.FC = () => {
 
                         {orders?.length === 0 && (
                             <div className="text-center py-8">
-                                <p className="text-default-500">No orders found</p>
+                                <p className="text-muted-foreground">No orders found</p>
                             </div>
                         )}
                     </div>

@@ -108,35 +108,32 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
             <div className="relative mx-auto flex max-w-[1400px] flex-col pb-4 pt-2">
                 <header className="flex gap-6 sm:items-end justify-between">
                     <div>
-                        <p className={cn("font-medium uppercase text-default-500 font-outfit", !title && "hidden")}>{title}</p>
-                        <h2
-                            className={cn("text-xl font-medium tracking-tight text-default-900 md:text-2xl", !description && "hidden")}
-                            id={headingId}
-                        >
+                        <p className={cn("font-medium uppercase text-muted-foreground font-outfit", !title && "hidden")}>{title}</p>
+                        <h2 className={cn("text-xl font-medium tracking-tight md:text-2xl", !description && "hidden")} id={headingId}>
                             {description}
                         </h2>
                     </div>
-                    <div>
-                        <div aria-label="Carousel controls" className="flex items-center gap-3" role="group">
-                            <Button
-                                aria-label="Scroll collections backward"
-                                className="h-12 w-12 rounded-full bg-white hover:bg-white/90 text-gray-500"
-                                disabled={scrollState.activeIndex <= 0}
-                                size="icon"
-                                onClick={() => scrollToIndex(scrollState.activeIndex - 1)}
-                            >
-                                <ChevronLeft className="h-5 w-5" strokeWidth={1.5} />
-                            </Button>
-                            <Button
-                                aria-label="Scroll collections forward"
-                                className="h-12 w-12 rounded-full bg-white hover:bg-white/90 text-gray-500"
-                                disabled={scrollState.activeIndex >= products.length - 1}
-                                size="icon"
-                                onClick={() => scrollToIndex(scrollState.activeIndex + 1)}
-                            >
-                                <ChevronRight className="h-5 w-5" strokeWidth={1.5} />
-                            </Button>
-                        </div>
+                    <div aria-label="Carousel controls" className="hidden md:flex items-center gap-3" role="group">
+                        <Button
+                            aria-label="Scroll collections backward"
+                            className="h-12 w-12 rounded-full text-gray-800 dark:text-gray-100 border border-gray-600 dark:border-gray-200"
+                            disabled={scrollState.activeIndex <= 0}
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => scrollToIndex(scrollState.activeIndex - 1)}
+                        >
+                            <ChevronLeft className="h-5 w-5" strokeWidth={1.5} />
+                        </Button>
+                        <Button
+                            aria-label="Scroll collections forward"
+                            className="h-12 w-12 rounded-full text-gray-800 dark:text-gray-100 border border-gray-600 dark:border-gray-200"
+                            disabled={scrollState.activeIndex >= products.length - 1}
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => scrollToIndex(scrollState.activeIndex + 1)}
+                        >
+                            <ChevronRight className="h-5 w-5" strokeWidth={1.5} />
+                        </Button>
                     </div>
                 </header>
                 <div className="relative mt-10">
@@ -146,7 +143,7 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
                             <li
                                 key={idx}
                                 data-card
-                                className="group/card relative flex-shrink-0 basis-[85%] snap-start snap-always sm:basis-[22%] min-w-[280px]"
+                                className="group/card relative flex-shrink-0 basis-[70%] snap-start snap-always sm:basis-[22%] min-w-[280px]"
                             >
                                 <ProductCard product={product} />
                             </li>

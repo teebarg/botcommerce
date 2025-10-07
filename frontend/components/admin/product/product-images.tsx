@@ -55,12 +55,12 @@ const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, i
             >
                 <input {...getInputProps()} />
                 <div className="flex flex-col items-center gap-2">
-                    <Upload className="w-8 h-8 text-default-500" />
-                    <p className="text-default-600">{isDragActive ? "Drop the images here" : "Drag & drop images or click to upload"}</p>
-                    <p className="text-sm text-default-400">(Max 5MB, JPG/PNG/GIF only)</p>
+                    <Upload className="w-8 h-8 text-muted-foreground" />
+                    <p className="text-foreground">{isDragActive ? "Drop the images here" : "Drag & drop images or click to upload"}</p>
+                    <p className="text-sm text-muted-foreground">(Max 5MB, JPG/PNG/GIF only)</p>
                     {uploadImages.isPending && (
                         <div className="mb-4">
-                            <div className="w-full bg-default-200 rounded-full h-2.5">
+                            <div className="w-full bg-border rounded-full h-2.5">
                                 <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${52}%` }} />
                             </div>
                             <p className="text-sm text-blue-500 mt-1">Uploading...</p>
@@ -71,9 +71,9 @@ const ProductImagesManager: React.FC<ProductImageManagerProps> = ({ productId, i
 
             <DraggableImageList initialImages={initialImages} productId={productId} />
 
-            {initialImages.length === 0 && <p className="text-center text-default-500">No images uploaded yet</p>}
+            {initialImages.length === 0 && <p className="text-center text-muted-foreground">No images uploaded yet</p>}
 
-            <div className="text-xs text-default-500">
+            <div className="text-xs text-muted-foreground">
                 <p>• Drag and drop images to reorder them</p>
                 <p>• The primary image will be displayed first in the product listing</p>
                 <p>• Recommended image size: 1000 x 1000 pixels</p>

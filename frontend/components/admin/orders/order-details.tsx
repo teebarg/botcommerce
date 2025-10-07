@@ -42,7 +42,7 @@ const orderStatusMap = {
     PROCESSING: {
         icon: <RefreshCw className="h-5 w-5 text-white" />,
         label: "Processing",
-        color: "bg-accent",
+        color: "bg-contrast",
     },
     SHIPPED: {
         icon: <Package className="h-5 w-5 text-white" />,
@@ -62,12 +62,12 @@ const orderStatusMap = {
     CANCELED: {
         icon: <XCircle className="h-5 w-5 text-white" />,
         label: "Cancelled",
-        color: "bg-danger",
+        color: "bg-destructive",
     },
     REFUNDED: {
         icon: <RotateCcw className="h-5 w-5 text-white" />,
         label: "Refunded",
-        color: "bg-danger",
+        color: "bg-destructive",
     },
 };
 
@@ -87,18 +87,18 @@ const OrderItemCard: React.FC<{ orderItem: OrderItem; orderId: number }> = ({ or
                 <img alt={orderItem.name} className="object-cover w-full h-full" src={orderItem.image || "/placeholder.jpg"} />
             </div>
             <div className="grow">
-                <h3 className="text-sm font-medium text-default-900">{orderItem.name}</h3>
-                <p className="text-sm text-default-500">SKU: {orderItem.variant_id}</p>
+                <h3 className="text-sm font-medium">{orderItem.name}</h3>
+                <p className="text-sm text-muted-foreground">SKU: {orderItem.variant_id}</p>
                 <div className="mt-1 flex flex-col gap-2">
-                    <div className="flex items-center text-sm text-default-500">
+                    <div className="flex items-center text-sm text-muted-foreground">
                         <span>Qty: {orderItem.quantity}</span>
                     </div>
-                    <div className="font-semibold text-default-900">{currency(orderItem.price)}</div>
+                    <div className="font-semibold">{currency(orderItem.price)}</div>
                 </div>
             </div>
             <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                 <DialogTrigger>
-                    <div className="font-semibold bg-destructive text-white px-4 py-2 rounded-md cursor-pointer">Return item</div>
+                    <div className="font-semibold bg-destructive text-white px-4 py-2 rounded-md cursor-pointer">Return</div>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader className="sr-only">
@@ -115,9 +115,9 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
     const { data: timeline } = useOrderTimeline(order?.id);
 
     return (
-        <div className="px-4 sm:px-6 pb-4 bg-content1 overflow-y-auto">
-            <div className="sticky top-0 z-10 bg-content1 py-6">
-                <button className="flex items-center text-default-500 hover:text-default-900 cursor-pointer" onClick={onClose}>
+        <div className="px-4 sm:px-6 pb-4 bg-background overflow-y-auto">
+            <div className="sticky top-0 z-10 py-6 bg-background">
+                <button className="flex items-center text-muted-foreground cursor-pointer" onClick={onClose}>
                     <ArrowLeft className="w-4 h-4 mr-1" />
                     <span>Back to Orders</span>
                 </button>
@@ -125,10 +125,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
 
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-default-900">Order: {order.order_number}</h1>
+                    <h1 className="text-2xl font-bold">Order: {order.order_number}</h1>
                     <div className="flex items-center">
-                        <Calendar className="w-4 h-4 text-default-500 mr-2" />
-                        <span className="text-default-500">{formatDate(order.created_at)}.</span>
+                        <Calendar className="w-4 h-4 text-muted-foreground mr-2" />
+                        <span className="text-muted-foreground">{formatDate(order.created_at)}.</span>
                     </div>
                 </div>
                 <div className="mt-4 md:mt-0">
@@ -139,58 +139,58 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-default-100 px-6 py-4">
-                            <h2 className="text-lg font-medium text-default-900">Order Items</h2>
+                        <div className="border-b border-border px-6 py-4">
+                            <h2 className="text-lg font-medium">Order Items</h2>
                         </div>
-                        <div className="divide-y divide-default-100">
+                        <div className="divide-y divide-border">
                             {order.order_items.map((item: OrderItem, idx: number) => (
                                 <OrderItemCard key={idx} orderId={order.id} orderItem={item} />
                             ))}
                         </div>
-                        <div className="border-t border-divider px-6 py-4">
-                            <div className="flex justify-between text-sm font-medium text-default-900">
+                        <div className="border-t border-input px-6 py-4">
+                            <div className="flex justify-between text-sm font-medium">
                                 <p>Subtotal</p>
-                                <p className="font-semibold text-default-900">{currency(order.subtotal)}</p>
+                                <p className="font-semibold">{currency(order.subtotal)}</p>
                             </div>
-                            <div className="flex justify-between text-sm font-medium text-default-900">
+                            <div className="flex justify-between text-sm font-medium">
                                 <p>Shipping</p>
-                                <p className="font-semibold text-default-900">{currency(order.shipping_fee)}</p>
+                                <p className="font-semibold">{currency(order.shipping_fee)}</p>
                             </div>
-                            <div className="flex justify-between text-sm font-medium text-default-900">
+                            <div className="flex justify-between text-sm font-medium">
                                 <p>Tax</p>
-                                <p className="font-semibold text-default-900">{currency(order.tax)}</p>
+                                <p className="font-semibold">{currency(order.tax)}</p>
                             </div>
-                            <div className="flex justify-between text-sm font-medium text-default-900 mt-4">
+                            <div className="flex justify-between text-sm font-medium mt-4">
                                 <p>Total</p>
-                                <p className="font-semibold text-default-900 text-lg">{currency(order.total)}</p>
+                                <p className="font-semibold text-lg">{currency(order.total)}</p>
                             </div>
                         </div>
                     </div>
 
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-divider px-6 py-4">
-                            <h2 className="text-lg font-medium flex items-center text-default-900">
-                                <User className="w-5 h-5 mr-2 text-default-500" />
+                        <div className="border-b border-input px-6 py-4">
+                            <h2 className="text-lg font-medium flex items-center">
+                                <User className="w-5 h-5 mr-2 text-muted-foreground" />
                                 Customer Information
                             </h2>
                         </div>
                         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <h3 className="text-sm font-medium text-default-500">Contact Details</h3>
-                                <p className="text-default-900 font-medium">
+                                <h3 className="text-sm font-medium text-muted-foreground">Contact Details</h3>
+                                <p className="font-medium">
                                     {order.user?.first_name} {order.user?.last_name}
                                 </p>
-                                <p className="text-default-900">{order.user?.email}</p>
-                                <p className="text-default-900">{order.shipping_address?.phone}</p>
+                                <p>{order.user?.email}</p>
+                                <p>{order.shipping_address?.phone}</p>
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-default-500">Shipping Address</h3>
+                                <h3 className="text-sm font-medium text-muted-foreground">Shipping Address</h3>
                                 {!order.shipping_address ? (
                                     <p>Not applicable ({order.shipping_method})</p>
                                 ) : (
                                     <>
-                                        <p className="text-default-900">{order.shipping_address?.address_1},</p>
-                                        <p className="text-default-900">
+                                        <p>{order.shipping_address?.address_1},</p>
+                                        <p>
                                             {order.shipping_address?.city}, {order.shipping_address?.state}.
                                         </p>
                                     </>
@@ -200,16 +200,16 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                     </div>
 
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-divider px-6 py-4">
-                            <h2 className="text-lg font-medium flex items-center text-default-900">
-                                <CreditCard className="w-5 h-5 mr-2 text-default-500" />
+                        <div className="border-b border-input px-6 py-4">
+                            <h2 className="text-lg font-medium flex items-center">
+                                <CreditCard className="w-5 h-5 mr-2 text-muted-foreground" />
                                 Payment Information
                             </h2>
                         </div>
                         <div className="p-6">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <p className="text-default-600">
+                                    <p className="text-muted-foreground">
                                         <span className="font-medium">Method:</span> {order.payment_method}
                                     </p>
                                 </div>
@@ -219,22 +219,20 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                     </div>
 
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-divider px-6 py-4">
-                            <h2 className="text-lg font-medium flex items-center text-default-900">
-                                <Truck className="w-5 h-5 mr-2 text-default-500" />
+                        <div className="border-b border-input px-6 py-4">
+                            <h2 className="text-lg font-medium flex items-center">
+                                <Truck className="w-5 h-5 mr-2 text-muted-foreground" />
                                 Shipping Information
                             </h2>
                         </div>
                         <div className="p-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <p className="text-default-500">
-                                        <span className="font-medium">Method:</span>{" "}
-                                        <span className="font-semibold text-default-900">{order.shipping_method}</span>
+                                    <p className="text-muted-foreground">
+                                        <span className="font-medium">Method:</span> <span className="font-semibold">{order.shipping_method}</span>
                                     </p>
-                                    <p className="text-default-500">
-                                        <span className="font-medium">Tracking:</span>{" "}
-                                        <span className="font-semibold text-default-900">{order.order_number}</span>
+                                    <p className="text-muted-foreground">
+                                        <span className="font-medium">Tracking:</span> <span className="font-semibold">{order.order_number}</span>
                                     </p>
                                 </div>
                             </div>
@@ -244,8 +242,8 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
 
                 <div className="space-y-6">
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-divider px-6 py-4">
-                            <h2 className="text-lg font-medium text-default-900">Actions</h2>
+                        <div className="border-b border-input px-6 py-4">
+                            <h2 className="text-lg font-medium">Actions</h2>
                         </div>
                         <div className="p-6 space-y-4">
                             <OrderProcessingAction order={order} />
@@ -263,8 +261,8 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                     </div>
 
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden pb-6">
-                        <div className="border-b border-divider px-6 py-4">
-                            <h2 className="text-lg font-medium text-default-900">Order Timeline</h2>
+                        <div className="border-b border-input px-6 py-4">
+                            <h2 className="text-lg font-medium">Order Timeline</h2>
                         </div>
                         <div className="p-6">
                             <div className="flow-root">
@@ -274,15 +272,15 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                             <span aria-hidden="true" className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" />
                                             <div className="relative flex space-x-3">
                                                 <div>
-                                                    <span className="h-8 w-8 rounded-full bg-violet-600 flex items-center justify-center ring-8 ring-content1">
+                                                    <span className="h-8 w-8 rounded-full bg-violet-600 flex items-center justify-center ring-8 ring-secondary">
                                                         <Clock className="h-5 w-5 text-white" />
                                                     </span>
                                                 </div>
                                                 <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
                                                     <div>
-                                                        <p className="text-sm text-default-500">Order placed</p>
+                                                        <p className="text-sm text-muted-foreground">Order placed</p>
                                                     </div>
-                                                    <div className="text-right text-sm whitespace-nowrap text-default-500">
+                                                    <div className="text-right text-sm whitespace-nowrap text-muted-foreground">
                                                         <time>{formatDate(order.created_at)}</time>
                                                     </div>
                                                 </div>
@@ -305,7 +303,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                                         <span
                                                             className={
                                                                 orderStatusMap[evt.to_status as keyof typeof orderStatusMap].color +
-                                                                " h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-content1"
+                                                                " h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-secondary"
                                                             }
                                                         >
                                                             {orderStatusMap[evt.to_status as keyof typeof orderStatusMap].icon}
@@ -313,12 +311,12 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                                     </div>
                                                     <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
                                                         <div className="flex-1">
-                                                            <p className="text-sm text-default-500">
+                                                            <p className="text-sm text-muted-foreground">
                                                                 {orderStatusMap[evt.to_status as keyof typeof orderStatusMap].label}
                                                             </p>
-                                                            {evt.message && <p className="text-sm text-default-500">{evt.message}</p>}
+                                                            {evt.message && <p className="text-sm text-muted-foreground">{evt.message}</p>}
                                                         </div>
-                                                        <div className="text-right text-sm whitespace-nowrap text-default-500">
+                                                        <div className="text-right text-sm whitespace-nowrap text-muted-foreground">
                                                             <time>{formatDate(evt.created_at)}</time>
                                                         </div>
                                                     </div>
@@ -328,7 +326,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                     ))}
                                 </ul>
                             </div>
-                            {timeline?.length === 0 && <p className="text-sm text-default-500">No timeline events found</p>}
+                            {timeline?.length === 0 && <p className="text-sm text-muted-foreground">No timeline events found</p>}
                         </div>
                     </div>
                 </div>

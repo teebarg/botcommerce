@@ -57,12 +57,12 @@ const CustomerView: React.FC = () => {
                 <div className="mb-4 flex items-center justify-between gap-3">
                     <div>
                         <h3 className="text-xl font-semibold">Customers view</h3>
-                        <p className="text-sm text-default-500">Manage your customers.</p>
+                        <p className="text-sm text-muted-foreground">Manage your customers.</p>
                     </div>
                     <CustomerCreateGuest />
                 </div>
                 <>
-                    <div key="table" className="md:block hidden">
+                    <div key="table" className="md:block hidden bg-card">
                         <CustomerFilter open={filterOpen} onOpenChange={setFilterOpen} />
                         <Table>
                             <TableHeader>
@@ -91,18 +91,18 @@ const CustomerView: React.FC = () => {
                                     </TableRow>
                                 ) : (
                                     users?.map((user: User, idx: number) => (
-                                        <TableRow key={idx} className="even:bg-content1">
+                                        <TableRow key={idx} className="odd:bg-background">
                                             <TableCell className="font-medium">{idx + 1}</TableCell>
                                             <TableCell>
                                                 <div>
                                                     <p>
                                                         {user?.first_name} {user?.last_name}
                                                     </p>
-                                                    <p className="text-default-500">{user.email}</p>
+                                                    <p className="text-muted-foreground">{user.email}</p>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <Badge variant={user.role == "ADMIN" ? "secondary" : "default"}>{user.role}</Badge>
+                                                <Badge variant={user.role == "ADMIN" ? "contrast" : "default"}>{user.role}</Badge>
                                             </TableCell>
                                             <TableCell>{getStatusBadge(user.status as Status)}</TableCell>
                                             <TableCell>{user.orders?.length}</TableCell>
@@ -120,19 +120,19 @@ const CustomerView: React.FC = () => {
                     </div>
                     <div className="pb-4 md:hidden">
                         <div>
-                            <div className="relative mb-4 bg-content1 rounded-md">
+                            <div className="relative mb-4 rounded-md">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Search className="text-default-500" size={18} />
+                                    <Search className="text-muted-foreground" size={18} />
                                 </div>
                                 <input
-                                    className="pl-10 pr-12 py-2 w-full border border-divider rounded-lg focus:outline-none"
+                                    className="pl-10 pr-12 py-2 w-full border border-input rounded-lg focus:outline-none"
                                     placeholder="Search customers..."
                                     type="text"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
                                 <button className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setFilterOpen(true)}>
-                                    <SlidersHorizontal className="text-default-500" size={18} />
+                                    <SlidersHorizontal className="text-muted-foreground" size={18} />
                                 </button>
                             </div>
                             <div className="mt-4 py-2">
@@ -145,7 +145,7 @@ const CustomerView: React.FC = () => {
 
                             {users?.length === 0 && (
                                 <div className="text-center py-10">
-                                    <p className="text-default-500">No users found</p>
+                                    <p className="text-muted-foreground">No users found</p>
                                 </div>
                             )}
                         </div>

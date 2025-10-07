@@ -79,7 +79,7 @@ export default function BannerForm({ banner, onClose }: BannerFormProps) {
                             <FormItem>
                                 <FormLabel>Title</FormLabel>
                                 <FormControl>
-                                    <Input {...field} color="bg-content2" />
+                                    <Input {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -92,7 +92,7 @@ export default function BannerForm({ banner, onClose }: BannerFormProps) {
                             <FormItem>
                                 <FormLabel>Subtitle</FormLabel>
                                 <FormControl>
-                                    <Input {...field} color="bg-content2" />
+                                    <Input {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -105,7 +105,7 @@ export default function BannerForm({ banner, onClose }: BannerFormProps) {
                             <FormItem>
                                 <FormLabel>Description</FormLabel>
                                 <FormControl>
-                                    <Textarea {...field} color="bg-content2" />
+                                    <Textarea {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -118,7 +118,7 @@ export default function BannerForm({ banner, onClose }: BannerFormProps) {
                             <FormItem>
                                 <FormLabel>Button Text</FormLabel>
                                 <FormControl>
-                                    <Input {...field} color="bg-content2" />
+                                    <Input {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -131,7 +131,7 @@ export default function BannerForm({ banner, onClose }: BannerFormProps) {
                             <FormItem>
                                 <FormLabel>Link</FormLabel>
                                 <FormControl>
-                                    <Input {...field} color="bg-content2" />
+                                    <Input {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -144,7 +144,7 @@ export default function BannerForm({ banner, onClose }: BannerFormProps) {
                             <FormItem>
                                 <FormLabel>Order</FormLabel>
                                 <FormControl>
-                                    <Input color="bg-content2" type="number" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
+                                    <Input type="number" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -154,7 +154,7 @@ export default function BannerForm({ banner, onClose }: BannerFormProps) {
                         <Button type="button" variant="destructive" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button disabled={formState.isSubmitting} isLoading={formState.isSubmitting} type="submit" variant="primary">
+                        <Button disabled={formState.isSubmitting} isLoading={formState.isSubmitting} type="submit">
                             {banner ? "Update" : "Create"}
                         </Button>
                     </div>

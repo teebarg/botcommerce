@@ -50,8 +50,8 @@ const ChatsView: React.FC = () => {
     return (
         <div className="px-2 md:px-10 py-8">
             <h3 className="text-2xl font-medium">Conversations view</h3>
-            <p className="text-default-500 text-sm mb-4">Manage your conversations.</p>
-            <div key="table" className="md:block hidden">
+            <p className="text-muted-foreground text-sm mb-4">Manage your conversations.</p>
+            <div key="table" className="md:block hidden bg-card">
                 <CustomerFilter open={filterOpen} onOpenChange={setFilterOpen} />
                 <Table>
                     <TableHeader>
@@ -81,7 +81,7 @@ const ChatsView: React.FC = () => {
                             </TableRow>
                         ) : (
                             conversations?.map((conversation: Conversation, idx: number) => (
-                                <TableRow key={idx} className="even:bg-content1">
+                                <TableRow key={idx} className="odd:bg-background">
                                     <TableCell className="font-medium">{idx + 1}</TableCell>
                                     <TableCell>{conversation.conversation_uuid}</TableCell>
                                     <TableCell>{conversation.messages?.length}</TableCell>
@@ -101,11 +101,6 @@ const ChatsView: React.FC = () => {
             <div key="mobile" className="md:hidden">
                 <div className="pb-4">
                     <div>
-                        {/* <div className="relative mb-2 py-4 flex justify-end">
-                                <button className="flex items-center bg-content1 rounded-md p-4" onClick={() => setFilterOpen(true)}>
-                                    <SlidersHorizontal className="text-default-500" size={18} />
-                                </button>
-                            </div> */}
                         <div>
                             {isLoading ? (
                                 <ComponentLoader className="h-[calc(100vh-200px)]" />
@@ -117,8 +112,8 @@ const ChatsView: React.FC = () => {
                         </div>
 
                         {conversations?.length === 0 && (
-                            <div className="text-center py-10">
-                                <p className="text-default-500">No conversation found</p>
+                            <div className="text-center py-10 bg-card">
+                                <p className="text-muted-foreground">No conversation found</p>
                             </div>
                         )}
                     </div>

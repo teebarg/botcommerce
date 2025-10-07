@@ -38,8 +38,7 @@ export function GalleryCardActions({ image }: GalleryCardActionProps) {
                 title="Create Metadata"
                 trigger={
                     <Button className="bg-white/90 text-black hover:bg-white" size="sm" onClick={editState.open}>
-                        <Edit2 className="h-4 w-4 mr-1" />
-                        Edit
+                        <Edit2 className="h-4 w-4" />
                     </Button>
                 }
                 onOpenChange={editState.setOpen}

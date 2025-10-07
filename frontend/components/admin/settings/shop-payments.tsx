@@ -63,11 +63,11 @@ const BankDetailComponent: React.FC<BankDetailsProps> = ({ bank }) => {
     };
 
     return (
-        <div className="flex items-center justify-between p-4 bg-content1 rounded-lg">
+        <div className="flex items-center justify-between p-4 rounded-lg bg-secondary">
             <div>
                 <h3 className="font-medium text-sm">{bank.bank_name}</h3>
-                <p className="text-default-900 font-semibold">{bank.account_name}</p>
-                <p className="text-default-700">{bank.account_number}</p>
+                <p className="font-semibold">{bank.account_name}</p>
+                <p className="text-muted-foreground">{bank.account_number}</p>
             </div>
             <Button
                 aria-label="delete"
@@ -100,17 +100,17 @@ export function ShopPayments({ settings }: ShopPaymentsProps) {
     };
 
     return (
-        <div className="space-y-8 py-4">
-            <div className="space-y-4">
+        <div className="space-y-8">
+            <div className="space-y-4 bg-card px-2 py-4">
                 {defaultFeatures.map((feature, idx: number) => {
                     const existingToggle = settings.find((t) => t.key === feature.key);
                     const isEnabled = existingToggle ? existingToggle.value === "true" : false;
 
                     return (
-                        <div key={idx} className="flex items-center justify-between p-4 bg-content1 rounded-lg">
+                        <div key={idx} className="flex items-center justify-between p-4 bg-background rounded-lg">
                             <div>
                                 <h3 className="font-medium">{feature.label}</h3>
-                                <p className="text-sm text-default-500">{feature.description}</p>
+                                <p className="text-sm text-muted-foreground">{feature.description}</p>
                             </div>
                             <Switch
                                 checked={isEnabled}
@@ -121,17 +121,13 @@ export function ShopPayments({ settings }: ShopPaymentsProps) {
                     );
                 })}
             </div>
-            <div>
+            <div className="bg-card px-2 py-4">
                 <div className="flex items-center justify-between">
                     <h3 className="font-medium">Bank Details</h3>
                     <Overlay
                         open={addState.isOpen}
                         title="Add Bank Details"
-                        trigger={
-                            <Button type="button" variant="primary">
-                                Add Bank Details
-                            </Button>
-                        }
+                        trigger={<Button type="button">Add Bank Details</Button>}
                         onOpenChange={addState.setOpen}
                     >
                         <BankDetailsForm onClose={addState.close} />
@@ -142,10 +138,10 @@ export function ShopPayments({ settings }: ShopPaymentsProps) {
                         return <BankDetailComponent key={idx} bank={detail} />;
                     })}
                     {bankDetails?.length === 0 && (
-                        <div className="flex flex-col items-center justify-center  md:col-span-2">
-                            <Exclamation className="w-14 h-14 text-default-500 mb-2" />
-                            <p className="text-default-800 font-semibold">No bank details found</p>
-                            <p className="text-default-500 text-sm">Add bank details to enable bank transfer payments</p>
+                        <div className="flex flex-col items-center justify-center md:col-span-2 bg-contrast/10 p-4 rounded-lg">
+                            <Exclamation className="w-14 h-14 text-muted-foreground mb-2" />
+                            <p className="font-semibold">No bank details found</p>
+                            <p className="text-muted-foreground text-sm">Add bank details to enable bank transfer payments</p>
                         </div>
                     )}
                 </div>

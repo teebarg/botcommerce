@@ -71,7 +71,7 @@ export function ImageUpload({ images, onImagesChange, isLoading = false, showUpl
             <Card
                 className={cn(
                     "border-2 border-dashed transition-all duration-smooth cursor-pointer hover:border-primary/50",
-                    isDragOver ? "border-primary bg-accent/50 scale-[1.02]" : "border-border"
+                    isDragOver ? "border-primary bg-contrast/30 scale-[1.02]" : "border-border"
                 )}
                 onClick={isLoading ? undefined : openFileDialog}
                 onDragLeave={handleDragLeave}
@@ -80,8 +80,8 @@ export function ImageUpload({ images, onImagesChange, isLoading = false, showUpl
             >
                 <div className="px-8 py-4 text-center">
                     <div className="flex justify-center mb-4">
-                        <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center">
-                            <Upload className="w-6 h-6 text-white" />
+                        <div className="w-12 h-12 bg-contrast/10 rounded-full flex items-center justify-center">
+                            <Upload className="w-6 h-6 text-contrast" />
                         </div>
                     </div>
                     <h3 className="text-lg font-medium text-card-foreground">Drop your images here</h3>
@@ -93,7 +93,7 @@ export function ImageUpload({ images, onImagesChange, isLoading = false, showUpl
                     <p className="text-xs text-muted-foreground mt-2">Supports JPG, PNG, WebP up to 5MB each</p>
                     {isLoading && (
                         <div className="mb-4 mt-2">
-                            <div className="w-full bg-default-200 rounded-full h-2.5">
+                            <div className="w-full bg-border rounded-full h-2.5">
                                 <div
                                     className="bg-blue-500 h-2.5 rounded-full transition-all duration-200 animate-pulse"
                                     style={{ width: `${52}%` }}

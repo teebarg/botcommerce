@@ -88,8 +88,8 @@ const AccountNavLink = ({ href, route, children, "data-testid": dataTestId }: Ac
 
     return (
         <LocalizedClientLink
-            className={cn("text-default-500 hover:text-default-900", {
-                "text-default-900 font-semibold": active,
+            className={cn("text-muted-foreground", {
+                "text-accent font-semibold": active,
             })}
             data-testid={dataTestId}
             href={href}

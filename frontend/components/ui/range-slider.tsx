@@ -65,15 +65,15 @@ const RangeSlider: React.FC<SliderProps> = ({ label, defaultValue = [0, 1000], m
         <div className="flex flex-col w-full max-w-md mx-auto mb-4">
             {label && (
                 <div className="flex justify-between text-sm mb-2">
-                    <label className="text-default-600 font-medium">{label}</label>
-                    <output className="text-default-800 font-semibold">
+                    <label className="text-muted-foreground font-medium">{label}</label>
+                    <output className="text-foreground font-semibold">
                         ₦{values[0]} - ₦{values[1]}
                     </output>
                 </div>
             )}
             <div ref={trackRef} className="relative h-2 bg-gray-200 rounded-full mt-2">
                 <div
-                    className="absolute bg-indigo-500 h-full rounded-full"
+                    className="absolute bg-primary h-full rounded-full"
                     style={{
                         left: `${((values[0] - min) / (max - min)) * 100}%`,
                         right: `${100 - ((values[1] - min) / (max - min)) * 100}%`,
@@ -83,7 +83,7 @@ const RangeSlider: React.FC<SliderProps> = ({ label, defaultValue = [0, 1000], m
                     <div
                         key={index}
                         className={cn(
-                            "absolute w-6 h-6 bg-white border-2 border-indigo-500 rounded-full shadow-md -top-2 cursor-pointer transition-transform transform hover:scale-110"
+                            "absolute w-6 h-6 bg-white border-2 border-primary rounded-full shadow-md -top-2 cursor-pointer transition-transform transform hover:scale-110"
                         )}
                         style={{
                             left: `${((values[index] - min) / (max - min)) * 100}%`,

@@ -21,16 +21,16 @@ type OrderConfirmationProps = {
 
 const SuccessConfirmation: React.FC<OrderConfirmationProps> = ({ order, onContinueShopping }) => {
     return (
-        <div className="w-full max-w-3xl mx-auto bg-content2 rounded-xl px-2 md:px-6 py-6 md:py-12">
+        <div className="w-full max-w-3xl mx-auto rounded-xl px-2 md:px-6 py-6 md:py-12">
             <FadeInComponent>
                 <div className="text-center mb-6">
                     <div className="inline-flex items-center justify-center w-20 h-20 bg-emerald-100 rounded-full mb-4 animate-pulse">
                         <Check className="w-12 h-12 text-emerald-700" />
                     </div>
 
-                    <h2 className="text-2xl font-bold text-default-900 mb-2">Order Confirmed!</h2>
+                    <h2 className="text-2xl font-bold mb-2">Order Confirmed!</h2>
 
-                    <p className="text-default-600">{`Thank you for your purchase. We've sent a confirmation to ${order.email}.`}</p>
+                    <p className="text-muted-foreground">{`Thank you for your purchase. We've sent a confirmation to ${order.email}.`}</p>
                 </div>
             </FadeInComponent>
 
@@ -65,7 +65,7 @@ const SuccessConfirmation: React.FC<OrderConfirmationProps> = ({ order, onContin
                         <ArrowRight className="ml-2 w-4 h-4" />
                     </Button> */}
 
-                    <Button className="w-full" size="lg" variant="primary" onClick={onContinueShopping}>
+                    <Button className="w-full" size="lg" onClick={onContinueShopping}>
                         Continue Shopping
                     </Button>
                 </div>

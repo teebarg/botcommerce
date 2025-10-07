@@ -34,20 +34,20 @@ const UnderConstruction: React.FC = () => {
                             Under Construction
                         </Badge>
 
-                        <h1 className="mb-6 text-4xl leading-tight font-bold text-default-900 md:text-6xl">
+                        <h1 className="mb-6 text-4xl leading-tight font-bold md:text-6xl">
                             {`We're building something`}
                             <span className="block bg-primary bg-clip-text text-transparent">amazing here</span>
                         </h1>
 
-                        <p className="mx-auto mb-12 max-w-2xl text-lg leading-relaxed text-default-600">
+                        <p className="mx-auto mb-12 max-w-2xl text-lg leading-relaxed">
                             This page is currently under active development. Our team is working hard to bring you an exceptional experience. Check
                             back soon!
                         </p>
 
                         <div className="text-center">
-                            <p className="mb-6 text-default-600">Want to be notified when this page is ready?</p>
+                            <p className="mb-6">Want to be notified when this page is ready?</p>
                             <a
-                                className="rounded-full border-2 border-secondary px-8 py-3 text-secondary transition-all duration-200 hover:bg-secondary/80"
+                                className="rounded-full border-1 border-border px-8 py-3 transition-all duration-200 hover:bg-secondary"
                                 href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`}
                             >
                                 Contact Support

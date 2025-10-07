@@ -135,8 +135,8 @@ export default function SupabaseUploader({
 
     return (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 bottom-0">
-            <div className="bg-content2 rounded-lg shadow-lg w-full md:max-w-2xl h-[100vh] md:h-[75vh] flex flex-col">
-                <div className="flex justify-between items-center border-b px-4 py-4 bg-content1">
+            <div className="rounded-lg shadow-lg w-full md:max-w-2xl h-[100vh] md:h-[75vh] flex flex-col">
+                <div className="flex justify-between items-center border-b px-4 py-4 bg-secondary">
                     <h2 className="font-semibold">Upload Queue</h2>
                     <button onClick={onClose}>✕</button>
                 </div>
@@ -145,8 +145,8 @@ export default function SupabaseUploader({
                     <div className={cn("", files.length > 0 ? "hidden" : "")}>
                         <Card
                             className={cn(
-                                "border-2 border-dashed border-indigo-500 transition-all duration-smooth cursor-pointer hover:border-indigo-400",
-                                isDragOver ? "border-primary bg-accent/50 scale-[1.02]" : ""
+                                "border-2 border-dashed border-primary/20 transition-all duration-smooth cursor-pointer hover:border-primary/30",
+                                isDragOver ? "border-primary/40 scale-[1.02]" : ""
                             )}
                             onClick={openFileDialog}
                             onDragLeave={handleDragLeave}
@@ -155,8 +155,8 @@ export default function SupabaseUploader({
                         >
                             <div className="px-8 py-4 text-center">
                                 <div className="flex justify-center mb-4">
-                                    <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center">
-                                        <Upload className="w-6 h-6 text-white" />
+                                    <div className="w-12 h-12 bg-contrast/10 rounded-full flex items-center justify-center">
+                                        <Upload className="w-6 h-6 text-contrast" />
                                     </div>
                                 </div>
                                 <h3 className="text-lg font-medium text-card-foreground">Drop your images here</h3>
@@ -208,10 +208,8 @@ export default function SupabaseUploader({
                     </div>
                 </div>
 
-                <div className="border-t px-4 py-4 flex justify-between bg-content1">
-                    <Button variant="indigo" onClick={() => document.getElementById("fileInput")?.click()}>
-                        Upload more
-                    </Button>
+                <div className="border-t px-4 py-4 flex justify-between bg-secondary">
+                    <Button onClick={() => document.getElementById("fileInput")?.click()}>Upload more</Button>
                     <Button disabled={isUploading} isLoading={isUploading} variant="emerald" onClick={handleDone}>
                         Done
                     </Button>

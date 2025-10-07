@@ -333,7 +333,7 @@ export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetForm
                 <Button variant="destructive" onClick={onClose}>
                     Close
                 </Button>
-                <Button disabled={isPending || selectedFields.size === 0} isLoading={isPending} variant="indigo" onClick={handleSubmit}>
+                <Button disabled={isPending || selectedFields.size === 0} isLoading={isPending} onClick={handleSubmit}>
                     {selectedFields.size === 0 ? "Select Fields First" : `Update ${selectedFields.size} Field${selectedFields.size !== 1 ? "s" : ""}`}
                 </Button>
             </div>

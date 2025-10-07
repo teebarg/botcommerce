@@ -9,15 +9,15 @@ import { cn } from "@/lib/utils";
 const radioVariants = {
     default: {
         container: "grid gap-3",
-        item: "border-input text-indigo-600 focus-visible:border-ring focus-visible:ring-ring/50 bg-content3 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+        item: "border border-primary text-primary focus-visible:border-ring focus-visible:ring-ring/50 aspect-square size-4 shrink-0 rounded-full shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
         indicator: "relative flex items-center justify-center",
-        icon: "fill-indigo-600 absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2",
+        icon: "fill-primary absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2",
     },
     card: {
         container: "grid gap-3",
-        item: "group relative flex items-center gap-3 rounded-lg border-2 border-default-200 bg-content1 p-4 transition-all duration-200 hover:border-accent hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-accent data-[state=checked]:bg-accent/10",
+        item: "group relative cursor-pointer flex items-center gap-3 rounded-lg border-1 border-input bg-card p-4 transition-all duration-200 hover:border-primary/10 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-primary/10",
         indicator: "absolute right-4 top-4 flex items-center justify-center",
-        icon: "size-5 text-accent opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
+        icon: "size-5 text-primary opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
     },
     pill: {
         container: "flex flex-wrap gap-2",
@@ -33,7 +33,7 @@ const radioVariants = {
     },
     delivery: {
         container: "grid gap-2",
-        item: "flex items-start space-x-4 p-6 rounded-lg border-2 cursor-pointer transition-all duration-300 hover:shadow-elegant border-border hover:border-accent/50 data-[state=checked]:border-accent data-[state=checked]:bg-accent/10 data-[state=checked]:shadow-elegant group relative focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+        item: "flex items-start space-x-4 p-6 rounded-lg border-2 cursor-pointer transition-all duration-300 hover:shadow-glow border-border hover:border-primary/20 data-[state=checked]:border-primary/30 data-[state=checked]:bg-primary/5 data-[state=checked]:shadow-primary group relative focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
         indicator: "flex items-center justify-center",
         icon: "size-4 opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
     },
@@ -107,8 +107,8 @@ function RadioGroupWithLabel({
         <div className="space-y-3">
             {label && (
                 <div className="space-y-1">
-                    <h3 className="text-sm font-medium text-default-900">{label}</h3>
-                    {description && <p className="text-sm text-default-600">{description}</p>}
+                    <h3 className="text-sm font-medium">{label}</h3>
+                    {description && <p className="text-sm text-muted-foreground">{description}</p>}
                 </div>
             )}
             <RadioGroup className={className} variant={variant} {...props} />

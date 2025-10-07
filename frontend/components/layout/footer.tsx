@@ -1,8 +1,8 @@
 "use client";
 
-import { Facebook, Twitter, WhatsApp } from "nui-react-icons";
+import { Facebook, Twitter, Instagram } from "lucide-react";
 import Link from "next/link";
-import { Instagram } from "lucide-react";
+import { WhatsApp } from "nui-react-icons";
 
 import LocalizedClientLink from "@/components/ui/link";
 import { Category } from "@/schemas/product";
@@ -59,29 +59,49 @@ export default function Footer() {
 
     return (
         <ClientOnly>
-            <footer className="flex w-full flex-col pb-20 md:pb-12 bg-content1 border-t border-divider">
+            <footer className="flex w-full flex-col pb-20 md:pb-12 border-t border-border/50">
                 <div className="hidden md:block mx-auto max-w-7xl px-6 pb-8 pt-8 sm:pt-24 lg:px-8 md:pt-32">
                     <div className="hidden md:grid md:grid-cols-3 md:gap-8">
                         <div className="md:pr-8">
-                            <div className="flex items-center justify-start">
-                                <span className="text-3xl font-semibold text-primary">{settings?.shop_name}</span>
-                            </div>
-                            <p className="text-sm text-default-600">
+                            <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                                {settings?.shop_name}
+                            </h3>
+                            <p className="text-sm text-foreground">
                                 {`We are a dedicated online store offering a wide range of high-quality and fun products for kids. Our mission is to bring
                             joy and happiness to every child's life.`}
                             </p>
                             <div className="flex space-x-6 mt-4">
-                                <Link aria-label="Twitter" href={`https://web.facebook.com/profile.php?id=${settings?.facebook}`} target="_blank">
-                                    <Facebook className="text-default-500 hover:text-primary transition-colors" size={34} />
+                                <Link
+                                    aria-label="Twitter"
+                                    className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                                    href={`https://web.facebook.com/profile.php?id=${settings?.facebook}`}
+                                    target="_blank"
+                                >
+                                    <Facebook className="text-primary" />
                                 </Link>
-                                <Link aria-label="Instagram" href={`https://www.instagram.com/${settings?.instagram}`} target="_blank">
-                                    <Instagram className="text-default-500 hover:text-primary transition-colors" size={34} />
+                                <Link
+                                    aria-label="Instagram"
+                                    className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                                    href={`https://www.instagram.com/${settings?.instagram}`}
+                                    target="_blank"
+                                >
+                                    <Instagram className="text-primary" />
                                 </Link>
-                                <Link aria-label="Tiktok" href={`https://www.tiktok.com/@${settings?.tiktok}`} target="_blank">
-                                    <WhatsApp className="text-default-500 hover:text-primary transition-colors" size={30} />
+                                <Link
+                                    aria-label="Tiktok"
+                                    className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                                    href={`https://www.tiktok.com/@${settings?.tiktok}`}
+                                    target="_blank"
+                                >
+                                    <WhatsApp className="text-primary" />
                                 </Link>
-                                <Link aria-label="X" href={`https://x.com/${settings?.twitter}`} target="_blank">
-                                    <Twitter className="text-default-500 hover:text-primary transition-colors" size={34} />
+                                <Link
+                                    aria-label="X"
+                                    className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                                    href={`https://x.com/${settings?.twitter}`}
+                                    target="_blank"
+                                >
+                                    <Twitter className="text-primary" />
                                 </Link>
                             </div>
                         </div>
@@ -89,8 +109,8 @@ export default function Footer() {
                             {collections && collections?.length > 0 && (
                                 <div className="hidden md:block">
                                     <div>
-                                        <h3 className="text-base font-semibold text-default-foreground">Collections</h3>
-                                        <ul className="mt-2 space-y-2 text-default-600">
+                                        <h3 className="text-base font-semibold">Collections</h3>
+                                        <ul className="mt-2 space-y-2 text-muted-foreground" data-testid="footer-collections">
                                             {collections?.slice(0, 6).map((c: any, idx: number) => (
                                                 <li key={idx}>
                                                     <LocalizedClientLink
@@ -107,8 +127,8 @@ export default function Footer() {
                             )}
                             {categories && categories?.length > 0 && (
                                 <div className="hidden md:block">
-                                    <h3 className="text-base font-semibold text-default-foreground">Categories</h3>
-                                    <ul className="mt-2 space-y-2 text-default-600" data-testid="footer-categories">
+                                    <h3 className="text-base font-semibold">Categories</h3>
+                                    <ul className="mt-2 space-y-2 text-muted-foreground" data-testid="footer-categories">
                                         {categories?.map((c: Category, idx: number) => {
                                             return (
                                                 <li key={idx}>
@@ -141,8 +161,8 @@ export default function Footer() {
                                 </div>
                             )}
                             <div>
-                                <h3 className="text-base font-semibold text-default-foreground">Support</h3>
-                                <ul className="mt-2 space-y-2 text-default-600">
+                                <h3 className="text-base font-semibold">Support</h3>
+                                <ul className="mt-2 space-y-2 text-muted-foreground">
                                     {support.map((item, idx: number) => (
                                         <li key={idx}>
                                             <LocalizedClientLink className="text-sm hover:text-primary transition-colors" href={item.to}>
@@ -153,8 +173,8 @@ export default function Footer() {
                                 </ul>
                             </div>
                             <div>
-                                <h3 className="text-base font-semibold text-default-foreground">Company</h3>
-                                <ul className="mt-2 space-y-2 text-default-600">
+                                <h3 className="text-base font-semibold">Company</h3>
+                                <ul className="mt-2 space-y-2 text-muted-foreground">
                                     {company.map((item, idx: number) => (
                                         <li key={idx}>
                                             <LocalizedClientLink className="text-sm hover:text-primary transition-colors" href={item.to}>
@@ -168,7 +188,7 @@ export default function Footer() {
                     </div>
                     <Separator className="my-4" />
                     <div>
-                        <p className="text-sm text-default-500">
+                        <p className="text-sm text-muted-foreground">
                             &copy; {new Date().getFullYear()} {settings?.shop_name}. All rights reserved.
                         </p>
                     </div>

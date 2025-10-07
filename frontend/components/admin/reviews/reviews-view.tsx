@@ -42,10 +42,10 @@ const ReviewView: React.FC = () => {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 className="text-2xl font-semibold">Reviews</h1>
-                    <p className="text-default-500 text-sm">Manage your product reviews</p>
+                    <p className="text-muted-foreground text-sm">Manage your product reviews</p>
                 </div>
                 <div className="flex w-full items-center gap-2 md:w-auto mb-4">
-                    <Input placeholder="Search reviews..." startContent={<Search />} type="search" wrapperClass="flex-1" />
+                    <Input className="bg-card" placeholder="Search reviews..." startContent={<Search />} type="search" wrapperClass="flex-1" />
                 </div>
             </div>
             <div className="md:block hidden">
@@ -67,7 +67,7 @@ const ReviewView: React.FC = () => {
                     </TableHeader>
                     <TableBody>
                         {reviews?.map((review: Review, idx: number) => (
-                            <TableRow key={idx} className="even:bg-content1">
+                            <TableRow key={idx} className="odd:bg-background">
                                 <TableCell>{idx + 1}</TableCell>
                                 <TableCell className="flex-1">
                                     <div className="font-bold truncate min-w-72">{review?.comment}</div>
@@ -88,7 +88,7 @@ const ReviewView: React.FC = () => {
                         ))}
                         {reviews?.length === 0 && (
                             <TableRow>
-                                <TableCell className="text-center py-4 text-default-500" colSpan={5}>
+                                <TableCell className="text-center py-4 text-muted-foreground" colSpan={5}>
                                     No reviews found.
                                 </TableCell>
                             </TableRow>
@@ -103,8 +103,8 @@ const ReviewView: React.FC = () => {
                     </div>
 
                     {reviews?.length === 0 && (
-                        <div className="text-center py-8 bg-content1 rounded-lg mt-3">
-                            <p className="text-default-500">No reviews found</p>
+                        <div className="text-center py-8 bg-secondary rounded-lg mt-3">
+                            <p className="text-muted-foreground">No reviews found</p>
                         </div>
                     )}
                 </div>

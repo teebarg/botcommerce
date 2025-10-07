@@ -48,7 +48,7 @@ const CarouselSection: React.FC = () => {
                                             {banner.title && <h1 className="text-3xl md:text-5xl font-bold mb-4">{banner.title}</h1>}
                                             {banner.description && <p className="text-lg mb-6 text-white/80">{banner.description}</p>}
                                             {banner.link && (
-                                                <BtnLink href={banner.link} size="lg" variant="primary">
+                                                <BtnLink href={banner.link} size="lg">
                                                     {banner.buttonText || "Shop Now"}
                                                 </BtnLink>
                                             )}

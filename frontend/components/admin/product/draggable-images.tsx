@@ -164,9 +164,9 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-6 bg-content1 rounded-lg shadow-lg">
-            <h2 className="text-xl font-bold text-default-800">Image Gallery</h2>
-            <p className="mb-4 text-default-600">Drag and drop images to reorder them</p>
+        <div className="max-w-4xl mx-auto p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-bold">Image Gallery</h2>
+            <p className="mb-4 text-muted-foreground">Drag and drop images to reorder them</p>
 
             <div ref={listRef} className="grid grid-cols-1 gap-4">
                 {images.map((image: ProductImage, index: number) => (
@@ -187,8 +187,8 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
                         onTouchMove={handleTouchMove}
                         onTouchStart={(e) => handleTouchStart(e, index)}
                     >
-                        <div className="flex items-center p-3 rounded-lg hover:bg-default-100">
-                            <div className="mr-4 text-default-500 font-semibold w-8 h-8 flex items-center justify-center bg-default-200 rounded-full">
+                        <div className="flex items-center p-3 rounded-lg">
+                            <div className="mr-4 text-muted-foreground font-semibold w-8 h-8 flex items-center justify-center bg-secondary rounded-full">
                                 {index + 1}
                             </div>
 
@@ -197,7 +197,7 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
                             </div>
 
                             <div className="grow hidden md:block">
-                                <div className="text-sm text-default-500 mt-1">
+                                <div className="text-sm text-muted-foreground mt-1">
                                     {isTouching && draggedItem === index ? "Release to drop" : "Drag to reorder"}
                                 </div>
                             </div>
@@ -207,7 +207,7 @@ export default function DraggableImageList({ initialImages, productId }: Draggab
                     </div>
                 ))}
             </div>
-            <p className="text-xs text-default-500 text-center mt-3">Tip: Tap and hold the drag icon to reorder images on mobile</p>
+            <p className="text-xs text-muted-foreground text-center mt-3">Tip: Tap and hold the drag icon to reorder images on mobile</p>
         </div>
     );
 }

@@ -46,7 +46,7 @@ const RecentOrdersList = () => {
                     View all
                 </Link>
             </div>
-            <div className="hidden md:block py-6 px-2 rounded-xl">
+            <div className="hidden md:block py-6 px-2 rounded-xl bg-card">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -61,7 +61,7 @@ const RecentOrdersList = () => {
                     </TableHeader>
                     <TableBody>
                         {orders?.map((order: Order, idx: number) => (
-                            <TableRow key={idx} className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted even:bg-content1">
+                            <TableRow key={idx} className="odd:bg-background">
                                 <TableCell className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-3">{idx + 1}</TableCell>
                                 <TableCell className="whitespace-nowrap px-3 py-4 text-sm">{order.order_number}</TableCell>
                                 <TableCell className="font-medium">
@@ -87,23 +87,23 @@ const RecentOrdersList = () => {
                     </TableBody>
                 </Table>
             </div>
-            <div className="bg-background rounded-lg shadow-sm border border-divide overflow-hidden md:hidden">
-                <div className="divide-y divide-default-200">
+            <div className="rounded-lg shadow-sm overflow-hidden md:hidden">
+                <div className="space-y-2">
                     {orders?.map((order: Order, idx: number) => (
-                        <div key={idx} className="p-4">
+                        <div key={idx} className="p-4 bg-card">
                             <div className="flex justify-between items-center mb-2 mt-2">
                                 <span className="font-medium">{order.order_number}</span>
                                 <PaymentStatusBadge status={order.payment_status} />
                             </div>
-                            <div className="flex justify-between text-sm text-default-500">
+                            <div className="flex justify-between text-sm text-muted-foreground">
                                 <span>
                                     {order.user?.first_name} {order.user?.last_name}
                                 </span>
-                                <span className="font-medium">{currency(order.total)}</span>
+                                <span className="font-medium text-foreground text-base">{currency(order.total)}</span>
                             </div>
-                            <div className="text-xs text-default-500 mt-1">{order.created_at}</div>
+                            <div className="text-xs text-muted-foreground mt-1">{formatDate(order.created_at)}</div>
                             <div className="flex justify-between items-center mt-2">
-                                <span>Order Status:</span>
+                                <span className="text-sm">Order Status:</span>
                                 <OrderStatusBadge status={order.status} />
                             </div>
                         </div>

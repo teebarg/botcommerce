@@ -55,7 +55,7 @@ const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onCl
     };
 
     return (
-        <div className="py-6 px-4 overflow-y-auto">
+        <div className="py-6 px-4 overflow-y-auto bg-card">
             <h2 className="text-lg font-semibold mb-4">Address</h2>
             <Form {...form}>
                 <form className="grid gap-6" onSubmit={form.handleSubmit(onSubmit)}>
@@ -194,7 +194,6 @@ const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onCl
                         disabled={updateAddress.isPending}
                         isLoading={updateAddress.isPending}
                         type="submit"
-                        variant="primary"
                     >
                         Update
                     </Button>

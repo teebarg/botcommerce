@@ -106,10 +106,10 @@ export function ProductDetails() {
                 )}
 
                 <div className="flex justify-between mb-4">
-                    <Button className="text-xs" size="sm" variant="indigo" onClick={handleManageCollections}>
+                    <Button className="text-xs" size="sm" onClick={handleManageCollections}>
                         Collections
                     </Button>
-                    <Button className="text-xs" size="sm" variant="indigo" onClick={handleManageCategories}>
+                    <Button className="text-xs" size="sm" onClick={handleManageCategories}>
                         Categories
                     </Button>
                 </div>
@@ -122,9 +122,9 @@ export function ProductDetails() {
                             <div
                                 key={`${product.id}-${idx}`}
                                 ref={isLast ? (lastElementRef as any) : undefined}
-                                className="relative bg-content1 border border-divider rounded-lg shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow"
+                                className="relative bg-card border border-input rounded-lg shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow"
                             >
-                                <div className="relative aspect-product w-full bg-content1 overflow-hidden">
+                                <div className="relative aspect-product w-full bg-card overflow-hidden">
                                     <img
                                         alt={product.name}
                                         className="object-cover"
@@ -142,7 +142,7 @@ export function ProductDetails() {
                                 </div>
 
                                 <div className="p-4 flex flex-col justify-between flex-1">
-                                    <h3 className="font-semibold text-lg text-default-900 mb-2 line-clamp-1">{product.name}</h3>
+                                    <h3 className="font-semibold text-lg mb-2 line-clamp-1">{product.name}</h3>
                                     <div className="flex justify-end">
                                         <ProductActions product={product} />
                                     </div>
@@ -156,13 +156,13 @@ export function ProductDetails() {
 
                 {products?.length === 0 && !isLoading && (
                     <div className="text-center py-8">
-                        <p className="text-default-500">No products found</p>
+                        <p className="text-muted-foreground">No products found</p>
                     </div>
                 )}
 
                 {!hasNextPage && products?.length > 0 && (
                     <div className="text-center py-4">
-                        <p className="text-sm text-default-500">You&apos;ve reached the end of the list</p>
+                        <p className="text-sm text-muted-foreground">You&apos;ve reached the end of the list</p>
                     </div>
                 )}
             </div>

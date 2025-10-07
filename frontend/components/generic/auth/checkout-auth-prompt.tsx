@@ -24,14 +24,14 @@ const CheckoutLoginPrompt: React.FC = () => {
                     </div>
 
                     <div className="text-center mb-8">
-                        <h2 className="text-3xl font-bold text-default-800">Sign in required</h2>
-                        <p className="mt-2 text-default-600">Please sign in to your account to continue with your checkout process</p>
+                        <h2 className="text-3xl font-bold">Sign in required</h2>
+                        <p className="mt-2 text-muted-foreground">Please sign in to your account to continue with your checkout process</p>
                     </div>
 
                     <div className="flex items-center justify-center">
                         <Dialog>
                             <DialogTrigger asChild>
-                                <Button variant="primary">Sign in to continue</Button>
+                                <Button>Sign in to continue</Button>
                             </DialogTrigger>
                             <DialogContent>
                                 <DialogHeader>
@@ -42,7 +42,7 @@ const CheckoutLoginPrompt: React.FC = () => {
                         </Dialog>
                     </div>
 
-                    <div className="mt-6 text-center text-sm text-default-500">
+                    <div className="mt-6 text-center text-sm text-muted-foreground">
                         <Dialog>
                             <DialogTrigger>
                                 <p>

@@ -154,7 +154,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
                                             <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                                         </FormControl>
                                         <div className="space-y-1 leading-none">
-                                            <FormLabel className="text-sm text-default-500">Show in Store</FormLabel>
+                                            <FormLabel className="text-sm text-muted-foreground">Show in Store</FormLabel>
                                             <FormMessage />
                                         </div>
                                     </FormItem>
@@ -165,7 +165,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, collections
                                 <Button className="min-w-32" type="button" variant="destructive" onClick={() => onClose()}>
                                     Close
                                 </Button>
-                                <Button className="min-w-32" disabled={isPending} isLoading={isPending} type="submit" variant="primary">
+                                <Button className="min-w-32" disabled={isPending} isLoading={isPending} type="submit">
                                     {product?.id ? "Update" : "Create"}
                                 </Button>
                             </div>

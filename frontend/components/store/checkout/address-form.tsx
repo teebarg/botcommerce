@@ -241,13 +241,7 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
                         <Button aria-label="cancel" type="button" variant="destructive" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button
-                            aria-label="continue"
-                            data-testid="submit-address-button"
-                            isLoading={updateCartDetails.isPending}
-                            type="submit"
-                            variant="primary"
-                        >
+                        <Button aria-label="continue" data-testid="submit-address-button" isLoading={updateCartDetails.isPending} type="submit">
                             Create
                         </Button>
                     </div>
