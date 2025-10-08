@@ -117,7 +117,7 @@ const PaymentStatusManager: React.FC<PaymentStatusManagerProps> = ({ id, current
                     <Button
                         disabled={!hasChanges || isPending}
                         isLoading={isPending}
-                        variant={hasChanges ? "indigo" : "outline"}
+                        variant={hasChanges ? "default" : "outline"}
                         onClick={handleStatusUpdate}
                     >
                         {hasChanges ? "Update Status" : "No Changes"}

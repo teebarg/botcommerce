@@ -28,7 +28,7 @@ const DeleteButton: React.FC<{ image: ProductImage; productId: number }> = ({ im
         <Button
             className="absolute top-12 right-6"
             disabled={deleteImages.isPending}
-            size="iconOnly"
+            size="icon"
             title="Delete"
             variant="ghost"
             onClick={handleDelete}

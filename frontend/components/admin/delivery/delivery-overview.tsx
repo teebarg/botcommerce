@@ -76,12 +76,12 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2 ml-4">
+                    <div className="flex items-center ml-4">
                         <Overlay
                             open={editState.isOpen}
                             title="Edit Delivery Option"
                             trigger={
-                                <Button size="iconOnly" onClick={editState.open}>
+                                <Button size="icon" variant="ghost" onClick={editState.open}>
                                     <Pencil className="h-5 w-5" />
                                 </Button>
                             }
@@ -130,7 +130,7 @@ const DeliveryOverview: React.FC = () => {
                     open={addState.isOpen}
                     title="Add Delivery Option"
                     trigger={
-                        <Button size="md">
+                        <Button>
                             <Plus className="h-4 w-4" />
                             Add Option
                         </Button>

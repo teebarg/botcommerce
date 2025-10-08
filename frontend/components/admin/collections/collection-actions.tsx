@@ -29,12 +29,12 @@ const CollectionActions: React.FC<Props> = ({ collection }) => {
     };
 
     return (
-        <div className="relative flex items-center gap-2">
+        <div className="relative flex items-center">
             <Overlay
                 open={editState.isOpen}
                 title="Edit Collection"
                 trigger={
-                    <Button size="iconOnly">
+                    <Button size="icon" variant="ghost">
                         <Pencil className="h-5 w-5" />
                     </Button>
                 }
@@ -43,8 +43,10 @@ const CollectionActions: React.FC<Props> = ({ collection }) => {
                 <CollectionForm collection={collection} type="update" onClose={editState.close} />
             </Overlay>
             <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
-                <DialogTrigger>
-                    <Trash2 className="h-5 w-5 text-destructive cursor-pointer" />
+                <DialogTrigger asChild>
+                    <Button size="icon" variant="ghost">
+                        <Trash2 className="text-red-500 h-5 w-5 cursor-pointer" />
+                    </Button>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader className="sr-only">

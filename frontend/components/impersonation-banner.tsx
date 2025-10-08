@@ -29,7 +29,7 @@ export default function ImpersonationBanner() {
             <Button className="underline" size="sm" variant="ghost" onClick={stopImpersonation}>
                 Exit
             </Button>
-            <Button aria-label="dismiss" size="iconOnly" onClick={stopImpersonation}>
+            <Button aria-label="dismiss" size="icon" variant="ghost" onClick={stopImpersonation}>
                 <X className="h-4 w-4" />
             </Button>
         </div>

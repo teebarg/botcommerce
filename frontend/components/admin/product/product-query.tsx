@@ -47,7 +47,7 @@ export function ProductQuery({ collections, selectedCollections }: ProductQueryP
             />
             <Dialog open={filterState.isOpen} onOpenChange={filterState.setOpen}>
                 <DialogTrigger asChild>
-                    <Button className="absolute inset-y-0 right-0 pr-3" size="iconOnly">
+                    <Button className="absolute inset-y-0 right-0 pr-3" size="icon">
                         <SlidersHorizontal className="text-muted-foreground h-5 w-5" />
                     </Button>
                 </DialogTrigger>

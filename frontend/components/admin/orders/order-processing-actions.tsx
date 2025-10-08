@@ -48,11 +48,11 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
             variant: "contrast",
         },
         SHIPPED: {
-            color: "bg-blue-100 text-blue-700",
+            color: "bg-cyan-200 text-cyan-800",
             label: "Order Packed",
             nextStatus: "OUT_FOR_DELIVERY" as const,
             actionLabel: "Mark Out for Delivery",
-            variant: "default",
+            variant: "outline",
         },
         OUT_FOR_DELIVERY: {
             color: "bg-success/20 text-success",

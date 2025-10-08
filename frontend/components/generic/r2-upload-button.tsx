@@ -193,7 +193,7 @@ export default function R2Uploader({
                                 {file.status === "success" && (
                                     <Button
                                         className="absolute bottom-1 right-1"
-                                        size="iconOnly"
+                                        size="icon"
                                         variant="destructive"
                                         onClick={() => handleDelete(file)}
                                     >

@@ -17,11 +17,6 @@ const CartControl: React.FC<Props> = ({ item }) => {
     const deleteItem = useDeleteCartItem();
 
     const onUpdateQuantity = async (id: number, quantity: number) => {
-        // if (!isInStock) {
-        //     toast.error("Product out of stock")
-        //     return;
-        // }
-
         await updateQuantity.mutateAsync({ item_id: id, quantity });
     };
 

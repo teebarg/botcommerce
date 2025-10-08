@@ -77,11 +77,11 @@ export function SocialShare({ catalog, className }: SocialShareProps) {
             </PopoverTrigger>
             <PopoverContent align="end" className="p-0 relative">
                 <div className="px-4 py-6">
-                    <h4 className="font-semibold mb-3">Share this collection</h4>
+                    <h4 className="font-semibold mb-3">Share this catalog</h4>
 
-                    <div className="flex gap-2 mb-3 mt-4">
+                    <div className="flex mb-3 mt-4">
                         {socialLinks.map((social, idx: number) => (
-                            <Button key={idx} className={cn("", social.color)} size="iconOnly" onClick={() => handleShare(social.url)}>
+                            <Button key={idx} className={cn("", social.color)} size="icon" variant="ghost" onClick={() => handleShare(social.url)}>
                                 <social.icon className="h-8 w-8" />
                             </Button>
                         ))}

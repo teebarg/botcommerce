@@ -15,7 +15,7 @@ const CustomerCard = ({ user, actions }: CustomerCardProps) => {
     const totalSpent = user.orders?.reduce((total: number, order: Order) => total + order.total, 0) || 0;
 
     return (
-        <Card className="mb-3 overflow-hidden hover:shadow-md transition-shadow bg-secondary p-4">
+        <Card className="mb-3 overflow-hidden hover:shadow-md transition-shadow bg-card p-4">
             <div className="flex justify-between items-start">
                 <div>
                     <h3 className="font-medium text-lg">{fullName}</h3>

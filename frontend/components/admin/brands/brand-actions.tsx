@@ -34,7 +34,7 @@ const BrandActions: React.FC<Props> = ({ item }) => {
                 open={editState.isOpen}
                 title="Edit Brand"
                 trigger={
-                    <Button size="iconOnly" onClick={editState.open}>
+                    <Button size="icon" variant="ghost" onClick={editState.open}>
                         <Pencil className="h-5 w-5" />
                     </Button>
                 }

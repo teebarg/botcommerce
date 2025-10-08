@@ -61,9 +61,9 @@ async def add_item_to_cart(
     )
 
     if not variant:
-        raise HTTPException(status_code=400, detail="Variant does not exist")
+        raise HTTPException(status_code=400, detail="Product does not exist")
     if variant.status != "IN_STOCK":
-        raise HTTPException(status_code=400, detail="Variant is out of stock")
+        raise HTTPException(status_code=400, detail="Product is out of stock")
 
     if item_in.quantity > variant.inventory:
         available_quantity = variant.inventory - item_in.quantity

@@ -32,8 +32,8 @@ const BackButton: React.FC<Props> = ({ onClick, className }) => {
     return (
         <Button
             aria-label="back button"
-            className={cn(className, "text-foreground w-auto md:hidden", pathname == "/" && "hidden")}
-            size="iconOnly"
+            className={cn(className, "text-foreground h-auto w-auto md:hidden", pathname == "/" && "hidden")}
+            size="icon"
             variant="ghost"
             onClick={handleGoBack}
         >

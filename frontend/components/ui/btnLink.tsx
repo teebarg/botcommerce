@@ -8,8 +8,8 @@ import { buttonVariants } from "@/components/ui/button";
 
 interface BtnLinkProps {
     children: React.ReactNode;
-    variant?: "secondary" | "default" | "destructive" | "warning" | "success" | "emerald" | "bordered";
-    size?: "sm" | "lg" | "icon" | "iconOnly";
+    variant?: "secondary" | "default" | "destructive" | "warning" | "success" | "emerald";
+    size?: "sm" | "lg" | "icon";
     className?: string;
     href: string;
 }

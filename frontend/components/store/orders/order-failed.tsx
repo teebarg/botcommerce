@@ -69,13 +69,10 @@ const FailedPayment: React.FC<OrderConfirmationProps> = ({ order, onRetry, onCon
 
             <FadeInComponent delay="700ms">
                 <div className="mt-6 space-y-3">
-                    <button
-                        className="w-full px-6 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center"
-                        onClick={onRetry}
-                    >
+                    <Button className="w-full px-6 py-3 rounded-xl transition-colors" variant="contrast" onClick={onRetry}>
                         <CreditCard className="mr-2 w-5 h-5" />
                         Try Payment Again
-                    </button>
+                    </Button>
                     <Button className="w-full" size="lg" onClick={onContinueShopping}>
                         Continue Shopping
                     </Button>
