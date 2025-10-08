@@ -12,7 +12,7 @@ from app.core.utils import (generate_contact_form_email,
                             generate_newsletter_email, send_email, generate_bulk_purchase_email)
 from app.models.generic import ContactFormCreate, NewsletterCreate, BulkPurchaseCreate
 from app.prisma_client import prisma as db
-from fastapi import BackgroundTasks, FastAPI, Request, Response
+from fastapi import BackgroundTasks, FastAPI, Request, Response, HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from app.services.websocket import manager
@@ -36,10 +36,10 @@ async def lifespan(app: FastAPI):
     logger.debug("🚀starting servers......:")
     await db.connect()
 
-    await redis_client.ping()
     app.state.redis = redis_client
 
     consumer = RedisStreamConsumer(redis_client, STREAM_NAME, GROUP_NAME, CONSUMER_NAME)
+    app.state.consumer = consumer
     await consumer.start()
 
     yield
@@ -51,8 +51,7 @@ async def lifespan(app: FastAPI):
 if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
     sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
 
-app = FastAPI(title="Botcommerce",
-              openapi_url="/api/openapi.json", lifespan=lifespan)
+app = FastAPI(title="Botcommerce", openapi_url="/api/openapi.json", lifespan=lifespan)
 
 # # Custom middleware to capture the client host
 # class ClientHostMiddleware(BaseHTTPMiddleware):
@@ -305,3 +304,29 @@ async def invalidate_react(key: str):
 async def invalidate_redis(key: str):
     await invalidate_list(key)
     return {"message": "success"}
+
+
+@app.post("/api/process-stale-messages")
+async def process_stale_messages(request: Request, background_tasks: BackgroundTasks):
+    consumer = request.app.state.consumer
+    background_tasks.add_task(consumer.claim_stale_messages)    
+    return {"message": "success"}
+
+
+@app.post("/api/process/{stream_id}")
+async def process_stream_id(stream_id: str, request: Request):
+    r = request.app.state.redis
+    consumer = request.app.state.consumer
+    msgs = await r.xrange(STREAM_NAME, min=stream_id, max=stream_id)
+    if not msgs:
+        raise HTTPException(status_code=404, detail="Message not found")
+
+    msg_id, data = msgs[0]
+    print(f"📦 Received message: {msg_id} -> {data}")
+    
+    try:
+       await consumer.process_stream(msg_id=msg_id, data=data)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing event: {str(e)}")
+
+    return {"status": "processed", "id": msg_id}

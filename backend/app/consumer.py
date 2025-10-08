@@ -44,9 +44,9 @@ class RedisStreamConsumer:
         self.consume_task = asyncio.create_task(
             supervise(self.consume, "redis-consume"), name="redis-consume-supervisor"
         )
-        self.claim_task = asyncio.create_task(
-            supervise(self.claim_stale_messages, "redis-claim-stale"), name="redis-claim-stale-supervisor"
-        )
+        # self.claim_task = asyncio.create_task(
+        #     supervise(self.claim_stale_messages, "redis-claim-stale"), name="redis-claim-stale-supervisor"
+        # )
 
         logger.info("Redis consumer started with supervision...")
 
@@ -54,7 +54,7 @@ class RedisStreamConsumer:
         """Stop consumer loops gracefully"""
         self.shutdown_event.set()
 
-        tasks = [t for t in [self.consume_task, self.claim_task] if t]
+        tasks = [t for t in [self.consume_task] if t]
 
         for task in tasks:
             logger.info(f"Cancelling task: {task.get_name()}")
@@ -99,29 +99,30 @@ class RedisStreamConsumer:
 
     async def claim_stale_messages(self):
         """Run occasionally to recover stuck messages."""
-        while not self.shutdown_event.is_set():
-            try:
-                claimed = await self.redis.xautoclaim(
-                    self.stream,
-                    self.group,
-                    self.consumer,
-                    600000,
-                    "0-0",
-                    count=10
-                )
+        try:
+            claimed = await self.redis.xautoclaim(
+                self.stream,
+                self.group,
+                self.consumer,
+                50000,
+                "0-0",
+                count=10
+            )
+            logger.info(f"Claimed {len(claimed[1])} stale messages")
+            for msg_id, data in claimed[1]:
+                await self._process(msg_id, data)
+        except Exception as e:
+            logger.error(f"XAUTOCLAIM error: {e}")
 
-                for msg_id, data in claimed[1]:
-                    await self._process(msg_id, data)
-            except Exception as e:
-                logger.error(f"XAUTOCLAIM error: {e}")
-
-            await asyncio.sleep(60)  # only sweep every 60s (tunable)
+    async def process_stream(self, msg_id: str, data: dict):
+        await self._process(msg_id, data)
 
 
     async def _process(self, msg_id, data):
         try:
             await self.handle_event(data)
             await self.redis.xack(self.stream, self.group, msg_id)
+            await self.redis.xdel(self.stream, msg_id)
         except Exception as e:
             logger.error(f"Failed to process {data}: {e}")
 
@@ -130,12 +131,8 @@ class RedisStreamConsumer:
             await self.handle_order_created(event)
         elif event["type"] == "ORDER_PAID":
             await self.handle_order_paid(event)
-        elif event["type"] == "ORDER_STATUS":
-            await self.handle_order_status(event)
         elif event["type"] == "PAYMENT_SUCCESS":
             await self.handle_payment_success(event)
-        elif event["type"] == "PAYMENT_FAILED":
-            await self.handle_payment_failed(event)
         elif event["type"] == "RECENTLY_VIEWED":
             await self.handle_recently_viewed(event)
         elif event["type"] == "USER_REGISTERED":
