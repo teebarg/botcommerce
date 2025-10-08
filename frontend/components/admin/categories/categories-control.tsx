@@ -40,7 +40,7 @@ const CategoryAction: React.FC<Props> = ({ category, index, categoriesLength, on
                 open={editState.isOpen}
                 title={`Edit Category ${category?.name}`}
                 trigger={
-                    <Button size="iconOnly">
+                    <Button size="icon" variant="ghost">
                         <Edit className="h-5 w-5" />
                     </Button>
                 }
@@ -57,7 +57,8 @@ const CategoryAction: React.FC<Props> = ({ category, index, categoriesLength, on
             <Button
                 className={cn("", index === 0 ? "opacity-50 cursor-not-allowed" : "")}
                 disabled={index === 0}
-                size="iconOnly"
+                size="icon"
+                variant="ghost"
                 title="Move up"
                 onClick={() => onOrderChange?.(category?.id, "up")}
             >
@@ -66,7 +67,8 @@ const CategoryAction: React.FC<Props> = ({ category, index, categoriesLength, on
             <Button
                 className={cn("", index === (categoriesLength ?? 0) - 1 ? "opacity-50 cursor-not-allowed" : "")}
                 disabled={index === (categoriesLength ?? 0) - 1}
-                size="iconOnly"
+                size="icon"
+                variant="ghost"
                 title="Move down"
                 onClick={() => onOrderChange?.(category?.id, "down")}
             >

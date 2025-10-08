@@ -119,12 +119,22 @@ export function ProductImageGallery() {
                     <div className="lg:hidden mb-4 sticky top-16 z-40 bg-background -mx-4 px-4 py-4 flex gap-2">
                         <div className="rounded-full p-1 flex items-center gap-2 bg-secondary w-1/2">
                             <div className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "grid" && "bg-background")}>
-                                <Button size="iconOnly" onClick={() => setViewMode("grid")}>
+                                <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-auto w-auto hover:bg-transparent"
+                                    onClick={() => setViewMode("grid")}
+                                >
                                     <LayoutDashboard className="h-6 w-6" />
                                 </Button>
                             </div>
                             <div className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "list" && "bg-background")}>
-                                <Button size="iconOnly" onClick={() => setViewMode("list")}>
+                                <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-auto w-auto hover:bg-transparent"
+                                    onClick={() => setViewMode("list")}
+                                >
                                     <RectangleVertical className="h-6 w-6" />
                                 </Button>
                             </div>
@@ -133,7 +143,7 @@ export function ProductImageGallery() {
                             <Button
                                 className="w-full rounded-full"
                                 size="lg"
-                                variant={selectionMode ? "destructive" : "indigo"}
+                                variant={selectionMode ? "destructive" : "default"}
                                 onClick={() => {
                                     setSelectionMode(!selectionMode);
                                     if (selectionMode) {

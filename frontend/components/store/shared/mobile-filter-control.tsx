@@ -28,7 +28,7 @@ export default function MobileFilterControl({ facets, setViewMode, viewMode }: P
                             viewMode === "grid" && "bg-primary"
                         )}
                     >
-                        <Button size="iconOnly" onClick={() => setViewMode("grid")}>
+                        <Button size="icon" className="h-auto w-auto hover:bg-transparent" variant="ghost" onClick={() => setViewMode("grid")}>
                             <LayoutDashboard className={cn("h-6 w-6 text-foreground", viewMode === "grid" && "text-white")} />
                         </Button>
                     </div>
@@ -38,7 +38,7 @@ export default function MobileFilterControl({ facets, setViewMode, viewMode }: P
                             viewMode === "list" && "bg-primary"
                         )}
                     >
-                        <Button size="iconOnly" onClick={() => setViewMode("list")}>
+                        <Button size="icon" className="h-auto w-auto hover:bg-transparent" variant="ghost" onClick={() => setViewMode("list")}>
                             <RectangleVertical className={cn("h-6 w-6 text-foreground", viewMode === "list" && "text-white")} />
                         </Button>
                     </div>

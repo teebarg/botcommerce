@@ -127,7 +127,7 @@ const ProductOverview: React.FC<{
                     <button
                         key={idx}
                         className={`w-16 h-16 rounded-md shrink-0 border-2 overflow-hidden relative ${
-                            selectedImageIdx === idx ? "border-indigo-500" : "border-gray-200"
+                            selectedImageIdx === idx ? "border-primary/30" : "border-gray-200"
                         }`}
                         onClick={() => setSelectedImageIdx(idx)}
                     >

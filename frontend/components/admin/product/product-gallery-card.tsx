@@ -29,7 +29,7 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
             className={cn(
                 "group relative overflow-hidden border-0 bg-gradient-to-br from-card to-muted/20 backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer",
                 image.product?.active ? "opacity-100" : "opacity-50 ring-2 ring-red-500",
-                isSelected && "ring-2 ring-indigo-500 ring-offset-2"
+                isSelected && "ring-2 ring-primary/40 ring-offset-2"
             )}
             onClick={selectionMode ? undefined : onClick}
         >

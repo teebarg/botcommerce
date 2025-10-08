@@ -34,12 +34,12 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
     };
 
     return (
-        <div className="relative flex items-center gap-2">
+        <div className="relative flex items-center">
             <Overlay
                 open={editState.isOpen}
                 title="Edit Review"
                 trigger={
-                    <Button size="iconOnly" onClick={editState.open}>
+                    <Button size="icon" onClick={editState.open}>
                         <Pencil className="h-5 w-5" />
                     </Button>
                 }
@@ -48,8 +48,10 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
                 <UpdateReviewForm review={review} onClose={editState.close} />
             </Overlay>
             <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
-                <DialogTrigger>
-                    <Trash2 className="h-5 w-5 text-destructive" />
+                <DialogTrigger asChild>
+                    <Button size="icon" variant="ghost">
+                        <Trash2 className="h-5 w-5 text-destructive" />
+                    </Button>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader className="sr-only">

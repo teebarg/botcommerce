@@ -55,7 +55,7 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
                     className="w-full mt-6"
                     data-testid="magic-link-button"
                     isLoading={loading}
-                    size="md"
+                    size="lg"
                     type="button"
                     onClick={handleEmailSignIn}
                 >

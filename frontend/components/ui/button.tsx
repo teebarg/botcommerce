@@ -21,8 +21,6 @@ const buttonVariants = cva(
                 warning: "bg-warning text-white hover:bg-warning/90",
                 success: "bg-success text-white hover:bg-success/90",
                 emerald: "bg-emerald-700 text-white hover:bg-emerald-800",
-                bordered: "bg-transparent border-2 border-primary text-primary hover:bg-primary-500",
-                indigo: "bg-indigo-500 text-white hover:bg-indigo-600",
                 accent: "bg-accent text-accent-foreground transform hover:scale-105 font-semibold",
                 contrast: "bg-contrast text-contrast-foreground",
             },
@@ -30,11 +28,8 @@ const buttonVariants = cva(
                 default: "h-10 px-4 py-2",
                 xs: "h-7 rounded-md px-2",
                 sm: "h-9 rounded-md px-3",
-                md: "h-11 rounded-md px-8 text-base font-normal min-w-32",
-                lg: "h-12 rounded-md px-8 text-base font-normal min-w-32",
-                xl: "h-14 rounded-lg px-12 text-base",
+                lg: "h-11 rounded-md px-8",
                 icon: "h-10 w-10",
-                iconOnly: "h-auto w-auto bg-transparent hover:bg-transparent border-none",
             },
         },
         defaultVariants: {
@@ -76,7 +71,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 {isLoading ? (
                     <>
                         <Loader className="h-4 w-4 animate-spin" />
-                        {size === "icon" || size === "iconOnly" ? "" : "Loading..."}
+                        {size === "icon" ? "" : "Loading..."}
                     </>
                 ) : (
                     <>

@@ -60,11 +60,6 @@ const SuccessConfirmation: React.FC<OrderConfirmationProps> = ({ order, onContin
 
             <FadeInComponent delay="650ms">
                 <div className="mt-6 space-y-3">
-                    {/* <Button className="w-full px-6 py-3 rounded-xl font-medium bg-indigo-600 text-white hover:bg-indigo-700" onClick={() => {}}>
-                        Track Your Order
-                        <ArrowRight className="ml-2 w-4 h-4" />
-                    </Button> */}
-
                     <Button className="w-full" size="lg" onClick={onContinueShopping}>
                         Continue Shopping
                     </Button>

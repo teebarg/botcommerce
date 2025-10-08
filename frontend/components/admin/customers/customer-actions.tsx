@@ -43,9 +43,9 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
     };
 
     return (
-        <div className="flex gap-2">
+        <div className="flex">
             {user.role !== "ADMIN" && (
-                <Button size="iconOnly" title="Impersonate" onClick={handleUpdateName}>
+                <Button size="icon" variant="ghost" title="Impersonate" onClick={handleUpdateName}>
                     <Eye className="h-5 w-5" />
                 </Button>
             )}
@@ -53,7 +53,7 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
                 open={editState.isOpen}
                 title="Edit Customer"
                 trigger={
-                    <Button size="iconOnly">
+                    <Button size="icon" variant="ghost">
                         <Edit className="h-5 w-5" />
                     </Button>
                 }
@@ -62,8 +62,10 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
                 <CustomerForm user={user} onClose={editState.close} />
             </Overlay>
             <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
-                <DialogTrigger>
-                    <Trash2 className="text-red-500 h-5 w-5 cursor-pointer" />
+                <DialogTrigger asChild>
+                    <Button size="icon" variant="ghost">
+                        <Trash2 className="text-red-500 h-5 w-5 cursor-pointer" />
+                    </Button>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader className="sr-only">

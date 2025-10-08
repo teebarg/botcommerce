@@ -20,7 +20,7 @@ const NotFound: React.FC = async () => {
                     {`We couldn't find the product you're looking for. It might have been removed or is temporarily unavailable.`}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <BtnLink href="/collections" size="lg" variant="bordered">
+                    <BtnLink href="/collections" size="lg">
                         Browse Collections
                         <ArrowUpRightMini className="w-4 h-4" />
                     </BtnLink>
