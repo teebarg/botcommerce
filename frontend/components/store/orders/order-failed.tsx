@@ -69,7 +69,7 @@ const FailedPayment: React.FC<OrderConfirmationProps> = ({ order, onRetry, onCon
 
             <FadeInComponent delay="700ms">
                 <div className="mt-6 space-y-3">
-                    <Button variant="contrast" className="w-full px-6 py-3 rounded-xl transition-colors" onClick={onRetry}>
+                    <Button className="w-full px-6 py-3 rounded-xl transition-colors" variant="contrast" onClick={onRetry}>
                         <CreditCard className="mr-2 w-5 h-5" />
                         Try Payment Again
                     </Button>

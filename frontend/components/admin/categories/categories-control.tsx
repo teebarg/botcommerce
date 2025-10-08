@@ -58,8 +58,8 @@ const CategoryAction: React.FC<Props> = ({ category, index, categoriesLength, on
                 className={cn("", index === 0 ? "opacity-50 cursor-not-allowed" : "")}
                 disabled={index === 0}
                 size="icon"
-                variant="ghost"
                 title="Move up"
+                variant="ghost"
                 onClick={() => onOrderChange?.(category?.id, "up")}
             >
                 <ArrowUpAZ className="h-5 w-5" />
@@ -68,8 +68,8 @@ const CategoryAction: React.FC<Props> = ({ category, index, categoriesLength, on
                 className={cn("", index === (categoriesLength ?? 0) - 1 ? "opacity-50 cursor-not-allowed" : "")}
                 disabled={index === (categoriesLength ?? 0) - 1}
                 size="icon"
-                variant="ghost"
                 title="Move down"
+                variant="ghost"
                 onClick={() => onOrderChange?.(category?.id, "down")}
             >
                 <ArrowDownAZ className="h-5 w-5" />

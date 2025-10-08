@@ -45,7 +45,7 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
     return (
         <div className="flex">
             {user.role !== "ADMIN" && (
-                <Button size="icon" variant="ghost" title="Impersonate" onClick={handleUpdateName}>
+                <Button size="icon" title="Impersonate" variant="ghost" onClick={handleUpdateName}>
                     <Eye className="h-5 w-5" />
                 </Button>
             )}
