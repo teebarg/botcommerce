@@ -2,18 +2,19 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Clock, Search, TrendingUp, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useRouter } from "next/navigation";
+import { useDebounce } from "use-debounce";
+import { useOverlayTriggerState } from "@react-stately/overlays";
+
+import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/store/products/product-card";
 import { ProductSearch } from "@/schemas";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useDebounce } from "use-debounce";
 import { cn } from "@/lib/utils";
 import { useProductSearch } from "@/lib/hooks/useProduct";
 import { Separator } from "@/components/ui/separator";
 import LocalizedClientLink from "@/components/ui/link";
-import { useOverlayTriggerState } from "@react-stately/overlays";
 
 interface SearchDialogProps {
     initialQuery?: string;
@@ -124,8 +125,8 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                                             {data?.suggestions?.map((term: string) => (
                                                 <button
                                                     key={term}
-                                                    onClick={() => handleSuggestionClick(term)}
                                                     className="block w-full text-left text-sm hover:text-primary transition-colors py-1"
+                                                    onClick={() => handleSuggestionClick(term)}
                                                 >
                                                     {term}
                                                 </button>
@@ -142,8 +143,8 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                                 <Separator className="my-4" />
                                 <div className="text-right">
                                     <LocalizedClientLink
-                                        href={`/search/${query}`}
                                         className="inline-block text-left text-sm hover:text-primary transition-colors py-1"
+                                        href={`/search/${query}`}
                                     >
                                         See all products
                                     </LocalizedClientLink>
@@ -167,9 +168,9 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                                         {data?.suggestions?.map((term: string) => (
                                             <Button
                                                 key={term}
+                                                className="rounded-full font-medium text-xs px-4 py-2 h-auto"
                                                 variant="outline"
                                                 onClick={() => handleSuggestionClick(term)}
-                                                className="rounded-full font-medium text-xs px-4 py-2 h-auto"
                                             >
                                                 {term}
                                             </Button>

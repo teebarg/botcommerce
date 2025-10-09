@@ -13,6 +13,7 @@ import { getSiteConfig } from "@/lib/config";
 
 export default async function PageLayout(props: { children: React.ReactNode }) {
     const siteConfig = await getSiteConfig();
+
     return (
         <div className="flex flex-col flex-1">
             <StoreNavbar />
