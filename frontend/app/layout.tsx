@@ -104,8 +104,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <head>
                 <ThemeScript />
                 <link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png" />
-                <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
-                <link href="/favicon.ico" rel="shortcut icon" />
+                <link href="/favicon.ico" rel="icon" type="image/x-icon" />
                 <link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180" />
                 <meta content="Shop" name="apple-mobile-web-app-title" />
                 <meta content="yes" name="apple-mobile-web-app-capable" />

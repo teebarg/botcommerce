@@ -3,7 +3,6 @@
 import React from "react";
 import { signOut } from "next-auth/react";
 
-import ProfileAvatar from "@/public/profile.svg";
 import LocalizedClientLink from "@/components/ui/link";
 import { Session } from "@/schemas";
 import {
@@ -69,7 +68,7 @@ export default function UserDropDown({ user }: { user: Session }) {
         <DropdownMenu>
             <DropdownMenuTrigger>
                 <Avatar>
-                    <AvatarImage alt="@user" src={user.image ?? ProfileAvatar} />
+                    <AvatarImage alt="@user" src={user.image ?? undefined} />
                     <AvatarFallback>{user?.first_name?.[0] + user?.last_name?.[0]}</AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>
