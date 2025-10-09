@@ -8,26 +8,31 @@ import GetApp from "../get-app";
 import UserDropDown from "./user-dropdown";
 
 import { CartComponent } from "@/components/store/cart/cart-component";
-import Search from "@/components/store/search";
 import LocalizedClientLink from "@/components/ui/link";
 import { auth } from "@/auth";
+import { SearchDialog } from "@/components/store/product-search";
+import { getSiteConfig } from "@/lib/config";
 
 const StoreNavbar = async () => {
     const session = await auth();
+    const siteConfig = await getSiteConfig();
 
     return (
-        <NavigationBar className="hidden md:flex bg-background">
+        <NavigationBar className="hidden md:flex bg-background py-2">
             <NavbarContent className="flex flex-1 max-w-8xl mx-auto">
                 <NavbarBrand className="flex items-center font-semibold">
-                    <LocalizedClientLink className="text-3xl block h-12 w-12" href="/">
-                        <img alt="Logo" className="h-full w-full object-contain" src="/icon.png" />
+                    <LocalizedClientLink className="flex items-center gap-1" href="/">
+                        <span className="tracking-tighter font-bold text-2xl uppercase">{siteConfig?.name}</span>
+                        <div className="h-8 w-8">
+                            <img alt="Logo" className="h-full w-full object-contain" src="/icon.png" />
+                        </div>
                     </LocalizedClientLink>
                     <LocalizedClientLink className="hidden md:block" href={"/collections"}>
                         Collections
                     </LocalizedClientLink>
                 </NavbarBrand>
                 <NavbarItem className="hidden md:flex justify-center flex-1">
-                    <Search className="w-full justify-between max-w-lg" />
+                    <SearchDialog />
                 </NavbarItem>
                 <NavbarItem className="flex gap-3 justify-end items-center">
                     <CartComponent />
