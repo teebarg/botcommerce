@@ -10,19 +10,17 @@ import UserDropDown from "./user-dropdown";
 import { CartComponent } from "@/components/store/cart/cart-component";
 import Search from "@/components/store/search";
 import LocalizedClientLink from "@/components/ui/link";
-import { getSiteConfig } from "@/lib/config";
 import { auth } from "@/auth";
 
 const StoreNavbar = async () => {
     const session = await auth();
-    const siteConfig = await getSiteConfig();
 
     return (
         <NavigationBar className="hidden md:flex bg-background">
             <NavbarContent className="flex flex-1 max-w-8xl mx-auto">
                 <NavbarBrand className="flex items-center font-semibold">
-                    <LocalizedClientLink className="text-3xl block" href="/">
-                        {siteConfig?.name}
+                    <LocalizedClientLink className="text-3xl block h-12 w-12" href="/">
+                        <img alt="Logo" className="h-full w-full object-contain" src="/icon.png" />
                     </LocalizedClientLink>
                     <LocalizedClientLink className="hidden md:block" href={"/collections"}>
                         Collections

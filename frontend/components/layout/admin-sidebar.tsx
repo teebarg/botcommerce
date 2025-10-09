@@ -38,7 +38,6 @@ import {
 } from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { useStoreSettings } from "@/providers/store-provider";
 import { UserAvatar } from "@/components/generic/user-avatar";
 import ClientOnly from "@/components/generic/client-only";
 
@@ -133,7 +132,6 @@ const storeItems = [
 
 export function AdminSidebar() {
     const { data: session } = useSession();
-    const { settings } = useStoreSettings();
     const { toggleSidebar, state } = useSidebar();
     const path = usePathname();
 
@@ -143,9 +141,11 @@ export function AdminSidebar() {
                 <SidebarHeader>
                     <SidebarMenu>
                         <SidebarMenuItem>
-                            <SidebarMenuButton>
+                            <SidebarMenuButton className="justify-between">
                                 <PanelLeftIcon onClick={toggleSidebar} />
-                                <p className="ml-2 text-2xl font-semibold">{settings?.shop_name}</p>
+                                <div className="h-8 w-8">
+                                    <img alt="Logo" className="h-full w-full object-contain" src="/icon.png" />
+                                </div>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     </SidebarMenu>
@@ -213,7 +213,7 @@ export function AdminSidebar() {
                                             <UserAvatar />
                                             <div className="flex flex-col">
                                                 <p className="font-semibold">{session?.user?.first_name ?? "User"}</p>
-                                                <p className="text-xs text-gray-600">{session?.user?.email ?? "User"}</p>
+                                                <p className="text-xs text-muted-foreground">{session?.user?.email ?? "User"}</p>
                                             </div>
                                         </div>
                                         <ChevronUp className="ml-auto" />

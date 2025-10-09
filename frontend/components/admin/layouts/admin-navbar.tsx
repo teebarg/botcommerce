@@ -2,14 +2,12 @@ import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from 
 import ThemeToggle from "@lib/theme/theme-button";
 
 import ActivityTray from "@/components/generic/activities/activity-tray";
-import { getSiteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
 import MenuComp from "@/components/layout/admin-mobile-menu-drawer";
 import UserDropDown from "@/components/layout/user-dropdown";
 import { auth } from "@/auth";
 
 const AdminNavbar = async () => {
-    const siteConfig = await getSiteConfig();
     const session = await auth();
 
     return (
@@ -17,7 +15,7 @@ const AdminNavbar = async () => {
             <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
                 <NavbarBrand className="gap-3 max-w-fit hidden sm:block">
                     <LocalizedClientLink href="/admin">
-                        <p className="font-bold text-inherit">{siteConfig.name}</p>
+                        <p className="font-bold text-inherit">Admin</p>
                     </LocalizedClientLink>
                 </NavbarBrand>
                 <MenuComp />
