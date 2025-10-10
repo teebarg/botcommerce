@@ -13,9 +13,10 @@ import { Separator } from "@/components/ui/separator";
 
 interface OrderProcessingActionProps {
     order: Order;
+    hasOutOfStock: boolean;
 }
 
-const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) => {
+const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order, hasOutOfStock }) => {
     const statusConfig: Record<
         "PENDING" | "PROCESSING" | "SHIPPED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELED" | "REFUNDED",
         {
@@ -102,12 +103,20 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
                         <DialogHeader className="sr-only">
                             <DialogTitle>Update Payment Status</DialogTitle>
                         </DialogHeader>
-                        <PaymentStatusManager
-                            currentStatus={order.payment_status}
-                            id={order.id}
-                            orderNumber={order.order_number}
-                            onClose={paymentState.close}
-                        />
+                        {hasOutOfStock ? (
+                            <div className="p-4">
+                                <p className="text-sm text-muted-foreground">
+                                    This order has out of stock items. Please resolve the issue before updating the payment status.
+                                </p>
+                            </div>
+                        ) : (
+                            <PaymentStatusManager
+                                currentStatus={order.payment_status}
+                                id={order.id}
+                                orderNumber={order.order_number}
+                                onClose={paymentState.close}
+                            />
+                        )}
                     </DialogContent>
                 </Dialog>
             )}

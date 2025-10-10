@@ -337,6 +337,7 @@ async def decrement_variant_inventory_for_order(order_id: int, notification=None
                 channel_name="slack",
                 slack_message={"text": slack_text}
             )
+            await invalidate_pattern("orders")
         except Exception as e:
             logger.error(f"Failed to send out-of-stock slack: {e}")
 
