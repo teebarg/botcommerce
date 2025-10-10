@@ -34,16 +34,22 @@ const StoreNavbar = async () => {
                 <NavbarItem className="hidden md:flex justify-center flex-1">
                     <SearchDialog />
                 </NavbarItem>
-                <NavbarItem className="flex gap-3 justify-end items-center">
+                <NavbarItem className="flex gap-1.5 justify-end items-center">
                     <CartComponent />
                     <ThemeButton />
                     <div className="hidden md:flex">
                         {session ? (
-                            <LocalizedClientLink aria-label="go to wishlist" href={"/wishlist"}>
-                                <HeartFilled className="h-8 w-8 text-primary" />
+                            <LocalizedClientLink
+                                aria-label="go to wishlist"
+                                href={"/wishlist"}
+                                className="flex items-center justify-center rounded-md h-10 w-10 hover:bg-accent"
+                            >
+                                <HeartFilled className="h-7 w-7 text-primary" />
                             </LocalizedClientLink>
                         ) : (
-                            <Heart className="h-8 w-8 text-muted-foreground" />
+                            <div className="flex items-center justify-center rounded-md h-10 w-10 hover:bg-accent">
+                                <Heart className="h-7 w-7 text-muted-foreground" />
+                            </div>
                         )}
                     </div>
                     <GetApp />

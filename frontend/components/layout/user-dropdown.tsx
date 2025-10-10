@@ -16,13 +16,18 @@ import {
 import { authApi } from "@/apis/auth";
 import { useInvalidateMe } from "@/lib/hooks/useUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { deleteCookie } from "@/lib/util/cookie";
+import { useInvalidateCart } from "@/lib/hooks/useCart";
 
 export default function UserDropDown({ user }: { user: Session }) {
     const invalidate = useInvalidateMe();
+    const invalidateCart = useInvalidateCart();
     const handleLogout = async () => {
+        deleteCookie("_cart_id");
         await authApi.logOut();
         await signOut();
         invalidate();
+        invalidateCart();
         window.location.href = "/";
     };
 

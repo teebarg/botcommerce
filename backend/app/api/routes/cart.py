@@ -4,11 +4,12 @@ from app.core.utils import generate_id
 from app.models.cart import CartUpdate, CartItemCreate, CartItemResponse, CartResponse
 from fastapi import APIRouter, Header, HTTPException, Request, BackgroundTasks
 from app.prisma_client import prisma as db
-from app.core.deps import TokenUser
+from app.core.deps import TokenUser, UserDep
 from prisma.models import Cart
 from app.services.redis import cache_response, invalidate_key, bust
 from app.core.logging import get_logger
 from app.services.shop_settings import ShopSettingsService
+from prisma.enums import CartStatus
 
 logger = get_logger(__name__)
 
@@ -30,30 +31,40 @@ async def calculate_cart_totals(cart: Cart):
         data={"subtotal": subtotal, "tax": tax, "total": total}
     )
 
+    if cart.user_id:
+        await bust(f"cart:{cart.user_id}")
     await bust(f"cart:{cart.cart_number}")
 
 
-async def get_or_create_cart(cartId: Optional[str]):
+async def get_or_create_cart(cart_number: Optional[str], user_id: Optional[str]):
     """Retrieve an existing cart or create a new one if it doesn't exist"""
-    if not cartId:
-        new_cart_id = generate_id()
-        return await db.cart.create(data={"cart_number": new_cart_id})
+    if user_id:
+        cart = await db.cart.find_first(
+            where={"user_id": user_id, "status": CartStatus.ACTIVE},
+            order={"updated_at": "desc"}
+        )
+        if cart:
+            return cart
 
-    cart = await db.cart.find_unique(where={"cart_number": cartId})
-    if cart is not None:
-        return cart
+    if cart_number:
+        cart = await db.cart.find_unique(where={"cart_number": cart_number})
+        if cart:
+            return cart
 
     new_cart_id = generate_id()
-    return await db.cart.create(data={"cart_number": new_cart_id})
+    return await db.cart.create(data={"cart_number": new_cart_id, "user_id": user_id})
 
 
 @router.post("/items", response_model=CartItemResponse)
 async def add_item_to_cart(
     item_in: CartItemCreate,
+    user: UserDep,
     background_tasks: BackgroundTasks,
     cartId: str = Header(default=None)
 ):
-    cart = await get_or_create_cart(cartId)
+    # print(user)
+    cart = await get_or_create_cart(cart_number=cartId, user_id=user.id if user else None)
+    print(cart)
 
     variant = await db.productvariant.find_unique(
         where={"id": item_in.variant_id},
@@ -92,19 +103,39 @@ async def add_item_to_cart(
         include={"variant": True}
     )
 
-    background_tasks.add_task(calculate_cart_totals, cart)
+    background_tasks.add_task(calculate_cart_totals, cart=cart)
 
     return item
 
 
 @router.get("/", response_model=Optional[CartResponse])
-@cache_response(key_prefix="cart", key=lambda request, cartId, **kwargs: cartId)
-async def get_cart(request: Request, cartId: str = Header()):
+@cache_response(key_prefix="cart", key=lambda request, user, cartId, **kwargs: user.id if user else cartId)
+async def get_cart(request: Request, user: UserDep, cartId: str = Header()):
     """Get a specific cart by ID"""
-    if not cartId:
-        return None
+    include_query = {
+        "items": {"include": {"variant": True}},
+        "shipping_address": True
+    }
 
-    return await db.cart.find_unique(where={"cart_number": cartId}, include={"items": {"include": {"variant": True}}, "shipping_address": True})
+    if user:
+        cart = await db.cart.find_first(
+            where={"user_id": user.id, "status": CartStatus.ACTIVE},
+            order={"updated_at": "desc"},
+            include=include_query
+        )
+        if cart:
+            return cart
+
+    if cartId:
+        cart = await db.cart.find_unique(where={"cart_number": cartId}, include=include_query)
+        if cart:
+            return cart
+
+    new_cart_id = generate_id()
+    return await db.cart.create(
+        data={"cart_number": new_cart_id, "user_id": user.id if user else None},
+        include=include_query
+    )
 
 
 @router.get("/items", response_model=Optional[list[CartItemResponse]])
@@ -183,7 +214,9 @@ async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: st
     if cart_update.shipping_address:
         await invalidate_key(f"addresses:{user.id}")
 
-    await invalidate_key(f"cart:{cartId}")
+    await bust(f"cart:{cartId}")
+    if cart.user_id:
+        await bust(f"cart:{cart.user_id}")
 
     return updated_cart
 
@@ -209,7 +242,9 @@ async def delete_cart_item(item_id: int, cartId: str = Header(default=None)):
             data={"subtotal": subtotal, "tax": tax, "total": total},
         )
 
-    await invalidate_key(f"cart:{cartId}")
+    await bust(f"cart:{cartId}")
+    if cart.user_id:
+        await bust(f"cart:{cart.user_id}")
     return {"message": "Item removed from cart successfully"}
 
 
@@ -234,6 +269,6 @@ async def update_cart_item(item_id: int, quantity: int, background_tasks: Backgr
         include={"variant": True}
     )
 
-    background_tasks.add_task(calculate_cart_totals, cart_item.cart)
+    background_tasks.add_task(calculate_cart_totals, cart=cart_item.cart)
 
     return updated_item
