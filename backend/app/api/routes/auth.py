@@ -165,7 +165,7 @@ async def verify_email(payload: VerifyEmailPayload, cartId: str = Header(default
         }
     )
 
-    await merge_cart(user_id=user.id, cartId=cartId)
+    await merge_cart(user_id=user.id, cart_number=cartId)
 
     try:
         await publish_user_registered(
@@ -333,6 +333,7 @@ async def send_magic_link(
     request: Request,
     background_tasks: BackgroundTasks,
     payload: EmailData,
+    cartId: str = Header(default=None)
 ) -> Message:
     """
     Request a magic link for passwordless authentication.
@@ -377,8 +378,9 @@ async def send_magic_link(
             html_content=email_data.html_content,
         )
 
-    background_tasks.add_task(send_magic_link_email,
-                              user.first_name, email, url)
+    await merge_cart(user_id=user.id, cart_number=cartId)
+
+    background_tasks.add_task(send_magic_link_email, user.first_name, email, url)
 
     return {"message": "If an account exists with this email, you will receive a magic link"}
 
@@ -426,14 +428,14 @@ async def sync_user(request: Request, payload: SyncUserPayload, cartId: str = He
         except Exception as e:
             logger.error(f"Failed to publish USER_REGISTERED event: {e}")
 
-    await merge_cart(user_id=user.id, cartId=cartId)
+    await merge_cart(user_id=user.id, cart_number=cartId)
     return {"message": "User synced successfully"}
 
 
-async def merge_cart(user_id: str, cartId: str | None = None):
-    if not cartId:
+async def merge_cart(user_id: str, cart_number: str | None = None):
+    if not cart_number:
         return
     await db.cart.update(
-        where={"cart_number": cartId},
+        where={"cart_number": cart_number},
         data={"user_id": user_id},
     )

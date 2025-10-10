@@ -62,9 +62,7 @@ async def add_item_to_cart(
     background_tasks: BackgroundTasks,
     cartId: str = Header(default=None)
 ):
-    # print(user)
     cart = await get_or_create_cart(cart_number=cartId, user_id=user.id if user else None)
-    print(cart)
 
     variant = await db.productvariant.find_unique(
         where={"id": item_in.variant_id},
