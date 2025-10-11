@@ -5,4 +5,3 @@ huey = RedisHuey("botcommerce", url=settings.REDIS_URL)
 
 import tasks.product_tasks
 import tasks.sync_tasks
-import tasks.cart_tasks

@@ -1,11 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api } from "@/apis/client";
 import { Cart } from "@/schemas";
 
 interface AbandonedCartParams {
-    status?: string;
     search?: string;
     hours_threshold?: number;
     skip?: number;
@@ -37,7 +36,6 @@ export const useAbandonedCarts = (params: AbandonedCartParams = {}) => {
         queryFn: async () => {
             return await api.get<AbandonedCartResponse>("/cart/abandoned-carts", {
                 params: {
-                    status: params.status,
                     search: params.search,
                     hours_threshold: params.hours_threshold || 24,
                     skip: params.skip || 0,
@@ -58,8 +56,6 @@ export const useAbandonedCartStats = (params: AbandonedCartStatsParams = {}) => 
 };
 
 export const useSendCartReminder = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async (cartId: number) => {
             return await api.post(`/cart/abandoned-carts/${cartId}/send-reminder`);
@@ -74,8 +70,6 @@ export const useSendCartReminder = () => {
 };
 
 export const useSendCartReminders = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async ({ hours_threshold, limit = 20 }: { hours_threshold: number; limit?: number }) => {
             return await api.post(`/cart/abandoned-carts/send-reminders`, {

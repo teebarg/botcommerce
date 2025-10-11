@@ -3,11 +3,11 @@ import { formatDistanceToNow } from "date-fns";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Cart } from "@/schemas";
 import { currency } from "@/lib/utils";
 import { useSendCartReminder } from "@/lib/hooks/useAbandonedCart";
 import { AbandonedCartDetailsDialog } from "./details";
+import { ReminderButton } from "./reminder-button";
 
 interface AbandonedCartCardProps {
     cart: Cart;
@@ -61,6 +61,7 @@ export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
                                         </span>
                                     )}
                                 </div>
+                                <p className="text-sm text-muted-foreground">{cart.cart_number}</p>
                             </div>
                         </div>
 
@@ -115,16 +116,11 @@ export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
                     <div className="flex flex-col justify-between items-end gap-4 min-w-[200px]">
                         <div className="hidden md:block text-right">
                             <div className="text-sm text-muted-foreground mb-1">Cart Value</div>
-                            <div className="text-3xl font-bold text-primary">{currency(cart.total || 0)}</div>
+                            <div className="text-3xl font-bold">{currency(cart.total || 0)}</div>
                         </div>
 
                         <div className="flex flex-col gap-2 w-full">
-                            {cart.status !== "CONVERTED" && (
-                                <Button className="w-full" onClick={handleSendReminder} disabled={sendReminderMutation.isPending}>
-                                    <Mail className="h-4 w-4 mr-2" />
-                                    {sendReminderMutation.isPending ? "Sending..." : "Send Reminder"}
-                                </Button>
-                            )}
+                            {cart.status !== "CONVERTED" && cart.user_id && <ReminderButton id={cart.id} />}
                             <AbandonedCartDetailsDialog cart={cart} />
                         </div>
                     </div>

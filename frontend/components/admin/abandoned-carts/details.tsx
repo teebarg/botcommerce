@@ -1,12 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Mail, MapPin, Clock, Package, Copy, ExternalLink, User, X } from "lucide-react";
+import { MapPin, Clock, Package, Copy, ExternalLink, User, X } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import Overlay from "@/components/overlay";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { Cart } from "@/schemas";
 import { currency } from "@/lib/utils";
+import { ReminderButton } from "./reminder-button";
+import { useInvalidateCart } from "@/lib/hooks/useCart";
+import { useInvalidateMe } from "@/lib/hooks/useUser";
+import { useSession } from "next-auth/react";
 
 interface AbandonedCartDetailsDialogProps {
     cart: Cart | null;
@@ -14,6 +18,10 @@ interface AbandonedCartDetailsDialogProps {
 
 export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogProps) => {
     const state = useOverlayTriggerState({});
+    const { data: session, update } = useSession();
+    const invalidateMe = useInvalidateMe();
+    const invalidateCart = useInvalidateCart();
+
     if (!cart) return null;
 
     const handleCopyEmail = () => {
@@ -21,9 +29,12 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
         toast.success("Email copied to clipboard");
     };
 
-    const handleSendReminder = () => {
-        toast.success(`Recovery email sent to ${cart?.user?.first_name} ${cart?.user?.last_name}`);
-        state.close();
+    const handleImpersonation = async () => {
+        await update({ impersonatedBy: session?.user?.email!, email: cart?.user?.email!, impersonated: true, mode: "impersonate" });
+        invalidateMe();
+        invalidateCart();
+        toast.success("Impersonated");
+        window.location.reload();
     };
 
     return (
@@ -32,7 +43,11 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
             open={state.isOpen}
             onOpenChange={state.setOpen}
             title="Cart Details"
-            trigger={<Button variant="contrast" onClick={state.open}>View Details</Button>}
+            trigger={
+                <Button variant="contrast" onClick={state.open}>
+                    View Details
+                </Button>
+            }
         >
             <div className="max-w-4xl px-2 overflow-y-auto">
                 <div className="-mx-2 px-2 py-6 bg-background sticky top-0 z-10">
@@ -41,12 +56,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                             <User className="h-5 w-5" />
                             Customer Information
                         </h3>
-                        {cart.status !== "CONVERTED" && (
-                            <Button onClick={handleSendReminder}>
-                                <Mail className="h-4 w-4 mr-2" />
-                                Send Recovery Email
-                            </Button>
-                        )}
+                        {cart.status !== "CONVERTED" && <ReminderButton id={cart.id} />}
                     </div>
                 </div>
 
@@ -55,29 +65,41 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg border bg-gradient-to-br from-contrast/5 to-primary/5">
                             <div className="space-y-1">
                                 <p className="text-sm text-muted-foreground">Name</p>
-                                <p className="font-medium">
-                                    {cart?.user?.first_name} {cart?.user?.last_name}
-                                </p>
+                                {cart?.user?.first_name ? (
+                                    <p className="font-medium">
+                                        {cart?.user?.first_name} {cart?.user?.last_name}
+                                    </p>
+                                ) : (
+                                    <p className="font-medium">Guest</p>
+                                )}
                             </div>
                             <div className="space-y-1">
                                 <p className="text-sm text-muted-foreground">Email</p>
-                                <div className="flex items-center gap-2">
-                                    <p className="font-medium">{cart?.user?.email}</p>
-                                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleCopyEmail}>
-                                        <Copy className="h-3 w-3" />
-                                    </Button>
-                                </div>
+                                {cart?.user?.email ? (
+                                    <div className="flex items-center gap-2">
+                                        <p className="font-medium">{cart?.user?.email}</p>
+                                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleCopyEmail}>
+                                            <Copy className="h-3 w-3" />
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <p className="font-medium">N/A</p>
+                                )}
                             </div>
                             <div className="space-y-1">
                                 <p className="text-sm text-muted-foreground">Location</p>
-                                <p className="font-medium flex items-center gap-1.5">
-                                    <MapPin className="h-4 w-4" />
-                                    {cart?.user?.addresses?.[0]?.city}
-                                </p>
+                                {cart?.user?.addresses?.[0] ? (
+                                    <p className="font-medium flex items-center gap-1.5">
+                                        <MapPin className="h-4 w-4" />
+                                        {cart?.user?.addresses?.[0]?.city}
+                                    </p>
+                                ) : (
+                                    <p className="font-medium">N/A</p>
+                                )}
                             </div>
                             <div className="space-y-1">
-                                <p className="text-sm text-muted-foreground">Cart ID</p>
-                                <p className="font-medium font-mono text-sm">{cart.id}</p>
+                                <p className="text-sm text-muted-foreground">Cart Number</p>
+                                <p className="font-medium font-mono text-sm">{cart.cart_number}</p>
                             </div>
                         </div>
                     </div>
@@ -100,7 +122,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                                         <p className="text-sm text-muted-foreground mb-2">Quantity: {item.quantity}</p>
                                         <div className="flex items-center justify-between">
                                             <p className="text-sm font-medium">{currency(item.price)}</p>
-                                            <p className="font-semibold text-primary">{currency(item.price * item.quantity)}</p>
+                                            <p className="font-semibold">{currency(item.price * item.quantity)}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -112,7 +134,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                                 <span className="font-medium">{currency(cart.subtotal)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Tax (10%)</span>
+                                <span className="text-muted-foreground">Tax</span>
                                 <span className="font-medium">{currency(cart.tax)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
@@ -122,16 +144,13 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                             <Separator />
                             <div className="flex justify-between items-center">
                                 <span className="font-semibold">Total</span>
-                                <span className="text-2xl font-bold text-primary">
-                                    {currency(cart.total)}
-                                </span>
+                                <span className="text-2xl font-bold">{currency(cart.total)}</span>
                             </div>
                         </div>
                     </div>
 
                     <Separator />
 
-                    {/* Timeline & Recovery Info */}
                     <div className="space-y-4 mb-4">
                         <h3 className="font-semibold text-lg flex items-center gap-2">
                             <Clock className="h-5 w-5" />
@@ -157,26 +176,17 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                                         {cart.recoveryAttempts === 0 ? "No emails sent yet" : "emails sent"}
                                     </p>
                                 </div> */}
-
-                            {/* {cart.lastEmailSent && (
-                                    <div className="p-4 rounded-lg border bg-card">
-                                        <div className="flex items-center gap-2 mb-2 text-muted-foreground">
-                                            <TrendingUp className="h-4 w-4" />
-                                            <span className="text-sm">Last Contact</span>
-                                        </div>
-                                        <p className="font-medium">{formatDistanceToNow(new Date(cart.lastEmailSent), { addSuffix: true })}</p>
-                                        <p className="text-xs text-muted-foreground mt-1">{new Date(cart.lastEmailSent).toLocaleString()}</p>
-                                    </div>
-                                )} */}
                         </div>
                     </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t -mx-2 px-2 py-4 bg-background sticky bottom-0">
-                    <Button variant="contrast">
-                        <ExternalLink className="h-4 w-4" />
-                        Impersonate
-                    </Button>
+                    {cart?.user?.email && (
+                        <Button variant="contrast" onClick={handleImpersonation}>
+                            <ExternalLink className="h-4 w-4" />
+                            Impersonate
+                        </Button>
+                    )}
                     <Button variant="outline" onClick={() => state.close()}>
                         <X className="h-4 w-4" />
                         Close

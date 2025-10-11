@@ -13,10 +13,10 @@ type SearchParams = Promise<{ callbackUrl?: string }>;
 export default async function SignIn({ searchParams }: { searchParams: SearchParams }) {
     const session = await auth();
 
-    const SP = await searchParams;
+    const sP = await searchParams;
 
-    if (session?.user && SP.callbackUrl) {
-        redirect(SP.callbackUrl);
+    if (session?.user && sP.callbackUrl) {
+        redirect(sP.callbackUrl ?? "/");
     }
 
     return <SignInPage />;

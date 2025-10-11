@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AbandonedCartCard } from "@/components/admin/abandoned-carts/card";
-import { Search, ArrowLeft } from "lucide-react";
-import LocalizedClientLink from "@/components/ui/link";
+import { Search } from "lucide-react";
 import { Cart } from "@/schemas";
 import { useAbandonedCarts, useAbandonedCartStats, useSendCartReminders } from "@/lib/hooks/useAbandonedCart";
 import ComponentLoader from "@/components/component-loader";
@@ -18,11 +17,10 @@ import { AbandonedCartStats } from "@/components/admin/abandoned-carts/stat";
 const LIMIT = 20;
 
 const AdminAbandonedCarts = () => {
-    const [searchQuery, setSearchQuery] = useState("");
-    const [timeFilter, setTimeFilter] = useState("24");
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [timeFilter, setTimeFilter] = useState<string>("24");
 
     const searchParams = useSearchParams();
-    const status = searchParams.get("status") as string;
     const { mutate: sendReminders, isPending: sendRemindersLoading } = useSendCartReminders();
 
     const { data: stats, isLoading: statsLoading } = useAbandonedCartStats({
@@ -30,7 +28,6 @@ const AdminAbandonedCarts = () => {
     });
 
     const { data: abandonedCartsData, isLoading: abandonedCartsLoading } = useAbandonedCarts({
-        status: status || undefined,
         search: searchQuery || undefined,
         hours_threshold: parseInt(timeFilter),
         skip: Number(searchParams.get("skip")) || 0,
