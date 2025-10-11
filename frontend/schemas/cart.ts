@@ -18,30 +18,35 @@ export const CartItemSchema = z
     })
     .merge(AuditSchema);
 
-export const CartSchema = z.object({
-    id: z.number(),
-    cart_number: z.string(),
-    user_id: z.number(),
-    email: z.string().email(),
-    status: z.enum(["pending", "processing", "fulfilled"]).optional(),
-    items: z.array(CartItemSchema),
-    checkout_step: z.enum(["address", "delivery", "payment"]).default("address").optional(),
-    subtotal: z.number(),
-    tax: z.number(),
-    shipping_fee: z.number(),
-    discount_total: z.number(),
-    discounts: z.any().optional(),
-    total: z.number(),
-    billing_address: AddressSchema,
-    shipping_address_id: z.number(),
-    shipping_address: AddressSchema,
-    shipping_method: ShippingMethodSchema,
-    payment_method: PaymentMethodSchema,
-    gift_cards: z.any(),
-});
+export const CartStatusSchema = z.enum(["ACTIVE", "ABANDONED", "CONVERTED"]).optional();
+
+export const CartSchema = z
+    .object({
+        id: z.number(),
+        cart_number: z.string(),
+        user_id: z.number().optional(),
+        email: z.string().email().optional(),
+        status: CartStatusSchema,
+        items: z.array(CartItemSchema),
+        checkout_step: z.enum(["address", "delivery", "payment"]).default("address").optional(),
+        subtotal: z.number(),
+        tax: z.number(),
+        shipping_fee: z.number(),
+        discount_total: z.number(),
+        discounts: z.any().optional(),
+        total: z.number(),
+        billing_address: AddressSchema.optional(),
+        shipping_address_id: z.number().optional(),
+        shipping_address: AddressSchema.optional(),
+        shipping_method: ShippingMethodSchema.optional(),
+        payment_method: PaymentMethodSchema.optional(),
+        gift_cards: z.any().optional(),
+    })
+    .merge(AuditSchema);
 
 export type CartItem = z.infer<typeof CartItemSchema>;
 export type Cart = z.infer<typeof CartSchema>;
+export type CartStatus = z.infer<typeof CartStatusSchema>;
 
 export type CartUpdate = {
     status?: CartStatus;

@@ -104,6 +104,11 @@ const storeItems = [
         icon: Image,
     },
     {
+        title: "Abandoned Carts",
+        url: "/admin/abandoned-carts",
+        icon: Image,
+    },
+    {
         title: "Orders",
         url: "/admin/orders",
         icon: ClipboardList,
