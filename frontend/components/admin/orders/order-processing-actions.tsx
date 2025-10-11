@@ -80,6 +80,7 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
     const stateState = useOverlayTriggerState({});
     const paymentState = useOverlayTriggerState({});
     const config = statusConfig[order.status];
+    const hasOutOfStock = order.order_items.some((item) => item.variant?.inventory < 1);
 
     const { mutateAsync: changeOrderStatus, isPending } = useChangeOrderStatus();
 
@@ -102,12 +103,20 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
                         <DialogHeader className="sr-only">
                             <DialogTitle>Update Payment Status</DialogTitle>
                         </DialogHeader>
-                        <PaymentStatusManager
-                            currentStatus={order.payment_status}
-                            id={order.id}
-                            orderNumber={order.order_number}
-                            onClose={paymentState.close}
-                        />
+                        {hasOutOfStock ? (
+                            <div className="p-4">
+                                <p className="text-sm text-muted-foreground">
+                                    This order has out of stock items. Please resolve the issue before updating the payment status.
+                                </p>
+                            </div>
+                        ) : (
+                            <PaymentStatusManager
+                                currentStatus={order.payment_status}
+                                id={order.id}
+                                orderNumber={order.order_number}
+                                onClose={paymentState.close}
+                            />
+                        )}
                     </DialogContent>
                 </Dialog>
             )}

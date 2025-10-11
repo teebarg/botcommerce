@@ -38,7 +38,7 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
         await update({ impersonatedBy: session?.user?.email!, email: user.email, impersonated: true, mode: "impersonate" });
         invalidateMe();
         invalidateCart();
-        toast.success("Exited impersonation");
+        toast.success("Impersonated");
         window.location.reload();
     };
 

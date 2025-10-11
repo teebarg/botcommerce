@@ -322,7 +322,7 @@ async def process_stream_id(stream_id: str, request: Request):
         raise HTTPException(status_code=404, detail="Message not found")
 
     msg_id, data = msgs[0]
-    print(f"📦 Received message: {msg_id} -> {data}")
+    logger.info(f"📦 Received message: {msg_id} -> {data}")
     
     try:
        await consumer.process_stream(msg_id=msg_id, data=data)

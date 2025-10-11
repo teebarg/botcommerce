@@ -6,11 +6,17 @@ import { deleteCookie, setCookie } from "@/lib/util/cookie";
 import { Cart, CartComplete, CartUpdate, Order, Message } from "@/schemas";
 import { api } from "@/apis/client";
 
-export const useCart = () => {
+export const useMyCart = () => {
     return useQuery({
         queryKey: ["cart"],
         queryFn: async () => {
-            return await api.get<Cart>("/cart/");
+            const res = await api.get<Cart>("/cart/");
+
+            if (res.cart_number) {
+                await setCookie("_cart_id", res.cart_number);
+            }
+
+            return res;
         },
     });
 };
@@ -37,7 +43,7 @@ export const useAddToCart = () => {
                 queryClient.setQueryData<Cart>(["cart"], (old) => {
                     if (!old) return old;
 
-                    const existingItemIndex = old.items.findIndex((item) => item.variant_id === variant_id);
+                    const existingItemIndex = old?.items?.findIndex((item) => item.variant_id === variant_id);
 
                     if (existingItemIndex >= 0) {
                         const updatedItems = [...old.items];
@@ -147,7 +153,6 @@ export const useDeleteCartItem = () => {
 };
 
 export const useCompleteCart = () => {
-    const queryClient = useQueryClient();
     const router = useRouter();
 
     return useMutation({
@@ -159,7 +164,6 @@ export const useCompleteCart = () => {
         onSuccess: async (data) => {
             await deleteCookie("_cart_id");
             router.push(`/order/confirmed/${data?.order_number}`);
-            queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Order placed successfully");
         },
         onError: (error: any) => {
@@ -170,6 +174,8 @@ export const useCompleteCart = () => {
 
 export const useInvalidateCart = () => {
     const queryClient = useQueryClient();
+
+    deleteCookie("_cart_id");
 
     const invalidate = () => {
         queryClient.removeQueries({ queryKey: ["cart"] });

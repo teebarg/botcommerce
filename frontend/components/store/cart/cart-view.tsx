@@ -61,7 +61,7 @@ const CartView: React.FC<Props> = () => {
                         </div>
                     </div>
                     <div className="px-2 mt-4">
-                        <p className="text:sm md:text-lg font-semibold">More to love88</p>
+                        <p className="text:sm md:text-lg font-semibold">More to love</p>
                         <RecommendedProducts exclude={product_ids} />
                     </div>
                 </div>

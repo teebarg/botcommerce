@@ -31,8 +31,8 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
                 </div>
 
                 {cart?.items?.length && (
-                    <p className="bg-secondary text-foreground p-2 rounded flex gap-2 mx-4 mt-4" data-testid="miniBag-urgentMessage-read">
-                        <Info className="text-muted-foreground" />
+                    <p className="bg-contrast/10 text-contrast p-2 rounded flex gap-2 mx-4 mt-4" data-testid="miniBag-urgentMessage-read">
+                        <Info />
                         <span className="text-sm">
                             <span className="font-semibold">{`Your items aren’t reserved`}</span>,{" "}
                             {`checkout quickly to make sure you don’t miss out.`}

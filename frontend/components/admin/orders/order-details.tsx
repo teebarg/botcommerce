@@ -27,6 +27,7 @@ import { useReturnOrderItem } from "@/lib/hooks/useOrder";
 import { currency, formatDate } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Confirm } from "@/components/generic/confirm";
+import { Badge } from "@/components/ui/badge";
 
 interface OrderDetailsProps {
     order: Order;
@@ -89,10 +90,15 @@ const OrderItemCard: React.FC<{ orderItem: OrderItem; orderId: number }> = ({ or
             <div className="grow">
                 <h3 className="text-sm font-medium">{orderItem.name}</h3>
                 <p className="text-sm text-muted-foreground">SKU: {orderItem.variant_id}</p>
-                <div className="mt-1 flex flex-col gap-2">
+                <div className="mt-1 space-y-2">
                     <div className="flex items-center text-sm text-muted-foreground">
                         <span>Qty: {orderItem.quantity}</span>
                     </div>
+                    {orderItem.variant?.inventory < 1 && (
+                        <Badge variant="destructive">
+                            <span>Out of stock</span>
+                        </Badge>
+                    )}
                     <div className="font-semibold">{currency(orderItem.price)}</div>
                 </div>
             </div>

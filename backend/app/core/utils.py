@@ -92,7 +92,6 @@ async def merge_metadata(metadata: Optional[dict[str, Any]] = {}) -> dict[str, A
 
 
 def render_email_template(*, template_name: str, context: dict[str, Any]) -> str:
-    # Set up Jinja2 environment and add the custom filter
     template_path = Path(__file__).parent.parent / "email-templates" / "build"
     env = Environment(loader=FileSystemLoader(template_path))
     env.filters["naira"] = format_naira
@@ -451,3 +450,19 @@ async def generate_verification_email(email_to: str, first_name: str, verificati
         },
     )
     return EmailData(html_content=html_content, subject="Verify Your Email")
+
+
+async def generate_abandoned_cart_email(cart_data: dict, user_email: str, user_name: str = None) -> EmailData:
+    """Generate abandoned cart reminder email"""
+    html_content = render_email_template(
+        template_name="abandoned_cart.html",
+        context={
+            "user_name": user_name or "Customer",
+            "user_email": user_email,
+            "cart": cart_data,
+            "cart_link": f"{settings.FRONTEND_HOST}/cart",
+            "current_year": datetime.now().year,
+            **(await merge_metadata({"description": "Complete your purchase"}))
+        },
+    )
+    return EmailData(html_content=html_content, subject="Don't forget your items!")
