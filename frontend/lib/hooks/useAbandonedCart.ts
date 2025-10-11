@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api } from "@/apis/client";
-import { Cart, CartStatus } from "@/schemas";
+import { Cart } from "@/schemas";
 
 interface AbandonedCartParams {
     status?: string;
@@ -12,14 +12,15 @@ interface AbandonedCartParams {
     limit?: number;
 }
 
+interface AbandonedCartStatsParams {
+    hours_threshold?: number;
+}
+
 interface AbandonedCartStats {
     active_count: number;
     abandoned_count: number;
     converted_count: number;
-    total_abandoned_value: number;
-    recovery_rate: number;
-    recovered_last_30_days: number;
-    total_abandoned_last_30_days: number;
+    potential_revenue: number;
 }
 
 interface AbandonedCartResponse {
@@ -34,24 +35,24 @@ export const useAbandonedCarts = (params: AbandonedCartParams = {}) => {
     return useQuery({
         queryKey: ["abandoned-carts", params],
         queryFn: async () => {
-            return await api.get<AbandonedCartResponse>("/cart/admin/abandoned-carts", {
+            return await api.get<AbandonedCartResponse>("/cart/abandoned-carts", {
                 params: {
                     status: params.status,
                     search: params.search,
                     hours_threshold: params.hours_threshold || 24,
                     skip: params.skip || 0,
-                    limit: params.limit || 20
-                }
+                    limit: params.limit || 20,
+                },
             });
         },
     });
 };
 
-export const useAbandonedCartStats = () => {
+export const useAbandonedCartStats = (params: AbandonedCartStatsParams = {}) => {
     return useQuery({
-        queryKey: ["abandoned-cart-stats"],
+        queryKey: ["abandoned-carts", "stats", params],
         queryFn: async () => {
-            return await api.get<AbandonedCartStats>("/cart/admin/abandoned-carts/stats");
+            return await api.get<AbandonedCartStats>(`/cart/abandoned-carts/stats?hours_threshold=${params.hours_threshold}`);
         },
     });
 };
@@ -61,12 +62,10 @@ export const useSendCartReminder = () => {
 
     return useMutation({
         mutationFn: async (cartId: number) => {
-            return await api.post(`/cart/admin/abandoned-carts/${cartId}/send-reminder`);
+            return await api.post(`/cart/abandoned-carts/${cartId}/send-reminder`);
         },
-        onSuccess: (data, cartId) => {
-            queryClient.invalidateQueries({ queryKey: ["abandoned-carts"] });
-            queryClient.invalidateQueries({ queryKey: ["abandoned-cart-stats"] });
-            toast.success(`Recovery email sent to ${data.email}`);
+        onSuccess: () => {
+            toast.success("Recovery email sent");
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to send recovery email");
@@ -74,20 +73,21 @@ export const useSendCartReminder = () => {
     });
 };
 
-export const useUpdateCartStatus = () => {
+export const useSendCartReminders = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ cartId, status }: { cartId: number; status: CartStatus }) => {
-            return await api.patch(`/cart/admin/abandoned-carts/${cartId}/status`, { status });
+        mutationFn: async ({ hours_threshold, limit = 20 }: { hours_threshold: number; limit?: number }) => {
+            return await api.post(`/cart/abandoned-carts/send-reminders`, {
+                hours_threshold,
+                limit,
+            });
         },
-        onSuccess: (data, { cartId, status }) => {
-            queryClient.invalidateQueries({ queryKey: ["abandoned-carts"] });
-            queryClient.invalidateQueries({ queryKey: ["abandoned-cart-stats"] });
-            toast.success(`Cart status updated to ${status}`);
+        onSuccess: () => {
+            toast.success("Recovery email sent");
         },
         onError: (error: any) => {
-            toast.error(error.message || "Failed to update cart status");
+            toast.error(error.message || "Failed to send recovery email");
         },
     });
 };

@@ -1,5 +1,6 @@
 from typing import Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from pydantic import BaseModel
 
 from app.core.utils import generate_id, generate_abandoned_cart_email, send_email
 from app.models.cart import CartUpdate, CartItemCreate, CartItemResponse, CartResponse
@@ -7,7 +8,7 @@ from fastapi import APIRouter, Header, HTTPException, Request, BackgroundTasks, 
 from app.prisma_client import prisma as db
 from app.core.deps import TokenUser, UserDep, get_current_superuser
 from prisma.models import Cart
-from app.services.redis import cache_response, invalidate_key, bust
+from app.services.redis import cache_response, invalidate_key, bust, invalidate_pattern
 from app.core.logging import get_logger
 from app.services.shop_settings import ShopSettingsService
 from prisma.enums import CartStatus
@@ -35,6 +36,7 @@ async def calculate_cart_totals(cart: Cart):
     if cart.user_id:
         await bust(f"cart:{cart.user_id}")
     await bust(f"cart:{cart.cart_number}")
+    await invalidate_pattern("abandoned-carts")
 
 
 async def get_or_create_cart(cart_number: Optional[str], user_id: Optional[str]):
@@ -216,6 +218,7 @@ async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: st
     await bust(f"cart:{cartId}")
     if cart.user_id:
         await bust(f"cart:{cart.user_id}")
+    await invalidate_pattern("abandoned-carts")
 
     return updated_cart
 
@@ -244,6 +247,7 @@ async def delete_cart_item(item_id: int, cartId: str = Header(default=None)):
     await bust(f"cart:{cartId}")
     if cart.user_id:
         await bust(f"cart:{cart.user_id}")
+    await invalidate_pattern("abandoned-carts")
     return {"message": "Item removed from cart successfully"}
 
 
@@ -276,7 +280,6 @@ async def update_cart_item(item_id: int, quantity: int, background_tasks: Backgr
 async def send_abandoned_cart_reminder(cart_id: int):
     """Background task to send abandoned cart reminder email"""
     try:
-        # Get cart with user and items
         cart = await db.cart.find_unique(
             where={"id": cart_id},
             include={
@@ -307,15 +310,15 @@ async def send_abandoned_cart_reminder(cart_id: int):
             logger.warning(f"Cart {cart_id} has no email address, skipping email")
             return
 
-        # Prepare cart data for email template
         cart_data = {
             "id": cart.id,
             "cart_number": cart.cart_number,
+            "email": cart.email or cart.user.email,
             "total": cart.total,
             "subtotal": cart.subtotal,
             "tax": cart.tax,
             "shipping_fee": cart.shipping_fee,
-            "items": [
+            "cart_items": [
                 {
                     "name": item.name,
                     "quantity": item.quantity,
@@ -329,7 +332,6 @@ async def send_abandoned_cart_reminder(cart_id: int):
             "updated_at": cart.updated_at
         }
 
-        # Generate and send email
         email_data = await generate_abandoned_cart_email(
             cart_data=cart_data,
             user_email=cart.email or cart.user.email,
@@ -348,11 +350,15 @@ async def send_abandoned_cart_reminder(cart_id: int):
         logger.error(f"Failed to send abandoned cart reminder for cart {cart_id}: {str(e)}")
 
 
-@router.post("/send-abandoned-cart-reminders")
+class SendAbandonedCartReminders(BaseModel):
+    hours_threshold: int
+    limit: int = 50
+
+
+@router.post("/abandoned-carts/send-reminders")
 async def send_abandoned_cart_reminders(
     background_tasks: BackgroundTasks,
-    hours_threshold: int = 24,
-    limit: int = 50
+    data: SendAbandonedCartReminders
 ):
     """
     Send reminder emails to users with abandoned carts.
@@ -362,24 +368,14 @@ async def send_abandoned_cart_reminders(
         limit: Maximum number of carts to process (default: 50)
     """
     try:
-        # Calculate the threshold time
-        threshold_time = datetime.utcnow() - timedelta(hours=hours_threshold)
-
-        # Find abandoned carts
+        threshold_time = datetime.now(timezone.utc) - timedelta(hours=data.hours_threshold)
         abandoned_carts = await db.cart.find_many(
             where={
-                "status": CartStatus.ACTIVE,
-                "updated_at": {"lt": threshold_time},
+                "status": {"in": [CartStatus.ACTIVE, CartStatus.ABANDONED]},
+                "updated_at": {"gt": threshold_time},
                 "user_id": {"not": None},
-                "OR": [
-                    {"user": {"email": {"not": None}}}  # User has email
-                ]
             },
-            include={
-                "user": True,
-                "items": True
-            },
-            take=limit,
+            take=data.limit,
             order={"updated_at": "asc"}
         )
 
@@ -387,7 +383,7 @@ async def send_abandoned_cart_reminders(
             return {
                 "message": "No abandoned carts found",
                 "carts_processed": 0,
-                "threshold_hours": hours_threshold
+                "threshold_hours": data.hours_threshold
             }
 
         for cart in abandoned_carts:
@@ -398,18 +394,7 @@ async def send_abandoned_cart_reminders(
         return {
             "message": f"Abandoned cart reminders queued successfully",
             "carts_processed": len(abandoned_carts),
-            "threshold_hours": hours_threshold,
-            "carts": [
-                {
-                    "cart_id": cart.id,
-                    "cart_number": cart.cart_number,
-                    "user_email": cart.email or cart.user.email if cart.user else None,
-                    "total": cart.total,
-                    "items_count": len(cart.items),
-                    "last_updated": cart.updated_at
-                }
-                for cart in abandoned_carts
-            ]
+            "threshold_hours": data.hours_threshold,
         }
 
     except Exception as e:
@@ -420,108 +405,10 @@ async def send_abandoned_cart_reminders(
         )
 
 
-@router.post("/mark-cart-abandoned/{cart_number}")
-async def mark_cart_abandoned(cart_number: str):
-    """Mark a specific cart as abandoned"""
-    try:
-        cart = await db.cart.find_unique(where={"cart_number": cart_number})
-        if not cart:
-            raise HTTPException(status_code=404, detail="Cart not found")
-
-        updated_cart = await db.cart.update(
-            where={"cart_number": cart_number},
-            data={"status": CartStatus.ABANDONED}
-        )
-
-        await bust(f"cart:{cart_number}")
-        if cart.user_id:
-            await bust(f"cart:{cart.user_id}")
-
-        return {
-            "message": "Cart marked as abandoned",
-            "cart_number": cart_number,
-            "status": updated_cart.status
-        }
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Failed to mark cart {cart_number} as abandoned: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to mark cart as abandoned: {str(e)}"
-        )
-
-
-@router.get("/abandoned-carts")
-async def get_abandoned_carts(
-    hours_threshold: int = 24,
-    limit: int = 20
-):
-    """
-    Get list of abandoned carts without sending emails.
-    Useful for testing and monitoring.
-    """
-    try:
-        threshold_time = datetime.utcnow() - timedelta(hours=hours_threshold)
-
-        abandoned_carts = await db.cart.find_many(
-            where={
-                "status": CartStatus.ACTIVE,
-                "updated_at": {"lt": threshold_time},
-                "user_id": {"not": None},
-                "OR": [
-                    {"email": {"not": None}},
-                    {"user": {"email": {"not": None}}}
-                ]
-            },
-            include={
-                "user": True,
-                "items": True
-            },
-            take=limit,
-            order={"updated_at": "asc"}
-        )
-
-        return {
-            "message": f"Found {len(abandoned_carts)} abandoned carts",
-            "threshold_hours": hours_threshold,
-            "carts": [
-                {
-                    "cart_id": cart.id,
-                    "cart_number": cart.cart_number,
-                    "user_email": cart.email or cart.user.email if cart.user else None,
-                    "user_name": cart.user.first_name or cart.user.username if cart.user else None,
-                    "total": cart.total,
-                    "items_count": len(cart.items),
-                    "last_updated": cart.updated_at,
-                    "items": [
-                        {
-                            "name": item.name,
-                            "quantity": item.quantity,
-                            "price": item.price
-                        }
-                        for item in cart.items
-                    ]
-                }
-                for cart in abandoned_carts
-            ]
-        }
-
-    except Exception as e:
-        logger.error(f"Failed to get abandoned carts: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to get abandoned carts: {str(e)}"
-        )
-
-
-# Admin endpoints for abandoned carts
-@router.get("/admin/abandoned-carts", dependencies=[Depends(get_current_superuser)])
-@cache_response(key_prefix="admin-abandoned-carts")
+@router.get("/abandoned-carts", dependencies=[Depends(get_current_superuser)])
+@cache_response(key_prefix="abandoned-carts")
 async def get_admin_abandoned_carts(
     request: Request,
-    status: Optional[str] = None,
     search: Optional[str] = None,
     hours_threshold: int = 24,
     skip: int = 0,
@@ -531,45 +418,21 @@ async def get_admin_abandoned_carts(
     Get abandoned carts for admin dashboard with filtering and pagination.
     """
     try:
-        # Build where clause
-        where_clause = {}
+        where_clause = {"status": {"in": [CartStatus.ACTIVE, CartStatus.ABANDONED]}}
+        threshold_time = datetime.now(timezone.utc) - timedelta(hours=hours_threshold)
+        where_clause["updated_at"] = {"gt": threshold_time}
 
-        if status:
-            where_clause["status"] = CartStatus(status)
-        else:
-            # Default: get both ACTIVE and ABANDONED carts
-            where_clause["status"] = {"in": [CartStatus.ACTIVE, CartStatus.ABANDONED]}
-
-        # Add time filter for active carts
-        if status == "ACTIVE" or not status:
-            threshold_time = datetime.utcnow() - timedelta(hours=hours_threshold)
-            where_clause["OR"] = [
-                {"status": CartStatus.ABANDONED},  # Always include abandoned
-                {
-                    "status": CartStatus.ACTIVE,
-                    "updated_at": {"lt": threshold_time}
-                }
-            ]
-
-        # Add search filter
         if search:
             search_clause = {
                 "OR": [
-                    {"cart_number": {"contains": search, "mode": "insensitive"}},
                     {"email": {"contains": search, "mode": "insensitive"}},
                     {"user": {"first_name": {"contains": search, "mode": "insensitive"}}},
                     {"user": {"last_name": {"contains": search, "mode": "insensitive"}}},
                     {"user": {"email": {"contains": search, "mode": "insensitive"}}}
                 ]
             }
-            if "OR" in where_clause:
-                # Combine with existing OR clause
-                where_clause["AND"] = [where_clause, search_clause]
-                del where_clause["OR"]
-            else:
-                where_clause.update(search_clause)
+            where_clause.update(search_clause)
 
-        # Only include carts with items
         where_clause["items"] = {"some": {}}
 
         carts = await db.cart.find_many(
@@ -590,8 +453,6 @@ async def get_admin_abandoned_carts(
                         }
                     }
                 },
-                "shipping_address": True,
-                "billing_address": True
             }
         )
 
@@ -613,7 +474,7 @@ async def get_admin_abandoned_carts(
         )
 
 
-@router.post("/admin/abandoned-carts/{cart_id}/send-reminder", dependencies=[Depends(get_current_superuser)])
+@router.post("/abandoned-carts/{cart_id}/send-reminder", dependencies=[Depends(get_current_superuser)])
 async def send_cart_reminder(
     cart_id: int,
     background_tasks: BackgroundTasks
@@ -623,39 +484,17 @@ async def send_cart_reminder(
     """
     try:
         cart = await db.cart.find_unique(
-            where={"id": cart_id},
-            include={
-                "user": True,
-                "items": {
-                    "include": {
-                        "variant": {
-                            "include": {
-                                "product": {
-                                    "include": {"images": True}
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            where={"id": cart_id, "user_id": {"not": None}},
         )
 
         if not cart:
             raise HTTPException(status_code=404, detail="Cart not found")
 
-        if not cart.user and not cart.email:
-            raise HTTPException(
-                status_code=400,
-                detail="Cart has no associated user or email address"
-            )
-
-        # Queue the email task
         background_tasks.add_task(send_abandoned_cart_reminder, cart.id)
 
         return {
             "message": "Recovery email queued successfully",
             "cart_id": cart_id,
-            "email": cart.email or cart.user.email if cart.user else None
         }
 
     except HTTPException:
@@ -668,115 +507,53 @@ async def send_cart_reminder(
         )
 
 
-@router.patch("/admin/abandoned-carts/{cart_id}/status", dependencies=[Depends(get_current_superuser)])
-async def update_cart_status(
-    cart_id: int,
-    status: CartStatus
-):
-    """
-    Update the status of a specific cart.
-    """
-    try:
-        cart = await db.cart.find_unique(where={"id": cart_id})
-
-        if not cart:
-            raise HTTPException(status_code=404, detail="Cart not found")
-
-        updated_cart = await db.cart.update(
-            where={"id": cart_id},
-            data={"status": status}
-        )
-
-        # Invalidate cache
-        await bust(f"cart:{cart.cart_number}")
-        if cart.user_id:
-            await bust(f"cart:{cart.user_id}")
-        await bust("abandoned-carts")
-
-        return {
-            "message": f"Cart status updated to {status}",
-            "cart_id": cart_id,
-            "status": updated_cart.status
-        }
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Failed to update cart status for cart {cart_id}: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to update cart status: {str(e)}"
-        )
-
-
-@router.get("/admin/abandoned-carts/stats", dependencies=[Depends(get_current_superuser)])
-@cache_response(key_prefix="admin-abandoned-carts", key="stats")
-async def get_abandoned_carts_stats(request: Request):
+@router.get("/abandoned-carts/stats", dependencies=[Depends(get_current_superuser)])
+@cache_response(key_prefix="abandoned-carts:stats")
+async def get_abandoned_carts_stats(request: Request, hours_threshold: int = 24):
     """
     Get statistics for abandoned carts dashboard.
     """
+    threshold_time = datetime.now(timezone.utc) - timedelta(hours=hours_threshold)
     try:
-        # Count carts by status
         active_count = await db.cart.count(
             where={
                 "status": CartStatus.ACTIVE,
                 "items": {"some": {}},
-                "updated_at": {"lt": datetime.utcnow() - timedelta(hours=24)}
+                "updated_at": {"gt": threshold_time}
             }
         )
 
         abandoned_count = await db.cart.count(
             where={
                 "status": CartStatus.ABANDONED,
-                "items": {"some": {}}
+                "items": {"some": {}},
+                "updated_at": {"gt": threshold_time}
             }
         )
 
         converted_count = await db.cart.count(
             where={
                 "status": CartStatus.CONVERTED,
-                "items": {"some": {}}
+                "items": {"some": {}},
+                "updated_at": {"gt": threshold_time}
             }
         )
 
-        # Calculate total value of abandoned carts
-        abandoned_carts = await db.cart.find_many(
+        non_converted_carts = await db.cart.find_many(
             where={
-                "status": CartStatus.ABANDONED,
-                "items": {"some": {}}
+                "status": {"in": [CartStatus.ACTIVE, CartStatus.ABANDONED]},
+                "items": {"some": {}},
+                "updated_at": {"gt": threshold_time}
             },
-            select={"total": True}
         )
 
-        total_abandoned_value = sum(cart.total for cart in abandoned_carts if cart.total)
-
-        # Calculate recovery rate (last 30 days)
-        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-
-        recovered_carts = await db.cart.count(
-            where={
-                "status": CartStatus.CONVERTED,
-                "updated_at": {"gte": thirty_days_ago}
-            }
-        )
-
-        total_abandoned_last_30_days = await db.cart.count(
-            where={
-                "status": CartStatus.ABANDONED,
-                "updated_at": {"gte": thirty_days_ago}
-            }
-        )
-
-        recovery_rate = (recovered_carts / total_abandoned_last_30_days * 100) if total_abandoned_last_30_days > 0 else 0
+        potential_revenue = sum(cart.total for cart in non_converted_carts if cart.total)
 
         return {
             "active_count": active_count,
             "abandoned_count": abandoned_count,
             "converted_count": converted_count,
-            "total_abandoned_value": total_abandoned_value,
-            "recovery_rate": round(recovery_rate, 2),
-            "recovered_last_30_days": recovered_carts,
-            "total_abandoned_last_30_days": total_abandoned_last_30_days
+            "potential_revenue": potential_revenue,
         }
 
     except Exception as e:

@@ -4,6 +4,7 @@ import { ShippingMethodSchema, PaymentMethodSchema, CartStatus, ShippingMethod, 
 import { ProductVariantSchema } from "./product";
 import { Address, AddressSchema } from "./address";
 import { AuditSchema } from "./base";
+import { UserSchema } from "./user";
 
 export const CartItemSchema = z
     .object({
@@ -25,6 +26,7 @@ export const CartSchema = z
         id: z.number(),
         cart_number: z.string(),
         user_id: z.number().optional(),
+        user: UserSchema.optional(),
         email: z.string().email().optional(),
         status: CartStatusSchema,
         items: z.array(CartItemSchema),
@@ -46,7 +48,6 @@ export const CartSchema = z
 
 export type CartItem = z.infer<typeof CartItemSchema>;
 export type Cart = z.infer<typeof CartSchema>;
-export type CartStatus = z.infer<typeof CartStatusSchema>;
 
 export type CartUpdate = {
     status?: CartStatus;

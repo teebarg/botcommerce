@@ -92,7 +92,6 @@ async def merge_metadata(metadata: Optional[dict[str, Any]] = {}) -> dict[str, A
 
 
 def render_email_template(*, template_name: str, context: dict[str, Any]) -> str:
-    # Set up Jinja2 environment and add the custom filter
     template_path = Path(__file__).parent.parent / "email-templates" / "build"
     env = Environment(loader=FileSystemLoader(template_path))
     env.filters["naira"] = format_naira
