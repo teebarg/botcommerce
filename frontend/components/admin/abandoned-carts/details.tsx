@@ -1,16 +1,18 @@
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { MapPin, Clock, Package, Copy, ExternalLink, User, X } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
-import Overlay from "@/components/overlay";
 import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useSession } from "next-auth/react";
+
+import { ReminderButton } from "./reminder-button";
+
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import Overlay from "@/components/overlay";
 import { Cart } from "@/schemas";
 import { currency } from "@/lib/utils";
-import { ReminderButton } from "./reminder-button";
 import { useInvalidateCart } from "@/lib/hooks/useCart";
 import { useInvalidateMe } from "@/lib/hooks/useUser";
-import { useSession } from "next-auth/react";
 
 interface AbandonedCartDetailsDialogProps {
     cart: Cart | null;
@@ -39,15 +41,15 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
 
     return (
         <Overlay
-            sheetClassName="min-w-[30vw]"
             open={state.isOpen}
-            onOpenChange={state.setOpen}
+            sheetClassName="min-w-[30vw]"
             title="Cart Details"
             trigger={
                 <Button variant="contrast" onClick={state.open}>
                     View Details
                 </Button>
             }
+            onOpenChange={state.setOpen}
         >
             <div className="max-w-4xl px-2 overflow-y-auto">
                 <div className="-mx-2 px-2 py-6 bg-background sticky top-0 z-10">
@@ -78,7 +80,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                                 {cart?.user?.email ? (
                                     <div className="flex items-center gap-2">
                                         <p className="font-medium">{cart?.user?.email}</p>
-                                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleCopyEmail}>
+                                        <Button className="h-6 w-6" size="icon" variant="ghost" onClick={handleCopyEmail}>
                                             <Copy className="h-3 w-3" />
                                         </Button>
                                     </div>
@@ -115,7 +117,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                             {cart.items.map((item) => (
                                 <div key={item.id} className="flex gap-4 p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors">
                                     <div className="w-20 h-20 rounded-lg overflow-hidden border bg-muted flex-shrink-0">
-                                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                        <img alt={item.name} className="w-full h-full object-cover" src={item.image} />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h4 className="font-medium mb-1">{item.name}</h4>

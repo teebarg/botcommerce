@@ -1,9 +1,9 @@
 import { Mail } from "lucide-react";
+import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import { Button } from "@/components/ui/button";
 import { useSendCartReminder } from "@/lib/hooks/useAbandonedCart";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useOverlayTriggerState } from "@react-stately/overlays";
 
 interface ReminderButtonProps {
     id: number;
@@ -37,7 +37,7 @@ export const ReminderButton = ({ id }: ReminderButtonProps) => {
                     </div>
                     <p className="text-sm text-muted-foreground mt-4 font-medium">Are you sure you want to send a reminder to this cart?</p>
                     <div className="flex justify-end gap-2 mt-8">
-                        <Button aria-label="submit" variant="destructive" className="min-w-36" onClick={state.close}>
+                        <Button aria-label="submit" className="min-w-36" variant="destructive" onClick={state.close}>
                             Close
                         </Button>
                         <Button

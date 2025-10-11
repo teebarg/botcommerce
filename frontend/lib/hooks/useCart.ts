@@ -11,9 +11,11 @@ export const useMyCart = () => {
         queryKey: ["cart"],
         queryFn: async () => {
             const res = await api.get<Cart>("/cart/");
+
             if (res.cart_number) {
                 await setCookie("_cart_id", res.cart_number);
             }
+
             return res;
         },
     });
@@ -172,6 +174,7 @@ export const useCompleteCart = () => {
 
 export const useInvalidateCart = () => {
     const queryClient = useQueryClient();
+
     deleteCookie("_cart_id");
 
     const invalidate = () => {

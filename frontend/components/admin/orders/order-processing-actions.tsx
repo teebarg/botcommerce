@@ -13,10 +13,9 @@ import { Separator } from "@/components/ui/separator";
 
 interface OrderProcessingActionProps {
     order: Order;
-    hasOutOfStock: boolean;
 }
 
-const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order, hasOutOfStock }) => {
+const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) => {
     const statusConfig: Record<
         "PENDING" | "PROCESSING" | "SHIPPED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELED" | "REFUNDED",
         {
@@ -81,6 +80,7 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order, ha
     const stateState = useOverlayTriggerState({});
     const paymentState = useOverlayTriggerState({});
     const config = statusConfig[order.status];
+    const hasOutOfStock = order.order_items.some((item) => item.variant?.inventory < 1);
 
     const { mutateAsync: changeOrderStatus, isPending } = useChangeOrderStatus();
 

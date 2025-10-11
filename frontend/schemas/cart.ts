@@ -1,6 +1,15 @@
 import { z } from "zod";
 
-import { ShippingMethodSchema, PaymentMethodSchema, CartStatus, ShippingMethod, PaymentMethod, OrderStatus, PaymentStatus } from "./enums";
+import {
+    ShippingMethodSchema,
+    PaymentMethodSchema,
+    CartStatus,
+    ShippingMethod,
+    PaymentMethod,
+    OrderStatus,
+    PaymentStatus,
+    CartStatusSchema,
+} from "./enums";
 import { ProductVariantSchema } from "./product";
 import { Address, AddressSchema } from "./address";
 import { AuditSchema } from "./base";
@@ -18,8 +27,6 @@ export const CartItemSchema = z
         price: z.number(),
     })
     .merge(AuditSchema);
-
-export const CartStatusSchema = z.enum(["ACTIVE", "ABANDONED", "CONVERTED"]).optional();
 
 export const CartSchema = z
     .object({

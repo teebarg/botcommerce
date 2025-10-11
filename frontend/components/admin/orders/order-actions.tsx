@@ -16,7 +16,6 @@ interface OrderActionsProps {
 
 const OrderActions: React.FC<OrderActionsProps> = ({ order }) => {
     const state = useOverlayTriggerState({});
-    const hasOutOfStock = order.order_items.some((item) => item.variant?.inventory < 1);
 
     return (
         <div className="flex items-center flex-wrap gap-2">
@@ -33,7 +32,7 @@ const OrderActions: React.FC<OrderActionsProps> = ({ order }) => {
             >
                 <OrderDetails order={order} onClose={() => state.close()} />
             </Overlay>
-            <OrderProcessingAction order={order} hasOutOfStock={hasOutOfStock} />
+            <OrderProcessingAction order={order} />
         </div>
     );
 };

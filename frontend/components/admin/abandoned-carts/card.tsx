@@ -1,13 +1,14 @@
 import { Clock, Mail, Package, MapPin } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
+import { AbandonedCartDetailsDialog } from "./details";
+import { ReminderButton } from "./reminder-button";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Cart } from "@/schemas";
 import { currency } from "@/lib/utils";
 import { useSendCartReminder } from "@/lib/hooks/useAbandonedCart";
-import { AbandonedCartDetailsDialog } from "./details";
-import { ReminderButton } from "./reminder-button";
 
 interface AbandonedCartCardProps {
     cart: Cart;
@@ -84,7 +85,7 @@ export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
                                                 />
                                             </div>
                                             {item.quantity > 1 && (
-                                                <Badge variant="contrast" className="absolute top-0 -right-3 h-5 w-5 p-0 justify-center">
+                                                <Badge className="absolute top-0 -right-3 h-5 w-5 p-0 justify-center" variant="contrast">
                                                     {item.quantity}
                                                 </Badge>
                                             )}

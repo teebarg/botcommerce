@@ -41,8 +41,8 @@ const StoreNavbar = async () => {
                         {session ? (
                             <LocalizedClientLink
                                 aria-label="go to wishlist"
-                                href={"/wishlist"}
                                 className="flex items-center justify-center rounded-md h-10 w-10 hover:bg-accent"
+                                href={"/wishlist"}
                             >
                                 <HeartFilled className="h-7 w-7 text-primary" />
                             </LocalizedClientLink>

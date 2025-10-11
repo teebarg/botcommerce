@@ -1,17 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { Search } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AbandonedCartCard } from "@/components/admin/abandoned-carts/card";
-import { Search } from "lucide-react";
 import { Cart } from "@/schemas";
 import { useAbandonedCarts, useAbandonedCartStats, useSendCartReminders } from "@/lib/hooks/useAbandonedCart";
 import ComponentLoader from "@/components/component-loader";
 import PaginationUI from "@/components/pagination";
-import { useSearchParams } from "next/navigation";
 import { AbandonedCartStats } from "@/components/admin/abandoned-carts/stat";
 
 const LIMIT = 20;
@@ -69,10 +70,10 @@ const AdminAbandonedCarts = () => {
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 z-10 text-muted-foreground" />
                             <Input
+                                className="pl-10 bg-card"
                                 placeholder="Search by customer name or email..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10 bg-card"
                             />
                         </div>
                         <div className="flex items-center gap-2">
@@ -88,7 +89,7 @@ const AdminAbandonedCarts = () => {
                                     <SelectItem value="168">Last 7 days</SelectItem>
                                 </SelectContent>
                             </Select>
-                            <Button isLoading={sendRemindersLoading} disabled={sendRemindersLoading} onClick={handleSendReminders}>
+                            <Button disabled={sendRemindersLoading} isLoading={sendRemindersLoading} onClick={handleSendReminders}>
                                 Send Reminders
                             </Button>
                         </div>
