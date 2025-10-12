@@ -2,11 +2,12 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { api } from "@/apis/client";
 import { addToOfflineCart, clearOfflineCart, getOfflineCart } from "@/lib/indexeddb/offline-cart";
 import { Cart } from "@/schemas";
+import { useMyCart } from "@/lib/hooks/useCart";
 
 type AddItem = {
     variant_id: number;
@@ -37,17 +38,7 @@ export const useCart = () => {
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     const [isSyncing, setIsSyncing] = useState<boolean>(false);
     const queryClient = useQueryClient();
-
-    const {
-        data: cart,
-        isLoading,
-        error,
-    } = useQuery({
-        queryKey: ["cart"],
-        queryFn: async () => {
-            return await api.get<Cart>("/cart/");
-        },
-    });
+    const { data: cart, isLoading, error } = useMyCart();
 
     // const loadCart = async () => {
     //     setIsLoading(true);

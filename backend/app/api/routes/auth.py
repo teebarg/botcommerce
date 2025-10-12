@@ -1,5 +1,5 @@
 from app.models.generic import Message
-from fastapi import APIRouter, HTTPException, status, BackgroundTasks, Request
+from fastapi import APIRouter, HTTPException, status, BackgroundTasks, Request, Header
 from pydantic import EmailStr, BaseModel, Field
 from app.core.config import settings
 
@@ -12,6 +12,7 @@ from app.services.events import publish_user_registered, publish_event
 from datetime import datetime, timedelta
 from pydantic import BaseModel
 from app.models.generic import Token
+from app.prisma_client import prisma as db
 
 import httpx
 from typing import Optional
@@ -128,7 +129,7 @@ async def signup(request: Request, payload: SignUpPayload, background_tasks: Bac
 
 
 @router.post("/verify-email")
-async def verify_email(payload: VerifyEmailPayload) -> Token:
+async def verify_email(payload: VerifyEmailPayload, cartId: str = Header(default=None)) -> Token:
     """
     Verify user's email address and activate their account.
     """
@@ -163,6 +164,8 @@ async def verify_email(payload: VerifyEmailPayload) -> Token:
             "email_verification_expires": None,
         }
     )
+
+    await merge_cart(user_id=user.id, cart_number=cartId)
 
     try:
         await publish_user_registered(
@@ -330,6 +333,7 @@ async def send_magic_link(
     request: Request,
     background_tasks: BackgroundTasks,
     payload: EmailData,
+    cartId: str = Header(default=None)
 ) -> Message:
     """
     Request a magic link for passwordless authentication.
@@ -374,8 +378,9 @@ async def send_magic_link(
             html_content=email_data.html_content,
         )
 
-    background_tasks.add_task(send_magic_link_email,
-                              user.first_name, email, url)
+    await merge_cart(user_id=user.id, cart_number=cartId)
+
+    background_tasks.add_task(send_magic_link_email, user.first_name, email, url)
 
     return {"message": "If an account exists with this email, you will receive a magic link"}
 
@@ -388,7 +393,7 @@ class SyncUserPayload(BaseModel):
 
 
 @router.post("/sync-user")
-async def sync_user(request: Request, payload: SyncUserPayload) -> Message:
+async def sync_user(request: Request, payload: SyncUserPayload, cartId: str = Header(default=None)) -> Message:
     user = await prisma.user.find_first(
         where={
             "email": payload.email,
@@ -422,4 +427,15 @@ async def sync_user(request: Request, payload: SyncUserPayload) -> Message:
             await publish_event(event=event)
         except Exception as e:
             logger.error(f"Failed to publish USER_REGISTERED event: {e}")
+
+    await merge_cart(user_id=user.id, cart_number=cartId)
     return {"message": "User synced successfully"}
+
+
+async def merge_cart(user_id: str, cart_number: str | None = None):
+    if not cart_number:
+        return
+    await db.cart.update(
+        where={"cart_number": cart_number},
+        data={"user_id": user_id},
+    )

@@ -161,10 +161,14 @@ async def create(*, create: PaymentCreate, notification: Notification, backgroun
 @router.patch("/{id}/status", dependencies=[Depends(get_current_superuser)], response_model=OrderResponse)
 async def payment_status(id: int, status: PaymentStatus):
     """Change payment status"""
-    order = await db.order.find_unique(where={"id": id})
+    order = await db.order.find_unique(where={"id": id}, include={"order_items": {"include": {"variant": True}}})
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
+    for item in order.order_items:
+        if item.variant.stock < item.quantity:
+            raise HTTPException(status_code=400, detail="Order has out of stock items, cannot update payment status")
+    
     data = {"payment_status": status}
 
     async with db.tx() as tx:

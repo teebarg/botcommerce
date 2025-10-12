@@ -4,7 +4,7 @@ from app.prisma_client import prisma as db
 from app.core.logging import get_logger
 from app.core.deps import get_notification_service
 from app.services.order import send_notification, process_order_payment
-from prisma.enums import OrderStatus, PaymentStatus, PaymentMethod
+from prisma.enums import OrderStatus, PaymentStatus, PaymentMethod, CartStatus
 from app.services.recently_viewed import RecentlyViewedService
 from app.services.popular_products import PopularProductsService
 from prisma import Json
@@ -159,6 +159,12 @@ class RedisStreamConsumer:
                     "message": f'Order {event["order_number"]} created',
                     "from_status": OrderStatus.PENDING,
                     "to_status": OrderStatus.PENDING,
+                }
+            )
+            await db.cart.update(
+                where={"id": int(event["cart_id"])},
+                data={
+                    "status": CartStatus.CONVERTED,
                 }
             )
             order_items = await db.orderitem.find_many(

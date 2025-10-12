@@ -18,6 +18,7 @@ import {
     ClipboardList,
     Notebook,
     Image,
+    ShoppingCart,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -102,6 +103,11 @@ const storeItems = [
         title: "Gallery",
         url: "/admin/gallery",
         icon: Image,
+    },
+    {
+        title: "Abandoned Carts",
+        url: "/admin/abandoned-carts",
+        icon: ShoppingCart,
     },
     {
         title: "Orders",

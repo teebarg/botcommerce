@@ -14,7 +14,7 @@ import ComponentLoader from "@/components/component-loader";
 import { useUserAddresses } from "@/lib/hooks/useAddress";
 
 interface AddressStepProps {
-    address: Address | null;
+    address: Address | null | undefined;
     onComplete?: () => void;
 }
 

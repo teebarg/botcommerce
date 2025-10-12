@@ -38,6 +38,7 @@ async def publish_order_event(order: dict, type: str):
     event = {
         "type": type,
         "order_id": order.id,
+        "cart_id": order.cart_id,
         "order_number": order.order_number,
         "user_id": order.user_id,
         "email": order.email if order.email else "",
