@@ -13,6 +13,7 @@ import { Cart } from "@/schemas";
 import { currency } from "@/lib/utils";
 import { useInvalidateCart } from "@/lib/hooks/useCart";
 import { useInvalidateMe } from "@/lib/hooks/useUser";
+import { deleteCookie } from "@/lib/util/cookie";
 
 interface AbandonedCartDetailsDialogProps {
     cart: Cart | null;
@@ -32,6 +33,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
     };
 
     const handleImpersonation = async () => {
+        deleteCookie("_cart_id");
         await update({ impersonatedBy: session?.user?.email!, email: cart?.user?.email!, impersonated: true, mode: "impersonate" });
         invalidateMe();
         invalidateCart();

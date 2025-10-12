@@ -98,8 +98,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
                 await tryCatch<Message>(
                     serverApi.post<Message>("/auth/sync-user", {
                         email: user.email!,
-                        first_name: profile?.given_name!,
-                        last_name: profile?.family_name!,
+                        first_name: profile?.given_name || "",
+                        last_name: profile?.family_name || "",
                         image: profile?.picture,
                     })
                 );

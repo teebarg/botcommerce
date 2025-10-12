@@ -387,8 +387,8 @@ async def send_magic_link(
 
 class SyncUserPayload(BaseModel):
     email: str
-    first_name: str
-    last_name: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
     image: Optional[str] = None
 
 

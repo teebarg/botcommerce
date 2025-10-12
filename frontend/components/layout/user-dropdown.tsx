@@ -58,6 +58,10 @@ export default function UserDropDown({ user }: { user: Session }) {
         },
     ];
 
+    const getInitials = () => {
+        return user?.first_name ? user?.first_name?.[0] + (user?.last_name?.[0] || "") : "GU";
+    };
+
     if (user.role === "ADMIN") {
         links.unshift({
             dataKey: "admin",
@@ -74,7 +78,7 @@ export default function UserDropDown({ user }: { user: Session }) {
             <DropdownMenuTrigger>
                 <Avatar>
                     <AvatarImage alt="@user" src={user.image ?? undefined} />
-                    <AvatarFallback>{user?.first_name ? user?.first_name?.[0] + user?.last_name?.[0] : "GU"}</AvatarFallback>
+                    <AvatarFallback>{getInitials()}</AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">

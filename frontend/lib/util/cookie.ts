@@ -14,3 +14,11 @@ export async function deleteCookie(name: string) {
         document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax`;
     }
 }
+
+export function getCookie(name: string) {
+    if (typeof window !== "undefined") {
+        const match = document.cookie.match(`(^|;)\\s*${name}\\s*=\\s*([^;]+)`);
+
+        return match ? decodeURIComponent(match[2]) : null;
+    }
+}

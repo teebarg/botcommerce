@@ -24,6 +24,7 @@ async def create_order(
     try:
         order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cartId)
         await invalidate_pattern("orders")
+        await invalidate_pattern("cart")
         return order
     except Exception as e:
         logger.error(f"Failed to create order: {str(e)}")

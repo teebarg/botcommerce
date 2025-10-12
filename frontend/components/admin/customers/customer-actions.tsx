@@ -15,6 +15,7 @@ import Overlay from "@/components/overlay";
 import { Confirm } from "@/components/generic/confirm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useInvalidateCart } from "@/lib/hooks/useCart";
+import { deleteCookie } from "@/lib/util/cookie";
 
 interface CustomerActionsProps {
     user: User;
@@ -34,7 +35,8 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
         });
     };
 
-    const handleUpdateName = async () => {
+    const handleImpersonation = async () => {
+        deleteCookie("_cart_id");
         await update({ impersonatedBy: session?.user?.email!, email: user.email, impersonated: true, mode: "impersonate" });
         invalidateMe();
         invalidateCart();
@@ -45,7 +47,7 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
     return (
         <div className="flex">
             {user.role !== "ADMIN" && (
-                <Button size="icon" title="Impersonate" variant="ghost" onClick={handleUpdateName}>
+                <Button size="icon" title="Impersonate" variant="ghost" onClick={handleImpersonation}>
                     <Eye className="h-5 w-5" />
                 </Button>
             )}

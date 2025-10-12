@@ -166,9 +166,9 @@ async def payment_status(id: int, status: PaymentStatus):
         raise HTTPException(status_code=404, detail="Order not found")
 
     for item in order.order_items:
-        if item.variant.stock < item.quantity:
+        if item.variant.inventory < item.quantity:
             raise HTTPException(status_code=400, detail="Order has out of stock items, cannot update payment status")
-    
+
     data = {"payment_status": status}
 
     async with db.tx() as tx:

@@ -33,10 +33,8 @@ async def calculate_cart_totals(cart: Cart):
         data={"subtotal": subtotal, "tax": tax, "total": total}
     )
 
-    if cart.user_id:
-        await bust(f"cart:{cart.user_id}")
-    await bust(f"cart:{cart.cart_number}")
     await invalidate_pattern("abandoned-carts")
+    await invalidate_pattern("cart")
 
 
 async def get_or_create_cart(cart_number: Optional[str], user_id: Optional[str]):
