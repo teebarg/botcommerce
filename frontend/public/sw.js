@@ -159,6 +159,22 @@ self.addEventListener("message", (event) => {
     }
 });
 
+async function staleWhileRevalidateImage(request) {
+    const cache = await caches.open(CACHE_NAME);
+    const cached = await cache.match(request);
+
+    const networkFetch = fetch(request)
+        .then((response) => {
+            if (response && response.status === 200) {
+                cache.put(request, response.clone());
+            }
+            return response;
+        })
+        .catch(() => cached);
+
+    return cached || networkFetch;
+}
+
 async function staleWhileRevalidate(request) {
     const cache = await caches.open(CACHE_NAME);
     const cached = await cache.match(request);
