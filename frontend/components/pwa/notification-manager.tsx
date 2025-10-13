@@ -11,7 +11,7 @@ const PushNotificationManager: React.FC = () => {
 
     useEffect(() => {
         if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.getRegistration().then((reg) => {
+            const setupSW = () => navigator.serviceWorker.getRegistration().then((reg) => {
                 if (!reg) return;
                 reg.addEventListener("updatefound", () => {
                     const newWorker = reg.installing;
@@ -26,7 +26,18 @@ const PushNotificationManager: React.FC = () => {
                     }
                 });
             });
-            registerServiceWorker();
+
+            if (document.readyState === "complete") {
+                setupSW();
+                registerServiceWorker();
+            } else {
+                const onLoad = () => {
+                    setupSW();
+                    registerServiceWorker();
+                    window.removeEventListener("load", onLoad);
+                };
+                window.addEventListener("load", onLoad);
+            }
         }
         // Listen for online/offline events
         const handleOnline = () => setOffline(false);

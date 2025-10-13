@@ -49,11 +49,6 @@ self.addEventListener("fetch", (event) => {
         return;
     }
 
-    if (url.pathname.match(/\.(png|jpg|jpeg|gif|svg|webp|avif)$/i)) {
-        event.respondWith(cacheImage(event.request));
-        return;
-    }
-
     // ✅ Cache static assets (Next.js static files, CSS, JS)
     if (url.pathname.startsWith("/_next/static/")) {
         event.respondWith(staleWhileRevalidate(event.request));
