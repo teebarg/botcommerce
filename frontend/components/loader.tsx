@@ -39,7 +39,7 @@ const DotsLoader: React.FC = () => {
 
 export default function PageLoader() {
     return (
-        <div className="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="flex flex-col items-center space-y-6">
                 <WaveLoader />
                 <div className="text-center space-y-2">

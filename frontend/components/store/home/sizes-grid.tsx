@@ -1,6 +1,4 @@
-"use client";
-
-import { useRouter } from "next/navigation";
+import LocalizedClientLink from "@/components/ui/link";
 
 const sizes = [
     {
@@ -54,8 +52,6 @@ const sizes = [
 ];
 
 const SizesGrid = () => {
-    const router = useRouter();
-
     return (
         <section className="py-16 px-4 md:px-2">
             <div className="max-w-7xl mx-auto">
@@ -66,12 +62,10 @@ const SizesGrid = () => {
 
                 <div className="grid grid-cols-4 lg:grid-cols-8 gap-4">
                     {sizes.map((size) => (
-                        <div
+                        <LocalizedClientLink
                             key={size.id}
                             className={`group relative overflow-hidden rounded-xl ${size.color} border border-border/50 hover:border-border transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-lg`}
-                            onClick={() => {
-                                router.push(`/collections?sizes=${size.size}`);
-                            }}
+                            href={`/collections?sizes=${size.size}`}
                         >
                             <div className="py-6 text-center">
                                 <div>
@@ -80,7 +74,7 @@ const SizesGrid = () => {
                                 </div>
                             </div>
                             <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        </div>
+                        </LocalizedClientLink>
                     ))}
                 </div>
             </div>

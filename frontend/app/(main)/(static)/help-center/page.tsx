@@ -1,8 +1,11 @@
-"use client";
-
 import { MessageCircle, Package, Truck } from "lucide-react";
+import { Metadata } from "next";
 
-const HelpCenterPage = () => {
+export const metadata: Metadata = {
+    title: "Help Center",
+};
+
+export default async function HelpCenterPage() {
     return (
         <div>
             <div className="bg-gradient-to-br from-primary to-secondary text-white">
@@ -61,6 +64,4 @@ const HelpCenterPage = () => {
             </div>
         </div>
     );
-};
-
-export default HelpCenterPage;
+}

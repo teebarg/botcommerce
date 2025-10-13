@@ -53,12 +53,12 @@ export const useDeleteCollection = () => {
     });
 };
 
-export const useCatalogs = (query?: string, is_active?: boolean) => {
+export const useCatalogs = (is_active?: boolean) => {
     const { data: session } = useSession();
 
     return useQuery({
-        queryKey: ["catalog", query, is_active],
-        queryFn: async () => await api.get<PaginatedShared>("/shared/", { params: { query: query || "", is_active: is_active } }),
+        queryKey: ["catalog", is_active],
+        queryFn: async () => await api.get<PaginatedShared>("/shared/", { params: { is_active } }),
         enabled: Boolean(session?.user?.isAdmin),
     });
 };

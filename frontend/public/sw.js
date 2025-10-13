@@ -1,89 +1,75 @@
 const broadcast = new BroadcastChannel("sw-messages");
-const CACHE_NAME = "shop-cache-v2";
-const ASSETS_TO_CACHE = [
-    // "/", // Root URL
-    "/careers",
-    "/about",
-    "/privacy",
-    "/terms",
-    "/returns",
-    "/shipping",
-    "/avatar_ai.png",
-    "/bot.svg",
-    "/offline", // A fallback page for offline users
-    "/favicon.ico", // Favicon
-    // "/_next/static/", // Next.js static files
-];
+const CACHE_NAME = "shop-cache-v3";
 
-// Install event: Cache static assets
+const STATIC_PAGES = ["/about", "/careers", "/privacy", "/terms", "/returns", "/shipping", "/offline", "/favicon.ico"];
+
 self.addEventListener("install", (event) => {
-    console.log("Service Worker installing...");
+    console.log("[Service Worker] Installing...");
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            console.log("[Service Worker] Caching assets...");
-
-            return cache.addAll(ASSETS_TO_CACHE);
+            console.log("[Service Worker] Pre-caching static pages...");
+            return cache.addAll(STATIC_PAGES);
         })
     );
-    self.skipWaiting(); // Skip waiting and activate the new service worker immediately
-    // broadcast.postMessage({ type: "NEW_CONTENT_AVAILABLE" });
+    self.skipWaiting();
 });
 
-// Activate event: Cleanup old caches
 self.addEventListener("activate", (event) => {
-    console.log("Service Worker activating...");
+    console.log("[Service Worker] Activating...");
     event.waitUntil(
-        caches.keys().then((cacheNames) =>
-            Promise.all(
-                cacheNames.map((cache) => {
-                    if (cache !== CACHE_NAME) {
-                        console.log("[Service Worker] Deleting old cache:", cache);
-
-                        return caches.delete(cache);
-                    }
-                })
-            )
-        )
+        caches.keys().then((keys) => {
+            return Promise.all(
+                keys
+                    .filter((key) => key !== CACHE_NAME)
+                    .map((oldKey) => {
+                        console.log(`[Service Worker] Removing old cache: ${oldKey}`);
+                        return caches.delete(oldKey);
+                    })
+            );
+        })
     );
+    self.clients.claim();
 });
 
-// Fetch event: Cache dynamic URLs
 self.addEventListener("fetch", (event) => {
     const url = new URL(event.request.url);
 
-    // Check if the request is for the `_next/image` endpoint
-    if (url.pathname === "/_next/image") {
-        event.respondWith(
-            caches.match(event.request).then((cachedResponse) => {
-                return (
-                    cachedResponse ||
-                    fetch(event.request).then((networkResponse) => {
-                        return caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(event.request, networkResponse.clone());
-
-                            return networkResponse;
-                        });
-                    })
-                );
-            })
-        );
-
+    if (url.pathname.startsWith("/_next/image")) {
+        event.respondWith(cacheImage(event.request));
         return;
     }
 
-    // Default caching strategy for other requests
-    // event.respondWith(
-    //     caches.match(event.request).then((cachedResponse) => {
-    //         return (
-    //             cachedResponse ||
-    //             fetch(event.request).catch(() => {
-    //                 if (event.request.mode === "navigate") {
-    //                     return caches.match("/offline"); // Serve the offline page
-    //                 }
-    //             })
-    //         );
-    //     })
-    // );
+    if (
+        url.pathname.match(/\.(png|jpg|jpeg|gif|svg|webp|avif)$/i) ||
+        url.pathname.startsWith("/products/") ||
+        url.href.includes("cdn") ||
+        url.href.includes("supabase.co/storage")
+    ) {
+        event.respondWith(staleWhileRevalidateImage(event.request));
+        return;
+    }
+
+    if (url.pathname.match(/\.(png|jpg|jpeg|gif|svg|webp|avif)$/i)) {
+        event.respondWith(cacheImage(event.request));
+        return;
+    }
+
+    // ✅ Cache static assets (Next.js static files, CSS, JS)
+    if (url.pathname.startsWith("/_next/static/")) {
+        event.respondWith(staleWhileRevalidate(event.request));
+        return;
+    }
+
+    // ✅ Cache static pages
+    if (STATIC_PAGES.includes(url.pathname)) {
+        event.respondWith(staleWhileRevalidate(event.request));
+        return;
+    }
+
+    if (event.request.mode === "navigate") {
+        event.respondWith(fetch(event.request).catch(() => caches.match("/offline")));
+        return;
+    }
 });
 
 self.addEventListener("push", function (event) {
@@ -92,7 +78,7 @@ self.addEventListener("push", function (event) {
         const options = {
             body: data.body,
             icon: "/icon.png", // small icon
-            image: data.imageUrl ?? "/promo-banner.webp", // large image
+            image: data.imageUrl ?? "/promo-banner.webp",
             badge: data.imageUrl ?? "/icon.png", // monochrome badge (Android only)
             actions: [
                 { action: "view", title: "View" },
@@ -138,19 +124,6 @@ self.addEventListener("push", function (event) {
     }
 });
 
-self.addEventListener("notificationclick", function (event) {
-    if (event.action == "view") {
-        event.waitUntil(clients.openWindow(event.notification.data.url));
-        event.notification.close();
-        return;
-    }
-
-    if (event.action == "dismiss") {
-        event.notification.close();
-    }
-});
-
-
 self.addEventListener("notificationclick", (event) => {
     const data = event.notification.data;
 
@@ -167,6 +140,16 @@ self.addEventListener("notificationclick", (event) => {
             readAt: new Date(),
         }),
     });
+
+    if (event.action == "view") {
+        event.waitUntil(clients.openWindow(event.notification.data.url));
+        event.notification.close();
+        return;
+    }
+
+    if (event.action == "dismiss") {
+        event.notification.close();
+    }
 });
 
 self.addEventListener("message", (event) => {
@@ -175,6 +158,44 @@ self.addEventListener("message", (event) => {
         self.skipWaiting();
     }
 });
+
+async function staleWhileRevalidate(request) {
+    const cache = await caches.open(CACHE_NAME);
+    const cached = await cache.match(request);
+    const networkFetch = fetch(request)
+        .then((response) => {
+            cache.put(request, response.clone());
+            return response;
+        })
+        .catch(() => cached);
+
+    return cached || networkFetch;
+}
+
+async function cacheImage(request) {
+    const cache = await caches.open(CACHE_NAME);
+    const cached = await cache.match(request);
+    if (cached) return cached;
+
+    try {
+        const networkResponse = await fetch(request);
+        cache.put(request, networkResponse.clone());
+        trimImageCache(150);
+        return networkResponse;
+    } catch (err) {
+        console.warn("[SW] Image fetch failed:", err);
+        return caches.match("/fallback-image.png");
+    }
+}
+
+async function trimImageCache(maxItems = 100) {
+    const cache = await caches.open(CACHE_NAME);
+    const keys = await cache.keys();
+
+    if (keys.length > maxItems) {
+        await cache.delete(keys[0]);
+    }
+}
 
 function getDeviceType() {
     const ua = navigator.userAgent || navigator.vendor || window.opera;

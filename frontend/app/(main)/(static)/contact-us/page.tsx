@@ -6,7 +6,7 @@ export const metadata: Metadata = {
     title: "Contact Us",
 };
 
-const ContactUsPage = () => {
+const ContactUsPage = async () => {
     return <ContactSection />;
 };
 

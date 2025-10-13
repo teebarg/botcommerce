@@ -23,6 +23,7 @@ from app.core.logging import get_logger
 from fastapi.responses import JSONResponse
 from app.consumer import RedisStreamConsumer
 from app.core.deps import ShopSettingsServiceDep
+from pydantic import BaseModel
 
 STREAM_NAME = "EVENT_STREAMS"
 GROUP_NAME = "notifications"
@@ -107,9 +108,9 @@ async def health():
     user = await db.user.find_unique(
         where={"id": 1}
     )
-    redis_res = await app.state.redis.ping()
+    # redis_res = await app.state.redis.ping()
     meilisearch_res = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
-    return {"message": "Server is running", "redis": redis_res, "meilisearch": meilisearch_res, "user": {"id": user.id, "email": user.email}}
+    return {"message": "Server is running", "meilisearch": meilisearch_res, "user": {"id": user.id, "email": user.email}}
 
 
 @app.post("/api/contact-form")
@@ -181,17 +182,30 @@ async def bulk_purchase(background_tasks: BackgroundTasks, service: ShopSettings
     background_tasks.add_task(send_email_task)
     return {"message": "Bulk purchase inquiry submitted successfully"}
 
+class ErrorPayload(BaseModel):
+    message: str
+    source: str | None = None
+    stack: str | None = None
+    scenario: str | None = None
+
 
 @app.post("/api/log-error")
 @limit("5/minute")
-async def log_error(error: dict, request: Request):
+async def log_error(payload: ErrorPayload, request: Request, background_tasks: BackgroundTasks):
+    client_ip = request.client.host if request.client else "Unknown IP"
+    user_agent = request.headers.get("user-agent", "Unknown UA")
+
     slack_message = (
-        f"*Message:* {error.get('message', 'N/A')}\n"
-        f"*Source:* {error.get('source', 'N/A')}\n"
-        f"*Stack:* {error.get('stack', 'N/A')}\n"
-        f"*Scenario:* {error.get('scenario', 'N/A')}\n"
+        f"*Message:* {payload.message}\n"
+        f"*Source:* {payload.source or 'N/A'}\n"
+        f"*Stack:* ```{payload.stack or 'N/A'}```\n"
+        f"*Scenario:* {payload.scenario or 'N/A'}\n"
+        f"*Client:* {client_ip} ({user_agent})\n"
     )
-    logger.critical(slack_message)
+    async def send_slack_task():
+        logger.critical(slack_message)
+    background_tasks.add_task(send_slack_task)
+    return {"message": "Error logged successfully"}
 
 
 @app.get("/api/sitemap.xml", response_class=Response)

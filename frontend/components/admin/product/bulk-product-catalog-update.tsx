@@ -43,7 +43,7 @@ const CatalogItem: React.FC<{ catalog: Shared; selectedProductIds: number[] }> =
 };
 
 export const CatalogBulkProductUpdate = ({ selectedProductIds = [] }: CatalogBulkProductUpdateProps) => {
-    const { data: sharedCollections } = useCatalogs("", true);
+    const { data: sharedCollections } = useCatalogs(true);
 
     return (
         <div className="p-4">

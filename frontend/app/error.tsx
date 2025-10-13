@@ -12,7 +12,6 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
             // Prepare the error data
             const errorData = {
                 message: error.message || "An error occurred",
-                name: error.name || "Error",
                 stack: error.stack || "",
                 scenario: "error-boundary",
             };

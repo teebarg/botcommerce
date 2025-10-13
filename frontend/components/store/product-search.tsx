@@ -66,6 +66,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                 </div>
                 <div className="rounded-md md:hidden h-10 w-10 flex items-center justify-center">
                     <Search className="w-6 h-6" />
+                    <span className="sr-only">Search</span>
                 </div>
             </SheetTrigger>
             <SheetContent side="top">
