@@ -25,12 +25,9 @@ export default async function Home() {
     return (
         <div>
             <HeroSection />
-
             <CategoriesSection />
             <SaleBanner />
-            <LazyFadeIn delay={100}>
-                <SizesGrid />
-            </LazyFadeIn>
+            <SizesGrid />
 
             <PromotionalBanner
                 btnClass="text-purple-600"
@@ -59,9 +56,7 @@ export default async function Home() {
             <LazyFadeIn delay={600}>
                 <ContactSection />
             </LazyFadeIn>
-            <LazyFadeIn delay={700}>
-                <NewsletterSection />
-            </LazyFadeIn>
+            <NewsletterSection />
         </div>
     );
 }

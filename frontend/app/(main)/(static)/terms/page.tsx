@@ -17,7 +17,7 @@ const Terms = async () => {
         <div className="max-w-5xl mx-auto px-4 py-12">
             <h1 className="text-3xl font-bold mb-8 text-center text-foreground">Terms and Conditions</h1>
 
-            <div className="bg-secondary rounded-lg shadow-lg p-8 mb-8">
+            <div className="bg-card rounded-lg shadow-lg p-8 mb-8">
                 <h2 className="text-2xl font-semibold mb-4 text-foreground">Welcome to {siteConfig.name} Stores</h2>
                 <p className="mb-4 text-foreground">
                     {`These terms and conditions outline the rules and regulations for the use of ${siteConfig.name} Stores' website and services. By accessing this

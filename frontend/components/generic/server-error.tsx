@@ -13,7 +13,6 @@ const ServerError: React.FC<{ className?: string; error?: string; scenario?: str
         if (error) {
             const errorData = {
                 message: error || "An error occurred",
-                name: "Error",
                 scenario,
                 stack,
             };

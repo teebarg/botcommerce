@@ -8,6 +8,7 @@ import { MenuIcon } from "lucide-react";
 import Menu from "../menu";
 
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
 
 const StoreMenuComp: React.FC = () => {
     const pathname = usePathname();
@@ -19,11 +20,13 @@ const StoreMenuComp: React.FC = () => {
 
     return (
         <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
-            <DrawerTrigger>
-                <span className="flex flex-col items-center gap-1.5 text-xs">
-                    <MenuIcon className="h-8 w-8" />
-                    Menu
-                </span>
+            <DrawerTrigger asChild>
+                <div className="flex flex-col items-center" aria-label="Menu">
+                    <Button variant="ghost" size="icon">
+                        <MenuIcon className="h-7 w-7" />
+                    </Button>
+                    <p className="text-xs">Menu</p>
+                </div>
             </DrawerTrigger>
             <DrawerContent>
                 <DrawerHeader className="sr-only">

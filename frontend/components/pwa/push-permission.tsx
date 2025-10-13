@@ -134,7 +134,7 @@ export default function PushPermission() {
     if (isDismissed || permission === "granted") return null;
 
     return (
-        <div className="fixed bottom-4 left-4 right-4 z-40 animate-slide-up">
+        <div className="fixed bottom-8 left-4 right-4 z-50 animate-slide-up">
             <div className="max-w-md mx-auto bg-gradient-to-r from-blue-700 to-cyan-500 rounded-lg shadow-strong border border-white/20 p-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3 flex-1">
@@ -148,11 +148,11 @@ export default function PushPermission() {
                     </div>
 
                     <div className="flex items-center space-x-2">
-                        <Button className="bg-white text-gray-800 hover:bg-white/90 h-8 px-3" size="sm" onClick={handleNotificationOptIn}>
+                        <Button aria-label="Enable" className="bg-white text-gray-800 hover:bg-white/90 h-10 px-3" size="sm" onClick={handleNotificationOptIn}>
                             Enable
                         </Button>
 
-                        <Button size="icon" variant="destructive" onClick={() => setIsDismissed(true)}>
+                        <Button aria-label="Dismiss" size="icon" variant="destructive" onClick={() => setIsDismissed(true)}>
                             <X className="h-4 w-4" />
                         </Button>
                     </div>

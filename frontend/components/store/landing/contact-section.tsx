@@ -1,13 +1,10 @@
-"use client";
-
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 
 import ContactForm from "../contact-form";
+import { getSiteConfig } from "@/lib/config";
 
-import { useStoreSettings } from "@/providers/store-provider";
-
-export function ContactSection() {
-    const { settings } = useStoreSettings();
+export async function ContactSection() {
+    const siteConfig = await getSiteConfig();
 
     return (
         <section className="py-16 bg-gradient-to-b from-card/30 to-background">
@@ -31,7 +28,7 @@ export function ContactSection() {
                                     <h3 className="font-semibold">Visit Us</h3>
                                 </div>
                                 <p className="text-muted-foreground text-sm">
-                                    {settings?.address}
+                                    {siteConfig?.address}
                                     <br />
                                     Lagos, Nigeria
                                 </p>
@@ -44,7 +41,7 @@ export function ContactSection() {
                                     </div>
                                     <h3 className="font-semibold">Call Us</h3>
                                 </div>
-                                <p className="text-muted-foreground text-sm">{settings?.contact_phone}</p>
+                                <p className="text-muted-foreground text-sm">{siteConfig?.contactPhone}</p>
                             </div>
 
                             <div className="bg-card p-6 rounded-lg border border-input">
@@ -54,7 +51,7 @@ export function ContactSection() {
                                     </div>
                                     <h3 className="font-semibold">Email Us</h3>
                                 </div>
-                                <p className="text-muted-foreground text-sm">{settings?.contact_email}</p>
+                                <p className="text-muted-foreground text-sm">{siteConfig?.contactEmail}</p>
                             </div>
 
                             <div className="bg-card p-6 rounded-lg border border-input">

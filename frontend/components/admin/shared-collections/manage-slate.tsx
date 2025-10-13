@@ -23,7 +23,7 @@ interface ManageSlateProps {
 export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
     const { data: session } = useSession();
     const state = useOverlayTriggerState({});
-    const { data, isLoading } = useCatalogs("", true);
+    const { data, isLoading } = useCatalogs(true);
 
     if (!session?.user?.isAdmin || !Boolean(product)) {
         return null;
