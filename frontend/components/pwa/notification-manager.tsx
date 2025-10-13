@@ -11,21 +11,22 @@ const PushNotificationManager: React.FC = () => {
 
     useEffect(() => {
         if ("serviceWorker" in navigator) {
-            const setupSW = () => navigator.serviceWorker.getRegistration().then((reg) => {
-                if (!reg) return;
-                reg.addEventListener("updatefound", () => {
-                    const newWorker = reg.installing;
+            const setupSW = () =>
+                navigator.serviceWorker.getRegistration().then((reg) => {
+                    if (!reg) return;
+                    reg.addEventListener("updatefound", () => {
+                        const newWorker = reg.installing;
 
-                    if (newWorker) {
-                        newWorker.addEventListener("statechange", () => {
-                            if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-                                setWaitingWorker(newWorker);
-                                setShow(true);
-                            }
-                        });
-                    }
+                        if (newWorker) {
+                            newWorker.addEventListener("statechange", () => {
+                                if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+                                    setWaitingWorker(newWorker);
+                                    setShow(true);
+                                }
+                            });
+                        }
+                    });
                 });
-            });
 
             if (document.readyState === "complete") {
                 setupSW();
@@ -36,6 +37,7 @@ const PushNotificationManager: React.FC = () => {
                     registerServiceWorker();
                     window.removeEventListener("load", onLoad);
                 };
+
                 window.addEventListener("load", onLoad);
             }
         }

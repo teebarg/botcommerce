@@ -4,7 +4,7 @@ import ContactForm from "../contact-form";
 
 import { getSiteConfig } from "@/lib/config";
 
-export async function ContactSection() {
+export default async function ContactSection() {
     const siteConfig = await getSiteConfig();
 
     return (

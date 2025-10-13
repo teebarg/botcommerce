@@ -22,6 +22,7 @@ export default function TanstackProviders({ children }: { children: ReactNode })
     useEffect(() => {
         if (typeof window === "undefined") return;
         const persister = createAsyncStoragePersister({ storage: window.localStorage });
+
         persistQueryClient({ queryClient: client, persister });
         // no cleanup needed; persistence is benign
     }, [client]);

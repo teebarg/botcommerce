@@ -125,6 +125,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
                 document.removeEventListener("visibilitychange", onVisible);
                 start();
             };
+
             document.addEventListener("visibilitychange", onVisible);
         } else if ("requestIdleCallback" in window) {
             (window as any).requestIdleCallback(start, { timeout: 2000 });
