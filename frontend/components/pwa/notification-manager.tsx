@@ -11,22 +11,35 @@ const PushNotificationManager: React.FC = () => {
 
     useEffect(() => {
         if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.getRegistration().then((reg) => {
-                if (!reg) return;
-                reg.addEventListener("updatefound", () => {
-                    const newWorker = reg.installing;
+            const setupSW = () =>
+                navigator.serviceWorker.getRegistration().then((reg) => {
+                    if (!reg) return;
+                    reg.addEventListener("updatefound", () => {
+                        const newWorker = reg.installing;
 
-                    if (newWorker) {
-                        newWorker.addEventListener("statechange", () => {
-                            if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-                                setWaitingWorker(newWorker);
-                                setShow(true);
-                            }
-                        });
-                    }
+                        if (newWorker) {
+                            newWorker.addEventListener("statechange", () => {
+                                if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+                                    setWaitingWorker(newWorker);
+                                    setShow(true);
+                                }
+                            });
+                        }
+                    });
                 });
-            });
-            registerServiceWorker();
+
+            if (document.readyState === "complete") {
+                setupSW();
+                registerServiceWorker();
+            } else {
+                const onLoad = () => {
+                    setupSW();
+                    registerServiceWorker();
+                    window.removeEventListener("load", onLoad);
+                };
+
+                window.addEventListener("load", onLoad);
+            }
         }
         // Listen for online/offline events
         const handleOnline = () => setOffline(false);

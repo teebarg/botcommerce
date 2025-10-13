@@ -3,16 +3,11 @@ import React from "react";
 
 import PromotionalBanner from "@/components/promotion";
 import CategoriesSection from "@/components/store/landing/category-section";
-import { ContactSection } from "@/components/store/landing/contact-section";
-import NewsletterSection from "@/components/store/landing/newsletter-section";
-import { LazyFadeIn } from "@/components/LazyFadeIn";
 import HeroSection from "@/components/hero-section";
-import NewArrivals from "@/components/store/home/arrival";
-import Trending from "@/components/store/home/trending";
-import Featured from "@/components/store/home/featured";
-import RecentlyViewedSection from "@/components/store/home/recently-viewed";
 import SizesGrid from "@/components/store/home/sizes-grid";
 import SaleBanner from "@/components/store/sale-banner";
+import { LazyInView } from "@/components/LazyInView";
+import { Featured, Trending, RecentlyViewedSection, NewArrivals, ContactSection, NewsletterSection } from "@/components/LazyClient";
 
 export const revalidate = 60;
 
@@ -35,28 +30,30 @@ export default async function Home() {
                 subtitle="Get up to 50% OFF on select products."
                 title="Big Sale on Top Brands!"
             />
-            <LazyFadeIn delay={200}>
+            <LazyInView>
                 <Featured />
-            </LazyFadeIn>
-            <LazyFadeIn delay={300}>
+            </LazyInView>
+            <LazyInView>
                 <Trending />
-            </LazyFadeIn>
+            </LazyInView>
             <PromotionalBanner
                 btnClass="text-purple-600"
                 outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-8xl"
                 subtitle="Get up to 50% OFF on select products."
                 title="Big Sale on Top Brands!"
             />
-            <LazyFadeIn delay={400}>
+            <LazyInView>
                 <RecentlyViewedSection />
-            </LazyFadeIn>
-            <LazyFadeIn delay={500}>
+            </LazyInView>
+            <LazyInView>
                 <NewArrivals />
-            </LazyFadeIn>
-            <LazyFadeIn delay={600}>
+            </LazyInView>
+            <LazyInView>
                 <ContactSection />
-            </LazyFadeIn>
-            <NewsletterSection />
+            </LazyInView>
+            <LazyInView>
+                <NewsletterSection />
+            </LazyInView>
         </div>
     );
 }

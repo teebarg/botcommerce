@@ -9,8 +9,8 @@ import ProductView from "@/components/store/products/product-view";
 import ReviewsSection from "@/components/product/product-reviews";
 import { tryCatch } from "@/lib/try-catch";
 import { Product } from "@/schemas";
-import { LazyFadeIn } from "@/components/LazyFadeIn";
-import RecentlyViewedSection from "@/components/store/home/recently-viewed";
+import { LazyInView } from "@/components/LazyInView";
+import { RecentlyViewedSection } from "@/components/LazyClient";
 
 export const revalidate = 60;
 
@@ -67,19 +67,19 @@ export default async function ProductPage({ params }: { params: Params }) {
     return (
         <div className="flex flex-col gap-y-8">
             <ProductView product={product} />
-            <LazyFadeIn delay={100}>
+            <LazyInView>
                 <ReviewsSection productName={product?.name} product_id={product?.id} />
-            </LazyFadeIn>
+            </LazyInView>
 
             <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4 w-full" data-testid="related-products">
-                <LazyFadeIn delay={200}>
+                <LazyInView>
                     <RelatedProducts product={product} />
-                </LazyFadeIn>
+                </LazyInView>
             </div>
 
-            <LazyFadeIn delay={300}>
+            <LazyInView>
                 <RecentlyViewedSection showBanner={false} />
-            </LazyFadeIn>
+            </LazyInView>
         </div>
     );
 }

@@ -6,13 +6,6 @@ const HeroSection: React.FC = () => {
     return (
         <div className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0 z-0">
-                <img
-                    alt="Fashion Hero"
-                    className="w-full h-full object-cover opacity-90 dark:opacity-75"
-                    fetchPriority="high"
-                    loading="eager"
-                    src="/hero.jpg"
-                />
                 <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
             </div>
 

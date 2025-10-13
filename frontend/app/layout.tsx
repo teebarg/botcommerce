@@ -128,7 +128,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                                     </CartProvider>
                                 </SessionProvider>
                             </StoreProvider>
-                            <ReactQueryDevtools initialIsOpen={false} />
+                            {process.env.NODE_ENV !== "production" && <ReactQueryDevtools initialIsOpen={false} />}
                         </TanstackProviders>
                     </div>
                 </ProgressBar>
