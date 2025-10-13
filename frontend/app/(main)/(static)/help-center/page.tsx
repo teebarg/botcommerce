@@ -64,4 +64,4 @@ export default async function HelpCenterPage() {
             </div>
         </div>
     );
-};
+}

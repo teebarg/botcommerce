@@ -1,4 +1,5 @@
 import { Mail, Gift, Zap, Bell } from "lucide-react";
+
 import { NewsletterForm } from "./newsletter-form";
 
 export default function NewsletterSection() {

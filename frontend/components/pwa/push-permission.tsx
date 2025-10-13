@@ -148,7 +148,12 @@ export default function PushPermission() {
                     </div>
 
                     <div className="flex items-center space-x-2">
-                        <Button aria-label="Enable" className="bg-white text-gray-800 hover:bg-white/90 h-10 px-3" size="sm" onClick={handleNotificationOptIn}>
+                        <Button
+                            aria-label="Enable"
+                            className="bg-white text-gray-800 hover:bg-white/90 h-10 px-3"
+                            size="sm"
+                            onClick={handleNotificationOptIn}
+                        >
                             Enable
                         </Button>
 

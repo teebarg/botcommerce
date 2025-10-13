@@ -41,7 +41,7 @@ const ButtonNav = async ({ className }: { className?: string }) => {
         >
             {nav.map((item: NavLink, idx: number) => (
                 <div key={idx} className="flex flex-col items-center text-xs">
-                    <LocalizedClientLink aria-label={item.label} active="bg-primary text-white rounded-xl" className="p-1.5" href={item.href}>
+                    <LocalizedClientLink active="bg-primary text-white rounded-xl" aria-label={item.label} className="p-1.5" href={item.href}>
                         {item.icon}
                     </LocalizedClientLink>
                     {item.label}

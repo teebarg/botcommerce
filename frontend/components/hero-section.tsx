@@ -1,4 +1,5 @@
 import { ArrowRight, Sparkles, Star } from "lucide-react";
+
 import { BtnLink } from "@/components/ui/btnLink";
 
 const HeroSection: React.FC = () => {
@@ -6,10 +7,10 @@ const HeroSection: React.FC = () => {
         <div className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0 z-0">
                 <img
-                    fetchPriority="high"
-                    loading="eager"
                     alt="Fashion Hero"
                     className="w-full h-full object-cover opacity-90 dark:opacity-75"
+                    fetchPriority="high"
+                    loading="eager"
                     src="/hero.jpg"
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
@@ -59,11 +60,11 @@ const HeroSection: React.FC = () => {
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-4 pt-2">
-                            <BtnLink href="/collections" className="group" size="lg">
+                            <BtnLink className="group" href="/collections" size="lg">
                                 Shop Collection
                                 <ArrowRight className="w-5 h-5 ml-1 transition-transform group-hover:translate-x-1" />
                             </BtnLink>
-                            <BtnLink href="/bulk" className="group border-primary/50 hover:bg-primary/10" size="lg" variant="outline">
+                            <BtnLink className="group border-primary/50 hover:bg-primary/10" href="/bulk" size="lg" variant="outline">
                                 Bulk Purchase
                                 <Sparkles className="w-5 h-5 ml-1 transition-transform group-hover:rotate-12" />
                             </BtnLink>

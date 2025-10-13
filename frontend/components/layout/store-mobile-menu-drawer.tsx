@@ -21,8 +21,8 @@ const StoreMenuComp: React.FC = () => {
     return (
         <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
             <DrawerTrigger asChild>
-                <div className="flex flex-col items-center" aria-label="Menu">
-                    <Button variant="ghost" size="icon">
+                <div aria-label="Menu" className="flex flex-col items-center">
+                    <Button size="icon" variant="ghost">
                         <MenuIcon className="h-7 w-7" />
                     </Button>
                     <p className="text-xs">Menu</p>

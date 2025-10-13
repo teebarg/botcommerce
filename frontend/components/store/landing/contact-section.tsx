@@ -1,6 +1,7 @@
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 
 import ContactForm from "../contact-form";
+
 import { getSiteConfig } from "@/lib/config";
 
 export async function ContactSection() {

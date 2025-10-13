@@ -1,4 +1,5 @@
 import { CheckCircle, Clock, Info } from "lucide-react";
+
 import { currency } from "@/lib/utils";
 
 export default function ShippingPage() {
