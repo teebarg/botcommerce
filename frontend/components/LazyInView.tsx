@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useRef, useEffect } from "react";
 
 export function LazyInView({ children, rootMargin = "200px" }: { children: React.ReactNode; rootMargin?: string }) {

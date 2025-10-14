@@ -7,7 +7,8 @@ import HeroSection from "@/components/hero-section";
 import SizesGrid from "@/components/store/home/sizes-grid";
 import SaleBanner from "@/components/store/sale-banner";
 import { LazyInView } from "@/components/LazyInView";
-import { Featured, Trending, RecentlyViewedSection, NewArrivals, ContactSection, NewsletterSection } from "@/components/LazyClient";
+import { Featured, Trending, RecentlyViewedSection, NewArrivals, NewsletterSection } from "@/components/LazyClient";
+import ContactSection from "@/components/store/landing/contact-section";
 
 export const revalidate = 60;
 
@@ -48,9 +49,7 @@ export default async function Home() {
             <LazyInView>
                 <NewArrivals />
             </LazyInView>
-            <LazyInView>
-                <ContactSection />
-            </LazyInView>
+            <ContactSection />
             <LazyInView>
                 <NewsletterSection />
             </LazyInView>
