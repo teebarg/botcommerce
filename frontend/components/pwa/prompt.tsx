@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Cancel } from "nui-react-icons";
-
 import { Button } from "@/components/ui/button";
 import ClientOnly from "@/components/generic/client-only";
+import { ShoppingBag, X } from "lucide-react";
 
 declare global {
     interface BeforeInstallPromptEvent extends Event {
@@ -75,14 +74,16 @@ const InstallPrompt: React.FC = () => {
 
     return (
         <ClientOnly>
-            <div className="fixed bottom-4 left-4 right-4 md:max-w-100 z-50">
+            <div className="fixed bottom-4 left-4 right-4 md:max-w-100 z-50 bg-card">
                 <div className="rounded-lg shadow-xl p-8">
-                    <button aria-label="cancel" className="absolute top-2 right-2 text-muted-foreground" onClick={handleClose}>
-                        <Cancel className="h-6 w-6" />
+                    <button aria-label="cancel" className="absolute top-2 right-2 text-muted-foreground cursor-pointer" onClick={handleClose}>
+                        <X className="h-6 w-6" />
                     </button>
 
                     <div className="flex items-start space-x-4">
-                        <div className="bg-blue-500 p-3 rounded-full">{/* <ShoppingBag className="w-6 h-6 text-white" /> */}</div>
+                        <div className="bg-contrast p-2 rounded-full">
+                            <ShoppingBag className="w-6 h-6 text-white" />
+                        </div>
 
                         <div className="flex-1">
                             <h3 className="font-semibold mb-1">Install Our App</h3>
