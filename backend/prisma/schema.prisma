@@ -209,6 +209,7 @@ model Product {
   collections        Collection[]       @relation("ProductCollections")
   brand              Brand?             @relation(fields: [brand_id], references: [id], onDelete: SetNull)
   brand_id           Int?
+  embedding          Json?              @db.JsonB
   tags               Tag[]              @relation("ProductTags")
   images             ProductImage[]
   reviews            Review[]

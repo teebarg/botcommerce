@@ -289,34 +289,3 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
 
     return product_dict
 
-
-# def prepare_image_data_for_indexing(image) -> dict:
-#     product = image.product
-#     image_dict = {
-#         "id": image.id,
-#         "product_id": image.product_id,
-#         "image": image.image,
-#         "created_at": image.created_at,
-#     }
-
-#     if product:
-#         image_dict["name"] = product.name
-#         image_dict["description"] = product.description
-#         image_dict["slug"] = product.slug
-#         image_dict["collections"] = [{"id": c.id, "name": c.name} for c in (product.collections or [])]
-#         image_dict["categories"] = [{"id": c.id, "name": c.name} for c in (product.categories or [])]
-#         images = [img.image for img in sorted((product.images or []), key=lambda img: img.order)]
-#         image_dict["images"] = images
-#         image_dict["image"] = images[0] if images else None
-
-#         variants = [{"id": v.id, "price": v.price, "old_price": v.old_price, "inventory": v.inventory, "size": v.size, "color": v.color, "measurement": v.measurement, "status": v.status} for v in (product.variants or [])]
-#         image_dict["variants"] = variants
-
-#         if any(v["inventory"] > 0 for v in variants):
-#             image_dict["status"] = "IN_STOCK"
-#         else:
-#             image_dict["status"] = "OUT_OF_STOCK"
-#         image_dict["active"] = product.active
-#         image_dict["catalogs"] = [sc.slug for sc in (product.shared_collections or [])]
-
-#     return image_dict

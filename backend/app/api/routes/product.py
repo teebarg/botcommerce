@@ -31,13 +31,14 @@ from app.prisma_client import prisma as db
 from app.core.storage import upload
 from app.core.config import settings
 from prisma.errors import UniqueViolationError
-from app.services.product import reindex_product, product_upload, product_export, index_images, delete_image_index
-from app.services.redis import cache_response
+from app.services.product import reindex_product, product_upload, index_images, delete_image_index
+from app.services.redis import cache_response, invalidate_pattern
 from meilisearch.errors import MeilisearchApiError
 from app.services.recently_viewed import RecentlyViewedService
 from app.core.storage import upload
 from app.services.generic import remove_image_from_storage
 from app.services.redis import invalidate_pattern
+from app.redis_client import redis_client
 
 logger = get_logger(__name__)
 
@@ -71,6 +72,22 @@ def build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any
 
 router = APIRouter()
 
+@router.get("/recommend/{product_id}")
+async def recommend(product_id: int):
+    key = f"product:recommendations:{product_id}"
+    ids = await redis_client.lrange(key, 0, -1)
+
+    if not ids:
+        raise HTTPException(status_code=404, detail="No recommendations found")
+
+    index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
+
+    results = index.get_documents({
+        "filter": f"id IN [{','.join(ids)}]"
+    })
+
+    return {"recommendations": results.results}
+
 
 # @router.get("/popular")
 # async def get_popular_products(
@@ -81,22 +98,6 @@ router = APIRouter()
 #     products = await service.get_popular_products(limit)
 #     return products
 
-
-@router.post("/export")
-async def export_products(
-    current_user: CurrentUser,
-    background_tasks: BackgroundTasks,
-) -> Any:
-    try:
-        background_tasks.add_task(
-            product_export, email=current_user.email, user_id=current_user.id)
-
-        return {
-            "message": "Data Export successful. Please check your email"
-        }
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.get("/")

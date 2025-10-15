@@ -238,6 +238,51 @@ services:
       - ./recommendation/:/app
       - /app/.venv
 
+  worker:
+    image: 'shop-worker:${TAG-latest}'
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.constraint-label=traefik-public
+
+      - traefik.http.services.shop-worker.loadbalancer.server.port=8000
+
+      - traefik.http.routers.shop-worker-http.rule=Host(`worker.localhost`)
+      - traefik.http.routers.shop-worker-http.entrypoints=http
+    ports:
+      - "7009:8000"
+    networks:
+      - traefik-public
+      - default
+    env_file:
+      - ./worker/.env
+    build:
+      context: ./worker
+      args:
+        INSTALL_DEV: ${INSTALL_DEV-false}
+    platform: linux/amd64 # Patch for M1 Mac
+    depends_on:
+      - postgres
+      - meilisearch
+    command:
+      - fastapi
+      - run
+      - --reload
+      - "main.py"
+    develop:
+      watch:
+        - path: ./worker
+          action: sync
+          target: /
+          ignore:
+            - ./worker/.venv
+            - .venv
+        - path: ./worker/pyproject.toml
+          action: rebuild
+    volumes:
+      - ./worker/:/app
+      - /app/.venv
+
 volumes:
   pg-data:
   meili-data:
