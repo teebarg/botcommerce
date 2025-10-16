@@ -3,6 +3,8 @@ import json
 import numpy as np
 from redis_client import redis_client as r
 from db import database
+import httpx
+from config import settings
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
@@ -78,3 +80,51 @@ async def compute_similarity():
                 pipe.ltrim(key, 0, 9)
                 pipe.expire(key, 60 * 60 * 24 * 30)
                 await pipe.execute()
+
+
+def parse_variants(value):
+    import json
+    if isinstance(value, str):
+        try:
+            return json.loads(value)
+        except json.JSONDecodeError:
+            return []
+    return value
+
+
+async def generate_description(product: dict) -> str:
+    """Generate SEO-optimized product description with variant + category info."""
+    variants = parse_variants(product.get("variants"))
+
+    variants_text = ", ".join(
+        [
+            f"Size: {v.get('size', '-')}, Color: {v.get('color', '-')}, Measurement: {v.get('measurement', '-')}"
+            for v in variants
+        ]
+    ) or "No variant information available."
+
+    category_path = product.get("category_name", "")
+
+    prompt = f"""
+    Write a short, engaging, and complete marketing product description for the following product.
+    Do not use placeholders, brackets, or markdown syntax. Use natural language only.
+
+    Product name: {product.get('name')}
+    Category: {category_path}
+    Available variants: {variants_text}
+    Highlight features, use cases, and appeal to the target audience in under 80 words.
+    """
+
+    GEMINI_MODEL = "gemini-2.0-flash-001"
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
+    headers = {"Content-Type": "application/json"}
+    payload = {"contents": [{"parts": [{"text": prompt}]}]}
+
+    async with httpx.AsyncClient(timeout=30) as client:
+        response = await client.post(f"{url}?key={settings.GEMINI_API_KEY}", json=payload, headers=headers)
+
+    response.raise_for_status()
+    data = response.json()
+
+    return data["candidates"][0]["content"]["parts"][0]["text"]
