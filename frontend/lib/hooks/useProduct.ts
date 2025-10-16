@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tansta
 import { toast } from "sonner";
 
 import { api } from "@/apis/client";
-import { Product, PaginatedProductSearch, Message, ProductVariant } from "@/schemas";
+import { Product, PaginatedProductSearch, Message, ProductVariant, ProductSearch } from "@/schemas";
 
 type SearchParams = {
     search?: string;
@@ -55,18 +55,10 @@ export const useProductRecommendations = (userId?: number, num: number = 16) => 
     });
 };
 
-export const useSimilarProducts = (productId: number, num: number = 16) => {
+export const useSimilarProducts = (productId: number) => {
     return useQuery({
         queryKey: ["products", "similar", productId],
-        queryFn: async () => {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_RECOMMENDATION_URL}/similar-products/${productId}?num=${num}`);
-
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-
-            return response.json();
-        },
+        queryFn: async () => await api.get<{ similar: ProductSearch[] }>(`/product/similar/${productId}`),
         enabled: !!productId,
     });
 };

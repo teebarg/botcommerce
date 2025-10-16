@@ -10,7 +10,6 @@ import ReviewsSection from "@/components/product/product-reviews";
 import { tryCatch } from "@/lib/try-catch";
 import { Product } from "@/schemas";
 import { LazyInView } from "@/components/LazyInView";
-import { RecentlyViewedSection } from "@/components/LazyClient";
 
 export const revalidate = 60;
 
@@ -76,10 +75,6 @@ export default async function ProductPage({ params }: { params: Params }) {
                     <RelatedProducts product={product} />
                 </LazyInView>
             </div>
-
-            <LazyInView>
-                <RecentlyViewedSection showBanner={false} />
-            </LazyInView>
         </div>
     );
 }

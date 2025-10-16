@@ -66,14 +66,14 @@ def build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any
     if category_ids:
         data["categories"] = {"connect": [{"id": id} for id in category_ids]}
     if collection_ids:
-        data["collections"] = {"connect": [{"id": id}
-                                           for id in collection_ids]}
+        data["collections"] = {"connect": [{"id": id} for id in collection_ids]}
     return data
 
 router = APIRouter()
 
-@router.get("/recommend/{product_id}")
-async def recommend(product_id: int):
+@router.get("/similar/{product_id}")
+@cache_response("products")
+async def recommend(request: Request, product_id: int):
     key = f"product:recommendations:{product_id}"
     ids = await redis_client.lrange(key, 0, -1)
 
@@ -86,7 +86,7 @@ async def recommend(product_id: int):
         "filter": f"id IN [{','.join(ids)}]"
     })
 
-    return {"recommendations": results.results}
+    return {"similar": results.results}
 
 
 # @router.get("/popular")
