@@ -10,7 +10,7 @@ type RelatedProductsProps = {
 };
 
 export default function RelatedProducts({ product }: RelatedProductsProps) {
-    const { data, isLoading, error } = useSimilarProducts(product.id);
+    const { data, isLoading, error } = useSimilarProducts(product.id, 4);
 
     if (isLoading) {
         return <ComponentLoader className="min-h-[400px]" />;

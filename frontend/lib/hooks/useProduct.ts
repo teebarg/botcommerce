@@ -3,6 +3,7 @@ import { toast } from "sonner";
 
 import { api } from "@/apis/client";
 import { Product, PaginatedProductSearch, Message, ProductVariant, ProductSearch } from "@/schemas";
+import { useSession } from "next-auth/react";
 
 type SearchParams = {
     search?: string;
@@ -39,26 +40,19 @@ export const useProductInfiniteSearch = (params: SearchParams) => {
     });
 };
 
-export const useProductRecommendations = (userId?: number, num: number = 16) => {
+export const useRecommendedProducts = (limit: number = 20) => {
+    const { data: session } = useSession();
     return useQuery({
-        queryKey: ["products", "recommendations", userId],
-        queryFn: async () => {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_RECOMMENDATION_URL}/recommendations/${userId}?num=${num}`);
-
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-
-            return response.json();
-        },
-        enabled: !!userId,
+        queryKey: ["products", "recommended", limit],
+        queryFn: async () => await api.get<{ recommended: ProductSearch[] }>("/product/recommend", { params: { limit } }),
+         enabled: Boolean(session?.user),
     });
 };
 
-export const useSimilarProducts = (productId: number) => {
+export const useSimilarProducts = (productId: number, limit: number = 20) => {
     return useQuery({
-        queryKey: ["products", "similar", productId],
-        queryFn: async () => await api.get<{ similar: ProductSearch[] }>(`/product/similar/${productId}`),
+        queryKey: ["products", "similar", productId, limit],
+        queryFn: async () => await api.get<{ similar: ProductSearch[] }>(`/product/${productId}/similar`, { params: { limit } }),
         enabled: !!productId,
     });
 };

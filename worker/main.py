@@ -1,7 +1,21 @@
-from fastapi import FastAPI
-from worker import process_pending_jobs
+from fastapi import FastAPI, HTTPException
+from worker import process_pending_jobs, compute_similarity
+from db import database
+import logging
+from contextlib import asynccontextmanager
 
-app = FastAPI(title="AI Embedding Worker Service")
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("🚀connecting to dbs......:")
+    await database.connect()
+    logger.info("✅ ~ connected to pyscopg......:")
+    yield
+    await database.disconnect()
+
+app = FastAPI(title="AI Embedding Worker Service", lifespan=lifespan)
 
 @app.get("/")
 async def root():
@@ -10,8 +24,21 @@ async def root():
 @app.post("/process-jobs")
 async def process_jobs():
     """
-    Reads pending job IDs from Redis and computes embeddings
-    for each product.
+    Computes embeddings for each product.
     """
-    results = await process_pending_jobs()
-    return {"processed": len(results), "details": results}
+    try:
+        results = await process_pending_jobs()
+        return {"processed": len(results), "details": results}
+    except Exception as e:
+        return HTTPException(status_code=400, detail=str(e))
+
+@app.post("/compute-similar")
+async def compute_similar():
+    """
+    Computes similarity for each product.
+    """
+    try:
+        await compute_similarity()
+        return {"status": "ok", "message": "Similarity computed successfully"}
+    except Exception as e:
+        return HTTPException(status_code=400, detail=str(e))

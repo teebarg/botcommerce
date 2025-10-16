@@ -59,7 +59,7 @@ export default function UserDropDown({ user }: { user: Session }) {
     ];
 
     const getInitials = () => {
-        return user?.first_name ? user?.first_name?.[0] + (user?.last_name?.[0] || "") : "GU";
+        return user?.first_name ? user?.first_name?.[0] : "G";
     };
 
     if (user.role === "ADMIN") {
@@ -85,9 +85,7 @@ export default function UserDropDown({ user }: { user: Session }) {
                 <DropdownMenuLabel>
                     <div key="user" className="flex gap-2">
                         <p className="font-semibold">Signed in as</p>
-                        <p className="font-semibold">
-                            @{user?.first_name} {user?.last_name}
-                        </p>
+                        <p className="font-semibold">@{user?.first_name}</p>
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />

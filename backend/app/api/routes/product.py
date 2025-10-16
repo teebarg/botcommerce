@@ -39,6 +39,7 @@ from app.core.storage import upload
 from app.services.generic import remove_image_from_storage
 from app.services.redis import invalidate_pattern
 from app.redis_client import redis_client
+from collections import Counter
 
 logger = get_logger(__name__)
 
@@ -71,22 +72,56 @@ def build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any
 
 router = APIRouter()
 
-@router.get("/similar/{product_id}")
+@router.get("/{id}/similar")
 @cache_response("products")
-async def recommend(request: Request, product_id: int):
-    key = f"product:recommendations:{product_id}"
+async def recommend(request: Request, id: int, limit: int = Query(default=20, le=100)):
+    key = f"product:{id}:similar"
     ids = await redis_client.lrange(key, 0, -1)
 
     if not ids:
-        raise HTTPException(status_code=404, detail="No recommendations found")
+        raise HTTPException(status_code=404, detail="No similar found")
 
     index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
 
     results = index.get_documents({
-        "filter": f"id IN [{','.join(ids)}]"
+        "filter": f"id IN [{','.join(ids)}]",
+        "limit": limit
     })
 
     return {"similar": results.results}
+
+
+@router.get("/recommend")
+@cache_response("products")
+async def get_recommendations(request: Request, user: CurrentUser, limit: int = Query(default=20, le=100)):
+    redis = request.app.state.redis
+    index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
+
+    product_ids = await redis.lrange(f"user:{user.id}:history", 0, 4)  # last 5 viewed
+    if not product_ids:
+        return {"recommended": []}
+
+    recommendation_scores = Counter()
+    seen = set(product_ids)
+
+    for pid in product_ids:
+        key = f"product:{pid}:similar"
+        similar_ids = await redis.lrange(key, 0, -1)
+        for sid in similar_ids:
+            if sid not in seen:
+                recommendation_scores[sid] += 1
+
+    if not recommendation_scores:
+        return {"recommended": []}
+
+    top_ids = [pid for pid, _ in recommendation_scores.most_common(10)]
+    if not top_ids:
+        return {"recommended": []}
+
+    filter_str = " OR ".join([f"id = {pid}" for pid in top_ids])
+    results = index.search("", {"filter": filter_str, "limit": limit})
+
+    return {"recommended": results["hits"]}
 
 
 # @router.get("/popular")
