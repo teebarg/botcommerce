@@ -10,7 +10,7 @@ type RecommendedProductsProps = {
     exclude?: number[];
 };
 
-export default function RecommendedProducts({ exclude = [] }: RecommendedProductsProps) {;
+export default function RecommendedProducts({ exclude = [] }: RecommendedProductsProps) {
     const { data, isLoading, error } = useRecommendedProducts(12);
 
     if (error) {

@@ -1,9 +1,9 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 import { api } from "@/apis/client";
 import { Product, PaginatedProductSearch, Message, ProductVariant, ProductSearch } from "@/schemas";
-import { useSession } from "next-auth/react";
 
 type SearchParams = {
     search?: string;
@@ -42,10 +42,11 @@ export const useProductInfiniteSearch = (params: SearchParams) => {
 
 export const useRecommendedProducts = (limit: number = 20) => {
     const { data: session } = useSession();
+
     return useQuery({
         queryKey: ["products", "recommended", limit],
         queryFn: async () => await api.get<{ recommended: ProductSearch[] }>("/product/recommend", { params: { limit } }),
-         enabled: Boolean(session?.user),
+        enabled: Boolean(session?.user),
     });
 };
 
