@@ -53,6 +53,10 @@ class Settings(BaseSettings):
     def all_cors_origins(self) -> list[str]:
         return [str(origin).rstrip("/") for origin in self.BACKEND_CORS_ORIGINS]
 
+    QDRANT_URL: str = ""
+    QDRANT_API_KEY: str = ""
+    QDRANT_COLLECTION: str = "products"
+
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)
         env_file=".env",

@@ -6,6 +6,9 @@ from contextlib import asynccontextmanager
 import asyncio
 from typing import List
 from config import settings
+from rag import fetch_db, build_corpus, index_corpus
+from chat import assistant
+from pydantic import BaseModel
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -105,3 +108,27 @@ async def generate_missing_descriptions(request: Request):
         "updated": len(updates),
         "product_ids": [u["id"] for u in updates],
     }
+
+
+@app.post("/index-corpus")
+async def post_index_corpus():
+    try:
+        raw_data = await fetch_db()
+        corpus = await build_corpus(raw_data)
+        await index_corpus(corpus)
+        return {"status": "ok", "message": "Corpus indexed successfully"}
+    except Exception as e:
+        return HTTPException(status_code=400, detail=str(e))
+
+
+class Message(BaseModel):
+    message: str
+
+
+@app.post("/chat")
+async def post_chat(request: Message):
+    try:
+        response = assistant.chat(request.message)
+        return {"response": response}
+    except Exception as e:
+        return HTTPException(status_code=400, detail=str(e))
