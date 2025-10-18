@@ -43,13 +43,6 @@ export const useDeleteConversation = () => {
     });
 };
 
-export const useConversationMessages = (uid: string) => {
-    return useQuery({
-        queryKey: ["conversations", uid],
-        queryFn: async () => await api.get<ChatMessage[]>(`/conversation/conversations/${uid}/messages`),
-    });
-};
-
 export const useStatsTrends = () => {
     return useQuery({
         queryKey: ["stats-trends"],

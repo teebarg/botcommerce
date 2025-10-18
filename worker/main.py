@@ -128,7 +128,7 @@ class Message(BaseModel):
 @app.post("/chat")
 async def post_chat(request: Message):
     try:
-        response = assistant.chat(request.message)
+        response = await assistant.chat(request.message)
         return {"response": response}
     except Exception as e:
         return HTTPException(status_code=400, detail=str(e))

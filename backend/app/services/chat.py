@@ -1,7 +1,7 @@
 import google.generativeai as genai
 from datetime import datetime
-from config import settings
-from rag import format_search_results_for_llm, smart_search
+from app.core.config import settings
+from app.services.rag import format_search_results_for_llm, smart_search
 from typing import List, Dict
 
 genai.configure(api_key=settings.GEMINI_API_KEY)

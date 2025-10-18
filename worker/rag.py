@@ -191,9 +191,6 @@ async def index_corpus(corpus: List[Dict]):
     print(f"✅ {len(points)} embeddings stored in Qdrant!")
 
 
-# ============================================================================
-# HYBRID SEARCH (Industry Standard Approach)
-# ============================================================================
 async def hybrid_search(
     query: str,
     top_k: int = 5,
@@ -281,10 +278,8 @@ async def hybrid_search(
     
     return results
 
-# ============================================================================
-# SMART QUERY PARSER (Optional but Recommended)
-# ============================================================================
-def parse_query(query: str) -> tuple[str, Dict[str, Any]]:
+
+async def parse_query(query: str) -> tuple[str, Dict[str, Any]]:
     """
     Extract structured filters from natural language query.
     Returns cleaned semantic query and extracted filters.
@@ -305,7 +300,6 @@ def parse_query(query: str) -> tuple[str, Dict[str, Any]]:
             cleaned_query = re.sub(pattern, '', cleaned_query)
             break
     
-    # Extract colors
     common_colors = ['red', 'blue', 'green', 'black', 'white', 'yellow', 
                      'pink', 'purple', 'brown', 'orange', 'gray', 'grey']
     found_colors = []
@@ -339,7 +333,7 @@ def parse_query(query: str) -> tuple[str, Dict[str, Any]]:
     
     return cleaned_query, filters
 
-def smart_search(query: str, top_k: int = 5) -> List[Dict]:
+async def smart_search(query: str, top_k: int = 5) -> List[Dict]:
     """
     Intelligent search that automatically extracts filters from natural language.
     
@@ -348,22 +342,15 @@ def smart_search(query: str, top_k: int = 5) -> List[Dict]:
         - "red luxury items under ₦5000"
         - "blue size 12 and 14 dresses"
     """
-    semantic_query, filters = parse_query(query)
+    semantic_query, filters = await parse_query(query)
     
-    print(f"🔍 Semantic query: '{semantic_query}'")
-    print(f"🎯 Filters: {filters}")
-    
-    return hybrid_search(semantic_query, top_k=top_k, **filters)
+    return await hybrid_search(semantic_query, top_k=top_k, **filters)
 
 
-# ============================================================================
-# RAG (RETRIEVAL-AUGMENTED GENERATION) WITH GOOGLE GEMINI
-# ============================================================================
-
-def format_search_results_for_llm(results: List[Dict]) -> str:
+async def format_search_results_for_llm(results: List[Dict]) -> str:
     """
     Format search results into a structured context for the LLM.
-    Industry standard: Use XML/structured format for better parsing.
+    TODOO: Use XML/structured format for better parsing.
     """
     if not results:
         return "No relevant products found in the database."
@@ -375,7 +362,6 @@ def format_search_results_for_llm(results: List[Dict]) -> str:
         
         meta = r.get('meta', {})
         
-        # Product details
         if meta.get('name'):
             context_parts.append(f"Name: {meta['name']}")
         
@@ -390,8 +376,7 @@ def format_search_results_for_llm(results: List[Dict]) -> str:
             colors_str = ', '.join(meta['colors']) if isinstance(meta['colors'], list) else meta['colors']
             context_parts.append(f"Available Colors: {colors_str}")
         
-        # Full text content
         context_parts.append(f"\nFull Details:\n{r['text']}")
-        context_parts.append("")  # Blank line
+        context_parts.append("")
     
     return "\n".join(context_parts)

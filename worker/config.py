@@ -47,6 +47,7 @@ class Settings(BaseSettings):
     )
 
     GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.0-flash-001"
 
     @computed_field  # type: ignore[prop-decorator]
     @property

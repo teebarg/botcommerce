@@ -115,9 +115,7 @@ async def generate_description(product: dict) -> str:
     Highlight features, use cases, and appeal to the target audience in under 80 words.
     """
 
-    GEMINI_MODEL = "gemini-2.0-flash-001"
-
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.GEMINI_MODEL}:generateContent"
     headers = {"Content-Type": "application/json"}
     payload = {"contents": [{"parts": [{"text": prompt}]}]}
 
