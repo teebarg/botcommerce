@@ -6,7 +6,7 @@ import { PagSchema } from "./common";
 
 export const ChatMessageSchema = z.object({
     id: z.number(),
-    conversation_id: z.number(),
+    conversation_uuid: z.number(),
     content: z.string(),
     sender: MessageSenderSchema,
     timestamp: z.string(),

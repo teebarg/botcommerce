@@ -10,7 +10,6 @@ genai.configure(api_key=settings.GEMINI_API_KEY)
 class ConversationalRAG:
     """
     Stateful conversational assistant that remembers context.
-    Industry standard approach for production chatbots.
     """
     
     def __init__(self):
@@ -18,7 +17,7 @@ class ConversationalRAG:
         self.session = self.model.start_chat(history=[])
         self.conversation_history = []
         
-        self.system_prompt = """You are a knowledgeable e-commerce assistant for a Nigerian online store. 
+        self.system_prompt = """You are a knowledgeable e-commerce assistant for our online store. 
 
         Your capabilities:
         - Help customers find products based on their needs
@@ -32,9 +31,20 @@ class ConversationalRAG:
         - If a product isn't available, suggest alternatives from the search results
         - Be warm, professional, and helpful
         - Use Nigerian Naira (₦) for all prices
-        - Remember previous exchanges in our conversation"""
+        - Remember previous exchanges in our conversation
+
+        Do not tell customer about search results
+
+        When suggesting or showing products, you must format them using Markdown like this (with image, product name, price, and link):
+        ---
+        * ![Image](https://cdn.example.com/product.jpg)  
+        * **🛍️ Product Name**  
+        * 💵 **Price:** ₦12,999.99  
+        * 🔗 [View Product](/products/product-slug)
+        ---
+        """
     
-    async def chat(self, user_message: str, top_k: int = 5) -> str:
+    async def chat(self, user_message: str, history: str, top_k: int = 5) -> str:
         """Send a message and get a response with product context."""
         
         results = await smart_search(user_message, top_k=top_k)
@@ -44,6 +54,8 @@ class ConversationalRAG:
 
         CURRENT PRODUCT SEARCH RESULTS:
         {context}
+
+        {history}
 
         CUSTOMER MESSAGE: {user_message}"""
         

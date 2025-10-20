@@ -33,18 +33,20 @@ def safe_join(value):
 
 FETCH_SQLS = {
 "products": """
- SELECT p.id, p.name, p.description, array_to_string(p.features, ', ') AS features,
+ SELECT p.id, p.name, p.slug, p.description, array_to_string(p.features, ', ') AS features,
       string_agg(DISTINCT c.name, ', ') AS categories,
       string_agg(DISTINCT col.name, ', ') AS collections,
       string_agg(DISTINCT ('₦' || ROUND(pv.price::numeric, 2)::text), ', ') AS price,
       string_agg(DISTINCT pv."size", ', ') AS sizes,
-      string_agg(DISTINCT pv."color", ', ') AS colors
+      string_agg(DISTINCT pv."color", ', ') AS colors,
+      MIN(pi.image) AS image
   FROM products p
   LEFT JOIN "_ProductCategories" pc ON p.id = pc."A"
   LEFT JOIN categories c ON pc."B" = c.id
   LEFT JOIN "_ProductCollections" pcl ON p.id = pcl."A"
   LEFT JOIN collections col ON pcl."B" = col.id
   JOIN product_variants pv ON p.id = pv.product_id
+  JOIN product_images pi ON p.id = pi.product_id
   WHERE p.active = TRUE
   GROUP BY p.id
   LIMIT 1000;
@@ -74,6 +76,7 @@ async def build_corpus(raw_data: Dict[str, Any]) -> List[Dict]:
         if p.get("features"): text_parts.append(f"Features: {safe_join(p['features'])}")
         if p.get("categories"): text_parts.append(f"Categories: {safe_join(p['categories'])}")
         if p.get("collections"): text_parts.append(f"Collections: {safe_join(p['collections'])}")
+        if p.get("image"): text_parts.append(f"Image: {p['image']}")
         if p.get("price"): text_parts.append(f"Price: {p['price']}")
         if p.get("sizes"): text_parts.append(f"Available sizes: {safe_join(p['sizes'])}")
         if p.get("colors"): text_parts.append(f"Available colors: {safe_join(p['colors'])}")
@@ -99,7 +102,6 @@ async def build_corpus(raw_data: Dict[str, Any]) -> List[Dict]:
             price_str = str(p["price"]).replace("₦", "").replace(",", "").strip()
             try:
                 price_numeric = float(price_str)
-                text_parts.append(f"Price: {p['price']}")
             except ValueError:
                 pass
                 
@@ -113,10 +115,12 @@ async def build_corpus(raw_data: Dict[str, Any]) -> List[Dict]:
                     "source": "products",
                     "product_id": p["id"],
                     "name": p.get("name"),
+                    "slug": p.get("slug"),
                     "price": p.get("price"),
                     "price_numeric": price_numeric,
                     "sizes": sizes_list,
-                    "colors": colors_list
+                    "colors": colors_list,
+                    "image": p.get("image")
                 }
         })
 
@@ -310,7 +314,6 @@ async def parse_query(query: str) -> tuple[str, Dict[str, Any]]:
     if found_colors:
         filters['colors'] = found_colors
     
-    # Extract price range
     price_patterns = [
         (r'under\s+₦?(\d+(?:,\d+)*)', 'max_price'),
         (r'below\s+₦?(\d+(?:,\d+)*)', 'max_price'),
@@ -324,7 +327,6 @@ async def parse_query(query: str) -> tuple[str, Dict[str, Any]]:
             filters[key] = price
             cleaned_query = re.sub(pattern, '', cleaned_query)
     
-    # Clean up remaining query
     cleaned_query = re.sub(r'\s+', ' ', cleaned_query).strip()
     
     # If query is too short after filtering, use generic term
@@ -364,6 +366,9 @@ async def format_search_results_for_llm(results: List[Dict]) -> str:
         
         if meta.get('name'):
             context_parts.append(f"Name: {meta['name']}")
+
+        if meta.get('slug'):
+            context_parts.append(f"Slug: {meta['slug']}")
         
         if meta.get('price'):
             context_parts.append(f"Price: {meta['price']}")
@@ -375,6 +380,9 @@ async def format_search_results_for_llm(results: List[Dict]) -> str:
         if meta.get('colors'):
             colors_str = ', '.join(meta['colors']) if isinstance(meta['colors'], list) else meta['colors']
             context_parts.append(f"Available Colors: {colors_str}")
+
+        if meta.get('image'):
+            context_parts.append(f"Image: {meta['image']}")
         
         context_parts.append(f"\nFull Details:\n{r['text']}")
         context_parts.append("")

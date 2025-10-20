@@ -72,21 +72,6 @@ class ConversationUpdate(BaseModel):
     status: Optional[ConversationStatus] = None
 
 
-@router.post("/conversations")
-async def create_conversation(user: UserDep):
-    """Create a new conversation"""
-    data = {
-        "conversation_uuid": str(uuid.uuid4()),
-        "status": ConversationStatus.ACTIVE,
-    }
-
-    if user:
-        data["user"] = {"connect": {"id": user.id}}
-
-    new_conversation = await db.conversation.create(data=data)
-    return new_conversation
-
-
 @router.get("/conversations")
 async def list_conversations(
     user_id: Optional[int] = Query(None),
@@ -128,32 +113,6 @@ async def get_conversation(id: int) -> Conversation:
     if not conversation:
         raise HTTPException(status_code=404, detail="Conversation not found")
     return conversation
-
-
-@router.get("/conversations/uuid/{uid}")
-async def get_conversation_by_uuid(uid: str) -> Conversation:
-    """Get a conversation by UUID with its messages"""
-    conversation = await db.conversation.find_unique(
-        where={"conversation_uuid": uid},
-        include={"messages": True}
-    )
-    if not conversation:
-        raise HTTPException(status_code=404, detail="Conversation not found")
-    return conversation
-
-
-@router.patch("/conversations/{id}")
-async def update_conversation(conversation_update: ConversationUpdate, id: int) -> Conversation:
-    """Update a conversation"""
-    existing_conversation = await db.conversation.find_unique(where={"id": id})
-    if not existing_conversation:
-        raise HTTPException(status_code=404, detail="Conversation not found")
-
-    update_data = {}
-    if conversation_update.status is not None:
-        update_data["status"] = conversation_update.status
-    updated_conversation = await db.conversation.update(where={"id": id}, data=update_data)
-    return updated_conversation
 
 
 @router.delete("/conversations/{id}")
@@ -257,23 +216,3 @@ async def list_messages(
         order={"timestamp": "asc"}
     )
     return messages
-
-
-@router.get("/messages/{message_id}")
-async def get_message(message_id: int) -> Message:
-    """Get a specific message by ID"""
-    message = await db.message.find_unique(where={"id": message_id})
-    if not message:
-        raise HTTPException(status_code=404, detail="Message not found")
-    return message
-
-
-@router.delete("/messages/{message_id}")
-async def delete_message(message_id: int):
-    """Delete a message"""
-    message = await db.message.find_unique(where={"id": message_id})
-    if not message:
-        raise HTTPException(status_code=404, detail="Message not found")
-
-    await db.message.delete(where={"id": message_id})
-    return None

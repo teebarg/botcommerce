@@ -7,8 +7,9 @@ import { toast } from "sonner";
 import ChatBody from "./chatbody";
 
 import { api } from "@/apis/client";
-import { ChatMessage, Conversation } from "@/schemas";
+import { ChatMessage } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
+import { useChatMutation } from "@/lib/hooks/useApi";
 
 interface Message {
     text: string;
@@ -27,36 +28,17 @@ const ChatBotComponent: React.FC<ChatBotProps> = ({ onClose, onMinimize }) => {
             isUser: false,
         },
     ]);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [input, setInput] = useState<string>("");
-
-    const [conversationId, setConversationId] = useState<string | null>(null);
+    const { mutateAsync: chat, isPending } = useChatMutation();
 
     useEffect(() => {
         const conversationId = sessionStorage.getItem("chatbotConversationId");
-
-        if (conversationId) {
-            setConversationId(conversationId);
+        if (conversationId && conversationId !== "undefined") {
             getMessages(conversationId);
 
             return;
         }
-
-        createConversation();
     }, []);
-
-    const createConversation = async () => {
-        const { data, error } = await tryCatch<Conversation>(api.post("/conversation/conversations"));
-
-        if (error || !data?.conversation_uuid) {
-            toast.error("Failed to start a new conversation.");
-
-            return;
-        }
-
-        sessionStorage.setItem("chatbotConversationId", data.conversation_uuid);
-        setConversationId(data.conversation_uuid);
-    };
 
     const getMessages = async (id: string) => {
         const { data, error } = await tryCatch<ChatMessage[]>(api.get(`/conversation/conversations/${id}/messages`));
@@ -80,25 +62,14 @@ const ChatBotComponent: React.FC<ChatBotProps> = ({ onClose, onMinimize }) => {
         e.preventDefault();
         if (!input.trim()) return;
 
-        if (!conversationId) {
-            await createConversation();
-        }
-
-        setIsLoading(true);
         setMessages([...messages, { text: input, isUser: true }]);
         setInput("");
 
-        const { data, error } = await tryCatch<ChatMessage>(api.post(`/conversation/conversations/${conversationId}/messages`, { content: input }));
-
-        if (error) {
-            toast.error(error);
-            setIsLoading(false);
-
-            return;
+        const resp = await chat(input);
+        if (resp) {
+            setMessages((prev) => [...prev, { text: resp?.reply || "", isUser: false }]);
+            sessionStorage.setItem("chatbotConversationId", resp.conversation_uuid);
         }
-
-        setMessages((prev) => [...prev, { text: data?.content || "", isUser: false }]);
-        setIsLoading(false);
     };
 
     return (
@@ -118,7 +89,7 @@ const ChatBotComponent: React.FC<ChatBotProps> = ({ onClose, onMinimize }) => {
                     </button>
                 </div>
             </header>
-            <ChatBody isLoading={isLoading} messages={messages} />
+            <ChatBody isLoading={isPending} messages={messages} />
             <form className="flex items-center px-3 py-2 bg-[#222d31] rounded-b-none md:rounded-b-xl border-t border-[#232930]" onSubmit={handleSend}>
                 <button aria-label="Attach file" className="p-2 rounded-full hover:bg-[#2a393f] transition" tabIndex={-1} type="button">
                     <Paperclip color="#b2b8bd" size={20} />
