@@ -43,10 +43,8 @@ async def process_jobs():
     """
     Computes embeddings for each product.
     """
-    from sentence_transformers import SentenceTransformer
-    model = SentenceTransformer("all-MiniLM-L6-v2")
     try:
-        results = await process_pending_jobs(model=model)
+        results = await process_pending_jobs()
         return {"processed": len(results), "details": results}
     except Exception as e:
         return HTTPException(status_code=400, detail=str(e))

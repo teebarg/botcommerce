@@ -33,10 +33,6 @@ class Settings(BaseSettings):
 
     REDIS_URL: str = "redis://localhost:6379/0"
 
-    MEILI_MASTER_KEY: str = "masterKey"
-    MEILI_HOST: str = "http://meilisearch:7700"
-    MEILI_PRODUCTS_INDEX: str = "products"
-
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
     # e.g: '["http://localhost"]'
     BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = (

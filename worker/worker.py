@@ -4,6 +4,7 @@ from redis_client import redis_client as r
 from db import database
 import httpx
 from config import settings
+from sentence import model
 
 
 def cosine_similarity(vec_a, vec_b):
@@ -16,7 +17,7 @@ def cosine_similarity(vec_a, vec_b):
     return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
 
 
-async def process_pending_jobs(model):
+async def process_pending_jobs():
     processed = []
     try:
         async with database.pool.acquire() as conn:
