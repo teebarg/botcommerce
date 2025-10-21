@@ -55,6 +55,7 @@ class Product(BM):
     images: Optional[List[ProductImage]] = []
     reviews: Optional[List[Review]] = []
     active: Optional[bool] = True
+    embedding: Optional[List[float]] = None
 
 class SearchCategory(BaseModel):
     id: int

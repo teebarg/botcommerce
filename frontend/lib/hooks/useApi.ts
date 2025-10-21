@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 
 import { api } from "@/apis/client";
-import { BankDetails, ConversationStatus, DeliveryOption, PaginatedConversation, User } from "@/schemas";
+import { BankDetails, ConversationStatus, DeliveryOption, PaginatedChat, User } from "@/schemas";
 import { StatsTrends } from "@/types/models";
 
 interface ConversationParams {
@@ -41,6 +41,10 @@ export const useChatMutation = () => {
                 body: JSON.stringify(body),
             });
 
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+
             return response.json();
         },
         onError: (error) => {
@@ -49,24 +53,24 @@ export const useChatMutation = () => {
     });
 };
 
-export const useConversations = (searchParams: ConversationParams) => {
+export const useChats = (searchParams: ConversationParams) => {
     return useQuery({
-        queryKey: ["conversations"],
-        queryFn: async () => await api.get<PaginatedConversation>("/conversation/", { params: { ...searchParams } }),
+        queryKey: ["chats"],
+        queryFn: async () => await api.get<PaginatedChat>("/chat/", { params: { ...searchParams } }),
     });
 };
 
-export const useDeleteConversation = () => {
+export const useDeleteChat = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (id: number) => await api.delete<User>(`/conversation/${id}`),
+        mutationFn: async (id: number) => await api.delete<User>(`/chat/${id}`),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["conversations"] });
-            toast.success("Conversation deleted successfully");
+            queryClient.invalidateQueries({ queryKey: ["chats"] });
+            toast.success("Chat deleted successfully");
         },
         onError: (error) => {
-            toast.error("Failed to delete conversation" + error);
+            toast.error("Failed to delete chat" + error);
         },
     });
 };

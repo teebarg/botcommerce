@@ -6,13 +6,13 @@ import { PagSchema } from "./common";
 
 export const ChatMessageSchema = z.object({
     id: z.number(),
-    conversation_uuid: z.number(),
+    conversation_id: z.number(),
     content: z.string(),
     sender: MessageSenderSchema,
     timestamp: z.string(),
 });
 
-export const ConversationSchema = z.object({
+export const ChatSchema = z.object({
     id: z.number(),
     conversation_uuid: z.string(),
     user_id: z.number(),
@@ -23,10 +23,10 @@ export const ConversationSchema = z.object({
     status: ConversationStatusSchema,
 });
 
-export const PaginatedConversationSchema = PagSchema.extend({
-    conversations: z.array(ConversationSchema),
+export const PaginatedChatSchema = PagSchema.extend({
+    chats: z.array(ChatSchema),
 });
 
 export type ChatMessage = z.infer<typeof ChatMessageSchema>;
-export type Conversation = z.infer<typeof ConversationSchema>;
-export type PaginatedConversation = z.infer<typeof PaginatedConversationSchema>;
+export type Chat = z.infer<typeof ChatSchema>;
+export type PaginatedChat = z.infer<typeof PaginatedChatSchema>;

@@ -35,24 +35,24 @@ const ChatBotComponent: React.FC<ChatBotProps> = ({ onClose, onMinimize }) => {
         const conversationId = sessionStorage.getItem("chatbotConversationId");
 
         if (conversationId && conversationId !== "undefined") {
-            getMessages(conversationId);
+            getChat(conversationId);
 
             return;
         }
     }, []);
 
-    const getMessages = async (id: string) => {
-        const { data, error } = await tryCatch<ChatMessage[]>(api.get(`/conversation/conversations/${id}/messages`));
+    const getChat = async (id: string) => {
+        const { data, error } = await tryCatch<{ messages: ChatMessage[] }>(api.get(`/chat/${id}`));
 
         if (error) {
             toast.error("Failed to fetch messages.");
-
+            sessionStorage.removeItem("chatbotConversationId");
             return;
         }
 
         setMessages((prev) => [
             ...prev,
-            ...(data?.map((message: ChatMessage) => ({
+            ...(data?.messages?.map((message: ChatMessage) => ({
                 text: message.content,
                 isUser: message.sender === "USER",
             })) ?? []),

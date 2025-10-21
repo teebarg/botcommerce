@@ -110,7 +110,6 @@ async def build_corpus(raw_data: Dict[str, Any]) -> List[Dict]:
             "id": pid,
             "type": "product",
             "text": joined,
-            # "meta": {"source": "products", "product_id": p["id"], "name": p.get("name"), "price": p.get("price"), "sizes": p.get("sizes"), "colors": p.get("colors")},
             "meta": {
                     "source": "products",
                     "product_id": p["id"],
@@ -368,6 +367,8 @@ async def format_search_results_for_llm(results: List[Dict]) -> str:
         context_parts.append(f"\n--- Product {i} (Relevance Score: {r['score']:.2f}) ---")
 
         meta = r.get('meta', {})
+        if meta is None:
+                continue
 
         if meta.get('name'):
             context_parts.append(f"Name: {meta['name']}")

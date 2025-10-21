@@ -91,7 +91,7 @@ async def generate_missing_descriptions(request: Request):
             LEFT JOIN product_variants v ON p.id = v.product_id
             WHERE p.description IS NULL OR p.description = ''
             GROUP BY p.id, c.name
-            LIMIT 5;
+            LIMIT 20;
             """
         )
 
@@ -151,7 +151,7 @@ async def chat_endpoint(payload: ChatRequest):
                 payload.conversation_uuid,
             )
             if not conversation:
-                raise HTTPException(status_code=404, detail="Conversation not found")
+                raise HTTPException(status_code=404, detail="Chat not found")
         else:
             conversation_uuid = str(uuid4())
             conversation = await conn.fetchrow(
