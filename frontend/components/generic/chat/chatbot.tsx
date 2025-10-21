@@ -47,6 +47,7 @@ const ChatBotComponent: React.FC<ChatBotProps> = ({ onClose, onMinimize }) => {
         if (error) {
             toast.error("Failed to fetch messages.");
             sessionStorage.removeItem("chatbotConversationId");
+
             return;
         }
 

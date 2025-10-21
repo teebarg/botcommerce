@@ -28,7 +28,7 @@ ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONPATH=/app
 
 # Copy only your source code (no tests, docs, etc.)
-COPY app ./app
+COPY ./ /app
 
 # Run the FastAPI app with a single worker on Render's expected port
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "10000"]

@@ -45,9 +45,7 @@ const ChatsView: React.FC = () => {
                             {isLoading ? (
                                 <ComponentLoader className="h-[calc(100vh-200px)]" />
                             ) : (
-                                chats?.map((chat: Chat, idx: number) => (
-                                    <ChatsCard key={idx} actions={<ChatsActions chat={chat} />} chat={chat} />
-                                ))
+                                chats?.map((chat: Chat, idx: number) => <ChatsCard key={idx} actions={<ChatsActions chat={chat} />} chat={chat} />)
                             )}
                         </div>
 

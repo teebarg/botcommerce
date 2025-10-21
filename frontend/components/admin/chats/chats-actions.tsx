@@ -30,7 +30,7 @@ const ChatsActions: React.FC<CustomerActionsProps> = ({ chat }) => {
                 sheetClassName="min-w-[450px]"
                 title="Chat"
                 trigger={
-                    <Button size="icon" variant="ghost" className="bg-primary/10 hover:bg-primary/20">
+                    <Button className="bg-primary/10 hover:bg-primary/20" size="icon" variant="ghost">
                         <Eye className="h-5 w-5 text-primary" />
                     </Button>
                 }
