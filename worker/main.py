@@ -132,10 +132,6 @@ async def post_index_corpus():
         return HTTPException(status_code=400, detail=str(e))
 
 
-class Message(BaseModel):
-    message: str
-
-
 class ChatRequest(BaseModel):
     user_message: str
     user_id: Optional[int] = None
