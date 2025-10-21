@@ -7,7 +7,7 @@ from db import database
 from config import settings
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
-    VectorParams, Distance, PointStruct, Filter, 
+    VectorParams, Distance, PointStruct, Filter,
     FieldCondition, MatchValue, MatchAny, Range
 )
 from tqdm import tqdm
@@ -88,7 +88,7 @@ async def build_corpus(raw_data: Dict[str, Any]) -> List[Dict]:
             else:
                 sizes_list = [s.strip() for s in str(p["sizes"]).split(",")]
             text_parts.append(f"Available sizes: {', '.join(sizes_list)}")
-        
+
         colors_list = []
         if p.get("colors"):
             if isinstance(p["colors"], list):
@@ -96,7 +96,7 @@ async def build_corpus(raw_data: Dict[str, Any]) -> List[Dict]:
             else:
                 colors_list = [c.strip().lower() for c in str(p["colors"]).split(",")]
             text_parts.append(f"Available colors: {', '.join(colors_list)}")
-        
+
         price_numeric = None
         if p.get("price"):
             price_str = str(p["price"]).replace("₦", "").replace(",", "").strip()
@@ -104,7 +104,7 @@ async def build_corpus(raw_data: Dict[str, Any]) -> List[Dict]:
                 price_numeric = float(price_str)
             except ValueError:
                 pass
-                
+
         joined = " \n ".join(text_parts)
         corpus.append({
             "id": pid,
@@ -139,6 +139,11 @@ async def build_corpus(raw_data: Dict[str, Any]) -> List[Dict]:
         text = f"Q: {f.get('question')}\nA: {f.get('answer')}"
         corpus.append({"id": fid, "type": "faq", "text": text, "meta": {"source": "faqs", "faq_id": f["id"], "question": f.get("question")}})
 
+    text += "\n- STANDARD: Regular delivery (typically 3-5 business days)\n"
+    text += "- EXPRESS: Expedited delivery (typically 1-2 business days)\n"
+    text += "- PICKUP: In-store pickup option (available same day if item is in stock)"
+    corpus.append({"id": "delivery", "type": "delivery", "text": text})
+
     return corpus
 
 
@@ -146,15 +151,15 @@ async def index_corpus(corpus: List[Dict]):
     """Index corpus into Qdrant with batch processing."""
     if not corpus:
         raise ValueError("Corpus is empty!")
-    
+
     if qclient.collection_exists(COLLECTION_NAME):
         qclient.delete_collection(COLLECTION_NAME)
-    
+
     qclient.create_collection(
         collection_name=COLLECTION_NAME,
         vectors_config=VectorParams(size=EMBED_DIM, distance=Distance.COSINE)
     )
-    
+
     qclient.create_payload_index(
         collection_name=COLLECTION_NAME,
         field_name="meta.sizes",
@@ -175,11 +180,11 @@ async def index_corpus(corpus: List[Dict]):
         field_name="type",
         field_schema="keyword"
     )
-    
+
     texts = [d['text'] for d in corpus]
     print(f"Encoding {len(texts)} documents...")
     embeddings = model.encode(texts, show_progress_bar=True, batch_size=32)
-    
+
     points = []
     for d, emb in zip(corpus, embeddings):
         points.append(PointStruct(
@@ -187,11 +192,11 @@ async def index_corpus(corpus: List[Dict]):
             vector=emb.tolist(),
             payload=d
         ))
-    
+
     for i in tqdm(range(0, len(points), BATCH_SIZE), desc="Uploading to Qdrant"):
         batch = points[i:i + BATCH_SIZE]
         qclient.upsert(collection_name=COLLECTION_NAME, points=batch)
-    
+
     print(f"✅ {len(points)} embeddings stored in Qdrant!")
 
 
@@ -206,7 +211,7 @@ async def hybrid_search(
 ) -> List[Dict]:
     """
     Hybrid search: Semantic vector search + exact attribute filtering.
-    
+
     Args:
         query: Natural language search query
         top_k: Number of results to return
@@ -215,14 +220,14 @@ async def hybrid_search(
         min_price: Minimum price filter
         max_price: Maximum price filter
         product_type: Filter by type (e.g., "product", "faq")
-    
+
     Returns:
         List of search results with scores
     """
     q_vec = model.encode(query).tolist()
-    
+
     must_conditions = []
-    
+
     if sizes:
         must_conditions.append(
             FieldCondition(
@@ -230,7 +235,7 @@ async def hybrid_search(
                 match=MatchAny(any=sizes)
             )
         )
-    
+
     if colors:
         colors_lower = [c.lower() for c in colors]
         must_conditions.append(
@@ -239,7 +244,7 @@ async def hybrid_search(
                 match=MatchAny(any=colors_lower)
             )
         )
-    
+
     if min_price is not None or max_price is not None:
         range_params = {}
         if min_price is not None:
@@ -252,7 +257,7 @@ async def hybrid_search(
                 range=Range(**range_params)
             )
         )
-    
+
     if product_type:
         must_conditions.append(
             FieldCondition(
@@ -260,16 +265,16 @@ async def hybrid_search(
                 match=MatchValue(value=product_type)
             )
         )
-    
+
     query_filter = Filter(must=must_conditions) if must_conditions else None
-    
+
     hits = qclient.query_points(
         collection_name=COLLECTION_NAME,
         query=q_vec,
         limit=top_k,
         query_filter=query_filter
     )
-    
+
     results = []
     for hit in hits.points:
         results.append({
@@ -279,7 +284,7 @@ async def hybrid_search(
             'type': hit.payload.get('type'),
             'meta': hit.payload.get('meta')
         })
-    
+
     return results
 
 
@@ -290,7 +295,7 @@ async def parse_query(query: str) -> tuple[str, Dict[str, Any]]:
     """
     filters = {}
     cleaned_query = query.lower()
-    
+
     # Extract sizes (e.g., "size 18", "sizes 12 and 14")
     size_patterns = [
         r'size[s]?\s+(\d+)(?:\s+and\s+(\d+))?(?:\s+and\s+(\d+))?',
@@ -303,8 +308,8 @@ async def parse_query(query: str) -> tuple[str, Dict[str, Any]]:
             filters['sizes'] = sizes
             cleaned_query = re.sub(pattern, '', cleaned_query)
             break
-    
-    common_colors = ['red', 'blue', 'green', 'black', 'white', 'yellow', 
+
+    common_colors = ['red', 'blue', 'green', 'black', 'white', 'yellow',
                      'pink', 'purple', 'brown', 'orange', 'gray', 'grey']
     found_colors = []
     for color in common_colors:
@@ -313,7 +318,7 @@ async def parse_query(query: str) -> tuple[str, Dict[str, Any]]:
             cleaned_query = cleaned_query.replace(color, '')
     if found_colors:
         filters['colors'] = found_colors
-    
+
     price_patterns = [
         (r'under\s+₦?(\d+(?:,\d+)*)', 'max_price'),
         (r'below\s+₦?(\d+(?:,\d+)*)', 'max_price'),
@@ -326,26 +331,26 @@ async def parse_query(query: str) -> tuple[str, Dict[str, Any]]:
             price = float(match.group(1).replace(',', ''))
             filters[key] = price
             cleaned_query = re.sub(pattern, '', cleaned_query)
-    
+
     cleaned_query = re.sub(r'\s+', ' ', cleaned_query).strip()
-    
+
     # If query is too short after filtering, use generic term
     if not cleaned_query or len(cleaned_query) < 2:
         cleaned_query = "product"
-    
+
     return cleaned_query, filters
 
 async def smart_search(query: str, top_k: int = 5) -> List[Dict]:
     """
     Intelligent search that automatically extracts filters from natural language.
-    
+
     Example queries:
         - "Do you have size 18 products?"
         - "red luxury items under ₦5000"
         - "blue size 12 and 14 dresses"
     """
     semantic_query, filters = await parse_query(query)
-    
+
     return await hybrid_search(semantic_query, top_k=top_k, **filters)
 
 
@@ -356,35 +361,35 @@ async def format_search_results_for_llm(results: List[Dict]) -> str:
     """
     if not results:
         return "No relevant products found in the database."
-    
+
     context_parts = ["PRODUCT CATALOG SEARCH RESULTS:\n"]
-    
+
     for i, r in enumerate(results, 1):
         context_parts.append(f"\n--- Product {i} (Relevance Score: {r['score']:.2f}) ---")
-        
+
         meta = r.get('meta', {})
-        
+
         if meta.get('name'):
             context_parts.append(f"Name: {meta['name']}")
 
         if meta.get('slug'):
             context_parts.append(f"Slug: {meta['slug']}")
-        
+
         if meta.get('price'):
             context_parts.append(f"Price: {meta['price']}")
-        
+
         if meta.get('sizes'):
             sizes_str = ', '.join(meta['sizes']) if isinstance(meta['sizes'], list) else meta['sizes']
             context_parts.append(f"Available Sizes: {sizes_str}")
-        
+
         if meta.get('colors'):
             colors_str = ', '.join(meta['colors']) if isinstance(meta['colors'], list) else meta['colors']
             context_parts.append(f"Available Colors: {colors_str}")
 
         if meta.get('image'):
             context_parts.append(f"Image: {meta['image']}")
-        
+
         context_parts.append(f"\nFull Details:\n{r['text']}")
         context_parts.append("")
-    
+
     return "\n".join(context_parts)

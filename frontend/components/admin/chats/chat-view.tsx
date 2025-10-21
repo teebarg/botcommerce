@@ -48,7 +48,7 @@ const ConversationViewer: React.FC<{ conversation: Conversation; onClose: () => 
                             {!conversation.user ? (
                                 <UserX size={20} />
                             ) : (
-                                <img src={conversation.user?.image} alt={conversation.user?.first_name} className="w-full h-full object-contain" />
+                                <img alt={conversation.user?.first_name} className="w-full h-full object-contain" src={conversation.user?.image} />
                             )}
                         </div>
 

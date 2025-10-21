@@ -33,6 +33,7 @@ const ChatBotComponent: React.FC<ChatBotProps> = ({ onClose, onMinimize }) => {
 
     useEffect(() => {
         const conversationId = sessionStorage.getItem("chatbotConversationId");
+
         if (conversationId && conversationId !== "undefined") {
             getMessages(conversationId);
 
@@ -66,6 +67,7 @@ const ChatBotComponent: React.FC<ChatBotProps> = ({ onClose, onMinimize }) => {
         setInput("");
 
         const resp = await chat(input);
+
         if (resp) {
             setMessages((prev) => [...prev, { text: resp?.reply || "", isUser: false }]);
             sessionStorage.setItem("chatbotConversationId", resp.conversation_uuid);

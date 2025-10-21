@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 import { api } from "@/apis/client";
 import { BankDetails, ConversationStatus, DeliveryOption, PaginatedConversation, User } from "@/schemas";
 import { StatsTrends } from "@/types/models";
-import { useSession } from "next-auth/react";
 
 interface ConversationParams {
     user_id?: number;
@@ -24,6 +24,7 @@ export const useBankDetails = () => {
 
 export const useChatMutation = () => {
     const { data: session } = useSession();
+
     return useMutation({
         mutationFn: async (message: string) => {
             const conversationId = sessionStorage.getItem("chatbotConversationId");
@@ -39,6 +40,7 @@ export const useChatMutation = () => {
                 },
                 body: JSON.stringify(body),
             });
+
             return response.json();
         },
         onError: (error) => {
@@ -50,7 +52,7 @@ export const useChatMutation = () => {
 export const useConversations = (searchParams: ConversationParams) => {
     return useQuery({
         queryKey: ["conversations"],
-        queryFn: async () => await api.get<PaginatedConversation>(`/conversation/conversations/`, { params: { ...searchParams } }),
+        queryFn: async () => await api.get<PaginatedConversation>("/conversation/", { params: { ...searchParams } }),
     });
 };
 
@@ -58,7 +60,7 @@ export const useDeleteConversation = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (id: number) => await api.delete<User>(`/conversation/conversations/${id}`),
+        mutationFn: async (id: number) => await api.delete<User>(`/conversation/${id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["conversations"] });
             toast.success("Conversation deleted successfully");
