@@ -1,12 +1,9 @@
-from sentence_transformers import SentenceTransformer
 import json
 import numpy as np
 from redis_client import redis_client as r
 from db import database
 import httpx
 from config import settings
-
-model = SentenceTransformer("all-MiniLM-L6-v2")
 
 
 def cosine_similarity(vec_a, vec_b):
@@ -19,7 +16,7 @@ def cosine_similarity(vec_a, vec_b):
     return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
 
 
-async def process_pending_jobs():
+async def process_pending_jobs(model):
     processed = []
     try:
         async with database.pool.acquire() as conn:

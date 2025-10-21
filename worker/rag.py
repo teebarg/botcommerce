@@ -1,6 +1,6 @@
 from typing import List, Dict, Any, Optional
 
-from sentence_transformers import SentenceTransformer
+# from sentence_transformers import SentenceTransformer
 import hashlib
 import re
 from db import database
@@ -14,8 +14,7 @@ from tqdm import tqdm
 
 
 qclient = QdrantClient(url=settings.QDRANT_URL, api_key=settings.QDRANT_API_KEY)
-model = SentenceTransformer('all-MiniLM-L6-v2')
-EMBED_DIM = model.get_sentence_embedding_dimension()
+# model = SentenceTransformer('all-MiniLM-L6-v2')
 COLLECTION_NAME = settings.QDRANT_COLLECTION
 BATCH_SIZE = 100
 
@@ -146,7 +145,7 @@ async def build_corpus(raw_data: Dict[str, Any]) -> List[Dict]:
     return corpus
 
 
-async def index_corpus(corpus: List[Dict]):
+async def index_corpus(corpus: List[Dict], model):
     """Index corpus into Qdrant with batch processing."""
     if not corpus:
         raise ValueError("Corpus is empty!")
@@ -156,7 +155,7 @@ async def index_corpus(corpus: List[Dict]):
 
     qclient.create_collection(
         collection_name=COLLECTION_NAME,
-        vectors_config=VectorParams(size=EMBED_DIM, distance=Distance.COSINE)
+        vectors_config=VectorParams(size=384, distance=Distance.COSINE)
     )
 
     qclient.create_payload_index(
@@ -223,6 +222,8 @@ async def hybrid_search(
     Returns:
         List of search results with scores
     """
+    from sentence_transformers import SentenceTransformer
+    model = SentenceTransformer("all-MiniLM-L6-v2")
     q_vec = model.encode(query).tolist()
 
     must_conditions = []

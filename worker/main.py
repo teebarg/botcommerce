@@ -43,8 +43,10 @@ async def process_jobs():
     """
     Computes embeddings for each product.
     """
+    from sentence_transformers import SentenceTransformer
+    model = SentenceTransformer("all-MiniLM-L6-v2")
     try:
-        results = await process_pending_jobs()
+        results = await process_pending_jobs(model=model)
         return {"processed": len(results), "details": results}
     except Exception as e:
         return HTTPException(status_code=400, detail=str(e))
@@ -123,10 +125,12 @@ async def generate_missing_descriptions(request: Request):
 
 @app.post("/index-corpus")
 async def post_index_corpus():
+    from sentence_transformers import SentenceTransformer
+    model = SentenceTransformer("all-MiniLM-L6-v2")
     try:
         raw_data = await fetch_db()
         corpus = await build_corpus(raw_data)
-        await index_corpus(corpus)
+        await index_corpus(corpus, model)
         return {"status": "ok", "message": "Corpus indexed successfully"}
     except Exception as e:
         return HTTPException(status_code=400, detail=str(e))

@@ -18,23 +18,22 @@ ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
 ENV UV_HTTP_TIMEOUT=600
 
-# Install dependencies
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
+# Copy only dependency files first (to cache efficiently)
+COPY pyproject.toml uv.lock ./
+
+# Install dependencies (no dev, no bytecode overhead)
 RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=uv.lock,target=uv.lock \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-install-project
+    uv sync --frozen --no-install-project --no-dev
 
 ENV PYTHONPATH=/app
 
-COPY ./pyproject.toml /app/
+# COPY ./pyproject.toml /app/
 
 COPY ./ /app
 
 # Sync the project
 # Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync
+# RUN --mount=type=cache,target=/root/.cache/uv \
+#     uv sync
 
 CMD ["fastapi", "run", "--workers", "4", "main.py"]
-
