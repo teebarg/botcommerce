@@ -4,7 +4,7 @@ from redis_client import redis_client as r
 from db import database
 import httpx
 from config import settings
-from sentence import model
+from sentence import get_model
 
 
 def cosine_similarity(vec_a, vec_b):
@@ -18,6 +18,9 @@ def cosine_similarity(vec_a, vec_b):
 
 
 async def process_pending_jobs():
+    model = get_model()
+    # from sentence_transformers import SentenceTransformer
+    # model = SentenceTransformer("all-MiniLM-L6-v2")
     processed = []
     try:
         async with database.pool.acquire() as conn:
