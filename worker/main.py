@@ -34,6 +34,14 @@ if settings.all_cors_origins:
         allow_headers=["*"],
     )
 
+
+@app.post("/load-model")
+async def post_index_corpus():
+    from sentence import get_model
+    model = get_model()
+    print(model)
+    return {"status": "ok", "message": "Model loaded successfully"}
+
 @app.get("/")
 async def root():
     return {"status": "ok", "message": "AI worker service running"}
@@ -123,12 +131,10 @@ async def generate_missing_descriptions(request: Request):
 
 @app.post("/index-corpus")
 async def post_index_corpus():
-    from sentence_transformers import SentenceTransformer
-    model = SentenceTransformer("all-MiniLM-L6-v2")
     try:
         raw_data = await fetch_db()
         corpus = await build_corpus(raw_data)
-        await index_corpus(corpus, model)
+        await index_corpus(corpus)
         return {"status": "ok", "message": "Corpus indexed successfully"}
     except Exception as e:
         return HTTPException(status_code=400, detail=str(e))
