@@ -107,6 +107,12 @@ class Settings(BaseSettings):
 
     BREVO_API_KEY: str = "key"
 
+    HF_TOKEN: str = ""
+
+    QDRANT_URL: str = ""
+    QDRANT_API_KEY: str = ""
+    QDRANT_COLLECTION: str = ""
+
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)
         env_file=".env",

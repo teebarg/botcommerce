@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 
 import { api } from "@/apis/client";
-import { BankDetails, ConversationStatus, DeliveryOption, PaginatedChat, User } from "@/schemas";
+import { BankDetails, ConversationStatus, DeliveryOption, Message, PaginatedChat, User } from "@/schemas";
 import { StatsTrends } from "@/types/models";
 
 interface ConversationParams {
@@ -33,19 +33,7 @@ export const useChatMutation = () => {
                 conversation_uuid: conversationId,
                 user_message: message,
             };
-            const response = await fetch(`${process.env.NEXT_PUBLIC_WORKER}/chat`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(body),
-            });
-
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-
-            return response.json();
+            return await api.post<{ reply: string; conversation_uuid: string }>("/chat/", body)
         },
         onError: (error) => {
             toast.error("Failed to chat" + error);
@@ -64,7 +52,7 @@ export const useDeleteChat = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (id: number) => await api.delete<User>(`/chat/${id}`),
+        mutationFn: async (id: number) => await api.delete<Message>(`/chat/${id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["chats"] });
             toast.success("Chat deleted successfully");

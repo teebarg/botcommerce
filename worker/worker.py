@@ -4,7 +4,6 @@ from redis_client import redis_client as r
 from db import database
 import httpx
 from config import settings
-from sentence import get_model
 
 
 def cosine_similarity(vec_a, vec_b):
@@ -15,42 +14,6 @@ def cosine_similarity(vec_a, vec_b):
     a = np.array(vec_a, dtype=float)
     b = np.array(vec_b, dtype=float)
     return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
-
-
-async def process_pending_jobs():
-    model = get_model()
-    processed = []
-    try:
-        async with database.pool.acquire() as conn:
-            products_query = """
-                SELECT p.id, p.name, p.description,
-                    ARRAY_AGG(DISTINCT c.name) as categories
-                FROM products p
-                LEFT JOIN "_ProductCategories" pc ON p.id = pc."A"
-                LEFT JOIN categories c ON pc."B" = c.id
-                GROUP BY p.id, p.name
-            """
-            products = await conn.fetch(products_query)
-            for p in products:
-                text = f"{p.get('name', '')} {p.get('description', '')} {''.join(c for c in p.get('categories', []) if c)}"
-                embedding = model.encode(text).tolist()
-
-                await conn.execute(
-                    """
-                    UPDATE products
-                    SET embedding = $1
-                    WHERE id = $2
-                    """,
-                    json.dumps(embedding),
-                    p["id"]
-                )
-                processed.append(p["id"])
-            print("All products updated successfully")
-    except Exception as e:
-        print(f"❌ Failed to fetch products: {e}")
-        raise Exception(f"Failed to fetch products: {e}")
-
-    return processed
 
 
 async def compute_similarity():

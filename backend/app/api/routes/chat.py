@@ -2,11 +2,79 @@ from fastapi import APIRouter, HTTPException, Query
 
 from app.prisma_client import prisma as db
 from typing import Optional
+from pydantic import BaseModel
+from uuid import uuid4
+from app.services.chat import assistant
 
 from prisma.enums import ConversationStatus
 from math import ceil
 
 router = APIRouter()
+
+class ChatRequest(BaseModel):
+    user_message: str
+    user_id: Optional[int] = None
+    conversation_uuid: Optional[str] = None
+
+
+@router.post("/")
+async def chat_endpoint(payload: ChatRequest):
+    if payload.conversation_uuid:
+        conversation = await db.conversation.find_unique(
+            where={"conversation_uuid": payload.conversation_uuid}
+        )
+        if not conversation:
+            raise HTTPException(status_code=404, detail="Chat not found")
+    else:
+        conversation = await db.conversation.create(
+            data={
+                "conversation_uuid": str(uuid4()),
+                "user_id": payload.user_id,
+            }
+        )
+
+    messages = await db.message.find_many(
+        where={"conversation_id": conversation.id},
+        order={"timestamp": "asc"}
+    )
+
+    history = []
+    for msg in messages:
+        if msg.sender == "USER":
+            history.append({"user": msg.content, "assistant": ""})
+        elif msg.sender == "BOT" and history:
+            history[-1]["assistant"] = msg.content
+
+    history_text = "\n\nRECENT CONVERSATION:\n" + "\n".join(
+        [f"User: {h['user']}\nAssistant: {h['assistant']}" for h in history]
+    )
+
+    reply = await assistant.chat(payload.user_message, history_text)
+
+    async with db.tx() as tx:
+        await tx.message.create(
+            data={
+                "conversation_id": conversation.id,
+                "content": payload.user_message,
+                "sender": "USER",
+            }
+        )
+        await tx.message.create(
+            data={
+                "conversation_id": conversation.id,
+                "content": reply,
+                "sender": "BOT",
+            }
+        )
+        await tx.conversation.update(
+            where={"id": conversation.id},
+            data={},
+        )
+
+    return {
+        "reply": reply,
+        "conversation_uuid": conversation.conversation_uuid,
+    }
 
 @router.get("/")
 async def list_chats(

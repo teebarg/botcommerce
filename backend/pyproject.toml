@@ -22,11 +22,11 @@ dependencies = [
     "redis==6.4.0",
     "prisma<1.0.0,>=0.11.0",
     "supabase==2.18.1",
-    "google-genai==1.32.0",
     "reportlab<5.0.0,>=4.0.0",
     "sentry-sdk[fastapi]<3.0.0,>=1.40.6",
-    "asyncpg==0.30.0",
-    "cloudinary==1.44.1"
+    "cloudinary==1.44.1",
+    "qdrant-client==1.15.1",
+    "google-generativeai==0.8.5"
 ]
 
 [tool.uv]
