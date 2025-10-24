@@ -1,47 +1,33 @@
-FROM python:3.10
+# ---------- STAGE 1: Builder ----------
+FROM python:3.11-slim AS builder
+WORKDIR /app
 
-ENV PYTHONUNBUFFERED=1
-
-WORKDIR /app/
-
-# Install uv
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#installing-uv
+# Copy uv (fast dependency installer)
 COPY --from=ghcr.io/astral-sh/uv:0.5.11 /uv /uvx /bin/
 
-# Place executables in the environment at the front of the path
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#using-the-environment
+# Environment for uv
 ENV PATH="/app/.venv/bin:$PATH"
-
-# Compile bytecode
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#compiling-bytecode
 ENV UV_COMPILE_BYTECODE=1
-
-# uv Cache
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#caching
 ENV UV_LINK_MODE=copy
+ENV UV_HTTP_TIMEOUT=600
 
-# Install dependencies
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
+# Copy only dependency metadata
+COPY pyproject.toml uv.lock ./
+
+# Install dependencies into a virtual env (.venv)
 RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=uv.lock,target=uv.lock \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-install-project
+    uv sync --frozen --no-dev
 
+    
+# ---------- STAGE 2: Final Runtime ----------
+FROM python:3.11-slim AS runtime
+WORKDIR /app
+
+# Copy the virtualenv from builder (only compiled packages)
+COPY --from=builder /app/.venv /app/.venv
+ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONPATH=/app
 
-COPY ./scripts /app/scripts
-
-COPY ./pyproject.toml ./uv.lock /app/
-
-COPY ./prisma /app/prisma
-
 COPY ./app /app/app
-
-# Sync the project
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync
-
-RUN prisma generate
 
 CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
