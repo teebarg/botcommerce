@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 
 import { api } from "@/apis/client";
-import { BankDetails, ConversationStatus, DeliveryOption, Message, PaginatedChat, User } from "@/schemas";
+import { BankDetails, ConversationStatus, DeliveryOption, Message, PaginatedChat } from "@/schemas";
 import { StatsTrends } from "@/types/models";
 
 interface ConversationParams {
@@ -33,7 +33,8 @@ export const useChatMutation = () => {
                 conversation_uuid: conversationId,
                 user_message: message,
             };
-            return await api.post<{ reply: string; conversation_uuid: string }>("/chat/", body)
+
+            return await api.post<{ reply: string; conversation_uuid: string }>("/chat/", body);
         },
         onError: (error) => {
             toast.error("Failed to chat" + error);
