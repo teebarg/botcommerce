@@ -10,7 +10,7 @@ type RelatedProductsProps = {
 };
 
 export default function RelatedProducts({ product }: RelatedProductsProps) {
-    const { data, isLoading, error } = useSimilarProducts(product.id, 5);
+    const { data, isLoading, error } = useSimilarProducts(product.id, 4);
 
     if (isLoading) {
         return <ComponentLoader className="min-h-[400px]" />;
@@ -20,7 +20,7 @@ export default function RelatedProducts({ product }: RelatedProductsProps) {
         return null;
     }
 
-    const productPreviews = data?.similar_products?.filter((item: ProductSearch) => item.id !== product.id);
+    const productPreviews = data?.similar?.filter((item: ProductSearch) => item.id !== product.id);
 
     if (!productPreviews?.length) {
         return null;

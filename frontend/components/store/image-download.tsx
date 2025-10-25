@@ -46,7 +46,7 @@ export function ImageDownloadButton({ url, fallbackName = "file", className }: I
     };
 
     return (
-        <Button className={cn("", className)} size="icon" onClick={handleDownload}>
+        <Button className={cn("bg-primary/10 hover:bg-primary/20", className)} size="icon" variant="ghost" onClick={handleDownload}>
             <Download className="h-6 w-6 text-primary" />
         </Button>
     );

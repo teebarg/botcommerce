@@ -7,7 +7,7 @@ export * from "./cart";
 export * from "./order";
 export * from "./review";
 export * from "./activity";
-export * from "./conversation";
+export * from "./chat";
 export * from "./carousel";
 
 export interface DeliveryOption {

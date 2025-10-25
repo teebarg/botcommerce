@@ -1,5 +1,4 @@
 import httpx
-import json
 import random
 import string
 from dataclasses import dataclass

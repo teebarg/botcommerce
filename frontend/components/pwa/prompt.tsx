@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ShoppingBag, X } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import ClientOnly from "@/components/generic/client-only";
-import { ShoppingBag, X } from "lucide-react";
 
 declare global {
     interface BeforeInstallPromptEvent extends Event {

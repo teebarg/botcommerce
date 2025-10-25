@@ -34,7 +34,7 @@ const UserCounter: React.FC<UserCounterProps> = ({ icon, label, count, trend, co
                 </div>
                 <div className="space-y-1">
                     <p className="text-2xl font-bold animate-pulse">{count}</p>
-                    <p className="text-sm text-muted-foreground font-medium">{label}</p>
+                    <p className="text-sm font-medium">{label}</p>
                 </div>
             </CardContent>
         </Card>

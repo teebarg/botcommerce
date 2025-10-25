@@ -3,10 +3,7 @@ from typing import Annotated, Any, Literal
 from pydantic import (
     AnyUrl,
     BeforeValidator,
-    PostgresDsn,
-    ValidationInfo,
     computed_field,
-    field_validator,
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -24,7 +21,6 @@ class Settings(BaseSettings):
     DATABASE_URL: str = ""
 
     DOMAIN: str = "localhost"
-    FRONTEND_HOST: str = "http://localhost:3000"
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
 
     @computed_field  # type: ignore[misc]
@@ -37,22 +33,19 @@ class Settings(BaseSettings):
 
     REDIS_URL: str = "redis://localhost:6379/0"
 
-    MEILI_MASTER_KEY: str = "masterKey"
-    MEILI_HOST: str = "http://meilisearch:7700"
-    MEILI_PRODUCTS_INDEX: str = "products"
-
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
     # e.g: '["http://localhost"]'
     BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = (
         []
     )
 
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.0-flash-001"
+
     @computed_field  # type: ignore[prop-decorator]
     @property
     def all_cors_origins(self) -> list[str]:
-        return [str(origin).rstrip("/") for origin in self.BACKEND_CORS_ORIGINS] + [
-            self.FRONTEND_HOST
-        ]
+        return [str(origin).rstrip("/") for origin in self.BACKEND_CORS_ORIGINS]
 
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)

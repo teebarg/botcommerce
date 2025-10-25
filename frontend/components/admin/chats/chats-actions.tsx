@@ -4,42 +4,43 @@ import React from "react";
 import { Eye, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
-import ConversationViewer from "./chat-view";
+import ChatViewer from "./chat-view";
 
-import { useDeleteConversation } from "@/lib/hooks/useApi";
+import { useDeleteChat } from "@/lib/hooks/useApi";
 import { Button } from "@/components/ui/button";
-import { Conversation } from "@/schemas";
+import { Chat } from "@/schemas";
 import Overlay from "@/components/overlay";
 
 interface CustomerActionsProps {
-    conversation: Conversation;
+    chat: Chat;
 }
 
-const ChatsActions: React.FC<CustomerActionsProps> = ({ conversation }) => {
-    const { mutate, isPending } = useDeleteConversation();
+const ChatsActions: React.FC<CustomerActionsProps> = ({ chat }) => {
+    const { mutate, isPending } = useDeleteChat();
     const state = useOverlayTriggerState({});
 
     const onDelete = () => {
-        mutate(conversation.id);
+        mutate(chat.id);
     };
 
     return (
-        <div className="flex">
+        <div className="flex gap-1.5 mt-2">
             <Overlay
                 open={state.isOpen}
                 sheetClassName="min-w-[450px]"
-                title="Conversation"
+                title="Chat"
                 trigger={
-                    <Button size="icon" variant="ghost">
-                        <Eye className="h-5 w-5" />
+                    <Button className="bg-primary/10 hover:bg-primary/20" size="icon" variant="ghost">
+                        <Eye className="h-5 w-5 text-primary" />
                     </Button>
                 }
                 onOpenChange={state.setOpen}
             >
-                <ConversationViewer conversation={conversation} onClose={state.close} />
+                <ChatViewer chat={chat} onClose={state.close} />
             </Overlay>
 
             <Button
+                className="bg-destructive/10 hover:bg-destructive/20"
                 disabled={isPending}
                 isLoading={isPending}
                 size="icon"
@@ -49,7 +50,7 @@ const ChatsActions: React.FC<CustomerActionsProps> = ({ conversation }) => {
                     onDelete();
                 }}
             >
-                <Trash2 className="h-5 w-5 text-red-500" />
+                <Trash2 className="h-5 w-5 text-destructive" />
             </Button>
         </div>
     );

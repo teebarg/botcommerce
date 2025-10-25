@@ -18,7 +18,6 @@ COPY pyproject.toml uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev
 
-    
 # ---------- STAGE 2: Final Runtime ----------
 FROM python:3.11-slim AS runtime
 WORKDIR /app
@@ -28,6 +27,8 @@ COPY --from=builder /app/.venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONPATH=/app
 
-COPY ./app /app/app
+# Copy only your source code (no tests, docs, etc.)
+COPY ./ /app
 
-CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
+# Run the FastAPI app with a single worker on Render's expected port
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "10000"]

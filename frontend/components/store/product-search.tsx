@@ -35,7 +35,6 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
 
     const { data, isLoading } = useProductSearch({ search: debouncedQuery, limit: 4, skip: 0, show_suggestions: true });
     const { data: trendingData } = useProductSearch({ collections: "trending", limit: 4, skip: 0 });
-    // const { data: recommendedData } = useProductRecommendations(session?.id, 5);
 
     useEffect(() => {
         const savedHistory = localStorage.getItem("searchHistory");
@@ -208,18 +207,6 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                                 </div>
                             </div>
                         )}
-                        {/* TODO: Implement recommended products */}
-                        {/* <div>
-                                    <div className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground">
-                                        <Star className="w-4 h-4" />
-                                        Recommended for You
-                                    </div>
-                                    <div className="space-y-1">
-                                        {recommendedData?.recommendations?.map((product: ProductSearch, idx: number) => (
-                                            <ProductCard key={idx} product={product} onProductSelect={handleProductSelect} />
-                                        ))}
-                                    </div>
-                                </div> */}
                     </div>
                 </div>
             </SheetContent>

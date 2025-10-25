@@ -100,8 +100,8 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
                             {currentScenario.primaryAction}
                         </Button>
 
-                        <Button className="w-full" size="lg" variant="outline" onClick={handleSecondaryAction}>
-                            <ArrowLeft className="w-4 h-4 mr-2" />
+                        <Button className="w-full" size="lg" variant="contrast" onClick={handleSecondaryAction}>
+                            <ArrowLeft className="w-4 h-4" />
                             <span>{currentScenario.secondaryAction}</span>
                         </Button>
                     </div>
@@ -116,7 +116,6 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
                     </div>
                 </div>
 
-                {/* Decorative Elements */}
                 <div className="mt-8 flex justify-center space-x-2">
                     <div className="w-2 h-2 rounded-full animate-bounce transition-colors bg-blue-500" />
                     <div className="w-2 h-2 rounded-full animate-bounce transition-colors bg-purple-500" style={{ animationDelay: "0.1s" }} />

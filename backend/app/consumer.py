@@ -208,6 +208,14 @@ class RedisStreamConsumer:
             }
             if int(event.get("time_spent", 0)) > 0:
                 metadata["time_spent"] = int(event.get("time_spent", 0))
+                
+            key = f"user:{event['user_id']}:history"
+            async with self.redis.pipeline(transaction=True) as pipe:
+                pipe.lpush(key, event['product_id'])
+                pipe.ltrim(key, 0, 49)
+                pipe.expire(key, 60 * 60 * 24 * 30)
+                await pipe.execute()
+                
             await db.userinteraction.create(
                 data={
                     "user": {"connect": {"id": int(event["user_id"])}},

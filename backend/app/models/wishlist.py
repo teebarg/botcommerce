@@ -1,7 +1,8 @@
 from typing import Optional
 from app.models.base import BM
 from pydantic import BaseModel
-from prisma.models import Product, ProductVariant
+from prisma.models import ProductVariant
+from app.models.product import Product
 
 
 class WishlistBase(BM):

@@ -70,6 +70,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     </div>
 
                     <div className="py-4 px-2 space-y-2">
+                        <p className="sr-only">{product.name}</p>
                         <PriceLabel priceInfo={priceInfo} />
                         <ProductActions product={product} />
                     </div>
