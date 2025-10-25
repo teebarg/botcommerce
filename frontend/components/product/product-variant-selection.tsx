@@ -113,6 +113,39 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                 </div>
             )}
 
+            {ages?.length > 0 && (
+                <div className="space-y-3">
+                    <h3 className="text-sm font-medium">Age Range</h3>
+                    <div className="flex flex-wrap gap-2">
+                        {ages?.map((age) => {
+                            if (!age) {
+                                return null;
+                            }
+                            const available = isOptionAvailable("age", age!);
+                            const isSelected = selectedAge === age;
+
+                            return (
+                                <button
+                                    key={age}
+                                    className={cn(
+                                        "px-6 py-2 text-sm font-medium border border-border rounded-md transition-all duration-200",
+                                        isSelected
+                                            ? "bg-teal-800 text-white"
+                                            : available
+                                              ? "bg-card"
+                                              : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
+                                    )}
+                                    disabled={!available}
+                                    onClick={() => available && toggleAgeSelect(age)}
+                                >
+                                    {age}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
             {measurements?.length > 0 && (
                 <div className="space-y-3">
                     <h3 className="text-sm font-medium">Measurement</h3>

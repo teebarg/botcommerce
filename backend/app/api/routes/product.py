@@ -52,6 +52,8 @@ def build_variant_data(payload) -> dict[str, Any]:
         data["color"] = payload.color
     if payload.measurement is not None:
         data["measurement"] = payload.measurement
+    if payload.age is not None:
+        data["age"] = payload.age
     if payload.inventory is not None:
         data["inventory"] = payload.inventory
         data["status"] = "IN_STOCK" if payload.inventory > 0 else "OUT_OF_STOCK"
@@ -361,6 +363,7 @@ async def create_product_bundle(
                                 "size": variant.size,
                                 "color": variant.color,
                                 "measurement": variant.measurement,
+                                "age": variant.age,
                             }
                         )
                     except Exception as e:
@@ -519,7 +522,8 @@ async def create_variant(id: int, variant: VariantWithStatus, background_tasks: 
                 "status": variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
                 "size": variant.size,
                 "color": variant.color,
-                "measurement": variant.measurement
+                "measurement": variant.measurement,
+                "age": variant.age
             }
         )
     except UniqueViolationError as e:
@@ -562,6 +566,9 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
 
     if variant.measurement is not None:
         update_data["measurement"] = variant.measurement
+
+    if variant.age is not None:
+        update_data["age"] = variant.age
 
     try:
         updated_variant = await db.productvariant.update(

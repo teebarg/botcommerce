@@ -11,7 +11,7 @@ import MultiSelect, { SelectOption } from "@/components/ui/multi-select";
 import { Button } from "@/components/ui/button";
 import { useBulkProductUpdate } from "@/lib/hooks/useGallery";
 import { Checkbox } from "@/components/ui/checkbox";
-import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/lib/constants";
+import { COLOR_OPTIONS, SIZE_OPTIONS, AGE_OPTIONS } from "@/lib/constants";
 import { Separator } from "@/components/ui/separator";
 
 type FormProduct = {
@@ -20,6 +20,7 @@ type FormProduct = {
     active: boolean;
     size: string;
     color: string;
+    age: string;
     measurement: number;
     price: number;
     old_price: number;
@@ -34,6 +35,7 @@ const FIELD_CONFIG = {
     collections: { label: "Collections", type: "multiselect" },
     size: { label: "Size", type: "select" },
     color: { label: "Color", type: "select" },
+    age: { label: "Age Range", type: "select" },
     measurement: { label: "Measurement", type: "number" },
     price: { label: "Price", type: "number" },
     old_price: { label: "Old Price", type: "number" },
@@ -113,6 +115,9 @@ export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetForm
         }
         if (selectedFields.has("color")) {
             input.color = product.color;
+        }
+        if (selectedFields.has("age")) {
+            input.age = product.age;
         }
         if (selectedFields.has("measurement")) {
             input.measurement = product.measurement;
@@ -224,6 +229,7 @@ export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetForm
 
             {(selectedFields.has("size") ||
                 selectedFields.has("color") ||
+                selectedFields.has("age") ||
                 selectedFields.has("measurement") ||
                 selectedFields.has("price") ||
                 selectedFields.has("old_price") ||
@@ -259,6 +265,24 @@ export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetForm
                                         {COLOR_OPTIONS.map((color: string) => (
                                             <SelectItem key={color} value={color}>
                                                 {color}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
+
+                        {selectedFields.has("age") && (
+                            <div className="space-y-2">
+                                <Label className="text-sm">Age Range</Label>
+                                <Select value={product.age.toString()} onValueChange={(value) => updateField("age", value)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select Age Range" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {AGE_OPTIONS.map((age: string) => (
+                                            <SelectItem key={age} value={age}>
+                                                {age}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>

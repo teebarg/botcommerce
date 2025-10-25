@@ -359,6 +359,7 @@ async def create_image_metadata(
                                 "size": variant.size,
                                 "color": variant.color,
                                 "measurement": variant.measurement,
+                                "age": variant.age,
                             }
                         )
                     except Exception as e:
@@ -435,6 +436,7 @@ async def update_image_metadata(
                                 'size': variant.size,
                                 'color': variant.color,
                                 'measurement': variant.measurement,
+                                'age': variant.age,
                             }
                         )
                     else:
@@ -449,6 +451,7 @@ async def update_image_metadata(
                                 'size': variant.size,
                                 'color': variant.color,
                                 'measurement': variant.measurement,
+                                'age': variant.age,
                             }
                         )
                 except Exception as e:

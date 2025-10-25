@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn, currency } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProductVariant } from "@/schemas";
-import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/lib/constants";
+import { COLOR_OPTIONS, SIZE_OPTIONS, AGE_OPTIONS } from "@/lib/constants";
 
 interface VariantCreationProps {
     variants: ProductVariant[];
@@ -101,6 +101,25 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
                                     {COLOR_OPTIONS.map((color: string) => (
                                         <SelectItem key={color} value={color}>
                                             {color}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label className="text-sm">Age Range</Label>
+                            <Select
+                                value={newVariant.age || ""}
+                                onValueChange={(value) => setNewVariant((prev) => ({ ...prev, age: value }))}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select Age Range" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {AGE_OPTIONS.map((age: string) => (
+                                        <SelectItem key={age} value={age}>
+                                            {age}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>

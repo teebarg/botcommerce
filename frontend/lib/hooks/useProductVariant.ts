@@ -23,6 +23,7 @@ export const useProductVariant = (product: Product | ProductSearch) => {
     const [selectedColor, setSelectedColor] = useState<string | null>(product?.variants?.[0]?.color || null);
     const [selectedSize, setSelectedSize] = useState<string | null>(product?.variants?.[0]?.size || null);
     const [selectedMeasurement, setSelectedMeasurement] = useState<number | null>(product?.variants?.[0]?.measurement || null);
+    const [selectedAge, setSelectedAge] = useState<string | null>(product?.variants?.[0]?.age || null);
     const [quantity, setQuantity] = useState<number>(1);
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>();
 
@@ -36,6 +37,10 @@ export const useProductVariant = (product: Product | ProductSearch) => {
 
     const measurements = useMemo(() => {
         return [...new Set(product?.variants?.filter((v) => v.measurement).map((v) => v.measurement))];
+    }, [product?.variants]);
+
+    const ages = useMemo(() => {
+        return [...new Set(product?.variants?.filter((v) => v.age).map((v) => v.age))];
     }, [product?.variants]);
 
     const priceInfo = useMemo(() => {
@@ -67,18 +72,18 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         return cart?.items?.find((item) => item.variant_id == selectedVariant?.id);
     }, [cart, selectedVariant]);
 
-    const findMatchingVariant = (size: string | null, color: string | null, measurement: number | null) => {
+    const findMatchingVariant = (size: string | null, color: string | null, measurement: number | null, age: string | null) => {
         if (product?.variants?.length == 0) {
             return undefined;
         }
         if (product?.variants?.length == 1) {
             return product?.variants[0];
         }
-        if (!size && !color && !measurement) {
+        if (!size && !color && !measurement && !age) {
             return product?.variants?.find((variant) => variant.inventory > 0);
         }
 
-        return product?.variants?.find((variant) => variant.size === size && variant.color === color && variant.measurement === measurement);
+        return product?.variants?.find((variant) => variant.size === size && variant.color === color && variant.measurement === measurement && variant.age === age);
     };
 
     useEffect(() => {
@@ -86,18 +91,19 @@ export const useProductVariant = (product: Product | ProductSearch) => {
     }, []);
 
     useEffect(() => {
-        const matchingVariant = findMatchingVariant(selectedSize, selectedColor, selectedMeasurement);
+        const matchingVariant = findMatchingVariant(selectedSize, selectedColor, selectedMeasurement, selectedAge);
 
         setSelectedVariant(matchingVariant ?? undefined);
-    }, [selectedSize, selectedColor, selectedMeasurement]);
+    }, [selectedSize, selectedColor, selectedMeasurement, selectedAge]);
 
-    const isOptionAvailable = (type: "size" | "color" | "measurement", value: string) => {
+    const isOptionAvailable = (type: "size" | "color" | "measurement" | "age", value: string) => {
         if (type === "size") {
             return product?.variants?.some(
                 (v) =>
                     v.size === value &&
                     (!selectedColor || v.color === selectedColor) &&
                     (!selectedMeasurement || v.measurement === selectedMeasurement) &&
+                    (!selectedAge || v.age === selectedAge) &&
                     v.inventory > 0
             );
         } else if (type === "color") {
@@ -106,17 +112,29 @@ export const useProductVariant = (product: Product | ProductSearch) => {
                     v.color === value &&
                     (!selectedSize || v.size === selectedSize) &&
                     (!selectedMeasurement || v.measurement === selectedMeasurement) &&
+                    (!selectedAge || v.age === selectedAge) &&
                     v.inventory > 0
             );
-        } else {
+        } else if (type === "measurement") {
             return product?.variants?.some(
                 (v) =>
                     v.measurement === parseInt(value) &&
                     (!selectedSize || v.size === selectedSize) &&
                     (!selectedColor || v.color === selectedColor) &&
+                    (!selectedAge || v.age === selectedAge) &&
+                    v.inventory > 0
+            );
+        } else if (type === "age") {
+            return product?.variants?.some(
+                (v) =>
+                    v.age === value &&
+                    (!selectedSize || v.size === selectedSize) &&
+                    (!selectedColor || v.color === selectedColor) &&
+                    (!selectedMeasurement || v.measurement === selectedMeasurement) &&
                     v.inventory > 0
             );
         }
+        return false;
     };
 
     const toggleSizeSelect = (size: string) => {
@@ -129,6 +147,10 @@ export const useProductVariant = (product: Product | ProductSearch) => {
 
     const toggleMeasurementSelect = (measurement: number) => {
         setSelectedMeasurement((prev) => (prev === measurement ? null : measurement));
+    };
+
+    const toggleAgeSelect = (age: string) => {
+        setSelectedAge((prev) => (prev === age ? null : age));
     };
 
     const handleAddToCart = async () => {
@@ -190,16 +212,20 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         setSelectedSize,
         selectedMeasurement,
         setSelectedMeasurement,
+        selectedAge,
+        setSelectedAge,
         quantity,
         setQuantity,
         selectedVariant,
         sizes,
         colors,
         measurements,
+        ages,
         isOptionAvailable,
         toggleSizeSelect,
         toggleColorSelect,
         toggleMeasurementSelect,
+        toggleAgeSelect,
         handleAddToCart,
         handleWhatsAppPurchase,
         priceInfo,

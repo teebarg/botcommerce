@@ -12,7 +12,7 @@ import { GalleryProduct, Product, ProductVariant } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useCreateImageMetadata, useUpdateImageMetadata } from "@/lib/hooks/useGallery";
 import { Textarea } from "@/components/ui/textarea";
-import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/lib/constants";
+import { COLOR_OPTIONS, SIZE_OPTIONS, AGE_OPTIONS } from "@/lib/constants";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ImageDownloadButton } from "@/components/store/image-download";
 
@@ -60,6 +60,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
         size: currentProduct?.variants?.[0]?.size ?? "",
         color: currentProduct?.variants?.[0]?.color ?? "",
         measurement: currentProduct?.variants?.[0]?.measurement ?? undefined,
+        age: currentProduct?.variants?.[0]?.age ?? "",
         price: currentProduct?.variants?.[0]?.price ?? 0,
         old_price: currentProduct?.variants?.[0]?.old_price ?? 0,
         inventory: currentProduct?.variants?.[0]?.inventory ?? 0,
@@ -197,6 +198,22 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                                 {COLOR_OPTIONS.map((color: string) => (
                                     <SelectItem key={color} value={color}>
                                         {color}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label className="text-sm">Age Range</Label>
+                        <Select value={newVariant.age?.toString() || ""} onValueChange={(value) => setNewVariant((prev) => ({ ...prev, age: value }))}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select Age Range" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {AGE_OPTIONS.map((age: string) => (
+                                    <SelectItem key={age} value={age}>
+                                        {age}
                                     </SelectItem>
                                 ))}
                             </SelectContent>

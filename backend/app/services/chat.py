@@ -23,7 +23,7 @@ class ConversationalRAG:
 
         Your capabilities:
         - Help customers find products based on their needs
-        - Answer questions about product availability, sizes, colors, and prices
+        - Answer questions about product availability, sizes, colors, ages, and prices
         - Provide recommendations based on customer preferences
         - Handle inquiries about categories and collections
 

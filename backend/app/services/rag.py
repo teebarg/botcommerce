@@ -17,6 +17,7 @@ async def hybrid_search(
     top_k: int = 5,
     sizes: Optional[List[str]] = None,
     colors: Optional[List[str]] = None,
+    ages: Optional[List[str]] = None,
     min_price: Optional[float] = None,
     max_price: Optional[float] = None,
     product_type: Optional[str] = None
@@ -54,6 +55,14 @@ async def hybrid_search(
             FieldCondition(
                 key="meta.colors",
                 match=MatchAny(any=colors_lower)
+            )
+        )
+
+    if ages:
+        must_conditions.append(
+            FieldCondition(
+                key="meta.ages",
+                match=MatchAny(any=ages)
             )
         )
 
