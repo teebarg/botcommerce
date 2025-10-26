@@ -46,6 +46,7 @@ const ProductVariants: React.FC<ProductVariantsProps> = ({ productId, variants =
                             <p className={cn("text-sm font-medium", variant.size ? "" : "hidden")}>Size: {variant.size}</p>
                             <p className={cn("text-sm font-medium", variant.color ? "" : "hidden")}>Color: {variant.color}</p>
                             <p className={cn("text-sm font-medium ", variant.measurement ? "" : "hidden")}>Measurement: {variant.measurement}</p>
+                            <p className={cn("text-sm font-medium ", variant.age ? "" : "hidden")}>Age: {variant.age}</p>
                             <p className="text-sm font-medium">Inventory: {variant.inventory}</p>
                             <p className="text-sm font-medium">
                                 <Badge variant={variant.status === "IN_STOCK" ? "emerald" : "destructive"}>{variant.status}</Badge>

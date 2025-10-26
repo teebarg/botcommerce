@@ -85,6 +85,14 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                                                                 </Badge>
                                                             </div>
                                                         )}
+                                                        {item.variant.age && (
+                                                            <div className="flex items-center gap-1">
+                                                                <span className="text-xs text-muted-foreground">Age:</span>
+                                                                <Badge className="text-sm px-2 py-0.5" variant="outline">
+                                                                    {item.variant.age}
+                                                                </Badge>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 )}
                                             </div>

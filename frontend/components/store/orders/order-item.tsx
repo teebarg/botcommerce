@@ -20,7 +20,7 @@ const OrderItemComponent: React.FC<{ item: OrderItem }> = ({ item }) => {
                     <h3 className="font-semibold line-clamp-2 leading-tight text-md">{item.name}</h3>
                 </div>
 
-                {item.variant && (item.variant.size || item.variant.color || item.variant.measurement) && (
+                {item.variant && (item.variant.size || item.variant.color || item.variant.measurement || item.variant.age) && (
                     <div className="flex flex-wrap gap-1.5 mb-2">
                         {item.variant.size && <Badge variant="gray">Size: {item.variant.size}</Badge>}
 
@@ -34,6 +34,7 @@ const OrderItemComponent: React.FC<{ item: OrderItem }> = ({ item }) => {
                             </Badge>
                         )}
                         {item.variant.measurement && <Badge variant="gray">Measurement: {item.variant.measurement}</Badge>}
+                        {item.variant.age && <Badge variant="gray">Age: {item.variant.age}</Badge>}
                     </div>
                 )}
 

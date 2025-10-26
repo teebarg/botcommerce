@@ -181,6 +181,7 @@ export const useProductVariant = (product: Product | ProductSearch) => {
                   selectedVariant.size && `Size: ${selectedVariant.size}`,
                   selectedVariant.color && `Color: ${selectedVariant.color}`,
                   selectedVariant.measurement && `Measurement: ${selectedVariant.measurement}`,
+                  selectedVariant.age && `Age: ${selectedVariant.age}`,
                   `Price: ${currency(selectedVariant.price)}`,
               ]
                   .filter(Boolean)

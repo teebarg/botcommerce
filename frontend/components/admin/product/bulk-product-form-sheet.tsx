@@ -61,6 +61,7 @@ export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetForm
         size: "",
         color: "",
         measurement: 0,
+        age: "",
         price: 0,
         old_price: 0,
         inventory: 0,

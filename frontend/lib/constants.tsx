@@ -43,7 +43,7 @@ export const COLOR_OPTIONS = [
 ];
 export const AGE_OPTIONS = [
     "0-6 months",
-    "6-12 months", 
+    "6-12 months",
     "1-2 years",
     "2-3 years",
     "3-4 years",
@@ -56,3 +56,5 @@ export const AGE_OPTIONS = [
     "10-12 years",
     "12+ years",
 ];
+
+export const PRESET_AGE_RANGES = ["0-2", "2-3", "3-4", "4-5", "5-6", "6-8", "8-10", "10-12", "12-14"];

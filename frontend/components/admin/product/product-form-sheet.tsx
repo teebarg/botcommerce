@@ -211,7 +211,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                                 <SelectValue placeholder="Select Age Range" />
                             </SelectTrigger>
                             <SelectContent>
-                                {AGE_OPTIONS.map((age: string) => (
+                                {AGE_OPTIONS?.map((age: string) => (
                                     <SelectItem key={age} value={age}>
                                         {age}
                                     </SelectItem>
