@@ -53,7 +53,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false }) 
                     <span data-testid="address-state-country">{address.state && `${address.state}`}</span>
                 </p>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
                 <Overlay
                     open={editState.isOpen}
                     sheetClassName="min-w-[30vw]"
@@ -69,7 +69,13 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false }) 
                 </Overlay>
                 <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                     <DialogTrigger asChild>
-                        <Button aria-label="delete address" data-testid="address-delete-button" size="icon" onClick={deleteState.open}>
+                        <Button
+                            variant="destructive"
+                            aria-label="delete address"
+                            data-testid="address-delete-button"
+                            size="icon"
+                            onClick={deleteState.open}
+                        >
                             <Trash2 className="h-5 w-5" />
                         </Button>
                     </DialogTrigger>

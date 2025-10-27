@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useUpdateCartDetails } from "@/lib/hooks/useCart";
+import { states } from "@/components/store/collections/data";
 
 const formSchema = z.object({
     label: z.string().optional(),
@@ -203,9 +204,9 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            {["Abuja", "Lagos", "Rivers", "Oyo"].map((item: string, idx: number) => (
-                                                <SelectItem key={idx} value={item}>
-                                                    {item}
+                                            {states.map((item) => (
+                                                <SelectItem key={item.id} value={item.id}>
+                                                    {item.name}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
