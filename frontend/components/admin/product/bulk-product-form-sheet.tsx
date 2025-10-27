@@ -11,8 +11,9 @@ import MultiSelect, { SelectOption } from "@/components/ui/multi-select";
 import { Button } from "@/components/ui/button";
 import { useBulkProductUpdate } from "@/lib/hooks/useGallery";
 import { Checkbox } from "@/components/ui/checkbox";
-import { COLOR_OPTIONS, SIZE_OPTIONS, AGE_OPTIONS } from "@/lib/constants";
+import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/lib/constants";
 import { Separator } from "@/components/ui/separator";
+import { AgeRangeSelector } from "@/components/ui/age-selector";
 
 type FormProduct = {
     categories: { value: number; label: string }[];
@@ -274,20 +275,11 @@ export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetForm
                         )}
 
                         {selectedFields.has("age") && (
-                            <div className="space-y-2">
-                                <Label className="text-sm">Age Range</Label>
-                                <Select value={product.age.toString()} onValueChange={(value) => updateField("age", value)}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select Age Range" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {AGE_OPTIONS.map((age: string) => (
-                                            <SelectItem key={age} value={age}>
-                                                {age}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                            <div className="col-span-2">
+                                <AgeRangeSelector
+                                    selectedRange={product.age}
+                                    onChange={(range) => updateField("age", range)}
+                                />
                             </div>
                         )}
 

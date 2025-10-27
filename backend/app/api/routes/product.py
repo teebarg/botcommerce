@@ -149,6 +149,7 @@ async def search(
     min_price: int = Query(default=1, gt=0),
     sizes: str = Query(default=""),
     colors: str = Query(default=""),
+    ages: str = Query(default=""),
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
     active: bool = Query(default=True),
@@ -171,6 +172,9 @@ async def search(
         filters.append(f"sizes IN [{sizes}]")
     if colors:
         filters.append(f"colors IN [{colors}]")
+    if ages:
+        age_values = ", ".join([f'"{age}"' for age in [ages]])
+        filters.append(f"ages IN [{age_values}]")
 
     search_params = {
         "limit": limit,
@@ -179,7 +183,7 @@ async def search(
     }
 
     if show_facets:
-        search_params["facets"] = ["category_slugs", "sizes", "colors"]
+        search_params["facets"] = ["category_slugs", "sizes", "colors", "ages"]
 
     if filters:
         search_params["filter"] = " AND ".join(filters)

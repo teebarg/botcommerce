@@ -21,16 +21,19 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
         selectedColor,
         selectedSize,
         selectedMeasurement,
+        selectedAge,
         quantity,
         selectedVariant,
         setQuantity,
         sizes,
         colors,
         measurements,
+        ages,
         isOptionAvailable,
         toggleSizeSelect,
         toggleColorSelect,
         toggleMeasurementSelect,
+        toggleAgeSelect,
         handleAddToCart,
         handleWhatsAppPurchase,
         loading,
@@ -60,7 +63,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                                     className={cn(
                                         "px-6 py-2 text-sm font-medium border border-border rounded-md transition-all duration-200",
                                         isSelected
-                                            ? "bg-teal-800 text-white"
+                                            ? "bg-contrast text-contrast-foreground"
                                             : available
                                               ? "bg-card"
                                               : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
@@ -92,7 +95,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                                     key={color}
                                     className={cn(
                                         "relative p-0.5 rounded-full border-2 transition-all duration-200",
-                                        isSelected ? "border-teal-700" : available ? "" : "cursor-not-allowed opacity-60"
+                                        isSelected ? "border-contrast" : available ? "" : "cursor-not-allowed opacity-60"
                                     )}
                                     disabled={!available}
                                     onClick={() => available && toggleColorSelect(color)}
@@ -130,7 +133,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                                     className={cn(
                                         "px-6 py-2 text-sm font-medium border border-border rounded-md transition-all duration-200",
                                         isSelected
-                                            ? "bg-teal-800 text-white"
+                                            ? "bg-contrast text-contrast-foreground"
                                             : available
                                               ? "bg-card"
                                               : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
@@ -163,7 +166,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                                     className={cn(
                                         "px-6 py-2 text-sm font-medium border border-border rounded-md transition-all duration-200",
                                         isSelected
-                                            ? "bg-teal-800 text-white"
+                                            ? "bg-contrast text-contrast-foreground"
                                             : available
                                               ? "bg-card"
                                               : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"

@@ -67,7 +67,8 @@ async def generate_missing_descriptions(request: Request):
                             'id', v.id,
                             'size', v.size,
                             'color', v.color,
-                            'measurement', v.measurement
+                            'measurement', v.measurement,
+                            'age', v.age
                         )
                     ) FILTER (WHERE v.id IS NOT NULL),
                     '[]'

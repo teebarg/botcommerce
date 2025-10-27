@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ProductVariant } from "@/schemas";
 import { useCreateVariant, useUpdateVariant } from "@/lib/hooks/useProduct";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AGE_OPTIONS } from "@/lib/constants";
 
 interface ProductVariantFormProps {
     variant: ProductVariant | null;
@@ -28,6 +30,7 @@ const variantFormSchema = z.object({
     size: z.string().optional(),
     color: z.string().optional(),
     measurement: z.number().optional(),
+    age: z.string().optional(),
 });
 
 const ProductVariantForm: React.FC<ProductVariantFormProps> = ({ productId, variant, onCancel }) => {
@@ -43,6 +46,7 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({ productId, vari
             size: variant?.size || "",
             color: variant?.color || "",
             measurement: variant?.measurement || undefined,
+            age: variant?.age || "",
         },
     });
 
@@ -56,6 +60,7 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({ productId, vari
             size: variant?.size || "",
             color: variant?.color || "",
             measurement: variant?.measurement || undefined,
+            age: variant?.age || "",
         });
     };
 
@@ -155,6 +160,30 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({ productId, vari
                                                 {...field}
                                                 onChange={(e) => field.onChange(Number(e.target.value))}
                                             />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="age"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Age</FormLabel>
+                                        <FormControl>
+                                            <Select {...field} value={field.value?.toString()} onValueChange={(value) => field.onChange(value)}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select Age Range" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {AGE_OPTIONS.map((age: string) => (
+                                                        <SelectItem key={age} value={age}>
+                                                            {age}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

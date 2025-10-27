@@ -1,44 +1,10 @@
 "use client";
 
-// import React from "react";
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-// import { Label } from "@/components/ui/label";
-// import { AGE_OPTIONS } from "@/lib/constants";
-
-// interface AgeRangeSelectorProps {
-//     value?: string;
-//     onValueChange: (value: string) => void;
-//     placeholder?: string;
-//     disabled?: boolean;
-// }
-
-// export function AgeRangeSelector({ value, onValueChange, placeholder = "Select Age Range", disabled = false }: AgeRangeSelectorProps) {
-//     return (
-//         <div className="space-y-2">
-//             <Label className="text-sm">Age Range</Label>
-//             <Select value={value || ""} onValueChange={onValueChange} disabled={disabled}>
-//                 <SelectTrigger>
-//                     <SelectValue placeholder={placeholder} />
-//                 </SelectTrigger>
-//                 <SelectContent>
-//                     {AGE_OPTIONS.map((age: string) => (
-//                         <SelectItem key={age} value={age}>
-//                             {age}
-//                         </SelectItem>
-//                     ))}
-//                 </SelectContent>
-//             </Select>
-//         </div>
-//     );
-// }
-
 import { useState } from "react";
-import { X, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-
-const PRESET_AGE_RANGES = ["0-2", "2-3", "3-4", "4-5", "5-6", "6-8", "8-10", "10-12", "12-14"];
+import { AGE_OPTIONS } from "@/lib/constants";
 
 interface AgeRangeSelectorProps {
     selectedRange: string;
@@ -51,30 +17,28 @@ export const AgeRangeSelector = ({ selectedRange, onChange }: AgeRangeSelectorPr
 
     const toggleRange = (range: string) => {
         if (selectedRange === range) {
-            onChange(range);
+            onChange("");
         } else {
             onChange(range);
         }
     };
 
     const addCustomRange = () => {
-        if ((customRange.trim() && !selectedRange) || selectedRange === customRange.trim()) {
+        if (customRange.trim() && selectedRange !== customRange.trim()) {
             onChange(customRange.trim());
             setCustomRange("");
             setShowCustomInput(false);
         }
     };
 
-    const removeRange = (range: string) => {
-        onChange(selectedRange);
-    };
+    const isCustomValue = selectedRange.trim() !== "" && !AGE_OPTIONS.includes(selectedRange.trim());
 
     return (
         <div className="space-y-4">
             <div>
-                <label className="text-sm font-medium text-foreground mb-3 block">Select Age Ranges</label>
+                <label className="text-sm font-medium text-foreground mb-3 block">Age Ranges</label>
                 <div className="flex flex-wrap gap-2">
-                    {PRESET_AGE_RANGES.map((range) => (
+                    {AGE_OPTIONS.map((range) => (
                         <button
                             key={range}
                             type="button"
@@ -85,55 +49,43 @@ export const AgeRangeSelector = ({ selectedRange, onChange }: AgeRangeSelectorPr
                                     : "bg-muted text-muted-foreground hover:bg-border hover:scale-105"
                             }`}
                         >
-                            {range} years
+                            {range}
                         </button>
                     ))}
+                    {isCustomValue && (
+                        <button
+                            type="button"
+                            onClick={() => toggleRange(selectedRange.trim())}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-md scale-105`}
+                        >
+                            {selectedRange.trim()}
+                        </button>
+                    )}
                 </div>
             </div>
 
-            {selectedRange && (
-                <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">Selected Ranges</label>
-                    <div className="flex flex-wrap gap-2">
-                        {selectedRange && (
-                            <Badge
-                                key={selectedRange}
-                                variant="secondary"
-                                className="px-3 py-1.5 bg-gradient-to-r from-accent to-accent-light text-accent-foreground flex items-center gap-2"
-                            >
-                                <span>{selectedRange} years</span>
-                                <button type="button" onClick={() => removeRange(selectedRange)} className="hover:opacity-70 transition-opacity">
-                                    <X className="h-3 w-3" />
-                                </button>
-                            </Badge>
-                        )}
-                    </div>
-                </div>
-            )}
-
             <div>
                 {!showCustomInput ? (
-                    <Button type="button" variant="outline" size="sm" onClick={() => setShowCustomInput(true)} className="border-dashed">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Custom Range
+                    <Button type="button" onClick={() => setShowCustomInput(true)} className="border-dashed">
+                        <Plus className="h-4 w-4" />
+                        Custom Range
                     </Button>
                 ) : (
                     <div className="flex gap-2">
                         <Input
                             type="text"
-                            placeholder="e.g., 1-3"
+                            placeholder="e.g., 1-3 years"
                             value={customRange}
                             onChange={(e) => setCustomRange(e.target.value)}
                             onKeyPress={(e) => e.key === "Enter" && addCustomRange()}
                             className="max-w-xs"
                         />
-                        <Button type="button" onClick={addCustomRange} size="sm">
+                        <Button type="button" onClick={addCustomRange}>
                             Add
                         </Button>
                         <Button
                             type="button"
-                            variant="ghost"
-                            size="sm"
+                            variant="destructive"
                             onClick={() => {
                                 setShowCustomInput(false);
                                 setCustomRange("");

@@ -64,7 +64,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                                                         {item.variant.color && (
                                                             <div className="flex items-center gap-1">
                                                                 <span className="text-xs text-muted-foreground">Color:</span>
-                                                                <Badge className="text-sm px-2 py-0.5" variant="outline">
+                                                                <Badge className="text-sm px-2 py-0.5" variant="contrast">
                                                                     {item.variant.color}
                                                                 </Badge>
                                                             </div>
@@ -72,7 +72,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                                                         {item.variant.size && (
                                                             <div className="flex items-center gap-1">
                                                                 <span className="text-xs text-muted-foreground">Size:</span>
-                                                                <Badge className="text-sm px-2 py-0.5" variant="outline">
+                                                                <Badge className="text-sm px-2 py-0.5" variant="contrast">
                                                                     {item.variant.size}
                                                                 </Badge>
                                                             </div>
@@ -80,7 +80,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                                                         {item.variant.measurement && (
                                                             <div className="flex items-center gap-1">
                                                                 <span className="text-xs text-muted-foreground">Measurement:</span>
-                                                                <Badge className="text-sm px-2 py-0.5" variant="outline">
+                                                                <Badge className="text-sm px-2 py-0.5" variant="contrast">
                                                                     {item.variant.measurement}
                                                                 </Badge>
                                                             </div>
@@ -88,7 +88,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                                                         {item.variant.age && (
                                                             <div className="flex items-center gap-1">
                                                                 <span className="text-xs text-muted-foreground">Age:</span>
-                                                                <Badge className="text-sm px-2 py-0.5" variant="outline">
+                                                                <Badge className="text-sm px-2 py-0.5" variant="contrast">
                                                                     {item.variant.age}
                                                                 </Badge>
                                                             </div>

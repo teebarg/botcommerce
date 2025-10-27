@@ -9,7 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { cn, currency } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProductVariant } from "@/schemas";
-import { COLOR_OPTIONS, SIZE_OPTIONS, AGE_OPTIONS } from "@/lib/constants";
+import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/lib/constants";
+import { AgeRangeSelector } from "@/components/ui/age-selector";
 
 interface VariantCreationProps {
     variants: ProductVariant[];
@@ -21,6 +22,7 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
         size: "",
         color: "",
         measurement: undefined,
+        age: "",
         price: 0,
         old_price: 0,
         inventory: 0,
@@ -35,6 +37,7 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
             size: newVariant.size || "",
             color: newVariant.color || "",
             measurement: newVariant.measurement || undefined,
+            age: newVariant.age || "",
         };
 
         onVariantsChange([...variants, variant]);
@@ -45,6 +48,7 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
             size: "",
             color: "",
             measurement: undefined,
+            age: "",
         });
     };
 
@@ -108,31 +112,19 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-sm">Age Range</Label>
-                            <Select
-                                value={newVariant.age || ""}
-                                onValueChange={(value) => setNewVariant((prev) => ({ ...prev, age: value }))}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select Age Range" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {AGE_OPTIONS.map((age: string) => (
-                                        <SelectItem key={age} value={age}>
-                                            {age}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div className="space-y-2">
                             <Label className="text-sm">Measurement</Label>
                             <Input
                                 placeholder="Enter measurement (e.g., 41, 42)"
                                 type="number"
                                 value={newVariant.measurement || ""}
                                 onChange={(e) => setNewVariant((prev) => ({ ...prev, measurement: parseFloat(e.target.value) || undefined }))}
+                            />
+                        </div>
+
+                        <div className="col-span-2">
+                            <AgeRangeSelector
+                                selectedRange={newVariant.age || ""}
+                                onChange={(range) => setNewVariant((prev) => ({ ...prev, age: range }))}
                             />
                         </div>
 
@@ -210,6 +202,11 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
                                                     {variant.measurement && (
                                                         <Badge className="text-xs" variant="success">
                                                             {variant.measurement}
+                                                        </Badge>
+                                                    )}
+                                                    {variant.age && (
+                                                        <Badge className="text-xs" variant="success">
+                                                            {variant.age}
                                                         </Badge>
                                                     )}
                                                 </div>

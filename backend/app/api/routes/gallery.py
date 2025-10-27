@@ -53,6 +53,8 @@ def build_variant_data(payload) -> dict[str, Any]:
         data["color"] = payload.color
     if payload.measurement is not None:
         data["measurement"] = payload.measurement
+    if payload.age is not None:
+        data["age"] = payload.age
     if payload.inventory is not None:
         data["inventory"] = payload.inventory
         data["status"] = "IN_STOCK" if payload.inventory > 0 else "OUT_OF_STOCK"

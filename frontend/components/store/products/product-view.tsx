@@ -185,7 +185,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                             <ArrowUpRight />
                         </LocalizedClientLink>
                     </div>
-                    <div className="text-sm py-8 bg-yellow-50 text-yellow-950 dark:bg-zinc-800 dark:text-yellow-50 -mx-4 px-4 md:px-2 rounded-none md:rounded-lg space-y-4">
+                    <div className="text-sm py-8 bg-yellow-50 text-yellow-950 -mx-4 px-4 md:px-2 rounded-none md:rounded-lg space-y-4">
                         <div className="flex items-start gap-x-2">
                             <Truck className="h-6 w-6" />
                             <div>

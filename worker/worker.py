@@ -60,7 +60,7 @@ async def generate_description(product: dict) -> str:
 
     variants_text = ", ".join(
         [
-            f"Size: {v.get('size', '-')}, Color: {v.get('color', '-')}, Measurement: {v.get('measurement', '-')}"
+            f"Size: {v.get('size', '-')}, Color: {v.get('color', '-')}, Measurement: {v.get('measurement', '-')}, Age: {v.get('age', '-')}"
             for v in variants
         ]
     ) or "No variant information available."

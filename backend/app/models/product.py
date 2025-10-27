@@ -76,6 +76,7 @@ class SearchVariant(BaseModel):
     size: Optional[str] = None
     color: Optional[str] = None
     measurement: Optional[int] = None
+    age: Optional[str] = None
 
 class SearchProduct(BaseModel):
     id: int

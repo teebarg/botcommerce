@@ -187,6 +187,7 @@ export function ProductCreator() {
                 size: (variant as any).size,
                 color: (variant as any).color,
                 measurement: (variant as any).measurement,
+                age: (variant as any).age,
             }));
 
             const payload: any = {

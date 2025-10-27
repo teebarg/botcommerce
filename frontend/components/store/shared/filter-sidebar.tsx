@@ -294,7 +294,6 @@ export function FilterSidebar({ facets }: Props) {
                 )}
             </div>
 
-            {/* Age Filter */}
             <div className="space-y-3">
                 <button
                     className="flex items-center justify-between w-full"

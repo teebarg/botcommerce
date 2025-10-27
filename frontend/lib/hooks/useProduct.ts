@@ -129,6 +129,7 @@ export const useUpdateVariant = (showToast = true) => {
             size?: string;
             color?: string;
             measurement?: number;
+            age?: string;
         }) => {
             const { id, ...variantData } = input;
 
