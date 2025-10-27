@@ -60,9 +60,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                             ))}
                         </div>
 
+                        {product?.variants?.[0]?.age && (
+                            <div className="absolute top-4 right-2 flex flex-wrap gap-1">
+                                <Badge variant="emerald">{product?.variants?.[0]?.age}</Badge>
+                            </div>
+                        )}
+
                         {outOfStock && (
                             <div className="absolute inset-0 bg-black/35 flex items-center justify-center">
-                                <Badge className="text-sm backdrop-blur-sm" variant="secondary">
+                                <Badge className="text-sm backdrop-blur-sm" variant="contrast">
                                     Out of Stock
                                 </Badge>
                             </div>

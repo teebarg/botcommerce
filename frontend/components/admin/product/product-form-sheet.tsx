@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/lib/constants";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ImageDownloadButton } from "@/components/store/image-download";
+import { AgeRangeSelector } from "@/components/ui/age-selector";
 
 type FormProduct = Omit<Partial<Product>, "images" | "variants" | "categories" | "collections"> & {
     categories: { value: number; label: string }[];
@@ -60,6 +61,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
         size: currentProduct?.variants?.[0]?.size ?? "",
         color: currentProduct?.variants?.[0]?.color ?? "",
         measurement: currentProduct?.variants?.[0]?.measurement ?? undefined,
+        age: currentProduct?.variants?.[0]?.age ?? "",
         price: currentProduct?.variants?.[0]?.price ?? 0,
         old_price: currentProduct?.variants?.[0]?.old_price ?? 0,
         inventory: currentProduct?.variants?.[0]?.inventory ?? 0,
@@ -211,6 +213,10 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                             value={newVariant.measurement || ""}
                             onChange={(e) => setNewVariant((prev) => ({ ...prev, measurement: parseFloat(e.target.value) || undefined }))}
                         />
+                    </div>
+
+                    <div className="col-span-2">
+                        <AgeRangeSelector selectedRange={newVariant.age} onChange={(range) => setNewVariant((prev) => ({ ...prev, age: range }))} />
                     </div>
 
                     <div className="space-y-2">

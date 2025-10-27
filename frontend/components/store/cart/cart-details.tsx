@@ -31,7 +31,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
                 </div>
 
                 {cart?.items?.length && (
-                    <p className="bg-contrast/10 text-contrast p-2 rounded flex gap-2 mx-4 mt-4" data-testid="miniBag-urgentMessage-read">
+                    <p className="bg-card text-card-foreground p-2 rounded flex gap-2 mx-4 mt-4" data-testid="urgentMessage-read">
                         <Info />
                         <span className="text-sm">
                             <span className="font-semibold">{`Your items aren’t reserved`}</span>,{" "}

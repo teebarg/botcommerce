@@ -17,6 +17,7 @@ type SearchParams = Promise<{
     minPrice?: string;
     sizes?: string;
     colors?: string;
+    ages?: string;
 }>;
 
 type Props = {
@@ -24,7 +25,7 @@ type Props = {
 };
 
 export default async function Collections({ searchParams }: Props) {
-    const { minPrice, maxPrice, cat_ids, sortBy, sizes, colors } = (await searchParams) || {};
+    const { minPrice, maxPrice, cat_ids, sortBy, sizes, colors, ages } = (await searchParams) || {};
 
     const queryParams: any = {
         limit: 24,
@@ -34,6 +35,7 @@ export default async function Collections({ searchParams }: Props) {
         cat_ids,
         sizes,
         colors,
+        ages,
     };
 
     const { data, error } = await tryCatch<PaginatedProductSearch>(serverApi.get("/product/", { params: { skip: 0, ...queryParams } }));

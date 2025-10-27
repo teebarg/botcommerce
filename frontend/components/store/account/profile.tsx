@@ -156,7 +156,9 @@ const ProfilePage: React.FC = () => {
                                                     {editingSection === "profile" ? (
                                                         <Input placeholder="Enter first name" {...field} />
                                                     ) : (
-                                                        <div className="px-4 py-3 rounded-lg text-foreground bg-card">{field.value || "Not set"}</div>
+                                                        <div className="px-4 py-3 rounded-lg text-foreground bg-secondary">
+                                                            {field.value || "Not set"}
+                                                        </div>
                                                     )}
                                                 </FormControl>
                                                 <FormMessage />
@@ -174,7 +176,9 @@ const ProfilePage: React.FC = () => {
                                                     {editingSection === "profile" ? (
                                                         <Input placeholder="Enter last name" {...field} />
                                                     ) : (
-                                                        <div className="px-4 py-3 rounded-lg text-foreground bg-card">{field.value || "Not set"}</div>
+                                                        <div className="px-4 py-3 rounded-lg text-foreground bg-secondary">
+                                                            {field.value || "Not set"}
+                                                        </div>
                                                     )}
                                                 </FormControl>
                                                 <FormMessage />
@@ -185,7 +189,7 @@ const ProfilePage: React.FC = () => {
 
                                 <div>
                                     <label className="block text-sm font-medium text-muted-foreground mb-2">Email Address</label>
-                                    <div className="px-4 py-3 rounded-lg text-foreground bg-card">{session?.user?.email}</div>
+                                    <div className="px-4 py-3 rounded-lg text-foreground bg-secondary">{session?.user?.email}</div>
                                 </div>
 
                                 {editingSection === "profile" && (

@@ -13,6 +13,7 @@ import { useBulkProductUpdate } from "@/lib/hooks/useGallery";
 import { Checkbox } from "@/components/ui/checkbox";
 import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/lib/constants";
 import { Separator } from "@/components/ui/separator";
+import { AgeRangeSelector } from "@/components/ui/age-selector";
 
 type FormProduct = {
     categories: { value: number; label: string }[];
@@ -20,6 +21,7 @@ type FormProduct = {
     active: boolean;
     size: string;
     color: string;
+    age: string;
     measurement: number;
     price: number;
     old_price: number;
@@ -34,6 +36,7 @@ const FIELD_CONFIG = {
     collections: { label: "Collections", type: "multiselect" },
     size: { label: "Size", type: "select" },
     color: { label: "Color", type: "select" },
+    age: { label: "Age Range", type: "select" },
     measurement: { label: "Measurement", type: "number" },
     price: { label: "Price", type: "number" },
     old_price: { label: "Old Price", type: "number" },
@@ -59,6 +62,7 @@ export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetForm
         size: "",
         color: "",
         measurement: 0,
+        age: "",
         price: 0,
         old_price: 0,
         inventory: 0,
@@ -113,6 +117,9 @@ export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetForm
         }
         if (selectedFields.has("color")) {
             input.color = product.color;
+        }
+        if (selectedFields.has("age")) {
+            input.age = product.age;
         }
         if (selectedFields.has("measurement")) {
             input.measurement = product.measurement;
@@ -224,6 +231,7 @@ export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetForm
 
             {(selectedFields.has("size") ||
                 selectedFields.has("color") ||
+                selectedFields.has("age") ||
                 selectedFields.has("measurement") ||
                 selectedFields.has("price") ||
                 selectedFields.has("old_price") ||
@@ -263,6 +271,12 @@ export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetForm
                                         ))}
                                     </SelectContent>
                                 </Select>
+                            </div>
+                        )}
+
+                        {selectedFields.has("age") && (
+                            <div className="col-span-2">
+                                <AgeRangeSelector selectedRange={product.age} onChange={(range) => updateField("age", range)} />
                             </div>
                         )}
 

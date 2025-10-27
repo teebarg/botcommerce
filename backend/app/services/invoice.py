@@ -217,6 +217,8 @@ class InvoiceService:
                     variant_parts.append(f"Color: {item.variant['color']}")
                 if item.variant.get('measurement'):
                     variant_parts.append(f"Measurement: {item.variant['measurement']}")
+                if item.variant.get('age'):
+                    variant_parts.append(f"Age: {item.variant['age']}")
                 if variant_parts:
                     item_name += f" ({', '.join(variant_parts)})"
 

@@ -13,6 +13,7 @@ class VariantWithStatus(BaseModel):
     size: Optional[str] = None
     color: Optional[str] = None
     measurement: Optional[int] = None
+    age: Optional[str] = None
 
 class ProductCreate(BaseModel):
     name: Optional[str] = Field(None)
@@ -75,6 +76,7 @@ class SearchVariant(BaseModel):
     size: Optional[str] = None
     color: Optional[str] = None
     measurement: Optional[int] = None
+    age: Optional[str] = None
 
 class SearchProduct(BaseModel):
     id: int
@@ -103,6 +105,7 @@ class Facets(BaseModel):
     category_slugs: Optional[dict[str, int]] = None
     sizes: Optional[dict[str, int]] = None
     colors: Optional[dict[str, int]] = None
+    ages: Optional[dict[str, int]] = None
 
 class SearchProducts(BaseModel):
     products: List[SearchProduct]
@@ -134,6 +137,7 @@ class ImageMetadata(BaseModel):
     size: Optional[str] = None
     color: Optional[str] = None
     measurement: Optional[int] = None
+    age: Optional[str] = None
     inventory: Optional[int] = None
     active: Optional[bool] = True
     price: Optional[float] = None

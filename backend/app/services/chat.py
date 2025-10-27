@@ -1,10 +1,10 @@
-import google.generativeai as genai
+from google import genai
 from datetime import datetime
 from app.core.config import settings
 from app.services.rag import format_search_results_for_llm, smart_search
 from typing import List, Dict
 
-genai.configure(api_key=settings.GEMINI_API_KEY)
+client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
 
 class ConversationalRAG:
@@ -13,8 +13,8 @@ class ConversationalRAG:
     """
     
     def __init__(self):
-        self.model = genai.GenerativeModel(settings.GEMINI_MODEL)
-        self.session = self.model.start_chat(history=[])
+        self.client = client
+        self.model_name = settings.GEMINI_MODEL
         self.conversation_history = []
         
         self.system_prompt = """You are a knowledgeable e-commerce assistant for our online store.
@@ -23,7 +23,7 @@ class ConversationalRAG:
 
         Your capabilities:
         - Help customers find products based on their needs
-        - Answer questions about product availability, sizes, colors, and prices
+        - Answer questions about product availability, sizes, colors, ages, and prices
         - Provide recommendations based on customer preferences
         - Handle inquiries about categories and collections
 
@@ -69,7 +69,11 @@ class ConversationalRAG:
 
         CUSTOMER MESSAGE: {user_message}"""
         
-        response = self.session.send_message(full_message)
+        response = self.client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=full_message,
+        )
+        
         assistant_reply = response.text
         
         self.conversation_history.append({
@@ -87,7 +91,6 @@ class ConversationalRAG:
     
     async def reset(self):
         """Reset conversation."""
-        self.session = self.model.start_chat(history=[])
         self.conversation_history = []
 
 assistant = ConversationalRAG()

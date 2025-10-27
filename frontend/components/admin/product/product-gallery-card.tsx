@@ -87,6 +87,16 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
                         ))}
                     </div>
 
+                    {image.product?.variants?.[0]?.age && (
+                        <div className="absolute top-2 right-2 flex flex-wrap gap-1">
+                            {image.product?.variants?.map((item: ProductVariant, idx: number) => (
+                                <Badge key={idx} variant="emerald">
+                                    {item.age}
+                                </Badge>
+                            ))}
+                        </div>
+                    )}
+
                     <div className="absolute bottom-2 left-2 flex flex-wrap gap-1">
                         {image.product?.variants?.length == 0 ||
                             (image.product?.variants?.every((v) => v.inventory <= 0) && <Badge variant="destructive">Out of stock</Badge>)}

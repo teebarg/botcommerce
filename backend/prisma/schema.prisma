@@ -237,6 +237,7 @@ model ProductVariant {
   size        String?
   color       String?
   measurement Int?
+  age         String?
   order_items OrderItem[]
   cart_items  CartItem[] // Added relation to CartItem
   created_at  DateTime      @default(now())

@@ -33,6 +33,7 @@ class ProductVariant(BaseModel):
     size: Optional[str]
     color: Optional[str]
     measurement: Optional[int]
+    age: Optional[str]
 
 
 class SearchProduct(BaseModel):

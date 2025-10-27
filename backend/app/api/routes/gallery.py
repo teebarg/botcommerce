@@ -53,6 +53,8 @@ def build_variant_data(payload) -> dict[str, Any]:
         data["color"] = payload.color
     if payload.measurement is not None:
         data["measurement"] = payload.measurement
+    if payload.age is not None:
+        data["age"] = payload.age
     if payload.inventory is not None:
         data["inventory"] = payload.inventory
         data["status"] = "IN_STOCK" if payload.inventory > 0 else "OUT_OF_STOCK"
@@ -359,6 +361,7 @@ async def create_image_metadata(
                                 "size": variant.size,
                                 "color": variant.color,
                                 "measurement": variant.measurement,
+                                "age": variant.age,
                             }
                         )
                     except Exception as e:
@@ -435,6 +438,7 @@ async def update_image_metadata(
                                 'size': variant.size,
                                 'color': variant.color,
                                 'measurement': variant.measurement,
+                                'age': variant.age,
                             }
                         )
                     else:
@@ -449,6 +453,7 @@ async def update_image_metadata(
                                 'size': variant.size,
                                 'color': variant.color,
                                 'measurement': variant.measurement,
+                                'age': variant.age,
                             }
                         )
                 except Exception as e:

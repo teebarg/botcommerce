@@ -52,6 +52,8 @@ def build_variant_data(payload) -> dict[str, Any]:
         data["color"] = payload.color
     if payload.measurement is not None:
         data["measurement"] = payload.measurement
+    if payload.age is not None:
+        data["age"] = payload.age
     if payload.inventory is not None:
         data["inventory"] = payload.inventory
         data["status"] = "IN_STOCK" if payload.inventory > 0 else "OUT_OF_STOCK"
@@ -147,6 +149,7 @@ async def search(
     min_price: int = Query(default=1, gt=0),
     sizes: str = Query(default=""),
     colors: str = Query(default=""),
+    ages: str = Query(default=""),
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
     active: bool = Query(default=True),
@@ -169,6 +172,9 @@ async def search(
         filters.append(f"sizes IN [{sizes}]")
     if colors:
         filters.append(f"colors IN [{colors}]")
+    if ages:
+        age_values = ", ".join([f'"{age}"' for age in [ages]])
+        filters.append(f"ages IN [{age_values}]")
 
     search_params = {
         "limit": limit,
@@ -177,7 +183,7 @@ async def search(
     }
 
     if show_facets:
-        search_params["facets"] = ["category_slugs", "sizes", "colors"]
+        search_params["facets"] = ["category_slugs", "sizes", "colors", "ages"]
 
     if filters:
         search_params["filter"] = " AND ".join(filters)
@@ -361,6 +367,7 @@ async def create_product_bundle(
                                 "size": variant.size,
                                 "color": variant.color,
                                 "measurement": variant.measurement,
+                                "age": variant.age,
                             }
                         )
                     except Exception as e:
@@ -519,7 +526,8 @@ async def create_variant(id: int, variant: VariantWithStatus, background_tasks: 
                 "status": variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
                 "size": variant.size,
                 "color": variant.color,
-                "measurement": variant.measurement
+                "measurement": variant.measurement,
+                "age": variant.age
             }
         )
     except UniqueViolationError as e:
@@ -562,6 +570,9 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
 
     if variant.measurement is not None:
         update_data["measurement"] = variant.measurement
+
+    if variant.age is not None:
+        update_data["age"] = variant.age
 
     try:
         updated_variant = await db.productvariant.update(

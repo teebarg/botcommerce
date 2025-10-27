@@ -7,7 +7,7 @@ import { useCategories } from "@/lib/hooks/useCategories";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/lib/constants";
+import { COLOR_OPTIONS, SIZE_OPTIONS, AGE_OPTIONS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import RangeSlider from "@/components/ui/range-slider";
 import { Facet } from "@/schemas/product";
@@ -23,12 +23,14 @@ export function FilterSidebar({ facets }: Props) {
         sort: true,
         size: true,
         color: true,
+        age: true,
     });
     const { data: categories } = useCategories();
 
     const [sort, setSort] = useState<string>("created_at:desc");
     const [sizeSet, setSizeSet] = useState<Set<string>>(new Set());
     const [colorSet, setColorSet] = useState<Set<string>>(new Set());
+    const [ageSet, setAgeSet] = useState<Set<string>>(new Set());
     const [categorySet, setCategorySet] = useState<Set<string>>(new Set());
     const [minPrice, setMinPrice] = useState<string>("");
     const [maxPrice, setMaxPrice] = useState<string>("");
@@ -75,6 +77,14 @@ export function FilterSidebar({ facets }: Props) {
         setColorSet(next);
     };
 
+    const onToggleAge = (age: string) => {
+        const next = new Set(ageSet);
+
+        if (next.has(age)) next.delete(age);
+        else next.add(age);
+        setAgeSet(next);
+    };
+
     const onToggleCategory = (slug: string) => {
         const next = new Set(categorySet);
 
@@ -104,6 +114,7 @@ export function FilterSidebar({ facets }: Props) {
             { key: "sortBy", value: sort || "created_at:desc" },
             { key: "sizes", value: Array.from(sizeSet).join(",") },
             { key: "colors", value: Array.from(colorSet).join(",") },
+            { key: "ages", value: Array.from(ageSet).join(",") },
             { key: "cat_ids", value: Array.from(categorySet).join(",") },
             { key: "minPrice", value: minPrice },
             { key: "maxPrice", value: maxPrice },
@@ -275,6 +286,38 @@ export function FilterSidebar({ facets }: Props) {
                                     <Label className="text-center text-sm" htmlFor={color}>
                                         {color}
                                         <span className={cn("ml-0.5", !facets && "hidden")}>({facets?.colors?.[color] || 0})</span>
+                                    </Label>
+                                </button>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+
+            <div className="space-y-3">
+                <button className="flex items-center justify-between w-full" onClick={() => setOpenSections((prev) => ({ ...prev, age: !prev.age }))}>
+                    <h3 className="font-medium">Age Range</h3>
+                    {openSections.age ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </button>
+
+                {openSections.age && (
+                    <div className="grid grid-cols-2 gap-2">
+                        {AGE_OPTIONS.map((age) => {
+                            const active = ageSet.has(age);
+
+                            return (
+                                <button
+                                    key={age}
+                                    aria-pressed={active}
+                                    className={cn(
+                                        "flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity p-2 rounded-md border",
+                                        active && "bg-primary text-primary-foreground"
+                                    )}
+                                    onClick={() => onToggleAge(age)}
+                                >
+                                    <Label className="text-center text-sm" htmlFor={age}>
+                                        {age}
+                                        <span className={cn("ml-0.5", !facets && "hidden")}>({facets?.ages?.[age] || 0})</span>
                                     </Label>
                                 </button>
                             );

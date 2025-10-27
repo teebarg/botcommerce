@@ -74,6 +74,7 @@ export const ProductVariantSchema: z.ZodType<any> = z.lazy(() =>
             size: z.string().nullable().optional(),
             color: z.string().nullable().optional(),
             measurement: z.number().nullable().optional(),
+            age: z.string().nullable().optional(),
             order_items: z.null(),
             cart_items: z.null(),
 
@@ -113,6 +114,7 @@ export const SearchVariantSchema = z.object({
     size: z.string().nullable().optional(),
     color: z.string().nullable().optional(),
     measurement: z.number().nullable().optional(),
+    age: z.string().nullable().optional(),
 });
 
 export const SearchCollectionSchema = z.object({
@@ -150,6 +152,7 @@ export const ProductSearchSchema = z.object({
     active: z.boolean(),
     sizes: z.array(z.string()),
     colors: z.array(z.string()),
+    ages: z.array(z.string()),
     measurements: z.array(z.number()),
 });
 
@@ -174,6 +177,7 @@ export const FacetSchema = z.object({
     category_slugs: z.record(z.string()).optional(),
     sizes: z.record(z.string()).optional(),
     colors: z.record(z.string()).optional(),
+    ages: z.record(z.string()).optional(),
 });
 
 export const PaginatedProductSearchSchema = PagSchema.extend({
