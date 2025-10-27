@@ -4,7 +4,6 @@ import re
 from app.core.config import settings
 from qdrant_client import QdrantClient
 from qdrant_client.models import  Filter, FieldCondition, MatchValue, MatchAny, Range
-from tqdm import tqdm
 from app.sentence import get_embedding_from_hf
 
 
