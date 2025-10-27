@@ -37,7 +37,7 @@ async def root():
 
 
 @app.post("/compute-similar")
-async def compute_similar():
+async def compute_products_similarity():
     """
     Computes similarity for each product.
     """

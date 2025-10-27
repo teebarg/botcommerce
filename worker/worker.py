@@ -2,7 +2,6 @@ import json
 import numpy as np
 from redis_client import redis_client as r
 from db import database
-import httpx
 from config import settings
 
 
@@ -65,26 +64,18 @@ async def generate_description(product: dict) -> str:
         ]
     ) or "No variant information available."
 
-    category_path = product.get("category_name", "")
-
     prompt = f"""
     Write a short, engaging, and complete marketing product description for the following product.
     Do not use placeholders, brackets, or markdown syntax. Use natural language only.
 
     Product name: {product.get('name')}
-    Category: {category_path}
+    Category: {product.get('category_name', '')}
     Available variants: {variants_text}
     Highlight features, use cases, and appeal to the target audience in under 80 words.
     """
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.GEMINI_MODEL}:generateContent"
-    headers = {"Content-Type": "application/json"}
-    payload = {"contents": [{"parts": [{"text": prompt}]}]}
-
-    async with httpx.AsyncClient(timeout=30) as client:
-        response = await client.post(f"{url}?key={settings.GEMINI_API_KEY}", json=payload, headers=headers)
-
-    response.raise_for_status()
-    data = response.json()
-
-    return data["candidates"][0]["content"]["parts"][0]["text"]
+    response = client.models.generate_content(
+        model=settings.GEMINI_MODEL,
+        contents=prompt,
+    )
+    return response.text

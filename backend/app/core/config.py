@@ -96,7 +96,7 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_SECRET: str = ""
 
     GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-2.0-flash-001"
+    GEMINI_MODEL: str = "gemini-2.5-flash"
 
     GOOGLE_SPREADSHEET_ID: str = ""
     GOOGLE_GID: str = ""
