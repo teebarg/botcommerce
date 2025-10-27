@@ -295,10 +295,7 @@ export function FilterSidebar({ facets }: Props) {
             </div>
 
             <div className="space-y-3">
-                <button
-                    className="flex items-center justify-between w-full"
-                    onClick={() => setOpenSections((prev) => ({ ...prev, age: !prev.age }))}
-                >
+                <button className="flex items-center justify-between w-full" onClick={() => setOpenSections((prev) => ({ ...prev, age: !prev.age }))}>
                     <h3 className="font-medium">Age Range</h3>
                     {openSections.age ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </button>

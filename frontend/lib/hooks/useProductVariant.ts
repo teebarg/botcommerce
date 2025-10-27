@@ -83,7 +83,9 @@ export const useProductVariant = (product: Product | ProductSearch) => {
             return product?.variants?.find((variant) => variant.inventory > 0);
         }
 
-        return product?.variants?.find((variant) => variant.size === size && variant.color === color && variant.measurement === measurement && variant.age === age);
+        return product?.variants?.find(
+            (variant) => variant.size === size && variant.color === color && variant.measurement === measurement && variant.age === age
+        );
     };
 
     useEffect(() => {
@@ -134,6 +136,7 @@ export const useProductVariant = (product: Product | ProductSearch) => {
                     v.inventory > 0
             );
         }
+
         return false;
     };
 

@@ -70,10 +70,10 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false }) 
                 <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                     <DialogTrigger asChild>
                         <Button
-                            variant="destructive"
                             aria-label="delete address"
                             data-testid="address-delete-button"
                             size="icon"
+                            variant="destructive"
                             onClick={deleteState.open}
                         >
                             <Trash2 className="h-5 w-5" />

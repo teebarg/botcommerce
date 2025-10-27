@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AGE_OPTIONS } from "@/lib/constants";
@@ -41,22 +42,22 @@ export const AgeRangeSelector = ({ selectedRange, onChange }: AgeRangeSelectorPr
                     {AGE_OPTIONS.map((range) => (
                         <button
                             key={range}
-                            type="button"
-                            onClick={() => toggleRange(range)}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                                 selectedRange === range
                                     ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-md scale-105"
                                     : "bg-muted text-muted-foreground hover:bg-border hover:scale-105"
                             }`}
+                            type="button"
+                            onClick={() => toggleRange(range)}
                         >
                             {range}
                         </button>
                     ))}
                     {isCustomValue && (
                         <button
+                            className={`px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-md scale-105`}
                             type="button"
                             onClick={() => toggleRange(selectedRange.trim())}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-md scale-105`}
                         >
                             {selectedRange.trim()}
                         </button>
@@ -66,19 +67,19 @@ export const AgeRangeSelector = ({ selectedRange, onChange }: AgeRangeSelectorPr
 
             <div>
                 {!showCustomInput ? (
-                    <Button type="button" onClick={() => setShowCustomInput(true)} className="border-dashed">
+                    <Button className="border-dashed" type="button" onClick={() => setShowCustomInput(true)}>
                         <Plus className="h-4 w-4" />
                         Custom Range
                     </Button>
                 ) : (
                     <div className="flex gap-2">
                         <Input
-                            type="text"
+                            className="max-w-xs"
                             placeholder="e.g., 1-3 years"
+                            type="text"
                             value={customRange}
                             onChange={(e) => setCustomRange(e.target.value)}
                             onKeyPress={(e) => e.key === "Enter" && addCustomRange()}
-                            className="max-w-xs"
                         />
                         <Button type="button" onClick={addCustomRange}>
                             Add

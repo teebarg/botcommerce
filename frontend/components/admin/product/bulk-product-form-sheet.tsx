@@ -276,10 +276,7 @@ export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetForm
 
                         {selectedFields.has("age") && (
                             <div className="col-span-2">
-                                <AgeRangeSelector
-                                    selectedRange={product.age}
-                                    onChange={(range) => updateField("age", range)}
-                                />
+                                <AgeRangeSelector selectedRange={product.age} onChange={(range) => updateField("age", range)} />
                             </div>
                         )}
 
