@@ -77,37 +77,6 @@ services:
       - ./backend/:/app
       - /app/.venv
 
-  # frontend:
-  #   build:
-  #       context: ./frontend
-  #   command: sh -c "npm run dev"
-  #   ports:
-  #       - "7003:3000"
-  #   volumes:
-  #       - ./frontend:/app
-  #       - /app/node_modules
-  #       - /app/.next
-  #   environment:
-  #       - NODE_ENV=development
-  #       - NEXT_TELEMETRY_DISABLED=1
-  #       - WATCHPACK_POLLING=true
-  #   depends_on:
-  #       - backend
-  #   networks:
-  #       - traefik-public
-  #   labels:
-  #       - traefik.enable=true
-  #       - traefik.docker.network=traefik-public
-  #       - traefik.constraint-label=traefik-public
-
-  #       - traefik.http.services.frontend.loadbalancer.server.port=3000
-
-  #       - traefik.http.routers.frontend-http.rule=Host(`store.localhost`)
-  #       - traefik.http.routers.frontend-http.entrypoints=http
-  #   env_file:
-  #     - ./frontend/.env
-
-
   postgres:
     image: postgres:15
     healthcheck:
@@ -179,65 +148,25 @@ services:
     volumes:
       - redis-data:/data
 
-  # worker:
-  #   image: 'shop-backend:${TAG-latest}'
-  #   depends_on:
-  #     - backend
-  #     - redis
-  #   command: huey_consumer.py huey.huey
-  #   volumes:
-  #     - ./backend:/app
-  #     - /app/.venv
-  #   env_file:
-  #     - ./backend/.env
-  #   networks:
-  #     - traefik-public
-  #     - default
+  celery:
+    image: 'shop-worker:${TAG-latest}'
+    build:
+      context: ./worker
+      dockerfile: Dockerfile.dev
+    container_name: celery_worker
+    command: celery -A celery_app.celery_app worker -Q enrichment -l info
+    volumes:
+      - ./worker:/app
+      - /app/.venv
+    env_file:
+      - ./worker/.env
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - traefik-public
+      - default
 
-  # recommendation:
-  #   image: 'shop-recommendation:${TAG-latest}'
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.docker.network=traefik-public
-  #     - traefik.constraint-label=traefik-public
-
-  #     - traefik.http.services.shop-recommendation.loadbalancer.server.port=8000
-
-  #     - traefik.http.routers.shop-recommendation-http.rule=Host(`recommendation.localhost`)
-  #     - traefik.http.routers.shop-recommendation-http.entrypoints=http
-  #   ports:
-  #     - "7008:8000"
-  #   networks:
-  #     - traefik-public
-  #     - default
-  #   env_file:
-  #     - ./recommendation/.env
-  #   build:
-  #     context: ./recommendation
-  #     args:
-  #       INSTALL_DEV: ${INSTALL_DEV-false}
-  #   platform: linux/amd64 # Patch for M1 Mac
-  #   depends_on:
-  #     - postgres
-  #     - meilisearch
-  #   command:
-  #     - fastapi
-  #     - run
-  #     - --reload
-  #     - "main.py"
-  #   develop:
-  #     watch:
-  #       - path: ./recommendation
-  #         action: sync
-  #         target: /
-  #         ignore:
-  #           - ./recommendation/.venv
-  #           - .venv
-  #       - path: ./recommendation/pyproject.toml
-  #         action: rebuild
-  #   volumes:
-  #     - ./recommendation/:/app
-  #     - /app/.venv
 
   worker:
     image: 'shop-worker:${TAG-latest}'
