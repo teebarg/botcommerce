@@ -1,98 +1,185 @@
-# Shop
+# ⚡ Revoque — Modern E-Commerce Platform
 
-Shop is an e-commerce platform that leverages modern web technologies to provide a seamless shopping experience. This project uses Next.js for the frontend and FastAPI for the backend.
+Revoque is a full-featured e-commerce platform built with **Next.js** and **FastAPI**, designed for performance, scalability, and smooth shopping experiences. It uses **multi-tier caching**, **real-time revalidation**, **fast full-text search**, and **AI-powered retrieval-augmented generation (RAG)** to deliver highly responsive storefront interactions.
 
-## 🏗️ Architecture
+---
 
-![Architecture Diagram](./architecture.png)
+## 🏗️ Architecture Overview
 
-## Features
+![Architecture Diagram](./architecture_dark.png)
 
-- Responsive web design
-- Real-time product updates
-- User authentication and authorization
-- Shopping cart functionality
-- Order management
-- Payment integration (paystack)
+**Key Highlights**
+- **Next.js App Router** — SSR, ISR revalidation, and SWR caching
+- **FastAPI Backend** — optimized Python APIs
+- **Redis Cache** — sessions, carts & cached API responses
+- **PostgreSQL** — primary data authority (products, orders, users)
+- **Meilisearch** — Instant product search with filters
+- **Qdrant** — vector search for semantic similarity (product embeddings)
+- **Supabase Storage** — product images, invoice files, exports
+- **Celery** — background tasks (embedding generation, indexing, exports, notifications)
+- **Gemini (LLM)** — conversational AI assistant using RAG
+- **CDN Cache** (Vercel/Cloudflare) — global static asset delivery
 
-## Tech Stack
+---
+
+## ✨ Features
+
+- 🔐 Secure authentication & authorization
+- 🛒 Persistent cart & smooth checkout flow
+- ⚡ SWR + CDN + Redis multi-level caching
+- 🔍 Real-time full-text product search (Meilisearch)
+- 🤖 AI-powered product discovery & conversational assistant (Gemini + Qdrant)
+  - Semantic "related products" via SentenceTransformers → Qdrant
+  - RAG conversational assistant: Meilisearch + Qdrant + DB retrieval → Gemini
+- 🧾 PDF invoice generation & storage on Supabase
+- 🔄 Background task processing with Celery
+- 📦 Bulk product import/export via spreadsheet
+- 💳 Payment integration with **Paystack**
+
+---
+
+## 🧰 Tech Stack
 
 ### Frontend
-- [Next.js](https://nextjs.org/) - React framework for production
-- [React](https://reactjs.org/) - JavaScript library for building user interfaces
-- Tailwindcss
-- React-aria
+- **Next.js** (App Router)
+- **React**
+- **TailwindCSS**
+- **SWR / React Query**
 
 ### Backend
-- [FastAPI](https://fastapi.tiangolo.com/) - Modern, fast (high-performance) Python web framework
-- (PostgreSQL, supabase)
-- Redis for caching
-- Meillisearch
+- **FastAPI**
+- **PostgreSQL**
+- **Redis**
+- **Celery + Redis broker**
+- **Meilisearch**
+- **Qdrant**
+- **SentenceTransformers**
+- **Gemini API**
+- **Supabase Storage**
 
-## Getting Started
+---
 
-### Prerequisites
+## 🚀 Getting Started
 
-- Node.js (version 18 or higher)
-- Python (version 3.11 or higher)
-- (Any other prerequisites)
+### ✅ Prerequisites
+- Node.js ≥ 18
+- Python ≥ 3.11
+- PostgreSQL
+- Redis
+- Meilisearch
+- Qdrant
+- Supabase Project (for storage buckets)
+- Paystack account (for payments)
 
-### Installation
+---
 
-1. Clone the repository
-   ```
-   git clone https://github.com/teebarg/botcommerce.git
-   cd botcommerce
-   ```
+### 📦 Installation
 
-2. Set up the frontend
-   ```
-   cd frontend
-   npm install
-   ```
+1. Clone repo
+```sh
+git clone https://github.com/teebarg/botcommerce.git
+cd botcommerce
+```
 
-3. Set up the backend
-   ```
-   cd ../backend
-   pip install -r requirements.txt
-   ```
+2. Install frontend
+```sh
+cd frontend
+npm install
+```
 
-4. Set up environment variables
-   - Create a `.env` file in both the frontend and backend directories
-   - Add necessary environment variables (e.g., API keys, database URLs)
+3. Install backend
+```sh
+cd ../backend
+pip install -r requirements.txt
+```
 
-5. Set up Supabase Storage Buckets
-   - Create the following buckets in your Supabase project:
-     - `images` - for general images
-     - `exports` - for exported files
-     - `invoices` - for invoice PDFs
-   - Ensure all buckets have public access enabled for file downloads
+4. Add environment variables
+Create `.env` in both `frontend` and `backend` using `.env.example` as a guide. Key entries include:
+- `DATABASE_URL` (Postgres)
+- `REDIS_URL`
+- `MEILISEARCH_URL`
+- `QDRANT_URL` and `QDRANT_API_KEY` (if used)
+- `SUPABASE_URL` and `SUPABASE_KEY`
+- `PAYSTACK_SECRET`
+- `GEMINI_API_KEY` (or appropriate LLM key)
 
-### Running the Application
+5. Create Supabase Storage buckets
+| Bucket | Purpose |
+|--------|---------|
+| `images` | Product images |
+| `exports` | Exported XLSX files |
+| `invoices` | Order invoice PDFs |
 
-1. Start the backend server
-   ```
-   cd backend
-   uvicorn main:app --reload
-   ```
+> Ensure **public read access** is enabled ⚠️ (or generate signed URLs if you prefer restricted access)
 
-2. In a new terminal, start the frontend development server
-   ```
-   cd frontend
-   npm run dev
-   ```
+---
 
-3. Open your browser and navigate to `http://localhost:3000`
+### ▶️ Running the App (development)
 
-## Contributing
+Start the backend:
+```sh
+cd backend
+uvicorn main:app --reload
+```
 
-We welcome contributions to Shop! Please see our [Contributing Guide](CONTRIBUTING.md) for more details.
+Start the frontend:
+```sh
+cd frontend
+npm run dev
+```
 
-## License
+Visit 👉 http://localhost:3000
 
-This project is licensed under the [MIT License](LICENSE).
+---
 
-## Contact
+## 🧠 AI — Hybrid Search & RAG
 
-For any inquiries, please reach out to [teebarg01@gmail.com](mailto:teebarg01@gmail.com).
+This project uses a hybrid search pattern combining Meilisearch (keyword + filters) and Qdrant (semantic vector similarity) to support both fast keyword search and human-like semantic queries.
+
+**Pipeline summary:**
+1. Product embedding generation (SentenceTransformers) runs as a Celery job when products are created/updated.
+2. Embeddings are stored in Qdrant for nearest-neighbor similarity queries ("Related Products").
+3. For AI chat, FastAPI retrieves relevant contexts from:
+   - Meilisearch (top keyword matches)
+   - Qdrant (top semantically-similar documents/products)
+   - PostgreSQL (product metadata, FAQs)
+4. Retrieved context is packaged and sent to **Gemini** (RAG) to produce a concise, conversational response.
+
+**Notes & best practices:**
+- Keep embedding vector dimensionality and Qdrant index configuration consistent across updates.
+- Use chunking for long product descriptions to improve retrieval relevance.
+- Apply rate-limiting and caching for LLM calls to control cost and latency.
+
+---
+
+## 🛠️ Operational Notes
+- Celery uses Redis as broker in this setup: ensure worker(s) are running for async jobs.
+- Meilisearch and Qdrant should be monitored for index health and storage usage.
+- Supabase storage policies: consider signed URLs for private downloads.
+
+---
+
+## 🗺️ Roadmap (example)
+- [ ] Docker + docker-compose development setup
+- [ ] CI / CD + deployment docs
+- [ ] Role-based admin UI & product moderation
+- [ ] Analytics dashboard for search & AI usage
+- [ ] Improve RAG with conversational memory & user session context
+
+---
+
+## 🤝 Contributing
+Contributions are welcome! See: [CONTRIBUTING.md](CONTRIBUTING.md)
+
+---
+
+## 📄 License
+Distributed under the **MIT License**. See: [LICENSE](LICENSE)
+
+---
+
+## 📬 Contact
+For inquiries: **teebarg01@gmail.com**
+
+
 
