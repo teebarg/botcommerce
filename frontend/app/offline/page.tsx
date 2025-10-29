@@ -57,7 +57,6 @@ const OfflinePage = () => {
                     <h2 className="text-sm font-semibold mb-4">{`While you're offline, you can:`}</h2>
                     <ul className="text-sm text-muted-foreground space-y-2">
                         <li>• View previously loaded content</li>
-                        <li>• Use cached features</li>
                         <li>• Check your internet connection</li>
                         <li>• Try connecting to a different network</li>
                     </ul>

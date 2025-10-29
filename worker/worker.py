@@ -2,18 +2,6 @@ import json
 import numpy as np
 from redis_client import redis_client as r
 from db import database
-from config import settings
-
-
-def cosine_similarity(vec_a, vec_b):
-    if isinstance(vec_a, str):
-        vec_a = json.loads(vec_a)
-    if isinstance(vec_b, str):
-        vec_b = json.loads(vec_b)
-    a = np.array(vec_a, dtype=float)
-    b = np.array(vec_b, dtype=float)
-    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
-
 
 async def compute_similarity():
     products = []
@@ -51,31 +39,3 @@ def parse_variants(value):
         except json.JSONDecodeError:
             return []
     return value
-
-
-async def generate_description(product: dict) -> str:
-    """Generate SEO-optimized product description with variant + category info."""
-    variants = parse_variants(product.get("variants"))
-
-    variants_text = ", ".join(
-        [
-            f"Size: {v.get('size', '-')}, Color: {v.get('color', '-')}, Measurement: {v.get('measurement', '-')}, Age: {v.get('age', '-')}"
-            for v in variants
-        ]
-    ) or "No variant information available."
-
-    prompt = f"""
-    Write a short, engaging, and complete marketing product description for the following product.
-    Do not use placeholders, brackets, or markdown syntax. Use natural language only.
-
-    Product name: {product.get('name')}
-    Category: {product.get('category_name', '')}
-    Available variants: {variants_text}
-    Highlight features, use cases, and appeal to the target audience in under 80 words.
-    """
-
-    response = client.models.generate_content(
-        model=settings.GEMINI_MODEL,
-        contents=prompt,
-    )
-    return response.text

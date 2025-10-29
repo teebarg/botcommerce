@@ -64,7 +64,7 @@ export function ProductDetailsForm({ product, onDetailsChange }: ProductDetailsF
                         <Textarea
                             className="min-h-[100px] resize-none"
                             id="description"
-                            placeholder="Describe your product features, benefits, and specifications..."
+                            placeholder="Describe your product, benefits, and specifications..."
                             value={product.description}
                             onChange={(e) => updateField("description", e.target.value)}
                         />

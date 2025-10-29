@@ -11,8 +11,6 @@ export const siteUrls = {
     publicUrl: "https://commerce.niyi.com.ng/",
     github: "https://github.com/teebarg/botcommerce",
     home: "/",
-    pricing: "/pricing",
-    features: "/features",
     support: "/support",
     auth: {
         login: "/auth/signin",
@@ -27,7 +25,7 @@ export const siteUrls = {
     },
 } as const;
 
-export const publicRoutes: string[] = [siteUrls.publicUrl, siteUrls.home, siteUrls.pricing, siteUrls.features, siteUrls.support];
+export const publicRoutes: string[] = [siteUrls.publicUrl, siteUrls.home, siteUrls.support];
 
 export const protectedRoutes: string[] = [
     siteUrls.auth.login,
