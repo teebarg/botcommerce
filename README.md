@@ -6,7 +6,7 @@ Revoque is a full-featured e-commerce platform built with **Next.js** and **Fast
 
 ## 🏗️ Architecture Overview
 
-![Architecture Diagram](./architecture_dark.png)
+![Architecture Diagram](./architecture.png)
 
 **Key Highlights**
 - **Next.js App Router** — SSR, ISR revalidation, and SWR caching
@@ -90,7 +90,7 @@ npm install
 3. Install backend
 ```sh
 cd ../backend
-pip install -r requirements.txt
+uv sync
 ```
 
 4. Add environment variables
@@ -156,15 +156,6 @@ This project uses a hybrid search pattern combining Meilisearch (keyword + filte
 - Celery uses Redis as broker in this setup: ensure worker(s) are running for async jobs.
 - Meilisearch and Qdrant should be monitored for index health and storage usage.
 - Supabase storage policies: consider signed URLs for private downloads.
-
----
-
-## 🗺️ Roadmap (example)
-- [ ] Docker + docker-compose development setup
-- [ ] CI / CD + deployment docs
-- [ ] Role-based admin UI & product moderation
-- [ ] Analytics dashboard for search & AI usage
-- [ ] Improve RAG with conversational memory & user session context
 
 ---
 
