@@ -148,24 +148,24 @@ services:
     volumes:
       - redis-data:/data
 
-  celery:
-    image: 'shop-worker:${TAG-latest}'
-    build:
-      context: ./worker
-      dockerfile: Dockerfile.dev
-    container_name: celery_worker
-    command: celery -A celery_app.celery_app worker -Q enrichment -l info
-    volumes:
-      - ./worker:/app
-      - /app/.venv
-    env_file:
-      - ./worker/.env
-    depends_on:
-      - redis
-      - postgres
-    networks:
-      - traefik-public
-      - default
+  # celery:
+  #   image: 'shop-worker:${TAG-latest}'
+  #   build:
+  #     context: ./worker
+  #     dockerfile: Dockerfile.dev
+  #   container_name: celery_worker
+  #   command: celery -A celery_app.celery_app worker -Q enrichment -l info
+  #   volumes:
+  #     - ./worker:/app
+  #     - /app/.venv
+  #   env_file:
+  #     - ./worker/.env
+  #   depends_on:
+  #     - redis
+  #     - postgres
+  #   networks:
+  #     - traefik-public
+  #     - default
 
 
   worker:
