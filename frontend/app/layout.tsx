@@ -6,6 +6,7 @@ import { ThemeScript } from "@lib/theme/theme-script";
 import { Toaster } from "sonner";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { SessionProvider } from "next-auth/react";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 import TanstackProviders from "./query-provider";
 
@@ -19,7 +20,6 @@ import { CartProvider } from "@/providers/cart-provider";
 import { StoreProvider } from "@/providers/store-provider";
 import ImpersonationBanner from "@/components/impersonation-banner";
 import PushPermission from "@/components/pwa/push-permission";
-import { GoogleAnalytics } from '@next/third-parties/google'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
