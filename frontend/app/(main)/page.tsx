@@ -14,7 +14,6 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
     title: "Home",
-    description: "Welcome to our store",
 };
 
 export default async function Home() {

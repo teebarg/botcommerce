@@ -19,6 +19,7 @@ import { CartProvider } from "@/providers/cart-provider";
 import { StoreProvider } from "@/providers/store-provider";
 import ImpersonationBanner from "@/components/impersonation-banner";
 import PushPermission from "@/components/pwa/push-permission";
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
@@ -132,6 +133,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                         </TanstackProviders>
                     </div>
                 </ProgressBar>
+                {/* Google Analytics - show only in production */}
+                {process.env.NODE_ENV === "production" && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID || ""} />}
             </body>
         </html>
     );
