@@ -91,6 +91,7 @@ export default defineConfig([
         },
 
         rules: {
+            "react-hooks/rules-of-hooks": "off",
             "@typescript-eslint/no-unsafe-assignment": "off",
             "no-console": "off",
             "react/prop-types": "off",

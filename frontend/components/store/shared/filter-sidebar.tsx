@@ -27,7 +27,7 @@ export function FilterSidebar({ facets }: Props) {
     });
     const { data: categories } = useCategories();
 
-    const [sort, setSort] = useState<string>("created_at:desc");
+    const [sort, setSort] = useState<string>(() => searchParams.get("sortBy") || "created_at:desc");
     const [sizeSet, setSizeSet] = useState<Set<string>>(new Set());
     const [colorSet, setColorSet] = useState<Set<string>>(new Set());
     const [ageSet, setAgeSet] = useState<Set<string>>(new Set());
@@ -43,8 +43,6 @@ export function FilterSidebar({ facets }: Props) {
     };
 
     useEffect(() => {
-        setSort(searchParams.get("sortBy") || "created_at:desc");
-
         const sizesFromURL = searchParams.get("sizes")?.split(",").filter(Boolean) || [];
 
         setSizeSet(new Set(sizesFromURL));
