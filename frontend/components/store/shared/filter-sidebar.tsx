@@ -17,6 +17,8 @@ interface Props {
 }
 
 export function FilterSidebar({ facets }: Props) {
+    const searchParams = useSearchParams();
+    const { updateQuery } = useUpdateQuery();
     const [openSections, setOpenSections] = useState({
         categories: true,
         price: true,
@@ -34,9 +36,6 @@ export function FilterSidebar({ facets }: Props) {
     const [categorySet, setCategorySet] = useState<Set<string>>(new Set());
     const [minPrice, setMinPrice] = useState<string>("");
     const [maxPrice, setMaxPrice] = useState<string>("");
-
-    const searchParams = useSearchParams();
-    const { updateQuery } = useUpdateQuery();
 
     const toggleSection = (section: keyof typeof openSections) => {
         setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
