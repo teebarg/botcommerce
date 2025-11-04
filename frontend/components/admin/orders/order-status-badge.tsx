@@ -4,6 +4,7 @@ import { CheckCircle, Package, PackageCheck, RefreshCw, RotateCcw, ShieldAlert, 
 
 import { Badge } from "@/components/ui/badge";
 import { OrderStatus } from "@/schemas";
+import { JSX } from "react";
 
 export const PaymentStatusBadge = ({ status }: { status: string }) => {
     const statusConfig: Record<

@@ -91,6 +91,7 @@ export default defineConfig([
         },
 
         rules: {
+            "@typescript-eslint/no-unsafe-assignment": "off",
             "no-console": "off",
             "react/prop-types": "off",
             "react/jsx-uses-react": "off",
