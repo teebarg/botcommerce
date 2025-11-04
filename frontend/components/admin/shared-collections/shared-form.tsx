@@ -41,7 +41,7 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
 
     const isLoading = createShared.isPending || updateShared.isPending;
 
-    const { handleSubmit, control, setValue, watch, formState } = form;
+    const { handleSubmit, control } = form;
 
     const onSubmit = async (values: SharedFormValues) => {
         if (current?.id) {
@@ -56,14 +56,14 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
             <Form {...form}>
                 <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
                     <Card className="border-none">
-                        <CardContent className="space-y-6">
-                            <div className="grid md:grid-cols-2 gap-6">
+                        <CardContent className="space-y-6 px-0 md:px-0">
+                            <div className="grid md:grid-cols-2">
                                 <FormField
                                     control={control}
                                     name="title"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Collection Title *</FormLabel>
+                                            <FormLabel>Collection Title*</FormLabel>
                                             <FormControl>
                                                 <Input {...field} required placeholder="My Amazing Collection" />
                                             </FormControl>
@@ -90,7 +90,7 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
                                 name="is_active"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
+                                        <div className="flex items-center justify-between p-4 bg-background rounded-lg">
                                             <div className="space-y-1">
                                                 <FormLabel>Active Status</FormLabel>
                                                 <p className="text-sm text-muted-foreground">Make this collection visible to others</p>
