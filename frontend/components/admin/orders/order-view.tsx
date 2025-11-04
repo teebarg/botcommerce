@@ -122,7 +122,9 @@ const OrderView: React.FC = () => {
 
                     <div>
                         {isLoading && <CardSkeleton showAvatar={false} />}
-                        {orders?.map((order: Order, idx: number) => <OrderCard key={idx} actions={<OrderActions order={order} />} order={order} />)}
+                        {orders?.map((order: Order, idx: number) => (
+                            <OrderCard key={idx} actions={<OrderActions order={order} />} order={order} />
+                        ))}
 
                         {orders?.length === 0 && (
                             <div className="text-center py-8">

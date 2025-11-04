@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 type CookieOptions = Partial<{
     path: string;
     domain: string;

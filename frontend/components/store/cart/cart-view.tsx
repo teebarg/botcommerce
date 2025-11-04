@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Shield } from "nui-react-icons";
+import { Shield } from "lucide-react";
 
 import EmptyCartMessage from "./empty-message";
 

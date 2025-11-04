@@ -39,7 +39,9 @@ export default function Wishlist() {
                     <h1 className="text-2xl font-bold text-center mt-4">Your Wishlist</h1>
                     <p className="text-center text-muted-foreground">Curate your luxury collection.</p>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 lg:gap-8 mt-6 px-1">
-                        {wishlists?.map((item: WishItem, idx: number) => <WishlistItem key={idx} {...item.product} />)}
+                        {wishlists?.map((item: WishItem, idx: number) => (
+                            <WishlistItem key={idx} {...item.product} />
+                        ))}
                     </div>
                 </div>
             ) : (

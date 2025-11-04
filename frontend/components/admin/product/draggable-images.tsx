@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, JSX } from "react";
 import { Trash } from "lucide-react";
 
 import { ProductImage } from "@/schemas";

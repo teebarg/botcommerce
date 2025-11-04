@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { CloudOff, RefreshCcw, WifiOff } from "nui-react-icons";
+import { CloudOff, RefreshCcw, WifiOff } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,6 @@ const OfflinePage = () => {
     const [showAnimation, setShowAnimation] = useState(true);
 
     useEffect(() => {
-        // Reset animation when retrying
         if (isRetrying) {
             setShowAnimation(false);
             setTimeout(() => setShowAnimation(true), 100);

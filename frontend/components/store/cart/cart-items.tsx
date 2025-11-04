@@ -20,7 +20,9 @@ const CartItems: React.FC<ItemsTemplateProps> = ({ className }) => {
 
     return (
         <div className={cn("flex flex-col gap-y-4 overflow-y-auto", className)}>
-            {cart?.items?.map((item: CartItem, idx: number) => <CartItemComponent key={idx} item={item} />)}
+            {cart?.items?.map((item: CartItem, idx: number) => (
+                <CartItemComponent key={idx} item={item} />
+            ))}
             {cart?.items?.length === 0 && <div className="text-center">No items in cart</div>}
         </div>
     );

@@ -10,7 +10,7 @@ export default function NewArrivals() {
     const { data, isLoading } = useProductSearch({ collections: "new-arrivals", limit: 10 });
 
     return (
-        <div className="bg-gradient-to-b from-background to-card/30 py-8 px-2">
+        <div className="bg-linear-to-b from-background to-card/30 py-8 px-2">
             <ProductsCarousel
                 description="Find the best thrifts for your kids"
                 isLoading={isLoading}

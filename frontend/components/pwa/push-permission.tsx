@@ -102,6 +102,7 @@ export default function PushPermission() {
         const registration = await navigator.serviceWorker.ready;
         const sub = await registration.pushManager.subscribe({
             userVisibleOnly: true,
+            // @ts-ignore -- Suppress TS2322 for BufferSource mismatch
             applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!),
         });
 
@@ -135,7 +136,7 @@ export default function PushPermission() {
 
     return (
         <div className="fixed bottom-8 left-4 right-4 z-50 animate-slide-up">
-            <div className="max-w-md mx-auto bg-gradient-to-r from-blue-700 to-cyan-500 rounded-lg shadow-strong border border-white/20 p-4">
+            <div className="max-w-md mx-auto bg-linear-to-r from-blue-700 to-cyan-500 rounded-lg shadow-strong border border-white/20 p-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3 flex-1">
                         <div className="h-10 w-10 bg-white/20 rounded-full flex items-center justify-center">

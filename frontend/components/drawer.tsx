@@ -25,7 +25,6 @@ interface Props extends Omit<React.ComponentPropsWithoutRef<typeof DrawerPrimiti
 }
 
 const DrawerUI: React.FC<Props> = ({ action, children, direction, trigger, title, description, ...props }) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { fadeFromIndex, ...restProps } = props;
 
     return (

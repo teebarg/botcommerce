@@ -69,7 +69,7 @@ const PushNotificationManager: React.FC = () => {
     if (!show && !offline) return null;
 
     return (
-        <div className="fixed bottom-4 left-1/2 z-50 w-[95vw] max-w-sm -translate-x-1/2 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 text-gray-900 shadow-2xl p-5 flex flex-col items-center animate-fade-in">
+        <div className="fixed bottom-4 left-1/2 z-50 w-[95vw] max-w-sm -translate-x-1/2 rounded-2xl bg-linear-to-br from-emerald-100 to-teal-100 text-gray-900 shadow-2xl p-5 flex flex-col items-center animate-fade-in">
             {offline ? (
                 <>
                     <h2 className="text-lg font-bold mb-1">No Internet Connection</h2>

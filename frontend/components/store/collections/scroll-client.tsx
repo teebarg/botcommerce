@@ -47,7 +47,7 @@ export default function InfiniteScrollClient({ initialSearchParams, initialData 
 
     return (
         <div className="flex gap-6">
-            <aside className="hidden lg:block w-96 flex-shrink-0">
+            <aside className="hidden lg:block w-96 shrink-0">
                 <div className="sticky top-24 max-h-[calc(100vh-5rem)] overflow-y-auto">
                     <FilterSidebar facets={facets} />
                 </div>

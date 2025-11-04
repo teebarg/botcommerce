@@ -62,7 +62,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
 
             handleUserInteraction("VIEW", { timeSpent });
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [session?.id, product?.id]);
 
     const handleUserInteraction = async (type: UserInteractionType, metadata?: Record<string, any>) => {

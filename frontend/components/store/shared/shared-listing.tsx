@@ -1,16 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 
 export const SocialShare = ({ title, view_count }: { title: string; view_count: number }) => {
     const { data: session } = useSession();
     const [copied, setCopied] = useState<boolean>(false);
-    const [url, setUrl] = useState<string>("");
-
-    useEffect(() => {
-        setUrl(window.location.href);
-    }, []);
+    const [url] = useState<string>(() => (typeof window !== "undefined" ? window.location.href : ""));
 
     const shareText = encodeURIComponent(`Check out this curated collection: ${title}`);
     const shareUrl = encodeURIComponent(url);
