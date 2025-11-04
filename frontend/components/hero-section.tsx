@@ -88,7 +88,7 @@ const HeroSection: React.FC = () => {
                             <div className="bg-card/80 backdrop-blur-sm border border-border/20 rounded-2xl p-6">
                                 <div className="flex items-start justify-between mb-4">
                                     <div>
-                                        <h3 className="font-semibold text-card-foreground">Spring Collection</h3>
+                                        <p className="font-semibold text-card-foreground text-lg">Spring Collection</p>
                                         <p className="text-sm text-muted-foreground">Limited Edition</p>
                                     </div>
                                     <div className="bg-primary/10 px-3 py-1 rounded-full">

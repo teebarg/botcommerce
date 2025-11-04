@@ -61,7 +61,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
             <SheetTrigger>
                 <div className="bg-card rounded-2xl hidden md:flex items-center gap-1.5 w-96 px-2 py-3">
                     <Search className="w-5 h-5 text-muted-foreground" />
-                    <span className="text-muted-foreground text-sm">{query ? query : "Search for products..."}</span>
+                    <span className="text-foreground text-sm">{query ? query : "Search for products..."}</span>
                 </div>
                 <div className="rounded-md md:hidden h-10 w-10 flex items-center justify-center">
                     <Search className="w-6 h-6" />
