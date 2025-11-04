@@ -6,7 +6,7 @@ import { auth } from "@/auth";
 
 const AUTH_PATHS = new Set<string>(["/auth/signin", "/auth/error", "/auth/verify-request"]);
 
-export default async function middleware(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
     const { pathname } = req.nextUrl;
     const session = await auth();
 
