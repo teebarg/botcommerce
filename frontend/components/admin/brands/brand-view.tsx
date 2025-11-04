@@ -84,7 +84,11 @@ const BrandView: React.FC = () => {
             </div>
             <div className="md:hidden">
                 <div>
-                    <div className="flex flex-col gap-3">{brands?.map((brand: Brand, idx: number) => <BrandItem key={idx} brand={brand} />)}</div>
+                    <div className="flex flex-col gap-3">
+                        {brands?.map((brand: Brand, idx: number) => (
+                            <BrandItem key={idx} brand={brand} />
+                        ))}
+                    </div>
 
                     {brands?.length === 0 && (
                         <div className="text-center py-8 bg-secondary rounded-lg">

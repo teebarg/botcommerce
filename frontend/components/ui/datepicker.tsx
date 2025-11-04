@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import type React from "react";
 
 import { format } from "date-fns";
@@ -11,7 +10,6 @@ interface DateTimePickerProps {
 
 const DateTimePicker: React.FC<DateTimePickerProps> = ({ value, onChange, minDate = new Date() }) => {
     const formatDateTime = (date: Date) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return format(date, "yyyy-MM-dd'T'HH:mm");
     };
 

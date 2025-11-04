@@ -56,7 +56,6 @@ const ProductOverview: React.FC<{
 
             handleUserInteraction("VIEW", { timeSpent });
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [session?.id, product?.id]);
 
     const handleAddToCartAndTrack = () => {
@@ -104,7 +103,7 @@ const ProductOverview: React.FC<{
                         className="object-contain h-full w-full rounded"
                         src={selectedImage || product.images[0] || "/placeholder.jpg"}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
 
                     <DiscountBadge discount={priceInfo.maxDiscountPercent} isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice} />
 

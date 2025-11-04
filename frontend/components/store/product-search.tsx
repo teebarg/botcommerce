@@ -136,7 +136,9 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                                     <div className="p-6">
                                         <h3 className="font-semibold text-sm tracking-wider mb-4">PRODUCTS</h3>
                                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                                            {data?.products?.map((product: ProductSearch) => <ProductCard key={product.id} product={product} />)}
+                                            {data?.products?.map((product: ProductSearch) => (
+                                                <ProductCard key={product.id} product={product} />
+                                            ))}
                                         </div>
                                     </div>
                                 </div>
@@ -183,7 +185,9 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                                         <h3 className="font-semibold text-sm tracking-wider">TRENDING PRODUCTS</h3>
                                     </div>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                        {trendingData?.products?.map((product: ProductSearch) => <ProductCard key={product.id} product={product} />)}
+                                        {trendingData?.products?.map((product: ProductSearch) => (
+                                            <ProductCard key={product.id} product={product} />
+                                        ))}
                                     </div>
                                 </div>
                             </div>

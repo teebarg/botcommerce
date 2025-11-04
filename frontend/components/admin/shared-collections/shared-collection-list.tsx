@@ -42,7 +42,9 @@ export default function SharedCollectionList() {
                 <div>No Catalogs found.</div>
             ) : (
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    {data?.shared?.map((col: DBCatalog, idx: number) => <SharedCard key={idx} catalog={col} />)}
+                    {data?.shared?.map((col: DBCatalog, idx: number) => (
+                        <SharedCard key={idx} catalog={col} />
+                    ))}
                 </div>
             )}
         </div>

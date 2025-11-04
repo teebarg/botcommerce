@@ -99,7 +99,9 @@ const ReviewView: React.FC = () => {
             <div className="md:hidden">
                 <div>
                     <div className="flex flex-col gap-3">
-                        {reviews?.map((review: Review, idx: number) => <ReviewItem key={idx} review={review} />)}
+                        {reviews?.map((review: Review, idx: number) => (
+                            <ReviewItem key={idx} review={review} />
+                        ))}
                     </div>
 
                     {reviews?.length === 0 && (

@@ -142,7 +142,9 @@ const DeliveryOverview: React.FC = () => {
             </div>
 
             <div className="space-y-4">
-                {deliveryOptions?.map((option: DeliveryOption, idx: number) => <DeliveryItem key={idx} option={option} />)}
+                {deliveryOptions?.map((option: DeliveryOption, idx: number) => (
+                    <DeliveryItem key={idx} option={option} />
+                ))}
             </div>
         </div>
     );

@@ -1,10 +1,9 @@
 "use client";
 
-import { HeartFilled } from "nui-react-icons";
 import React from "react";
 import Link from "next/link";
+import { Heart } from "lucide-react";
 
-import { cn } from "@/lib/utils";
 import { ProductImage } from "@/schemas";
 import { useUserDeleteWishlist } from "@/lib/hooks/useUser";
 
@@ -22,7 +21,7 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, slug, name, images }) =
     };
 
     return (
-        <div className="relative flex max-w-full flex-none flex-col gap-3 rounded-1xl md:bg-inherit w-full snap-start h-full" id={id.toString()}>
+        <div className="relative flex max-w-full flex-none flex-col gap-3 rounded-1xl md:bg-card w-full snap-start h-full" id={id.toString()}>
             <div className="relative flex max-h-full w-full flex-col items-center overflow-hidden rounded-xl h-64 md:h-80 justify-between">
                 <div className="relative md:rounded-1xl z-0 h-full w-full overflow-visible">
                     {images[0] && (
@@ -35,11 +34,9 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, slug, name, images }) =
                     {name}
                 </Link>
             </div>
-            <div className="flex gap-3 absolute top-2 right-2">
-                <button aria-label="remove from wishlist" className={cn("transition-colors text-secondary cursor-pointer")} onClick={onRemove}>
-                    <HeartFilled className="w-10 h-10" />
-                </button>
-            </div>
+            <button aria-label="remove from wishlist" className="absolute top-2 right-2 cursor-pointer" onClick={onRemove}>
+                <Heart className="w-10 h-10 fill-primary text-transparent" />
+            </button>
         </div>
     );
 };

@@ -36,7 +36,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             title="Details"
             trigger={
                 <div className="group relative bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
-                    <div className="relative aspect-[3/4] overflow-hidden">
+                    <div className="relative aspect-3/4 overflow-hidden">
                         <img
                             alt={product.name}
                             className={cn("w-full h-full object-cover duration-700 group-hover:scale-105", imageLoaded ? "opacity-100" : "opacity-0")}

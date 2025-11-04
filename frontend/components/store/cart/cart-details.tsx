@@ -52,7 +52,9 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
                         </div>
                     ) : (
                         <div className="space-y-6">
-                            {cart?.items?.map((item: CartItem, idx: number) => <CartItemComponent key={idx} item={item} />)}
+                            {cart?.items?.map((item: CartItem, idx: number) => (
+                                <CartItemComponent key={idx} item={item} />
+                            ))}
                         </div>
                     )}
                 </div>

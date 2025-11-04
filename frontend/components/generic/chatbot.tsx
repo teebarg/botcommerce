@@ -33,27 +33,12 @@ const ChatBot: React.FC<Props> = () => {
     const state = useOverlayTriggerState({});
 
     useEffect(() => {
-        // Set isOpen after hydration
         const savedIsOpen = localStorage.getItem("chatbotOpen") !== "false";
-
-        setIsOpen(savedIsOpen);
-    }, []);
-
-    // Replace the existing auto-open useEffect
-    useEffect(() => {
         const hasBeenClosedThisSession = sessionStorage.getItem("chatbotClosed") === "true";
 
         setHasBeenClosed(hasBeenClosedThisSession);
-
-        // if (!hasBeenClosedThisSession) {
-        //     const timer = setTimeout(() => {
-        //         setIsOpen(true);
-        //         localStorage.setItem("chatbotOpen", "true");
-        //     }, 2000);
-
-        //     return () => clearTimeout(timer);
-        // }
-    }, []); // Empty dependency array means this runs once on mount
+        setIsOpen(savedIsOpen);
+    }, []);
 
     const toggleChat = () => {
         const newIsOpen = !isOpen;

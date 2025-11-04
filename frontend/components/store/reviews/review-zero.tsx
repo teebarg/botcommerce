@@ -24,9 +24,9 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
     return (
         <Card className="w-full max-w-6xl mx-auto text-center border-dashed border-2">
             <div className="space-y-6 mb-4 px-2">
-                <div className="relative w-full h-48 rounded-lg overflow-hidden bg-gradient-to-br from-primary/5 via-accent/10 to-secondary/5 flex items-center justify-center">
+                <div className="relative w-full h-48 rounded-lg overflow-hidden bg-linear-to-br from-primary/5 via-accent/10 to-secondary/5 flex items-center justify-center">
                     <div className="relative z-10 text-center space-y-4">
-                        <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center border border-primary/20">
+                        <div className="w-20 h-20 mx-auto rounded-full bg-linear-to-br from-primary/20 to-accent/20 flex items-center justify-center border border-primary/20">
                             <Package className="w-10 h-10 text-primary/60" />
                         </div>
                         <div className="flex justify-center space-x-1">
@@ -35,7 +35,7 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
                             ))}
                         </div>
                     </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
+                    <div className="absolute inset-0 bg-linear-to-t from-background/20 to-transparent" />
                 </div>
 
                 <div className="space-y-4">

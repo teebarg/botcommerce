@@ -95,7 +95,9 @@ const CollectionView: React.FC<Props> = ({ search }) => {
             <div className="md:hidden">
                 <div>
                     <div className="flex flex-col gap-3">
-                        {collections?.map((collection: Collection, idx: number) => <CollectionItem key={idx} collection={collection} />)}
+                        {collections?.map((collection: Collection, idx: number) => (
+                            <CollectionItem key={idx} collection={collection} />
+                        ))}
                     </div>
 
                     {collections?.length === 0 && (

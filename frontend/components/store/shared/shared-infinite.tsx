@@ -73,7 +73,7 @@ export default function SharedInfinite({ slug, initialCatalog, initialSearchPara
     return (
         <main className="w-full py-2">
             <div className="flex gap-6">
-                <aside className="hidden lg:block w-80 flex-shrink-0">
+                <aside className="hidden lg:block w-80 shrink-0">
                     <div className="sticky top-24 max-h-[calc(100vh-5rem)] overflow-y-auto">
                         <FilterSidebar />
                     </div>

@@ -1,9 +1,9 @@
 "use client";
 
-import { InformationCircleSolid } from "nui-react-icons";
 import React from "react";
 import { currency } from "@lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@components/ui/tooltip";
+import { Info } from "lucide-react";
 
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/providers/cart-provider";
@@ -28,7 +28,7 @@ const CartTotals: React.FC = () => {
                                 Subtotal
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <InformationCircleSolid />
+                                        <Info />
                                     </TooltipTrigger>
                                     <TooltipContent>
                                         <p>Cart total excluding shipping and taxes.</p>

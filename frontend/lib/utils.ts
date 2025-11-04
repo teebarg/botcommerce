@@ -13,7 +13,7 @@ const buildUrl = (baseUrl: string, queryParams: Record<string, string | number |
 
     for (const key in queryParams) {
         if (!queryParams[key]) continue;
-        // eslint-disable-next-line no-prototype-builtins
+
         if (queryParams.hasOwnProperty(key)) {
             if (firstQueryParam) {
                 url += `?${key}=${queryParams[key]}`;
