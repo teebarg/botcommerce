@@ -14,6 +14,7 @@ import { currency } from "@/lib/utils";
 import { useInvalidateCart } from "@/lib/hooks/useCart";
 import { useInvalidateMe } from "@/lib/hooks/useUser";
 import { deleteCookie } from "@/lib/util/cookie";
+import ImageDisplay from "@/components/image-display";
 
 interface AbandonedCartDetailsDialogProps {
     cart: Cart | null;
@@ -66,7 +67,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
 
                 <div className="space-y-6">
                     <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg border bg-gradient-to-br from-contrast/5 to-primary/5">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg border bg-linear-to-br from-contrast/5 to-primary/5">
                             <div className="space-y-1">
                                 <p className="text-sm text-muted-foreground">Name</p>
                                 {cart?.user?.first_name ? (
@@ -118,8 +119,8 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                         <div className="space-y-3">
                             {cart.items.map((item) => (
                                 <div key={item.id} className="flex gap-4 p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors">
-                                    <div className="w-20 h-20 rounded-lg overflow-hidden border bg-muted flex-shrink-0">
-                                        <img alt={item.name} className="w-full h-full object-cover" src={item.image} />
+                                    <div className="w-20 h-20 rounded-lg overflow-hidden border bg-muted shrink-0">
+                                        <ImageDisplay alt={item.name} url={item.image} />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h4 className="font-medium mb-1">{item.name}</h4>

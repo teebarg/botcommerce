@@ -1,6 +1,3 @@
-import { useState } from "react";
-import { Package } from "lucide-react";
-
 import { GalleryCardActions } from "./gallery-card-actions";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Collection, GalleryImageItem, ProductVariant } from "@/schemas";
+import MediaDisplay from "@/components/media-display";
 
 interface GalleryCardProps {
     image: GalleryImageItem;
@@ -18,8 +16,6 @@ interface GalleryCardProps {
 }
 
 export function GalleryCard({ image, onClick, isSelected = false, onSelectionChange, selectionMode = false }: GalleryCardProps) {
-    const [imageLoaded, setImageLoaded] = useState<boolean>(false);
-
     const handleSelectionChange = (checked: boolean) => {
         onSelectionChange?.(image.id, checked);
     };
@@ -27,7 +23,7 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
     return (
         <Card
             className={cn(
-                "group relative overflow-hidden border-0 bg-gradient-to-br from-card to-muted/20 backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer",
+                "group relative overflow-hidden border-0 bg-linear-to-br from-card to-muted/20 backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer",
                 image.product?.active ? "opacity-100" : "opacity-50 ring-2 ring-red-500",
                 isSelected && "ring-2 ring-primary/40 ring-offset-2"
             )}
@@ -35,30 +31,7 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
         >
             <CardContent className="p-0 md:p-0">
                 <div className="relative aspect-product overflow-hidden">
-                    {image.image ? (
-                        <>
-                            <img
-                                alt="product image"
-                                className={cn(
-                                    "w-full h-full object-cover transition-all duration-500 group-hover:scale-110",
-                                    imageLoaded ? "opacity-100" : "opacity-0"
-                                )}
-                                loading="lazy"
-                                src={image.image}
-                                onLoad={() => setImageLoaded(true)}
-                            />
-                            {!imageLoaded && (
-                                <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted/50 animate-pulse flex items-center justify-center">
-                                    <Package className="h-8 w-8 text-muted-foreground" />
-                                </div>
-                            )}
-                        </>
-                    ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
-                            <Package className="h-12 w-12 text-muted-foreground" />
-                        </div>
-                    )}
-
+                    <MediaDisplay url={image.image} alt={image.product?.name || ""} />
                     <div
                         className={cn(
                             "absolute top-2 left-2 z-10 opacity-0 lg:opacity-100 transition-opacity duration-300",

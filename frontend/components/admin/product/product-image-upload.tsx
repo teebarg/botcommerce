@@ -6,6 +6,7 @@ import { Upload, X, Image as ImageIcon, Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import ImageDisplay from "@/components/image-display";
 
 interface ImageUploadProps {
     images: ProductImage[];
@@ -114,10 +115,10 @@ export function ImageUpload({ images, onImagesChange, isLoading = false, showUpl
                             {images.map((image: ProductImage, idx: number) => (
                                 <Card key={idx} className="relative group overflow-hidden bg-card shadow-sm">
                                     <div className="aspect-square">
-                                        <img
-                                            alt={`Product image ${idx + 1}`}
-                                            className="w-full h-full object-cover transition-transform duration-smooth group-hover:scale-105"
-                                            src={image.url}
+                                        <ImageDisplay
+                                            alt={`image ${idx + 1}`}
+                                            className="transition-transform duration-smooth group-hover:scale-105"
+                                            url={image.url}
                                         />
                                     </div>
                                     {idx === 0 && (

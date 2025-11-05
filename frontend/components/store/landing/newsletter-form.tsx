@@ -35,7 +35,7 @@ export function NewsletterForm() {
 
     if (isSubscribed) {
         return (
-            <div className="bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 max-w-5xl mx-auto text-center rounded-2xl border border-input p-8 shadow-lg">
+            <div className="bg-linear-to-r from-primary/20 via-secondary/20 to-accent/20 max-w-5xl mx-auto text-center rounded-2xl border border-input p-8 shadow-lg">
                 <div className="mb-6">
                     <div className="w-16 h-16 bg-success rounded-full flex items-center justify-center mx-auto mb-4">
                         <CheckCircle className="h-8 w-8 text-secondary" />
@@ -57,7 +57,7 @@ export function NewsletterForm() {
     }
 
     return (
-        <div className="bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 rounded-2xl border border-input p-8 shadow-lg">
+        <div className="bg-linear-to-r from-primary/20 via-secondary/20 to-accent/20 rounded-2xl border border-input p-8 shadow-lg">
             <div className="max-w-md mx-auto">
                 <div className="text-center mb-6">
                     <h3 className="text-xl font-semibold mb-2">Subscribe Now</h3>

@@ -36,7 +36,7 @@ const CartControl: React.FC<Props> = ({ item }) => {
                         <Minus className="h-4 w-4 text-muted-foreground" />
                     </button>
 
-                    <div className="px-2 py-1.5 min-w-[2rem] text-center">
+                    <div className="px-2 py-1.5 min-w-8 text-center">
                         <span className="text-xs font-medium text-foreground">{updateQuantity.isPending ? "..." : item.quantity}</span>
                     </div>
 

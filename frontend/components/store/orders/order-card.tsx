@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { currency, formatDate } from "@/lib/utils";
 import Overlay from "@/components/overlay";
 import { OrderStatusBadge } from "@/components/admin/orders/order-status-badge";
+import ImageDisplay from "@/components/image-display";
 
 const OrderCard = ({ order }: { order: Order }) => {
     const state = useOverlayTriggerState({});
@@ -60,9 +61,7 @@ const OrderCard = ({ order }: { order: Order }) => {
                             key={idx}
                             className="aspect-product h-40 w-40 relative group-hover:scale-105 transition-transform duration-200 rounded-lg overflow-hidden"
                         >
-                            {item.image && (
-                                <img alt={item.variant?.product?.name || item.image} className="object-cover w-full h-full" src={item.image} />
-                            )}
+                            {item.image && <ImageDisplay alt={item.variant?.product?.name || item.image} url={item.image} />}
                         </div>
                     ))}
                     {order.order_items.length > 6 && (

@@ -8,7 +8,7 @@ export default async function ContactSection() {
     const siteConfig = await getSiteConfig();
 
     return (
-        <section className="py-16 bg-gradient-to-b from-card/30 to-background">
+        <section className="py-16 bg-linear-to-b from-card/30 to-background">
             <div className="max-w-8xl mx-auto px-4">
                 <div className="text-center mb-12">
                     <h2 className="text-3xl font-bold mb-2">Get in Touch</h2>
@@ -89,7 +89,7 @@ export default async function ContactSection() {
                                     title="Our Location"
                                     width="100%"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+                                <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent pointer-events-none" />
                             </div>
                         </div>
                     </div>

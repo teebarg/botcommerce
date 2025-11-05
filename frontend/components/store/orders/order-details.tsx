@@ -1,4 +1,3 @@
-import React from "react";
 import { ArrowLeft, Package, MapPin, Download } from "lucide-react";
 
 import OrderOverview from "./order-overview";
@@ -10,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Order, OrderItem } from "@/schemas";
 import { currency } from "@/lib/utils";
 import { useStoreSettings } from "@/providers/store-provider";
+import ImageDisplay from "@/components/image-display";
 
 interface OrderDetailsProps {
     order: Order;
@@ -48,13 +48,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                                     <div key={idx}>
                                         <div className="flex items-center gap-4">
                                             <div className="h-36 w-36 relative group-hover:scale-105 transition-transform duration-200 rounded-lg overflow-hidden">
-                                                {item.image && (
-                                                    <img
-                                                        alt={item.variant?.product?.name || item.image}
-                                                        className="object-cover w-full h-full"
-                                                        src={item.image}
-                                                    />
-                                                )}
+                                                {item.image && <ImageDisplay alt={item.variant?.product?.name || item.image} url={item.image} />}
                                             </div>
                                             <div className="flex-1">
                                                 <h4 className="font-medium">{item.name}</h4>
@@ -166,7 +160,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                                 className="flex items-center justify-center text-sm font-medium transition-colors bg-transparent border border-primary text-primary py-2 px-4 rounded-lg w-full"
                                 href={order.invoice_url}
                             >
-                                <Download className="w-4 h-4 mr-2 group-hover/link:translate-y-[-1px] transition-transform" />
+                                <Download className="w-4 h-4 mr-2 group-hover/link:-translate-y-px transition-transform" />
                                 Download Invoice
                             </a>
                         )}

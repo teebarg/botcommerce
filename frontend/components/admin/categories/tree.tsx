@@ -86,7 +86,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
     return (
         <React.Fragment>
             <div className="w-full max-w-6xl mx-auto p-2 md:p-4 space-y-6">
-                <div className="bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 rounded-2xl p-8">
+                <div className="bg-linear-to-r from-primary/20 via-secondary/20 to-accent/20 rounded-2xl p-8">
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                         <div>
                             <h1 className="text-3xl font-bold mb-2">Product Categories</h1>
@@ -154,7 +154,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                                                     </div>
                                                 </div>
 
-                                                <div className="flex items-center gap-2 flex-shrink-0">
+                                                <div className="flex items-center gap-2 shrink-0">
                                                     {category?.subcategories && category?.subcategories?.length > 0 && (
                                                         <button
                                                             aria-label={expandedCategories.includes(category.id) ? "Collapse" : "Expand"}

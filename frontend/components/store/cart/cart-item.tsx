@@ -7,12 +7,13 @@ import CartControl from "./cart-control";
 import { currency } from "@/lib/utils";
 import { CartItem } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
+import ImageDisplay from "@/components/image-display";
 
 const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
     return (
         <div className="flex gap-3">
             <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-card ring-1 ring-border">
-                <img alt={item.name} className="object-cover w-full h-full rounded-lg" src={item?.image || "/placeholder.jpg"} />
+                <ImageDisplay className="rounded-lg" url={item?.image} alt={item.name} />
             </div>
 
             <div className="flex-1 min-w-0">

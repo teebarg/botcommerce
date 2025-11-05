@@ -46,8 +46,8 @@ const BannerItem: React.FC<BannerItemProps> = ({ banner }) => {
         >
             <div className="p-6">
                 <div className="flex flex-col lg:flex-row gap-6">
-                    <div className="lg:w-80 flex-shrink-0">
-                        <div className="relative rounded-xl overflow-hidden aspect-[2/1]">
+                    <div className="lg:w-80 shrink-0">
+                        <div className="relative rounded-xl overflow-hidden aspect-2/1">
                             {banner.image ? (
                                 <>
                                     <img alt={banner.title} className="object-cover" src={banner.image} />

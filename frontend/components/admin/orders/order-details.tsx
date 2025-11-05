@@ -28,6 +28,7 @@ import { currency, formatDate } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Confirm } from "@/components/generic/confirm";
 import { Badge } from "@/components/ui/badge";
+import ImageDisplay from "@/components/image-display";
 
 interface OrderDetailsProps {
     order: Order;
@@ -85,7 +86,7 @@ const OrderItemCard: React.FC<{ orderItem: OrderItem; orderId: number }> = ({ or
     return (
         <div className="flex gap-4 px-2 py-4">
             <div className="h-28 w-28 rounded-lg overflow-hidden">
-                <img alt={orderItem.name} className="object-cover w-full h-full" src={orderItem.image || "/placeholder.jpg"} />
+                <ImageDisplay alt={orderItem.name} url={orderItem.image} />
             </div>
             <div className="grow">
                 <h3 className="text-sm font-medium">{orderItem.name}</h3>
@@ -259,7 +260,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                     className="flex items-center justify-center text-sm font-medium transition-colors bg-transparent border border-primary text-primary py-2 px-4 rounded-lg w-full"
                                     href={order.invoice_url}
                                 >
-                                    <Download className="w-4 h-4 mr-2 group-hover/link:translate-y-[-1px] transition-transform" />
+                                    <Download className="w-4 h-4 mr-2 group-hover/link:-translate-y-px transition-transform" />
                                     Download Invoice
                                 </a>
                             )}
