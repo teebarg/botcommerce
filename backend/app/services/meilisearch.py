@@ -78,7 +78,7 @@ async def add_documents_to_index(index_name: str, documents: list) -> None:
 
     def _add():
         task = index.add_documents(documents, primary_key="id", serializer=CustomEncoder)
-        index.wait_for_task(task.task_uid)
+        index.wait_for_task(task.task_uid, timeout_in_ms=30000)
         return task
 
     task = await to_thread.run_sync(_add)
@@ -93,7 +93,7 @@ async def update_document(index_name: str, document: dict) -> None:
 
     def _update():
         task = index.update_documents([document], serializer=CustomEncoder)
-        index.wait_for_task(task.task_uid)
+        index.wait_for_task(task.task_uid, timeout_in_ms=30000)
         return task
 
     task = await to_thread.run_sync(_update)
@@ -108,7 +108,7 @@ async def delete_document(index_name: str, document_id: str) -> None:
 
     def _delete():
         task = index.delete_document(document_id)
-        index.wait_for_task(task.task_uid)
+        index.wait_for_task(task.task_uid, timeout_in_ms=30000)
         return task
 
     task = await to_thread.run_sync(_delete)
@@ -123,7 +123,7 @@ async def clear_index(index_name: str) -> None:
 
     def _clear():
         task = index.delete_all_documents()
-        index.wait_for_task(task.task_uid)
+        index.wait_for_task(task.task_uid, timeout_in_ms=30000)
         return task
 
     task = await to_thread.run_sync(_clear)
