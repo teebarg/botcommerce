@@ -14,7 +14,7 @@ const OrderItemComponent: React.FC<{ item: OrderItem }> = ({ item }) => {
                 <div className="relative h-16 w-16 md:h-20 md:w-20 shrink-0 overflow-hidden rounded-lg bg-card ring-1 ring-border">
                     <ImageDisplay className="rounded-lg" url={item?.image} alt={item.name} />
                 </div>
-            </div>  
+            </div>
 
             <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-start mb-1">
