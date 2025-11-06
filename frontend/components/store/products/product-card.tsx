@@ -1,10 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-
 import ProductActions from "./product-actions";
-
 import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import { PriceLabel } from "@/components/store/products/price-label";
 import { DiscountBadge } from "@/components/store/products/discount-badge";
@@ -14,16 +12,15 @@ import ProductOverview from "@/components/store/products/product-overview";
 import { ProductSearch, ProductVariant } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import MediaDisplay from "@/components/media-display";
 
 interface ProductCardProps {
     product: ProductSearch;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-    const [imageLoaded, setImageLoaded] = useState<boolean>(false);
     const { priceInfo, outOfStock } = useProductVariant(product);
     const dialogState = useOverlayTriggerState({});
-
     const { data } = useUserWishlist();
 
     const inWishlist = !!data?.wishlists?.find((wishlist) => wishlist.product_id === product.id);
@@ -37,14 +34,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             trigger={
                 <div className="group relative bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
                     <div className="relative aspect-3/4 overflow-hidden">
-                        <img
-                            alt={product.name}
-                            className={cn("w-full h-full object-cover duration-700 group-hover:scale-105", imageLoaded ? "opacity-100" : "opacity-0")}
-                            src={product.images?.[0] || "/placeholder.jpg"}
-                            onLoad={() => setImageLoaded(true)}
-                        />
-
-                        {!imageLoaded && <div className="absolute inset-0 bg-muted animate-pulse" />}
+                        <MediaDisplay url={product.images?.[0]} alt={product.name} />
 
                         <DiscountBadge
                             className="absolute top-4 left-2"

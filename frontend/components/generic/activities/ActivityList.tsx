@@ -41,7 +41,7 @@ const ActivityListItem: React.FC<{ activity: Activity }> = ({ activity }) => {
             <div className="p-4 sm:p-6">
                 <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center space-x-3">
-                        <div className="flex-shrink-0 mt-0.5">
+                        <div className="shrink-0 mt-0.5">
                             <ActivityTypeIcon isSuccess={activity.is_success} type={activity.activity_type} />
                         </div>
                         <div className="hidden sm:block">
@@ -80,7 +80,7 @@ const ActivityListItem: React.FC<{ activity: Activity }> = ({ activity }) => {
                                 className="inline-flex items-center text-sm font-medium text-blue-500 hover:text-blue-700 transition-colors"
                                 href={activity.action_download_url}
                             >
-                                <Download className="w-4 h-4 mr-2 group-hover/link:translate-y-[-1px] transition-transform" />
+                                <Download className="w-4 h-4 mr-2 group-hover/link:-translate-y-px transition-transform" />
                                 Download File
                             </a>
                         )}

@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { currency } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
+import ImageDisplay from "@/components/image-display";
 
 interface ProductReviewProps {
     product: FormProduct;
@@ -35,7 +36,7 @@ export function ProductReview({ product }: ProductReviewProps) {
 
                         {images.length > 0 && (
                             <div className="aspect-square rounded-lg overflow-hidden bg-muted relative">
-                                <img alt="Main product image" className="w-full h-full object-cover" src={images[0].url} />
+                                <ImageDisplay alt="Main product image" url={images[0].url} />
                             </div>
                         )}
                     </div>
@@ -52,7 +53,7 @@ export function ProductReview({ product }: ProductReviewProps) {
                             <div className="grid grid-cols-4 gap-2">
                                 {images.slice(0, 4).map((image, index) => (
                                     <div key={image.id} className="aspect-square rounded overflow-hidden bg-muted relative">
-                                        <img alt={`Product image ${index + 1}`} className="w-full h-full object-cover" src={image.url} />
+                                        <ImageDisplay alt={`Product image ${index + 1}`} url={image.url} />
                                         {index === 0 && <div className="absolute top-1 left-1 bg-primary text-white text-xs px-1 rounded">Main</div>}
                                     </div>
                                 ))}

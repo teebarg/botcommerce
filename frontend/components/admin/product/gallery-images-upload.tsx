@@ -29,6 +29,10 @@ export function GalleryImagesUpload() {
             </Button> */}
             <CldUploadWidget
                 uploadPreset="shop_test"
+                options={{
+                    clientAllowedFormats: ["image"],
+                    multiple: true,
+                }}
                 onSuccess={(result: any) => {
                     if (result.event === "success") {
                         setImageUrls((prev) => [...prev, result.info.secure_url]);
@@ -42,6 +46,25 @@ export function GalleryImagesUpload() {
                         </Button>
                     );
                 }}
+            </CldUploadWidget>
+            <CldUploadWidget
+                uploadPreset="shop_test_video"
+                options={{
+                    clientAllowedFormats: ["video"],
+                    multiple: true,
+                    maxFileSize: 2000000, // 2MB before transformation
+                }}
+                onSuccess={(result: any) => {
+                    if (result.event === "success") {
+                        setImageUrls((prev) => [...prev, result.info.secure_url]);
+                    }
+                }}
+            >
+                {({ open }) => (
+                    <Button variant="outline" onClick={() => open()}>
+                        Upload Videos
+                    </Button>
+                )}
             </CldUploadWidget>
             {imageUrls.length > 0 && (
                 <Button disabled={isPending} onClick={onComplete}>

@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Cart } from "@/schemas";
 import { currency } from "@/lib/utils";
 import { useSendCartReminder } from "@/lib/hooks/useAbandonedCart";
+import ImageDisplay from "@/components/image-display";
 
 interface AbandonedCartCardProps {
     cart: Cart;
@@ -80,10 +81,10 @@ export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
                                     {cart.items.slice(0, 3).map((item) => (
                                         <div key={item.id} className="group relative">
                                             <div className="w-20 h-20 rounded-lg overflow-hidden border bg-muted">
-                                                <img
+                                                <ImageDisplay
                                                     alt={item.name}
-                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                                                    src={item.image || "/placeholder.jpg"}
+                                                    className="group-hover:scale-110 transition-transform duration-300"
+                                                    url={item.image}
                                                 />
                                             </div>
                                             {item.quantity > 1 && (

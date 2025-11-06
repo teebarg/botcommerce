@@ -41,6 +41,9 @@ def custom_deserializer(obj: dict) -> dict:
 def format_naira(value: int):
     return f"₦{value:,.2f}" if value else "₦0.00"
 
+def normalize_image(image: str):
+    return image.replace("mp4", "webp")
+
 
 def format_image(image: str):
     return image
@@ -96,6 +99,7 @@ def render_email_template(*, template_name: str, context: dict[str, Any]) -> str
     env.filters["naira"] = format_naira
     env.filters["image"] = format_image
     env.filters["date"] = format_date
+    env.filters["normalize_image"] = normalize_image
 
     # Load and render the template
     template = env.get_template(template_name)

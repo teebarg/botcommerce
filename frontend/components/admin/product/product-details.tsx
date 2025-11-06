@@ -15,6 +15,7 @@ import { useCollections } from "@/lib/hooks/useCollection";
 import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
 import ComponentLoader from "@/components/component-loader";
 import ServerError from "@/components/generic/server-error";
+import ImageDisplay from "@/components/image-display";
 
 const LIMIT = 24;
 
@@ -125,11 +126,7 @@ export function ProductDetails() {
                                 className="relative bg-card border border-input rounded-lg shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow"
                             >
                                 <div className="relative aspect-product w-full bg-card overflow-hidden">
-                                    <img
-                                        alt={product.name}
-                                        className="object-cover"
-                                        src={product.images?.[0] || product?.image || "/placeholder.jpg"}
-                                    />
+                                    <ImageDisplay alt={product.name} url={product.images?.[0] || product?.image} />
 
                                     <div className="absolute top-2 right-2 flex flex-col gap-1">
                                         <Badge className="shadow-sm" variant={getStatus(product.variants) === "In Stock" ? "emerald" : "destructive"}>

@@ -13,7 +13,7 @@
                 <div style="display: flex; padding: 15px; border-bottom: 1px solid #e5e7eb;">
                     <div style="flex: 0 0 80px; margin-right: 15px;">
                         {% if item.image %}
-                        <img src="{{ item.image }}" alt="{{ item.name }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px;">
+                        <img src="{{ item.image | normalize_image }}" alt="{{ item.name }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px;">
                         {% else %}
                         <div style="width: 80px; height: 80px; background-color: #f3f4f6; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 12px;">No Image</div>
                         {% endif %}

@@ -5,13 +5,14 @@ import React from "react";
 import { currency } from "@/lib/utils";
 import { OrderItem } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
+import ImageDisplay from "@/components/image-display";
 
 const OrderItemComponent: React.FC<{ item: OrderItem }> = ({ item }) => {
     return (
         <div className="flex gap-3 p-4">
             <div className="relative">
                 <div className="relative h-16 w-16 md:h-20 md:w-20 shrink-0 overflow-hidden rounded-lg bg-card ring-1 ring-border">
-                    <img alt={item.name} className="object-cover object-center rounded-lg" src={item?.image || "/placeholder.jpg"} />
+                    <ImageDisplay className="rounded-lg" url={item?.image} alt={item.name} />
                 </div>
             </div>
 

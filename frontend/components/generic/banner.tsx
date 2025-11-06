@@ -13,7 +13,7 @@ interface ComponentProps {}
 const Banner: React.FC<ComponentProps> = () => {
     const router = useRouter();
     const [currentSlide, setCurrentSlide] = useState<number>(0);
-    const content = ["Summer Sale 😍 🌴 Save 30% off selected seasonal items", "Buy clothes worth 20,000 naira and get Free Gift Card"];
+    const content = ["Summer Sale 😍 🌴 Save 30% off selected seasonal items", "Buy clothes worth 40,000 naira and get Free Gift Card"];
 
     useEffect(() => {
         const interval = setInterval(() => {

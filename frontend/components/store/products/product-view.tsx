@@ -15,6 +15,8 @@ import { UserInteractionType, useTrackUserInteraction } from "@/lib/hooks/useUse
 import { ProductCollectionIndicator } from "@/components/admin/shared-collections/product-collection-indicator";
 import { Button } from "@/components/ui/button";
 import { useUpdateVariant } from "@/lib/hooks/useProduct";
+import ImageDisplay from "@/components/image-display";
+import MediaDisplay from "@/components/media-display";
 
 interface Props {
     product: Product;
@@ -111,16 +113,16 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                     }`}
                                     onClick={() => setSelectedImageId(image.id)}
                                 >
-                                    <img alt={image.image} className="object-cover" src={image.image} />
+                                    <ImageDisplay alt={image.image} url={image.image} />
                                 </button>
                             ))}
                     </div>
                     <div className="flex-1">
                         <div className="h-[60vh] flex items-center justify-center p-4 relative">
-                            <img
+                            <MediaDisplay
                                 alt={product.name}
-                                className="object-contain h-full w-full rounded"
-                                src={selectedImage?.image || product.images?.[0]?.image || "/placeholder.jpg"}
+                                className="object-contain rounded"
+                                url={selectedImage?.image || product.images?.[0]?.image}
                             />
                         </div>
                     </div>

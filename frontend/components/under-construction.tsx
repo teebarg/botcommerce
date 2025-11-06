@@ -18,13 +18,13 @@ const UnderConstruction: React.FC = () => {
                 <div className="mx-auto max-w-4xl text-center">
                     <div className={`transform transition-all duration-1000 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
                         <div className="relative mb-8">
-                            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg">
+                            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 shadow-lg">
                                 <Wrench className="h-12 w-12 animate-bounce text-white" />
                             </div>
-                            <div className="absolute -top-2 -right-2 flex h-8 w-8 animate-spin items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-600">
+                            <div className="absolute -top-2 -right-2 flex h-8 w-8 animate-spin items-center justify-center rounded-full bg-linear-to-br from-emerald-500 to-teal-600">
                                 <Cog className="h-4 w-4 text-white" />
                             </div>
-                            <div className="absolute -bottom-2 -left-2 flex h-6 w-6 animate-pulse items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600">
+                            <div className="absolute -bottom-2 -left-2 flex h-6 w-6 animate-pulse items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-purple-600">
                                 <Hammer className="h-3 w-3 text-white" />
                             </div>
                         </div>
@@ -47,7 +47,7 @@ const UnderConstruction: React.FC = () => {
                         <div className="text-center">
                             <p className="mb-6">Want to be notified when this page is ready?</p>
                             <a
-                                className="rounded-full border-1 border-border px-8 py-3 transition-all duration-200 hover:bg-secondary"
+                                className="rounded-full border border-border px-8 py-3 transition-all duration-200 hover:bg-secondary"
                                 href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`}
                             >
                                 Contact Support

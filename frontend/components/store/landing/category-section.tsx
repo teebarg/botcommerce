@@ -12,7 +12,7 @@ const CategoriesSection: React.FC = () => {
 
     return (
         <ClientOnly>
-            <div className="bg-gradient-to-b from-background to-card/30">
+            <div className="bg-linear-to-b from-background to-card/30">
                 <div className="max-w-8xl mx-auto px-4 py-8 w-full text-center">
                     <h2 className="text-4xl font-bold mb-1 mt-6">Shop by category</h2>
                     <p className="text-muted-foreground text-lg mb-8">Discover our wide range of products across different categories</p>

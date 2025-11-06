@@ -52,7 +52,7 @@ const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
         <div className="px-6 py-4">
             <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-3 flex-1">
-                    <div className="flex-shrink-0 mt-0.5">
+                    <div className="shrink-0 mt-0.5">
                         <ActivityTypeIcon isSuccess={activity.is_success} type={activity.activity_type} />
                     </div>
 
@@ -101,7 +101,7 @@ const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
                     </div>
                 </div>
 
-                <div className="flex-shrink-0 ml-4">
+                <div className="shrink-0 ml-4">
                     <Button aria-label="Remove activity" disabled={isPending} size="icon" variant="ghost" onClick={() => removeActivity(activity.id)}>
                         {isPending ? (
                             <div className="animate-spin h-4 w-4 border-2 border-border border-t-red-500 rounded-full" />

@@ -12,6 +12,8 @@ import { useProductVariant } from "@/lib/hooks/useProductVariant";
 import { useUserCreateWishlist, useUserDeleteWishlist } from "@/lib/hooks/useUser";
 import { UserInteractionType, useTrackUserInteraction } from "@/lib/hooks/useUserInteraction";
 import { ImageDownloadButton } from "@/components/store/image-download";
+import MediaDisplay from "@/components/media-display";
+import ImageDisplay from "@/components/image-display";
 
 const ProductOverview: React.FC<{
     product: ProductSearch;
@@ -98,11 +100,7 @@ const ProductOverview: React.FC<{
                 </button>
 
                 <div className="relative h-[60vh] overflow-hidden">
-                    <img
-                        alt={product.name}
-                        className="object-contain h-full w-full rounded"
-                        src={selectedImage || product.images[0] || "/placeholder.jpg"}
-                    />
+                    <MediaDisplay alt={product.name} className="object-contain rounded" url={selectedImage || product.images[0]} />
                     <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
 
                     <DiscountBadge discount={priceInfo.maxDiscountPercent} isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice} />
@@ -133,7 +131,7 @@ const ProductOverview: React.FC<{
                         }`}
                         onClick={() => setSelectedImageIdx(idx)}
                     >
-                        <img alt={image} className="object-cover" src={image} />
+                        <ImageDisplay alt={image} url={image} />
                     </button>
                 ))}
             </div>
