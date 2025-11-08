@@ -88,6 +88,9 @@ export async function generateMetadata() {
                 },
             ],
         },
+        alternates: {
+            canonical: "./",
+        },
     };
 }
 
