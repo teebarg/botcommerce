@@ -14,9 +14,10 @@ import { Facet } from "@/schemas/product";
 
 interface Props {
     facets?: Facet;
+    onApplyComplete?: () => void;
 }
 
-export function FilterSidebar({ facets }: Props) {
+export function FilterSidebar({ facets, onApplyComplete }: Props) {
     const searchParams = useSearchParams();
     const { updateQuery } = useUpdateQuery();
     const [openSections, setOpenSections] = useState({
@@ -116,6 +117,7 @@ export function FilterSidebar({ facets }: Props) {
             { key: "minPrice", value: minPrice },
             { key: "maxPrice", value: maxPrice },
         ]);
+        onApplyComplete?.();
     };
 
     return (

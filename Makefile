@@ -77,7 +77,7 @@ serve-recommendation:
 	@cd recommendation; uvicorn main:app --host 0.0.0.0 --reload --workers 4 --port 8001
 
 serve-frontend:
-	@cd frontend; npm run dev-https-t
+	@cd frontend; npm run dev-https
 
 sync:
 	@cd backend; uv sync && source .venv/bin/activate

@@ -54,7 +54,7 @@ export default function MobileFilterControl({ facets, setViewMode, viewMode }: P
                     }
                     onOpenChange={editState.setOpen}
                 >
-                    <FilterSidebar facets={facets} />
+                    <FilterSidebar facets={facets} onApplyComplete={editState.close} />
                 </Overlay>
             </div>
         </div>
