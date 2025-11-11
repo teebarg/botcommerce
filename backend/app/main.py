@@ -217,7 +217,7 @@ async def generate_sitemap(request: Request):
     if cached_sitemap:
         return Response(content=cached_sitemap, media_type="application/xml")
 
-    products = await db.product.find_many()
+    products = await db.product.find_many(where={"is_active": True})
     categories = await db.category.find_many()
     collections = await db.collection.find_many()
 
@@ -245,7 +245,7 @@ async def generate_sitemap(request: Request):
 
     for product in products:
         url = SubElement(urlset, "url")
-        SubElement(url, "loc").text = f"{base_url}/product/{product.slug}"
+        SubElement(url, "loc").text = f"{base_url}/products/{product.slug}"
         SubElement(url, "priority").text = "0.6"
         SubElement(url, "changefreq").text = "weekly"
 
