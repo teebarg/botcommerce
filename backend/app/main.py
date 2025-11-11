@@ -217,7 +217,7 @@ async def generate_sitemap(request: Request):
     if cached_sitemap:
         return Response(content=cached_sitemap, media_type="application/xml")
 
-    products = await db.product.find_many(where={"is_active": True})
+    products = await db.product.find_many(where={"active": True})
     categories = await db.category.find_many()
     collections = await db.collection.find_many()
 
@@ -323,7 +323,7 @@ async def invalidate_redis(key: str):
 @app.post("/api/process-stale-messages")
 async def process_stale_messages(request: Request, background_tasks: BackgroundTasks):
     consumer = request.app.state.consumer
-    background_tasks.add_task(consumer.claim_stale_messages)    
+    background_tasks.add_task(consumer.claim_stale_messages)
     return {"message": "success"}
 
 
@@ -337,7 +337,7 @@ async def process_stream_id(stream_id: str, request: Request):
 
     msg_id, data = msgs[0]
     logger.info(f"📦 Received message: {msg_id} -> {data}")
-    
+
     try:
        await consumer.process_stream(msg_id=msg_id, data=data)
     except Exception as e:
