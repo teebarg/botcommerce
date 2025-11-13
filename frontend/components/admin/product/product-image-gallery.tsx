@@ -114,6 +114,8 @@ export function ProductImageGallery() {
 
             {isImagesLoading ? (
                 <ComponentLoader />
+            ) : images.length === 0 ? (
+                <div className="text-center">No images found</div>
             ) : (
                 <div>
                     <div className="lg:hidden mb-4 sticky top-16 z-40 bg-background -mx-4 px-4 py-4 flex gap-2">
