@@ -3,133 +3,128 @@
 import React, { useMemo, useState } from "react";
 import { currency } from "@lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@components/ui/tooltip";
-import { Info, Trash2 } from "lucide-react";
+import { Check, Info, Trash2, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/providers/cart-provider";
 import ComponentLoader from "@/components/component-loader";
+import { Card, CardContent } from "@/components/ui/card";
+import { useApplyCoupon, useRemoveCoupon } from "@/lib/hooks/useCoupon";
+import { toast } from "sonner";
 
 const DiscountCode: React.FC = () => {
     const { cart, isLoading } = useCart();
-    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [code, setCode] = useState("");
+    const applyMutation = useApplyCoupon();
+    const removeMutation = useRemoveCoupon();
 
-    const { discounts, gift_cards } = cart || {};
+    const appliedCoupon = useMemo(() => {
+        if (!cart?.coupon_id) return null;
+        // Cart should include coupon info, but for now we'll show discount_amount
+        return {
+            code: "APPLIED", // You might want to include coupon code in cart response
+            discount_amount: cart.discount_amount || 0,
+        };
+    }, [cart]);
 
     const appliedDiscount = useMemo(() => {
-        if (!discounts || !discounts.length) {
-            return undefined;
+        if (!appliedCoupon) return null;
+        if (appliedCoupon.discount_amount) {
+            return currency(appliedCoupon.discount_amount);
         }
-
-        switch (discounts[0].rule.type) {
-            case "percentage":
-                return `${discounts[0].rule.value}%`;
-            case "fixed":
-                return `- ${currency(discounts[0].rule.value)}`;
-
-            default:
-                return "Free shipping";
-        }
-    }, [discounts]);
-
-    const removeGiftCardCode = async (code: string) => {
-        // TODO
-    };
+        return null;
+    }, [appliedCoupon]);
 
     const removeDiscountCode = async () => {
-        // TODO
+        try {
+            await removeMutation.mutateAsync();
+        } catch (error: any) {
+            // Error is already handled in the hook
+        }
+    };
+
+    const applyDiscountCode = async () => {
+        if (!code.trim()) {
+            toast.error("Please enter a coupon code");
+            return;
+        }
+
+        try {
+            await applyMutation.mutateAsync(code);
+            setCode("");
+        } catch (error: any) {
+            // Error is already handled in the hook
+        }
     };
 
     if (isLoading) return <ComponentLoader className="h-[100px]" />;
 
     return (
         <div className="w-full flex flex-col">
-            <div className="txt-medium">
-                {gift_cards?.length > 0 && (
-                    <div className="flex flex-col mb-4">
-                        <h2 className="text-lg font-medium">Gift card(s) applied:</h2>
-                        {gift_cards?.map((gc: any, idx: number) => (
-                            <div key={idx} className="flex items-center justify-between txt-small-plus" data-testid="gift-card">
-                                <p className="flex gap-x-1 items-baseline">
-                                    <span>Code: </span>
-                                    <span className="truncate" data-testid="gift-card-code">
-                                        {gc.code}
-                                    </span>
-                                </p>
-                                <p className="font-semibold" data-testid="gift-card-amount" data-value={gc.balance}>
-                                    {currency(gc.balance)}
-                                </p>
-                                <button
-                                    aria-label="remove gift card"
-                                    className="flex items-center gap-x-2 !background-transparent border-none!"
-                                    data-testid="remove-gift-card-button"
-                                    onClick={() => removeGiftCardCode(gc.code)}
-                                >
-                                    <Trash2 size={14} />
-                                </button>
+            {appliedDiscount ? (
+                <Card className="border-primary bg-primary/5">
+                    <CardContent className="flex items-center justify-between p-4">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                                <Check className="h-4 w-4 text-primary" />
                             </div>
-                        ))}
-                    </div>
-                )}
-
-                {appliedDiscount ? (
-                    <div className="w-full flex items-center">
-                        <div className="flex flex-col w-full">
-                            <h2 className="text-lg font-medium">Discount applied:</h2>
-                            <div className="flex items-center justify-between w-full max-w-full" data-testid="discount-row">
-                                <p className="flex gap-x-1 items-baseline txt-small-plus w-4/5 pr-1">
-                                    <span>Code:</span>
-                                    <span className="truncate" data-testid="discount-code">
-                                        {discounts[0].code}
-                                    </span>
-                                    <span className="min-w-fit" data-testid="discount-amount" data-value={discounts[0]?.rule?.value}>
-                                        ({appliedDiscount})
-                                    </span>
-                                </p>
-                                <button
-                                    aria-label="remove discount"
-                                    className="flex items-center"
-                                    data-testid="remove-discount-button"
-                                    onClick={removeDiscountCode}
-                                >
-                                    <Trash2 size={14} />
-                                    <span className="sr-only">Remove discount code from order</span>
-                                </button>
+                            <div>
+                                <p className="text-sm font-medium">Coupon Applied</p>
+                                <p className="text-xs text-muted-foreground">-{appliedDiscount} discount applied</p>
                             </div>
                         </div>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={removeDiscountCode}
+                            disabled={removeMutation.isPending}
+                            className="h-8 w-8"
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </CardContent>
+                </Card>
+            ) : (
+                <div className="w-full">
+                    <span className="flex gap-x-1 my-2 items-center">
+                        Add gift card or coupon code
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Info className="size-4 text-gray-500" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>You can add multiple gift cards, but only one discount code.</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </span>
+                    <div className="flex w-full gap-x-2 items-center">
+                        <Input
+                            value={code}
+                            onChange={(e) => setCode(e.target.value.toUpperCase())}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    applyDiscountCode();
+                                }
+                            }}
+                            className="flex-1 bg-card"
+                            data-testid="discount-input"
+                            name="code"
+                            placeholder="Enter coupon code"
+                            type="text"
+                            disabled={applyMutation.isPending}
+                        />
+                        <Button
+                            aria-label="apply"
+                            className="px-4 min-w-20 text-sm"
+                            onClick={applyDiscountCode}
+                            disabled={applyMutation.isPending || !code.trim()}
+                        >
+                            {applyMutation.isPending ? "Applying..." : "Apply"}
+                        </Button>
                     </div>
-                ) : (
-                    <form className="w-full">
-                        <span className="flex gap-x-1 my-2 items-center">
-                            <button
-                                aria-label="add gift card"
-                                className="text-sm font-medium text-blue-500"
-                                data-testid="add-discount-button"
-                                type="button"
-                                onClick={() => setIsOpen(!isOpen)}
-                            >
-                                Add gift card or discount code
-                            </button>
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <Info className="size-4 text-gray-500" />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>You can add multiple gift cards, but only one discount code.</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </span>
-                        {isOpen && (
-                            <div className="flex w-full gap-x-2 items-center">
-                                <Input className="flex-1" data-testid="discount-input" name="code" type="text" />
-                                <Button aria-label="apply" className="px-4 min-w-20 text-sm gap-2" type="submit">
-                                    Apply
-                                </Button>
-                            </div>
-                        )}
-                    </form>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 };

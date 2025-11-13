@@ -33,6 +33,11 @@ enum DiscountType {
   FIXED_AMOUNT
 }
 
+enum CouponScope {
+  GENERAL
+  SPECIFIC_USERS
+}
+
 enum PaymentMethod {
   CREDIT_CARD
   CASH_ON_DELIVERY
@@ -326,6 +331,7 @@ model Order {
   total           Float           @db.DoublePrecision
   subtotal        Float           @db.DoublePrecision
   tax             Float           @db.DoublePrecision
+  discount_amount Float           @default(0) @db.DoublePrecision
   status          OrderStatus     @default(PENDING)
   payment         Payment?
   payment_method  PaymentMethod
@@ -400,16 +406,43 @@ model Payment {
 
 // Coupon Model
 model Coupon {
-  id              Int          @id @default(autoincrement())
-  code            String       @unique
-  discount_type   DiscountType
-  discount_value  Float        @db.DoublePrecision
-  expiration_date DateTime
-  orders          Order[]
-  created_at      DateTime     @default(now())
-  updated_at      DateTime     @updatedAt
+  id                Int          @id @default(autoincrement())
+  code              String       @unique
+  discount_type     DiscountType
+  discount_value    Float        @db.DoublePrecision
+  min_cart_value    Float?       @db.DoublePrecision
+  min_item_quantity Int?
+  valid_from        DateTime
+  valid_until       DateTime
+  max_uses          Int          @default(1)
+  current_uses      Int          @default(0)
+  scope             CouponScope  @default(GENERAL)
+  is_active         Boolean      @default(true)
+  assigned_users    Json?        @db.JsonB // Array of user IDs for specific_users scope
+  orders            Order[]
+  carts             Cart[]
+  coupon_users      CouponUser[]
+  created_at        DateTime     @default(now())
+  updated_at        DateTime     @updatedAt
 
+  @@index([code])
+  @@index([is_active])
+  @@index([valid_from, valid_until])
   @@map("coupons")
+}
+
+// CouponUser model to track assigned users (alternative approach)
+model CouponUser {
+  id        Int    @id @default(autoincrement())
+  coupon    Coupon @relation(fields: [coupon_id], references: [id], onDelete: Cascade)
+  coupon_id Int
+  user      User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id   Int
+
+  @@unique([coupon_id, user_id])
+  @@index([coupon_id])
+  @@index([user_id])
+  @@map("coupon_users")
 }
 
 // Cart Model
@@ -426,8 +459,11 @@ model Cart {
   subtotal        Float           @default(0) @db.DoublePrecision
   tax             Float           @default(0) @db.DoublePrecision
   shipping_fee    Float           @default(0) @db.DoublePrecision
+  discount_amount Float           @default(0) @db.DoublePrecision
   payment_method  PaymentMethod?
   shipping_method ShippingMethod?
+  coupon          Coupon?         @relation(fields: [coupon_id], references: [id], onDelete: SetNull)
+  coupon_id       Int?
 
   shipping_address    Address? @relation("ShippingCartAddress", fields: [shipping_address_id], references: [id], onDelete: SetNull)
   shipping_address_id Int?
@@ -484,6 +520,7 @@ model User {
   activity_logs              ActivityLog[]
   interactions               UserInteraction[]
   preferences                UserPreference[]
+  coupon_users               CouponUser[]
 
   created_at           DateTime?              @default(now())
   updated_at           DateTime?              @updatedAt

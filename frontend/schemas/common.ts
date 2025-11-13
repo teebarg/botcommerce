@@ -72,8 +72,27 @@ export const ImageUploadSchema = z.object({
     content_type: z.string(),
 });
 
+export const CouponSchema = z.object({
+    id: z.number(),
+    code: z.string(),
+    type: z.enum(["percentage", "fixed"]),
+    value: z.number().min(1),
+    minCartValue: z.number().optional(),
+    minItemQuantity: z.number().optional(),
+    validFrom: z.string(),
+    validUntil: z.string(),
+    maxUses: z.number().min(1),
+    currentUses: z.number().optional(),
+    scope: z.enum(["general", "specific_users"]),
+    status: z.enum(["active", "inactive"]),
+    isActive: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+});
+
 export type DeliveryOption = z.infer<typeof DeliveryOptionSchema>;
 export type ImageUpload = z.infer<typeof ImageUploadSchema>;
+export type Coupon = z.infer<typeof CouponSchema>;
 
 export type Token = z.infer<typeof TokenSchema>;
 export type Pag = z.infer<typeof PagSchema>;

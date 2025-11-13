@@ -33,6 +33,7 @@ export const OrderSchema = z
         order_items: z.array(OrderItemSchema),
         subtotal: z.number(),
         tax: z.number(),
+        discount_amount: z.number().optional(),
         shipping_fee: z.number(),
         total: z.number(),
         coupon: z.number().optional(),

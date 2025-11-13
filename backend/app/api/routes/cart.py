@@ -19,6 +19,8 @@ router = APIRouter()
 
 async def calculate_cart_totals(cart: Cart):
     """Helper function to calculate cart totals"""
+    from app.services.coupon import CouponService
+    
     service = ShopSettingsService()
     tax_rate = float(await service.get("tax_rate"))
     cart_items = await db.cartitem.find_many(where={"cart_id": cart.id})
@@ -26,11 +28,35 @@ async def calculate_cart_totals(cart: Cart):
     subtotal = sum(item.price * item.quantity for item in cart_items)
     tax = subtotal * (tax_rate / 100)
 
-    total = subtotal + tax + cart.shipping_fee
+    discount_amount = 0.0
+    if cart.coupon_id:
+        coupon_service = CouponService()
+        coupon = await db.coupon.find_unique(where={"id": cart.coupon_id})
+        if coupon:
+            try:
+                await coupon_service.validate_coupon(
+                    code=coupon.code,
+                    cart=cart,
+                    user_id=cart.user_id
+                )
+                discount_amount = await coupon_service.calculate_discount(coupon, subtotal)
+            except Exception:
+                discount_amount = 0.0
+                await db.cart.update(
+                    where={"id": cart.id},
+                    data={"coupon_id": None}
+                )
+
+    total = subtotal + tax + cart.shipping_fee - discount_amount
 
     await db.cart.update(
         where={"id": cart.id},
-        data={"subtotal": subtotal, "tax": tax, "total": total}
+        data={
+            "subtotal": subtotal,
+            "tax": tax,
+            "discount_amount": discount_amount,
+            "total": total
+        }
     )
 
     await invalidate_pattern("abandoned-carts")
@@ -200,7 +226,7 @@ async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: st
 
     if cart_update.shipping_fee is not None:
         update_data["shipping_fee"] = cart_update.shipping_fee
-        update_data["total"] = cart.subtotal + cart.tax + update_data["shipping_fee"]
+        update_data["total"] = cart.subtotal + cart.tax + update_data["shipping_fee"] - cart.discount_amount
 
     if user:
         update_data["user"] = {"connect": {"id": user.id}}
@@ -233,7 +259,7 @@ async def delete_cart_item(item_id: int, cartId: str = Header(default=None)):
     subtotal = cart.subtotal - decrement
     service = ShopSettingsService()
     tax = subtotal * (float(await service.get("tax_rate")) / 100)
-    total = subtotal + tax + cart.shipping_fee
+    total = subtotal + tax + cart.shipping_fee - cart.discount_amount
 
     async with db.tx() as tx:
         await tx.cartitem.delete(where={"id": item_id})

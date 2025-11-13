@@ -35,6 +35,7 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
             "subtotal": cart.subtotal,
             "tax": cart.tax,
             "shipping_fee": cart.shipping_fee,
+            "discount_amount": cart.discount_amount,
             "status": order_in.status,
             "payment_status": order_in.payment_status,
             "shipping_method": cart.shipping_method,
@@ -53,6 +54,12 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
                 ]
             }
         }
+
+    if cart.coupon_id:
+        data["coupon"] = {"connect": {"id": cart.coupon_id}}
+        from app.services.coupon import CouponService
+        coupon_service = CouponService()
+        await coupon_service.increment_coupon_usage(cart.coupon_id)
 
     if cart.shipping_address_id:
         data["shipping_address"] = {"connect": {"id": cart.shipping_address_id}}

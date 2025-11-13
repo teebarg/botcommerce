@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { FileImage, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Clock, LucideProps, Package, Pencil, Trash2, Truck, Zap } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
@@ -120,6 +120,20 @@ const DeliveryOverview: React.FC = () => {
 
     if (isLoading) {
         return <ComponentLoader className="h-[400px]" />;
+    }
+
+    if (!deliveryOptions || deliveryOptions.length === 0) {
+        return (
+            <div className="bg-card rounded-2xl p-12 text-center border-2 border-dashed border-input">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <FileImage className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">No delivery options yet</h3>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                    Start organizing your delivery options by creating your first delivery option.
+                </p>
+            </div>
+        );
     }
 
     return (

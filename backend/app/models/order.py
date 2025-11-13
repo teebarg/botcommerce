@@ -26,6 +26,7 @@ class OrderResponse(BaseModel):
     total: float
     subtotal: float
     tax: float
+    discount_amount: float
     status: OrderStatus
     payment_status: PaymentStatus
     shipping_method: ShippingMethod

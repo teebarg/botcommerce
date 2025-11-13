@@ -16,7 +16,7 @@ const CartTotals: React.FC = () => {
 
     if (!cart) return null;
 
-    const { discount_total, tax, total, subtotal } = cart;
+    const { discount_amount, tax, total, subtotal } = cart;
 
     return (
         <>
@@ -58,12 +58,12 @@ const CartTotals: React.FC = () => {
                             </span>
                         </dd>
                     </div>
-                    {!!discount_total && (
+                    {!!discount_amount && (
                         <div className="flex justify-between">
                             <dt className="text-sm text-muted-foreground">Discount</dt>
                             <dd className="text-sm font-semibold text-success">
-                                <span className="text-blue-500" data-testid="cart-discount" data-value={discount_total || 0}>
-                                    - {currency(discount_total)}
+                                <span className="text-blue-500" data-testid="cart-discount" data-value={discount_amount || 0}>
+                                    - {currency(discount_amount)}
                                 </span>
                             </dd>
                         </div>

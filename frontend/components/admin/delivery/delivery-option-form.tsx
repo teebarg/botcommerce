@@ -54,7 +54,7 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
         if (initialData?.id) {
             response = await tryCatch<DeliveryOption>(api.patch(`/delivery/${initialData.id}`, data));
         } else {
-            response = await tryCatch<DeliveryOption>(api.post("/delivery", data));
+            response = await tryCatch<DeliveryOption>(api.post("/delivery/", data));
         }
 
         if (response.error) {

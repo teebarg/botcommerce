@@ -17,6 +17,7 @@ import {
     UsersRound,
     Star,
     ShoppingCart,
+    Tag,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -39,6 +40,7 @@ const AdminMobileMenu: React.FC = () => {
         { id: "collections", label: "Collections", icon: <LayoutGrid size={20} />, href: "/admin/collections" },
         { id: "reviews", label: "Reviews", icon: <Star size={20} />, href: "/admin/reviews" },
         { id: "shared", label: "Catalog", icon: <LayoutGrid size={20} />, href: "/admin/shared" },
+        { id: "coupons", label: "Coupons", icon: <Tag size={20} />, href: "/admin/coupons" },
         { id: "settings", label: "Settings", icon: <Settings size={20} />, href: "/admin/settings" },
         { id: "activities", label: "Activities", icon: <Activity size={20} />, href: "/admin/activities" },
         { id: "chats", label: "Chats", icon: <MessageSquare size={20} />, href: "/admin/chats" },
