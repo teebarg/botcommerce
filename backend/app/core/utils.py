@@ -13,6 +13,7 @@ from app.models.order import OrderResponse
 from app.models.user import User
 from jinja2 import Environment, FileSystemLoader, Template
 from app.services.shop_settings import ShopSettingsService
+from app.models.coupon import CouponResponse
 
 
 @dataclass
@@ -54,6 +55,11 @@ def url_to_list(url: str) -> list[str]:
 def format_date(date: datetime) -> str:
     return date.strftime("%B %d, %Y")
 
+def format_discount(coupon: CouponResponse) -> str:
+    if coupon.discount_type == "PERCENTAGE":
+        return f"{int(coupon.discount_value) if coupon.discount_value.is_integer() else coupon.discount_value}%"
+    return f"₦{coupon.discount_value:,.2f}"
+
 
 def slugify(text) -> str:
     """
@@ -89,6 +95,7 @@ async def merge_metadata(metadata: Optional[dict[str, Any]] = {}) -> dict[str, A
         "instagram": await service.get("instagram"),
         "tiktok": await service.get("tiktok"),
         "support_email": await service.get("shop_email"),
+        "current_year": datetime.now().year,
         **metadata
     }
 
@@ -100,7 +107,7 @@ def render_email_template(*, template_name: str, context: dict[str, Any]) -> str
     env.filters["image"] = format_image
     env.filters["date"] = format_date
     env.filters["normalize_image"] = normalize_image
-
+    env.filters["discount"] = format_discount
     # Load and render the template
     template = env.get_template(template_name)
     return template.render(context)
@@ -425,16 +432,21 @@ async def generate_magic_link_email(email_to: str, magic_link: str, first_name: 
     return EmailData(html_content=html_content, subject="Sign in to your account")
 
 
-async def generate_welcome_email(email_to: str, first_name: str) -> EmailData:
+async def generate_welcome_email(email_to: str, first_name: str, coupon: CouponResponse) -> EmailData:
     service = ShopSettingsService()
     shop_name = await service.get("shop_name")
 
     html_content = render_email_template(
-        template_name="welcome.html",
+        template_name="welcome3.html",
         context={
             "first_name": first_name,
             "email": email_to,
             "current_year": datetime.now().year,
+            "coupon": coupon,
+            "header_title": "Welcome Gift Inside! 🎁",
+            "header_subtitle": f"We're excited to have you here, {first_name}!!",
+            "cta_url": "collections",
+            "cta_text": "Start Shopping",
             **(await merge_metadata({"description": ""}))
         },
     )

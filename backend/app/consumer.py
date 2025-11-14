@@ -11,6 +11,7 @@ from prisma import Json
 from datetime import datetime
 from app.core.utils import generate_welcome_email
 from app.services.redis import invalidate_pattern
+from datetime import timedelta
 
 logger = get_logger(__name__)
 
@@ -124,7 +125,7 @@ class RedisStreamConsumer:
             await self.redis.xack(self.stream, self.group, msg_id)
             await self.redis.xdel(self.stream, msg_id)
         except Exception as e:
-            logger.error(f"Failed to process {data}: {e}")
+            logger.error(f"Failed to process {msg_id}: {e}")
 
     async def handle_event(self, event):
         if event["type"] == "ORDER_CREATED":
@@ -247,11 +248,25 @@ class RedisStreamConsumer:
         await recent_service.track_product_interaction(product_id=product_id, interaction_type=interaction_type)
 
     async def handle_user_registered(self, event):
-        notification = self.get_notification()
+        import uuid
         try:
+            notification = self.get_notification()
+            coupon = await db.coupon.create(data={
+                "code": f"WELCOME{uuid.uuid4().hex[:3].upper()}",
+                "discount_type": "PERCENTAGE",
+                "discount_value": 10,
+                "min_cart_value": 5000,
+                "min_item_quantity": 0,
+                "valid_from": datetime.now(),
+                "valid_until": datetime.now() + timedelta(days=14),
+                "max_uses": 1,
+                "scope": "GENERAL",
+                "is_active": True,
+            })
             welcome_email = await generate_welcome_email(
                 email_to=event["email"],
-                first_name=event["first_name"]
+                first_name=event["first_name"],
+                coupon=coupon
             )
             await notification.send_notification(
                 channel_name="email",

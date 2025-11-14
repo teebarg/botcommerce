@@ -1,0 +1,41 @@
+<!-- Footer Section -->
+<tr>
+    <td style="background-color: #f8fafc; padding: 30px; border-top: 1px solid #e2e8f0;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+                <td align="center" style="color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 12px; padding-bottom: 10px;">
+                    © {{ current_year|default('2026') }} {{ project_name }}. All rights reserved.
+                </td>
+            </tr>
+            <tr>
+                <td align="center" style="color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 12px; padding-bottom: 10px;">
+                    You're receiving this because you signed up for our newsletter.
+                </td>
+            </tr>
+            <tr>
+                <td align="center" style="padding-top: 10px;">
+                    <table border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td style="padding: 0 5px;">
+                                <a href="https://web.facebook.com/profile/{{ facebook }}" target="_blank" style="color: #64748b; text-decoration: none;">Facebook</a>
+                            </td>
+                            <td style="padding: 0 5px;">
+                                <a href="https://www.tiktok.com/@{{ tiktok }}" target="_blank" style="color: #64748b; text-decoration: none;">Tiktok</a>
+                            </td>
+                            <td style="padding: 0 5px;">
+                                <a href="https://www.instagram.com/{{ instagram }}/" target="_blank" style="color: #64748b; text-decoration: none;">Instagram</a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td align="center" style="padding-top: 15px;">
+                    <a href="{{ frontend_host }}/unsubscribe" target="_blank" style="color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 12px; text-decoration: underline;">
+                        Unsubscribe
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>

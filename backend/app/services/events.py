@@ -13,6 +13,7 @@ async def publish_user_registered(
     created_at: Optional[Any] = None,
 ) -> None:
     payload: Dict[str, Any] = {
+        "type": "USER_REGISTERED",
         "id": user.id,
         "email": user.email,
         "first_name": user.first_name,
@@ -24,7 +25,7 @@ async def publish_user_registered(
     if created_at is not None:
         payload["created_at"] = created_at.isoformat()
 
-    await redis_client.xadd("USER_REGISTERED", payload)
+    await redis_client.xadd("EVENT_STREAMS", payload)
 
 
 async def publish_event(event: dict):
