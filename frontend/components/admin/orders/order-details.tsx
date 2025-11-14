@@ -146,7 +146,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-border px-6 py-4">
+                        <div className="border-b border-border py-4">
                             <h2 className="text-lg font-medium">Order Items</h2>
                         </div>
                         <div className="divide-y divide-border">
@@ -154,7 +154,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                 <OrderItemCard key={idx} orderId={order.id} orderItem={item} />
                             ))}
                         </div>
-                        <div className="border-t border-input px-6 py-4">
+                        <div className="border-t border-input px-2 py-4 space-y-2">
                             <div className="flex justify-between text-sm font-medium">
                                 <p>Subtotal</p>
                                 <p className="font-semibold">{currency(order.subtotal)}</p>
@@ -167,6 +167,15 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                 <p>Tax</p>
                                 <p className="font-semibold">{currency(order.tax)}</p>
                             </div>
+                            {order.discount_amount && order.discount_amount > 0 && (
+                                <div className="flex justify-between text-sm font-medium">
+                                    <p>Discount</p>
+                                    <p className="font-semibold text-green-600">
+                                        -{currency(order.discount_amount)}
+                                        {order.coupon && ` (${order.coupon.code})`}
+                                    </p>
+                                </div>
+                            )}
                             <div className="flex justify-between text-sm font-medium mt-4">
                                 <p>Total</p>
                                 <p className="font-semibold text-lg">{currency(order.total)}</p>
@@ -175,13 +184,13 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                     </div>
 
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-input px-6 py-4">
+                        <div className="border-b border-input py-4">
                             <h2 className="text-lg font-medium flex items-center">
                                 <User className="w-5 h-5 mr-2 text-muted-foreground" />
                                 Customer Information
                             </h2>
                         </div>
-                        <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="px-2 py-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <h3 className="text-sm font-medium text-muted-foreground">Contact Details</h3>
                                 <p className="font-medium">
@@ -207,13 +216,13 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                     </div>
 
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-input px-6 py-4">
+                        <div className="border-b border-input py-4">
                             <h2 className="text-lg font-medium flex items-center">
                                 <CreditCard className="w-5 h-5 mr-2 text-muted-foreground" />
                                 Payment Information
                             </h2>
                         </div>
-                        <div className="p-6">
+                        <div className="px-2 py-6">
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-muted-foreground">
@@ -226,13 +235,13 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                     </div>
 
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-input px-6 py-4">
+                        <div className="border-b border-input py-4">
                             <h2 className="text-lg font-medium flex items-center">
                                 <Truck className="w-5 h-5 mr-2 text-muted-foreground" />
                                 Shipping Information
                             </h2>
                         </div>
-                        <div className="p-6">
+                        <div className="px-2 py-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <p className="text-muted-foreground">
@@ -249,10 +258,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
 
                 <div className="space-y-6">
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-input px-6 py-4">
+                        <div className="border-b border-input py-4">
                             <h2 className="text-lg font-medium">Actions</h2>
                         </div>
-                        <div className="p-6 space-y-4">
+                        <div className="px-2 py-6 space-y-4">
                             <OrderProcessingAction order={order} />
                             {order.payment_status === "SUCCESS" && order.invoice_url && (
                                 <a
@@ -268,10 +277,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                     </div>
 
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden pb-6">
-                        <div className="border-b border-input px-6 py-4">
+                        <div className="border-b border-input py-4">
                             <h2 className="text-lg font-medium">Order Timeline</h2>
                         </div>
-                        <div className="p-6">
+                        <div className="px-2 py-6">
                             <div className="flow-root">
                                 <ul className="-mb-8">
                                     <li>

@@ -136,6 +136,7 @@ async def list_orders(
             },
             "user": True,
             "shipping_address": True,
+            "coupon": True,
         }
     )
     total = await db.order.count(where=where)

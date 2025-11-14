@@ -44,6 +44,12 @@
         <td colspan="3" style="padding: 5px 10px; text-align: right; font-weight: bold">Delivery Fee:</td>
         <td style="padding: 5px 10px; text-align: right">{{ order.shipping_fee | naira }}</td>
     </tr>
+    {% if order.discount_amount %}
+    <tr>
+        <td colspan="3" style="padding: 5px 10px; text-align: right; font-weight: bold">Discount:</td>
+        <td style="padding: 5px 10px; text-align: right; color: green">{{ order.discount_amount | naira }}</td>
+    </tr>
+    {% endif %}
     <tr>
         <td colspan="3" style="padding: 10px; text-align: right; font-weight: bold">Total:</td>
         <td style="padding: 10px; text-align: right; font-weight: bold; color: #007bff">{{ order.total | naira }}</td>

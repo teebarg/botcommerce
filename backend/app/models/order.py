@@ -2,7 +2,7 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
 
-from prisma.models import Address, Payment, OrderItem, User
+from prisma.models import Address, Payment, OrderItem, User, Coupon
 from prisma.enums import PaymentMethod, ShippingMethod, OrderStatus, PaymentStatus
 
 class OrderItemCreate(BaseModel):
@@ -52,6 +52,7 @@ class Order(BaseModel):
     total: float
     subtotal: float
     tax: float
+    discount_amount: float
     status: OrderStatus
     payment_status: PaymentStatus
     shipping_method: ShippingMethod
@@ -59,6 +60,7 @@ class Order(BaseModel):
     payment_method: PaymentMethod
     shipping_fee: float
     coupon_id: Optional[int]
+    coupon: Optional[Coupon]
     cart_id: Optional[int]
     order_items: list[OrderItem]
     created_at: datetime

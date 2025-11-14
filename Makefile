@@ -9,7 +9,7 @@ build:
 
 .PHONY: up
 up:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) up
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) up -d
 
 .PHONY: update
 update:
@@ -18,6 +18,24 @@ update:
 .PHONY: stop
 stop:
 	@COMPOSE_PROJECT_NAME=$(PROJECT_SLUG) $(DOCKER_COMPOSE) down
+
+
+.PHONY: logs
+logs:
+	$(DOCKER_COMPOSE) logs -f $(service)
+
+.PHONY: bash
+bash:
+	$(DOCKER_COMPOSE) exec $(SERVICE) /bin/bash
+
+
+.PHONY: install
+install:
+	$(DOCKER_COMPOSE) exec $(SERVICE) pip install $(package)
+
+.PHONY: clean
+clean:
+	$(DOCKER_COMPOSE) down -v --remove-orphans
 
 
 .PHONY: lint-backend
@@ -57,10 +75,6 @@ prep-docker:
 .PHONY: serve-backend
 serve-backend:
 	@cd backend; uvicorn app.main:app --host 0.0.0.0 --reload --workers 4
-
-.PHONY: serve-recommendation
-serve-recommendation:
-	@cd recommendation; uvicorn main:app --host 0.0.0.0 --reload --workers 4 --port 8001
 
 .PHONY: serve-frontend
 serve-frontend:

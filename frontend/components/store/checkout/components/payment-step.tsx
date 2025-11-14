@@ -10,6 +10,7 @@ import { PaystackPayment } from "@/components/store/payment/paystack-payment";
 import BankTransfer from "@/components/store/payment/bank-transfer";
 import Pickup from "@/components/store/payment/pickup";
 import { useStoreSettings } from "@/providers/store-provider";
+import CheckoutSummary from "../checkout-summary";
 
 const payMethods: { id: string; provider_id: PaymentMethod }[] = [
     { id: "pickup", provider_id: "CASH_ON_DELIVERY" },
@@ -41,7 +42,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                 </CardTitle>
                 <CardDescription>Choose your payment method and complete your order</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent>
                 <RadioGroupWithLabel
                     className="grid grid-cols-1 md:grid-cols-3 gap-2"
                     label="Payment Method"
@@ -78,6 +79,10 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                         );
                     })}
                 </RadioGroupWithLabel>
+
+                <div className="mb-12 md:mb-0 md:hidden">
+                    <CheckoutSummary />
+                </div>
 
                 {cart?.payment_method === "PAYSTACK" && <PaystackPayment amount={cart.total} cartNumber={cart.cart_number} />}
 

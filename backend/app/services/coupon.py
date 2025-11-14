@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from fastapi import HTTPException
 from app.prisma_client import prisma as db
@@ -30,7 +30,7 @@ class CouponService:
         if not coupon.is_active:
             raise HTTPException(status_code=400, detail="Coupon is inactive")
 
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         if coupon.valid_from > now:
             raise HTTPException(
                 status_code=400,

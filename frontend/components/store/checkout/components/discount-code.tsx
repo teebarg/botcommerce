@@ -88,7 +88,7 @@ const DiscountCode: React.FC = () => {
             ) : (
                 <div className="w-full">
                     <span className="flex gap-x-1 my-2 items-center">
-                        Add gift card or coupon code
+                        Add coupon code
                         <Tooltip>
                             <TooltipTrigger>
                                 <Info className="size-4 text-gray-500" />

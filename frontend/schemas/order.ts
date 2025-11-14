@@ -5,7 +5,7 @@ import { UserSchema } from "./user";
 import { AddressSchema } from "./address";
 import { ProductVariantSchema } from "./product";
 import { AuditSchema } from "./base";
-import { PagSchema } from "./common";
+import { PagSchema, CouponSchema } from "./common";
 
 export const OrderItemSchema = z
     .object({
@@ -36,7 +36,7 @@ export const OrderSchema = z
         discount_amount: z.number().optional(),
         shipping_fee: z.number(),
         total: z.number(),
-        coupon: z.number().optional(),
+        coupon: CouponSchema.optional(),
         billing_address: AddressSchema,
         shipping_address: AddressSchema,
         shipping_method: ShippingMethodSchema,

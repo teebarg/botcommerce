@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 
 const OrderSummary: React.FC<{ order: Order }> = ({ order }) => {
     return (
-        <div className="bg-secondary rounded-xl shadow-sm p-4 mb-6">
+        <div className="bg-card rounded-xl shadow-sm p-4 mb-6">
             <h3 className="font-medium mb-3">Payment Details</h3>
 
             <div className="space-y-2 text-sm">
@@ -27,6 +27,12 @@ const OrderSummary: React.FC<{ order: Order }> = ({ order }) => {
                     <span className="text-muted-foreground">Tax</span>
                     <span className="font-semibold">{currency(order.tax)}</span>
                 </div>
+                {order.discount_amount && order.discount_amount > 0 && (
+                    <div className="flex justify-between">
+                        <span className="text-muted-foreground">Discount</span>
+                        <span className="font-semibold text-green-600">-{currency(order.discount_amount)}</span>
+                    </div>
+                )}
                 <Separator />
                 <div className="pt-2 mt-2">
                     <div className="flex justify-between font-medium">

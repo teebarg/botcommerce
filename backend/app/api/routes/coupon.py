@@ -1,7 +1,6 @@
 from typing import Optional, List
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Header
-from datetime import datetime
-from app.core.deps import get_current_user, get_current_superuser, UserDep
+from app.core.deps import get_current_superuser, UserDep
 from app.models.coupon import (
     CouponCreate,
     CouponUpdate,
@@ -21,35 +20,9 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 
-@router.get("/", response_model=List[CouponResponse])
+@router.get("/", dependencies=[Depends(get_current_superuser)])
+@cache_response(key_prefix="coupons")
 async def get_coupons(
-    query: Optional[str] = Query("", description="Search by coupon code"),
-    is_active: Optional[bool] = None,
-    user: UserDep = None
-):
-    """
-    Get all coupons. Admin can see all, users see only active ones.
-    """
-    where_clause = {}
-
-    if query:
-        where_clause["code"] = {"contains": query, "mode": "insensitive"}
-
-    if user and user.role.value != "admin":
-        where_clause["is_active"] = True
-    elif is_active is not None:
-        where_clause["is_active"] = is_active
-
-    coupons = await db.coupon.find_many(
-        where=where_clause,
-        order={"created_at": "desc"}
-    )
-    return coupons
-
-
-@router.get("/admin", dependencies=[Depends(get_current_superuser)])
-@cache_response(key_prefix="coupons:admin")
-async def get_admin_coupons(
     request: Request,
     query: Optional[str] = Query(""),
     is_active: Optional[bool] = None,
@@ -132,7 +105,7 @@ async def create_coupon(coupon_data: CouponCreate):
         else:
             coupon = await db.coupon.create(data=data)
 
-        await invalidate_pattern("coupons:*")
+        await invalidate_pattern("coupons")
         return coupon
     except PrismaError as e:
         logger.error(f"Error creating coupon: {str(e)}")
@@ -181,7 +154,7 @@ async def update_coupon(id: int, coupon_data: CouponUpdate):
             data=data
         )
 
-        await invalidate_pattern("coupons:*")
+        await invalidate_pattern("coupons")
         return updated_coupon
     except HTTPException:
         raise
@@ -201,7 +174,7 @@ async def delete_coupon(id: int):
 
     try:
         await db.coupon.delete(where={"id": id})
-        await invalidate_pattern("coupons:*")
+        await invalidate_pattern("coupons")
         return {"message": "Coupon deleted successfully"}
     except PrismaError as e:
         logger.error(f"Error deleting coupon: {str(e)}")
@@ -291,7 +264,9 @@ async def apply_coupon(
     await service.apply_coupon_to_cart(coupon, cart)
 
     from app.services.redis import invalidate_pattern
-    await invalidate_pattern("cart:*")
+    await invalidate_pattern("abandoned-carts")
+    await invalidate_pattern("cart")
+    await invalidate_pattern("coupons")
 
     return coupon
 
@@ -323,7 +298,9 @@ async def remove_coupon(
     await service.remove_coupon_from_cart(cart)
 
     from app.services.redis import invalidate_pattern
-    await invalidate_pattern("cart:*")
+    await invalidate_pattern("abandoned-carts")
+    await invalidate_pattern("cart")
+    await invalidate_pattern("coupons")
 
     return {"message": "Coupon removed successfully"}
 
@@ -370,7 +347,7 @@ async def share_coupon(id: int, user_ids: List[int]):
             data={"assigned_users": all_user_ids}
         )
 
-        await invalidate_pattern("coupons:*")
+        await invalidate_pattern("coupons")
         return {"message": f"Coupon shared with {len(user_ids)} user(s) successfully"}
     except PrismaError as e:
         logger.error(f"Error sharing coupon: {str(e)}")
@@ -392,7 +369,7 @@ async def toggle_coupon_status(id: int):
             data={"is_active": not coupon.is_active}
         )
 
-        await invalidate_pattern("coupons:*")
+        await invalidate_pattern("coupons")
         return updated_coupon
     except PrismaError as e:
         logger.error(f"Error toggling coupon status: {str(e)}")

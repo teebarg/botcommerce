@@ -13,14 +13,14 @@ import { useCreateCoupon } from "@/lib/hooks/useCoupon";
 
 const couponSchema = z.object({
     code: z.string().min(3).max(20).toUpperCase(),
-    type: z.enum(["percentage", "fixed"]),
+    type: z.enum(["PERCENTAGE", "FIXED_AMOUNT"]),
     value: z.number().min(1),
     minCartValue: z.number().optional(),
     minItemQuantity: z.number().optional(),
     validFrom: z.string(),
     validUntil: z.string(),
     maxUses: z.number().min(1),
-    scope: z.enum(["general", "specific_users"]),
+    scope: z.enum(["GENERAL", "SPECIFIC_USERS"]),
     status: z.enum(["active", "inactive"]),
 });
 
@@ -34,10 +34,10 @@ export const CreateCouponDialog = () => {
         resolver: zodResolver(couponSchema),
         defaultValues: {
             code: "",
-            type: "percentage",
+            type: "PERCENTAGE",
             value: 10,
             maxUses: 100,
-            scope: "general",
+            scope: "GENERAL",
             status: "active",
             validFrom: new Date().toISOString().split("T")[0],
             validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
@@ -46,19 +46,18 @@ export const CreateCouponDialog = () => {
 
     const onSubmit = async (data: CouponFormValues) => {
         try {
-            // Transform frontend data to backend format
             const backendData = {
                 code: data.code.toUpperCase(),
-                discount_type: data.type === "percentage" ? "PERCENTAGE" : "FIXED_AMOUNT",
+                discount_type: data.type,
                 discount_value: data.value,
                 min_cart_value: data.minCartValue && data.minCartValue > 0 ? data.minCartValue : null,
                 min_item_quantity: data.minItemQuantity && data.minItemQuantity > 0 ? data.minItemQuantity : null,
                 valid_from: new Date(data.validFrom + "T00:00:00Z").toISOString(),
                 valid_until: new Date(data.validUntil + "T23:59:59Z").toISOString(),
                 max_uses: data.maxUses,
-                scope: data.scope === "general" ? "GENERAL" : "SPECIFIC_USERS",
+                scope: data.scope,
                 is_active: data.status === "active",
-                assigned_users: data.scope === "specific_users" ? [] : null, // Can be populated later
+                assigned_users: data.scope === "SPECIFIC_USERS" ? [] : null, // Can be populated later
             };
 
             await createMutation.mutateAsync(backendData);
@@ -88,7 +87,7 @@ export const CreateCouponDialog = () => {
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-2">
                             <FormField
                                 control={form.control}
                                 name="code"
@@ -140,8 +139,8 @@ export const CreateCouponDialog = () => {
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                <SelectItem value="percentage">Percentage</SelectItem>
-                                                <SelectItem value="fixed">Fixed Amount</SelectItem>
+                                                <SelectItem value="PERCENTAGE">Percentage</SelectItem>
+                                                <SelectItem value="FIXED_AMOUNT">Fixed Amount</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -154,7 +153,7 @@ export const CreateCouponDialog = () => {
                                 name="value"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>{form.watch("type") === "percentage" ? "Percentage" : "Amount ($)"}</FormLabel>
+                                        <FormLabel>{form.watch("type") === "PERCENTAGE" ? "Percentage" : "Amount (₦)"}</FormLabel>
                                         <FormControl>
                                             <Input type="number" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
                                         </FormControl>
@@ -170,7 +169,7 @@ export const CreateCouponDialog = () => {
                                 name="minCartValue"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Min Cart Value ($)</FormLabel>
+                                        <FormLabel>Min Cart Value (₦)</FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="number"
@@ -267,8 +266,8 @@ export const CreateCouponDialog = () => {
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                <SelectItem value="general">General Use</SelectItem>
-                                                <SelectItem value="specific_users">Specific Users</SelectItem>
+                                                <SelectItem value="GENERAL">General Use</SelectItem>
+                                                <SelectItem value="SPECIFIC_USERS">Specific Users</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -278,12 +277,7 @@ export const CreateCouponDialog = () => {
                         </div>
 
                         <div className="flex justify-end gap-3 pt-4">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => setOpen(false)}
-                                disabled={createMutation.isPending}
-                            >
+                            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={createMutation.isPending}>
                                 Cancel
                             </Button>
                             <Button type="submit" disabled={createMutation.isPending}>

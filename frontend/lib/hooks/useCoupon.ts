@@ -5,21 +5,13 @@ import { api } from "@/apis/client";
 import { Coupon } from "@/schemas";
 import { CouponFormValues } from "@/components/admin/coupons/coupon-form";
 
-export const useCoupons = (query?: string) => {
+export const useCoupons = (query?: string, isActive?: boolean, skip?: number, limit?: number) => {
     return useQuery({
-        queryKey: ["coupons", query],
-        queryFn: async () => await api.get<Coupon[]>("/coupon/", { params: { query: query || "" } }),
-    });
-};
-
-export const useAdminCoupons = (query?: string, isActive?: boolean, skip = 0, limit = 20) => {
-    return useQuery({
-        queryKey: ["coupons", "admin", query, isActive, skip, limit],
+        queryKey: ["coupons", query, isActive, skip, limit],
         queryFn: async () =>
-            await api.get<{ coupons: Coupon[]; skip: number; limit: number; total_count: number; total_pages: number }>(
-                "/coupon/admin",
-                { params: { query: query || "", is_active: isActive, skip, limit } }
-            ),
+            await api.get<{ coupons: Coupon[]; skip: number; limit: number; total_count: number; total_pages: number }>("/coupon/", {
+                params: { query: query || "", is_active: isActive, skip, limit },
+            }),
     });
 };
 
@@ -38,11 +30,9 @@ export const useCreateCoupon = () => {
             scope: "GENERAL" | "SPECIFIC_USERS";
             is_active: boolean;
             assigned_users?: number[] | null;
-        }) =>
-            await api.post<Coupon>("/coupon/", data),
+        }) => await api.post<Coupon>("/coupon/", data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["coupons"] });
-            // Success toast is handled in the component for better context
         },
         onError: (error: any) => {
             toast.error("Failed to create coupon: " + (error?.message || "Unknown error"));
@@ -53,8 +43,7 @@ export const useCreateCoupon = () => {
 export const useUpdateCoupon = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: Partial<CouponFormValues> }) =>
-            await api.patch<Coupon>(`/coupon/${id}`, data),
+        mutationFn: async ({ id, data }: { id: number; data: Partial<CouponFormValues> }) => await api.patch<Coupon>(`/coupon/${id}`, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["coupons"] });
             toast.success("Coupon updated successfully");
@@ -82,10 +71,7 @@ export const useDeleteCoupon = () => {
 export const useValidateCoupon = () => {
     return useMutation({
         mutationFn: async (code: string) =>
-            await api.post<{ valid: boolean; coupon?: Coupon; discount_amount?: number; message?: string }>(
-                "/coupon/validate",
-                { code }
-            ),
+            await api.post<{ valid: boolean; coupon?: Coupon; discount_amount?: number; message?: string }>("/coupon/validate", { code }),
     });
 };
 
