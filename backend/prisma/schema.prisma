@@ -408,7 +408,7 @@ model Payment {
 model Coupon {
   id                Int          @id @default(autoincrement())
   code              String       @unique
-  discount_type     DiscountType
+  discount_type     DiscountType @default(PERCENTAGE)
   discount_value    Float        @db.DoublePrecision
   min_cart_value    Float?       @db.DoublePrecision
   min_item_quantity Int?
@@ -421,7 +421,7 @@ model Coupon {
   assigned_users    Json?        @db.JsonB // Array of user IDs for specific_users scope
   orders            Order[]
   carts             Cart[]
-  coupon_users      CouponUser[]
+  users             User[]        @relation("UserCoupon")
   created_at        DateTime     @default(now())
   updated_at        DateTime     @updatedAt
 
@@ -429,20 +429,6 @@ model Coupon {
   @@index([is_active])
   @@index([valid_from, valid_until])
   @@map("coupons")
-}
-
-// CouponUser model to track assigned users (alternative approach)
-model CouponUser {
-  id        Int    @id @default(autoincrement())
-  coupon    Coupon @relation(fields: [coupon_id], references: [id], onDelete: Cascade)
-  coupon_id Int
-  user      User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  user_id   Int
-
-  @@unique([coupon_id, user_id])
-  @@index([coupon_id])
-  @@index([user_id])
-  @@map("coupon_users")
 }
 
 // Cart Model
@@ -520,7 +506,7 @@ model User {
   activity_logs              ActivityLog[]
   interactions               UserInteraction[]
   preferences                UserPreference[]
-  coupon_users               CouponUser[]
+  coupon                     User[]   @relation("UserCoupon")
 
   created_at           DateTime?              @default(now())
   updated_at           DateTime?              @updatedAt

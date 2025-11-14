@@ -101,7 +101,7 @@ export const CouponList = () => {
                                     <p className="font-medium">{currency(coupon.min_cart_value)}</p>
                                 </div>
                             )}
-                            {coupon.min_item_quantity && (
+                            {Boolean(coupon.min_item_quantity) && (
                                 <div>
                                     <p className="text-muted-foreground">Min Items</p>
                                     <p className="font-medium">{coupon.min_item_quantity}</p>
