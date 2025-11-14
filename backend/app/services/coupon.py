@@ -46,6 +46,20 @@ class CouponService:
                 detail="Coupon has reached maximum usage limit"
             )
 
+        # Check if user has already used this coupon
+        if user_id:
+            existing_order = await db.order.find_first(
+                where={
+                    "user_id": user_id,
+                    "coupon_id": coupon.id
+                }
+            )
+            if existing_order:
+                raise HTTPException(
+                    status_code=400,
+                    detail="You have already used this coupon."
+                )
+
         if coupon.scope == CouponScope.SPECIFIC_USERS:
             if not user_id:
                 raise HTTPException(

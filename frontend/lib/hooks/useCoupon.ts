@@ -43,7 +43,25 @@ export const useCreateCoupon = () => {
 export const useUpdateCoupon = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: Partial<CouponFormValues> }) => await api.patch<Coupon>(`/coupon/${id}`, data),
+        mutationFn: async ({
+            id,
+            data,
+        }: {
+            id: number;
+            data: {
+                code?: string;
+                discount_type?: "PERCENTAGE" | "FIXED_AMOUNT";
+                discount_value?: number;
+                min_cart_value?: number | null;
+                min_item_quantity?: number | null;
+                valid_from?: string;
+                valid_until?: string;
+                max_uses?: number;
+                scope?: "GENERAL" | "SPECIFIC_USERS";
+                is_active?: boolean;
+                assigned_users?: number[] | null;
+            };
+        }) => await api.patch<Coupon>(`/coupon/${id}`, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["coupons"] });
             toast.success("Coupon updated successfully");

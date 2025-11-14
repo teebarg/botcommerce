@@ -7,6 +7,7 @@ import { useCoupons, useDeleteCoupon, useToggleCouponStatus } from "@/lib/hooks/
 import { Coupon } from "@/schemas";
 import ComponentLoader from "@/components/component-loader";
 import { currency, formatDate } from "@/lib/utils";
+import { EditCouponDialog } from "./edit-coupon-dialog";
 
 export const CouponList = () => {
     const { data, isLoading } = useCoupons();
@@ -56,6 +57,7 @@ export const CouponList = () => {
                                 <Button variant="ghost" size="icon" onClick={() => handleCopy(coupon.code)} className="h-8 w-8">
                                     <Copy className="h-4 w-4" />
                                 </Button>
+                                <EditCouponDialog coupon={coupon} />
                                 <Button
                                     variant="ghost"
                                     size="icon"

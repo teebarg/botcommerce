@@ -15,6 +15,7 @@ from prisma.enums import CouponScope
 from app.core.logging import get_logger
 from app.services.redis import cache_response, invalidate_pattern
 from prisma.errors import PrismaError
+from prisma import Json
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -132,9 +133,31 @@ async def update_coupon(id: int, coupon_data: CouponUpdate):
             if existing:
                 raise HTTPException(status_code=400, detail="Coupon code already exists")
 
-        if coupon_data.scope == CouponScope.SPECIFIC_USERS and coupon_data.assigned_users is not None:
-            data["assigned_users"] = coupon_data.assigned_users
-
+        # Handle scope and assigned users changes
+        if "scope" in data:
+            if data["scope"] == CouponScope.SPECIFIC_USERS:
+                if coupon_data.assigned_users is not None:
+                    data["assigned_users"] = coupon_data.assigned_users
+                    # Delete existing CouponUser records and create new ones
+                    await db.couponuser.delete_many(where={"coupon_id": id})
+                    for user_id in coupon_data.assigned_users:
+                        user = await db.user.find_unique(where={"id": user_id})
+                        if user:
+                            try:
+                                await db.couponuser.create(
+                                    data={
+                                        "coupon_id": id,
+                                        "user_id": user_id
+                                    }
+                                )
+                            except PrismaError:
+                                pass
+            else:
+                # If changing to GENERAL, clear assigned_users
+                data["assigned_users"] = Json([])
+                await db.couponuser.delete_many(where={"coupon_id": id})
+        elif coupon_data.scope == CouponScope.SPECIFIC_USERS and coupon_data.assigned_users is not None:
+            data["assigned_users"] = Json(coupon_data.assigned_users)
             await db.couponuser.delete_many(where={"coupon_id": id})
             for user_id in coupon_data.assigned_users:
                 user = await db.user.find_unique(where={"id": user_id})
