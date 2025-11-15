@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { FileImage, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Clock, LucideProps, Package, Pencil, Trash2, Truck, Zap } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
@@ -20,6 +20,7 @@ import ServerError from "@/components/generic/server-error";
 import { tryCatch } from "@/lib/try-catch";
 import Overlay from "@/components/overlay";
 import ComponentLoader from "@/components/component-loader";
+import { ZeroState } from "@/components/zero";
 
 const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
     const editState = useOverlayTriggerState({});
@@ -120,6 +121,12 @@ const DeliveryOverview: React.FC = () => {
 
     if (isLoading) {
         return <ComponentLoader className="h-[400px]" />;
+    }
+
+    if (!deliveryOptions || deliveryOptions.length === 0) {
+        return (
+            <ZeroState title="No delivery options yet" description="Start organizing your delivery options by creating your first delivery option." />
+        );
     }
 
     return (

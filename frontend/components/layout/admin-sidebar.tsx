@@ -19,6 +19,7 @@ import {
     Notebook,
     Image,
     ShoppingCart,
+    Tag,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -133,6 +134,11 @@ const storeItems = [
         title: "Catalog",
         url: "/admin/shared",
         icon: LayoutGrid,
+    },
+    {
+        title: "Coupons",
+        url: "/admin/coupons",
+        icon: Tag,
     },
 ];
 

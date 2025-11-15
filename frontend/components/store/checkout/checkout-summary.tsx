@@ -8,10 +8,10 @@ import CartItems from "@/components/store/cart/cart-items";
 
 const CheckoutSummary = () => {
     return (
-        <div className="relative md:sticky top-16 flex gap-y-8 w-full rounded-xl shadow-md px-2 py-4 md:px-6 md:py-8 lg:w-[400px] lg:flex-none mt-6 sm:mt-0">
+        <div className="relative md:sticky md:top-16 flex gap-y-8 w-full rounded-xl md:shadow-md px-2 py-4 md:px-6 md:py-8 lg:w-[400px] lg:flex-none mt-6 sm:mt-0">
             <div className="w-full">
-                <h2 className="font-medium text-muted-foreground">Cart Summary</h2>
-                <Separator className="my-4" />
+                <h2 className="font-medium">Cart Summary</h2>
+                <Separator className="my-2" />
                 <CartTotals />
                 <CartItems className="max-h-[40vh] overflow-y-auto" />
                 <div className="my-6">

@@ -39,6 +39,14 @@ async def lifespan(app: FastAPI):
 
     app.state.redis = redis_client
 
+    # try:
+    #     logger.info("Creating Redis stream and group")
+    #     await redis_client.xgroup_create(STREAM_NAME, GROUP_NAME, id="$", mkstream=True)
+    # except Exception as e:
+    #     logger.error(f"Failed to create Redis stream and group: {e}")
+    #     if "BUSYGROUP" in str(e):
+    #         pass  # group already exists
+
     consumer = RedisStreamConsumer(redis_client, STREAM_NAME, GROUP_NAME, CONSUMER_NAME)
     app.state.consumer = consumer
     await consumer.start()

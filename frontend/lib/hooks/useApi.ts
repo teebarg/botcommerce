@@ -81,7 +81,7 @@ export const useDeliveryOptions = () => {
 export const useAdminDeliveryOptions = () => {
     return useQuery({
         queryKey: ["delivery"],
-        queryFn: async () => await api.get<DeliveryOption[]>("/delivery"),
+        queryFn: async () => await api.get<DeliveryOption[]>("/delivery/"),
     });
 };
 

@@ -76,8 +76,6 @@ class Settings(BaseSettings):
             self.FRONTEND_HOST
         ]
 
-    RABBITMQ_HOST: str = "rabbitmq"
-
     MEILI_MASTER_KEY: str = "masterKey"
     MEILI_HOST: str = "http://meilisearch:7700"
     MEILI_PRODUCTS_INDEX: str = ""

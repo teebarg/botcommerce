@@ -1,0 +1,83 @@
+{% extends "partials/layout.html" %}
+
+{% block content %}
+<!-- Main Content Section -->
+<tr>
+    <td style="padding: 40px 30px; background-color: #ffffff;" class="mobile-padding">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+            <!-- Intro Text -->
+            <tr>
+                <td
+                    style="color: #333333; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 16px; line-height: 1.6; padding-bottom: 30px;">
+                    <p>Hi {{user.first_name}},</p>
+                    <p style="margin-top: 0px;">Your order is currently pending, please transfer to the bank account provided below to complete your order.</p>
+                </td>
+            </tr>
+
+            <!-- Bank transfer Box -->
+            <tr>
+                <td align="center" style="padding-bottom: 30px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%"
+                        style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); background-color: #3b82f6; border-radius: 12px;">
+                        <tr>
+                            <td style="padding: 30px;">
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+                                    <!-- "Your Exclusive Code" Label -->
+                                    <tr>
+                                        <td align="center"
+                                            style="color: rgba(255, 255, 255, 0.9); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; padding-bottom: 10px;">
+                                            Bank Transfer
+                                        </td>
+                                    </tr>
+
+                                    <!-- "Bank Transfer" Text -->
+                                    <tr>
+                                        <td align="center"
+                                            style="color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 20px; font-weight: bold; padding-bottom: 2px;">
+                                            {{ bank_details.account_name }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="center"
+                                            style="color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 20px; font-weight: bold; padding-bottom: 2px;">
+                                            {{ bank_details.account_number }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="center"
+                                            style="color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 20px; font-weight: bold; padding-bottom: 2px;">
+                                            {{ bank_details.bank_name }}
+                                        </td>
+                                    </tr>
+
+
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    {% include "partials/order-details2.html" %}
+                    {% include "partials/order-extra.html" %}
+                </td>
+            </tr>
+
+            {% include 'partials/cta_button.html' %}
+
+            <tr>
+                <td align="center"
+                    style="color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 14px; line-height: 1.6;">
+                    We'll send you another email once your payment is confirmed. If you have any questions about your
+                    order, please don't hesitate to contact our customer support.
+                </td>
+            </tr>
+
+        </table>
+    </td>
+</tr>
+{% endblock %}
