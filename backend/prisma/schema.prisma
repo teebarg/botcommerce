@@ -406,29 +406,43 @@ model Payment {
 
 // Coupon Model
 model Coupon {
-  id                Int          @id @default(autoincrement())
-  code              String       @unique
-  discount_type     DiscountType @default(PERCENTAGE)
-  discount_value    Float        @db.DoublePrecision
-  min_cart_value    Float?       @db.DoublePrecision
+  id                Int           @id @default(autoincrement())
+  code              String        @unique
+  discount_type     DiscountType  @default(PERCENTAGE)
+  discount_value    Float         @db.DoublePrecision
+  min_cart_value    Float?        @db.DoublePrecision
   min_item_quantity Int?
   valid_from        DateTime
   valid_until       DateTime
-  max_uses          Int          @default(1)
-  current_uses      Int          @default(0)
-  scope             CouponScope  @default(GENERAL)
-  is_active         Boolean      @default(true)
-  assigned_users    Json?        @db.JsonB // Array of user IDs for specific_users scope
+  max_uses          Int           @default(1)
+  max_uses_per_user Int           @default(1)
+  current_uses      Int           @default(0)
+  scope             CouponScope   @default(GENERAL)
+  is_active         Boolean       @default(true)
+  usages            CouponUsage[]
   orders            Order[]
   carts             Cart[]
-  users             User[]        @relation("UserCoupon")
-  created_at        DateTime     @default(now())
-  updated_at        DateTime     @updatedAt
+  users             User[]        @relation("CouponAllowedUser")
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
 
   @@index([code])
   @@index([is_active])
   @@index([valid_from, valid_until])
   @@map("coupons")
+}
+
+model CouponUsage {
+  id         Int      @id @default(autoincrement())
+  coupon     Coupon   @relation(fields: [coupon_id], references: [id], onDelete: Cascade)
+  coupon_id  Int
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id    Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([coupon_id, user_id])
+  @@map("coupon_usages")
 }
 
 // Cart Model
@@ -506,12 +520,13 @@ model User {
   activity_logs              ActivityLog[]
   interactions               UserInteraction[]
   preferences                UserPreference[]
-  coupon                     User[]   @relation("UserCoupon")
+  coupons                    Coupon[]          @relation("CouponAllowedUser")
 
   created_at           DateTime?              @default(now())
   updated_at           DateTime?              @updatedAt
   Conversation         Conversation[]
   SharedCollectionView SharedCollectionView[]
+  CouponUsage          CouponUsage[]
 
   @@index([first_name, last_name, email])
   @@map("users")

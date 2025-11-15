@@ -85,10 +85,12 @@ async def merge_metadata(metadata: Optional[dict[str, Any]] = {}) -> dict[str, A
     service = ShopSettingsService()
     shop_name = await service.get("shop_name")
     shop_address = await service.get("address")
+    shop_phone = await service.get("contact_phone")  
 
     return {
         "project_name": shop_name,
         "address": shop_address,
+        "phone": shop_phone,
         "description": "Exclusive offers just for you",
         "frontend_host": settings.FRONTEND_HOST,
         "facebook": await service.get("facebook"),
@@ -262,7 +264,7 @@ async def send_email(
     cc_list: list[str] = [],
 ) -> None:
     try:
-        if settings.ENVIRONMENT == "local":
+        if settings.ENVIRONMENT == "local2":
             await send_email_smtp(
                 email_to=email_to,
                 subject=subject,
@@ -290,15 +292,23 @@ def generate_test_email(email_to: str) -> EmailData:
 
 
 async def generate_invoice_email(order: OrderResponse, user: User) -> EmailData:
-    template_name = "paid_invoice.html"
+    service = ShopSettingsService()
+    header_title = "Your order has been processed successfully"
+    template_name = "paid_invoice1.html"
     description = "Your order has been processed"
+    bank_details = None
     if order.payment_method == "CASH_ON_DELIVERY":
-        template_name = "pickup_invoice.html"
+        template_name = "pickup_invoice1.html"
+        header_title = "Your order has been processed"
         description = "Your order has been processed"
+        bank_details = await service.get_bank_details()
     elif order.payment_status == "PENDING":
-        template_name = "pending_invoice.html"
+        header_title = "Your order is pending payment"
+        template_name = "pending_invoice1.html"
         description = "Your order is pending payment"
+        bank_details = await service.get_bank_details()
     elif order.payment_status == "FAILED":
+        header_title = "Your order payment failed"
         template_name = "failed_invoice.html"
         description = "Your order payment failed"
 
@@ -308,10 +318,14 @@ async def generate_invoice_email(order: OrderResponse, user: User) -> EmailData:
             "order": order,
             "user": user,
             "current_year": datetime.now().year,
+            "header_title": header_title,
+            "cta_url": f"order/confirmed/{order.order_number}",
+            "cta_text": "View Order",
+            "bank_details": bank_details,
             **(await merge_metadata({"description": description}))
         },
     )
-    return EmailData(html_content=html_content, subject="Order Confirmation")
+    return EmailData(html_content=html_content, subject=f"Order Confirmation for {order.order_number}")
 
 
 async def generate_payment_receipt(order: OrderResponse, user: User) -> EmailData:
@@ -325,22 +339,6 @@ async def generate_payment_receipt(order: OrderResponse, user: User) -> EmailDat
         },
     )
     return EmailData(html_content=html_content, subject="Payment Receipt")
-
-
-async def generate_new_account_email(
-    email_to: str, username: str, password: str
-) -> EmailData:
-    html_content = render_email_template(
-        template_name="new_account.html",
-        context={
-            "username": username,
-            "password": password,
-            "email": email_to,
-            "link": settings.server_host,
-            **(await merge_metadata({"description": ""}))
-        },
-    )
-    return EmailData(html_content=html_content, subject=f"New account for user {username}")
 
 
 async def generate_data_export_email(download_link: str) -> EmailData:
@@ -437,7 +435,7 @@ async def generate_welcome_email(email_to: str, first_name: str, coupon: CouponR
     shop_name = await service.get("shop_name")
 
     html_content = render_email_template(
-        template_name="welcome3.html",
+        template_name="welcome.html",
         context={
             "first_name": first_name,
             "email": email_to,

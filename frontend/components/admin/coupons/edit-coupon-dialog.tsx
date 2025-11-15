@@ -18,11 +18,12 @@ const couponSchema = z.object({
     code: z.string().min(3).max(20),
     type: z.enum(["PERCENTAGE", "FIXED_AMOUNT"]),
     value: z.number().min(1),
-    minCartValue: z.number().optional(),
-    minItemQuantity: z.number().optional(),
-    validFrom: z.string(),
-    validUntil: z.string(),
-    maxUses: z.number().min(1),
+    min_cart_value: z.number().optional(),
+    min_item_quantity: z.number().optional(),
+    valid_from: z.string(),
+    valid_until: z.string(),
+    max_uses: z.number().min(1),
+    max_uses_per_user: z.number().min(1),
     scope: z.enum(["GENERAL", "SPECIFIC_USERS"]),
     status: z.enum(["active", "inactive"]),
 });
@@ -58,22 +59,15 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
         defaultValues: {
             code: coupon.code,
             type: getDiscountType(),
-            value: coupon.discount_value || (coupon as any).value || 0,
-            minCartValue: coupon.min_cart_value ?? (coupon as any).minCartValue ?? undefined,
-            minItemQuantity: coupon.min_item_quantity ?? (coupon as any).minItemQuantity ?? undefined,
-            maxUses: coupon.max_uses ?? (coupon as any).maxUses ?? 1,
+            value: coupon.discount_value || 0,
+            min_cart_value: coupon.min_cart_value ?? undefined,
+            min_item_quantity: coupon.min_item_quantity ?? undefined,
+            max_uses: coupon.max_uses ?? 1,
+            max_uses_per_user: coupon.max_uses_per_user ?? 1,
             scope: getScope(),
             status: coupon.is_active ? "active" : "inactive",
-            validFrom: coupon.valid_from
-                ? new Date(coupon.valid_from).toISOString().split("T")[0]
-                : (coupon as any).validFrom
-                  ? new Date((coupon as any).validFrom).toISOString().split("T")[0]
-                  : new Date().toISOString().split("T")[0],
-            validUntil: coupon.valid_until
-                ? new Date(coupon.valid_until).toISOString().split("T")[0]
-                : (coupon as any).validUntil
-                  ? new Date((coupon as any).validUntil).toISOString().split("T")[0]
-                  : new Date().toISOString().split("T")[0],
+            valid_from: coupon.valid_from ? new Date(coupon.valid_from).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
+            valid_until: coupon.valid_until ? new Date(coupon.valid_until).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
         },
     });
 
@@ -84,21 +78,14 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
                 code: coupon.code,
                 type: getDiscountType(),
                 value: coupon.discount_value ?? (coupon as any).value ?? 0,
-                minCartValue: coupon.min_cart_value ?? (coupon as any).minCartValue ?? undefined,
-                minItemQuantity: coupon.min_item_quantity ?? (coupon as any).minItemQuantity ?? undefined,
-                maxUses: coupon.max_uses ?? (coupon as any).maxUses ?? 1,
+                min_cart_value: coupon.min_cart_value ?? undefined,
+                min_item_quantity: coupon.min_item_quantity ?? undefined,
+                max_uses: coupon.max_uses ?? 1,
+                max_uses_per_user: coupon.max_uses_per_user ?? 1,
                 scope: getScope(),
                 status: coupon.is_active ? "active" : "inactive",
-                validFrom: coupon.valid_from
-                    ? new Date(coupon.valid_from).toISOString().split("T")[0]
-                    : (coupon as any).validFrom
-                      ? new Date((coupon as any).validFrom).toISOString().split("T")[0]
-                      : new Date().toISOString().split("T")[0],
-                validUntil: coupon.valid_until
-                    ? new Date(coupon.valid_until).toISOString().split("T")[0]
-                    : (coupon as any).validUntil
-                      ? new Date((coupon as any).validUntil).toISOString().split("T")[0]
-                      : new Date().toISOString().split("T")[0],
+                valid_from: coupon.valid_from ? new Date(coupon.valid_from).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
+                valid_until: coupon.valid_until ? new Date(coupon.valid_until).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
             });
         }
     }, [coupon, open, form]);
@@ -110,14 +97,14 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
                 code: data.code.toUpperCase(),
                 discount_type: data.type,
                 discount_value: data.value,
-                min_cart_value: data.minCartValue && data.minCartValue > 0 ? data.minCartValue : null,
-                min_item_quantity: data.minItemQuantity && data.minItemQuantity > 0 ? data.minItemQuantity : null,
-                valid_from: new Date(data.validFrom + "T00:00:00Z").toISOString(),
-                valid_until: new Date(data.validUntil + "T23:59:59Z").toISOString(),
-                max_uses: data.maxUses,
+                min_cart_value: data.min_cart_value && data.min_cart_value > 0 ? data.min_cart_value : null,
+                min_item_quantity: data.min_item_quantity && data.min_item_quantity > 0 ? data.min_item_quantity : null,
+                valid_from: new Date(data.valid_from + "T00:00:00Z").toISOString(),
+                valid_until: new Date(data.valid_until + "T23:59:59Z").toISOString(),
+                max_uses: data.max_uses,
+                max_uses_per_user: data.max_uses_per_user,
                 scope: data.scope,
                 is_active: data.status === "active",
-                assigned_users: data.scope === "SPECIFIC_USERS" ? [] : null,
             };
 
             await updateMutation.mutateAsync({ id: coupon.id, data: backendData });
@@ -219,7 +206,7 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
                         <div className="grid grid-cols-2 gap-2">
                             <FormField
                                 control={form.control}
-                                name="minCartValue"
+                                name="min_cart_value"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Min Cart Value (₦)</FormLabel>
@@ -240,7 +227,7 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
 
                             <FormField
                                 control={form.control}
-                                name="minItemQuantity"
+                                name="min_item_quantity"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Min Item Quantity</FormLabel>
@@ -263,7 +250,7 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
                         <div className="grid grid-cols-2 gap-2">
                             <FormField
                                 control={form.control}
-                                name="validFrom"
+                                name="valid_from"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Valid From</FormLabel>
@@ -277,7 +264,7 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
 
                             <FormField
                                 control={form.control}
-                                name="validUntil"
+                                name="valid_until"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Valid Until</FormLabel>
@@ -293,7 +280,7 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
                         <div className="grid grid-cols-2 gap-2">
                             <FormField
                                 control={form.control}
-                                name="maxUses"
+                                name="max_uses"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Max Uses</FormLabel>
@@ -306,6 +293,23 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
                                 )}
                             />
 
+                            <FormField
+                                control={form.control}
+                                name="max_uses_per_user"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Max Uses Per User</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
+                                        </FormControl>
+                                        <FormDescription>Total times coupon can be used</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
                             <FormField
                                 control={form.control}
                                 name="scope"
@@ -330,12 +334,7 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
                         </div>
 
                         <div className="flex justify-end gap-3 pt-4">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => setOpen(false)}
-                                disabled={updateMutation.isPending}
-                            >
+                            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={updateMutation.isPending}>
                                 Cancel
                             </Button>
                             <Button type="submit" disabled={updateMutation.isPending}>
@@ -348,4 +347,3 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
         </Dialog>
     );
 };
-

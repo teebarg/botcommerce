@@ -103,6 +103,9 @@ async def verify_payment(reference: str, user: CurrentUser):
             cart_number = data["data"]["metadata"]["cart_number"]
 
             order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cart_number)
+
+            await invalidate_pattern("orders")
+            await invalidate_pattern("cart")
             await publish_order_event(order=order, type="ORDER_PAID")
 
             event = {

@@ -9,7 +9,7 @@ build:
 
 .PHONY: up
 up:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) up -d
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) up
 
 .PHONY: update
 update:
@@ -17,7 +17,7 @@ update:
 
 .PHONY: stop
 stop:
-	@COMPOSE_PROJECT_NAME=$(PROJECT_SLUG) $(DOCKER_COMPOSE) down
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) down
 
 
 .PHONY: logs

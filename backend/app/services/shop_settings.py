@@ -2,6 +2,8 @@ from app.prisma_client import prisma as db
 from prisma.models import ShopSettings
 
 from app.redis_client import redis_client
+import json
+from typing import Any
 
 class ShopSettingsService:
     CACHE_PREFIX = "shop-settings:"
@@ -40,6 +42,25 @@ class ShopSettingsService:
         )
         await self.redis.set(self._cache_key(key), value, ex=self.CACHE_EXPIRATION)
         return setting
+
+    async def get_bank_details(self) -> dict[str, Any] | None:
+        """
+        Get a setting by key, check Redis first, fallback to DB
+        """
+        cached = await self.redis.get(self._cache_key("bank_details"))
+        if cached is not None:
+            return json.loads(cached)
+
+        setting = await db.bankdetails.find_first()
+        if setting:
+            data = {
+                "account_name": setting.account_name,
+                "account_number": setting.account_number,
+                "bank_name": setting.bank_name
+            }
+            await self.redis.set(self._cache_key("bank_details"), json.dumps(data), ex=self.CACHE_EXPIRATION)
+            return data
+        return None
 
     async def invalidate(self, key: str):
         """

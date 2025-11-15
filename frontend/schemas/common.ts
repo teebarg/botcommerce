@@ -72,6 +72,15 @@ export const ImageUploadSchema = z.object({
     content_type: z.string(),
 });
 
+const UserSchema = z.object({
+    id: z.number(),
+    first_name: z.string(),
+    last_name: z.string().optional(),
+    email: z.string().email(),
+    status: z.enum(["PENDING", "ACTIVE", "INACTIVE"]),
+    role: z.enum(["ADMIN", "CUSTOMER"]),
+});
+
 export const CouponSchema = z.object({
     id: z.number(),
     code: z.string(),
@@ -82,10 +91,12 @@ export const CouponSchema = z.object({
     valid_from: z.string(),
     valid_until: z.string(),
     max_uses: z.number().min(1),
+    max_uses_per_user: z.number().min(1),
     current_uses: z.number().optional(),
     scope: z.enum(["GENERAL", "SPECIFIC_USERS"]),
     status: z.enum(["active", "inactive"]),
     is_active: z.boolean(),
+    users: z.array(UserSchema).optional(),
     created_at: z.string(),
     updated_at: z.string(),
 });

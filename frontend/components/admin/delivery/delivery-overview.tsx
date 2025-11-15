@@ -20,6 +20,7 @@ import ServerError from "@/components/generic/server-error";
 import { tryCatch } from "@/lib/try-catch";
 import Overlay from "@/components/overlay";
 import ComponentLoader from "@/components/component-loader";
+import { ZeroState } from "@/components/zero";
 
 const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
     const editState = useOverlayTriggerState({});
@@ -124,15 +125,7 @@ const DeliveryOverview: React.FC = () => {
 
     if (!deliveryOptions || deliveryOptions.length === 0) {
         return (
-            <div className="bg-card rounded-2xl p-12 text-center border-2 border-dashed border-input">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <FileImage className="w-8 h-8 text-gray-400" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">No delivery options yet</h3>
-                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                    Start organizing your delivery options by creating your first delivery option.
-                </p>
-            </div>
+            <ZeroState title="No delivery options yet" description="Start organizing your delivery options by creating your first delivery option." />
         );
     }
 

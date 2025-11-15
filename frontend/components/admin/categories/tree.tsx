@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 import { useReorderCategories } from "@/lib/hooks/useCategories";
+import { ZeroState } from "@/components/zero";
 
 interface Props {
     data?: Category[];
@@ -219,20 +220,11 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                 </div>
 
                 {(!categories || categories.length === 0) && (
-                    <div className="bg-card rounded-2xl p-12 text-center border-2 border-dashed border-input">
-                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <FileImage className="w-8 h-8 text-gray-400" />
-                        </div>
-                        <h3 className="text-xl font-semibold mb-2">No categories yet</h3>
-                        <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                            Start organizing your products by creating your first category. You can add images and subcategories to make navigation
-                            easier.
-                        </p>
-                        <Button className="w-full md:w-auto">
-                            <Plus className="w-5 h-5" />
-                            Create First Category
-                        </Button>
-                    </div>
+                    <ZeroState
+                        title="No categories yet"
+                        description="Start organizing your products by creating your first category. You can add images and subcategories to make navigation easier."
+                        icon={<FileImage className="w-8 h-8 text-gray-400" />}
+                    />
                 )}
             </div>
         </React.Fragment>

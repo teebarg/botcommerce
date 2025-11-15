@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from "react";
 import { currency } from "@lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@components/ui/tooltip";
-import { Check, Info, Trash2, X } from "lucide-react";
+import { Check, Info, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,6 @@ const DiscountCode: React.FC = () => {
 
     const appliedCoupon = useMemo(() => {
         if (!cart?.coupon_id) return null;
-        // Cart should include coupon info, but for now we'll show discount_amount
         return {
             code: "APPLIED", // You might want to include coupon code in cart response
             discount_amount: cart.discount_amount || 0,
@@ -39,9 +38,7 @@ const DiscountCode: React.FC = () => {
     const removeDiscountCode = async () => {
         try {
             await removeMutation.mutateAsync();
-        } catch (error: any) {
-            // Error is already handled in the hook
-        }
+        } catch (error: any) {}
     };
 
     const applyDiscountCode = async () => {
@@ -53,9 +50,7 @@ const DiscountCode: React.FC = () => {
         try {
             await applyMutation.mutateAsync(code);
             setCode("");
-        } catch (error: any) {
-            // Error is already handled in the hook
-        }
+        } catch (error: any) {}
     };
 
     if (isLoading) return <ComponentLoader className="h-[100px]" />;
@@ -74,13 +69,7 @@ const DiscountCode: React.FC = () => {
                                 <p className="text-xs text-muted-foreground">-{appliedDiscount} discount applied</p>
                             </div>
                         </div>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={removeDiscountCode}
-                            disabled={removeMutation.isPending}
-                            className="h-8 w-8"
-                        >
+                        <Button variant="ghost" size="icon" onClick={removeDiscountCode} disabled={removeMutation.isPending} className="h-8 w-8">
                             <X className="h-4 w-4" />
                         </Button>
                     </CardContent>

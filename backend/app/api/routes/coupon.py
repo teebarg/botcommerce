@@ -1,6 +1,6 @@
 from typing import Optional, List
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Header
-from app.core.deps import get_current_superuser, UserDep
+from app.core.deps import get_current_superuser, UserDep, CurrentUser
 from app.models.coupon import (
     CouponCreate,
     CouponUpdate,
@@ -11,11 +11,11 @@ from app.models.coupon import (
 )
 from app.services.coupon import CouponService
 from app.prisma_client import prisma as db
-from prisma.enums import CouponScope
+
 from app.core.logging import get_logger
 from app.services.redis import cache_response, invalidate_pattern
 from prisma.errors import PrismaError
-from prisma import Json
+from app.models.coupon import CouponScope
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -45,7 +45,8 @@ async def get_coupons(
         where=where_clause,
         skip=skip,
         take=limit,
-        order={"created_at": "desc"}
+        order={"created_at": "desc"},
+        include={"users": True}
     )
 
     total_count = await db.coupon.count(where=where_clause)
@@ -82,29 +83,9 @@ async def create_coupon(coupon_data: CouponCreate):
         raise HTTPException(status_code=400, detail="Coupon code already exists")
 
     try:
-        data = coupon_data.model_dump(exclude={"assigned_users"})
+        data = coupon_data.model_dump(exclude={})
         data["code"] = code
-
-        # Handle assigned users for specific_users scope
-        if coupon_data.scope == CouponScope.SPECIFIC_USERS and coupon_data.assigned_users:
-            # Store in JSON field
-            data["assigned_users"] = coupon_data.assigned_users
-
-            coupon = await db.coupon.create(data=data)
-            for user_id in coupon_data.assigned_users:
-                user = await db.user.find_unique(where={"id": user_id})
-                if user:
-                    try:
-                        await db.couponuser.create(
-                            data={
-                                "coupon_id": coupon.id,
-                                "user_id": user_id
-                            }
-                        )
-                    except PrismaError:
-                        pass  # Already exists, skip
-        else:
-            coupon = await db.coupon.create(data=data)
+        coupon = await db.coupon.create(data=data)
 
         await invalidate_pattern("coupons")
         return coupon
@@ -123,7 +104,7 @@ async def update_coupon(id: int, coupon_data: CouponUpdate):
         raise HTTPException(status_code=404, detail="Coupon not found")
 
     try:
-        data = coupon_data.model_dump(exclude_unset=True, exclude={"assigned_users"})
+        data = coupon_data.model_dump(exclude_unset=True)
 
         if "code" in data:
             data["code"] = data["code"].upper()
@@ -132,45 +113,6 @@ async def update_coupon(id: int, coupon_data: CouponUpdate):
             )
             if existing:
                 raise HTTPException(status_code=400, detail="Coupon code already exists")
-
-        # Handle scope and assigned users changes
-        if "scope" in data:
-            if data["scope"] == CouponScope.SPECIFIC_USERS:
-                if coupon_data.assigned_users is not None:
-                    data["assigned_users"] = coupon_data.assigned_users
-                    # Delete existing CouponUser records and create new ones
-                    await db.couponuser.delete_many(where={"coupon_id": id})
-                    for user_id in coupon_data.assigned_users:
-                        user = await db.user.find_unique(where={"id": user_id})
-                        if user:
-                            try:
-                                await db.couponuser.create(
-                                    data={
-                                        "coupon_id": id,
-                                        "user_id": user_id
-                                    }
-                                )
-                            except PrismaError:
-                                pass
-            else:
-                # If changing to GENERAL, clear assigned_users
-                data["assigned_users"] = Json([])
-                await db.couponuser.delete_many(where={"coupon_id": id})
-        elif coupon_data.scope == CouponScope.SPECIFIC_USERS and coupon_data.assigned_users is not None:
-            data["assigned_users"] = Json(coupon_data.assigned_users)
-            await db.couponuser.delete_many(where={"coupon_id": id})
-            for user_id in coupon_data.assigned_users:
-                user = await db.user.find_unique(where={"id": user_id})
-                if user:
-                    try:
-                        await db.couponuser.create(
-                            data={
-                                "coupon_id": id,
-                                "user_id": user_id
-                            }
-                        )
-                    except PrismaError:
-                        pass
 
         updated_coupon = await db.coupon.update(
             where={"id": id},
@@ -259,7 +201,7 @@ async def validate_coupon(
 @router.post("/apply", response_model=CouponResponse)
 async def apply_coupon(
     code: str = Query(..., description="Coupon code to apply"),
-    user: UserDep = None,
+    user: CurrentUser = None,
     cartId: Optional[str] = Header(default=None)
 ):
     """
@@ -339,36 +281,9 @@ async def share_coupon(id: int, user_ids: List[int]):
 
     try:
         if coupon.scope != CouponScope.SPECIFIC_USERS:
-            await db.coupon.update(
-                where={"id": id},
-                data={"scope": CouponScope.SPECIFIC_USERS}
-            )
-
-        current_users = await db.couponuser.find_many(
-            where={"coupon_id": id},
-            select={"user_id": True}
-        )
-        current_user_ids = {cu.user_id for cu in current_users}
-
-        for user_id in user_ids:
-            if user_id not in current_user_ids:
-                user = await db.user.find_unique(where={"id": user_id})
-                if user:
-                    try:
-                        await db.couponuser.create(
-                            data={
-                                "coupon_id": id,
-                                "user_id": user_id
-                            }
-                        )
-                    except PrismaError:
-                        pass
-
-        all_user_ids = list(set(list(current_user_ids) + user_ids))
-        await db.coupon.update(
-            where={"id": id},
-            data={"assigned_users": all_user_ids}
-        )
+            update_data["users"] = {"set": [{"id": id} for id in user_ids]}
+            update_data["scope"] = CouponScope.SPECIFIC_USERS
+            await db.coupon.update(where={"id": id}, data=update_data)
 
         await invalidate_pattern("coupons")
         return {"message": f"Coupon shared with {len(user_ids)} user(s) successfully"}

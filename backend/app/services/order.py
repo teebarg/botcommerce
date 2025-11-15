@@ -59,7 +59,7 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
         data["coupon"] = {"connect": {"id": cart.coupon_id}}
         from app.services.coupon import CouponService
         coupon_service = CouponService()
-        await coupon_service.increment_coupon_usage(cart.coupon_id)
+        await coupon_service.increment_coupon_usage(cart.coupon_id, user_id)
 
     if cart.shipping_address_id:
         data["shipping_address"] = {"connect": {"id": cart.shipping_address_id}}

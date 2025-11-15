@@ -27,9 +27,9 @@ export const useCreateCoupon = () => {
             valid_from: string;
             valid_until: string;
             max_uses: number;
+            max_uses_per_user: number;
             scope: "GENERAL" | "SPECIFIC_USERS";
             is_active: boolean;
-            assigned_users?: number[] | null;
         }) => await api.post<Coupon>("/coupon/", data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["coupons"] });
@@ -57,9 +57,9 @@ export const useUpdateCoupon = () => {
                 valid_from?: string;
                 valid_until?: string;
                 max_uses?: number;
+                max_uses_per_user?: number;
                 scope?: "GENERAL" | "SPECIFIC_USERS";
                 is_active?: boolean;
-                assigned_users?: number[] | null;
             };
         }) => await api.patch<Coupon>(`/coupon/${id}`, data),
         onSuccess: () => {
@@ -83,13 +83,6 @@ export const useDeleteCoupon = () => {
         onError: (error: any) => {
             toast.error("Failed to delete coupon: " + (error?.message || "Unknown error"));
         },
-    });
-};
-
-export const useValidateCoupon = () => {
-    return useMutation({
-        mutationFn: async (code: string) =>
-            await api.post<{ valid: boolean; coupon?: Coupon; discount_amount?: number; message?: string }>("/coupon/validate", { code }),
     });
 };
 

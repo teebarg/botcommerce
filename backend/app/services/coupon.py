@@ -2,12 +2,12 @@ from datetime import datetime, timezone
 from typing import Optional
 from fastapi import HTTPException
 from app.prisma_client import prisma as db
-from prisma.enums import DiscountType, CouponScope
+from prisma.enums import DiscountType
+from app.models.coupon import CouponScope
 from prisma.models import Coupon, Cart
 from app.core.logging import get_logger
 
 logger = get_logger(__name__)
-
 
 class CouponService:
     async def validate_coupon(
@@ -21,7 +21,8 @@ class CouponService:
         Returns coupon if valid, raises HTTPException if invalid.
         """
         coupon = await db.coupon.find_unique(
-            where={"code": code.upper()}
+            where={"code": code.upper()},
+            include={"users": True}
         )
 
         if not coupon:
@@ -46,19 +47,19 @@ class CouponService:
                 detail="Coupon has reached maximum usage limit"
             )
 
-        # Check if user has already used this coupon
-        if user_id:
-            existing_order = await db.order.find_first(
-                where={
-                    "user_id": user_id,
-                    "coupon_id": coupon.id
-                }
-            )
-            if existing_order:
-                raise HTTPException(
-                    status_code=400,
-                    detail="You have already used this coupon."
+        if coupon.max_uses_per_user > 0:
+            if user_id:
+                usage_count = await db.couponusage.count(
+                    where={
+                        "coupon_id": coupon.id,
+                        "user_id": user_id
+                    }
                 )
+                if usage_count >= coupon.max_uses_per_user:
+                    raise HTTPException(
+                        status_code=400,
+                        detail="You have reached the maximum usage limit for this coupon."
+                    )
 
         if coupon.scope == CouponScope.SPECIFIC_USERS:
             if not user_id:
@@ -67,22 +68,11 @@ class CouponService:
                     detail="Coupon is only available for specific users. Please log in."
                 )
 
-            # Check if user is assigned (using CouponUser table)
-            coupon_user = await db.couponuser.find_first(
-                where={
-                    "coupon_id": coupon.id,
-                    "user_id": user_id
-                }
-            )
-
-            # Also check assigned_users JSON field as fallback
-            if not coupon_user:
-                assigned_users = coupon.assigned_users or []
-                if user_id not in assigned_users:
-                    raise HTTPException(
-                        status_code=403,
-                        detail="This coupon is not available for your account"
-                    )
+            if user_id not in coupon.users:
+                raise HTTPException(
+                    status_code=403,
+                    detail="This coupon is not available for your account"
+                )
 
         # Validate cart requirements if cart is provided
         if cart:
@@ -159,12 +149,19 @@ class CouponService:
 
         return updated_cart
 
-    async def increment_coupon_usage(self, coupon_id: int):
+    async def increment_coupon_usage(self, coupon_id: int, user_id: int):
         """
         Increment coupon usage count. Called when order is placed.
         """
-        await db.coupon.update(
-            where={"id": coupon_id},
-            data={"current_uses": {"increment": 1}}
-        )
+        async with db.tx() as tx:
+            await tx.coupon.update(
+                where={"id": coupon_id},
+                data={"current_uses": {"increment": 1}}
+            )
+            await tx.couponusage.create(
+                data={
+                    "coupon_id": coupon_id,
+                    "user_id": user_id
+                }
+            )
 

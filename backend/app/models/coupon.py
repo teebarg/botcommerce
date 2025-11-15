@@ -1,7 +1,13 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
-from prisma.enums import DiscountType, CouponScope
+from prisma.enums import DiscountType
+from enum import Enum
+from app.models.user import User
+
+class CouponScope(str, Enum):
+    GENERAL = "GENERAL"
+    SPECIFIC_USERS = "SPECIFIC_USERS"
 
 
 class CouponBase(BaseModel):
@@ -13,9 +19,9 @@ class CouponBase(BaseModel):
     valid_from: datetime
     valid_until: datetime
     max_uses: int = Field(1, ge=1, description="Maximum number of times coupon can be used")
+    max_uses_per_user: int = Field(1, ge=1, description="Maximum number of times coupon can be used per user")
     scope: CouponScope = CouponScope.GENERAL
     is_active: bool = True
-    assigned_users: Optional[List[int]] = Field(None, description="List of user IDs for specific_users scope")
 
 
 class CouponCreate(CouponBase):
@@ -31,13 +37,14 @@ class CouponUpdate(BaseModel):
     valid_from: Optional[datetime] = None
     valid_until: Optional[datetime] = None
     max_uses: Optional[int] = Field(None, ge=1)
+    max_uses_per_user: Optional[int] = Field(None, ge=1)
     scope: Optional[CouponScope] = None
     is_active: Optional[bool] = None
-    assigned_users: Optional[List[int]] = None
 
 
 class CouponResponse(CouponBase):
     id: int
+    users: Optional[List[User]] = None
     current_uses: int
     created_at: datetime
     updated_at: datetime
@@ -65,4 +72,3 @@ class CouponsList(BaseModel):
     limit: int
     total_count: int
     total_pages: int
-

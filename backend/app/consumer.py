@@ -252,18 +252,15 @@ class RedisStreamConsumer:
         try:
             notification = self.get_notification()
             coupon = await db.coupon.create(data={
-            "code": f"WELCOME{uuid.uuid4().hex[:3].upper()}",
+                "code": f"WELCOME{uuid.uuid4().hex[:3].upper()}",
                 "discount_type": "PERCENTAGE",
                 "discount_value": 10,
                 "min_cart_value": 5000,
                 "min_item_quantity": 0,
                 "valid_from": datetime.now(),
                 "valid_until": datetime.now() + timedelta(days=14),
-            })
-            # attach coupon to user
-            await db.couponuser.create(data={
-                "coupon": {"connect": {"id": coupon.id}},
-                "user": {"connect": {"id": int(event["user_id"])}}
+                "scope": "SPECIFIC_USERS",
+                "users": {"connect": [{"id": int(event["id"])}]}
             })
             welcome_email = await generate_welcome_email(
                 email_to=event["email"],
