@@ -270,7 +270,7 @@ async def remove_coupon(
     return {"message": "Coupon removed successfully"}
 
 
-@router.post("/{id}/share", dependencies=[Depends(get_current_superuser)])
+@router.post("/{id}/assign", dependencies=[Depends(get_current_superuser)])
 async def share_coupon(id: int, user_ids: List[int]):
     """
     Share a coupon with specific users (Admin only).

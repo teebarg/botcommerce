@@ -128,3 +128,18 @@ export const useToggleCouponStatus = () => {
         },
     });
 };
+
+export const useCouponAssignment = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ id, assignedUserIds }: { id: number; assignedUserIds: number[] }) =>
+            await api.patch<Coupon>(`/coupon/${id}/assign`, { assignedUserIds }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["coupons"] });
+            toast.success("Coupon updated successfully");
+        },
+        onError: (error: any) => {
+            toast.error("Failed to update coupon: " + (error?.message || "Unknown error"));
+        },
+    });
+};
