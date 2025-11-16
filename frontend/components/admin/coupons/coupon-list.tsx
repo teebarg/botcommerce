@@ -8,6 +8,7 @@ import { Coupon } from "@/schemas";
 import ComponentLoader from "@/components/component-loader";
 import { currency, formatDate } from "@/lib/utils";
 import { EditCouponDialog } from "./edit-coupon-dialog";
+import { SwipeableCouponCard } from "./swipeable-coupon-card";
 
 export const CouponList = () => {
     const { data, isLoading } = useCoupons();
@@ -44,6 +45,9 @@ export const CouponList = () => {
 
     return (
         <div className="space-y-4">
+            {coupons.map((coupon) => (
+                <SwipeableCouponCard key={coupon.id} coupon={coupon} onCopy={handleCopy} onToggleStatus={toggleStatus} onDelete={handleDelete} />
+            ))}
             {coupons.map((coupon: Coupon) => (
                 <Card key={coupon.id}>
                     <CardHeader className="pb-3">

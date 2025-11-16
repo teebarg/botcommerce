@@ -3,7 +3,6 @@ import { toast } from "sonner";
 
 import { api } from "@/apis/client";
 import { Coupon } from "@/schemas";
-import { CouponFormValues } from "@/components/admin/coupons/coupon-form";
 
 export const useCoupons = (query?: string, isActive?: boolean, skip?: number, limit?: number) => {
     return useQuery({

@@ -1,6 +1,6 @@
 "use client";
 
-import { CreateCouponDialog } from "@/components/admin/coupons/coupon-form";
+import { CreateCouponDialog } from "@/components/admin/coupons/create-coupon-dialog";
 import { CouponList } from "@/components/admin/coupons/coupon-list";
 import { Separator } from "@/components/ui/separator";
 import { BarChart3 } from "lucide-react";

@@ -9,13 +9,13 @@ import { User } from "@/schemas";
 import { useCouponAssignment } from "@/lib/hooks/useCoupon";
 import { toast } from "sonner";
 
-interface UserAssignmentDialogProps {
+interface AssignmentDialogProps {
     couponId: number;
     couponCode: string;
     assignedUserIds: number[];
 }
 
-export const UserAssignmentDialog = ({ couponId, couponCode, assignedUserIds }: UserAssignmentDialogProps) => {
+export const AssignmentDialog = ({ couponId, couponCode, assignedUserIds }: AssignmentDialogProps) => {
     const DUMMY_USERS: User[] = [];
     const [open, setOpen] = useState(false);
     const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
@@ -69,24 +69,24 @@ export const UserAssignmentDialog = ({ couponId, couponCode, assignedUserIds }: 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="w-full sm:w-auto">
                     <Users className="h-4 w-4 mr-2" />
                     Manage Users
                 </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>Manage Users for {couponCode}</DialogTitle>
-                    <DialogDescription>Assign or remove users who can use this coupon</DialogDescription>
+                    <DialogTitle className="text-lg md:text-xl">Manage Users for {couponCode}</DialogTitle>
+                    <DialogDescription className="text-sm">Assign or remove users who can use this coupon</DialogDescription>
                 </DialogHeader>
 
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     {/* Assigned Users */}
                     <div className="space-y-3">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                             <h3 className="text-sm font-semibold">Assigned Users ({assignedUsers.length})</h3>
                             {selectedUsers.length > 0 && assignedUsers.some((u) => selectedUsers.includes(u.id)) && (
-                                <Button variant="destructive" size="sm" onClick={handleRemoveSelected}>
+                                <Button variant="destructive" size="sm" onClick={handleRemoveSelected} className="w-full sm:w-auto">
                                     Remove Selected
                                 </Button>
                             )}
@@ -107,7 +107,9 @@ export const UserAssignmentDialog = ({ couponId, couponCode, assignedUserIds }: 
                                                     onCheckedChange={() => toggleUserSelection(user.id)}
                                                 />
                                                 <div>
-                                                    <p className="text-sm font-medium">{user.first_name}</p>
+                                                    <p className="text-sm font-medium">
+                                                        {user.first_name} {user.last_name}
+                                                    </p>
                                                     <p className="text-xs text-muted-foreground">{user.email}</p>
                                                 </div>
                                             </div>
@@ -123,7 +125,7 @@ export const UserAssignmentDialog = ({ couponId, couponCode, assignedUserIds }: 
 
                     {/* Available Users */}
                     <div className="space-y-3">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                             <h3 className="text-sm font-semibold">Available Users ({availableUsers.length})</h3>
                             {selectedUsers.length > 0 && availableUsers.some((u) => selectedUsers.includes(u.id)) && (
                                 <Badge variant="secondary">{selectedUsers.filter((id) => !assignedUserIds.includes(id)).length} selected</Badge>
@@ -156,13 +158,14 @@ export const UserAssignmentDialog = ({ couponId, couponCode, assignedUserIds }: 
                     </div>
                 </div>
 
-                <DialogFooter>
-                    <Button variant="outline" onClick={() => setOpen(false)}>
+                <DialogFooter className="flex-col sm:flex-row gap-2">
+                    <Button variant="outline" onClick={() => setOpen(false)} className="w-full sm:w-auto">
                         Close
                     </Button>
                     <Button
                         onClick={handleAddUsers}
                         disabled={selectedUsers.length === 0 || !selectedUsers.some((id) => !assignedUserIds.includes(id))}
+                        className="w-full sm:w-auto"
                     >
                         Add {selectedUsers.filter((id) => !assignedUserIds.includes(id)).length || ""} User
                         {selectedUsers.filter((id) => !assignedUserIds.includes(id)).length !== 1 ? "s" : ""}

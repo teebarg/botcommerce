@@ -97,6 +97,15 @@ export const CouponSchema = z.object({
     status: z.enum(["active", "inactive"]),
     is_active: z.boolean(),
     users: z.array(UserSchema).optional(),
+    usages: z.array(z.any()).optional(),
+    created_at: z.string(),
+    updated_at: z.string(),
+});
+
+export const CouponUsageSchema = z.object({
+    id: z.number(),
+    coupon: CouponSchema,
+    user: UserSchema,
     created_at: z.string(),
     updated_at: z.string(),
 });
@@ -104,6 +113,7 @@ export const CouponSchema = z.object({
 export type DeliveryOption = z.infer<typeof DeliveryOptionSchema>;
 export type ImageUpload = z.infer<typeof ImageUploadSchema>;
 export type Coupon = z.infer<typeof CouponSchema>;
+export type CouponUsage = z.infer<typeof CouponUsageSchema>;
 
 export type Token = z.infer<typeof TokenSchema>;
 export type Pag = z.infer<typeof PagSchema>;
