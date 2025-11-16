@@ -1,13 +1,14 @@
 import { useState } from "react";
+import { History } from "lucide-react";
+
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
-import { History, TrendingUp } from "lucide-react";
 import { CouponUsage } from "@/schemas/common";
-import { formatDate } from "@/lib/utils";
+import { currency, formatDate } from "@/lib/utils";
 
 interface CouponUsageDialogProps {
     couponCode: string;
@@ -18,11 +19,12 @@ interface CouponUsageDialogProps {
 
 export const CouponUsageDialog = ({ couponCode, usageHistory, couponType, assignedUserIds }: CouponUsageDialogProps) => {
     const [open, setOpen] = useState(false);
+    const totalDiscountGiven = usageHistory.reduce((total, usage) => total + usage.discount_amount, 0);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                <Button className="w-full sm:w-auto" size="sm" variant="outline">
                     <History className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Usage History ({usageHistory.length})</span>
                     <span className="sm:hidden">History ({usageHistory.length})</span>
@@ -39,6 +41,10 @@ export const CouponUsageDialog = ({ couponCode, usageHistory, couponType, assign
                     <div>
                         <p className="text-xs md:text-sm text-muted-foreground">Total Uses</p>
                         <p className="text-xl md:text-2xl font-bold">{usageHistory.length}</p>
+                    </div>
+                    <div>
+                        <p className="text-xs md:text-sm text-muted-foreground">Total Discount Given</p>
+                        <p className="text-xl md:text-2xl font-bold text-destructive">{currency(totalDiscountGiven)}</p>
                     </div>
                 </div>
 
@@ -59,7 +65,7 @@ export const CouponUsageDialog = ({ couponCode, usageHistory, couponType, assign
                                             <TableHead>User</TableHead>
                                             <TableHead>Email</TableHead>
                                             <TableHead>Date Used</TableHead>
-                                            <TableHead className="text-right">Cart Total</TableHead>
+                                            {/* <TableHead className="text-right">Cart Total</TableHead> */}
                                             <TableHead className="text-right">Discount Applied</TableHead>
                                         </TableRow>
                                     </TableHeader>
@@ -75,12 +81,10 @@ export const CouponUsageDialog = ({ couponCode, usageHistory, couponType, assign
                                                         <span>{formatDate(record.created_at)}</span>
                                                     </div>
                                                 </TableCell>
-                                                {/* <TableCell className="text-right font-medium">${record.cartTotal.toFixed(2)}</TableCell>
+                                                {/* <TableCell className="text-right font-medium">${record.cartTotal.toFixed(2)}</TableCell> */}
                                                 <TableCell className="text-right">
-                                                    <Badge variant="destructive" className="font-mono">
-                                                        -${record.discountApplied.toFixed(2)}
-                                                    </Badge>
-                                                </TableCell> */}
+                                                    <Badge variant="destructive">-{currency(record.discount_amount)}</Badge>
+                                                </TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -101,9 +105,7 @@ export const CouponUsageDialog = ({ couponCode, usageHistory, couponType, assign
                                                     </p>
                                                     <p className="text-xs text-muted-foreground">{record.user.email}</p>
                                                 </div>
-                                                {/* <Badge variant="destructive" className="font-mono text-xs">
-                                                    -${record.discountApplied.toFixed(2)}
-                                                </Badge> */}
+                                                <Badge variant="destructive">-{currency(record.discount_amount)}</Badge>
                                             </div>
                                             <div className="flex justify-between text-sm">
                                                 <div>

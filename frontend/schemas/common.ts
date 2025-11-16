@@ -106,6 +106,7 @@ export const CouponUsageSchema = z.object({
     id: z.number(),
     coupon: CouponSchema,
     user: UserSchema,
+    discount_amount: z.number(),
     created_at: z.string(),
     updated_at: z.string(),
 });

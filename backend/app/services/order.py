@@ -59,7 +59,7 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
         data["coupon"] = {"connect": {"id": cart.coupon_id}}
         from app.services.coupon import CouponService
         coupon_service = CouponService()
-        await coupon_service.increment_coupon_usage(cart.coupon_id, user_id)
+        await coupon_service.increment_coupon_usage(coupon_id=cart.coupon_id, user_id=user_id, discount_amount=cart.discount_amount)
 
     if cart.shipping_address_id:
         data["shipping_address"] = {"connect": {"id": cart.shipping_address_id}}
@@ -381,7 +381,7 @@ async def process_order_payment(order_id: int, notification: Notification):
         await decrement_variant_inventory_for_order(order_id, notification)
     except Exception as e:
         logger.error(f"Failed to decrement variant inventory for order {order_id}: {e}")
-    
+
 
 async def return_order_item(order_id: int, item_id: int, background_tasks: BackgroundTasks) -> OrderResponse:
     """

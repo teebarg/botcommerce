@@ -149,7 +149,7 @@ class CouponService:
 
         return updated_cart
 
-    async def increment_coupon_usage(self, coupon_id: int, user_id: int):
+    async def increment_coupon_usage(self, coupon_id: int, user_id: int, discount_amount: float):
         """
         Increment coupon usage count. Called when order is placed.
         """
@@ -161,7 +161,8 @@ class CouponService:
             await tx.couponusage.create(
                 data={
                     "coupon_id": coupon_id,
-                    "user_id": user_id
+                    "user_id": user_id,
+                    "discount_amount": discount_amount
                 }
             )
 

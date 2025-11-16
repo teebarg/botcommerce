@@ -433,13 +433,14 @@ model Coupon {
 }
 
 model CouponUsage {
-  id         Int      @id @default(autoincrement())
-  coupon     Coupon   @relation(fields: [coupon_id], references: [id], onDelete: Cascade)
-  coupon_id  Int
-  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  user_id    Int
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id              Int      @id @default(autoincrement())
+  coupon          Coupon   @relation(fields: [coupon_id], references: [id], onDelete: Cascade)
+  coupon_id       Int
+  user            User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id         Int
+  discount_amount Float    @db.DoublePrecision
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
 
   @@index([coupon_id, user_id])
   @@map("coupon_usages")
