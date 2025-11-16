@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useSwipeable } from "react-swipeable";
+import { Trash2, Power, PowerOff, Copy } from "lucide-react";
+
+import { AssignmentDialog } from "./assignment-dialog";
+import { CouponUsageDialog } from "./coupon-usage-dialog";
+import { EditCouponDialog } from "./edit-coupon-dialog";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Power, PowerOff, Copy } from "lucide-react";
-import { AssignmentDialog } from "./assignment-dialog";
-import { CouponUsageDialog } from "./coupon-usage-dialog";
 import { Coupon } from "@/schemas/common";
 import { cn, currency, formatDate } from "@/lib/utils";
 
@@ -66,11 +69,11 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
             {/* Swipeable Card Content */}
             <div
                 {...handlers}
+                className="relative bg-background"
                 style={{
                     transform: `translateX(${swipeOffset}px)`,
                     transition: isSwiping ? "none" : "transform 0.3s ease-out",
                 }}
-                className="relative bg-background"
             >
                 <Card className={cn("border-border", isSwiping && "cursor-grabbing")}>
                     <CardHeader className="pb-3">
@@ -81,17 +84,18 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
                                 {coupon.scope === "SPECIFIC_USERS" && <Badge variant="outline">VIP Only</Badge>}
                             </div>
                             <div className="flex gap-2 self-start sm:self-auto">
-                                <Button variant="ghost" size="icon" onClick={() => onCopy(coupon.code)} className="h-9 w-9">
+                                <Button className="h-9 w-9" size="icon" variant="ghost" onClick={() => onCopy(coupon.code)}>
                                     <Copy className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon" onClick={() => onToggleStatus(coupon.id, coupon.status)} className="h-9 w-9">
+                                <EditCouponDialog coupon={coupon} />
+                                <Button className="h-9 w-9" size="icon" variant="ghost" onClick={() => onToggleStatus(coupon.id, coupon.status)}>
                                     {coupon.status === "active" ? <PowerOff className="h-4 w-4" /> : <Power className="h-4 w-4" />}
                                 </Button>
                                 <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => onDelete(coupon.id, coupon.code)}
                                     className="h-9 w-9 text-destructive hover:text-destructive"
+                                    size="icon"
+                                    variant="ghost"
+                                    onClick={() => onDelete(coupon.id, coupon.code)}
                                 >
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
@@ -101,16 +105,16 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
                     {coupon.scope === "SPECIFIC_USERS" && (
                         <CardContent className="pb-3 pt-0">
                             <AssignmentDialog
-                                couponId={coupon.id}
-                                couponCode={coupon.code}
                                 assignedUserIds={coupon.users?.map((user) => user.id) || []}
+                                couponCode={coupon.code}
+                                couponId={coupon.id}
                             />
                         </CardContent>
                     )}
                     <CardContent className="space-y-3">
                         {coupon.scope === "SPECIFIC_USERS" ? "" : " "}
                         <div className="flex items-center justify-between pb-3 border-b">
-                            <CouponUsageDialog couponCode={coupon.code} usageHistory={coupon.usages || []} couponType={coupon.discount_type} />
+                            <CouponUsageDialog couponCode={coupon.code} couponType={coupon.discount_type} usageHistory={coupon.usages || []} />
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 text-sm">
                             <div>

@@ -1,9 +1,10 @@
 "use client";
 
+import { BarChart3 } from "lucide-react";
+
 import { CreateCouponDialog } from "@/components/admin/coupons/create-coupon-dialog";
 import { CouponList } from "@/components/admin/coupons/coupon-list";
 import { Separator } from "@/components/ui/separator";
-import { BarChart3 } from "lucide-react";
 import LocalizedClientLink from "@/components/ui/link";
 
 const Coupon = () => {
@@ -16,8 +17,8 @@ const Coupon = () => {
                 </div>
                 <div className="flex gap-2">
                     <LocalizedClientLink
-                        href="/admin/coupons/analytics"
                         className="flex items-center gap-2 border border-input bg-background hover:bg-accent py-2 px-4 rounded-md"
+                        href="/admin/coupons/analytics"
                     >
                         <BarChart3 className="mr-2 h-4 w-4" />
                         View Analytics

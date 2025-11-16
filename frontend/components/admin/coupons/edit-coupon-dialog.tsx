@@ -4,13 +4,13 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { Edit } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Edit } from "lucide-react";
-import { toast } from "sonner";
 import { useUpdateCoupon } from "@/lib/hooks/useCoupon";
 import { Coupon } from "@/schemas";
 
@@ -41,16 +41,21 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
     const getDiscountType = (): "PERCENTAGE" | "FIXED_AMOUNT" => {
         if ((coupon as any).discount_type) return (coupon as any).discount_type;
         const type = (coupon as any).type;
+
         if (type === "percentage" || type === "PERCENTAGE") return "PERCENTAGE";
+
         return "FIXED_AMOUNT";
     };
 
     const getScope = (): "GENERAL" | "SPECIFIC_USERS" => {
         if ((coupon as any).scope) {
             const scope = (coupon as any).scope;
+
             if (scope === "GENERAL" || scope === "general") return "GENERAL";
+
             return "SPECIFIC_USERS";
         }
+
         return "GENERAL";
     };
 
@@ -117,7 +122,7 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Button className="h-8 w-8" size="icon" variant="ghost">
                     <Edit className="h-4 w-4" />
                 </Button>
             </DialogTrigger>
@@ -126,7 +131,7 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
                     <DialogTitle>Edit Coupon</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
                         <div className="grid grid-cols-2 gap-2">
                             <FormField
                                 control={form.control}
@@ -148,7 +153,7 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Status</FormLabel>
-                                        <Select onValueChange={field.onChange} value={field.value}>
+                                        <Select value={field.value} onValueChange={field.onChange}>
                                             <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue />
@@ -172,7 +177,7 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Discount Type</FormLabel>
-                                        <Select onValueChange={field.onChange} value={field.value}>
+                                        <Select value={field.value} onValueChange={field.onChange}>
                                             <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue />
@@ -212,11 +217,11 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
                                         <FormLabel>Min Cart Value (₦)</FormLabel>
                                         <FormControl>
                                             <Input
-                                                type="number"
                                                 placeholder="Optional"
+                                                type="number"
                                                 {...field}
-                                                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                                                 value={field.value ?? ""}
+                                                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                                             />
                                         </FormControl>
                                         <FormDescription>Minimum cart total to apply coupon</FormDescription>
@@ -233,11 +238,11 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
                                         <FormLabel>Min Item Quantity</FormLabel>
                                         <FormControl>
                                             <Input
-                                                type="number"
                                                 placeholder="Optional"
+                                                type="number"
                                                 {...field}
-                                                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                                                 value={field.value ?? ""}
+                                                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                                             />
                                         </FormControl>
                                         <FormDescription>Minimum items in cart</FormDescription>
@@ -316,7 +321,7 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Scope</FormLabel>
-                                        <Select onValueChange={field.onChange} value={field.value}>
+                                        <Select value={field.value} onValueChange={field.onChange}>
                                             <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue />
@@ -334,10 +339,10 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
                         </div>
 
                         <div className="flex justify-end gap-3 pt-4">
-                            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={updateMutation.isPending}>
+                            <Button disabled={updateMutation.isPending} type="button" variant="outline" onClick={() => setOpen(false)}>
                                 Cancel
                             </Button>
-                            <Button type="submit" disabled={updateMutation.isPending}>
+                            <Button disabled={updateMutation.isPending} type="submit">
                                 {updateMutation.isPending ? "Updating..." : "Update Coupon"}
                             </Button>
                         </div>

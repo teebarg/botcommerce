@@ -2,13 +2,14 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { Plus } from "lucide-react";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Plus } from "lucide-react";
-import { toast } from "sonner";
 import { useCreateCoupon } from "@/lib/hooks/useCoupon";
 
 const couponSchema = z.object({
@@ -88,7 +89,7 @@ export const CreateCouponDialog = () => {
                     <DialogTitle>Create New Coupon</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
                         <div className="grid grid-cols-2 gap-2">
                             <FormField
                                 control={form.control}
@@ -110,7 +111,7 @@ export const CreateCouponDialog = () => {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Status</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <Select defaultValue={field.value} onValueChange={field.onChange}>
                                             <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue />
@@ -134,7 +135,7 @@ export const CreateCouponDialog = () => {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Discount Type</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <Select defaultValue={field.value} onValueChange={field.onChange}>
                                             <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue />
@@ -174,11 +175,11 @@ export const CreateCouponDialog = () => {
                                         <FormLabel>Min Cart Value (₦)</FormLabel>
                                         <FormControl>
                                             <Input
-                                                type="number"
                                                 placeholder="Optional"
+                                                type="number"
                                                 {...field}
-                                                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                                                 value={field.value ?? ""}
+                                                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                                             />
                                         </FormControl>
                                         <FormDescription>Minimum cart total to apply coupon</FormDescription>
@@ -195,11 +196,11 @@ export const CreateCouponDialog = () => {
                                         <FormLabel>Min Item Quantity</FormLabel>
                                         <FormControl>
                                             <Input
-                                                type="number"
                                                 placeholder="Optional"
+                                                type="number"
                                                 {...field}
-                                                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                                                 value={field.value ?? ""}
+                                                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                                             />
                                         </FormControl>
                                         <FormDescription>Minimum items in cart</FormDescription>
@@ -278,7 +279,7 @@ export const CreateCouponDialog = () => {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Scope</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <Select defaultValue={field.value} onValueChange={field.onChange}>
                                             <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue />
@@ -296,10 +297,10 @@ export const CreateCouponDialog = () => {
                         </div>
 
                         <div className="flex justify-end gap-3 pt-4">
-                            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={createMutation.isPending}>
+                            <Button disabled={createMutation.isPending} type="button" variant="outline" onClick={() => setOpen(false)}>
                                 Cancel
                             </Button>
-                            <Button type="submit" disabled={createMutation.isPending}>
+                            <Button disabled={createMutation.isPending} type="submit">
                                 {createMutation.isPending ? "Creating..." : "Create Coupon"}
                             </Button>
                         </div>

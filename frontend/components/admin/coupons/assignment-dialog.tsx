@@ -1,13 +1,14 @@
 import { useState } from "react";
+import { Users, X } from "lucide-react";
+import { toast } from "sonner";
+
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Users, X } from "lucide-react";
 import { User } from "@/schemas";
 import { useCouponAssignment } from "@/lib/hooks/useCoupon";
-import { toast } from "sonner";
 
 interface AssignmentDialogProps {
     couponId: number;
@@ -32,6 +33,7 @@ export const AssignmentDialog = ({ couponId, couponCode, assignedUserIds }: Assi
         if (selectedUsers.length === 0) return;
 
         const newAssignedUserIds = [...assignedUserIds, ...selectedUsers];
+
         updateCoupon.mutate({ id: couponId, assignedUserIds: newAssignedUserIds });
 
         toast.success("Users added", {
@@ -43,9 +45,11 @@ export const AssignmentDialog = ({ couponId, couponCode, assignedUserIds }: Assi
 
     const handleRemoveUser = (userId: number) => {
         const newAssignedUserIds = assignedUserIds.filter((id) => id !== userId);
+
         updateCoupon.mutate({ id: couponId, assignedUserIds: newAssignedUserIds });
 
         const user = DUMMY_USERS.find((u) => u.id === userId);
+
         toast.success("User removed", {
             description: `${user?.first_name} removed from ${couponCode}`,
         });
@@ -57,6 +61,7 @@ export const AssignmentDialog = ({ couponId, couponCode, assignedUserIds }: Assi
         if (usersToRemove.length === 0) return;
 
         const newAssignedUserIds = assignedUserIds.filter((id) => !usersToRemove.includes(id));
+
         updateCoupon.mutate({ id: couponId, assignedUserIds: newAssignedUserIds });
 
         toast.success("Users removed", {
@@ -69,7 +74,7 @@ export const AssignmentDialog = ({ couponId, couponCode, assignedUserIds }: Assi
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                <Button className="w-full sm:w-auto" size="sm" variant="outline">
                     <Users className="h-4 w-4 mr-2" />
                     Manage Users
                 </Button>
@@ -86,7 +91,7 @@ export const AssignmentDialog = ({ couponId, couponCode, assignedUserIds }: Assi
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                             <h3 className="text-sm font-semibold">Assigned Users ({assignedUsers.length})</h3>
                             {selectedUsers.length > 0 && assignedUsers.some((u) => selectedUsers.includes(u.id)) && (
-                                <Button variant="destructive" size="sm" onClick={handleRemoveSelected} className="w-full sm:w-auto">
+                                <Button className="w-full sm:w-auto" size="sm" variant="destructive" onClick={handleRemoveSelected}>
                                     Remove Selected
                                 </Button>
                             )}
@@ -113,7 +118,7 @@ export const AssignmentDialog = ({ couponId, couponCode, assignedUserIds }: Assi
                                                     <p className="text-xs text-muted-foreground">{user.email}</p>
                                                 </div>
                                             </div>
-                                            <Button variant="ghost" size="sm" onClick={() => handleRemoveUser(user.id)}>
+                                            <Button size="sm" variant="ghost" onClick={() => handleRemoveUser(user.id)}>
                                                 <X className="h-4 w-4" />
                                             </Button>
                                         </div>
@@ -159,13 +164,13 @@ export const AssignmentDialog = ({ couponId, couponCode, assignedUserIds }: Assi
                 </div>
 
                 <DialogFooter className="flex-col sm:flex-row gap-2">
-                    <Button variant="outline" onClick={() => setOpen(false)} className="w-full sm:w-auto">
+                    <Button className="w-full sm:w-auto" variant="outline" onClick={() => setOpen(false)}>
                         Close
                     </Button>
                     <Button
-                        onClick={handleAddUsers}
-                        disabled={selectedUsers.length === 0 || !selectedUsers.some((id) => !assignedUserIds.includes(id))}
                         className="w-full sm:w-auto"
+                        disabled={selectedUsers.length === 0 || !selectedUsers.some((id) => !assignedUserIds.includes(id))}
+                        onClick={handleAddUsers}
                     >
                         Add {selectedUsers.filter((id) => !assignedUserIds.includes(id)).length || ""} User
                         {selectedUsers.filter((id) => !assignedUserIds.includes(id)).length !== 1 ? "s" : ""}
