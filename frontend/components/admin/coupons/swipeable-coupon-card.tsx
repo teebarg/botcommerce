@@ -104,11 +104,7 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
                     </CardHeader>
                     {coupon.scope === "SPECIFIC_USERS" && (
                         <CardContent className="pb-3 pt-0">
-                            <AssignmentDialog
-                                assignedUserIds={coupon.users?.map((user) => user.id) || []}
-                                couponCode={coupon.code}
-                                couponId={coupon.id}
-                            />
+                            <AssignmentDialog assignedUsers={coupon.users ?? []} couponCode={coupon.code} couponId={coupon.id} />
                         </CardContent>
                     )}
                     <CardContent className="space-y-3">

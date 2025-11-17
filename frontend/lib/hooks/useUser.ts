@@ -24,10 +24,15 @@ interface UsersParams {
     sort?: string;
 }
 
-export const useUsers = (searchParams: UsersParams) => {
+interface UsersQueryOptions {
+    enabled?: boolean;
+}
+
+export const useUsers = (searchParams: UsersParams, options?: UsersQueryOptions) => {
     return useQuery({
         queryKey: ["users", JSON.stringify(searchParams)],
         queryFn: async () => await api.get<PaginatedUser>("/users/", { params: { ...searchParams } }),
+        enabled: options?.enabled,
     });
 };
 

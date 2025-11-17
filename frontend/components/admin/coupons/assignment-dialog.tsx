@@ -1,74 +1,109 @@
-import { useState } from "react";
-import { Users, X } from "lucide-react";
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { Loader2, Users, X } from "lucide-react";
 import { toast } from "sonner";
+import { useDebounce } from "use-debounce";
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { User } from "@/schemas";
-import { useCouponAssignment } from "@/lib/hooks/useCoupon";
+import { Input } from "@/components/ui/input";
+import { Coupon } from "@/schemas";
+import { useAssignCoupon } from "@/lib/hooks/useCoupon";
+import { useUsers } from "@/lib/hooks/useUser";
+
+type CouponUser = NonNullable<Coupon["users"]>[number];
 
 interface AssignmentDialogProps {
     couponId: number;
     couponCode: string;
-    assignedUserIds: number[];
+    assignedUsers?: CouponUser[];
 }
 
-export const AssignmentDialog = ({ couponId, couponCode, assignedUserIds }: AssignmentDialogProps) => {
-    const DUMMY_USERS: User[] = [];
+export const AssignmentDialog = ({ couponId, couponCode, assignedUsers }: AssignmentDialogProps) => {
     const [open, setOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
     const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
-    const updateCoupon = useCouponAssignment();
+    const [debouncedSearch] = useDebounce(searchQuery, 400);
 
-    const assignedUsers = DUMMY_USERS.filter((user) => assignedUserIds.includes(user.id));
-    const availableUsers = DUMMY_USERS.filter((user) => !assignedUserIds.includes(user.id));
+    const assignCoupon = useAssignCoupon();
+    const memoizedAssignedUsers = useMemo(() => assignedUsers ?? [], [assignedUsers]);
+    const assignedUserIds = useMemo(() => memoizedAssignedUsers.map((user) => user.id), [memoizedAssignedUsers]);
+    const assignedUserIdsSet = useMemo(() => new Set(assignedUserIds), [assignedUserIds]);
+
+    const { data: usersResponse, isLoading: isUsersLoading } = useUsers(
+        {
+            skip: 0,
+            limit: 50,
+            status: "ACTIVE",
+            query: debouncedSearch || undefined,
+        },
+        { enabled: open }
+    );
+
+    const availableUsers = useMemo(() => {
+        const fetchedUsers = usersResponse?.users ?? [];
+
+        return fetchedUsers.filter((user) => !assignedUserIdsSet.has(user.id));
+    }, [usersResponse, assignedUserIdsSet]);
+
+    const selectedAssignedIds = selectedUsers.filter((id) => assignedUserIdsSet.has(id));
+    const selectedAvailableIds = selectedUsers.filter((id) => !assignedUserIdsSet.has(id));
+
+    useEffect(() => {
+        if (!open) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setSelectedUsers([]);
+            setSearchQuery("");
+        }
+    }, [open]);
 
     const toggleUserSelection = (userId: number) => {
         setSelectedUsers((prev) => (prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]));
     };
 
-    const handleAddUsers = () => {
-        if (selectedUsers.length === 0) return;
-
-        const newAssignedUserIds = [...assignedUserIds, ...selectedUsers];
-
-        updateCoupon.mutate({ id: couponId, assignedUserIds: newAssignedUserIds });
-
-        toast.success("Users added", {
-            description: `${selectedUsers.length} user${selectedUsers.length > 1 ? "s" : ""} assigned to ${couponCode}`,
-        });
-
-        setSelectedUsers([]);
+    const updateAssignments = async (nextUserIds: number[], title: string, description?: string) => {
+        try {
+            await assignCoupon.mutateAsync({ id: couponId, userIds: nextUserIds });
+            toast.success(title, description ? { description } : undefined);
+            setSelectedUsers([]);
+        } catch (error) {
+            // Error toast handled inside the mutation hook
+        }
     };
 
-    const handleRemoveUser = (userId: number) => {
+    const handleAddUsers = async () => {
+        if (selectedAvailableIds.length === 0) return;
+
+        const newAssignedUserIds = Array.from(new Set([...assignedUserIds, ...selectedAvailableIds]));
+
+        await updateAssignments(
+            newAssignedUserIds,
+            "Users added",
+            `${selectedAvailableIds.length} user${selectedAvailableIds.length > 1 ? "s" : ""} assigned to ${couponCode}`
+        );
+    };
+
+    const handleRemoveUser = async (userId: number) => {
+        if (!assignedUserIdsSet.has(userId)) return;
         const newAssignedUserIds = assignedUserIds.filter((id) => id !== userId);
+        const user = memoizedAssignedUsers.find((u) => u.id === userId);
 
-        updateCoupon.mutate({ id: couponId, assignedUserIds: newAssignedUserIds });
-
-        const user = DUMMY_USERS.find((u) => u.id === userId);
-
-        toast.success("User removed", {
-            description: `${user?.first_name} removed from ${couponCode}`,
-        });
+        await updateAssignments(newAssignedUserIds, "User removed", `${user?.first_name ?? "User"} removed from ${couponCode}`);
     };
 
-    const handleRemoveSelected = () => {
-        const usersToRemove = assignedUsers.filter((user) => selectedUsers.includes(user.id)).map((user) => user.id);
+    const handleRemoveSelected = async () => {
+        if (selectedAssignedIds.length === 0) return;
+        const newAssignedUserIds = assignedUserIds.filter((id) => !selectedAssignedIds.includes(id));
 
-        if (usersToRemove.length === 0) return;
-
-        const newAssignedUserIds = assignedUserIds.filter((id) => !usersToRemove.includes(id));
-
-        updateCoupon.mutate({ id: couponId, assignedUserIds: newAssignedUserIds });
-
-        toast.success("Users removed", {
-            description: `${usersToRemove.length} user${usersToRemove.length > 1 ? "s" : ""} removed from ${couponCode}`,
-        });
-
-        setSelectedUsers([]);
+        await updateAssignments(
+            newAssignedUserIds,
+            "Users removed",
+            `${selectedAssignedIds.length} user${selectedAssignedIds.length > 1 ? "s" : ""} removed from ${couponCode}`
+        );
     };
 
     return (
@@ -89,19 +124,25 @@ export const AssignmentDialog = ({ couponId, couponCode, assignedUserIds }: Assi
                     {/* Assigned Users */}
                     <div className="space-y-3">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                            <h3 className="text-sm font-semibold">Assigned Users ({assignedUsers.length})</h3>
-                            {selectedUsers.length > 0 && assignedUsers.some((u) => selectedUsers.includes(u.id)) && (
-                                <Button className="w-full sm:w-auto" size="sm" variant="destructive" onClick={handleRemoveSelected}>
+                            <h3 className="text-sm font-semibold">Assigned Users ({memoizedAssignedUsers.length})</h3>
+                            {selectedAssignedIds.length > 0 && (
+                                <Button
+                                    className="w-full sm:w-auto"
+                                    disabled={assignCoupon.isPending}
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={handleRemoveSelected}
+                                >
                                     Remove Selected
                                 </Button>
                             )}
                         </div>
                         <ScrollArea className="h-[300px] rounded-md border bg-muted/20 p-4">
-                            {assignedUsers.length === 0 ? (
+                            {memoizedAssignedUsers.length === 0 ? (
                                 <p className="text-sm text-muted-foreground text-center py-8">No users assigned yet</p>
                             ) : (
                                 <div className="space-y-2">
-                                    {assignedUsers.map((user) => (
+                                    {memoizedAssignedUsers.map((user) => (
                                         <div
                                             key={user.id}
                                             className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
@@ -109,6 +150,7 @@ export const AssignmentDialog = ({ couponId, couponCode, assignedUserIds }: Assi
                                             <div className="flex items-center gap-3">
                                                 <Checkbox
                                                     checked={selectedUsers.includes(user.id)}
+                                                    disabled={assignCoupon.isPending}
                                                     onCheckedChange={() => toggleUserSelection(user.id)}
                                                 />
                                                 <div>
@@ -118,7 +160,12 @@ export const AssignmentDialog = ({ couponId, couponCode, assignedUserIds }: Assi
                                                     <p className="text-xs text-muted-foreground">{user.email}</p>
                                                 </div>
                                             </div>
-                                            <Button size="sm" variant="ghost" onClick={() => handleRemoveUser(user.id)}>
+                                            <Button
+                                                disabled={assignCoupon.isPending}
+                                                size="sm"
+                                                variant="ghost"
+                                                onClick={() => handleRemoveUser(user.id)}
+                                            >
                                                 <X className="h-4 w-4" />
                                             </Button>
                                         </div>
@@ -130,15 +177,30 @@ export const AssignmentDialog = ({ couponId, couponCode, assignedUserIds }: Assi
 
                     {/* Available Users */}
                     <div className="space-y-3">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                            <h3 className="text-sm font-semibold">Available Users ({availableUsers.length})</h3>
-                            {selectedUsers.length > 0 && availableUsers.some((u) => selectedUsers.includes(u.id)) && (
-                                <Badge variant="secondary">{selectedUsers.filter((id) => !assignedUserIds.includes(id)).length} selected</Badge>
-                            )}
+                        <div className="flex flex-col gap-3">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                <h3 className="text-sm font-semibold">Available Users ({availableUsers.length})</h3>
+                                {selectedAvailableIds.length > 0 && <Badge variant="secondary">{selectedAvailableIds.length} selected</Badge>}
+                            </div>
+                            <Input
+                                placeholder="Search by name or email"
+                                value={searchQuery}
+                                onChange={(event) => setSearchQuery(event.target.value)}
+                            />
                         </div>
                         <ScrollArea className="h-[300px] rounded-md border bg-muted/20 p-4">
-                            {availableUsers.length === 0 ? (
-                                <p className="text-sm text-muted-foreground text-center py-8">All users assigned</p>
+                            {isUsersLoading ? (
+                                <div className="flex items-center justify-center py-8 text-muted-foreground">
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                </div>
+                            ) : availableUsers.length === 0 ? (
+                                <p className="text-sm text-muted-foreground text-center py-8">
+                                    {memoizedAssignedUsers.length === 0
+                                        ? "No users available yet"
+                                        : searchQuery
+                                          ? "No users match your search"
+                                          : "All users assigned"}
+                                </p>
                             ) : (
                                 <div className="space-y-2">
                                     {availableUsers.map((user) => (
@@ -149,10 +211,13 @@ export const AssignmentDialog = ({ couponId, couponCode, assignedUserIds }: Assi
                                         >
                                             <Checkbox
                                                 checked={selectedUsers.includes(user.id)}
+                                                disabled={assignCoupon.isPending}
                                                 onCheckedChange={() => toggleUserSelection(user.id)}
                                             />
                                             <div>
-                                                <p className="text-sm font-medium">{user.first_name}</p>
+                                                <p className="text-sm font-medium">
+                                                    {user.first_name} {user.last_name}
+                                                </p>
                                                 <p className="text-xs text-muted-foreground">{user.email}</p>
                                             </div>
                                         </div>
@@ -169,11 +234,11 @@ export const AssignmentDialog = ({ couponId, couponCode, assignedUserIds }: Assi
                     </Button>
                     <Button
                         className="w-full sm:w-auto"
-                        disabled={selectedUsers.length === 0 || !selectedUsers.some((id) => !assignedUserIds.includes(id))}
+                        disabled={selectedAvailableIds.length === 0 || assignCoupon.isPending}
                         onClick={handleAddUsers}
                     >
-                        Add {selectedUsers.filter((id) => !assignedUserIds.includes(id)).length || ""} User
-                        {selectedUsers.filter((id) => !assignedUserIds.includes(id)).length !== 1 ? "s" : ""}
+                        {assignCoupon.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Assign Selected Users
                     </Button>
                 </DialogFooter>
             </DialogContent>
