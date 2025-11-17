@@ -46,7 +46,7 @@ async def get_coupons(
         skip=skip,
         take=limit,
         order={"created_at": "desc"},
-        include={"users": True}
+        include={"users": True, "usages": True}
     )
 
     total_count = await db.coupon.count(where=where_clause)
@@ -280,10 +280,10 @@ async def assign_coupon(id: int, user_ids: List[int]):
         raise HTTPException(status_code=404, detail="Coupon not found")
 
     try:
+        update_data = {"users": {"set": [{"id": id} for id in user_ids]}}
         if coupon.scope != CouponScope.SPECIFIC_USERS:
-            update_data["users"] = {"set": [{"id": id} for id in user_ids]}
             update_data["scope"] = CouponScope.SPECIFIC_USERS
-            await db.coupon.update(where={"id": id}, data=update_data)
+        await db.coupon.update(where={"id": id}, data=update_data)
 
         await invalidate_pattern("coupons")
         return {"message": f"Coupon shared with {len(user_ids)} user(s) successfully"}

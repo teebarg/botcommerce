@@ -1,13 +1,21 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 from prisma.enums import DiscountType
 from enum import Enum
-from app.models.user import User
+from prisma.models import CouponUsage
 
 class CouponScope(str, Enum):
     GENERAL = "GENERAL"
     SPECIFIC_USERS = "SPECIFIC_USERS"
+
+class User(BaseModel):
+    id: int
+    email: Optional[str]
+    first_name: Optional[str]
+    last_name: Optional[str]
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CouponBase(BaseModel):
@@ -44,6 +52,7 @@ class CouponUpdate(BaseModel):
 
 class CouponResponse(CouponBase):
     id: int
+    usages: Optional[List[CouponUsage]] = None
     users: Optional[List[User]] = None
     current_uses: int
     created_at: datetime

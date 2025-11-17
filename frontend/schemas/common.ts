@@ -77,8 +77,6 @@ const UserSchema = z.object({
     first_name: z.string(),
     last_name: z.string().optional(),
     email: z.string().email(),
-    status: z.enum(["PENDING", "ACTIVE", "INACTIVE"]),
-    role: z.enum(["ADMIN", "CUSTOMER"]),
 });
 
 export const CouponSchema = z.object({
@@ -94,7 +92,6 @@ export const CouponSchema = z.object({
     max_uses_per_user: z.number().min(1),
     current_uses: z.number().optional(),
     scope: z.enum(["GENERAL", "SPECIFIC_USERS"]),
-    status: z.enum(["active", "inactive"]),
     is_active: z.boolean(),
     users: z.array(UserSchema).optional(),
     usages: z.array(z.any()).optional(),
@@ -106,6 +103,8 @@ export const CouponUsageSchema = z.object({
     id: z.number(),
     coupon: CouponSchema,
     user: UserSchema,
+    name: z.string(),
+    email: z.string().email(),
     discount_amount: z.number(),
     created_at: z.string(),
     updated_at: z.string(),

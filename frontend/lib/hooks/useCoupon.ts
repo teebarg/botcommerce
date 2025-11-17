@@ -139,7 +139,7 @@ export const useAssignCoupon = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ id, userIds }: { id: number; userIds: number[] }) => await api.post(`/coupon/${id}/assign`, { user_ids: userIds }),
+        mutationFn: async ({ id, userIds }: { id: number; userIds: number[] }) => await api.post(`/coupon/${id}/assign`, userIds),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["coupons"] });
         },

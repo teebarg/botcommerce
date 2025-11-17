@@ -153,6 +153,9 @@ class CouponService:
         """
         Increment coupon usage count. Called when order is placed.
         """
+        user = await db.user.find_unique(
+            where={"id": user_id}
+        )
         async with db.tx() as tx:
             await tx.coupon.update(
                 where={"id": coupon_id},
@@ -162,7 +165,9 @@ class CouponService:
                 data={
                     "coupon_id": coupon_id,
                     "user_id": user_id,
-                    "discount_amount": discount_amount
+                    "discount_amount": discount_amount,
+                    "name": user.first_name + " " + user.last_name,
+                    "email": user.email
                 }
             )
 

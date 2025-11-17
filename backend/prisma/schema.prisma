@@ -438,6 +438,8 @@ model CouponUsage {
   coupon_id       Int
   user            User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id         Int
+  name            String
+  email           String
   discount_amount Float    @db.DoublePrecision
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt

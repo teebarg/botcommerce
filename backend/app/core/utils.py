@@ -264,7 +264,7 @@ async def send_email(
     cc_list: list[str] = [],
 ) -> None:
     try:
-        if settings.ENVIRONMENT == "local2":
+        if settings.ENVIRONMENT == "local":
             await send_email_smtp(
                 email_to=email_to,
                 subject=subject,

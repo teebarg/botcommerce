@@ -36,7 +36,6 @@ export const CouponUsageDialog = ({ couponCode, usageHistory, couponType, assign
                     <DialogDescription className="text-sm">Track who used this coupon and when</DialogDescription>
                 </DialogHeader>
 
-                {/* Statistics */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 p-3 md:p-4 rounded-lg bg-muted/50">
                     <div>
                         <p className="text-xs md:text-sm text-muted-foreground">Total Uses</p>
@@ -56,7 +55,6 @@ export const CouponUsageDialog = ({ couponCode, usageHistory, couponType, assign
                     </div>
                 ) : (
                     <>
-                        {/* Desktop Table View */}
                         <div className="hidden md:block">
                             <ScrollArea className="h-[400px] rounded-md border">
                                 <Table>
@@ -65,23 +63,19 @@ export const CouponUsageDialog = ({ couponCode, usageHistory, couponType, assign
                                             <TableHead>User</TableHead>
                                             <TableHead>Email</TableHead>
                                             <TableHead>Date Used</TableHead>
-                                            {/* <TableHead className="text-right">Cart Total</TableHead> */}
                                             <TableHead className="text-right">Discount Applied</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {usageHistory.map((record) => (
                                             <TableRow key={record.id}>
-                                                <TableCell className="font-medium">
-                                                    {record.user.first_name} {record.user.last_name}
-                                                </TableCell>
-                                                <TableCell className="text-muted-foreground">{record.user.email}</TableCell>
+                                                <TableCell className="font-medium">{record.name}</TableCell>
+                                                <TableCell className="text-muted-foreground">{record.email}</TableCell>
                                                 <TableCell>
                                                     <div className="flex flex-col">
                                                         <span>{formatDate(record.created_at)}</span>
                                                     </div>
                                                 </TableCell>
-                                                {/* <TableCell className="text-right font-medium">${record.cartTotal.toFixed(2)}</TableCell> */}
                                                 <TableCell className="text-right">
                                                     <Badge variant="destructive">-{currency(record.discount_amount)}</Badge>
                                                 </TableCell>
@@ -92,7 +86,6 @@ export const CouponUsageDialog = ({ couponCode, usageHistory, couponType, assign
                             </ScrollArea>
                         </div>
 
-                        {/* Mobile Card View */}
                         <ScrollArea className="md:hidden h-[400px]">
                             <div className="space-y-3">
                                 {usageHistory.map((record) => (
@@ -100,10 +93,8 @@ export const CouponUsageDialog = ({ couponCode, usageHistory, couponType, assign
                                         <CardContent className="p-4 space-y-2">
                                             <div className="flex justify-between items-start">
                                                 <div>
-                                                    <p className="font-medium">
-                                                        {record.user.first_name} {record.user.last_name}
-                                                    </p>
-                                                    <p className="text-xs text-muted-foreground">{record.user.email}</p>
+                                                    <p className="font-medium">{record.name}</p>
+                                                    <p className="text-xs text-muted-foreground">{record.email}</p>
                                                 </div>
                                                 <Badge variant="destructive">-{currency(record.discount_amount)}</Badge>
                                             </div>
@@ -112,10 +103,6 @@ export const CouponUsageDialog = ({ couponCode, usageHistory, couponType, assign
                                                     <p className="text-muted-foreground text-xs">Date</p>
                                                     <p>{formatDate(record.created_at)}</p>
                                                 </div>
-                                                {/* <div className="text-right">
-                                                    <p className="text-muted-foreground text-xs">Cart Total</p>
-                                                    <p className="font-medium">${record.cartTotal.toFixed(2)}</p>
-                                                </div> */}
                                             </div>
                                         </CardContent>
                                     </Card>

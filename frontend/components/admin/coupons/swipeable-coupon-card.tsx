@@ -15,7 +15,7 @@ import { cn, currency, formatDate } from "@/lib/utils";
 interface SwipeableCouponCardProps {
     coupon: Coupon;
     onCopy: (code: string) => void;
-    onToggleStatus: (id: number, currentStatus: "active" | "inactive") => void;
+    onToggleStatus: (id: number, currentStatus: boolean) => void;
     onDelete: (id: number, code: string) => void;
 }
 
@@ -36,11 +36,9 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
         onSwiped: (eventData) => {
             setIsSwiping(false);
             if (eventData.deltaX < SWIPE_THRESHOLD) {
-                // Trigger delete
                 onDelete(coupon.id, coupon.code);
                 setSwipeOffset(0);
             } else {
-                // Reset position
                 setSwipeOffset(0);
             }
         },
@@ -80,16 +78,16 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                             <div className="flex flex-wrap items-center gap-2">
                                 <CardTitle className="text-lg md:text-xl font-semibold">{coupon.code}</CardTitle>
-                                <Badge variant={coupon.status === "active" ? "default" : "secondary"}>{coupon.status}</Badge>
-                                {coupon.scope === "SPECIFIC_USERS" && <Badge variant="outline">VIP Only</Badge>}
+                                <Badge variant={coupon.is_active ? "emerald" : "secondary"}>{coupon.is_active ? "Active" : "Inactive"}</Badge>
+                                {coupon.scope === "SPECIFIC_USERS" && <Badge variant="warning">VIP Only</Badge>}
                             </div>
                             <div className="flex gap-2 self-start sm:self-auto">
                                 <Button className="h-9 w-9" size="icon" variant="ghost" onClick={() => onCopy(coupon.code)}>
                                     <Copy className="h-4 w-4" />
                                 </Button>
                                 <EditCouponDialog coupon={coupon} />
-                                <Button className="h-9 w-9" size="icon" variant="ghost" onClick={() => onToggleStatus(coupon.id, coupon.status)}>
-                                    {coupon.status === "active" ? <PowerOff className="h-4 w-4" /> : <Power className="h-4 w-4" />}
+                                <Button className="h-9 w-9" size="icon" variant="ghost" onClick={() => onToggleStatus(coupon.id, coupon.is_active)}>
+                                    {coupon.is_active ? <PowerOff className="h-4 w-4" /> : <Power className="h-4 w-4" />}
                                 </Button>
                                 <Button
                                     className="h-9 w-9 text-destructive hover:text-destructive"
