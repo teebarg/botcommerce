@@ -15,14 +15,13 @@ import { toast } from "sonner";
 
 const DiscountCode: React.FC = () => {
     const { cart, isLoading } = useCart();
-    const [code, setCode] = useState("");
+    const [code, setCode] = useState<string>("");
     const applyMutation = useApplyCoupon();
     const removeMutation = useRemoveCoupon();
 
     const appliedCoupon = useMemo(() => {
         if (!cart?.coupon_id) return null;
         return {
-            code: "APPLIED", // You might want to include coupon code in cart response
             discount_amount: cart.discount_amount || 0,
         };
     }, [cart]);
@@ -83,7 +82,7 @@ const DiscountCode: React.FC = () => {
                                 <Info className="size-4 text-gray-500" />
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p>You can add multiple gift cards, but only one discount code.</p>
+                                <p>Enter a coupon code to apply a discount to your order.</p>
                             </TooltipContent>
                         </Tooltip>
                     </span>

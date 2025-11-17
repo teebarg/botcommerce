@@ -11,6 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Coupon } from "@/schemas/common";
 import { cn, currency, formatDate } from "@/lib/utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Confirm } from "@/components/generic/confirm";
+import { useOverlayTriggerState } from "@react-stately/overlays";
 
 interface SwipeableCouponCardProps {
     coupon: Coupon;
@@ -22,6 +25,7 @@ interface SwipeableCouponCardProps {
 export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }: SwipeableCouponCardProps) => {
     const [swipeOffset, setSwipeOffset] = useState(0);
     const [isSwiping, setIsSwiping] = useState(false);
+    const deleteState = useOverlayTriggerState({});
 
     const SWIPE_THRESHOLD = -100; // Pixels to swipe before triggering delete
 
@@ -64,7 +68,6 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
                 </div>
             </div>
 
-            {/* Swipeable Card Content */}
             <div
                 {...handlers}
                 className="relative bg-background"
@@ -89,14 +92,19 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
                                 <Button className="h-9 w-9" size="icon" variant="ghost" onClick={() => onToggleStatus(coupon.id, coupon.is_active)}>
                                     {coupon.is_active ? <PowerOff className="h-4 w-4" /> : <Power className="h-4 w-4" />}
                                 </Button>
-                                <Button
-                                    className="h-9 w-9 text-destructive hover:text-destructive"
-                                    size="icon"
-                                    variant="ghost"
-                                    onClick={() => onDelete(coupon.id, coupon.code)}
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
+                                <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
+                                    <DialogTrigger asChild>
+                                        <Button size="icon" variant="ghost">
+                                            <Trash2 className="text-red-500 h-4 w-4 cursor-pointer" />
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <DialogHeader className="sr-only">
+                                            <DialogTitle>Delete</DialogTitle>
+                                        </DialogHeader>
+                                        <Confirm onClose={deleteState.close} onConfirm={() => onDelete(coupon.id, coupon.code)} />
+                                    </DialogContent>
+                                </Dialog>
                             </div>
                         </div>
                     </CardHeader>

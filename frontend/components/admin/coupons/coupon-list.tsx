@@ -23,18 +23,13 @@ export const CouponList = () => {
         try {
             await toggleMutation.mutateAsync(id);
             toast.success("Coupon status updated successfully");
-        } catch (error) {
-            // Error handled in hook
-        }
+        } catch (error) {}
     };
 
     const handleDelete = async (id: number, code: string) => {
-        if (!confirm(`Are you sure you want to delete coupon "${code}"?`)) return;
         try {
             await deleteMutation.mutateAsync(id);
-        } catch (error) {
-            // Error handled in hook
-        }
+        } catch (error) {}
     };
 
     if (isLoading) return <ComponentLoader className="h-[200px]" />;
