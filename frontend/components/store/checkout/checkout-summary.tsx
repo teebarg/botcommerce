@@ -1,7 +1,5 @@
 "use client";
 
-import DiscountCode from "./components/discount-code";
-
 import CartTotals from "@/components/store/cart/cart-totals";
 import { Separator } from "@/components/ui/separator";
 import CartItems from "@/components/store/cart/cart-items";
@@ -14,9 +12,6 @@ const CheckoutSummary = () => {
                 <Separator className="my-2" />
                 <CartTotals />
                 <CartItems className="max-h-[40vh] overflow-y-auto" />
-                <div className="my-6">
-                    <DiscountCode />
-                </div>
             </div>
         </div>
     );

@@ -68,7 +68,7 @@ class CouponService:
                     detail="Coupon is only available for specific users. Please log in."
                 )
 
-            if user_id not in coupon.users:
+            if not any(user.id == user_id for user in coupon.users):
                 raise HTTPException(
                     status_code=403,
                     detail="This coupon is not available for your account"
@@ -128,7 +128,8 @@ class CouponService:
             data={
                 "coupon_id": coupon.id,
                 "discount_amount": discount_amount,
-                "total": cart.subtotal + cart.tax + cart.shipping_fee - discount_amount
+                "total": cart.subtotal + cart.tax + cart.shipping_fee - discount_amount,
+                "payment_method": "COUPON"
             }
         )
 

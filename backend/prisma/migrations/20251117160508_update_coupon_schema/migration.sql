@@ -9,6 +9,9 @@
 -- CreateEnum
 CREATE TYPE "CouponScope" AS ENUM ('GENERAL', 'SPECIFIC_USERS');
 
+-- AlterEnum
+ALTER TYPE "PaymentMethod" ADD VALUE 'COUPON';
+
 -- AlterTable
 ALTER TABLE "carts" ADD COLUMN     "coupon_id" INTEGER,
 ADD COLUMN     "discount_amount" DOUBLE PRECISION NOT NULL DEFAULT 0;

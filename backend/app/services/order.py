@@ -72,6 +72,9 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
 
     await publish_order_event(order=new_order, type="ORDER_CREATED")
 
+    if order_in.payment_status == "SUCCESS":
+        await publish_order_event(order=new_order, type="ORDER_PAID")
+
     return new_order
 
 async def retrieve_order(order_id: str) -> OrderResponse:

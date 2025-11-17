@@ -58,11 +58,11 @@ const DiscountCode: React.FC = () => {
     return (
         <div className="w-full flex flex-col">
             {appliedDiscount ? (
-                <Card className="border-primary bg-primary/5">
-                    <CardContent className="flex items-center justify-between p-4">
+                <Card className="border-emerald-500 bg-emerald-500/5 w-fit">
+                    <CardContent className="flex items-center justify-between p-4 gap-4">
                         <div className="flex items-center gap-3">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                                <Check className="h-4 w-4 text-primary" />
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10">
+                                <Check className="h-4 w-4 text-emerald-500" />
                             </div>
                             <div>
                                 <p className="text-sm font-medium">Coupon Applied</p>

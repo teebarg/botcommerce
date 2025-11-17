@@ -109,7 +109,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                         <CardContent className="space-y-3">
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Subtotal</span>
-                                <span className="text-foreground">{currency(order.total)}</span>
+                                <span className="text-foreground">{currency(order.subtotal)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Shipping</span>

@@ -106,7 +106,6 @@ async def verify_payment(reference: str, user: CurrentUser):
 
             await invalidate_pattern("orders")
             await invalidate_pattern("cart")
-            await publish_order_event(order=order, type="ORDER_PAID")
 
             event = {
                 "type": "PAYMENT_SUCCESS",
