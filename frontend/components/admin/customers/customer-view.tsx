@@ -26,18 +26,15 @@ const CustomerView: React.FC = () => {
 
     const searchParams = useSearchParams();
 
-    const page = Number(searchParams.get("page")) || 1;
-    const status: Status = searchParams.get("status") as Status;
+    const skip = Number(searchParams.get("skip")) || 0;
 
-    const filters = {
-        status,
-    };
-
-    const { data, isLoading } = useUsers({
-        skip: (page - 1) * LIMIT,
-        limit: LIMIT,
-        ...filters,
-    });
+    const { data, isLoading } = useUsers(
+        {
+            skip,
+            limit: LIMIT,
+        },
+        { enabled: true }
+    );
 
     const { users, ...pagination } = data ?? { skip: 0, limit: 0, total_pages: 0, total_count: 0 };
 
@@ -92,7 +89,7 @@ const CustomerView: React.FC = () => {
                                 ) : (
                                     users?.map((user: User, idx: number) => (
                                         <TableRow key={idx} className="odd:bg-background">
-                                            <TableCell className="font-medium">{idx + 1}</TableCell>
+                                            <TableCell className="font-medium">{idx + 1 + skip}</TableCell>
                                             <TableCell>
                                                 <div>
                                                     <p>
