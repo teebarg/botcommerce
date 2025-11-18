@@ -109,12 +109,22 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                         <CardContent className="space-y-3">
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Subtotal</span>
-                                <span className="text-foreground">{currency(order.total)}</span>
+                                <span className="text-foreground">{currency(order.subtotal)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Shipping</span>
                                 <span className="text-foreground">{currency(order.shipping_fee)}</span>
                             </div>
+                            <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Tax</span>
+                                <span className="text-foreground">{currency(order.tax)}</span>
+                            </div>
+                            {order.discount_amount && order.discount_amount > 0 && (
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">Discount</span>
+                                    <span className="font-semibold text-green-600">-{currency(order.discount_amount)}</span>
+                                </div>
+                            )}
                             <Separator />
                             <div className="flex justify-between font-medium">
                                 <span className="text-foreground">Total</span>

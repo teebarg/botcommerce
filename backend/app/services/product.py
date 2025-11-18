@@ -195,6 +195,10 @@ async def index_images():
                 product_dict = prepare_product_data_for_indexing(image.product)
                 documents.append(product_dict)
 
+        if len(documents) == 0:
+            logger.info("No products to re-index.")
+            return
+
         await clear_index(settings.MEILI_PRODUCTS_INDEX)
         await add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
 

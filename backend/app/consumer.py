@@ -11,6 +11,7 @@ from prisma import Json
 from datetime import datetime
 from app.core.utils import generate_welcome_email
 from app.services.redis import invalidate_pattern
+from datetime import timedelta
 
 logger = get_logger(__name__)
 
@@ -124,7 +125,7 @@ class RedisStreamConsumer:
             await self.redis.xack(self.stream, self.group, msg_id)
             await self.redis.xdel(self.stream, msg_id)
         except Exception as e:
-            logger.error(f"Failed to process {data}: {e}")
+            logger.error(f"Failed to process {msg_id}: {e}")
 
     async def handle_event(self, event):
         if event["type"] == "ORDER_CREATED":
@@ -179,7 +180,7 @@ class RedisStreamConsumer:
             for item in order_items:
                 await service.track_product_interaction(product_id=item.variant.product_id, interaction_type="purchase")
         except Exception as e:
-            logger.error(f"Failed to create order: {str(e)}")
+            logger.error(f"Failed to create order in handle_order_created: {str(e)}")
             raise Exception(f"Database error: {str(e)}")
 
         await send_notification(id=int(event["order_id"]), user_id=int(event["user_id"]), notification=self.get_notification())
@@ -198,7 +199,7 @@ class RedisStreamConsumer:
                 }
             )
         except Exception as e:
-            logger.error(f"Failed to create order: {str(e)}")
+            logger.error(f"Failed to create order in handle_payment_success: {str(e)}")
             raise Exception(f"Database error: {str(e)}")
 
     async def handle_recently_viewed(self, event):
@@ -208,14 +209,14 @@ class RedisStreamConsumer:
             }
             if int(event.get("time_spent", 0)) > 0:
                 metadata["time_spent"] = int(event.get("time_spent", 0))
-                
+
             key = f"user:{event['user_id']}:history"
             async with self.redis.pipeline(transaction=True) as pipe:
                 pipe.lpush(key, event['product_id'])
                 pipe.ltrim(key, 0, 49)
                 pipe.expire(key, 60 * 60 * 24 * 30)
                 await pipe.execute()
-                
+
             await db.userinteraction.create(
                 data={
                     "user": {"connect": {"id": int(event["user_id"])}},
@@ -226,7 +227,7 @@ class RedisStreamConsumer:
                 }
             )
         except Exception as e:
-            logger.error(f"Failed to create order: {str(e)}")
+            logger.error(f"Failed to create user interaction: {str(e)}")
             raise Exception(f"Database error: {str(e)}")
 
         try:
@@ -247,11 +248,24 @@ class RedisStreamConsumer:
         await recent_service.track_product_interaction(product_id=product_id, interaction_type=interaction_type)
 
     async def handle_user_registered(self, event):
-        notification = self.get_notification()
+        import uuid
         try:
+            notification = self.get_notification()
+            coupon = await db.coupon.create(data={
+                "code": f"WELCOME{uuid.uuid4().hex[:3].upper()}",
+                "discount_type": "PERCENTAGE",
+                "discount_value": 10,
+                "min_cart_value": 5000,
+                "min_item_quantity": 0,
+                "valid_from": datetime.now(),
+                "valid_until": datetime.now() + timedelta(days=14),
+                "scope": "SPECIFIC_USERS",
+                "users": {"connect": [{"id": int(event["id"])}]}
+            })
             welcome_email = await generate_welcome_email(
                 email_to=event["email"],
-                first_name=event["first_name"]
+                first_name=event["first_name"],
+                coupon=coupon
             )
             await notification.send_notification(
                 channel_name="email",
@@ -259,6 +273,7 @@ class RedisStreamConsumer:
                 subject=welcome_email.subject,
                 message=welcome_email.html_content
             )
+            await invalidate_pattern("coupons")
         except Exception as e:
             logger.error(f"Failed to send welcome email: {str(e)}")
             raise Exception(f"Email error: {str(e)}")

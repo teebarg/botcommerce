@@ -6,7 +6,7 @@ from app.core.utils import generate_id, generate_abandoned_cart_email, send_emai
 from app.models.cart import CartUpdate, CartItemCreate, CartItemResponse, CartResponse
 from fastapi import APIRouter, Header, HTTPException, Request, BackgroundTasks, Depends
 from app.prisma_client import prisma as db
-from app.core.deps import TokenUser, UserDep, get_current_superuser
+from app.core.deps import UserDep, get_current_superuser
 from prisma.models import Cart
 from app.services.redis import cache_response, invalidate_key, bust, invalidate_pattern
 from app.core.logging import get_logger
@@ -19,18 +19,46 @@ router = APIRouter()
 
 async def calculate_cart_totals(cart: Cart):
     """Helper function to calculate cart totals"""
+    from app.services.coupon import CouponService
+    
     service = ShopSettingsService()
     tax_rate = float(await service.get("tax_rate"))
     cart_items = await db.cartitem.find_many(where={"cart_id": cart.id})
 
     subtotal = sum(item.price * item.quantity for item in cart_items)
-    tax = subtotal * (tax_rate / 100)
 
-    total = subtotal + tax + cart.shipping_fee
+    discount_amount = 0.0
+    if cart.coupon_id:
+        coupon_service = CouponService()
+        coupon = await db.coupon.find_unique(where={"id": cart.coupon_id})
+        if coupon:
+            try:
+                await coupon_service.validate_coupon(
+                    code=coupon.code,
+                    cart=cart,
+                    user_id=cart.user_id
+                )
+                discount_amount = await coupon_service.calculate_discount(coupon, subtotal)
+            except Exception:
+                discount_amount = 0.0
+                await db.cart.update(
+                    where={"id": cart.id},
+                    data={"coupon_id": None}
+                )
+
+    new_subtotal = subtotal - discount_amount
+    tax = new_subtotal * (tax_rate / 100)
+
+    total = new_subtotal + tax + cart.shipping_fee
 
     await db.cart.update(
         where={"id": cart.id},
-        data={"subtotal": subtotal, "tax": tax, "total": total}
+        data={
+            "subtotal": subtotal,
+            "tax": tax,
+            "discount_amount": discount_amount,
+            "total": total
+        }
     )
 
     await invalidate_pattern("abandoned-carts")
@@ -138,25 +166,24 @@ async def get_cart(request: Request, user: UserDep, cartId: str = Header()):
 
 
 @router.get("/items", response_model=Optional[list[CartItemResponse]])
-async def get_cart_items(cartId: str = Header()):
+async def get_cart_items(user: UserDep, cartId: str = Header()):
     """Get all items in a specific cart"""
-    if not cartId:
+    cart = await get_or_create_cart(cart_number=cartId, user_id=user.id if user else None)
+    if not cart:
         return None
-    return await db.cartitem.find_many(where={"cart_number": cartId}, include={"variant": True})
+    return await db.cartitem.find_many(where={"cart_number": cart.cart_number}, include={"variant": True})
 
 
 @router.put("/", response_model=CartResponse)
-async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: str = Header(default=None)):
+async def update_cart(cart_update: CartUpdate, user: UserDep, cartId: str = Header(default=None)):
     """Update cart status"""
-    cart = await db.cart.find_unique(where={"cart_number": cartId})
+    cart = await get_or_create_cart(cart_number=cartId, user_id=user.id if user else None)
     if not cart:
         cart = await db.cart.create(
             data={
                 "cart_number": cartId
             },
         )
-
-    user = await db.user.find_unique(where={"email": token_data.sub}) if token_data else None
 
     update_data = {}
 
@@ -200,20 +227,20 @@ async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: st
 
     if cart_update.shipping_fee is not None:
         update_data["shipping_fee"] = cart_update.shipping_fee
-        update_data["total"] = cart.subtotal + cart.tax + update_data["shipping_fee"]
+        update_data["total"] = cart.subtotal + cart.tax + update_data["shipping_fee"] - cart.discount_amount
 
     if user:
         update_data["user"] = {"connect": {"id": user.id}}
 
     updated_cart = await db.cart.update(
-        where={"cart_number": cartId},
+        where={"cart_number": cart.cart_number},
         data=update_data,
     )
 
     if cart_update.shipping_address:
         await invalidate_key(f"addresses:{user.id}")
 
-    await bust(f"cart:{cartId}")
+    await bust(f"cart:{cart.cart_number}")
     if cart.user_id:
         await bust(f"cart:{cart.user_id}")
     await invalidate_pattern("abandoned-carts")
@@ -222,27 +249,26 @@ async def update_cart(cart_update: CartUpdate, token_data: TokenUser, cartId: st
 
 
 @router.delete("/items/{item_id}")
-async def delete_cart_item(item_id: int, cartId: str = Header(default=None)):
+async def delete_cart_item(item_id: int, user: UserDep, cartId: str = Header(default=None)):
+    cart = await get_or_create_cart(cart_number=cartId, user_id=user.id if user else None)
     cart_item = await db.cartitem.find_unique(where={"id": item_id})
-    if not cart_item or cart_item.cart_number != cartId:
+    if not cart_item or cart_item.cart_number != cart.cart_number:
         raise HTTPException(status_code=404, detail="cart item not found")
-
-    cart = await db.cart.find_unique(where={"cart_number": cartId})
 
     decrement = cart_item.price * cart_item.quantity
     subtotal = cart.subtotal - decrement
     service = ShopSettingsService()
     tax = subtotal * (float(await service.get("tax_rate")) / 100)
-    total = subtotal + tax + cart.shipping_fee
+    total = subtotal + tax + cart.shipping_fee - cart.discount_amount
 
     async with db.tx() as tx:
         await tx.cartitem.delete(where={"id": item_id})
         await tx.cart.update(
-            where={"cart_number": cartId},
+            where={"cart_number": cart.cart_number},
             data={"subtotal": subtotal, "tax": tax, "total": total},
         )
 
-    await bust(f"cart:{cartId}")
+    await bust(f"cart:{cart.cart_number}")
     if cart.user_id:
         await bust(f"cart:{cart.user_id}")
     await invalidate_pattern("abandoned-carts")
@@ -250,12 +276,13 @@ async def delete_cart_item(item_id: int, cartId: str = Header(default=None)):
 
 
 @router.put("/items/{item_id}", response_model=CartItemResponse)
-async def update_cart_item(item_id: int, quantity: int, background_tasks: BackgroundTasks, cartId: str = Header(default=None)):
+async def update_cart_item(item_id: int, quantity: int, user: UserDep, background_tasks: BackgroundTasks, cartId: str = Header(default=None)):
+    cart = await get_or_create_cart(cart_number=cartId, user_id=user.id if user else None)
     cart_item = await db.cartitem.find_unique(
         where={"id": item_id},
-        include={"cart": True, "variant": True}
+        include={"variant": True}
     )
-    if not cart_item or cart_item.cart_number != cartId:
+    if not cart_item or cart_item.cart_number != cart.cart_number:
         raise HTTPException(status_code=404, detail="cart item not found")
 
     if quantity > cart_item.variant.inventory:
@@ -270,7 +297,7 @@ async def update_cart_item(item_id: int, quantity: int, background_tasks: Backgr
         include={"variant": True}
     )
 
-    background_tasks.add_task(calculate_cart_totals, cart=cart_item.cart)
+    background_tasks.add_task(calculate_cart_totals, cart=cart)
 
     return updated_item
 

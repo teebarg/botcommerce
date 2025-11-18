@@ -19,7 +19,7 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
     """
     Create a new order from a cart
     """
-    order_number = f"ORD-{uuid.uuid4().hex[:8].upper()}"
+    order_number = f"ORD{uuid.uuid4().hex[:8].upper()}"
 
     cart = await db.cart.find_unique(
         where={"cart_number": cart_number},
@@ -35,6 +35,7 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
             "subtotal": cart.subtotal,
             "tax": cart.tax,
             "shipping_fee": cart.shipping_fee,
+            "discount_amount": cart.discount_amount,
             "status": order_in.status,
             "payment_status": order_in.payment_status,
             "shipping_method": cart.shipping_method,
@@ -54,16 +55,25 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
             }
         }
 
+    if cart.coupon_id:
+        data["coupon"] = {"connect": {"id": cart.coupon_id}}
+        from app.services.coupon import CouponService
+        coupon_service = CouponService()
+        await coupon_service.increment_coupon_usage(coupon_id=cart.coupon_id, user_id=user_id, discount_amount=cart.discount_amount)
+
     if cart.shipping_address_id:
         data["shipping_address"] = {"connect": {"id": cart.shipping_address_id}}
 
     try:
         new_order = await db.order.create(data=data)
     except Exception as e:
-        logger.error(f"Failed to create order: {str(e)}")
+        logger.error(f"Failed to create order in create_order_from_cart: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
     await publish_order_event(order=new_order, type="ORDER_CREATED")
+
+    if order_in.payment_status == "SUCCESS":
+        await publish_order_event(order=new_order, type="ORDER_PAID")
 
     return new_order
 
@@ -129,6 +139,7 @@ async def list_orders(
             },
             "user": True,
             "shipping_address": True,
+            "coupon": True,
         }
     )
     total = await db.order.count(where=where)
@@ -373,7 +384,7 @@ async def process_order_payment(order_id: int, notification: Notification):
         await decrement_variant_inventory_for_order(order_id, notification)
     except Exception as e:
         logger.error(f"Failed to decrement variant inventory for order {order_id}: {e}")
-    
+
 
 async def return_order_item(order_id: int, item_id: int, background_tasks: BackgroundTasks) -> OrderResponse:
     """

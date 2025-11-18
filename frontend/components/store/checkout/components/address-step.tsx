@@ -76,7 +76,7 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
                     )}
 
                     {addressOption === "new" && (
-                        <div className="space-y-6 border-t pt-6 bg-secondary">
+                        <div className="space-y-6 border-t pt-6">
                             <ShippingAddressForm onClose={() => setAddressOption("existing")} />
                         </div>
                     )}

@@ -27,7 +27,7 @@ async def create_order(
         await invalidate_pattern("cart")
         return order
     except Exception as e:
-        logger.error(f"Failed to create order: {str(e)}")
+        logger.error(f"Failed to create order in create_order: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/{order_id}", response_model=OrderResponse)

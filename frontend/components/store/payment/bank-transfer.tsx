@@ -26,7 +26,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({ amount }) => {
     };
 
     return (
-        <div className="space-y-4 border-t pt-6">
+        <div className="space-y-4">
             <div className="p-4 bg-contrast/10 rounded-lg">
                 <h4 className="font-medium mb-3 flex items-center space-x-2">
                     <Banknote className="h-4 w-4" />

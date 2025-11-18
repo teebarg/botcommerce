@@ -72,8 +72,48 @@ export const ImageUploadSchema = z.object({
     content_type: z.string(),
 });
 
+const UserSchema = z.object({
+    id: z.number(),
+    first_name: z.string(),
+    last_name: z.string().optional(),
+    email: z.string().email(),
+});
+
+export const CouponSchema = z.object({
+    id: z.number(),
+    code: z.string(),
+    discount_type: z.enum(["PERCENTAGE", "FIXED_AMOUNT"]),
+    discount_value: z.number().min(1),
+    min_cart_value: z.number().optional(),
+    min_item_quantity: z.number().optional(),
+    valid_from: z.string(),
+    valid_until: z.string(),
+    max_uses: z.number().min(1),
+    max_uses_per_user: z.number().min(1),
+    current_uses: z.number().optional(),
+    scope: z.enum(["GENERAL", "SPECIFIC_USERS"]),
+    is_active: z.boolean(),
+    users: z.array(UserSchema).optional(),
+    usages: z.array(z.any()).optional(),
+    created_at: z.string(),
+    updated_at: z.string(),
+});
+
+export const CouponUsageSchema = z.object({
+    id: z.number(),
+    coupon: CouponSchema,
+    user: UserSchema,
+    name: z.string(),
+    email: z.string().email(),
+    discount_amount: z.number(),
+    created_at: z.string(),
+    updated_at: z.string(),
+});
+
 export type DeliveryOption = z.infer<typeof DeliveryOptionSchema>;
 export type ImageUpload = z.infer<typeof ImageUploadSchema>;
+export type Coupon = z.infer<typeof CouponSchema>;
+export type CouponUsage = z.infer<typeof CouponUsageSchema>;
 
 export type Token = z.infer<typeof TokenSchema>;
 export type Pag = z.infer<typeof PagSchema>;

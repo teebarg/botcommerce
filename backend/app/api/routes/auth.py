@@ -8,7 +8,7 @@ from app.core.config import settings
 from app.core.utils import generate_magic_link_email, send_email, generate_verification_email
 from app.models.user import User
 from app.prisma_client import prisma
-from app.services.events import publish_user_registered, publish_event
+from app.services.events import publish_user_registered
 from datetime import datetime, timedelta
 from pydantic import BaseModel
 from app.models.generic import Token
@@ -176,15 +176,6 @@ async def verify_email(payload: VerifyEmailPayload, cartId: str = Header(default
     except Exception as e:
         logger.error(f"Failed to publish USER_REGISTERED event: {e}")
         pass
-
-    event = {
-        "type": "USER_REGISTERED",
-        "user_id": user.id,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "email": user.email,
-    }
-    await publish_event(event=event)
 
     access_token = security.create_access_token(
         data=tokenData(user=user),
@@ -417,14 +408,6 @@ async def sync_user(request: Request, payload: SyncUserPayload, cartId: str = He
                 source="sync_user",
                 created_at=user.created_at,
             )
-            event = {
-                "type": "USER_REGISTERED",
-                "user_id": user.id,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "email": user.email,
-            }
-            await publish_event(event=event)
         except Exception as e:
             logger.error(f"Failed to publish USER_REGISTERED event: {e}")
 
@@ -439,3 +422,27 @@ async def merge_cart(user_id: str, cart_number: str | None = None):
         where={"cart_number": cart_number},
         data={"user_id": user_id},
     )
+
+
+@router.post("/test-job")
+async def test(request: Request, id: int):
+    """
+    Test job
+    """
+    user = await prisma.user.find_first(
+        where={
+            "id": id,
+        }
+    )
+
+    try:
+        await publish_user_registered(
+            user=user,
+            source="email_password",
+            created_at=user.created_at,
+        )
+    except Exception as e:
+        logger.error(f"Failed to publish USER_REGISTERED event: {e}")
+        pass
+
+    return {"message": "User registered successfully"}

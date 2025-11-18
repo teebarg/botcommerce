@@ -23,7 +23,7 @@ const Pickup: React.FC<PickupProps> = ({ amount }) => {
     };
 
     return (
-        <div className="space-y-4 border-t pt-6">
+        <div className="space-y-4">
             <div className="space-y-3 p-4 bg-contrast/5 rounded-lg">
                 <div className="flex items-start mb-3">
                     <MapPin className="w-4 h-4 mt-0.5 shrink-0" />

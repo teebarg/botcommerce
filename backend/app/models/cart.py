@@ -50,6 +50,8 @@ class CartResponse(BaseModel):
     subtotal: Optional[float] = 0
     tax: Optional[float] = 0
     shipping_fee: Optional[float] = 0
+    discount_amount: Optional[float] = 0
+    coupon_id: Optional[int] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
