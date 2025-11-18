@@ -26,7 +26,6 @@ async def calculate_cart_totals(cart: Cart):
     cart_items = await db.cartitem.find_many(where={"cart_id": cart.id})
 
     subtotal = sum(item.price * item.quantity for item in cart_items)
-    tax = subtotal * (tax_rate / 100)
 
     discount_amount = 0.0
     if cart.coupon_id:
@@ -47,7 +46,10 @@ async def calculate_cart_totals(cart: Cart):
                     data={"coupon_id": None}
                 )
 
-    total = (subtotal + tax + cart.shipping_fee) - discount_amount
+    new_subtotal = subtotal - discount_amount
+    tax = new_subtotal * (tax_rate / 100)
+
+    total = new_subtotal + tax + cart.shipping_fee
 
     await db.cart.update(
         where={"id": cart.id},

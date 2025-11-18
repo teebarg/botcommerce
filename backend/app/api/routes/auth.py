@@ -425,13 +425,13 @@ async def merge_cart(user_id: str, cart_number: str | None = None):
 
 
 @router.post("/test-job")
-async def test(request: Request):
+async def test(request: Request, id: int):
     """
     Test job
     """
     user = await prisma.user.find_first(
         where={
-            "id": 1,
+            "id": id,
         }
     )
 
