@@ -24,8 +24,8 @@ class CouponBase(BaseModel):
     discount_value: float = Field(..., gt=0, description="Discount value")
     min_cart_value: Optional[float] = Field(None, ge=0, description="Minimum cart value required")
     min_item_quantity: Optional[int] = Field(None, ge=0, description="Minimum item quantity required")
-    valid_from: datetime
-    valid_until: datetime
+    valid_from: Optional[datetime] = None
+    valid_until: Optional[datetime] = None
     max_uses: int = Field(1, ge=1, description="Maximum number of times coupon can be used")
     max_uses_per_user: int = Field(1, ge=1, description="Maximum number of times coupon can be used per user")
     scope: CouponScope = CouponScope.GENERAL

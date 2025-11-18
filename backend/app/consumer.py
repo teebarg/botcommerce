@@ -180,7 +180,7 @@ class RedisStreamConsumer:
             for item in order_items:
                 await service.track_product_interaction(product_id=item.variant.product_id, interaction_type="purchase")
         except Exception as e:
-            logger.error(f"Failed to create order: {str(e)}")
+            logger.error(f"Failed to create order in handle_order_created: {str(e)}")
             raise Exception(f"Database error: {str(e)}")
 
         await send_notification(id=int(event["order_id"]), user_id=int(event["user_id"]), notification=self.get_notification())
@@ -199,7 +199,7 @@ class RedisStreamConsumer:
                 }
             )
         except Exception as e:
-            logger.error(f"Failed to create order: {str(e)}")
+            logger.error(f"Failed to create order in handle_payment_success: {str(e)}")
             raise Exception(f"Database error: {str(e)}")
 
     async def handle_recently_viewed(self, event):
@@ -209,14 +209,14 @@ class RedisStreamConsumer:
             }
             if int(event.get("time_spent", 0)) > 0:
                 metadata["time_spent"] = int(event.get("time_spent", 0))
-                
+
             key = f"user:{event['user_id']}:history"
             async with self.redis.pipeline(transaction=True) as pipe:
                 pipe.lpush(key, event['product_id'])
                 pipe.ltrim(key, 0, 49)
                 pipe.expire(key, 60 * 60 * 24 * 30)
                 await pipe.execute()
-                
+
             await db.userinteraction.create(
                 data={
                     "user": {"connect": {"id": int(event["user_id"])}},
@@ -227,7 +227,7 @@ class RedisStreamConsumer:
                 }
             )
         except Exception as e:
-            logger.error(f"Failed to create order: {str(e)}")
+            logger.error(f"Failed to create user interaction: {str(e)}")
             raise Exception(f"Database error: {str(e)}")
 
         try:

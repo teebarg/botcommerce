@@ -19,7 +19,7 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
     """
     Create a new order from a cart
     """
-    order_number = f"ORD-{uuid.uuid4().hex[:8].upper()}"
+    order_number = f"ORD{uuid.uuid4().hex[:8].upper()}"
 
     cart = await db.cart.find_unique(
         where={"cart_number": cart_number},
@@ -55,19 +55,23 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
             }
         }
 
+    print("111111111")
     if cart.coupon_id:
         data["coupon"] = {"connect": {"id": cart.coupon_id}}
         from app.services.coupon import CouponService
         coupon_service = CouponService()
         await coupon_service.increment_coupon_usage(coupon_id=cart.coupon_id, user_id=user_id, discount_amount=cart.discount_amount)
 
+    print("222222222")
     if cart.shipping_address_id:
         data["shipping_address"] = {"connect": {"id": cart.shipping_address_id}}
 
     try:
+        print("3333333333")
         new_order = await db.order.create(data=data)
+        print(new_order)
     except Exception as e:
-        logger.error(f"Failed to create order: {str(e)}")
+        logger.error(f"Failed to create order in create_order_from_cart: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
     await publish_order_event(order=new_order, type="ORDER_CREATED")

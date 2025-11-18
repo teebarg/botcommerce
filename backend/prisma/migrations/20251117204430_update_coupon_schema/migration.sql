@@ -2,8 +2,6 @@
   Warnings:
 
   - You are about to drop the column `expiration_date` on the `coupons` table. All the data in the column will be lost.
-  - Added the required column `valid_from` to the `coupons` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `valid_until` to the `coupons` table without a default value. This is not possible if the table is not empty.
 
 */
 -- CreateEnum
@@ -25,8 +23,8 @@ ADD COLUMN     "max_uses_per_user" INTEGER NOT NULL DEFAULT 1,
 ADD COLUMN     "min_cart_value" DOUBLE PRECISION,
 ADD COLUMN     "min_item_quantity" INTEGER,
 ADD COLUMN     "scope" "CouponScope" NOT NULL DEFAULT 'GENERAL',
-ADD COLUMN     "valid_from" TIMESTAMP(3) NOT NULL,
-ADD COLUMN     "valid_until" TIMESTAMP(3) NOT NULL,
+ADD COLUMN     "valid_from" TIMESTAMP(3),
+ADD COLUMN     "valid_until" TIMESTAMP(3),
 ALTER COLUMN "discount_type" SET DEFAULT 'PERCENTAGE';
 
 -- AlterTable

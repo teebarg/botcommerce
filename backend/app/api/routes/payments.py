@@ -191,6 +191,6 @@ async def payment_status(id: int, status: PaymentStatus):
                 )
                 await invalidate_key(f"order-timeline:{id}")
             except Exception as e:
-                logger.error(f"Failed to create order timeline: {str(e)}")
+                logger.error(f"Failed to create order timeline when updating payment status: {str(e)}")
                 raise HTTPException(status_code=400, detail=f"Database error: {str(e)}")
         return updated_order

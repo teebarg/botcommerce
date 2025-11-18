@@ -413,8 +413,8 @@ model Coupon {
   discount_value    Float         @db.DoublePrecision
   min_cart_value    Float?        @db.DoublePrecision
   min_item_quantity Int?
-  valid_from        DateTime
-  valid_until       DateTime
+  valid_from        DateTime?
+  valid_until       DateTime?
   max_uses          Int           @default(1)
   max_uses_per_user Int           @default(1)
   current_uses      Int           @default(0)
