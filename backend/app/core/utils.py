@@ -264,7 +264,7 @@ async def send_email(
     cc_list: list[str] = [],
 ) -> None:
     try:
-        if settings.ENVIRONMENT == "local":
+        if settings.ENVIRONMENT == "local2":
             await send_email_smtp(
                 email_to=email_to,
                 subject=subject,
@@ -294,17 +294,17 @@ def generate_test_email(email_to: str) -> EmailData:
 async def generate_invoice_email(order: OrderResponse, user: User) -> EmailData:
     service = ShopSettingsService()
     header_title = "Your order has been processed successfully"
-    template_name = "paid_invoice1.html"
+    template_name = "paid_invoice.html"
     description = "Your order has been processed"
     bank_details = None
     if order.payment_method == "CASH_ON_DELIVERY":
-        template_name = "pickup_invoice1.html"
+        template_name = "pickup_invoice.html"
         header_title = "Your order has been processed"
         description = "Your order has been processed"
         bank_details = await service.get_bank_details()
     elif order.payment_status == "PENDING":
         header_title = "Your order is pending payment"
-        template_name = "pending_invoice1.html"
+        template_name = "pending_invoice.html"
         description = "Your order is pending payment"
         bank_details = await service.get_bank_details()
     elif order.payment_status == "FAILED":

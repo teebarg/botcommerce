@@ -1,15 +1,27 @@
-{% include "partials/header.html" %}
-<!-- Product Section -->
+{% extends "partials/layout.html" %}
+
+{% block content %}
 <tr>
-    <td style="padding: 20px">
-        <h2>Thank you for your order!</h2>
-        <p>Hi {{user.first_name}},</p>
-        <p>Thank you for your recent purchase.</p>
-        <p>Here's your invoice for <span style="font-weight: 600;">{{ order.order_number }}</span>.</p>
+    <td style="padding: 40px 30px; background-color: #ffffff;" class="mobile-padding">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+                <td
+                    style="color: #333333; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 16px; line-height: 1.6; padding-bottom: 30px;">
+                    <p>Hi {{user.first_name}},</p>
+                    <p style="margin-top: 0px; margin-bottom: 0px;">Thank you for your recent purchase.</p>
+                    <p style="margin-top: 0px; margin-bottom: 0px;">Here's your invoice for <span style="font-weight: 600;">{{ order.order_number }}</span>.</p>
+                </td>
+            </tr>
 
-        {% include "partials/order-details.html" %}
+            <tr>
+                <td>
+                    {% include "partials/order-details.html" %}
+                    {% include "partials/order-extra.html" %}
+                </td>
+            </tr>
 
-        <a href="{{ frontend_host }}/order/confirmed/{{order.order_number}}" style="margin-top: 10px; display: inline-block;" class="action-button">View Order Status</a>
+            {% include 'partials/cta_button.html' %}
+        </table>
     </td>
 </tr>
-{% include "partials/footer.html" %}
+{% endblock %}

@@ -100,7 +100,7 @@ export const useApplyCoupon = () => {
         onError: (error: any) => {
             const message = error?.message || "Failed to apply coupon";
 
-            toast.error(message);
+            toast.error(message, { duration: 5000 });
             throw error;
         },
     });

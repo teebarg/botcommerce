@@ -1,66 +1,214 @@
-<table style="width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 20px">
-    <tr style="background-color: #007bff; color: white">
-        <th style="padding: 10px; text-align: left">Item</th>
-        <th style="padding: 10px; text-align: center">Image</th>
-        <th style="padding: 10px; text-align: right">Quantity</th>
-        <th style="padding: 10px; text-align: right">Price</th>
-    </tr>
+<!-- Order Items List -->
+<table border="0" cellpadding="0" cellspacing="0" width="100%"
+    style="margin: 20px 0; border: 1px solid #e5e7eb; border-radius: 8px;">
     {% for item in order.order_items %}
     <tr>
-        <td style="padding: 10px; border-bottom: 1px solid #dee2e6">
-            <p style="font-weight: bold; font-size: 14px; line-height: 1.5; color: #333;">{{ item.name }}</p>
-            {% if item.variant %}
-                <br />
-                {% if item.variant.size %}
-                    Size: {{ item.variant.size }}
-                {% endif %}
-                {% if item.variant.color %}
-                    Color: {{ item.variant.color }}
-                {% endif %}
-                {% if item.variant.measurement %}
-                    Measurement: {{ item.variant.measurement }}
-                {% endif %}
-                {% if item.variant.age %}
-                    Age: {{ item.variant.age }}
-                {% endif %}
-            {% endif %}
+        <td style="padding: 15px; border-bottom: 1px solid #e5e7eb;">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <!-- Product Image Column -->
+                    <td width="80" valign="top" style="padding-right: 15px;">
+                        {% if item.image %}
+                        <img src="{{ item.image | normalize_image }}" alt="{{ item.name }}" width="80" height="80"
+                            style="display: block; width: 80px; height: 80px; border-radius: 4px; object-fit: cover;" />
+                        {% else %}
+                        <table border="0" cellpadding="0" cellspacing="0" width="80" height="80"
+                            style="background-color: #f3f4f6; border-radius: 4px;">
+                            <tr>
+                                <td align="center" valign="middle"
+                                    style="color: #6b7280; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 12px;">
+                                    No Image
+                                </td>
+                            </tr>
+                        </table>
+                        {% endif %}
+                    </td>
+
+                    <!-- Product Details Column -->
+                    <td valign="top">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <!-- Product Name -->
+                            <tr>
+                                <td style="padding-bottom: 5px;">
+                                    <span
+                                        style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 16px; font-weight: bold; color: #111827;">
+                                        {{ item.name }}
+                                    </span>
+                                </td>
+                            </tr>
+
+                            <!-- Quantity -->
+                            <tr>
+                                <td style="padding-bottom: 5px;">
+                                    <span
+                                        style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #6b7280;">
+                                        Quantity: {{ item.quantity }}
+                                    </span>
+                                </td>
+                            </tr>
+
+                            <!-- Price -->
+                            <tr>
+                                <td style="padding-bottom: 5px;">
+                                    <span
+                                        style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 14px; font-weight: bold; color: #111827;">
+                                        {{ item.price | naira }}
+                                    </span>
+                                </td>
+                            </tr>
+
+                            <!-- Variant Information -->
+                            {% if item.variant %}
+                            <tr>
+                                <td style="padding-top: 5px;">
+                                    <table border="0" cellpadding="0" cellspacing="0">
+                                        {% if item.variant.size %}
+                                        <tr>
+                                            <td
+                                                style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #6b7280; padding-bottom: 2px;">
+                                                Size: {{ item.variant.size }}
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                        {% if item.variant.color %}
+                                        <tr>
+                                            <td
+                                                style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #6b7280; padding-bottom: 2px;">
+                                                Color: {{ item.variant.color }}
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                        {% if item.variant.measurement %}
+                                        <tr>
+                                            <td
+                                                style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #6b7280; padding-bottom: 2px;">
+                                                Measurement: {{ item.variant.measurement }}
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                        {% if item.variant.age %}
+                                        <tr>
+                                            <td
+                                                style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #6b7280; padding-bottom: 2px;">
+                                                Age: {{ item.variant.age }}
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                    </table>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </td>
+                </tr>
+            </table>
         </td>
-        <td style="padding: 10px; text-align: center; border-bottom: 1px solid #dee2e6">
-            <img src="{{item.image | normalize_image }}" alt="Product 1" style="width: 80px; height: 80px" />
-        </td>
-        <td style="padding: 10px; text-align: right; border-bottom: 1px solid #dee2e6">{{ item.quantity }}</td>
-        <td style="padding: 10px; text-align: right; border-bottom: 1px solid #dee2e6">{{ item.price | naira }}</td>
     </tr>
     {% endfor %}
-    <tr>
-        <td colspan="3" style="padding: 10px 10px 5px; text-align: right; font-weight: bold">Subtotal:</td>
-        <td style="padding: 10px 10px 5px; text-align: right">{{ order.subtotal | naira }}</td>
-    </tr>
-    <tr>
-        <td colspan="3" style="padding: 5px 10px; text-align: right; font-weight: bold">Tax:</td>
-        <td style="padding: 5px 10px; text-align: right">{{ order.tax | naira }}</td>
-    </tr>
-    <tr>
-        <td colspan="3" style="padding: 5px 10px; text-align: right; font-weight: bold">Delivery Fee:</td>
-        <td style="padding: 5px 10px; text-align: right">{{ order.shipping_fee | naira }}</td>
-    </tr>
-    {% if order.discount_amount %}
-    <tr>
-        <td colspan="3" style="padding: 5px 10px; text-align: right; font-weight: bold">Discount:</td>
-        <td style="padding: 5px 10px; text-align: right; color: green">{{ order.discount_amount | naira }}</td>
-    </tr>
-    {% endif %}
-    <tr>
-        <td colspan="3" style="padding: 10px; text-align: right; font-weight: bold">Total:</td>
-        <td style="padding: 10px; text-align: right; font-weight: bold; color: #007bff">{{ order.total | naira }}</td>
-    </tr>
 </table>
 
-<p>Payment Method: {{order.payment_method}}</p>
-<p>Shipping Address:</p>
-<p style="margin-left: 20px">
-    {{order.user.first_name}} {{order.user.last_name}}<br />
-    {{order.shipping_address.address_1}}<br />
-    {{order.shipping_address.city}}, {{order.shipping_address.state}}<br />
-    Nigeria
-</p>
+<!-- Order Summary -->
+<table border="0" cellpadding="15" cellspacing="0" width="100%"
+    style="background-color: #f8fafc; border-radius: 8px; margin: 20px 0;">
+    <tr>
+        <td>
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <!-- Subtotal Row -->
+                <tr>
+                    <td style="padding-bottom: 5px;">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td align="left"
+                                    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #111827;">
+                                    Subtotal:
+                                </td>
+                                <td align="right"
+                                    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #111827;">
+                                    {{ order.subtotal | naira }}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- Tax Row (if exists) -->
+                {% if order.tax %}
+                <tr>
+                    <td style="padding-bottom: 5px;">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td align="left"
+                                    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #111827;">
+                                    Tax:
+                                </td>
+                                <td align="right"
+                                    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #111827;">
+                                    {{ order.tax | naira }}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                {% endif %}
+
+                <!-- Shipping Row (if exists) -->
+                {% if order.shipping_fee %}
+                <tr>
+                    <td style="padding-bottom: 5px;">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td align="left"
+                                    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #111827;">
+                                    Shipping:
+                                </td>
+                                <td align="right"
+                                    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #111827;">
+                                    {{ order.shipping_fee | naira }}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                {% endif %}
+
+                <!-- Discount Row (if exists) -->
+                {% if order.discount_amount %}
+                <tr>
+                    <td style="padding-bottom: 5px;">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td align="left"
+                                    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #111827;">
+                                    Discount:
+                                </td>
+                                <td align="right"
+                                    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 14px; color: green;">
+                                    - {{ order.discount_amount | naira }}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                {% endif %}
+
+                <!-- Total Row -->
+                <tr>
+                    <td style="border-top: 1px solid #e5e7eb; padding-top: 10px; margin-top: 10px;">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td align="left"
+                                    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 18px; font-weight: bold; color: #111827;">
+                                    Total:
+                                </td>
+                                <td align="right"
+                                    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 18px; font-weight: bold; color: #111827;">
+                                    {{ order.total | naira }}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>

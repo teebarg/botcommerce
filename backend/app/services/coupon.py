@@ -74,7 +74,7 @@ class CouponService:
                     detail="This coupon is not available for your account"
                 )
 
-        # Validate cart requirements if cart is provided
+        # Validate cart requirements
         if cart:
             cart_items = await db.cartitem.find_many(
                 where={"cart_id": cart.id}
@@ -86,7 +86,7 @@ class CouponService:
                 if current_subtotal < coupon.min_cart_value:
                     raise HTTPException(
                         status_code=400,
-                        detail=f"Minimum cart value of ${coupon.min_cart_value} required to use this coupon"
+                        detail=f"Minimum cart value of ₦{coupon.min_cart_value:,.2f} required to use this coupon"
                     )
 
             if coupon.min_item_quantity:
