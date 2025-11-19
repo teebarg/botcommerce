@@ -44,7 +44,7 @@ const Overlay: React.FC<OverlayProps> = ({
     return (
         <Drawer open={open} onOpenChange={onOpenChange}>
             <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-            <DrawerContent aria-describedby={undefined} className="h-dvh overflow-y-auto touch-manipulation">
+            <DrawerContent aria-describedby={undefined} className="h-dvh max-h-dvh touch-manipulation">
                 <DrawerHeader className={showHeader ? "" : "sr-only"}>
                     <DrawerTitle>{title}</DrawerTitle>
                 </DrawerHeader>

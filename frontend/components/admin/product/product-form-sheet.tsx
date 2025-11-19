@@ -96,7 +96,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
             {currentProduct && <ImageDownloadButton fallbackName={currentProduct.slug} url={currentProduct.image} />}
 
             <div className="grid gap-6">
-                <Card className="p-4 bg-card shadow-sm">
+                <Card className="p-4 shadow-sm">
                     <div className="space-y-2">
                         <Label className="text-sm font-medium flex items-center gap-2" htmlFor="name">
                             <Package className="w-4 h-4 text-primary" />
@@ -112,7 +112,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                         {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
                     </div>
                 </Card>
-                <Card className="p-4 bg-card shadow-sm">
+                <Card className="p-4 shadow-sm">
                     <div className="space-y-2">
                         <Label className="text-sm font-medium flex items-center gap-2" htmlFor="description">
                             <FileText className="w-4 h-4 text-primary" />
@@ -140,7 +140,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-4">
-                    <Card className="p-4 bg-card shadow-sm">
+                    <Card className="p-4 shadow-sm">
                         <div className="space-y-2">
                             <Label className="text-sm font-medium flex items-center gap-2">
                                 <Tag className="w-4 h-4 text-primary" />
@@ -155,7 +155,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                         </div>
                     </Card>
 
-                    <Card className="p-4 bg-card shadow-sm">
+                    <Card className="p-4 shadow-sm">
                         <div className="space-y-2">
                             <Label className="text-sm font-medium flex items-center gap-2">
                                 <Tag className="w-4 h-4 text-primary" />

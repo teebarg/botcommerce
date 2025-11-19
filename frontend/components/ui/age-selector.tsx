@@ -44,7 +44,7 @@ export const AgeRangeSelector = ({ selectedRange, onChange }: AgeRangeSelectorPr
                             key={range}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                                 selectedRange === range
-                                    ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-md scale-105"
+                                    ? "bg-primary text-primary-foreground shadow-md scale-105"
                                     : "bg-muted text-muted-foreground hover:bg-border hover:scale-105"
                             }`}
                             type="button"
@@ -55,7 +55,7 @@ export const AgeRangeSelector = ({ selectedRange, onChange }: AgeRangeSelectorPr
                     ))}
                     {isCustomValue && (
                         <button
-                            className={`px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-md scale-105`}
+                            className="px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground shadow-md scale-105"
                             type="button"
                             onClick={() => toggleRange(selectedRange.trim())}
                         >

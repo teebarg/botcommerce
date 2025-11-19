@@ -27,8 +27,10 @@ export const CouponList = () => {
     };
 
     const handleDelete = async (id: number, code: string) => {
+        const toastId = toast.loading("Deleting coupon...");
         try {
             await deleteMutation.mutateAsync(id);
+            toast.success("Coupon deleted successfully", { id: toastId });
         } catch (error) {}
     };
 
