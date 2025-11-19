@@ -46,22 +46,22 @@
                                                 style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #6b7280; line-height: 1.6;">
                                                 {% if order.shipping_method == 'PICKUP' %}
                                                     <!-- Pickup Information -->
-                                                    <strong>{{ project_name }}</strong><br />
-                                                    {{ address }}<br />
-                                                    Nigeria
+                                                    <strong>{{ project_name }},</strong><br />
+                                                    {{ address }},<br />
+                                                    Nigeria.
                                                     {% if phone %}
                                                     <br />Phone: {{ phone }}
                                                     {% endif %}
                                                 {% else %}
                                                     <!-- Shipping Information -->
-                                                    {{ order.user.first_name }} {{ order.user.last_name }}<br />
-                                                    {{ order.shipping_address.address_1 }}<br />
+                                                    {{ order.user.first_name }} {{ order.user.last_name }},<br />
+                                                    {{ order.shipping_address.address_1 }},<br />
                                                     {% if order.shipping_address.address_2 %}
-                                                    {{ order.shipping_address.address_2 }}<br />
+                                                    {{ order.shipping_address.address_2 }},<br />
                                                     {% endif %}
                                                     {{ order.shipping_address.city }}, {{ order.shipping_address.state
-                                                    }}<br />
-                                                    Nigeria
+                                                    }},<br />
+                                                    Nigeria.
                                                     {% if order.shipping_address.phone %}
                                                     <br />Phone: {{ order.shipping_address.phone }}
                                                     {% endif %}

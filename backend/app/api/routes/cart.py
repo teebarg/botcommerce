@@ -219,6 +219,9 @@ async def update_cart(cart_update: CartUpdate, user: UserDep, cartId: str = Head
     if cart_update.email:
         update_data["email"] = cart_update.email
 
+    if cart_update.phone:
+        update_data["phone"] = cart_update.phone
+
     if cart_update.payment_method:
         update_data["payment_method"] = cart_update.payment_method
 

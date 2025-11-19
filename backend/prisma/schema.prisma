@@ -328,6 +328,7 @@ model Order {
   billing_address_id  Int?
 
   email           String?
+  phone           String?
   order_items     OrderItem[]
   total           Float           @db.DoublePrecision
   subtotal        Float           @db.DoublePrecision
@@ -459,6 +460,7 @@ model Cart {
   status          CartStatus      @default(ACTIVE) // Tracks if cart is active, abandoned, or converted
   order           Order?          @relation // Links to the order if cart is converted
   email           String?
+  phone           String?
   total           Float           @default(0) @db.DoublePrecision
   subtotal        Float           @default(0) @db.DoublePrecision
   tax             Float           @default(0) @db.DoublePrecision
@@ -531,6 +533,7 @@ model User {
   Conversation         Conversation[]
   SharedCollectionView SharedCollectionView[]
   CouponUsage          CouponUsage[]
+  PushSubscription     PushSubscription[]
 
   @@index([first_name, last_name, email])
   @@map("users")
@@ -707,4 +710,19 @@ model SharedCollectionView {
   timestamp            DateTime         @default(now())
 
   @@map("shared_collection_views")
+}
+
+model PushSubscription {
+  id       String @id @default(cuid())
+  endpoint String @unique
+  p256dh   String @db.Text
+  auth     String @db.Text
+
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+
+  @@map("push_subscriptions")
 }

@@ -39,6 +39,7 @@ class CartResponse(BaseModel):
     user_id: Optional[int] = None
     cart_number: Optional[str] = None
     email: Optional[str] = None
+    phone: Optional[str] = None
     status: Optional[CartStatus] = None
     items: Optional[list[CartItemResponse]] = []
     payment_method: Optional[PaymentMethod] = None
@@ -78,6 +79,7 @@ class CartUpdate(BaseModel):
     shipping_address: Optional[CartAddress] = None
     billing_address: Optional[CartAddress] = None
     email: Optional[str] = None
+    phone: Optional[str] = None
     shipping_method: Optional[ShippingMethod] = None
     payment_method: Optional[PaymentMethod] = None
     status: Optional[CartStatus] = None

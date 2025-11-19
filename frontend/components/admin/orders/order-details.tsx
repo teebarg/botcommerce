@@ -192,7 +192,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                         </div>
                         <div className="px-2 py-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <h3 className="text-sm font-medium text-muted-foreground">Contact Details</h3>
+                                <h3 className="text-sm font-medium text-muted-foreground">Contact Details2</h3>
                                 <p className="font-medium">
                                     {order.user?.first_name} {order.user?.last_name}
                                 </p>
@@ -211,6 +211,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                         </p>
                                     </>
                                 )}
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-medium text-muted-foreground">Contact Number</h3>
+                                <p>{order?.phone}</p>
                             </div>
                         </div>
                     </div>

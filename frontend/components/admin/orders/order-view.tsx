@@ -25,7 +25,7 @@ const OrderView: React.FC = () => {
 
     const searchParams = useSearchParams();
 
-    const page = Number(searchParams.get("page")) || 1;
+    const skip = Number(searchParams.get("skip")) || 0;
     const status = searchParams.get("status") || "";
     const start_date = searchParams.get("start_date") || "";
     const end_date = searchParams.get("end_date") || "";
@@ -37,7 +37,7 @@ const OrderView: React.FC = () => {
     };
 
     const { data, isLoading } = useOrders({
-        skip: (page - 1) * LIMIT,
+        skip,
         take: LIMIT,
         ...filters,
     });

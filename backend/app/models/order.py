@@ -18,6 +18,7 @@ class OrderCreate(BaseModel):
 class OrderResponse(BaseModel):
     id: int
     email: Optional[EmailStr] = None
+    phone: Optional[str] = None
     order_number: str
     user_id: int
     user: Optional[User]
@@ -44,6 +45,7 @@ class OrderResponse(BaseModel):
 class Order(BaseModel):
     id: int
     email: Optional[EmailStr] = None
+    phone: Optional[str] = None
     order_number: str
     user_id: int
     user: User

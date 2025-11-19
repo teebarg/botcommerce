@@ -26,6 +26,7 @@ export const OrderSchema = z
         order_number: z.string(),
         status: OrderStatusSchema,
         email: z.string(),
+        phone: z.string().optional(),
         cart_id: z.string(),
         cart_number: z.string(),
         user_id: z.number(),

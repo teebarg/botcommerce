@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from app.models.generic import Message
 from app.core.logging import get_logger
 from app.services.redis import redis_client
+from app.prisma_client import prisma as db
 
 from typing import Optional, Literal
 from datetime import datetime
@@ -36,6 +37,10 @@ async def create_push_event(data: PushEventSchema):
 
 @router.post("/push-fcm")
 async def push_fcm(data: FCMIn):
-    logger.error(data)
     await redis_client.xadd("FCM", jsonable_encoder(data, exclude_none=True))
+    try:
+        await db.pushsubscription.create(data={**data.model_dump()})
+    except Exception as e:
+        logger.error(f"Failed to create subs: {str(e)}")
+        raise Exception(f"Database error: {str(e)}")
     return {"message": "success"}
