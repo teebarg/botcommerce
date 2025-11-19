@@ -35,7 +35,10 @@ export const CartSchema = z
         user_id: z.number().optional(),
         user: UserSchema.optional(),
         email: z.string().email().optional(),
-        phone: z.string().regex(/^\+?[1-9]\d{1,14}$/).optional(),
+        phone: z
+            .string()
+            .regex(/^\+?[1-9]\d{1,14}$/)
+            .optional(),
         status: CartStatusSchema,
         items: z.array(CartItemSchema),
         checkout_step: z.enum(["address", "delivery", "payment"]).default("address").optional(),

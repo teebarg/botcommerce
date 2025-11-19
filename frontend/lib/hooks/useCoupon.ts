@@ -159,12 +159,11 @@ type CouponAnalyticsResponse = {
         start_date: string;
         end_date: string;
     };
-}
+};
 
 export const useCouponsAnalytics = () => {
     return useQuery({
         queryKey: ["coupons"],
-        queryFn: async () =>
-            await api.get<CouponAnalyticsResponse>("/coupon/analytics"),
+        queryFn: async () => await api.get<CouponAnalyticsResponse>("/coupon/analytics"),
     });
 };
