@@ -125,10 +125,11 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
                     <Edit className="h-4 w-4" />
                 </Button>
             }
+            sheetClassName="min-w-[35vw]"
             onOpenChange={state.setOpen}
         >
             <Form {...form}>
-                <form className="space-y-4 py-6 px-4 mt-6 overflow-auto" onSubmit={form.handleSubmit(onSubmit)}>
+                <form className="space-y-4 py-6 px-2 md:px-4 mt-6 overflow-auto" onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="flex justify-between items-center">
                         <h2 className="text-lg font-semibold">Edit Coupon</h2>
                     </div>

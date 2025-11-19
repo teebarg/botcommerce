@@ -87,9 +87,10 @@ export const CreateCouponDialog = () => {
                 </Button>
             }
             onOpenChange={state.setOpen}
+            sheetClassName="min-w-[35vw]"
         >
             <Form {...form}>
-                <form className="space-y-4 mt-4 px-2 py-8 overflow-auto" onSubmit={form.handleSubmit(onSubmit)}>
+                <form className="space-y-4 mt-4 px-2 md:px-4 py-8 overflow-auto" onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="flex justify-between items-center">
                         <h2 className="text-lg font-semibold">Create Coupon</h2>
                     </div>

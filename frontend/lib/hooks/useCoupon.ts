@@ -148,3 +148,23 @@ export const useAssignCoupon = () => {
         },
     });
 };
+
+type CouponAnalyticsResponse = {
+    total_coupons: number;
+    used_coupons: number;
+    total_redemptions: number;
+    active_coupons: number;
+    avg_redemption_rate: number;
+    date_range: {
+        start_date: string;
+        end_date: string;
+    };
+}
+
+export const useCouponsAnalytics = () => {
+    return useQuery({
+        queryKey: ["coupons"],
+        queryFn: async () =>
+            await api.get<CouponAnalyticsResponse>("/coupon/analytics"),
+    });
+};

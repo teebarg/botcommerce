@@ -6,6 +6,7 @@ import { CreateCouponDialog } from "@/components/admin/coupons/create-coupon-dia
 import { CouponList } from "@/components/admin/coupons/coupon-list";
 import { Separator } from "@/components/ui/separator";
 import LocalizedClientLink from "@/components/ui/link";
+import AnalyticsStats from "./analytics-stats";
 
 const Coupon = () => {
     return (
@@ -27,6 +28,7 @@ const Coupon = () => {
                 </div>
             </div>
             <Separator className="mb-6" />
+            <AnalyticsStats />
             <CouponList />
         </div>
     );

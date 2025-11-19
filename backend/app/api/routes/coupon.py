@@ -7,7 +7,7 @@ from app.models.coupon import (
     CouponResponse,
     CouponValidateRequest,
     CouponValidateResponse,
-    CouponsList,
+    CouponsList, CouponScope, CouponAnalyticsResponse
 )
 from app.services.coupon import CouponService
 from app.prisma_client import prisma as db
@@ -15,7 +15,7 @@ from app.prisma_client import prisma as db
 from app.core.logging import get_logger
 from app.services.redis import cache_response, invalidate_pattern
 from prisma.errors import PrismaError
-from app.models.coupon import CouponScope
+from datetime import datetime, date
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -58,17 +58,6 @@ async def get_coupons(
         total_count=total_count,
         total_pages=(total_count + limit - 1) // limit
     )
-
-
-@router.get("/{id}", response_model=CouponResponse)
-async def get_coupon(id: int):
-    """
-    Get a coupon by ID.
-    """
-    coupon = await db.coupon.find_unique(where={"id": id})
-    if not coupon:
-        raise HTTPException(status_code=404, detail="Coupon not found")
-    return coupon
 
 
 @router.post("/", dependencies=[Depends(get_current_superuser)], response_model=CouponResponse)
@@ -312,3 +301,140 @@ async def toggle_coupon_status(id: int):
     except PrismaError as e:
         logger.error(f"Error toggling coupon status: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+
+@router.get("/analytics", response_model=CouponAnalyticsResponse)
+async def get_coupon_analytics(
+    start_date: Optional[date] = Query(None, description="Filter coupons created from this date"),
+    end_date: Optional[date] = Query(None, description="Filter coupons created until this date")
+):
+    """
+    Get comprehensive coupon analytics with optional date range filtering.
+    """
+    
+    date_filter = {}
+    if start_date or end_date:
+        date_filter["created_at"] = {}
+        if start_date:
+            date_filter["created_at"]["gte"] = datetime.combine(start_date, datetime.min.time())
+        if end_date:
+            date_filter["created_at"]["lte"] = datetime.combine(end_date, datetime.max.time())
+    
+    total_coupons = await db.coupon.count(
+        where=date_filter if date_filter else None
+    )
+    
+    used_filter = {
+        "current_uses": {"gt": 0}
+    }
+    if date_filter:
+        used_filter.update(date_filter)
+    used_filter = {
+        "current_uses": {"gt": 0}
+    }
+    if date_filter:
+        used_filter.update(date_filter)
+    
+    used_coupons = await db.coupon.count(
+        where=used_filter
+    )
+    
+    coupons_with_uses = await db.coupon.find_many(
+        where=date_filter if date_filter else None,
+    )
+    total_redemptions = sum(coupon.current_uses for coupon in coupons_with_uses)
+    
+    now = datetime.utcnow()
+    
+    active_filter = {
+        "is_active": True,
+        "OR": [
+            {"valid_from": None},
+            {"valid_from": {"lte": now}}
+        ],
+        "AND": [
+            {
+                "OR": [
+                    {"valid_until": None},
+                    {"valid_until": {"gte": now}}
+                ]
+            }
+        ]
+    }
+    
+    if date_filter:
+        active_filter.update(date_filter)
+    
+    active_coupons_data = await db.coupon.find_many(where=active_filter)    
+    active_coupons = sum(
+        1 for coupon in active_coupons_data 
+        if coupon.max_uses == 0 or coupon.current_uses < coupon.max_uses
+    )
+    
+    avg_redemption_rate = (used_coupons / total_coupons * 100) if total_coupons > 0 else 0.0
+    
+    return CouponAnalyticsResponse(
+        total_coupons=total_coupons,
+        used_coupons=used_coupons,
+        total_redemptions=total_redemptions,
+        active_coupons=active_coupons,
+        avg_redemption_rate=round(avg_redemption_rate, 2),
+        date_range={
+            "start_date": start_date.isoformat() if start_date else None,
+            "end_date": end_date.isoformat() if end_date else None
+        }
+    )
+
+@router.get("/detailed")
+async def get_detailed_coupon_analytics(
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None)
+):
+    """
+    Get detailed coupon analytics including breakdown by discount type, scope, etc.
+    """
+    date_filter = {}
+    if start_date or end_date:
+        date_filter["created_at"] = {}
+        if start_date:
+            date_filter["created_at"]["gte"] = datetime.combine(start_date, datetime.min.time())
+        if end_date:
+            date_filter["created_at"]["lte"] = datetime.combine(end_date, datetime.max.time())
+    
+    coupons = await db.coupon.find_many(
+        where=date_filter if date_filter else None,
+    )
+    
+    # By type
+    by_type = {}
+    for coupon in coupons:
+        discount_type = coupon.discount_type
+        by_type[discount_type] = by_type.get(discount_type, 0) + 1
+    
+    # By scope
+    by_scope = {}
+    for coupon in coupons:
+        scope = coupon.scope
+        by_scope[scope] = by_scope.get(scope, 0) + 1
+    
+    # Top performing coupons
+    top_coupons = sorted(coupons, key=lambda x: x.current_uses, reverse=True)[:10]
+    top_coupons_data = [
+        {
+            "code": coupon.code,
+            "redemptions": coupon.current_uses,
+            "discount_type": coupon.discount_type,
+            "discount_value": coupon.discount_value
+        }
+        for coupon in top_coupons
+    ]
+    
+    return {
+        "breakdown_by_discount_type": by_type,
+        "breakdown_by_scope": by_scope,
+        "top_performing_coupons": top_coupons_data,
+        "date_range": {
+            "start_date": start_date.isoformat() if start_date else None,
+            "end_date": end_date.isoformat() if end_date else None
+        }
+    }
