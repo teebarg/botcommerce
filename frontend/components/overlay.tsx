@@ -44,12 +44,12 @@ const Overlay: React.FC<OverlayProps> = ({
     return (
         <Drawer open={open} onOpenChange={onOpenChange}>
             <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-            <DrawerContent aria-describedby={undefined}>
+            <DrawerContent aria-describedby={undefined} className="h-dvh overflow-y-auto touch-manipulation">
                 <DrawerHeader className={showHeader ? "" : "sr-only"}>
                     <DrawerTitle>{title}</DrawerTitle>
                 </DrawerHeader>
                 {showCloseButton && (
-                    <DrawerClose className="absolute top-4 right-4 z-70">
+                    <DrawerClose className="absolute top-4 right-4 z-70 p-2">
                         <X className="h-5 w-5" />
                     </DrawerClose>
                 )}
