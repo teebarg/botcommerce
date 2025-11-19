@@ -31,6 +31,7 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
     data = {
             "order_number": order_number,
             "email": cart.email,
+            "phone": cart.phone,
             "total": cart.total,
             "subtotal": cart.subtotal,
             "tax": cart.tax,

@@ -9,6 +9,9 @@ import { Message } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
 import { Button } from "@/components/ui/button";
 
+const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
+const CHECK_INTERVAL = 60 * 60 * 1000; // Check every hour
+
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
     try {
         // Add padding to make length a multiple of 4
@@ -31,12 +34,52 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
     }
 }
 
+function getStoredSubscriptionKeys() {
+    const stored = localStorage.getItem("push_subscription_keys");
+    return stored ? JSON.parse(stored) : null;
+}
+
+function hasSubscriptionChanged(currentSub: PushSubscription) {
+    const stored = getStoredSubscriptionKeys();
+    if (!stored) return true;
+
+    const current = {
+        endpoint: currentSub.endpoint,
+        p256dh: currentSub.toJSON().keys?.p256dh || "",
+        auth: currentSub.toJSON().keys?.auth || "",
+    };
+
+    return stored.endpoint !== current.endpoint || stored.p256dh !== current.p256dh || stored.auth !== current.auth;
+}
+
+function storeSubscriptionKeys(sub: PushSubscription) {
+    const subscriptionData = {
+        endpoint: sub.endpoint,
+        p256dh: sub.toJSON().keys?.p256dh || "",
+        auth: sub.toJSON().keys?.auth || "",
+    };
+    localStorage.setItem("push_subscription_keys", JSON.stringify(subscriptionData));
+}
+
 export default function PushPermission() {
     const [permission, setPermission] = useState("granted");
     const [subscription, setSubscription] = useState<PushSubscription | any | null>(null);
     const [isDismissed, setIsDismissed] = useState<boolean>(false);
 
     useEffect(() => {
+        const dismissedAt = localStorage.getItem("push_dismissed_at");
+        if (dismissedAt) {
+            const dismissedTime = parseInt(dismissedAt, 10);
+            const now = Date.now();
+
+            if (now - dismissedTime < DISMISS_DURATION) {
+                setIsDismissed(true);
+            } else {
+                localStorage.removeItem("push_dismissed_at");
+                setIsDismissed(false);
+            }
+        }
+
         if (localStorage.getItem("push_synced") === "true") {
             setIsDismissed(true);
         }
@@ -51,16 +94,30 @@ export default function PushPermission() {
         }
     }, [permission]);
 
-    async function registerServiceWorker() {
-        const registration = await navigator.serviceWorker.ready;
-        const sub = await registration.pushManager.getSubscription();
+    useEffect(() => {
+        if (permission !== "granted") return;
 
-        if (!sub) {
-            setIsDismissed(false);
+        const checkSubscriptionChanges = async () => {
+            try {
+                const registration = await navigator.serviceWorker.ready;
+                const sub = await registration.pushManager.getSubscription();
 
-            return;
-        }
+                if (sub && hasSubscriptionChanged(sub)) {
+                    console.log("Subscription changed, syncing with backend...");
+                    await syncSubscriptionToBackend(sub);
+                }
+            } catch (error) {
+                console.error("Error checking subscription:", error);
+            }
+        };
 
+        checkSubscriptionChanges();
+        const intervalId = setInterval(checkSubscriptionChanges, CHECK_INTERVAL);
+
+        return () => clearInterval(intervalId);
+    }, [permission]);
+
+    async function syncSubscriptionToBackend(sub: PushSubscription) {
         const subscriptionData = {
             endpoint: sub.endpoint,
             p256dh: sub.toJSON().keys?.p256dh || "",
@@ -71,12 +128,29 @@ export default function PushPermission() {
 
         if (error) {
             toast.error(error);
+            return false;
+        }
 
+        storeSubscriptionKeys(sub);
+        setSubscription(sub);
+        localStorage.setItem("push_synced", "true");
+        return true;
+    }
+
+    async function registerServiceWorker() {
+        const registration = await navigator.serviceWorker.ready;
+        const sub = await registration.pushManager.getSubscription();
+
+        if (!sub) {
+            setIsDismissed(false);
             return;
         }
 
-        setSubscription(sub);
-        localStorage.setItem("push_synced", "true");
+        if (hasSubscriptionChanged(sub)) {
+            await syncSubscriptionToBackend(sub);
+        } else {
+            setSubscription(sub);
+        }
     }
 
     async function handleNotificationOptIn() {
@@ -87,7 +161,6 @@ export default function PushPermission() {
             toast.error("You blocked notifications. Please re-enable in browser settings.", {
                 duration: 5000,
             });
-
             return;
         }
         await subscribeToPush();
@@ -110,26 +183,15 @@ export default function PushPermission() {
             toast.error("You blocked notifications. Please re-enable in browser settings.", {
                 duration: 5000,
             });
-
             return;
         }
 
-        const subscriptionData = {
-            endpoint: sub.endpoint,
-            p256dh: sub.toJSON().keys?.p256dh || "",
-            auth: sub.toJSON().keys?.auth || "",
-        };
+        await syncSubscriptionToBackend(sub);
+    }
 
-        const { error } = await tryCatch(api.post<Message>("/notification/push-fcm", subscriptionData));
-
-        if (error) {
-            toast.error(error);
-
-            return;
-        }
-
-        setSubscription(sub);
-        localStorage.setItem("push_synced", "true");
+    function handleDismiss() {
+        setIsDismissed(true);
+        localStorage.setItem("push_dismissed_at", Date.now().toString());
     }
 
     if (isDismissed || permission === "granted") return null;
@@ -157,13 +219,7 @@ export default function PushPermission() {
                         OK
                     </Button>
 
-                    <Button
-                        aria-label="Dismiss"
-                        size="icon"
-                        className="absolute top-2 right-2 w-auto h-auto"
-                        variant="ghost"
-                        onClick={() => setIsDismissed(true)}
-                    >
+                    <Button aria-label="Dismiss" size="icon" className="absolute top-2 right-2 w-auto h-auto" variant="ghost" onClick={handleDismiss}>
                         <X className="h-5 w-5 text-white" />
                     </Button>
                 </div>

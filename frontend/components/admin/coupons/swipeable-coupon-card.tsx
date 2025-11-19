@@ -27,7 +27,7 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
     const [isSwiping, setIsSwiping] = useState(false);
     const deleteState = useOverlayTriggerState({});
 
-    const SWIPE_THRESHOLD = -100; // Pixels to swipe before triggering delete
+    const SWIPE_THRESHOLD = -150; // Pixels to swipe before triggering delete
 
     const handlers = useSwipeable({
         onSwiping: (eventData) => {
@@ -81,7 +81,7 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                             <div className="flex flex-wrap items-center gap-2">
                                 <CardTitle className="text-lg md:text-xl font-semibold">{coupon.code}</CardTitle>
-                                <Badge variant={coupon.is_active ? "emerald" : "secondary"}>{coupon.is_active ? "Active" : "Inactive"}</Badge>
+                                <Badge variant={coupon.is_active ? "emerald" : "destructive"}>{coupon.is_active ? "Active" : "Inactive"}</Badge>
                                 {coupon.scope === "SPECIFIC_USERS" && <Badge variant="warning">VIP Only</Badge>}
                             </div>
                             <div className="flex gap-2 self-start sm:self-auto">
@@ -94,7 +94,7 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
                                 </Button>
                                 <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                                     <DialogTrigger asChild>
-                                        <Button size="icon" variant="ghost">
+                                        <Button className="h-9 w-9" size="icon" variant="ghost">
                                             <Trash2 className="text-red-500 h-4 w-4 cursor-pointer" />
                                         </Button>
                                     </DialogTrigger>
@@ -118,7 +118,7 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
                         <div className="flex items-center justify-between pb-3 border-b">
                             <CouponUsageDialog couponCode={coupon.code} couponType={coupon.discount_type} usageHistory={coupon.usages || []} />
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 text-sm">
+                        <div className="grid grid-cols-2 md:grid-cols-6 gap-3 text-sm">
                             <div>
                                 <p className="text-muted-foreground">Discount</p>
                                 <p className="font-medium">
@@ -137,7 +137,7 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
                                     <p className="font-medium">{currency(coupon.min_cart_value)}</p>
                                 </div>
                             )}
-                            {coupon.min_item_quantity && (
+                            {Number(coupon.min_item_quantity) > 0 && (
                                 <div>
                                     <p className="text-muted-foreground">Min Items</p>
                                     <p className="font-medium">{coupon.min_item_quantity}</p>

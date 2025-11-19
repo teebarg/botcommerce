@@ -304,13 +304,6 @@ async def start_websocket_manager():
     await manager.start()
 
 
-@app.post("/api/notify-order")
-async def notify_order(order_id: int):
-    formatted_text = f"New order received: {order_id}\nsecond line"
-    logger.publish(formatted_text, extra={"channel": "orders"})
-    return {"message": f"Order notification sent for order {order_id}"}
-
-
 @app.post("/api/invalidate-react")
 async def invalidate_react(key: str):
     await manager.broadcast_to_all(

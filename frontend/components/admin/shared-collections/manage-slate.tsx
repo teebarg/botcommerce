@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Plus, Check, Trash2 } from "lucide-react";
+import { Plus, Check, Trash2, Boxes } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { useSession } from "next-auth/react";
 
@@ -30,7 +30,16 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
     }
 
     return (
-        <Overlay open={state.isOpen} title="Manage Catalogs" trigger={<Button size="sm">Catalogs</Button>} onOpenChange={state.setOpen}>
+        <Overlay
+            open={state.isOpen}
+            title="Manage Catalogs"
+            trigger={
+                <Button size="icon" className="p-2">
+                    <Boxes className="h-4 w-4" />
+                </Button>
+            }
+            onOpenChange={state.setOpen}
+        >
             <div className="bg-background overflow-auto">
                 <div className="p-4">
                     <h3 className="text-lg font-semibold">Manage Catalogs</h3>

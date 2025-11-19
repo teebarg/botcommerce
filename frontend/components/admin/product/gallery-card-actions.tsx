@@ -37,7 +37,7 @@ export function GalleryCardActions({ image }: GalleryCardActionProps) {
                 sheetClassName="min-w-[40vw]"
                 title="Create Metadata"
                 trigger={
-                    <Button className="bg-white/90 text-black hover:bg-white" size="sm" onClick={editState.open}>
+                    <Button className="bg-white/90 text-black hover:bg-white p-2" size="icon" onClick={editState.open}>
                         <Edit2 className="h-4 w-4" />
                     </Button>
                 }

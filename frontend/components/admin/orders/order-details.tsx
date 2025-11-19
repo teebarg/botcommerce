@@ -212,6 +212,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                     </>
                                 )}
                             </div>
+                            <div>
+                                <h3 className="text-sm font-medium text-muted-foreground">Contact Number</h3>
+                                <p>{order?.phone}</p>
+                            </div>
                         </div>
                     </div>
 

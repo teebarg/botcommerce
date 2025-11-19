@@ -122,16 +122,16 @@ class CouponService:
         Apply coupon to cart and update totals.
         """
         discount_amount = await self.calculate_discount(coupon, cart.subtotal)
+        total = cart.subtotal + cart.tax + cart.shipping_fee - discount_amount
+        data = {
+            "coupon_id": coupon.id,
+            "discount_amount": discount_amount,
+            "total": total,
+        }
+        if total < 1:
+            data["payment_method"] = "COUPON"
 
-        updated_cart = await db.cart.update(
-            where={"id": cart.id},
-            data={
-                "coupon_id": coupon.id,
-                "discount_amount": discount_amount,
-                "total": cart.subtotal + cart.tax + cart.shipping_fee - discount_amount,
-                "payment_method": "COUPON"
-            }
-        )
+        updated_cart = await db.cart.update( where={"id": cart.id}, data=data)
 
         return updated_cart
 

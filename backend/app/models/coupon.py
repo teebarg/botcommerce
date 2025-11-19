@@ -81,3 +81,11 @@ class CouponsList(BaseModel):
     limit: int
     total_count: int
     total_pages: int
+
+class CouponAnalyticsResponse(BaseModel):
+    total_coupons: int
+    used_coupons: int
+    total_redemptions: int
+    active_coupons: int
+    avg_redemption_rate: float
+    date_range: dict
