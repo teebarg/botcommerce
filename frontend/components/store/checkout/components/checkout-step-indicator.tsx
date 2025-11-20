@@ -40,7 +40,7 @@ const CheckoutStepIndicator: React.FC<CheckoutStepIndicatorProps> = ({ currentSt
     const steps: CheckoutStep[] = ["delivery", "address", "payment"];
 
     return (
-        <div className="w-full bg-secondary border border-border rounded-lg py-4 px-1 mb-6 sticky top-16 z-10">
+        <div className="w-full bg-secondary border border-border rounded-lg py-4 px-1 mb-6 sticky z-20 top-16">
             <div className="flex items-center justify-between">
                 {steps.map((step: CheckoutStep, index: number) => {
                     const config = stepConfig[step];

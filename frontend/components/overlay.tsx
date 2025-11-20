@@ -50,7 +50,7 @@ const Overlay: React.FC<OverlayProps> = ({
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogTrigger asChild>{trigger}</DialogTrigger>
-            <DialogContent size="full" className={cn(isIOS && "pb-[env(safe-area-inset-bottom)]")}>
+            <DialogContent className={cn(isIOS && "pb-[env(safe-area-inset-bottom)]")} size="full">
                 <div className="overflow-y-auto">{children}</div>
             </DialogContent>
         </Dialog>

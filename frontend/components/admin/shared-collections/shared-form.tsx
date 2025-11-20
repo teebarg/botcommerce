@@ -53,7 +53,7 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
 
     return (
         <div className="px-4 py-4">
-            <h2 className="text-lg font-semibold mb-4">{current ? "Update": "Create"} Catalog</h2>
+            <h2 className="text-lg font-semibold mb-4">{current ? "Update" : "Create"} Catalog</h2>
             <Form {...form}>
                 <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
                     <FormField

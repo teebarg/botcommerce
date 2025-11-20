@@ -4,6 +4,7 @@ import { Phone } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/providers/cart-provider";
@@ -21,7 +22,7 @@ const ContactFormSchema = z.object({
 type ContactFormValues = z.infer<typeof ContactFormSchema>;
 
 const CartContactForm = () => {
-    const { cart, isLoading } = useCart();
+    const { cart } = useCart();
     const updateCartDetails = useUpdateCartDetails();
     const form = useForm<ContactFormValues>({
         resolver: zodResolver(ContactFormSchema),
@@ -42,12 +43,12 @@ const CartContactForm = () => {
                     name="phone"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="text-sm font-medium">How do we contact you? *</FormLabel>
+                            <FormLabel className="text-sm font-medium">How do we contact you?</FormLabel>
                             <FormControl>
                                 <div className="relative flex gap-2 items-center">
                                     <Phone className="absolute z-10 left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                    <Input placeholder="08031234567" className="pl-10" {...field} />
-                                    <Button onClick={handleCompleteOrder} disabled={updateCartDetails.isPending || !form.formState.isValid}>
+                                    <Input className="pl-10" placeholder="08031234567" {...field} />
+                                    <Button disabled={updateCartDetails.isPending || !form.formState.isValid} onClick={handleCompleteOrder}>
                                         {updateCartDetails.isPending ? "Saving..." : "Save"}
                                     </Button>
                                 </div>

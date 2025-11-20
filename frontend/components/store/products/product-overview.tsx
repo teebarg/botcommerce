@@ -332,11 +332,11 @@ const ProductOverview: React.FC<{
 
                     <div className={cn("flex gap-3 flex-row")}>
                         <Button disabled={loading || !selectedVariant || outOfStock} isLoading={loading} size="lg" onClick={handleAddToCartAndTrack}>
-                            <ShoppingCart className="w-5 h-5 relative z-10 hover:rotate-12 transition-transform duration-300 mr-2" />
+                            <ShoppingCart className="w-5 h-5 relative z-10 hover:rotate-12 transition-transform duration-300" />
                             <span className="relative z-10">{outOfStock ? "Out of Stock" : "Add to Cart"}</span>
                         </Button>
                         <Button disabled={loading || !selectedVariant || outOfStock} size="lg" variant="emerald" onClick={handleWhatsAppPurchase}>
-                            <MessageCircle className="w-5 h-5 relative z-10 hover:animate-bounce mr-2" />
+                            <MessageCircle className="w-5 h-5 relative z-10 hover:animate-bounce" />
                             <span className="relative z-10">WhatsApp Buy</span>
                         </Button>
                     </div>
