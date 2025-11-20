@@ -10,6 +10,7 @@ import GetApp from "@/components/get-app";
 import { SearchDialog } from "@/components/store/product-search";
 import LocalizedClientLink from "@/components/ui/link";
 import { getSiteConfig } from "@/lib/config";
+import { TestOverlay } from "@/components/text-overlay";
 
 export default async function PageLayout(props: { children: React.ReactNode }) {
     const siteConfig = await getSiteConfig();
@@ -31,6 +32,7 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
                     <GetApp />
                 </div>
             </div>
+            <TestOverlay />
             <main className="flex-1 flex flex-col">{props.children}</main>
             <Cookie />
             <ChatBotWrapper />

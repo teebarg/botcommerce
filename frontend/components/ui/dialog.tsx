@@ -32,7 +32,7 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 const DialogContent = React.forwardRef<
     React.ElementRef<typeof DialogPrimitive.Content>,
-    React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { size?: "sm" | "md" | "lg" }
+    React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { size?: "sm" | "md" | "lg" | "full" }
 >(({ className, children, size = "sm", ...props }, ref) => (
     <DialogPortal>
         <DialogOverlay />
@@ -44,6 +44,7 @@ const DialogContent = React.forwardRef<
                     "max-w-md": size == "sm",
                     "max-w-2xl": size == "md",
                     "max-w-6xl": size == "lg",
+                    "inset-0 max-w-full translate-x-0 translate-y-0 bg-red-500 p-0": size == "full",
                 },
                 className
             )}
