@@ -40,7 +40,7 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
             }
             onOpenChange={state.setOpen}
         >
-            <div className="bg-background overflow-auto">
+            <div className="pt-4">
                 <div className="p-4">
                     <h3 className="text-lg font-semibold">Manage Catalogs</h3>
                 </div>

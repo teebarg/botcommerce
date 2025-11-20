@@ -71,7 +71,7 @@ const BrandForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, curre
     };
 
     return (
-        <div className="mx-auto w-full px-2 py-6">
+        <div className="px-2 pt-4">
             <h2 className="text-xl font-semibold mb-4">{isCreate ? "Create Brand" : "Update Brand"}</h2>
             <Form {...form}>
                 <form className="h-full flex flex-col" onSubmit={handleSubmit(onSubmit)}>

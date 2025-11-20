@@ -61,7 +61,7 @@ export function FaqForm({ faq, onCancel }: FaqFormProps) {
     };
 
     return (
-        <div className="py-6 px-3 bg-card h-full">
+        <div className="py-4 px-3">
             <h2 className="text-xl font-semibold mb-4">{faq ? "Edit FAQ" : "Create New FAQ"}</h2>
 
             <Form {...form}>

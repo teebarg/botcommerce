@@ -122,7 +122,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
     const { data: timeline } = useOrderTimeline(order?.id);
 
     return (
-        <div className="px-4 sm:px-6 pb-4 bg-background overflow-y-auto">
+        <div className="px-4 sm:px-6 pb-4">
             <div className="sticky top-0 z-10 py-6 bg-background">
                 <button className="flex items-center text-muted-foreground cursor-pointer" onClick={onClose}>
                     <ArrowLeft className="w-4 h-4 mr-1" />

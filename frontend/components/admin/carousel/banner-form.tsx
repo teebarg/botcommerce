@@ -69,7 +69,7 @@ export default function BannerForm({ banner, onClose }: BannerFormProps) {
     };
 
     return (
-        <div className="bg-card py-8 px-4 h-full">
+        <div className="pt-4 px-4">
             <Form {...form}>
                 <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
                     <FormField

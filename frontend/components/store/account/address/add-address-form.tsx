@@ -54,7 +54,7 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
     };
 
     return (
-        <div className="px-2 md:px-4 py-8 bg-card h-full">
+        <div className="px-2 md:px-4 pt-4">
             <h2 className="text-lg font-semibold mb-4">Add new address</h2>
             <Form {...form}>
                 <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>

@@ -41,7 +41,7 @@ const ChatViewer: React.FC<{ chat: Chat; onClose: () => void }> = ({ chat, onClo
 
                         <div
                             className={`w-10 h-10 rounded-full overflow-hidden flex items-center justify-center ${
-                                !chat.user && "bg-gradient-to-br from-blue-500 to-purple-600"
+                                !chat.user && "bg-linear-to-br from-blue-500 to-purple-600"
                             }`}
                         >
                             {!chat.user ? (

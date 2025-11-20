@@ -1,8 +1,9 @@
-import { X } from "lucide-react";
+import { useEffect, useState } from "react";
 
-import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useMediaQuery } from "@/lib/hooks/use-media-query";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 interface OverlayProps {
     trigger: React.ReactNode;
@@ -12,7 +13,6 @@ interface OverlayProps {
     title?: string;
     sheetClassName?: string;
     showHeader?: boolean;
-    showCloseButton?: boolean;
 }
 
 const Overlay: React.FC<OverlayProps> = ({
@@ -23,9 +23,15 @@ const Overlay: React.FC<OverlayProps> = ({
     title = "Content",
     sheetClassName = "min-w-[400px]",
     showHeader = false,
-    showCloseButton = true,
 }) => {
+    const [isIOS, setIsIOS] = useState(false);
     const { isDesktop } = useMediaQuery();
+
+    useEffect(() => {
+        // Detect iOS to enable safe-area patches
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
+    }, []);
 
     if (isDesktop) {
         return (
@@ -42,20 +48,12 @@ const Overlay: React.FC<OverlayProps> = ({
     }
 
     return (
-        <Drawer open={open} onOpenChange={onOpenChange}>
-            <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-            <DrawerContent aria-describedby={undefined} className="h-dvh max-h-dvh touch-manipulation">
-                <DrawerHeader className={showHeader ? "" : "sr-only"}>
-                    <DrawerTitle>{title}</DrawerTitle>
-                </DrawerHeader>
-                {showCloseButton && (
-                    <DrawerClose className="absolute top-4 right-4 z-70 p-2">
-                        <X className="h-5 w-5" />
-                    </DrawerClose>
-                )}
-                {children}
-            </DrawerContent>
-        </Drawer>
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogTrigger asChild>{trigger}</DialogTrigger>
+            <DialogContent size="full" className={cn(isIOS && "pb-[env(safe-area-inset-bottom)]")}>
+                <div className="overflow-y-auto">{children}</div>
+            </DialogContent>
+        </Dialog>
     );
 };
 

@@ -90,15 +90,8 @@ const ProductOverview: React.FC<{
     };
 
     return (
-        <div className="z-50 overflow-y-auto duration-300 w-full rounded-[inherit]">
+        <div>
             <div className="sticky top-safe z-20 bg-background">
-                <button
-                    className="absolute top-4 right-4 z-10 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-2 rounded-full hover:bg-white dark:hover:bg-gray-700 transition-colors shadow-lg"
-                    onClick={onClose}
-                >
-                    <X className="text-gray-600 dark:text-gray-300" size={20} />
-                </button>
-
                 <div className="relative h-[60vh] overflow-hidden">
                     <MediaDisplay alt={product.name} className="object-contain rounded" url={selectedImage || product.images[0]} />
                     <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />

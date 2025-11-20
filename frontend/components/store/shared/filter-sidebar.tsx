@@ -121,8 +121,8 @@ export function FilterSidebar({ facets, onApplyComplete }: Props) {
     };
 
     return (
-        <div className="px-6 h-full overflow-y-auto bg-secondary dark:bg-secondary/30 relative">
-            <div className="flex items-center justify-between mb-4 sticky top-0 z-10 py-4 bg-secondary dark:bg-secondary/5">
+        <div className="px-6 bg-background relative pt-6">
+            <div className="flex items-center justify-between mb-4 sticky top-0 z-20 py-4 bg-background">
                 <h2 className="font-semibold text-lg">FILTER & SORT</h2>
                 <Button className="text-primary px-0 justify-end hover:bg-transparent" variant="ghost" onClick={onClearAll}>
                     Clear All
@@ -324,7 +324,7 @@ export function FilterSidebar({ facets, onApplyComplete }: Props) {
                     </div>
                 )}
             </div>
-            <div className="flex justify-center sticky bottom-0 px-4 py-4 bg-secondary dark:bg-secondary/5">
+            <div className="flex justify-center sticky bottom-0 px-4 py-4 bg-background">
                 <Button className="w-full rounded-full py-6" onClick={onApply}>
                     Apply
                 </Button>
