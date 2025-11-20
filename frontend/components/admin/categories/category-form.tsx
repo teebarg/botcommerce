@@ -70,7 +70,7 @@ const CategoryForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
     };
 
     return (
-        <div className="mx-auto w-full px-2 py-6 bg-card h-full">
+        <div className="py-4 px-4">
             <h2 className="text-xl font-semibold mb-4">{isCreate ? "Create Category" : "Update Category"}</h2>
             <Form {...form}>
                 <form className="h-full flex flex-col" onSubmit={handleSubmit(onSubmit)}>

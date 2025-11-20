@@ -46,7 +46,7 @@ const UpdateReviewForm: React.FC<Props> = ({ onClose, review }) => {
     };
 
     return (
-        <div className="py-8 px-2 md:px-4">
+        <div className="py-4 px-2 md:px-4">
             <h1 className="text-lg font-semibold mb-4">Update Review</h1>
             <Form {...form}>
                 <form className="h-full flex flex-col gap-2" onSubmit={form.handleSubmit(onSubmit)}>

@@ -69,7 +69,7 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
     };
 
     return (
-        <div className="px-2 md:px-4 py-8">
+        <div className="px-4 py-4">
             <h3 className="text-xl font-semibold mb-4">{initialData ? "Edit" : "Add"} Delivery Option</h3>
             <Form {...form}>
                 <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>

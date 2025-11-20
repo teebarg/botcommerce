@@ -138,7 +138,7 @@ export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetForm
     };
 
     return (
-        <div className="space-y-4 px-4 pt-8 min-h-[calc(100vh-5rem)] overflow-y-auto">
+        <div className="space-y-4 px-4 pt-4">
             <h2 className="text-xl font-semibold text-card-foreground">Bulk Product Details</h2>
 
             <Card className="p-4 bg-muted/50">

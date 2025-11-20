@@ -29,7 +29,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <Overlay
             open={dialogState.isOpen}
             sheetClassName="min-w-[30vw]"
-            showCloseButton={false}
             title="Details"
             trigger={
                 <div className="group relative bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">

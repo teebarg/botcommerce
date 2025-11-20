@@ -56,7 +56,7 @@ export default function CustomerForm({ user, onClose }: ReviewFormProps) {
     }
 
     return (
-        <div className="mx-auto w-full h-full py-6 px-2 bg-card">
+        <div className="pt-4 px-4">
             <h3 className="text-lg font-medium mb-4">Update Customer</h3>
             <Form {...form}>
                 <form className="space-y-6 h-full flex-1" onSubmit={form.handleSubmit(onSubmit)}>

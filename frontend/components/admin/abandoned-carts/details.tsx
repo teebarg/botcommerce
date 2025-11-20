@@ -54,7 +54,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
             }
             onOpenChange={state.setOpen}
         >
-            <div className="max-w-4xl px-2 overflow-y-auto">
+            <div className="max-w-4xl px-2">
                 <div className="-mx-2 px-2 py-6 bg-background sticky top-0 z-10">
                     <div className="flex items-center justify-between mt-4">
                         <h3 className="font-semibold text-lg flex items-center gap-2">

@@ -72,7 +72,7 @@ const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
     };
 
     return (
-        <div className="mx-auto w-full py-6 px-2 bg-card h-full">
+        <div className="py-4 px-4">
             <h3 className="text-lg font-medium mb-4">{isCreate ? "Create Collection" : "Update Collection"}</h3>
             <Form {...form}>
                 <form className="h-full flex flex-col" onSubmit={handleSubmit(onSubmit)}>

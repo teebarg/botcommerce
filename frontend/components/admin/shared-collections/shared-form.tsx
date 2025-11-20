@@ -52,59 +52,54 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
     };
 
     return (
-        <div className="px-4 py-4 overflow-y-auto bg-card h-full">
+        <div className="px-4 py-4">
+            <h2 className="text-lg font-semibold mb-4">{current ? "Update": "Create"} Catalog</h2>
             <Form {...form}>
                 <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
-                    <Card className="border-none">
-                        <CardContent className="space-y-6 px-0 md:px-0">
-                            <div className="grid md:grid-cols-2">
-                                <FormField
-                                    control={control}
-                                    name="title"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Collection Title*</FormLabel>
-                                            <FormControl>
-                                                <Input {...field} required placeholder="My Amazing Collection" />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-                            <FormField
-                                control={control}
-                                name="description"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Description</FormLabel>
-                                        <FormControl>
-                                            <Textarea {...field} placeholder="Describe your collection and what makes it special..." />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={control}
-                                name="is_active"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <div className="flex items-center justify-between p-4 bg-background rounded-lg">
-                                            <div className="space-y-1">
-                                                <FormLabel>Active Status</FormLabel>
-                                                <p className="text-sm text-muted-foreground">Make this collection visible to others</p>
-                                            </div>
-                                            <FormControl>
-                                                <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                            </FormControl>
-                                        </div>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </CardContent>
-                    </Card>
+                    <FormField
+                        control={control}
+                        name="title"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Catalog Title*</FormLabel>
+                                <FormControl>
+                                    <Input {...field} required placeholder="My Amazing Collection" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={control}
+                        name="description"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Description</FormLabel>
+                                <FormControl>
+                                    <Textarea {...field} placeholder="Describe your collection and what makes it special..." />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={control}
+                        name="is_active"
+                        render={({ field }) => (
+                            <FormItem>
+                                <div className="flex items-center justify-between p-4 bg-card rounded-lg">
+                                    <div className="space-y-1">
+                                        <FormLabel>Active Status</FormLabel>
+                                        <p className="text-sm text-muted-foreground">Make this collection visible to others</p>
+                                    </div>
+                                    <FormControl>
+                                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                    </FormControl>
+                                </div>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                     <div className="flex justify-end gap-2">
                         {onClose && (
                             <Button type="button" variant="destructive" onClick={onClose}>

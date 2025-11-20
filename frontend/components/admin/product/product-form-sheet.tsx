@@ -87,7 +87,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
     };
 
     return (
-        <div className="space-y-4 px-4 pt-8 overflow-y-auto">
+        <div className="space-y-4 px-4 pt-6">
             <div>
                 <h2 className="text-xl font-semibold text-card-foreground">Product Details</h2>
                 <p className="text-muted-foreground">Provide essential information about your product that customers will see.</p>

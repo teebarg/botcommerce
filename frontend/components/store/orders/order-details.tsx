@@ -20,8 +20,8 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
     const { settings } = useStoreSettings();
 
     return (
-        <div className="space-y-6 px-4 md:px-8 py-8 overflow-auto">
-            <div className="flex items-center gap-4">
+        <div className="space-y-6 px-4 md:px-8 py-6">
+            <div className="flex items-center gap-4 sticky top-0 z-10 bg-background py-4">
                 <Button className="flex items-center gap-2" size="sm" variant="outline" onClick={onBack}>
                     <ArrowLeft className="h-4 w-4" />
                     Back to Orders

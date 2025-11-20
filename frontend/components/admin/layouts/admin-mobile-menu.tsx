@@ -49,7 +49,7 @@ const AdminMobileMenu: React.FC = () => {
     ];
 
     return (
-        <div className="h-full rounded-[inherit] overflow-hidden overflow-y-auto">
+        <div className="h-screen rounded-[inherit] overflow-hidden overflow-y-auto">
             <div className="p-4 bg-primary text-primary-foreground sticky top-safe z-10">
                 <div className="flex items-center space-x-3">
                     <Avatar>

@@ -44,14 +44,14 @@ const DialogContent = React.forwardRef<
                     "max-w-md": size == "sm",
                     "max-w-2xl": size == "md",
                     "max-w-6xl": size == "lg",
-                    "inset-0 max-w-full translate-x-0 translate-y-0 bg-red-500 p-0": size == "full",
+                    "inset-0 max-w-full translate-x-0 translate-y-0 p-0": size == "full",
                 },
                 className
             )}
             {...props}
         >
             {children}
-            <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity data-[state=open]:bg-accent data-[state=open]:text-muted-foreground hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
+            <DialogPrimitive.Close className="absolute right-4 top-4 z-20 rounded-sm opacity-70 ring-offset-background transition-opacity data-[state=open]:bg-accent data-[state=open]:text-muted-foreground hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
                 <X className="h-4 w-4" />
                 <span className="sr-only">Close</span>
             </DialogPrimitive.Close>

@@ -42,7 +42,7 @@ export default function CustomerCreateGuest() {
             <DialogTrigger asChild>
                 <Button>Create Guest User</Button>
             </DialogTrigger>
-            <DialogContent className="bg-card">
+            <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Create Guest User</DialogTitle>
                 </DialogHeader>
