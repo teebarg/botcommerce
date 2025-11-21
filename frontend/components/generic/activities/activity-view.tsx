@@ -11,11 +11,12 @@ const ActivityView: React.FC = () => {
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useActivities();
 
     const { lastElementRef } = useInfiniteScroll({
-        onIntersect: () => {
-            if (!isFetchingNextPage && hasNextPage) {
+        onLoadMore: () => {
+            if (hasNextPage && !isFetchingNextPage) {
                 fetchNextPage();
             }
         },
+        disabled: isFetchingNextPage,
     });
 
     const activities = data?.pages?.flatMap((page) => page.activities) || [];

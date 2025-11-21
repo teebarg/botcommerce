@@ -100,9 +100,9 @@ const ChatViewer: React.FC<{ chat: Chat; onClose: () => void }> = ({ chat, onClo
                             }`}
                         >
                             <div
-                                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                                className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
                                     message.sender === "USER"
-                                        ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white"
+                                        ? "bg-linear-to-br from-blue-500 to-purple-600 text-white"
                                         : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                                 }`}
                             >

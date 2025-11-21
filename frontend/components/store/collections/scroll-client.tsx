@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { Loader } from "lucide-react";
 
 import MobileFilterControl from "@/components/store/shared/mobile-filter-control";
@@ -34,12 +34,12 @@ export default function InfiniteScrollClient({ initialSearchParams, initialData 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useProductInfiniteSearch({ ...initialSearchParams, show_facets: true });
 
     const { lastElementRef } = useInfiniteScroll({
-        onIntersect: () => {
-            if (!isFetchingNextPage && hasNextPage) {
+        onLoadMore: () => {
+            if (hasNextPage && !isFetchingNextPage) {
                 fetchNextPage();
             }
         },
-        isFetching: isFetchingNextPage,
+        disabled: isFetchingNextPage,
     });
 
     const products = data?.pages?.flatMap((page) => page.products) ?? initialData;

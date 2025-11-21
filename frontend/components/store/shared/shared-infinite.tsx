@@ -62,12 +62,12 @@ export default function SharedInfinite({ slug, initialCatalog, initialSearchPara
     const totalProducts = query.data?.pages[0].total_count || 0;
 
     const { lastElementRef } = useInfiniteScroll({
-        onIntersect: () => {
+        onLoadMore: () => {
             if (query.hasNextPage && !query.isFetchingNextPage) {
                 query.fetchNextPage();
             }
         },
-        isFetching: query.isFetchingNextPage,
+        disabled: query.isFetchingNextPage,
     });
 
     return (

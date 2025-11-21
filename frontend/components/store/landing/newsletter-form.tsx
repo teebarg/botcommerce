@@ -98,15 +98,15 @@ export function NewsletterForm() {
                 <div className="mt-6 pt-6 border-t border-input">
                     <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
                         <div className="flex items-center gap-1">
-                            <CheckCircle className="h-3 w-3 text-accent" />
+                            <CheckCircle className="h-3 w-3" />
                             <span>No spam</span>
                         </div>
                         <div className="flex items-center gap-1">
-                            <CheckCircle className="h-3 w-3 text-accent" />
+                            <CheckCircle className="h-3 w-3" />
                             <span>Unsubscribe anytime</span>
                         </div>
                         <div className="flex items-center gap-1">
-                            <CheckCircle className="h-3 w-3 text-accent" />
+                            <CheckCircle className="h-3 w-3" />
                             <span>Privacy protected</span>
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { LayoutDashboard, RectangleVertical } from "lucide-react";
 
@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useWebSocket } from "@/providers/websocket";
 import { GalleryImageItem } from "@/schemas";
+import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
 
 export function ProductImageGallery() {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -22,11 +23,19 @@ export function ProductImageGallery() {
     const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(32);
     const images = data?.pages?.flatMap((p: any) => p.images) || [];
 
-    const sentinelRef = useRef<HTMLDivElement | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { currentMessage, messages } = useWebSocket();
     const { mutateAsync: bulkDeleteImages, isPending: isDeleting } = useBulkDeleteGalleryImages();
     const { mutateAsync: reIndexGallery, isPending: isReIndexing } = useReIndexGallery();
+
+    const { lastElementRef } = useInfiniteScroll({
+        onLoadMore: () => {
+            if (hasNextPage && !isFetchingNextPage) {
+                fetchNextPage();
+            }
+        },
+        disabled: isFetchingNextPage,
+    });
 
     const selectedProductIds = useMemo(() => {
         const ids = new Set<number>();
@@ -55,25 +64,6 @@ export function ProductImageGallery() {
             setSelectionMode(false);
         }
     }, [currentMessage?.percent, currentMessage?.status, messages]);
-
-    useEffect(() => {
-        if (!sentinelRef.current) return;
-        const el = sentinelRef.current;
-        const observer = new IntersectionObserver(
-            (entries) => {
-                const first = entries[0];
-
-                if (first.isIntersecting && hasNextPage && !isFetchingNextPage) {
-                    fetchNextPage();
-                }
-            },
-            { root: null, rootMargin: "200px", threshold: 0.1 }
-        );
-
-        observer.observe(el);
-
-        return () => observer.unobserve(el);
-    }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
     const handleSelectionChange = (imageId: number, selected: boolean) => {
         setSelectedImages((prev) => {
@@ -172,7 +162,9 @@ export function ProductImageGallery() {
                                 onSelectionChange={handleSelectionChange}
                             />
                         ))}
+                        {hasNextPage && <div ref={lastElementRef} className="h-10" />}
                     </div>
+                    {isFetchingNextPage && <ComponentLoader />}
                     {selectedImages.size > 0 && (
                         <ProductBulkActions
                             isLoading={isDeleting}
@@ -183,8 +175,6 @@ export function ProductImageGallery() {
                             onDelete={handleBulkDelete}
                         />
                     )}
-                    <div ref={sentinelRef} />
-                    {isFetchingNextPage && <ComponentLoader />}
                 </div>
             )}
         </div>

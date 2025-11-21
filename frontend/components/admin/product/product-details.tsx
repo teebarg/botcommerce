@@ -40,12 +40,12 @@ export function ProductDetails() {
     }, [searchParams]);
 
     const { lastElementRef } = useInfiniteScroll({
-        onIntersect: () => {
+        onLoadMore: () => {
             if (hasNextPage && !isFetchingNextPage) {
                 fetchNextPage();
             }
         },
-        isFetching: isFetchingNextPage,
+        disabled: isFetchingNextPage,
     });
 
     if (isLoading) {
@@ -117,12 +117,9 @@ export function ProductDetails() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {products?.map((product: ProductSearch, idx: number) => {
-                        const isLast = idx === products.length - 1;
-
                         return (
                             <div
                                 key={`${product.id}-${idx}`}
-                                ref={isLast ? (lastElementRef as any) : undefined}
                                 className="relative bg-card border border-input rounded-lg shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow"
                             >
                                 <div className="relative aspect-product w-full bg-card overflow-hidden">
@@ -148,6 +145,7 @@ export function ProductDetails() {
                         );
                     })}
                 </div>
+                {hasNextPage && <div ref={lastElementRef} className="h-10" />}
 
                 {isFetchingNextPage && <ComponentLoader className="h-[200px]" />}
 

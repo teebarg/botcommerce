@@ -99,7 +99,7 @@ const GetApp: React.FC = () => {
 
     if (showIosBanner) {
         return (
-            <div className="fixed inset-x-4 top-16 z-[70] rounded-2xl bg-white/95 shadow-xl border border-gray-200 p-4 backdrop-blur-sm">
+            <div className="fixed inset-x-4 top-16 z-70 rounded-2xl bg-white/95 shadow-xl border border-gray-200 p-4 backdrop-blur-sm">
                 <div className="flex items-start gap-3">
                     <RectangleVertical className="text-primary shrink-0 mt-0.5" />
                     <div className="text-gray-800 text-sm leading-relaxed">

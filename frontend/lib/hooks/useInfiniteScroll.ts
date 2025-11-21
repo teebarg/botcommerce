@@ -3,44 +3,43 @@
 import { useEffect, useRef, useCallback } from "react";
 
 interface UseInfiniteScrollOptions {
-    onIntersect: () => void;
-    isFetching?: boolean;
-    root?: Element | null;
+    onLoadMore: () => void;
     rootMargin?: string;
     threshold?: number;
+    disabled?: boolean;
 }
 
-export const useInfiniteScroll = ({ onIntersect, root = null, rootMargin = "0px", threshold = 0, isFetching = false }: UseInfiniteScrollOptions) => {
-    const observer = useRef<IntersectionObserver | null>(null);
+export function useInfiniteScroll({ onLoadMore, rootMargin = "600px", threshold = 0, disabled = false }: UseInfiniteScrollOptions) {
+    const observerRef = useRef<IntersectionObserver | null>(null);
+
     const lastElementRef = useCallback(
         (node: Element | null) => {
-            if (observer.current) {
-                observer.current.disconnect();
-            }
+            if (disabled) return;
 
-            observer.current = new IntersectionObserver(
+            if (observerRef.current) observerRef.current.disconnect();
+
+            observerRef.current = new IntersectionObserver(
                 (entries) => {
-                    if (entries[0].isIntersecting && !isFetching) {
-                        onIntersect();
+                    const entry = entries[0];
+                    if (entry.isIntersecting && !disabled) {
+                        onLoadMore();
                     }
                 },
-                { root, rootMargin, threshold }
+                {
+                    root: null,
+                    rootMargin,
+                    threshold,
+                }
             );
 
-            if (node) {
-                observer.current.observe(node);
-            }
+            if (node) observerRef.current.observe(node);
         },
-        [onIntersect, root, rootMargin, threshold, isFetching]
+        [onLoadMore, rootMargin, threshold, disabled]
     );
 
     useEffect(() => {
-        return () => {
-            if (observer.current) {
-                observer.current.disconnect();
-            }
-        };
+        return () => observerRef.current?.disconnect();
     }, []);
 
     return { lastElementRef };
-};
+}
