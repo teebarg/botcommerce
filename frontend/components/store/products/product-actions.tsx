@@ -33,7 +33,7 @@ const ProductActions: React.FC<{
     };
 
     return (
-        <div className="flex gap-1.5">
+        <div className="flex gap-1">
             <Button className="w-full h-11!" disabled={loading || !selectedVariant || outOfStock} size="sm" onClick={handleAddToCartAndTrack}>
                 {loading ? (
                     "Adding..."

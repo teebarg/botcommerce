@@ -47,6 +47,11 @@
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
 
+    --color-discount-sale: var(--discount-sale);
+    --color-discount-sale-glow: var(--discount-sale-glow);
+
+    --background-image-gradient-sale: var(--gradient-sale);
+
     --aspect-product: 4 / 5;
 
     --container-8xl: 88rem;
@@ -70,7 +75,8 @@
     --animate-accordion-up: accordion-up 0.2s ease-out;
     --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     --animate-bounce: bounce 1s infinite;
-    --animate-shimmer: shimmer2 2s infinite;
+    --animate-shimmer: shimmer 2s infinite;
+    --animate-shimmer2: shimmer2 2s infinite;
     --animate-wave: wave 1.2s ease-in-out infinite;
     --animate-float: float 6s ease-in-out infinite;
     --animate-fade-in: fade-in 0.8s ease-out;
@@ -98,18 +104,18 @@
             transform: rotate(360deg);
         }
     }
-    @keyframes shimmer {
+    @keyframes shimmer2 {
         100% {
             content: "var(--tw-content)";
             transform: translateX(100%);
         }
     }
-    @keyframes shimmer2 {
+    @keyframes shimmer {
         0% {
-            background-position: -200% 0;
+            background-position: -200% center;
         }
         100% {
-            background-position: 200% 0;
+            background-position: 200% center;
         }
     }
     @keyframes indeterminate {
@@ -234,9 +240,18 @@
     --warning: #f59e0b;
     --warning-foreground: #ffffff;
 
+    /* Discount Badge Colors */
+    --discount-sale: hsl(0 85% 60%);
+    --discount-sale-glow: hsl(0 100% 70%);
+
+    /* Gradients */
+    --gradient-sale: linear-gradient(135deg, hsl(0 85% 60%) 0%, hsl(14 100% 57%) 100%);
+
     /* Shadows */
     --shadow-glow: 0 0 30px hsl(219 100% 53% / 0.2);
     --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.1);
+    --shadow-discount: 0 4px 20px -2px;
+    --shadow-intense: 0 8px 32px -4px;
 
     --sidebar: hsl(0 0% 98%);
     --sidebar-foreground: hsl(240 5.3% 26.1%);

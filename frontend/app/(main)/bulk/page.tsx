@@ -118,13 +118,13 @@ const BulkPurchase: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/10">
+        <div className="min-h-screen bg-linear-to-br from-background via-background to-secondary/10">
             <section className="relative py-20 px-4">
                 <div className="max-w-6xl mx-auto text-center">
                     <Badge className="mb-4" variant="contrast">
                         Wholesale & Bulk Orders
                     </Badge>
-                    <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary via-primary/80 to-accent bg-clip-text text-transparent mb-6">
+                    <h1 className="text-4xl md:text-6xl font-bold bg-linear-to-r from-primary via-primary/80 to-accent bg-clip-text text-transparent mb-6">
                         Scale Your Business with Bulk Fashion
                     </h1>
                     <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
@@ -160,7 +160,7 @@ const BulkPurchase: React.FC = () => {
                                 return (
                                     <Card
                                         key={idx}
-                                        className={`cursor-pointer transition-all duration-200 hover:shadow-lg border-1 ${
+                                        className={`cursor-pointer transition-all duration-200 hover:shadow-lg border ${
                                             isSelected ? "border-primary/40 bg-primary/5" : "border-border hover:border-primary/30"
                                         } ${option.popular ? "ring-1 ring-accent/20" : ""}`}
                                         onClick={() => handleBulkTypeSelect(option.id)}
@@ -212,7 +212,7 @@ const BulkPurchase: React.FC = () => {
                                 <div className="grid gap-3">
                                     {benefits.map((benefit, index) => (
                                         <div key={index} className="flex items-center gap-3">
-                                            <Dot className="w-4 h-4 text-contrast flex-shrink-0" />
+                                            <Dot className="w-4 h-4 text-contrast shrink-0" />
                                             <span className="text-sm">{benefit}</span>
                                         </div>
                                     ))}

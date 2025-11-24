@@ -6,7 +6,7 @@ const HeroSection: React.FC = () => {
     return (
         <div className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0 z-0">
-                <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
+                <div className="absolute inset-0 bg-linear-to-b from-background/80 via-background/60 to-background" />
             </div>
 
             <div className="absolute top-20 left-10 animate-float">

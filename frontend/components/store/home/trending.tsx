@@ -14,7 +14,7 @@ export default function Trending() {
                 <h2 className="text-3xl font-bold text-foreground mb-1 font-outfit">Trending Products</h2>
                 <p className="text-xl text-muted-foreground">Discover our handpicked selection of premium products</p>
             </div>
-            <ProductsCarousel isLoading={isLoading} products={data?.products || []} />
+            <ProductsCarousel isLoading={isLoading} products={data?.products || []} variant="electric" />
         </div>
     );
 }

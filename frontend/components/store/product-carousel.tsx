@@ -18,9 +18,10 @@ interface IconCollectionsProps {
     title?: string;
     description?: string;
     isLoading?: boolean;
+    variant?: "sale" | "electric";
 }
 
-const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, description, isLoading = false }) => {
+const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, description, isLoading = false, variant = "sale" }) => {
     const headingId = useId();
     const listRef = useRef<HTMLUListElement>(null);
     const [scrollState, setScrollState] = useState<ScrollState>({
@@ -143,9 +144,9 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
                             <li
                                 key={idx}
                                 data-card
-                                className="group/card relative flex-shrink-0 basis-[70%] snap-start snap-always sm:basis-[22%] min-w-[280px]"
+                                className="group/card relative shrink-0 basis-[70%] snap-start snap-always sm:basis-[22%] min-w-[280px]"
                             >
-                                <ProductCard product={product} />
+                                <ProductCard product={product} variant={variant} />
                             </li>
                         ))}
                     </ul>

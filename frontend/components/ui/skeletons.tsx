@@ -1,7 +1,7 @@
 import React from "react";
 
 export const Skeleton = ({ className = "", ...props }) => (
-    <div className={`bg-linear-to-r from-background/20 to-secondary/20 animate-shimmer rounded ${className}`} {...props} />
+    <div className={`bg-linear-to-r from-background/20 to-secondary/20 animate-shimmer2 rounded ${className}`} {...props} />
 );
 export const TextSkeleton = ({ lines = 3, className = "" }) => (
     <div className={`space-y-3 ${className}`}>
