@@ -41,7 +41,7 @@ const Overlay: React.FC<OverlayProps> = ({
                     <SheetHeader className={showHeader ? "" : "sr-only"}>
                         <SheetTitle>{title}</SheetTitle>
                     </SheetHeader>
-                    {children}
+                    <div className="overflow-y-auto">{children}</div>
                 </SheetContent>
             </Sheet>
         );
