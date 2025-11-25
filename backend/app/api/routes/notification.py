@@ -30,7 +30,6 @@ router = APIRouter()
 
 @router.post("/push-event")
 async def create_push_event(data: PushEventSchema):
-    logger.error(data)
     await redis_client.xadd("PUSH_EVENT", jsonable_encoder(data, exclude_none=True))
     return Message(message="success")
 
