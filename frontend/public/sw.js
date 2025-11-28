@@ -67,84 +67,99 @@ self.addEventListener("fetch", (event) => {
     }
 });
 
-self.addEventListener("push", function (event) {
-    if (event.data) {
-        const data = event.data.json();
-        const options = {
-            body: data.body,
-            icon: "/icon.png", // small icon
-            image: data.imageUrl ?? "/promo-banner.webp",
-            badge: data.imageUrl ?? "/icon.png", // monochrome badge (Android only)
-            actions: [
-                { action: "view", title: "View" },
-                { action: "dismiss", title: "Dismiss" },
-            ],
-            vibrate: [200, 100, 200],
-            data: {
-                url: data.data.actionUrl || data.path || "/",
-                dateOfArrival: Date.now(),
-                primaryKey: "2",
-                subscriberId: data.subscriberId,
-                notificationId: data.notificationId,
-            },
-            requireInteraction: true,
-        };
+self.addEventListener("push", (event) => {
+    if (!event.data) return;
 
+    let data;
+    try {
+        data = event.data.json();
+    } catch (err) {
+        console.error("[SW] Failed to parse push payload:", err);
+        return;
+    }
+
+    const options = {
+        body: data.body,
+        icon: "/icon.png",
+        image: data.imageUrl ?? "/promo-banner.webp",
+        badge: "/icon.png",
+        vibrate: [200, 100, 200],
+        requireInteraction: true,
+        actions: [
+            { action: "view", title: "View" },
+            { action: "dismiss", title: "Dismiss" },
+        ],
+        data: {
+            url: data?.data?.actionUrl ?? data?.path ?? "/",
+            subscriberId: data.subscriberId,
+            notificationId: data.notificationId,
+            receivedAt: Date.now(),
+        },
+    };
+
+    event.waitUntil(
+        self.registration.showNotification(data.title, options).then(() => {
+            return fetch("/api/push-event", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    subscriberId: data.subscriberId,
+                    notificationId: data.notificationId,
+                    eventType: "DELIVERED",
+                    deliveredAt: new Date().toISOString(),
+                }),
+            }).catch((err) => {
+                console.warn("[SW] Failed to log delivered:", err);
+            });
+        })
+    );
+});
+
+self.addEventListener("notificationclick", (event) => {
+    const info = event.notification.data;
+    const action = event.action;
+
+    const eventType = action === "view" ? "OPENED" : "DISMISSED";
+
+    event.waitUntil(
         fetch("/api/push-event", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                subscriberId: data.subscriberId,
-                eventType: "DELIVERED",
-                platform: navigator.platform,
-                deviceType: getDeviceType(),
-                userAgent: navigator.userAgent,
-                notificationId: data.notificationId,
-                deliveredAt: new Date(),
+                subscriberId: info.subscriberId,
+                notificationId: info.notificationId,
+                eventType,
+                timestamp: new Date().toISOString(),
             }),
-        });
+        }).catch((err) => {
+            console.warn("[SW] Failed to report push event:", err);
+        })
+    );
 
-        event.waitUntil(
-            self.registration
-                .showNotification(data.title, options)
-                .then(hasActiveClients)
-                .then((activeClients) => {
-                    if (!activeClients) {
-                        self.numBadges += 1;
-                        navigator.setAppBadge(self.numBadges);
-                    }
-                })
-                .catch((err) => sendMessage(err))
-        );
-    }
-});
-
-self.addEventListener("notificationclick", (event) => {
-    const data = event.notification.data;
-
-    fetch("/api/push-event", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            subscriberId: data.subscriberId,
-            eventType: event.action === "view" ? "OPENED" : "DISMISSED",
-            platform: navigator.platform,
-            deviceType: getDeviceType(),
-            userAgent: navigator.userAgent,
-            notificationId: data.notificationId,
-            readAt: new Date(),
-        }),
-    });
-
-    if (event.action == "view") {
-        event.waitUntil(clients.openWindow(event.notification.data.url));
+    if (action === "view") {
+        event.waitUntil(clients.openWindow(info.url));
         event.notification.close();
         return;
     }
 
-    if (event.action == "dismiss") {
-        event.notification.close();
-    }
+    event.notification.close();
+});
+
+self.addEventListener("notificationclose", (event) => {
+    const info = event.notification.data;
+
+    event.waitUntil(
+        fetch("/api/push-event", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                subscriberId: info.subscriberId,
+                notificationId: info.notificationId,
+                eventType: "DISMISSED",
+                timestamp: new Date().toISOString(),
+            }),
+        })
+    );
 });
 
 self.addEventListener("message", (event) => {
