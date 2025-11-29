@@ -13,11 +13,8 @@ class PushEventSchema(BaseModel):
     notificationId: str
     subscriberId: str
     eventType: Literal["DELIVERED", "OPENED", "CLICKED", "DISMISSED"]
-    platform: str
-    deviceType: Literal["WEB", "IOS", "ANDROID", "DESKTOP"]
     userAgent: Optional[str] = None
     deliveredAt: Optional[datetime] = None
-    readAt: Optional[datetime] = None
 
 class FCMIn(BaseModel):
     endpoint: str
