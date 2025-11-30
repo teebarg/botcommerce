@@ -20,7 +20,7 @@ router = APIRouter()
 async def calculate_cart_totals(cart: Cart):
     """Helper function to calculate cart totals"""
     from app.services.coupon import CouponService
-    
+
     service = ShopSettingsService()
     tax_rate = float(await service.get("tax_rate"))
     cart_items = await db.cartitem.find_many(where={"cart_id": cart.id})
@@ -70,7 +70,7 @@ async def get_or_create_cart(cart_number: Optional[str], user_id: Optional[str])
     if user_id:
         cart = await db.cart.find_first(
             where={"user_id": user_id, "status": CartStatus.ACTIVE},
-            order={"updated_at": "desc"}
+            order={"created_at": "desc"}
         )
         if cart:
             return cart

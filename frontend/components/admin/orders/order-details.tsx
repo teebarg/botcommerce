@@ -167,7 +167,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                 <p>Tax</p>
                                 <p className="font-semibold">{currency(order.tax)}</p>
                             </div>
-                            {order.discount_amount && order.discount_amount > 0 && (
+                            {typeof order.discount_amount === "number" && order.discount_amount > 0 && (
                                 <div className="flex justify-between text-sm font-medium">
                                     <p>Discount</p>
                                     <p className="font-semibold text-green-600">

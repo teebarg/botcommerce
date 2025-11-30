@@ -27,7 +27,7 @@ const OrderSummary: React.FC<{ order: Order }> = ({ order }) => {
                     <span className="text-muted-foreground">Tax</span>
                     <span className="font-semibold">{currency(order.tax)}</span>
                 </div>
-                {order.discount_amount && order.discount_amount > 0 && (
+                {typeof order.discount_amount === "number" && order.discount_amount > 0 && (
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">Discount</span>
                         <span className="font-semibold text-green-600">-{currency(order.discount_amount)}</span>
