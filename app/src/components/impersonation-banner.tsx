@@ -1,10 +1,8 @@
-"use client";
-
 import { X } from "lucide-react";
 import { toast } from "sonner";
 
-import { useInvalidateMe } from "@/lib/hooks/useUser";
-import { useInvalidateCart } from "@/lib/hooks/useCart";
+import { useInvalidateMe } from "@/hooks/useUser";
+import { useInvalidateCart } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
 import { deleteCookie } from "@/lib/util/cookie";
 

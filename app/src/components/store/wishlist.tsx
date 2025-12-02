@@ -5,7 +5,7 @@ import { Link } from "@tanstack/react-router"
 import { Heart } from "lucide-react";
 
 import { ProductImage } from "@/schemas";
-import { useUserDeleteWishlist } from "@/lib/hooks/useUser";
+import { useUserDeleteWishlist } from "@/hooks/useUser";
 import ImageDisplay from "../image-display";
 
 interface WishlistItemProps {

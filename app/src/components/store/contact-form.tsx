@@ -11,7 +11,7 @@ import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useContactForm } from "@/lib/hooks/useGeneric";
+import { useContactForm } from "@/hooks/useGeneric";
 
 const contactFormSchema = z.object({
     name: z.string().min(1, "Name is required"),

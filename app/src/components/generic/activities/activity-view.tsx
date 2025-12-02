@@ -3,8 +3,8 @@
 import React from "react";
 
 import { ActivityList } from "@/components/generic/activities/ActivityList";
-import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
-import { useActivities } from "@/lib/hooks/useActivities";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { useActivities } from "@/hooks/useActivities";
 import ComponentLoader from "@/components/component-loader";
 
 const ActivityView: React.FC = () => {

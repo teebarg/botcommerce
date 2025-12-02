@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
+import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Facet } from "@/schemas/product";

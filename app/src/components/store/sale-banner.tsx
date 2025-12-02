@@ -2,7 +2,7 @@ import React from "react";
 import { ArrowRight, Star } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useCatalogs } from "@/lib/hooks/useCollection";
+import { useCatalogs } from "@/hooks/useCollection";
 import { useNavigate } from "@tanstack/react-router";
 
 const SaleBanner: React.FC = () => {

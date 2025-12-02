@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Address, AddressSchema } from "@/schemas/address";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useUpdateAddress } from "@/lib/hooks/useAddress";
+import { useUpdateAddress } from "@/hooks/useAddress";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { states } from "@/components/store/collections/data";
 

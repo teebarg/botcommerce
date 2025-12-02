@@ -6,7 +6,7 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import PromotionalBanner from "@/components/promotion";
 import { Order, Session } from "@/schemas";
-import { useOrders } from "@/lib/hooks/useOrder";
+import { useOrders } from "@/hooks/useOrder";
 import Overlay from "@/components/overlay";
 import OrderDetails from "@/components/store/orders/order-details";
 import ComponentLoader from "@/components/component-loader";

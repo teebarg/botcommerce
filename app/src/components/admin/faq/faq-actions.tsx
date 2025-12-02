@@ -10,9 +10,9 @@ import { Button } from "@/components/ui/button";
 import { FAQ } from "@/schemas";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Confirm } from "@/components/generic/confirm";
-import { useInvalidate } from "@/lib/hooks/useApi";
+import { useInvalidate } from "@/hooks/useApi";
 import Overlay from "@/components/overlay";
-import { useDeleteFaq } from "@/lib/hooks/useFaq";
+import { useDeleteFaq } from "@/hooks/useFaq";
 
 interface FaqActionsProps {
     faq: FAQ;

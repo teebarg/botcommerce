@@ -4,7 +4,7 @@ import { DollarSign, Package, ShoppingCart, Users } from "lucide-react";
 
 import StatCard from "@/components/ui/stat-card";
 import { currency } from "@/lib/utils";
-import { useStatsTrends } from "@/lib/hooks/useApi";
+import { useStatsTrends } from "@/hooks/useApi";
 import ServerError from "@/components/generic/server-error";
 import ComponentLoader from "@/components/component-loader";
 

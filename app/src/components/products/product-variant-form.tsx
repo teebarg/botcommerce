@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ProductVariant } from "@/schemas";
-import { useCreateVariant, useUpdateVariant } from "@/lib/hooks/useProduct";
+import { useCreateVariant, useUpdateVariant } from "@/hooks/useProduct";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AGE_OPTIONS } from "@/lib/constants";
 

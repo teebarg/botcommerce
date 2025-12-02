@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/providers/cart-provider";
 import ComponentLoader from "@/components/component-loader";
 import { Card, CardContent } from "@/components/ui/card";
-import { useApplyCoupon, useRemoveCoupon } from "@/lib/hooks/useCoupon";
+import { useApplyCoupon, useRemoveCoupon } from "@/hooks/useCoupon";
 import { toast } from "sonner";
 
 const DiscountCode: React.FC = () => {

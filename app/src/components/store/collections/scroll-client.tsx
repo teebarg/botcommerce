@@ -6,7 +6,7 @@ import { CollectionHeader } from "@/components/store/collections/collection-head
 import NoProductsFound from "@/components/store/products/no-products";
 // import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
 import { Collection, ProductSearch } from "@/schemas/product";
-import { useProductInfiniteSearch } from "@/lib/hooks/useProduct";
+import { useProductInfiniteSearch } from "@/hooks/useProduct";
 import ProductCardListings from "@/components/store/products/product-card-listings";
 import { FilterSidebar } from "@/components/store/shared/filter-sidebar";
 import SaleBanner from "@/components/store/sale-banner";

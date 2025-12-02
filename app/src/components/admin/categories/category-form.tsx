@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { useCreateCategory, useUpdateCategory } from "@/lib/hooks/useCategories";
+import { useCreateCategory, useUpdateCategory } from "@/hooks/useCategories";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 const CategoryFormSchema = z.object({

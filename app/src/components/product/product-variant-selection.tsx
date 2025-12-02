@@ -7,7 +7,7 @@ import { ProductVariant } from "@/schemas";
 import { cn, currency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useProductVariant } from "@/lib/hooks/useProductVariant";
+import { useProductVariant } from "@/hooks/useProductVariant";
 import { Product } from "@/schemas/product";
 
 interface VariantSelectionProps {

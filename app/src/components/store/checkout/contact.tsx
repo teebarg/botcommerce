@@ -8,7 +8,7 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/providers/cart-provider";
-import { useUpdateCartDetails } from "@/lib/hooks/useCart";
+import { useUpdateCartDetails } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
 
 const ContactFormSchema = z.object({

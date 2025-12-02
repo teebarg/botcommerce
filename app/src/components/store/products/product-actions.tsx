@@ -3,8 +3,8 @@ import { Check, ShoppingCart } from "lucide-react";
 
 import { ProductSearch } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import { useProductVariant } from "@/lib/hooks/useProductVariant";
-import { UserInteractionType, useTrackUserInteraction } from "@/lib/hooks/useUserInteraction";
+import { useProductVariant } from "@/hooks/useProductVariant";
+import { UserInteractionType, useTrackUserInteraction } from "@/hooks/useUserInteraction";
 
 const ProductActions: React.FC<{
     product: ProductSearch;

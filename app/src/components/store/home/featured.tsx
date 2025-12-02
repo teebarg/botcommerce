@@ -4,7 +4,7 @@ import React from "react";
 import { TrendingUp } from "lucide-react";
 
 import LocalizedClientLink from "@/components/ui/link";
-import { useProductSearch } from "@/lib/hooks/useProduct";
+import { useProductSearch } from "@/hooks/useProduct";
 import ProductsCarousel from "@/components/store/product-carousel";
 
 export default function Featured() {

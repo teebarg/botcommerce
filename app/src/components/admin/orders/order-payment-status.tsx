@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PaymentStatus } from "@/schemas";
-import { useChangePaymentStatus } from "@/lib/hooks/useOrder";
+import { useChangePaymentStatus } from "@/hooks/useOrder";
 
 interface PaymentStatusManagerProps {
     id: number;

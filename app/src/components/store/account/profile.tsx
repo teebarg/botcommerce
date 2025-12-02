@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/apis/client";
 import { Message } from "@/schemas";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useInvalidate } from "@/lib/hooks/useApi";
+import { useInvalidate } from "@/hooks/useApi";
 import ServerError from "@/components/generic/server-error";
 import { tryCatch } from "@/lib/try-catch";
 import { Separator } from "@/components/ui/separator";

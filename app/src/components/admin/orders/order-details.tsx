@@ -21,9 +21,9 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 import OrderProcessingAction from "./order-processing-actions";
 import { OrderStatusBadge } from "./order-status-badge";
 
-import { useOrderTimeline } from "@/lib/hooks/useOrder";
+import { useOrderTimeline } from "@/hooks/useOrder";
 import { Order, OrderItem } from "@/schemas";
-import { useReturnOrderItem } from "@/lib/hooks/useOrder";
+import { useReturnOrderItem } from "@/hooks/useOrder";
 import { currency, formatDate } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Confirm } from "@/components/generic/confirm";

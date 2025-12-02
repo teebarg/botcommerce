@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { CreditCard, Heart, Home, LayoutGrid, User2, User as UserIcon } from "lucide-react";
 
@@ -7,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
 import { authApi } from "@/apis/auth";
-import { useInvalidateMe } from "@/lib/hooks/useUser";
+import { useInvalidateMe } from "@/hooks/useUser";
 import { useLocation } from "@tanstack/react-router";
 import { ThemeToggle } from "./theme-toggle";
 

@@ -4,7 +4,7 @@ import React from "react";
 
 import ProductsCarousel from "../product-carousel";
 
-import { useProductSearch } from "@/lib/hooks/useProduct";
+import { useProductSearch } from "@/hooks/useProduct";
 
 export default function NewArrivals() {
     const { data, isLoading } = useProductSearch({ collections: "new-arrivals", limit: 10 });

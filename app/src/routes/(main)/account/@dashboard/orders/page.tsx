@@ -1,7 +1,7 @@
 "use client";
 
 import ServerError from "@/components/generic/server-error";
-import { useOrders } from "@/lib/hooks/useOrder";
+import { useOrders } from "@/hooks/useOrder";
 import ComponentLoader from "@/components/component-loader";
 import { Order } from "@/schemas";
 import OrderCard from "@/components/store/orders/order-card";

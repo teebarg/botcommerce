@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Review } from "@/schemas";
-import { useUpdateReview } from "@/lib/hooks/useReview";
+import { useUpdateReview } from "@/hooks/useReview";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 
 interface Props {

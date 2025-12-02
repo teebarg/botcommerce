@@ -7,12 +7,12 @@ import { useState } from "react";
 import MobileFilterControl from "./mobile-filter-control";
 
 import ProductCard from "@/components/store/products/product-card";
-import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { api } from "@/apis/client";
 import { Catalog, ProductSearch } from "@/schemas";
 import { FilterSidebar } from "@/components/store/shared/filter-sidebar";
 import { Button } from "@/components/ui/button";
-import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
+import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import { SortOptions } from "@/types/models";
 import { cn } from "@/lib/utils";
 

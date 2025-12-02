@@ -9,7 +9,7 @@ import ChatBody from "./chatbody";
 import { api } from "@/apis/client";
 import { ChatMessage } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
-import { useChatMutation } from "@/lib/hooks/useApi";
+import { useChatMutation } from "@/hooks/useApi";
 
 interface Message {
     text: string;

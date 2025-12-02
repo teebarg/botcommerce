@@ -7,7 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/apis/client";
 import { addToOfflineCart, clearOfflineCart, getOfflineCart } from "@/lib/indexeddb/offline-cart";
 import { Cart } from "@/schemas";
-import { useMyCart } from "@/lib/hooks/useCart";
+import { useMyCart } from "@/hooks/useCart";
 
 type AddItem = {
     variant_id: number;

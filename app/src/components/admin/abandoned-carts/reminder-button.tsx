@@ -2,7 +2,7 @@ import { Mail } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import { Button } from "@/components/ui/button";
-import { useSendCartReminder } from "@/lib/hooks/useAbandonedCart";
+import { useSendCartReminder } from "@/hooks/useAbandonedCart";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface ReminderButtonProps {

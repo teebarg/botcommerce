@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 
 import { type Pag as PaginationType } from "@/schemas/common";
@@ -12,7 +10,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
-import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
+import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 
 interface Props {
     pagination: PaginationType;

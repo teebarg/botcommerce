@@ -5,7 +5,7 @@ import { Trash } from "lucide-react";
 
 import { ProductImage } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import { useDeleteImages, useReorderImages } from "@/lib/hooks/useProduct";
+import { useDeleteImages, useReorderImages } from "@/hooks/useProduct";
 import ImageDisplay from "@/components/image-display";
 
 interface DraggableImageListProps {

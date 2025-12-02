@@ -6,8 +6,8 @@ import { ProductReviewsZeroState } from "../store/reviews/review-zero";
 import { ReviewsList } from "../store/reviews/reviews-list";
 
 import ComponentLoader from "@/components/component-loader";
-import { useOrders } from "@/lib/hooks/useOrder";
-import { useReviews } from "@/lib/hooks/useReview";
+import { useOrders } from "@/hooks/useOrder";
+import { useReviews } from "@/hooks/useReview";
 
 interface Prop {
     product_id: number;

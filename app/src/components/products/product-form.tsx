@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import MultiSelect from "@/components/ui/multi-select";
 import { Category, Collection, ProductSearch, SearchCategory, SearchCollection } from "@/schemas/product";
-import { useCreateProduct, useUpdateProduct } from "@/lib/hooks/useProduct";
+import { useCreateProduct, useUpdateProduct } from "@/hooks/useProduct";
 import { Checkbox } from "@/components/ui/checkbox";
 
 const formSchema = z.object({

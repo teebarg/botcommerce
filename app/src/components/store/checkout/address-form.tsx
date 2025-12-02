@@ -11,7 +11,7 @@ import { CartUpdate } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useUpdateCartDetails } from "@/lib/hooks/useCart";
+import { useUpdateCartDetails } from "@/hooks/useCart";
 import { states } from "@/components/store/collections/data";
 
 const formSchema = z.object({

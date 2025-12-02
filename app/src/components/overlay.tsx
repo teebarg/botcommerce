@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { useMediaQuery } from "@/lib/hooks/use-media-query";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -29,7 +29,7 @@ const Overlay: React.FC<OverlayProps> = ({
 
     useEffect(() => {
         // Detect iOS to enable safe-area patches
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+        // react-hooks/set-state-in-effect
         setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
     }, []);
 

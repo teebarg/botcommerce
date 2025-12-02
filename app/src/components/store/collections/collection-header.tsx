@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { useCollections } from "@/lib/hooks/useCollection";
+import { useCollections } from "@/hooks/useCollection";
 import LocalizedClientLink from "@/components/ui/link";
 import ShareButton from "@/components/share";
 import { useNavigate } from "@tanstack/react-router";

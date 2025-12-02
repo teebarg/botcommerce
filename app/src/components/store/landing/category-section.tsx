@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
-import { useCategories } from "@/lib/hooks/useCategories";
+import { useCategories } from "@/hooks/useCategories";
 import { Category } from "@/schemas/product";
 import ComponentLoader from "@/components/component-loader";
 

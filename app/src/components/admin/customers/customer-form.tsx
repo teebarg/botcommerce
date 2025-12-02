@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { User } from "@/schemas";
-import { useCreateUser, useUpdateUser } from "@/lib/hooks/useUser";
+import { useCreateUser, useUpdateUser } from "@/hooks/useUser";
 
 interface ReviewFormProps {
     user?: User;

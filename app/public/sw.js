@@ -34,11 +34,6 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
     const url = new URL(event.request.url);
 
-    if (url.pathname.startsWith("/_next/image")) {
-        event.respondWith(cacheImage(event.request));
-        return;
-    }
-
     if (
         url.pathname.match(/\.(png|jpg|jpeg|gif|svg|webp|avif)$/i) ||
         url.pathname.startsWith("/products/") ||
@@ -46,12 +41,6 @@ self.addEventListener("fetch", (event) => {
         url.href.includes("supabase.co/storage")
     ) {
         event.respondWith(staleWhileRevalidateImage(event.request));
-        return;
-    }
-
-    // ✅ Cache static assets (Next.js static files, CSS, JS)
-    if (url.pathname.startsWith("/_next/static/")) {
-        event.respondWith(staleWhileRevalidate(event.request));
         return;
     }
 

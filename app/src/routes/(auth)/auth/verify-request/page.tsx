@@ -21,7 +21,7 @@ export default function VerifyRequestPage() {
 
                     <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-8">
                         <div className="flex items-start gap-3">
-                            <Clock className="text-emerald-600 mt-0.5 flex-shrink-0" size={20} />
+                            <Clock className="text-emerald-600 mt-0.5 shrink-0" size={20} />
                             <div className="text-left">
                                 <p className="text-sm font-medium text-emerald-800 mb-1">Link expires in 15 minutes</p>
                                 <p className="text-xs text-emerald-700">Click the link in your email to sign in securely</p>

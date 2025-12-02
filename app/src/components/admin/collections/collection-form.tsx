@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { useCreateCollection, useUpdateCollection } from "@/lib/hooks/useCollection";
+import { useCreateCollection, useUpdateCollection } from "@/hooks/useCollection";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 
 const CollectionFormSchema = z.object({

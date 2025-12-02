@@ -5,20 +5,6 @@ import { ReviewSchema } from "./review";
 import { AuditSchema } from "./base";
 import { PagSchema } from "./common";
 
-export const BrandSchema = z
-    .object({
-        id: z.number(),
-        name: z.string(),
-        slug: z.string(),
-        is_active: z.boolean(),
-        products: z.null(),
-    })
-    .merge(AuditSchema);
-
-export const PaginatedBrandSchema = PagSchema.extend({
-    brands: z.array(BrandSchema),
-});
-
 export const CategorySchema = z
     .object({
         id: z.number(),
@@ -268,9 +254,6 @@ export type Product = z.infer<typeof ProductSchema>;
 export type ProductSearch = z.infer<typeof ProductSearchSchema>;
 export type PaginatedProductSearch = z.infer<typeof PaginatedProductSearchSchema>;
 export type Facet = z.infer<typeof FacetSchema>;
-
-export type Brand = z.infer<typeof BrandSchema>;
-export type PaginatedBrand = z.infer<typeof PaginatedBrandSchema>;
 
 export type Category = z.infer<typeof CategorySchema>;
 export type PaginatedCategory = z.infer<typeof PaginatedCategorySchema>;

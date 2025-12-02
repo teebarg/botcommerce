@@ -4,7 +4,7 @@ import { CldUploadWidget } from "next-cloudinary";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { useBulkUploadImages } from "@/lib/hooks/useGallery";
+import { useBulkUploadImages } from "@/hooks/useGallery";
 
 export function GalleryImagesUpload() {
     // const editState = useOverlayTriggerState({});

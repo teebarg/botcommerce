@@ -11,14 +11,30 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as MainLayoutRouteImport } from './routes/_mainLayout'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as MainLayoutIndexRouteImport } from './routes/_mainLayout/index'
 import { Route as PaymentVerifyRouteImport } from './routes/payment/verify'
 import { Route as ApiPushEventRouteImport } from './routes/api/push-event'
+import { Route as AdminSharedRouteImport } from './routes/admin/shared'
 import { Route as MainLayoutCartRouteImport } from './routes/_mainLayout/cart'
 import { Route as MainLayoutBulkRouteImport } from './routes/_mainLayout/bulk'
 import { Route as MainLayoutCollectionsRouteImport } from './routes/_mainLayout/_collections'
 import { Route as MainLayoutCollectionsIndexRouteImport } from './routes/_mainLayout/collections/index'
+import { Route as AdminstoreReviewsRouteImport } from './routes/admin/(store)/reviews'
+import { Route as AdminstoreOrdersRouteImport } from './routes/admin/(store)/orders'
+import { Route as AdminstoreGalleryRouteImport } from './routes/admin/(store)/gallery'
+import { Route as AdminstoreCouponsRouteImport } from './routes/admin/(store)/coupons'
+import { Route as AdminstoreCollectionsRouteImport } from './routes/admin/(store)/collections'
+import { Route as AdminstoreCategoriesRouteImport } from './routes/admin/(store)/categories'
+import { Route as AdminstoreAbandonedCartsRouteImport } from './routes/admin/(store)/abandoned-carts'
+import { Route as AdminadminUsersRouteImport } from './routes/admin/(admin)/users'
+import { Route as AdminadminSettingsRouteImport } from './routes/admin/(admin)/settings'
+import { Route as AdminadminOnlineRouteImport } from './routes/admin/(admin)/online'
+import { Route as AdminadminFaqsRouteImport } from './routes/admin/(admin)/faqs'
+import { Route as AdminadminChatsRouteImport } from './routes/admin/(admin)/chats'
+import { Route as AdminadminActivitiesRouteImport } from './routes/admin/(admin)/activities'
 import { Route as MainLayoutCollectionsSlugRouteImport } from './routes/_mainLayout/collections/$slug'
 import { Route as MainLayoutstaticTermsRouteImport } from './routes/_mainLayout/(static)/terms'
 import { Route as MainLayoutstaticShippingRouteImport } from './routes/_mainLayout/(static)/shipping'
@@ -28,6 +44,7 @@ import { Route as MainLayoutstaticHelpCenterRouteImport } from './routes/_mainLa
 import { Route as MainLayoutstaticContactUsRouteImport } from './routes/_mainLayout/(static)/contact-us'
 import { Route as MainLayoutstaticCareersRouteImport } from './routes/_mainLayout/(static)/careers'
 import { Route as MainLayoutstaticAboutRouteImport } from './routes/_mainLayout/(static)/about'
+import { Route as AdminstoreCouponsAnalyticsRouteImport } from './routes/admin/(store)/coupons.analytics'
 
 const OfflineRoute = OfflineRouteImport.update({
   id: '/offline',
@@ -39,9 +56,19 @@ const CheckoutRoute = CheckoutRouteImport.update({
   path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MainLayoutRoute = MainLayoutRouteImport.update({
   id: '/_mainLayout',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const MainLayoutIndexRoute = MainLayoutIndexRouteImport.update({
   id: '/',
@@ -57,6 +84,11 @@ const ApiPushEventRoute = ApiPushEventRouteImport.update({
   id: '/api/push-event',
   path: '/api/push-event',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSharedRoute = AdminSharedRouteImport.update({
+  id: '/shared',
+  path: '/shared',
+  getParentRoute: () => AdminRoute,
 } as any)
 const MainLayoutCartRoute = MainLayoutCartRouteImport.update({
   id: '/cart',
@@ -78,6 +110,72 @@ const MainLayoutCollectionsIndexRoute =
     path: '/collections/',
     getParentRoute: () => MainLayoutRoute,
   } as any)
+const AdminstoreReviewsRoute = AdminstoreReviewsRouteImport.update({
+  id: '/(store)/reviews',
+  path: '/reviews',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminstoreOrdersRoute = AdminstoreOrdersRouteImport.update({
+  id: '/(store)/orders',
+  path: '/orders',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminstoreGalleryRoute = AdminstoreGalleryRouteImport.update({
+  id: '/(store)/gallery',
+  path: '/gallery',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminstoreCouponsRoute = AdminstoreCouponsRouteImport.update({
+  id: '/(store)/coupons',
+  path: '/coupons',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminstoreCollectionsRoute = AdminstoreCollectionsRouteImport.update({
+  id: '/(store)/collections',
+  path: '/collections',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminstoreCategoriesRoute = AdminstoreCategoriesRouteImport.update({
+  id: '/(store)/categories',
+  path: '/categories',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminstoreAbandonedCartsRoute =
+  AdminstoreAbandonedCartsRouteImport.update({
+    id: '/(store)/abandoned-carts',
+    path: '/abandoned-carts',
+    getParentRoute: () => AdminRoute,
+  } as any)
+const AdminadminUsersRoute = AdminadminUsersRouteImport.update({
+  id: '/(admin)/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminadminSettingsRoute = AdminadminSettingsRouteImport.update({
+  id: '/(admin)/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminadminOnlineRoute = AdminadminOnlineRouteImport.update({
+  id: '/(admin)/online',
+  path: '/online',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminadminFaqsRoute = AdminadminFaqsRouteImport.update({
+  id: '/(admin)/faqs',
+  path: '/faqs',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminadminChatsRoute = AdminadminChatsRouteImport.update({
+  id: '/(admin)/chats',
+  path: '/chats',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminadminActivitiesRoute = AdminadminActivitiesRouteImport.update({
+  id: '/(admin)/activities',
+  path: '/activities',
+  getParentRoute: () => AdminRoute,
+} as any)
 const MainLayoutCollectionsSlugRoute =
   MainLayoutCollectionsSlugRouteImport.update({
     id: '/collections/$slug',
@@ -127,15 +225,24 @@ const MainLayoutstaticAboutRoute = MainLayoutstaticAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => MainLayoutRoute,
 } as any)
+const AdminstoreCouponsAnalyticsRoute =
+  AdminstoreCouponsAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AdminstoreCouponsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
+  '/admin': typeof AdminRouteWithChildren
   '/checkout': typeof CheckoutRoute
   '/offline': typeof OfflineRoute
   '/bulk': typeof MainLayoutBulkRoute
   '/cart': typeof MainLayoutCartRoute
+  '/admin/shared': typeof AdminSharedRoute
   '/api/push-event': typeof ApiPushEventRoute
   '/payment/verify': typeof PaymentVerifyRoute
   '/': typeof MainLayoutIndexRoute
+  '/admin/': typeof AdminIndexRoute
   '/about': typeof MainLayoutstaticAboutRoute
   '/careers': typeof MainLayoutstaticCareersRoute
   '/contact-us': typeof MainLayoutstaticContactUsRoute
@@ -145,16 +252,32 @@ export interface FileRoutesByFullPath {
   '/shipping': typeof MainLayoutstaticShippingRoute
   '/terms': typeof MainLayoutstaticTermsRoute
   '/collections/$slug': typeof MainLayoutCollectionsSlugRoute
+  '/admin/activities': typeof AdminadminActivitiesRoute
+  '/admin/chats': typeof AdminadminChatsRoute
+  '/admin/faqs': typeof AdminadminFaqsRoute
+  '/admin/online': typeof AdminadminOnlineRoute
+  '/admin/settings': typeof AdminadminSettingsRoute
+  '/admin/users': typeof AdminadminUsersRoute
+  '/admin/abandoned-carts': typeof AdminstoreAbandonedCartsRoute
+  '/admin/categories': typeof AdminstoreCategoriesRoute
+  '/admin/collections': typeof AdminstoreCollectionsRoute
+  '/admin/coupons': typeof AdminstoreCouponsRouteWithChildren
+  '/admin/gallery': typeof AdminstoreGalleryRoute
+  '/admin/orders': typeof AdminstoreOrdersRoute
+  '/admin/reviews': typeof AdminstoreReviewsRoute
   '/collections': typeof MainLayoutCollectionsIndexRoute
+  '/admin/coupons/analytics': typeof AdminstoreCouponsAnalyticsRoute
 }
 export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/offline': typeof OfflineRoute
   '/bulk': typeof MainLayoutBulkRoute
   '/cart': typeof MainLayoutCartRoute
+  '/admin/shared': typeof AdminSharedRoute
   '/api/push-event': typeof ApiPushEventRoute
   '/payment/verify': typeof PaymentVerifyRoute
   '/': typeof MainLayoutIndexRoute
+  '/admin': typeof AdminIndexRoute
   '/about': typeof MainLayoutstaticAboutRoute
   '/careers': typeof MainLayoutstaticCareersRoute
   '/contact-us': typeof MainLayoutstaticContactUsRoute
@@ -164,19 +287,36 @@ export interface FileRoutesByTo {
   '/shipping': typeof MainLayoutstaticShippingRoute
   '/terms': typeof MainLayoutstaticTermsRoute
   '/collections/$slug': typeof MainLayoutCollectionsSlugRoute
+  '/admin/activities': typeof AdminadminActivitiesRoute
+  '/admin/chats': typeof AdminadminChatsRoute
+  '/admin/faqs': typeof AdminadminFaqsRoute
+  '/admin/online': typeof AdminadminOnlineRoute
+  '/admin/settings': typeof AdminadminSettingsRoute
+  '/admin/users': typeof AdminadminUsersRoute
+  '/admin/abandoned-carts': typeof AdminstoreAbandonedCartsRoute
+  '/admin/categories': typeof AdminstoreCategoriesRoute
+  '/admin/collections': typeof AdminstoreCollectionsRoute
+  '/admin/coupons': typeof AdminstoreCouponsRouteWithChildren
+  '/admin/gallery': typeof AdminstoreGalleryRoute
+  '/admin/orders': typeof AdminstoreOrdersRoute
+  '/admin/reviews': typeof AdminstoreReviewsRoute
   '/collections': typeof MainLayoutCollectionsIndexRoute
+  '/admin/coupons/analytics': typeof AdminstoreCouponsAnalyticsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_mainLayout': typeof MainLayoutRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/checkout': typeof CheckoutRoute
   '/offline': typeof OfflineRoute
   '/_mainLayout/_collections': typeof MainLayoutCollectionsRoute
   '/_mainLayout/bulk': typeof MainLayoutBulkRoute
   '/_mainLayout/cart': typeof MainLayoutCartRoute
+  '/admin/shared': typeof AdminSharedRoute
   '/api/push-event': typeof ApiPushEventRoute
   '/payment/verify': typeof PaymentVerifyRoute
   '/_mainLayout/': typeof MainLayoutIndexRoute
+  '/admin/': typeof AdminIndexRoute
   '/_mainLayout/(static)/about': typeof MainLayoutstaticAboutRoute
   '/_mainLayout/(static)/careers': typeof MainLayoutstaticCareersRoute
   '/_mainLayout/(static)/contact-us': typeof MainLayoutstaticContactUsRoute
@@ -186,18 +326,35 @@ export interface FileRoutesById {
   '/_mainLayout/(static)/shipping': typeof MainLayoutstaticShippingRoute
   '/_mainLayout/(static)/terms': typeof MainLayoutstaticTermsRoute
   '/_mainLayout/collections/$slug': typeof MainLayoutCollectionsSlugRoute
+  '/admin/(admin)/activities': typeof AdminadminActivitiesRoute
+  '/admin/(admin)/chats': typeof AdminadminChatsRoute
+  '/admin/(admin)/faqs': typeof AdminadminFaqsRoute
+  '/admin/(admin)/online': typeof AdminadminOnlineRoute
+  '/admin/(admin)/settings': typeof AdminadminSettingsRoute
+  '/admin/(admin)/users': typeof AdminadminUsersRoute
+  '/admin/(store)/abandoned-carts': typeof AdminstoreAbandonedCartsRoute
+  '/admin/(store)/categories': typeof AdminstoreCategoriesRoute
+  '/admin/(store)/collections': typeof AdminstoreCollectionsRoute
+  '/admin/(store)/coupons': typeof AdminstoreCouponsRouteWithChildren
+  '/admin/(store)/gallery': typeof AdminstoreGalleryRoute
+  '/admin/(store)/orders': typeof AdminstoreOrdersRoute
+  '/admin/(store)/reviews': typeof AdminstoreReviewsRoute
   '/_mainLayout/collections/': typeof MainLayoutCollectionsIndexRoute
+  '/admin/(store)/coupons/analytics': typeof AdminstoreCouponsAnalyticsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/admin'
     | '/checkout'
     | '/offline'
     | '/bulk'
     | '/cart'
+    | '/admin/shared'
     | '/api/push-event'
     | '/payment/verify'
     | '/'
+    | '/admin/'
     | '/about'
     | '/careers'
     | '/contact-us'
@@ -207,16 +364,32 @@ export interface FileRouteTypes {
     | '/shipping'
     | '/terms'
     | '/collections/$slug'
+    | '/admin/activities'
+    | '/admin/chats'
+    | '/admin/faqs'
+    | '/admin/online'
+    | '/admin/settings'
+    | '/admin/users'
+    | '/admin/abandoned-carts'
+    | '/admin/categories'
+    | '/admin/collections'
+    | '/admin/coupons'
+    | '/admin/gallery'
+    | '/admin/orders'
+    | '/admin/reviews'
     | '/collections'
+    | '/admin/coupons/analytics'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/checkout'
     | '/offline'
     | '/bulk'
     | '/cart'
+    | '/admin/shared'
     | '/api/push-event'
     | '/payment/verify'
     | '/'
+    | '/admin'
     | '/about'
     | '/careers'
     | '/contact-us'
@@ -226,18 +399,35 @@ export interface FileRouteTypes {
     | '/shipping'
     | '/terms'
     | '/collections/$slug'
+    | '/admin/activities'
+    | '/admin/chats'
+    | '/admin/faqs'
+    | '/admin/online'
+    | '/admin/settings'
+    | '/admin/users'
+    | '/admin/abandoned-carts'
+    | '/admin/categories'
+    | '/admin/collections'
+    | '/admin/coupons'
+    | '/admin/gallery'
+    | '/admin/orders'
+    | '/admin/reviews'
     | '/collections'
+    | '/admin/coupons/analytics'
   id:
     | '__root__'
     | '/_mainLayout'
+    | '/admin'
     | '/checkout'
     | '/offline'
     | '/_mainLayout/_collections'
     | '/_mainLayout/bulk'
     | '/_mainLayout/cart'
+    | '/admin/shared'
     | '/api/push-event'
     | '/payment/verify'
     | '/_mainLayout/'
+    | '/admin/'
     | '/_mainLayout/(static)/about'
     | '/_mainLayout/(static)/careers'
     | '/_mainLayout/(static)/contact-us'
@@ -247,11 +437,26 @@ export interface FileRouteTypes {
     | '/_mainLayout/(static)/shipping'
     | '/_mainLayout/(static)/terms'
     | '/_mainLayout/collections/$slug'
+    | '/admin/(admin)/activities'
+    | '/admin/(admin)/chats'
+    | '/admin/(admin)/faqs'
+    | '/admin/(admin)/online'
+    | '/admin/(admin)/settings'
+    | '/admin/(admin)/users'
+    | '/admin/(store)/abandoned-carts'
+    | '/admin/(store)/categories'
+    | '/admin/(store)/collections'
+    | '/admin/(store)/coupons'
+    | '/admin/(store)/gallery'
+    | '/admin/(store)/orders'
+    | '/admin/(store)/reviews'
     | '/_mainLayout/collections/'
+    | '/admin/(store)/coupons/analytics'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   MainLayoutRoute: typeof MainLayoutRouteWithChildren
+  AdminRoute: typeof AdminRouteWithChildren
   CheckoutRoute: typeof CheckoutRoute
   OfflineRoute: typeof OfflineRoute
   ApiPushEventRoute: typeof ApiPushEventRoute
@@ -274,12 +479,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_mainLayout': {
       id: '/_mainLayout'
       path: ''
       fullPath: ''
       preLoaderRoute: typeof MainLayoutRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/_mainLayout/': {
       id: '/_mainLayout/'
@@ -301,6 +520,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/push-event'
       preLoaderRoute: typeof ApiPushEventRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/shared': {
+      id: '/admin/shared'
+      path: '/shared'
+      fullPath: '/admin/shared'
+      preLoaderRoute: typeof AdminSharedRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/_mainLayout/cart': {
       id: '/_mainLayout/cart'
@@ -329,6 +555,97 @@ declare module '@tanstack/react-router' {
       fullPath: '/collections'
       preLoaderRoute: typeof MainLayoutCollectionsIndexRouteImport
       parentRoute: typeof MainLayoutRoute
+    }
+    '/admin/(store)/reviews': {
+      id: '/admin/(store)/reviews'
+      path: '/reviews'
+      fullPath: '/admin/reviews'
+      preLoaderRoute: typeof AdminstoreReviewsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/(store)/orders': {
+      id: '/admin/(store)/orders'
+      path: '/orders'
+      fullPath: '/admin/orders'
+      preLoaderRoute: typeof AdminstoreOrdersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/(store)/gallery': {
+      id: '/admin/(store)/gallery'
+      path: '/gallery'
+      fullPath: '/admin/gallery'
+      preLoaderRoute: typeof AdminstoreGalleryRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/(store)/coupons': {
+      id: '/admin/(store)/coupons'
+      path: '/coupons'
+      fullPath: '/admin/coupons'
+      preLoaderRoute: typeof AdminstoreCouponsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/(store)/collections': {
+      id: '/admin/(store)/collections'
+      path: '/collections'
+      fullPath: '/admin/collections'
+      preLoaderRoute: typeof AdminstoreCollectionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/(store)/categories': {
+      id: '/admin/(store)/categories'
+      path: '/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AdminstoreCategoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/(store)/abandoned-carts': {
+      id: '/admin/(store)/abandoned-carts'
+      path: '/abandoned-carts'
+      fullPath: '/admin/abandoned-carts'
+      preLoaderRoute: typeof AdminstoreAbandonedCartsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/(admin)/users': {
+      id: '/admin/(admin)/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminadminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/(admin)/settings': {
+      id: '/admin/(admin)/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminadminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/(admin)/online': {
+      id: '/admin/(admin)/online'
+      path: '/online'
+      fullPath: '/admin/online'
+      preLoaderRoute: typeof AdminadminOnlineRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/(admin)/faqs': {
+      id: '/admin/(admin)/faqs'
+      path: '/faqs'
+      fullPath: '/admin/faqs'
+      preLoaderRoute: typeof AdminadminFaqsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/(admin)/chats': {
+      id: '/admin/(admin)/chats'
+      path: '/chats'
+      fullPath: '/admin/chats'
+      preLoaderRoute: typeof AdminadminChatsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/(admin)/activities': {
+      id: '/admin/(admin)/activities'
+      path: '/activities'
+      fullPath: '/admin/activities'
+      preLoaderRoute: typeof AdminadminActivitiesRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/_mainLayout/collections/$slug': {
       id: '/_mainLayout/collections/$slug'
@@ -393,6 +710,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainLayoutstaticAboutRouteImport
       parentRoute: typeof MainLayoutRoute
     }
+    '/admin/(store)/coupons/analytics': {
+      id: '/admin/(store)/coupons/analytics'
+      path: '/analytics'
+      fullPath: '/admin/coupons/analytics'
+      preLoaderRoute: typeof AdminstoreCouponsAnalyticsRouteImport
+      parentRoute: typeof AdminstoreCouponsRoute
+    }
   }
 }
 
@@ -434,8 +758,58 @@ const MainLayoutRouteWithChildren = MainLayoutRoute._addFileChildren(
   MainLayoutRouteChildren,
 )
 
+interface AdminstoreCouponsRouteChildren {
+  AdminstoreCouponsAnalyticsRoute: typeof AdminstoreCouponsAnalyticsRoute
+}
+
+const AdminstoreCouponsRouteChildren: AdminstoreCouponsRouteChildren = {
+  AdminstoreCouponsAnalyticsRoute: AdminstoreCouponsAnalyticsRoute,
+}
+
+const AdminstoreCouponsRouteWithChildren =
+  AdminstoreCouponsRoute._addFileChildren(AdminstoreCouponsRouteChildren)
+
+interface AdminRouteChildren {
+  AdminSharedRoute: typeof AdminSharedRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminadminActivitiesRoute: typeof AdminadminActivitiesRoute
+  AdminadminChatsRoute: typeof AdminadminChatsRoute
+  AdminadminFaqsRoute: typeof AdminadminFaqsRoute
+  AdminadminOnlineRoute: typeof AdminadminOnlineRoute
+  AdminadminSettingsRoute: typeof AdminadminSettingsRoute
+  AdminadminUsersRoute: typeof AdminadminUsersRoute
+  AdminstoreAbandonedCartsRoute: typeof AdminstoreAbandonedCartsRoute
+  AdminstoreCategoriesRoute: typeof AdminstoreCategoriesRoute
+  AdminstoreCollectionsRoute: typeof AdminstoreCollectionsRoute
+  AdminstoreCouponsRoute: typeof AdminstoreCouponsRouteWithChildren
+  AdminstoreGalleryRoute: typeof AdminstoreGalleryRoute
+  AdminstoreOrdersRoute: typeof AdminstoreOrdersRoute
+  AdminstoreReviewsRoute: typeof AdminstoreReviewsRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminSharedRoute: AdminSharedRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  AdminadminActivitiesRoute: AdminadminActivitiesRoute,
+  AdminadminChatsRoute: AdminadminChatsRoute,
+  AdminadminFaqsRoute: AdminadminFaqsRoute,
+  AdminadminOnlineRoute: AdminadminOnlineRoute,
+  AdminadminSettingsRoute: AdminadminSettingsRoute,
+  AdminadminUsersRoute: AdminadminUsersRoute,
+  AdminstoreAbandonedCartsRoute: AdminstoreAbandonedCartsRoute,
+  AdminstoreCategoriesRoute: AdminstoreCategoriesRoute,
+  AdminstoreCollectionsRoute: AdminstoreCollectionsRoute,
+  AdminstoreCouponsRoute: AdminstoreCouponsRouteWithChildren,
+  AdminstoreGalleryRoute: AdminstoreGalleryRoute,
+  AdminstoreOrdersRoute: AdminstoreOrdersRoute,
+  AdminstoreReviewsRoute: AdminstoreReviewsRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   MainLayoutRoute: MainLayoutRouteWithChildren,
+  AdminRoute: AdminRouteWithChildren,
   CheckoutRoute: CheckoutRoute,
   OfflineRoute: OfflineRoute,
   ApiPushEventRoute: ApiPushEventRoute,

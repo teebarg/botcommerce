@@ -12,7 +12,7 @@ import OrderOverview from "./order-overview";
 import FadeInComponent from "@/components/generic/fade-in-component";
 import { Order } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import { useBankDetails } from "@/lib/hooks/useApi";
+import { useBankDetails } from "@/hooks/useApi";
 
 type OrderConfirmationProps = {
     order: Order;

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { useUpdateCoupon } from "@/lib/hooks/useCoupon";
+import { useUpdateCoupon } from "@/hooks/useCoupon";
 import { Coupon } from "@/schemas";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import Overlay from "@/components/overlay";

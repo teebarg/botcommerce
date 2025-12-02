@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ShopSettings } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import { useSyncShopDetails } from "@/lib/hooks/useGeneric";
+import { useSyncShopDetails } from "@/hooks/useGeneric";
 
 interface ShopDetailsProps {
     settings: ShopSettings[];

@@ -9,7 +9,7 @@ import { ProductView } from "@/components/products/product-view";
 import { Confirm } from "@/components/generic/confirm";
 import Overlay from "@/components/overlay";
 import { Button } from "@/components/ui/button";
-import { useDeleteProduct } from "@/lib/hooks/useProduct";
+import { useDeleteProduct } from "@/hooks/useProduct";
 
 interface ProductActionsProps {
     product: ProductSearch;

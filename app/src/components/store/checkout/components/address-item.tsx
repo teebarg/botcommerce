@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 import { Confirm } from "@/components/generic/confirm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useUpdateCartDetails } from "@/lib/hooks/useCart";
+import { useUpdateCartDetails } from "@/hooks/useCart";
 import ComponentLoader from "@/components/component-loader";
 
 interface AddressItemProp {

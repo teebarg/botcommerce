@@ -1,5 +1,3 @@
-"use client";
-
 import { toast } from "sonner";
 import { Share2, Copy, Smartphone, Twitter, Facebook } from "lucide-react";
 

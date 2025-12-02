@@ -10,10 +10,10 @@ import ProductShare from "@/components/product/product-share";
 import { ProductImage, ProductVariant } from "@/schemas";
 import { ProductVariantSelection } from "@/components/product/product-variant-selection";
 import { Product } from "@/schemas/product";
-import { UserInteractionType, useTrackUserInteraction } from "@/lib/hooks/useUserInteraction";
+import { UserInteractionType, useTrackUserInteraction } from "@/hooks/useUserInteraction";
 import { ProductCollectionIndicator } from "@/components/admin/shared-collections/product-collection-indicator";
 import { Button } from "@/components/ui/button";
-import { useUpdateVariant } from "@/lib/hooks/useProduct";
+import { useUpdateVariant } from "@/hooks/useProduct";
 import ImageDisplay from "@/components/image-display";
 import MediaDisplay from "@/components/media-display";
 

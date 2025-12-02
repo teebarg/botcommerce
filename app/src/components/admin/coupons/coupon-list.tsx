@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { SwipeableCouponCard } from "./swipeable-coupon-card";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { useCoupons, useDeleteCoupon, useToggleCouponStatus } from "@/lib/hooks/useCoupon";
+import { useCoupons, useDeleteCoupon, useToggleCouponStatus } from "@/hooks/useCoupon";
 import ComponentLoader from "@/components/component-loader";
 
 export const CouponList = () => {

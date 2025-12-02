@@ -12,7 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AddressTypeSchema } from "@/schemas";
 import { states } from "@/components/store/collections/data";
-import { useUpdateAddress } from "@/lib/hooks/useAddress";
+import { useUpdateAddress } from "@/hooks/useAddress";
 
 const addressSchema = z.object({
     address_type: AddressTypeSchema,

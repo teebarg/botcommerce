@@ -1,6 +1,6 @@
 import { ProductDetails } from "@/components/admin/product/product-details";
 import { Button } from "@/components/ui/button";
-import { useBustCache, useFlushCache, useReIndexProducts } from "@/lib/hooks/useProduct";
+import { useBustCache, useFlushCache, useReIndexProducts } from "@/hooks/useProduct";
 import { useNavigate } from "@tanstack/react-router";
 
 export function ProductInventory() {

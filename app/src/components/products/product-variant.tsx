@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductVariant } from "@/schemas";
 import { cn, currency } from "@/lib/utils";
-import { useDeleteVariant, useUpdateVariant } from "@/lib/hooks/useProduct";
+import { useDeleteVariant, useUpdateVariant } from "@/hooks/useProduct";
 
 interface ProductVariantsProps {
     variants: ProductVariant[];

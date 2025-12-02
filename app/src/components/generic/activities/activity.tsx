@@ -7,7 +7,7 @@ import { Activity } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { useDeleteActivity } from "@/lib/hooks/useActivities";
+import { useDeleteActivity } from "@/hooks/useActivities";
 
 interface Props {
     activities?: Activity[];

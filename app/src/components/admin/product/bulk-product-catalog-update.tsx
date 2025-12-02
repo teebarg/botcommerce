@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useBulkAddProductsToCatalog, useCatalogs } from "@/lib/hooks/useCollection";
+import { useBulkAddProductsToCatalog, useCatalogs } from "@/hooks/useCollection";
 import { Shared } from "@/schemas";
 
 interface CatalogBulkProductUpdateProps {

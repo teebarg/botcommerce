@@ -2,7 +2,7 @@ import { MapPin, Truck } from "lucide-react";
 
 import { DeliveryOption, Order } from "@/schemas";
 import { useStoreSettings } from "@/providers/store-provider";
-import { useDeliveryOptions } from "@/lib/hooks/useApi";
+import { useDeliveryOptions } from "@/hooks/useApi";
 
 const OrderAddress: React.FC<{ order: Order }> = ({ order }) => {
     const { settings } = useStoreSettings();

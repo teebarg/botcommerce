@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { DeliveryOption } from "@/schemas";
-import { useInvalidate } from "@/lib/hooks/useApi";
+import { useInvalidate } from "@/hooks/useApi";
 import { api } from "@/apis/client";
 import { ShippingMethodSchema } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";

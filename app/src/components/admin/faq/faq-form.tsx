@@ -11,7 +11,7 @@ import { FAQ } from "@/schemas";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useCreateFaq, useUpdateFaq } from "@/lib/hooks/useFaq";
+import { useCreateFaq, useUpdateFaq } from "@/hooks/useFaq";
 
 interface FaqFormProps {
     faq?: FAQ | null;

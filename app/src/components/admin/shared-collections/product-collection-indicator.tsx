@@ -4,7 +4,7 @@ import React from "react";
 import { Check } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { useCatalogs } from "@/lib/hooks/useCollection";
+import { useCatalogs } from "@/hooks/useCollection";
 
 interface ProductCollectionIndicatorProps {
     product: { id: number; name: string; [key: string]: any };

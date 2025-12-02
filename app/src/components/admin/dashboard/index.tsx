@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { OrderStatusBadge, PaymentStatusBadge } from "../orders/order-status-badge";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useOrders } from "@/lib/hooks/useOrder";
+import { useOrders } from "@/hooks/useOrder";
 import { Order } from "@/schemas";
 import { currency, formatDate } from "@/lib/utils";
 import ComponentLoader from "@/components/component-loader";

@@ -7,7 +7,7 @@ import { Upload } from "lucide-react";
 import DraggableImageList from "./draggable-images";
 
 import { ProductImage } from "@/schemas";
-import { useUploadImages } from "@/lib/hooks/useProduct";
+import { useUploadImages } from "@/hooks/useProduct";
 
 interface ProductImageManagerProps {
     productId: number;

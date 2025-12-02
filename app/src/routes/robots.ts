@@ -1,13 +1,11 @@
-import type { MetadataRoute } from "next";
+const BaseUrl = import.meta.env.VITE_BASE_URL
 
-import { siteUrls } from "@config/urls";
-
-export default function robots(): MetadataRoute.Robots {
+export default function robots() {
     return {
         rules: {
             userAgent: "*",
             allow: "/",
         },
-        sitemap: `${siteUrls.publicUrl}/api/sitemap.xml`,
+        sitemap: `${BaseUrl}/api/sitemap.xml`,
     };
 }

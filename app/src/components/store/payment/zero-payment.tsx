@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useCompleteCart } from "@/lib/hooks/useCart";
+import { useCompleteCart } from "@/hooks/useCart";
 
 export function ZeroPayment() {
     const completeCart = useCompleteCart();

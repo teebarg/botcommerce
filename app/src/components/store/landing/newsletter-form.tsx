@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
-import { useSubscribeNewsletter } from "@/lib/hooks/useGeneric";
+import { useSubscribeNewsletter } from "@/hooks/useGeneric";
 
 const newsletterSchema = z.object({
     email: z.string().email("Please enter a valid email address"),

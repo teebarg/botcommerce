@@ -45,7 +45,7 @@ export default function MobileFilterControl({ facets, setViewMode, viewMode }: P
                 </div>
                 <Overlay
                     open={editState.isOpen}
-                    title="Edit Brand"
+                    title="Filters"
                     trigger={
                         <Button className="rounded-full w-1/2 h-12">
                             <SlidersHorizontal className="h-5 w-5" />

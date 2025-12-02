@@ -8,7 +8,7 @@ import { SharedForm } from "./shared-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
-import { useDeleteCatalog } from "@/lib/hooks/useCollection";
+import { useDeleteCatalog } from "@/hooks/useCollection";
 import { Confirm } from "@/components/generic/confirm";
 import { DBCatalog } from "@/schemas/product";
 import { useNavigate } from "@tanstack/react-router";

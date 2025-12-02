@@ -6,7 +6,7 @@ import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import ChatViewer from "./chat-view";
 
-import { useDeleteChat } from "@/lib/hooks/useApi";
+import { useDeleteChat } from "@/hooks/useApi";
 import { Button } from "@/components/ui/button";
 import { Chat } from "@/schemas";
 import Overlay from "@/components/overlay";

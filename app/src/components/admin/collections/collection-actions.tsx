@@ -10,7 +10,7 @@ import { CollectionForm } from "@/components/admin/collections/collection-form";
 import { Collection } from "@/schemas/product";
 import Overlay from "@/components/overlay";
 import { Button } from "@/components/ui/button";
-import { useDeleteCollection } from "@/lib/hooks/useCollection";
+import { useDeleteCollection } from "@/hooks/useCollection";
 
 interface Props {
     collection: Collection;

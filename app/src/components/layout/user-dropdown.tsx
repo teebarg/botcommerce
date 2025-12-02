@@ -11,10 +11,10 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authApi } from "@/apis/auth";
-import { useInvalidateMe } from "@/lib/hooks/useUser";
+import { useInvalidateMe } from "@/hooks/useUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { deleteCookie } from "@/lib/util/cookie";
-import { useInvalidateCart } from "@/lib/hooks/useCart";
+import { useInvalidateCart } from "@/hooks/useCart";
 
 export default function UserDropDown({ user }: { user: Session }) {
     const invalidate = useInvalidateMe();

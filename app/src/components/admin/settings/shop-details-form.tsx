@@ -7,7 +7,7 @@ import { ShopSettings } from "@/schemas";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useSyncShopDetails } from "@/lib/hooks/useGeneric";
+import { useSyncShopDetails } from "@/hooks/useGeneric";
 
 interface ShopDetailsProps {
     settings: ShopSettings[];

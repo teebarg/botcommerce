@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect } from "react";
 
-import { useShopSettingsPublic } from "@/lib/hooks/useGeneric";
+import { useShopSettingsPublic } from "@/hooks/useGeneric";
 import { setCookie } from "@/lib/util/cookie";
 
 type StoreContextType = {

@@ -4,8 +4,8 @@ import ProductVariants from "@/components/products/product-variant";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProductForm from "@/components/products/product-form";
 import { ProductSearch } from "@/schemas/product";
-import { useCollections } from "@/lib/hooks/useCollection";
-import { useCategories } from "@/lib/hooks/useCategories";
+import { useCollections } from "@/hooks/useCollection";
+import { useCategories } from "@/hooks/useCategories";
 
 export function ProductView({ product, onClose }: { product?: ProductSearch; onClose: () => void }) {
     const { data: collections } = useCollections();

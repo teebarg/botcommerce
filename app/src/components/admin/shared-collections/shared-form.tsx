@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { DBCatalog } from "@/schemas";
-import { useUpdateCatalog, useCreateCatalog } from "@/lib/hooks/useCollection";
+import { useUpdateCatalog, useCreateCatalog } from "@/hooks/useCollection";
 
 interface SharedFormProps {
     current?: DBCatalog;

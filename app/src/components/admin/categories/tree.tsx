@@ -13,7 +13,7 @@ import { Category } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
-import { useReorderCategories } from "@/lib/hooks/useCategories";
+import { useReorderCategories } from "@/hooks/useCategories";
 import { ZeroState } from "@/components/zero";
 
 interface Props {

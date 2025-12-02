@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { CategoryForm } from "@/components/admin/categories/category-form";
 import Overlay from "@/components/overlay";
-import { useDeleteCategory } from "@/lib/hooks/useCategories";
+import { useDeleteCategory } from "@/hooks/useCategories";
 import { Confirm } from "@/components/generic/confirm";
 import { cn } from "@/lib/utils";
 

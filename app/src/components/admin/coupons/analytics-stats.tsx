@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingDown, DollarSign, Percent, Users, Tag } from "lucide-react";
-import { useCouponsAnalytics } from "@/lib/hooks/useCoupon";
+import { useCouponsAnalytics } from "@/hooks/useCoupon";
 
 const AnalyticsStats = () => {
     const { data } = useCouponsAnalytics();

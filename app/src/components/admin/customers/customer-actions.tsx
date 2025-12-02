@@ -8,12 +8,12 @@ import { toast } from "sonner";
 import CustomerForm from "./customer-form";
 
 import { User } from "@/schemas";
-import { useDeleteUser, useInvalidateMe } from "@/lib/hooks/useUser";
+import { useDeleteUser, useInvalidateMe } from "@/hooks/useUser";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 import { Confirm } from "@/components/generic/confirm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useInvalidateCart } from "@/lib/hooks/useCart";
+import { useInvalidateCart } from "@/hooks/useCart";
 import { deleteCookie } from "@/lib/util/cookie";
 
 interface CustomerActionsProps {

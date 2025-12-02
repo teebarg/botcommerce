@@ -7,7 +7,7 @@ import { Order } from "@/schemas";
 import PaymentLoading from "@/components/store/payment/payment-loading";
 import { deleteCookie } from "@/lib/util/cookie";
 import { tryCatch } from "@/lib/try-catch";
-import { useInvalidate } from "@/lib/hooks/useApi";
+import { useInvalidate } from "@/hooks/useApi";
 
 export const Route = createFileRoute("/payment/verify")({
     component: RouteComponent,

@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { useCreateReview } from "@/lib/hooks/useReview";
+import { useCreateReview } from "@/hooks/useReview";
 
 const reviewSchema = z.object({
     rating: z.number().min(1, "Rating is required").max(5, "Max rating is 5"),

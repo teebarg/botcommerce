@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Review } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
-import { useDeleteReview, useUpdateReview } from "@/lib/hooks/useReview";
+import { useDeleteReview, useUpdateReview } from "@/hooks/useReview";
 
 interface Props {
     review: Review;

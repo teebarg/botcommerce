@@ -12,8 +12,8 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Coupon } from "@/schemas";
-import { useAssignCoupon } from "@/lib/hooks/useCoupon";
-import { useUsers } from "@/lib/hooks/useUser";
+import { useAssignCoupon } from "@/hooks/useCoupon";
+import { useUsers } from "@/hooks/useUser";
 
 type CouponUser = NonNullable<Coupon["users"]>[number];
 
@@ -55,7 +55,7 @@ export const AssignmentDialog = ({ couponId, couponCode, assignedUsers }: Assign
 
     useEffect(() => {
         if (!open) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
+            // react-hooks/set-state-in-effect
             setSelectedUsers([]);
             setSearchQuery("");
         }

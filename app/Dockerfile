@@ -14,5 +14,5 @@ COPY . .
 # Expose the development port
 EXPOSE 7000
 
-# Start Next.js in development mode
+# Start in development mode
 CMD ["npm", "run", "dev"]

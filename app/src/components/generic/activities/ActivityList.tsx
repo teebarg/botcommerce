@@ -7,7 +7,7 @@ import { Download, Trash2, Activity as ActivityIcon, FileSpreadsheet, AlertCircl
 import { Activity } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useDeleteActivity } from "@/lib/hooks/useActivities";
+import { useDeleteActivity } from "@/hooks/useActivities";
 
 interface ActivityListProps {
     activities: Activity[];

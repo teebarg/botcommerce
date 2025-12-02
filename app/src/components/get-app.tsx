@@ -1,5 +1,3 @@
-"use client";
-
 import { RectangleVertical, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -45,12 +43,6 @@ const GetApp: React.FC = () => {
 
         setIsStandalone(window.matchMedia("(display-mode: standalone)").matches);
     }, []);
-
-    // useEffect(() => {
-    //     if (window.matchMedia("(display-mode: standalone)").matches || isInStandaloneMode()) {
-    //         setIsStandalone(true);
-    //     }
-    // }, []);
 
     useEffect(() => {
         const handler = (e: Event) => {

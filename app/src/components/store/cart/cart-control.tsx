@@ -3,7 +3,7 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 
 import { CartItem } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import { useChangeCartQuantity, useDeleteCartItem } from "@/lib/hooks/useCart";
+import { useChangeCartQuantity, useDeleteCartItem } from "@/hooks/useCart";
 
 interface Props {
     item: CartItem;

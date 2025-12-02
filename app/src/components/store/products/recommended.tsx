@@ -2,7 +2,7 @@
 
 import ProductCard from "@/components/store/products/product-card";
 import { ProductSearch } from "@/schemas/product";
-import { useRecommendedProducts } from "@/lib/hooks/useProduct";
+import { useRecommendedProducts } from "@/hooks/useProduct";
 import ComponentLoader from "@/components/component-loader";
 import ServerError from "@/components/generic/server-error";
 

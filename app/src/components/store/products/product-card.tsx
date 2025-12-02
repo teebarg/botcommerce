@@ -3,11 +3,11 @@
 import React from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import ProductActions from "./product-actions";
-import { useProductVariant } from "@/lib/hooks/useProductVariant";
+import { useProductVariant } from "@/hooks/useProductVariant";
 import { PriceLabel } from "@/components/store/products/price-label";
 import { DiscountBadge } from "@/components/store/products/discount-badge";
 import Overlay from "@/components/overlay";
-import { useUserWishlist } from "@/lib/hooks/useUser";
+import { useUserWishlist } from "@/hooks/useUser";
 import ProductOverview from "@/components/store/products/product-overview";
 import { ProductSearch, ProductVariant } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";

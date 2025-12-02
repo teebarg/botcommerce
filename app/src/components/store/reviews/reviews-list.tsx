@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ReviewCard } from "@/components/store/reviews/review-card";
 import { PaginatedReview, Review } from "@/schemas";
 import Overlay from "@/components/overlay";
-import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
+import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 
 interface ReviewsListProps {
     data: PaginatedReview;

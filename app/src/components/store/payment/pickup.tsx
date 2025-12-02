@@ -4,7 +4,7 @@ import { MapPin } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useStoreSettings } from "@/providers/store-provider";
-import { useCompleteCart } from "@/lib/hooks/useCart";
+import { useCompleteCart } from "@/hooks/useCart";
 
 interface PickupProps {
     amount: number;

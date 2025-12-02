@@ -7,7 +7,7 @@ import PaymentStatusManager from "./order-payment-status";
 
 import { Button } from "@/components/ui/button";
 import { Order, OrderStatus } from "@/schemas";
-import { useChangeOrderStatus } from "@/lib/hooks/useOrder";
+import { useChangeOrderStatus } from "@/hooks/useOrder";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 

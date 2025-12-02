@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { useUserRecentlyViewed } from "@/lib/hooks/useUser";
+import { useUserRecentlyViewed } from "@/hooks/useUser";
 import PromotionalBanner from "@/components/promotion";
 import ProductsCarousel from "@/components/store/product-carousel";
 

@@ -13,8 +13,8 @@ import { BankDetails, Message, ShopSettings } from "@/schemas";
 import { api } from "@/apis/client";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
-import { useBankDetails } from "@/lib/hooks/useApi";
-import { useSyncShopDetails } from "@/lib/hooks/useGeneric";
+import { useBankDetails } from "@/hooks/useApi";
+import { useSyncShopDetails } from "@/hooks/useGeneric";
 
 interface ShopPaymentsProps {
     settings: ShopSettings[];

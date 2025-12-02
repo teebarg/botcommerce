@@ -3,7 +3,7 @@ import PendingPayment from "./order-pending";
 import OrderPickup from "./order-pickup";
 import SuccessConfirmation from "./order-success";
 
-import { useOrder } from "@/lib/hooks/useOrder";
+import { useOrder } from "@/hooks/useOrder";
 import ServerError from "@/components/generic/server-error";
 import ComponentLoader from "@/components/component-loader";
 import { useNavigate } from "@tanstack/react-router";

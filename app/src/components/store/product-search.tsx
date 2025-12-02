@@ -10,7 +10,7 @@ import ProductCard from "@/components/store/products/product-card";
 import { ProductSearch } from "@/schemas";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { useProductSearch } from "@/lib/hooks/useProduct";
+import { useProductSearch } from "@/hooks/useProduct";
 import { Separator } from "@/components/ui/separator";
 import LocalizedClientLink from "@/components/ui/link";
 import { useRouter } from "@tanstack/react-router";

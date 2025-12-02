@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
+import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 
-import { useCategories } from "@/lib/hooks/useCategories";
+import { useCategories } from "@/hooks/useCategories";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";

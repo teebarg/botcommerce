@@ -5,7 +5,7 @@ import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
 import ServerError from "@/components/generic/server-error";
 import { WishItem } from "@/schemas";
-import { useUserWishlist } from "@/lib/hooks/useUser";
+import { useUserWishlist } from "@/hooks/useUser";
 import ComponentLoader from "@/components/component-loader";
 
 export default function Wishlist() {

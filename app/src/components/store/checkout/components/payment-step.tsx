@@ -5,7 +5,7 @@ import { paymentInfoMap } from "@lib/constants";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroupItem, RadioGroupWithLabel } from "@/components/ui/radio-group";
 import { Cart, PaymentMethod } from "@/schemas";
-import { useUpdateCartDetails } from "@/lib/hooks/useCart";
+import { useUpdateCartDetails } from "@/hooks/useCart";
 import { PaystackPayment } from "@/components/store/payment/paystack-payment";
 import BankTransfer from "@/components/store/payment/bank-transfer";
 import Pickup from "@/components/store/payment/pickup";
