@@ -1,9 +1,9 @@
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery, keepPreviousData } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
 
 import { api } from "@/apis/client";
 import { Product, PaginatedProductSearch, Message, ProductVariant, ProductSearch } from "@/schemas";
+import { GetProductsFn } from "@/server/product.server";
 
 type SearchParams = {
     search?: string;
@@ -40,8 +40,39 @@ export const useProductInfiniteSearch = (params: SearchParams) => {
     });
 };
 
+export const useProductInfiniteSearch1 = (params: SearchParams, initialData?: any) => {
+    return useInfiniteQuery({
+        queryKey: ["products", "search", "infinite", params],
+        queryFn: async ({ pageParam = 0 }) => await GetProductsFn({ data: { skip: pageParam, limit: 24, ...params } }),
+        getNextPageParam: (lastPage: any) => {
+            console.log("🚀 ~ file: useProduct.ts:33 ~ lastPage:", lastPage);
+            const nextSkip = lastPage.skip + lastPage.limit;
+            const hasMore = nextSkip < lastPage.total_count;
+
+            return hasMore ? nextSkip : undefined;
+        },
+        initialPageParam: 0,
+        // initialData: initialData ? { pages: [initialData], pageParams: [0] } : undefined,
+    });
+};
+
+export const useProductInfiniteSearch2 = (params: SearchParams) => {
+    return useInfiniteQuery<any>({
+        queryKey: ["products", "search", "infinite", params],
+        queryFn: async ({ pageParam = 0 }) => {
+            const start = (pageParam as number) * 24;
+            const fetchedData = await GetProductsFn({ data: { skip: start, limit: 24, ...params } }); //pretend api call
+            return fetchedData;
+        },
+        initialPageParam: 0,
+        getNextPageParam: (_lastGroup, groups) => groups.length,
+        refetchOnWindowFocus: false,
+        placeholderData: keepPreviousData,
+    });
+};
+
 export const useRecommendedProducts = (limit: number = 20) => {
-    const { data: session } = useSession();
+    const session: any = null;
 
     return useQuery({
         queryKey: ["products", "recommended", limit],

@@ -1,10 +1,7 @@
-"use client";
-
 import React from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { Edit, Trash2 } from "lucide-react";
 import { Eye } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 import { SharedForm } from "./shared-form";
 
@@ -14,6 +11,7 @@ import Overlay from "@/components/overlay";
 import { useDeleteCatalog } from "@/lib/hooks/useCollection";
 import { Confirm } from "@/components/generic/confirm";
 import { DBCatalog } from "@/schemas/product";
+import { useNavigate } from "@tanstack/react-router";
 
 interface Props {
     item: DBCatalog;
@@ -22,7 +20,7 @@ interface Props {
 const SharedActions: React.FC<Props> = ({ item }) => {
     const deleteState = useOverlayTriggerState({});
     const editState = useOverlayTriggerState({});
-    const router = useRouter();
+    const navigate = useNavigate();
 
     const deleteMutation = useDeleteCatalog();
 
@@ -34,7 +32,7 @@ const SharedActions: React.FC<Props> = ({ item }) => {
 
     return (
         <div className="relative flex items-center justify-end gap-2 mt-4">
-            <Button className="bg-primary/10" size="icon" variant="ghost" onClick={() => router.push(`/shared/${item.slug}`)}>
+            <Button className="bg-primary/10" size="icon" variant="ghost" onClick={() => navigate({to: `/shared/${item.slug}`})}>
                 <Eye className="h-5 w-5 text-primary" />
             </Button>
             <Overlay

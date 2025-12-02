@@ -1,15 +1,11 @@
-import { signOut } from "next-auth/react";
-
-import { getCookie } from "@/lib/util/server-utils";
-
-const baseURL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+const baseURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
 
 type RequestOptions = RequestInit & {
     params?: Record<string, string | number | unknown>;
 };
 
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-    const { token } = await fetch("/api/session").then((res) => res.json());
+    const token = "ksksksk"
     const { params, ...restOptions } = options;
 
     const url = new URL(`/api${endpoint}`, baseURL);
@@ -21,12 +17,12 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         });
     }
 
-    const cartId = await getCookie("_cart_id");
+    // const cartId = await getCookie("_cart_id");
 
     const headers = {
         "Content-Type": "application/json",
         "X-Auth": token ?? "token",
-        cartId: cartId ?? "",
+        cartId: "",
         ...options.headers,
     };
 
@@ -38,7 +34,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
 
     if (!response.ok) {
         if (response.status === 401) {
-            await signOut({ redirect: false });
+            // await signOut({ redirect: false });
             // window.location.href = `/auth/signin?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
         }
         const error = await response.json();

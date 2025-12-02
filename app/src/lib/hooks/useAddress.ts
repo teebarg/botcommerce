@@ -1,12 +1,11 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
 
 import { api } from "@/apis/client";
 import { Address, Message } from "@/schemas";
 
 export const useUserAddresses = () => {
-    const { data: session } = useSession();
+    const session: any = null;
 
     return useQuery({
         queryKey: ["addresses", session?.id?.toString()],

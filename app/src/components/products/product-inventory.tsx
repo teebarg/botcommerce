@@ -1,16 +1,13 @@
-"use client";
-
-import { useRouter } from "next/navigation";
-
 import { ProductDetails } from "@/components/admin/product/product-details";
 import { Button } from "@/components/ui/button";
 import { useBustCache, useFlushCache, useReIndexProducts } from "@/lib/hooks/useProduct";
+import { useNavigate } from "@tanstack/react-router";
 
 export function ProductInventory() {
     const reIndexProducts = useReIndexProducts();
     const bustCache = useBustCache();
     const flushCache = useFlushCache();
-    const router = useRouter();
+    const navigate = useNavigate();
 
     const handleReIndex = () => {
         reIndexProducts.mutate();
@@ -31,7 +28,7 @@ export function ProductInventory() {
                 <p className="text-sm text-muted-foreground">Manage your product inventory and stock levels. Scroll down to load more products.</p>
             </div>
             <div className="flex flex-wrap gap-2 mb-2">
-                <Button onClick={() => router.push("/admin/products/create")}>Create Product</Button>
+                <Button onClick={() => navigate({to: "/admin/products/create"})}>Create Product</Button>
                 <Button
                     className="min-w-32"
                     disabled={reIndexProducts.isPending}

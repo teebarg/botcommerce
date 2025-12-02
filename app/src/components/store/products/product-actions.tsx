@@ -1,6 +1,5 @@
 import React from "react";
 import { Check, ShoppingCart } from "lucide-react";
-import { useSession } from "next-auth/react";
 
 import { ProductSearch } from "@/schemas";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,7 @@ const ProductActions: React.FC<{
 }> = ({ product }) => {
     const { selectedVariant, handleAddToCart, handleWhatsAppPurchase, loading, outOfStock, isAdded } = useProductVariant(product);
 
-    const { data: session } = useSession();
+    const session: any = null;
     const trackInteraction = useTrackUserInteraction();
 
     const handleAddToCartAndTrack = (e: React.MouseEvent) => {

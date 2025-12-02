@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { Input } from "@components/ui/input";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { useSearchParams } from "next/navigation";
+import { useSearch } from "@tanstack/react-router"; 
 import { Mail } from "lucide-react";
-import { signIn } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
 import SocialLoginButtons from "@/components/generic/auth/social-login-buttons";
@@ -18,7 +17,8 @@ type Props = {
 const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
     const [email, setEmail] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
-    const searchParams = useSearchParams();
+    // const search = useSearch();
+    
 
     const handleEmailSignIn = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -29,10 +29,10 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
         }
         setLoading(true);
 
-        await signIn("http-email", {
-            email,
-            callbackUrl: callbackUrl || searchParams.get("callbackUrl") || "/",
-        });
+        // await signIn("http-email", {
+        //     email,
+        //     callbackUrl: callbackUrl || "/",
+        // });
     };
 
     return (

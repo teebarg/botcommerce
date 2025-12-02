@@ -1,10 +1,7 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ShoppingBag, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import ClientOnly from "@/components/generic/client-only";
 
 declare global {
     interface BeforeInstallPromptEvent extends Event {
@@ -74,7 +71,7 @@ const InstallPrompt: React.FC = () => {
     }
 
     return (
-        <ClientOnly>
+        <React.Fragment>
             <div className="fixed bottom-4 left-4 right-4 md:max-w-100 z-50 bg-card">
                 <div className="rounded-lg shadow-xl p-8">
                     <button aria-label="cancel" className="absolute top-2 right-2 text-muted-foreground cursor-pointer" onClick={handleClose}>
@@ -114,7 +111,7 @@ const InstallPrompt: React.FC = () => {
                     </p>
                 )}
             </div>
-        </ClientOnly>
+        </React.Fragment>
     );
 };
 

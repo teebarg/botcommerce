@@ -142,11 +142,3 @@ Contains global TypeScript type defintions.
 ### `middleware.ts`
 
 Next.js Middleware, which is basically an Edge function that runs before (almost) every request.
-
-# Resources
-
-## Learn more about Next.js
-
-- [Website](https://nextjs.org/)
-- [GitHub](https://github.com/vercel/next.js)
-- [Documentation](https://nextjs.org/docs)

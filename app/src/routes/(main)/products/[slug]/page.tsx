@@ -1,7 +1,3 @@
-import { notFound } from "next/navigation";
-import React from "react";
-import { Metadata } from "next";
-
 import RelatedProducts from "@/components/store/products/related-products";
 import { serverApi } from "@/apis/server-client";
 import ServerError from "@/components/generic/server-error";
@@ -11,44 +7,42 @@ import { tryCatch } from "@/lib/try-catch";
 import { Product } from "@/schemas";
 import { LazyInView } from "@/components/LazyInView";
 
-export const revalidate = 60;
-
 type Params = Promise<{ slug: string }>;
 
-export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-    const { slug } = await params;
-    const { data: product, error } = await tryCatch<Product>(serverApi.get(`/product/${slug}`));
+// export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+//     const { slug } = await params;
+//     const { data: product, error } = await tryCatch<Product>(serverApi.get(`/product/${slug}`));
 
-    if (error || !product) {
-        return {};
-    }
+//     if (error || !product) {
+//         return {};
+//     }
 
-    return {
-        title: product.name,
-        description: product.description,
-        openGraph: {
-            title: product.name,
-            description: product.description,
-            url: `${process.env.NEXT_PUBLIC_BASE_URL}/products/${slug}`,
-            type: "website",
-            siteName: "Thrift",
-            images: [
-                {
-                    url: product?.images?.[0]?.image,
-                    width: 800,
-                    height: 800,
-                    alt: product.name,
-                },
-            ],
-        },
-        twitter: {
-            card: "summary_large_image",
-            title: product.name,
-            description: product.description,
-            images: [product?.images?.[0]?.image],
-        },
-    };
-}
+//     return {
+//         title: product.name,
+//         description: product.description,
+//         openGraph: {
+//             title: product.name,
+//             description: product.description,
+//             url: `${import.meta.env.VITE_BASE_URL}/products/${slug}`,
+//             type: "website",
+//             siteName: "Thrift",
+//             images: [
+//                 {
+//                     url: product?.images?.[0]?.image,
+//                     width: 800,
+//                     height: 800,
+//                     alt: product.name,
+//                 },
+//             ],
+//         },
+//         twitter: {
+//             card: "summary_large_image",
+//             title: product.name,
+//             description: product.description,
+//             images: [product?.images?.[0]?.image],
+//         },
+//     };
+// }
 
 export default async function ProductPage({ params }: { params: Params }) {
     const { slug } = await params;
@@ -57,10 +51,6 @@ export default async function ProductPage({ params }: { params: Params }) {
 
     if (error) {
         return <ServerError />;
-    }
-
-    if (!product) {
-        notFound();
     }
 
     return (

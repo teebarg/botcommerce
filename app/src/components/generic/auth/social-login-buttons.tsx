@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
 
@@ -11,12 +9,12 @@ type Props = {
 };
 
 export default function SocialLoginButtons({ callbackUrl }: Props) {
-    const searchParams = useSearchParams();
+    // const searchParams = useSearchParams();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const handleSocialLogin = async () => {
         setIsLoading(true);
-        signIn("google", { callbackUrl: callbackUrl || searchParams.get("callbackUrl") || "/" });
+        // signIn("google", { callbackUrl: callbackUrl || searchParams.get("callbackUrl") || "/" });
     };
 
     return (

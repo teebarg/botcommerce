@@ -1,6 +1,3 @@
-"use client";
-
-import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { MenuIcon } from "lucide-react";
@@ -9,9 +6,11 @@ import Menu from "../menu";
 
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
+import { useLocation } from "@tanstack/react-router";
 
 const StoreMenuComp: React.FC = () => {
-    const pathname = usePathname();
+    const location = useLocation();
+    const pathname = location.pathname;
     const state = useOverlayTriggerState({});
 
     useEffect(() => {

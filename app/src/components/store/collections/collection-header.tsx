@@ -1,16 +1,13 @@
-"use client";
-
-import { useParams, useRouter } from "next/navigation";
-
 import { Badge } from "@/components/ui/badge";
 import { useCollections } from "@/lib/hooks/useCollection";
 import LocalizedClientLink from "@/components/ui/link";
 import ShareButton from "@/components/share";
+import { useNavigate } from "@tanstack/react-router";
 
 export function CollectionHeader() {
     const { data: collections } = useCollections();
-    const router = useRouter();
-    const params = useParams();
+    const navigate = useNavigate();
+    // const params = useParams();
 
     return (
         <div className="flex flex-col gap-3 py-4 px-0.5">
@@ -34,8 +31,8 @@ export function CollectionHeader() {
                     <Badge
                         key={collection.id}
                         className="cursor-pointer py-1 text-sm"
-                        variant={params.slug === collection.slug ? "indigo" : "gray"}
-                        onClick={() => router.push(`/collections/${collection.slug}`)}
+                        // variant={params.slug === collection.slug ? "indigo" : "gray"}
+                        onClick={() => navigate({to: `/collections/${collection.slug}`})}
                     >
                         {collection.name}
                     </Badge>

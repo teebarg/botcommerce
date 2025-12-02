@@ -1,14 +1,10 @@
-"use client";
-
-import React from "react";
 import { AlertTriangle, ArrowLeft } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 export default function ErrorPage() {
-    const searchParams = useSearchParams();
+    const searchParams: any = null;
     const error = searchParams?.get("error");
 
     const getErrorContent = () => {
@@ -86,7 +82,7 @@ export default function ErrorPage() {
             <div className="mt-6 text-center">
                 <p className="text-sm text-muted-foreground">
                     Still having trouble?{" "}
-                    <a className="text-emerald-600 hover:text-emerald-700 font-medium" href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`}>
+                    <a className="text-emerald-600 hover:text-emerald-700 font-medium" href={`mailto:${import.meta.env.VITE_CONTACT_EMAIL}`}>
                         Contact support
                     </a>
                 </p>

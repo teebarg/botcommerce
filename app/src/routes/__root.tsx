@@ -1,15 +1,14 @@
 /// <reference types="vite/client" />
 
-import "./globals.css";
 import { HeadContent, Outlet, ScriptOnce, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import { Toaster } from "sonner";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { PushNotificationManager } from "@/components/pwa/notification-manager";
 import { InstallPrompt } from "@/components/pwa/prompt";
 import { ProgressBar } from "@/components/ui/progress-bar";
-import { WebSocketProvider } from "@/providers/websocket";
 import { CartProvider } from "@/providers/cart-provider";
 import { StoreProvider } from "@/providers/store-provider";
 import ImpersonationBanner from "@/components/impersonation-banner";
@@ -18,6 +17,8 @@ import { getStoredTheme, ThemeProvider } from "@/components/ThemeProvider";
 import { seo } from "@/utils/seo";
 import NotFound from "@/components/generic/not-found";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
+import { WebSocketProvider } from "pulsews";
+import appCss from "@/styles.css?url";
 
 export const Route = createRootRouteWithContext()({
     head: () => ({
@@ -32,6 +33,7 @@ export const Route = createRootRouteWithContext()({
             }),
         ],
         links: [
+            { rel: "stylesheet", href: appCss },
             { rel: "icon", href: "/favicon-32x32.png", type: "image/png" },
             { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
             { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
@@ -86,18 +88,22 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                             <InstallPrompt />
                             <StoreProvider>
                                 <CartProvider>
-                                    <WebSocketProvider>
-                                        <Outlet />
+                                    <WebSocketProvider
+                                        url={import.meta.env.VITE_WS_URL + "/api/ws/"}
+                                        debug={true}
+                                        onOpen={() => console.log("WebSocket connected!")}
+                                        onClose={() => console.log("WebSocket disconnected!")}
+                                    >
+                                        {children}
                                         <ImpersonationBanner />
                                     </WebSocketProvider>
                                 </CartProvider>
                             </StoreProvider>
 
-                            {import.meta.env.MODE !== "production" && <ReactQueryDevtools initialIsOpen={false} />}
+                            {import.meta.env.MODE !== "production" && <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />}
                         </div>
                     </ProgressBar>
-                    {import.meta.env.MODE !== "production" && <TanStackRouterDevtoolsPanel />}
-                    <ReactQueryDevtools buttonPosition="bottom-left" />
+                    {/* {import.meta.env.MODE !== "production" && <TanStackRouterDevtoolsPanel />} */}
                     <Toaster closeButton richColors duration={3000} expand={false} position="top-right" />
                     <Scripts />
                 </ThemeProvider>

@@ -2,17 +2,18 @@
 
 import { Send, X } from "lucide-react";
 import { useState } from "react";
-import { usePathname } from "next/navigation";
 
 import { Button } from "./button";
 
 import { formatDate } from "@/lib/utils";
 import { useStoreSettings } from "@/providers/store-provider";
+import { useLocation } from "@tanstack/react-router";
 
 const WhatsAppWidget: React.FC = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [message, setMessage] = useState<string>("");
-    const path = usePathname();
+    const location = useLocation();
+    const path = location.pathname;
 
     const { settings } = useStoreSettings();
 

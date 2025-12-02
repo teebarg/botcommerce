@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
 
 import { api } from "@/apis/client";
 import { Order, OrderStatus, PaginatedOrder, PaymentStatus } from "@/schemas";
@@ -15,7 +14,7 @@ interface OrderSearchParams {
 }
 
 export const useOrders = (searchParams: OrderSearchParams) => {
-    const { data: session } = useSession();
+    const session: any = null;
 
     return useQuery({
         queryKey: ["orders", JSON.stringify(searchParams)],

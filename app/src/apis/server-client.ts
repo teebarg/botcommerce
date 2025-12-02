@@ -1,14 +1,11 @@
-import { auth } from "@/auth";
-import { getCookie } from "@/lib/util/server-utils";
-
-const baseURL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+const baseURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
 
 type RequestOptions = RequestInit & {
     params?: Record<string, string | number>;
 };
 
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-    const session = await auth();
+    const session: any = null;
     const { params, ...restOptions } = options;
 
     const url = new URL(`/api${endpoint}`, baseURL);
@@ -20,12 +17,12 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         });
     }
 
-    const cartId = await getCookie("_cart_id");
+    // const cartId = await getCookie("_cart_id");
 
     const headers = {
         "Content-Type": "application/json",
         "X-Auth": session?.accessToken ?? "token",
-        cartId: cartId ?? "",
+        cartId: "",
         ...options.headers,
     };
 
@@ -35,16 +32,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         credentials: "include",
     });
 
-    if (!response.ok) {
-        if (response.status === 401) {
-            // window.location.href = `/auth/signin?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
-        }
-        const error = await response.json();
-
-        throw new Error(error.detail || error.message || `API Error: ${response.statusText}`);
-    }
-
-    return response.json();
+    return response.json()
 }
 
 export const serverApi = {

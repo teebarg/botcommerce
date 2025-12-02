@@ -2,8 +2,6 @@ import { MapPin, Clock, Package, Copy, ExternalLink, User, X } from "lucide-reac
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import { useSession } from "next-auth/react";
-
 import { ReminderButton } from "./reminder-button";
 
 import { Button } from "@/components/ui/button";
@@ -22,7 +20,8 @@ interface AbandonedCartDetailsDialogProps {
 
 export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogProps) => {
     const state = useOverlayTriggerState({});
-    const { data: session, update } = useSession();
+    // const { data: session, update } = useSession();
+    const session: any = null
     const invalidateMe = useInvalidateMe();
     const invalidateCart = useInvalidateCart();
 
@@ -35,7 +34,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
 
     const handleImpersonation = async () => {
         deleteCookie("_cart_id");
-        await update({ impersonatedBy: session?.user?.email!, email: cart?.user?.email!, impersonated: true, mode: "impersonate" });
+        // await update({ impersonatedBy: session?.user?.email!, email: cart?.user?.email!, impersonated: true, mode: "impersonate" });
         invalidateMe();
         invalidateCart();
         toast.success("Impersonated");

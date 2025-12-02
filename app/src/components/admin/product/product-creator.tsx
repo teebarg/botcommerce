@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CheckCircle, ArrowLeft, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
 import { ImageUpload } from "./product-image-upload";
 import { ProductDetailsForm } from "./product-details-form";
@@ -16,6 +15,7 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { Product, ProductVariant } from "@/schemas";
 import { api } from "@/apis/client";
+import { useNavigate } from "@tanstack/react-router";
 
 export interface ProductImage {
     id: string;
@@ -46,7 +46,7 @@ const STEPS = [
 ];
 
 export function ProductCreator() {
-    const router = useRouter();
+    const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState<number>(1);
     const [product, setProduct] = useState<FormProduct>({
         name: "",
@@ -261,7 +261,7 @@ export function ProductCreator() {
                         <Button className="w-full" variant="success" onClick={() => window.location.reload()}>
                             Create Another Product
                         </Button>
-                        <Button className="w-full" onClick={() => router.push("/admin/products")}>
+                        <Button className="w-full" onClick={() => navigate({to: "/admin/products"})}>
                             Go To Products
                         </Button>
                     </div>

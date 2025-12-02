@@ -2,7 +2,6 @@
 
 import React from "react";
 import { ArrowUpDown, Search } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 
 import { ReviewActions } from "./reviews-actions";
 import ReviewItem from "./review-item";
@@ -18,7 +17,7 @@ import ServerError from "@/components/generic/server-error";
 import ComponentLoader from "@/components/component-loader";
 
 const ReviewView: React.FC = () => {
-    const searchParams = useSearchParams();
+    const searchParams: any = null;
     const skip = parseInt(searchParams.get("skip") || "0", 10);
 
     const { data, isLoading, error } = useReviews({ skip, limit: 20 });

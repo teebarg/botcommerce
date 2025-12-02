@@ -1,8 +1,8 @@
 import { startTransition, useCallback } from "react";
-import { debounce } from "@lib/utils";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { debounce } from "@/lib/utils";
 
 import { useProgressBar } from "@/components/ui/progress-bar";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 
 interface QueryParam {
     key: string;
@@ -10,9 +10,10 @@ interface QueryParam {
 }
 
 const useUpdateQuery = (delay = 500) => {
-    const router = useRouter();
-    const pathname = usePathname();
-    const searchParams = useSearchParams();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const pathname = location.pathname;
+    const searchParams: any = null;
     let progress = useProgressBar();
 
     const updateQuery = useCallback(
@@ -30,7 +31,7 @@ const useUpdateQuery = (delay = 500) => {
             progress.start();
 
             startTransition(() => {
-                router.push(`${pathname}?${params.toString()}`);
+                navigate({ to: `${pathname}?${params.toString()}` });
                 progress.done();
             });
         }, delay),

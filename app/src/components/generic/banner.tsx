@@ -1,17 +1,15 @@
-"use client";
-
 import React from "react";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "@tanstack/react-router";
 
 interface ComponentProps {}
 
 const Banner: React.FC<ComponentProps> = () => {
-    const router = useRouter();
+    const navigate = useNavigate();
     const [currentSlide, setCurrentSlide] = useState<number>(0);
     const content = ["Summer Sale 😍 🌴 Save 30% off selected seasonal items", "Buy clothes worth 40,000 naira and get Free Gift Card"];
 
@@ -45,7 +43,7 @@ const Banner: React.FC<ComponentProps> = () => {
                         </span>
                     </div>
 
-                    <Button aria-label="shop now" className="min-w-[100px] rounded-full! p-px" size="sm" onClick={() => router.push("/collections")}>
+                    <Button aria-label="shop now" className="min-w-[100px] rounded-full! p-px" size="sm" onClick={() => navigate({to: "/collections"})}>
                         <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#F54180_0%,#338EF7_50%,#F54180_100%)]" />
                         <div className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-background group-hover:bg-background/70 transition-background px-3 py-1 text-sm font-medium text-foreground backdrop-blur-3xl">
                             Shop Now

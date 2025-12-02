@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
-import { useSearchParams } from "next/navigation";
+import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Facet } from "@/schemas/product";
@@ -16,7 +15,7 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ groupName, checkboxes, fa
     const { updateQuery } = useUpdateQuery(300);
     const [dataSet, setDataSet] = useState(new Set());
 
-    const searchParams = useSearchParams();
+    const searchParams: any = null;
 
     const handleParentChange = (checked: boolean) => {
         const newSet = new Set(dataSet);

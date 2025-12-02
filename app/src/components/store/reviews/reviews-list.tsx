@@ -1,6 +1,5 @@
 import { Star, Filter } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import { useSearchParams } from "next/navigation";
 
 import { ReviewForm } from "./review-form";
 
@@ -24,7 +23,7 @@ export const ReviewsList = ({ data, productName, product_id, hasPurchased, hasRe
     const state = useOverlayTriggerState({});
     const { reviews, ratings } = data;
     const { updateQuery } = useUpdateQuery(200);
-    const searchParams = useSearchParams();
+    const searchParams: any = null;
     const sort = searchParams.get("sort") || "newest";
 
     const getPercentage = (count: number) => (count / ratings?.count) * 100;

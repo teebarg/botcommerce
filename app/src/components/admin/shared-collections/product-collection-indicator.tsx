@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Check } from "lucide-react";
-import { useSession } from "next-auth/react";
 
 import { Badge } from "@/components/ui/badge";
 import { useCatalogs } from "@/lib/hooks/useCollection";
@@ -12,7 +11,7 @@ interface ProductCollectionIndicatorProps {
 }
 
 export const ProductCollectionIndicator: React.FC<ProductCollectionIndicatorProps> = ({ product }) => {
-    const { data: session } = useSession();
+    const session: any = null;
     const { data } = useCatalogs();
 
     if (!session?.user?.isAdmin) {

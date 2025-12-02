@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { useSearchParams } from "next/navigation";
-import { useUpdateQuery } from "@lib/hooks/useUpdateQuery";
+import { useUpdateQuery } from "@/lib/hooks/useUpdateQuery";
 
 import { useCategories } from "@/lib/hooks/useCategories";
 import { Button } from "@/components/ui/button";
@@ -18,7 +17,7 @@ interface Props {
 }
 
 export function FilterSidebar({ facets, onApplyComplete }: Props) {
-    const searchParams = useSearchParams();
+    const searchParams: any = null;
     const { updateQuery } = useUpdateQuery();
     const [openSections, setOpenSections] = useState({
         categories: true,
@@ -30,7 +29,7 @@ export function FilterSidebar({ facets, onApplyComplete }: Props) {
     });
     const { data: categories } = useCategories();
 
-    const [sort, setSort] = useState<string>(() => searchParams.get("sortBy") || "created_at:desc");
+    const [sort, setSort] = useState<string>(() => searchParams?.get("sortBy") || "created_at:desc");
     const [sizeSet, setSizeSet] = useState<Set<string>>(new Set());
     const [colorSet, setColorSet] = useState<Set<string>>(new Set());
     const [ageSet, setAgeSet] = useState<Set<string>>(new Set());
@@ -43,20 +42,20 @@ export function FilterSidebar({ facets, onApplyComplete }: Props) {
     };
 
     useEffect(() => {
-        const sizesFromURL = searchParams.get("sizes")?.split(",").filter(Boolean) || [];
+        const sizesFromURL = searchParams?.get("sizes")?.split(",").filter(Boolean) || [];
 
         setSizeSet(new Set(sizesFromURL));
 
-        const colorsFromURL = searchParams.get("colors")?.split(",").filter(Boolean) || [];
+        const colorsFromURL = searchParams?.get("colors")?.split(",").filter(Boolean) || [];
 
         setColorSet(new Set(colorsFromURL));
 
-        const catsFromURL = searchParams.get("cat_ids")?.split(",").filter(Boolean) || [];
+        const catsFromURL = searchParams?.get("cat_ids")?.split(",").filter(Boolean) || [];
 
         setCategorySet(new Set(catsFromURL));
 
-        setMinPrice(searchParams.get("minPrice") || "");
-        setMaxPrice(searchParams.get("maxPrice") || "");
+        setMinPrice(searchParams?.get("minPrice") || "");
+        setMaxPrice(searchParams?.get("maxPrice") || "");
     }, [searchParams]);
 
     const onToggleSize = (slug: string) => {

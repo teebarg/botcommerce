@@ -1,5 +1,3 @@
-"use client";
-
 import { Plus, Upload } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
@@ -9,9 +7,9 @@ import BannerItem from "./banner-item";
 import { Button } from "@/components/ui/button";
 import { CarouselBanner } from "@/schemas/carousel";
 import Overlay from "@/components/overlay";
-import ClientOnly from "@/components/generic/client-only";
 import { useCarouselBanners } from "@/lib/hooks/useCarousel";
 import ComponentLoader from "@/components/component-loader";
+import React from "react";
 
 export default function CarouselBannerList() {
     const addState = useOverlayTriggerState({});
@@ -19,7 +17,7 @@ export default function CarouselBannerList() {
     const { data: banners, isLoading } = useCarouselBanners();
 
     return (
-        <ClientOnly>
+        <React.Fragment>
             <div className="bg-card rounded-2xl shadow-sm border p-6 mb-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
@@ -55,6 +53,6 @@ export default function CarouselBannerList() {
                     </div>
                 )}
             </div>
-        </ClientOnly>
+        </React.Fragment>
     );
 }

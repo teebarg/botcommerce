@@ -1,7 +1,4 @@
-"use client";
-
 import React from "react";
-import { useSearchParams } from "next/navigation";
 import { format } from "date-fns";
 import { Search } from "lucide-react";
 
@@ -23,7 +20,7 @@ const LIMIT = 10;
 const OrderView: React.FC = () => {
     const { updateQuery } = useUpdateQuery(200);
 
-    const searchParams = useSearchParams();
+    const searchParams: any = null;
 
     const skip = Number(searchParams.get("skip")) || 0;
     const status = searchParams.get("status") || "";

@@ -1,5 +1,4 @@
-import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from "@components/navbar";
-import ThemeButton from "@lib/theme/theme-button";
+import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from "@/components/navbar";
 
 import GetApp from "../get-app";
 
@@ -7,17 +6,19 @@ import UserDropDown from "./user-dropdown";
 
 import { CartComponent } from "@/components/store/cart/cart-component";
 import LocalizedClientLink from "@/components/ui/link";
-import { auth } from "@/auth";
 import { SearchDialog } from "@/components/store/product-search";
 import { getSiteConfig } from "@/lib/config";
 import { Heart, HeartOff } from "lucide-react";
+import { ThemeToggle } from "../theme-toggle";
 
-const StoreNavbar = async () => {
-    const session = await auth();
-    const siteConfig = await getSiteConfig();
+const StoreNavbar = () => {
+    const session: any = null;
+    const siteConfig = getSiteConfig();
+    console.log("StoreNavbar rendered on", typeof window === "undefined" ? "server" : "client");
+
 
     return (
-        <NavigationBar className="hidden md:flex bg-background py-2">
+        <NavigationBar className="bg-background py-2">
             <NavbarContent className="flex flex-1 max-w-8xl mx-auto">
                 <NavbarBrand className="flex items-center font-semibold">
                     <LocalizedClientLink className="flex items-center gap-1" href="/">
@@ -35,7 +36,7 @@ const StoreNavbar = async () => {
                 </NavbarItem>
                 <NavbarItem className="flex gap-1.5 justify-end items-center">
                     <CartComponent />
-                    <ThemeButton />
+                    <ThemeToggle />
                     <div className="hidden md:flex">
                         {session ? (
                             <LocalizedClientLink
@@ -54,7 +55,7 @@ const StoreNavbar = async () => {
                     <GetApp />
                     <div className="hidden sm:flex">
                         {session ? (
-                            <UserDropDown user={session.user} />
+                            <UserDropDown user={session?.user} />
                         ) : (
                             <LocalizedClientLink className="text-sm font-semibold leading-6" href="/auth/signin">
                                 Log In <span aria-hidden="true">&rarr;</span>

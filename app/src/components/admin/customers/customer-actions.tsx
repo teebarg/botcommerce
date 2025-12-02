@@ -4,7 +4,6 @@ import React from "react";
 import { Edit, Trash2, Eye } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
 
 import CustomerForm from "./customer-form";
 
@@ -25,7 +24,8 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
     const { mutateAsync } = useDeleteUser();
     const editState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
-    const { data: session, update } = useSession();
+    // const { data: session, update } = useSession();
+    const session: any = null
     const invalidateMe = useInvalidateMe();
     const invalidateCart = useInvalidateCart();
 

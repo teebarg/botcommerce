@@ -1,8 +1,5 @@
-"use client";
-
 import { useState } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import ProductFilter from "./product-filter";
@@ -18,7 +15,7 @@ interface ProductQueryProps {
 }
 
 export function ProductQuery({ collections, selectedCollections }: ProductQueryProps) {
-    const searchParams = useSearchParams();
+    const searchParams: any = null;
     const { updateQuery } = useUpdateQuery(500);
 
     const [searchQuery, setSearchQuery] = useState<string>(searchParams.get("search") || "");

@@ -2,15 +2,14 @@
 
 import React from "react";
 import { CreditCard, Heart, Home, LayoutGrid, User2, User as UserIcon } from "lucide-react";
-import { usePathname } from "next/navigation";
-import { signOut, useSession } from "next-auth/react";
 
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
-import ThemeButton from "@/lib/theme/theme-button";
 import { authApi } from "@/apis/auth";
 import { useInvalidateMe } from "@/lib/hooks/useUser";
+import { useLocation } from "@tanstack/react-router";
+import { ThemeToggle } from "./theme-toggle";
 
 interface NavLinkProp {
     href: string;
@@ -29,12 +28,14 @@ const NavLink: React.FC<NavLinkProp> = ({ href = "", title, icon, className }) =
 };
 
 const Menu: React.FC = () => {
-    const pathname = usePathname();
-    const { data: session } = useSession();
+    const location = useLocation();
+
+    const pathname = location.pathname;
+    const session: any = null
     const invalidate = useInvalidateMe();
     const handleLogout = async () => {
         await authApi.logOut();
-        await signOut();
+        // await signOut();
         invalidate();
         window.location.href = "/";
     };
@@ -57,7 +58,7 @@ const Menu: React.FC = () => {
                 <NavLink href="/support" title="Contact Us" />
             </div>
             <div className="mt-8">
-                <ThemeButton />
+                <ThemeToggle />
             </div>
             <div className="mt-4 mb-2 block md:hidden">
                 {session ? (

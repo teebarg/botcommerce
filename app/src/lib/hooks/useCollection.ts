@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
 
 import { api } from "@/apis/client";
 import { Collection, PaginatedShared, Shared } from "@/schemas";
@@ -54,7 +53,7 @@ export const useDeleteCollection = () => {
 };
 
 export const useCatalogs = (is_active?: boolean) => {
-    const { data: session } = useSession();
+    const session: any = null;
 
     return useQuery({
         queryKey: ["catalog", is_active],

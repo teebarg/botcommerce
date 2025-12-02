@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Input } from "@components/ui/input";
+import { Input } from "@/components/ui/input";
 
 import { Address, AddressSchema } from "@/schemas/address";
 import { Button } from "@/components/ui/button";

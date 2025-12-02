@@ -1,10 +1,8 @@
 "use client";
 
-import { notFound } from "next/navigation";
-import { currency } from "@lib/utils";
+import { currency } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import { useSession } from "next-auth/react";
 
 import PromotionalBanner from "@/components/promotion";
 import { Order, Session } from "@/schemas";
@@ -69,15 +67,11 @@ const OrderItem: React.FC<{ order: Order }> = ({ order }) => {
 };
 
 const OverviewTemplate: React.FC = () => {
-    const { data: session } = useSession();
+    const session: any = null;
     const { data, isPending } = useOrders({});
 
     if (isPending) {
         return <ComponentLoader className="h-192" />;
-    }
-
-    if (!data?.orders) {
-        notFound();
     }
 
     return (

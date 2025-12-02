@@ -3,7 +3,6 @@
 import React from "react";
 import { Plus, Check, Trash2, Boxes } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import { useSession } from "next-auth/react";
 
 import { SocialShare } from "./social-share";
 
@@ -21,7 +20,7 @@ interface ManageSlateProps {
 }
 
 export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
-    const { data: session } = useSession();
+    const session: any = null;
     const state = useOverlayTriggerState({});
     const { data, isLoading } = useCatalogs(true);
 

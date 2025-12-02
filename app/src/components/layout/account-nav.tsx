@@ -1,8 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { MapPin, Package, User } from "lucide-react";
-import { signOut } from "next-auth/react";
 
 import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
@@ -10,12 +8,12 @@ import { authApi } from "@/apis/auth";
 import { useInvalidateMe } from "@/lib/hooks/useUser";
 
 const AccountNav = () => {
-    const route = usePathname();
+    const route = "/";
     const invalidate = useInvalidateMe();
 
     const handleLogout = async () => {
         await authApi.logOut();
-        await signOut();
+        // await signOut();
         invalidate();
         window.location.href = "/";
     };

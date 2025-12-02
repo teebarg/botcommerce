@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { ArrowUpRight, ChevronRight, Truck } from "lucide-react";
-import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 
 import { cn, currency } from "@/lib/utils";
@@ -29,7 +28,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
 
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(product.variants?.[0]);
 
-    const { data: session } = useSession();
+    const session: any = null;
     const trackInteraction = useTrackUserInteraction();
     const updateVariant = useUpdateVariant(false);
 

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { useSearchParams } from "next/navigation";
 
 import CustomerFilter from "./chats-filter";
 import ChatsActions from "./chats-actions";
@@ -17,7 +16,7 @@ const LIMIT = 20;
 const ChatsView: React.FC = () => {
     const [filterOpen, setFilterOpen] = useState<boolean>(false);
 
-    const searchParams = useSearchParams();
+    const searchParams: any = null;
 
     const page = Number(searchParams.get("page")) || 1;
     const status: ConversationStatus = searchParams.get("status") as ConversationStatus;

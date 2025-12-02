@@ -4,8 +4,8 @@ import ContactForm from "../contact-form";
 
 import { getSiteConfig } from "@/lib/config";
 
-export default async function ContactSection() {
-    const siteConfig = await getSiteConfig();
+export default function ContactSection() {
+    const siteConfig = getSiteConfig();
 
     return (
         <section className="py-16 bg-linear-to-b from-card/30 to-background">

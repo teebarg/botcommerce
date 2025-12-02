@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { useSession } from "next-auth/react";
 
 import DeliveryStep from "./delivery-step";
 import AddressStep from "./address-step";
@@ -20,7 +19,7 @@ interface CheckoutFlowProps {
 }
 
 const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose, cart }) => {
-    const { data: session } = useSession();
+    const session: any = null;
     const [currentStep, setCurrentStep] = useState<CheckoutStep>("auth");
 
     const getStep = () => {

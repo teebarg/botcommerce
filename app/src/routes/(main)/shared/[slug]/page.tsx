@@ -1,6 +1,3 @@
-import { notFound } from "next/navigation";
-import { Metadata } from "next";
-
 import { Catalog, Shared } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
 import SharedInfinite from "@/components/store/shared/shared-infinite";
@@ -19,37 +16,37 @@ type SearchParams = Promise<{
     colors?: string;
 }>;
 
-export async function generateMetadata({ params }: { params: Params }) {
-    const { slug } = await params;
-    const { data: shared } = await tryCatch<Shared>(serverApi.get(`/shared/${slug}`));
+// export async function generateMetadata({ params }: { params: Params }) {
+//     const { slug } = await params;
+//     const { data: shared } = await tryCatch<Shared>(serverApi.get(`/shared/${slug}`));
 
-    if (!shared) {
-        return {
-            title: "Shared Collection Not Found",
-            description: "This shared collection does not exist or is no longer available.",
-            openGraph: {
-                title: "Shared Collection Not Found",
-                description: "This shared collection does not exist or is no longer available.",
-            },
-        } as Metadata;
-    }
+//     if (!shared) {
+//         return {
+//             title: "Shared Collection Not Found",
+//             description: "This shared collection does not exist or is no longer available.",
+//             openGraph: {
+//                 title: "Shared Collection Not Found",
+//                 description: "This shared collection does not exist or is no longer available.",
+//             },
+//         } as Metadata;
+//     }
 
-    return {
-        title: shared.title,
-        description: shared.description || `Curated product list: ${shared.title}`,
-        openGraph: {
-            title: shared.title,
-            description: shared.description || `Curated product list: ${shared.title}`,
-            url: `${process.env.NEXT_PUBLIC_SITE_URL || ""}/shared/${shared.slug}`,
-            type: "website",
-        },
-        twitter: {
-            card: "summary_large_image",
-            title: shared.title,
-            description: shared.description || `Curated product list: ${shared.title}`,
-        },
-    } as Metadata;
-}
+//     return {
+//         title: shared.title,
+//         description: shared.description || `Curated product list: ${shared.title}`,
+//         openGraph: {
+//             title: shared.title,
+//             description: shared.description || `Curated product list: ${shared.title}`,
+//             url: `${import.meta.env.VITE_SITE_URL || ""}/shared/${shared.slug}`,
+//             type: "website",
+//         },
+//         twitter: {
+//             card: "summary_large_image",
+//             title: shared.title,
+//             description: shared.description || `Curated product list: ${shared.title}`,
+//         },
+//     } as Metadata;
+// }
 
 export default async function SharedPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
     const { slug } = await params;
@@ -64,7 +61,7 @@ export default async function SharedPage({ params, searchParams }: { params: Par
 
     const { data: catalog, error } = await tryCatch<Catalog>(serverApi.get(`/shared/${slug}`, { params: { skip: 0, ...queryParams } }));
 
-    if (!catalog || error) return notFound();
+    if (!catalog || error) return null;
 
     return (
         <div>

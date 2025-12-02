@@ -1,7 +1,3 @@
-"use client";
-
-import { useRouter } from "next/navigation";
-
 import FailedPayment from "./order-failed";
 import PendingPayment from "./order-pending";
 import OrderPickup from "./order-pickup";
@@ -10,6 +6,7 @@ import SuccessConfirmation from "./order-success";
 import { useOrder } from "@/lib/hooks/useOrder";
 import ServerError from "@/components/generic/server-error";
 import ComponentLoader from "@/components/component-loader";
+import { useNavigate } from "@tanstack/react-router";
 
 type OrderConfirmationProps = {
     orderNumber: string;
@@ -17,11 +14,11 @@ type OrderConfirmationProps = {
 };
 
 const OrderConfirmation: React.FC<OrderConfirmationProps> = (props) => {
-    const router = useRouter();
+    const navigate = useNavigate();
     const { data: order, isLoading, error } = useOrder(props.orderNumber);
 
     const onContinueShopping = () => {
-        router.push("/collections");
+        navigate({to: "/collections"});
     };
 
     if (isLoading) {

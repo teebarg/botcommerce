@@ -1,7 +1,5 @@
 import { MessageSquare, Star, Users, Package } from "lucide-react";
 import { useOverlayTriggerState } from "@react-stately/overlays";
-import { usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
 
 import { ReviewForm } from "./review-form";
 
@@ -9,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Overlay from "@/components/overlay";
 import { BtnLink } from "@/components/ui/btnLink";
+import { useLocation } from "@tanstack/react-router";
 
 interface ProductReviewsZeroStateProps {
     onWriteReview?: () => void;
@@ -17,9 +16,10 @@ interface ProductReviewsZeroStateProps {
 }
 
 export const ProductReviewsZeroState = ({ productName, product_id }: ProductReviewsZeroStateProps) => {
-    const { data: session } = useSession();
+    const session: any = null;
     const state = useOverlayTriggerState({});
-    const pathname = usePathname();
+    const location = useLocation()
+    const pathname = location.pathname
 
     return (
         <Card className="w-full max-w-6xl mx-auto text-center border-dashed border-2">

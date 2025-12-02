@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
 
 import { api } from "@/apis/client";
 import { BankDetails, ConversationStatus, DeliveryOption, Message, PaginatedChat } from "@/schemas";
@@ -23,7 +22,7 @@ export const useBankDetails = () => {
 };
 
 export const useChatMutation = () => {
-    const { data: session } = useSession();
+    const session: any = null;
 
     return useMutation({
         mutationFn: async (message: string) => {

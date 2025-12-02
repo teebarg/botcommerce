@@ -1,11 +1,9 @@
-"use client";
-
-import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import { ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 
 interface Props {
     className?: string;
@@ -13,8 +11,9 @@ interface Props {
 }
 
 const BackButton: React.FC<Props> = ({ onClick, className }) => {
-    const router = useRouter();
-    const pathname = usePathname();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const pathname = location.pathname;
     const handleGoBack = () => {
         if (onClick) {
             onClick();
@@ -23,9 +22,9 @@ const BackButton: React.FC<Props> = ({ onClick, className }) => {
         }
 
         if (window.history.length > 1) {
-            router.back();
+            navigate({delta: -1})
         } else {
-            router.push("/");
+            navigate({to: "/"});
         }
     };
 

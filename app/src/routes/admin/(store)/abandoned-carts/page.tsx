@@ -1,8 +1,5 @@
-"use client";
-
 import { useState } from "react";
 import { Search } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +11,6 @@ import { useAbandonedCarts, useAbandonedCartStats, useSendCartReminders } from "
 import ComponentLoader from "@/components/component-loader";
 import PaginationUI from "@/components/pagination";
 import { AbandonedCartStats } from "@/components/admin/abandoned-carts/stat";
-import ClientOnly from "@/components/generic/client-only";
 
 const LIMIT = 20;
 
@@ -22,7 +18,7 @@ const AdminAbandonedCarts = () => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [timeFilter, setTimeFilter] = useState<string>("24");
 
-    const searchParams = useSearchParams();
+    const searchParams: any = null;
     const { mutate: sendReminders, isPending: sendRemindersLoading } = useSendCartReminders();
 
     const { data: stats, isLoading: statsLoading } = useAbandonedCartStats({
@@ -87,32 +83,30 @@ const AdminAbandonedCarts = () => {
                     </div>
                 </div>
             </div>
-            <ClientOnly>
-                {abandonedCartsLoading || statsLoading ? (
-                    <ComponentLoader className="h-100" />
-                ) : (
-                    <div className="container mx-auto px-6 py-8">
-                        {stats && <AbandonedCartStats stat={stats} />}
+            {abandonedCartsLoading || statsLoading ? (
+                <ComponentLoader className="h-100" />
+            ) : (
+                <div className="container mx-auto px-6 py-8">
+                    {stats && <AbandonedCartStats stat={stats} />}
 
-                        <div className="mt-4 space-y-4">
-                            {allCarts.length > 0 ? (
-                                allCarts.map((cart: Cart) => <AbandonedCartCard key={cart.id} cart={cart} />)
-                            ) : (
-                                <Card>
-                                    <CardContent className="py-12 text-center">
-                                        <p className="text-muted-foreground">No converted carts found, adjust the time range or search query</p>
-                                    </CardContent>
-                                </Card>
-                            )}
-                        </div>
-                        {pagination.total_pages > 1 && (
-                            <div className="mt-8">
-                                <PaginationUI pagination={pagination} />
-                            </div>
+                    <div className="mt-4 space-y-4">
+                        {allCarts.length > 0 ? (
+                            allCarts.map((cart: Cart) => <AbandonedCartCard key={cart.id} cart={cart} />)
+                        ) : (
+                            <Card>
+                                <CardContent className="py-12 text-center">
+                                    <p className="text-muted-foreground">No converted carts found, adjust the time range or search query</p>
+                                </CardContent>
+                            </Card>
                         )}
                     </div>
-                )}
-            </ClientOnly>
+                    {pagination.total_pages > 1 && (
+                        <div className="mt-8">
+                            <PaginationUI pagination={pagination} />
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

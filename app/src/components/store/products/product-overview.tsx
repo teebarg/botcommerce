@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Heart, Star, Plus, Minus, ShoppingCart, MessageCircle, X, Truck, Shield, RotateCcw } from "lucide-react";
-import { useSession } from "next-auth/react";
 
 import { DiscountBadge } from "./discount-badge";
 
@@ -47,7 +46,8 @@ const ProductOverview: React.FC<{
     const { mutate: createWishlist } = useUserCreateWishlist();
     const { mutate: deleteWishlist } = useUserDeleteWishlist();
 
-    const { data: session } = useSession();
+    // const { data: session } = useSession();
+    const session: any = null
     const trackInteraction = useTrackUserInteraction();
 
     useEffect(() => {

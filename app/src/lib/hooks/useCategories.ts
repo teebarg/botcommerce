@@ -4,11 +4,12 @@ import { toast } from "sonner";
 import { api } from "@/apis/client";
 import { Category } from "@/schemas";
 import { CategoryFormValues } from "@/components/admin/categories/category-form";
+import { GetCategoriesFn } from "@/server/categories-server";
 
 export const useCategories = (query?: string) => {
     return useQuery({
         queryKey: ["categories", query],
-        queryFn: async () => await api.get<Category[]>(`/category/`, { params: { query: query ?? "" } }),
+        queryFn: async () => GetCategoriesFn(),
     });
 };
 

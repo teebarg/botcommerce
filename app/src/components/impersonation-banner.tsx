@@ -2,7 +2,6 @@
 
 import { X } from "lucide-react";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
 
 import { useInvalidateMe } from "@/lib/hooks/useUser";
 import { useInvalidateCart } from "@/lib/hooks/useCart";
@@ -10,13 +9,14 @@ import { Button } from "@/components/ui/button";
 import { deleteCookie } from "@/lib/util/cookie";
 
 export default function ImpersonationBanner() {
-    const { data: session, update } = useSession();
+    // const { data: session, update } = useSession();
+    const session: any = null
     const invalidateMe = useInvalidateMe();
     const invalidateCart = useInvalidateCart();
 
     const stopImpersonation = async () => {
         deleteCookie("_cart_id");
-        await update({ email: session?.impersonatedBy!, impersonated: false, impersonatedBy: null, mode: "impersonate" });
+        // await update({ email: session?.impersonatedBy!, impersonated: false, impersonatedBy: null, mode: "impersonate" });
         invalidateMe();
         invalidateCart();
         toast.success("Exited impersonation");

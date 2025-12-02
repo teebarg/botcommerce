@@ -1,10 +1,9 @@
-import { getCookie } from "@/lib/util/server-utils";
-
-export const getSiteConfig = async () => {
+export const getSiteConfig = () => {
     let shopSettings: Record<string, string> = {};
 
     try {
-        const cookie = (await getCookie("configs")) ?? "{}";
+        // const cookie = (await getCookie("configs")) ?? "{}";
+        const cookie = "{}";
 
         shopSettings = JSON.parse(cookie) || {};
     } catch {
@@ -18,7 +17,7 @@ export const getSiteConfig = async () => {
         contactEmail: shopSettings.contact_email || "",
         contactPhone: shopSettings.contact_phone || "",
         shopEmail: shopSettings.shop_email || "",
-        baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
+        baseUrl: import.meta.env.VITE_BASE_URL,
         links: {
             facebook: `https://web.facebook.com/profile.php?id=${shopSettings.facebook}`,
             instagram: `https://www.instagram.com/${shopSettings.instagram}`,

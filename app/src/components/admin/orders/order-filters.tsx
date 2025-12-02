@@ -1,7 +1,4 @@
-"use client";
-
 import React, { useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { DateRange } from "react-day-picker";
 import { Filter, Search, X } from "lucide-react";
 
@@ -16,7 +13,7 @@ interface OrderFiltersProps {}
 
 const OrderFilters: React.FC<OrderFiltersProps> = () => {
     const { updateQuery } = useUpdateQuery(200);
-    const searchParams = useSearchParams();
+    const searchParams:any = null;
 
     const [filters, setFilters] = useState({
         status: "",

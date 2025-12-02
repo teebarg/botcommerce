@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Clock, Search, TrendingUp, X } from "lucide-react";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { useRouter } from "next/navigation";
 import { useDebounce } from "use-debounce";
 import { useOverlayTriggerState } from "@react-stately/overlays";
 
@@ -15,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { useProductSearch } from "@/lib/hooks/useProduct";
 import { Separator } from "@/components/ui/separator";
 import LocalizedClientLink from "@/components/ui/link";
+import { useRouter } from "@tanstack/react-router";
 
 interface SearchDialogProps {
     initialQuery?: string;
@@ -69,12 +68,10 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                 </div>
             </SheetTrigger>
             <SheetContent side="top">
-                <VisuallyHidden>
-                    <SheetHeader>
-                        <SheetTitle>Search Products</SheetTitle>
-                        <SheetDescription>Search for products, categories, and more</SheetDescription>
-                    </SheetHeader>
-                </VisuallyHidden>
+                <SheetHeader className="sr-only">
+                    <SheetTitle>Search Products</SheetTitle>
+                    <SheetDescription>Search for products, categories, and more</SheetDescription>
+                </SheetHeader>
                 <div className="relative px-8 pb-8 overflow-y-auto max-h-screen min-h-[75vh]">
                     <div className="w-full sticky top-0 z-10 bg-background py-4">
                         <div

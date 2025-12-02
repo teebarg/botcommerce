@@ -9,27 +9,438 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as OfflineRouteImport } from './routes/offline'
+import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as MainLayoutRouteImport } from './routes/_mainLayout'
+import { Route as MainLayoutIndexRouteImport } from './routes/_mainLayout/index'
+import { Route as PaymentVerifyRouteImport } from './routes/payment/verify'
+import { Route as ApiPushEventRouteImport } from './routes/api/push-event'
+import { Route as MainLayoutCartRouteImport } from './routes/_mainLayout/cart'
+import { Route as MainLayoutBulkRouteImport } from './routes/_mainLayout/bulk'
+import { Route as MainLayoutCollectionsRouteImport } from './routes/_mainLayout/_collections'
+import { Route as MainLayoutCollectionsIndexRouteImport } from './routes/_mainLayout/collections/index'
+import { Route as MainLayoutCollectionsSlugRouteImport } from './routes/_mainLayout/collections/$slug'
+import { Route as MainLayoutstaticTermsRouteImport } from './routes/_mainLayout/(static)/terms'
+import { Route as MainLayoutstaticShippingRouteImport } from './routes/_mainLayout/(static)/shipping'
+import { Route as MainLayoutstaticReturnsRouteImport } from './routes/_mainLayout/(static)/returns'
+import { Route as MainLayoutstaticPrivacyRouteImport } from './routes/_mainLayout/(static)/privacy'
+import { Route as MainLayoutstaticHelpCenterRouteImport } from './routes/_mainLayout/(static)/help-center'
+import { Route as MainLayoutstaticContactUsRouteImport } from './routes/_mainLayout/(static)/contact-us'
+import { Route as MainLayoutstaticCareersRouteImport } from './routes/_mainLayout/(static)/careers'
+import { Route as MainLayoutstaticAboutRouteImport } from './routes/_mainLayout/(static)/about'
 
-export interface FileRoutesByFullPath {}
-export interface FileRoutesByTo {}
+const OfflineRoute = OfflineRouteImport.update({
+  id: '/offline',
+  path: '/offline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MainLayoutRoute = MainLayoutRouteImport.update({
+  id: '/_mainLayout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MainLayoutIndexRoute = MainLayoutIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+const PaymentVerifyRoute = PaymentVerifyRouteImport.update({
+  id: '/payment/verify',
+  path: '/payment/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPushEventRoute = ApiPushEventRouteImport.update({
+  id: '/api/push-event',
+  path: '/api/push-event',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MainLayoutCartRoute = MainLayoutCartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+const MainLayoutBulkRoute = MainLayoutBulkRouteImport.update({
+  id: '/bulk',
+  path: '/bulk',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+const MainLayoutCollectionsRoute = MainLayoutCollectionsRouteImport.update({
+  id: '/_collections',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+const MainLayoutCollectionsIndexRoute =
+  MainLayoutCollectionsIndexRouteImport.update({
+    id: '/collections/',
+    path: '/collections/',
+    getParentRoute: () => MainLayoutRoute,
+  } as any)
+const MainLayoutCollectionsSlugRoute =
+  MainLayoutCollectionsSlugRouteImport.update({
+    id: '/collections/$slug',
+    path: '/collections/$slug',
+    getParentRoute: () => MainLayoutRoute,
+  } as any)
+const MainLayoutstaticTermsRoute = MainLayoutstaticTermsRouteImport.update({
+  id: '/(static)/terms',
+  path: '/terms',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+const MainLayoutstaticShippingRoute =
+  MainLayoutstaticShippingRouteImport.update({
+    id: '/(static)/shipping',
+    path: '/shipping',
+    getParentRoute: () => MainLayoutRoute,
+  } as any)
+const MainLayoutstaticReturnsRoute = MainLayoutstaticReturnsRouteImport.update({
+  id: '/(static)/returns',
+  path: '/returns',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+const MainLayoutstaticPrivacyRoute = MainLayoutstaticPrivacyRouteImport.update({
+  id: '/(static)/privacy',
+  path: '/privacy',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+const MainLayoutstaticHelpCenterRoute =
+  MainLayoutstaticHelpCenterRouteImport.update({
+    id: '/(static)/help-center',
+    path: '/help-center',
+    getParentRoute: () => MainLayoutRoute,
+  } as any)
+const MainLayoutstaticContactUsRoute =
+  MainLayoutstaticContactUsRouteImport.update({
+    id: '/(static)/contact-us',
+    path: '/contact-us',
+    getParentRoute: () => MainLayoutRoute,
+  } as any)
+const MainLayoutstaticCareersRoute = MainLayoutstaticCareersRouteImport.update({
+  id: '/(static)/careers',
+  path: '/careers',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+const MainLayoutstaticAboutRoute = MainLayoutstaticAboutRouteImport.update({
+  id: '/(static)/about',
+  path: '/about',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+
+export interface FileRoutesByFullPath {
+  '/checkout': typeof CheckoutRoute
+  '/offline': typeof OfflineRoute
+  '/bulk': typeof MainLayoutBulkRoute
+  '/cart': typeof MainLayoutCartRoute
+  '/api/push-event': typeof ApiPushEventRoute
+  '/payment/verify': typeof PaymentVerifyRoute
+  '/': typeof MainLayoutIndexRoute
+  '/about': typeof MainLayoutstaticAboutRoute
+  '/careers': typeof MainLayoutstaticCareersRoute
+  '/contact-us': typeof MainLayoutstaticContactUsRoute
+  '/help-center': typeof MainLayoutstaticHelpCenterRoute
+  '/privacy': typeof MainLayoutstaticPrivacyRoute
+  '/returns': typeof MainLayoutstaticReturnsRoute
+  '/shipping': typeof MainLayoutstaticShippingRoute
+  '/terms': typeof MainLayoutstaticTermsRoute
+  '/collections/$slug': typeof MainLayoutCollectionsSlugRoute
+  '/collections': typeof MainLayoutCollectionsIndexRoute
+}
+export interface FileRoutesByTo {
+  '/checkout': typeof CheckoutRoute
+  '/offline': typeof OfflineRoute
+  '/bulk': typeof MainLayoutBulkRoute
+  '/cart': typeof MainLayoutCartRoute
+  '/api/push-event': typeof ApiPushEventRoute
+  '/payment/verify': typeof PaymentVerifyRoute
+  '/': typeof MainLayoutIndexRoute
+  '/about': typeof MainLayoutstaticAboutRoute
+  '/careers': typeof MainLayoutstaticCareersRoute
+  '/contact-us': typeof MainLayoutstaticContactUsRoute
+  '/help-center': typeof MainLayoutstaticHelpCenterRoute
+  '/privacy': typeof MainLayoutstaticPrivacyRoute
+  '/returns': typeof MainLayoutstaticReturnsRoute
+  '/shipping': typeof MainLayoutstaticShippingRoute
+  '/terms': typeof MainLayoutstaticTermsRoute
+  '/collections/$slug': typeof MainLayoutCollectionsSlugRoute
+  '/collections': typeof MainLayoutCollectionsIndexRoute
+}
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/_mainLayout': typeof MainLayoutRouteWithChildren
+  '/checkout': typeof CheckoutRoute
+  '/offline': typeof OfflineRoute
+  '/_mainLayout/_collections': typeof MainLayoutCollectionsRoute
+  '/_mainLayout/bulk': typeof MainLayoutBulkRoute
+  '/_mainLayout/cart': typeof MainLayoutCartRoute
+  '/api/push-event': typeof ApiPushEventRoute
+  '/payment/verify': typeof PaymentVerifyRoute
+  '/_mainLayout/': typeof MainLayoutIndexRoute
+  '/_mainLayout/(static)/about': typeof MainLayoutstaticAboutRoute
+  '/_mainLayout/(static)/careers': typeof MainLayoutstaticCareersRoute
+  '/_mainLayout/(static)/contact-us': typeof MainLayoutstaticContactUsRoute
+  '/_mainLayout/(static)/help-center': typeof MainLayoutstaticHelpCenterRoute
+  '/_mainLayout/(static)/privacy': typeof MainLayoutstaticPrivacyRoute
+  '/_mainLayout/(static)/returns': typeof MainLayoutstaticReturnsRoute
+  '/_mainLayout/(static)/shipping': typeof MainLayoutstaticShippingRoute
+  '/_mainLayout/(static)/terms': typeof MainLayoutstaticTermsRoute
+  '/_mainLayout/collections/$slug': typeof MainLayoutCollectionsSlugRoute
+  '/_mainLayout/collections/': typeof MainLayoutCollectionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: never
+  fullPaths:
+    | '/checkout'
+    | '/offline'
+    | '/bulk'
+    | '/cart'
+    | '/api/push-event'
+    | '/payment/verify'
+    | '/'
+    | '/about'
+    | '/careers'
+    | '/contact-us'
+    | '/help-center'
+    | '/privacy'
+    | '/returns'
+    | '/shipping'
+    | '/terms'
+    | '/collections/$slug'
+    | '/collections'
   fileRoutesByTo: FileRoutesByTo
-  to: never
-  id: '__root__'
+  to:
+    | '/checkout'
+    | '/offline'
+    | '/bulk'
+    | '/cart'
+    | '/api/push-event'
+    | '/payment/verify'
+    | '/'
+    | '/about'
+    | '/careers'
+    | '/contact-us'
+    | '/help-center'
+    | '/privacy'
+    | '/returns'
+    | '/shipping'
+    | '/terms'
+    | '/collections/$slug'
+    | '/collections'
+  id:
+    | '__root__'
+    | '/_mainLayout'
+    | '/checkout'
+    | '/offline'
+    | '/_mainLayout/_collections'
+    | '/_mainLayout/bulk'
+    | '/_mainLayout/cart'
+    | '/api/push-event'
+    | '/payment/verify'
+    | '/_mainLayout/'
+    | '/_mainLayout/(static)/about'
+    | '/_mainLayout/(static)/careers'
+    | '/_mainLayout/(static)/contact-us'
+    | '/_mainLayout/(static)/help-center'
+    | '/_mainLayout/(static)/privacy'
+    | '/_mainLayout/(static)/returns'
+    | '/_mainLayout/(static)/shipping'
+    | '/_mainLayout/(static)/terms'
+    | '/_mainLayout/collections/$slug'
+    | '/_mainLayout/collections/'
   fileRoutesById: FileRoutesById
 }
-export interface RootRouteChildren {}
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {}
+export interface RootRouteChildren {
+  MainLayoutRoute: typeof MainLayoutRouteWithChildren
+  CheckoutRoute: typeof CheckoutRoute
+  OfflineRoute: typeof OfflineRoute
+  ApiPushEventRoute: typeof ApiPushEventRoute
+  PaymentVerifyRoute: typeof PaymentVerifyRoute
 }
 
-const rootRouteChildren: RootRouteChildren = {}
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/offline': {
+      id: '/offline'
+      path: '/offline'
+      fullPath: '/offline'
+      preLoaderRoute: typeof OfflineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_mainLayout': {
+      id: '/_mainLayout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof MainLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_mainLayout/': {
+      id: '/_mainLayout/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof MainLayoutIndexRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/payment/verify': {
+      id: '/payment/verify'
+      path: '/payment/verify'
+      fullPath: '/payment/verify'
+      preLoaderRoute: typeof PaymentVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/push-event': {
+      id: '/api/push-event'
+      path: '/api/push-event'
+      fullPath: '/api/push-event'
+      preLoaderRoute: typeof ApiPushEventRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_mainLayout/cart': {
+      id: '/_mainLayout/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof MainLayoutCartRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_mainLayout/bulk': {
+      id: '/_mainLayout/bulk'
+      path: '/bulk'
+      fullPath: '/bulk'
+      preLoaderRoute: typeof MainLayoutBulkRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_mainLayout/_collections': {
+      id: '/_mainLayout/_collections'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof MainLayoutCollectionsRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_mainLayout/collections/': {
+      id: '/_mainLayout/collections/'
+      path: '/collections'
+      fullPath: '/collections'
+      preLoaderRoute: typeof MainLayoutCollectionsIndexRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_mainLayout/collections/$slug': {
+      id: '/_mainLayout/collections/$slug'
+      path: '/collections/$slug'
+      fullPath: '/collections/$slug'
+      preLoaderRoute: typeof MainLayoutCollectionsSlugRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_mainLayout/(static)/terms': {
+      id: '/_mainLayout/(static)/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof MainLayoutstaticTermsRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_mainLayout/(static)/shipping': {
+      id: '/_mainLayout/(static)/shipping'
+      path: '/shipping'
+      fullPath: '/shipping'
+      preLoaderRoute: typeof MainLayoutstaticShippingRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_mainLayout/(static)/returns': {
+      id: '/_mainLayout/(static)/returns'
+      path: '/returns'
+      fullPath: '/returns'
+      preLoaderRoute: typeof MainLayoutstaticReturnsRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_mainLayout/(static)/privacy': {
+      id: '/_mainLayout/(static)/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof MainLayoutstaticPrivacyRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_mainLayout/(static)/help-center': {
+      id: '/_mainLayout/(static)/help-center'
+      path: '/help-center'
+      fullPath: '/help-center'
+      preLoaderRoute: typeof MainLayoutstaticHelpCenterRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_mainLayout/(static)/contact-us': {
+      id: '/_mainLayout/(static)/contact-us'
+      path: '/contact-us'
+      fullPath: '/contact-us'
+      preLoaderRoute: typeof MainLayoutstaticContactUsRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_mainLayout/(static)/careers': {
+      id: '/_mainLayout/(static)/careers'
+      path: '/careers'
+      fullPath: '/careers'
+      preLoaderRoute: typeof MainLayoutstaticCareersRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_mainLayout/(static)/about': {
+      id: '/_mainLayout/(static)/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof MainLayoutstaticAboutRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+  }
+}
+
+interface MainLayoutRouteChildren {
+  MainLayoutCollectionsRoute: typeof MainLayoutCollectionsRoute
+  MainLayoutBulkRoute: typeof MainLayoutBulkRoute
+  MainLayoutCartRoute: typeof MainLayoutCartRoute
+  MainLayoutIndexRoute: typeof MainLayoutIndexRoute
+  MainLayoutstaticAboutRoute: typeof MainLayoutstaticAboutRoute
+  MainLayoutstaticCareersRoute: typeof MainLayoutstaticCareersRoute
+  MainLayoutstaticContactUsRoute: typeof MainLayoutstaticContactUsRoute
+  MainLayoutstaticHelpCenterRoute: typeof MainLayoutstaticHelpCenterRoute
+  MainLayoutstaticPrivacyRoute: typeof MainLayoutstaticPrivacyRoute
+  MainLayoutstaticReturnsRoute: typeof MainLayoutstaticReturnsRoute
+  MainLayoutstaticShippingRoute: typeof MainLayoutstaticShippingRoute
+  MainLayoutstaticTermsRoute: typeof MainLayoutstaticTermsRoute
+  MainLayoutCollectionsSlugRoute: typeof MainLayoutCollectionsSlugRoute
+  MainLayoutCollectionsIndexRoute: typeof MainLayoutCollectionsIndexRoute
+}
+
+const MainLayoutRouteChildren: MainLayoutRouteChildren = {
+  MainLayoutCollectionsRoute: MainLayoutCollectionsRoute,
+  MainLayoutBulkRoute: MainLayoutBulkRoute,
+  MainLayoutCartRoute: MainLayoutCartRoute,
+  MainLayoutIndexRoute: MainLayoutIndexRoute,
+  MainLayoutstaticAboutRoute: MainLayoutstaticAboutRoute,
+  MainLayoutstaticCareersRoute: MainLayoutstaticCareersRoute,
+  MainLayoutstaticContactUsRoute: MainLayoutstaticContactUsRoute,
+  MainLayoutstaticHelpCenterRoute: MainLayoutstaticHelpCenterRoute,
+  MainLayoutstaticPrivacyRoute: MainLayoutstaticPrivacyRoute,
+  MainLayoutstaticReturnsRoute: MainLayoutstaticReturnsRoute,
+  MainLayoutstaticShippingRoute: MainLayoutstaticShippingRoute,
+  MainLayoutstaticTermsRoute: MainLayoutstaticTermsRoute,
+  MainLayoutCollectionsSlugRoute: MainLayoutCollectionsSlugRoute,
+  MainLayoutCollectionsIndexRoute: MainLayoutCollectionsIndexRoute,
+}
+
+const MainLayoutRouteWithChildren = MainLayoutRoute._addFileChildren(
+  MainLayoutRouteChildren,
+)
+
+const rootRouteChildren: RootRouteChildren = {
+  MainLayoutRoute: MainLayoutRouteWithChildren,
+  CheckoutRoute: CheckoutRoute,
+  OfflineRoute: OfflineRoute,
+  ApiPushEventRoute: ApiPushEventRoute,
+  PaymentVerifyRoute: PaymentVerifyRoute,
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()

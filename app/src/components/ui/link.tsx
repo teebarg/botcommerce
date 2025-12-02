@@ -1,8 +1,5 @@
-"use client";
-
-import { Link } from "@tanstack/react-router"
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import React, { startTransition } from "react";
-import { usePathname, useRouter } from "next/navigation";
 
 import { useProgressBar } from "@/components/ui/progress-bar";
 import { cn } from "@/lib/utils";
@@ -15,8 +12,9 @@ interface TransitionLinkProps {
 }
 
 const LocalizedClientLink: React.FC<TransitionLinkProps> = ({ children, href, className, active, ...props }) => {
-    const router = useRouter();
-    const pathname = usePathname();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const pathname = location.pathname;
     let progress = useProgressBar();
 
     return (
@@ -29,7 +27,7 @@ const LocalizedClientLink: React.FC<TransitionLinkProps> = ({ children, href, cl
                 progress.start();
 
                 startTransition(() => {
-                    router.push(href.toString());
+                    navigate({ to: href.toString() });
                     progress.done();
                 });
             }}

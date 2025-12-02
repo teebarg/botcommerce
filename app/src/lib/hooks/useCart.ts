@@ -1,10 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
 import { deleteCookie, setCookie } from "@/lib/util/cookie";
 import { Cart, CartComplete, CartUpdate, Order, Message } from "@/schemas";
 import { api } from "@/apis/client";
+import { useNavigate } from "@tanstack/react-router";
 
 export const useMyCart = () => {
     return useQuery({
@@ -153,7 +153,7 @@ export const useDeleteCartItem = () => {
 };
 
 export const useCompleteCart = () => {
-    const router = useRouter();
+    const navigate = useNavigate();
 
     return useMutation({
         mutationFn: async (complete: CartComplete) => {
@@ -163,7 +163,7 @@ export const useCompleteCart = () => {
         },
         onSuccess: async (data) => {
             await deleteCookie("_cart_id");
-            router.push(`/order/confirmed/${data?.order_number}`);
+            navigate({ to: `/order/confirmed/${data?.order_number}` });
             toast.success("Order placed successfully");
         },
         onError: (error: any) => {

@@ -1,7 +1,6 @@
 "use client";
 
 import { Box, MapPin, Package, User } from "lucide-react";
-import { useSession } from "next-auth/react";
 
 import RecommendedProducts from "@/components/store/products/recommended";
 import LocalizedClientLink from "@/components/ui/link";
@@ -36,7 +35,7 @@ const navLinks = [
 ];
 
 export default function AccountPageLayout({ dashboard }: { dashboard?: React.ReactNode }) {
-    const { data: session } = useSession();
+    const session: any = null;
 
     return (
         <div className="flex-1 sm:py-4 px-2 md:px-0" data-testid="account-page">

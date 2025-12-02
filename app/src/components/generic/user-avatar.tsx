@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function UserAvatar() {
-    const { data: session } = useSession();
+    const session: any = null;
     const [hasMounted, setHasMounted] = useState<boolean>(false);
 
     useEffect(() => {

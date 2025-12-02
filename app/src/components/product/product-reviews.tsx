@@ -1,8 +1,6 @@
 "use client";
 
 import React from "react";
-import { useSearchParams } from "next/navigation";
-import { useSession } from "next-auth/react";
 
 import { ProductReviewsZeroState } from "../store/reviews/review-zero";
 import { ReviewsList } from "../store/reviews/reviews-list";
@@ -17,8 +15,8 @@ interface Prop {
 }
 
 const ReviewsSection: React.FC<Prop> = ({ product_id, productName }) => {
-    const { data: session } = useSession();
-    const searchParams = useSearchParams();
+    const session: any = null;
+    const searchParams: any = null;
     const skip = parseInt(searchParams.get("skip") || "0", 10);
     const sort = searchParams.get("sort") || "newest";
 

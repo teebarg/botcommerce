@@ -48,7 +48,7 @@ const UnderConstruction: React.FC = () => {
                             <p className="mb-6">Want to be notified when this page is ready?</p>
                             <a
                                 className="rounded-full border border-border px-8 py-3 transition-all duration-200 hover:bg-secondary"
-                                href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`}
+                                href={`mailto:${import.meta.env.VITE_CONTACT_EMAIL}`}
                             >
                                 Contact Support
                             </a>

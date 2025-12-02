@@ -1,8 +1,5 @@
 "use client";
 
-import React from "react";
-import { signOut } from "next-auth/react";
-
 import LocalizedClientLink from "@/components/ui/link";
 import { Session } from "@/schemas";
 import {
@@ -25,7 +22,7 @@ export default function UserDropDown({ user }: { user: Session }) {
     const handleLogout = async () => {
         deleteCookie("_cart_id");
         await authApi.logOut();
-        await signOut();
+        // await signOut();
         invalidate();
         invalidateCart();
         window.location.href = "/";

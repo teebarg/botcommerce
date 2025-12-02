@@ -63,7 +63,7 @@ export default function R2Uploader({
             newFiles.map(async (item: UploadedFile) => {
                 try {
                     const res = await fetch(
-                        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/r2/signed-url?filename=${encodeURIComponent(item.file.name)}&content_type=${encodeURIComponent(item.file.type)}`,
+                        `${import.meta.env.VITE_BACKEND_URL}/api/r2/signed-url?filename=${encodeURIComponent(item.file.name)}&content_type=${encodeURIComponent(item.file.type)}`,
                         { method: "POST" }
                     );
 

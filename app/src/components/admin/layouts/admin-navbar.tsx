@@ -1,14 +1,13 @@
-import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from "@components/navbar";
-import ThemeToggle from "@lib/theme/theme-button";
+import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from "@/components/navbar";
 
 import ActivityTray from "@/components/generic/activities/activity-tray";
 import LocalizedClientLink from "@/components/ui/link";
 import MenuComp from "@/components/layout/admin-mobile-menu-drawer";
 import UserDropDown from "@/components/layout/user-dropdown";
-import { auth } from "@/auth";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const AdminNavbar = async () => {
-    const session = await auth();
+    const session: any = null;
 
     return (
         <NavigationBar className="h-16 bg-background">

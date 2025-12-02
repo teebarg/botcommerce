@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
 
 import { ProductQuery } from "./product-query";
 
@@ -16,13 +15,14 @@ import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
 import ComponentLoader from "@/components/component-loader";
 import ServerError from "@/components/generic/server-error";
 import ImageDisplay from "@/components/image-display";
+import { useNavigate } from "@tanstack/react-router";
 
 const LIMIT = 24;
 
 export function ProductDetails() {
-    const router = useRouter();
+    const navigate = useNavigate();
     const { data: collections } = useCollections();
-    const searchParams = useSearchParams();
+    const searchParams: any = null;
     const query = searchParams.get("search") || "";
 
     const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useProductInfiniteSearch({
@@ -59,11 +59,11 @@ export function ProductDetails() {
     const products = data.pages.flatMap((page) => page.products);
 
     const handleManageCollections = () => {
-        router.push("/admin/collections");
+        navigate({to: "/admin/collections"});
     };
 
     const handleManageCategories = () => {
-        router.push("/admin/categories");
+        navigate({to: "/admin/categories"});
     };
 
     const getStatus = (variants: ProductVariant[] | undefined | null) => {
@@ -123,7 +123,7 @@ export function ProductDetails() {
                                 className="relative bg-card border border-input rounded-lg shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow"
                             >
                                 <div className="relative aspect-product w-full bg-card overflow-hidden">
-                                    <ImageDisplay alt={product.name} url={product.images?.[0] || product?.image} />
+                                    <ImageDisplay alt={product.name} url={product?.images?.[0] || product?.image} />
 
                                     <div className="absolute top-2 right-2 flex flex-col gap-1">
                                         <Badge className="shadow-sm" variant={getStatus(product.variants) === "In Stock" ? "emerald" : "destructive"}>

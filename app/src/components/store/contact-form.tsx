@@ -3,9 +3,9 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Input } from "@components/ui/input";
-import { Textarea } from "@components/ui/textarea";
-import { Checkbox } from "@components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Send } from "lucide-react";
 
 import { Button } from "@/components/ui/button";

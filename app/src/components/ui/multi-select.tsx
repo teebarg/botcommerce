@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown, X } from "lucide-react";
 
-import ClientOnly from "@/components/generic/client-only";
-
 export interface SelectOption {
     value: string | number;
     label: string;
@@ -142,22 +140,18 @@ interface MultiSelectWithHookFormProps {
     disabled?: boolean;
 }
 
-// Example of how to use with react-hook-form
 export const MultiSelectWithHookForm = ({ control, name, rules, options, placeholder, disabled }: MultiSelectWithHookFormProps) => {
-    // Using dynamic import for Controller
     const { Controller } = require("react-hook-form");
 
     return (
-        <ClientOnly>
-            <Controller
-                control={control}
-                name={name}
-                render={({ field, fieldState: { error } }: any) => (
-                    <MultiSelect {...field} disabled={disabled} error={error?.message} options={options} placeholder={placeholder} />
-                )}
-                rules={rules}
-            />
-        </ClientOnly>
+        <Controller
+            control={control}
+            name={name}
+            render={({ field, fieldState: { error } }: any) => (
+                <MultiSelect {...field} disabled={disabled} error={error?.message} options={options} placeholder={placeholder} />
+            )}
+            rules={rules}
+        />
     );
 };
 

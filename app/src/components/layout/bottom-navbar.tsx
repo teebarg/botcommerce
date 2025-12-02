@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { CartComponent } from "@/components/store/cart/cart-component";
 import LocalizedClientLink from "@/components/ui/link";
 
-const ButtonNav = async ({ className }: { className?: string }) => {
+const ButtonNav = ({ className }: { className?: string }) => {
     interface NavLink {
         icon: React.ReactNode;
         label: string;

@@ -12,7 +12,7 @@ interface SocialShareProps {
 }
 
 export function SocialShare({ catalog, className }: SocialShareProps) {
-    const targetUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/shared/${catalog.slug}`;
+    const targetUrl = `${import.meta.env.VITE_BASE_URL}/shared/${catalog.slug}`;
     const shareUrl = encodeURIComponent(targetUrl);
     const shareText = encodeURIComponent(`Check out this amazing ${catalog.title}`);
 

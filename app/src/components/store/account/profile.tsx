@@ -6,7 +6,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -42,7 +41,7 @@ const ProfilePage: React.FC = () => {
     const [editingSection, setEditingSection] = useState<string | null>(null);
     const invalidate = useInvalidate();
     const [isPending, setIsPending] = useState<boolean>(false);
-    const { data: session } = useSession();
+    const session: any = null;
 
     const profileForm = useForm<ProfileFormValues>({
         resolver: zodResolver(profileSchema),

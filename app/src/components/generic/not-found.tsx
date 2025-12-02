@@ -1,9 +1,9 @@
 import { Search, Home, RefreshCw, ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useStoreSettings } from "@/providers/store-provider";
+import { useNavigate } from "@tanstack/react-router";
 
 interface NotFoundProps {
     className?: string;
@@ -11,7 +11,7 @@ interface NotFoundProps {
 }
 
 export default function NotFoundUI({ scenario, className }: NotFoundProps) {
-    const router = useRouter();
+    const navigate = useNavigate();
     const { settings } = useStoreSettings();
 
     const scenarios: Record<string, any> = {
@@ -56,21 +56,21 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
 
     const handlePrimaryAction = () => {
         if (scenario === "404") {
-            router.push("/");
+            navigate({to: "/"});
         } else if (scenario === "search") {
-            router.push("/search");
+            navigate({to: "/search"});
         } else if (["data", "connection", "server"].includes(scenario!)) {
-            router.refresh();
+            navigate({to: "/"});
         }
     };
 
     const handleSecondaryAction = () => {
         if (scenario === "404") {
-            router.back();
+            navigate({to: "-"});
         } else if (scenario === "search") {
-            router.back();
+            navigate({to: "/search"});
         } else if (["data", "connection", "server"].includes(scenario!)) {
-            router.back();
+            navigate({to: "-"});
         }
     };
 

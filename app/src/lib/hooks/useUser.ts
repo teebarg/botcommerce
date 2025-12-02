@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
 
 import { api } from "@/apis/client";
 import { PaginatedUser, ProductSearch, User, Wishlist } from "@/schemas";
@@ -97,7 +96,7 @@ export const useDeleteUser = () => {
 };
 
 export const useUserWishlist = () => {
-    const { data: session } = useSession();
+    const session: any = null;
 
     return useQuery({
         queryKey: ["products", "wishlist", session?.id?.toString()],
@@ -107,7 +106,7 @@ export const useUserWishlist = () => {
 };
 
 export const useUserRecentlyViewed = (limit: number = 12) => {
-    const { data: session } = useSession();
+    const session: any = null;
 
     return useQuery({
         queryKey: ["products", "recently-viewed"],

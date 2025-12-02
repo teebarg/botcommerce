@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
 
 export const SocialShare = ({ title, view_count }: { title: string; view_count: number }) => {
-    const { data: session } = useSession();
+    const session: any = null;
     const [copied, setCopied] = useState<boolean>(false);
     const [url] = useState<string>(() => (typeof window !== "undefined" ? window.location.href : ""));
 

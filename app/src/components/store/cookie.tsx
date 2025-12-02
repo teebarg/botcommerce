@@ -1,7 +1,7 @@
 "use client";
 
 import { FC, useEffect, useState } from "react";
-import { useCookie } from "@lib/hooks/use-cookie";
+import { useCookie } from "@/lib/hooks/use-cookie";
 import { Link } from "@tanstack/react-router"
 
 import { Button } from "@/components/ui/button";

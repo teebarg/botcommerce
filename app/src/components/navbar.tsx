@@ -1,5 +1,3 @@
-"use client";
-
 import React, { createContext, useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils";
@@ -13,16 +11,6 @@ const NavbarContext = createContext<NavbarContextType | null>(null);
 
 export const Navbar = ({ children, className }: { children: React.ReactNode; className?: string }) => {
     const [expanded, setExpanded] = useState<boolean>(false);
-    const [hasMounted, setHasMounted] = useState<boolean>(false);
-
-    useEffect(() => {
-        setHasMounted(true);
-    }, []);
-
-    if (!hasMounted) {
-        return null;
-    }
-
     return (
         <NavbarContext.Provider value={{ expanded, setExpanded }}>
             <nav
