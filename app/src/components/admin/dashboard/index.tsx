@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 
 import { OrderStatusBadge, PaymentStatusBadge } from "../orders/order-status-badge";
 
@@ -42,7 +42,7 @@ const RecentOrdersList = () => {
         <div className="px-4 md:px-10 py-8">
             <div className="flex justify-between items-center mb-3">
                 <h3 className="text-lg font-medium font-outfit">Recent Orders</h3>
-                <Link prefetch className="text-sm font-medium text-primary hover:underline" href="/admin/orders">
+                <Link className="text-sm font-medium text-primary hover:underline" to="/admin/orders">
                     View all
                 </Link>
             </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { Facebook, Twitter, Instagram, MessageSquare } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router"
 
 import LocalizedClientLink from "@/components/ui/link";
 import { Category } from "@/schemas/product";
@@ -62,7 +62,7 @@ export default function Footer() {
                 <div className="hidden md:block mx-auto max-w-7xl px-6 pb-8 pt-8 sm:pt-24 lg:px-8 md:pt-32">
                     <div className="hidden md:grid md:grid-cols-3 md:gap-8">
                         <div className="md:pr-8">
-                            <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                            <h3 className="text-xl font-bold bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
                                 {settings?.shop_name}
                             </h3>
                             <p className="text-sm text-foreground">
@@ -73,7 +73,7 @@ export default function Footer() {
                                 <Link
                                     aria-label="Twitter"
                                     className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-                                    href={`https://web.facebook.com/profile.php?id=${settings?.facebook}`}
+                                    to={`https://web.facebook.com/profile.php?id=${settings?.facebook}`}
                                     target="_blank"
                                 >
                                     <Facebook className="text-primary" />
@@ -81,7 +81,7 @@ export default function Footer() {
                                 <Link
                                     aria-label="Instagram"
                                     className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-                                    href={`https://www.instagram.com/${settings?.instagram}`}
+                                    to={`https://www.instagram.com/${settings?.instagram}`}
                                     target="_blank"
                                 >
                                     <Instagram className="text-primary" />
@@ -89,7 +89,7 @@ export default function Footer() {
                                 <Link
                                     aria-label="Tiktok"
                                     className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-                                    href={`https://www.tiktok.com/@${settings?.tiktok}`}
+                                    to={`https://www.tiktok.com/@${settings?.tiktok}`}
                                     target="_blank"
                                 >
                                     <MessageSquare className="text-primary" />
@@ -97,7 +97,7 @@ export default function Footer() {
                                 <Link
                                     aria-label="X"
                                     className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-                                    href={`https://x.com/${settings?.twitter}`}
+                                    to={`https://x.com/${settings?.twitter}`}
                                     target="_blank"
                                 >
                                     <Twitter className="text-primary" />

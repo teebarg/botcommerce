@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router"
 import { Heart } from "lucide-react";
 
 import { ProductImage } from "@/schemas";
@@ -29,7 +29,7 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, slug, name, images }) =
                 </div>
             </div>
             <div className="space-y-1 px-1">
-                <Link prefetch className="font-medium line-clamp-1 text-lg" href={`/products/${slug}`}>
+                <Link className="font-medium line-clamp-1 text-lg" to={`/products/${slug}`}>
                     {name}
                 </Link>
             </div>

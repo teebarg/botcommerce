@@ -1,5 +1,3 @@
-"use client";
-
 import {
     Home,
     Settings,
@@ -21,7 +19,7 @@ import {
     ShoppingCart,
     Tag,
 } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router"
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 
@@ -170,7 +168,7 @@ export function AdminSidebar() {
                                 {AdminItems.map((item, idx: number) => (
                                     <SidebarMenuItem key={idx}>
                                         <SidebarMenuButton asChild isActive={path === item.url}>
-                                            <Link href={item.url}>
+                                            <Link to={item.url}>
                                                 <item.icon />
                                                 <span>{item.title}</span>
                                             </Link>
@@ -187,7 +185,7 @@ export function AdminSidebar() {
                                 {storeItems.map((item, idx: number) => (
                                     <SidebarMenuItem key={idx}>
                                         <SidebarMenuButton asChild isActive={path === item.url}>
-                                            <Link href={item.url}>
+                                            <Link to={item.url}>
                                                 <item.icon />
                                                 <span>{item.title}</span>
                                             </Link>
@@ -204,7 +202,7 @@ export function AdminSidebar() {
                                 {AccountItems.map((item, idx: number) => (
                                     <SidebarMenuItem key={idx}>
                                         <SidebarMenuButton asChild isActive={path === item.url}>
-                                            <Link href={item.url}>
+                                            <Link to={item.url}>
                                                 <item.icon />
                                                 <span>{item.title}</span>
                                             </Link>
@@ -233,17 +231,17 @@ export function AdminSidebar() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent className="w-(--radix-popper-anchor-width)" side="top">
                                     <DropdownMenuItem>
-                                        <Link className="justify-between" href="/profile">
+                                        <Link className="justify-between" to="/profile">
                                             Profile
                                             <span className="badge">New</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
-                                        <Link href="/settings">Settings</Link>
+                                        <Link to="/settings">Settings</Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem className="text-red-600 cursor-pointer">
                                         <LogOut className="h-4 w-4 mr-2" />
-                                        <Link href="/api/auth/signout">Sign out</Link>
+                                        <Link to="/api/auth/signout">Sign out</Link>
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>

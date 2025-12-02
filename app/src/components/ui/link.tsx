@@ -1,13 +1,13 @@
 "use client";
 
-import Link, { LinkProps } from "next/link";
+import { Link } from "@tanstack/react-router"
 import React, { startTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 import { useProgressBar } from "@/components/ui/progress-bar";
 import { cn } from "@/lib/utils";
 
-interface TransitionLinkProps extends LinkProps {
+interface TransitionLinkProps {
     children: React.ReactNode;
     href: string;
     className?: string;
@@ -22,9 +22,8 @@ const LocalizedClientLink: React.FC<TransitionLinkProps> = ({ children, href, cl
     return (
         <Link
             {...props}
-            prefetch
             className={cn(className, pathname == href && active)}
-            href={href}
+            to={href}
             onClick={(e) => {
                 e.preventDefault();
                 progress.start();

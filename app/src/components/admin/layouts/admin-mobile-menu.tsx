@@ -1,5 +1,3 @@
-"use client";
-
 import {
     LayoutDashboard,
     Users,
@@ -19,7 +17,7 @@ import {
     ShoppingCart,
     Tag,
 } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 
@@ -81,11 +79,10 @@ const AdminMobileMenu: React.FC = () => {
                 {menuItems.map((item, idx: number) => (
                     <Link
                         key={idx}
-                        prefetch
                         className={`flex items-center justify-between w-full p-3 text-left transition-colors ${
                             pathname === item.href ? "bg-primary/20 text-primary" : ""
                         }`}
-                        href={item.href}
+                        to={item.href}
                     >
                         <div className="flex items-center space-x-3">
                             <span className={pathname === item.href ? "text-primary" : "text-muted-foreground"}>{item.icon}</span>

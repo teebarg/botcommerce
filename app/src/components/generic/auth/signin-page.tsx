@@ -1,7 +1,7 @@
 "use client";
 
 import { Mail } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router"
 
 import { MagicLinkForm } from "./magic-link";
 
@@ -41,7 +41,7 @@ export default function SignInPage() {
             <div className="mt-8 text-center">
                 <p className="text-sm text-muted-foreground">
                     Need help?{" "}
-                    <Link prefetch className="text-contrast font-medium" href="/contact">
+                    <Link className="text-contrast font-medium" to="/contact">
                         Contact support
                     </Link>
                 </p>

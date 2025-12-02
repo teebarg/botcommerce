@@ -2,7 +2,7 @@
 
 import { FC, useEffect, useState } from "react";
 import { useCookie } from "@lib/hooks/use-cookie";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router"
 
 import { Button } from "@/components/ui/button";
 
@@ -34,7 +34,7 @@ const Cookie: FC<CookieProps> = () => {
                         clicking<b className="font-semibold">{`"Accept All"`}</b>, you consent to the use of ALL the cookies. However, you may visit
                         <span className="font-semibold">{`"Cookie Settings"`}</span>
                         to provide a controlled consent. For more information, please read our
-                        <Link className="inline-flex text-primary hover:underline hover:opacity-80" href="/">
+                        <Link className="inline-flex text-primary hover:underline hover:opacity-80" to="/">
                             Cookie Policy.
                         </Link>
                     </p>

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import React from "react";
 
 import { getSiteConfig } from "@/lib/config";
@@ -14,7 +14,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
                         <div className="w-8 h-8 bg-linear-to-br from-primary to-contrast rounded-lg flex items-center justify-center">
                             <span className="text-lg font-bold text-white">M</span>
                         </div>
-                        <Link prefetch href="/">
+                        <Link to="/">
                             <span className="text-xl font-semibold bg-clip-text text-transparent bg-linear-to-r from-primary to-contrast">
                                 {siteConfig.name}
                             </span>
