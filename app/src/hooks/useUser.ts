@@ -1,8 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api } from "@/apis/client";
 import { PaginatedUser, ProductSearch, User, Wishlist } from "@/schemas";
+import { getUsersFn } from "@/server/users.server";
 
 export const useMe = () => {
     return useQuery({
@@ -23,17 +24,11 @@ interface UsersParams {
     sort?: string;
 }
 
-interface UsersQueryOptions {
-    enabled?: boolean;
-}
-
-export const useUsers = (searchParams: UsersParams, options?: UsersQueryOptions) => {
-    return useQuery({
+export const useUsers = (searchParams: UsersParams) =>
+    queryOptions({
         queryKey: ["users", JSON.stringify(searchParams)],
-        queryFn: async () => await api.get<PaginatedUser>("/users/", { params: { ...searchParams } }),
-        enabled: options?.enabled,
+        queryFn: () => getUsersFn(),
     });
-};
 
 export const useCreateUser = () => {
     const queryClient = useQueryClient();

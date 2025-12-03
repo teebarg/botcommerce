@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -13,14 +13,25 @@ import CustomerCreateGuest from "@/components/admin/customers/customer-create-gu
 import CustomerFilter from "@/components/admin/customers/customer-filter";
 import CustomerActions from "@/components/admin/customers/customer-actions";
 import CustomerCard from "@/components/admin/customers/customer-card";
+import z from "zod";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 const LIMIT = 10;
 
 export const Route = createFileRoute("/admin/(admin)/users")({
+    validateSearch: z.object({
+        offset: z.number().optional(),
+        limit: z.number().optional(),
+    }),
+    loaderDeps: ({ search: { offset, limit } }) => ({ offset, limit }),
+    loader: async ({ deps: { offset, limit }, context }) => {
+        await context.queryClient.ensureQueryData(useUsers({ skip: offset, limit }));
+    },
     component: RouteComponent,
 });
 
 function RouteComponent() {
+    const usersQuery = useSuspenseQuery(useUsers({ skip: 0, limit: LIMIT }));
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [filterOpen, setFilterOpen] = useState<boolean>(false);
 
@@ -28,13 +39,15 @@ function RouteComponent() {
 
     const skip = Number(searchParams.get("skip")) || 0;
 
-    const { data, isLoading } = useUsers(
-        {
-            skip,
-            limit: LIMIT,
-        },
-        { enabled: true }
-    );
+    // const { data, isLoading } = useUsers(
+    //     {
+    //         skip,
+    //         limit: LIMIT,
+    //     },
+    //     { enabled: true }
+    // );
+
+    const { data, isLoading } = usersQuery;
 
     const { users, ...pagination } = data ?? { skip: 0, limit: 0, total_pages: 0, total_count: 0 };
 
