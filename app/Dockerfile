@@ -1,18 +1,15 @@
-# Use the slim version of Node.js
-FROM node:20-slim
+FROM node:22-alpine
 
-# Set working directory
+RUN corepack enable && corepack prepare pnpm@10.24.0 --activate
+
 WORKDIR /app
 
-# Install dependencies
-COPY package*.json ./
-RUN npm install
+COPY package.json pnpm-lock.yaml ./
 
-# Copy the rest of your app
-COPY . .
+RUN pnpm install --frozen-lockfile
 
-# Expose the development port
-EXPOSE 7000
+COPY . ./
 
-# Start in development mode
-CMD ["npm", "run", "dev"]
+EXPOSE 5173
+
+CMD ["pnpm", "dev"]
