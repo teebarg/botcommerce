@@ -1,6 +1,6 @@
 import React from "react";
 import { CreditCard } from "lucide-react";
-import { paymentInfoMap } from "@lib/constants";
+import { paymentInfoMap } from "@/lib/constants";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroupItem, RadioGroupWithLabel } from "@/components/ui/radio-group";

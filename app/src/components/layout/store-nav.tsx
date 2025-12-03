@@ -10,18 +10,21 @@ import { SearchDialog } from "@/components/store/product-search";
 import { getSiteConfig } from "@/lib/config";
 import { Heart, HeartOff } from "lucide-react";
 import { ThemeToggle } from "../theme-toggle";
+import { Session } from "start-authjs";
 
-const StoreNavbar = () => {
-    const session: any = null;
+const StoreNavbar = ({ session }: { session: Session | null }) => {
     const siteConfig = getSiteConfig();
-    console.log("StoreNavbar rendered on", typeof window === "undefined" ? "server" : "client");
-
 
     return (
         <NavigationBar className="bg-background py-2">
             <NavbarContent className="flex flex-1 max-w-8xl mx-auto">
                 <NavbarBrand className="flex items-center font-semibold">
-                    <LocalizedClientLink className="flex items-center gap-1" href="/">
+                    <LocalizedClientLink
+                        className="flex items-center gap-1"
+                        href="/"
+                        activeProps={{ className: "font-bold text-red-600" }}
+                        activeOptions={{ exact: true }}
+                    >
                         <span className="tracking-tighter font-bold text-2xl uppercase">{siteConfig?.name}</span>
                         <div className="h-8 w-8">
                             <img alt="Logo" className="h-full w-full object-contain" src="/icon.png" />
@@ -54,7 +57,7 @@ const StoreNavbar = () => {
                     </div>
                     <GetApp />
                     <div className="hidden sm:flex">
-                        {session ? (
+                        {session?.user ? (
                             <UserDropDown user={session?.user} />
                         ) : (
                             <LocalizedClientLink className="text-sm font-semibold leading-6" href="/auth/signin">

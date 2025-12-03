@@ -1,8 +1,9 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api } from "@/apis/client";
-import { Order, OrderStatus, PaginatedOrder, PaymentStatus } from "@/schemas";
+import { Order, OrderStatus, PaymentStatus } from "@/schemas";
+import { getOrdersFn } from "@/server/order.server";
 
 interface OrderSearchParams {
     order_number?: string;
@@ -13,15 +14,11 @@ interface OrderSearchParams {
     sort?: string;
 }
 
-export const useOrders = (searchParams: OrderSearchParams) => {
-    const session: any = null;
-
-    return useQuery({
+export const useOrders = (searchParams: OrderSearchParams) =>
+    queryOptions({
         queryKey: ["orders", JSON.stringify(searchParams)],
-        queryFn: async () => await api.get<PaginatedOrder>("/order/", { params: { ...searchParams } }),
-        enabled: Boolean(session?.user),
+        queryFn: () => getOrdersFn({ data: { ...searchParams } }),
     });
-};
 
 export const useOrder = (orderNumber: string) => {
     return useQuery({

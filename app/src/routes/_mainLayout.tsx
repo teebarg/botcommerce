@@ -10,35 +10,21 @@ import GetApp from "@/components/get-app";
 import { SearchDialog } from "@/components/store/product-search";
 import LocalizedClientLink from "@/components/ui/link";
 import { getSiteConfig } from "@/lib/config";
-
-import { CartComponent } from "@/components/store/cart/cart-component";
-import { Heart, HeartOff } from "lucide-react";
+import { Session } from "start-authjs";
 
 export const Route = createFileRoute("/_mainLayout")({
     component: MainLayoutComponent,
-    // beforeLoad: async ({ context }) => {
-    //     const user = await fetchUser();
-    //     if (!user) {
-    //         throw new Error("Not authenticated");
-    //     }
-    //     return {
-    //         user,
-    //     };
-    // },
     errorComponent: ({ error }) => {
-        if (error.message === "Not authenticated") {
-            // return <Auth />;
-        }
-
         throw error;
     },
 });
 
 function MainLayoutComponent() {
     const siteConfig = getSiteConfig();
+    const { session } = Route.useRouteContext();
     return (
         <div className="flex flex-col flex-1">
-            <StoreNavbar />
+            <StoreNavbar session={session as unknown as Session} />
             <div className="safe-top-mask md:hidden" />
             <div className="md:hidden sticky top-[env(safe-area-inset-top)] z-40 bg-background">
                 <div className="flex items-center gap-2 px-2 py-3">

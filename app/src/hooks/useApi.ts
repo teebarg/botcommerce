@@ -1,9 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api } from "@/apis/client";
 import { BankDetails, ConversationStatus, DeliveryOption, Message, PaginatedChat } from "@/schemas";
 import { StatsTrends } from "@/types/models";
+import { getStatsTrendsFn } from "@/server/admin.server";
 
 interface ConversationParams {
     user_id?: number;
@@ -63,12 +64,11 @@ export const useDeleteChat = () => {
     });
 };
 
-export const useStatsTrends = () => {
-    return useQuery({
-        queryKey: ["stats-trends"],
-        queryFn: async () => await api.get<StatsTrends>("/stats/trends"),
-    });
-};
+export const useStatsTrends = () =>
+  queryOptions({
+    queryKey: ["stats-trends"],
+    queryFn: () => getStatsTrendsFn(),
+  })
 
 export const useDeliveryOptions = () => {
     return useQuery({

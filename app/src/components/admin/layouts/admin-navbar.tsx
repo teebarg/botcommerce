@@ -5,10 +5,9 @@ import LocalizedClientLink from "@/components/ui/link";
 import MenuComp from "@/components/layout/admin-mobile-menu-drawer";
 import UserDropDown from "@/components/layout/user-dropdown";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Session } from "start-authjs";
 
-const AdminNavbar = async () => {
-    const session: any = null;
-
+const AdminNavbar = ({ session }: { session: Session | null }) => {
     return (
         <NavigationBar className="h-16 bg-background">
             <NavbarContent className="basis-1/5 sm:basis-full" justify="start">

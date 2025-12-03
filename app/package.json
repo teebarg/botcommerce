@@ -21,11 +21,12 @@
         "format": "prettier --write ."
     },
     "dependencies": {
+        "@auth/core": "^0.41.1",
+        "@auth/upstash-redis-adapter": "^2.11.1",
         "@fontsource-variable/lexend": "^5.2.11",
         "@fontsource-variable/nunito-sans": "^5.2.7",
         "@fontsource-variable/outfit": "^5.2.8",
         "@hookform/resolvers": "^4.1.3",
-        "@prisma/client": "^7.0.1",
         "@radix-ui/react-accordion": "^1.2.0",
         "@radix-ui/react-alert-dialog": "^1.1.1",
         "@radix-ui/react-aspect-ratio": "^1.1.0",
@@ -87,12 +88,13 @@
         "react-swipeable": "^7.0.2",
         "sharp": "^0.33.5",
         "sonner": "^2.0.1",
+        "start-authjs": "^1.0.0",
         "tailwind-merge": "^2.6.0",
         "tailwindcss-animate": "^1.0.7",
         "use-debounce": "^10.0.5",
         "uuid": "^10.0.0",
         "vaul": "^1.1.2",
-        "zod": "^3.24.2"
+        "zod": "^4.1.13"
     },
     "devDependencies": {
         "@babel/core": "^7.17.5",

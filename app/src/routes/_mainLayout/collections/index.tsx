@@ -51,9 +51,6 @@ export const Route = createFileRoute("/_mainLayout/collections/")({
         };
 
         const { data, error } = await tryCatch(GetProductsFn({ data: queryParams }));
-        console.log("🚀 ~ file: index.tsx:32 ~ error:", error);
-        console.log("🚀 ~ file: index.tsx:32 ~ data:", data);
-
         return {
             queryParams,
             data,

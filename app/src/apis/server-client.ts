@@ -1,11 +1,14 @@
+import { useSession } from "@/server/auth-server";
+import { Session } from "start-authjs";
+
 const baseURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
 
 type RequestOptions = RequestInit & {
-    params?: Record<string, string | number>;
+    params?: Record<string, string | number | boolean>;
 };
 
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-    const session: any = null;
+    const session = await useSession() as unknown as Session;
     const { params, ...restOptions } = options;
 
     const url = new URL(`/api${endpoint}`, baseURL);
@@ -21,7 +24,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
 
     const headers = {
         "Content-Type": "application/json",
-        "X-Auth": session?.accessToken ?? "token",
+        "X-Auth": session?.accessToken ?? "",
         cartId: "",
         ...options.headers,
     };
@@ -32,7 +35,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         credentials: "include",
     });
 
-    return response.json()
+    return response.json();
 }
 
 export const serverApi = {

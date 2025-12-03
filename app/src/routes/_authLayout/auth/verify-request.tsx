@@ -1,12 +1,14 @@
-"use client";
-
-import React from "react";
+import { createFileRoute } from "@tanstack/react-router";
 import { Mail, ArrowLeft, Clock } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
-export default function VerifyRequestPage() {
+export const Route = createFileRoute("/_authLayout/auth/verify-request")({
+    component: RouteComponent,
+});
+
+function RouteComponent() {
     return (
         <div>
             <div className="p-4 md:p-8">

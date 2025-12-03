@@ -1,10 +1,29 @@
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import React from "react";
-
+import { redirect } from "@tanstack/react-router";
 import { getSiteConfig } from "@/lib/config";
+import z from "zod";
 
-export default async function AuthLayout({ children }: { children: React.ReactNode }) {
-    const siteConfig = await getSiteConfig();
+export const Route = createFileRoute("/_authLayout")({
+    validateSearch: z.object({
+        callbackUrl: z.string().optional(),
+    }),
+    beforeLoad: ({ context, search }) => {
+        if (context.session) {
+            if (search.callbackUrl) {
+                throw redirect({ to: search.callbackUrl });
+            }
+            throw redirect({ to: "/" });
+        }
+        return {
+            callbackUrl: search.callbackUrl,
+        };
+    },
+    component: RouteComponent,
+});
+
+function RouteComponent() {
+    const siteConfig = getSiteConfig();
 
     return (
         <div className="h-screen flex flex-col">
@@ -23,7 +42,9 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
                 </div>
             </nav>
             <div className="flex items-center justify-center flex-1">
-                <div className="bg-card px-3 py-6 rounded-lg">{children}</div>
+                <div className="bg-card px-3 py-6 rounded-lg">
+                    <Outlet />
+                </div>
             </div>
         </div>
     );

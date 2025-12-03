@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { serverApi } from "@/apis/server-client";
-import { Category } from "@/schemas";
+import { Category, Message } from "@/schemas";
 
 export const CategorySchema = z.object({
     query: z.string().optional(),
@@ -50,5 +50,5 @@ export const deleteCategoryFn = createServerFn({ method: "POST" })
     )
     .handler(async ({ data }) => {
         const { id } = data;
-        return await serverApi.delete(`/category/${id}`);
+        return await serverApi.delete<Message>(`/category/${id}`);
     });

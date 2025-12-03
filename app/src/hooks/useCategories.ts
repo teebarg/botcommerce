@@ -9,7 +9,7 @@ import { GetCategoriesFn } from "@/server/categories-server";
 export const useCategories = (query?: string) => {
     return useQuery({
         queryKey: ["categories", query],
-        queryFn: async () => GetCategoriesFn(),
+        queryFn: async () => GetCategoriesFn({ data: { query } }),
     });
 };
 

@@ -1,9 +1,5 @@
-"use client";
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
-import { useSearch } from "@tanstack/react-router"; 
 import { Mail } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -17,27 +13,20 @@ type Props = {
 const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
     const [email, setEmail] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
-    // const search = useSearch();
-    
 
-    const handleEmailSignIn = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!email) {
-            toast.error("Please enter a valid email");
+    const [csrfToken, setCsrfToken] = useState<string>("");
 
-            return;
-        }
-        setLoading(true);
-
-        // await signIn("http-email", {
-        //     email,
-        //     callbackUrl: callbackUrl || "/",
-        // });
-    };
+    useEffect(() => {
+        fetch("/api/auth/csrf")
+            .then((res) => res.json())
+            .then((data) => setCsrfToken(data.csrfToken));
+    }, []);
 
     return (
         <React.Fragment>
-            <div className="w-full">
+            <form className="w-full" action="/api/auth/signin/http-email" method="POST">
+                <input type="hidden" name="csrfToken" value={csrfToken} />
+                <input type="hidden" name="callbackUrl" value={callbackUrl || "/"} />
                 <Input
                     required
                     className=""
@@ -56,12 +45,12 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
                     data-testid="magic-link-button"
                     isLoading={loading}
                     size="lg"
-                    type="button"
-                    onClick={handleEmailSignIn}
+                    type="submit"
+                    disabled={!email}
                 >
                     Send Magic Link
                 </Button>
-            </div>
+            </form>
             <Separator className="my-6" />
             <SocialLoginButtons callbackUrl={callbackUrl} />
         </React.Fragment>

@@ -1,8 +1,6 @@
-"use client";
-
 import React from "react";
-import { currency } from "@lib/utils";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@components/ui/tooltip";
+import { currency } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
 
 import { Separator } from "@/components/ui/separator";

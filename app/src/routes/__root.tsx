@@ -1,8 +1,6 @@
 /// <reference types="vite/client" />
 
 import { HeadContent, Outlet, ScriptOnce, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import { Toaster } from "sonner";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
@@ -13,14 +11,30 @@ import { CartProvider } from "@/providers/cart-provider";
 import { StoreProvider } from "@/providers/store-provider";
 import ImpersonationBanner from "@/components/impersonation-banner";
 import PushPermission from "@/components/pwa/push-permission";
-import { getStoredTheme, ThemeProvider } from "@/components/ThemeProvider";
 import { seo } from "@/utils/seo";
 import NotFound from "@/components/generic/not-found";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { WebSocketProvider } from "pulsews";
 import appCss from "@/styles.css?url";
+import { AuthSession, getSession } from "start-authjs";
+import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
+import { authConfig } from "@/utils/auth";
+import { getStoredTheme, ThemeProvider } from "@/providers/theme-provider";
+import type { QueryClient } from "@tanstack/react-query";
 
-export const Route = createRootRouteWithContext()({
+interface RouterContext {
+    session: AuthSession | null;
+    queryClient: QueryClient;
+}
+
+const fetchSession = createServerFn({ method: "GET" }).handler(async () => {
+    const request = getRequest();
+    const session = await getSession(request, authConfig);
+    return session;
+});
+
+export const Route = createRootRouteWithContext<RouterContext>()({
     head: () => ({
         meta: [
             { charSet: "utf-8" },
@@ -39,7 +53,15 @@ export const Route = createRootRouteWithContext()({
             { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
         ],
     }),
-    loader: async () => ({ _storedTheme: await getStoredTheme() }),
+    beforeLoad: async ({}) => {
+        const session = await fetchSession();
+        const _storedTheme = await getStoredTheme();
+        return {
+            _storedTheme,
+            session,
+        };
+    },
+    // loader: async ({ context }) => ({ ...context }),
     errorComponent: (props) => {
         return (
             <RootDocument>
@@ -60,7 +82,7 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-    const { _storedTheme } = Route.useLoaderData();
+    const { _storedTheme } = Route.useRouteContext();
     return (
         <html suppressHydrationWarning className="antialiased">
             <head>

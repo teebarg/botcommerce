@@ -1,7 +1,4 @@
-"use client";
-
 import LocalizedClientLink from "@/components/ui/link";
-import { Session } from "@/schemas";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -15,17 +12,20 @@ import { useInvalidateMe } from "@/hooks/useUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { deleteCookie } from "@/lib/util/cookie";
 import { useInvalidateCart } from "@/hooks/useCart";
+import { UserSession } from "@/schemas";
 
-export default function UserDropDown({ user }: { user: Session }) {
+export default function UserDropDown({ user }: { user: UserSession }) {
     const invalidate = useInvalidateMe();
     const invalidateCart = useInvalidateCart();
-    const handleLogout = async () => {
+    const handleLogout = () => {
         deleteCookie("_cart_id");
-        await authApi.logOut();
-        // await signOut();
+        authApi.logOut().catch(() => {});
+
         invalidate();
         invalidateCart();
-        window.location.href = "/";
+
+        // must come last
+        window.location.href = "/api/auth/signout";
     };
 
     const links = [

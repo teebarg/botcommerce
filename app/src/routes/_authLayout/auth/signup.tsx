@@ -1,15 +1,14 @@
-import { Metadata } from "next";
-
+import { createFileRoute } from "@tanstack/react-router";
 import { SignUpForm } from "@/components/generic/auth/signup";
 import { getSiteConfig } from "@/lib/config";
 import LocalizedClientLink from "@/components/ui/link";
 
-export const metadata: Metadata = {
-    title: "Sign Up",
-};
+export const Route = createFileRoute("/_authLayout/auth/signup")({
+    component: RouteComponent,
+});
 
-export default async function SignUp() {
-    const siteConfig = await getSiteConfig();
+function RouteComponent() {
+    const siteConfig = getSiteConfig();
 
     return (
         <>

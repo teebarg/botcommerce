@@ -3,28 +3,10 @@ import { Link } from "@tanstack/react-router";
 import { OrderStatusBadge, PaymentStatusBadge } from "../orders/order-status-badge";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useOrders } from "@/hooks/useOrder";
 import { Order } from "@/schemas";
 import { currency, formatDate } from "@/lib/utils";
-import ComponentLoader from "@/components/component-loader";
-import ServerError from "@/components/generic/server-error";
 
-const RecentOrdersList = () => {
-    const { data, isLoading, error } = useOrders({ take: 5 });
-
-    if (isLoading)
-        return (
-            <div className="px-2 md:px-10">
-                <ComponentLoader className="h-100" />
-            </div>
-        );
-
-    if (error) {
-        return <ServerError />;
-    }
-
-    const { orders } = data || { orders: [] };
-
+const RecentOrdersList = ({ orders }: { orders: Order[] }) => {
     if (!orders) {
         return (
             <div className="px-2 md:px-10 py-8">

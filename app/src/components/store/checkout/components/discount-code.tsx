@@ -1,8 +1,6 @@
-"use client";
-
 import React, { useMemo, useState } from "react";
-import { currency } from "@lib/utils";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@components/ui/tooltip";
+import { currency } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Check, Info, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";

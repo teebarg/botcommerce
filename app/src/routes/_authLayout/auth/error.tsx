@@ -1,11 +1,25 @@
+import { createFileRoute } from "@tanstack/react-router";
 import { AlertTriangle, ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import z from "zod";
 
-export default function ErrorPage() {
-    const searchParams: any = null;
-    const error = searchParams?.get("error");
+export const Route = createFileRoute("/_authLayout/auth/error")({
+    validateSearch: z.object({
+        error: z.string().optional(),
+    }),
+    beforeLoad: ({ context, search }) => {
+        console.log("🚀 ~ file: error.tsx:13 ~ context:", context)
+        return {
+            error: search.error,
+        };
+    },
+    component: RouteComponent,
+});
+
+function RouteComponent() {
+    const { error } = Route.useRouteContext();
 
     const getErrorContent = () => {
         switch (error) {

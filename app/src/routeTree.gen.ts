@@ -13,6 +13,7 @@ import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as MainLayoutRouteImport } from './routes/_mainLayout'
+import { Route as AuthLayoutRouteImport } from './routes/_authLayout'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as MainLayoutIndexRouteImport } from './routes/_mainLayout/index'
 import { Route as PaymentVerifyRouteImport } from './routes/payment/verify'
@@ -20,8 +21,9 @@ import { Route as ApiPushEventRouteImport } from './routes/api/push-event'
 import { Route as AdminSharedRouteImport } from './routes/admin/shared'
 import { Route as MainLayoutCartRouteImport } from './routes/_mainLayout/cart'
 import { Route as MainLayoutBulkRouteImport } from './routes/_mainLayout/bulk'
-import { Route as MainLayoutCollectionsRouteImport } from './routes/_mainLayout/_collections'
+import { Route as AuthLayoutHomeRouteImport } from './routes/_authLayout/home'
 import { Route as MainLayoutCollectionsIndexRouteImport } from './routes/_mainLayout/collections/index'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AdminstoreReviewsRouteImport } from './routes/admin/(store)/reviews'
 import { Route as AdminstoreOrdersRouteImport } from './routes/admin/(store)/orders'
 import { Route as AdminstoreGalleryRouteImport } from './routes/admin/(store)/gallery'
@@ -44,6 +46,10 @@ import { Route as MainLayoutstaticHelpCenterRouteImport } from './routes/_mainLa
 import { Route as MainLayoutstaticContactUsRouteImport } from './routes/_mainLayout/(static)/contact-us'
 import { Route as MainLayoutstaticCareersRouteImport } from './routes/_mainLayout/(static)/careers'
 import { Route as MainLayoutstaticAboutRouteImport } from './routes/_mainLayout/(static)/about'
+import { Route as AuthLayoutAuthVerifyRequestRouteImport } from './routes/_authLayout/auth/verify-request'
+import { Route as AuthLayoutAuthSignupRouteImport } from './routes/_authLayout/auth/signup'
+import { Route as AuthLayoutAuthSigninRouteImport } from './routes/_authLayout/auth/signin'
+import { Route as AuthLayoutAuthErrorRouteImport } from './routes/_authLayout/auth/error'
 import { Route as AdminstoreCouponsAnalyticsRouteImport } from './routes/admin/(store)/coupons.analytics'
 
 const OfflineRoute = OfflineRouteImport.update({
@@ -63,6 +69,10 @@ const AdminRoute = AdminRouteImport.update({
 } as any)
 const MainLayoutRoute = MainLayoutRouteImport.update({
   id: '/_mainLayout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLayoutRoute = AuthLayoutRouteImport.update({
+  id: '/_authLayout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -100,9 +110,10 @@ const MainLayoutBulkRoute = MainLayoutBulkRouteImport.update({
   path: '/bulk',
   getParentRoute: () => MainLayoutRoute,
 } as any)
-const MainLayoutCollectionsRoute = MainLayoutCollectionsRouteImport.update({
-  id: '/_collections',
-  getParentRoute: () => MainLayoutRoute,
+const AuthLayoutHomeRoute = AuthLayoutHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AuthLayoutRoute,
 } as any)
 const MainLayoutCollectionsIndexRoute =
   MainLayoutCollectionsIndexRouteImport.update({
@@ -110,6 +121,11 @@ const MainLayoutCollectionsIndexRoute =
     path: '/collections/',
     getParentRoute: () => MainLayoutRoute,
   } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminstoreReviewsRoute = AdminstoreReviewsRouteImport.update({
   id: '/(store)/reviews',
   path: '/reviews',
@@ -225,6 +241,27 @@ const MainLayoutstaticAboutRoute = MainLayoutstaticAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => MainLayoutRoute,
 } as any)
+const AuthLayoutAuthVerifyRequestRoute =
+  AuthLayoutAuthVerifyRequestRouteImport.update({
+    id: '/auth/verify-request',
+    path: '/auth/verify-request',
+    getParentRoute: () => AuthLayoutRoute,
+  } as any)
+const AuthLayoutAuthSignupRoute = AuthLayoutAuthSignupRouteImport.update({
+  id: '/auth/signup',
+  path: '/auth/signup',
+  getParentRoute: () => AuthLayoutRoute,
+} as any)
+const AuthLayoutAuthSigninRoute = AuthLayoutAuthSigninRouteImport.update({
+  id: '/auth/signin',
+  path: '/auth/signin',
+  getParentRoute: () => AuthLayoutRoute,
+} as any)
+const AuthLayoutAuthErrorRoute = AuthLayoutAuthErrorRouteImport.update({
+  id: '/auth/error',
+  path: '/auth/error',
+  getParentRoute: () => AuthLayoutRoute,
+} as any)
 const AdminstoreCouponsAnalyticsRoute =
   AdminstoreCouponsAnalyticsRouteImport.update({
     id: '/analytics',
@@ -236,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/checkout': typeof CheckoutRoute
   '/offline': typeof OfflineRoute
+  '/home': typeof AuthLayoutHomeRoute
   '/bulk': typeof MainLayoutBulkRoute
   '/cart': typeof MainLayoutCartRoute
   '/admin/shared': typeof AdminSharedRoute
@@ -243,6 +281,10 @@ export interface FileRoutesByFullPath {
   '/payment/verify': typeof PaymentVerifyRoute
   '/': typeof MainLayoutIndexRoute
   '/admin/': typeof AdminIndexRoute
+  '/auth/error': typeof AuthLayoutAuthErrorRoute
+  '/auth/signin': typeof AuthLayoutAuthSigninRoute
+  '/auth/signup': typeof AuthLayoutAuthSignupRoute
+  '/auth/verify-request': typeof AuthLayoutAuthVerifyRequestRoute
   '/about': typeof MainLayoutstaticAboutRoute
   '/careers': typeof MainLayoutstaticCareersRoute
   '/contact-us': typeof MainLayoutstaticContactUsRoute
@@ -265,12 +307,14 @@ export interface FileRoutesByFullPath {
   '/admin/gallery': typeof AdminstoreGalleryRoute
   '/admin/orders': typeof AdminstoreOrdersRoute
   '/admin/reviews': typeof AdminstoreReviewsRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/collections': typeof MainLayoutCollectionsIndexRoute
   '/admin/coupons/analytics': typeof AdminstoreCouponsAnalyticsRoute
 }
 export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/offline': typeof OfflineRoute
+  '/home': typeof AuthLayoutHomeRoute
   '/bulk': typeof MainLayoutBulkRoute
   '/cart': typeof MainLayoutCartRoute
   '/admin/shared': typeof AdminSharedRoute
@@ -278,6 +322,10 @@ export interface FileRoutesByTo {
   '/payment/verify': typeof PaymentVerifyRoute
   '/': typeof MainLayoutIndexRoute
   '/admin': typeof AdminIndexRoute
+  '/auth/error': typeof AuthLayoutAuthErrorRoute
+  '/auth/signin': typeof AuthLayoutAuthSigninRoute
+  '/auth/signup': typeof AuthLayoutAuthSignupRoute
+  '/auth/verify-request': typeof AuthLayoutAuthVerifyRequestRoute
   '/about': typeof MainLayoutstaticAboutRoute
   '/careers': typeof MainLayoutstaticCareersRoute
   '/contact-us': typeof MainLayoutstaticContactUsRoute
@@ -300,16 +348,18 @@ export interface FileRoutesByTo {
   '/admin/gallery': typeof AdminstoreGalleryRoute
   '/admin/orders': typeof AdminstoreOrdersRoute
   '/admin/reviews': typeof AdminstoreReviewsRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/collections': typeof MainLayoutCollectionsIndexRoute
   '/admin/coupons/analytics': typeof AdminstoreCouponsAnalyticsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/_authLayout': typeof AuthLayoutRouteWithChildren
   '/_mainLayout': typeof MainLayoutRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
   '/checkout': typeof CheckoutRoute
   '/offline': typeof OfflineRoute
-  '/_mainLayout/_collections': typeof MainLayoutCollectionsRoute
+  '/_authLayout/home': typeof AuthLayoutHomeRoute
   '/_mainLayout/bulk': typeof MainLayoutBulkRoute
   '/_mainLayout/cart': typeof MainLayoutCartRoute
   '/admin/shared': typeof AdminSharedRoute
@@ -317,6 +367,10 @@ export interface FileRoutesById {
   '/payment/verify': typeof PaymentVerifyRoute
   '/_mainLayout/': typeof MainLayoutIndexRoute
   '/admin/': typeof AdminIndexRoute
+  '/_authLayout/auth/error': typeof AuthLayoutAuthErrorRoute
+  '/_authLayout/auth/signin': typeof AuthLayoutAuthSigninRoute
+  '/_authLayout/auth/signup': typeof AuthLayoutAuthSignupRoute
+  '/_authLayout/auth/verify-request': typeof AuthLayoutAuthVerifyRequestRoute
   '/_mainLayout/(static)/about': typeof MainLayoutstaticAboutRoute
   '/_mainLayout/(static)/careers': typeof MainLayoutstaticCareersRoute
   '/_mainLayout/(static)/contact-us': typeof MainLayoutstaticContactUsRoute
@@ -339,6 +393,7 @@ export interface FileRoutesById {
   '/admin/(store)/gallery': typeof AdminstoreGalleryRoute
   '/admin/(store)/orders': typeof AdminstoreOrdersRoute
   '/admin/(store)/reviews': typeof AdminstoreReviewsRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/_mainLayout/collections/': typeof MainLayoutCollectionsIndexRoute
   '/admin/(store)/coupons/analytics': typeof AdminstoreCouponsAnalyticsRoute
 }
@@ -348,6 +403,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/checkout'
     | '/offline'
+    | '/home'
     | '/bulk'
     | '/cart'
     | '/admin/shared'
@@ -355,6 +411,10 @@ export interface FileRouteTypes {
     | '/payment/verify'
     | '/'
     | '/admin/'
+    | '/auth/error'
+    | '/auth/signin'
+    | '/auth/signup'
+    | '/auth/verify-request'
     | '/about'
     | '/careers'
     | '/contact-us'
@@ -377,12 +437,14 @@ export interface FileRouteTypes {
     | '/admin/gallery'
     | '/admin/orders'
     | '/admin/reviews'
+    | '/api/auth/$'
     | '/collections'
     | '/admin/coupons/analytics'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/checkout'
     | '/offline'
+    | '/home'
     | '/bulk'
     | '/cart'
     | '/admin/shared'
@@ -390,6 +452,10 @@ export interface FileRouteTypes {
     | '/payment/verify'
     | '/'
     | '/admin'
+    | '/auth/error'
+    | '/auth/signin'
+    | '/auth/signup'
+    | '/auth/verify-request'
     | '/about'
     | '/careers'
     | '/contact-us'
@@ -412,15 +478,17 @@ export interface FileRouteTypes {
     | '/admin/gallery'
     | '/admin/orders'
     | '/admin/reviews'
+    | '/api/auth/$'
     | '/collections'
     | '/admin/coupons/analytics'
   id:
     | '__root__'
+    | '/_authLayout'
     | '/_mainLayout'
     | '/admin'
     | '/checkout'
     | '/offline'
-    | '/_mainLayout/_collections'
+    | '/_authLayout/home'
     | '/_mainLayout/bulk'
     | '/_mainLayout/cart'
     | '/admin/shared'
@@ -428,6 +496,10 @@ export interface FileRouteTypes {
     | '/payment/verify'
     | '/_mainLayout/'
     | '/admin/'
+    | '/_authLayout/auth/error'
+    | '/_authLayout/auth/signin'
+    | '/_authLayout/auth/signup'
+    | '/_authLayout/auth/verify-request'
     | '/_mainLayout/(static)/about'
     | '/_mainLayout/(static)/careers'
     | '/_mainLayout/(static)/contact-us'
@@ -450,17 +522,20 @@ export interface FileRouteTypes {
     | '/admin/(store)/gallery'
     | '/admin/(store)/orders'
     | '/admin/(store)/reviews'
+    | '/api/auth/$'
     | '/_mainLayout/collections/'
     | '/admin/(store)/coupons/analytics'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  AuthLayoutRoute: typeof AuthLayoutRouteWithChildren
   MainLayoutRoute: typeof MainLayoutRouteWithChildren
   AdminRoute: typeof AdminRouteWithChildren
   CheckoutRoute: typeof CheckoutRoute
   OfflineRoute: typeof OfflineRoute
   ApiPushEventRoute: typeof ApiPushEventRoute
   PaymentVerifyRoute: typeof PaymentVerifyRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -491,6 +566,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: ''
       preLoaderRoute: typeof MainLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authLayout': {
+      id: '/_authLayout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthLayoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -542,12 +624,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainLayoutBulkRouteImport
       parentRoute: typeof MainLayoutRoute
     }
-    '/_mainLayout/_collections': {
-      id: '/_mainLayout/_collections'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof MainLayoutCollectionsRouteImport
-      parentRoute: typeof MainLayoutRoute
+    '/_authLayout/home': {
+      id: '/_authLayout/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AuthLayoutHomeRouteImport
+      parentRoute: typeof AuthLayoutRoute
     }
     '/_mainLayout/collections/': {
       id: '/_mainLayout/collections/'
@@ -555,6 +637,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/collections'
       preLoaderRoute: typeof MainLayoutCollectionsIndexRouteImport
       parentRoute: typeof MainLayoutRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/(store)/reviews': {
       id: '/admin/(store)/reviews'
@@ -710,6 +799,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainLayoutstaticAboutRouteImport
       parentRoute: typeof MainLayoutRoute
     }
+    '/_authLayout/auth/verify-request': {
+      id: '/_authLayout/auth/verify-request'
+      path: '/auth/verify-request'
+      fullPath: '/auth/verify-request'
+      preLoaderRoute: typeof AuthLayoutAuthVerifyRequestRouteImport
+      parentRoute: typeof AuthLayoutRoute
+    }
+    '/_authLayout/auth/signup': {
+      id: '/_authLayout/auth/signup'
+      path: '/auth/signup'
+      fullPath: '/auth/signup'
+      preLoaderRoute: typeof AuthLayoutAuthSignupRouteImport
+      parentRoute: typeof AuthLayoutRoute
+    }
+    '/_authLayout/auth/signin': {
+      id: '/_authLayout/auth/signin'
+      path: '/auth/signin'
+      fullPath: '/auth/signin'
+      preLoaderRoute: typeof AuthLayoutAuthSigninRouteImport
+      parentRoute: typeof AuthLayoutRoute
+    }
+    '/_authLayout/auth/error': {
+      id: '/_authLayout/auth/error'
+      path: '/auth/error'
+      fullPath: '/auth/error'
+      preLoaderRoute: typeof AuthLayoutAuthErrorRouteImport
+      parentRoute: typeof AuthLayoutRoute
+    }
     '/admin/(store)/coupons/analytics': {
       id: '/admin/(store)/coupons/analytics'
       path: '/analytics'
@@ -720,8 +837,27 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthLayoutRouteChildren {
+  AuthLayoutHomeRoute: typeof AuthLayoutHomeRoute
+  AuthLayoutAuthErrorRoute: typeof AuthLayoutAuthErrorRoute
+  AuthLayoutAuthSigninRoute: typeof AuthLayoutAuthSigninRoute
+  AuthLayoutAuthSignupRoute: typeof AuthLayoutAuthSignupRoute
+  AuthLayoutAuthVerifyRequestRoute: typeof AuthLayoutAuthVerifyRequestRoute
+}
+
+const AuthLayoutRouteChildren: AuthLayoutRouteChildren = {
+  AuthLayoutHomeRoute: AuthLayoutHomeRoute,
+  AuthLayoutAuthErrorRoute: AuthLayoutAuthErrorRoute,
+  AuthLayoutAuthSigninRoute: AuthLayoutAuthSigninRoute,
+  AuthLayoutAuthSignupRoute: AuthLayoutAuthSignupRoute,
+  AuthLayoutAuthVerifyRequestRoute: AuthLayoutAuthVerifyRequestRoute,
+}
+
+const AuthLayoutRouteWithChildren = AuthLayoutRoute._addFileChildren(
+  AuthLayoutRouteChildren,
+)
+
 interface MainLayoutRouteChildren {
-  MainLayoutCollectionsRoute: typeof MainLayoutCollectionsRoute
   MainLayoutBulkRoute: typeof MainLayoutBulkRoute
   MainLayoutCartRoute: typeof MainLayoutCartRoute
   MainLayoutIndexRoute: typeof MainLayoutIndexRoute
@@ -738,7 +874,6 @@ interface MainLayoutRouteChildren {
 }
 
 const MainLayoutRouteChildren: MainLayoutRouteChildren = {
-  MainLayoutCollectionsRoute: MainLayoutCollectionsRoute,
   MainLayoutBulkRoute: MainLayoutBulkRoute,
   MainLayoutCartRoute: MainLayoutCartRoute,
   MainLayoutIndexRoute: MainLayoutIndexRoute,
@@ -808,12 +943,14 @@ const AdminRouteChildren: AdminRouteChildren = {
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  AuthLayoutRoute: AuthLayoutRouteWithChildren,
   MainLayoutRoute: MainLayoutRouteWithChildren,
   AdminRoute: AdminRouteWithChildren,
   CheckoutRoute: CheckoutRoute,
   OfflineRoute: OfflineRoute,
   ApiPushEventRoute: ApiPushEventRoute,
   PaymentVerifyRoute: PaymentVerifyRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

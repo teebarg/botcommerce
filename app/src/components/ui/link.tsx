@@ -9,6 +9,7 @@ interface TransitionLinkProps {
     href: string;
     className?: string;
     active?: string;
+    [key: string]: any;
 }
 
 const LocalizedClientLink: React.FC<TransitionLinkProps> = ({ children, href, className, active, ...props }) => {

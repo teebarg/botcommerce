@@ -1,16 +1,9 @@
-"use client";
-
 import { DollarSign, Package, ShoppingCart, Users } from "lucide-react";
 
 import StatCard from "@/components/ui/stat-card";
 import { currency } from "@/lib/utils";
-import { useStatsTrends } from "@/hooks/useApi";
-import ServerError from "@/components/generic/server-error";
-import ComponentLoader from "@/components/component-loader";
 
-const StatComponent: React.FC = () => {
-    const { data, isLoading, error } = useStatsTrends();
-
+const StatComponent = ({ summary }: { summary?: any }) => {
     const getPercentageChange = (growth: number): { value: string; trend: "up" | "down" | "neutral" } => {
         return {
             value: `${growth}%`,
@@ -18,27 +11,13 @@ const StatComponent: React.FC = () => {
         };
     };
 
-    if (isLoading) {
-        return (
-            <div className="px-2 md:px-10 py-8">
-                <ComponentLoader className="h-50" />
-            </div>
-        );
-    }
-
-    if (error) {
-        return <ServerError />;
-    }
-
-    if (!data) {
+    if (!summary) {
         return (
             <div className="px-2 md:px-10 py-8 text-center">
                 <p>Stats not found</p>
             </div>
         );
     }
-
-    const { summary } = data;
 
     return (
         <div className="px-4 md:px-10 py-8">

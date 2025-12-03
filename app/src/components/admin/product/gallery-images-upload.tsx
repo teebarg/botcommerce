@@ -1,6 +1,4 @@
-"use client";
-
-import { CldUploadWidget } from "next-cloudinary";
+// import { CldUploadWidget } from "next-cloudinary";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -27,7 +25,7 @@ export function GalleryImagesUpload() {
             {/* <Button onClick={editState.open}>
                 Upload Images
             </Button> */}
-            <CldUploadWidget
+            {/* <CldUploadWidget
                 uploadPreset="shop_test"
                 options={{
                     clientAllowedFormats: ["image"],
@@ -65,7 +63,7 @@ export function GalleryImagesUpload() {
                         Upload Videos
                     </Button>
                 )}
-            </CldUploadWidget>
+            </CldUploadWidget> */}
             {imageUrls.length > 0 && (
                 <Button disabled={isPending} onClick={onComplete}>
                     {isPending ? "Saving..." : "Complete"}
