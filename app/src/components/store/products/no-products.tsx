@@ -1,6 +1,3 @@
-"use client";
-
-import React from "react";
 import { Home, PackageSearch, RefreshCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";

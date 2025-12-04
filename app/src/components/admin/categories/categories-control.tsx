@@ -1,7 +1,5 @@
-"use client";
-
 import React from "react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 import { ArrowDownAZ, ArrowUpAZ, Edit, Trash2 } from "lucide-react";
 
 import { Category } from "@/schemas/product";

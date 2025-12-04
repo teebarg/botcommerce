@@ -1,8 +1,6 @@
-"use client";
-
 import React from "react";
 import { toast } from "sonner";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 import { FileExclamationPoint } from 'lucide-react';
 import { useMutation } from "@tanstack/react-query";
 

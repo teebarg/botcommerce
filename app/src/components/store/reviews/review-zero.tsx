@@ -1,5 +1,5 @@
 import { MessageSquare, Star, Users, Package } from "lucide-react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 
 import { ReviewForm } from "./review-form";
 

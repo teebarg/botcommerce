@@ -20,32 +20,20 @@ const LIMIT = 10;
 
 export const Route = createFileRoute("/admin/(admin)/users")({
     validateSearch: z.object({
-        offset: z.number().optional(),
-        limit: z.number().optional(),
+        skip: z.number().optional(),
     }),
-    loaderDeps: ({ search: { offset, limit } }) => ({ offset, limit }),
-    loader: async ({ deps: { offset, limit }, context }) => {
-        await context.queryClient.ensureQueryData(useUsers({ skip: offset, limit }));
+    loaderDeps: ({ search: { skip } }) => ({ skip }),
+    loader: async ({ deps: { skip }, context }) => {
+        await context.queryClient.ensureQueryData(useUsers({ skip: skip || 0, limit: LIMIT }));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const usersQuery = useSuspenseQuery(useUsers({ skip: 0, limit: LIMIT }));
+    const { skip = 0 } = Route.useSearch();
+    const usersQuery = useSuspenseQuery(useUsers({ skip: skip || 0, limit: LIMIT }));
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [filterOpen, setFilterOpen] = useState<boolean>(false);
-
-    const searchParams: any = null;
-
-    const skip = Number(searchParams.get("skip")) || 0;
-
-    // const { data, isLoading } = useUsers(
-    //     {
-    //         skip,
-    //         limit: LIMIT,
-    //     },
-    //     { enabled: true }
-    // );
 
     const { data, isLoading } = usersQuery;
 

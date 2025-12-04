@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 import { MenuIcon } from "lucide-react";
 
 import Menu from "../menu";

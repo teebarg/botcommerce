@@ -1,7 +1,5 @@
-"use client";
-
 import React from "react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 
 import { Address } from "@/schemas";

@@ -1,6 +1,6 @@
 import { omit } from "@/lib/utils";
 import { Building, Check, Edit3, Home, MapPin, Phone, Trash2 } from "lucide-react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 
 import ShippingAddressFormEdit from "../address-form-edit";
 

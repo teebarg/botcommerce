@@ -1,8 +1,6 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import { ChevronDown, FileImage, Plus, Save } from "lucide-react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 
 import CategoryAction from "./categories-control";
 import CategoryImageManager from "./category-image";

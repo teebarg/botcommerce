@@ -27,7 +27,7 @@ interface UsersParams {
 export const useUsers = (searchParams: UsersParams) =>
     queryOptions({
         queryKey: ["users", JSON.stringify(searchParams)],
-        queryFn: () => getUsersFn(),
+        queryFn: () => getUsersFn({ data: { ...searchParams } }),
     });
 
 export const useCreateUser = () => {
@@ -94,7 +94,7 @@ export const userWishlistQueryOptions = () =>
     queryOptions({
         queryKey: ["products", "wishlist"],
         queryFn: () => getUserWishlistFn(),
-    })
+    });
 
 export const useUserWishlist = () => {
     const session: any = null;

@@ -3,10 +3,9 @@ import PendingPayment from "./order-pending";
 import OrderPickup from "./order-pickup";
 import SuccessConfirmation from "./order-success";
 
-import { useOrder } from "@/hooks/useOrder";
-import ServerError from "@/components/generic/server-error";
-import ComponentLoader from "@/components/component-loader";
+import { orderQueryOptions } from "@/hooks/useOrder";
 import { useNavigate } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 type OrderConfirmationProps = {
     orderNumber: string;
@@ -15,19 +14,11 @@ type OrderConfirmationProps = {
 
 const OrderConfirmation: React.FC<OrderConfirmationProps> = (props) => {
     const navigate = useNavigate();
-    const { data: order, isLoading, error } = useOrder(props.orderNumber);
+    const { data: order } = useSuspenseQuery(orderQueryOptions(props.orderNumber));
 
     const onContinueShopping = () => {
         navigate({to: "/collections"});
     };
-
-    if (isLoading) {
-        return <ComponentLoader className="h-192" />;
-    }
-
-    if (error) {
-        return <ServerError />;
-    }
 
     if (!order) {
         return <div className="flex items-center justify-center py-12 px-2 bg-secondary">Order not found</div>;

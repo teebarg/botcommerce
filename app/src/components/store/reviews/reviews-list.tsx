@@ -1,5 +1,4 @@
 import { Star, Filter } from "lucide-react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
 
 import { ReviewForm } from "./review-form";
 
@@ -10,6 +9,7 @@ import { ReviewCard } from "@/components/store/reviews/review-card";
 import { PaginatedReview, Review } from "@/schemas";
 import Overlay from "@/components/overlay";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
+import { useOverlayTriggerState } from "react-stately";
 
 interface ReviewsListProps {
     data: PaginatedReview;
@@ -23,8 +23,7 @@ export const ReviewsList = ({ data, productName, product_id, hasPurchased, hasRe
     const state = useOverlayTriggerState({});
     const { reviews, ratings } = data;
     const { updateQuery } = useUpdateQuery(200);
-    const searchParams: any = null;
-    const sort = searchParams.get("sort") || "newest";
+    const sort = "newest";
 
     const getPercentage = (count: number) => (count / ratings?.count) * 100;
 

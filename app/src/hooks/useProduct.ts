@@ -40,34 +40,27 @@ export const useProductInfiniteSearch = (params: SearchParams) => {
     });
 };
 
-export const useProductInfiniteSearch1 = (params: SearchParams, initialData?: any) => {
+export const useProductInfiniteSearch1 = (initialData: any, search?: any) => {
     return useInfiniteQuery({
-        queryKey: ["products", "search", "infinite", params],
-        queryFn: async ({ pageParam = 0 }) => await GetProductsFn({ data: { skip: pageParam, limit: 24, ...params } }),
-        getNextPageParam: (lastPage: any) => {
-            console.log("🚀 ~ file: useProduct.ts:33 ~ lastPage:", lastPage);
+        queryKey: ["products", "search", "infinite", JSON.stringify(search)],
+        queryFn: ({ pageParam = 0 }) => GetProductsFn({ data: { skip: pageParam, limit: 24, ...search } }),
+        getNextPageParam: (lastPage) => {
             const nextSkip = lastPage.skip + lastPage.limit;
             const hasMore = nextSkip < lastPage.total_count;
 
             return hasMore ? nextSkip : undefined;
         },
         initialPageParam: 0,
-        // initialData: initialData ? { pages: [initialData], pageParams: [0] } : undefined,
-    });
-};
-
-export const useProductInfiniteSearch2 = (params: SearchParams) => {
-    return useInfiniteQuery<any>({
-        queryKey: ["products", "search", "infinite", params],
-        queryFn: async ({ pageParam = 0 }) => {
-            const start = (pageParam as number) * 24;
-            const fetchedData = await GetProductsFn({ data: { skip: start, limit: 24, ...params } }); //pretend api call
-            return fetchedData;
-        },
-        initialPageParam: 0,
-        getNextPageParam: (_lastGroup, groups) => groups.length,
-        refetchOnWindowFocus: false,
-        placeholderData: keepPreviousData,
+        initialData: initialData
+            ? {
+                  pages: [
+                      {
+                          ...initialData,
+                      },
+                  ],
+                  pageParams: [0],
+              }
+            : undefined,
     });
 };
 

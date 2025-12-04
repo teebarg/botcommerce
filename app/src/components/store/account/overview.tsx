@@ -1,8 +1,6 @@
-"use client";
-
 import { currency } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 
 import PromotionalBanner from "@/components/promotion";
 import { Order, Session } from "@/schemas";

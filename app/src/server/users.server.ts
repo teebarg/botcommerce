@@ -16,7 +16,6 @@ export const getUsersFn = createServerFn({ method: "GET" })
     .inputValidator((input: unknown) => UserSearchSchema.parse(input))
     .handler(async ({ data }) => {
         const res = await serverApi.get<PaginatedUser>("/users/", { params: { ...data } });
-        console.log("🚀 ~ file: admin.server.tsx:10 ~ res:", res);
         return res;
     });
 

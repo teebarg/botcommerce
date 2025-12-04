@@ -4,6 +4,9 @@ import ServerError from "@/components/generic/server-error";
 import { tryCatch } from "@/lib/try-catch";
 import { GetProductsFn } from "@/server/product.server";
 import z from "zod";
+import { getCollectionFn } from "@/server/collections.server";
+import { getSiteConfig } from "@/lib/config";
+import { seo } from "@/utils/seo";
 
 const productSearchSchema = z.object({
     sort: z.enum(["min_variant_price:asc", "min_variant_price:desc", "id:desc", "created_at:desc"]).optional(),
@@ -17,38 +20,37 @@ const productSearchSchema = z.object({
     ages: z.string().optional(),
 });
 
-export const Route = createFileRoute("/_mainLayout/collections/")({
+export const Route = createFileRoute("/_mainLayout/search/$query")({
     validateSearch: productSearchSchema,
-    component: CollectionsPage,
     beforeLoad: ({ search }) => {
         console.log("🚀 ~ file: index.tsx:24 ~ search:", search);
         return {
             search,
         };
     },
-    loader: async ({ context, params, location }) => {
-        // console.log("🚀 ~ file: index.tsx:30 ~ params:", params)
-        // console.log("🚀 ~ file: index.tsx:30 ~ route:", route)
-        // console.log("🚀 ~ file: index.tsx:30 ~ location:", location)
-        // console.log("🚀 ~ file: index.tsx:12 ~ context:", context);
-
-        const { data, error } = await tryCatch(GetProductsFn({ data: { limit: 36, ...context.search } }));
+    loader: async ({ params: { query }, context }) => {
+        const { data, error } = await tryCatch(GetProductsFn({ data: { limit: 36, search: query, ...context.search } }));
         return {
+            query,
             data,
             error,
         };
     },
+    component: RouteComponent,
 });
 
-function CollectionsPage() {
-    const { data, error } = Route.useLoaderData();
+function RouteComponent() {
+    const { data, error, query } = Route.useLoaderData();
     if (error) {
-        return <ServerError error={error} scenario="server" stack="Collections" />;
+        return <ServerError error={error} scenario="server" stack="SearchResults" />;
     }
-
     return (
-        <div className="max-w-9xl mx-auto w-full py-4 px-2">
-            <InfiniteScrollClient initialData={data} />
+        <div className="container mx-auto mt-4 py-4 px-1">
+            <div className="flex flex-col items-start">
+                <p className="text-sm">Search Results for</p>
+                <h4 className="text-lg font-bold">“{decodeURI(query)}”</h4>
+            </div>
+            <InfiniteScrollClient initialData={data} searchTerm={query} />
         </div>
     );
 }

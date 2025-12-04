@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 
 import { SharedCard } from "@/components/admin/shared-collections/shared-card";
 import { SharedForm } from "@/components/admin/shared-collections/shared-form";

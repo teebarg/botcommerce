@@ -1,7 +1,5 @@
-"use client";
-
 import { Edit2, Trash2 } from "lucide-react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 
 import { ManageSlate } from "../shared-collections/manage-slate";
 

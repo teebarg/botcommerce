@@ -1,9 +1,7 @@
-"use client";
-
-import { FileImage, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Clock, LucideProps, Package, Pencil, Trash2, Truck, Zap } from "lucide-react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 
 import DeliveryOptionForm from "./delivery-option-form";
 

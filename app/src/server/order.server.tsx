@@ -1,5 +1,5 @@
 import { serverApi } from "@/apis/server-client";
-import { PaginatedOrder } from "@/schemas";
+import { Order, PaginatedOrder } from "@/schemas";
 import { createServerFn } from "@tanstack/react-start";
 import z from "zod";
 
@@ -16,6 +16,13 @@ export const getOrdersFn = createServerFn({ method: "GET" })
     .inputValidator((input: unknown) => OrderSearchSchema.parse(input))
     .handler(async ({ data }) => {
         const res = await serverApi.get<PaginatedOrder>("/order/", { params: { ...data } });
-        console.log("🚀 ~ file: admin.server.tsx:10 ~ res:", res);
+        return res;
+    });
+
+
+export const getOrderFn = createServerFn({ method: "GET" })
+    .inputValidator((d: string) => d)
+    .handler(async ({ data }) => {
+        const res = await serverApi.get<Order>(`/order/${data}`);
         return res;
     });

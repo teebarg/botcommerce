@@ -1,6 +1,4 @@
-"use client";
-
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 import React from "react";
 
 import { CartItem } from "@/schemas";

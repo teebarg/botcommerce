@@ -34,7 +34,7 @@ const fetchSession = createServerFn({ method: "GET" }).handler(async () => {
     return session;
 });
 
-export const Route = createRootRouteWithContext<RouterContext>()({
+export const Route = createRootRouteWithContext<RouterContext>()({ 
     head: () => ({
         meta: [
             { charSet: "utf-8" },

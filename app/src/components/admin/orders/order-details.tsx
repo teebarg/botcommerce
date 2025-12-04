@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import {
     User,
@@ -16,7 +14,7 @@ import {
     XCircle,
     RotateCcw,
 } from "lucide-react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 
 import OrderProcessingAction from "./order-processing-actions";
 import { OrderStatusBadge } from "./order-status-badge";

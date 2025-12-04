@@ -3,7 +3,7 @@ import { toast } from "sonner";
 
 import { api } from "@/apis/client";
 import { Order, OrderStatus, PaymentStatus } from "@/schemas";
-import { getOrdersFn } from "@/server/order.server";
+import { getOrderFn, getOrdersFn } from "@/server/order.server";
 
 interface OrderSearchParams {
     order_number?: string;
@@ -19,6 +19,19 @@ export const useOrders = (searchParams: OrderSearchParams) =>
         queryKey: ["orders", JSON.stringify(searchParams)],
         queryFn: () => getOrdersFn({ data: { ...searchParams } }),
     });
+
+
+export const orderQueryOptions = (orderNumber: string) => ({
+    queryKey: ["order", orderNumber],
+    queryFn: () => getOrderFn({ data: orderNumber }),
+});
+
+export const useOrders2 = (searchParams: OrderSearchParams) => {
+    return useQuery({
+        queryKey: ["orders", JSON.stringify(searchParams)],
+        queryFn: () => getOrdersFn({ data: { ...searchParams } }),
+    });
+};
 
 export const useOrder = (orderNumber: string) => {
     return useQuery({

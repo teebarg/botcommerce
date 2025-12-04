@@ -1,37 +1,28 @@
-"use client";
-
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Grid3X3 } from "lucide-react";
+import { Grid3X3, Loader } from "lucide-react";
 import { useState } from "react";
 
 import MobileFilterControl from "./mobile-filter-control";
 
 import ProductCard from "@/components/store/products/product-card";
-import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { api } from "@/apis/client";
 import { Catalog, ProductSearch } from "@/schemas";
 import { FilterSidebar } from "@/components/store/shared/filter-sidebar";
 import { Button } from "@/components/ui/button";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
-import { SortOptions } from "@/types/models";
 import { cn } from "@/lib/utils";
-
-interface SearchParams {
-    sortBy?: SortOptions;
-    sizes?: string;
-    colors?: string;
-    maxPrice?: string;
-    minPrice?: string;
-    limit?: number;
-}
+import { useSearch } from "@tanstack/react-router";
+import { getCatalogFn } from "@/server/catalog.server";
+import { InfiniteScroll } from "@/components/InfiniteScroll";
 
 interface Props {
     slug: string;
     initialCatalog: Catalog;
-    initialSearchParams: SearchParams;
 }
 
-export default function SharedInfinite({ slug, initialCatalog, initialSearchParams }: Props) {
+export default function SharedInfinite({ slug, initialCatalog }: Props) {
+    const search = useSearch({
+        strict: false,
+    });
     const pageSize = initialCatalog.limit || 20;
     const [viewMode, setViewMode] = useState<"grid" | "list">("list");
 
@@ -39,15 +30,15 @@ export default function SharedInfinite({ slug, initialCatalog, initialSearchPara
 
     const onClearAll = () => {
         updateQuery([
-            { key: "sortBy", value: "id:desc" },
+            { key: "sort", value: "id:desc" },
             { key: "sizes", value: "" },
             { key: "colors", value: "" },
         ]);
     };
 
-    const query = useInfiniteQuery<Catalog>({
-        queryKey: ["product", "catalog", slug, JSON.stringify(initialSearchParams)],
-        queryFn: async ({ pageParam = 0 }) => await api.get<Catalog>(`/shared/${slug}`, { params: { skip: pageParam, ...initialSearchParams } }),
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery<Catalog>({
+        queryKey: ["product", "catalog", slug, JSON.stringify(search)],
+        queryFn: ({ pageParam = 0 }) => getCatalogFn({ data: { skip: pageParam, ...search, slug } }),
         initialPageParam: 0,
         getNextPageParam: (lastPage: Catalog) => {
             const nextSkip = (lastPage.skip || 0) + (lastPage.limit || pageSize);
@@ -58,17 +49,8 @@ export default function SharedInfinite({ slug, initialCatalog, initialSearchPara
         initialData: { pages: [initialCatalog], pageParams: [0] },
     });
 
-    const products = query.data?.pages.flatMap((p) => p.products) || [];
-    const totalProducts = query.data?.pages[0].total_count || 0;
-
-    const { lastElementRef } = useInfiniteScroll({
-        onLoadMore: () => {
-            if (query.hasNextPage && !query.isFetchingNextPage) {
-                query.fetchNextPage();
-            }
-        },
-        disabled: query.isFetchingNextPage,
-    });
+    const products = data?.pages.flatMap((p) => p.products) || [];
+    const totalProducts = data?.pages[0].total_count || 0;
 
     return (
         <main className="w-full py-2">
@@ -99,18 +81,26 @@ export default function SharedInfinite({ slug, initialCatalog, initialSearchPara
                         </div>
                     )}
 
-                    <div className={cn("grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4", viewMode === "grid" ? "" : "grid-cols-1")}>
-                        {products.map((product: ProductSearch, idx: number) => {
-                            const isLast = idx === products.length - 1;
-
-                            return (
-                                <div key={`${product.id}-${idx}`} ref={isLast ? (lastElementRef as any) : undefined}>
+                    <InfiniteScroll
+                        onLoadMore={fetchNextPage}
+                        hasMore={!!hasNextPage}
+                        isLoading={isFetchingNextPage}
+                        loader={
+                            <div className="flex flex-col items-center justify-center text-blue-600">
+                                <Loader className="h-8 w-8 animate-spin mb-2" />
+                                <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
+                            </div>
+                        }
+                        endMessage={<div className="text-center py-8 text-muted-foreground">You've viewed all products</div>}
+                    >
+                        <div className={cn("grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4", viewMode === "grid" ? "" : "grid-cols-1")}>
+                            {products.map((product: ProductSearch, idx: number) => (
+                                <div key={`product-${idx}`}>
                                     <ProductCard product={product} />
                                 </div>
-                            );
-                        })}
-                    </div>
-                    {query.isFetchingNextPage && <div className="col-span-full text-center py-4 text-muted-foreground">Loading...</div>}
+                            ))}
+                        </div>
+                    </InfiniteScroll>
                 </div>
             </div>
         </main>

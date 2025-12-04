@@ -1,9 +1,7 @@
-"use client";
-
 import React, { useState, useEffect, useRef } from "react";
 import { Clock, Search, TrendingUp, X } from "lucide-react";
 import { useDebounce } from "use-debounce";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/store/products/product-card";

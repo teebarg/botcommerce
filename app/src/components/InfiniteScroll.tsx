@@ -18,8 +18,8 @@ export const InfiniteScroll = ({
     hasMore,
     isLoading,
     loader = <div className="text-center py-4">Loading...</div>,
-    endMessage = <div className="text-center py-4 text-gray-500">No more items</div>,
-    threshold = 100,
+    endMessage = <div className="text-center py-4 text-muted-foreground">No more items</div>,
+    threshold = 500,
     className = "",
 }: InfiniteScrollProps) => {
     const observerTarget = useRef<HTMLDivElement>(null);

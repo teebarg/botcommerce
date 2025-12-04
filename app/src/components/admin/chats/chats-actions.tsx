@@ -1,8 +1,6 @@
-"use client";
-
 import React from "react";
 import { Eye, Trash2 } from "lucide-react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 
 import ChatViewer from "./chat-view";
 

@@ -38,6 +38,9 @@ import { Route as AdminadminOnlineRouteImport } from './routes/admin/(admin)/onl
 import { Route as AdminadminFaqsRouteImport } from './routes/admin/(admin)/faqs'
 import { Route as AdminadminChatsRouteImport } from './routes/admin/(admin)/chats'
 import { Route as AdminadminActivitiesRouteImport } from './routes/admin/(admin)/activities'
+import { Route as MainLayoutSharedSlugRouteImport } from './routes/_mainLayout/shared.$slug'
+import { Route as MainLayoutSearchQueryRouteImport } from './routes/_mainLayout/search.$query'
+import { Route as MainLayoutProductsSlugRouteImport } from './routes/_mainLayout/products.$slug'
 import { Route as MainLayoutCollectionsSlugRouteImport } from './routes/_mainLayout/collections/$slug'
 import { Route as MainLayoutstaticTermsRouteImport } from './routes/_mainLayout/(static)/terms'
 import { Route as MainLayoutstaticShippingRouteImport } from './routes/_mainLayout/(static)/shipping'
@@ -52,6 +55,7 @@ import { Route as AuthLayoutAuthSignupRouteImport } from './routes/_authLayout/a
 import { Route as AuthLayoutAuthSigninRouteImport } from './routes/_authLayout/auth/signin'
 import { Route as AuthLayoutAuthErrorRouteImport } from './routes/_authLayout/auth/error'
 import { Route as AdminstoreCouponsAnalyticsRouteImport } from './routes/admin/(store)/coupons.analytics'
+import { Route as MainLayoutOrderConfirmedIdRouteImport } from './routes/_mainLayout/order.confirmed.$id'
 
 const OfflineRoute = OfflineRouteImport.update({
   id: '/offline',
@@ -198,6 +202,21 @@ const AdminadminActivitiesRoute = AdminadminActivitiesRouteImport.update({
   path: '/activities',
   getParentRoute: () => AdminRoute,
 } as any)
+const MainLayoutSharedSlugRoute = MainLayoutSharedSlugRouteImport.update({
+  id: '/shared/$slug',
+  path: '/shared/$slug',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+const MainLayoutSearchQueryRoute = MainLayoutSearchQueryRouteImport.update({
+  id: '/search/$query',
+  path: '/search/$query',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+const MainLayoutProductsSlugRoute = MainLayoutProductsSlugRouteImport.update({
+  id: '/products/$slug',
+  path: '/products/$slug',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
 const MainLayoutCollectionsSlugRoute =
   MainLayoutCollectionsSlugRouteImport.update({
     id: '/collections/$slug',
@@ -274,6 +293,12 @@ const AdminstoreCouponsAnalyticsRoute =
     path: '/analytics',
     getParentRoute: () => AdminstoreCouponsRoute,
   } as any)
+const MainLayoutOrderConfirmedIdRoute =
+  MainLayoutOrderConfirmedIdRouteImport.update({
+    id: '/order/confirmed/$id',
+    path: '/order/confirmed/$id',
+    getParentRoute: () => MainLayoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
@@ -301,6 +326,9 @@ export interface FileRoutesByFullPath {
   '/shipping': typeof MainLayoutstaticShippingRoute
   '/terms': typeof MainLayoutstaticTermsRoute
   '/collections/$slug': typeof MainLayoutCollectionsSlugRoute
+  '/products/$slug': typeof MainLayoutProductsSlugRoute
+  '/search/$query': typeof MainLayoutSearchQueryRoute
+  '/shared/$slug': typeof MainLayoutSharedSlugRoute
   '/admin/activities': typeof AdminadminActivitiesRoute
   '/admin/chats': typeof AdminadminChatsRoute
   '/admin/faqs': typeof AdminadminFaqsRoute
@@ -316,6 +344,7 @@ export interface FileRoutesByFullPath {
   '/admin/reviews': typeof AdminstoreReviewsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/collections': typeof MainLayoutCollectionsIndexRoute
+  '/order/confirmed/$id': typeof MainLayoutOrderConfirmedIdRoute
   '/admin/coupons/analytics': typeof AdminstoreCouponsAnalyticsRoute
 }
 export interface FileRoutesByTo {
@@ -343,6 +372,9 @@ export interface FileRoutesByTo {
   '/shipping': typeof MainLayoutstaticShippingRoute
   '/terms': typeof MainLayoutstaticTermsRoute
   '/collections/$slug': typeof MainLayoutCollectionsSlugRoute
+  '/products/$slug': typeof MainLayoutProductsSlugRoute
+  '/search/$query': typeof MainLayoutSearchQueryRoute
+  '/shared/$slug': typeof MainLayoutSharedSlugRoute
   '/admin/activities': typeof AdminadminActivitiesRoute
   '/admin/chats': typeof AdminadminChatsRoute
   '/admin/faqs': typeof AdminadminFaqsRoute
@@ -358,6 +390,7 @@ export interface FileRoutesByTo {
   '/admin/reviews': typeof AdminstoreReviewsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/collections': typeof MainLayoutCollectionsIndexRoute
+  '/order/confirmed/$id': typeof MainLayoutOrderConfirmedIdRoute
   '/admin/coupons/analytics': typeof AdminstoreCouponsAnalyticsRoute
 }
 export interface FileRoutesById {
@@ -389,6 +422,9 @@ export interface FileRoutesById {
   '/_mainLayout/(static)/shipping': typeof MainLayoutstaticShippingRoute
   '/_mainLayout/(static)/terms': typeof MainLayoutstaticTermsRoute
   '/_mainLayout/collections/$slug': typeof MainLayoutCollectionsSlugRoute
+  '/_mainLayout/products/$slug': typeof MainLayoutProductsSlugRoute
+  '/_mainLayout/search/$query': typeof MainLayoutSearchQueryRoute
+  '/_mainLayout/shared/$slug': typeof MainLayoutSharedSlugRoute
   '/admin/(admin)/activities': typeof AdminadminActivitiesRoute
   '/admin/(admin)/chats': typeof AdminadminChatsRoute
   '/admin/(admin)/faqs': typeof AdminadminFaqsRoute
@@ -404,6 +440,7 @@ export interface FileRoutesById {
   '/admin/(store)/reviews': typeof AdminstoreReviewsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_mainLayout/collections/': typeof MainLayoutCollectionsIndexRoute
+  '/_mainLayout/order/confirmed/$id': typeof MainLayoutOrderConfirmedIdRoute
   '/admin/(store)/coupons/analytics': typeof AdminstoreCouponsAnalyticsRoute
 }
 export interface FileRouteTypes {
@@ -434,6 +471,9 @@ export interface FileRouteTypes {
     | '/shipping'
     | '/terms'
     | '/collections/$slug'
+    | '/products/$slug'
+    | '/search/$query'
+    | '/shared/$slug'
     | '/admin/activities'
     | '/admin/chats'
     | '/admin/faqs'
@@ -449,6 +489,7 @@ export interface FileRouteTypes {
     | '/admin/reviews'
     | '/api/auth/$'
     | '/collections'
+    | '/order/confirmed/$id'
     | '/admin/coupons/analytics'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -476,6 +517,9 @@ export interface FileRouteTypes {
     | '/shipping'
     | '/terms'
     | '/collections/$slug'
+    | '/products/$slug'
+    | '/search/$query'
+    | '/shared/$slug'
     | '/admin/activities'
     | '/admin/chats'
     | '/admin/faqs'
@@ -491,6 +535,7 @@ export interface FileRouteTypes {
     | '/admin/reviews'
     | '/api/auth/$'
     | '/collections'
+    | '/order/confirmed/$id'
     | '/admin/coupons/analytics'
   id:
     | '__root__'
@@ -521,6 +566,9 @@ export interface FileRouteTypes {
     | '/_mainLayout/(static)/shipping'
     | '/_mainLayout/(static)/terms'
     | '/_mainLayout/collections/$slug'
+    | '/_mainLayout/products/$slug'
+    | '/_mainLayout/search/$query'
+    | '/_mainLayout/shared/$slug'
     | '/admin/(admin)/activities'
     | '/admin/(admin)/chats'
     | '/admin/(admin)/faqs'
@@ -536,6 +584,7 @@ export interface FileRouteTypes {
     | '/admin/(store)/reviews'
     | '/api/auth/$'
     | '/_mainLayout/collections/'
+    | '/_mainLayout/order/confirmed/$id'
     | '/admin/(store)/coupons/analytics'
   fileRoutesById: FileRoutesById
 }
@@ -755,6 +804,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminadminActivitiesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_mainLayout/shared/$slug': {
+      id: '/_mainLayout/shared/$slug'
+      path: '/shared/$slug'
+      fullPath: '/shared/$slug'
+      preLoaderRoute: typeof MainLayoutSharedSlugRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_mainLayout/search/$query': {
+      id: '/_mainLayout/search/$query'
+      path: '/search/$query'
+      fullPath: '/search/$query'
+      preLoaderRoute: typeof MainLayoutSearchQueryRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_mainLayout/products/$slug': {
+      id: '/_mainLayout/products/$slug'
+      path: '/products/$slug'
+      fullPath: '/products/$slug'
+      preLoaderRoute: typeof MainLayoutProductsSlugRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
     '/_mainLayout/collections/$slug': {
       id: '/_mainLayout/collections/$slug'
       path: '/collections/$slug'
@@ -853,6 +923,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminstoreCouponsAnalyticsRouteImport
       parentRoute: typeof AdminstoreCouponsRoute
     }
+    '/_mainLayout/order/confirmed/$id': {
+      id: '/_mainLayout/order/confirmed/$id'
+      path: '/order/confirmed/$id'
+      fullPath: '/order/confirmed/$id'
+      preLoaderRoute: typeof MainLayoutOrderConfirmedIdRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
   }
 }
 
@@ -890,7 +967,11 @@ interface MainLayoutRouteChildren {
   MainLayoutstaticShippingRoute: typeof MainLayoutstaticShippingRoute
   MainLayoutstaticTermsRoute: typeof MainLayoutstaticTermsRoute
   MainLayoutCollectionsSlugRoute: typeof MainLayoutCollectionsSlugRoute
+  MainLayoutProductsSlugRoute: typeof MainLayoutProductsSlugRoute
+  MainLayoutSearchQueryRoute: typeof MainLayoutSearchQueryRoute
+  MainLayoutSharedSlugRoute: typeof MainLayoutSharedSlugRoute
   MainLayoutCollectionsIndexRoute: typeof MainLayoutCollectionsIndexRoute
+  MainLayoutOrderConfirmedIdRoute: typeof MainLayoutOrderConfirmedIdRoute
 }
 
 const MainLayoutRouteChildren: MainLayoutRouteChildren = {
@@ -907,7 +988,11 @@ const MainLayoutRouteChildren: MainLayoutRouteChildren = {
   MainLayoutstaticShippingRoute: MainLayoutstaticShippingRoute,
   MainLayoutstaticTermsRoute: MainLayoutstaticTermsRoute,
   MainLayoutCollectionsSlugRoute: MainLayoutCollectionsSlugRoute,
+  MainLayoutProductsSlugRoute: MainLayoutProductsSlugRoute,
+  MainLayoutSearchQueryRoute: MainLayoutSearchQueryRoute,
+  MainLayoutSharedSlugRoute: MainLayoutSharedSlugRoute,
   MainLayoutCollectionsIndexRoute: MainLayoutCollectionsIndexRoute,
+  MainLayoutOrderConfirmedIdRoute: MainLayoutOrderConfirmedIdRoute,
 }
 
 const MainLayoutRouteWithChildren = MainLayoutRoute._addFileChildren(

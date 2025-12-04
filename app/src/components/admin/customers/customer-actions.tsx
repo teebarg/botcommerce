@@ -1,8 +1,6 @@
-"use client";
-
 import React from "react";
 import { Edit, Trash2, Eye } from "lucide-react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 import { toast } from "sonner";
 
 import CustomerForm from "./customer-form";

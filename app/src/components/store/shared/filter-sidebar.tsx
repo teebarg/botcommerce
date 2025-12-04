@@ -10,6 +10,7 @@ import { COLOR_OPTIONS, SIZE_OPTIONS, AGE_OPTIONS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import RangeSlider from "@/components/ui/range-slider";
 import { Facet } from "@/schemas/product";
+import { useSearch } from "@tanstack/react-router";
 
 interface Props {
     facets?: Facet;
@@ -17,7 +18,9 @@ interface Props {
 }
 
 export function FilterSidebar({ facets, onApplyComplete }: Props) {
-    const searchParams: any = null;
+    const search = useSearch({
+        strict: false,
+    });
     const { updateQuery } = useUpdateQuery();
     const [openSections, setOpenSections] = useState({
         categories: true,
@@ -29,7 +32,7 @@ export function FilterSidebar({ facets, onApplyComplete }: Props) {
     });
     const { data: categories } = useCategories();
 
-    const [sort, setSort] = useState<string>(() => searchParams?.get("sortBy") || "created_at:desc");
+    const [sort, setSort] = useState<string>(() => search?.sort || "created_at:desc");
     const [sizeSet, setSizeSet] = useState<Set<string>>(new Set());
     const [colorSet, setColorSet] = useState<Set<string>>(new Set());
     const [ageSet, setAgeSet] = useState<Set<string>>(new Set());
@@ -42,21 +45,22 @@ export function FilterSidebar({ facets, onApplyComplete }: Props) {
     };
 
     useEffect(() => {
-        const sizesFromURL = searchParams?.get("sizes")?.split(",").filter(Boolean) || [];
+        const sizesFromURL = search.sizes?.toString().split(",").filter(Boolean) || [];
 
         setSizeSet(new Set(sizesFromURL));
 
-        const colorsFromURL = searchParams?.get("colors")?.split(",").filter(Boolean) || [];
+        const colorsFromURL = search.colors?.toString().split(",").filter(Boolean) || [];
 
         setColorSet(new Set(colorsFromURL));
 
-        const catsFromURL = searchParams?.get("cat_ids")?.split(",").filter(Boolean) || [];
+        const catsFromURL = search.cat_ids?.toString().split(",").filter(Boolean) || [];
 
         setCategorySet(new Set(catsFromURL));
 
-        setMinPrice(searchParams?.get("minPrice") || "");
-        setMaxPrice(searchParams?.get("maxPrice") || "");
-    }, [searchParams]);
+        setMinPrice(search.min_price?.toString() || "");
+        setMaxPrice(search.max_price?.toString() || "");
+        setAgeSet(new Set(search.ages?.toString().split(",").filter(Boolean) || []));
+    }, [search]);
 
     const onToggleSize = (slug: string) => {
         const next = new Set(sizeSet);
@@ -108,7 +112,7 @@ export function FilterSidebar({ facets, onApplyComplete }: Props) {
 
     const onApply = () => {
         updateQuery([
-            { key: "sortBy", value: sort || "created_at:desc" },
+            { key: "sort", value: sort || "created_at:desc" },
             { key: "sizes", value: Array.from(sizeSet).join(",") },
             { key: "colors", value: Array.from(colorSet).join(",") },
             { key: "ages", value: Array.from(ageSet).join(",") },
@@ -176,7 +180,7 @@ export function FilterSidebar({ facets, onApplyComplete }: Props) {
 
                 {(openSections as any).price && (
                     <RangeSlider
-                        defaultValue={[Number(searchParams?.get("minPrice") ?? 1000), Number(searchParams?.get("maxPrice") ?? 50000)]}
+                        defaultValue={[Number(search.min_price ?? 1000), Number(search.max_price ?? 50000)]}
                         label="Price Range"
                         max={100000}
                         min={0}

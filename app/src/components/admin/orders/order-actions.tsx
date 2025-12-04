@@ -1,7 +1,5 @@
-"use client";
-
 import React from "react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 
 import OrderDetails from "./order-details";
 import OrderProcessingAction from "./order-processing-actions";

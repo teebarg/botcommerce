@@ -1,26 +1,13 @@
-"use client";
-
-import { Product, ProductSearch } from "@/schemas/product";
-import { useSimilarProducts } from "@/hooks/useProduct";
-import ComponentLoader from "@/components/component-loader";
+import { ProductSearch } from "@/schemas/product";
 import ProductCard from "@/components/store/products/product-card";
 
 type RelatedProductsProps = {
-    product: Product;
+    similar: ProductSearch[];
+    productId: number;
 };
 
-export default function RelatedProducts({ product }: RelatedProductsProps) {
-    const { data, isLoading, error } = useSimilarProducts(product.id, 4);
-
-    if (isLoading) {
-        return <ComponentLoader className="min-h-[400px]" />;
-    }
-
-    if (error) {
-        return null;
-    }
-
-    const productPreviews = data?.similar?.filter((item: ProductSearch) => item.id !== product.id);
+export default function RelatedProducts({ similar, productId }: RelatedProductsProps) {
+    const productPreviews = similar?.filter((item: ProductSearch) => item.id !== productId);
 
     if (!productPreviews?.length) {
         return null;

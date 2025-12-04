@@ -13,7 +13,7 @@ import { Coupon } from "@/schemas/common";
 import { cn, currency, formatDate } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Confirm } from "@/components/generic/confirm";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 
 interface SwipeableCouponCardProps {
     coupon: Coupon;

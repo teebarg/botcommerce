@@ -1,8 +1,6 @@
-"use client";
-
 import React from "react";
 import { Plus, Check, Trash2, Boxes } from "lucide-react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 
 import { SocialShare } from "./social-share";
 

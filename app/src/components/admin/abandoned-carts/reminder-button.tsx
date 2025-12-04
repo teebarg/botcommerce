@@ -1,5 +1,5 @@
 import { Mail } from "lucide-react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 
 import { Button } from "@/components/ui/button";
 import { useSendCartReminder } from "@/hooks/useAbandonedCart";

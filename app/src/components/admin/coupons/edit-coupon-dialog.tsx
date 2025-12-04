@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { useUpdateCoupon } from "@/hooks/useCoupon";
 import { Coupon } from "@/schemas";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 import Overlay from "@/components/overlay";
 
 const couponSchema = z.object({

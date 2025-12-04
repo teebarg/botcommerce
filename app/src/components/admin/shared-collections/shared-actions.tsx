@@ -1,5 +1,5 @@
 import React from "react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 import { Edit, Trash2 } from "lucide-react";
 import { Eye } from "lucide-react";
 

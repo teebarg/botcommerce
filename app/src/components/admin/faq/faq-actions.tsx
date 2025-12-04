@@ -1,8 +1,6 @@
-"use client";
-
 import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 
 import { FaqForm } from "./faq-form";
 

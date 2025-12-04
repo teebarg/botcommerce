@@ -1,7 +1,7 @@
 import { MapPin, Clock, Package, Copy, ExternalLink, User, X } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 import { ReminderButton } from "./reminder-button";
 
 import { Button } from "@/components/ui/button";

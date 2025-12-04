@@ -1,7 +1,5 @@
-"use client";
-
 import { SlidersHorizontal, RectangleVertical, LayoutDashboard } from "lucide-react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 
 import { FilterSidebar } from "@/components/store/shared/filter-sidebar";
 import { Button } from "@/components/ui/button";

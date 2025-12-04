@@ -1,5 +1,5 @@
 import { Trash2, Edit3, X, Boxes } from "lucide-react";
-import { useOverlayTriggerState } from "@react-stately/overlays";
+import { useOverlayTriggerState } from "react-stately";
 
 import { BulkProductSheetForm } from "./bulk-product-form-sheet";
 import { CatalogBulkProductUpdate } from "./bulk-product-catalog-update";

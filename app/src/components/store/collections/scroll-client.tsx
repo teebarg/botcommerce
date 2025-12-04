@@ -1,68 +1,48 @@
 import { useState } from "react";
-// import { Loader } from "lucide-react";
 
 import MobileFilterControl from "@/components/store/shared/mobile-filter-control";
 import { CollectionHeader } from "@/components/store/collections/collection-header";
 import NoProductsFound from "@/components/store/products/no-products";
-// import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
-import { Collection, ProductSearch } from "@/schemas/product";
-import { useProductInfiniteSearch } from "@/hooks/useProduct";
+import { Collection } from "@/schemas/product";
+import { useProductInfiniteSearch, useProductInfiniteSearch1 } from "@/hooks/useProduct";
 import ProductCardListings from "@/components/store/products/product-card-listings";
 import { FilterSidebar } from "@/components/store/shared/filter-sidebar";
 import SaleBanner from "@/components/store/sale-banner";
-import React from "react";
-
-interface SearchParams {
-    sortBy?: string;
-    cat_ids?: string;
-    maxPrice?: string;
-    minPrice?: string;
-    search?: string;
-    limit?: number;
-}
+import { useSearch } from "@tanstack/react-router";
+import { InfiniteScroll } from "@/components/InfiniteScroll";
+import { CollectionTemplateSkeleton } from "./skeleton";
+import { Loader } from "lucide-react";
 
 interface Props {
-    initialSearchParams: SearchParams;
     collection?: Collection;
-    initialData?: ProductSearch[];
+    searchTerm?: string;
+    initialData: any;
 }
 
-export default function InfiniteScrollClient({ initialSearchParams, initialData }: Props) {
-    const [viewMode, setViewMode] = useState<"grid" | "list">("list");
-    const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useProductInfiniteSearch({
-        ...initialSearchParams,
-        show_facets: true,
+export default function InfiniteScrollClient({ initialData, collection, searchTerm }: Props) {
+    const search = useSearch({
+        strict: false,
     });
-    const divRef = React.useRef<HTMLDivElement>(null);
+    const [viewMode, setViewMode] = useState<"grid" | "list">("list");
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } = useProductInfiniteSearch1(initialData, {
+        ...search,
+        show_facets: true,
+        collections: collection?.slug,
+        search: searchTerm,
+    });
 
-    // const { lastElementRef } = useInfiniteScroll({
-    //     onLoadMore: () => {
-    //         if (hasNextPage && !isFetchingNextPage) {
-    //             fetchNextPage();
-    //         }
-    //     },
-    //     disabled: isFetchingNextPage,
-    // });
+    if (isLoading) {
+        return <CollectionTemplateSkeleton />;
+    }
+
+    if (isError) {
+        return <div className="p-4 bg-red-50 text-red-800 rounded">Error loading products: {error.message}</div>;
+    }
 
     const products = data?.pages?.flatMap((page) => page.products) ?? initialData;
     const facets = data?.pages?.[0]?.facets || {};
 
-    const fetchMoreOnBottomReached = React.useCallback(
-        (containerRefElement?: HTMLDivElement | null) => {
-            if (containerRefElement) {
-                const { scrollHeight, scrollTop, clientHeight } = containerRefElement;
-                if (scrollHeight - scrollTop - clientHeight < 500 && !isFetchingNextPage) {
-                    console.log("fetching more");
-                    fetchNextPage();
-                }
-            }
-        },
-        [fetchNextPage, isFetchingNextPage]
-    );
-
-    React.useEffect(() => {
-        fetchMoreOnBottomReached(divRef.current);
-    }, [fetchMoreOnBottomReached]);
+    const hasProducts = products.length > 0;
 
     return (
         <div className="flex gap-6">
@@ -74,21 +54,26 @@ export default function InfiniteScrollClient({ initialSearchParams, initialData 
             <div className="w-full flex-1 flex-col relative">
                 <SaleBanner />
                 <CollectionHeader />
-                <div ref={divRef} className="w-full">
-                    <MobileFilterControl facets={facets} setViewMode={setViewMode} viewMode={viewMode} />
-                    <main className="w-full overflow-visible px-2 md:px-1 md:rounded-xl py-4 min-h-[50vh]">
-                        <ProductCardListings className="w-full pb-4" products={products!} viewMode={viewMode} />
-                        {products?.length == 0 && <NoProductsFound />}
-                    </main>
-                    {isFetchingNextPage ? "Loading more..." : hasNextPage ? "Load More" : "Nothing more to load"}
-                </div>
-                {/* <div className="w-full absolute bottom-52">{hasNextPage && <div ref={lastElementRef} className="h-2" />}</div>
-                {isFetchingNextPage && (
-                    <div className="flex flex-col items-center justify-center text-blue-600">
-                        <Loader className="h-8 w-8 animate-spin mb-2" />
-                        <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
-                    </div>
-                )} */}
+                <MobileFilterControl facets={facets} setViewMode={setViewMode} viewMode={viewMode} />
+                <main className="w-full px-2 md:px-1 md:rounded-xl py-4 min-h-[50vh]">
+                    {!isLoading && !hasProducts && <NoProductsFound />}
+                    {!isLoading && hasProducts && (
+                        <InfiniteScroll
+                            onLoadMore={fetchNextPage}
+                            hasMore={!!hasNextPage}
+                            isLoading={isFetchingNextPage}
+                            loader={
+                                <div className="flex flex-col items-center justify-center text-blue-600">
+                                    <Loader className="h-8 w-8 animate-spin mb-2" />
+                                    <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
+                                </div>
+                            }
+                            endMessage={<div className="text-center py-8 text-muted-foreground">You've viewed all products</div>}
+                        >
+                            <ProductCardListings className="w-full pb-4" products={products!} viewMode={viewMode} />
+                        </InfiniteScroll>
+                    )}
+                </main>
             </div>
         </div>
     );
