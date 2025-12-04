@@ -1,5 +1,5 @@
 import { serverApi } from "@/apis/server-client";
-import { PaginatedUser } from "@/schemas";
+import { PaginatedUser, Wishlist } from "@/schemas";
 import { createServerFn } from "@tanstack/react-start";
 import z from "zod";
 
@@ -19,3 +19,8 @@ export const getUsersFn = createServerFn({ method: "GET" })
         console.log("🚀 ~ file: admin.server.tsx:10 ~ res:", res);
         return res;
     });
+
+export const getUserWishlistFn = createServerFn({ method: "GET" }).handler(async () => {
+    const res = await serverApi.get<Wishlist>("/users/wishlist");
+    return res;
+});

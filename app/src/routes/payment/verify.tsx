@@ -1,48 +1,75 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
 import { toast } from "sonner";
 
-import { api } from "@/apis/client";
-import { Order } from "@/schemas";
 import PaymentLoading from "@/components/store/payment/payment-loading";
-import { deleteCookie } from "@/lib/util/cookie";
-import { tryCatch } from "@/lib/try-catch";
 import { useInvalidate } from "@/hooks/useApi";
+import z from "zod";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { verifyPaymentFn } from "@/server/payment.server";
 
 export const Route = createFileRoute("/payment/verify")({
+    validateSearch: z.object({
+        reference: z.string(),
+    }),
+    loaderDeps: ({ search: { reference } }) => ({ reference }),
+    loader: async ({ deps: { reference }, context }) => {
+        await context.queryClient.ensureQueryData({
+            queryKey: ["payment", "verify", reference],
+            queryFn: () => verifyPaymentFn({ data: { reference } }),
+        });
+    },
     component: RouteComponent,
 });
 
 function RouteComponent() {
     const navigate = useNavigate();
-    const searchParams: any = null;
-    const reference = searchParams.get("reference");
     const invalidate = useInvalidate();
+    const { reference } = Route.useSearch();
 
-    useEffect(() => {
-        const verifyPayment = async () => {
-            if (!reference) {
-                toast.error("Invalid payment reference");
-                navigate({ to: "/orders" });
+    const { data, error, isLoading } = useSuspenseQuery({
+        queryKey: ["payment", "verify", reference],
+        queryFn: () => verifyPaymentFn({ data: { reference } }),
+    });
 
-                return;
-            }
+    if (isLoading) {
+        return <PaymentLoading />;
+    }
 
-            const { data, error } = await tryCatch<Order>(api.get(`/payment/verify/${reference}`));
+    if (error) {
+        toast.error(error.message);
+        navigate({ to: "/checkout" });
+    }
 
-            if (error) {
-                toast.error(error);
-                navigate({ to: "/checkout" });
+    if (data?.payment_status === "SUCCESS") {
+        // await deleteCookie("_cart_id");
+        invalidate("cart");
+        navigate({ to: `/order/confirmed/${data?.order_number}` });
+    }
 
-                return;
-            }
-            await deleteCookie("_cart_id");
-            invalidate("cart");
-            navigate({ to: `/order/confirmed/${data?.order_number}` });
-        };
+    // useEffect(() => {
+    //     const verifyPayment = async () => {
+    //         if (!reference) {
+    //             toast.error("Invalid payment reference");
+    //             navigate({ to: "/orders" });
 
-        verifyPayment();
-    }, [reference, navigate]);
+    //             return;
+    //         }
+
+    //         const { data, error } = await tryCatch<Order>(api.get(`/payment/verify/${reference}`));
+
+    //         if (error) {
+    //             toast.error(error);
+    //             navigate({ to: "/checkout" });
+
+    //             return;
+    //         }
+    //         await deleteCookie("_cart_id");
+    //         invalidate("cart");
+    //         navigate({ to: `/order/confirmed/${data?.order_number}` });
+    //     };
+
+    //     verifyPayment();
+    // }, [reference, navigate]);
 
     return <PaymentLoading />;
 }

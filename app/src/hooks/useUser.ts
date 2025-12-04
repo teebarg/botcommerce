@@ -3,7 +3,7 @@ import { toast } from "sonner";
 
 import { api } from "@/apis/client";
 import { PaginatedUser, ProductSearch, User, Wishlist } from "@/schemas";
-import { getUsersFn } from "@/server/users.server";
+import { getUsersFn, getUserWishlistFn } from "@/server/users.server";
 
 export const useMe = () => {
     return useQuery({
@@ -89,6 +89,12 @@ export const useDeleteUser = () => {
         },
     });
 };
+
+export const userWishlistQueryOptions = () =>
+    queryOptions({
+        queryKey: ["products", "wishlist"],
+        queryFn: () => getUserWishlistFn(),
+    })
 
 export const useUserWishlist = () => {
     const session: any = null;

@@ -1,17 +1,31 @@
-"use client";
+import { createFileRoute } from "@tanstack/react-router";
 
 import WishlistItem from "@/components/store/wishlist";
 import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
 import ServerError from "@/components/generic/server-error";
 import { WishItem } from "@/schemas";
-import { useUserWishlist } from "@/hooks/useUser";
+import { userWishlistQueryOptions } from "@/hooks/useUser";
 import ComponentLoader from "@/components/component-loader";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { redirect } from "@tanstack/react-router";
 
-export default function Wishlist() {
-    const { data, isLoading, error } = useUserWishlist();
+export const Route = createFileRoute("/_mainLayout/wishlist")({
+    beforeLoad: ({ context, location }) => {
+        if (!context.session) {
+            throw redirect({ to: "/auth/signin", search: { callbackUrl: location.href } });
+        }
+    },
+    loader: async ({ context }) => {
+        await context.queryClient.ensureQueryData(userWishlistQueryOptions());
+    },
+    component: RouteComponent,
+});
 
-    if (isLoading) {
+function RouteComponent() {
+    const wishlistQuery = useSuspenseQuery(userWishlistQueryOptions());
+
+    if (wishlistQuery.isLoading) {
         return (
             <div className="max-w-7xl mx-auto mt-2 mb-4 w-full">
                 <ComponentLoader className="h-[55vh]" />
@@ -19,11 +33,11 @@ export default function Wishlist() {
         );
     }
 
-    if (error) {
-        return <ServerError error={error.message} scenario="wishlist" stack={error.stack} />;
+    if (wishlistQuery.error) {
+        return <ServerError error={wishlistQuery.error.message} scenario="wishlist" stack={wishlistQuery.error.stack} />;
     }
 
-    const wishlists = data ? data.wishlists : [];
+    const wishlists = wishlistQuery.data?.wishlists ?? [];
 
     return (
         <div className="max-w-7xl mx-auto w-full mt-2 mb-4 py-8 px-2 md:px-0">

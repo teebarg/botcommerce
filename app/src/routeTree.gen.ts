@@ -19,6 +19,7 @@ import { Route as MainLayoutIndexRouteImport } from './routes/_mainLayout/index'
 import { Route as PaymentVerifyRouteImport } from './routes/payment/verify'
 import { Route as ApiPushEventRouteImport } from './routes/api/push-event'
 import { Route as AdminSharedRouteImport } from './routes/admin/shared'
+import { Route as MainLayoutWishlistRouteImport } from './routes/_mainLayout/wishlist'
 import { Route as MainLayoutCartRouteImport } from './routes/_mainLayout/cart'
 import { Route as MainLayoutBulkRouteImport } from './routes/_mainLayout/bulk'
 import { Route as AuthLayoutHomeRouteImport } from './routes/_authLayout/home'
@@ -99,6 +100,11 @@ const AdminSharedRoute = AdminSharedRouteImport.update({
   id: '/shared',
   path: '/shared',
   getParentRoute: () => AdminRoute,
+} as any)
+const MainLayoutWishlistRoute = MainLayoutWishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
+  getParentRoute: () => MainLayoutRoute,
 } as any)
 const MainLayoutCartRoute = MainLayoutCartRouteImport.update({
   id: '/cart',
@@ -276,6 +282,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof AuthLayoutHomeRoute
   '/bulk': typeof MainLayoutBulkRoute
   '/cart': typeof MainLayoutCartRoute
+  '/wishlist': typeof MainLayoutWishlistRoute
   '/admin/shared': typeof AdminSharedRoute
   '/api/push-event': typeof ApiPushEventRoute
   '/payment/verify': typeof PaymentVerifyRoute
@@ -317,6 +324,7 @@ export interface FileRoutesByTo {
   '/home': typeof AuthLayoutHomeRoute
   '/bulk': typeof MainLayoutBulkRoute
   '/cart': typeof MainLayoutCartRoute
+  '/wishlist': typeof MainLayoutWishlistRoute
   '/admin/shared': typeof AdminSharedRoute
   '/api/push-event': typeof ApiPushEventRoute
   '/payment/verify': typeof PaymentVerifyRoute
@@ -362,6 +370,7 @@ export interface FileRoutesById {
   '/_authLayout/home': typeof AuthLayoutHomeRoute
   '/_mainLayout/bulk': typeof MainLayoutBulkRoute
   '/_mainLayout/cart': typeof MainLayoutCartRoute
+  '/_mainLayout/wishlist': typeof MainLayoutWishlistRoute
   '/admin/shared': typeof AdminSharedRoute
   '/api/push-event': typeof ApiPushEventRoute
   '/payment/verify': typeof PaymentVerifyRoute
@@ -406,6 +415,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/bulk'
     | '/cart'
+    | '/wishlist'
     | '/admin/shared'
     | '/api/push-event'
     | '/payment/verify'
@@ -447,6 +457,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/bulk'
     | '/cart'
+    | '/wishlist'
     | '/admin/shared'
     | '/api/push-event'
     | '/payment/verify'
@@ -491,6 +502,7 @@ export interface FileRouteTypes {
     | '/_authLayout/home'
     | '/_mainLayout/bulk'
     | '/_mainLayout/cart'
+    | '/_mainLayout/wishlist'
     | '/admin/shared'
     | '/api/push-event'
     | '/payment/verify'
@@ -609,6 +621,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/shared'
       preLoaderRoute: typeof AdminSharedRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/_mainLayout/wishlist': {
+      id: '/_mainLayout/wishlist'
+      path: '/wishlist'
+      fullPath: '/wishlist'
+      preLoaderRoute: typeof MainLayoutWishlistRouteImport
+      parentRoute: typeof MainLayoutRoute
     }
     '/_mainLayout/cart': {
       id: '/_mainLayout/cart'
@@ -860,6 +879,7 @@ const AuthLayoutRouteWithChildren = AuthLayoutRoute._addFileChildren(
 interface MainLayoutRouteChildren {
   MainLayoutBulkRoute: typeof MainLayoutBulkRoute
   MainLayoutCartRoute: typeof MainLayoutCartRoute
+  MainLayoutWishlistRoute: typeof MainLayoutWishlistRoute
   MainLayoutIndexRoute: typeof MainLayoutIndexRoute
   MainLayoutstaticAboutRoute: typeof MainLayoutstaticAboutRoute
   MainLayoutstaticCareersRoute: typeof MainLayoutstaticCareersRoute
@@ -876,6 +896,7 @@ interface MainLayoutRouteChildren {
 const MainLayoutRouteChildren: MainLayoutRouteChildren = {
   MainLayoutBulkRoute: MainLayoutBulkRoute,
   MainLayoutCartRoute: MainLayoutCartRoute,
+  MainLayoutWishlistRoute: MainLayoutWishlistRoute,
   MainLayoutIndexRoute: MainLayoutIndexRoute,
   MainLayoutstaticAboutRoute: MainLayoutstaticAboutRoute,
   MainLayoutstaticCareersRoute: MainLayoutstaticCareersRoute,
