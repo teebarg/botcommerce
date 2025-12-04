@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { formatDistanceToNow } from "date-fns";
 import { Download, Trash2, Activity as ActivityIcon, FileSpreadsheet, AlertCircle, CheckCircle2 } from "lucide-react";
@@ -29,7 +27,7 @@ const StatusBadge = ({ isSuccess, activityType }: { isSuccess: boolean; activity
     return <Badge variant="blue">Success</Badge>;
 };
 
-const ActivityListItem: React.FC<{ activity: Activity }> = ({ activity }) => {
+export const ActivityListItem: React.FC<{ activity: Activity }> = ({ activity }) => {
     const { mutateAsync: deleteActivity, isPending } = useDeleteActivity();
 
     const handleDeleteActivity = async (id: number) => {

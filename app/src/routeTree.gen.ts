@@ -20,10 +20,10 @@ import { Route as PaymentVerifyRouteImport } from './routes/payment/verify'
 import { Route as ApiPushEventRouteImport } from './routes/api/push-event'
 import { Route as AdminSharedRouteImport } from './routes/admin/shared'
 import { Route as MainLayoutWishlistRouteImport } from './routes/_mainLayout/wishlist'
+import { Route as MainLayoutCollectionsRouteImport } from './routes/_mainLayout/collections'
 import { Route as MainLayoutCartRouteImport } from './routes/_mainLayout/cart'
 import { Route as MainLayoutBulkRouteImport } from './routes/_mainLayout/bulk'
 import { Route as AuthLayoutHomeRouteImport } from './routes/_authLayout/home'
-import { Route as MainLayoutCollectionsIndexRouteImport } from './routes/_mainLayout/collections/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AdminstoreReviewsRouteImport } from './routes/admin/(store)/reviews'
 import { Route as AdminstoreOrdersRouteImport } from './routes/admin/(store)/orders'
@@ -41,7 +41,7 @@ import { Route as AdminadminActivitiesRouteImport } from './routes/admin/(admin)
 import { Route as MainLayoutSharedSlugRouteImport } from './routes/_mainLayout/shared.$slug'
 import { Route as MainLayoutSearchQueryRouteImport } from './routes/_mainLayout/search.$query'
 import { Route as MainLayoutProductsSlugRouteImport } from './routes/_mainLayout/products.$slug'
-import { Route as MainLayoutCollectionsSlugRouteImport } from './routes/_mainLayout/collections/$slug'
+import { Route as MainLayoutCollectionsSlugRouteImport } from './routes/_mainLayout/collections.$slug'
 import { Route as MainLayoutstaticTermsRouteImport } from './routes/_mainLayout/(static)/terms'
 import { Route as MainLayoutstaticShippingRouteImport } from './routes/_mainLayout/(static)/shipping'
 import { Route as MainLayoutstaticReturnsRouteImport } from './routes/_mainLayout/(static)/returns'
@@ -110,6 +110,11 @@ const MainLayoutWishlistRoute = MainLayoutWishlistRouteImport.update({
   path: '/wishlist',
   getParentRoute: () => MainLayoutRoute,
 } as any)
+const MainLayoutCollectionsRoute = MainLayoutCollectionsRouteImport.update({
+  id: '/collections',
+  path: '/collections',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
 const MainLayoutCartRoute = MainLayoutCartRouteImport.update({
   id: '/cart',
   path: '/cart',
@@ -125,12 +130,6 @@ const AuthLayoutHomeRoute = AuthLayoutHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AuthLayoutRoute,
 } as any)
-const MainLayoutCollectionsIndexRoute =
-  MainLayoutCollectionsIndexRouteImport.update({
-    id: '/collections/',
-    path: '/collections/',
-    getParentRoute: () => MainLayoutRoute,
-  } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -219,9 +218,9 @@ const MainLayoutProductsSlugRoute = MainLayoutProductsSlugRouteImport.update({
 } as any)
 const MainLayoutCollectionsSlugRoute =
   MainLayoutCollectionsSlugRouteImport.update({
-    id: '/collections/$slug',
-    path: '/collections/$slug',
-    getParentRoute: () => MainLayoutRoute,
+    id: '/$slug',
+    path: '/$slug',
+    getParentRoute: () => MainLayoutCollectionsRoute,
   } as any)
 const MainLayoutstaticTermsRoute = MainLayoutstaticTermsRouteImport.update({
   id: '/(static)/terms',
@@ -307,6 +306,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof AuthLayoutHomeRoute
   '/bulk': typeof MainLayoutBulkRoute
   '/cart': typeof MainLayoutCartRoute
+  '/collections': typeof MainLayoutCollectionsRouteWithChildren
   '/wishlist': typeof MainLayoutWishlistRoute
   '/admin/shared': typeof AdminSharedRoute
   '/api/push-event': typeof ApiPushEventRoute
@@ -343,7 +343,6 @@ export interface FileRoutesByFullPath {
   '/admin/orders': typeof AdminstoreOrdersRoute
   '/admin/reviews': typeof AdminstoreReviewsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/collections': typeof MainLayoutCollectionsIndexRoute
   '/order/confirmed/$id': typeof MainLayoutOrderConfirmedIdRoute
   '/admin/coupons/analytics': typeof AdminstoreCouponsAnalyticsRoute
 }
@@ -353,6 +352,7 @@ export interface FileRoutesByTo {
   '/home': typeof AuthLayoutHomeRoute
   '/bulk': typeof MainLayoutBulkRoute
   '/cart': typeof MainLayoutCartRoute
+  '/collections': typeof MainLayoutCollectionsRouteWithChildren
   '/wishlist': typeof MainLayoutWishlistRoute
   '/admin/shared': typeof AdminSharedRoute
   '/api/push-event': typeof ApiPushEventRoute
@@ -389,7 +389,6 @@ export interface FileRoutesByTo {
   '/admin/orders': typeof AdminstoreOrdersRoute
   '/admin/reviews': typeof AdminstoreReviewsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/collections': typeof MainLayoutCollectionsIndexRoute
   '/order/confirmed/$id': typeof MainLayoutOrderConfirmedIdRoute
   '/admin/coupons/analytics': typeof AdminstoreCouponsAnalyticsRoute
 }
@@ -403,6 +402,7 @@ export interface FileRoutesById {
   '/_authLayout/home': typeof AuthLayoutHomeRoute
   '/_mainLayout/bulk': typeof MainLayoutBulkRoute
   '/_mainLayout/cart': typeof MainLayoutCartRoute
+  '/_mainLayout/collections': typeof MainLayoutCollectionsRouteWithChildren
   '/_mainLayout/wishlist': typeof MainLayoutWishlistRoute
   '/admin/shared': typeof AdminSharedRoute
   '/api/push-event': typeof ApiPushEventRoute
@@ -439,7 +439,6 @@ export interface FileRoutesById {
   '/admin/(store)/orders': typeof AdminstoreOrdersRoute
   '/admin/(store)/reviews': typeof AdminstoreReviewsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/_mainLayout/collections/': typeof MainLayoutCollectionsIndexRoute
   '/_mainLayout/order/confirmed/$id': typeof MainLayoutOrderConfirmedIdRoute
   '/admin/(store)/coupons/analytics': typeof AdminstoreCouponsAnalyticsRoute
 }
@@ -452,6 +451,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/bulk'
     | '/cart'
+    | '/collections'
     | '/wishlist'
     | '/admin/shared'
     | '/api/push-event'
@@ -488,7 +488,6 @@ export interface FileRouteTypes {
     | '/admin/orders'
     | '/admin/reviews'
     | '/api/auth/$'
-    | '/collections'
     | '/order/confirmed/$id'
     | '/admin/coupons/analytics'
   fileRoutesByTo: FileRoutesByTo
@@ -498,6 +497,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/bulk'
     | '/cart'
+    | '/collections'
     | '/wishlist'
     | '/admin/shared'
     | '/api/push-event'
@@ -534,7 +534,6 @@ export interface FileRouteTypes {
     | '/admin/orders'
     | '/admin/reviews'
     | '/api/auth/$'
-    | '/collections'
     | '/order/confirmed/$id'
     | '/admin/coupons/analytics'
   id:
@@ -547,6 +546,7 @@ export interface FileRouteTypes {
     | '/_authLayout/home'
     | '/_mainLayout/bulk'
     | '/_mainLayout/cart'
+    | '/_mainLayout/collections'
     | '/_mainLayout/wishlist'
     | '/admin/shared'
     | '/api/push-event'
@@ -583,7 +583,6 @@ export interface FileRouteTypes {
     | '/admin/(store)/orders'
     | '/admin/(store)/reviews'
     | '/api/auth/$'
-    | '/_mainLayout/collections/'
     | '/_mainLayout/order/confirmed/$id'
     | '/admin/(store)/coupons/analytics'
   fileRoutesById: FileRoutesById
@@ -678,6 +677,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainLayoutWishlistRouteImport
       parentRoute: typeof MainLayoutRoute
     }
+    '/_mainLayout/collections': {
+      id: '/_mainLayout/collections'
+      path: '/collections'
+      fullPath: '/collections'
+      preLoaderRoute: typeof MainLayoutCollectionsRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
     '/_mainLayout/cart': {
       id: '/_mainLayout/cart'
       path: '/cart'
@@ -698,13 +704,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/home'
       preLoaderRoute: typeof AuthLayoutHomeRouteImport
       parentRoute: typeof AuthLayoutRoute
-    }
-    '/_mainLayout/collections/': {
-      id: '/_mainLayout/collections/'
-      path: '/collections'
-      fullPath: '/collections'
-      preLoaderRoute: typeof MainLayoutCollectionsIndexRouteImport
-      parentRoute: typeof MainLayoutRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -827,10 +826,10 @@ declare module '@tanstack/react-router' {
     }
     '/_mainLayout/collections/$slug': {
       id: '/_mainLayout/collections/$slug'
-      path: '/collections/$slug'
+      path: '/$slug'
       fullPath: '/collections/$slug'
       preLoaderRoute: typeof MainLayoutCollectionsSlugRouteImport
-      parentRoute: typeof MainLayoutRoute
+      parentRoute: typeof MainLayoutCollectionsRoute
     }
     '/_mainLayout/(static)/terms': {
       id: '/_mainLayout/(static)/terms'
@@ -953,9 +952,23 @@ const AuthLayoutRouteWithChildren = AuthLayoutRoute._addFileChildren(
   AuthLayoutRouteChildren,
 )
 
+interface MainLayoutCollectionsRouteChildren {
+  MainLayoutCollectionsSlugRoute: typeof MainLayoutCollectionsSlugRoute
+}
+
+const MainLayoutCollectionsRouteChildren: MainLayoutCollectionsRouteChildren = {
+  MainLayoutCollectionsSlugRoute: MainLayoutCollectionsSlugRoute,
+}
+
+const MainLayoutCollectionsRouteWithChildren =
+  MainLayoutCollectionsRoute._addFileChildren(
+    MainLayoutCollectionsRouteChildren,
+  )
+
 interface MainLayoutRouteChildren {
   MainLayoutBulkRoute: typeof MainLayoutBulkRoute
   MainLayoutCartRoute: typeof MainLayoutCartRoute
+  MainLayoutCollectionsRoute: typeof MainLayoutCollectionsRouteWithChildren
   MainLayoutWishlistRoute: typeof MainLayoutWishlistRoute
   MainLayoutIndexRoute: typeof MainLayoutIndexRoute
   MainLayoutstaticAboutRoute: typeof MainLayoutstaticAboutRoute
@@ -966,17 +979,16 @@ interface MainLayoutRouteChildren {
   MainLayoutstaticReturnsRoute: typeof MainLayoutstaticReturnsRoute
   MainLayoutstaticShippingRoute: typeof MainLayoutstaticShippingRoute
   MainLayoutstaticTermsRoute: typeof MainLayoutstaticTermsRoute
-  MainLayoutCollectionsSlugRoute: typeof MainLayoutCollectionsSlugRoute
   MainLayoutProductsSlugRoute: typeof MainLayoutProductsSlugRoute
   MainLayoutSearchQueryRoute: typeof MainLayoutSearchQueryRoute
   MainLayoutSharedSlugRoute: typeof MainLayoutSharedSlugRoute
-  MainLayoutCollectionsIndexRoute: typeof MainLayoutCollectionsIndexRoute
   MainLayoutOrderConfirmedIdRoute: typeof MainLayoutOrderConfirmedIdRoute
 }
 
 const MainLayoutRouteChildren: MainLayoutRouteChildren = {
   MainLayoutBulkRoute: MainLayoutBulkRoute,
   MainLayoutCartRoute: MainLayoutCartRoute,
+  MainLayoutCollectionsRoute: MainLayoutCollectionsRouteWithChildren,
   MainLayoutWishlistRoute: MainLayoutWishlistRoute,
   MainLayoutIndexRoute: MainLayoutIndexRoute,
   MainLayoutstaticAboutRoute: MainLayoutstaticAboutRoute,
@@ -987,11 +999,9 @@ const MainLayoutRouteChildren: MainLayoutRouteChildren = {
   MainLayoutstaticReturnsRoute: MainLayoutstaticReturnsRoute,
   MainLayoutstaticShippingRoute: MainLayoutstaticShippingRoute,
   MainLayoutstaticTermsRoute: MainLayoutstaticTermsRoute,
-  MainLayoutCollectionsSlugRoute: MainLayoutCollectionsSlugRoute,
   MainLayoutProductsSlugRoute: MainLayoutProductsSlugRoute,
   MainLayoutSearchQueryRoute: MainLayoutSearchQueryRoute,
   MainLayoutSharedSlugRoute: MainLayoutSharedSlugRoute,
-  MainLayoutCollectionsIndexRoute: MainLayoutCollectionsIndexRoute,
   MainLayoutOrderConfirmedIdRoute: MainLayoutOrderConfirmedIdRoute,
 }
 

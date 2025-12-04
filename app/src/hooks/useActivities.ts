@@ -20,16 +20,6 @@ export const useActivities = () => {
     });
 };
 
-export const useMyActivities = () => {
-    const session: any = null;
-
-    return useQuery({
-        queryKey: ["activity", session?.id?.toString()],
-        queryFn: async () => await api.get<Activity[]>(`/activities/me`),
-        enabled: Boolean(session?.user),
-    });
-};
-
 export const useDeleteActivity = () => {
     return useMutation({
         mutationFn: async (id: number) => await api.delete<void>(`/activities/${id}`),

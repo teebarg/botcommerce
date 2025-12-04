@@ -1,15 +1,17 @@
-"use client";
-
 import React from "react";
 import { Bell } from "lucide-react";
 
 import ActivityView from "./activity";
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useMyActivities } from "@/hooks/useActivities";
+import { useQuery } from "@tanstack/react-query";
+import { getMyActivitiesFn } from "@/server/activities.server";
 
 const ActivityTray: React.FC = () => {
-    const { data: activities, isLoading } = useMyActivities();
+    const { data: activities, isLoading } = useQuery({
+        queryKey: ["activity"],
+        queryFn: async () => await getMyActivitiesFn(),
+    });
 
     return (
         <DropdownMenu>

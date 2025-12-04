@@ -17,7 +17,7 @@ const productSearchSchema = z.object({
     ages: z.string().optional(),
 });
 
-export const Route = createFileRoute("/_mainLayout/collections/")({
+export const Route = createFileRoute("/_mainLayout/collections")({
     validateSearch: productSearchSchema,
     component: CollectionsPage,
     beforeLoad: ({ search }) => {

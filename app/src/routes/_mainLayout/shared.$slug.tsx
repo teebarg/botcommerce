@@ -1,10 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import InfiniteScrollClient from "@/components/store/collections/scroll-client";
-import ServerError from "@/components/generic/server-error";
-import { tryCatch } from "@/lib/try-catch";
-import { GetProductsFn } from "@/server/product.server";
 import z from "zod";
-import { getCollectionFn } from "@/server/collections.server";
 import { getSiteConfig } from "@/lib/config";
 import { seo } from "@/utils/seo";
 import { getCatalogFn } from "@/server/catalog.server";
