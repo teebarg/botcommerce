@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import React, { useState } from "react";
+import { useState } from "react";
 
 import CustomerFilter from "@/components/admin/chats/chats-filter";
 import ChatsActions from "@/components/admin/chats/chats-actions";

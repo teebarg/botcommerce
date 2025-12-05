@@ -4,7 +4,7 @@ import MobileFilterControl from "@/components/store/shared/mobile-filter-control
 import { CollectionHeader } from "@/components/store/collections/collection-header";
 import NoProductsFound from "@/components/store/products/no-products";
 import { Collection } from "@/schemas/product";
-import { useProductInfiniteSearch, useProductInfiniteSearch1 } from "@/hooks/useProduct";
+import { useProductInfiniteSearch1 } from "@/hooks/useProduct";
 import ProductCardListings from "@/components/store/products/product-card-listings";
 import { FilterSidebar } from "@/components/store/shared/filter-sidebar";
 import SaleBanner from "@/components/store/sale-banner";

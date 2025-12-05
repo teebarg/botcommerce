@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CheckCircle, ArrowLeft, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
