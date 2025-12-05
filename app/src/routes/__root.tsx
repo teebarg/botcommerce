@@ -16,7 +16,7 @@ import NotFound from "@/components/generic/not-found";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { WebSocketProvider } from "pulsews";
 import appCss from "@/styles.css?url";
-import { AuthSession, getSession } from "start-authjs";
+import { AuthSession, getSession, Session } from "start-authjs";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { authConfig } from "@/utils/auth";
@@ -54,7 +54,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         ],
     }),
     beforeLoad: async ({}) => {
-        const session = await fetchSession();
+        const session = await fetchSession() as unknown as Session;
         const _storedTheme = await getStoredTheme();
         return {
             _storedTheme,

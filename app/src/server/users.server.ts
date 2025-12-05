@@ -1,7 +1,7 @@
 import { api } from "@/utils/fetch-api";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { PaginatedUser, ProductSearch, User, Wishlist } from "@/schemas";
+import type { Message, PaginatedUser, ProductSearch, User, Wishlist } from "@/schemas";
 
 export const UserSearchSchema = z.object({
     query: z.string().optional(),
@@ -19,6 +19,32 @@ export const getUserWishlistFn = createServerFn({ method: "GET" }).handler(async
 export const getMeFn = createServerFn({ method: "GET" }).handler(async () => {
     return await api.get<User>("/users/me");
 });
+
+export const updateMeFn = createServerFn({ method: "POST" })
+    .inputValidator(
+        z.object({
+            first_name: z.string().min(1, "First name is required").max(255, "First name is too long"),
+            last_name: z.string().min(1, "Last name is required").max(255, "Last name is too long"),
+        })
+    )
+    .handler(async ({ data }) => {
+        return await api.patch<Message>("/users/me", data);
+    });
+
+export const updatePasswordFn = createServerFn({ method: "POST" })
+    .inputValidator(
+        z.object({
+            currentPassword: z.string().min(1, "Current password is required"),
+            newPassword: z.string().min(8, "Password must be at least 8 characters"),
+            confirmPassword: z.string().min(1, "Please confirm your password"),
+        })
+    )
+    .handler(async ({ data }) => {
+        return await api.post<Message>("/users/change-password", {
+            old_password: data.currentPassword,
+            new_password: data.newPassword,
+        });
+    });
 
 export const getUsersFn = createServerFn({ method: "GET" })
     .inputValidator((input: unknown) => UserSearchSchema.parse(input))

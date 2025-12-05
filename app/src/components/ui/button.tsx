@@ -49,13 +49,6 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ({ className, variant, size, asChild = false, isLoading = false, children, startContent, endContent, ...props }, ref) => {
         const Comp = asChild ? Slot : "button";
-        const [isClient, setIsClient] = React.useState<boolean>(false);
-
-        React.useEffect(() => {
-            setIsClient(true);
-        }, []);
-
-        if (!isClient) return null;
 
         return (
             <Comp

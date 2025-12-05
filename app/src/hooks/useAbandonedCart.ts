@@ -1,31 +1,6 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { getAbandonedCartsFn, getAbandonedCartStatsFn, sendCartReminderFn, sendCartRemindersFn } from "@/server/cart.server";
-
-interface AbandonedCartParams {
-    search?: string;
-    hours_threshold?: number;
-    skip?: number;
-    limit?: number;
-}
-
-interface AbandonedCartStatsParams {
-    hours_threshold?: number;
-}
-
-export const useAbandonedCarts = (params: AbandonedCartParams = {}) => {
-    return useQuery({
-        queryKey: ["abandoned-carts", params],
-        queryFn: () => getAbandonedCartsFn({ data: params }),
-    });
-};
-
-export const useAbandonedCartStats = (params: AbandonedCartStatsParams = {}) => {
-    return useQuery({
-        queryKey: ["abandoned-carts", "stats", params],
-        queryFn: async () => await getAbandonedCartStatsFn({ data: params.hours_threshold! }),
-    });
-};
+import { sendCartReminderFn, sendCartRemindersFn } from "@/server/cart.server";
 
 export const useSendCartReminder = () => {
     return useMutation({

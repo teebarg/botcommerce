@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import AddressBook from "@components/store/account/address/address-book";
+import AddressBook from "@/components/store/account/address/address-book";
 
 export const metadata: Metadata = {
     title: "Addresses",

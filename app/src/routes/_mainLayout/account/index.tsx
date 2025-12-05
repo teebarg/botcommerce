@@ -1,13 +1,13 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { ordersQueryOptions } from "@/hooks/useOrder";
+import PromotionalBanner from "@/components/promotion";
 import { currency } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
-
-import PromotionalBanner from "@/components/promotion";
 import { Order, Session } from "@/schemas";
-import { useOrders } from "@/hooks/useOrder";
 import Overlay from "@/components/overlay";
 import OrderDetails from "@/components/store/orders/order-details";
-import ComponentLoader from "@/components/component-loader";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 const getProfileCompletion = (customer: Omit<Session, "password_hash"> | null) => {
     let count = 0;
@@ -64,13 +64,16 @@ const OrderItem: React.FC<{ order: Order }> = ({ order }) => {
     );
 };
 
-const OverviewTemplate: React.FC = () => {
-    const session: any = null;
-    const { data, isPending } = useOrders({});
+export const Route = createFileRoute("/_mainLayout/account/")({
+    loader: async ({ context }) => {
+        await context.queryClient.ensureQueryData(ordersQueryOptions({}));
+    },
+    component: RouteComponent,
+});
 
-    if (isPending) {
-        return <ComponentLoader className="h-192" />;
-    }
+function RouteComponent() {
+    const { session } = Route.useRouteContext();
+    const { data } = useSuspenseQuery(ordersQueryOptions({}));
 
     return (
         <div className="px-2 md:px-0" data-testid="overview-page-wrapper">
@@ -121,8 +124,8 @@ const OverviewTemplate: React.FC = () => {
                                 <h3 className="text-lg">Recent orders</h3>
                             </div>
                             <ul className="flex flex-col gap-y-4" data-testid="orders-wrapper">
-                                {data?.orders.length > 0 ? (
-                                    data.orders.slice(0, 5).map((order: Order, idx: number) => {
+                                {data?.orders && data?.orders?.length > 0 ? (
+                                    data?.orders.slice(0, 5).map((order: Order, idx: number) => {
                                         return <OrderItem key={idx} data-testid="order-wrapper" data-value={order.order_number} order={order} />;
                                     })
                                 ) : (
@@ -135,6 +138,4 @@ const OverviewTemplate: React.FC = () => {
             </div>
         </div>
     );
-};
-
-export default OverviewTemplate;
+}

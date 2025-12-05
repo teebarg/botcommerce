@@ -56,20 +56,7 @@ function RouteComponent() {
             limit: LIMIT,
         })
     );
-
-    // const searchParams: any = null;
     const { mutate: sendReminders, isPending: sendRemindersLoading } = useSendCartReminders();
-
-    // const { data: stats, isLoading: statsLoading } = useAbandonedCartStats({
-    //     hours_threshold: parseInt(timeFilter),
-    // });
-
-    // const { data: abandonedCartsData, isLoading: abandonedCartsLoading } = useAbandonedCarts({
-    //     search: searchQuery || undefined,
-    //     hours_threshold: parseInt(timeFilter),
-    //     skip: Number(searchParams.get("skip")) || 0,
-    //     limit: LIMIT,
-    // });
 
     const { carts: allCarts, ...pagination } = abandonedCartsData ?? {
         carts: [],
