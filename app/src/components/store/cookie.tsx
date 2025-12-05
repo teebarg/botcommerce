@@ -1,5 +1,3 @@
-"use client";
-
 import { FC, useEffect, useState } from "react";
 import { useCookie } from "@/hooks/use-cookie";
 import { Link } from "@tanstack/react-router"

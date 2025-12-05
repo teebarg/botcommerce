@@ -1,13 +1,11 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Gift, X } from "lucide-react";
 
-import { api } from "@/apis/client";
 import { Message } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
 import { Button } from "@/components/ui/button";
+import { api } from "@/utils/fetch-api";
 
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
 const CHECK_INTERVAL = 60 * 60 * 1000; // Check every hour

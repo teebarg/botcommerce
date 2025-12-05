@@ -21,8 +21,7 @@ export const Route = createFileRoute("/admin/(admin)/activities")({
 
 function RouteComponent() {
     const { data: catalog } = useSuspenseQuery(activitiesQueryOptions());
-    // const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useActivities();
-    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteQuery({
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
         queryKey: ["activities"],
         queryFn: ({ pageParam = 0 }) => getActivitiesFn({ data: { skip: pageParam } }),
         initialPageParam: 0,
@@ -37,7 +36,7 @@ function RouteComponent() {
 
     const activities = data?.pages?.flatMap((page) => page.activities) || [];
 
-    if (!activities.length) {
+    if (activities && !activities?.length) {
         return (
             <div className="px-2 md:px-10 py-8">
                 <h1 className="text-2xl font-bold mb-6">Activities History</h1>

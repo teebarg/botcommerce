@@ -1,26 +1,20 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-
-import { api } from "@/apis/client";
-import { Address, Message } from "@/schemas";
+import { createAddressFn, deleteAddressFn, getUserAddressesFn, updateAddressFn } from "@/server/address.server";
 
 export const useUserAddresses = () => {
-    const session: any = null;
+    // const session: any = null;
 
     return useQuery({
-        queryKey: ["addresses", session?.id?.toString()],
-        queryFn: async () => {
-            const res = await api.get<{ addresses: Address[] }>("/address/");
-
-            return res;
-        },
-        enabled: Boolean(session?.user),
+        queryKey: ["addresses"],
+        queryFn: () => getUserAddressesFn(),
+        // enabled: Boolean(session?.user),
     });
 };
 
 export const useCreateAddress = () => {
     return useMutation({
-        mutationFn: async (input: any) => await api.post<Address>("/address/", input),
+        mutationFn: async (input: any) => await createAddressFn({ data: input }),
         onSuccess: () => {
             toast.success("Address successfully created");
         },
@@ -32,7 +26,7 @@ export const useCreateAddress = () => {
 
 export const useUpdateAddress = () => {
     return useMutation({
-        mutationFn: async ({ id, input }: { id: number; input: any }) => await api.patch<Address>(`/address/${id}`, input),
+        mutationFn: async ({ id, input }: { id: number; input: any }) => await updateAddressFn({ data: { id, input } }),
         onSuccess: () => {
             toast.success("Address successfully updated");
         },
@@ -44,7 +38,7 @@ export const useUpdateAddress = () => {
 
 export const useDeleteAddress = () => {
     return useMutation({
-        mutationFn: async (id: number) => await api.delete<Message>(`/address/${id}`),
+        mutationFn: async (id: number) => await deleteAddressFn({ data: id }),
         onSuccess: () => {
             toast.success("Address successfully deleted");
         },

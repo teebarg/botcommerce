@@ -5,7 +5,6 @@ import { Search, SlidersHorizontal } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Order, Status, User } from "@/schemas";
-import { useUsers } from "@/hooks/useUser";
 import { currency } from "@/lib/utils";
 import { CardSkeleton } from "@/components/ui/skeletons";
 import PaginationUI from "@/components/pagination";
@@ -14,9 +13,25 @@ import CustomerFilter from "@/components/admin/customers/customer-filter";
 import CustomerActions from "@/components/admin/customers/customer-actions";
 import CustomerCard from "@/components/admin/customers/customer-card";
 import z from "zod";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { getUsersFn } from "@/server/users.server";
 
 const LIMIT = 10;
+
+interface UsersParams {
+    query?: string;
+    role?: "ADMIN" | "CUSTOMER";
+    status?: "ACTIVE" | "INACTIVE" | "PENDING";
+    skip?: number;
+    limit?: number;
+    sort?: string;
+}
+
+export const useUsers = (searchParams: UsersParams) =>
+    queryOptions({
+        queryKey: ["users", JSON.stringify(searchParams)],
+        queryFn: () => getUsersFn({ data: { ...searchParams } }),
+    });
 
 export const Route = createFileRoute("/admin/(admin)/users")({
     validateSearch: z.object({

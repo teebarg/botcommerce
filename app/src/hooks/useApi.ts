@@ -1,10 +1,7 @@
-import { queryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-
-import { api } from "@/apis/client";
-import { BankDetails, ConversationStatus, DeliveryOption, Message, PaginatedChat } from "@/schemas";
-import { StatsTrends } from "@/types/models";
-import { getStatsTrendsFn } from "@/server/admin.server";
+import type { ConversationStatus } from "@/schemas";
+import { chatMutationFn, deleteChatFn, getAdminDeliveryOptionsFn, getBankDetailsFn, getChatsFn, getDeliveryOptionsFn } from "@/server/generic.server";
 
 interface ConversationParams {
     user_id?: number;
@@ -16,9 +13,7 @@ interface ConversationParams {
 export const useBankDetails = () => {
     return useQuery({
         queryKey: ["bank-details"],
-        queryFn: async () => {
-            return await api.get<BankDetails[]>("/bank-details/");
-        },
+        queryFn: () => getBankDetailsFn(),
     });
 };
 
@@ -30,11 +25,11 @@ export const useChatMutation = () => {
             const conversationId = sessionStorage.getItem("chatbotConversationId");
             const body = {
                 user_id: session?.id,
-                conversation_uuid: conversationId,
+                conversation_uuid: conversationId!,
                 user_message: message,
             };
 
-            return await api.post<{ reply: string; conversation_uuid: string }>("/chat/", body);
+            return await chatMutationFn({ data: body });
         },
         onError: (error) => {
             toast.error("Failed to chat" + error);
@@ -45,7 +40,7 @@ export const useChatMutation = () => {
 export const useChats = (searchParams: ConversationParams) => {
     return useQuery({
         queryKey: ["chats"],
-        queryFn: async () => await api.get<PaginatedChat>("/chat/", { params: { ...searchParams } }),
+        queryFn: () => getChatsFn({ data: searchParams }),
     });
 };
 
@@ -53,7 +48,7 @@ export const useDeleteChat = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (id: number) => await api.delete<Message>(`/chat/${id}`),
+        mutationFn: async (id: number) => await deleteChatFn({ data: id }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["chats"] });
             toast.success("Chat deleted successfully");
@@ -64,23 +59,17 @@ export const useDeleteChat = () => {
     });
 };
 
-export const useStatsTrends = () =>
-  queryOptions({
-    queryKey: ["stats-trends"],
-    queryFn: () => getStatsTrendsFn(),
-  })
-
 export const useDeliveryOptions = () => {
     return useQuery({
         queryKey: ["delivery", "available"],
-        queryFn: async () => await api.get<DeliveryOption[]>("/delivery/available"),
+        queryFn: () => getDeliveryOptionsFn(),
     });
 };
 
 export const useAdminDeliveryOptions = () => {
     return useQuery({
         queryKey: ["delivery"],
-        queryFn: async () => await api.get<DeliveryOption[]>("/delivery/"),
+        queryFn: () => getAdminDeliveryOptionsFn(),
     });
 };
 

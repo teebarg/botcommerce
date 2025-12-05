@@ -1,8 +1,6 @@
-"use client";
-
 import { useEffect, useState } from "react";
 
-import { api } from "@/apis/client";
+import { api } from "@/utils/fetch-api";
 import { tryCatch } from "@/lib/try-catch";
 
 interface SharedCollectionVisitTrackerProps {

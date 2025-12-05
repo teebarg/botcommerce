@@ -1,11 +1,9 @@
-"use client";
-
 import { useState } from "react";
 import { toast } from "sonner";
 import { Globe } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { api } from "@/apis/client";
+import { api } from "@/utils/fetch-api";
 import { PaymentInitialize } from "@/types/payment";
 import { currency } from "@/lib/utils";
 import { tryCatch } from "@/lib/try-catch";

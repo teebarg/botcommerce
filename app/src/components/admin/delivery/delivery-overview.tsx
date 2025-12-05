@@ -7,7 +7,7 @@ import DeliveryOptionForm from "./delivery-option-form";
 
 import { Button } from "@/components/ui/button";
 import { DeliveryOption, Message } from "@/schemas";
-import { api } from "@/apis/client";
+import { api } from "@/utils/fetch-api";
 import { useAdminDeliveryOptions } from "@/hooks/useApi";
 import { useInvalidate } from "@/hooks/useApi";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";

@@ -1,11 +1,20 @@
+import { useSession } from "@/server/auth-server";
+import { Session } from "start-authjs";
+
 const baseURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+// console.log(process.env);
+
+interface HeaderOptions {
+    cartId?: string | undefined;
+}
 
 type RequestOptions = RequestInit & {
-    params?: Record<string, string | number | unknown>;
+    params?: Record<string, string | number | boolean | null | undefined>;
+    headers?: HeaderOptions;
 };
 
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-    const token = "ksksksk"
+    const session = (await useSession()) as unknown as Session;
     const { params, ...restOptions } = options;
 
     const url = new URL(`/api${endpoint}`, baseURL);
@@ -21,8 +30,8 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
 
     const headers = {
         "Content-Type": "application/json",
-        "X-Auth": token ?? "token",
-        cartId: "",
+        "X-Auth": session?.accessToken ?? "",
+        // cartId: "",
         ...options.headers,
     };
 
@@ -31,16 +40,6 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         headers,
         credentials: "include",
     });
-
-    if (!response.ok) {
-        if (response.status === 401) {
-            // await signOut({ redirect: false });
-            // window.location.href = `/auth/signin?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
-        }
-        const error = await response.json();
-
-        throw new Error(error.detail || error.message || `API Error: ${response.statusText}`);
-    }
 
     return response.json();
 }

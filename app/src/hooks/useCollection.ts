@@ -1,24 +1,31 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-
-import { api } from "@/apis/client";
-import { Collection, PaginatedShared, Shared } from "@/schemas";
 import { CollectionFormValues } from "@/components/admin/collections/collection-form";
 import { SharedFormValues } from "@/components/admin/shared-collections/shared-form";
+import {
+    addProductToCatalogFn,
+    bulkAddProductsToCatalogFn,
+    createCatalogFn,
+    createCollectionFn,
+    deleteCatalogFn,
+    deleteCollectionFn,
+    getCatalogsFn,
+    getCollectionsFn,
+    removeProductFromCatalogFn,
+    updateCatalogFn,
+    updateCollectionFn,
+} from "@/server/collections.server";
 
 export const useCollections = (query?: string) => {
     return useQuery({
         queryKey: ["collections", query],
-        queryFn: async () => await api.get<Collection[]>("/collection/", { params: { query: query || "" } }),
+        queryFn: () => getCollectionsFn({ data: query }),
     });
 };
 
 export const useCreateCollection = () => {
     return useMutation({
-        mutationFn: async (data: CollectionFormValues) =>
-            await api.post<Collection>("/collection/", {
-                ...data,
-            }),
+        mutationFn: async (data: CollectionFormValues) => await createCollectionFn({ data }),
         onSuccess: () => {
             toast.success("Collection created successfully");
         },
@@ -30,7 +37,7 @@ export const useCreateCollection = () => {
 
 export const useUpdateCollection = () => {
     return useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: CollectionFormValues }) => await api.patch<Collection>(`/collection/${id}`, data),
+        mutationFn: async ({ id, data }: { id: number; data: CollectionFormValues }) => await updateCollectionFn({ data: { id, data } }),
         onSuccess: () => {
             toast.success("Collection updated successfully");
         },
@@ -42,7 +49,7 @@ export const useUpdateCollection = () => {
 
 export const useDeleteCollection = () => {
     return useMutation({
-        mutationFn: async (id: number) => await api.delete<Collection>(`/collection/${id}`),
+        mutationFn: async (id: number) => await deleteCollectionFn({ data: id }),
         onSuccess: () => {
             toast.success("Collection deleted successfully");
         },
@@ -53,21 +60,18 @@ export const useDeleteCollection = () => {
 };
 
 export const useCatalogs = (is_active?: boolean) => {
-    const session: any = null;
+    // const session: any = null;
 
     return useQuery({
         queryKey: ["catalog", is_active],
-        queryFn: async () => await api.get<PaginatedShared>("/shared/", { params: { is_active } }),
-        enabled: Boolean(session?.user?.isAdmin),
+        queryFn: () => getCatalogsFn({ data: is_active }),
+        // enabled: Boolean(session?.user?.isAdmin),
     });
 };
 
 export const useCreateCatalog = () => {
     return useMutation({
-        mutationFn: async (data: SharedFormValues) =>
-            await api.post<Shared>("/shared/", {
-                ...data,
-            }),
+        mutationFn: async (data: SharedFormValues) => await createCatalogFn({ data }),
         onSuccess: () => {
             toast.success("Shared collection created successfully");
         },
@@ -79,7 +83,7 @@ export const useCreateCatalog = () => {
 
 export const useUpdateCatalog = () => {
     return useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: SharedFormValues }) => await api.patch<Shared>(`/shared/${id}`, data),
+        mutationFn: async ({ id, data }: { id: number; data: SharedFormValues }) => await updateCatalogFn({ data: { id, data } }),
         onSuccess: () => {
             toast.success("Shared collection updated successfully");
         },
@@ -91,7 +95,7 @@ export const useUpdateCatalog = () => {
 
 export const useDeleteCatalog = () => {
     return useMutation({
-        mutationFn: async (id: number) => await api.delete<Shared>(`/shared/${id}`),
+        mutationFn: async (id: number) => await deleteCatalogFn({ data: id }),
         onSuccess: () => {
             toast.success("Shared collection deleted successfully");
         },
@@ -104,7 +108,7 @@ export const useDeleteCatalog = () => {
 export const useAddProductToCatalog = () => {
     return useMutation({
         mutationFn: async ({ collectionId, productId }: { collectionId: number; productId: number }) =>
-            await api.post<{ message: string }>(`/shared/${collectionId}/add-product/${productId}`),
+            await addProductToCatalogFn({ data: { collectionId, productId } }),
         onSuccess: () => {
             toast.success("Product added to collection successfully");
         },
@@ -117,7 +121,7 @@ export const useAddProductToCatalog = () => {
 export const useRemoveProductFromCatalog = () => {
     return useMutation({
         mutationFn: async ({ collectionId, productId }: { collectionId: number; productId: number }) =>
-            await api.delete<{ message: string }>(`/shared/${collectionId}/remove-product/${productId}`),
+            await removeProductFromCatalogFn({ data: { collectionId, productId } }),
         onSuccess: () => {
             toast.success("Product removed from collection successfully");
         },
@@ -130,7 +134,7 @@ export const useRemoveProductFromCatalog = () => {
 export const useBulkAddProductsToCatalog = () => {
     return useMutation({
         mutationFn: async ({ collectionId, productIds }: { collectionId: number; productIds: number[] }) =>
-            await api.post<{ message: string }>(`/shared/${collectionId}/add-products`, { product_ids: productIds }),
+            await bulkAddProductsToCatalogFn({ data: { collectionId, productIds } }),
         onError: (error) => {
             toast.error("Failed to add products to catalog: " + error);
         },

@@ -1,23 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { deleteCookie, setCookie } from "@/lib/util/cookie";
-import { Cart, CartComplete, CartUpdate, Order, Message } from "@/schemas";
-import { api } from "@/apis/client";
+import { Cart, CartComplete, CartUpdate } from "@/schemas";
 import { useNavigate } from "@tanstack/react-router";
+import { addToCartFn, completeCartFn, deleteCartItemFn, getCartFn, updateCartDetailsFn, updateCartQuantityFn } from "@/server/cart.server";
 
 export const useMyCart = () => {
     return useQuery({
         queryKey: ["cart"],
-        queryFn: async () => {
-            const res = await api.get<Cart>("/cart/");
-
-            if (res.cart_number) {
-                await setCookie("_cart_id", res.cart_number);
-            }
-
-            return res;
-        },
+        queryFn: () => getCartFn(),
     });
 };
 
@@ -25,15 +16,7 @@ export const useAddToCart = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ variant_id, quantity }: { variant_id: number; quantity: number }) => {
-            const res = await api.post<Cart>("/cart/items", { variant_id, quantity });
-
-            if (res.cart_number) {
-                await setCookie("_cart_id", res.cart_number);
-            }
-
-            return res;
-        },
+        mutationFn: async ({ variant_id, quantity }: { variant_id: number; quantity: number }) => await addToCartFn({ data: { variant_id, quantity } }),
         onMutate: async ({ variant_id, quantity }) => {
             await queryClient.cancelQueries({ queryKey: ["cart"] });
 
@@ -82,9 +65,7 @@ export const useChangeCartQuantity = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ item_id, quantity }: { item_id: number; quantity: number }) => {
-            return await api.put<Cart>(`/cart/items/${item_id}?quantity=${quantity}`);
-        },
+        mutationFn: async ({ item_id, quantity }: { item_id: number; quantity: number }) => await updateCartQuantityFn({ data: { item_id, quantity } }),
         onMutate: async ({ item_id, quantity }) => {
             await queryClient.cancelQueries({ queryKey: ["cart"] });
 
@@ -122,9 +103,7 @@ export const useUpdateCartDetails = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (update: CartUpdate) => {
-            return await api.put<Cart>("/cart/", update);
-        },
+        mutationFn: async (update: CartUpdate) => await updateCartDetailsFn({ data: update }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Cart details updated");
@@ -139,9 +118,7 @@ export const useDeleteCartItem = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (item_id: number) => {
-            return await api.delete<Message>(`/cart/items/${item_id}`);
-        },
+        mutationFn: async (item_id: number) => await deleteCartItemFn({ data: item_id }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Item removed from cart");
@@ -156,13 +133,8 @@ export const useCompleteCart = () => {
     const navigate = useNavigate();
 
     return useMutation({
-        mutationFn: async (complete: CartComplete) => {
-            const res = await api.post<Order>("/order/", complete);
-
-            return res;
-        },
+        mutationFn: async (complete: CartComplete) => await completeCartFn({ data: complete }),
         onSuccess: async (data) => {
-            await deleteCookie("_cart_id");
             navigate({ to: `/order/confirmed/${data?.order_number}` });
             toast.success("Order placed successfully");
         },
@@ -175,7 +147,7 @@ export const useCompleteCart = () => {
 export const useInvalidateCart = () => {
     const queryClient = useQueryClient();
 
-    deleteCookie("_cart_id");
+    // deleteCookie("_cart_id");
 
     const invalidate = () => {
         queryClient.removeQueries({ queryKey: ["cart"] });

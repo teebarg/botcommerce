@@ -1,10 +1,29 @@
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery, keepPreviousData } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { api } from "@/apis/client";
-import { Product, PaginatedProductSearch, Message, ProductVariant, ProductSearch } from "@/schemas";
-import { GetProductsFn } from "@/server/product.server";
+import { api } from "@/utils/fetch-api";
+import { PaginatedProductSearch } from "@/schemas";
+import {
+    bustCacheFn,
+    createProductFn,
+    createVariantFn,
+    deleteImagesFn,
+    deleteProductFn,
+    deleteVariantFn,
+    flushCacheFn,
+    getProductsFn,
+    productSearchFn,
+    recommendedProductsFn,
+    reIndexProductsFn,
+    reorderImagesFn,
+    similarProductsFn,
+    updateProductFn,
+    updateVariantFn,
+    uploadImageFn,
+    uploadImagesFn,
+} from "@/server/product.server";
 
+// Type definitions matching the Server Function inputs
 type SearchParams = {
     search?: string;
     categories?: string;
@@ -18,10 +37,35 @@ type SearchParams = {
     show_suggestions?: boolean;
 };
 
+type UpdateProductInput = { id: number; input: any };
+type CreateVariantInput = {
+    productId: number;
+    sku?: string;
+    price: number;
+    old_price?: number;
+    inventory: number;
+    size?: string;
+    color?: string;
+};
+type UpdateVariantInput = {
+    id: number;
+    price?: number;
+    old_price?: number;
+    inventory?: number;
+    status?: "IN_STOCK" | "OUT_OF_STOCK";
+    size?: string;
+    color?: string;
+    measurement?: number;
+    age?: string;
+};
+type UploadImageInput = { id: number; data: any };
+type DeleteImageInput = { id: number; imageId: number };
+type ReorderImagesInput = { id: number; imageIds: number[] };
+
 export const useProductSearch = (params: SearchParams) => {
     return useQuery({
         queryKey: ["products", "search", params],
-        queryFn: async () => await api.get<PaginatedProductSearch>("/product/", { params }),
+        queryFn: () => productSearchFn({ data: params }),
     });
 };
 
@@ -43,7 +87,7 @@ export const useProductInfiniteSearch = (params: SearchParams) => {
 export const useProductInfiniteSearch1 = (initialData: any, search?: any) => {
     return useInfiniteQuery({
         queryKey: ["products", "search", "infinite", JSON.stringify(search)],
-        queryFn: ({ pageParam = 0 }) => GetProductsFn({ data: { skip: pageParam, limit: 24, ...search } }),
+        queryFn: ({ pageParam = 0 }) => getProductsFn({ data: { skip: pageParam, limit: 24, ...search } }),
         getNextPageParam: (lastPage) => {
             const nextSkip = lastPage.skip + lastPage.limit;
             const hasMore = nextSkip < lastPage.total_count;
@@ -65,26 +109,27 @@ export const useProductInfiniteSearch1 = (initialData: any, search?: any) => {
 };
 
 export const useRecommendedProducts = (limit: number = 20) => {
-    const session: any = null;
+    // const session: any = null;
 
     return useQuery({
         queryKey: ["products", "recommended", limit],
-        queryFn: async () => await api.get<{ recommended: ProductSearch[] }>("/product/recommend", { params: { limit } }),
-        enabled: Boolean(session?.user),
+        queryFn: () => recommendedProductsFn({ data: { limit } }),
+        // queryFn: async () => await api.get<{ recommended: ProductSearch[] }>("/product/recommend", { params: { limit } }),
+        // enabled: Boolean(session?.user),
     });
 };
 
 export const useSimilarProducts = (productId: number, limit: number = 20) => {
     return useQuery({
         queryKey: ["products", "similar", productId, limit],
-        queryFn: async () => await api.get<{ similar: ProductSearch[] }>(`/product/${productId}/similar`, { params: { limit } }),
+        queryFn: () => similarProductsFn({ data: { productId, limit } }),
         enabled: !!productId,
     });
 };
 
 export const useCreateProduct = () => {
     return useMutation({
-        mutationFn: async (input: any) => await api.post<Product>("/product", input),
+        mutationFn: async (input: any) => await createProductFn({ data: input }),
         onSuccess: () => {
             toast.success("Product created");
         },
@@ -96,7 +141,7 @@ export const useCreateProduct = () => {
 
 export const useUpdateProduct = () => {
     return useMutation({
-        mutationFn: async ({ id, input }: { id: number; input: any }) => await api.put<Product>(`/product/${id}`, input),
+        mutationFn: async ({ id, input }: UpdateProductInput) => await updateProductFn({ data: { id, input } }),
         onSuccess: () => {
             toast.success("Product updated");
         },
@@ -108,7 +153,7 @@ export const useUpdateProduct = () => {
 
 export const useDeleteProduct = () => {
     return useMutation({
-        mutationFn: async (id: number) => await api.delete<Message>(`/product/${id}`),
+        mutationFn: async (id: number) => await deleteProductFn({ data: id }),
         onSuccess: () => {
             toast.success("Product deleted");
         },
@@ -120,19 +165,7 @@ export const useDeleteProduct = () => {
 
 export const useCreateVariant = () => {
     return useMutation({
-        mutationFn: async (input: {
-            productId: number;
-            sku?: string;
-            price: number;
-            old_price?: number;
-            inventory: number;
-            size?: string;
-            color?: string;
-        }) => {
-            const { productId, ...variantData } = input;
-
-            return await api.post<ProductVariant>(`/product/${productId}/variants`, variantData);
-        },
+        mutationFn: async (input: CreateVariantInput) => await createVariantFn({ data: input }),
         onSuccess: () => {
             toast.success("Variant created");
         },
@@ -144,21 +177,7 @@ export const useCreateVariant = () => {
 
 export const useUpdateVariant = (showToast = true) => {
     return useMutation({
-        mutationFn: async (input: {
-            id: number;
-            price?: number;
-            old_price?: number;
-            inventory?: number;
-            status?: "IN_STOCK" | "OUT_OF_STOCK";
-            size?: string;
-            color?: string;
-            measurement?: number;
-            age?: string;
-        }) => {
-            const { id, ...variantData } = input;
-
-            return await api.put<ProductVariant>(`/product/variants/${id}`, variantData);
-        },
+        mutationFn: async (input: UpdateVariantInput) => await updateVariantFn({ data: input }),
         onSuccess: () => {
             showToast && toast.success("Variant updated");
         },
@@ -170,7 +189,7 @@ export const useUpdateVariant = (showToast = true) => {
 
 export const useDeleteVariant = () => {
     return useMutation({
-        mutationFn: async (id: number) => await api.delete<Message>(`/product/variants/${id}`),
+        mutationFn: async (id: number) => await deleteVariantFn({ data: id }),
         onSuccess: () => {
             toast.success("Variant deleted");
         },
@@ -182,7 +201,7 @@ export const useDeleteVariant = () => {
 
 export const useReIndexProducts = () => {
     return useMutation({
-        mutationFn: async () => await api.post<Message>(`/product/reindex`),
+        mutationFn: async () => await reIndexProductsFn({}),
         onSuccess: () => {
             toast.success("Products re-indexed successfully");
         },
@@ -194,7 +213,7 @@ export const useReIndexProducts = () => {
 
 export const useUploadImage = () => {
     return useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: any }) => await api.patch<Message>(`/product/${id}/image`, data),
+        mutationFn: async ({ id, data }: UploadImageInput) => await uploadImageFn({ data: { id, data } }),
         onSuccess: () => {
             toast.success("Image uploaded successfully");
         },
@@ -206,7 +225,7 @@ export const useUploadImage = () => {
 
 export const useUploadImages = () => {
     return useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: any }) => await api.post<Message>(`/product/${id}/images`, data),
+        mutationFn: async ({ id, data }: UploadImageInput) => await uploadImagesFn({ data: { id, data } }),
         onSuccess: () => {
             toast.success("Images uploaded successfully");
         },
@@ -218,7 +237,7 @@ export const useUploadImages = () => {
 
 export const useDeleteImages = () => {
     return useMutation({
-        mutationFn: async ({ id, imageId }: { id: number; imageId: number }) => await api.delete<Message>(`/product/${id}/images/${imageId}`),
+        mutationFn: async ({ id, imageId }: DeleteImageInput) => await deleteImagesFn({ data: { id, imageId } }),
         onSuccess: () => {
             toast.success("Image deleted successfully");
         },
@@ -230,8 +249,7 @@ export const useDeleteImages = () => {
 
 export const useReorderImages = () => {
     return useMutation({
-        mutationFn: async ({ id, imageIds }: { id: number; imageIds: number[] }) =>
-            await api.patch<Message>(`/product/${id}/images/reorder`, imageIds),
+        mutationFn: async ({ id, imageIds }: ReorderImagesInput) => await reorderImagesFn({ data: { id, imageIds } }),
         onSuccess: () => {
             toast.success("Images reordered successfully");
         },
@@ -245,7 +263,7 @@ export const useBustCache = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async () => await api.post<Message>("/cache/bust", { pattern: "products" }),
+        mutationFn: async () => await bustCacheFn({}),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] });
             toast.success("Cache busted successfully");
@@ -260,7 +278,7 @@ export const useFlushCache = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async () => await api.post<Message>("/cache/clear", {}),
+        mutationFn: async () => await flushCacheFn({}),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] });
             toast.success("Cache cleared successfully");

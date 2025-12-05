@@ -1,14 +1,11 @@
-"use client";
-
 import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
-
-import { api } from "@/apis/client";
 import { Button } from "@/components/ui/button";
 import { Message } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
+import { api } from "@/utils/fetch-api";
 
 interface ProductImageManagerProps {
     categoryId: number;

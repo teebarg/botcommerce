@@ -1,5 +1,3 @@
-// import { setCookie } from "@tanstack/react-start/server";
-// import type { Profile } from "@auth/core/types";
 import type { StartAuthJSConfig } from "start-authjs";
 import Google from "@auth/core/providers/google";
 import { UpstashRedisAdapter } from "@auth/upstash-redis-adapter";
@@ -7,8 +5,8 @@ import { Redis } from "@upstash/redis";
 import { SignJWT } from "jose";
 
 import { tryCatch } from "@/lib/try-catch";
-import { serverApi } from "@/apis/server-client";
 import type { User, Address, Role, Status, Message } from "@/schemas";
+import { api } from "./fetch-api";
 
 const redis = new Redis({
     url: process.env.UPSTASH_REDIS_URL!,
@@ -73,21 +71,6 @@ declare module "@auth/core/types" {
     }
 }
 
-// declare module "@auth/core/types" {
-//     export interface Session {
-//         user: {
-//             name: string;
-//             email: string;
-//             sub: string;
-//             email_verified: boolean;
-//         } & Profile;
-//         account: {
-//             access_token: string;
-//         };
-//         expires: Date;
-//     }
-// }
-
 export const authConfig: StartAuthJSConfig = {
     secret: process.env.AUTH_SECRET,
     adapter: UpstashRedisAdapter(redis),
@@ -109,7 +92,7 @@ export const authConfig: StartAuthJSConfig = {
             type: "email",
             maxAge: 60 * 60 * 24 * 30 * 12,
             async sendVerificationRequest({ identifier: email, url }) {
-                const { error } = await tryCatch<Message>(serverApi.post("/auth/send-magic-link", { email, url }));
+                const { error } = await tryCatch<Message>(api.post("/auth/send-magic-link", { email, url }));
                 if (error) throw new Error(error);
             },
         },
@@ -121,7 +104,7 @@ export const authConfig: StartAuthJSConfig = {
             async profile(profile, tokens) {
                 // Sync user with your backend
                 await tryCatch(
-                    serverApi.post<Message>("/auth/sync-user", {
+                    api.post<Message>("/auth/sync-user", {
                         email: profile.email!,
                         first_name: profile.given_name ?? "",
                         last_name: profile.family_name ?? "",
@@ -136,7 +119,7 @@ export const authConfig: StartAuthJSConfig = {
         async jwt({ token, user, account, profile, trigger, session }) {
             // IMPERSONATION
             if (trigger === "update" && session?.mode === "impersonate") {
-                const { data } = await tryCatch<User>(serverApi.get(`/users/get-user?email=${session.email}`));
+                const { data } = await tryCatch<User>(api.get(`/users/get-user?email=${session.email}`));
 
                 if (data) {
                     token.user = data;
@@ -150,7 +133,7 @@ export const authConfig: StartAuthJSConfig = {
 
             // ON SSO LOGIN
             if (account?.provider === "google") {
-                const { data } = await tryCatch<User>(serverApi.get(`/users/get-user?email=${token.email}`));
+                const { data } = await tryCatch<User>(api.get(`/users/get-user?email=${token.email}`));
                 if (data) {
                     token.user = data;
                     token.accessToken = await generateJoseToken(data.email);

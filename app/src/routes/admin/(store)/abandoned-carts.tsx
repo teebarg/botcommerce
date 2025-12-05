@@ -8,34 +8,68 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AbandonedCartCard } from "@/components/admin/abandoned-carts/card";
 import { Cart } from "@/schemas";
-import { useAbandonedCarts, useAbandonedCartStats, useSendCartReminders } from "@/hooks/useAbandonedCart";
-import ComponentLoader from "@/components/component-loader";
+import { useSendCartReminders } from "@/hooks/useAbandonedCart";
 import PaginationUI from "@/components/pagination";
 import { AbandonedCartStats } from "@/components/admin/abandoned-carts/stat";
+import { getAbandonedCartsFn, getAbandonedCartStatsFn } from "@/server/cart.server";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 const LIMIT = 20;
 
+interface AbandonedCartParams {
+    search?: string;
+    hours_threshold?: number;
+    skip?: number;
+    limit?: number;
+}
+
+const abandonedCartStatsQueryOptions = (limit: number) => ({
+    queryKey: ["abandoned-carts", "stats", JSON.stringify({ limit })],
+    queryFn: () => getAbandonedCartStatsFn({ data: limit }),
+});
+
+const abandonedCartsQueryOptions = (params: AbandonedCartParams) => ({
+    queryKey: ["abandoned-carts", JSON.stringify(params)],
+    queryFn: () => getAbandonedCartsFn({ data: params }),
+});
+
 export const Route = createFileRoute("/admin/(store)/abandoned-carts")({
+    loader: async ({ context: { queryClient } }) => {
+        await queryClient.ensureQueryData(abandonedCartStatsQueryOptions(24));
+        await queryClient.ensureQueryData(
+            abandonedCartsQueryOptions({
+                hours_threshold: 24,
+                limit: LIMIT,
+            })
+        );
+    },
     component: RouteComponent,
 });
 
 function RouteComponent() {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [timeFilter, setTimeFilter] = useState<string>("24");
+    const { data: stats } = useSuspenseQuery(abandonedCartStatsQueryOptions(parseInt(timeFilter)));
+    const { data: abandonedCartsData } = useSuspenseQuery(
+        abandonedCartsQueryOptions({
+            hours_threshold: parseInt(timeFilter),
+            limit: LIMIT,
+        })
+    );
 
-    const searchParams: any = null;
+    // const searchParams: any = null;
     const { mutate: sendReminders, isPending: sendRemindersLoading } = useSendCartReminders();
 
-    const { data: stats, isLoading: statsLoading } = useAbandonedCartStats({
-        hours_threshold: parseInt(timeFilter),
-    });
+    // const { data: stats, isLoading: statsLoading } = useAbandonedCartStats({
+    //     hours_threshold: parseInt(timeFilter),
+    // });
 
-    const { data: abandonedCartsData, isLoading: abandonedCartsLoading } = useAbandonedCarts({
-        search: searchQuery || undefined,
-        hours_threshold: parseInt(timeFilter),
-        skip: Number(searchParams.get("skip")) || 0,
-        limit: LIMIT,
-    });
+    // const { data: abandonedCartsData, isLoading: abandonedCartsLoading } = useAbandonedCarts({
+    //     search: searchQuery || undefined,
+    //     hours_threshold: parseInt(timeFilter),
+    //     skip: Number(searchParams.get("skip")) || 0,
+    //     limit: LIMIT,
+    // });
 
     const { carts: allCarts, ...pagination } = abandonedCartsData ?? {
         carts: [],
@@ -88,30 +122,26 @@ function RouteComponent() {
                     </div>
                 </div>
             </div>
-            {abandonedCartsLoading || statsLoading ? (
-                <ComponentLoader className="h-100" />
-            ) : (
-                <div className="container mx-auto px-6 py-8">
-                    {stats && <AbandonedCartStats stat={stats} />}
+            <div className="container mx-auto px-6 py-8">
+                {stats && <AbandonedCartStats stat={stats} />}
 
-                    <div className="mt-4 space-y-4">
-                        {allCarts.length > 0 ? (
-                            allCarts.map((cart: Cart) => <AbandonedCartCard key={cart.id} cart={cart} />)
-                        ) : (
-                            <Card>
-                                <CardContent className="py-12 text-center">
-                                    <p className="text-muted-foreground">No converted carts found, adjust the time range or search query</p>
-                                </CardContent>
-                            </Card>
-                        )}
-                    </div>
-                    {pagination.total_pages > 1 && (
-                        <div className="mt-8">
-                            <PaginationUI pagination={pagination} />
-                        </div>
+                <div className="mt-4 space-y-4">
+                    {allCarts.length > 0 ? (
+                        allCarts.map((cart: Cart) => <AbandonedCartCard key={cart.id} cart={cart} />)
+                    ) : (
+                        <Card>
+                            <CardContent className="py-12 text-center">
+                                <p className="text-muted-foreground">No converted carts found, adjust the time range or search query</p>
+                            </CardContent>
+                        </Card>
                     )}
                 </div>
-            )}
+                {pagination.total_pages > 1 && (
+                    <div className="mt-8">
+                        <PaginationUI pagination={pagination} />
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

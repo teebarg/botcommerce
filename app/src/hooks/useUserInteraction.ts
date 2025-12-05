@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { api } from "@/apis/client";
+import { api } from "@/utils/fetch-api";
 
 export type UserInteractionType = "VIEW" | "PURCHASE" | "CART_ADD" | "WISHLIST_ADD" | "WISHLIST_REMOVE";
 

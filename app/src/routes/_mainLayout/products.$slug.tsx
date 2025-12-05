@@ -9,7 +9,7 @@ import SuspenseQuery from "@/utils/query";
 import { getProductReviewFn } from "@/server/review.server";
 import { PaginatedReview, ProductSearch } from "@/schemas";
 import ProductView from "@/components/store/products/product-view";
-import { useOrders } from "@/hooks/useOrder";
+import { ordersQueryOptions } from "@/hooks/useOrder";
 import { seo } from "@/utils/seo";
 import { getSiteConfig } from "@/lib/config";
 import { ArrowUpRight, TriangleAlert } from "lucide-react";
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/_mainLayout/products/$slug")({
 
         queryClient.prefetchQuery(reviewsQueryOptions(data.id));
         queryClient.prefetchQuery(relatedProductsQueryOptions(data.id, 4));
-        queryClient.prefetchQuery(useOrders({}));
+        queryClient.prefetchQuery(ordersQueryOptions({}));
 
         const siteConfig = getSiteConfig();
         return {

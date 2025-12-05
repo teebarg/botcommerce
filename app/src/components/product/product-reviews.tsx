@@ -2,10 +2,7 @@ import React from "react";
 
 import { ProductReviewsZeroState } from "../store/reviews/review-zero";
 import { ReviewsList } from "../store/reviews/reviews-list";
-
-import ComponentLoader from "@/components/component-loader";
-import { useOrders, useOrders2 } from "@/hooks/useOrder";
-// import { useReviews } from "@/hooks/useReview";
+import { ordersQueryOptions } from "@/hooks/useOrder";
 import { PaginatedReview } from "@/schemas";
 import { getRouteApi } from "@tanstack/react-router";
 import { Session } from "start-authjs";
@@ -18,15 +15,8 @@ interface Prop {
 }
 
 const ReviewsSection: React.FC<Prop> = ({ product_id, productName, paginatedReviews }) => {
-    // const session: any = null;
     const routeApi = getRouteApi("/_mainLayout/products/$slug");
-    // const searchParams: any = null;
-    // const skip = parseInt(searchParams.get("skip") || "0", 10);
-    // const sort = searchParams.get("sort") || "newest";
-
-    // const { data, isLoading } = useReviews({ product_id, limit: 5 });
-    // const { data: orders, isLoading: ordersLoading } = useOrders2({});
-    const { data: orders } = useSuspenseQuery(useOrders({}));
+    const { data: orders } = useSuspenseQuery(ordersQueryOptions({}));
 
     const context = routeApi.useRouteContext();
     const session = context.session as unknown as Session;

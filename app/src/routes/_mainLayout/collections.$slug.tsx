@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import ServerError from "@/components/generic/server-error";
 import { tryCatch } from "@/lib/try-catch";
-import { GetProductsFn } from "@/server/product.server";
+import { getProductsFn } from "@/server/product.server";
 import z from "zod";
 import { getCollectionFn } from "@/server/collections.server";
 import { getSiteConfig } from "@/lib/config";
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/_mainLayout/collections/$slug")({
         const { data: collection } = await tryCatch(getCollectionFn({ data: slug }));
         const siteConfig = getSiteConfig();
 
-        const { data, error } = await tryCatch(GetProductsFn({ data: { limit: 36, collections: collection?.slug, ...context.search } }));
+        const { data, error } = await tryCatch(getProductsFn({ data: { limit: 36, collections: collection?.slug, ...context.search } }));
         return {
             collection,
             data,

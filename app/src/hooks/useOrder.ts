@@ -1,9 +1,7 @@
 import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-
-import { api } from "@/apis/client";
-import { Order, OrderStatus, PaymentStatus } from "@/schemas";
-import { getOrderFn, getOrdersFn } from "@/server/order.server";
+import { changeOrderStatusFn, changePaymentStatusFn, getOrderFn, getOrdersFn, getOrderTimelineFn, returnOrderItemFn } from "@/server/order.server";
+import type { OrderStatus, PaymentStatus } from "@/schemas";
 
 interface OrderSearchParams {
     order_number?: string;
@@ -14,35 +12,37 @@ interface OrderSearchParams {
     sort?: string;
 }
 
-export const useOrders = (searchParams: OrderSearchParams) =>
+export const ordersQueryOptions = (searchParams: OrderSearchParams) =>
     queryOptions({
         queryKey: ["orders", JSON.stringify(searchParams)],
         queryFn: () => getOrdersFn({ data: { ...searchParams } }),
     });
 
+export const useOrders = (searchParams: OrderSearchParams) => {
+    // const { data: session } = useSession();
+
+    return useQuery({
+        queryKey: ["orders", JSON.stringify(searchParams)],
+        queryFn: () => getOrdersFn({ data: searchParams }),
+        // enabled: Boolean(session?.user),
+    });
+};
 
 export const orderQueryOptions = (orderNumber: string) => ({
     queryKey: ["order", orderNumber],
     queryFn: () => getOrderFn({ data: orderNumber }),
 });
 
-export const useOrders2 = (searchParams: OrderSearchParams) => {
-    return useQuery({
-        queryKey: ["orders", JSON.stringify(searchParams)],
-        queryFn: () => getOrdersFn({ data: { ...searchParams } }),
-    });
-};
-
 export const useOrder = (orderNumber: string) => {
     return useQuery({
         queryKey: ["order", orderNumber],
-        queryFn: async () => await api.get<Order>(`/order/${orderNumber}`),
+        queryFn: () => getOrderFn({ data: orderNumber }),
     });
 };
 
 export const useChangeOrderStatus = () => {
     return useMutation({
-        mutationFn: async ({ id, status }: { id: number; status: OrderStatus }) => await api.patch<Order>(`/order/${id}/status?status=${status}`),
+        mutationFn: async ({ id, status }: { id: number; status: OrderStatus }) => await changeOrderStatusFn({ data: { id, status } }),
         onSuccess: () => {
             toast.success("Successfully changed order status");
         },
@@ -54,7 +54,7 @@ export const useChangeOrderStatus = () => {
 
 export const useChangePaymentStatus = () => {
     return useMutation({
-        mutationFn: async ({ id, status }: { id: number; status: PaymentStatus }) => await api.patch<Order>(`/payment/${id}/status?status=${status}`),
+        mutationFn: async ({ id, status }: { id: number; status: PaymentStatus }) => await changePaymentStatusFn({ data: { id, status } }),
         onSuccess: () => {
             toast.success("Successful!", {
                 description: "Payment status changed successfully",
@@ -81,14 +81,13 @@ export const useOrderTimeline = (orderId?: number) => {
     return useQuery({
         queryKey: ["order-timeline", orderId?.toString()],
         enabled: !!orderId,
-        queryFn: async () => await api.get<OrderTimelineEntry[]>(`/order/${orderId}/timeline`),
+        queryFn: () => getOrderTimelineFn({ data: orderId! }),
     });
 };
 
 export const useReturnOrderItem = () => {
     return useMutation({
-        mutationFn: async ({ orderId, itemId }: { orderId: number; itemId: number }) =>
-            await api.post<Order>(`/order/${orderId}/return`, { item_id: itemId }),
+        mutationFn: async ({ orderId, itemId }: { orderId: number; itemId: number }) => await returnOrderItemFn({ data: { orderId, itemId } }),
         onSuccess: () => {
             toast.success("Item returned. Inventory updated and totals recalculated.");
         },

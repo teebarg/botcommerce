@@ -7,7 +7,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { authApi } from "@/apis/auth";
 import { useInvalidateMe } from "@/hooks/useUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { deleteCookie } from "@/lib/util/cookie";
@@ -19,7 +18,7 @@ export default function UserDropDown({ user }: { user: UserSession }) {
     const invalidateCart = useInvalidateCart();
     const handleLogout = () => {
         deleteCookie("_cart_id");
-        authApi.logOut().catch(() => {});
+        // authApi.logOut().catch(() => {});
 
         invalidate();
         invalidateCart();

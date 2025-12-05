@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect, useMemo, useState } from "react";
 
 import { useAddToCart, useChangeCartQuantity } from "./useCart";

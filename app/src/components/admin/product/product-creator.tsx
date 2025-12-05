@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { Product, ProductVariant } from "@/schemas";
-import { api } from "@/apis/client";
+import { api } from "@/utils/fetch-api";
 import { useNavigate } from "@tanstack/react-router";
 
 export interface ProductImage {

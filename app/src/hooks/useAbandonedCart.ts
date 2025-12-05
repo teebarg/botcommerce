@@ -1,8 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-
-import { api } from "@/apis/client";
-import { Cart } from "@/schemas";
+import { getAbandonedCartsFn, getAbandonedCartStatsFn, sendCartReminderFn, sendCartRemindersFn } from "@/server/cart.server";
 
 interface AbandonedCartParams {
     search?: string;
@@ -15,51 +13,23 @@ interface AbandonedCartStatsParams {
     hours_threshold?: number;
 }
 
-interface AbandonedCartStats {
-    active_count: number;
-    abandoned_count: number;
-    converted_count: number;
-    potential_revenue: number;
-}
-
-interface AbandonedCartResponse {
-    carts: Cart[];
-    skip: number;
-    limit: number;
-    total_count: number;
-    total_pages: number;
-}
-
 export const useAbandonedCarts = (params: AbandonedCartParams = {}) => {
     return useQuery({
         queryKey: ["abandoned-carts", params],
-        queryFn: async () => {
-            return await api.get<AbandonedCartResponse>("/cart/abandoned-carts", {
-                params: {
-                    search: params.search,
-                    hours_threshold: params.hours_threshold || 24,
-                    skip: params.skip || 0,
-                    limit: params.limit || 20,
-                },
-            });
-        },
+        queryFn: () => getAbandonedCartsFn({ data: params }),
     });
 };
 
 export const useAbandonedCartStats = (params: AbandonedCartStatsParams = {}) => {
     return useQuery({
         queryKey: ["abandoned-carts", "stats", params],
-        queryFn: async () => {
-            return await api.get<AbandonedCartStats>(`/cart/abandoned-carts/stats?hours_threshold=${params.hours_threshold}`);
-        },
+        queryFn: async () => await getAbandonedCartStatsFn({ data: params.hours_threshold! }),
     });
 };
 
 export const useSendCartReminder = () => {
     return useMutation({
-        mutationFn: async (cartId: number) => {
-            return await api.post(`/cart/abandoned-carts/${cartId}/send-reminder`);
-        },
+        mutationFn: async (cartId: number) => await sendCartReminderFn({ data: { cartId } }),
         onSuccess: () => {
             toast.success("Recovery email sent");
         },
@@ -71,12 +41,8 @@ export const useSendCartReminder = () => {
 
 export const useSendCartReminders = () => {
     return useMutation({
-        mutationFn: async ({ hours_threshold, limit = 20 }: { hours_threshold: number; limit?: number }) => {
-            return await api.post(`/cart/abandoned-carts/send-reminders`, {
-                hours_threshold,
-                limit,
-            });
-        },
+        mutationFn: async ({ hours_threshold, limit = 20 }: { hours_threshold: number; limit?: number }) =>
+            await sendCartRemindersFn({ data: { hours_threshold, limit } }),
         onSuccess: () => {
             toast.success("Recovery email sent");
         },

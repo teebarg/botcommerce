@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { tryCatch } from "@/lib/try-catch";
 import { Message } from "@/schemas";
-import { api } from "@/apis/client";
+import { api } from "@/utils/fetch-api";
 import { useStoreSettings } from "@/providers/store-provider";
 
 export const Route = createFileRoute("/_mainLayout/bulk")({

@@ -1,24 +1,40 @@
 import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import {
+    bulkDeleteGalleryImagesFn,
+    bulkProductUpdateFn,
+    bulkUploadImagesFn,
+    createImageMetadataFn,
+    deleteGalleryImageFn,
+    getGalleryImagesFn,
+    reIndexGalleryFn,
+    updateImageMetadataFn,
+} from "@/server/gallery.server";
+import { Catalog, GalleryImage, GalleryImageItem } from "@/schemas";
 
-import { api } from "@/apis/client";
-import { GalleryImageItem, Message } from "@/schemas";
+type ImageMetadataInput = { imageId: number; input: any };
+type BulkDeleteInput = { imageIds: number[] };
+type BulkUpdateInput = { imageIds: number[]; input: any };
+type BulkUploadInput = { urls: string[] };
 
-export const useImageGalleryInfinite = (pageSize: number = 20) => {
+interface PaginatedGalleryResponse {
+    images: GalleryImageItem[];
+    next_cursor: number | null;
+}
+
+export const useImageGalleryInfinite = (pageSize: number = 20, initial: PaginatedGalleryResponse) => {
     return useInfiniteQuery({
         queryKey: ["gallery"],
-        queryFn: async ({ pageParam }: { pageParam: number | null }) =>
-            await api.get<{ images: GalleryImageItem[]; next_cursor: number | null }>("/gallery/", {
-                params: { cursor: pageParam, limit: pageSize },
-            }),
+        queryFn: ({ pageParam = 0 }) => getGalleryImagesFn({ data: { cursor: pageParam, limit: pageSize } }),
         getNextPageParam: (lastPage) => lastPage.next_cursor,
         initialPageParam: null as number | null,
+        initialData: { pages: [initial], pageParams: [0] },
     });
 };
 
 export const useCreateImageMetadata = () => {
     return useMutation({
-        mutationFn: async ({ imageId, input }: { imageId: number; input: any }) => await api.post<Message>(`/gallery/${imageId}/metadata`, input),
+        mutationFn: async (payload: ImageMetadataInput) => await createImageMetadataFn({ data: payload }),
         onSuccess: () => {
             toast.success("Image metadata created");
         },
@@ -30,7 +46,7 @@ export const useCreateImageMetadata = () => {
 
 export const useUpdateImageMetadata = () => {
     return useMutation({
-        mutationFn: async ({ imageId, input }: { imageId: number; input: any }) => await api.patch<Message>(`/gallery/${imageId}/metadata`, input),
+        mutationFn: async (payload: ImageMetadataInput) => await updateImageMetadataFn({ data: payload }),
         onSuccess: () => {
             toast.success("Image metadata updated");
         },
@@ -42,7 +58,7 @@ export const useUpdateImageMetadata = () => {
 
 export const useReIndexGallery = () => {
     return useMutation({
-        mutationFn: async () => await api.post<Message>(`/gallery/reindex`),
+        mutationFn: async () => await reIndexGalleryFn({}),
         onSuccess: () => {
             toast.success("Gallery re-indexed successfully");
         },
@@ -54,7 +70,7 @@ export const useReIndexGallery = () => {
 
 export const useDeleteGalleryImage = () => {
     return useMutation({
-        mutationFn: async ({ id }: { id: number }) => await api.delete<Message>(`/gallery/${id}`),
+        mutationFn: async ({ id }: { id: number }) => await deleteGalleryImageFn({ data: { id } }),
         onSuccess: () => {
             toast.success("Image deleted successfully");
         },
@@ -66,7 +82,7 @@ export const useDeleteGalleryImage = () => {
 
 export const useBulkDeleteGalleryImages = () => {
     return useMutation({
-        mutationFn: async ({ imageIds }: { imageIds: number[] }) => await api.post<Message>(`/gallery/bulk-delete`, { files: imageIds }),
+        mutationFn: async ({ imageIds }: { imageIds: number[] }) => await bulkDeleteGalleryImagesFn({ data: { imageIds } }),
         onSuccess: () => {
             toast.success("Bulk delete successfully");
         },
@@ -78,8 +94,7 @@ export const useBulkDeleteGalleryImages = () => {
 
 export const useBulkProductUpdate = () => {
     return useMutation({
-        mutationFn: async ({ imageIds, input }: { imageIds: number[]; input: any }) =>
-            await api.patch<Message>("/gallery/bulk-update", { image_ids: imageIds, data: input }),
+        mutationFn: async (payload: BulkUpdateInput) => await bulkProductUpdateFn({ data: payload }),
         onSuccess: () => {
             toast.success("Bulk metadata updated successfully");
         },
@@ -91,7 +106,7 @@ export const useBulkProductUpdate = () => {
 
 export const useBulkUploadImages = () => {
     return useMutation({
-        mutationFn: async ({ urls }: { urls: string[] }) => await api.post<Message>("/gallery/bulk-upload", { urls }),
+        mutationFn: async (payload: BulkUploadInput) => await bulkUploadImagesFn({ data: payload }),
         onSuccess: () => {
             toast.success("Bulk image URLs saved successfully");
         },

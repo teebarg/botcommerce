@@ -4,7 +4,6 @@ import { CreditCard, Heart, Home, LayoutGrid, User2, User as UserIcon } from "lu
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
-import { authApi } from "@/apis/auth";
 import { useInvalidateMe } from "@/hooks/useUser";
 import { useLocation } from "@tanstack/react-router";
 import { ThemeToggle } from "./theme-toggle";
@@ -32,7 +31,7 @@ const Menu: React.FC = () => {
     const session: any = null
     const invalidate = useInvalidateMe();
     const handleLogout = async () => {
-        await authApi.logOut();
+        // await authApi.logOut();
         // await signOut();
         invalidate();
         window.location.href = "/";

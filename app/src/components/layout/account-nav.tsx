@@ -1,10 +1,7 @@
-"use client";
-
 import { MapPin, Package, User } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
-import { authApi } from "@/apis/auth";
 import { useInvalidateMe } from "@/hooks/useUser";
 
 const AccountNav = () => {
@@ -12,7 +9,7 @@ const AccountNav = () => {
     const invalidate = useInvalidateMe();
 
     const handleLogout = async () => {
-        await authApi.logOut();
+        // await authApi.logOut();
         // await signOut();
         invalidate();
         window.location.href = "/";

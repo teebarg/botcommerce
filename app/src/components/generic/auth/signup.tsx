@@ -11,7 +11,6 @@ import SocialLoginButtons from "@/components/generic/auth/social-login-buttons";
 import { useStoreSettings } from "@/providers/store-provider";
 import { Separator } from "@/components/ui/separator";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { authApi } from "@/apis/auth";
 import { Eye, EyeOff } from "lucide-react";
 
 const signUpSchema = z.object({
@@ -44,14 +43,14 @@ const SignUpForm: React.FC<Props> = () => {
 
     const onSubmit = async (values: SignUpFormValues) => {
         setIsPending(true);
-        const { error } = await authApi.signUp(values);
+        // const { error } = await authApi.signUp(values);
 
         setIsPending(false);
-        if (error) {
-            toast.error(error || "Sign up failed");
+        // if (error) {
+        //     toast.error(error || "Sign up failed");
 
-            return;
-        }
+        //     return;
+        // }
         toast.success("Please check your email to verify your account");
         window.location.href = "/";
     };

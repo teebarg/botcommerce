@@ -1,12 +1,10 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import { Send, Paperclip, Minus, X } from "lucide-react";
 import { toast } from "sonner";
 
 import ChatBody from "./chatbody";
 
-import { api } from "@/apis/client";
+import { api } from "@/utils/fetch-api";
 import { ChatMessage } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
 import { useChatMutation } from "@/hooks/useApi";

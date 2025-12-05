@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState } from "react";
 import { Save } from "lucide-react";
 import { toast } from "sonner";
@@ -11,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Order } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
-import { api } from "@/apis/client";
+import { api } from "@/utils/fetch-api";
 
 interface OrderNotesProp {
     order: Order;

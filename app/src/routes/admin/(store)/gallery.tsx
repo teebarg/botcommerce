@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { LayoutDashboard, RectangleVertical } from "lucide-react";
+import { LayoutDashboard, Loader, RectangleVertical } from "lucide-react";
 
 import { GalleryCard } from "@/components/admin/product/product-gallery-card";
 import { ProductBulkActions } from "@/components/admin/product/gallery-bulk-action";
@@ -12,33 +12,35 @@ import ComponentLoader from "@/components/component-loader";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { GalleryImageItem } from "@/schemas";
-import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useWebSocket } from "pulsews";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { getGalleryImagesFn } from "@/server/gallery.server";
+import { InfiniteScroll } from "@/components/InfiniteScroll";
+
+const galleryInfiniteQueryOptions = (limit: number) => ({
+    queryKey: ["gallery", JSON.stringify({ limit })],
+    queryFn: () => getGalleryImagesFn({ data: { limit } }),
+});
 
 export const Route = createFileRoute("/admin/(store)/gallery")({
+    loader: async ({ context: { queryClient } }) => {
+        await queryClient.ensureQueryData(galleryInfiniteQueryOptions(32));
+    },
     component: RouteComponent,
 });
 
 function RouteComponent() {
+    const { data: initialImages } = useSuspenseQuery(galleryInfiniteQueryOptions(32));
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
-    const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(32);
+    const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(32, initialImages);
     const images = data?.pages?.flatMap((p: any) => p.images) || [];
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { lastMessage } = useWebSocket();
     const { mutateAsync: bulkDeleteImages, isPending: isDeleting } = useBulkDeleteGalleryImages();
     const { mutateAsync: reIndexGallery, isPending: isReIndexing } = useReIndexGallery();
-
-    const { lastElementRef } = useInfiniteScroll({
-        onLoadMore: () => {
-            if (hasNextPage && !isFetchingNextPage) {
-                fetchNextPage();
-            }
-        },
-        disabled: isFetchingNextPage,
-    });
 
     const selectedProductIds = useMemo(() => {
         const ids = new Set<number>();
@@ -150,24 +152,37 @@ function RouteComponent() {
                             </Button>
                         </div>
                     </div>
-                    <div
-                        className={cn(
-                            "mb-8 w-full grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 lg:gap-4",
-                            viewMode === "grid" ? "" : "grid-cols-1"
-                        )}
-                    >
-                        {images.map((img: GalleryImageItem, idx: number) => (
-                            <GalleryCard
-                                key={idx}
-                                image={img}
-                                isSelected={selectedImages.has(img.id)}
-                                selectionMode={selectionMode}
-                                onSelectionChange={handleSelectionChange}
-                            />
-                        ))}
-                        {hasNextPage && <div ref={lastElementRef} className="h-10" />}
-                    </div>
-                    {isFetchingNextPage && <ComponentLoader />}
+                    {!isLoading && images.length > 0 && (
+                        <InfiniteScroll
+                            onLoadMore={fetchNextPage}
+                            hasMore={!!hasNextPage}
+                            isLoading={isFetchingNextPage}
+                            loader={
+                                <div className="flex flex-col items-center justify-center text-blue-600">
+                                    <Loader className="h-8 w-8 animate-spin mb-2" />
+                                    <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
+                                </div>
+                            }
+                            endMessage={<div className="text-center py-8 text-muted-foreground">You've viewed all products</div>}
+                        >
+                            <div
+                                className={cn(
+                                    "mb-8 w-full grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 lg:gap-4",
+                                    viewMode === "grid" ? "" : "grid-cols-1"
+                                )}
+                            >
+                                {images.map((img: GalleryImageItem, idx: number) => (
+                                    <GalleryCard
+                                        key={idx}
+                                        image={img}
+                                        isSelected={selectedImages.has(img.id)}
+                                        selectionMode={selectionMode}
+                                        onSelectionChange={handleSelectionChange}
+                                    />
+                                ))}
+                            </div>
+                        </InfiniteScroll>
+                    )}
                     {selectedImages.size > 0 && (
                         <ProductBulkActions
                             isLoading={isDeleting}

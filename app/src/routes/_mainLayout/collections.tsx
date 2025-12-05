@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import ServerError from "@/components/generic/server-error";
 import { tryCatch } from "@/lib/try-catch";
-import { GetProductsFn } from "@/server/product.server";
+import { getProductsFn } from "@/server/product.server";
 import z from "zod";
 
 const productSearchSchema = z.object({
@@ -21,7 +21,6 @@ export const Route = createFileRoute("/_mainLayout/collections")({
     validateSearch: productSearchSchema,
     component: CollectionsPage,
     beforeLoad: ({ search }) => {
-        console.log("🚀 ~ file: index.tsx:24 ~ search:", search);
         return {
             search,
         };
@@ -32,7 +31,7 @@ export const Route = createFileRoute("/_mainLayout/collections")({
         // console.log("🚀 ~ file: index.tsx:30 ~ location:", location)
         // console.log("🚀 ~ file: index.tsx:12 ~ context:", context);
 
-        const { data, error } = await tryCatch(GetProductsFn({ data: { limit: 36, ...context.search } }));
+        const { data, error } = await tryCatch(getProductsFn({ data: { limit: 36, ...context.search } }));
         return {
             data,
             error,

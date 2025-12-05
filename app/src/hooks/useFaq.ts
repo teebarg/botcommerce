@@ -1,16 +1,13 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-
 import { useInvalidate } from "./useApi";
-
-import { api } from "@/apis/client";
-import { FAQ, Message } from "@/schemas";
 import { FaqFormValues } from "@/components/admin/faq/faq-form";
+import { createFaqFn, deleteFaqFn, getFaqsFn, updateFaqFn } from "@/server/faq.server";
 
 export const useFaqs = () => {
     return useQuery({
         queryKey: ["faqs"],
-        queryFn: async () => await api.get<FAQ[]>("/faq/"),
+        queryFn: () => getFaqsFn(),
     });
 };
 
@@ -18,10 +15,7 @@ export const useCreateFaq = () => {
     const invalidate = useInvalidate();
 
     return useMutation({
-        mutationFn: async (data: FaqFormValues) =>
-            await api.post<Message>("/faq", {
-                ...data,
-            }),
+        mutationFn: async (data: FaqFormValues) => await createFaqFn({ data }),
         onSuccess: () => {
             invalidate("faqs");
             toast.success("FAQ created successfully");
@@ -36,7 +30,7 @@ export const useUpdateFaq = () => {
     const invalidate = useInvalidate();
 
     return useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: FaqFormValues }) => await api.patch<Message>(`/faq/${id}`, data),
+        mutationFn: async ({ id, data }: { id: number; data: FaqFormValues }) => await updateFaqFn({ data: { id, data } }),
         onSuccess: () => {
             invalidate("faqs");
             toast.success("FAQ updated successfully");
@@ -51,7 +45,7 @@ export const useDeleteFaq = () => {
     const invalidate = useInvalidate();
 
     return useMutation({
-        mutationFn: async (id: number) => await api.delete<FAQ>(`/faq/${id}`),
+        mutationFn: async (id: number) => await deleteFaqFn({ data: id }),
         onSuccess: () => {
             invalidate("faqs");
             toast.success("FAQ deleted successfully");

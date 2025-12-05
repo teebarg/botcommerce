@@ -5,7 +5,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import { api } from "@/apis/client";
+import { api } from "@/utils/fetch-api";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { BankDetailsSchema } from "@/schemas/common";
