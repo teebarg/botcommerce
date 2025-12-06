@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Clock, Search, TrendingUp, X } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import { useOverlayTriggerState } from "react-stately";
@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { useProductSearch } from "@/hooks/useProduct";
 import { Separator } from "@/components/ui/separator";
 import LocalizedClientLink from "@/components/ui/link";
-import { useRouter } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 
 interface SearchDialogProps {
     initialQuery?: string;
@@ -21,7 +21,7 @@ interface SearchDialogProps {
 
 export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder = "Search for products..." }: SearchDialogProps) => {
     const searchState = useOverlayTriggerState({});
-    const router = useRouter();
+    const navigate = useNavigate();
     const [query, setQuery] = useState(initialQuery);
     const [debouncedQuery] = useDebounce(query, searchDelay);
     const [recentSearches, setRecentSearches] = useState<string[]>([]);
@@ -47,7 +47,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
 
     const handleSuggestionClick = (suggestion: string) => {
         searchState.close();
-        router.push(`/search/${suggestion}`);
+        navigate({ to: `/search/${suggestion}` });
     };
 
     const hasResults = query.trim() && !!data?.products?.length;

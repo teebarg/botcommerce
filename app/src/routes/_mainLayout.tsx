@@ -2,7 +2,7 @@ import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 import { BackButton } from "@/components/back";
 import ChatBotWrapper from "@/components/generic/chatbot";
-import Cookie from "@/components/store/cookie";
+import Cookie from "@/components/store/cookie-consent";
 import Footer from "@/components/layout/footer";
 import StoreNavbar from "@/components/layout/store-nav";
 import ButtonNav from "@/components/layout/bottom-navbar";

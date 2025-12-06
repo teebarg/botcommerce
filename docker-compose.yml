@@ -43,6 +43,7 @@ services:
     volumes:
       - ./app/src:/app/src
       - ./app/public:/app/public
+      - ./app/vite.config.ts:/app/vite.config.ts
       - /app/node_modules
     environment:
       - NODE_ENV=development
@@ -54,12 +55,13 @@ services:
       - traefik.enable=true
       - traefik.docker.network=traefik-public
       - traefik.constraint-label=traefik-public
-      # Frontend Router
-      - traefik.http.services.app-frontend.loadbalancer.server.port=5173
-      - traefik.http.routers.app-frontend-http.rule=Host(`app.localhost`)
-      - traefik.http.routers.app-frontend-http.entrypoints=http
-      - traefik.http.routers.app-frontend-http.service=app-frontend
-    command: ["pnpm", "dev"]
+
+      - traefik.http.services.shop-app.loadbalancer.server.port=5173
+      
+      - traefik.http.routers.shop-app-http.rule=Host(`app.localhost`)
+      - traefik.http.routers.shop-app-http.entrypoints=http
+      # - traefik.http.routers.shop-app-http.service=shop-app
+    command: ["pnpm", "dev", "--host", "0.0.0.0"]
     networks:
       - traefik-public
       - default

@@ -6,7 +6,11 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
     server: {
-        port: 5174,
+        port: 5173,
+        watch: {
+            usePolling: true,
+            interval: 1000,
+        },
     },
     plugins: [
         tailwindcss(),

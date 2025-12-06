@@ -11,7 +11,8 @@
     ],
     "type": "module",
     "scripts": {
-        "dev": "vite dev",
+        "dev-debug": "echo 'Debug mode - container will stay alive' && tail -f /dev/null",
+        "dev": "vite dev --host 0.0.0.0",
         "build": "vite build",
         "start": "node .output/server/index.mjs",
         "lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix",

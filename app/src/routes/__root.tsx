@@ -25,6 +25,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { categoriesQuery } from "@/hooks/useCategories";
 import { collectionsQuery } from "@/hooks/useCollection";
 import { useRef } from "react";
+import { getSiteConfig } from "@/lib/config";
 
 interface RouterContext {
     session: AuthSession | null;
@@ -38,24 +39,34 @@ const fetchSession = createServerFn({ method: "GET" }).handler(async () => {
 });
 
 export const Route = createRootRouteWithContext<RouterContext>()({
-    head: () => ({
-        meta: [
-            { charSet: "utf-8" },
-            { name: "viewport", content: "width=device-width, initial-scale=1" },
-            { name: "apple-mobile-web-app-capable", content: "yes" },
-            { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-            ...seo({
-                title: "AI Knowledge Search",
-                description: `AI Knowledge Search is a type-safe, client-first, full-stack React framework. `,
-            }),
-        ],
-        links: [
-            { rel: "stylesheet", href: appCss },
-            { rel: "icon", href: "/favicon-32x32.png", type: "image/png" },
-            { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
-            { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
-        ],
-    }),
+    head: () => {
+        const baseUrl = import.meta.env.VITE_BASE_URL;
+        // const title = loaderData?.siteConfig?.name;
+        const title = "Title";
+        const description = "Special description";
+
+        return {
+            meta: [
+                { charSet: "utf-8" },
+                { name: "viewport", content: "width=device-width, initial-scale=1" },
+                { name: "apple-mobile-web-app-capable", content: "yes" },
+                { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+                ...seo({
+                    title,
+                    description,
+                    url: `${baseUrl}}`,
+                    image: "/default-og.png",
+                    name: title,
+                }),
+            ],
+            links: [
+                { rel: "stylesheet", href: appCss },
+                { rel: "icon", href: "/favicon-32x32.png", type: "image/png" },
+                { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+                { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+            ],
+        };
+    },
     beforeLoad: async ({}) => {
         const session = (await fetchSession()) as unknown as Session;
         const _storedTheme = await getStoredTheme();
