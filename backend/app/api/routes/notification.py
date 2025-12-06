@@ -35,7 +35,22 @@ async def create_push_event(data: PushEventSchema):
 async def push_fcm(data: FCMIn):
     await redis_client.xadd("FCM", jsonable_encoder(data, exclude_none=True))
     try:
-        await db.pushsubscription.create(data={**data.model_dump()})
+        await db.pushsubscription.upsert(
+            where={
+                'endpoint': data.endpoint
+            },
+            data={
+                "create": {
+                    'p256dh': data.p256dh,
+                    'auth': data.auth,
+                    'endpoint': data.endpoint
+                },
+                "update": {
+                    'p256dh': data.p256dh,
+                    'auth': data.auth,
+                }
+            }
+        )
     except Exception as e:
         logger.error(f"Failed to create subs: {str(e)}")
         raise Exception(f"Database error: {str(e)}")

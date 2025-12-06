@@ -1,0 +1,84 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { Users, UserCheck, Eye, TrendingUp } from "lucide-react";
+
+import UserCounter from "@/components/admin/online/UserCounter";
+import UserAvatar from "@/components/admin/online/UserAvatar";
+import ActivityIndicator from "@/components/admin/online/ActivityIndicator";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useWebSocket } from "pulsews";
+
+interface Session {
+    id: string;
+    type: string;
+    email?: string;
+    path: string;
+    location: string;
+    last_seen: number;
+    name: string;
+}
+
+export const Route = createFileRoute("/admin/(admin)/online")({
+    component: RouteComponent,
+});
+
+function RouteComponent() {
+    const [sessions, setSessions] = useState<Session[]>([]);
+    const { lastMessage } = useWebSocket();
+
+    useEffect(() => {
+        if (lastMessage?.type === "online-users") {
+            setSessions(lastMessage.users);
+        }
+    }, [lastMessage]);
+
+    const total = sessions.length;
+    const loggedIn = sessions.filter((s) => s.type === "user").length;
+    const guests = total - loggedIn;
+    const active = sessions.filter((s) => s.last_seen <= 60).length;
+    return (
+        <div className="container mx-auto px-4 py-8">
+            <div className="text-center mb-8">
+                <h1 className="text-3xl font-bold">Online Users</h1>
+                <p className="text-muted-foreground">Real-time user activity monitoring</p>
+            </div>
+            <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <UserCounter color="blue" count={total} icon={<Users className="h-5 w-5" />} label="Total Online" trend="+12%" />
+                    <UserCounter color="green" count={loggedIn} icon={<UserCheck className="h-5 w-5" />} label="Logged In" trend="+8%" />
+                    <UserCounter color="purple" count={guests} icon={<Eye className="h-5 w-5" />} label="Visitors" trend="+15%" />
+                    <UserCounter color="orange" count={active} icon={<TrendingUp className="h-5 w-5" />} label="Active Now" trend="+5%" />
+                </div>
+
+                <Card className="shadow-lg border-0 bg-card">
+                    <CardHeader className="pb-4">
+                        <CardTitle className="text-xl font-semibold flex items-center gap-2">
+                            <ActivityIndicator />
+                            Live User Activity
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-3 max-h-96 overflow-y-auto">
+                            {sessions.map((user: Session, idx: number) => (
+                                <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-secondary">
+                                    <div className="flex items-center gap-3">
+                                        <UserAvatar user={user} />
+                                        <div>
+                                            <div className="font-medium">{user.email !== "Unknown" ? user.email : "Anonymous Visitor"}</div>
+                                            <div className="text-sm text-muted-foreground">Viewing: {user.path}</div>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-xs text-muted-foreground">{user.location}</div>
+                                        <div className="text-xs text-muted-foreground">{user.last_seen}s ago</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+    );
+}

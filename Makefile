@@ -80,13 +80,18 @@ serve-backend:
 serve-frontend:
 	@cd frontend; npm run dev-https
 
+
+.PHONY: serve-app
+serve-app:
+	@cd app; pnpm dev
+
 .PHONY: sync
 sync:
 	@cd backend; uv sync && source .venv/bin/activate
 
 .PHONY: dev
 dev:
-	make -j 2 serve-backend serve-frontend
+	make -j 2 serve-backend serve-app
 
 .PHONY: deploy
 deploy:
