@@ -12,18 +12,21 @@ import Overlay from "@/components/overlay";
 import { Confirm } from "@/components/generic/confirm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useInvalidateCart } from "@/hooks/useCart";
-import { deleteCookie } from "@/lib/util/cookie";
+import { updateAuthSession } from "@/utils/auth-client";
+import { useRouteContext, useRouter } from "@tanstack/react-router";
 
 interface CustomerActionsProps {
     user: User;
 }
 
 const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
+    const { session } = useRouteContext({
+        strict: false,
+    });
     const { mutateAsync } = useDeleteUser();
+    const router = useRouter();
     const editState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
-    // const { data: session, update } = useSession();
-    const session: any = null
     const invalidateMe = useInvalidateMe();
     const invalidateCart = useInvalidateCart();
 
@@ -33,19 +36,29 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
         });
     };
 
-    const handleImpersonation = async () => {
-        deleteCookie("_cart_id");
-        await update({ impersonatedBy: session?.user?.email!, email: user.email, impersonated: true, mode: "impersonate" });
-        invalidateMe();
-        invalidateCart();
-        toast.success("Impersonated");
-        window.location.reload();
+    const handleImpersonate = async () => {
+        try {
+            await updateAuthSession({
+                email: user?.email!,
+                mode: "impersonate",
+                impersonated: true,
+                impersonatedBy: session?.user?.email,
+            });
+            invalidateMe();
+            invalidateCart();
+
+            toast.success("Impersonated");
+            await router.invalidate();
+            await router.navigate({ to: "/" });
+        } catch (err) {
+            console.error("Impersonation failed", err);
+        }
     };
 
     return (
         <div className="flex">
             {user.role !== "ADMIN" && (
-                <Button size="icon" title="Impersonate" variant="ghost" onClick={handleImpersonation}>
+                <Button size="icon" title="Impersonate" variant="ghost" onClick={handleImpersonate}>
                     <Eye className="h-5 w-5" />
                 </Button>
             )}

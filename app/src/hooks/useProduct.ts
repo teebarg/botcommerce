@@ -69,22 +69,7 @@ export const useProductSearch = (params: SearchParams) => {
     });
 };
 
-export const useProductInfiniteSearch = (params: SearchParams) => {
-    return useInfiniteQuery({
-        queryKey: ["products", "search", "infinite", params],
-        queryFn: async ({ pageParam = 0 }) =>
-            await api.get<PaginatedProductSearch>("/product/", { params: { skip: pageParam, limit: 24, ...params } }),
-        getNextPageParam: (lastPage: PaginatedProductSearch) => {
-            const nextSkip = lastPage.skip + lastPage.limit;
-            const hasMore = nextSkip < lastPage.total_count;
-
-            return hasMore ? nextSkip : undefined;
-        },
-        initialPageParam: 0,
-    });
-};
-
-export const useProductInfiniteSearch1 = (initialData: any, search?: any) => {
+export const useProductInfiniteSearch = (initialData: PaginatedProductSearch, search?: SearchParams) => {
     return useInfiniteQuery({
         queryKey: ["products", "search", "infinite", JSON.stringify(search)],
         queryFn: ({ pageParam = 0 }) => getProductsFn({ data: { skip: pageParam, limit: 24, ...search } }),
@@ -108,14 +93,11 @@ export const useProductInfiniteSearch1 = (initialData: any, search?: any) => {
     });
 };
 
-export const useRecommendedProducts = (limit: number = 20) => {
-    // const session: any = null;
-
+export const useRecommendedProducts = (limit: number = 20, enabled: boolean = true) => {
     return useQuery({
         queryKey: ["products", "recommended", limit],
         queryFn: () => recommendedProductsFn({ data: { limit } }),
-        // queryFn: async () => await api.get<{ recommended: ProductSearch[] }>("/product/recommend", { params: { limit } }),
-        // enabled: Boolean(session?.user),
+        enabled: enabled,
     });
 };
 

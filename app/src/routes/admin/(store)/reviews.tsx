@@ -7,29 +7,41 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { timeAgo } from "@/lib/utils";
 import PaginationUI from "@/components/pagination";
-import { useReviews } from "@/hooks/useReview";
-import ServerError from "@/components/generic/server-error";
-import ComponentLoader from "@/components/component-loader";
 import { ReviewActions } from "@/components/admin/reviews/reviews-actions";
 import ReviewItem from "@/components/admin/reviews/review-item";
+import z from "zod";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { getReviewsFn } from "@/server/review.server";
+
+type ReviewsParams = {
+    product_id?: number;
+    skip?: number;
+    limit?: number;
+    sort?: string;
+};
+
+const useReviewsQuery = (params: ReviewsParams) =>
+    queryOptions({
+        queryKey: ["reviews", JSON.stringify(params)],
+        queryFn: () => getReviewsFn({ data: params }),
+    });
 
 export const Route = createFileRoute("/admin/(store)/reviews")({
+    validateSearch: z.object({
+        product_id: z.number().optional(),
+        skip: z.number().optional(),
+        sort: z.string().optional(),
+    }),
+    loaderDeps: ({ search: { product_id, skip, sort } }) => ({ product_id, skip, sort }),
+    loader: async ({ context, deps: { product_id, skip, sort } }) => {
+        await context.queryClient.ensureQueryData(useReviewsQuery({ product_id, skip, sort, limit: 20 }));
+    },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const searchParams: any = null;
-    const skip = parseInt(searchParams.get("skip") || "0", 10);
-
-    const { data, isLoading, error } = useReviews({ skip, limit: 20 });
-
-    if (isLoading) {
-        return <ComponentLoader className="h-[80vh]" />;
-    }
-
-    if (error) {
-        return <ServerError />;
-    }
+    const search = Route.useSearch();
+    const { data } = useSuspenseQuery(useReviewsQuery({ ...search }));
 
     if (!data) {
         return <div className="px-2 md:px-12 py-48">No reviews found</div>;

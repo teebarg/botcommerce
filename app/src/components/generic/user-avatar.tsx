@@ -1,20 +1,8 @@
-"use client";
-
-import { useEffect, useState } from "react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useRouteContext } from "@tanstack/react-router";
 
 export function UserAvatar() {
-    const session: any = null;
-    const [hasMounted, setHasMounted] = useState<boolean>(false);
-
-    useEffect(() => {
-        setHasMounted(true);
-    }, []);
-
-    if (!hasMounted) {
-        return null;
-    }
+    const { session } = useRouteContext({ strict: false });
 
     return (
         <Avatar className="h-8 w-8 cursor-pointer">

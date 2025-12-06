@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useCallback } from "react";
 
 import DeliveryStep from "./delivery-step";
@@ -10,6 +8,7 @@ import CheckoutStepIndicator from "./checkout-step-indicator";
 import CheckoutLoginPrompt from "@/components/generic/auth/checkout-auth-prompt";
 import { Cart } from "@/schemas";
 import { cn } from "@/lib/utils";
+import { useRouteContext } from "@tanstack/react-router";
 
 export type CheckoutStep = "auth" | "delivery" | "address" | "payment";
 
@@ -19,7 +18,7 @@ interface CheckoutFlowProps {
 }
 
 const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose, cart }) => {
-    const session: any = null;
+    const { session } = useRouteContext({ strict: false });
     const [currentStep, setCurrentStep] = useState<CheckoutStep>("auth");
 
     const getStep = () => {

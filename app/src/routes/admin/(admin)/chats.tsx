@@ -7,33 +7,42 @@ import ChatsActions from "@/components/admin/chats/chats-actions";
 import ChatsCard from "@/components/admin/chats/chats-card";
 
 import { Chat, ConversationStatus } from "@/schemas";
-import { useChats } from "@/hooks/useApi";
-import ComponentLoader from "@/components/component-loader";
 import PaginationUI from "@/components/pagination";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { getChatsFn } from "@/server/generic.server";
+import z from "zod";
 
 const LIMIT = 20;
 
+interface ConversationParams {
+    user_id?: number;
+    status?: ConversationStatus;
+    skip?: number;
+    limit?: number;
+}
+
+const useChatsQuery = (searchParams: ConversationParams) =>
+    queryOptions({
+        queryKey: ["chats"],
+        queryFn: () => getChatsFn({ data: searchParams }),
+    });
+
 export const Route = createFileRoute("/admin/(admin)/chats")({
+    validateSearch: z.object({
+        skip: z.number().optional(),
+        status: z.enum(["ACTIVE", "COMPLETED", "ABANDONED"]).optional(),
+    }),
+    loaderDeps: ({ search: { skip, status } }) => ({ skip, status }),
+    loader: async ({ context, deps: { skip, status } }) => {
+        await context.queryClient.ensureQueryData(useChatsQuery({ skip, status, limit: LIMIT }));
+    },
     component: RouteComponent,
 });
 
 function RouteComponent() {
     const [filterOpen, setFilterOpen] = useState<boolean>(false);
-
-    const searchParams: any = null;
-
-    const page = Number(searchParams.get("page")) || 1;
-    const status: ConversationStatus = searchParams.get("status") as ConversationStatus;
-
-    const filters = {
-        status,
-    };
-
-    const { data, isLoading } = useChats({
-        skip: (page - 1) * LIMIT,
-        limit: LIMIT,
-        ...filters,
-    });
+    const search = Route.useSearch();
+    const { data } = useSuspenseQuery(useChatsQuery({ ...search }));
 
     const { chats, ...pagination } = data ?? { skip: 0, limit: 0, total_pages: 0, total_count: 0 };
 
@@ -45,11 +54,9 @@ function RouteComponent() {
                 <div className="pb-4">
                     <div>
                         <div>
-                            {isLoading ? (
-                                <ComponentLoader className="h-[calc(100vh-200px)]" />
-                            ) : (
-                                chats?.map((chat: Chat, idx: number) => <ChatsCard key={idx} actions={<ChatsActions chat={chat} />} chat={chat} />)
-                            )}
+                            {chats?.map((chat: Chat, idx: number) => (
+                                <ChatsCard key={idx} actions={<ChatsActions chat={chat} />} chat={chat} />
+                            ))}
                         </div>
 
                         {chats?.length === 0 && (

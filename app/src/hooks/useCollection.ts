@@ -15,6 +15,7 @@ import {
     updateCatalogFn,
     updateCollectionFn,
 } from "@/server/collections.server";
+import { useRouteContext } from "@tanstack/react-router";
 
 // export const useCollections = (query?: string) => {
 //     return useQuery({
@@ -68,12 +69,12 @@ export const useDeleteCollection = () => {
 };
 
 export const useCatalogs = (is_active?: boolean) => {
-    // const session: any = null;
+    const { session } = useRouteContext({ strict: false });
 
     return useQuery({
         queryKey: ["catalog", is_active],
         queryFn: () => getCatalogsFn({ data: is_active }),
-        // enabled: Boolean(session?.user?.isAdmin),
+        enabled: Boolean(session?.user?.isAdmin),
     });
 };
 

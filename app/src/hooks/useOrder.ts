@@ -10,6 +10,8 @@ interface OrderSearchParams {
     take?: number;
     customer_id?: number;
     sort?: string;
+    start_date?: string;
+    end_date?: string;
 }
 
 export const ordersQueryOptions = (searchParams: OrderSearchParams) =>

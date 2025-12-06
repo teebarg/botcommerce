@@ -8,20 +8,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { useSearch } from "@tanstack/react-router";
 
 interface OrderFiltersProps {}
 
 const OrderFilters: React.FC<OrderFiltersProps> = () => {
     const { updateQuery } = useUpdateQuery(200);
-    const searchParams:any = null;
+    const search = useSearch({ strict: false });
 
     const [filters, setFilters] = useState({
         status: "",
         search: "",
     });
     const [dateRange, setDateRange] = useState<DateRange | undefined>();
-
-    const status = searchParams.get("status") || "";
 
     const updateStatusQuery = (status?: OrderStatus) => {
         updateQuery([{ key: "status", value: status ?? "" }]);
@@ -105,7 +104,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = () => {
                     <button
                         key={idx}
                         className={`px-3 py-1.5 text-sm rounded-full whitespace-nowrap ${
-                            status === item.status ? item.color + " text-white" : "bg-gray-200 text-gray-700"
+                            search.status === item.status ? item.color + " text-white" : "bg-gray-200 text-gray-700"
                         }`}
                         onClick={() => updateStatusQuery(item.status as OrderStatus)}
                     >

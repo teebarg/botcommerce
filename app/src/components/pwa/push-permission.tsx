@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Gift, X } from "lucide-react";
-
-import { Message } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
 import { Button } from "@/components/ui/button";
-import { api } from "@/utils/fetch-api";
+import { sendFCMFn } from "@/server/generic.server";
 
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
 const CHECK_INTERVAL = 60 * 60 * 1000; // Check every hour
@@ -122,7 +120,7 @@ export default function PushPermission() {
             auth: sub.toJSON().keys?.auth || "",
         };
 
-        const { error } = await tryCatch(api.post<Message>("/notification/push-fcm", subscriptionData));
+        const { error } = await tryCatch(sendFCMFn({ data: subscriptionData }));
 
         if (error) {
             toast.error(error);

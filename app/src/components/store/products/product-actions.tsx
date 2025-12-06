@@ -5,13 +5,14 @@ import { ProductSearch } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useProductVariant } from "@/hooks/useProductVariant";
 import { UserInteractionType, useTrackUserInteraction } from "@/hooks/useUserInteraction";
+import { useRouteContext } from "@tanstack/react-router";
 
 const ProductActions: React.FC<{
     product: ProductSearch;
 }> = ({ product }) => {
     const { selectedVariant, handleAddToCart, handleWhatsAppPurchase, loading, outOfStock, isAdded } = useProductVariant(product);
 
-    const session: any = null;
+    const { session } = useRouteContext({ strict: false });
     const trackInteraction = useTrackUserInteraction();
 
     const handleAddToCartAndTrack = (e: React.MouseEvent) => {

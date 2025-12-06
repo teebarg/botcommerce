@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 
@@ -7,7 +5,7 @@ import { ProductQuery } from "./product-query";
 
 import { Badge } from "@/components/ui/badge";
 import { ProductActions } from "@/components/admin/product/product-actions";
-import { Collection, ProductSearch, ProductVariant } from "@/schemas/product";
+import { Collection, PaginatedProductSearch, ProductSearch, ProductVariant } from "@/schemas/product";
 import { Button } from "@/components/ui/button";
 import { useProductInfiniteSearch } from "@/hooks/useProduct";
 import { useCollections } from "@/hooks/useCollection";
@@ -25,7 +23,7 @@ export function ProductDetails() {
     const searchParams: any = null;
     const query = searchParams.get("search") || "";
 
-    const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useProductInfiniteSearch({
+    const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useProductInfiniteSearch({} as PaginatedProductSearch, {
         search: query,
         skip: 0,
         limit: LIMIT,
@@ -59,11 +57,11 @@ export function ProductDetails() {
     const products = data.pages.flatMap((page) => page.products);
 
     const handleManageCollections = () => {
-        navigate({to: "/admin/collections"});
+        navigate({ to: "/admin/collections" });
     };
 
     const handleManageCategories = () => {
-        navigate({to: "/admin/categories"});
+        navigate({ to: "/admin/categories" });
     };
 
     const getStatus = (variants: ProductVariant[] | undefined | null) => {

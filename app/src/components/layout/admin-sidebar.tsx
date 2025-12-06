@@ -19,7 +19,7 @@ import {
     ShoppingCart,
     Tag,
 } from "lucide-react";
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useLocation, useRouteContext } from "@tanstack/react-router";
 
 import {
     Sidebar,
@@ -37,6 +37,7 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/generic/user-avatar";
+import LocalizedClientLink from "../ui/link";
 
 const AdminItems = [
     {
@@ -138,9 +139,9 @@ const storeItems = [
 ];
 
 export function AdminSidebar() {
-    const session: any = null;
+    const { session } = useRouteContext({ strict: false });
     const { toggleSidebar, state } = useSidebar();
-    const location = useLocation;
+    const location = useLocation();
     const path = location.pathname;
 
     return (
@@ -234,11 +235,11 @@ export function AdminSidebar() {
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
-                                    <Link to="/settings">Settings</Link>
+                                    <LocalizedClientLink href="/admin/settings">Settings</LocalizedClientLink>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem className="text-red-600 cursor-pointer">
                                     <LogOut className="h-4 w-4 mr-2" />
-                                    <Link to="/api/auth/signout">Sign out</Link>
+                                    <LocalizedClientLink href="/api/auth/signout">Sign out</LocalizedClientLink>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>

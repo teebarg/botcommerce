@@ -1,5 +1,3 @@
-"use client";
-
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -15,7 +13,7 @@ import { useContactForm } from "@/hooks/useGeneric";
 
 const contactFormSchema = z.object({
     name: z.string().min(1, "Name is required"),
-    email: z.email("Please enter a valid email address"),
+    email: z.email(),
     phone: z.string().optional(),
     subject: z.string().optional(),
     message: z.string().min(1, "Message is required"),

@@ -5,13 +5,15 @@ import { ProductSearch } from "@/schemas/product";
 import { useRecommendedProducts } from "@/hooks/useProduct";
 import ComponentLoader from "@/components/component-loader";
 import ServerError from "@/components/generic/server-error";
+import { useRouteContext } from "@tanstack/react-router";
 
 type RecommendedProductsProps = {
     exclude?: number[];
 };
 
 export default function RecommendedProducts({ exclude = [] }: RecommendedProductsProps) {
-    const { data, isLoading, error } = useRecommendedProducts(12);
+    const { session } = useRouteContext({ strict: false });
+    const { data, isLoading, error } = useRecommendedProducts(12, Boolean(session?.user));
 
     if (error) {
         return <ServerError error={error.message} scenario="recommended-products" stack={error.stack} />;

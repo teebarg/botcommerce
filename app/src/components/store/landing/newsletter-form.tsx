@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Mail, CheckCircle } from "lucide-react";
 import { z } from "zod";
@@ -13,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { useSubscribeNewsletter } from "@/hooks/useGeneric";
 
 const newsletterSchema = z.object({
-    email: z.email("Please enter a valid email address"),
+    email: z.email(),
 });
 
 type NewsletterFormValues = z.infer<typeof newsletterSchema>;

@@ -1,5 +1,3 @@
-"use client";
-
 import { Clock, Mail, Package, MapPin } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 

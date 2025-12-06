@@ -1,14 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ContactFormValues } from "@/components/store/contact-form";
-import { contactFormFn, getShopSettingsFn, getShopSettingsPublicFn, subscribeNewsletterFn, syncShopDetailsFn } from "@/server/generic.server";
-
-export const useShopSettings = () => {
-    return useQuery({
-        queryKey: ["shop-settings"],
-        queryFn: () => getShopSettingsFn(),
-    });
-};
+import { contactFormFn, getShopSettingsPublicFn, subscribeNewsletterFn, syncShopDetailsFn } from "@/server/generic.server";
 
 export const useShopSettingsPublic = () => {
     return useQuery({
@@ -21,7 +14,7 @@ export const useSyncShopDetails = () => {
     return useMutation({
         mutationFn: async (input: Record<string, string>) => await syncShopDetailsFn({ data: input }),
         onSuccess: () => {
-            toast.success("Shop details synced successfully");
+            toast.success("Shop details synced successfully"); 
         },
         onError: (error) => {
             toast.error("Failed to sync shop details" + error.message);

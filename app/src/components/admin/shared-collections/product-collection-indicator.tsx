@@ -1,17 +1,16 @@
-"use client";
-
 import React from "react";
 import { Check } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { useCatalogs } from "@/hooks/useCollection";
+import { useRouteContext } from "@tanstack/react-router";
 
 interface ProductCollectionIndicatorProps {
     product: { id: number; name: string; [key: string]: any };
 }
 
 export const ProductCollectionIndicator: React.FC<ProductCollectionIndicatorProps> = ({ product }) => {
-    const session: any = null;
+    const { session } = useRouteContext({ strict: false });
     const { data } = useCatalogs();
 
     if (!session?.user?.isAdmin) {

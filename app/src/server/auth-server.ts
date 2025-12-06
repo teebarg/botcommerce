@@ -5,7 +5,7 @@ import { authConfig } from "@/utils/auth";
 import { getSession } from "start-authjs";
 
 export const credentialsSchema = z.object({
-    email: z.email("Please enter a valid email address"),
+    email: z.email(),
     password: z.string().min(6, "Password must be at least 6 characters"),
 });
 

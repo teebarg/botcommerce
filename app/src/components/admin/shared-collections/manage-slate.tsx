@@ -12,13 +12,14 @@ import { useAddProductToCatalog, useRemoveProductFromCatalog, useCatalogs } from
 import ComponentLoader from "@/components/component-loader";
 import { DBCatalog, GalleryProduct } from "@/schemas";
 import Overlay from "@/components/overlay";
+import { useRouteContext } from "@tanstack/react-router";
 
 interface ManageSlateProps {
     product: GalleryProduct;
 }
 
 export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
-    const session: any = null;
+    const { session } = useRouteContext({ strict: false });
     const state = useOverlayTriggerState({});
     const { data, isLoading } = useCatalogs(true);
 

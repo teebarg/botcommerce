@@ -1,14 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { ConversationStatus } from "@/schemas";
-import { chatMutationFn, deleteChatFn, getAdminDeliveryOptionsFn, getBankDetailsFn, getChatsFn, getDeliveryOptionsFn } from "@/server/generic.server";
-
-interface ConversationParams {
-    user_id?: number;
-    status?: ConversationStatus;
-    skip?: number;
-    limit?: number;
-}
+import { chatMutationFn, deleteChatFn, getAdminDeliveryOptionsFn, getBankDetailsFn, getDeliveryOptionsFn } from "@/server/generic.server";
+import { useRouteContext } from "@tanstack/react-router";
 
 export const useBankDetails = () => {
     return useQuery({
@@ -18,7 +11,7 @@ export const useBankDetails = () => {
 };
 
 export const useChatMutation = () => {
-    const session: any = null;
+    const { session } = useRouteContext({ strict: false });
 
     return useMutation({
         mutationFn: async (message: string) => {
@@ -34,13 +27,6 @@ export const useChatMutation = () => {
         onError: (error) => {
             toast.error("Failed to chat" + error);
         },
-    });
-};
-
-export const useChats = (searchParams: ConversationParams) => {
-    return useQuery({
-        queryKey: ["chats"],
-        queryFn: () => getChatsFn({ data: searchParams }),
     });
 };
 

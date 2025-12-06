@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Overlay from "@/components/overlay";
 import { BtnLink } from "@/components/ui/btnLink";
-import { useLocation } from "@tanstack/react-router";
+import { useLocation, useRouteContext } from "@tanstack/react-router";
 
 interface ProductReviewsZeroStateProps {
     onWriteReview?: () => void;
@@ -16,7 +16,7 @@ interface ProductReviewsZeroStateProps {
 }
 
 export const ProductReviewsZeroState = ({ productName, product_id }: ProductReviewsZeroStateProps) => {
-    const session: any = null;
+    const { session } = useRouteContext({ strict: false });
     const state = useOverlayTriggerState({});
     const location = useLocation()
     const pathname = location.pathname

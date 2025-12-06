@@ -16,6 +16,7 @@ import ServerError from "@/components/generic/server-error";
 import { tryCatch } from "@/lib/try-catch";
 import { Separator } from "@/components/ui/separator";
 import { updateMeFn, updatePasswordFn } from "@/server/users.server";
+import { updateAuthSession } from "@/utils/auth-client";
 
 const profileSchema = z.object({
     first_name: z.string().min(1, "First name is required").max(255, "First name is too long"),
@@ -74,6 +75,10 @@ function RouteComponent() {
 
             return;
         }
+        await updateAuthSession({
+            email: session?.user?.email!,
+            mode: "refresh",
+        });
         invalidate("me");
         toast.success("Profile updated successfully");
         setEditingSection(null);

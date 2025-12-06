@@ -46,6 +46,12 @@ export const updatePasswordFn = createServerFn({ method: "POST" })
         });
     });
 
+export const getUserFn = createServerFn({ method: "GET" })
+    .inputValidator((d: string) => d)
+    .handler(async ({ data: email }) => {
+        return await api.get<User>(`/users/get-user?email=${email}`);
+    });
+
 export const getUsersFn = createServerFn({ method: "GET" })
     .inputValidator((input: unknown) => UserSearchSchema.parse(input))
     .handler(async ({ data }) => {

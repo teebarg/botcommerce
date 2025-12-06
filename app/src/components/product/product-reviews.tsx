@@ -19,7 +19,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id, productName, paginatedRevi
     const { data: orders } = useSuspenseQuery(ordersQueryOptions({}));
 
     const context = routeApi.useRouteContext();
-    const session = context.session as unknown as Session;
+    const session = context.session;
     const hasReviewed = session && paginatedReviews?.reviews?.some((r) => r.user?.id === session?.id);
     let hasPurchased = false;
 

@@ -17,15 +17,15 @@ import {
     ShoppingCart,
     Tag,
 } from "lucide-react";
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useLocation, useRouteContext } from "@tanstack/react-router";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const AdminMobileMenu: React.FC = () => {
+    const { session } = useRouteContext({ strict: false });
     const location = useLocation();
 
     const pathname = location.pathname;
-    const session: any = null;
 
     const menuItems = [
         { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/admin" },

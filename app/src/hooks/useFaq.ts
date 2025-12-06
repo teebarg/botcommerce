@@ -1,15 +1,8 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useInvalidate } from "./useApi";
 import { FaqFormValues } from "@/components/admin/faq/faq-form";
-import { createFaqFn, deleteFaqFn, getFaqsFn, updateFaqFn } from "@/server/faq.server";
-
-export const useFaqs = () => {
-    return useQuery({
-        queryKey: ["faqs"],
-        queryFn: () => getFaqsFn(),
-    });
-};
+import { createFaqFn, deleteFaqFn, updateFaqFn } from "@/server/faq.server";
 
 export const useCreateFaq = () => {
     const invalidate = useInvalidate();

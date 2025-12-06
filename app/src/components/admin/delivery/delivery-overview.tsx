@@ -7,7 +7,6 @@ import DeliveryOptionForm from "./delivery-option-form";
 
 import { Button } from "@/components/ui/button";
 import { DeliveryOption, Message } from "@/schemas";
-import { api } from "@/utils/fetch-api";
 import { useAdminDeliveryOptions } from "@/hooks/useApi";
 import { useInvalidate } from "@/hooks/useApi";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -19,6 +18,7 @@ import { tryCatch } from "@/lib/try-catch";
 import Overlay from "@/components/overlay";
 import ComponentLoader from "@/components/component-loader";
 import { ZeroState } from "@/components/zero";
+import { deleteDeliveryFn } from "@/server/generic.server";
 
 const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
     const editState = useOverlayTriggerState({});
@@ -37,7 +37,7 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
     };
 
     const handleDelete = async () => {
-        const { error } = await tryCatch<Message>(api.delete(`/delivery/${option.id}`));
+        const { error } = await tryCatch<Message>(deleteDeliveryFn({ data: option.id }));
 
         if (!error) {
             toast.success("Delivery option deleted successfully");

@@ -76,7 +76,7 @@ const UserSchema = z.object({
     id: z.number(),
     first_name: z.string(),
     last_name: z.string().optional(),
-    email: z.string().email(),
+    email: z.email(),
 });
 
 export const CouponSchema = z.object({
@@ -104,7 +104,7 @@ export const CouponUsageSchema = z.object({
     coupon: CouponSchema,
     user: UserSchema,
     name: z.string(),
-    email: z.string().email(),
+    email: z.email(),
     discount_amount: z.number(),
     created_at: z.string(),
     updated_at: z.string(),

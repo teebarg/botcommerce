@@ -14,6 +14,7 @@ import { useInvalidate } from "@/hooks/useApi";
 import { api } from "@/utils/fetch-api";
 import { ShippingMethodSchema } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
+import { createDeliveryFn, updateDeliveryFn } from "@/server/generic.server";
 
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -50,9 +51,9 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
         let response = null;
 
         if (initialData?.id) {
-            response = await tryCatch<DeliveryOption>(api.patch(`/delivery/${initialData.id}`, data));
+            response = await tryCatch<DeliveryOption>(updateDeliveryFn({ data: { id: initialData.id, ...data } }));
         } else {
-            response = await tryCatch<DeliveryOption>(api.post("/delivery/", data));
+            response = await tryCatch<DeliveryOption>(createDeliveryFn({ data }));
         }
 
         if (response.error) {

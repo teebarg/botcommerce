@@ -1,8 +1,7 @@
 import { useSession } from "@/server/auth-server";
 import { Session } from "start-authjs";
 
-const baseURL = process.env.API_URL || "http://localhost:8000";
-// console.log(process.env);
+const baseURL = process.env.API_URL || "http://niyi.dev";
 
 interface HeaderOptions {
     cartId?: string | undefined;

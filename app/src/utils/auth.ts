@@ -7,6 +7,7 @@ import { SignJWT } from "jose";
 import { tryCatch } from "@/lib/try-catch";
 import type { User, Address, Role, Status, Message } from "@/schemas";
 import { api } from "./fetch-api";
+import { getUserFn } from "@/server/users.server";
 
 const redis = new Redis({
     url: process.env.UPSTASH_REDIS_URL!,
@@ -102,7 +103,6 @@ export const authConfig: StartAuthJSConfig = {
             allowDangerousEmailAccountLinking: true,
             authorization: { params: { scope: "openid email profile" } },
             async profile(profile, tokens) {
-                // Sync user with your backend
                 await tryCatch(
                     api.post<Message>("/auth/sync-user", {
                         email: profile.email!,
@@ -117,9 +117,8 @@ export const authConfig: StartAuthJSConfig = {
     ],
     callbacks: {
         async jwt({ token, user, account, profile, trigger, session }) {
-            // IMPERSONATION
             if (trigger === "update" && session?.mode === "impersonate") {
-                const { data } = await tryCatch<User>(api.get(`/users/get-user?email=${session.email}`));
+                const { data } = await tryCatch<User>(getUserFn({ data: session.email! }));
 
                 if (data) {
                     token.user = data;
@@ -131,9 +130,18 @@ export const authConfig: StartAuthJSConfig = {
                 return token;
             }
 
-            // ON SSO LOGIN
-            if (account?.provider === "google") {
-                const { data } = await tryCatch<User>(api.get(`/users/get-user?email=${token.email}`));
+            // Refresh
+            if (trigger === "update" && session?.mode === "refresh") {
+                const { data } = await tryCatch<User>(getUserFn({ data: session.email! }));
+
+                if (data) {
+                    token.user = data;
+                }
+                return token;
+            }
+
+            if (account?.provider === "google" || account?.provider === "http-email") {
+                const { data } = await tryCatch<User>(getUserFn({ data: token.email! }));
                 if (data) {
                     token.user = data;
                     token.accessToken = await generateJoseToken(data.email);

@@ -11,8 +11,9 @@ import { Cart } from "@/schemas";
 import { currency } from "@/lib/utils";
 import { useInvalidateCart } from "@/hooks/useCart";
 import { useInvalidateMe } from "@/hooks/useUser";
-import { deleteCookie } from "@/lib/util/cookie";
 import ImageDisplay from "@/components/image-display";
+import { useRouteContext, useRouter } from "@tanstack/react-router";
+import { updateAuthSession } from "@/utils/auth-client";
 
 interface AbandonedCartDetailsDialogProps {
     cart: Cart | null;
@@ -20,8 +21,8 @@ interface AbandonedCartDetailsDialogProps {
 
 export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogProps) => {
     const state = useOverlayTriggerState({});
-    // const { data: session, update } = useSession();
-    const session: any = null
+    const { session } = useRouteContext({ strict: false });
+    const router = useRouter();
     const invalidateMe = useInvalidateMe();
     const invalidateCart = useInvalidateCart();
 
@@ -33,12 +34,24 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
     };
 
     const handleImpersonation = async () => {
-        deleteCookie("_cart_id");
-        // await update({ impersonatedBy: session?.user?.email!, email: cart?.user?.email!, impersonated: true, mode: "impersonate" });
-        invalidateMe();
-        invalidateCart();
-        toast.success("Impersonated");
-        window.location.reload();
+        try {
+            await updateAuthSession({
+                email: cart?.user?.email!,
+                mode: "impersonate",
+                impersonated: true,
+                impersonatedBy: session?.user?.email,
+            });
+
+            invalidateMe();
+            invalidateCart();
+
+            toast.success("Impersonated");
+
+            await router.invalidate();
+            await router.navigate({ to: "/" });
+        } catch (err) {
+            console.error("Impersonation failed", err);
+        }
     };
 
     return (

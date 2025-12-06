@@ -1,18 +1,15 @@
-"use client";
-
 import React from "react";
 
 import CartItems from "./cart-items";
-
 import EmptyCartMessage from "@/components/store/cart/empty-message";
 import Summary from "@/components/store/cart/summary";
 import SignInPrompt from "@/components/generic/auth/sign-in-prompt";
 import { useCart } from "@/providers/cart-provider";
 import ComponentLoader from "@/components/component-loader";
-import { useLocation } from "@tanstack/react-router";
+import { useLocation, useRouteContext } from "@tanstack/react-router";
 
 const CartPageDetails: React.FC = () => {
-    const session: any = null;
+    const { session } = useRouteContext({ strict: false });
     const location = useLocation();
     const pathname = location.pathname;
     const { cart, isLoading } = useCart();

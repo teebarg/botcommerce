@@ -7,7 +7,7 @@ import { useNavigate } from "@tanstack/react-router";
 
 const SaleBanner: React.FC = () => {
     const { data } = useCatalogs(true);
-    const catalog = data?.shared[0];
+    const catalog = data?.shared?.[0];
     const navigate = useNavigate();
 
     if (!catalog) return null;

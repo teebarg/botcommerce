@@ -1,7 +1,7 @@
 import React from "react";
 import { toast } from "sonner";
 import { useOverlayTriggerState } from "react-stately";
-import { FileExclamationPoint } from 'lucide-react';
+import { ShieldAlert } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 
 import BankDetailsForm from "./bank-details-form";
@@ -137,7 +137,7 @@ export function ShopPayments({ settings }: ShopPaymentsProps) {
                     })}
                     {bankDetails?.length === 0 && (
                         <div className="flex flex-col items-center justify-center md:col-span-2 bg-contrast/10 p-4 rounded-lg">
-                            <FileExclamationPoint className="w-14 h-14 text-muted-foreground mb-2" />
+                            <ShieldAlert className="w-14 h-14 text-muted-foreground mb-2" />
                             <p className="font-semibold">No bank details found</p>
                             <p className="text-muted-foreground text-sm">Add bank details to enable bank transfer payments</p>
                         </div>

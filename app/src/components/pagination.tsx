@@ -18,7 +18,6 @@ interface Props {
 }
 
 const PaginationUI: React.FC<Props> = ({ pagination, range = 2 }) => {
-    console.log("🚀 ~ file: pagination.tsx:21 ~ pagination:", pagination)
     const { updateQuery } = useUpdateQuery(200);
     const page = (pagination?.skip ?? 0) / (pagination?.limit ?? 1) + 1;
     const totalPages = pagination?.total_pages ?? 1;

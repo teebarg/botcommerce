@@ -2,7 +2,15 @@ import { z } from "zod";
 import type { ContactFormValues } from "@/components/store/contact-form";
 import { createServerFn } from "@tanstack/react-start";
 import { api } from "@/utils/fetch-api";
-import type { BankDetails, ConversationStatus, DeliveryOption, Message, PaginatedChat, ShopSettings } from "@/schemas";
+import {
+    ShippingMethodSchema,
+    type BankDetails,
+    type ConversationStatus,
+    type DeliveryOption,
+    type Message,
+    type PaginatedChat,
+    type ShopSettings,
+} from "@/schemas";
 
 export const getShopSettingsFn = createServerFn({ method: "GET" }).handler(async () => {
     return await api.get<ShopSettings[]>("/shop-settings/");
@@ -19,7 +27,7 @@ export const syncShopDetailsFn = createServerFn({ method: "POST" })
     });
 
 export const subscribeNewsletterFn = createServerFn({ method: "POST" })
-    .inputValidator(z.object({ email: z.string().email() }))
+    .inputValidator(z.object({ email: z.email() }))
     .handler(async ({ data }) => {
         return await api.post<Message>(`/newsletter`, data);
     });
@@ -69,8 +77,8 @@ export const getChatsFn = createServerFn({ method: "GET" })
         return await api.get<PaginatedChat>("/chat/", { params: data });
     });
 
-export const deleteChatFn = createServerFn({ method: "POST" }) // Using POST for RPC call
-    .inputValidator(z.number()) // ID of the chat to delete
+export const deleteChatFn = createServerFn({ method: "POST" })
+    .inputValidator(z.number())
     .handler(async ({ data: id }) => {
         return await api.delete<Message>(`/chat/${id}`);
     });
@@ -82,3 +90,44 @@ export const getDeliveryOptionsFn = createServerFn({ method: "GET" }).handler(as
 export const getAdminDeliveryOptionsFn = createServerFn({ method: "GET" }).handler(async () => {
     return await api.get<DeliveryOption[]>("/delivery/");
 });
+
+const DeliverySchema = z.object({
+    id: z.number().optional(),
+    name: z.string().optional(),
+    description: z.string().optional(),
+    method: ShippingMethodSchema,
+    amount: z.number().min(0, "Amount must be greater than or equal to 0"),
+    duration: z.string().min(1, "Duration is required"),
+    is_active: z.boolean().default(true),
+});
+
+export const createDeliveryFn = createServerFn({ method: "POST" })
+    .inputValidator(DeliverySchema)
+    .handler(async ({ data }) => {
+        return await api.post<DeliveryOption>("/delivery/", data);
+    });
+
+export const updateDeliveryFn = createServerFn({ method: "POST" })
+    .inputValidator(DeliverySchema)
+    .handler(async ({ data }) => {
+        const { id, ...rest } = data;
+        return await api.patch<DeliveryOption>(`/delivery/${id}`, rest);
+    });
+
+export const deleteDeliveryFn = createServerFn({ method: "POST" })
+    .inputValidator(z.number())
+    .handler(async ({ data: id }) => {
+        return await api.delete<Message>(`/delivery/${id}`);
+    });
+
+const FCMSchema = z.object({
+    endpoint: z.string(),
+    p256dh: z.string(),
+    auth: z.string(),
+});
+
+export const sendFCMFn = createServerFn({ method: "POST" })
+    .inputValidator(FCMSchema)
+    .handler(async ({ data }) => {
+        return await api.post<Message>("/notification/push-fcm", data);
+    });

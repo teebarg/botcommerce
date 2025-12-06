@@ -13,6 +13,7 @@ import { UserInteractionType, useTrackUserInteraction } from "@/hooks/useUserInt
 import { ImageDownloadButton } from "@/components/store/image-download";
 import MediaDisplay from "@/components/media-display";
 import ImageDisplay from "@/components/image-display";
+import { useRouteContext } from "@tanstack/react-router";
 
 const ProductOverview: React.FC<{
     product: ProductSearch;
@@ -46,8 +47,7 @@ const ProductOverview: React.FC<{
     const { mutate: createWishlist } = useUserCreateWishlist();
     const { mutate: deleteWishlist } = useUserDeleteWishlist();
 
-    // const { data: session } = useSession();
-    const session: any = null
+    const { session } = useRouteContext({ strict: false });
     const trackInteraction = useTrackUserInteraction();
 
     useEffect(() => {

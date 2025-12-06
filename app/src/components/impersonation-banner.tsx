@@ -4,21 +4,33 @@ import { toast } from "sonner";
 import { useInvalidateMe } from "@/hooks/useUser";
 import { useInvalidateCart } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
-import { deleteCookie } from "@/lib/util/cookie";
+import { useRouteContext, useRouter } from "@tanstack/react-router";
+import { updateAuthSession } from "@/utils/auth-client";
 
 export default function ImpersonationBanner() {
-    // const { data: session, update } = useSession();
-    const session: any = null
+    const { session } = useRouteContext({ strict: false });
     const invalidateMe = useInvalidateMe();
     const invalidateCart = useInvalidateCart();
+    const router = useRouter();
 
     const stopImpersonation = async () => {
-        deleteCookie("_cart_id");
-        // await update({ email: session?.impersonatedBy!, impersonated: false, impersonatedBy: null, mode: "impersonate" });
-        invalidateMe();
-        invalidateCart();
-        toast.success("Exited impersonation");
-        window.location.reload();
+        try {
+            await updateAuthSession({
+                email: session?.impersonatedBy!,
+                mode: "impersonate",
+                impersonated: false,
+                impersonatedBy: null,
+            });
+
+            invalidateMe();
+            invalidateCart();
+
+            toast.success("Exited impersonation");
+            await router.invalidate();
+            await router.navigate({ to: "/" });
+        } catch (err) {
+            console.error("Impersonation failed", err);
+        }
     };
 
     if (!session?.impersonated) return null;

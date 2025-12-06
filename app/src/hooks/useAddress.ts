@@ -1,6 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { createAddressFn, deleteAddressFn, getUserAddressesFn, updateAddressFn } from "@/server/address.server";
+import { useRouteContext } from "@tanstack/react-router";
 
 export const addressesQueryOptions = () => ({
     queryKey: ["addresses"],
@@ -8,12 +9,12 @@ export const addressesQueryOptions = () => ({
 });
 
 export const useUserAddresses = () => {
-    // const session: any = null;
+    const { session } = useRouteContext({ strict: false });
 
     return useQuery({
         queryKey: ["addresses"],
         queryFn: () => getUserAddressesFn(),
-        // enabled: Boolean(session?.user),
+        enabled: Boolean(session?.user),
     });
 };
 

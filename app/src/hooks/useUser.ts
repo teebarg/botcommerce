@@ -14,6 +14,7 @@ import {
     getWishlistFn,
     updateUserFn,
 } from "@/server/users.server";
+import { useRouteContext } from "@tanstack/react-router";
 
 interface UsersParams {
     query?: string;
@@ -111,7 +112,7 @@ export const userWishlistQueryOptions = () =>
     });
 
 export const useUserWishlist = () => {
-    const session: any = null;
+    const { session } = useRouteContext({ strict: false });
 
     return useQuery({
         queryKey: ["products", "wishlist", session?.id?.toString()],
@@ -120,13 +121,11 @@ export const useUserWishlist = () => {
     });
 };
 
-export const useUserRecentlyViewed = (limit: number = 12) => {
-    const session: any = null;
-
+export const useUserRecentlyViewed = (limit: number = 12, enabled: boolean = true) => {
     return useQuery({
         queryKey: ["products", "recently-viewed"],
         queryFn: () => getRecentlyViewedFn({ data: limit }),
-        enabled: Boolean(session?.user),
+        enabled: enabled,
     });
 };
 

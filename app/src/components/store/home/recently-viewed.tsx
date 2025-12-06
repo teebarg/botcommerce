@@ -1,10 +1,7 @@
-"use client";
-
-import React from "react";
-
 import { useUserRecentlyViewed } from "@/hooks/useUser";
 import PromotionalBanner from "@/components/promotion";
 import ProductsCarousel from "@/components/store/product-carousel";
+import { useRouteContext } from "@tanstack/react-router";
 
 interface RecentlyViewedSectionProps {
     limit?: number;
@@ -12,7 +9,8 @@ interface RecentlyViewedSectionProps {
 }
 
 export default function RecentlyViewedSection({ limit = 5, showBanner = true }: RecentlyViewedSectionProps) {
-    const { data, isLoading } = useUserRecentlyViewed(limit);
+    const { session } = useRouteContext({ strict: false });
+    const { data, isLoading } = useUserRecentlyViewed(limit, Boolean(session?.user));
 
     if (!data || data.length === 0 || isLoading) return null;
 

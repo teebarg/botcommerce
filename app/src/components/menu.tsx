@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
 import { useInvalidateMe } from "@/hooks/useUser";
-import { useLocation } from "@tanstack/react-router";
+import { useLocation, useRouteContext } from "@tanstack/react-router";
 import { ThemeToggle } from "./theme-toggle";
 
 interface NavLinkProp {
@@ -28,13 +28,11 @@ const Menu: React.FC = () => {
     const location = useLocation();
 
     const pathname = location.pathname;
-    const session: any = null
+    const { session } = useRouteContext({ strict: false });
     const invalidate = useInvalidateMe();
     const handleLogout = async () => {
-        // await authApi.logOut();
-        // await signOut();
         invalidate();
-        window.location.href = "/";
+        window.location.href = "/api/auth/signout";
     };
 
     return (

@@ -5,42 +5,37 @@ import { Search } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Order } from "@/schemas";
 import { currency } from "@/lib/utils";
-import { useOrders } from "@/hooks/useOrder";
+import { ordersQueryOptions, useOrders } from "@/hooks/useOrder";
 import OrderCard from "@/components/admin/orders/order-card";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import PaginationUI from "@/components/pagination";
-import { CardSkeleton } from "@/components/ui/skeletons";
 import OrderFilters from "@/components/admin/orders/order-filters";
 import { OrderStatusBadge, PaymentStatusBadge } from "@/components/admin/orders/order-status-badge";
 import OrderActions from "@/components/admin/orders/order-actions";
+import z from "zod";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 const LIMIT = 10;
 
 export const Route = createFileRoute("/admin/(store)/orders")({
+    validateSearch: z.object({
+        search: z.string().optional(),
+        skip: z.number().optional(),
+        status: z.enum(["ACTIVE", "COMPLETED", "ABANDONED", "DELIVERED"]).optional(),
+        start_date: z.string().optional(),
+        end_date: z.string().optional(),
+    }),
+    loaderDeps: ({ search: { skip, status, start_date, end_date } }) => ({ skip, status, start_date, end_date }),
+    loader: async ({ context, deps: { skip, status, start_date, end_date } }) => {
+        await context.queryClient.ensureQueryData(ordersQueryOptions({ skip, status, start_date, end_date, take: LIMIT }));
+    },
     component: RouteComponent,
 });
 
 function RouteComponent() {
+    const search = Route.useSearch();
+    const { data } = useSuspenseQuery(ordersQueryOptions({ ...search }));
     const { updateQuery } = useUpdateQuery(200);
-
-    const searchParams: any = null;
-
-    const skip = Number(searchParams.get("skip")) || 0;
-    const status = searchParams.get("status") || "";
-    const start_date = searchParams.get("start_date") || "";
-    const end_date = searchParams.get("end_date") || "";
-
-    const filters = {
-        status,
-        start_date,
-        end_date,
-    };
-
-    const { data, isLoading } = useOrders({
-        skip,
-        take: LIMIT,
-        ...filters,
-    });
 
     const { orders, ...pagination } = data ?? { skip: 0, limit: 0, total_pages: 0, total_count: 0 };
     return (
@@ -66,13 +61,7 @@ function RouteComponent() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {isLoading ? (
-                            <TableRow key="loading">
-                                <TableCell className="text-center" colSpan={7}>
-                                    Loading...
-                                </TableCell>
-                            </TableRow>
-                        ) : orders?.length === 0 ? (
+                        {orders?.length === 0 ? (
                             <TableRow key="no-orders">
                                 <TableCell className="text-center" colSpan={7}>
                                     No orders found
@@ -112,7 +101,7 @@ function RouteComponent() {
                             className="pl-10 pr-4 py-2 w-full border border-input rounded-lg focus:outline-none"
                             placeholder="Search orders..."
                             type="text"
-                            value={searchParams.get("search") ?? ""}
+                            value={search.search ?? ""}
                             onChange={(e) => updateQuery([{ key: "search", value: e.target.value }])}
                         />
                     </div>
@@ -120,7 +109,6 @@ function RouteComponent() {
                     <OrderFilters />
 
                     <div>
-                        {isLoading && <CardSkeleton showAvatar={false} />}
                         {orders?.map((order: Order, idx: number) => (
                             <OrderCard key={idx} actions={<OrderActions order={order} />} order={order} />
                         ))}

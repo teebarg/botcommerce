@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import { ArrowUpRight, ChevronRight, Truck } from "lucide-react";
 import { toast } from "sonner";
@@ -16,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useUpdateVariant } from "@/hooks/useProduct";
 import ImageDisplay from "@/components/image-display";
 import MediaDisplay from "@/components/media-display";
+import { useRouteContext } from "@tanstack/react-router";
 
 interface Props {
     product: Product;
@@ -28,7 +27,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
 
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(product.variants?.[0]);
 
-    const session: any = null;
+    const { session } = useRouteContext({ strict: false });
     const trackInteraction = useTrackUserInteraction();
     const updateVariant = useUpdateVariant(false);
 

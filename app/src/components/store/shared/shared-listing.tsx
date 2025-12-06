@@ -1,9 +1,8 @@
-"use client";
-
+import { useRouteContext } from "@tanstack/react-router";
 import { useState } from "react";
 
 export const SocialShare = ({ title, view_count }: { title: string; view_count: number }) => {
-    const session: any = null;
+    const { session } = useRouteContext({ strict: false });
     const [copied, setCopied] = useState<boolean>(false);
     const [url] = useState<string>(() => (typeof window !== "undefined" ? window.location.href : ""));
 

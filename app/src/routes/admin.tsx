@@ -10,6 +10,9 @@ export const Route = createFileRoute("/admin")({
         if (!context.session) {
             throw redirect({ to: "/auth/signin", search: { callbackUrl: location.href } });
         }
+        if (!context.session.user.isAdmin) {
+            throw redirect({ to: "/" });
+        }
     },
     component: AdminLayoutComponent,
 });
