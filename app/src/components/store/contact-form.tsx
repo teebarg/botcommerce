@@ -15,7 +15,7 @@ import { useContactForm } from "@/hooks/useGeneric";
 
 const contactFormSchema = z.object({
     name: z.string().min(1, "Name is required"),
-    email: z.string().email("Please enter a valid email address"),
+    email: z.email("Please enter a valid email address"),
     phone: z.string().optional(),
     subject: z.string().optional(),
     message: z.string().min(1, "Message is required"),

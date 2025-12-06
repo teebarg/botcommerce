@@ -1,7 +1,7 @@
 import { useSession } from "@/server/auth-server";
 import { Session } from "start-authjs";
 
-const baseURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+const baseURL = process.env.API_URL || "http://localhost:8000";
 // console.log(process.env);
 
 interface HeaderOptions {
@@ -26,12 +26,9 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         });
     }
 
-    // const cartId = await getCookie("_cart_id");
-
     const headers = {
         "Content-Type": "application/json",
         "X-Auth": session?.accessToken ?? "",
-        // cartId: "",
         ...options.headers,
     };
 

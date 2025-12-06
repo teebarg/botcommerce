@@ -31,6 +31,39 @@ services:
       - traefik.http.routers.traefik-dashboard.service=api@internal
       - traefik.http.middlewares.https-redirect.contenttype.autodetect=false
 
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: app
+    ports:
+      - "7003:5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./app/src:/app/src
+      - ./app/public:/app/public
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+    env_file:
+      - ./app/.env
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.constraint-label=traefik-public
+      # Frontend Router
+      - traefik.http.services.app-frontend.loadbalancer.server.port=5173
+      - traefik.http.routers.app-frontend-http.rule=Host(`app.localhost`)
+      - traefik.http.routers.app-frontend-http.entrypoints=http
+      - traefik.http.routers.app-frontend-http.service=app-frontend
+    command: ["pnpm", "dev"]
+    networks:
+      - traefik-public
+      - default
+
   backend:
     image: 'shop-backend:${TAG-latest}'
     labels:

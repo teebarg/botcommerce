@@ -19,6 +19,7 @@ export const Route = createFileRoute("/payment/verify")({
         });
     },
     component: RouteComponent,
+    pendingComponent: PaymentLoading,
 });
 
 function RouteComponent() {
@@ -26,14 +27,10 @@ function RouteComponent() {
     const invalidate = useInvalidate();
     const { reference } = Route.useSearch();
 
-    const { data, error, isLoading } = useSuspenseQuery({
+    const { data, error } = useSuspenseQuery({
         queryKey: ["payment", "verify", reference],
         queryFn: () => verifyPaymentFn({ data: { reference } }),
     });
-
-    if (isLoading) {
-        return <PaymentLoading />;
-    }
 
     if (error) {
         toast.error(error.message);
@@ -41,35 +38,9 @@ function RouteComponent() {
     }
 
     if (data?.payment_status === "SUCCESS") {
-        // await deleteCookie("_cart_id");
         invalidate("cart");
         navigate({ to: `/order/confirmed/${data?.order_number}` });
     }
-
-    // useEffect(() => {
-    //     const verifyPayment = async () => {
-    //         if (!reference) {
-    //             toast.error("Invalid payment reference");
-    //             navigate({ to: "/orders" });
-
-    //             return;
-    //         }
-
-    //         const { data, error } = await tryCatch<Order>(api.get(`/payment/verify/${reference}`));
-
-    //         if (error) {
-    //             toast.error(error);
-    //             navigate({ to: "/checkout" });
-
-    //             return;
-    //         }
-    //         await deleteCookie("_cart_id");
-    //         invalidate("cart");
-    //         navigate({ to: `/order/confirmed/${data?.order_number}` });
-    //     };
-
-    //     verifyPayment();
-    // }, [reference, navigate]);
 
     return <PaymentLoading />;
 }

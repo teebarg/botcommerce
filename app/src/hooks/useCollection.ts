@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CollectionFormValues } from "@/components/admin/collections/collection-form";
 import { SharedFormValues } from "@/components/admin/shared-collections/shared-form";
@@ -16,12 +16,20 @@ import {
     updateCollectionFn,
 } from "@/server/collections.server";
 
-export const useCollections = (query?: string) => {
-    return useQuery({
-        queryKey: ["collections", query],
-        queryFn: () => getCollectionsFn({ data: query }),
-    });
-};
+// export const useCollections = (query?: string) => {
+//     return useQuery({
+//         queryKey: ["collections", query],
+//         queryFn: () => getCollectionsFn({ data: query }),
+//     });
+// };
+
+export const collectionsQuery = (query?: string) => queryOptions({
+    queryKey: ["collections", query],
+    staleTime: 1000 * 60 * 60, // 1 hour
+    queryFn: () => getCollectionsFn({ data: query }),
+});
+
+export const useCollections = (query?: string) => useQuery(collectionsQuery(query));
 
 export const useCreateCollection = () => {
     return useMutation({

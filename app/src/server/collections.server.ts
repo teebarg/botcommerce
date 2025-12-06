@@ -5,10 +5,6 @@ import type { Collection, PaginatedShared, Shared } from "@/schemas";
 import type { CollectionFormValues } from "@/components/admin/collections/collection-form";
 import type { SharedFormValues } from "@/components/admin/shared-collections/shared-form";
 
-export const oauthSchema = z.object({
-    redirectTo: z.string().optional(),
-});
-
 // Using z.custom since the schema definitions are not provided
 const CollectionFormValuesSchema = z.custom<CollectionFormValues>();
 const SharedFormValuesSchema = z.custom<SharedFormValues>();

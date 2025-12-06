@@ -13,7 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { useSubscribeNewsletter } from "@/hooks/useGeneric";
 
 const newsletterSchema = z.object({
-    email: z.string().email("Please enter a valid email address"),
+    email: z.email("Please enter a valid email address"),
 });
 
 type NewsletterFormValues = z.infer<typeof newsletterSchema>;

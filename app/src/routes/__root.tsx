@@ -22,6 +22,9 @@ import { getRequest } from "@tanstack/react-start/server";
 import { authConfig } from "@/utils/auth";
 import { getStoredTheme, ThemeProvider } from "@/providers/theme-provider";
 import type { QueryClient } from "@tanstack/react-query";
+import { categoriesQuery } from "@/hooks/useCategories";
+import { collectionsQuery } from "@/hooks/useCollection";
+import { useRef } from "react";
 
 interface RouterContext {
     session: AuthSession | null;
@@ -34,7 +37,7 @@ const fetchSession = createServerFn({ method: "GET" }).handler(async () => {
     return session;
 });
 
-export const Route = createRootRouteWithContext<RouterContext>()({ 
+export const Route = createRootRouteWithContext<RouterContext>()({
     head: () => ({
         meta: [
             { charSet: "utf-8" },
@@ -54,14 +57,16 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         ],
     }),
     beforeLoad: async ({}) => {
-        const session = await fetchSession() as unknown as Session;
+        const session = (await fetchSession()) as unknown as Session;
         const _storedTheme = await getStoredTheme();
         return {
             _storedTheme,
             session,
         };
     },
-    // loader: async ({ context }) => ({ ...context }),
+    loader: async ({ context: { queryClient } }) => {
+        return Promise.all([queryClient.ensureQueryData(categoriesQuery()), queryClient.ensureQueryData(collectionsQuery())]);
+    },
     errorComponent: (props) => {
         return (
             <RootDocument>
@@ -82,7 +87,7 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-    const { _storedTheme } = Route.useRouteContext();
+    const { _storedTheme, session } = Route.useRouteContext();
     return (
         <html suppressHydrationWarning className="antialiased">
             <head>
@@ -111,7 +116,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                             <StoreProvider>
                                 <CartProvider>
                                     <WebSocketProvider
-                                        url={import.meta.env.VITE_WS_URL + "/api/ws/"}
+                                        url={import.meta.env.VITE_WS + "/api/ws/"}
                                         debug={true}
                                         onOpen={() => console.log("WebSocket connected!")}
                                         onClose={() => console.log("WebSocket disconnected!")}

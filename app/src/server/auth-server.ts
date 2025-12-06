@@ -2,21 +2,11 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getRequest } from "@tanstack/react-start/server";
 import { authConfig } from "@/utils/auth";
-import { AuthSession, getSession } from "start-authjs";
+import { getSession } from "start-authjs";
 
-// Validation schemas
 export const credentialsSchema = z.object({
-    email: z.string().email("Please enter a valid email address"),
+    email: z.email("Please enter a valid email address"),
     password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-export const signupSchema = credentialsSchema.extend({
-    redirectUrl: z.string().optional(),
-    fullName: z.string().optional(),
-});
-
-export const oauthSchema = z.object({
-    redirectTo: z.string().optional(),
 });
 
 export const useSession = createServerFn({ method: "GET" }).handler(async () => {
@@ -24,31 +14,3 @@ export const useSession = createServerFn({ method: "GET" }).handler(async () => 
     const session = await getSession(request, authConfig);
     return session;
 });
-
-// Server functions
-// export const loginFn = createServerFn({ method: "POST" })
-//     .inputValidator((input: unknown) => credentialsSchema.parse(input))
-//     .handler(async ({ data }) => {
-//         const supabase = getSupabaseServerClient();
-//         const { error } = await supabase.auth.signInWithPassword({
-//             email: data.email,
-//             password: data.password,
-//         });
-
-//         if (error) {
-//             throw new Error(error.message);
-//         }
-
-//         return { success: true } as const;
-//     });
-
-
-// export const logoutFn = createServerFn({ method: "POST" }).handler(async () => {
-//     const supabase = getSupabaseServerClient();
-//     const { error } = await supabase.auth.signOut();
-//     if (error) {
-//         throw new Error(error.message);
-//     }
-
-//     return { success: true } as const;
-// });

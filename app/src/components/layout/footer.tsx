@@ -50,7 +50,6 @@ export default function Footer() {
     const { data: collections } = useCollections();
 
     const { data: cat } = useCategories();
-    console.log("🚀 ~ Footer ~ cat:", cat)
     const categories = cat?.filter((cat: Category) => !cat.parent_id).slice(0, 6);
 
     return (
