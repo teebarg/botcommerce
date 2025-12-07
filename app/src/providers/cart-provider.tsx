@@ -52,27 +52,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     const queryClient = useQueryClient();
     const { data: cart, isLoading, error } = useMyCart();
 
-    // const loadCart = async () => {
-    //     setIsLoading(true);
-    //     try {
-    //         const [cartRes, itemRes] = await Promise.all([
-    //             navigator.onLine ? api.get<Cart>("/cart/") : Promise.resolve(null),
-    //             navigator.onLine ? api.get<CartItem[]>("/cart/items") : getOfflineCart(),
-    //         ]);
-
-    //         if (cartRes) setCart(cartRes);
-    //         setCartItems(itemRes || []);
-    //     } catch (e) {
-    //         toast.error("Failed to load cart");
-    //     } finally {
-    //         setIsLoading(false);
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     loadCart();
-    // }, []);
-
     const addItem = async (item: AddItem) => {
         if (!navigator.onLine) {
             await addToOfflineCart(item);

@@ -175,3 +175,9 @@ export const sendUserInteractionsFn = createServerFn({ method: "POST" })
     .handler(async ({ data }) => {
         return await api.post<Message>("/user-interactions/batch", data);
     });
+
+export const bulkRequestFn = createServerFn({ method: "POST" })
+    .inputValidator((d: any) => d)
+    .handler(async ({ data }) => {
+        return await api.post<Message>("/bulk-purchase", data);
+    });

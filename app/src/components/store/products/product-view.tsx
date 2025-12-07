@@ -60,7 +60,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
         return () => {
             const timeSpent = Date.now() - startTime;
 
-            handleUserInteraction("VIEW", { timeSpent });
+            handleUserInteraction("VIEW", { timeSpent: timeSpent.toString() });
         };
     }, [session?.id, product?.id]);
 
