@@ -36,7 +36,6 @@ type BulkPurchaseFormValues = z.infer<typeof bulkPurchaseSchema>;
 function RouteComponent() {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const { settings } = useStoreSettings();
-    console.log("Bulk rendered on", typeof window === "undefined" ? "server" : "client");
 
     const form = useForm<BulkPurchaseFormValues>({
         resolver: zodResolver(bulkPurchaseSchema),

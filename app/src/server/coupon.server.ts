@@ -26,7 +26,6 @@ interface CouponAnalyticsResponse {
     };
 }
 
-// Schema for parameters used in useCoupons
 const GetCouponsParamsSchema = z
     .object({
         query: z.string().optional(),

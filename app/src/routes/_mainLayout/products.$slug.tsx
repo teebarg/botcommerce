@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
 import RelatedProducts from "@/components/store/products/related-products";
@@ -12,9 +11,9 @@ import ProductView from "@/components/store/products/product-view";
 import { ordersQueryOptions } from "@/hooks/useOrder";
 import { seo } from "@/utils/seo";
 import { getSiteConfig } from "@/lib/config";
-import { ArrowUpRight, TriangleAlert } from "lucide-react";
+import { ArrowUpRight, RefreshCcw, TriangleAlert } from "lucide-react";
 import { BtnLink } from "@/components/ui/btnLink";
-import Reload from "@/components/generic/reload";
+import { Button } from "@/components/ui/button";
 
 const productQueryOptions = (slug: string) => ({
     queryKey: ["product", slug],
@@ -78,7 +77,15 @@ export const Route = createFileRoute("/_mainLayout/products/$slug")({
                             Browse Collections
                             <ArrowUpRight className="w-4 h-4" />
                         </BtnLink>
-                        <Reload />
+                        <Button
+                            aria-label="reload button"
+                            className="px-8 rounded-full min-w-48"
+                            size="lg"
+                            startContent={<RefreshCcw className="h-4 w-4" />}
+                            onClick={() => window.location.reload()}
+                        >
+                            <span>Reload</span>
+                        </Button>
                     </div>
                 </div>
             </div>

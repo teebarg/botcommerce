@@ -6,7 +6,6 @@ import {
     createCouponFn,
     deleteCouponFn,
     getCouponsAnalyticsFn,
-    getCouponsFn,
     removeCouponFn,
     toggleCouponStatusFn,
     updateCouponFn,
@@ -29,15 +28,6 @@ type CreateCouponData = {
 type UpdateCouponInput = {
     id: number;
     data: Partial<CreateCouponData>;
-};
-
-export const useCoupons = (query?: string, isActive?: boolean, skip?: number, limit?: number) => {
-    return useQuery({
-        queryKey: ["coupons", query, isActive, skip, limit],
-        queryFn: () => getCouponsFn({ data: { query, isActive, skip, limit } }),
-        // Define return type to match the expected API structure
-        // select: (data) => data as PaginatedCouponsResponse,
-    });
 };
 
 export const useCreateCoupon = () => {
