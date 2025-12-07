@@ -1,7 +1,3 @@
-"use client";
-
-import React from "react";
-
 import { ShopDetailsForm } from "./shop-details-form";
 import { ShopSocialForm } from "./shop-social-form";
 

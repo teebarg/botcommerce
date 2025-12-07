@@ -1,5 +1,3 @@
-"use client";
-
 import { CheckCircle, Package, Calendar, Clock, RefreshCw, X, Truck } from "lucide-react";
 
 import { Order, OrderStatus } from "@/schemas";

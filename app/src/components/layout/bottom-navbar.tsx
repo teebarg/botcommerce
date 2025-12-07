@@ -1,8 +1,6 @@
 import React from "react";
 import { Home, Search, User } from "lucide-react";
-
 import StoreMenuComp from "./store-mobile-menu-drawer";
-
 import { cn } from "@/lib/utils";
 import { CartComponent } from "@/components/store/cart/cart-component";
 import LocalizedClientLink from "@/components/ui/link";

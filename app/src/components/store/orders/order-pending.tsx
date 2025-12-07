@@ -1,5 +1,3 @@
-"use client";
-
 import { AlertCircle, ArrowRight, Clock } from "lucide-react";
 
 import OrderItems from "./order-items";
@@ -8,7 +6,6 @@ import OrderAddress from "./order-address";
 import OrderNotes from "./order-notes";
 import OrderNext from "./order-next";
 import OrderOverview from "./order-overview";
-
 import FadeInComponent from "@/components/generic/fade-in-component";
 import { Order } from "@/schemas";
 import { Button } from "@/components/ui/button";

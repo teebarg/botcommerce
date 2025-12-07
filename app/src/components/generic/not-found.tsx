@@ -2,7 +2,7 @@ import { Search, Home, RefreshCw, ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useStoreSettings } from "@/providers/store-provider";
+import { useConfig } from "@/providers/store-provider";
 import { useNavigate } from "@tanstack/react-router";
 
 interface NotFoundProps {
@@ -12,7 +12,7 @@ interface NotFoundProps {
 
 export default function NotFoundUI({ scenario, className }: NotFoundProps) {
     const navigate = useNavigate();
-    const { settings } = useStoreSettings();
+    const { config } = useConfig();
 
     const scenarios: Record<string, any> = {
         "404": {
@@ -56,21 +56,21 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
 
     const handlePrimaryAction = () => {
         if (scenario === "404") {
-            navigate({to: "/"});
+            navigate({ to: "/" });
         } else if (scenario === "search") {
-            navigate({to: "/search"});
+            navigate({ to: "/search" });
         } else if (["data", "connection", "server"].includes(scenario!)) {
-            navigate({to: "/"});
+            navigate({ to: "/" });
         }
     };
 
     const handleSecondaryAction = () => {
         if (scenario === "404") {
-            navigate({to: "-"});
+            navigate({ to: "-" });
         } else if (scenario === "search") {
-            navigate({to: "/search"});
+            navigate({ to: "/search" });
         } else if (["data", "connection", "server"].includes(scenario!)) {
-            navigate({to: "-"});
+            navigate({ to: "-" });
         }
     };
 
@@ -107,7 +107,7 @@ export default function NotFoundUI({ scenario, className }: NotFoundProps) {
                     <div className="mt-6 pt-6 border-t border-input">
                         <p className="text-sm text-muted-foreground">
                             Need help?{" "}
-                            <a className="font-medium transition-colors text-blue-500 hover:text-blue-600" href={`mailto:${settings?.contact_email}`}>
+                            <a className="font-medium transition-colors text-blue-500 hover:text-blue-600" href={`mailto:${config?.contact_email}`}>
                                 Contact our support team
                             </a>
                         </p>

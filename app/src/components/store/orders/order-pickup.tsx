@@ -1,5 +1,3 @@
-"use client";
-
 import { AlertCircle, ArrowRight, ShoppingBag } from "lucide-react";
 
 import OrderItems from "./order-items";
@@ -7,11 +5,10 @@ import OrderSummary from "./order-summary";
 import OrderNotes from "./order-notes";
 import OrderNext from "./order-next";
 import OrderOverview from "./order-overview";
-
 import FadeInComponent from "@/components/generic/fade-in-component";
 import { Order } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import { useStoreSettings } from "@/providers/store-provider";
+import { useConfig } from "@/providers/store-provider";
 
 type OrderConfirmationProps = {
     order: Order;
@@ -19,7 +16,7 @@ type OrderConfirmationProps = {
 };
 
 const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShopping }) => {
-    const { settings } = useStoreSettings();
+    const { config } = useConfig();
 
     return (
         <div className="w-full max-w-3xl mx-auto rounded-xl px-2 md:px-6 py-6">

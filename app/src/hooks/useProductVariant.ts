@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useAddToCart, useChangeCartQuantity } from "./useCart";
 
 import { currency } from "@/lib/utils";
-import { useStoreSettings } from "@/providers/store-provider";
+import { useConfig } from "@/providers/store-provider";
 import { ProductVariant } from "@/schemas";
 import { Product, ProductSearch } from "@/schemas/product";
 import { useCart } from "@/providers/cart-provider";
@@ -11,7 +11,7 @@ import { isFirstWhatsAppMessage, markFirstWhatsAppMessageSent } from "@/lib/util
 
 export const useProductVariant = (product: Product | ProductSearch) => {
     const { cart } = useCart();
-    const { settings } = useStoreSettings();
+    const { config } = useConfig();
     const { mutateAsync: addToCart, isPending: creating } = useAddToCart();
     const { mutateAsync: updateQuantity, isPending: updating } = useChangeCartQuantity();
     const [isAdded, setIsAdded] = useState<boolean>(false);
@@ -201,7 +201,7 @@ export const useProductVariant = (product: Product | ProductSearch) => {
             }/products/${product.slug}`;
         }
 
-        const whatsappUrl = `https://wa.me/${settings?.whatsapp}?text=${encodeURIComponent(message)}`;
+        const whatsappUrl = `https://wa.me/${config?.whatsapp}?text=${encodeURIComponent(message)}`;
 
         window.open(whatsappUrl, "_blank");
         markFirstWhatsAppMessageSent();

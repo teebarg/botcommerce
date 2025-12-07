@@ -1,19 +1,16 @@
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from "@/components/navbar";
-
 import GetApp from "../get-app";
-
 import UserDropDown from "./user-dropdown";
-
 import { CartComponent } from "@/components/store/cart/cart-component";
 import LocalizedClientLink from "@/components/ui/link";
 import { SearchDialog } from "@/components/store/product-search";
-import { getSiteConfig } from "@/lib/config";
 import { Heart, HeartOff } from "lucide-react";
 import { ThemeToggle } from "../theme-toggle";
 import { Session } from "start-authjs";
+import { useConfig } from "@/providers/store-provider";
 
 const StoreNavbar = ({ session }: { session: Session | null }) => {
-    const siteConfig = getSiteConfig();
+    const { config } = useConfig();
 
     return (
         <NavigationBar className="bg-background py-2">
@@ -25,7 +22,7 @@ const StoreNavbar = ({ session }: { session: Session | null }) => {
                         activeProps={{ className: "font-bold text-red-600" }}
                         activeOptions={{ exact: true }}
                     >
-                        <span className="tracking-tighter font-bold text-2xl uppercase">{siteConfig?.name}</span>
+                        <span className="tracking-tighter font-bold text-2xl uppercase">{config?.shop_name}</span>
                         <div className="h-8 w-8">
                             <img alt="Logo" className="h-full w-full object-contain" src="/icon.png" />
                         </div>

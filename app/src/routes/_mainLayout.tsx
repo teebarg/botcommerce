@@ -9,8 +9,8 @@ import ButtonNav from "@/components/layout/bottom-navbar";
 import GetApp from "@/components/get-app";
 import { SearchDialog } from "@/components/store/product-search";
 import LocalizedClientLink from "@/components/ui/link";
-import { getSiteConfig } from "@/lib/config";
 import { Session } from "start-authjs";
+import { useConfig } from "@/providers/store-provider";
 
 export const Route = createFileRoute("/_mainLayout")({
     component: MainLayoutComponent,
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_mainLayout")({
 });
 
 function MainLayoutComponent() {
-    const siteConfig = getSiteConfig();
+    const { config } = useConfig();
     const { session } = Route.useRouteContext();
     return (
         <div className="flex flex-col flex-1">
@@ -33,7 +33,7 @@ function MainLayoutComponent() {
                         <LocalizedClientLink className="text-3xl block h-12 w-12" href="/">
                             <img alt="Logo" className="h-full w-full object-contain" src="/icon.png" />
                         </LocalizedClientLink>
-                        <span className="tracking-tighter font-bold text-lg uppercase">{siteConfig?.name}</span>
+                        <span className="tracking-tighter font-bold text-lg uppercase">{config?.shop_name}</span>
                     </div>
                     <SearchDialog />
                     <GetApp />

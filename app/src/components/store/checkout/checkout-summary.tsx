@@ -1,5 +1,3 @@
-"use client";
-
 import CartTotals from "@/components/store/cart/cart-totals";
 import { Separator } from "@/components/ui/separator";
 import CartItems from "@/components/store/cart/cart-items";

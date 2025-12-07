@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import LocalizedClientLink from "@/components/ui/link";
 import { Button } from "@/components/ui/button";
 import SocialLoginButtons from "@/components/generic/auth/social-login-buttons";
-import { useStoreSettings } from "@/providers/store-provider";
+import { useConfig } from "@/providers/store-provider";
 import { Separator } from "@/components/ui/separator";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Eye, EyeOff } from "lucide-react";
@@ -27,7 +27,7 @@ type Props = {};
 
 const SignUpForm: React.FC<Props> = () => {
     const [show, setShow] = useState<boolean>(false);
-    const { settings } = useStoreSettings();
+    const { config } = useConfig();
     const form = useForm<SignUpFormValues>({
         resolver: zodResolver(signUpSchema),
         defaultValues: {
@@ -140,7 +140,7 @@ const SignUpForm: React.FC<Props> = () => {
                         />
                     </div>
                     <span className="text-center text-muted-foreground text-xs mt-6">
-                        By creating an account, you agree to {settings?.shop_name} Store&apos;s{" "}
+                        By creating an account, you agree to {config?.shop_name} Store&apos;s{" "}
                         <LocalizedClientLink className="underline" href="/content/privacy-policy">
                             Privacy Policy
                         </LocalizedClientLink>{" "}

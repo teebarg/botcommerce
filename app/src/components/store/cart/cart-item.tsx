@@ -1,9 +1,6 @@
-"use client";
-
 import React from "react";
 
 import CartControl from "./cart-control";
-
 import { currency } from "@/lib/utils";
 import { CartItem } from "@/schemas";
 import { Badge } from "@/components/ui/badge";

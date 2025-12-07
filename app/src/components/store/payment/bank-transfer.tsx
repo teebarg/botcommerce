@@ -1,5 +1,3 @@
-"use client";
-
 import { Banknote, Lock } from "lucide-react";
 
 import { Button } from "@/components/ui/button";

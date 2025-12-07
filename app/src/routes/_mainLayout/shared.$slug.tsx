@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import z from "zod";
-import { getSiteConfig } from "@/lib/config";
 import { seo } from "@/utils/seo";
 import { getCatalogFn } from "@/server/catalog.server";
 import { SharedCollectionVisitTracker } from "@/components/store/shared/shared-collection-visit-tracker";
@@ -23,19 +22,16 @@ const catalogQueryOptions = (slug: string, params: any) => ({
 export const Route = createFileRoute("/_mainLayout/shared/$slug")({
     validateSearch: CatalogSearchSchema,
     beforeLoad: ({ search }) => {
-        console.log("🚀 ~ file: index.tsx:24 ~ search:", search);
         return {
             search,
         };
     },
     loader: async ({ params: { slug }, context: { queryClient, search } }) => {
         const data = await queryClient.ensureQueryData(catalogQueryOptions(slug, { ...search }));
-        const siteConfig = getSiteConfig();
 
         return {
             data,
             slug,
-            siteConfig,
         };
     },
     head: ({ loaderData }) => {

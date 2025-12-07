@@ -1,26 +1,24 @@
 import { FC, useEffect, useState } from "react";
-import { useCookie } from "@/hooks/use-cookie";
-import { Link } from "@tanstack/react-router"
-
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
+import { getCookieFn, setCookieFn } from "@/server/cookie.server";
 
 export interface CookieProps {}
 
 const Cookie: FC<CookieProps> = () => {
-    const { getCookie, setCookie } = useCookie();
     const [showCookie, setShowCookie] = useState<boolean>(false);
 
     useEffect(() => {
-        const acceptCookie = getCookie("tbo_cookie");
-
-        if (acceptCookie) {
-            setShowCookie(false);
-        }
+        getCookieFn({ data: "tbo_cookie" }).then((res) => {
+            if (!res) {
+                setShowCookie(true);
+            }
+        });
     }, []);
 
     const handleCookie = () => {
         setShowCookie(false);
-        setCookie("tbo_cookie", true);
+        setCookieFn({ data: { key: "tbo_cookie", value: "true" } });
     };
 
     return (

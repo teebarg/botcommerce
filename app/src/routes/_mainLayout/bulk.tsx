@@ -16,7 +16,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { tryCatch } from "@/lib/try-catch";
 import { Message } from "@/schemas";
 import { api } from "@/utils/fetch-api";
-import { useStoreSettings } from "@/providers/store-provider";
+import { useConfig } from "@/providers/store-provider";
 
 export const Route = createFileRoute("/_mainLayout/bulk")({
     component: RouteComponent,
@@ -35,7 +35,7 @@ type BulkPurchaseFormValues = z.infer<typeof bulkPurchaseSchema>;
 
 function RouteComponent() {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    const { settings } = useStoreSettings();
+    const { config } = useConfig();
 
     const form = useForm<BulkPurchaseFormValues>({
         resolver: zodResolver(bulkPurchaseSchema),
@@ -327,15 +327,15 @@ function RouteComponent() {
                                     <div className="space-y-2 text-sm">
                                         <div className="flex items-center gap-2">
                                             <Phone className="w-4 h-4 text-primary" />
-                                            <span>{settings?.contact_phone}</span>
+                                            <span>{config?.contact_phone}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <Mail className="w-4 h-4 text-primary" />
-                                            <span>{settings?.contact_email}</span>
+                                            <span>{config?.contact_email}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <MapPin className="w-4 h-4 text-primary" />
-                                            <span>{settings?.address}</span>
+                                            <span>{config?.address}</span>
                                         </div>
                                     </div>
                                 </div>

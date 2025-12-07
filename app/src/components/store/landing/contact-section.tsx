@@ -1,11 +1,9 @@
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
-
 import ContactForm from "../contact-form";
-
-import { getSiteConfig } from "@/lib/config";
+import { useConfig } from "@/providers/store-provider";
 
 export default function ContactSection() {
-    const siteConfig = getSiteConfig();
+    const { config } = useConfig();
 
     return (
         <section className="py-16 bg-linear-to-b from-card/30 to-background">
@@ -29,7 +27,7 @@ export default function ContactSection() {
                                     <h3 className="font-semibold">Visit Us</h3>
                                 </div>
                                 <p className="text-muted-foreground text-sm">
-                                    {siteConfig?.address}
+                                    {config?.address}
                                     <br />
                                     Lagos, Nigeria
                                 </p>
@@ -42,7 +40,7 @@ export default function ContactSection() {
                                     </div>
                                     <h3 className="font-semibold">Call Us</h3>
                                 </div>
-                                <p className="text-muted-foreground text-sm">{siteConfig?.contactPhone}</p>
+                                <p className="text-muted-foreground text-sm">{config?.contact_phone}</p>
                             </div>
 
                             <div className="bg-card p-6 rounded-lg border border-input">
@@ -52,7 +50,7 @@ export default function ContactSection() {
                                     </div>
                                     <h3 className="font-semibold">Email Us</h3>
                                 </div>
-                                <p className="text-muted-foreground text-sm">{siteConfig?.contactEmail}</p>
+                                <p className="text-muted-foreground text-sm">{config?.contact_email}</p>
                             </div>
 
                             <div className="bg-card p-6 rounded-lg border border-input">

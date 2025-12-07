@@ -24,8 +24,8 @@ import { getStoredTheme, ThemeProvider } from "@/providers/theme-provider";
 import type { QueryClient } from "@tanstack/react-query";
 import { categoriesQuery } from "@/hooks/useCategories";
 import { collectionsQuery } from "@/hooks/useCollection";
-import { useRef } from "react";
-import { getSiteConfig } from "@/lib/config";
+import { InvalidateProvider } from "@/providers/invalidate-provider";
+import { siteConfigQuery } from "@/hooks/useGeneric";
 
 interface RouterContext {
     session: AuthSession | null;
@@ -76,7 +76,20 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         };
     },
     loader: async ({ context: { queryClient } }) => {
-        return Promise.all([queryClient.ensureQueryData(categoriesQuery()), queryClient.ensureQueryData(collectionsQuery())]);
+        // return Promise.all([
+        //     queryClient.ensureQueryData(categoriesQuery()),
+        //     queryClient.ensureQueryData(collectionsQuery()),
+        //     queryClient.ensureQueryData(siteConfigQuery),
+        // ]);
+        const categories = await queryClient.ensureQueryData(categoriesQuery());
+        const collections = await queryClient.ensureQueryData(collectionsQuery());
+        const siteConfig = await queryClient.ensureQueryData(siteConfigQuery);
+
+        return {
+            categories,
+            collections,
+            siteConfig,
+        };
     },
     errorComponent: (props) => {
         return (
@@ -132,7 +145,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                         onOpen={() => console.log("WebSocket connected!")}
                                         onClose={() => console.log("WebSocket disconnected!")}
                                     >
-                                        {children}
+                                        <InvalidateProvider>{children}</InvalidateProvider>
                                         <ImpersonationBanner />
                                     </WebSocketProvider>
                                 </CartProvider>

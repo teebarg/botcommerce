@@ -5,7 +5,6 @@ import { tryCatch } from "@/lib/try-catch";
 import { getProductsFn } from "@/server/product.server";
 import z from "zod";
 import { getCollectionFn } from "@/server/collections.server";
-import { getSiteConfig } from "@/lib/config";
 import { seo } from "@/utils/seo";
 
 const productSearchSchema = z.object({
@@ -23,21 +22,17 @@ const productSearchSchema = z.object({
 export const Route = createFileRoute("/_mainLayout/collections/$slug")({
     validateSearch: productSearchSchema,
     beforeLoad: ({ search }) => {
-        console.log("🚀 ~ file: index.tsx:24 ~ search:", search);
         return {
             search,
         };
     },
     loader: async ({ params: { slug }, context }) => {
         const { data: collection } = await tryCatch(getCollectionFn({ data: slug }));
-        const siteConfig = getSiteConfig();
-
         const { data, error } = await tryCatch(getProductsFn({ data: { limit: 36, collections: collection?.slug, ...context.search } }));
         return {
             collection,
             data,
             error,
-            siteConfig,
         };
     },
     head: ({ loaderData }) => {
@@ -45,14 +40,14 @@ export const Route = createFileRoute("/_mainLayout/collections/$slug")({
         const baseUrl = import.meta.env.VITE_BASE_URL;
         const name = collection?.name;
         const title = `${name} Collection`;
-        const description = `Explore ${name} at ${loaderData?.siteConfig?.name}`;
+        // const description = `Explore ${name} at ${siteConfig?.shop_name}`;
 
         return {
             title,
             meta: [
                 ...seo({
                     title,
-                    description,
+                    description: "",
                     url: `${baseUrl}/collections/${collection?.slug}`,
                     image: "/default-og.png",
                     name,

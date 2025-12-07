@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getSiteConfig } from "@/lib/config";
-
 import { BtnLink } from "@/components/ui/btnLink";
+import { useConfig } from "@/providers/store-provider";
 
 export const Route = createFileRoute("/_mainLayout/(static)/careers")({
     head: () => ({
@@ -19,7 +18,7 @@ export const Route = createFileRoute("/_mainLayout/(static)/careers")({
 });
 
 function RouteComponent() {
-    const siteConfig = getSiteConfig();
+    const { config } = useConfig();
     const jobOpenings: { title: string; location: string }[] = [
         // { title: "Store Manager", location: "New York, NY" },
         // { title: "Sales Associate", location: "Los Angeles, CA" },
@@ -30,12 +29,12 @@ function RouteComponent() {
     return (
         <div>
             <div className="max-w-6xl mx-auto px-4 py-12">
-                <h1 className="text-4xl font-bold text-center mb-8 text-foreground">Career Opportunities at {siteConfig.name}</h1>
+                <h1 className="text-4xl font-bold text-center mb-8 text-foreground">Career Opportunities at {config?.shop_name}</h1>
 
                 <div className="bg-card rounded-lg shadow-lg p-8 mb-8">
                     <h2 className="text-2xl font-semibold mb-4">Join Our Team</h2>
                     <p className="mb-4">
-                        {`At ${siteConfig.name}, we're always looking for passionate individuals to join our growing family. We offer exciting career
+                        {`At ${config?.shop_name}, we're always looking for passionate individuals to join our growing family. We offer exciting career
                           opportunities, competitive benefits, and a supportive work environment.`}
                     </p>
                     <p className="mb-4">Explore our current openings and find the perfect role for you!</p>

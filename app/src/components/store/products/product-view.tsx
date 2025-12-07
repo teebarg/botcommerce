@@ -4,9 +4,9 @@ import { toast } from "sonner";
 
 import { cn, currency } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
-import ProductShare from "@/components/product/product-share";
+import ProductShare from "@/components/products/product-share";
 import { ProductImage, ProductVariant } from "@/schemas";
-import { ProductVariantSelection } from "@/components/product/product-variant-selection";
+import { ProductVariantSelection } from "@/components/products/product-variant-selection";
 import { Product } from "@/schemas/product";
 import { UserInteractionType, useTrackUserInteraction } from "@/hooks/useUserInteraction";
 import { ProductCollectionIndicator } from "@/components/admin/shared-collections/product-collection-indicator";

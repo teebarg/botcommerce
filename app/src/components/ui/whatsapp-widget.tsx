@@ -1,12 +1,8 @@
-"use client";
-
 import { Send, X } from "lucide-react";
 import { useState } from "react";
-
 import { Button } from "./button";
-
 import { formatDate } from "@/lib/utils";
-import { useStoreSettings } from "@/providers/store-provider";
+import { useConfig } from "@/providers/store-provider";
 import { useLocation } from "@tanstack/react-router";
 
 const WhatsAppWidget: React.FC = () => {
@@ -14,10 +10,9 @@ const WhatsAppWidget: React.FC = () => {
     const [message, setMessage] = useState<string>("");
     const location = useLocation();
     const path = location.pathname;
+    const { config } = useConfig();
 
-    const { settings } = useStoreSettings();
-
-    if (!settings?.whatsapp || path.includes("/admin")) {
+    if (!config?.whatsapp || path.includes("/admin")) {
         return null;
     }
 
@@ -25,7 +20,7 @@ const WhatsAppWidget: React.FC = () => {
         e.preventDefault();
         const encodedMessage = encodeURIComponent(message);
 
-        window.open(`https://api.whatsapp.com/send/?phone=${settings?.whatsapp}&text=${encodedMessage}`, "_blank");
+        window.open(`https://api.whatsapp.com/send/?phone=${config?.whatsapp}&text=${encodedMessage}`, "_blank");
         setMessage("");
         setIsOpen(false);
     };
@@ -51,7 +46,7 @@ const WhatsAppWidget: React.FC = () => {
                                 </svg>
                             </div>
                             <div className="text-white">
-                                <h3 className="font-semibold text-lg">{settings?.shop_name}</h3>
+                                <h3 className="font-semibold text-lg">{config?.shop_name}</h3>
                                 <p className="text-sm opacity-90">Typically replies within 10 minutes</p>
                             </div>
                         </div>
@@ -62,7 +57,7 @@ const WhatsAppWidget: React.FC = () => {
 
                     <div className="p-4 bg-[#E5DDD5]">
                         <div className="bg-white rounded-lg p-3 inline-block max-w-[80%]">
-                            <p className="text-gray-800">Hi, welcome to {settings?.shop_name}, how can we help you today 😊</p>
+                            <p className="text-gray-800">Hi, welcome to {config?.shop_name}, how can we help you today 😊</p>
                             <p className="text-xs text-gray-500 text-right mt-1">{formatDate(new Date().toISOString())}</p>
                         </div>
                     </div>

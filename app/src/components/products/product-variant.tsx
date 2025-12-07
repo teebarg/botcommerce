@@ -1,10 +1,6 @@
-"use client";
-
 import { useState } from "react";
 import { Edit, Trash2 } from "lucide-react";
-
 import ProductVariantForm from "./product-variant-form";
-
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductVariant } from "@/schemas";

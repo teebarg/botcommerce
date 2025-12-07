@@ -10,7 +10,7 @@ import CheckoutSummary from "@/components/store/checkout/checkout-summary";
 import { useCart } from "@/providers/cart-provider";
 import CheckoutFlow from "@/components/store/checkout/components/checkout-flow";
 import ComponentLoader from "@/components/component-loader";
-import { useStoreSettings } from "@/providers/store-provider";
+import { useConfig } from "@/providers/store-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export const Route = createFileRoute("/checkout")({
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/checkout")({
 });
 
 function RouteComponent() {
-    const { settings } = useStoreSettings();
+    const { config } = useConfig();
 
     const { cart, error, isLoading } = useCart();
 
@@ -51,7 +51,7 @@ function RouteComponent() {
                 </div>
                 <header className="hidden md:flex justify-between items-center px-8 sticky top-safe h-16 bg-background z-10">
                     <LocalizedClientLink className="text-xl font-semibold" href="/">
-                        {settings?.shop_name}
+                        {config?.shop_name}
                     </LocalizedClientLink>
                     <ThemeToggle />
                 </header>{" "}

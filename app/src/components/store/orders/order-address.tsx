@@ -1,11 +1,11 @@
 import { MapPin, Truck } from "lucide-react";
 
 import { DeliveryOption, Order } from "@/schemas";
-import { useStoreSettings } from "@/providers/store-provider";
+import { useConfig } from "@/providers/store-provider";
 import { useDeliveryOptions } from "@/hooks/useApi";
 
 const OrderAddress: React.FC<{ order: Order }> = ({ order }) => {
-    const { settings } = useStoreSettings();
+    const { config } = useConfig();
     const { data: deliveryOptions } = useDeliveryOptions();
 
     if (order.shipping_method === "PICKUP") {
@@ -15,7 +15,7 @@ const OrderAddress: React.FC<{ order: Order }> = ({ order }) => {
                     <MapPin className="w-5 h-5 text-muted-foreground mt-0.5" />
                     <div className="ml-3">
                         <p className="font-medium">Collection Point</p>
-                        <p className="text-sm text-muted-foreground">{settings?.address}</p>
+                        <p className="text-sm text-muted-foreground">{config?.address}</p>
                         <p className="text-sm text-muted-foreground">Open Mon-Sat: 9am - 6pm</p>
                     </div>
                 </div>

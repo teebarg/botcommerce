@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getSiteConfig } from "@/lib/config";
 import { BtnLink } from "@/components/ui/btnLink";
+import { useConfig } from "@/providers/store-provider";
 
 export const Route = createFileRoute("/_mainLayout/(static)/privacy")({
     head: () => ({
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_mainLayout/(static)/privacy")({
 });
 
 function RouteComponent() {
-    const siteConfig = getSiteConfig();
+    const { config } = useConfig();
 
     return (
         <div className="max-w-6xl mx-auto px-4 py-12">
@@ -27,7 +27,7 @@ function RouteComponent() {
             <div className="bg-card rounded-lg shadow-lg p-8 mb-8">
                 <h2 className="text-xl font-semibold mb-4 text-foreground">Your Privacy Matters</h2>
                 <p className="mb-4 text-foreground">
-                    At {siteConfig.name}, we are committed to protecting your privacy and ensuring the security of your personal information. This
+                    At {config?.shop_name}, we are committed to protecting your privacy and ensuring the security of your personal information. This
                     Privacy Policy outlines how we collect, use, and safeguard your data when you use our website or services.
                 </p>
                 <h2 className="text-xl font-semibold mb-4 text-foreground">Information We Collect</h2>
@@ -53,12 +53,12 @@ function RouteComponent() {
                 <p className="mb-4 text-foreground">If you have any questions about our Privacy Policy, please contact us at:</p>
                 <p className="text-foreground">
                     Email:{" "}
-                    <a className="text-primary hover:underline" href={`mailto:${siteConfig.contactEmail}`} rel="noreferrer" target="_blank">
-                        {siteConfig.contactEmail}
+                    <a className="text-primary hover:underline" href={`mailto:${config?.contact_email}`} rel="noreferrer" target="_blank">
+                        {config?.contact_email}
                     </a>
                 </p>
                 <p className="text-foreground">
-                    Phone: <span className="font-semibold">{siteConfig.contactPhone}</span>
+                    Phone: <span className="font-semibold">{config?.contact_phone}</span>
                 </p>
             </div>
 

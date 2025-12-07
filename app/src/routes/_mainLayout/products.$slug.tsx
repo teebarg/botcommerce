@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
 import RelatedProducts from "@/components/store/products/related-products";
-import ReviewsSection from "@/components/product/product-reviews";
+import ReviewsSection from "@/components/products/product-reviews";
 import { getProductFn, getRelatedProductFn } from "@/server/product.server";
 import SuspenseQuery from "@/utils/query";
 import { getProductReviewFn } from "@/server/review.server";
@@ -10,7 +10,6 @@ import { PaginatedReview, ProductSearch } from "@/schemas";
 import ProductView from "@/components/store/products/product-view";
 import { ordersQueryOptions } from "@/hooks/useOrder";
 import { seo } from "@/utils/seo";
-import { getSiteConfig } from "@/lib/config";
 import { ArrowUpRight, RefreshCcw, TriangleAlert } from "lucide-react";
 import { BtnLink } from "@/components/ui/btnLink";
 import { Button } from "@/components/ui/button";
@@ -38,10 +37,8 @@ export const Route = createFileRoute("/_mainLayout/products/$slug")({
         queryClient.prefetchQuery(relatedProductsQueryOptions(data.id, 4));
         queryClient.prefetchQuery(ordersQueryOptions({}));
 
-        const siteConfig = getSiteConfig();
         return {
             data,
-            siteConfig,
         };
     },
     head: ({ loaderData }) => {

@@ -5,7 +5,7 @@ import { Category } from "@/schemas/product";
 import { useCategories } from "@/hooks/useCategories";
 import { useCollections } from "@/hooks/useCollection";
 import { Separator } from "@/components/ui/separator";
-import { useStoreSettings } from "@/providers/store-provider";
+import { useConfig } from "@/providers/store-provider";
 
 const company = [
     {
@@ -46,7 +46,7 @@ const support = [
 ];
 
 export default function Footer() {
-    const { settings } = useStoreSettings();
+    const { config } = useConfig();
     const { data: collections } = useCollections();
 
     const { data: cat } = useCategories();
@@ -58,7 +58,7 @@ export default function Footer() {
                 <div className="hidden md:grid md:grid-cols-3 md:gap-8">
                     <div className="md:pr-8">
                         <h3 className="text-xl font-bold bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
-                            {settings?.shop_name}
+                            {config?.shop_name}
                         </h3>
                         <p className="text-sm text-foreground">
                             {`We are a dedicated online store offering a wide range of high-quality and fun products for kids. Our mission is to bring
@@ -68,7 +68,7 @@ export default function Footer() {
                             <a
                                 aria-label="Twitter"
                                 className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-                                href={`https://web.facebook.com/profile.php?id=${settings?.facebook}`}
+                                href={`https://web.facebook.com/profile.php?id=${config?.facebook}`}
                                 target="_blank"
                             >
                                 <Facebook className="text-primary" />
@@ -76,7 +76,7 @@ export default function Footer() {
                             <a
                                 aria-label="Instagram"
                                 className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-                                href={`https://www.instagram.com/${settings?.instagram}`}
+                                href={`https://www.instagram.com/${config?.instagram}`}
                                 target="_blank"
                             >
                                 <Instagram className="text-primary" />
@@ -84,7 +84,7 @@ export default function Footer() {
                             <a
                                 aria-label="Tiktok"
                                 className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-                                href={`https://www.tiktok.com/@${settings?.tiktok}`}
+                                href={`https://www.tiktok.com/@${config?.tiktok}`}
                                 target="_blank"
                             >
                                 <MessageSquare className="text-primary" />
@@ -92,7 +92,7 @@ export default function Footer() {
                             <a
                                 aria-label="X"
                                 className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-                                href={`https://x.com/${settings?.twitter}`}
+                                href={`https://x.com/${config?.twitter}`}
                                 target="_blank"
                             >
                                 <Twitter className="text-primary" />
@@ -183,7 +183,7 @@ export default function Footer() {
                 <Separator className="my-4" />
                 <div>
                     <p className="text-sm text-muted-foreground">
-                        &copy; {new Date().getFullYear()} {settings?.shop_name}. All rights reserved.
+                        &copy; {new Date().getFullYear()} {config?.shop_name}. All rights reserved.
                     </p>
                 </div>
             </div>

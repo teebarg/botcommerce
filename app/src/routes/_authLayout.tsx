@@ -1,8 +1,8 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { redirect } from "@tanstack/react-router";
-import { getSiteConfig } from "@/lib/config";
 import z from "zod";
+import { useConfig } from "@/providers/store-provider";
 
 export const Route = createFileRoute("/_authLayout")({
     validateSearch: z.object({
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authLayout")({
 });
 
 function RouteComponent() {
-    const siteConfig = getSiteConfig();
+    const { config } = useConfig();
 
     return (
         <div className="h-screen flex flex-col">
@@ -35,7 +35,7 @@ function RouteComponent() {
                         </div>
                         <Link to="/">
                             <span className="text-xl font-semibold bg-clip-text text-transparent bg-linear-to-r from-primary to-contrast">
-                                {siteConfig.name}
+                                {config?.shop_name}
                             </span>
                         </Link>
                     </div>

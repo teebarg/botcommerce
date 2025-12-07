@@ -1,5 +1,3 @@
-"use client";
-
 import { ProductSearch } from "@/schemas";
 import ProductCard from "@/components/store/products/product-card";
 

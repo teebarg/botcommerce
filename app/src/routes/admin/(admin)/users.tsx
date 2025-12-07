@@ -1,12 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
-
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Order, Status, User } from "@/schemas";
 import { currency } from "@/lib/utils";
-import { CardSkeleton } from "@/components/ui/skeletons";
 import PaginationUI from "@/components/pagination";
 import CustomerCreateGuest from "@/components/admin/customers/customer-create-guest";
 import CustomerFilter from "@/components/admin/customers/customer-filter";
@@ -46,11 +44,9 @@ export const Route = createFileRoute("/admin/(admin)/users")({
 
 function RouteComponent() {
     const { skip = 0 } = Route.useSearch();
-    const usersQuery = useSuspenseQuery(useUsers({ skip: skip || 0, limit: LIMIT }));
+    const { data } = useSuspenseQuery(useUsers({ skip: skip || 0, limit: LIMIT }));
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [filterOpen, setFilterOpen] = useState<boolean>(false);
-
-    const { data, isLoading } = usersQuery;
 
     const { users, ...pagination } = data ?? { skip: 0, limit: 0, total_pages: 0, total_count: 0 };
 
@@ -89,13 +85,7 @@ function RouteComponent() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {isLoading ? (
-                                <TableRow key="loading">
-                                    <TableCell className="text-center" colSpan={6}>
-                                        Loading...
-                                    </TableCell>
-                                </TableRow>
-                            ) : users?.length === 0 ? (
+                            {users?.length === 0 ? (
                                 <TableRow key="no-orders">
                                     <TableCell className="text-center" colSpan={6}>
                                         No users found
@@ -151,8 +141,6 @@ function RouteComponent() {
                             {users?.map((user: User, idx: number) => (
                                 <CustomerCard key={idx} actions={<CustomerActions user={user} />} user={user} />
                             ))}
-
-                            {isLoading && <CardSkeleton showAvatar={false} />}
                         </div>
 
                         {users?.length === 0 && (

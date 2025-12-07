@@ -1,5 +1,3 @@
-"use client";
-
 import ProductVariants from "@/components/products/product-variant";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProductForm from "@/components/products/product-form";

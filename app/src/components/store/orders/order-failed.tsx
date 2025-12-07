@@ -1,5 +1,3 @@
-"use client";
-
 import { AlertCircle, CreditCard } from "lucide-react";
 
 import OrderItems from "./order-items";

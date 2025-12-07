@@ -1,8 +1,5 @@
-"use client";
-
 import React, { useEffect } from "react";
 import { MessageCircleMore } from "lucide-react";
-
 import { ProductVariant } from "@/schemas";
 import { cn, currency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";

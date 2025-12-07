@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Order, OrderItem } from "@/schemas";
 import { currency } from "@/lib/utils";
-import { useStoreSettings } from "@/providers/store-provider";
+import { useConfig } from "@/providers/store-provider";
 import ImageDisplay from "@/components/image-display";
 
 interface OrderDetailsProps {
@@ -17,7 +17,7 @@ interface OrderDetailsProps {
 }
 
 const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
-    const { settings } = useStoreSettings();
+    const { config } = useConfig();
 
     return (
         <div className="space-y-6 px-4 md:px-8 py-6">
@@ -142,7 +142,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                         <CardContent>
                             {order.shipping_method === "PICKUP" ? (
                                 <div className="text-sm space-y-1">
-                                    <p className="font-medium text-foreground">{settings?.address}</p>
+                                    <p className="font-medium text-foreground">{config?.address}</p>
                                     <p className="text-muted-foreground">Open Mon-Sat: 9am - 6pm</p>
                                 </div>
                             ) : (

@@ -1,5 +1,3 @@
-"use client";
-
 import { CheckCircle, Package, PackageCheck, RefreshCw, RotateCcw, ShieldAlert, Truck, XCircle } from "lucide-react";
 import { JSX } from "react";
 

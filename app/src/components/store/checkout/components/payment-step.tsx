@@ -9,11 +9,11 @@ import { useUpdateCartDetails } from "@/hooks/useCart";
 import { PaystackPayment } from "@/components/store/payment/paystack-payment";
 import BankTransfer from "@/components/store/payment/bank-transfer";
 import Pickup from "@/components/store/payment/pickup";
-import { useStoreSettings } from "@/providers/store-provider";
+import { useConfig } from "@/providers/store-provider";
 import DiscountCode from "./discount-code";
 import { Separator } from "@/components/ui/separator";
-import { ZeroPayment } from "../../payment/zero-payment";
 import CartContactForm from "../contact";
+import { ZeroPayment } from "../../payment/zero-payment";
 
 const payMethods: { id: string; provider_id: PaymentMethod }[] = [
     { id: "pickup", provider_id: "CASH_ON_DELIVERY" },
@@ -27,7 +27,7 @@ interface PaymentStepProps {
 }
 
 const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
-    const { settings } = useStoreSettings();
+    const { config } = useConfig();
     const updateCartDetails = useUpdateCartDetails();
     const [selectedPaymentMethod, setSelectedPaymentMethod] = React.useState<PaymentMethod | null>(null);
 
@@ -66,9 +66,9 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                                 >
                                     {payMethods.map((item: { id: string; provider_id: PaymentMethod }, idx: number) => {
                                         if (
-                                            (item.provider_id === "CASH_ON_DELIVERY" && settings?.payment_cash != "true") ||
-                                            (item.provider_id === "BANK_TRANSFER" && settings?.payment_bank != "true") ||
-                                            (item.provider_id === "PAYSTACK" && settings?.payment_paystack != "true") ||
+                                            (item.provider_id === "CASH_ON_DELIVERY" && config?.payment_cash != "true") ||
+                                            (item.provider_id === "BANK_TRANSFER" && config?.payment_bank != "true") ||
+                                            (item.provider_id === "PAYSTACK" && config?.payment_paystack != "true") ||
                                             (cart?.shipping_method !== "PICKUP" && item.provider_id === "CASH_ON_DELIVERY")
                                         ) {
                                             return null;

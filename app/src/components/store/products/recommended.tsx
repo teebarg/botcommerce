@@ -1,5 +1,3 @@
-"use client";
-
 import ProductCard from "@/components/store/products/product-card";
 import { ProductSearch } from "@/schemas/product";
 import { useRecommendedProducts } from "@/hooks/useProduct";

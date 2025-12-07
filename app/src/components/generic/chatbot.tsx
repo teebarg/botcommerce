@@ -3,14 +3,13 @@ import { useOverlayTriggerState } from "react-stately";
 
 import ChatBotComponent from "./chat/chatbot";
 
-import { useStoreSettings } from "@/providers/store-provider";
+import { useConfig } from "@/providers/store-provider";
 
 interface Props {}
 
 const ChatBotWrapper: React.FC = () => {
-    const { settings } = useStoreSettings();
-
-    if (settings?.feature_chatbot != "true") {
+    const { config } = useConfig();
+    if (config?.feature_chatbot != "true") {
         return null;
     }
 
