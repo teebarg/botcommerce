@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { BankDetailsSchema } from "@/schemas/common";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { createBankDetailsFn } from "@/server/generic.server";
 
 interface BankDetailsFormProps {
     onClose: () => void;
@@ -35,7 +36,7 @@ const BankDetailsForm: React.FC<BankDetailsFormProps> = ({ onClose }) => {
     });
 
     const { mutate: createBankDetails, isPending } = useMutation({
-        mutationFn: async (input: BankDetailsFormValues) => await api.post("/bank-details/", input),
+        mutationFn: async (input: BankDetailsFormValues) => await createBankDetailsFn({ data: input }),
         onSuccess: () => {
             toast.success("Bank details added successfully");
             onClose();

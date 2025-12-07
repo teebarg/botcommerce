@@ -1,5 +1,3 @@
-"use client";
-
 import { ShoppingCart, DollarSign, TrendingUp, BarChart3 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

@@ -7,12 +7,12 @@ import { useMutation } from "@tanstack/react-query";
 import BankDetailsForm from "./bank-details-form";
 
 import { Switch } from "@/components/ui/switch";
-import { BankDetails, Message, ShopSettings } from "@/schemas";
-import { api } from "@/utils/fetch-api";
+import { BankDetails, ShopSettings } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 import { useBankDetails } from "@/hooks/useApi";
 import { useSyncShopDetails } from "@/hooks/useGeneric";
+import { deleteBankDetailsFn } from "@/server/generic.server";
 
 interface ShopPaymentsProps {
     settings: ShopSettings[];
@@ -47,7 +47,7 @@ interface BankDetailsProps {
 
 const BankDetailComponent: React.FC<BankDetailsProps> = ({ bank }) => {
     const deleteMutation = useMutation({
-        mutationFn: async (id: number) => await api.delete<Message>(`/bank-details/${id}`),
+        mutationFn: async (id: number) => await deleteBankDetailsFn({ data: id }),
         onSuccess: () => {
             toast.success("Bank details deleted successfully");
         },

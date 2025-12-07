@@ -114,7 +114,7 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
                             {description}
                         </h2>
                     </div>
-                    <div aria-label="Carousel controls" className="hidden md:flex items-center gap-3" role="group">
+                    <div aria-label="carousel controls" className="hidden md:flex items-center gap-3" role="group">
                         <Button
                             aria-label="Scroll collections backward"
                             className="h-12 w-12 rounded-full text-gray-800 dark:text-gray-100 border border-gray-600 dark:border-gray-200"

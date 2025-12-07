@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import { Wrench, AlertCircle, Cog, Hammer } from "lucide-react";
 

@@ -3,7 +3,9 @@ import type { ContactFormValues } from "@/components/store/contact-form";
 import { createServerFn } from "@tanstack/react-start";
 import { api } from "@/utils/fetch-api";
 import {
+    ChatMessage,
     ShippingMethodSchema,
+    UserInteraction,
     type BankDetails,
     type ConversationStatus,
     type DeliveryOption,
@@ -11,6 +13,7 @@ import {
     type PaginatedChat,
     type ShopSettings,
 } from "@/schemas";
+import { D } from "node_modules/@upstash/redis/zmscore-DhpQcqpW.mjs";
 
 export const getShopSettingsFn = createServerFn({ method: "GET" }).handler(async () => {
     return await api.get<ShopSettings[]>("/shop-settings/");
@@ -61,9 +64,28 @@ const ChatInputSchema = z.object({
     user_message: z.string(),
 });
 
+// Bank details settings
 export const getBankDetailsFn = createServerFn({ method: "GET" }).handler(async () => {
     return await api.get<BankDetails[]>("/bank-details/");
 });
+
+const BankDetailsSchema = z.object({
+    bank_name: z.string(),
+    account_name: z.string(),
+    account_number: z.string(),
+});
+
+export const createBankDetailsFn = createServerFn({ method: "POST" })
+    .inputValidator(BankDetailsSchema)
+    .handler(async ({ data }) => {
+        return await api.post<Message>("/bank-details/", data);
+    });
+
+export const deleteBankDetailsFn = createServerFn({ method: "POST" })
+    .inputValidator(z.number())
+    .handler(async ({ data: id }) => {
+        return await api.delete<Message>(`/bank-details/${id}`);
+    });
 
 export const chatMutationFn = createServerFn({ method: "POST" })
     .inputValidator(ChatInputSchema)
@@ -75,6 +97,12 @@ export const getChatsFn = createServerFn({ method: "GET" })
     .inputValidator(ConversationParamsSchema)
     .handler(async ({ data }) => {
         return await api.get<PaginatedChat>("/chat/", { params: data });
+    });
+
+export const getChatFn = createServerFn({ method: "GET" })
+    .inputValidator((data: string) => data)
+    .handler(async ({ data: id }) => {
+        return await api.get<{ messages: ChatMessage[] }>(`/chat/${id}`);
     });
 
 export const deleteChatFn = createServerFn({ method: "POST" })
@@ -130,4 +158,20 @@ export const sendFCMFn = createServerFn({ method: "POST" })
     .inputValidator(FCMSchema)
     .handler(async ({ data }) => {
         return await api.post<Message>("/notification/push-fcm", data);
+    });
+
+const UserInteractionSchema = z.object({
+    user_id: z.number(),
+    product_id: z.number(),
+    type: z.enum(["VIEW", "PURCHASE", "CART_ADD", "WISHLIST_ADD", "WISHLIST_REMOVE"]).optional(),
+    metadata: z.record(z.string(), z.string()).optional(),
+});
+
+const BatchUserInteractionSchema = z.array(UserInteractionSchema);
+
+// interactions fn
+export const sendUserInteractionsFn = createServerFn({ method: "POST" })
+    .inputValidator(BatchUserInteractionSchema)
+    .handler(async ({ data }) => {
+        return await api.post<Message>("/user-interactions/batch", data);
     });

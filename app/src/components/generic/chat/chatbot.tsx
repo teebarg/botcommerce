@@ -3,11 +3,10 @@ import { Send, Paperclip, Minus, X } from "lucide-react";
 import { toast } from "sonner";
 
 import ChatBody from "./chatbody";
-
-import { api } from "@/utils/fetch-api";
 import { ChatMessage } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
 import { useChatMutation } from "@/hooks/useApi";
+import { getChatFn } from "@/server/generic.server";
 
 interface Message {
     text: string;
@@ -40,7 +39,7 @@ const ChatBotComponent: React.FC<ChatBotProps> = ({ onClose, onMinimize }) => {
     }, []);
 
     const getChat = async (id: string) => {
-        const { data, error } = await tryCatch<{ messages: ChatMessage[] }>(api.get(`/chat/${id}`));
+        const { data, error } = await tryCatch<{ messages: ChatMessage[] }>(getChatFn({ data: id }));
 
         if (error) {
             toast.error("Failed to fetch messages.");

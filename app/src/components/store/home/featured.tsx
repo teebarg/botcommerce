@@ -1,6 +1,3 @@
-"use client";
-
-import React from "react";
 import { TrendingUp } from "lucide-react";
 
 import LocalizedClientLink from "@/components/ui/link";

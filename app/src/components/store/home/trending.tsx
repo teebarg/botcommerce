@@ -1,7 +1,3 @@
-"use client";
-
-import React from "react";
-
 import { useProductSearch } from "@/hooks/useProduct";
 import ProductsCarousel from "@/components/store/product-carousel";
 

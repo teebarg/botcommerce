@@ -1,5 +1,3 @@
-"use client";
-
 import type { Collection } from "@/schemas/product";
 
 import React, { forwardRef, useEffect } from "react";

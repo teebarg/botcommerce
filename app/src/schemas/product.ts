@@ -160,10 +160,10 @@ export const PaginatedSharedSchema = PagSchema.extend({
 });
 
 export const FacetSchema = z.object({
-  category_slugs: z.record(z.string(), z.string()).optional(),
-  sizes: z.record(z.string(), z.string()).optional(),
-  colors: z.record(z.string(), z.string()).optional(),
-  ages: z.record(z.string(), z.string()).optional(),
+    category_slugs: z.record(z.string(), z.string()).optional(),
+    sizes: z.record(z.string(), z.string()).optional(),
+    colors: z.record(z.string(), z.string()).optional(),
+    ages: z.record(z.string(), z.string()).optional(),
 });
 
 export const PaginatedProductSearchSchema = PagSchema.extend({
