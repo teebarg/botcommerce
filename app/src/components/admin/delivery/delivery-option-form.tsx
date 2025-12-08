@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { DeliveryOption } from "@/schemas";
 import { useInvalidate } from "@/hooks/useApi";
 import { ShippingMethodSchema } from "@/schemas";
-import { tryCatch } from "@/lib/try-catch";
+import { tryCatch } from "@/utils/try-catch";
 import { createDeliveryFn, updateDeliveryFn } from "@/server/generic.server";
 
 const formSchema = z.object({

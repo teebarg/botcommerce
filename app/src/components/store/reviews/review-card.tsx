@@ -3,7 +3,7 @@ import { Star, Shield } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Review } from "@/schemas";
-import { formatDate } from "@/lib/utils";
+import { formatDate } from "@/utils";
 
 interface ReviewCardProps {
     review: Review;

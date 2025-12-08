@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 import ChatBody from "./chatbody";
 import { ChatMessage } from "@/schemas";
-import { tryCatch } from "@/lib/try-catch";
+import { tryCatch } from "@/utils/try-catch";
 import { useChatMutation } from "@/hooks/useApi";
 import { getChatFn } from "@/server/generic.server";
 

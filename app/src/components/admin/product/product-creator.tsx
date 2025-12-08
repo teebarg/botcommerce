@@ -8,7 +8,7 @@ import { ProductReview } from "./product-review";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { Product, ProductVariant } from "@/schemas";
 import { useNavigate } from "@tanstack/react-router";
 import { createBundleFn } from "@/server/product.server";

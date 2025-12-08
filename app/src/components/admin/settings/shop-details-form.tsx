@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-
 import { Input } from "@/components/ui/input";
 import { ShopSettings } from "@/schemas";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { useSyncShopDetails } from "@/hooks/useGeneric";
 

@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Order, OrderItem } from "@/schemas";
-import { currency } from "@/lib/utils";
+import { currency } from "@/utils";
 import { useConfig } from "@/providers/store-provider";
 import ImageDisplay from "@/components/image-display";
 

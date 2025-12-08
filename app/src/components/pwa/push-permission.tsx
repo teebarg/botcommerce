@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Gift, X } from "lucide-react";
-import { tryCatch } from "@/lib/try-catch";
+import { tryCatch } from "@/utils/try-catch";
 import { Button } from "@/components/ui/button";
 import { sendFCMFn } from "@/server/generic.server";
 

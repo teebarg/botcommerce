@@ -3,8 +3,8 @@ import { toast } from "sonner";
 import { Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PaymentInitialize } from "@/types/payment";
-import { currency } from "@/lib/utils";
-import { tryCatch } from "@/lib/try-catch";
+import { currency } from "@/utils";
+import { tryCatch } from "@/utils/try-catch";
 import { createPaymentFn } from "@/server/payment.server";
 
 interface PaystackPaymentProps {

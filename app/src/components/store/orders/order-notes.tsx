@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Order } from "@/schemas";
-import { tryCatch } from "@/lib/try-catch";
+import { tryCatch } from "@/utils/try-catch";
 import { createOrderNoteFn } from "@/server/order.server";
 
 interface OrderNotesProp {

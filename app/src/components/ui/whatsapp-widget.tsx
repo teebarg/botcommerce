@@ -1,7 +1,7 @@
 import { Send, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./button";
-import { formatDate } from "@/lib/utils";
+import { formatDate } from "@/utils";
 import { useConfig } from "@/providers/store-provider";
 import { useLocation } from "@tanstack/react-router";
 

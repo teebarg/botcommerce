@@ -3,7 +3,7 @@ import { Bot, User, MoreVertical, ArrowLeft, Mail, UserX, Eye } from "lucide-rea
 import ReactMarkdown from "react-markdown";
 
 import { Chat, ChatMessage, ConversationStatus } from "@/schemas";
-import { formatDate } from "@/lib/utils";
+import { formatDate } from "@/utils";
 import { Badge } from "@/components/ui/badge";
 
 const StatusBadge = ({ status }: { status: ConversationStatus }) => {

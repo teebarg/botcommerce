@@ -1,9 +1,7 @@
 import React from "react";
 import { CheckCircle, Circle, Truck, MapPin, CreditCard, User } from "lucide-react";
-
 import { CheckoutStep } from "./checkout-flow";
-
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 
 interface CheckoutStepIndicatorProps {
     currentStep: CheckoutStep;

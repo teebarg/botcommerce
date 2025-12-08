@@ -1,5 +1,5 @@
 import { Order } from "@/schemas";
-import { currency } from "@/lib/utils";
+import { currency } from "@/utils";
 import { Separator } from "@/components/ui/separator";
 
 const OrderSummary: React.FC<{ order: Order }> = ({ order }) => {

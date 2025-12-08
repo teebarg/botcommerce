@@ -22,7 +22,7 @@ export function ThemeToggle() {
     return (
         <button
             aria-label="Toggle theme"
-            className="h-10 w-10 rounded-md border p-2 hover:bg-accent hover:text-accent-foreground"
+            className="h-10 w-10 rounded-md border p-2 hover:bg-accent hover:text-accent-foreground hidden md:block"
             onClick={toggleTheme}
         >
             {getThemeIcon()}

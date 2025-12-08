@@ -4,7 +4,7 @@ import { UpstashRedisAdapter } from "@auth/upstash-redis-adapter";
 import { Redis } from "@upstash/redis";
 import { SignJWT } from "jose";
 
-import { tryCatch } from "@/lib/try-catch";
+import { tryCatch } from "@/utils/try-catch";
 import type { User, Address, Role, Status, Message } from "@/schemas";
 import { api } from "./fetch-api";
 import { getUserFn } from "@/server/users.server";

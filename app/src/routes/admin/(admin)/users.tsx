@@ -4,7 +4,7 @@ import { Search, SlidersHorizontal } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Order, Status, User } from "@/schemas";
-import { currency } from "@/lib/utils";
+import { currency } from "@/utils";
 import PaginationUI from "@/components/pagination";
 import CustomerCreateGuest from "@/components/admin/customers/customer-create-guest";
 import CustomerFilter from "@/components/admin/customers/customer-filter";

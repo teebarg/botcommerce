@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Overlay from "@/components/overlay";
 import { Cart } from "@/schemas";
-import { currency } from "@/lib/utils";
+import { currency } from "@/utils";
 import { useInvalidateCart } from "@/hooks/useCart";
 import { useInvalidateMe } from "@/hooks/useUser";
 import ImageDisplay from "@/components/image-display";

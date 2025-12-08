@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/store/products/product-card";
 import { ProductSearch } from "@/schemas";
 import ComponentLoader from "@/components/component-loader";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 
 interface ScrollState {
     atStart: boolean;

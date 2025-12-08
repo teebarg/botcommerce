@@ -4,7 +4,7 @@ import { useOverlayTriggerState } from "react-stately";
 import { FilterSidebar } from "@/components/store/shared/filter-sidebar";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { Facet } from "@/schemas/product";
 
 interface Props {

@@ -1,10 +1,8 @@
 import { Link } from "@tanstack/react-router";
-
 import { OrderStatusBadge, PaymentStatusBadge } from "../orders/order-status-badge";
-
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Order } from "@/schemas";
-import { currency, formatDate } from "@/lib/utils";
+import { currency, formatDate } from "@/utils";
 
 const RecentOrdersList = ({ orders }: { orders: Order[] }) => {
     if (!orders) {

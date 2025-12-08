@@ -4,7 +4,7 @@ import ProductVariantForm from "./product-variant-form";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductVariant } from "@/schemas";
-import { cn, currency } from "@/lib/utils";
+import { cn, currency } from "@/utils";
 import { useDeleteVariant, useUpdateVariant } from "@/hooks/useProduct";
 
 interface ProductVariantsProps {

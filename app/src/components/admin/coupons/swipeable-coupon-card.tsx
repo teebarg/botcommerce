@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Coupon } from "@/schemas/common";
-import { cn, currency, formatDate } from "@/lib/utils";
+import { cn, currency, formatDate } from "@/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Confirm } from "@/components/generic/confirm";
 import { useOverlayTriggerState } from "react-stately";

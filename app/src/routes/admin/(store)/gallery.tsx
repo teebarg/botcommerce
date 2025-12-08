@@ -2,14 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { LayoutDashboard, Loader, RectangleVertical } from "lucide-react";
-
 import { GalleryCard } from "@/components/admin/product/product-gallery-card";
 import { ProductBulkActions } from "@/components/admin/product/gallery-bulk-action";
 import { GalleryImagesUpload } from "@/components/admin/product/gallery-images-upload";
-
 import { useImageGalleryInfinite, useBulkDeleteGalleryImages, useReIndexGallery } from "@/hooks/useGallery";
 import ComponentLoader from "@/components/component-loader";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { GalleryImageItem } from "@/schemas";
 import { useWebSocket } from "pulsews";

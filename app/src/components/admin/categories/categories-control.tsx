@@ -9,7 +9,7 @@ import { CategoryForm } from "@/components/admin/categories/category-form";
 import Overlay from "@/components/overlay";
 import { useDeleteCategory } from "@/hooks/useCategories";
 import { Confirm } from "@/components/generic/confirm";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 
 interface Props {
     category: Category;

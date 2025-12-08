@@ -7,7 +7,7 @@ import { ReminderButton } from "./reminder-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Cart } from "@/schemas";
-import { currency } from "@/lib/utils";
+import { currency } from "@/utils";
 import { useSendCartReminder } from "@/hooks/useAbandonedCart";
 import ImageDisplay from "@/components/image-display";
 

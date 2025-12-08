@@ -2,12 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import React from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { Pencil, Plus, Trash2 } from "lucide-react";
-
 import { Address } from "@/schemas";
 import Overlay from "@/components/overlay";
 import { Button } from "@/components/ui/button";
 import AddAddressForm from "@/components/store/account/address/add-address-form";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import EditAddressForm from "@/components/store/account/address/edit-address-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { addressesQueryOptions, useDeleteAddress } from "@/hooks/useAddress";

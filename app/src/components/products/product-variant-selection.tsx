@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { MessageCircleMore } from "lucide-react";
 import { ProductVariant } from "@/schemas";
-import { cn, currency } from "@/lib/utils";
+import { cn, currency } from "@/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useProductVariant } from "@/hooks/useProductVariant";

@@ -1,13 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 
 import { useAddToCart, useChangeCartQuantity } from "./useCart";
-
-import { currency } from "@/lib/utils";
+import { currency } from "@/utils";
 import { useConfig } from "@/providers/store-provider";
 import { ProductVariant } from "@/schemas";
 import { Product, ProductSearch } from "@/schemas/product";
 import { useCart } from "@/providers/cart-provider";
-import { isFirstWhatsAppMessage, markFirstWhatsAppMessageSent } from "@/lib/utils/whatsapp-message-state";
+import { isFirstWhatsAppMessage, markFirstWhatsAppMessageSent } from "@/utils/whatsapp-message-state";
 
 export const useProductVariant = (product: Product | ProductSearch) => {
     const { cart } = useCart();

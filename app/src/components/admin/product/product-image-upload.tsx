@@ -1,11 +1,9 @@
 import type { ProductImage } from "./product-creator";
-
 import { useState, useRef } from "react";
 import { Upload, X, Image as ImageIcon, Plus } from "lucide-react";
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import ImageDisplay from "@/components/image-display";
 
 interface ImageUploadProps {

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ProductVariant } from "@/schemas";
 import { useCreateVariant, useUpdateVariant } from "@/hooks/useProduct";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AGE_OPTIONS } from "@/lib/constants";
+import { AGE_OPTIONS } from "@/utils/constants";
 
 interface ProductVariantFormProps {
     variant: ProductVariant | null;

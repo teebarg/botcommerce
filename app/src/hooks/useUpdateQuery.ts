@@ -1,6 +1,5 @@
 import { startTransition, useCallback } from "react";
-import { debounce } from "@/lib/utils";
-
+import { debounce } from "@/utils";
 import { useProgressBar } from "@/components/ui/progress-bar";
 import { useLocation, useNavigate, useSearch } from "@tanstack/react-router";
 

@@ -1,7 +1,7 @@
 import { Banknote, Lock } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { currency } from "@/lib/utils";
+import { currency } from "@/utils";
 import { useBankDetails } from "@/hooks/useApi";
 import { useCompleteCart } from "@/hooks/useCart";
 import { Label } from "@/components/ui/label";

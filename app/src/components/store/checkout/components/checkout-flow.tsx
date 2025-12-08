@@ -4,10 +4,9 @@ import DeliveryStep from "./delivery-step";
 import AddressStep from "./address-step";
 import PaymentStep from "./payment-step";
 import CheckoutStepIndicator from "./checkout-step-indicator";
-
 import CheckoutLoginPrompt from "@/components/generic/auth/checkout-auth-prompt";
 import { Cart } from "@/schemas";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { useRouteContext } from "@tanstack/react-router";
 
 export type CheckoutStep = "auth" | "delivery" | "address" | "payment";

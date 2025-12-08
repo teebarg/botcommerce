@@ -2,12 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import { Clock, Search, TrendingUp, X } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import { useOverlayTriggerState } from "react-stately";
-
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/store/products/product-card";
 import { ProductSearch } from "@/schemas";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { useProductSearch } from "@/hooks/useProduct";
 import { Separator } from "@/components/ui/separator";
 import LocalizedClientLink from "@/components/ui/link";

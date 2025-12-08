@@ -1,10 +1,8 @@
 import type { FormProduct } from "./product-creator";
-
 import { Package, Image as ImageIcon, Palette } from "lucide-react";
-
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { currency } from "@/lib/utils";
+import { currency } from "@/utils";
 import { Label } from "@/components/ui/label";
 import ImageDisplay from "@/components/image-display";
 

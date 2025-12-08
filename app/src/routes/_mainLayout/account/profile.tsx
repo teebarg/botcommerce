@@ -11,7 +11,7 @@ import { Message } from "@/schemas";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useInvalidate } from "@/hooks/useApi";
 import ServerError from "@/components/generic/server-error";
-import { tryCatch } from "@/lib/try-catch";
+import { tryCatch } from "@/utils/try-catch";
 import { Separator } from "@/components/ui/separator";
 import { updateMeFn, updatePasswordFn } from "@/server/users.server";
 import { updateAuthSession } from "@/utils/auth-client";

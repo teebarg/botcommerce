@@ -5,7 +5,7 @@ import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AGE_OPTIONS } from "@/lib/constants";
+import { AGE_OPTIONS } from "@/utils/constants";
 
 interface AgeRangeSelectorProps {
     selectedRange: string;

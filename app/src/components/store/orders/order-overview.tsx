@@ -1,7 +1,7 @@
 import { CheckCircle, Package, Calendar, Clock, RefreshCw, X, Truck } from "lucide-react";
 
 import { Order, OrderStatus } from "@/schemas";
-import { cn, formatDate } from "@/lib/utils";
+import { cn, formatDate } from "@/utils";
 
 const OrderOverview = ({ order }: { order: Order }) => {
     const isPending = order.payment_status === "PENDING";

@@ -1,7 +1,7 @@
 import { ShoppingCart, DollarSign, TrendingUp, BarChart3 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { currency } from "@/lib/utils";
+import { currency } from "@/utils";
 
 interface Stat {
     active_count: number;

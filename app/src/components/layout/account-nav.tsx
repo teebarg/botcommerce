@@ -1,10 +1,8 @@
 import { MapPin, Package, User } from "lucide-react";
-import { cn } from "@/lib/utils";
 import LocalizedClientLink from "@/components/ui/link";
 import { useInvalidateMe } from "@/hooks/useUser";
 
 const AccountNav = () => {
-    const route = "/";
     const invalidate = useInvalidateMe();
 
     const handleLogout = async () => {
@@ -51,7 +49,7 @@ const AccountNav = () => {
                         <ul className="flex mb-0 justify-start items-start flex-col gap-y-4">
                             {navLinks.map((link, index: number) => (
                                 <li key={`account-${index}`}>
-                                    <AccountNavLink data-testid={link.dataTestid} href={link.href} route={route!}>
+                                    <AccountNavLink data-testid={link.dataTestid} href={link.href}>
                                         {link.label}
                                     </AccountNavLink>
                                 </li>
@@ -71,22 +69,13 @@ const AccountNav = () => {
 
 type AccountNavLinkProps = {
     href: string;
-    route: string;
     children: React.ReactNode;
     "data-testid"?: string;
 };
 
-const AccountNavLink = ({ href, route, children, "data-testid": dataTestId }: AccountNavLinkProps) => {
-    const active = route === href;
-
+const AccountNavLink = ({ href, children, "data-testid": dataTestId }: AccountNavLinkProps) => {
     return (
-        <LocalizedClientLink
-            className={cn("text-muted-foreground", {
-                "text-accent font-semibold": active,
-            })}
-            data-testid={dataTestId}
-            href={href}
-        >
+        <LocalizedClientLink active="text-primary font-semibold" className="text-muted-foreground" data-testid={dataTestId} href={href}>
             {children}
         </LocalizedClientLink>
     );

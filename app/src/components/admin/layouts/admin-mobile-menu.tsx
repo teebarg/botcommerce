@@ -17,9 +17,10 @@ import {
     ShoppingCart,
     Tag,
 } from "lucide-react";
-import { Link, useLocation, useRouteContext } from "@tanstack/react-router";
+import { useLocation, useRouteContext } from "@tanstack/react-router";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import LocalizedClientLink from "@/components/ui/link";
 
 const AdminMobileMenu: React.FC = () => {
     const { session } = useRouteContext({ strict: false });
@@ -77,19 +78,18 @@ const AdminMobileMenu: React.FC = () => {
 
             <nav className="py-2">
                 {menuItems.map((item, idx: number) => (
-                    <Link
+                    <LocalizedClientLink
                         key={idx}
                         className="flex items-center justify-between w-full p-3 text-left transition-colors"
-                        to={item.href}
-                        activeProps={{ className: "bg-primary/20 text-primary" }}
-                        activeOptions={{ exact: true }}
+                        href={item.href}
+                        active="bg-primary/20 text-primary"
                     >
                         <div className="flex items-center space-x-3">
                             <span className={pathname === item.href ? "text-primary" : "text-muted-foreground"}>{item.icon}</span>
                             <span>{item.label}</span>
                         </div>
                         <ChevronRight className={pathname === item.href ? "text-primary" : "text-muted-foreground"} size={16} />
-                    </Link>
+                    </LocalizedClientLink>
                 ))}
             </nav>
 

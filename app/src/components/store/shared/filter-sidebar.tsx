@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
-
 import { useCategories } from "@/hooks/useCategories";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { COLOR_OPTIONS, SIZE_OPTIONS, AGE_OPTIONS } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { COLOR_OPTIONS, SIZE_OPTIONS, AGE_OPTIONS } from "@/utils/constants";
+import { cn } from "@/utils";
 import RangeSlider from "@/components/ui/range-slider";
 import { Facet } from "@/schemas/product";
 import { useSearch } from "@tanstack/react-router";

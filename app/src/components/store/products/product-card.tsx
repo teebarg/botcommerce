@@ -9,7 +9,7 @@ import { useUserWishlist } from "@/hooks/useUser";
 import ProductOverview from "@/components/store/products/product-overview";
 import { ProductSearch, ProductVariant } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import MediaDisplay from "@/components/media-display";
 
 interface ProductCardProps {

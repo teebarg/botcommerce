@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CheckCircle, Clock, Info } from "lucide-react";
-
-import { currency } from "@/lib/utils";
+import { currency } from "@/utils";
 
 export const Route = createFileRoute("/_mainLayout/(static)/shipping")({
     head: () => ({

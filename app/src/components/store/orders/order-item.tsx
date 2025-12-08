@@ -1,6 +1,6 @@
 import React from "react";
 
-import { currency } from "@/lib/utils";
+import { currency } from "@/utils";
 import { OrderItem } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
 import ImageDisplay from "@/components/image-display";

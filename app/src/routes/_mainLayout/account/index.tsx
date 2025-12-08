@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ordersQueryOptions } from "@/hooks/useOrder";
 import PromotionalBanner from "@/components/promotion";
-import { currency } from "@/lib/utils";
+import { currency } from "@/utils";
 import { ChevronDown } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { Order, Session } from "@/schemas";

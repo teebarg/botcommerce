@@ -19,7 +19,7 @@ import {
     ShoppingCart,
     Tag,
 } from "lucide-react";
-import { Link, useRouteContext } from "@tanstack/react-router";
+import { useRouteContext } from "@tanstack/react-router";
 
 import {
     Sidebar,
@@ -35,9 +35,9 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { UserAvatar } from "@/components/generic/user-avatar";
-import LocalizedClientLink from "../ui/link";
+import LocalizedClientLink from "@/components/ui/link";
 
 const AdminItems = [
     {
@@ -164,10 +164,10 @@ export function AdminSidebar() {
                             {AdminItems.map((item, idx: number) => (
                                 <SidebarMenuItem key={idx}>
                                     <SidebarMenuButton asChild>
-                                        <Link to={item.url} activeProps={{ className: "bg-primary/20 text-primary" }} activeOptions={{ exact: true }}>
+                                        <LocalizedClientLink href={item.url} active="bg-primary/20 text-primary">
                                             <item.icon />
                                             <span>{item.title}</span>
-                                        </Link>
+                                        </LocalizedClientLink>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             ))}
@@ -181,10 +181,10 @@ export function AdminSidebar() {
                             {storeItems.map((item, idx: number) => (
                                 <SidebarMenuItem key={idx}>
                                     <SidebarMenuButton asChild>
-                                        <Link to={item.url} activeProps={{ className: "bg-primary/20 text-primary" }} activeOptions={{ exact: true }}>
+                                        <LocalizedClientLink href={item.url} active="bg-primary/20 text-primary">
                                             <item.icon />
                                             <span>{item.title}</span>
-                                        </Link>
+                                        </LocalizedClientLink>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             ))}
@@ -198,10 +198,10 @@ export function AdminSidebar() {
                             {AccountItems.map((item, idx: number) => (
                                 <SidebarMenuItem key={idx}>
                                     <SidebarMenuButton asChild>
-                                        <Link to={item.url} activeProps={{ className: "bg-primary/20 text-primary" }} activeOptions={{ exact: true }}>
+                                        <LocalizedClientLink href={item.url} active="bg-primary/20 text-primary">
                                             <item.icon />
                                             <span>{item.title}</span>
-                                        </Link>
+                                        </LocalizedClientLink>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             ))}
@@ -227,13 +227,15 @@ export function AdminSidebar() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-(--radix-popper-anchor-width)" side="top">
                                 <DropdownMenuItem>
-                                    <Link className="justify-between" to="/account/profile">
+                                    <LocalizedClientLink className="justify-between" href="/account/profile">
                                         Profile
                                         <span className="badge">New</span>
-                                    </Link>
+                                    </LocalizedClientLink>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
-                                    <LocalizedClientLink href="/admin/settings">Settings</LocalizedClientLink>
+                                    <LocalizedClientLink href="/admin/settings" active="bg-primary/20 text-primary">
+                                        Settings
+                                    </LocalizedClientLink>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem className="text-red-600 cursor-pointer">
                                     <LogOut className="h-4 w-4 mr-2" />

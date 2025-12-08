@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ArrowUpRight, ChevronRight, Truck } from "lucide-react";
 import { toast } from "sonner";
-
-import { cn, currency } from "@/lib/utils";
+import { cn, currency } from "@/utils";
 import LocalizedClientLink from "@/components/ui/link";
 import ProductShare from "@/components/products/product-share";
 import { ProductImage, ProductVariant } from "@/schemas";

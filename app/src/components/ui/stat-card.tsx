@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { Badge } from "@/components/ui/badge";
 
 interface StatCardProps {

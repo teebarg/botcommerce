@@ -2,7 +2,7 @@ import React from "react";
 import { CreditCard, Heart, Home, LayoutGrid, User2, User as UserIcon } from "lucide-react";
 
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import LocalizedClientLink from "@/components/ui/link";
 import { useInvalidateMe } from "@/hooks/useUser";
 import { useLocation, useRouteContext } from "@tanstack/react-router";

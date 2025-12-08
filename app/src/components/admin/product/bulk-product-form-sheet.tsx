@@ -11,7 +11,7 @@ import MultiSelect, { SelectOption } from "@/components/ui/multi-select";
 import { Button } from "@/components/ui/button";
 import { useBulkProductUpdate } from "@/hooks/useGallery";
 import { Checkbox } from "@/components/ui/checkbox";
-import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/lib/constants";
+import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/utils/constants";
 import { Separator } from "@/components/ui/separator";
 import { AgeRangeSelector } from "@/components/ui/age-selector";
 

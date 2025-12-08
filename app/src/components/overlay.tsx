@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 interface OverlayProps {

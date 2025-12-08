@@ -1,8 +1,7 @@
 import React from "react";
-import { currency } from "@/lib/utils";
+import { currency } from "@/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
-
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/providers/cart-provider";
 import ComponentLoader from "@/components/component-loader";

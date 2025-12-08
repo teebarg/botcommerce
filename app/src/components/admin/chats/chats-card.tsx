@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { formatDate } from "@/lib/utils";
+import { formatDate } from "@/utils";
 import { Chat, ConversationStatus } from "@/schemas";
 
 interface CustomerCardProps {

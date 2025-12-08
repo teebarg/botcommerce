@@ -4,7 +4,6 @@ import LocalizedClientLink from "@/components/ui/link";
 import { Separator } from "@/components/ui/separator";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { Box, MapPin, Package, User } from "lucide-react";
-import { Session } from "start-authjs";
 
 export const Route = createFileRoute("/_mainLayout/account")({
     component: RouteComponent,
@@ -59,7 +58,7 @@ function RouteComponent() {
                     {navLinks.map((link, idx: number) => (
                         <li key={idx}>
                             <LocalizedClientLink
-                                active="text-contrast"
+                                active="bg-primary/20 text-primary"
                                 className="text-xs font-semibold"
                                 data-testid={link.dataTestid}
                                 href={link.href}

@@ -1,7 +1,6 @@
 import { Search, Home, RefreshCw, ArrowLeft } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { useConfig } from "@/providers/store-provider";
 import { useNavigate } from "@tanstack/react-router";
 

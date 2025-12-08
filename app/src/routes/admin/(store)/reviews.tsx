@@ -5,7 +5,7 @@ import { Review } from "@/schemas";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { timeAgo } from "@/lib/utils";
+import { timeAgo } from "@/utils";
 import PaginationUI from "@/components/pagination";
 import { ReviewActions } from "@/components/admin/reviews/reviews-actions";
 import ReviewItem from "@/components/admin/reviews/review-item";

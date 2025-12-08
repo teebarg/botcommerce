@@ -4,7 +4,7 @@ import { Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Message } from "@/schemas";
-import { tryCatch } from "@/lib/try-catch";
+import { tryCatch } from "@/utils/try-catch";
 import { deleteCategoryImageFn, updateCategoryImageFn } from "@/server/categories.server";
 
 interface ProductImageManagerProps {

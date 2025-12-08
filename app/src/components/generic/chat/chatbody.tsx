@@ -1,9 +1,6 @@
 import React, { useRef, useEffect } from "react";
-
 import MessageBubble from "./message-bubble";
-
-import { cn } from "@/lib/utils";
-import { formatDate } from "@/lib/utils";
+import { formatDate, cn } from "@/utils";
 
 interface Message {
     text: string;

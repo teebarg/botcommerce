@@ -3,13 +3,12 @@ import { Grid3X3, Loader } from "lucide-react";
 import { useState } from "react";
 
 import MobileFilterControl from "./mobile-filter-control";
-
 import ProductCard from "@/components/store/products/product-card";
 import { Catalog, ProductSearch } from "@/schemas";
 import { FilterSidebar } from "@/components/store/shared/filter-sidebar";
 import { Button } from "@/components/ui/button";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { useSearch } from "@tanstack/react-router";
 import { getCatalogFn } from "@/server/catalog.server";
 import { InfiniteScroll } from "@/components/InfiniteScroll";

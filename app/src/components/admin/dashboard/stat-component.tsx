@@ -1,7 +1,6 @@
 import { DollarSign, Package, ShoppingCart, Users } from "lucide-react";
-
 import StatCard from "@/components/ui/stat-card";
-import { currency } from "@/lib/utils";
+import { currency } from "@/utils";
 
 const StatComponent = ({ summary }: { summary?: any }) => {
     const getPercentageChange = (growth: number): { value: string; trend: "up" | "down" | "neutral" } => {

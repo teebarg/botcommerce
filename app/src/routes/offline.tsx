@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { CloudOff, RefreshCcw, WifiOff } from "lucide-react";
-
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/offline")({

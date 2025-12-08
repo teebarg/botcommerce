@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { tryCatch } from "@/lib/try-catch";
+import { tryCatch } from "@/utils/try-catch";
 import { trackVisitFn } from "@/server/catalog.server";
 
 interface SharedCollectionVisitTrackerProps {

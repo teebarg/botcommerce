@@ -4,7 +4,7 @@ import { Search } from "lucide-react";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Order } from "@/schemas";
-import { currency } from "@/lib/utils";
+import { currency } from "@/utils";
 import { ordersQueryOptions, useOrders } from "@/hooks/useOrder";
 import OrderCard from "@/components/admin/orders/order-card";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
