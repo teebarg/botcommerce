@@ -6,13 +6,6 @@ import tailwindcss from "@tailwindcss/vite";
 import { nitro } from "nitro/vite";
 
 export default defineConfig({
-    server: {
-        port: 5173,
-        watch: {
-            usePolling: true,
-            interval: 1000,
-        },
-    },
     plugins: [
         tailwindcss(),
         tsconfigPaths({
