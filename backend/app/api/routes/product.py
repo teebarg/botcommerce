@@ -81,7 +81,7 @@ async def recommend(request: Request, id: int, limit: int = Query(default=20, le
     ids = await redis_client.lrange(key, 0, -1)
 
     if not ids:
-        raise HTTPException(status_code=404, detail="No similar found")
+        return {"similar": []}
 
     index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
 
