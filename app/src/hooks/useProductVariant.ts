@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
+import type React from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useAddToCart, useChangeCartQuantity } from "./useCart";
 import { currency } from "@/utils";
 import { useConfig } from "@/providers/store-provider";
-import { ProductVariant } from "@/schemas";
-import { Product, ProductSearch } from "@/schemas/product";
+import type { ProductVariant } from "@/schemas";
+import type { Product, ProductSearch } from "@/schemas/product";
 import { useCart } from "@/providers/cart-provider";
 import { isFirstWhatsAppMessage, markFirstWhatsAppMessageSent } from "@/utils/whatsapp-message-state";
 

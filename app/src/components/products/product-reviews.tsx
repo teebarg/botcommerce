@@ -1,8 +1,8 @@
-import React from "react";
+import type React from "react";
 import { ProductReviewsZeroState } from "../store/reviews/review-zero";
 import { ReviewsList } from "../store/reviews/reviews-list";
 import { ordersQueryOptions } from "@/hooks/useOrder";
-import { PaginatedReview } from "@/schemas";
+import type { PaginatedReview } from "@/schemas";
 import { useRouteContext } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 

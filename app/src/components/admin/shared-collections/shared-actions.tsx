@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { Edit, Trash2 } from "lucide-react";
 import { Eye } from "lucide-react";
@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 import { useDeleteCatalog } from "@/hooks/useCollection";
 import { Confirm } from "@/components/generic/confirm";
-import { DBCatalog } from "@/schemas/product";
+import type { DBCatalog } from "@/schemas/product";
 import { useNavigate } from "@tanstack/react-router";
 
 interface Props {

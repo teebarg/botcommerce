@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { CreditCard, Heart, Home, LayoutGrid, User2, User as UserIcon } from "lucide-react";
 
 import { Separator } from "@/components/ui/separator";

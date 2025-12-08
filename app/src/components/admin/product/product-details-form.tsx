@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useCollections } from "@/hooks/useCollection";
 import { useCategories } from "@/hooks/useCategories";
-import MultiSelect, { SelectOption } from "@/components/ui/multi-select";
+import MultiSelect, { type SelectOption } from "@/components/ui/multi-select";
 
 interface ProductDetailsFormProps {
     product: FormProduct;

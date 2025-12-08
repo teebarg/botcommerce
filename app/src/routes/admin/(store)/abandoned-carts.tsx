@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AbandonedCartCard } from "@/components/admin/abandoned-carts/card";
-import { Cart } from "@/schemas";
+import type { Cart } from "@/schemas";
 import { useSendCartReminders } from "@/hooks/useAbandonedCart";
 import PaginationUI from "@/components/pagination";
 import { AbandonedCartStats } from "@/components/admin/abandoned-carts/stat";

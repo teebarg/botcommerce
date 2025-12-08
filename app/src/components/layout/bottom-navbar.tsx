@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { Home, Search, User } from "lucide-react";
 import StoreMenuComp from "./store-mobile-menu-drawer";
 import { cn } from "@/utils";

@@ -1,8 +1,8 @@
-import React from "react";
+import type React from "react";
 import { formatDistanceToNow } from "date-fns";
 import { Download, Trash2, Activity as ActivityIcon, FileSpreadsheet, AlertCircle, CheckCircle2 } from "lucide-react";
 
-import { Activity } from "@/schemas";
+import type { Activity } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useDeleteActivity } from "@/hooks/useActivities";

@@ -2,7 +2,7 @@ import { Home, PackageSearch, RefreshCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useCollections } from "@/hooks/useCollection";
-import { Collection } from "@/schemas/product";
+import type { Collection } from "@/schemas/product";
 import { BtnLink } from "@/components/ui/btnLink";
 import { Separator } from "@/components/ui/separator";
 

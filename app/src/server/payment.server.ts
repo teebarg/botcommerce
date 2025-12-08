@@ -1,9 +1,9 @@
 import { api } from "@/utils/fetch-api";
 import { createServerFn } from "@tanstack/react-start";
-import { Order } from "@/schemas";
+import type { Order } from "@/schemas";
 import { z } from "zod";
 import { deleteCookie } from "@tanstack/react-start/server";
-import { PaymentInitialize } from "@/types/payment";
+import type { PaymentInitialize } from "@/types/payment";
 
 const CART_COOKIE = "_cart_id";
 

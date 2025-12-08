@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { Facet } from "@/schemas/product";
+import type { Facet } from "@/schemas/product";
 
 interface CheckboxGroupProps {
     groupName: string;

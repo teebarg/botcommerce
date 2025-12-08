@@ -6,7 +6,7 @@ import ReviewsSection from "@/components/products/product-reviews";
 import { getProductFn, getRelatedProductFn } from "@/server/product.server";
 import SuspenseQuery from "@/utils/query";
 import { getProductReviewFn } from "@/server/review.server";
-import { PaginatedReview, ProductSearch } from "@/schemas";
+import type { PaginatedReview, ProductSearch } from "@/schemas";
 import ProductView from "@/components/store/products/product-view";
 import { ordersQueryOptions } from "@/hooks/useOrder";
 import { seo } from "@/utils/seo";

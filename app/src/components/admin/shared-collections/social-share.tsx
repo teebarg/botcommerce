@@ -2,7 +2,7 @@ import { Facebook, Twitter, MessageCircle, Link, Share } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { DBCatalog } from "@/schemas";
+import type { DBCatalog } from "@/schemas";
 import { cn } from "@/utils";
 
 interface SocialShareProps {

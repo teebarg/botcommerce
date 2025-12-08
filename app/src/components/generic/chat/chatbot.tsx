@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import type React from "react";
+import { useState, useEffect } from "react";
 import { Send, Paperclip, Minus, X } from "lucide-react";
 import { toast } from "sonner";
 
 import ChatBody from "./chatbody";
-import { ChatMessage } from "@/schemas";
+import type { ChatMessage } from "@/schemas";
 import { tryCatch } from "@/utils/try-catch";
 import { useChatMutation } from "@/hooks/useApi";
 import { getChatFn } from "@/server/generic.server";

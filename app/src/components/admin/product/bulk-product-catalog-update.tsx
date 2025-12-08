@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useBulkAddProductsToCatalog, useCatalogs } from "@/hooks/useCollection";
-import { Shared } from "@/schemas";
+import type { Shared } from "@/schemas";
 
 interface CatalogBulkProductUpdateProps {
     selectedCount: number;

@@ -16,7 +16,7 @@ import NotFound from "@/components/generic/not-found";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { WebSocketProvider } from "pulsews";
 import appCss from "@/styles.css?url";
-import { AuthSession, getSession, Session } from "start-authjs";
+import { type AuthSession, getSession, type Session } from "start-authjs";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { authConfig } from "@/utils/auth";
@@ -108,7 +108,7 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-    const { _storedTheme, session } = Route.useRouteContext();
+    const { _storedTheme } = Route.useRouteContext();
     return (
         <html suppressHydrationWarning className="antialiased">
             <head>

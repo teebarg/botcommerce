@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { Bell } from "lucide-react";
 
 import ActivityView from "./activity";

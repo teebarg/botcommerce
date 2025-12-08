@@ -1,7 +1,7 @@
-import React from "react";
+import type React from "react";
 import CartItemComponent from "./cart-item";
 import { cn } from "@/utils";
-import { CartItem } from "@/schemas";
+import type { CartItem } from "@/schemas";
 import ComponentLoader from "@/components/component-loader";
 import { useCart } from "@/providers/cart-provider";
 

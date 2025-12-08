@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 
 import CartItems from "./cart-items";
 import EmptyCartMessage from "@/components/store/cart/empty-message";

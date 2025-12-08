@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-import { Message } from "@/schemas";
+import type { Message } from "@/schemas";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -14,7 +14,7 @@ const buildUrl = (baseUrl: string, queryParams: Record<string, string | number |
     for (const key in queryParams) {
         if (!queryParams[key]) continue;
 
-        if (queryParams.hasOwnProperty(key)) {
+        if (Object.hasOwn(queryParams, key)) {
             if (firstQueryParam) {
                 url += `?${key}=${queryParams[key]}`;
                 firstQueryParam = false;
@@ -35,7 +35,6 @@ const capitalize = (str: string): string => {
     return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-// eslint-disable-next-line
 const debounce = <T extends (...args: any[]) => void>(func: T, delay: number): ((...args: Parameters<T>) => void) => {
     let timer: NodeJS.Timeout;
 
@@ -48,7 +47,6 @@ const debounce = <T extends (...args: any[]) => void>(func: T, delay: number): (
 };
 
 const isEqual = (value: any, other: any): boolean => {
-    // Check if the values are strictly equal
     if (value === other) {
         return true;
     }

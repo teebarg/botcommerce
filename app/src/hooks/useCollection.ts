@@ -1,7 +1,7 @@
 import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CollectionFormValues } from "@/components/admin/collections/collection-form";
-import { SharedFormValues } from "@/components/admin/shared-collections/shared-form";
+import type { CollectionFormValues } from "@/components/admin/collections/collection-form";
+import type { SharedFormValues } from "@/components/admin/shared-collections/shared-form";
 import {
     addProductToCatalogFn,
     bulkAddProductsToCatalogFn,

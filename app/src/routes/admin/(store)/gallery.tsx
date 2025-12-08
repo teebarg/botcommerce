@@ -9,7 +9,7 @@ import { useImageGalleryInfinite, useBulkDeleteGalleryImages, useReIndexGallery 
 import ComponentLoader from "@/components/component-loader";
 import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
-import { GalleryImageItem } from "@/schemas";
+import type { GalleryImageItem } from "@/schemas";
 import { useWebSocket } from "pulsews";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getGalleryImagesFn } from "@/server/gallery.server";

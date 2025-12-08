@@ -4,7 +4,7 @@ import { useDebounce } from "use-debounce";
 import { useOverlayTriggerState } from "react-stately";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/store/products/product-card";
-import { ProductSearch } from "@/schemas";
+import type { ProductSearch } from "@/schemas";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/utils";
 import { useProductSearch } from "@/hooks/useProduct";

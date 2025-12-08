@@ -1,7 +1,7 @@
 import { CollectionActions } from "./collection-actions";
 
 import { Badge } from "@/components/ui/badge";
-import { Collection } from "@/schemas/product";
+import type { Collection } from "@/schemas/product";
 
 interface CollectionItemProps {
     collection: Collection;

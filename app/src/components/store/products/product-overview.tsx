@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from "react";
+import type React from "react";
+import { useState, useEffect } from "react";
 import { Heart, Star, Plus, Minus, ShoppingCart, MessageCircle, X, Truck, Shield, RotateCcw } from "lucide-react";
 
 import { DiscountBadge } from "./discount-badge";
-import { ProductSearch } from "@/schemas";
+import type { ProductSearch } from "@/schemas";
 import { cn, currency } from "@/utils";
 import { Button } from "@/components/ui/button";
 import LocalizedClientLink from "@/components/ui/link";
 import { useProductVariant } from "@/hooks/useProductVariant";
 import { useUserCreateWishlist, useUserDeleteWishlist } from "@/hooks/useUser";
-import { UserInteractionType, useTrackUserInteraction } from "@/hooks/useUserInteraction";
+import { type UserInteractionType, useTrackUserInteraction } from "@/hooks/useUserInteraction";
 import { ImageDownloadButton } from "@/components/store/image-download";
 import MediaDisplay from "@/components/media-display";
 import ImageDisplay from "@/components/image-display";

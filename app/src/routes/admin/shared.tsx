@@ -6,7 +6,7 @@ import { SharedCard } from "@/components/admin/shared-collections/shared-card";
 import { SharedForm } from "@/components/admin/shared-collections/shared-form";
 
 import ComponentLoader from "@/components/component-loader";
-import { DBCatalog } from "@/schemas";
+import type { DBCatalog } from "@/schemas";
 import Overlay from "@/components/overlay";
 import { Button } from "@/components/ui/button";
 import { useCatalogs } from "@/hooks/useCollection";

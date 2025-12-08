@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { currency } from "@/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";

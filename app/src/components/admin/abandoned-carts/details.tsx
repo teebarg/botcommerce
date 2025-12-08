@@ -7,7 +7,7 @@ import { ReminderButton } from "./reminder-button";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Overlay from "@/components/overlay";
-import { Cart } from "@/schemas";
+import type { Cart } from "@/schemas";
 import { currency } from "@/utils";
 import { useInvalidateCart } from "@/hooks/useCart";
 import { useInvalidateMe } from "@/hooks/useUser";

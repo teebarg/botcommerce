@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { Cart, CartComplete, CartUpdate } from "@/schemas";
+import type { Cart, CartComplete, CartUpdate } from "@/schemas";
 import { useNavigate } from "@tanstack/react-router";
 import { addToCartFn, completeCartFn, deleteCartItemFn, getCartFn, updateCartDetailsFn, updateCartQuantityFn } from "@/server/cart.server";
 

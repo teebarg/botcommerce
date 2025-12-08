@@ -4,7 +4,7 @@ import PromotionalBanner from "@/components/promotion";
 import { currency } from "@/utils";
 import { ChevronDown } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
-import { Order, Session } from "@/schemas";
+import type { Order, Session } from "@/schemas";
 import Overlay from "@/components/overlay";
 import OrderDetails from "@/components/store/orders/order-details";
 import { useSuspenseQuery } from "@tanstack/react-query";

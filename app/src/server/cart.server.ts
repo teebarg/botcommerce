@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createServerFn } from "@tanstack/react-start";
-import { Cart, CartComplete, CartUpdate, Message, Order } from "@/schemas";
+import type { Cart, CartComplete, CartUpdate, Message, Order } from "@/schemas";
 import { api } from "@/utils/fetch-api";
 import { setCookie, getCookie, deleteCookie } from "@tanstack/react-start/server";
 

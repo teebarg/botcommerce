@@ -1,11 +1,11 @@
-import React from "react";
+import type React from "react";
 import { useOverlayTriggerState } from "react-stately";
 
 import { Button } from "@/components/ui/button";
 import { CollectionForm } from "@/components/admin/collections/collection-form";
 import Overlay from "@/components/overlay";
 
-interface Props {}
+type Props = {}
 
 const CreateCollection: React.FC<Props> = () => {
     const state = useOverlayTriggerState({});

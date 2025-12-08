@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import type React from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { Cart } from "@/schemas";
+import type { Cart } from "@/schemas";
 import { useMyCart } from "@/hooks/useCart";
 
 import { update, get, del } from "idb-keyval";

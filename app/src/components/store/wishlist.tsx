@@ -1,8 +1,8 @@
-import React from "react";
+import type React from "react";
 import { Link } from "@tanstack/react-router"
 import { Heart } from "lucide-react";
 
-import { ProductImage } from "@/schemas";
+import type { ProductImage } from "@/schemas";
 import { useUserDeleteWishlist } from "@/hooks/useUser";
 import ImageDisplay from "../image-display";
 

@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ProductVariant } from "@/schemas";
+import type { ProductVariant } from "@/schemas";
 import { useCreateVariant, useUpdateVariant } from "@/hooks/useProduct";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AGE_OPTIONS } from "@/utils/constants";

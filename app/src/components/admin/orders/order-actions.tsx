@@ -1,11 +1,11 @@
-import React from "react";
+import type React from "react";
 import { useOverlayTriggerState } from "react-stately";
 
 import OrderDetails from "./order-details";
 import OrderProcessingAction from "./order-processing-actions";
 
 import { Button } from "@/components/ui/button";
-import { Order } from "@/schemas";
+import type { Order } from "@/schemas";
 import Overlay from "@/components/overlay";
 
 interface OrderActionsProps {

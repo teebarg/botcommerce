@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 
 import { BtnLink } from "@/components/ui/btnLink";
 import { cn } from "@/utils";

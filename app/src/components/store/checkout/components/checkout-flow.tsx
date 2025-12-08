@@ -1,11 +1,12 @@
-import React, { useState, useCallback } from "react";
+import type React from "react";
+import { useState, useCallback } from "react";
 
 import DeliveryStep from "./delivery-step";
 import AddressStep from "./address-step";
 import PaymentStep from "./payment-step";
 import CheckoutStepIndicator from "./checkout-step-indicator";
 import CheckoutLoginPrompt from "@/components/generic/auth/checkout-auth-prompt";
-import { Cart } from "@/schemas";
+import type { Cart } from "@/schemas";
 import { cn } from "@/utils";
 import { useRouteContext } from "@tanstack/react-router";
 

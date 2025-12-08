@@ -5,7 +5,7 @@ import { ProductQuery } from "./product-query";
 
 import { Badge } from "@/components/ui/badge";
 import { ProductActions } from "@/components/admin/product/product-actions";
-import { Collection, PaginatedProductSearch, ProductSearch, ProductVariant } from "@/schemas/product";
+import type { Collection, PaginatedProductSearch, ProductSearch, ProductVariant } from "@/schemas/product";
 import { Button } from "@/components/ui/button";
 import { useProductInfiniteSearch } from "@/hooks/useProduct";
 import { useCollections } from "@/hooks/useCollection";

@@ -3,15 +3,15 @@ import { z } from "zod";
 import {
     ShippingMethodSchema,
     PaymentMethodSchema,
-    CartStatus,
-    ShippingMethod,
-    PaymentMethod,
-    OrderStatus,
-    PaymentStatus,
+    type CartStatus,
+    type ShippingMethod,
+    type PaymentMethod,
+    type OrderStatus,
+    type PaymentStatus,
     CartStatusSchema,
 } from "./enums";
 import { ProductVariantSchema } from "./product";
-import { Address, AddressSchema } from "./address";
+import { type Address, AddressSchema } from "./address";
 import { AuditSchema } from "./base";
 import { UserSchema } from "./user";
 

@@ -1,7 +1,7 @@
 import ProductVariants from "@/components/products/product-variant";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProductForm from "@/components/products/product-form";
-import { ProductSearch } from "@/schemas/product";
+import type { ProductSearch } from "@/schemas/product";
 import { useCollections } from "@/hooks/useCollection";
 import { useCategories } from "@/hooks/useCategories";
 

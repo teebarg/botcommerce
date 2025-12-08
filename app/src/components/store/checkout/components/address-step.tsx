@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from "react";
+import type React from "react";
+import { useState, useMemo } from "react";
 import { MapPin, ArrowRight } from "lucide-react";
 
 import ShippingAddressForm from "../address-form";
@@ -9,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
-import { Address } from "@/schemas";
+import type { Address } from "@/schemas";
 import ComponentLoader from "@/components/component-loader";
 import { useUserAddresses } from "@/hooks/useAddress";
 

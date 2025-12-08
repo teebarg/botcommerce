@@ -171,7 +171,7 @@ export default function PushPermission() {
         const registration = await navigator.serviceWorker.ready;
         const sub = await registration.pushManager.subscribe({
             userVisibleOnly: true,
-            // @ts-ignore -- Suppress TS2322 for BufferSource mismatch
+            // @ts-expect-error -- Suppress TS2322 for BufferSource mismatch
             applicationServerKey: urlBase64ToUint8Array(import.meta.env.VITE_VAPID_PUBLIC_KEY!),
         });
 

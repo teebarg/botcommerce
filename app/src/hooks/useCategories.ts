@@ -1,6 +1,6 @@
 import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CategoryFormValues } from "@/components/admin/categories/category-form";
+import type { CategoryFormValues } from "@/components/admin/categories/category-form";
 import { createCategoryFn, deleteCategoryFn, getCategoriesFn, reorderCategoriesFn, updateCategoryFn } from "@/server/categories.server";
 
 // export const useCategories = (query?: string) => {

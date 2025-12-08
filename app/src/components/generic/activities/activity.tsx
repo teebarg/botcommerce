@@ -1,8 +1,8 @@
-import React from "react";
+import type React from "react";
 import { formatDistanceToNow } from "date-fns";
 import { AlertCircle, CheckCircle2, Clock, Download, FileSpreadsheet, Trash2 } from "lucide-react";
 import { useConfig } from "@/providers/store-provider";
-import { Activity } from "@/schemas";
+import type { Activity } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";

@@ -1,11 +1,11 @@
-import React from "react";
+import type React from "react";
 import { Edit, Trash2, Eye } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { toast } from "sonner";
 
 import CustomerForm from "./customer-form";
 
-import { User } from "@/schemas";
+import type { User } from "@/schemas";
 import { useDeleteUser, useInvalidateMe } from "@/hooks/useUser";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";

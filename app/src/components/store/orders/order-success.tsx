@@ -6,7 +6,7 @@ import OrderAddress from "./order-address";
 import OrderNotes from "./order-notes";
 import OrderNext from "./order-next";
 import OrderOverview from "./order-overview";
-import { Order } from "@/schemas";
+import type { Order } from "@/schemas";
 import FadeInComponent from "@/components/generic/fade-in-component";
 import { Button } from "@/components/ui/button";
 

@@ -7,7 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import BankDetailsForm from "./bank-details-form";
 
 import { Switch } from "@/components/ui/switch";
-import { BankDetails, ShopSettings } from "@/schemas";
+import type { BankDetails, ShopSettings } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 import { useBankDetails } from "@/hooks/useApi";

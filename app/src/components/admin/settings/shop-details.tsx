@@ -1,7 +1,7 @@
 import { ShopDetailsForm } from "./shop-details-form";
 import { ShopSocialForm } from "./shop-social-form";
 
-import { ShopSettings } from "@/schemas";
+import type { ShopSettings } from "@/schemas";
 
 interface ShopDetailsProps {
     settings: ShopSettings[];

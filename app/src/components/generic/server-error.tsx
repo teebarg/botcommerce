@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { useEffect } from "react";
 import NotFoundUI from "./not-found";
 import { cn } from "@/utils";

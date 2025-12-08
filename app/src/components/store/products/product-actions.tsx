@@ -1,10 +1,10 @@
-import React from "react";
+import type React from "react";
 import { Check, ShoppingCart } from "lucide-react";
 
-import { ProductSearch } from "@/schemas";
+import type { ProductSearch } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useProductVariant } from "@/hooks/useProductVariant";
-import { UserInteractionType, useTrackUserInteraction } from "@/hooks/useUserInteraction";
+import { type UserInteractionType, useTrackUserInteraction } from "@/hooks/useUserInteraction";
 import { useRouteContext } from "@tanstack/react-router";
 
 const ProductActions: React.FC<{

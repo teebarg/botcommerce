@@ -12,7 +12,7 @@ const useUpdateQuery = (delay = 500) => {
     const navigate = useNavigate();
     const location = useLocation();
     const pathname = location.pathname;
-    let progress = useProgressBar();
+    const progress = useProgressBar();
     const search = useSearch({
         strict: false,
     }) as Record<string, string>;

@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import {
     User,
     CreditCard,
@@ -18,7 +18,7 @@ import { useOverlayTriggerState } from "react-stately";
 import OrderProcessingAction from "./order-processing-actions";
 import { OrderStatusBadge } from "./order-status-badge";
 import { useOrderTimeline } from "@/hooks/useOrder";
-import { Order, OrderItem } from "@/schemas";
+import type { Order, OrderItem } from "@/schemas";
 import { useReturnOrderItem } from "@/hooks/useOrder";
 import { currency, formatDate } from "@/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";

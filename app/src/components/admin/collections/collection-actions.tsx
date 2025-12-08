@@ -1,11 +1,11 @@
-import React from "react";
+import type React from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { Pencil, Trash2 } from "lucide-react";
 
 import { Confirm } from "@/components/generic/confirm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { CollectionForm } from "@/components/admin/collections/collection-form";
-import { Collection } from "@/schemas/product";
+import type { Collection } from "@/schemas/product";
 import Overlay from "@/components/overlay";
 import { Button } from "@/components/ui/button";
 import { useDeleteCollection } from "@/hooks/useCollection";

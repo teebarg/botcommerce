@@ -24,7 +24,7 @@ interface Props {
     onClose?: () => void;
 }
 
-interface ChildRef {}
+type ChildRef = {}
 
 const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, collection }, ref) => {
     const isCreate = type === "create";

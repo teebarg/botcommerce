@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react";
+import type React from "react";
+import { useState, useEffect } from "react";
 import { ArrowUpRight, ChevronRight, Truck } from "lucide-react";
 import { toast } from "sonner";
 import { cn, currency } from "@/utils";
 import LocalizedClientLink from "@/components/ui/link";
 import ProductShare from "@/components/products/product-share";
-import { ProductImage, ProductVariant } from "@/schemas";
+import type { ProductImage, ProductVariant } from "@/schemas";
 import { ProductVariantSelection } from "@/components/products/product-variant-selection";
-import { Product } from "@/schemas/product";
-import { UserInteractionType, useTrackUserInteraction } from "@/hooks/useUserInteraction";
+import type { Product } from "@/schemas/product";
+import { type UserInteractionType, useTrackUserInteraction } from "@/hooks/useUserInteraction";
 import { ProductCollectionIndicator } from "@/components/admin/shared-collections/product-collection-indicator";
 import { Button } from "@/components/ui/button";
 import { useUpdateVariant } from "@/hooks/useProduct";

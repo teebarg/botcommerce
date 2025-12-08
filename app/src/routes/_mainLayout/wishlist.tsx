@@ -4,7 +4,7 @@ import WishlistItem from "@/components/store/wishlist";
 import { BtnLink } from "@/components/ui/btnLink";
 import PromotionalBanner from "@/components/promotion";
 import ServerError from "@/components/generic/server-error";
-import { WishItem } from "@/schemas";
+import type { WishItem } from "@/schemas";
 import { userWishlistQueryOptions } from "@/hooks/useUser";
 import ComponentLoader from "@/components/component-loader";
 import { useSuspenseQuery } from "@tanstack/react-query";

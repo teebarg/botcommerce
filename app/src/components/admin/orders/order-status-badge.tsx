@@ -1,8 +1,8 @@
 import { CheckCircle, Package, PackageCheck, RefreshCw, RotateCcw, ShieldAlert, Truck, XCircle } from "lucide-react";
-import { JSX } from "react";
+import type { JSX } from "react";
 
 import { Badge } from "@/components/ui/badge";
-import { OrderStatus } from "@/schemas";
+import type { OrderStatus } from "@/schemas";
 
 export const PaymentStatusBadge = ({ status }: { status: string }) => {
     const statusConfig: Record<

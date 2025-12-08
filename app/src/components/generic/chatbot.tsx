@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
+import type React from "react";
+import { useState, useEffect } from "react";
 import { useOverlayTriggerState } from "react-stately";
 
 import ChatBotComponent from "./chat/chatbot";
 
 import { useConfig } from "@/providers/store-provider";
 
-interface Props {}
+type Props = {}
 
 const ChatBotWrapper: React.FC = () => {
     const { config } = useConfig();

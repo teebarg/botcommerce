@@ -1,5 +1,5 @@
 import { Building, CreditCard, ShoppingBag } from "lucide-react";
-import { JSX } from "react";
+import type { JSX } from "react";
 
 export const paymentInfoMap: Record<string, { title: string; description: string; icon: JSX.Element | any }> = {
     PAYSTACK: {

@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
 import { CheckCircle, Clock, X, RotateCcw, CreditCard } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PaymentStatus } from "@/schemas";
+import type { PaymentStatus } from "@/schemas";
 import { useChangePaymentStatus } from "@/hooks/useOrder";
 
 interface PaymentStatusManagerProps {

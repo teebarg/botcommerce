@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { Eye, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 
@@ -6,7 +6,7 @@ import ChatViewer from "./chat-view";
 
 import { useDeleteChat } from "@/hooks/useApi";
 import { Button } from "@/components/ui/button";
-import { Chat } from "@/schemas";
+import type { Chat } from "@/schemas";
 import Overlay from "@/components/overlay";
 
 interface CustomerActionsProps {

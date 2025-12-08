@@ -9,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { Coupon } from "@/schemas";
+import type { Coupon } from "@/schemas";
 import { useAssignCoupon } from "@/hooks/useCoupon";
 import { useUsers } from "@/hooks/useUser";
 

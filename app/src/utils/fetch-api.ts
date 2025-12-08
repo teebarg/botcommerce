@@ -1,7 +1,7 @@
-import { useSession } from "@/server/auth-server";
-import { Session } from "start-authjs";
+import { getSessionFn } from "@/server/auth-server";
+import type { Session } from "start-authjs";
 
-const baseURL = process.env.API_URL || "http://niyi.dev";
+const baseURL = process.env.API_URL || "http://localhost.dev";
 
 interface HeaderOptions {
     cartId?: string | undefined;
@@ -13,7 +13,7 @@ type RequestOptions = RequestInit & {
 };
 
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-    const session = (await useSession()) as unknown as Session;
+    const session = (await getSessionFn()) as unknown as Session;
     const { params, ...restOptions } = options;
 
     const url = new URL(`/api${endpoint}`, baseURL);

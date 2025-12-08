@@ -1,6 +1,6 @@
 import { MapPin, Truck } from "lucide-react";
 
-import { DeliveryOption, Order } from "@/schemas";
+import type { DeliveryOption, Order } from "@/schemas";
 import { useConfig } from "@/providers/store-provider";
 import { useDeliveryOptions } from "@/hooks/useApi";
 

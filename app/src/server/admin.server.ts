@@ -1,4 +1,4 @@
-import { StatsTrends } from "@/types/models";
+import type { StatsTrends } from "@/types/models";
 import { api } from "@/utils/fetch-api";
 import { createServerFn } from "@tanstack/react-start";
 

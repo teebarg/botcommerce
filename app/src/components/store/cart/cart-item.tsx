@@ -1,7 +1,7 @@
-import React from "react";
+import type React from "react";
 import CartControl from "./cart-control";
 import { currency } from "@/utils";
-import { CartItem } from "@/schemas";
+import type { CartItem } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
 import ImageDisplay from "@/components/image-display";
 

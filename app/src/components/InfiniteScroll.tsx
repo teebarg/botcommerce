@@ -1,4 +1,5 @@
-import React, { useRef, useEffect, useCallback } from "react";
+import type React from "react";
+import { useRef, useEffect, useCallback } from "react";
 
 interface InfiniteScrollProps {
     children: React.ReactNode;

@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import ServerError from "@/components/generic/server-error";
 import { useCategories } from "@/hooks/useCategories";
 import CategoryTree from "@/components/admin/categories/tree";
-import { Category } from "@/schemas/product";
+import type { Category } from "@/schemas/product";
 import ComponentLoader from "@/components/component-loader";
 
 export const Route = createFileRoute("/admin/(store)/categories")({

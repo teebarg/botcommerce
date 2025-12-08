@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 
-import { Address, AddressSchema } from "@/schemas/address";
+import { type Address, AddressSchema } from "@/schemas/address";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useUpdateAddress } from "@/hooks/useAddress";

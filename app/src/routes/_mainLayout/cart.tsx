@@ -5,7 +5,7 @@ import ServerError from "@/components/generic/server-error";
 import SummaryMobile from "@/components/store/cart/summary-mobile";
 import RecommendedProducts from "@/components/store/products/recommended";
 import PromotionalBanner from "@/components/promotion";
-import { CartItem } from "@/schemas";
+import type { CartItem } from "@/schemas";
 import CartPageDetails from "@/components/store/cart/cart-page-details";
 import { useCart } from "@/providers/cart-provider";
 import ComponentLoader from "@/components/component-loader";

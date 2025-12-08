@@ -4,7 +4,7 @@ import { useOverlayTriggerState } from "react-stately";
 
 import OrderDetails from "./order-details";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Order, OrderItem } from "@/schemas";
+import type { Order, OrderItem } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { currency, formatDate } from "@/utils";
 import Overlay from "@/components/overlay";

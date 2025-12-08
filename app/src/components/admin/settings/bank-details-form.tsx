@@ -1,7 +1,7 @@
-import React from "react";
+import type React from "react";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
-import { z } from "zod";
+import type { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";

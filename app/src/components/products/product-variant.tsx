@@ -3,7 +3,7 @@ import { Edit, Trash2 } from "lucide-react";
 import ProductVariantForm from "./product-variant-form";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ProductVariant } from "@/schemas";
+import type { ProductVariant } from "@/schemas";
 import { cn, currency } from "@/utils";
 import { useDeleteVariant, useUpdateVariant } from "@/hooks/useProduct";
 

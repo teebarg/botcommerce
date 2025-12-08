@@ -1,11 +1,11 @@
-import React from "react";
+import type React from "react";
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "@tanstack/react-router";
 
-interface ComponentProps {}
+type ComponentProps = {}
 
 const Banner: React.FC<ComponentProps> = () => {
     const navigate = useNavigate();

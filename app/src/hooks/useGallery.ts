@@ -10,7 +10,7 @@ import {
     reIndexGalleryFn,
     updateImageMetadataFn,
 } from "@/server/gallery.server";
-import { Catalog, GalleryImage, GalleryImageItem } from "@/schemas";
+import { Catalog, GalleryImage, type GalleryImageItem } from "@/schemas";
 
 type ImageMetadataInput = { imageId: number; input: any };
 type BulkDeleteInput = { imageIds: number[] };

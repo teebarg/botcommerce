@@ -9,7 +9,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useUpdateCoupon } from "@/hooks/useCoupon";
-import { Coupon } from "@/schemas";
+import type { Coupon } from "@/schemas";
 import { useOverlayTriggerState } from "react-stately";
 import Overlay from "@/components/overlay";
 

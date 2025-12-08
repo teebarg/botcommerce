@@ -3,7 +3,7 @@ import { Star } from "lucide-react";
 import { ReviewActions } from "./reviews-actions";
 
 import { Card } from "@/components/ui/card";
-import { Review } from "@/schemas";
+import type { Review } from "@/schemas";
 
 interface ReviewListProps {
     review: Review;

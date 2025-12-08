@@ -1,11 +1,11 @@
 "use client";
 
-import { ReactNode, createContext, useContext, useEffect, useRef, useState } from "react";
+import { type ReactNode, createContext, useContext, useEffect, useRef, useState } from "react";
 
 const ProgressBarContext = createContext<ReturnType<typeof useProgress> | null>(null);
 
 export function useProgressBar() {
-    let progress = useContext(ProgressBarContext);
+    const progress = useContext(ProgressBarContext);
 
     if (progress === null) {
         throw new Error("Need to be inside provider");
@@ -15,7 +15,7 @@ export function useProgressBar() {
 }
 
 export function ProgressBar({ className, children }: { className: string; children: ReactNode }) {
-    let progress = useProgress();
+    const progress = useProgress();
     const width = `${progress.value}%`;
 
     return (

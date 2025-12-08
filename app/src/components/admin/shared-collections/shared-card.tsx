@@ -3,7 +3,7 @@ import { SocialShare } from "./social-share";
 import { SharedActions } from "./shared-actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DBCatalog } from "@/schemas";
+import type { DBCatalog } from "@/schemas";
 import { formatDate } from "@/utils";
 
 export const SharedCard: React.FC<{ catalog: DBCatalog }> = ({ catalog }) => (

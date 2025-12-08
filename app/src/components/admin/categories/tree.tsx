@@ -7,7 +7,7 @@ import CategoryImageManager from "./category-image";
 import { CategoryForm } from "./category-form";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Category } from "@/schemas/product";
+import type { Category } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";

@@ -1,10 +1,10 @@
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
-import { Clock, LucideProps, Package, Pencil, Trash2, Truck, Zap } from "lucide-react";
+import { Clock, type LucideProps, Package, Pencil, Trash2, Truck, Zap } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import DeliveryOptionForm from "./delivery-option-form";
 import { Button } from "@/components/ui/button";
-import { DeliveryOption, Message } from "@/schemas";
+import type { DeliveryOption, Message } from "@/schemas";
 import { useAdminDeliveryOptions } from "@/hooks/useApi";
 import { useInvalidate } from "@/hooks/useApi";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";

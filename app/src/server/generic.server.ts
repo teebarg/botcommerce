@@ -3,7 +3,7 @@ import type { ContactFormValues } from "@/components/store/contact-form";
 import { createServerFn } from "@tanstack/react-start";
 import { api } from "@/utils/fetch-api";
 import {
-    ChatMessage,
+    type ChatMessage,
     ShippingMethodSchema,
     type BankDetails,
     type ConversationStatus,
@@ -22,7 +22,7 @@ export const getShopSettingsPublicFn = createServerFn({ method: "GET" }).handler
 });
 
 export const syncShopDetailsFn = createServerFn({ method: "POST" })
-    .inputValidator(z.record(z.string(), z.string())) // Validates Record<string, string>
+    .inputValidator(z.record(z.string(), z.string()))
     .handler(async ({ data }) => {
         return await api.patch<ShopSettings>("/shop-settings/sync-shop-details", data);
     });

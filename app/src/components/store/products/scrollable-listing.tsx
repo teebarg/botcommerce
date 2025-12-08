@@ -1,4 +1,4 @@
-import { ProductSearch } from "@/schemas";
+import type { ProductSearch } from "@/schemas";
 import ProductCard from "@/components/store/products/product-card";
 
 export default function ScrollableListing({ products }: { products: ProductSearch[] }) {

@@ -9,7 +9,7 @@ import ButtonNav from "@/components/layout/bottom-navbar";
 import GetApp from "@/components/get-app";
 import { SearchDialog } from "@/components/store/product-search";
 import LocalizedClientLink from "@/components/ui/link";
-import { Session } from "start-authjs";
+import type { Session } from "start-authjs";
 import { useConfig } from "@/providers/store-provider";
 
 export const Route = createFileRoute("/_mainLayout")({

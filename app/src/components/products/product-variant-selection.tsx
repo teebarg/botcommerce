@@ -1,11 +1,12 @@
-import React, { useEffect } from "react";
+import type React from "react";
+import { useEffect } from "react";
 import { MessageCircleMore } from "lucide-react";
-import { ProductVariant } from "@/schemas";
+import type { ProductVariant } from "@/schemas";
 import { cn, currency } from "@/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useProductVariant } from "@/hooks/useProductVariant";
-import { Product } from "@/schemas/product";
+import type { Product } from "@/schemas/product";
 
 interface VariantSelectionProps {
     product: Product;

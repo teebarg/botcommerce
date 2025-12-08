@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Message } from "@/schemas";
+import type { Message } from "@/schemas";
 import { tryCatch } from "@/utils/try-catch";
 import { deleteCategoryImageFn, updateCategoryImageFn } from "@/server/categories.server";
 

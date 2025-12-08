@@ -27,7 +27,7 @@ interface Props {
     parent_id?: number | null;
 }
 
-interface ChildRef {}
+type ChildRef = {}
 
 const CategoryForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, current, hasParent = false, parent_id = null }, ref) => {
     const isCreate = type === "create";
@@ -50,7 +50,7 @@ const CategoryForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
 
     useEffect(() => {
         reset(defaultValues);
-    }, [current, parent_id]);
+    }, [current, parent_id, defaultValues]);
 
     useEffect(() => {
         if (createMutation.isSuccess || updateMutation.isSuccess) {

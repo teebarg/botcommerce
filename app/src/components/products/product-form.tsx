@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import MultiSelect from "@/components/ui/multi-select";
-import { Category, Collection, ProductSearch, SearchCategory, SearchCollection } from "@/schemas/product";
+import type { Category, Collection, ProductSearch, SearchCategory, SearchCollection } from "@/schemas/product";
 import { useCreateProduct, useUpdateProduct } from "@/hooks/useProduct";
 import { Checkbox } from "@/components/ui/checkbox";
 

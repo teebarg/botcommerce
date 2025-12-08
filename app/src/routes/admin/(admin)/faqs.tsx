@@ -8,7 +8,7 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { getFaqsFn } from "@/server/faq.server";
 import { Eye, EyeOff, Tag } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { FAQ } from "@/schemas";
+import type { FAQ } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
 import FaqActions from "@/components/admin/faq/faq-actions";
 

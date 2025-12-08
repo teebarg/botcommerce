@@ -1,4 +1,4 @@
-import { ProductSearch } from "@/schemas/product";
+import type { ProductSearch } from "@/schemas/product";
 import ProductCard from "@/components/store/products/product-card";
 
 type RelatedProductsProps = {

@@ -1,4 +1,4 @@
-import { Order } from "@/schemas";
+import type { Order } from "@/schemas";
 import { currency } from "@/utils";
 import { Separator } from "@/components/ui/separator";
 

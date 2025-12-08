@@ -5,7 +5,7 @@ import { useOverlayTriggerState } from "react-stately";
 import ProductFilter from "./product-filter";
 
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
-import { Collection } from "@/schemas/product";
+import type { Collection } from "@/schemas/product";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 

@@ -5,7 +5,7 @@ import LocalizedClientLink from "@/components/ui/link";
 import MenuComp from "@/components/layout/admin-mobile-menu-drawer";
 import UserDropDown from "@/components/layout/user-dropdown";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Session } from "start-authjs";
+import type { Session } from "start-authjs";
 
 const AdminNavbar = ({ session }: { session: Session | null }) => {
     return (

@@ -4,7 +4,7 @@ import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
 import OrderAddress from "./order-address";
 
-import { Order } from "@/schemas";
+import type { Order } from "@/schemas";
 import FadeInComponent from "@/components/generic/fade-in-component";
 import { Button } from "@/components/ui/button";
 

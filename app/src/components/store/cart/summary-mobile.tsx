@@ -3,7 +3,7 @@ import { ChevronDown, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { currency, cn } from "@/utils";
 import { BtnLink } from "@/components/ui/btnLink";
-import { Cart, CartItem } from "@/schemas";
+import type { Cart, CartItem } from "@/schemas";
 
 type SummaryProps = {
     cart: Cart;

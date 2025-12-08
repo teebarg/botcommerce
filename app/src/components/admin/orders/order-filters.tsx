@@ -1,16 +1,17 @@
-import React, { useState } from "react";
-import { DateRange } from "react-day-picker";
+import type React from "react";
+import { useState } from "react";
+import type { DateRange } from "react-day-picker";
 import { Filter, Search, X } from "lucide-react";
 
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
-import { OrderStatus } from "@/schemas";
+import type { OrderStatus } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { useSearch } from "@tanstack/react-router";
 
-interface OrderFiltersProps {}
+type OrderFiltersProps = {}
 
 const OrderFilters: React.FC<OrderFiltersProps> = () => {
     const { updateQuery } = useUpdateQuery(200);

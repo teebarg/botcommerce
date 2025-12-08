@@ -1,6 +1,6 @@
-import React from "react";
+import type React from "react";
 
-import { type Pag as PaginationType } from "@/schemas/common";
+import type { Pag as PaginationType } from "@/schemas/common";
 import {
     Pagination,
     PaginationContent,

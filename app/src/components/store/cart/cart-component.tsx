@@ -1,7 +1,7 @@
 import { useOverlayTriggerState } from "react-stately";
-import React from "react";
+import type React from "react";
 
-import { CartItem } from "@/schemas";
+import type { CartItem } from "@/schemas";
 import CartDetails from "@/components/store/cart/cart-details";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";

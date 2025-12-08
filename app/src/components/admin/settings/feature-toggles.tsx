@@ -1,6 +1,6 @@
 import React from "react";
 import { Switch } from "@/components/ui/switch";
-import { ShopSettings } from "@/schemas";
+import type { ShopSettings } from "@/schemas";
 import { useSyncShopDetails } from "@/hooks/useGeneric";
 
 interface FeatureTogglesProps {

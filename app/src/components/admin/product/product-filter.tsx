@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Collection } from "@/schemas/product";
+import type { Collection } from "@/schemas/product";
 import { Separator } from "@/components/ui/separator";
 
 interface ProductFilterProps {

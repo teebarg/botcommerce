@@ -1,4 +1,5 @@
-import React, { createContext, useState } from "react";
+import type React from "react";
+import { createContext, useState } from "react";
 
 import { cn } from "@/utils";
 

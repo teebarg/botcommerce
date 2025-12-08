@@ -1,7 +1,7 @@
 import { Facebook, Twitter, Instagram, MessageSquare } from "lucide-react";
 
 import LocalizedClientLink from "@/components/ui/link";
-import { Category } from "@/schemas/product";
+import type { Category } from "@/schemas/product";
 import { useCategories } from "@/hooks/useCategories";
 import { useCollections } from "@/hooks/useCollection";
 import { Separator } from "@/components/ui/separator";

@@ -2,7 +2,7 @@ import { omit } from "@/utils";
 import { Building, Check, Edit3, Home, MapPin, Phone, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import ShippingAddressFormEdit from "../address-form-edit";
-import { Address } from "@/schemas";
+import type { Address } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 import { Confirm } from "@/components/generic/confirm";

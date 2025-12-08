@@ -1,8 +1,8 @@
-import React from "react";
+import type React from "react";
 import { Bot, User, MoreVertical, ArrowLeft, Mail, UserX, Eye } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
-import { Chat, ChatMessage, ConversationStatus } from "@/schemas";
+import type { Chat, ChatMessage, ConversationStatus } from "@/schemas";
 import { formatDate } from "@/utils";
 import { Badge } from "@/components/ui/badge";
 

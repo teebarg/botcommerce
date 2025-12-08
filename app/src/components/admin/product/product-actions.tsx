@@ -2,7 +2,7 @@ import { useOverlayTriggerState } from "react-stately";
 import { Pencil, Trash2 } from "lucide-react";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ProductSearch } from "@/schemas/product";
+import type { ProductSearch } from "@/schemas/product";
 import { ProductView } from "@/components/products/product-view";
 import { Confirm } from "@/components/generic/confirm";
 import Overlay from "@/components/overlay";

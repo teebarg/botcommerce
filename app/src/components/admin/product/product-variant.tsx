@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { cn, currency } from "@/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ProductVariant } from "@/schemas";
+import type { ProductVariant } from "@/schemas";
 import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/utils/constants";
 import { AgeRangeSelector } from "@/components/ui/age-selector";
 

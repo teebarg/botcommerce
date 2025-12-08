@@ -6,7 +6,7 @@ import { ManageSlate } from "../shared-collections/manage-slate";
 import { ProductSheetForm } from "./product-form-sheet";
 
 import { Button } from "@/components/ui/button";
-import { GalleryImageItem } from "@/schemas";
+import type { GalleryImageItem } from "@/schemas";
 import Overlay from "@/components/overlay";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Confirm } from "@/components/generic/confirm";

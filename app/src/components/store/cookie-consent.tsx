@@ -1,9 +1,9 @@
-import { FC, useEffect, useState } from "react";
+import { type FC, useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { getCookieFn, setCookieFn } from "@/server/cookie.server";
 
-export interface CookieProps {}
+export type CookieProps = {}
 
 const Cookie: FC<CookieProps> = () => {
     const [showCookie, setShowCookie] = useState<boolean>(false);

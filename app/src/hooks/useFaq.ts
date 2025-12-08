@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useInvalidate } from "./useApi";
-import { FaqFormValues } from "@/components/admin/faq/faq-form";
+import type { FaqFormValues } from "@/components/admin/faq/faq-form";
 import { createFaqFn, deleteFaqFn, updateFaqFn } from "@/server/faq.server";
 
 export const useCreateFaq = () => {

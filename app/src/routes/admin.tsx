@@ -3,7 +3,7 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import AdminNavbar from "@/components/admin/layouts/admin-navbar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/layout/admin-sidebar";
-import { Session } from "start-authjs";
+import type { Session } from "start-authjs";
 
 export const Route = createFileRoute("/admin")({
     beforeLoad: ({ context, location }) => {

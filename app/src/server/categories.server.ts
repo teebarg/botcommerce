@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { Category, Message } from "@/schemas";
+import type { Category, Message } from "@/schemas";
 import { api } from "@/utils/fetch-api";
 
 const ReorderCategoriesSchema = z.object({

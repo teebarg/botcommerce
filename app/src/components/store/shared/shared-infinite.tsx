@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import MobileFilterControl from "./mobile-filter-control";
 import ProductCard from "@/components/store/products/product-card";
-import { Catalog, ProductSearch } from "@/schemas";
+import type { Catalog, ProductSearch } from "@/schemas";
 import { FilterSidebar } from "@/components/store/shared/filter-sidebar";
 import { Button } from "@/components/ui/button";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";

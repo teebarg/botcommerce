@@ -9,8 +9,7 @@ export const credentialsSchema = z.object({
     password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-export const useSession = createServerFn({ method: "GET" }).handler(async () => {
+export const getSessionFn = createServerFn({ method: "GET" }).handler(async () => {
     const request = getRequest();
-    const session = await getSession(request, authConfig);
-    return session;
+    return await getSession(request, authConfig);
 });

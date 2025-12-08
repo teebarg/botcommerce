@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/utils";
-import { Collection, GalleryImageItem, ProductVariant } from "@/schemas";
+import type { Collection, GalleryImageItem, ProductVariant } from "@/schemas";
 import MediaDisplay from "@/components/media-display";
 
 interface GalleryCardProps {

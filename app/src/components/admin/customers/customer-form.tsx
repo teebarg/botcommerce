@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { User } from "@/schemas";
+import type { User } from "@/schemas";
 import { useCreateUser, useUpdateUser } from "@/hooks/useUser";
 
 interface ReviewFormProps {

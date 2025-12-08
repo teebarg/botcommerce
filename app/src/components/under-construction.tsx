@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import type React from "react";
+import { useState, useEffect } from "react";
 import { Wrench, AlertCircle, Cog, Hammer } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";

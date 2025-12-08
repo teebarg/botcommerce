@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { COLOR_OPTIONS, SIZE_OPTIONS, AGE_OPTIONS } from "@/utils/constants";
 import { cn } from "@/utils";
 import RangeSlider from "@/components/ui/range-slider";
-import { Facet } from "@/schemas/product";
+import type { Facet } from "@/schemas/product";
 import { useSearch } from "@tanstack/react-router";
 
 interface Props {

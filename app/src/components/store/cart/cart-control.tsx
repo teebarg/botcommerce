@@ -1,7 +1,7 @@
-import React from "react";
+import type React from "react";
 import { Minus, Plus, Trash2 } from "lucide-react";
 
-import { CartItem } from "@/schemas";
+import type { CartItem } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useChangeCartQuantity, useDeleteCartItem } from "@/hooks/useCart";
 

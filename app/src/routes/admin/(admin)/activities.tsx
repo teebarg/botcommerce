@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ActivityListItem } from "@/components/generic/activities/ActivityList";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getActivitiesFn } from "@/server/activities.server";
-import { Activity } from "@/schemas";
+import type { Activity } from "@/schemas";
 import { ActivityIcon } from "lucide-react";
 import z from "zod";
 import PaginationUI from "@/components/pagination";

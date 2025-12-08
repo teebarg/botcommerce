@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Star } from "lucide-react";
 
-import ReviewItem, { Review } from "./review-item";
+import ReviewItem, { type Review } from "./review-item";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";

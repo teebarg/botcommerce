@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { Save } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { DBCatalog } from "@/schemas";
+import type { DBCatalog } from "@/schemas";
 import { useUpdateCatalog, useCreateCatalog } from "@/hooks/useCollection";
 
 interface SharedFormProps {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Input } from "@/components/ui/input";
-import { ShopSettings } from "@/schemas";
+import type { ShopSettings } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useSyncShopDetails } from "@/hooks/useGeneric";
 

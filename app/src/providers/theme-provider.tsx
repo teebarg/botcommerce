@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie, setCookie } from "@tanstack/react-start/server";
-import { createContext, ReactNode, use, useEffect, useState } from "react";
+import { createContext, type ReactNode, use, useEffect, useState } from "react";
 
 export type UserTheme = "light" | "dark" | "system";
 export type AppTheme = Exclude<UserTheme, "system">;

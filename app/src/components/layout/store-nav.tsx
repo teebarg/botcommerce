@@ -6,7 +6,7 @@ import LocalizedClientLink from "@/components/ui/link";
 import { SearchDialog } from "@/components/store/product-search";
 import { Heart, HeartOff } from "lucide-react";
 import { ThemeToggle } from "../theme-toggle";
-import { Session } from "start-authjs";
+import type { Session } from "start-authjs";
 import { useConfig } from "@/providers/store-provider";
 
 const StoreNavbar = ({ session }: { session: Session | null }) => {

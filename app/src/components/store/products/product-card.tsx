@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { useOverlayTriggerState } from "react-stately";
 import ProductActions from "./product-actions";
 import { useProductVariant } from "@/hooks/useProductVariant";
@@ -7,7 +7,7 @@ import { DiscountBadge } from "@/components/store/products/discount-badge";
 import Overlay from "@/components/overlay";
 import { useUserWishlist } from "@/hooks/useUser";
 import ProductOverview from "@/components/store/products/product-overview";
-import { ProductSearch, ProductVariant } from "@/schemas/product";
+import type { ProductSearch, ProductVariant } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/utils";
 import MediaDisplay from "@/components/media-display";

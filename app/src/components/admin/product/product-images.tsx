@@ -1,9 +1,9 @@
-import React from "react";
+import type React from "react";
 import { useDropzone } from "react-dropzone";
 import { Upload } from "lucide-react";
 
 import DraggableImageList from "./draggable-images";
-import { ProductImage } from "@/schemas";
+import type { ProductImage } from "@/schemas";
 import { useUploadImages } from "@/hooks/useProduct";
 
 interface ProductImageManagerProps {

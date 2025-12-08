@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCollections } from "@/hooks/useCollection";
 import { useCategories } from "@/hooks/useCategories";
-import MultiSelect, { SelectOption } from "@/components/ui/multi-select";
+import MultiSelect, { type SelectOption } from "@/components/ui/multi-select";
 import { Button } from "@/components/ui/button";
 import { useBulkProductUpdate } from "@/hooks/useGallery";
 import { Checkbox } from "@/components/ui/checkbox";

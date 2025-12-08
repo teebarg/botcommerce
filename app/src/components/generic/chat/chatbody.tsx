@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from "react";
+import type React from "react";
+import { useRef, useEffect } from "react";
 import MessageBubble from "./message-bubble";
 import { formatDate, cn } from "@/utils";
 

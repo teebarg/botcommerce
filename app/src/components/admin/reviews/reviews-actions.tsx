@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { Pencil, Trash2 } from "lucide-react";
 
@@ -6,7 +6,7 @@ import { UpdateReviewForm } from "./reviews-form";
 
 import { Confirm } from "@/components/generic/confirm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Review } from "@/schemas";
+import type { Review } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 import { useDeleteReview, useUpdateReview } from "@/hooks/useReview";

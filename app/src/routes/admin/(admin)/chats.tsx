@@ -6,7 +6,7 @@ import CustomerFilter from "@/components/admin/chats/chats-filter";
 import ChatsActions from "@/components/admin/chats/chats-actions";
 import ChatsCard from "@/components/admin/chats/chats-card";
 
-import { Chat, ConversationStatus } from "@/schemas";
+import type { Chat, ConversationStatus } from "@/schemas";
 import PaginationUI from "@/components/pagination";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { getChatsFn } from "@/server/generic.server";

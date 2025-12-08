@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import OrderItemComponent from "./order-item";
 
-import { OrderItem } from "@/schemas";
+import type { OrderItem } from "@/schemas";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 const OrderItems: React.FC<{ items: OrderItem[]; showDetails: boolean }> = ({ items, showDetails }) => {

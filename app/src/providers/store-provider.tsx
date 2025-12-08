@@ -1,4 +1,5 @@
-import React, { createContext, useContext } from "react";
+import type React from "react";
+import { createContext, useContext } from "react";
 import { siteConfigQuery } from "@/hooks/useGeneric";
 import z from "zod";
 import { useQuery } from "@tanstack/react-query";

@@ -1,5 +1,5 @@
 import { OrderStatusBadge, PaymentStatusBadge } from "./order-status-badge";
-import { Order } from "@/schemas";
+import type { Order } from "@/schemas";
 import { currency, formatDate } from "@/utils";
 
 interface OrderCardProps {

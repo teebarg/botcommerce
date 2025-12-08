@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { Plus, Check, Trash2, Boxes } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 
@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAddProductToCatalog, useRemoveProductFromCatalog, useCatalogs } from "@/hooks/useCollection";
 import ComponentLoader from "@/components/component-loader";
-import { DBCatalog, GalleryProduct } from "@/schemas";
+import type { DBCatalog, GalleryProduct } from "@/schemas";
 import Overlay from "@/components/overlay";
 import { useRouteContext } from "@tanstack/react-router";
 
@@ -23,7 +23,7 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
     const state = useOverlayTriggerState({});
     const { data, isLoading } = useCatalogs(true);
 
-    if (!session?.user?.isAdmin || !Boolean(product)) {
+    if (!session?.user?.isAdmin || !product) {
         return null;
     }
 

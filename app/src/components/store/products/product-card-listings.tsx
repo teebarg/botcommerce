@@ -1,6 +1,6 @@
-import React from "react";
+import type React from "react";
 import { useInView } from "react-intersection-observer";
-import { ProductSearch } from "@/schemas/product";
+import type { ProductSearch } from "@/schemas/product";
 import { cn } from "@/utils";
 import ProductCard from "@/components/store/products/product-card";
 

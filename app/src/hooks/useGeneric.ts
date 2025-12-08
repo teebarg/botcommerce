@@ -1,6 +1,6 @@
 import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ContactFormValues } from "@/components/store/contact-form";
+import type { ContactFormValues } from "@/components/store/contact-form";
 import { contactFormFn, getShopSettingsPublicFn, subscribeNewsletterFn, syncShopDetailsFn } from "@/server/generic.server";
 
 export const siteConfigQuery = queryOptions({

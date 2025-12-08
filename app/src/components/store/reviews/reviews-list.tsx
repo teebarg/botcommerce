@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ReviewCard } from "@/components/store/reviews/review-card";
-import { PaginatedReview, Review } from "@/schemas";
+import type { PaginatedReview, Review } from "@/schemas";
 import Overlay from "@/components/overlay";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import { useOverlayTriggerState } from "react-stately";

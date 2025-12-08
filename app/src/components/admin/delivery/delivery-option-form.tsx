@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { DeliveryOption } from "@/schemas";
+import type { DeliveryOption } from "@/schemas";
 import { useInvalidate } from "@/hooks/useApi";
 import { ShippingMethodSchema } from "@/schemas";
 import { tryCatch } from "@/utils/try-catch";

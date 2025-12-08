@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
-import { CouponUsage } from "@/schemas/common";
+import type { CouponUsage } from "@/schemas/common";
 import { currency, formatDate } from "@/utils";
 
 interface CouponUsageDialogProps {

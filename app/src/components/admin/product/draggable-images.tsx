@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect, JSX } from "react";
+import type React from "react";
+import { useState, useRef, useEffect, type JSX } from "react"
 import { Trash } from "lucide-react";
 
-import { ProductImage } from "@/schemas";
+import type { ProductImage } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useDeleteImages, useReorderImages } from "@/hooks/useProduct";
 import ImageDisplay from "@/components/image-display";

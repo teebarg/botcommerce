@@ -1,6 +1,6 @@
 import { CheckCircle, Package, Calendar, Clock, RefreshCw, X, Truck } from "lucide-react";
 
-import { Order, OrderStatus } from "@/schemas";
+import type { Order, OrderStatus } from "@/schemas";
 import { cn, formatDate } from "@/utils";
 
 const OrderOverview = ({ order }: { order: Order }) => {

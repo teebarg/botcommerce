@@ -1,7 +1,7 @@
 import { ordersQueryOptions } from "@/hooks/useOrder";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Order } from "@/schemas";
+import type { Order } from "@/schemas";
 import OrderCard from "@/components/store/orders/order-card";
 import { BtnLink } from "@/components/ui/btnLink";
 

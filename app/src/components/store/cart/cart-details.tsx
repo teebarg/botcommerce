@@ -1,8 +1,8 @@
-import React from "react";
+import type React from "react";
 import { Info, ShoppingCart } from "lucide-react";
 import CartItemComponent from "./cart-item";
 import { useRouterState } from "@tanstack/react-router";
-import { Cart, CartItem } from "@/schemas";
+import type { Cart, CartItem } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { currency } from "@/utils";
 import { Separator } from "@/components/ui/separator";

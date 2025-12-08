@@ -5,7 +5,7 @@ import { useOverlayTriggerState } from "react-stately";
 import { FaqForm } from "./faq-form";
 
 import { Button } from "@/components/ui/button";
-import { FAQ } from "@/schemas";
+import type { FAQ } from "@/schemas";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Confirm } from "@/components/generic/confirm";
 import { useInvalidate } from "@/hooks/useApi";

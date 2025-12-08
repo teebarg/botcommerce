@@ -1,7 +1,7 @@
-import React from "react";
+import type React from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { Pencil, Plus, Trash2 } from "lucide-react";
-import { Address } from "@/schemas";
+import type { Address } from "@/schemas";
 import Overlay from "@/components/overlay";
 import { Button } from "@/components/ui/button";
 import AddAddressForm from "@/components/store/account/address/add-address-form";

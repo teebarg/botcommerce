@@ -6,9 +6,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
 import { useDeliveryOptions } from "@/hooks/useApi";
 import { currency } from "@/utils";
-import { DeliveryOption } from "@/schemas";
+import type { DeliveryOption } from "@/schemas";
 import { useUpdateCartDetails } from "@/hooks/useCart";
-import { Cart } from "@/schemas";
+import type { Cart } from "@/schemas";
 import { useConfig } from "@/providers/store-provider";
 import ComponentLoader from "@/components/component-loader";
 

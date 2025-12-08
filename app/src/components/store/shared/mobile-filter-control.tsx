@@ -5,7 +5,7 @@ import { FilterSidebar } from "@/components/store/shared/filter-sidebar";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 import { cn } from "@/utils";
-import { Facet } from "@/schemas/product";
+import type { Facet } from "@/schemas/product";
 
 interface Props {
     facets?: Facet;

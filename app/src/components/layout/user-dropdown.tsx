@@ -10,7 +10,7 @@ import {
 import { useInvalidateMe } from "@/hooks/useUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useInvalidateCart } from "@/hooks/useCart";
-import { UserSession } from "@/schemas";
+import type { UserSession } from "@/schemas";
 
 export default function UserDropDown({ user }: { user: UserSession }) {
     const invalidate = useInvalidateMe();

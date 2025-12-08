@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
+import type React from "react";
+import { useState, useRef, useEffect } from "react";
 
 export function LazyInView({ children, rootMargin = "200px" }: { children: React.ReactNode; rootMargin?: string }) {
     const [isVisible, setIsVisible] = useState<boolean>(false);
