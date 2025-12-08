@@ -90,7 +90,6 @@ export default function SharedInfinite({ slug, initialCatalog }: Props) {
                                 <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
                             </div>
                         }
-                        endMessage={<div className="text-center py-8 text-muted-foreground">You've viewed all products</div>}
                     >
                         <div className={cn("grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4", viewMode === "grid" ? "" : "grid-cols-1")}>
                             {products.map((product: ProductSearch, idx: number) => (

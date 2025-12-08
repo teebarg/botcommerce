@@ -33,8 +33,11 @@ class InMemoryWebSocketManager:
                 await self.connections[user_id].close()
             except:
                 pass
-            del self.connections[user_id]
-            self.heartbeats.pop(user_id, None)
+            try:
+                del self.connections[user_id]
+                self.heartbeats.pop(user_id, None)
+            except Exception as e:
+                logger.error(f"❌ Failed to disconnect user {user_id}: {e}")
             logger.info(f"👋 User {user_id} disconnected.")
 
     async def send_to_user(self, user_id: str, data: dict, message_type: str = "general") -> bool:

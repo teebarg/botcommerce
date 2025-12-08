@@ -1,5 +1,4 @@
 import React, { useRef, useEffect, useCallback } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
 
 interface InfiniteScrollProps {
     children: React.ReactNode;
@@ -18,7 +17,7 @@ export const InfiniteScroll = ({
     hasMore,
     isLoading,
     loader = <div className="text-center py-4">Loading...</div>,
-    endMessage = <div className="text-center py-4 text-muted-foreground">No more items</div>,
+    endMessage = null,
     threshold = 500,
     className = "",
 }: InfiniteScrollProps) => {

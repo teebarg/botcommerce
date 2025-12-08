@@ -3,7 +3,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { Product, PaginatedProductSearch, Message, ProductVariant, ProductSearch } from "@/schemas";
 
-// --- Type Definitions and Schemas ---
 const SearchParamsSchema = z.object({
     search: z.string().optional(),
     categories: z.string().optional(),
@@ -72,7 +71,7 @@ export const SearchSchema = z.object({
     sort: z.string().optional(),
     show_facets: z.boolean().optional(),
     show_suggestions: z.boolean().optional(),
-    // cat_ids: z.string().optional(),
+    cat_ids: z.string().optional(),
     sizes: z.number().optional(),
     colors: z.string().optional(),
     ages: z.string().optional(),
@@ -86,9 +85,8 @@ export const RelatedProductSearchSchema = z.object({
     limit: z.number().optional(),
 });
 
-// --- Server Functions ---
 export const getProductsFn = createServerFn({ method: "GET" })
-    .inputValidator((input: unknown) => SearchSchema.parse(input))
+    .inputValidator(SearchSchema)
     .handler(async ({ data }) => {
         const res = await api.get<PaginatedProductSearch>("/product/", { params: { skip: 0, ...data } });
         return res;

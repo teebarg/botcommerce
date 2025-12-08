@@ -3,7 +3,6 @@ import { useState } from "react";
 import MobileFilterControl from "@/components/store/shared/mobile-filter-control";
 import { CollectionHeader } from "@/components/store/collections/collection-header";
 import NoProductsFound from "@/components/store/products/no-products";
-import { Collection } from "@/schemas/product";
 import { useProductInfiniteSearch } from "@/hooks/useProduct";
 import ProductCardListings from "@/components/store/products/product-card-listings";
 import { FilterSidebar } from "@/components/store/shared/filter-sidebar";
@@ -14,31 +13,26 @@ import { CollectionTemplateSkeleton } from "./skeleton";
 import { Loader } from "lucide-react";
 
 interface Props {
-    collection?: Collection;
+    collection_slug?: string;
     searchTerm?: string;
     initialData: any;
 }
 
-export default function InfiniteScrollClient({ initialData, collection, searchTerm }: Props) {
+export default function InfiniteScrollClient({ initialData, collection_slug, searchTerm }: Props) {
     const search = useSearch({
         strict: false,
     });
     const [viewMode, setViewMode] = useState<"grid" | "list">("list");
-    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } = useProductInfiniteSearch(initialData, {
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useProductInfiniteSearch(initialData, {
         ...search,
         show_facets: true,
-        collections: collection?.slug,
+        collections: collection_slug,
         search: searchTerm,
     });
 
     if (isLoading) {
         return <CollectionTemplateSkeleton />;
     }
-
-    if (isError) {
-        return <div className="p-4 bg-red-50 text-red-800 rounded">Error loading products: {error.message}</div>;
-    }
-
     const products = data?.pages?.flatMap((page) => page.products) ?? initialData;
     const facets = data?.pages?.[0]?.facets || {};
 
@@ -68,7 +62,6 @@ export default function InfiniteScrollClient({ initialData, collection, searchTe
                                     <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
                                 </div>
                             }
-                            endMessage={<div className="text-center py-8 text-muted-foreground">You've viewed all products</div>}
                         >
                             <ProductCardListings className="w-full pb-4" products={products!} viewMode={viewMode} />
                         </InfiniteScroll>

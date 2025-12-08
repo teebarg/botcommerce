@@ -26,8 +26,8 @@ type SearchParams = {
     search?: string;
     categories?: string;
     collections?: string;
-    min_price?: number | string;
-    max_price?: number | string;
+    min_price?: number;
+    max_price?: number;
     skip?: number;
     limit?: number;
     sort?: string;
@@ -59,6 +59,11 @@ type UpdateVariantInput = {
 type UploadImageInput = { id: number; data: any };
 type DeleteImageInput = { id: number; imageId: number };
 type ReorderImagesInput = { id: number; imageIds: number[] };
+
+export const productQueryOptions = (params: SearchParams) => ({
+    queryKey: ["products", "query", JSON.stringify(params)],
+    queryFn: () => getProductsFn({ data: params }),
+});
 
 export const useProductSearch = (params: SearchParams) => {
     return useQuery({

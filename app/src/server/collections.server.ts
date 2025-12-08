@@ -62,9 +62,9 @@ export const deleteCollectionFn = createServerFn({ method: "POST" })
 
 // --- Shared Collection (Catalog) Hooks ---
 export const getCatalogsFn = createServerFn({ method: "GET" })
-    .inputValidator(z.boolean().optional()) // is_active
+    .inputValidator(z.boolean().optional())
     .handler(async ({ data: is_active }) => {
-        return await api.get<PaginatedShared>("/shared/", { params: { is_active: is_active ?? true } });
+        return await api.get<PaginatedShared>("/shared/", { params: { is_active: is_active ?? null } });
     });
 
 export const createCatalogFn = createServerFn({ method: "POST" })

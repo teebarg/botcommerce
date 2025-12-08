@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
-import ServerError from "@/components/generic/server-error";
 import { tryCatch } from "@/utils/try-catch";
-import { getProductsFn } from "@/server/product.server";
 import z from "zod";
 import { getCollectionFn } from "@/server/collections.server";
 import { seo } from "@/utils/seo";
+import { productQueryOptions } from "@/hooks/useProduct";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 const productSearchSchema = z.object({
     sort: z.enum(["min_variant_price:asc", "min_variant_price:desc", "id:desc", "created_at:desc"]).optional(),
@@ -26,14 +26,12 @@ export const Route = createFileRoute("/_mainLayout/collections/$slug")({
             search,
         };
     },
-    loader: async ({ params: { slug }, context }) => {
+    loader: async ({ params: { slug }, context: { queryClient, search, config } }) => {
         const { data: collection } = await tryCatch(getCollectionFn({ data: slug }));
-        const { data, error } = await tryCatch(getProductsFn({ data: { limit: 36, collections: collection?.slug, ...context.search } }));
+        await queryClient.ensureQueryData(productQueryOptions({ limit: 36, collections: collection?.slug, ...search }));
         return {
             collection,
-            data,
-            error,
-            config: context.config,
+            config,
         };
     },
     head: ({ loaderData }) => {
@@ -60,14 +58,13 @@ export const Route = createFileRoute("/_mainLayout/collections/$slug")({
 });
 
 function RouteComponent() {
-    const { data, error, collection } = Route.useLoaderData();
-    if (error) {
-        return <ServerError error={error} scenario="server" stack="Collections" />;
-    }
+    const { slug } = Route.useParams();
+    const search = Route.useSearch();
+    const { data } = useSuspenseQuery(productQueryOptions({ limit: 36, collections: slug, ...search }));
 
     return (
         <div className="max-w-9xl mx-auto w-full py-4 px-2">
-            <InfiniteScrollClient initialData={data} collection={collection!} />
+            <InfiniteScrollClient initialData={data} collection_slug={slug!} />
         </div>
     );
 }

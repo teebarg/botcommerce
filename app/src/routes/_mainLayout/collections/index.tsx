@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
-import ServerError from "@/components/generic/server-error";
-import { tryCatch } from "@/utils/try-catch";
-import { getProductsFn } from "@/server/product.server";
 import z from "zod";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { productQueryOptions } from "@/hooks/useProduct";
 
 const productSearchSchema = z.object({
     sort: z.enum(["min_variant_price:asc", "min_variant_price:desc", "id:desc", "created_at:desc"]).optional(),
@@ -17,7 +16,7 @@ const productSearchSchema = z.object({
     ages: z.string().optional(),
 });
 
-export const Route = createFileRoute("/_mainLayout/collections")({
+export const Route = createFileRoute("/_mainLayout/collections/")({
     validateSearch: productSearchSchema,
     component: CollectionsPage,
     beforeLoad: ({ search }) => {
@@ -25,25 +24,14 @@ export const Route = createFileRoute("/_mainLayout/collections")({
             search,
         };
     },
-    loader: async ({ context, params, location }) => {
-        // console.log("🚀 ~ file: index.tsx:30 ~ params:", params)
-        // console.log("🚀 ~ file: index.tsx:30 ~ route:", route)
-        // console.log("🚀 ~ file: index.tsx:30 ~ location:", location)
-        // console.log("🚀 ~ file: index.tsx:12 ~ context:", context);
-
-        const { data, error } = await tryCatch(getProductsFn({ data: { limit: 36, ...context.search } }));
-        return {
-            data,
-            error,
-        };
+    loader: async ({ context: { queryClient, search } }) => {
+        await queryClient.ensureQueryData(productQueryOptions({ limit: 36, ...search }));
     },
 });
 
 function CollectionsPage() {
-    const { data, error } = Route.useLoaderData();
-    if (error) {
-        return <ServerError error={error} scenario="server" stack="Collections" />;
-    }
+    const search = Route.useSearch();
+    const { data } = useSuspenseQuery(productQueryOptions(search));
 
     return (
         <div className="max-w-9xl mx-auto w-full py-4 px-2">

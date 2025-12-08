@@ -10,8 +10,7 @@ export const ActivitiesSearchSchema = z.object({
 export const getActivitiesFn = createServerFn({ method: "GET" })
     .inputValidator((input: unknown) => ActivitiesSearchSchema.parse(input))
     .handler(async ({ data }) => {
-        const res = await api.get<PaginatedActivity>("/activities/", { params: data });
-        return res
+        return await api.get<PaginatedActivity>("/activities/", { params: data });
     });
 
 export const getMyActivitiesFn = createServerFn({ method: "GET" }).handler(async () => {

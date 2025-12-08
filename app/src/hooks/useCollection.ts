@@ -17,18 +17,12 @@ import {
 } from "@/server/collections.server";
 import { useRouteContext } from "@tanstack/react-router";
 
-// export const useCollections = (query?: string) => {
-//     return useQuery({
-//         queryKey: ["collections", query],
-//         queryFn: () => getCollectionsFn({ data: query }),
-//     });
-// };
-
-export const collectionsQuery = (query?: string) => queryOptions({
-    queryKey: ["collections", query],
-    staleTime: 1000 * 60 * 60, // 1 hour
-    queryFn: () => getCollectionsFn({ data: query }),
-});
+export const collectionsQuery = (query?: string) =>
+    queryOptions({
+        queryKey: ["collections", query],
+        staleTime: 1000 * 60 * 60, // 1 hour
+        queryFn: () => getCollectionsFn({ data: query }),
+    });
 
 export const useCollections = (query?: string) => useQuery(collectionsQuery(query));
 

@@ -20,7 +20,6 @@ const productSearchSchema = z.object({
 export const Route = createFileRoute("/_mainLayout/search/$query")({
     validateSearch: productSearchSchema,
     beforeLoad: ({ search }) => {
-        console.log("🚀 ~ file: index.tsx:24 ~ search:", search);
         return {
             search,
         };
