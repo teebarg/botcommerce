@@ -33,21 +33,22 @@ export const Route = createFileRoute("/_mainLayout/collections/$slug")({
             collection,
             data,
             error,
+            config: context.config,
         };
     },
     head: ({ loaderData }) => {
         const collection = loaderData?.collection;
         const baseUrl = import.meta.env.VITE_BASE_URL;
         const name = collection?.name;
-        const title = `${name} Collection`;
-        // const description = `Explore ${name} at ${siteConfig?.shop_name}`;
+        const title = `${name} Collection | ${loaderData?.config?.shop_name}`;
+        const description = `Explore ${name} at ${loaderData?.config?.shop_name}`;
 
         return {
             title,
             meta: [
                 ...seo({
                     title,
-                    description: "",
+                    description,
                     url: `${baseUrl}/collections/${collection?.slug}`,
                     image: "/default-og.png",
                     name,

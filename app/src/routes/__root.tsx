@@ -30,6 +30,7 @@ import { siteConfigQuery } from "@/hooks/useGeneric";
 interface RouterContext {
     session: AuthSession | null;
     queryClient: QueryClient;
+    config: any;
 }
 
 const fetchSession = createServerFn({ method: "GET" }).handler(async () => {
@@ -39,11 +40,31 @@ const fetchSession = createServerFn({ method: "GET" }).handler(async () => {
 });
 
 export const Route = createRootRouteWithContext<RouterContext>()({
-    head: () => {
+    beforeLoad: async ({}) => {
+        const session = (await fetchSession()) as unknown as Session;
+        const _storedTheme = await getStoredTheme();
+        return {
+            _storedTheme,
+            session,
+        };
+    },
+    loader: async ({ context: { queryClient } }) => {
+        const [categories, collections, siteConfig] = await Promise.all([
+            queryClient.ensureQueryData(categoriesQuery()),
+            queryClient.ensureQueryData(collectionsQuery()),
+            queryClient.ensureQueryData(siteConfigQuery),
+        ]);
+
+        return {
+            categories,
+            collections,
+            config: siteConfig,
+        };
+    },
+    head: ({ loaderData }) => {
         const baseUrl = import.meta.env.VITE_BASE_URL;
-        // const title = loaderData?.siteConfig?.name;
-        const title = "Title";
-        const description = "Special description";
+        const title = loaderData?.config?.shop_name ?? "";
+        const description = loaderData?.config?.shop_description ?? "";
 
         return {
             meta: [
@@ -65,30 +86,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
                 { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
                 { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
             ],
-        };
-    },
-    beforeLoad: async ({}) => {
-        const session = (await fetchSession()) as unknown as Session;
-        const _storedTheme = await getStoredTheme();
-        return {
-            _storedTheme,
-            session,
-        };
-    },
-    loader: async ({ context: { queryClient } }) => {
-        // return Promise.all([
-        //     queryClient.ensureQueryData(categoriesQuery()),
-        //     queryClient.ensureQueryData(collectionsQuery()),
-        //     queryClient.ensureQueryData(siteConfigQuery),
-        // ]);
-        const categories = await queryClient.ensureQueryData(categoriesQuery());
-        const collections = await queryClient.ensureQueryData(collectionsQuery());
-        const siteConfig = await queryClient.ensureQueryData(siteConfigQuery);
-
-        return {
-            categories,
-            collections,
-            siteConfig,
         };
     },
     errorComponent: (props) => {

@@ -19,7 +19,7 @@ import {
     ShoppingCart,
     Tag,
 } from "lucide-react";
-import { Link, useLocation, useRouteContext } from "@tanstack/react-router";
+import { Link, useRouteContext } from "@tanstack/react-router";
 
 import {
     Sidebar,
@@ -141,8 +141,6 @@ const storeItems = [
 export function AdminSidebar() {
     const { session } = useRouteContext({ strict: false });
     const { toggleSidebar, state } = useSidebar();
-    const location = useLocation();
-    const path = location.pathname;
 
     return (
         <Sidebar collapsible="icon">
@@ -165,8 +163,8 @@ export function AdminSidebar() {
                         <SidebarMenu>
                             {AdminItems.map((item, idx: number) => (
                                 <SidebarMenuItem key={idx}>
-                                    <SidebarMenuButton asChild isActive={path === item.url}>
-                                        <Link to={item.url}>
+                                    <SidebarMenuButton asChild>
+                                        <Link to={item.url} activeProps={{ className: "bg-primary/20 text-primary" }} activeOptions={{ exact: true }}>
                                             <item.icon />
                                             <span>{item.title}</span>
                                         </Link>
@@ -182,8 +180,8 @@ export function AdminSidebar() {
                         <SidebarMenu>
                             {storeItems.map((item, idx: number) => (
                                 <SidebarMenuItem key={idx}>
-                                    <SidebarMenuButton asChild isActive={path === item.url}>
-                                        <Link to={item.url}>
+                                    <SidebarMenuButton asChild>
+                                        <Link to={item.url} activeProps={{ className: "bg-primary/20 text-primary" }} activeOptions={{ exact: true }}>
                                             <item.icon />
                                             <span>{item.title}</span>
                                         </Link>
@@ -199,8 +197,8 @@ export function AdminSidebar() {
                         <SidebarMenu>
                             {AccountItems.map((item, idx: number) => (
                                 <SidebarMenuItem key={idx}>
-                                    <SidebarMenuButton asChild isActive={path === item.url}>
-                                        <Link to={item.url}>
+                                    <SidebarMenuButton asChild>
+                                        <Link to={item.url} activeProps={{ className: "bg-primary/20 text-primary" }} activeOptions={{ exact: true }}>
                                             <item.icon />
                                             <span>{item.title}</span>
                                         </Link>
@@ -229,7 +227,7 @@ export function AdminSidebar() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-(--radix-popper-anchor-width)" side="top">
                                 <DropdownMenuItem>
-                                    <Link className="justify-between" to="/profile">
+                                    <Link className="justify-between" to="/account/profile">
                                         Profile
                                         <span className="badge">New</span>
                                     </Link>

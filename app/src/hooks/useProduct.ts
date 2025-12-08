@@ -1,7 +1,5 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-
-import { api } from "@/utils/fetch-api";
 import { PaginatedProductSearch } from "@/schemas";
 import {
     bustCacheFn,

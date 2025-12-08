@@ -19,8 +19,6 @@ const StoreNavbar = ({ session }: { session: Session | null }) => {
                     <LocalizedClientLink
                         className="flex items-center gap-1"
                         href="/"
-                        activeProps={{ className: "font-bold text-red-600" }}
-                        activeOptions={{ exact: true }}
                     >
                         <span className="tracking-tighter font-bold text-2xl uppercase">{config?.shop_name}</span>
                         <div className="h-8 w-8">

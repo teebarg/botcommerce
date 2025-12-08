@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { Globe } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
-import { api } from "@/utils/fetch-api";
 import { PaymentInitialize } from "@/types/payment";
 import { currency } from "@/lib/utils";
 import { tryCatch } from "@/lib/try-catch";
+import { createPaymentFn } from "@/server/payment.server";
 
 interface PaystackPaymentProps {
     cartNumber: string;
@@ -19,7 +18,7 @@ export function PaystackPayment({ cartNumber, amount }: PaystackPaymentProps) {
 
     const handlePayment = async () => {
         setLoading(true);
-        const { data, error } = await tryCatch<PaymentInitialize>(api.post(`/payment/initialize/${cartNumber}`));
+        const { data, error } = await tryCatch<PaymentInitialize>(createPaymentFn({ data: cartNumber }));
 
         setLoading(false);
 

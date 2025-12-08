@@ -31,40 +31,40 @@ services:
       - traefik.http.routers.traefik-dashboard.service=api@internal
       - traefik.http.middlewares.https-redirect.contenttype.autodetect=false
 
-  # app:
-  #   build:
-  #     context: ./app
-  #     dockerfile: Dockerfile
-  #   container_name: app
-  #   ports:
-  #     - "7003:5173"
-  #   depends_on:
-  #     - backend
-  #   volumes:
-  #     - ./app/src:/app/src
-  #     - ./app/public:/app/public
-  #     - ./app/vite.config.ts:/app/vite.config.ts
-  #     - /app/node_modules
-  #   environment:
-  #     - NODE_ENV=development
-  #     - WATCHPACK_POLLING=true
-  #     - CHOKIDAR_USEPOLLING=true
-  #   env_file:
-  #     - ./app/.env.docker
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.docker.network=traefik-public
-  #     - traefik.constraint-label=traefik-public
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: app
+    ports:
+      - "7003:5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./app/src:/app/src
+      - ./app/public:/app/public
+      - ./app/vite.config.ts:/app/vite.config.ts
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+    env_file:
+      - ./app/.env.docker
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.constraint-label=traefik-public
 
-  #     - traefik.http.services.shop-app.loadbalancer.server.port=5173
+      - traefik.http.services.shop-app.loadbalancer.server.port=5173
       
-  #     - traefik.http.routers.shop-app-http.rule=Host(`app.localhost`)
-  #     - traefik.http.routers.shop-app-http.entrypoints=http
-  #     # - traefik.http.routers.shop-app-http.service=shop-app
-  #   command: ["pnpm", "dev", "--host", "0.0.0.0"]
-  #   networks:
-  #     - traefik-public
-  #     - default
+      - traefik.http.routers.shop-app-http.rule=Host(`app.localhost`)
+      - traefik.http.routers.shop-app-http.entrypoints=http
+      # - traefik.http.routers.shop-app-http.service=shop-app
+    command: ["pnpm", "dev", "--host", "0.0.0.0"]
+    networks:
+      - traefik-public
+      - default
 
   backend:
     image: 'shop-backend:${TAG-latest}'

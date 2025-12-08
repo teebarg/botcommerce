@@ -2,14 +2,13 @@ import React, { useState } from "react";
 import { Save } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Order } from "@/schemas";
 import { tryCatch } from "@/lib/try-catch";
-import { api } from "@/utils/fetch-api";
+import { createOrderNoteFn } from "@/server/order.server";
 
 interface OrderNotesProp {
     order: Order;
@@ -24,7 +23,7 @@ const OrderNotes: React.FC<OrderNotesProp> = ({ order }) => {
         if (!notes.trim()) return;
 
         setIsLoading(true);
-        const { error } = await tryCatch(api.patch(`/order/${order.id}/notes`, { notes }));
+        const { error } = await tryCatch(createOrderNoteFn({ data: { orderId: order.id, notes } }));
 
         setIsLoading(false);
 

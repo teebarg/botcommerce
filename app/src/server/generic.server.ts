@@ -5,7 +5,6 @@ import { api } from "@/utils/fetch-api";
 import {
     ChatMessage,
     ShippingMethodSchema,
-    UserInteraction,
     type BankDetails,
     type ConversationStatus,
     type DeliveryOption,
@@ -13,14 +12,13 @@ import {
     type PaginatedChat,
     type ShopSettings,
 } from "@/schemas";
-import { D } from "node_modules/@upstash/redis/zmscore-DhpQcqpW.mjs";
 
 export const getShopSettingsFn = createServerFn({ method: "GET" }).handler(async () => {
     return await api.get<ShopSettings[]>("/shop-settings/");
 });
 
 export const getShopSettingsPublicFn = createServerFn({ method: "GET" }).handler(async () => {
-    return await api.get<Record<string, string | number>>("/shop-settings/public");
+    return await api.get<Record<string, string>>("/shop-settings/public");
 });
 
 export const syncShopDetailsFn = createServerFn({ method: "POST" })
@@ -180,4 +178,16 @@ export const bulkRequestFn = createServerFn({ method: "POST" })
     .inputValidator((d: any) => d)
     .handler(async ({ data }) => {
         return await api.post<Message>("/bulk-purchase", data);
+    });
+
+export const createErrorFn = createServerFn({ method: "POST" })
+    .inputValidator(
+        z.object({
+            message: z.string(),
+            scenario: z.string().optional(),
+            stack: z.string().optional(),
+        })
+    )
+    .handler(async ({ data }) => {
+        return await api.post<Message>("/log-error", data);
     });

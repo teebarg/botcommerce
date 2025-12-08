@@ -17,3 +17,15 @@ export const getCatalogFn = createServerFn({ method: "GET" })
         const res = await api.get<Catalog>(`/shared/${data.slug}`, { params: { skip: 0, ...data } });
         return res;
     });
+
+interface VisitTrackerResponse {
+    success: boolean;
+    is_new_visit: boolean;
+    view_count: number;
+}
+
+export const trackVisitFn = createServerFn({ method: "POST" })
+    .inputValidator((d: string) => d)
+    .handler(async ({ data: slug }) => {
+        return await api.post<VisitTrackerResponse>(`/shared/${slug}/track-visit`);
+    });

@@ -1,12 +1,16 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@import "@fontsource-variable/lexend";
+@import "@fontsource-variable/nunito-sans";
+@import "@fontsource-variable/outfit";
+
 @custom-variant dark (&:where(.dark, .dark *));
 
-@theme {
-    --font-outfit: var(--font-outfit);
-    --font-nunito: var(--font-nunito);
-    --font-lexend: var(--font-lexend);
+@theme inline {
+    --font-outfit: "Outfit Variable", sans-serif;
+    --font-nunito: "Nunito Variable", sans-serif;
+    --font-lexend: "Lexend Variable", sans-serif;
 
     --color-background: var(--background);
     --color-foreground: var(--foreground);

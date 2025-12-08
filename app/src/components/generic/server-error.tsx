@@ -1,10 +1,8 @@
 import React from "react";
 import { useEffect } from "react";
-
 import NotFoundUI from "./not-found";
-
-import { api } from "@/utils/fetch-api";
 import { cn } from "@/lib/utils";
+import { createErrorFn } from "@/server/generic.server";
 
 const ServerError: React.FC<{ className?: string; error?: string; scenario?: string; stack?: string }> = ({ className, error, scenario, stack }) => {
     useEffect(() => {
@@ -14,8 +12,7 @@ const ServerError: React.FC<{ className?: string; error?: string; scenario?: str
                 scenario,
                 stack,
             };
-
-            api.post("/log-error", errorData);
+            createErrorFn({ data: errorData });
         }
     }, [error]);
 

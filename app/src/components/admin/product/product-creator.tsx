@@ -1,18 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CheckCircle, ArrowLeft, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
-
 import { ImageUpload } from "./product-image-upload";
 import { ProductDetailsForm } from "./product-details-form";
 import { VariantCreation } from "./product-variant";
 import { ProductReview } from "./product-review";
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { Product, ProductVariant } from "@/schemas";
-import { api } from "@/utils/fetch-api";
 import { useNavigate } from "@tanstack/react-router";
 import { createBundleFn } from "@/server/product.server";
 

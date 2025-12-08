@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-
-import { api } from "@/utils/fetch-api";
 import { tryCatch } from "@/lib/try-catch";
+import { trackVisitFn } from "@/server/catalog.server";
 
 interface SharedCollectionVisitTrackerProps {
     slug: string;
@@ -20,7 +19,7 @@ export function SharedCollectionVisitTracker({ slug }: SharedCollectionVisitTrac
         const trackVisit = async () => {
             if (hasTracked) return;
 
-            const { data } = await tryCatch<VisitTrackerResponse>(api.post(`/shared/${slug}/track-visit`));
+            const { data } = await tryCatch<VisitTrackerResponse>(trackVisitFn({ data: slug }));
 
             if (data) {
                 setHasTracked(true);

@@ -74,3 +74,14 @@ export const returnOrderItemFn = createServerFn({ method: "POST" })
     .handler(async ({ data }) => {
         return await api.post<Order>(`/order/${data.orderId}/return`, { item_id: data.itemId });
     });
+
+export const createOrderNoteFn = createServerFn({ method: "POST" })
+    .inputValidator(
+        z.object({
+            orderId: z.number(),
+            notes: z.string(),
+        })
+    )
+    .handler(async ({ data: { orderId, notes } }) => {
+        return await api.patch<Order>(`/order/${orderId}/notes`, { notes });
+    });

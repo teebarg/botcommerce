@@ -79,10 +79,10 @@ const AdminMobileMenu: React.FC = () => {
                 {menuItems.map((item, idx: number) => (
                     <Link
                         key={idx}
-                        className={`flex items-center justify-between w-full p-3 text-left transition-colors ${
-                            pathname === item.href ? "bg-primary/20 text-primary" : ""
-                        }`}
+                        className="flex items-center justify-between w-full p-3 text-left transition-colors"
                         to={item.href}
+                        activeProps={{ className: "bg-primary/20 text-primary" }}
+                        activeOptions={{ exact: true }}
                     >
                         <div className="flex items-center space-x-3">
                             <span className={pathname === item.href ? "text-primary" : "text-muted-foreground"}>{item.icon}</span>
