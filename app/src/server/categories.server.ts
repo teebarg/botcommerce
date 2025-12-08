@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { Category } from "@/schemas";
+import { Category, Message } from "@/schemas";
 import { api } from "@/utils/fetch-api";
 
 const ReorderCategoriesSchema = z.object({
@@ -26,6 +26,14 @@ const UpdateCategorySchema = z.object({
     id: z.string(),
     data: CategoryFormSchema,
 });
+
+const UpdateCategoryImageSchema = z.object({
+    id: z.string(),
+    file: z.string(),
+    file_name: z.string(),
+    content_type: z.string(),
+});
+
 
 export const getCategoriesFn = createServerFn({ method: "GET" })
     .inputValidator(z.string().optional())
@@ -56,4 +64,17 @@ export const reorderCategoriesFn = createServerFn({ method: "POST" })
     .inputValidator(ReorderCategoriesSchema)
     .handler(async ({ data }) => {
         return await api.patch<Category>(`/category/reorder`, data);
+    });
+
+export const updateCategoryImageFn = createServerFn({ method: "POST" })
+    .inputValidator((input: unknown) => UpdateCategoryImageSchema.parse(input))
+    .handler(async ({ data }) => {
+        const { id, ...body } = data;
+        return await api.patch<Message>(`/category/${id}/image`, body);
+    });
+
+export const deleteCategoryImageFn = createServerFn({ method: "POST" })
+    .inputValidator(z.number())
+    .handler(async ({ data: id }) => {
+        return await api.delete<Message>(`/category/${id}/image`);
     });

@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { Product, ProductVariant } from "@/schemas";
 import { api } from "@/utils/fetch-api";
 import { useNavigate } from "@tanstack/react-router";
+import { createBundleFn } from "@/server/product.server";
 
 export interface ProductImage {
     id: string;
@@ -198,7 +199,7 @@ export function ProductCreator() {
             };
 
             setLastPayload(payload);
-            await api.post("/product/create-bundle", payload);
+            await createBundleFn({data: payload});
 
             toast.success("Product created successfully");
             setIsCompleted(true);
@@ -217,7 +218,7 @@ export function ProductCreator() {
         setIsLoading(true);
         try {
             setErrorMessage(null);
-            await api.post("/product/create-bundle", lastPayload);
+            await createBundleFn({data: lastPayload});
             toast.success("Product created successfully");
             setIsCompleted(true);
             clearDraft();

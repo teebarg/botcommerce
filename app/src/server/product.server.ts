@@ -210,3 +210,10 @@ export const flushCacheFn = createServerFn({ method: "POST" })
     .handler(async () => {
         return await api.post<Message>("/cache/clear", {});
     });
+
+
+export const createBundleFn = createServerFn({ method: "POST" })
+    .inputValidator((d: any) => d)
+    .handler(async ({ data }) => {
+        return await api.post<any>("/product/create-bundle", data);
+    });
