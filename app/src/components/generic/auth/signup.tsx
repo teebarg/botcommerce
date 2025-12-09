@@ -103,7 +103,7 @@ const SignUpForm: React.FC<Props> = () => {
                             control={control}
                             name="phone"
                             render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="md:col-span-2">
                                     <FormLabel>Phone</FormLabel>
                                     <FormControl>
                                         <Input autoComplete="tel" data-testid="phone-input" type="tel" {...field} />

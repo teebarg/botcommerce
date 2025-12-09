@@ -4,7 +4,6 @@ import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MagicLinkForm } from "@/components/generic/auth/magic-link";
-import { SignUpForm } from "@/components/generic/auth/signup";
 import { useLocation } from "@tanstack/react-router";
 
 const CheckoutLoginPrompt: React.FC = () => {
@@ -38,8 +37,7 @@ const CheckoutLoginPrompt: React.FC = () => {
                         </DialogContent>
                     </Dialog>
                 </div>
-
-                <div className="mt-6 text-center text-sm text-muted-foreground">
+                {/* <div className="mt-6 text-center text-sm text-muted-foreground">
                     <Dialog>
                         <DialogTrigger>
                             <p>
@@ -54,7 +52,7 @@ const CheckoutLoginPrompt: React.FC = () => {
                             <SignUpForm />
                         </DialogContent>
                     </Dialog>
-                </div>
+                </div> */}
             </div>
         </div>
     );
