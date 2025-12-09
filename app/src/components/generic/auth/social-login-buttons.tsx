@@ -7,8 +7,6 @@ type Props = {
 };
 
 export default function SocialLoginButtons({ callbackUrl }: Props) {
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-
     const [csrfToken, setCsrfToken] = useState<string>("");
 
     useEffect(() => {
@@ -22,7 +20,7 @@ export default function SocialLoginButtons({ callbackUrl }: Props) {
             <form action="/api/auth/signin/google" method="POST">
                 <input type="hidden" name="csrfToken" value={csrfToken} />
                 <input type="hidden" name="callbackUrl" value={callbackUrl || "/"} />
-                <Button className="w-full" disabled={isLoading} isLoading={isLoading} size="lg" type="submit">
+                <Button className="w-full" size="lg" type="submit">
                     <img alt="Google" className="mr-2" height={20} src="/google.svg" width={20} />
                     Continue with Google
                 </Button>
