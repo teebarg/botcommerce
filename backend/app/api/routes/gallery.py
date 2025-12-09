@@ -86,6 +86,7 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
                         "slug": slugify(name),
                         "sku": generate_sku(),
                         "active": payload.data.active,
+                        "is_new": payload.data.is_new,
                         **build_relation_data(payload.data.category_ids, payload.data.collection_ids),
                     }
                     product = await tx.product.create(data=product_data)
@@ -107,6 +108,10 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
                     if payload.data.collection_ids:
                         relation_updates["collections"] = {
                             "set": [{"id": id} for id in payload.data.collection_ids]}
+                    if payload.data.is_new is not None:
+                        relation_updates["is_new"] = payload.data.is_new
+                    if payload.data.active is not None:
+                        relation_updates["active"] = payload.data.active
 
                     if relation_updates:
                         await tx.product.update(where={"id": image.product_id}, data=relation_updates)
@@ -328,6 +333,7 @@ async def create_image_metadata(
                 "sku": generate_sku(),
                 "description": payload.description,
                 "active": True,
+                "is_new": payload.is_new if payload.is_new is not None else False,
             }
 
             if payload.category_ids:
@@ -417,6 +423,8 @@ async def update_image_metadata(
                 update_data["collections"] = {"set": collection_ids}
             if payload.active is not None:
                 update_data["active"] = payload.active
+            if payload.is_new is not None:
+                update_data["is_new"] = payload.is_new
 
             await tx.product.update(
                 where={"id": existing_image.product_id},

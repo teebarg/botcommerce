@@ -249,8 +249,10 @@ async def search(
     total_count = search_results["estimatedTotalHits"]
     total_pages = (total_count // limit) + (total_count % limit > 0)
 
+    hits = search_results["hits"]
+
     return {
-        "products": search_results["hits"],
+        "products": hits,
         "facets": search_results.get("facetDistribution", {}),
         "skip": skip,
         "limit": limit,
@@ -271,6 +273,7 @@ async def create_product(product: ProductCreate, background_tasks: BackgroundTas
         "description": product.description,
         # "brand": {"connect": {"id": product.brand_id}},
         "active": product.active,
+        "is_new": product.is_new if product.is_new is not None else False,
     }
 
     if product.category_ids:
@@ -319,6 +322,7 @@ async def create_product_bundle(
                 "sku": generate_sku(),
                 "description": payload.description,
                 "active": True,
+                "is_new": payload.is_new if payload.is_new is not None else False,
             }
 
             if payload.category_ids:
@@ -424,7 +428,10 @@ async def read(request: Request, slug: str):
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    return product
+    product_dict = product.dict()
+    product_dict["is_new"] = getattr(product, "is_new", False)
+
+    return product_dict
 
 
 @router.put("/{id}", dependencies=[Depends(get_current_superuser)])
@@ -457,6 +464,8 @@ async def update_product(id: int, product: ProductUpdate, background_tasks: Back
     #     update_data["brand"] = {"connect": {"id": product.brand_id}}
     if product.active is not None:
         update_data["active"] = product.active
+    if product.is_new is not None:
+        update_data["is_new"] = product.is_new
 
     try:
         updated_product = await db.product.update(

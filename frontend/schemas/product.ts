@@ -101,6 +101,7 @@ export const ProductSchema = z
         reviews: z.array(ReviewSchema),
         favorites: z.null(),
         active: z.boolean(),
+        is_new: z.boolean().optional(),
     })
     .merge(AuditSchema);
 
@@ -154,6 +155,7 @@ export const ProductSearchSchema = z.object({
     colors: z.array(z.string()),
     ages: z.array(z.string()),
     measurements: z.array(z.number()),
+    is_new: z.boolean().optional(),
 });
 
 export const SharedSchema = z
@@ -241,6 +243,7 @@ export const GalleryProductSchema = z.object({
     product_id: z.number().optional(),
     status: ProductStatusSchema,
     shared_collections: z.array(DBCatalogSchema),
+    is_new: z.boolean().optional(),
 });
 
 export const GalleryImageItemSchema = z.object({

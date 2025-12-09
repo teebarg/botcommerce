@@ -19,6 +19,7 @@ type FormProduct = {
     categories: { value: number; label: string }[];
     collections: { value: number; label: string }[];
     active: boolean;
+    is_new: boolean;
     size: string;
     color: string;
     age: string;
@@ -32,6 +33,7 @@ type FieldKey = keyof FormProduct;
 
 const FIELD_CONFIG = {
     active: { label: "Show in Store", type: "boolean" },
+    is_new: { label: "Is New", type: "boolean" },
     categories: { label: "Categories", type: "multiselect" },
     collections: { label: "Collections", type: "multiselect" },
     size: { label: "Size", type: "select" },
@@ -59,6 +61,7 @@ export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetForm
         categories: [],
         collections: [],
         active: true,
+        is_new: false,
         size: "",
         color: "",
         measurement: 0,
@@ -111,6 +114,9 @@ export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetForm
         }
         if (selectedFields.has("active")) {
             input.active = product.active;
+        }
+        if (selectedFields.has("is_new")) {
+            input.is_new = product.is_new;
         }
         if (selectedFields.has("size")) {
             input.size = product.size;
@@ -181,12 +187,25 @@ export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetForm
             <Separator />
 
             <div className="grid gap-6">
-                {selectedFields.has("active") && (
-                    <div className="flex items-center gap-2">
-                        <Checkbox checked={product.active} id="active" onCheckedChange={(checked) => updateField("active", checked)} />
-                        <Label className="text-sm font-medium" htmlFor="active">
-                            Show in Store
-                        </Label>
+                {(selectedFields.has("active") || selectedFields.has("is_new")) && (
+                    <div className="grid sm:grid-cols-2 gap-4">
+                        {selectedFields.has("active") && (
+                            <div className="flex items-center gap-2">
+                                <Checkbox checked={product.active} id="active" onCheckedChange={(checked) => updateField("active", checked)} />
+                                <Label className="text-sm font-medium" htmlFor="active">
+                                    Show in Store
+                                </Label>
+                            </div>
+                        )}
+
+                        {selectedFields.has("is_new") && (
+                            <div className="flex items-center gap-2">
+                                <Checkbox checked={product.is_new} id="is_new" onCheckedChange={(checked) => updateField("is_new", checked)} />
+                                <Label className="text-sm font-medium" htmlFor="is_new">
+                                    Is New
+                                </Label>
+                            </div>
+                        )}
                     </div>
                 )}
 

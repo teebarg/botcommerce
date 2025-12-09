@@ -23,6 +23,7 @@ class ProductCreate(BaseModel):
     collection_ids: Optional[List[int]] = None
     tags_ids: Optional[List[int]] = None
     active: Optional[bool] = True
+    is_new: Optional[bool] = False
 
 class ProductUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1)
@@ -33,6 +34,7 @@ class ProductUpdate(BaseModel):
     collection_ids: Optional[List[int]] = None
     tags_ids: Optional[List[int]] = None
     active: Optional[bool] = True
+    is_new: Optional[bool] = None
 
 class ReviewCreate(BaseModel):
     product_id: int = Field(..., gt=0)
@@ -56,6 +58,7 @@ class Product(BM):
     images: Optional[List[ProductImage]] = []
     reviews: Optional[List[Review]] = []
     active: Optional[bool] = True
+    is_new: Optional[bool] = False
     embedding: Optional[List[float]] = None
 
 class SearchCategory(BaseModel):
@@ -100,6 +103,7 @@ class SearchProduct(BaseModel):
     sizes: Optional[List[str]] = None
     colors: Optional[List[str]] = None
     catalogs: Optional[List[str]] = None
+    is_new: Optional[bool] = False
 
 class Facets(BaseModel):
     category_slugs: Optional[dict[str, int]] = None
@@ -139,7 +143,8 @@ class ImageMetadata(BaseModel):
     measurement: Optional[int] = None
     age: Optional[str] = None
     inventory: Optional[int] = None
-    active: Optional[bool] = True
+    active: Optional[bool] = None
+    is_new: Optional[bool] = None
     price: Optional[float] = None
     old_price: Optional[float] = None
 

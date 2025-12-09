@@ -3,8 +3,6 @@ import { z } from "zod";
 import { api } from "@/utils/fetch-api";
 import type { GalleryImageItem, Message } from "@/schemas";
 
-// --- Type Definitions for API Response Schemas ---
-
 interface PaginatedGalleryResponse {
     images: GalleryImageItem[];
     next_cursor: number | null;
@@ -18,7 +16,6 @@ const GetGalleryParamsSchema = z.object({
 
 const ImageMetadataPayloadSchema = z.object({
     imageId: z.number(),
-    // 'input' is typed as 'any' in the original code, so we use z.unknown()
     input: z.unknown(),
 });
 
@@ -40,11 +37,9 @@ const BulkUploadSchema = z.object({
     urls: z.array(z.string().url()),
 });
 
-// --- Server Functions ---
 export const getGalleryImagesFn = createServerFn({ method: "GET" })
     .inputValidator(GetGalleryParamsSchema.partial())
     .handler(async ({ data }) => {
-        // Map client-side camelCase to server-side params
         const params = {
             cursor: data?.cursor,
             limit: data?.limit,
