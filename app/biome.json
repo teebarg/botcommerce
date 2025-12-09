@@ -10,12 +10,12 @@
         "includes": ["**/src/**/*", "**/.vscode/**/*", "**/index.html", "**/vite.config.js", "!**/src/routeTree.gen.ts", "!**/src/styles.css"]
     },
     "formatter": {
-        "enabled": false,
+        "enabled": true,
         "indentStyle": "tab"
     },
     "assist": { "actions": { "source": { "organizeImports": "on" } } },
     "linter": {
-        "enabled": false,
+        "enabled": true,
         "rules": {
             "recommended": true
         }

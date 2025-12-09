@@ -1,4 +1,4 @@
-import { getSessionFn } from "@/server/auth-server";
+import { getSessionFn } from "@/server/auth.server";
 import type { Session } from "start-authjs";
 
 const baseURL = process.env.API_URL || "http://localhost.dev";

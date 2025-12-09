@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Search } from "lucide-react";
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +10,7 @@ import type { Cart } from "@/schemas";
 import { useSendCartReminders } from "@/hooks/useAbandonedCart";
 import PaginationUI from "@/components/pagination";
 import { AbandonedCartStats } from "@/components/admin/abandoned-carts/stat";
-import { getAbandonedCartsFn, getAbandonedCartStatsFn } from "@/server/cart.server";
+import { getAbandonedCartsFn, getAbandonedCartStatsFn } from "@/server/abandoned-cart.server";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 const LIMIT = 20;

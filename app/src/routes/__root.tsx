@@ -49,17 +49,53 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         };
     },
     loader: async ({ context: { queryClient } }) => {
-        const [categories, collections, siteConfig] = await Promise.all([
-            queryClient.ensureQueryData(categoriesQuery()),
-            queryClient.ensureQueryData(collectionsQuery()),
-            queryClient.ensureQueryData(siteConfigQuery),
-        ]);
+        // const data = await queryClient.ensureQueryData(categoriesQuery());
+        // const [categories, collections, siteConfig] = await Promise.all([
+        //     queryClient.ensureQueryData(categoriesQuery()),
+        //     queryClient.ensureQueryData(collectionsQuery()),
+        //     queryClient.ensureQueryData(siteConfigQuery),
+        // ]);
+
+        // let categories, collections, siteConfig;
+
+        // try {
+        //     categories = await queryClient.ensureQueryData(categoriesQuery());
+        // } catch (e) {
+        //     console.error("CATEGORIES ERROR", e);
+        // }
+
+        // try {
+        //     collections = await queryClient.ensureQueryData(collectionsQuery());
+        // } catch (e) {
+        //     console.error("COLLECTIONS ERROR", e);
+        // }
+
+        // try {
+        //     siteConfig = await queryClient.ensureQueryData(siteConfigQuery);
+        // } catch (e) {
+        //     console.error("SITE CONFIG ERROR", e);
+        // }
+
+        // const categories = await queryClient.ensureQueryData(categoriesQuery());
+        // const collections = await queryClient.ensureQueryData(collectionsQuery());
+        // const siteConfig = await queryClient.ensureQueryData(siteConfigQuery);
+
+        // const [categories, collections] = await Promise.all([
+        //     queryClient.ensureQueryData(categoriesQuery()),
+        //     queryClient.ensureQueryData(collectionsQuery()),
+        // ]);
 
         return {
-            categories,
-            collections,
-            config: siteConfig,
+            categories: null,
+            collections: null,
+            config: {},
         };
+
+        // return {
+        //     categories: [],
+        //     collections: [],
+        //     config: {},
+        // };
     },
     head: ({ loaderData }) => {
         const baseUrl = import.meta.env.VITE_BASE_URL;
