@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { useSubscribeNewsletter } from "@/hooks/useGeneric";
 
 const newsletterSchema = z.object({
-    email: z.email(),
+    email: z.string().email(),
 });
 
 type NewsletterFormValues = z.infer<typeof newsletterSchema>;

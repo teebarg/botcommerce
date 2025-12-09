@@ -228,8 +228,8 @@ importers:
         specifier: ^5.1.4
         version: 5.1.4(typescript@5.9.3)(vite@7.2.7(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))
       zod:
-        specifier: ^4.1.11
-        version: 4.1.13
+        specifier: 3.24.2
+        version: 3.24.2
     devDependencies:
       '@biomejs/biome':
         specifier: 2.2.4
@@ -4045,11 +4045,8 @@ packages:
   yallist@3.1.1:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
 
-  zod@3.25.76:
-    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
-
-  zod@4.1.13:
-    resolution: {integrity: sha512-AvvthqfqrAhNH9dnfmrfKzX5upOdjUVJYFqNSlkmGf64gRaTzlPwz99IHYnVs28qYAybvAlBV+H7pn0saFY4Ig==}
+  zod@3.24.2:
+    resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -6136,7 +6133,7 @@ snapshots:
       recast: 0.23.11
       source-map: 0.7.6
       tsx: 4.21.0
-      zod: 3.25.76
+      zod: 3.24.2
     transitivePeerDependencies:
       - supports-color
 
@@ -6155,7 +6152,7 @@ snapshots:
       babel-dead-code-elimination: 1.0.10
       chokidar: 3.6.0
       unplugin: 2.3.11
-      zod: 3.25.76
+      zod: 3.24.2
     optionalDependencies:
       '@tanstack/react-router': 1.140.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       vite: 7.2.7(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)
@@ -6227,7 +6224,7 @@ snapshots:
       vite: 7.2.7(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)
       vitefu: 1.1.1(vite@7.2.7(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))
       xmlbuilder2: 4.0.3
-      zod: 3.25.76
+      zod: 3.24.2
     transitivePeerDependencies:
       - '@rsbuild/core'
       - '@tanstack/react-router'
@@ -7976,8 +7973,6 @@ snapshots:
 
   yallist@3.1.1: {}
 
-  zod@3.25.76: {}
-
-  zod@4.1.13: {}
+  zod@3.24.2: {}
 
   zwitch@2.0.4: {}

@@ -28,28 +28,20 @@ export const syncShopDetailsFn = createServerFn({ method: "POST" })
     });
 
 export const subscribeNewsletterFn = createServerFn({ method: "POST" })
-    .inputValidator(z.object({ email: z.email() }))
+    .inputValidator(z.object({ email: z.string().email() }))
     .handler(async ({ data }) => {
         return await api.post<Message>(`/newsletter`, data);
     });
 
 export const contactFormFn = createServerFn({ method: "POST" })
-    // Using z.custom here since the specific Zod schema for ContactFormValues wasn't provided,
-    // but you can replace this with your actual Zod schema object if you have it.
     .inputValidator(z.custom<ContactFormValues>())
     .handler(async ({ data }) => {
         return await api.post<Message>(`/contact-form`, data);
     });
 
-// Assuming getStatsTrendsFn is defined and imported elsewhere, as per original file:
-// import { getStatsTrendsFn } from "@/server/admin.server";
-
-// --- Zod Schemas for Validation ---
-
 const ConversationParamsSchema = z
     .object({
         user_id: z.number().optional(),
-        // Assuming ConversationStatus is a string type defined in your schemas
         status: z.custom<ConversationStatus>().optional(),
         skip: z.number().optional(),
         limit: z.number().optional(),
@@ -57,12 +49,11 @@ const ConversationParamsSchema = z
     .optional();
 
 const ChatInputSchema = z.object({
-    user_id: z.number().nullable().optional(), // Nullable since session might be missing
+    user_id: z.number().nullable().optional(),
     conversation_uuid: z.string().optional(),
     user_message: z.string(),
 });
 
-// Bank details settings
 export const getBankDetailsFn = createServerFn({ method: "GET" }).handler(async () => {
     return await api.get<BankDetails[]>("/bank-details/");
 });

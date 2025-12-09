@@ -9,11 +9,12 @@ import { routeTree } from "./routeTree.gen";
 export const getRouter = () => {
     const rqContext = TanstackQuery.getContext();
     const session = null
+    const config = {}
 
     const router = createRouter({
         routeTree,
         scrollRestoration: true,
-        context: { ...rqContext, session },
+        context: { ...rqContext, session, config },
         defaultPreload: "intent",
         Wrap: (props: { children: React.ReactNode }) => {
             return <TanstackQuery.Provider {...rqContext}>{props.children}</TanstackQuery.Provider>;

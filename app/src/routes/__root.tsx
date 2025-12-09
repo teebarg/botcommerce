@@ -25,7 +25,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { categoriesQuery } from "@/hooks/useCategories";
 import { collectionsQuery } from "@/hooks/useCollection";
 import { InvalidateProvider } from "@/providers/invalidate-provider";
-import { siteConfigQuery } from "@/hooks/useGeneric";
+import { siteConfigQueryOptions } from "@/hooks/useGeneric";
 
 interface RouterContext {
     session: AuthSession | null;
@@ -49,53 +49,17 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         };
     },
     loader: async ({ context: { queryClient } }) => {
-        // const data = await queryClient.ensureQueryData(categoriesQuery());
-        // const [categories, collections, siteConfig] = await Promise.all([
-        //     queryClient.ensureQueryData(categoriesQuery()),
-        //     queryClient.ensureQueryData(collectionsQuery()),
-        //     queryClient.ensureQueryData(siteConfigQuery),
-        // ]);
-
-        // let categories, collections, siteConfig;
-
-        // try {
-        //     categories = await queryClient.ensureQueryData(categoriesQuery());
-        // } catch (e) {
-        //     console.error("CATEGORIES ERROR", e);
-        // }
-
-        // try {
-        //     collections = await queryClient.ensureQueryData(collectionsQuery());
-        // } catch (e) {
-        //     console.error("COLLECTIONS ERROR", e);
-        // }
-
-        // try {
-        //     siteConfig = await queryClient.ensureQueryData(siteConfigQuery);
-        // } catch (e) {
-        //     console.error("SITE CONFIG ERROR", e);
-        // }
-
-        // const categories = await queryClient.ensureQueryData(categoriesQuery());
-        // const collections = await queryClient.ensureQueryData(collectionsQuery());
-        // const siteConfig = await queryClient.ensureQueryData(siteConfigQuery);
-
-        // const [categories, collections] = await Promise.all([
-        //     queryClient.ensureQueryData(categoriesQuery()),
-        //     queryClient.ensureQueryData(collectionsQuery()),
-        // ]);
+        const [categories, collections, config] = await Promise.all([
+            queryClient.ensureQueryData(categoriesQuery()),
+            queryClient.ensureQueryData(collectionsQuery()),
+            queryClient.ensureQueryData(siteConfigQueryOptions()),
+        ]);
 
         return {
-            categories: null,
-            collections: null,
-            config: {},
+            categories,
+            collections,
+            config,
         };
-
-        // return {
-        //     categories: [],
-        //     collections: [],
-        //     config: {},
-        // };
     },
     head: ({ loaderData }) => {
         const baseUrl = import.meta.env.VITE_BASE_URL;
@@ -106,7 +70,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
             meta: [
                 { charSet: "utf-8" },
                 { name: "viewport", content: "width=device-width, initial-scale=1" },
-                { name: "apple-mobile-web-app-capable", content: "yes" },
+                { name: "mobile-web-app-capable", content: "yes" },
                 { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
                 ...seo({
                     title,

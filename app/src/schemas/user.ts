@@ -10,7 +10,7 @@ export const UserSchema = z
         id: z.number(),
         first_name: z.string(),
         last_name: z.string().optional(),
-        email: z.email(),
+        email: z.string().email(),
         emailVerified: z.string(),
         status: z.enum(["PENDING", "ACTIVE", "INACTIVE"]),
         hashed_password: z.string(),

@@ -1,0 +1,21 @@
+{
+    "name": "Revoque",
+    "short_name": "Revoque",
+    "description": "Affordable thrift and new clothing for kids and adults. Shop quality fashion, shoes, and accessories at unbeatable prices.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#2EC6FE",
+    "theme_color": "#0F63FF",
+    "icons": [
+        {
+            "src": "/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

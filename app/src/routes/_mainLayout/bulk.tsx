@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_mainLayout/bulk")({
 
 const bulkPurchaseSchema = z.object({
     name: z.string().min(1, "Full name is required"),
-    email: z.email(),
+    email: z.string().email(),
     phone: z.string().min(1, "Phone number is required"),
     bulkType: z.string().min(1, "Please select a bulk option"),
     quantity: z.string().optional(),

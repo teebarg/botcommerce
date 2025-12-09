@@ -1,8 +1,8 @@
 import type React from "react";
 import { createContext, useContext } from "react";
-import { siteConfigQuery } from "@/hooks/useGeneric";
+import { siteConfigQueryOptions } from "@/hooks/useGeneric";
 import z from "zod";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 const ConfigTypeSchema = z.object({
     shop_name: z.string().optional(),
@@ -37,7 +37,7 @@ type StoreContextType = {
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
-    const { data } = useQuery(siteConfigQuery)
+    const { data } = useSuspenseQuery(siteConfigQueryOptions())
     return <StoreContext.Provider value={{ config: data }}>{children}</StoreContext.Provider>;
 };
 

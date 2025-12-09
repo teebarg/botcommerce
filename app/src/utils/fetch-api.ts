@@ -1,4 +1,4 @@
-import { getSessionFn } from "@/server/auth.server";
+import { getSessionFromContext } from "@/server/auth.server";
 import type { Session } from "start-authjs";
 
 const baseURL = process.env.API_URL || "http://localhost.dev";
@@ -13,7 +13,7 @@ type RequestOptions = RequestInit & {
 };
 
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-    const session = (await getSessionFn()) as unknown as Session;
+    const session = await getSessionFromContext() as unknown as Session;
     const { params, ...restOptions } = options;
 
     const url = new URL(`/api${endpoint}`, baseURL);
