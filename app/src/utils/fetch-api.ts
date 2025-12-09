@@ -27,7 +27,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
 
     const headers = {
         "Content-Type": "application/json",
-        "X-Auth": session?.accessToken ?? "",
+        "X-Auth": session?.accessToken ?? "jwt",
         ...options.headers,
     };
 
