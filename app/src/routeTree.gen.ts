@@ -16,6 +16,7 @@ import { Route as MainLayoutRouteImport } from './routes/_mainLayout'
 import { Route as AuthLayoutRouteImport } from './routes/_authLayout'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as MainLayoutIndexRouteImport } from './routes/_mainLayout/index'
+import { Route as RobotsTxtRouteImport } from './routes/robots.txt'
 import { Route as PaymentVerifyRouteImport } from './routes/payment.verify'
 import { Route as ApiPushEventRouteImport } from './routes/api/push-event'
 import { Route as AdminSharedRouteImport } from './routes/admin/shared'
@@ -94,6 +95,11 @@ const MainLayoutIndexRoute = MainLayoutIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => MainLayoutRoute,
+} as any)
+const RobotsTxtRoute = RobotsTxtRouteImport.update({
+  id: '/robots/txt',
+  path: '/robots/txt',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PaymentVerifyRoute = PaymentVerifyRouteImport.update({
   id: '/payment/verify',
@@ -344,6 +350,7 @@ export interface FileRoutesByFullPath {
   '/admin/shared': typeof AdminSharedRoute
   '/api/push-event': typeof ApiPushEventRoute
   '/payment/verify': typeof PaymentVerifyRoute
+  '/robots/txt': typeof RobotsTxtRoute
   '/': typeof MainLayoutIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/auth/error': typeof AuthLayoutAuthErrorRoute
@@ -394,6 +401,7 @@ export interface FileRoutesByTo {
   '/admin/shared': typeof AdminSharedRoute
   '/api/push-event': typeof ApiPushEventRoute
   '/payment/verify': typeof PaymentVerifyRoute
+  '/robots/txt': typeof RobotsTxtRoute
   '/': typeof MainLayoutIndexRoute
   '/admin': typeof AdminIndexRoute
   '/auth/error': typeof AuthLayoutAuthErrorRoute
@@ -449,6 +457,7 @@ export interface FileRoutesById {
   '/admin/shared': typeof AdminSharedRoute
   '/api/push-event': typeof ApiPushEventRoute
   '/payment/verify': typeof PaymentVerifyRoute
+  '/robots/txt': typeof RobotsTxtRoute
   '/_mainLayout/': typeof MainLayoutIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/_authLayout/auth/error': typeof AuthLayoutAuthErrorRoute
@@ -503,6 +512,7 @@ export interface FileRouteTypes {
     | '/admin/shared'
     | '/api/push-event'
     | '/payment/verify'
+    | '/robots/txt'
     | '/'
     | '/admin/'
     | '/auth/error'
@@ -553,6 +563,7 @@ export interface FileRouteTypes {
     | '/admin/shared'
     | '/api/push-event'
     | '/payment/verify'
+    | '/robots/txt'
     | '/'
     | '/admin'
     | '/auth/error'
@@ -607,6 +618,7 @@ export interface FileRouteTypes {
     | '/admin/shared'
     | '/api/push-event'
     | '/payment/verify'
+    | '/robots/txt'
     | '/_mainLayout/'
     | '/admin/'
     | '/_authLayout/auth/error'
@@ -656,6 +668,7 @@ export interface RootRouteChildren {
   OfflineRoute: typeof OfflineRoute
   ApiPushEventRoute: typeof ApiPushEventRoute
   PaymentVerifyRoute: typeof PaymentVerifyRoute
+  RobotsTxtRoute: typeof RobotsTxtRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -709,6 +722,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof MainLayoutIndexRouteImport
       parentRoute: typeof MainLayoutRoute
+    }
+    '/robots/txt': {
+      id: '/robots/txt'
+      path: '/robots/txt'
+      fullPath: '/robots/txt'
+      preLoaderRoute: typeof RobotsTxtRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/payment/verify': {
       id: '/payment/verify'
@@ -1170,6 +1190,7 @@ const rootRouteChildren: RootRouteChildren = {
   OfflineRoute: OfflineRoute,
   ApiPushEventRoute: ApiPushEventRoute,
   PaymentVerifyRoute: PaymentVerifyRoute,
+  RobotsTxtRoute: RobotsTxtRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

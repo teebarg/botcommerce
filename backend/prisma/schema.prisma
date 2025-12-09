@@ -209,6 +209,7 @@ model Product {
   features           Json?              @db.JsonB
   image              String?            @db.VarChar(255)
   active             Boolean            @default(true)
+  is_new             Boolean            @default(false)
   variants           ProductVariant[]
   ratings            Float?             @default(0)
   categories         Category[]         @relation("ProductCategories")

@@ -21,6 +21,7 @@ type FormProduct = Omit<Partial<Product>, "images" | "variants" | "categories" |
     categories: { value: number; label: string }[];
     collections: { value: number; label: string }[];
     variants: ProductVariant[];
+    is_new?: boolean;
 };
 
 interface ProductSheetFormProps {
@@ -44,6 +45,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
         collections: currentProduct?.collections?.map((c) => ({ value: c.id, label: c.name })) ?? [],
         active: currentProduct?.active ?? true,
         variants: currentProduct?.variants ?? [],
+        is_new: currentProduct?.is_new ?? false,
     });
 
     const updateField = (field: keyof FormProduct, value: string | number | SelectOption[] | boolean) => {
@@ -77,6 +79,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
             collection_ids: product.collections?.map((c) => c.value) || [],
             active: product.active,
             variants: [newVariant],
+            is_new: product.is_new ?? false,
         };
 
         if (currentProduct?.id) {
@@ -167,6 +170,24 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                                 value={product.collections}
                                 onChange={(value) => updateField("collections", value)}
                             />
+                        </div>
+                    </Card>
+
+                    <Card className="p-4 shadow-sm">
+                        <div className="space-y-2">
+                            <Label className="text-sm font-medium flex items-center gap-2">
+                                <Tag className="w-4 h-4 text-primary" />
+                                Condition
+                            </Label>
+                            <Select value={product.is_new ? "new" : "used"} onValueChange={(val) => updateField("is_new", val === "new")}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select condition" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="new">New</SelectItem>
+                                    <SelectItem value="used">Used</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                     </Card>
                 </div>

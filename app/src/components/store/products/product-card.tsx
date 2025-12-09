@@ -11,6 +11,8 @@ import type { ProductSearch, ProductVariant } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/utils";
 import MediaDisplay from "@/components/media-display";
+import { useMemo } from "react";
+import { IsNew } from "@/components/products/product-badges";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -23,6 +25,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale" }) 
     const { data } = useUserWishlist();
 
     const inWishlist = !!data?.wishlists?.find((wishlist) => wishlist.product_id === product.id);
+    const isNew = useMemo(() => !!product?.is_new, [product]);
 
     return (
         <Overlay
@@ -39,6 +42,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale" }) 
                             isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice}
                             variant={variant}
                         />
+
+                        {isNew && <IsNew />}
 
                         {product?.variants?.[0]?.age && (
                             <div className="absolute bottom-3 right-3 bg-background/90 backdrop-blur-sm text-foreground px-3 py-1 rounded-full text-xs font-semibold border border-border shadow-md">

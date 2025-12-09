@@ -94,6 +94,12 @@ export function ProductReview({ product }: ProductReviewProps) {
                             </div>
                             <Label className="text-xs font-medium text-muted-foreground">Description</Label>
                             {product.description && <p className="text-sm text-primary line-clamp-2">{product.description}</p>}
+                            <div className="mt-3 flex items-center gap-2">
+                                <Label className="text-xs font-medium text-muted-foreground">Condition</Label>
+                                <Badge variant={product.is_new ? "emerald" : "secondary"} className="text-xs">
+                                    {product.is_new ? "New" : "Used"}
+                                </Badge>
+                            </div>
                         </div>
                     </Card>
 

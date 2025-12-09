@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Mail } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import SocialLoginButtons from "@/components/generic/auth/social-login-buttons";
 import { Separator } from "@/components/ui/separator";
@@ -12,8 +11,6 @@ type Props = {
 
 const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
     const [email, setEmail] = useState<string>("");
-    const [loading, setLoading] = useState<boolean>(false);
-
     const [csrfToken, setCsrfToken] = useState<string>("");
 
     useEffect(() => {
@@ -43,7 +40,6 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
                     aria-label="send magic link"
                     className="w-full mt-6"
                     data-testid="magic-link-button"
-                    isLoading={loading}
                     size="lg"
                     type="submit"
                     disabled={!email}
