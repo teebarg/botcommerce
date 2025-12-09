@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { CloudOff, RefreshCcw, WifiOff } from "lucide-react";
 import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
+import { healthCheckFn } from "@/server/generic.server";
 
 export const Route = createFileRoute("/offline")({
     component: RouteComponent,
@@ -22,9 +23,8 @@ function RouteComponent() {
     const handleRetry = async () => {
         setIsRetrying(true);
         try {
-            const response = await fetch("/api/health-check");
-
-            if (response.ok) {
+            const response = await healthCheckFn();
+            if (response) {
                 window.location.reload();
             }
         } catch (error) {
@@ -34,7 +34,7 @@ function RouteComponent() {
     };
 
     return (
-        <div className="bg-linear-to-b from-background/20 to-secondary/20 flex items-center justify-center p-4 flex-1">
+        <div className="bg-linear-to-b from-background/20 to-secondary/20 flex items-center justify-center p-4 h-dvh">
             <div className="max-w-md w-full rounded-2xl shadow-xl p-8 text-center">
                 <div className={cn("mb-8 relative", { "animate-bounce": showAnimation })}>
                     <div className="relative">

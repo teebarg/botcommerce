@@ -1,7 +1,23 @@
 const broadcast = new BroadcastChannel("sw-messages");
-const CACHE_NAME = "shop-cache-v3";
+const CACHE_NAME = "shop-app-v1";
 
-const STATIC_PAGES = ["/about", "/careers", "/privacy", "/terms", "/returns", "/shipping", "/offline", "/favicon.ico"];
+const STATIC_PAGES = [
+    "/",
+    "/favicon.ico",
+    "/favicon-32x32.png",
+    "/favicon-16x16.png",
+    "/placeholder.jpg",
+    "/icon.png",
+    "/about",
+    "/careers",
+    "/privacy",
+    "/terms",
+    "/returns",
+    "/shipping",
+    "/offline",
+    "/contact-us",
+    "/manifest.webmanifest",
+];
 
 self.addEventListener("install", (event) => {
     console.log("[Service Worker] Installing...");
@@ -33,6 +49,21 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
     const url = new URL(event.request.url);
+
+    if (url.pathname.endsWith(".css")) {
+        event.respondWith(
+            caches.match(event.request).then((cached) => {
+                return (
+                    cached ||
+                    fetch(event.request).then((resp) => {
+                        const clone = resp.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+                        return resp;
+                    })
+                );
+            })
+        );
+    }
 
     if (
         url.pathname.match(/\.(png|jpg|jpeg|gif|svg|webp|avif)$/i) ||

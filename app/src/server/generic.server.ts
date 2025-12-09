@@ -13,6 +13,10 @@ import {
     type ShopSettings,
 } from "@/schemas";
 
+export const healthCheckFn = createServerFn().handler(async () => {
+    return await api.get<Message>("/health-check");
+});
+
 export const getShopSettingsFn = createServerFn({ method: "GET" }).handler(async () => {
     return await api.get<ShopSettings[]>("/shop-settings/");
 });
