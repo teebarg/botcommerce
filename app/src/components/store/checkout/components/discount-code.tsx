@@ -11,6 +11,7 @@ import ComponentLoader from "@/components/component-loader";
 import { Card, CardContent } from "@/components/ui/card";
 import { useApplyCoupon, useRemoveCoupon } from "@/hooks/useCoupon";
 import { toast } from "sonner";
+import { fireConfetti } from "@/utils/confetti";
 
 const DiscountCode: React.FC = () => {
     const { cart, isLoading } = useCart();
@@ -48,6 +49,7 @@ const DiscountCode: React.FC = () => {
         try {
             await applyMutation.mutateAsync(code);
             setCode("");
+            fireConfetti();
         } catch (error: any) {}
     };
 
