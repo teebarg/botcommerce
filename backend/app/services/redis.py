@@ -102,13 +102,18 @@ def cache_response(key_prefix: str, key: Union[str, Callable[..., str], None] = 
 
 
 async def invalidate_pattern(pattern: str):
-    await invalidate_list(pattern)
-    await manager.broadcast_to_all(
-        data={
-            "key": pattern,
-        },
-        message_type="invalidate",
-    )
+    import asyncio
+    await asyncio.sleep(1)
+    try:
+        await manager.broadcast_to_all(
+            data={
+                "key": pattern,
+            },
+            message_type="invalidate",
+        )
+    except Exception as e:
+        logger.error(f"Error invalidating pattern {pattern}: {e}")
+
 
 async def invalidate_key(key: str):
     await bust(key)
