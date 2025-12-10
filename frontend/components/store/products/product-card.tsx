@@ -13,6 +13,7 @@ import { ProductSearch, ProductVariant } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import MediaDisplay from "@/components/media-display";
+import { useMemo } from "react";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -25,6 +26,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale" }) 
     const { data } = useUserWishlist();
 
     const inWishlist = !!data?.wishlists?.find((wishlist) => wishlist.product_id === product.id);
+
+    const isNew = useMemo(() => !!product?.is_new, [product]);
 
     return (
         <Overlay
@@ -41,6 +44,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale" }) 
                             isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice}
                             variant={variant}
                         />
+
+                        {isNew && (
+                            <div
+                                className="absolute top-2 left-2 w-12 h-12 flex items-center justify-center text-[9px] font-bold text-white uppercase tracking-wide bg-emerald-500 shadow-lg"
+                                style={{
+                                    clipPath:
+                                        "polygon(50% 0%, 61% 15%, 80% 10%, 75% 28%, 95% 40%, 80% 52%, 90% 70%, 72% 70%, 65% 90%, 50% 78%, 35% 90%, 28% 70%, 10% 70%, 20% 52%, 5% 40%, 25% 28%, 20% 10%, 39% 15%)",
+                                }}
+                            >
+                                New
+                            </div>
+                        )}
+
 
                         {product?.variants?.[0]?.age && (
                             <div className="absolute bottom-3 right-3 bg-background/90 backdrop-blur-sm text-foreground px-3 py-1 rounded-full text-xs font-semibold border border-border shadow-md">

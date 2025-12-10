@@ -43,6 +43,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
         categories: currentProduct?.categories?.map((c) => ({ value: c.id, label: c.name })) ?? [],
         collections: currentProduct?.collections?.map((c) => ({ value: c.id, label: c.name })) ?? [],
         active: currentProduct?.active ?? true,
+        is_new: currentProduct?.is_new ?? false,
         variants: currentProduct?.variants ?? [],
     });
 
@@ -76,6 +77,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
             category_ids: product.categories?.map((c) => c.value) || [],
             collection_ids: product.collections?.map((c) => c.value) || [],
             active: product.active,
+            is_new: product.is_new,
             variants: [newVariant],
         };
 
@@ -132,11 +134,20 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                     </div>
                 </Card>
 
-                <div className="flex items-center gap-2">
-                    <Checkbox checked={product.active} id="active" onCheckedChange={(checked) => updateField("active", checked)} />
-                    <Label className="text-sm font-medium" htmlFor="active">
-                        Show in Store
-                    </Label>
+                <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="flex items-center gap-2">
+                        <Checkbox checked={product.active} id="active" onCheckedChange={(checked) => updateField("active", checked)} />
+                        <Label className="text-sm font-medium" htmlFor="active">
+                            Show in Store
+                        </Label>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <Checkbox checked={product.is_new} id="is_new" onCheckedChange={(checked) => updateField("is_new", checked)} />
+                        <Label className="text-sm font-medium" htmlFor="is_new">
+                            Is New
+                        </Label>
+                    </div>
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-4">

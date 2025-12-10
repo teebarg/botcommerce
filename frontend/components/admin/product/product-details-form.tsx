@@ -21,7 +21,7 @@ export function ProductDetailsForm({ product, onDetailsChange }: ProductDetailsF
     const { data: collections } = useCollections();
     const { data: categories } = useCategories();
 
-    const updateField = (field: keyof FormProduct, value: string | number | SelectOption[]) => {
+    const updateField = (field: keyof FormProduct, value: string | number | boolean | SelectOption[]) => {
         const updatedDetails = { ...product, [field]: value };
 
         onDetailsChange(updatedDetails);

@@ -250,6 +250,7 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
         "description": product.description,
         "sku": product.sku,
         "active": product.active,
+        "is_new": getattr(product, "is_new", False),
     }
 
     product_dict["collection_slugs"] = [c.slug for c in (product.collections or [])]

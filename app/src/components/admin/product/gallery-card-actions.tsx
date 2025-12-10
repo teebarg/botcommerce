@@ -1,10 +1,6 @@
 import { Edit2, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
-
-import { ManageSlate } from "../shared-collections/manage-slate";
-
 import { ProductSheetForm } from "./product-form-sheet";
-
 import { Button } from "@/components/ui/button";
 import type { GalleryImageItem } from "@/schemas";
 import Overlay from "@/components/overlay";
@@ -28,8 +24,7 @@ export function GalleryCardActions({ image }: GalleryCardActionProps) {
     };
 
     return (
-        <div className="flex items-center flex-wrap gap-2">
-            {image.product && <ManageSlate product={image.product} />}
+        <div className="flex items-center gap-2">
             <Overlay
                 open={editState.isOpen}
                 sheetClassName="min-w-[40vw]"

@@ -2,9 +2,10 @@ import { GalleryCardActions } from "./gallery-card-actions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { cn } from "@/utils";
+import { cn, currency } from "@/utils";
 import type { Collection, GalleryImageItem, ProductVariant } from "@/schemas";
 import MediaDisplay from "@/components/media-display";
+import { IsNew } from "@/components/products/product-badges";
 
 interface GalleryCardProps {
     image: GalleryImageItem;
@@ -69,38 +70,21 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
                         </div>
                     )}
 
+                    {image.product?.is_new && <IsNew className="top-4 left-2" />}
+
                     <div className="absolute bottom-2 left-2 flex flex-wrap gap-1">
                         {image.product?.variants?.length == 0 ||
                             (image.product?.variants?.every((v) => v.inventory <= 0) && <Badge variant="destructive">Out of stock</Badge>)}
                     </div>
 
                     <div className="absolute bottom-2 right-2">
-                        <p className="text-lg font-bold text-white">#{image.id}</p>
+                        <p className="text-lg font-bold text-amber-600">#{image.id}</p>
                     </div>
-
-                    {/* {image.product?.images?.length > 0 && (
-                        <Overlay
-                            open={imgState.isOpen}
-                            sheetClassName="min-w-[40vw]"
-                            title="Create Metadata"
-                            trigger={
-                                <div
-                                    className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 rounded-full text-xs font-medium"
-                                    onClick={imgState.open}
-                                >
-                                    {image.product?.images?.length} photos
-                                </div>
-                            }
-                            onOpenChange={imgState.setOpen}
-                        >
-                            <div className="p-6 overflow-y-auto">
-                                <ProductImagesManager
-                                    initialImages={product?.images?.sort((a, b) => a.order - b.order) || []}
-                                    productId={product.id}
-                                />
-                            </div>
-                        </Overlay>
-                    )} */}
+                    {image.product && (
+                        <div className="absolute top-2 left-1/2 -translate-x-1/2">
+                            <Badge variant="indigo" className="text-base font-bold">{currency(image.product.variants?.[0]?.price)}</Badge>
+                        </div>
+                    )}
                 </div>
             </CardContent>
         </Card>
