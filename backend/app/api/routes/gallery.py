@@ -75,7 +75,7 @@ def build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any
     return data
 
 
-async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
+async def handle_bulk_update_products(payload: ImagesBulkUpdate, images): 
     async with db.tx() as tx:
         for index, image in enumerate(images):
             try:
@@ -85,8 +85,8 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
                         "name": name,
                         "slug": slugify(name),
                         "sku": generate_sku(),
-                        "active": payload.data.active,
-                        "is_new": payload.data.is_new,
+                        "active": payload.data.active or True,
+                        "is_new": payload.data.is_new or False,
                         **build_relation_data(payload.data.category_ids, payload.data.collection_ids),
                     }
                     product = await tx.product.create(data=product_data)
