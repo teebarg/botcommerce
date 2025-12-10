@@ -127,6 +127,7 @@ self.addEventListener("push", (event) => {
                     notificationId: data.notificationId,
                     eventType: "DELIVERED",
                     deliveredAt: new Date().toISOString(),
+                    timestamp: new Date().toISOString(),
                 }),
             }).catch((err) => {
                 console.warn("[SW] Failed to log delivered:", err);

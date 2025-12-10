@@ -9,6 +9,7 @@ export const pushEventFn = createServerFn({ method: "POST" })
             subscriberId: z.string(),
             notificationId: z.string(),
             eventType: z.enum(["DELIVERED", "OPENED", "CLICKED", "DISMISSED"]),
+            deliveredAt: z.string().optional(),
             timestamp: z.string(),
         })
     )

@@ -11,6 +11,7 @@
     ],
     "type": "module",
     "scripts": {
+        "dev-debug": "echo 'Debug mode - container will stay alive' && tail -f /dev/null",
         "dev": "vite dev --host 0.0.0.0",
         "build": "vite build",
         "preview": "vite preview",
