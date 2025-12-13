@@ -100,9 +100,9 @@ self.addEventListener("push", (event) => {
 
     const options = {
         body: data.body,
-        icon: "/icon.png",
+        icon: "/pr-logo.png",
         image: data.imageUrl ?? "/promo-banner.webp",
-        badge: "/icon.png",
+        badge: "/pr-logo.png",
         vibrate: [200, 100, 200],
         requireInteraction: true,
         actions: [
