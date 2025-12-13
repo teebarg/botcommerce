@@ -44,18 +44,16 @@ export const Route = createFileRoute("/_mainLayout/products/$slug")({
     head: ({ loaderData }) => {
         const product = loaderData?.data;
         const baseUrl = import.meta.env.VITE_BASE_URL;
-        const name = product?.name;
-        const title = name || "";
+        const title = product?.name || "";
 
         return {
-            title,
             meta: [
                 ...seo({
                     title,
                     description: product?.description || "",
                     url: `${baseUrl}/products/${product?.slug}`,
                     image: product?.images?.[0]?.image,
-                    name,
+                    name: title,
                 }),
             ],
         };

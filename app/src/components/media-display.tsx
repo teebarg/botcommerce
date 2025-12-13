@@ -1,5 +1,4 @@
-import type React from "react";
-import { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/utils";
 
 interface MediaDisplayProps {
@@ -9,49 +8,37 @@ interface MediaDisplayProps {
 }
 
 const MediaDisplay: React.FC<MediaDisplayProps> = ({ url, alt, className }) => {
-    const [mediaLoaded, setMediaLoaded] = useState<boolean>(false);
+    const [mediaLoaded, setMediaLoaded] = useState(false);
+    const imgRef = useRef<HTMLImageElement | null>(null);
 
     const mediaUrl = url || "/placeholder.jpg";
     const isVideo = /\.(mp4|webm|mov)$/i.test(mediaUrl);
-    const isMobile = typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
+
+    useEffect(() => {
+        if (imgRef.current?.complete) {
+            setMediaLoaded(true);
+        }
+    }, [mediaUrl]);
+
+    if (isVideo) {
+        return (
+            <video
+                className={cn("w-full h-full object-cover duration-700", mediaLoaded ? "opacity-100" : "opacity-0", className)}
+                src={mediaUrl}
+                onLoadedData={() => setMediaLoaded(true)}
+            />
+        );
+    }
 
     return (
         <>
-            {isVideo ? (
-                <video
-                    className={cn(
-                        "w-full h-full object-cover duration-700 group-hover:scale-105",
-                        mediaLoaded ? "opacity-100" : "opacity-0",
-                        className
-                    )}
-                    src={mediaUrl}
-                    playsInline
-                    preload="metadata"
-                    loop={isMobile}
-                    autoPlay={isMobile}
-                    onLoadedData={() => setMediaLoaded(true)}
-                    onMouseEnter={(e) => !isMobile && e.currentTarget.play()}
-                    onMouseLeave={(e) => {
-                        if (!isMobile) {
-                            e.currentTarget.pause();
-                            e.currentTarget.currentTime = 0;
-                        }
-                    }}
-                />
-            ) : (
-                <img
-                    alt={alt}
-                    className={cn(
-                        "w-full h-full object-cover duration-700 group-hover:scale-105",
-                        mediaLoaded ? "opacity-100" : "opacity-0",
-                        className
-                    )}
-                    src={mediaUrl}
-                    onLoad={() => setMediaLoaded(true)}
-                    loading="lazy"
-                />
-            )}
-
+            <img
+                ref={imgRef}
+                alt={alt}
+                src={mediaUrl}
+                onLoad={() => setMediaLoaded(true)}
+                className={cn("w-full h-full object-cover duration-700", mediaLoaded ? "opacity-100" : "opacity-0", className)}
+            />
             {!mediaLoaded && <div className="absolute inset-0 bg-muted animate-pulse" />}
         </>
     );
