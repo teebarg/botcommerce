@@ -105,6 +105,7 @@ async def invalidate_pattern(pattern: str):
     import asyncio
     await asyncio.sleep(1)
     try:
+        await invalidate_list(pattern)
         await manager.broadcast_to_all(
             data={
                 "key": pattern,

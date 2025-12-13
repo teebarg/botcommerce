@@ -17,7 +17,6 @@ const config = defineConfig({
                 inline: ["@auth/core"],
             },
         }),
-        // this is the plugin that enables path aliases
         viteTsConfigPaths({
             projects: ["./tsconfig.json"],
         }),
