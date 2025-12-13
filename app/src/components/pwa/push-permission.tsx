@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Gift, X } from "lucide-react";
 import { tryCatch } from "@/utils/try-catch";
 import { Button } from "@/components/ui/button";
 import { sendFCMFn } from "@/server/generic.server";
+import { Gift, Sparkles, X, Check, Star } from "lucide-react";
+import { currency } from "@/utils";
 
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
 const CHECK_INTERVAL = 60 * 60 * 1000; // Check every hour
@@ -193,31 +194,96 @@ export default function PushPermission() {
     if (isDismissed || permission === "granted") return null;
 
     return (
-        <div className="fixed bottom-8 left-4 right-4 z-50 animate-slide-up">
-            <div className="relative flex items-center justify-between max-w-md mx-auto bg-linear-to-r from-blue-800 to-cyan-700 rounded-lg py-4 px-6">
-                <div className="flex items-center space-x-3 flex-1">
-                    <div className="shrink-0 w-12 h-12 rounded-full bg-linear-to-br from-accent to-primary flex items-center justify-center animate-bounce">
-                        <Gift className="w-6 h-6 text-accent-foreground" />
-                    </div>
-                    <div className="flex-1">
-                        <p className="text-white font-semibold text-sm">🎁 Unlock Your Gift!</p>
-                        <p className="text-white/80 text-xs">Enable alerts to receive your offer</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-500 animate-slide-up">
+            <div className="absolute inset-0 bg-foreground/10 backdrop-blur-sm" />
+
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                {[...Array(12)].map((_, i) => (
+                    <div
+                        key={i}
+                        className="absolute w-3 h-3 rounded-full bg-gold opacity-60"
+                        style={{
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 100}%`,
+                            animationDelay: `${i * 0.2}s`,
+                            animation: `float ${3 + Math.random() * 2}s ease-in-out infinite`,
+                        }}
+                    />
+                ))}
+            </div>
+            <div className="relative w-full max-w-md bg-card rounded-3xl shadow-card overflow-hidden transition-all duration-500 animate-scale-in">
+                <button onClick={handleDismiss} className="absolute top-4 right-4 z-10 p-2 rounded-full bg-muted/50 hover:bg-muted transition-colors">
+                    <X className="w-5 h-5 text-muted-foreground" />
+                </button>
+
+                <div className="relative gradient-success py-8 px-6">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary-foreground/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary-foreground/10 rounded-full translate-y-1/2 -translate-x-1/2" />
+
+                    <div className="relative flex justify-center">
+                        <div className="relative">
+                            <div className="absolute inset-0 bg-gold/30 rounded-2xl blur-xl animate-pulse-glow" />
+                            <div className="relative bg-card p-5 rounded-2xl shadow-glow animate-gift-open">
+                                <Gift className="w-12 h-12 text-primary" strokeWidth={2} />
+                            </div>
+                            <div className="absolute -top-2 -left-2 animate-sparkle-burst" style={{ animationDelay: "0s" }}>
+                                <Star className="w-4 h-4 text-gold fill-gold" />
+                            </div>
+                            <div className="absolute -top-1 -right-2 animate-sparkle-burst" style={{ animationDelay: "0.5s" }}>
+                                <Star className="w-3 h-3 text-gold fill-gold" />
+                            </div>
+                            <div className="absolute -bottom-1 -left-1 animate-sparkle-burst" style={{ animationDelay: "1s" }}>
+                                <Star className="w-3 h-3 text-gold fill-gold" />
+                            </div>
+                            <div className="absolute -bottom-2 -right-1 animate-sparkle-burst" style={{ animationDelay: "0.75s" }}>
+                                <Sparkles className="w-4 h-4 text-accent" />
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <div className="px-6 py-8 text-center">
+                    <div className="flex justify-center mb-4">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 text-accent-foreground">
+                            <Gift className="w-4 h-4 text-gold" />
+                            <span className="text-sm font-semibold">Surprise Gift</span>
+                        </div>
+                    </div>
 
-                <div className="flex items-center space-x-2">
-                    <Button
-                        aria-label="Enable"
-                        className="bg-white text-gray-800 hover:bg-white/90 h-10 mr-4"
-                        size="sm"
-                        onClick={handleNotificationOptIn}
-                    >
-                        OK
-                    </Button>
+                    <h2 className="text-2xl font-extrabold text-foreground mb-2">You Have a Gift! 🎁</h2>
+                    <p className="text-muted-foreground mb-6">We have something special waiting just for you</p>
 
-                    <Button aria-label="Dismiss" size="icon" className="absolute top-2 right-2 w-auto h-auto" variant="ghost" onClick={handleDismiss}>
-                        <X className="h-5 w-5 text-white" />
-                    </Button>
+                    <div className="relative mb-8">
+                        <div className="absolute inset-0 gradient-gold opacity-20 blur-2xl rounded-3xl" />
+                        <div className="relative bg-muted rounded-2xl p-6 border-2 border-gold/30">
+                            <p className="text-sm text-muted-foreground mb-2">Your gift is worth</p>
+                            <div className="flex items-center justify-center gap-2">
+                                <span className="text-5xl font-extrabold text-gradient-gold">{currency(50000)}</span>
+                            </div>
+                            <p className="text-sm font-medium text-primary mt-2">Shopping Credits</p>
+                        </div>
+                    </div>
+                    <div className="space-y-3 mb-8">
+                        {["Be the first to know about flash sales", "Get exclusive VIP discounts", "Never miss your order updates"].map(
+                            (benefit, index) => (
+                                <div key={index} className="flex items-center gap-3 text-left" style={{ animationDelay: `${index * 0.1}s` }}>
+                                    <div className="shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                                        <Check className="w-4 h-4 text-primary" />
+                                    </div>
+                                    <span className="text-sm text-foreground">{benefit}</span>
+                                </div>
+                            )
+                        )}
+                    </div>
+                    <div className="space-y-3">
+                        <Button variant="reward" size="xl" className="w-full" onClick={handleNotificationOptIn}>
+                            <Gift className="w-5 h-5" />
+                            Claim My Gift!
+                        </Button>
+                        <button onClick={handleDismiss} className="w-full py-3 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                            Maybe later
+                        </button>
+                    </div>
+                    <p className="mt-6 text-xs text-muted-foreground">🔒 We respect your privacy. Unsubscribe anytime.</p>
                 </div>
             </div>
         </div>

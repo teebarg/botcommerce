@@ -109,19 +109,29 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
     const { _storedTheme } = Route.useRouteContext();
+    const { config } = Route.useLoaderData();
     return (
-        <html suppressHydrationWarning className="antialiased">
+        <html suppressHydrationWarning>
             <head>
                 <HeadContent />
                 <ScriptOnce
                     children={`
                     (function() {
                         const storedTheme = ${JSON.stringify(_storedTheme)};
+                        const siteConfig = ${JSON.stringify(config)};
                         if (storedTheme === 'system') {
-                        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                        document.documentElement.className = systemTheme;
+                            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                            document.documentElement.className = systemTheme;
+                            document.documentElement.setAttribute(
+                                'data-theme',
+                                siteConfig.theme || 'default'
+                                );
                         } else {
-                        document.documentElement.className = storedTheme;
+                            document.documentElement.className = storedTheme;
+                            document.documentElement.setAttribute(
+                                'data-theme',
+                                siteConfig.theme || 'default'
+                                );
                         }
                     })();
                     `}
