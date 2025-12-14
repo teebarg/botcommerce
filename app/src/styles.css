@@ -432,7 +432,6 @@
     /* Shadows */
     --shadow-glow: 0 0 60px hsl(var(--gold) / 0.4);
     --shadow-card: 0 25px 50px -12px hsl(var(--foreground) / 0.15);
-    --shadow-button: 0 10px 30px -5px hsl(var(--primary) / 0.4);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
