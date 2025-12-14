@@ -1,7 +1,11 @@
 import { getSessionFromContext } from "@/server/auth.server";
 import type { Session } from "start-authjs";
 
-const baseURL = process.env.API_URL || "http://localhost.dev";
+const isServer = typeof window === "undefined";
+
+const API_BASE_URL = isServer
+  ? process.env.API_URL!
+  : import.meta.env.VITE_API_URL!;
 
 interface HeaderOptions {
     cartId?: string | undefined;
@@ -16,7 +20,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
     const session = await getSessionFromContext() as unknown as Session;
     const { params, ...restOptions } = options;
 
-    const url = new URL(`/api${endpoint}`, baseURL);
+    const url = new URL(`/api${endpoint}`, API_BASE_URL);
 
     if (params) {
         Object.entries(params).forEach(([key, value]) => {
