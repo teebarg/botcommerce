@@ -105,7 +105,7 @@ export const ActivityList: React.FC<ActivityListProps> = ({ activities }) => {
     return (
         <div className="max-w-6xl mx-auto py-4 px-1 md:px-6 md:py-12">
             <div className="space-y-2 sm:space-y-6">
-                {activities.map((activity: Activity, idx: number) => (
+                {activities?.map((activity: Activity, idx: number) => (
                     <ActivityListItem key={idx} activity={activity} />
                 ))}
             </div>

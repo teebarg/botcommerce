@@ -12,7 +12,7 @@ export default function Featured() {
             <div className="text-center">
                 <div className="flex items-center justify-center mb-2">
                     <TrendingUp className="text-orange-500 mr-2" size={32} />
-                    <h2 className="text-4xl font-bold font-outfit">Featured products</h2>
+                    <h2 className="text-4xl font-semibold font-display text-foreground">Featured products</h2>
                 </div>
                 <p className="text-xl text-muted-foreground">Handpicked selections from our premium collection</p>
             </div>

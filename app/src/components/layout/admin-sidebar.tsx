@@ -18,6 +18,7 @@ import {
     Image,
     ShoppingCart,
     Tag,
+    ShoppingBag,
 } from "lucide-react";
 import { useRouteContext } from "@tanstack/react-router";
 
@@ -149,8 +150,8 @@ export function AdminSidebar() {
                     <SidebarMenuItem>
                         <SidebarMenuButton className="justify-between">
                             <PanelLeftIcon onClick={toggleSidebar} />
-                            <div className="h-8 w-8">
-                                <img alt="Logo" className="h-full w-full object-contain" src="/icon.png" />
+                            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                                <ShoppingBag className="w-5 h-5 text-primary-foreground" />
                             </div>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -227,10 +228,7 @@ export function AdminSidebar() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-(--radix-popper-anchor-width)" side="top">
                                 <DropdownMenuItem>
-                                    <LocalizedClientLink className="justify-between" href="/account/profile">
-                                        Profile
-                                        <span className="badge">New</span>
-                                    </LocalizedClientLink>
+                                    <LocalizedClientLink href="/account/profile">Profile</LocalizedClientLink>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
                                     <LocalizedClientLink href="/admin/settings" active="bg-primary/20 text-primary">

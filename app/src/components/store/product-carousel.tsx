@@ -108,10 +108,10 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
             <div className="relative mx-auto flex max-w-[1400px] flex-col pb-4 pt-2">
                 <header className="flex gap-6 sm:items-end justify-between">
                     <div>
-                        <p className={cn("font-medium uppercase text-muted-foreground font-outfit", !title && "hidden")}>{title}</p>
-                        <h2 className={cn("text-xl font-medium tracking-tight md:text-2xl", !description && "hidden")} id={headingId}>
+                        <h2 className={cn("font-semibold font-display text-xl", !title && "hidden")}>{title}</h2>
+                        <p className={cn("font-medium text-muted-foreground", !description && "hidden")} id={headingId}>
                             {description}
-                        </h2>
+                        </p>
                     </div>
                     <div aria-label="carousel controls" className="hidden md:flex items-center gap-3" role="group">
                         <Button
@@ -139,7 +139,7 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
                 <div className="relative mt-10">
                     {isLoading && <ComponentLoader className="h-[400px]" />}
                     <ul ref={listRef} aria-label="Products" className="m-0 flex list-none snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth">
-                        {products.map((product: ProductSearch, idx: number) => (
+                        {products?.map((product: ProductSearch, idx: number) => (
                             <li
                                 key={idx}
                                 data-card

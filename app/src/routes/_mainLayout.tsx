@@ -11,6 +11,7 @@ import { SearchDialog } from "@/components/store/product-search";
 import LocalizedClientLink from "@/components/ui/link";
 import type { Session } from "start-authjs";
 import { useConfig } from "@/providers/store-provider";
+import { ShoppingBag } from "lucide-react";
 
 export const Route = createFileRoute("/_mainLayout")({
     component: MainLayoutComponent,
@@ -30,8 +31,10 @@ function MainLayoutComponent() {
                 <div className="flex items-center gap-2 px-2 py-3">
                     <div className="flex gap-2 items-center flex-1">
                         <BackButton />
-                        <LocalizedClientLink className="text-3xl block h-12 w-12" href="/">
-                            <img alt="Logo" className="h-full w-full object-contain" src="/icon.png" />
+                        <LocalizedClientLink className="" href="/">
+                            <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
+                                <ShoppingBag className="w-5 h-5 text-primary-foreground" />
+                            </div>
                         </LocalizedClientLink>
                         <span className="tracking-tighter font-bold text-lg uppercase">{config?.shop_name}</span>
                     </div>

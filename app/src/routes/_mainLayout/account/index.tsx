@@ -125,7 +125,7 @@ function RouteComponent() {
                             </div>
                             <ul className="flex flex-col gap-y-4" data-testid="orders-wrapper">
                                 {data?.orders && data?.orders?.length > 0 ? (
-                                    data?.orders.slice(0, 5).map((order: Order, idx: number) => {
+                                    data?.orders.slice(0, 5)?.map((order: Order, idx: number) => {
                                         return <OrderItem key={idx} data-testid="order-wrapper" data-value={order.order_number} order={order} />;
                                     })
                                 ) : (

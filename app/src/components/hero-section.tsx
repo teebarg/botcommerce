@@ -4,7 +4,7 @@ import { BtnLink } from "@/components/ui/btnLink";
 
 const HeroSection: React.FC = () => {
     return (
-        <div className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
+        <div className="relative min-h-[92vh] md:min-h-[80vh] flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0 z-0">
                 <div className="absolute inset-0 bg-linear-to-b from-background/80 via-background/60 to-background" />
             </div>
@@ -21,18 +21,18 @@ const HeroSection: React.FC = () => {
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    <div className="text-left space-y-4 lg:space-y-8 animate-fade-in">
+                    <div className="text-left space-y-2 lg:space-y-7 animate-fade-in">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-contrast/10 border border-contrast/20 text-contrast backdrop-blur-sm">
                             <Star className="w-4 h-4 text-contrast" />
                             <span className="text-sm font-medium">New Collection</span>
                         </div>
 
-                        <div className="space-y-3">
-                            <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-                                Elevate Your
-                                <span className="inline-block text-primary ml-3">Style</span>
+                        <div className="space-y-2">
+                            <h1 className="text-3xl md:text-5xl font-display font-bold text-foreground tracking-tight leading-tight">
+                                Discover Your
+                                <span className="text-primary block">Perfect Style</span>
                             </h1>
-                            <p className="text-xl md:text-2xl text-muted-foreground max-w-lg">
+                            <p className="text-lg text-muted-foreground max-w-lg">
                                 Discover our curated collection of premium fashion pieces that define elegance and sophistication.
                             </p>
                         </div>

@@ -4,7 +4,7 @@ import UserDropDown from "./user-dropdown";
 import { CartComponent } from "@/components/store/cart/cart-component";
 import LocalizedClientLink from "@/components/ui/link";
 import { SearchDialog } from "@/components/store/product-search";
-import { Heart, HeartOff } from "lucide-react";
+import { Heart, HeartOff, ShoppingBag } from "lucide-react";
 import { ThemeToggle } from "../theme-toggle";
 import type { Session } from "start-authjs";
 import { useConfig } from "@/providers/store-provider";
@@ -13,20 +13,17 @@ const StoreNavbar = ({ session }: { session: Session | null }) => {
     const { config } = useConfig();
 
     return (
-        <NavigationBar className="bg-background py-2">
+        <NavigationBar className="bg-background py-2 hidden md:block">
             <NavbarContent className="flex flex-1 max-w-8xl mx-auto">
                 <NavbarBrand className="flex items-center font-semibold">
-                    <LocalizedClientLink
-                        className="flex items-center gap-1"
-                        href="/"
-                    >
-                        <span className="tracking-tighter font-bold text-2xl uppercase">{config?.shop_name}</span>
-                        <div className="h-8 w-8">
-                            <img alt="Logo" className="h-full w-full object-contain" src="/icon.png" />
+                    <LocalizedClientLink href="/" className="flex items-center gap-2">
+                        <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
+                            <ShoppingBag className="w-5 h-5 text-primary-foreground" />
                         </div>
+                        <span className="font-display text-xl font-semibold text-foreground hidden sm:block">{config?.shop_name}</span>
                     </LocalizedClientLink>
                     <LocalizedClientLink className="hidden md:block" href={"/collections"}>
-                        Collections
+                        Explore
                     </LocalizedClientLink>
                 </NavbarBrand>
                 <NavbarItem className="hidden md:flex justify-center flex-1">

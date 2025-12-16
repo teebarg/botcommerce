@@ -34,7 +34,9 @@ export function ShopDetails({ settings }: ShopDetailsProps) {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="default">Default</SelectItem>
-                        <SelectItem value="ocean">Ocean</SelectItem>
+                        <SelectItem value="ibm-blue">Ibm Blue</SelectItem>
+                        <SelectItem value="aliexpress-red">Aliexpress Red</SelectItem>
+                        <SelectItem value="forest-green">Forest Green</SelectItem>
                     </SelectContent>
                 </Select>
             </div>

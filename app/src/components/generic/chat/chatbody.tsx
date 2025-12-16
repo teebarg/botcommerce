@@ -48,17 +48,15 @@ const ChatBody: React.FC<Props> = ({ messages, isLoading }) => {
                 backgroundBlendMode: "multiply",
             }}
         >
-            {/* Date */}
             <p className={cn("text-sm my-3 mx-0 text-center uppercase min-h-4 leading-6 font-medium text-white")}>
                 {formatDate(new Date().toISOString())}
             </p>
-            {messages.map((msg: Message, idx: number) => (
+            {messages?.map((msg: Message, idx: number) => (
                 <div key={idx} className={`flex ${msg.isUser ? "justify-end" : "justify-start"}`}>
                     <MessageBubble {...msg} />
                 </div>
             ))}
             {isLoading && <TypingIndicator />}
-            {/* Invisible element for scrolling */}
             <div ref={messagesEndRef} />
         </div>
     );

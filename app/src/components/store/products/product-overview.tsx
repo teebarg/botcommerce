@@ -116,7 +116,7 @@ const ProductOverview: React.FC<{
                 </div>
             </div>
             <div className="flex flex-wrap gap-4 px-2 mt-4">
-                {product.images.map((image: string, idx: number) => (
+                {product?.images?.map((image: string, idx: number) => (
                     <button
                         key={idx}
                         className={`w-16 h-16 rounded-md shrink-0 border-2 overflow-hidden relative ${

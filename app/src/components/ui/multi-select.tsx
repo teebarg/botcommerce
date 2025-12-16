@@ -80,7 +80,7 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                     onClick={toggleDropdown}
                 >
                     {selectedItems.length > 0 ? (
-                        selectedItems.map((item: SelectOption, idx: number) => (
+                        selectedItems?.map((item: SelectOption, idx: number) => (
                             <div key={idx} className="flex items-center gap-1 rounded-md bg-blue-100 px-2 py-1 text-blue-800">
                                 <span>{item.label}</span>
                                 {!disabled && <X className="cursor-pointer hover:text-blue-500" size={14} onClick={(e) => removeItem(e, item)} />}

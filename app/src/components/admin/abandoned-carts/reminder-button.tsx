@@ -33,7 +33,7 @@ export const ReminderButton = ({ id }: ReminderButtonProps) => {
                 </DialogHeader>
                 <div>
                     <div className="pb-2 border-b border-input">
-                        <h2 className="text-lg font-semibold leading-6 font-outfit">Send Reminder</h2>
+                        <h2 className="text-lg font-semibold leading-6 font-display">Send Reminder</h2>
                     </div>
                     <p className="text-sm text-muted-foreground mt-4 font-medium">Are you sure you want to send a reminder to this cart?</p>
                     <div className="flex justify-end gap-2 mt-8">

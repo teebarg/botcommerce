@@ -47,7 +47,7 @@ const AccountNav = () => {
                     </div>
                     <div className="text-base">
                         <ul className="flex mb-0 justify-start items-start flex-col gap-y-4">
-                            {navLinks.map((link, index: number) => (
+                            {navLinks?.map((link, index: number) => (
                                 <li key={`account-${index}`}>
                                     <AccountNavLink data-testid={link.dataTestid} href={link.href}>
                                         {link.label}

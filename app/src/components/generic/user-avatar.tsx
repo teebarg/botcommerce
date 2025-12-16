@@ -10,7 +10,7 @@ export function UserAvatar() {
             <AvatarFallback className="bg-green-600 text-white text-xs">
                 {session?.user?.first_name
                     ?.split(" ")
-                    .map((n) => n[0])
+                    ?.map((n) => n[0])
                     .join("") ?? "ME"}
             </AvatarFallback>
         </Avatar>

@@ -11,7 +11,7 @@ export default function ScrollableListing({ products }: { products: ProductSearc
             </div>
             <div className="lg:hidden overflow-x-auto pb-4">
                 <div className="flex gap-4 w-max">
-                    {products.map((product) => (
+                    {products?.map((product) => (
                         <div key={product.id} className="w-72 shrink-0 snap-start">
                             <ProductCard product={product} />
                         </div>

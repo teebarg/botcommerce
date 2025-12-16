@@ -57,10 +57,10 @@ export default function Footer() {
             <div className="hidden md:block mx-auto max-w-7xl px-6 pb-8 pt-8 sm:pt-24 lg:px-8 md:pt-32">
                 <div className="hidden md:grid md:grid-cols-3 md:gap-8">
                     <div className="md:pr-8">
-                        <h3 className="text-xl font-bold bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
+                        <h3 className="text-xl font-semibold">
                             {config?.shop_name}
                         </h3>
-                        <p className="text-sm text-foreground">
+                        <p className="text-sm text-muted-foreground">
                             {`We are a dedicated online store offering a wide range of high-quality and fun products for kids. Our mission is to bring
                             joy and happiness to every child's life.`}
                         </p>

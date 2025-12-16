@@ -133,7 +133,7 @@ const ActivityView: React.FC<Props> = ({ activities }) => {
                         <p className="mt-1 text-sm text-muted-foreground">Your recent activities will appear here.</p>
                     </div>
                 ) : (
-                    activities.map((item, idx: number) => <ActivityViewItem key={idx} activity={item} />)
+                    activities?.map((item, idx: number) => <ActivityViewItem key={idx} activity={item} />)
                 )}
             </div>
         </div>

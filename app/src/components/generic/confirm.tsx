@@ -21,7 +21,7 @@ const Confirm: React.FC<Props> = ({ title = "Confirm?", content, onConfirm, onCl
     return (
         <div className="mx-auto w-full">
             <div className="pb-2 border-b border-input">
-                <h2 className="text-lg font-semibold leading-6 font-outfit">{title}</h2>
+                <h2 className="text-lg font-semibold leading-6 font-display">{title}</h2>
             </div>
             <p className="text-sm text-muted-foreground mt-2 font-medium">
                 {content ??
