@@ -2,7 +2,6 @@ const broadcast = new BroadcastChannel("sw-messages");
 const CACHE_NAME = "shop-app-v1";
 
 const STATIC_PAGES = [
-    "/",
     "/favicon.ico",
     "/favicon-32x32.png",
     "/favicon-16x16.png",

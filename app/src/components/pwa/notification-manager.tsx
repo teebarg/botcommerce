@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
+import OfflinePage from "../OfflinePage";
 
 const PushNotificationManager: React.FC = () => {
     const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
@@ -66,26 +67,19 @@ const PushNotificationManager: React.FC = () => {
 
     if (!show && !offline) return null;
 
+    if (offline) {
+        return <OfflinePage />;
+    }
+
     return (
         <div className="fixed bottom-4 left-1/2 z-50 w-[95vw] max-w-sm -translate-x-1/2 rounded-2xl bg-linear-to-br from-emerald-100 to-teal-100 text-gray-900 shadow-2xl p-5 flex flex-col items-center animate-fade-in">
-            {offline ? (
-                <>
-                    <h2 className="text-lg font-bold mb-1">No Internet Connection</h2>
-                    <p className="text-gray-700 text-sm mb-3 text-center">
-                        You are currently offline. Some features may not work until you are back online.
-                    </p>
-                </>
-            ) : (
-                <>
-                    <h2 className="text-lg font-bold mb-1">Update Available</h2>
-                    <p className="text-gray-700 text-sm mb-3 text-center">
-                        A new version of the app is available. Please refresh to get the latest features and fixes.
-                    </p>
-                    <Button className="mb-2 w-full" variant="emerald" onClick={handleRefresh}>
-                        Refresh Now
-                    </Button>
-                </>
-            )}
+            <h2 className="text-lg font-bold mb-1">Update Available</h2>
+            <p className="text-gray-700 text-sm mb-3 text-center">
+                A new version of the app is available. Please refresh to get the latest features and fixes.
+            </p>
+            <Button className="mb-2 w-full" variant="emerald" onClick={handleRefresh}>
+                Refresh Now
+            </Button>
         </div>
     );
 };

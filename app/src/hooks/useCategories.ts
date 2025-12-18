@@ -3,13 +3,6 @@ import { toast } from "sonner";
 import type { CategoryFormValues } from "@/components/admin/categories/category-form";
 import { createCategoryFn, deleteCategoryFn, getCategoriesFn, reorderCategoriesFn, updateCategoryFn } from "@/server/categories.server";
 
-// export const useCategories = (query?: string) => {
-//     return useQuery({
-//         queryKey: ["categories", query],
-//         queryFn: () => getCategoriesFn({ data: query }),
-//     });
-// };
-
 export const categoriesQuery = (query?: string) => queryOptions({
     queryKey: ["categories", query],
     staleTime: 1000 * 60 * 60, // 1 hour

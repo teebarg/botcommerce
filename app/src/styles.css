@@ -44,6 +44,19 @@
     --color-warning: var(--warning);
     --color-warning-foreground: var(--warning-foreground);
 
+    --color-discount-sale: hsl(var(--discount-sale));
+    --color-discount-sale-glow: hsl(var(--discount-sale-glow));
+
+    --color-gold: hsl(var(--gold));
+    --color-gold-light: hsl(var(--gold-light));
+    --color-emerald-dark: hsl(var(--emerald-dark));
+    --color-emerald-light: hsl(var(--emerald-light));
+
+    --color-error: hsl(var(--error));
+    --color-error-foreground: hsl(var(--error-foreground));
+    --color-error-light: hsl(var(--error-light));
+    --color-error-border: hsl(var(--error-border));
+
     --color-sidebar: hsl(var(--sidebar));
     --color-sidebar-foreground: hsl(var(--sidebar-foreground));
     --color-sidebar-primary: hsl(var(--sidebar-primary));
@@ -52,14 +65,6 @@
     --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
     --color-sidebar-border: hsl(var(--sidebar-border));
     --color-sidebar-ring: hsl(var(--sidebar-ring));
-
-    --color-discount-sale: hsl(var(--discount-sale));
-    --color-discount-sale-glow: hsl(var(--discount-sale-glow));
-
-    --color-gold: hsl(var(--gold));
-    --color-gold-light: hsl(var(--gold-light));
-    --color-emerald-dark: hsl(var(--emerald-dark));
-    --color-emerald-light: hsl(var(--emerald-light));
 
     --background-image-gradient-sale: var(--gradient-sale);
     --background-image-gradient-gold: var(--gradient-gold);
@@ -244,6 +249,11 @@
 }
 
 :root {
+    --error: 15 90% 60%;
+    --error-foreground: 0 0% 100%;
+    --error-light: 15 100% 97%;
+    --error-border: 15 80% 85%;
+
     --discount-sale: 0 85% 60%;
     --discount-sale-glow: 0 100% 70%;
 
@@ -277,6 +287,13 @@
     --safe-bottom: env(safe-area-inset-bottom);
     --safe-left: env(safe-area-inset-left);
     --safe-right: env(safe-area-inset-right);
+}
+
+.dark {
+    --error: 15 85% 55%;
+    --error-foreground: 0 0% 100%;
+    --error-light: 15 40% 15%;
+    --error-border: 15 50% 30%;
 }
 
 :root[data-theme="default"] {

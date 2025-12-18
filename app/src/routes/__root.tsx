@@ -109,7 +109,7 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
     const { _storedTheme } = Route.useRouteContext();
-    const { config } = Route.useLoaderData();
+    const loaderData = Route.useLoaderData();
     return (
         <html suppressHydrationWarning>
             <head>
@@ -118,7 +118,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                     children={`
                     (function() {
                         const storedTheme = ${JSON.stringify(_storedTheme)};
-                        const siteConfig = ${JSON.stringify(config)};
+                        const siteConfig = ${JSON.stringify(loaderData?.config || {})};
                         if (storedTheme === 'system') {
                             const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
                             document.documentElement.className = systemTheme;
