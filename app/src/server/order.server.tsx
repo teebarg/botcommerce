@@ -26,11 +26,10 @@ export const getOrderFn = createServerFn({ method: "GET" })
         return await api.get<Order>(`/order/${data}`);
     });
 
-export const changeOrderStatusFn = createServerFn({ method: "POST" }) // Using POST for RPC call
+export const changeOrderStatusFn = createServerFn({ method: "POST" })
     .inputValidator(
         z.object({
             id: z.number(),
-            // Assuming OrderStatus is a string literal type/enum defined in schemas
             status: z.custom<OrderStatus>(),
         })
     )
@@ -38,7 +37,7 @@ export const changeOrderStatusFn = createServerFn({ method: "POST" }) // Using P
         return await api.patch<Order>(`/order/${data.id}/status?status=${data.status}`, {});
     });
 
-export const changePaymentStatusFn = createServerFn({ method: "POST" }) // Using POST for RPC call
+export const changePaymentStatusFn = createServerFn({ method: "POST" })
     .inputValidator(
         z.object({
             id: z.number(),

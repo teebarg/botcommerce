@@ -50,9 +50,7 @@ function Home() {
                 <NewArrivals />
             </LazyInView>
             <ContactSection />
-            {/* <LazyInView> */}
             <NewsletterSection />
-            {/* </LazyInView> */}
         </div>
     );
 }

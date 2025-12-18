@@ -12,10 +12,6 @@ export const UserSearchSchema = z.object({
     sort: z.string().optional(),
 });
 
-export const getUserWishlistFn = createServerFn({ method: "GET" }).handler(async () => {
-    return await api.get<Wishlist>("/users/wishlist");
-});
-
 export const getMeFn = createServerFn({ method: "GET" }).handler(async () => {
     return await api.get<User>("/users/me");
 });
@@ -92,7 +88,14 @@ export const deleteUserFn = createServerFn({ method: "POST" })
         return await api.delete<User>(`/users/${id}`);
     });
 
-export const getWishlistFn = createServerFn({ method: "GET" }).handler(async () => {
+export const getWishlistFn = createServerFn()
+    .inputValidator(z.string().optional())
+    .handler(async ({ data }) => {
+        const res = await api.get<Wishlist>("/users/wishlist", { from: data });
+        return res;
+    });
+
+export const getWishlistListingFn = createServerFn().handler(async () => {
     return await api.get<Wishlist>("/users/wishlist");
 });
 
@@ -111,7 +114,7 @@ export const createWishlistItemFn = createServerFn({ method: "POST" })
     });
 
 export const deleteWishlistItemFn = createServerFn({ method: "POST" })
-    .inputValidator(z.number()) // id
+    .inputValidator(z.number())
     .handler(async ({ data: id }) => {
         return await api.delete<Wishlist>(`/users/wishlist/${id}`);
     });

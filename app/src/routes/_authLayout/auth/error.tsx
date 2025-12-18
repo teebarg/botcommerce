@@ -9,8 +9,7 @@ export const Route = createFileRoute("/_authLayout/auth/error")({
     validateSearch: z.object({
         error: z.string().optional(),
     }),
-    beforeLoad: ({ context, search }) => {
-        console.log("🚀 ~ file: error.tsx:13 ~ context:", context)
+    beforeLoad: ({ search }) => {
         return {
             error: search.error,
         };

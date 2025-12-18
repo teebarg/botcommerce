@@ -1,5 +1,5 @@
 from typing import Any, Optional
-from fastapi import APIRouter, HTTPException, Query, Depends, Request
+from fastapi import APIRouter, HTTPException, Query, Depends, Request, status
 from pydantic import BaseModel, Field
 
 from app.core.deps import CurrentUser, get_current_superuser
@@ -15,7 +15,7 @@ from math import ceil
 from app.core.security import verify_password, get_password_hash
 from app.services.recently_viewed import RecentlyViewedService
 from app.models.product import SearchProduct
-from app.services.redis import cache_response, invalidate_key
+from app.services.redis import cache_response, bust
 
 router = APIRouter()
 
@@ -225,7 +225,7 @@ async def create_user_wishlist_item(item: WishlistCreate, user: CurrentUser):
                 "user_id": user.id
             }
         )
-        await invalidate_key(f"products:wishlist:{user.id}")
+        await bust(f"products:wishlist:{user.id}")
         return favorite
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -256,7 +256,7 @@ async def remove_wishlist_item(
                 }
             }
         )
-        await invalidate_key(f"products:wishlist:{user.id}")
+        await bust(f"products:wishlist:{user.id}")
         return Message(message="Product deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

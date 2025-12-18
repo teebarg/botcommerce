@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useLocation } from "@tanstack/react-router";
 
 import WishlistItem from "@/components/store/wishlist";
 import { BtnLink } from "@/components/ui/btnLink";
@@ -16,14 +16,15 @@ export const Route = createFileRoute("/_mainLayout/wishlist")({
             throw redirect({ to: "/auth/signin", search: { callbackUrl: location.href } });
         }
     },
-    loader: async ({ context }) => {
-        await context.queryClient.ensureQueryData(userWishlistQueryOptions());
+    loader: async ({ context, location }) => {
+        await context.queryClient.ensureQueryData(userWishlistQueryOptions(location.href));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const wishlistQuery = useSuspenseQuery(userWishlistQueryOptions());
+    const location = useLocation()
+    const wishlistQuery = useSuspenseQuery(userWishlistQueryOptions(location.href));
 
     if (wishlistQuery.isLoading) {
         return (

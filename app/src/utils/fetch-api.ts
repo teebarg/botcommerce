@@ -1,5 +1,7 @@
 import { getSessionFromContext } from "@/server/auth.server";
+import { redirect } from "@tanstack/react-router";
 import type { Session } from "start-authjs";
+import { deleteCookie } from "@tanstack/react-start/server";
 
 const baseURL = process.env.API_URL || "http://localhost.dev";
 
@@ -10,11 +12,12 @@ interface HeaderOptions {
 type RequestOptions = RequestInit & {
     params?: Record<string, string | number | boolean | null | undefined>;
     headers?: HeaderOptions;
+    from?: string;
 };
 
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-    const session = await getSessionFromContext() as unknown as Session;
-    const { params, ...restOptions } = options;
+    const session = (await getSessionFromContext()) as unknown as Session;
+    const { params, from, ...restOptions } = options;
 
     const url = new URL(`/api${endpoint}`, baseURL);
 
@@ -36,6 +39,17 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         headers,
         credentials: "include",
     });
+
+    if (response.status === 401 && from) {
+        deleteCookie("authjs.session-token", { path: "/" });
+
+        throw redirect({
+            to: "/auth/signin",
+            search: {
+                callbackUrl: from,
+            },
+        });
+    }
 
     return response.json();
 }

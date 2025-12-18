@@ -10,11 +10,10 @@ import {
     getMeFn,
     getRecentlyViewedFn,
     getUsersFn,
-    getUserWishlistFn,
     getWishlistFn,
+    getWishlistListingFn,
     updateUserFn,
 } from "@/server/users.server";
-import { useRouteContext } from "@tanstack/react-router";
 
 interface UsersParams {
     query?: string;
@@ -105,19 +104,16 @@ export const useDeleteUser = () => {
     });
 };
 
-export const userWishlistQueryOptions = () =>
+export const userWishlistQueryOptions = (from: string) =>
     queryOptions({
         queryKey: ["products", "wishlist"],
-        queryFn: () => getUserWishlistFn(),
+        queryFn: () => getWishlistFn({ data: from }),
     });
 
 export const useUserWishlist = () => {
-    const { session } = useRouteContext({ strict: false });
-
     return useQuery({
-        queryKey: ["products", "wishlist", session?.id?.toString()],
-        queryFn: () => getWishlistFn(),
-        enabled: Boolean(session?.user),
+        queryKey: ["products", "wishlist"],
+        queryFn: () => getWishlistListingFn(),
     });
 };
 
@@ -130,9 +126,11 @@ export const useUserRecentlyViewed = (limit: number = 12, enabled: boolean = tru
 };
 
 export const useUserCreateWishlist = () => {
+    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (product_id: number) => await createWishlistItemFn({ data: product_id }),
         onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["products", "wishlist"] });
             toast.success("Wishlist created successfully");
         },
         onError: (error) => {
@@ -142,9 +140,11 @@ export const useUserCreateWishlist = () => {
 };
 
 export const useUserDeleteWishlist = () => {
+    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (id: number) => await deleteWishlistItemFn({ data: id }),
         onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["products", "wishlist"] });
             toast.success("Wishlist deleted successfully");
         },
         onError: (error) => {
