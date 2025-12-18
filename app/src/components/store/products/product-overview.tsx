@@ -1,6 +1,6 @@
 import type React from "react";
 import { useState, useEffect } from "react";
-import { Heart, Star, Plus, Minus, ShoppingCart, MessageCircle, X, Truck, Shield, RotateCcw } from "lucide-react";
+import { Heart, Star, Plus, Minus, ShoppingCart, MessageCircle, Truck, Shield, RotateCcw } from "lucide-react";
 
 import { DiscountBadge } from "./discount-badge";
 import type { ProductSearch } from "@/schemas";
@@ -93,7 +93,7 @@ const ProductOverview: React.FC<{
         <div>
             <div className="sticky top-safe z-20 bg-background">
                 <div className="relative h-[60vh] overflow-hidden">
-                    <MediaDisplay alt={product.name} className="object-contain rounded" url={selectedImage || product.images[0]} />
+                    <MediaDisplay alt={product.name} className="object-contain rounded" url={selectedImage || product.images?.[0]} />
                     <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
 
                     <DiscountBadge discount={priceInfo.maxDiscountPercent} isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice} />

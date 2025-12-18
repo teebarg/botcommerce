@@ -271,6 +271,8 @@
     --contrast: 14 90% 58%;
     --contrast-foreground: 0 0% 100%;
 
+    --radius: 0.5rem;
+
     --safe-top: env(safe-area-inset-top);
     --safe-bottom: env(safe-area-inset-bottom);
     --safe-left: env(safe-area-inset-left);
@@ -298,8 +300,6 @@
     --border: 0 0% 90%;
     --input: 0 0% 90%;
     --ring: 219 100% 53%;
-
-    --radius: 0.5rem;
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(219 100% 53%), hsl(219 100% 48%));
@@ -377,7 +377,6 @@
     --border: 214 25% 88%;
     --input: 214 25% 88%;
     --ring: 214 100% 45%;
-    --radius: 0.5rem;
     --sidebar-background: 214 30% 97%;
     --sidebar-foreground: 214 32% 20%;
     --sidebar-primary: 214 100% 45%;
@@ -543,6 +542,83 @@
     --sidebar-accent-foreground: 142 60% 60%;
     --sidebar-border: 142 25% 16%;
     --sidebar-ring: 142 60% 45%;
+}
+
+[data-theme="luxury"] {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%;
+    --card: 0 0% 97%;
+    --card-foreground: 0 0% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+    --primary: 0 0% 10%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 45 96% 56%;
+    --secondary-foreground: 0 0% 10%;
+    --accent: 46 65% 53%;
+    --accent-foreground: 0 0% 10%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 40%;
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 46 65% 53%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(46 65% 53%), hsl(45 67% 47%));
+    --gradient-secondary: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 97%));
+    --gradient-accent: linear-gradient(90deg, hsl(46 65% 53% / 0.08), hsl(46 65% 53% / 0.16));
+
+    /* Sidebar */
+    --sidebar: 0 0% 98%;
+    --sidebar-foreground: 0 0% 10%;
+    --sidebar-primary: 0 0% 10%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 45 96% 56%;
+    --sidebar-accent-foreground: 0 0% 10%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 46 65% 53%;
+}
+
+[data-theme="luxury"].dark,
+.dark[data-theme="luxury"] {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 96%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 96%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 46 65% 53%;
+    --primary-foreground: 0 0% 10%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 96%;
+    --accent: 45 96% 56%;
+    --accent-foreground: 0 0% 10%;
+    --muted: 0 0% 16%;
+    --muted-foreground: 43 89% 39%;
+    --destructive: 0 88% 71%;
+    --destructive-foreground: 0 0% 10%;
+
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 45 96% 56%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(46 65% 53%), hsl(45 96% 56%));
+    --gradient-secondary: linear-gradient(180deg, hsl(0 0% 10%), hsl(0 0% 4%));
+    --gradient-accent: linear-gradient(90deg, hsl(45 96% 56% / 0.12), hsl(45 96% 56% / 0.24));
+
+    /* Sidebar */
+    --sidebar: 0 0% 10%;
+    --sidebar-foreground: 0 0% 96%;
+    --sidebar-primary: 46 65% 53%;
+    --sidebar-primary-foreground: 0 0% 10%;
+    --sidebar-accent: 0 0% 16%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 0 0% 16%;
+    --sidebar-ring: 45 96% 56%;
 }
 
 .chatbot-message li a {

@@ -37,6 +37,7 @@ export function ShopDetails({ settings }: ShopDetailsProps) {
                         <SelectItem value="ibm-blue">Ibm Blue</SelectItem>
                         <SelectItem value="aliexpress-red">Aliexpress Red</SelectItem>
                         <SelectItem value="forest-green">Forest Green</SelectItem>
+                        <SelectItem value="luxury">Luxury Gold</SelectItem>
                     </SelectContent>
                 </Select>
             </div>

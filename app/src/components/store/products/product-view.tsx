@@ -21,9 +21,9 @@ interface Props {
 }
 
 const ProductView: React.FC<Props> = ({ product }) => {
-    const [selectedImageId, setSelectedImageId] = useState<number>(product.images[0]?.id || 0);
+    const [selectedImageId, setSelectedImageId] = useState<number>(product.images?.[0]?.id || 0);
 
-    const selectedImage = product.images.find((img: ProductImage) => img.id === selectedImageId) || product.images[0];
+    const selectedImage = product.images?.find((img: ProductImage) => img.id === selectedImageId) || product.images?.[0];
 
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(product.variants?.[0]);
 
