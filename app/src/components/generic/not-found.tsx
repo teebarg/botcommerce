@@ -4,7 +4,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 
-export default function NotFoundUI() {
+export default function NotFound() {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState<string>("");
 

@@ -1,10 +1,9 @@
 import type React from "react";
 import { useEffect } from "react";
-import NotFoundUI from "./not-found";
-import { cn } from "@/utils";
+import NotFound from "@/components/generic/not-found";
 import { createErrorFn } from "@/server/generic.server";
 
-const ServerError: React.FC<{ className?: string; error?: string; scenario?: string; stack?: string }> = ({ className, error, scenario, stack }) => {
+const ServerError: React.FC<{ error?: string; scenario?: string; stack?: string }> = ({ error, scenario, stack }) => {
     useEffect(() => {
         if (error) {
             const errorData = {
@@ -16,7 +15,7 @@ const ServerError: React.FC<{ className?: string; error?: string; scenario?: str
         }
     }, [error]);
 
-    return <NotFoundUI className={cn("h-full", className)} scenario="server" />;
+    return <NotFound />;
 };
 
 export default ServerError;
