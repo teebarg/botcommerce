@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as OfflineRouteImport } from './routes/offline'
+import { Route as MaintenanceRouteImport } from './routes/maintenance'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as MainLayoutRouteImport } from './routes/_mainLayout'
@@ -65,6 +66,11 @@ import { Route as MainLayoutOrderConfirmedIdRouteImport } from './routes/_mainLa
 const OfflineRoute = OfflineRouteImport.update({
   id: '/offline',
   path: '/offline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaintenanceRoute = MaintenanceRouteImport.update({
+  id: '/maintenance',
+  path: '/maintenance',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -335,6 +341,7 @@ const MainLayoutOrderConfirmedIdRoute =
 export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/checkout': typeof CheckoutRoute
+  '/maintenance': typeof MaintenanceRoute
   '/offline': typeof OfflineRoute
   '/home': typeof AuthLayoutHomeRoute
   '/account': typeof MainLayoutAccountRouteWithChildren
@@ -386,6 +393,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
+  '/maintenance': typeof MaintenanceRoute
   '/offline': typeof OfflineRoute
   '/home': typeof AuthLayoutHomeRoute
   '/bulk': typeof MainLayoutBulkRoute
@@ -440,6 +448,7 @@ export interface FileRoutesById {
   '/_mainLayout': typeof MainLayoutRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
   '/checkout': typeof CheckoutRoute
+  '/maintenance': typeof MaintenanceRoute
   '/offline': typeof OfflineRoute
   '/_authLayout/home': typeof AuthLayoutHomeRoute
   '/_mainLayout/account': typeof MainLayoutAccountRouteWithChildren
@@ -494,6 +503,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/admin'
     | '/checkout'
+    | '/maintenance'
     | '/offline'
     | '/home'
     | '/account'
@@ -545,6 +555,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/checkout'
+    | '/maintenance'
     | '/offline'
     | '/home'
     | '/bulk'
@@ -598,6 +609,7 @@ export interface FileRouteTypes {
     | '/_mainLayout'
     | '/admin'
     | '/checkout'
+    | '/maintenance'
     | '/offline'
     | '/_authLayout/home'
     | '/_mainLayout/account'
@@ -653,6 +665,7 @@ export interface RootRouteChildren {
   MainLayoutRoute: typeof MainLayoutRouteWithChildren
   AdminRoute: typeof AdminRouteWithChildren
   CheckoutRoute: typeof CheckoutRoute
+  MaintenanceRoute: typeof MaintenanceRoute
   OfflineRoute: typeof OfflineRoute
   ApiPushEventRoute: typeof ApiPushEventRoute
   PaymentVerifyRoute: typeof PaymentVerifyRoute
@@ -666,6 +679,13 @@ declare module '@tanstack/react-router' {
       path: '/offline'
       fullPath: '/offline'
       preLoaderRoute: typeof OfflineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/maintenance': {
+      id: '/maintenance'
+      path: '/maintenance'
+      fullPath: '/maintenance'
+      preLoaderRoute: typeof MaintenanceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -1167,6 +1187,7 @@ const rootRouteChildren: RootRouteChildren = {
   MainLayoutRoute: MainLayoutRouteWithChildren,
   AdminRoute: AdminRouteWithChildren,
   CheckoutRoute: CheckoutRoute,
+  MaintenanceRoute: MaintenanceRoute,
   OfflineRoute: OfflineRoute,
   ApiPushEventRoute: ApiPushEventRoute,
   PaymentVerifyRoute: PaymentVerifyRoute,

@@ -257,15 +257,18 @@
     --discount-sale: 0 85% 60%;
     --discount-sale-glow: 0 100% 70%;
 
-    --shadow-glow: 0 0 30px hsl(219 100% 53% / 0.2);
     --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.1);
     --shadow-discount: 0 4px 20px -2px;
     --shadow-intense: 0 8px 32px -4px;
+    --shadow-soft: 0 4px 24px -4px hsl(222 47% 11% / 0.08);
+    --shadow-glow: 0 0 40px hsl(35 92% 55% / 0.2);
 
     --gradient-sale: linear-gradient(135deg, hsl(0 85% 60%) 0%, hsl(14 100% 57%) 100%);
     --gradient-reward: linear-gradient(135deg, hsl(var(--secondary)) 0%, hsl(var(--accent)) 100%);
     --gradient-success: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--emerald-light)) 100%);
     --gradient-gold: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(var(--gold-light)) 50%, hsl(var(--gold)) 100%);
+    --gradient-warm: linear-gradient(135deg, hsl(35 92% 55% / 0.15), hsl(22 80% 50% / 0.1));
+    --gradient-hero: linear-gradient(180deg, hsl(40 33% 98%) 0%, hsl(40 30% 95%) 100%);
 
     --success: #10b981;
     --success-foreground: #ffffff;
@@ -294,6 +297,14 @@
     --error-foreground: 0 0% 100%;
     --error-light: 15 40% 15%;
     --error-border: 15 50% 30%;
+
+    --gradient-warm: linear-gradient(135deg, hsl(35 92% 55% / 0.1), hsl(22 80% 50% / 0.08));
+    --gradient-hero: linear-gradient(180deg, hsl(222 47% 8%) 0%, hsl(222 47% 6%) 100%);
+    --shadow-soft: 0 4px 24px -4px hsl(0 0% 0% / 0.3);
+    --shadow-glow: 0 0 40px hsl(35 92% 55% / 0.15);
+
+    --contrast: 43 74% 66%;
+    --contrast-foreground: 20 14.3% 4.1%;
 }
 
 :root[data-theme="default"] {
@@ -350,9 +361,6 @@
     --accent-foreground: 0 0% 96%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 96%;
-
-    /* --contrast: 43 74% 66%;
-    --contrast-foreground: 20 14.3% 4.1%; */
 
     --border: 0 0% 22%;
     --input: 0 0% 22%;

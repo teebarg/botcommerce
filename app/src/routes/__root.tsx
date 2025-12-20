@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-import { HeadContent, Outlet, ScriptOnce, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
+import { HeadContent, Outlet, ScriptOnce, Scripts, createRootRouteWithContext, redirect } from "@tanstack/react-router";
 import { Toaster } from "sonner";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
@@ -40,7 +40,10 @@ const fetchSession = createServerFn({ method: "GET" }).handler(async () => {
 });
 
 export const Route = createRootRouteWithContext<RouterContext>()({
-    beforeLoad: async ({}) => {
+    beforeLoad: async ({ location }) => {
+        if (process.env.MAINTENANCE_MODE === "true" && location.pathname !== "/maintenance") {
+            throw redirect({ to: "/maintenance" });
+        }
         const session = (await fetchSession()) as unknown as Session;
         const _storedTheme = await getStoredTheme();
         return {
