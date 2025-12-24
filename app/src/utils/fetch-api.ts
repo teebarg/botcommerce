@@ -42,6 +42,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
 
     if (response.status === 401 && from) {
         deleteCookie("authjs.session-token", { path: "/" });
+        deleteCookie("__Secure-authjs.session-token", { path: "/" });
 
         throw redirect({
             to: "/auth/signin",
