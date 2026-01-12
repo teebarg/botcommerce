@@ -8,6 +8,7 @@ import type { ProductVariant } from "@/schemas";
 import type { Product, ProductSearch } from "@/schemas/product";
 import { useCart } from "@/providers/cart-provider";
 import { isFirstWhatsAppMessage, markFirstWhatsAppMessageSent } from "@/utils/whatsapp-message-state";
+import { analytics } from "@/utils/pulsemetric";
 
 export const useProductVariant = (product: Product | ProductSearch) => {
     const { cart } = useCart();
@@ -160,6 +161,12 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         if (variantInCart) {
             updateQuantity({ item_id: variantInCart.id, quantity: variantInCart.quantity + quantity }).then(() => {
                 setIsAdded(true);
+                analytics.addToCart({
+                    product_id: product.id.toString(),
+                    product_name: product.name,
+                    quantity,
+                    price: selectedVariant.price,
+                });
             });
             setTimeout(() => setIsAdded(false), 3000);
 
@@ -170,6 +177,12 @@ export const useProductVariant = (product: Product | ProductSearch) => {
             quantity,
         }).then(() => {
             setIsAdded(true);
+            analytics.addToCart({
+                product_id: product.id.toString(),
+                product_name: product.name,
+                quantity,
+                price: selectedVariant.price,
+            });
         });
         setTimeout(() => setIsAdded(false), 3000);
     };

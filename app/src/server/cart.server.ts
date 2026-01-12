@@ -50,7 +50,7 @@ export const updateCartQuantityFn = createServerFn({ method: "POST" })
     )
     .handler(async ({ data: { item_id, quantity } }) => {
         const cartId = getCookie(CART_COOKIE);
-        return await api.put<Cart>(`/cart/items/${item_id}?quantity=${quantity}`, { headers: { cartId: cartId ?? "" } });
+        return await api.put<Cart>(`/cart/items/${item_id}?quantity=${quantity}`, {}, { headers: { cartId: cartId ?? "" } });
     });
 
 export const updateCartDetailsFn = createServerFn({ method: "POST" })

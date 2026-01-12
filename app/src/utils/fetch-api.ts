@@ -56,7 +56,20 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         });
     }
 
-    return response.json();
+    if (response.ok) {
+        return response.json();
+    }
+
+    let message = "Request failed";
+
+    try {
+        const errorBody = await response.json();
+        message = errorBody?.detail || errorBody?.message || errorBody?.error || message;
+    } catch {
+        message = response.statusText || message;
+    }
+
+    throw new Error(message);
 }
 
 export const api = {

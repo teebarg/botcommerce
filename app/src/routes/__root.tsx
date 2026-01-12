@@ -26,6 +26,8 @@ import { categoriesQuery } from "@/hooks/useCategories";
 import { collectionsQuery } from "@/hooks/useCollection";
 import { InvalidateProvider } from "@/providers/invalidate-provider";
 import { siteConfigQueryOptions } from "@/hooks/useGeneric";
+import { useEffect } from "react";
+import { initPulseMetrics } from "@/utils/pulsemetric";
 
 interface RouterContext {
     session: AuthSession | null;
@@ -113,6 +115,9 @@ function RootComponent() {
 function RootDocument({ children }: { children: React.ReactNode }) {
     const { _storedTheme } = Route.useRouteContext();
     const loaderData = Route.useLoaderData();
+    useEffect(() => {
+        initPulseMetrics();
+    }, []);
     return (
         <html suppressHydrationWarning>
             <head>
@@ -146,6 +151,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=false, viewport-fit=cover" />
                 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+                <script src="https://pub-f4e5ec522d104f0c94def43905ff791e.r2.dev/sdk.js" onError={(e) => console.error("Failed to load SDK:", e)} />
             </head>
             <body className="min-h-screen bg-background text-foreground">
                 <ThemeProvider initialTheme={_storedTheme}>

@@ -4,6 +4,7 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import type { CartItem } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useChangeCartQuantity, useDeleteCartItem } from "@/hooks/useCart";
+import { analytics } from "@/utils/pulsemetric";
 
 interface Props {
     item: CartItem;
@@ -15,6 +16,12 @@ const CartControl: React.FC<Props> = ({ item }) => {
 
     const onUpdateQuantity = async (id: number, quantity: number) => {
         await updateQuantity.mutateAsync({ item_id: id, quantity });
+        analytics.addToCart({
+            product_id: item.variant.product_id.toString(),
+            product_name: item.name,
+            quantity,
+            price: item.variant.price,
+        });
     };
 
     const removeItem = async (id: number) => {

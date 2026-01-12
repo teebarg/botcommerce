@@ -42,7 +42,7 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
                 <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
                     <Button
                         onClick={() => {
-                            router.invalidate();
+                            window.location.reload();
                         }}
                         className="gap-2 px-6 py-5 text-base font-medium"
                     >
