@@ -27,15 +27,18 @@ interface Props {
     parent_id?: number | null;
 }
 
-type ChildRef = {}
+type ChildRef = {};
 
 const CategoryForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, current, hasParent = false, parent_id = null }, ref) => {
     const isCreate = type === "create";
-    const defaultValues: CategoryFormValues = {
-        name: current?.name || "",
-        is_active: current?.is_active ?? true,
-        parent_id: hasParent && parent_id ? parent_id : (current?.parent_id ?? null),
-    };
+    const defaultValues = React.useMemo<CategoryFormValues>(
+        () => ({
+            name: current?.name || "",
+            is_active: current?.is_active ?? true,
+            parent_id: hasParent && parent_id ? parent_id : (current?.parent_id ?? null),
+        }),
+        [current, parent_id, hasParent]
+    );
 
     const form = useForm<CategoryFormValues>({
         resolver: zodResolver(CategoryFormSchema),
@@ -50,7 +53,7 @@ const CategoryForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
 
     useEffect(() => {
         reset(defaultValues);
-    }, [current, parent_id, defaultValues]);
+    }, [defaultValues, reset]);
 
     useEffect(() => {
         if (createMutation.isSuccess || updateMutation.isSuccess) {
