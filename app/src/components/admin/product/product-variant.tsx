@@ -199,12 +199,12 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
                                                         </Badge>
                                                     )}
                                                     {variant.measurement && (
-                                                        <Badge className="text-xs" variant="success">
+                                                        <Badge className="text-xs">
                                                             {variant.measurement}
                                                         </Badge>
                                                     )}
                                                     {variant.age && (
-                                                        <Badge className="text-xs" variant="success">
+                                                        <Badge className="text-xs" variant="emerald">
                                                             {variant.age}
                                                         </Badge>
                                                     )}
@@ -214,7 +214,7 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
                                                     {variant.old_price !== 0 && (
                                                         <span
                                                             className={cn(
-                                                                variant.old_price > variant.price ? "text-success" : "text-warning",
+                                                                variant.old_price > variant.price ? "text-emerald-600" : "text-warning",
                                                                 "text-xs"
                                                             )}
                                                         >

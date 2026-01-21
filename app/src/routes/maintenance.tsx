@@ -36,7 +36,7 @@ function RouteComponent() {
     ];
 
     return (
-        <div className="min-h-screen gradient-hero flex flex-col">
+        <div className="min-h-screen flex flex-col">
             <div className="fixed top-8 right-4">
                 <ThemeToggle />
             </div>

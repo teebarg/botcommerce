@@ -35,8 +35,8 @@ export function NewsletterForm() {
         return (
             <div className="bg-linear-to-r from-primary/20 via-secondary/20 to-accent/20 max-w-5xl mx-auto text-center rounded-2xl border border-input p-8 shadow-lg">
                 <div className="mb-6">
-                    <div className="w-16 h-16 bg-success rounded-full flex items-center justify-center mx-auto mb-4">
-                        <CheckCircle className="h-8 w-8 text-secondary" />
+                    <div className="w-16 h-16 bg-emerald-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <CheckCircle className="h-8 w-8 text-emerald-800" />
                     </div>
                     <h2 className="text-2xl font-bold mb-2">Welcome to the Club! 🎉</h2>
                     <p className="text-muted-foreground">You’re now subscribed to our newsletter. Check your inbox for a welcome email!</p>

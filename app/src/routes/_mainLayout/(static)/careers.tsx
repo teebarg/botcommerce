@@ -69,7 +69,7 @@ function RouteComponent() {
                         {`We're always interested in hearing from talented individuals. Send us your resume, and we'll keep you in mind for future
                           opportunities.`}
                     </p>
-                    <BtnLink href="#" size="lg" variant="success">
+                    <BtnLink href="#" size="lg" variant="emerald">
                         Submit Your Resume
                     </BtnLink>
                 </div>

@@ -196,7 +196,7 @@ export function ProductCreator() {
             };
 
             setLastPayload(payload);
-            await createBundleFn({data: payload});
+            await createBundleFn({ data: payload });
 
             toast.success("Product created successfully");
             setIsCompleted(true);
@@ -215,7 +215,7 @@ export function ProductCreator() {
         setIsLoading(true);
         try {
             setErrorMessage(null);
-            await createBundleFn({data: lastPayload});
+            await createBundleFn({ data: lastPayload });
             toast.success("Product created successfully");
             setIsCompleted(true);
             clearDraft();
@@ -254,10 +254,10 @@ export function ProductCreator() {
                     <h2 className="text-2xl font-bold mb-4 text-card-foreground">Product Created!</h2>
                     <p className="text-muted-foreground mb-6">{`Your product "${product.name}" has been successfully created.`}</p>
                     <div className="flex gap-2">
-                        <Button className="w-full" variant="success" onClick={() => window.location.reload()}>
+                        <Button className="w-full" variant="emerald" onClick={() => window.location.reload()}>
                             Create Another Product
                         </Button>
-                        <Button className="w-full" onClick={() => navigate({to: "/admin/products"})}>
+                        <Button className="w-full" onClick={() => navigate({ to: "/admin/gallery" })}>
                             Go To Products
                         </Button>
                     </div>

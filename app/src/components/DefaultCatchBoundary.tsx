@@ -23,7 +23,7 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
                             <div className="relative">
                                 <ShoppingCart className="w-20 h-20 text-muted-foreground/40" strokeWidth={1.5} />
                                 <div className="absolute -top-1 -right-1 bg-error rounded-full p-1.5 animate-bounce-gentle">
-                                    <AlertCircle className="w-5 h-5 text-error-foreground" />
+                                    <AlertCircle className="w-5 h-5 text-primary-foreground" />
                                 </div>
                             </div>
                         </div>

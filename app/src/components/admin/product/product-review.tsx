@@ -131,7 +131,7 @@ export function ProductReview({ product }: ProductReviewProps) {
                                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                                 <span>{currency(variant.price)}</span>
                                                 {variant.old_price !== 0 && (
-                                                    <span className={variant.old_price > variant.price ? "text-success" : "text-warning"}>
+                                                    <span className={variant.old_price > variant.price ? "text-emerald-600" : "text-warning"}>
                                                         {variant.old_price > variant.price ? "+" : ""}
                                                         {currency(variant.old_price)}
                                                     </span>

@@ -43,27 +43,27 @@ const orderStatusMap = {
         color: "bg-contrast",
     },
     SHIPPED: {
-        icon: <Package className="h-5 w-5 text-white" />,
+        icon: <Package className="h-5 w-5 text-secondary-foreground" />,
         label: "Order Packed",
-        color: "bg-primary",
+        color: "bg-secondary",
     },
     OUT_FOR_DELIVERY: {
-        icon: <Truck className="h-5 w-5 text-white" />,
+        icon: <Truck className="h-5 w-5 text-primary-foreground" />,
         label: "Out for Delivery",
         color: "bg-primary",
     },
     DELIVERED: {
         icon: <PackageCheck className="h-5 w-5 text-white" />,
         label: "Delivered",
-        color: "bg-success",
+        color: "bg-emerald-700",
     },
     CANCELED: {
-        icon: <XCircle className="h-5 w-5 text-white" />,
+        icon: <XCircle className="h-5 w-5 text-destructive-foreground" />,
         label: "Cancelled",
         color: "bg-destructive",
     },
     REFUNDED: {
-        icon: <RotateCcw className="h-5 w-5 text-white" />,
+        icon: <RotateCcw className="h-5 w-5 text-destructive-foreground" />,
         label: "Refunded",
         color: "bg-destructive",
     },

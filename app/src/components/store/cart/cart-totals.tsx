@@ -58,8 +58,8 @@ const CartTotals: React.FC = () => {
                     {!!discount_amount && (
                         <div className="flex justify-between">
                             <dt className="text-sm text-muted-foreground">Discount</dt>
-                            <dd className="text-sm font-semibold text-success">
-                                <span className="text-green-500" data-testid="cart-discount" data-value={discount_amount || 0}>
+                            <dd className="text-sm font-semibold">
+                                <span className="text-emerald-600" data-testid="cart-discount" data-value={discount_amount || 0}>
                                     - {currency(discount_amount)}
                                 </span>
                             </dd>

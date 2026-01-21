@@ -17,57 +17,49 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
     const statusConfig: Record<
         "PENDING" | "PROCESSING" | "SHIPPED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELED" | "REFUNDED",
         {
-            color: string;
             label: string;
             nextStatus: OrderStatus | null;
             actionLabel: string;
-            variant: "default" | "destructive" | "outline" | "secondary" | "success" | "warning" | "contrast";
+            variant: "default" | "destructive" | "outline" | "secondary" | "emerald" | "warning" | "contrast";
         }
     > = {
         REFUNDED: {
-            color: "bg-destructive/20 text-destructive",
             label: "Refunded",
             nextStatus: null,
             actionLabel: "",
             variant: "destructive",
         },
         PENDING: {
-            color: "bg-warning/20 text-warning",
             label: "Pending",
             nextStatus: "PROCESSING" as const,
             actionLabel: "Mark as Processing",
             variant: "warning",
         },
         PROCESSING: {
-            color: "bg-contrast text-contrast-foreground",
             label: "Processing",
             nextStatus: "SHIPPED" as const,
             actionLabel: "Order Packed",
             variant: "contrast",
         },
         SHIPPED: {
-            color: "bg-cyan-200 text-cyan-800",
             label: "Order Packed",
             nextStatus: "OUT_FOR_DELIVERY" as const,
             actionLabel: "Mark Out for Delivery",
             variant: "outline",
         },
         OUT_FOR_DELIVERY: {
-            color: "bg-success/20 text-success",
             label: "Out for Delivery",
             nextStatus: "DELIVERED" as const,
             actionLabel: "Mark Delivered",
-            variant: "default",
+            variant: "secondary",
         },
         DELIVERED: {
-            color: "bg-success/20 text-success",
             label: "Delivered",
             nextStatus: null,
             actionLabel: "",
-            variant: "destructive",
+            variant: "emerald",
         },
         CANCELED: {
-            color: "bg-destructive/20 text-destructive",
             label: "Cancelled",
             nextStatus: null,
             actionLabel: "",
