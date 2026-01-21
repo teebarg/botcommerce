@@ -23,12 +23,12 @@ export const CategoryFormSchema = z.object({
 });
 
 const UpdateCategorySchema = z.object({
-    id: z.string(),
+    id: z.number(),
     data: CategoryFormSchema,
 });
 
 const UpdateCategoryImageSchema = z.object({
-    id: z.string(),
+    id: z.number(),
     file: z.string(),
     file_name: z.string(),
     content_type: z.string(),

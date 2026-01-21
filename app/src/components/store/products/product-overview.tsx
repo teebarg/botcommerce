@@ -14,6 +14,7 @@ import { ImageDownloadButton } from "@/components/store/image-download";
 import MediaDisplay from "@/components/media-display";
 import ImageDisplay from "@/components/image-display";
 import { useRouteContext } from "@tanstack/react-router";
+import { analytics } from "@/utils/pulsemetric";
 
 const ProductOverview: React.FC<{
     product: ProductSearch;
@@ -52,6 +53,12 @@ const ProductOverview: React.FC<{
 
     useEffect(() => {
         const startTime = Date.now();
+
+        analytics.productView({
+            product_id: product.id.toString(),
+            product_name: product.name,
+            price: selectedVariant?.price,
+        });
 
         return () => {
             const timeSpent = Date.now() - startTime;
@@ -210,8 +217,8 @@ const ProductOverview: React.FC<{
                                         isSelected
                                             ? "bg-primary text-primary-foreground"
                                             : available
-                                              ? "bg-card hover:bg-accent"
-                                              : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
+                                            ? "bg-card hover:bg-accent"
+                                            : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
                                     )}
                                     disabled={!available}
                                     onClick={() => available && toggleAgeSelect(age)}

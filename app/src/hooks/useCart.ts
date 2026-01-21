@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import type { Cart, CartComplete, CartUpdate } from "@/schemas";
 import { useNavigate } from "@tanstack/react-router";
 import { addToCartFn, completeCartFn, deleteCartItemFn, getCartFn, updateCartDetailsFn, updateCartQuantityFn } from "@/server/cart.server";
+import { analytics } from "@/utils/pulsemetric";
 
 export const useMyCart = () => {
     return useQuery({
@@ -16,7 +17,8 @@ export const useAddToCart = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ variant_id, quantity }: { variant_id: number; quantity: number }) => await addToCartFn({ data: { variant_id, quantity } }),
+        mutationFn: async ({ variant_id, quantity }: { variant_id: number; quantity: number }) =>
+            await addToCartFn({ data: { variant_id, quantity } }),
         onMutate: async ({ variant_id, quantity }) => {
             await queryClient.cancelQueries({ queryKey: ["cart"] });
 
@@ -65,7 +67,8 @@ export const useChangeCartQuantity = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ item_id, quantity }: { item_id: number; quantity: number }) => await updateCartQuantityFn({ data: { item_id, quantity } }),
+        mutationFn: async ({ item_id, quantity }: { item_id: number; quantity: number }) =>
+            await updateCartQuantityFn({ data: { item_id, quantity } }),
         onMutate: async ({ item_id, quantity }) => {
             await queryClient.cancelQueries({ queryKey: ["cart"] });
 
@@ -136,6 +139,10 @@ export const useCompleteCart = () => {
         mutationFn: async (complete: CartComplete) => await completeCartFn({ data: complete }),
         onSuccess: async (data) => {
             navigate({ to: `/order/confirmed/${data?.order_number}` });
+            analytics.checkout({
+                cart_value: data?.total,
+                item_count: data?.order_items?.length,
+            });
             toast.success("Order placed successfully");
         },
         onError: (error: any) => {

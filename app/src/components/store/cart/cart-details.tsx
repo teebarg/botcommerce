@@ -27,7 +27,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
                 </div>
             </div>
 
-            {cart?.items?.length && (
+            {cart?.items && cart?.items?.length > 0 && (
                 <p className="bg-card text-card-foreground p-2 rounded flex gap-2 mx-4 mt-4" data-testid="urgentMessage-read">
                     <Info />
                     <span className="text-sm">
@@ -36,7 +36,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
                 </p>
             )}
 
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 overflow-y-auto p-4 mt-4">
                 {!cart || cart?.items?.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-64 text-center">
                         <ShoppingCart className="h-24 w-24 text-muted-foreground mb-4" />
@@ -55,7 +55,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
                 )}
             </div>
 
-            {cart?.items?.length && (
+            {cart?.items && cart?.items?.length > 0 && (
                 <div className="p-4 space-y-3">
                     <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Subtotal</span>
