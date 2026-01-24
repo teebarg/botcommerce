@@ -29,7 +29,7 @@ export const getRouter = () => {
     setupRouterSsrQueryIntegration({ router, queryClient: rqContext.queryClient });
 
     router.subscribe("onLoad", ({ toLocation }) => {
-        analytics.pageView();
+        analytics.pageView(toLocation.href);
     });
 
     return router;

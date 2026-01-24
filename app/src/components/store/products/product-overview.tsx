@@ -54,6 +54,8 @@ const ProductOverview: React.FC<{
     useEffect(() => {
         const startTime = Date.now();
 
+        if (!selectedVariant?.price) return;
+
         analytics.productView({
             product_id: product.id.toString(),
             product_name: product.name,
@@ -65,7 +67,7 @@ const ProductOverview: React.FC<{
 
             handleUserInteraction("VIEW", { timeSpent: timeSpent.toString() });
         };
-    }, [session?.id, product?.id]);
+    }, [session?.id, product?.id, selectedVariant?.price]);
 
     const handleAddToCartAndTrack = () => {
         handleUserInteraction("CART_ADD");
@@ -217,8 +219,8 @@ const ProductOverview: React.FC<{
                                         isSelected
                                             ? "bg-primary text-primary-foreground"
                                             : available
-                                            ? "bg-card hover:bg-accent"
-                                            : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
+                                              ? "bg-card hover:bg-accent"
+                                              : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
                                     )}
                                     disabled={!available}
                                     onClick={() => available && toggleAgeSelect(age)}

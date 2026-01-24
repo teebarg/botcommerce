@@ -58,9 +58,9 @@ export const trackEvent = (eventType: EventType, properties: EventPayload) => {
 };
 
 export const analytics = {
-    pageView: () => {
+    pageView: (href: string) => {
         trackEvent("page_view", {
-            page: window.location.pathname,
+            page: href,
             title: document.title,
             referrer: document.referrer,
         });
