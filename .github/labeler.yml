@@ -1,6 +1,6 @@
 Frontend:
 - changed-files:
-  - any-glob-to-any-file: frontend/**
+  - any-glob-to-any-file: app/**
 
 
 Backend:
