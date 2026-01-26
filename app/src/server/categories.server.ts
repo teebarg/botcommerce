@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { Category, Message } from "@/schemas";
+import { ProductSearchSchema, type Category, type Message } from "@/schemas";
 import { api } from "@/utils/fetch-api";
 
 const ReorderCategoriesSchema = z.object({
@@ -33,6 +33,24 @@ const UpdateCategoryImageSchema = z.object({
     file_name: z.string(),
     content_type: z.string(),
 });
+
+
+export const CategoriesProductsSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    slug: z.string(),
+    products: z.array(ProductSearchSchema),
+    created_at: z.string(),
+    updated_at: z.string(),
+});
+
+export type CategoriesWithProducts = z.infer<typeof CategoriesProductsSchema>;
+
+export const getCategoriesProductsFn = createServerFn()
+    .handler(async () => {
+        const res = await api.get<CategoriesWithProducts[]>("/category/home/products");
+        return res;
+    });
 
 
 export const getCategoriesFn = createServerFn({ method: "GET" })

@@ -1,176 +1,212 @@
-# ⚡ Revoque — Modern E-Commerce Platform
+# BotCommerce
 
-Revoque is a full-featured e-commerce platform built with **Next.js** and **FastAPI**, designed for performance, scalability, and smooth shopping experiences. It uses **multi-tier caching**, **real-time revalidation**, **fast full-text search**, and **AI-powered retrieval-augmented generation (RAG)** to deliver highly responsive storefront interactions.
+BotCommerce is an e-commerce platform with:
+
+- **Frontend**: **TanStack Start** app in `app/` (React 19, TanStack Router/Query, Vite)
+- **Backend**: **FastAPI** service in `backend/` (PostgreSQL, Redis cache, Meilisearch search)
+- **Worker**: **Celery** tasks in `worker/` (async jobs: indexing, notifications, embeddings, exports)
+
+This repo previously had a different storefront; the active storefront is **TanStack Start in `app/`**.
 
 ---
 
-## 🏗️ Architecture Overview
+## Architecture (high level)
 
 ![Architecture Diagram](./architecture.png)
 
-**Key Highlights**
-- **Next.js App Router** — SSR, ISR revalidation, and SWR caching
-- **FastAPI Backend** — optimized Python APIs
-- **Redis Cache** — sessions, carts & cached API responses
-- **PostgreSQL** — primary data authority (products, orders, users)
-- **Meilisearch** — Instant product search with filters
-- **Qdrant** — vector search for semantic similarity (product embeddings)
-- **Supabase Storage** — product images, invoice files, exports
-- **Celery** — background tasks (embedding generation, indexing, exports, notifications)
-- **Gemini (LLM)** — conversational AI assistant using RAG
-- **CDN Cache** (Vercel/Cloudflare) — global static asset delivery
+- **HTTP API**: FastAPI serves under **`/api/*`** (config: `backend/app/core/config.py` → `API_V1_STR="/api"`).
+- **Search**: Meilisearch is used for fast catalog queries and faceting.
+- **Cache/session**: Redis for caching, carts/sessions, and as the Celery broker.
+- **DB**: PostgreSQL is the system of record.
+- **Optional services**: Qdrant / vector search are present in code but not enabled in the default `docker-compose.yml`.
 
 ---
 
-## ✨ Features
+## Repo layout
 
-- 🔐 Secure authentication & authorization
-- 🛒 Persistent cart & smooth checkout flow
-- ⚡ SWR + CDN + Redis multi-level caching
-- 🔍 Real-time full-text product search (Meilisearch)
-- 🤖 AI-powered product discovery & conversational assistant (Gemini + Qdrant)
-  - Semantic "related products" via SentenceTransformers → Qdrant
-  - RAG conversational assistant: Meilisearch + Qdrant + DB retrieval → Gemini
-- 🧾 PDF invoice generation & storage on Supabase
-- 🔄 Background task processing with Celery
-- 📦 Bulk product import/export via spreadsheet
-- 💳 Payment integration with **Paystack**
-
----
-
-## 🧰 Tech Stack
-
-### Frontend
-- **Next.js** (App Router)
-- **React**
-- **TailwindCSS**
-- **SWR / React Query**
-
-### Backend
-- **FastAPI**
-- **PostgreSQL**
-- **Redis**
-- **Celery + Redis broker**
-- **Meilisearch**
-- **Qdrant**
-- **SentenceTransformers**
-- **Gemini API**
-- **Supabase Storage**
-
----
-
-## 🚀 Getting Started
-
-### ✅ Prerequisites
-- Node.js ≥ 18
-- Python ≥ 3.11
-- PostgreSQL
-- Redis
-- Meilisearch
-- Qdrant
-- Supabase Project (for storage buckets)
-- Paystack account (for payments)
-
----
-
-### 📦 Installation
-
-1. Clone repo
-```sh
-git clone https://github.com/teebarg/botcommerce.git
-cd botcommerce
+```
+botcommerce/
+├── app/                # TanStack Start storefront (the frontend)
+├── backend/             # FastAPI API service
+├── worker/              # Celery worker (optional in local dev)
+├── docker-compose.yml   # Dev infra (traefik, postgres, redis, meilisearch, backend)
+├── Makefile             # Common dev commands
+└── README.md
 ```
 
-2. Install frontend
+---
+
+## Quickstart (local dev)
+
+### Prerequisites
+
+- Node.js 18+
+- pnpm
+- Python 3.11+
+- uv (`https://github.com/astral-sh/uv`)
+- Postgres + Redis + Meilisearch (or use Docker Compose below)
+
+### Install
+
+Frontend:
+
 ```sh
-cd frontend
-npm install
+cd app
+pnpm install
 ```
 
-3. Install backend
+Backend:
+
 ```sh
-cd ../backend
+cd backend
 uv sync
 ```
 
-4. Add environment variables
-Create `.env` in both `frontend` and `backend` using `.env.example` as a guide. Key entries include:
-- `DATABASE_URL` (Postgres)
-- `REDIS_URL`
-- `MEILISEARCH_URL`
-- `QDRANT_URL` and `QDRANT_API_KEY` (if used)
-- `SUPABASE_URL` and `SUPABASE_KEY`
-- `PAYSTACK_SECRET`
-- `GEMINI_API_KEY` (or appropriate LLM key)
+Worker (optional):
 
-5. Create Supabase Storage buckets
-| Bucket | Purpose |
-|--------|---------|
-| `images` | Product images |
-| `exports` | Exported XLSX files |
-| `invoices` | Order invoice PDFs |
+```sh
+cd worker
+uv sync
+```
 
-> Ensure **public read access** is enabled ⚠️ (or generate signed URLs if you prefer restricted access)
+### Configure env
 
----
+There are no committed `.env.example` files in this repo. Create these locally:
 
-### ▶️ Running the App (development)
+#### `app/.env`
 
-Start the backend:
+- **`API_URL`**: base URL of the backend (default in code is `http://localhost.dev`, so set this)
+  - Local backend: `API_URL=http://localhost:8000`
+  - Docker backend via Traefik: `API_URL=http://api.localhost:7000` (see Docker section)
+- (Optional) **`VITE_BASE_URL`**, **`VITE_WS`**, **`VITE_CONTACT_EMAIL`**, **`VITE_VAPID_PUBLIC_KEY`**: used in a few UI features and share links.
+
+#### `backend/.env`
+
+Minimum you’ll usually want:
+
+- `DATABASE_URL=postgresql://...`
+- `REDIS_URL=redis://...`
+- `MEILI_HOST=http://...`
+- `MEILI_MASTER_KEY=...`
+- `FRONTEND_HOST=http://localhost:5173` (important: backend CORS allowlist uses this)
+
+### Run
+
+From repo root, if you have `make`:
+
+```sh
+make dev
+```
+
+If you don’t have `make` (common on Windows), run in two terminals:
+
 ```sh
 cd backend
-uvicorn main:app --reload
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Start the frontend:
 ```sh
-cd frontend
-npm run dev
+cd app
+pnpm dev
 ```
 
-Visit 👉 http://localhost:3000
+Optional worker:
+
+```sh
+cd worker
+celery -A celery_app.celery_app worker -l info
+```
+
+### URLs
+
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:8000`
+- Backend docs: `http://localhost:8000/api/docs`
 
 ---
 
-## 🧠 AI — Hybrid Search & RAG
+## Quickstart (Docker Compose)
 
-This project uses a hybrid search pattern combining Meilisearch (keyword + filters) and Qdrant (semantic vector similarity) to support both fast keyword search and human-like semantic queries.
+`docker-compose.yml` is primarily for infra + backend. The `app` container is currently **commented out**.
 
-**Pipeline summary:**
-1. Product embedding generation (SentenceTransformers) runs as a Celery job when products are created/updated.
-2. Embeddings are stored in Qdrant for nearest-neighbor similarity queries ("Related Products").
-3. For AI chat, FastAPI retrieves relevant contexts from:
-   - Meilisearch (top keyword matches)
-   - Qdrant (top semantically-similar documents/products)
-   - PostgreSQL (product metadata, FAQs)
-4. Retrieved context is packaged and sent to **Gemini** (RAG) to produce a concise, conversational response.
+Start dev stack:
 
-**Notes & best practices:**
-- Keep embedding vector dimensionality and Qdrant index configuration consistent across updates.
-- Use chunking for long product descriptions to improve retrieval relevance.
-- Apply rate-limiting and caching for LLM calls to control cost and latency.
+```sh
+make up
+```
+
+Useful endpoints (from compose ports):
+
+- Traefik dashboard: `http://localhost:7001` (router host: `http://traefik.localhost`)
+- Backend (direct port): `http://localhost:7002`
+- Backend (via Traefik host rule): `http://api.localhost:7000`
+- Meilisearch: `http://localhost:7005` (or `http://meilisearch.localhost:7000`)
+- Adminer: `http://localhost:7006` (or `http://adminer.localhost:7000`)
+- Redis: `localhost:7007`
+- RedisInsight: `http://localhost:7008` (or `http://redisinsight.localhost:7000`)
+- Postgres: `localhost:7004`
+
+Then run the frontend locally:
+
+```sh
+cd app
+pnpm dev
+```
+
+and set `app/.env`:
+
+```
+API_URL=http://api.localhost:7000
+```
 
 ---
 
-## 🛠️ Operational Notes
-- Celery uses Redis as broker in this setup: ensure worker(s) are running for async jobs.
-- Meilisearch and Qdrant should be monitored for index health and storage usage.
-- Supabase storage policies: consider signed URLs for private downloads.
+## API surface (major route groups)
+
+The API is under `/api/*` and is composed of routers in `backend/app/api/routes/`.
+
+Common paths:
+
+- `/api/auth/*`
+- `/api/product/*`
+- `/api/category/*` (includes `/api/category/home/products`)
+- `/api/collection/*`
+- `/api/cart/*`
+- `/api/order/*`
+- `/api/payment/*`
+- `/api/users/*`
+- `/api/chat/*`
+- `/api/reviews/*`
+- `/api/coupon/*`
 
 ---
 
-## 🤝 Contributing
-Contributions are welcome! See: [CONTRIBUTING.md](CONTRIBUTING.md)
+## Developer ergonomics
+
+### Make targets
+
+- `make dev`: run backend + app (uses `uvicorn` + `pnpm dev`)
+- `make serve-backend`: backend only
+- `make serve-app`: app only
+- `make lint-backend`, `make test-backend`: backend quality gates
+- `make up`, `make stop`, `make logs service=backend`: docker compose helpers
+
+### Conventions
+
+- Frontend server calls use TanStack Start `createServerFn` (see `app/src/server/*`).
+- API client base URL is configured by `process.env.API_URL` (see `app/src/utils/fetch-api.ts`).
 
 ---
 
-## 📄 License
-Distributed under the **MIT License**. See: [LICENSE](LICENSE)
+## Troubleshooting
+
+- **CORS errors**: set `FRONTEND_HOST=http://localhost:5173` in backend env; restart backend.
+- **Frontend can’t reach backend**: ensure `app/.env` sets `API_URL` to the backend base URL.
+- **Meilisearch auth failures**: confirm `MEILI_MASTER_KEY` matches the container (compose uses `"secret"` by default).
 
 ---
 
-## 📬 Contact
-For inquiries: **teebarg01@gmail.com**
+## License
 
-
+MIT — see `LICENSE`.
 

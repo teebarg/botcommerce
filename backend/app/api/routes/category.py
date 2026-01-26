@@ -1,6 +1,6 @@
 from typing import Optional
 
-from app.models.category import Category, CategoryCreate, CategoryUpdate
+from app.models.category import Category, CategoryCreate, CategoryUpdate, CategoryWithProducts
 from app.models.generic import Message
 from app.core.utils import slugify
 from fastapi import (APIRouter, Depends, HTTPException, Request)
@@ -20,6 +20,19 @@ router = APIRouter()
 
 class Search(BaseModel):
     results: list[Category]
+
+
+@router.get("/home/products")
+@cache_response(key_prefix="products", key="home")
+async def get_home_categories_products(request: Request) -> list[CategoryWithProducts]:
+    categories = await db.category.find_many(
+        where={"is_active": True, "parent_id": None},
+        order={"display_order": "asc"},
+        include={"products": {"include": {"variants": True, "images": True}, "take": 6}},
+        take=4
+    )
+
+    return categories
 
 @router.get("/")
 @cache_response(key_prefix="categories")

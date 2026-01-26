@@ -1,7 +1,19 @@
 from app.models.base import BM
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
+from prisma.models import ProductImage, ProductVariant
 
+class Product(BaseModel):
+    id: int
+    name: Optional[str] = None
+    sku: Optional[str] = None
+    slug: str
+    description: Optional[str] = None
+    image: Optional[str] = None
+    variants: Optional[List[ProductVariant]] = None
+    images: Optional[List[ProductImage]] = []
+    active: Optional[bool] = True
+    is_new: Optional[bool] = False
 
 class CategoryBase(BM):
     name: str = Field(..., min_length=1, description="Name is required")
@@ -32,6 +44,12 @@ class CategoryUpdate(BaseModel):
     is_active: Optional[bool] = None
     parent_id: Optional[int] = None
     display_order: Optional[int] = None
+
+class CategoryWithProducts(BaseModel):
+    id: int
+    name: Optional[str] = None
+    slug: str = Field(..., min_length=1)
+    products: Optional[list[Product]] = None
 
 
 class Search(BaseModel):

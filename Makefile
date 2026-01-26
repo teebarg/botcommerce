@@ -42,27 +42,9 @@ clean:
 lint-backend:
 	@cd backend && ./scripts/lint.sh
 
-.PHONY: lint-frontend
-lint-frontend:
-	@cd frontend && npm run lint
-
-.PHONY: lint
-lint:
-	@$(MAKE) -s lint-backend
-	@$(MAKE) -s lint-frontend
-
-.PHONY: test-frontend
-test-frontend:
-	@cd frontend && npm run test:unit
-
 .PHONY: test-backend
 test-backend:
 	@cd backend && ./scripts/test.sh
-
-.PHONY: test
-test:
-	@$(MAKE) -s test-frontend
-	@$(MAKE) -s test-backend
 
 .PHONY: prep
 prep:
@@ -75,11 +57,6 @@ prep-docker:
 .PHONY: serve-backend
 serve-backend:
 	@cd backend; uvicorn app.main:app --host 0.0.0.0 --reload --workers 4
-
-.PHONY: serve-frontend
-serve-frontend:
-	@cd frontend; npm run dev-https
-
 
 .PHONY: serve-app
 serve-app:
@@ -100,25 +77,6 @@ deploy:
 .PHONY: scaffold
 scaffold:
 	@cd scripts && python scaffold.py run -n $(name)
-
-.PHONY: pre-commit
-pre-commit:
-	npx concurrently --kill-others-on-fail --prefix "[{name}]" --names "frontend:lint,frontend:build,backend:lint,backend:test" \
-	--prefix-colors "bgRed.bold.white,bgGreen.bold.white,bgBlue.bold.white,bgMagenta.bold.white" \
-    "cd frontend && npm run lint:check" \
-    "cd frontend && npm run build" \
-	"cd backend && ./scripts/lint.sh" \
-	"cd backend && ./scripts/test.sh"
-
-.PHONY: pre-commit-docker
-pre-commit-docker:
-	npx concurrently --kill-others-on-fail --prefix "[{name}]" --names "frontend:lint,frontend:test,frontend:build,backend:lint,backend:test" \
-	--prefix-colors "bgRed.bold.white,bgGreen.bold.white,bgBlue.bold.white,bgMagenta.bold.white" \
-    "docker exec shop-frontend-1 npm run lint:check" \
-    "docker exec shop-frontend-1 npm run test:unit" \
-    "docker exec shop-frontend-1 npm run build" \
-	"docker exec shop-backend-1 ./scripts/lint.sh" \
-	"docker exec shop-backend-1 ./scripts/test.sh"
 
 .PHONY: stage
 stage: docker-build docker-push

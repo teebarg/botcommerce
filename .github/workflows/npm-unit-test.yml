@@ -24,10 +24,10 @@ jobs:
       uses: actions/setup-node@v6
       with:
         node-version: 18
-        cache: 'npm'
-        cache-dependency-path: frontend/package-lock.json
+        cache: 'pnpm'
+        cache-dependency-path: app/package-lock.json
     - name: NPM Unit Tests
       run: |
-        cd frontend
-        # npm install
-        # npm run test
+        cd app
+        # pnpm install
+        # pnpm run test

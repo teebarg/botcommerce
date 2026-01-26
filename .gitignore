@@ -20,10 +20,6 @@ __debug_bin
 jsconfig.json
 *.code-workspace
 *.bkp
-frontend/node_modules
-frontend/build
-frontend/dist
-frontend/dev-dist
 .vercel
 
 meilisearch-data
