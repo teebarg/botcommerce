@@ -44,6 +44,7 @@ import { Route as AdminadminActivitiesRouteImport } from './routes/admin/(admin)
 import { Route as MainLayoutSharedSlugRouteImport } from './routes/_mainLayout/shared.$slug'
 import { Route as MainLayoutSearchQueryRouteImport } from './routes/_mainLayout/search.$query'
 import { Route as MainLayoutProductsSlugRouteImport } from './routes/_mainLayout/products.$slug'
+import { Route as MainLayoutCollectionsFeatureRouteImport } from './routes/_mainLayout/collections/feature'
 import { Route as MainLayoutCollectionsSlugRouteImport } from './routes/_mainLayout/collections/$slug'
 import { Route as MainLayoutAccountProfileRouteImport } from './routes/_mainLayout/account/profile'
 import { Route as MainLayoutAccountOrdersRouteImport } from './routes/_mainLayout/account/orders'
@@ -238,6 +239,12 @@ const MainLayoutProductsSlugRoute = MainLayoutProductsSlugRouteImport.update({
   path: '/products/$slug',
   getParentRoute: () => MainLayoutRoute,
 } as any)
+const MainLayoutCollectionsFeatureRoute =
+  MainLayoutCollectionsFeatureRouteImport.update({
+    id: '/collections/feature',
+    path: '/collections/feature',
+    getParentRoute: () => MainLayoutRoute,
+  } as any)
 const MainLayoutCollectionsSlugRoute =
   MainLayoutCollectionsSlugRouteImport.update({
     id: '/collections/$slug',
@@ -369,6 +376,7 @@ export interface FileRoutesByFullPath {
   '/account/orders': typeof MainLayoutAccountOrdersRoute
   '/account/profile': typeof MainLayoutAccountProfileRoute
   '/collections/$slug': typeof MainLayoutCollectionsSlugRoute
+  '/collections/feature': typeof MainLayoutCollectionsFeatureRoute
   '/products/$slug': typeof MainLayoutProductsSlugRoute
   '/search/$query': typeof MainLayoutSearchQueryRoute
   '/shared/$slug': typeof MainLayoutSharedSlugRoute
@@ -420,6 +428,7 @@ export interface FileRoutesByTo {
   '/account/orders': typeof MainLayoutAccountOrdersRoute
   '/account/profile': typeof MainLayoutAccountProfileRoute
   '/collections/$slug': typeof MainLayoutCollectionsSlugRoute
+  '/collections/feature': typeof MainLayoutCollectionsFeatureRoute
   '/products/$slug': typeof MainLayoutProductsSlugRoute
   '/search/$query': typeof MainLayoutSearchQueryRoute
   '/shared/$slug': typeof MainLayoutSharedSlugRoute
@@ -476,6 +485,7 @@ export interface FileRoutesById {
   '/_mainLayout/account/orders': typeof MainLayoutAccountOrdersRoute
   '/_mainLayout/account/profile': typeof MainLayoutAccountProfileRoute
   '/_mainLayout/collections/$slug': typeof MainLayoutCollectionsSlugRoute
+  '/_mainLayout/collections/feature': typeof MainLayoutCollectionsFeatureRoute
   '/_mainLayout/products/$slug': typeof MainLayoutProductsSlugRoute
   '/_mainLayout/search/$query': typeof MainLayoutSearchQueryRoute
   '/_mainLayout/shared/$slug': typeof MainLayoutSharedSlugRoute
@@ -531,6 +541,7 @@ export interface FileRouteTypes {
     | '/account/orders'
     | '/account/profile'
     | '/collections/$slug'
+    | '/collections/feature'
     | '/products/$slug'
     | '/search/$query'
     | '/shared/$slug'
@@ -582,6 +593,7 @@ export interface FileRouteTypes {
     | '/account/orders'
     | '/account/profile'
     | '/collections/$slug'
+    | '/collections/feature'
     | '/products/$slug'
     | '/search/$query'
     | '/shared/$slug'
@@ -637,6 +649,7 @@ export interface FileRouteTypes {
     | '/_mainLayout/account/orders'
     | '/_mainLayout/account/profile'
     | '/_mainLayout/collections/$slug'
+    | '/_mainLayout/collections/feature'
     | '/_mainLayout/products/$slug'
     | '/_mainLayout/search/$query'
     | '/_mainLayout/shared/$slug'
@@ -919,6 +932,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainLayoutProductsSlugRouteImport
       parentRoute: typeof MainLayoutRoute
     }
+    '/_mainLayout/collections/feature': {
+      id: '/_mainLayout/collections/feature'
+      path: '/collections/feature'
+      fullPath: '/collections/feature'
+      preLoaderRoute: typeof MainLayoutCollectionsFeatureRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
     '/_mainLayout/collections/$slug': {
       id: '/_mainLayout/collections/$slug'
       path: '/collections/$slug'
@@ -1100,6 +1120,7 @@ interface MainLayoutRouteChildren {
   MainLayoutstaticShippingRoute: typeof MainLayoutstaticShippingRoute
   MainLayoutstaticTermsRoute: typeof MainLayoutstaticTermsRoute
   MainLayoutCollectionsSlugRoute: typeof MainLayoutCollectionsSlugRoute
+  MainLayoutCollectionsFeatureRoute: typeof MainLayoutCollectionsFeatureRoute
   MainLayoutProductsSlugRoute: typeof MainLayoutProductsSlugRoute
   MainLayoutSearchQueryRoute: typeof MainLayoutSearchQueryRoute
   MainLayoutSharedSlugRoute: typeof MainLayoutSharedSlugRoute
@@ -1122,6 +1143,7 @@ const MainLayoutRouteChildren: MainLayoutRouteChildren = {
   MainLayoutstaticShippingRoute: MainLayoutstaticShippingRoute,
   MainLayoutstaticTermsRoute: MainLayoutstaticTermsRoute,
   MainLayoutCollectionsSlugRoute: MainLayoutCollectionsSlugRoute,
+  MainLayoutCollectionsFeatureRoute: MainLayoutCollectionsFeatureRoute,
   MainLayoutProductsSlugRoute: MainLayoutProductsSlugRoute,
   MainLayoutSearchQueryRoute: MainLayoutSearchQueryRoute,
   MainLayoutSharedSlugRoute: MainLayoutSharedSlugRoute,

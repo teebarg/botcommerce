@@ -475,6 +475,49 @@
   }
 }
 
+@layer components {
+  .glass {
+    @apply bg-white/[0.08] backdrop-blur-xl border border-white/[0.12];
+  }
+
+  .glass-strong {
+    @apply bg-white/[0.15] backdrop-blur-2xl border border-white/[0.2];
+  }
+
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(350 89% 60%), hsl(280 100% 65%));
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, hsl(350 89% 60%), hsl(280 100% 65%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .action-button {
+    @apply w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300;
+    @apply bg-white/[0.1] backdrop-blur-lg hover:bg-white/[0.2] active:scale-90;
+  }
+
+  .product-card {
+    @apply relative w-full h-screen snap-start snap-always flex items-end;
+  }
+
+  .product-overlay {
+    @apply absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent;
+  }
+
+  .floating-nav {
+    @apply fixed bottom-0 left-0 right-0 glass-strong z-50;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .pulse-dot {
+    @apply w-2 h-2 rounded-full bg-primary animate-pulse;
+  }
+}
+
 @layer utilities {
   .top-safe {
     top: var(--safe-top);
