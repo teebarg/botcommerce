@@ -29,7 +29,7 @@ async def get_home_categories_products(request: Request) -> list[CategoryWithPro
     categories = await db.category.find_many(
         where={"is_active": True, "parent_id": None},
         order={"display_order": "asc"},
-        include={"products": {"include": {"variants": True, "images": True}, "take": 6}},
+        include={"products": {"include": {"variants": True, "images": True}, "take": 6, "orderBy": {"id": "desc"}}},
         take=4
     )
 
