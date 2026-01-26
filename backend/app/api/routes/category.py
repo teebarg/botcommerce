@@ -13,6 +13,7 @@ from app.prisma_client import prisma as db
 from app.services.redis import cache_response, invalidate_pattern
 from app.core.deps import get_current_superuser
 from app.core.logging import get_logger
+from app.services.product import prepare_product_data_for_indexing
 
 logger = get_logger(__name__)
 
@@ -31,6 +32,9 @@ async def get_home_categories_products(request: Request) -> list[CategoryWithPro
         include={"products": {"include": {"variants": True, "images": True}, "take": 6}},
         take=4
     )
+
+    for category in categories:
+        category.products = [prepare_product_data_for_indexing(product) for product in category.products]
 
     return categories
 

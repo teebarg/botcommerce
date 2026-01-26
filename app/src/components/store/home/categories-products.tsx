@@ -1,4 +1,4 @@
-import { CategoriesWithProducts } from "@/server/catalog.server";
+import { CategoriesWithProducts } from "@/server/categories.server";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import ProductCard from "../products/product-card";
 import { ProductSearch } from "@/schemas";
@@ -102,16 +102,16 @@ const ProductsCarousel = ({ name, slug, products }: { name: string; slug: string
             <div className="relative mx-auto flex max-w-[1400px] flex-col pb-4 pt-2">
                 <Button
                     aria-label="Scroll backward"
-                    className="carousel-nav-link absolute top-1/2 -translate-y-1/2 z-10 h-12 w-12 -left-6 hidden md:block"
+                    className="carousel-nav-link absolute top-1/2 -translate-y-1/2 z-10 h-12 w-12 -left-6 hidden md:flex"
                     size="icon"
                     onClick={() => scrollToIndex(scrollState.activeIndex - 1)}
                     disabled={scrollState.activeIndex <= 0}
                 >
-                    <ChevronLeft className="h-6 w-6" strokeWidth={2} />
+                    <ChevronLeft className="h-5 w-5" strokeWidth={2} />
                 </Button>
                 <Button
                     aria-label="Scroll forward"
-                    className="carousel-nav-link absolute top-1/2 -translate-y-1/2 z-10 h-12 w-12 -right-6 hidden md:block"
+                    className="carousel-nav-link absolute top-1/2 -translate-y-1/2 z-10 h-12 w-12 -right-6 hidden md:flex"
                     size="icon"
                     onClick={() => scrollToIndex(scrollState.activeIndex + 1)}
                     disabled={scrollState.activeIndex >= products.length - 1}
