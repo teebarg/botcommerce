@@ -15,7 +15,7 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
     console.error(error);
 
     return (
-        <div className="min-h-screen bg-background flex items-center justify-center p-4 relative transition-colors duration-300">
+        <div className="min-h-screen flex items-center justify-center p-4 relative transition-colors duration-300">
             <div className="max-w-md w-full text-center animate-fade-in">
                 <div className="relative mb-8">
                     <div className="w-32 h-32 mx-auto relative animate-float">
@@ -86,7 +86,7 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
 
                     <div className={`overflow-hidden transition-all duration-300 ${showDetails ? "max-h-40" : "max-h-0"}`}>
                         <div className="px-4 pb-4">
-                            <code className="block text-left text-sm bg-background/50 rounded-md p-3 text-error font-mono break-all border border-error-border/50">
+                            <code className="block text-left text-sm bg-muted rounded-md p-3 text-error font-mono break-all border border-error-border/50">
                                 <ErrorComponent error={error} />
                             </code>
                         </div>

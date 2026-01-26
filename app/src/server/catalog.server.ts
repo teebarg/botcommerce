@@ -1,4 +1,4 @@
-import type { Catalog } from "@/schemas";
+import { type Catalog } from "@/schemas";
 import { api } from "@/utils/fetch-api";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
