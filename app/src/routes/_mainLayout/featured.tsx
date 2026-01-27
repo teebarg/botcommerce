@@ -16,7 +16,7 @@ const productSearchSchema = z.object({
     ages: z.string().optional(),
 });
 
-export const Route = createFileRoute('/_mainLayout/collections/feature')({
+export const Route = createFileRoute("/_mainLayout/featured")({
     validateSearch: productSearchSchema,
     component: RouteComponent,
     beforeLoad: ({ search }) => {
@@ -27,8 +27,7 @@ export const Route = createFileRoute('/_mainLayout/collections/feature')({
     loader: async ({ context: { queryClient, search } }) => {
         await queryClient.ensureQueryData(productQueryOptions({ limit: 36, ...search }));
     },
-})
-
+});
 
 function RouteComponent() {
     const search = Route.useSearch();

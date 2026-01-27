@@ -21,6 +21,8 @@ import { Route as PaymentVerifyRouteImport } from './routes/payment.verify'
 import { Route as ApiPushEventRouteImport } from './routes/api/push-event'
 import { Route as AdminSharedRouteImport } from './routes/admin/shared'
 import { Route as MainLayoutWishlistRouteImport } from './routes/_mainLayout/wishlist'
+import { Route as MainLayoutFeaturedRouteImport } from './routes/_mainLayout/featured'
+import { Route as MainLayoutFeatureRouteImport } from './routes/_mainLayout/feature'
 import { Route as MainLayoutCartRouteImport } from './routes/_mainLayout/cart'
 import { Route as MainLayoutBulkRouteImport } from './routes/_mainLayout/bulk'
 import { Route as MainLayoutAccountRouteImport } from './routes/_mainLayout/account'
@@ -44,7 +46,6 @@ import { Route as AdminadminActivitiesRouteImport } from './routes/admin/(admin)
 import { Route as MainLayoutSharedSlugRouteImport } from './routes/_mainLayout/shared.$slug'
 import { Route as MainLayoutSearchQueryRouteImport } from './routes/_mainLayout/search.$query'
 import { Route as MainLayoutProductsSlugRouteImport } from './routes/_mainLayout/products.$slug'
-import { Route as MainLayoutCollectionsFeatureRouteImport } from './routes/_mainLayout/collections/feature'
 import { Route as MainLayoutCollectionsSlugRouteImport } from './routes/_mainLayout/collections/$slug'
 import { Route as MainLayoutAccountProfileRouteImport } from './routes/_mainLayout/account/profile'
 import { Route as MainLayoutAccountOrdersRouteImport } from './routes/_mainLayout/account/orders'
@@ -120,6 +121,16 @@ const AdminSharedRoute = AdminSharedRouteImport.update({
 const MainLayoutWishlistRoute = MainLayoutWishlistRouteImport.update({
   id: '/wishlist',
   path: '/wishlist',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+const MainLayoutFeaturedRoute = MainLayoutFeaturedRouteImport.update({
+  id: '/featured',
+  path: '/featured',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+const MainLayoutFeatureRoute = MainLayoutFeatureRouteImport.update({
+  id: '/feature',
+  path: '/feature',
   getParentRoute: () => MainLayoutRoute,
 } as any)
 const MainLayoutCartRoute = MainLayoutCartRouteImport.update({
@@ -239,12 +250,6 @@ const MainLayoutProductsSlugRoute = MainLayoutProductsSlugRouteImport.update({
   path: '/products/$slug',
   getParentRoute: () => MainLayoutRoute,
 } as any)
-const MainLayoutCollectionsFeatureRoute =
-  MainLayoutCollectionsFeatureRouteImport.update({
-    id: '/collections/feature',
-    path: '/collections/feature',
-    getParentRoute: () => MainLayoutRoute,
-  } as any)
 const MainLayoutCollectionsSlugRoute =
   MainLayoutCollectionsSlugRouteImport.update({
     id: '/collections/$slug',
@@ -354,6 +359,8 @@ export interface FileRoutesByFullPath {
   '/account': typeof MainLayoutAccountRouteWithChildren
   '/bulk': typeof MainLayoutBulkRoute
   '/cart': typeof MainLayoutCartRoute
+  '/feature': typeof MainLayoutFeatureRoute
+  '/featured': typeof MainLayoutFeaturedRoute
   '/wishlist': typeof MainLayoutWishlistRoute
   '/admin/shared': typeof AdminSharedRoute
   '/api/push-event': typeof ApiPushEventRoute
@@ -376,7 +383,6 @@ export interface FileRoutesByFullPath {
   '/account/orders': typeof MainLayoutAccountOrdersRoute
   '/account/profile': typeof MainLayoutAccountProfileRoute
   '/collections/$slug': typeof MainLayoutCollectionsSlugRoute
-  '/collections/feature': typeof MainLayoutCollectionsFeatureRoute
   '/products/$slug': typeof MainLayoutProductsSlugRoute
   '/search/$query': typeof MainLayoutSearchQueryRoute
   '/shared/$slug': typeof MainLayoutSharedSlugRoute
@@ -406,6 +412,8 @@ export interface FileRoutesByTo {
   '/home': typeof AuthLayoutHomeRoute
   '/bulk': typeof MainLayoutBulkRoute
   '/cart': typeof MainLayoutCartRoute
+  '/feature': typeof MainLayoutFeatureRoute
+  '/featured': typeof MainLayoutFeaturedRoute
   '/wishlist': typeof MainLayoutWishlistRoute
   '/admin/shared': typeof AdminSharedRoute
   '/api/push-event': typeof ApiPushEventRoute
@@ -428,7 +436,6 @@ export interface FileRoutesByTo {
   '/account/orders': typeof MainLayoutAccountOrdersRoute
   '/account/profile': typeof MainLayoutAccountProfileRoute
   '/collections/$slug': typeof MainLayoutCollectionsSlugRoute
-  '/collections/feature': typeof MainLayoutCollectionsFeatureRoute
   '/products/$slug': typeof MainLayoutProductsSlugRoute
   '/search/$query': typeof MainLayoutSearchQueryRoute
   '/shared/$slug': typeof MainLayoutSharedSlugRoute
@@ -463,6 +470,8 @@ export interface FileRoutesById {
   '/_mainLayout/account': typeof MainLayoutAccountRouteWithChildren
   '/_mainLayout/bulk': typeof MainLayoutBulkRoute
   '/_mainLayout/cart': typeof MainLayoutCartRoute
+  '/_mainLayout/feature': typeof MainLayoutFeatureRoute
+  '/_mainLayout/featured': typeof MainLayoutFeaturedRoute
   '/_mainLayout/wishlist': typeof MainLayoutWishlistRoute
   '/admin/shared': typeof AdminSharedRoute
   '/api/push-event': typeof ApiPushEventRoute
@@ -485,7 +494,6 @@ export interface FileRoutesById {
   '/_mainLayout/account/orders': typeof MainLayoutAccountOrdersRoute
   '/_mainLayout/account/profile': typeof MainLayoutAccountProfileRoute
   '/_mainLayout/collections/$slug': typeof MainLayoutCollectionsSlugRoute
-  '/_mainLayout/collections/feature': typeof MainLayoutCollectionsFeatureRoute
   '/_mainLayout/products/$slug': typeof MainLayoutProductsSlugRoute
   '/_mainLayout/search/$query': typeof MainLayoutSearchQueryRoute
   '/_mainLayout/shared/$slug': typeof MainLayoutSharedSlugRoute
@@ -519,6 +527,8 @@ export interface FileRouteTypes {
     | '/account'
     | '/bulk'
     | '/cart'
+    | '/feature'
+    | '/featured'
     | '/wishlist'
     | '/admin/shared'
     | '/api/push-event'
@@ -541,7 +551,6 @@ export interface FileRouteTypes {
     | '/account/orders'
     | '/account/profile'
     | '/collections/$slug'
-    | '/collections/feature'
     | '/products/$slug'
     | '/search/$query'
     | '/shared/$slug'
@@ -571,6 +580,8 @@ export interface FileRouteTypes {
     | '/home'
     | '/bulk'
     | '/cart'
+    | '/feature'
+    | '/featured'
     | '/wishlist'
     | '/admin/shared'
     | '/api/push-event'
@@ -593,7 +604,6 @@ export interface FileRouteTypes {
     | '/account/orders'
     | '/account/profile'
     | '/collections/$slug'
-    | '/collections/feature'
     | '/products/$slug'
     | '/search/$query'
     | '/shared/$slug'
@@ -627,6 +637,8 @@ export interface FileRouteTypes {
     | '/_mainLayout/account'
     | '/_mainLayout/bulk'
     | '/_mainLayout/cart'
+    | '/_mainLayout/feature'
+    | '/_mainLayout/featured'
     | '/_mainLayout/wishlist'
     | '/admin/shared'
     | '/api/push-event'
@@ -649,7 +661,6 @@ export interface FileRouteTypes {
     | '/_mainLayout/account/orders'
     | '/_mainLayout/account/profile'
     | '/_mainLayout/collections/$slug'
-    | '/_mainLayout/collections/feature'
     | '/_mainLayout/products/$slug'
     | '/_mainLayout/search/$query'
     | '/_mainLayout/shared/$slug'
@@ -769,6 +780,20 @@ declare module '@tanstack/react-router' {
       path: '/wishlist'
       fullPath: '/wishlist'
       preLoaderRoute: typeof MainLayoutWishlistRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_mainLayout/featured': {
+      id: '/_mainLayout/featured'
+      path: '/featured'
+      fullPath: '/featured'
+      preLoaderRoute: typeof MainLayoutFeaturedRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_mainLayout/feature': {
+      id: '/_mainLayout/feature'
+      path: '/feature'
+      fullPath: '/feature'
+      preLoaderRoute: typeof MainLayoutFeatureRouteImport
       parentRoute: typeof MainLayoutRoute
     }
     '/_mainLayout/cart': {
@@ -930,13 +955,6 @@ declare module '@tanstack/react-router' {
       path: '/products/$slug'
       fullPath: '/products/$slug'
       preLoaderRoute: typeof MainLayoutProductsSlugRouteImport
-      parentRoute: typeof MainLayoutRoute
-    }
-    '/_mainLayout/collections/feature': {
-      id: '/_mainLayout/collections/feature'
-      path: '/collections/feature'
-      fullPath: '/collections/feature'
-      preLoaderRoute: typeof MainLayoutCollectionsFeatureRouteImport
       parentRoute: typeof MainLayoutRoute
     }
     '/_mainLayout/collections/$slug': {
@@ -1109,6 +1127,8 @@ interface MainLayoutRouteChildren {
   MainLayoutAccountRoute: typeof MainLayoutAccountRouteWithChildren
   MainLayoutBulkRoute: typeof MainLayoutBulkRoute
   MainLayoutCartRoute: typeof MainLayoutCartRoute
+  MainLayoutFeatureRoute: typeof MainLayoutFeatureRoute
+  MainLayoutFeaturedRoute: typeof MainLayoutFeaturedRoute
   MainLayoutWishlistRoute: typeof MainLayoutWishlistRoute
   MainLayoutIndexRoute: typeof MainLayoutIndexRoute
   MainLayoutstaticAboutRoute: typeof MainLayoutstaticAboutRoute
@@ -1120,7 +1140,6 @@ interface MainLayoutRouteChildren {
   MainLayoutstaticShippingRoute: typeof MainLayoutstaticShippingRoute
   MainLayoutstaticTermsRoute: typeof MainLayoutstaticTermsRoute
   MainLayoutCollectionsSlugRoute: typeof MainLayoutCollectionsSlugRoute
-  MainLayoutCollectionsFeatureRoute: typeof MainLayoutCollectionsFeatureRoute
   MainLayoutProductsSlugRoute: typeof MainLayoutProductsSlugRoute
   MainLayoutSearchQueryRoute: typeof MainLayoutSearchQueryRoute
   MainLayoutSharedSlugRoute: typeof MainLayoutSharedSlugRoute
@@ -1132,6 +1151,8 @@ const MainLayoutRouteChildren: MainLayoutRouteChildren = {
   MainLayoutAccountRoute: MainLayoutAccountRouteWithChildren,
   MainLayoutBulkRoute: MainLayoutBulkRoute,
   MainLayoutCartRoute: MainLayoutCartRoute,
+  MainLayoutFeatureRoute: MainLayoutFeatureRoute,
+  MainLayoutFeaturedRoute: MainLayoutFeaturedRoute,
   MainLayoutWishlistRoute: MainLayoutWishlistRoute,
   MainLayoutIndexRoute: MainLayoutIndexRoute,
   MainLayoutstaticAboutRoute: MainLayoutstaticAboutRoute,
@@ -1143,7 +1164,6 @@ const MainLayoutRouteChildren: MainLayoutRouteChildren = {
   MainLayoutstaticShippingRoute: MainLayoutstaticShippingRoute,
   MainLayoutstaticTermsRoute: MainLayoutstaticTermsRoute,
   MainLayoutCollectionsSlugRoute: MainLayoutCollectionsSlugRoute,
-  MainLayoutCollectionsFeatureRoute: MainLayoutCollectionsFeatureRoute,
   MainLayoutProductsSlugRoute: MainLayoutProductsSlugRoute,
   MainLayoutSearchQueryRoute: MainLayoutSearchQueryRoute,
   MainLayoutSharedSlugRoute: MainLayoutSharedSlugRoute,
@@ -1218,12 +1238,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

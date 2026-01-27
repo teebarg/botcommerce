@@ -477,11 +477,11 @@
 
 @layer components {
   .glass {
-    @apply bg-white/[0.08] backdrop-blur-xl border border-white/[0.12];
+    @apply bg-white/8 backdrop-blur-xl border border-white/12;
   }
 
   .glass-strong {
-    @apply bg-white/[0.15] backdrop-blur-2xl border border-white/[0.2];
+    @apply bg-white/[0.15] backdrop-blur-2xl border border-white/20;
   }
 
   .gradient-primary {
@@ -497,7 +497,7 @@
 
   .action-button {
     @apply w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300;
-    @apply bg-white/[0.1] backdrop-blur-lg hover:bg-white/[0.2] active:scale-90;
+    @apply bg-white/10 backdrop-blur-lg hover:bg-white/20 active:scale-90;
   }
 
   .product-card {
@@ -509,7 +509,7 @@
   }
 
   .floating-nav {
-    @apply fixed bottom-0 left-0 right-0 glass-strong z-50;
+    @apply fixed bottom-0 left-0 right-0 bg-white/15 backdrop-blur-2xl border border-white/20 z-50;
     padding-bottom: env(safe-area-inset-bottom);
   }
 
