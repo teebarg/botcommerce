@@ -1,164 +1,127 @@
 import type React from "react";
-import { useOverlayTriggerState } from "react-stately";
 import ProductActions from "./product-actions";
 import { useProductVariant } from "@/hooks/useProductVariant";
 import { PriceLabel } from "@/components/store/products/price-label";
 import { DiscountBadge } from "@/components/store/products/discount-badge";
-import Overlay from "@/components/overlay";
-import { useUserWishlist } from "@/hooks/useUser";
-import ProductOverview from "@/components/store/products/product-overview";
-import type { ProductSearch, ProductVariant } from "@/schemas/product";
+import { useUserCreateWishlist, useUserDeleteWishlist, useUserWishlist } from "@/hooks/useUser";
+import type { Facet, ProductSearch } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/utils";
 import MediaDisplay from "@/components/media-display";
 import { useMemo } from "react";
 import { IsNew } from "@/components/products/product-badges";
 import { motion } from "framer-motion";
-import { Heart, Share2, ShoppingBag, Music, Verified } from "lucide-react";
-import { useState } from "react";
+import { Filter, Heart, Music } from "lucide-react";
+import { ActionButton } from "../collections/action-button";
+import ShareButton2 from "@/components/share2";
+import Overlay from "@/components/overlay";
+import { FilterSidebar } from "../shared/filter-sidebar";
+import { useOverlayTriggerState } from "react-stately";
 
 interface ProductCardProps {
     product: ProductSearch;
-    banner?: "sale" | "electric";
     isActive?: boolean;
     variant?: "mobile" | "desktop";
+    facets?: Facet;
     onClick?: () => void;
 }
 
-const ProductCardSocial: React.FC<ProductCardProps> = ({ product, banner = "sale", isActive, variant, onClick }) => {
+const ProductCardSocial: React.FC<ProductCardProps> = ({ product, isActive, variant, facets, onClick }) => {
+    const editState = useOverlayTriggerState({});
     const { priceInfo, outOfStock } = useProductVariant(product);
-    const dialogState = useOverlayTriggerState({});
     const { data } = useUserWishlist();
 
     const inWishlist = !!data?.wishlists?.find((wishlist) => wishlist.product_id === product.id);
     const isNew = useMemo(() => !!product?.is_new, [product]);
 
+    const { mutate: createWishlist } = useUserCreateWishlist();
+    const { mutate: deleteWishlist } = useUserDeleteWishlist();
+
+    const addWishlist = async () => {
+        createWishlist(product.id);
+    };
+
+    const removeWishlist = async () => {
+        deleteWishlist(product.id);
+    };
+
     return (
-        <div className="product-card" onClick={onClick}>
-            {/* Product Image */}
+        <div className="product-card h-[calc(100dvh-36px)]!" onClick={onClick}>
             <motion.div
                 initial={{ scale: 1.1 }}
                 animate={{ scale: isActive ? 1 : 1.1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 className="absolute inset-0"
             >
-                <img
-                    src={product.images?.[0]}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                />
-                {/* <MediaDisplay url={product.images?.[0]} alt={product.name} /> */}
+                <MediaDisplay url={product.images?.[0]} alt={product.name} />
             </motion.div>
 
+            <DiscountBadge
+                discount={priceInfo.maxDiscountPercent}
+                isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice}
+                variant="sale"
+                className="top-4 right-4"
+            />
+
+            {isNew && <IsNew className="top-4 left-4" />}
             {/* Gradient Overlay */}
             <div className="product-overlay" />
 
-            {/* Progress Bar at Top */}
-            <div className="absolute top-0 left-0 right-0 p-4 pt-20 flex gap-1">
-                {[...Array(5)].map((_, i) => (
-                    <div
-                        key={i}
-                        className={`h-0.5 flex-1 rounded-full ${i === (product.id - 1) % 5 ? "bg-foreground" : "bg-foreground/30"
-                            }`}
-                    />
-                ))}
-            </div>
+            {outOfStock && (
+                <div className="absolute inset-0 bg-black/35 flex items-center justify-center">
+                    <Badge className="text-sm backdrop-blur-sm" variant="contrast">
+                        Out of Stock
+                    </Badge>
+                </div>
+            )}
 
-            {/* Side Actions */}
             <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3, duration: 0.4 }}
-                className="absolute right-4 bottom-40 flex flex-col gap-5"
+                className="absolute right-4 bottom-54 flex flex-col gap-5 z-20"
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* <ActionButton
-                    icon={Heart}
-                    count={likeCount}
-                    isActive={liked}
-                    onClick={() => {
-                        setLiked(!liked);
-                        setLikeCount(prev => liked ? prev - 1 : prev + 1);
-                    }}
-                    activeColor="text-primary"
-                />
+                <Overlay
+                    open={editState.isOpen}
+                    title="Filters"
+                    trigger={
+                        <motion.button whileTap={{ scale: 0.85 }} className="flex flex-col items-center gap-1">
+                            <div className="action-button bg-warning/10!">
+                                <Filter className="w-6 h-6 transition-colors text-warning" fill="currentColor" />
+                            </div>
+                            <span className="text-xs font-bold text-warning/80">Filter</span>
+                        </motion.button>
+                    }
+                    onOpenChange={editState.setOpen}
+                >
+                    <FilterSidebar facets={facets} onApplyComplete={editState.close} />
+                </Overlay>
                 <ActionButton
-                    icon={Share2}
-                    count={product.shares}
-                /> */}
+                    icon={Heart}
+                    isActive={inWishlist}
+                    onClick={() => {
+                        inWishlist ? removeWishlist() : addWishlist();
+                    }}
+                    activeColor="text-destructive"
+                    activeBackgroundColor="bg-destructive/20!"
+                    label="Wishlist"
+                />
+                <ShareButton2 />
             </motion.div>
-
-            {/* Product Info */}
             <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
-                className="relative z-10 p-6 pb-32 w-full max-w-[calc(100%-80px)]"
+                className="relative z-10 p-6 pb-32 w-full max-w-full bg-gradient-to-t from-black/90 via-black/40 to-transparent"
             >
-                {/* Brand */}
-                {/* <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-xs font-bold">
-                        {product.brand.charAt(0)}
-                    </div>
-                    <span className="font-semibold text-foreground">{product.brand}</span>
-                    {product.isVerified && (
-                        <Verified className="w-4 h-4 text-primary" fill="currentColor" />
-                    )}
-                </div> */}
+                <h2 className="mb-1 font-bold text-white/80 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">{product.name}</h2>
+                {/* <p className="text-sm line-clamp-2 font-semibold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">{product.description}</p> */}
 
-                {/* Product Name & Description */}
-                <h2 className="text-xl font-bold text-foreground mb-1">{product.name}</h2>
-                <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                    {product.description}
-                </p>
-
-                {/* Tags */}
-                {/* {product.tags && (
-                    <div className="flex flex-wrap gap-2 mb-4">
-                        {product.tags.map((tag, i) => (
-                            <span
-                                key={i}
-                                className="text-xs text-primary font-medium"
-                            >
-                                #{tag}
-                            </span>
-                        ))}
-                    </div>
-                )} */}
-
-                {/* Price & CTA */}
-                <div className="flex items-center gap-4">
-                    <div className="flex items-baseline gap-2">
-                        <PriceLabel priceInfo={priceInfo} />
-                        {/* <span className="text-2xl font-bold text-foreground">
-                            ${product.price}
-                        </span>
-                        {product.originalPrice && (
-                            <>
-                                <span className="text-sm text-muted-foreground line-through">
-                                    ${product.originalPrice}
-                                </span>
-                                <span className="text-xs font-semibold text-primary bg-primary/20 px-2 py-0.5 rounded-full">
-                                    -{discount}%
-                                </span>
-                            </>
-                        )} */}
-                    </div>
+                <div className="flex items-baseline gap-2 mb-2">
+                    <PriceLabel priceInfo={priceInfo} priceClassName="text-white text-2xl" oldPriceClassName="text-white/50" />
                 </div>
 
-                {/* Buy Button */}
-                <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onClick?.();
-                    }}
-                    className="mt-4 w-full gradient-primary text-primary-foreground font-semibold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg"
-                    style={{ boxShadow: "0 8px 32px hsl(350 89% 60% / 0.4)" }}
-                >
-                    <ShoppingBag className="w-5 h-5" />
-                    Add to Bag
-                </motion.button>
+                <ProductActions product={product} />
 
                 {/* Sound indicator */}
                 <div className="flex items-center gap-2 mt-4">
@@ -175,69 +138,6 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, banner = "sale
                 </div>
             </motion.div>
         </div>
-    );
-
-    return (
-        <Overlay
-            open={dialogState.isOpen}
-            sheetClassName="min-w-[30vw]"
-            title="Details"
-            trigger={
-                <div className="h-full group relative bg-card flex flex-col rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
-                    <div className="relative aspect-3/4 overflow-hidden">
-                        <MediaDisplay url={product.images?.[0]} alt={product.name} />
-
-                        <DiscountBadge
-                            discount={priceInfo.maxDiscountPercent}
-                            isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice}
-                            variant={banner}
-                        />
-
-                        {isNew && <IsNew />}
-
-                        {product?.variants?.[0]?.age && (
-                            <div className="absolute bottom-3 right-3 bg-background/90 backdrop-blur-sm text-foreground px-3 py-1 rounded-full text-xs font-semibold border border-border shadow-md">
-                                {product?.variants?.[0]?.age}
-                            </div>
-                        )}
-
-                        <div className="absolute bottom-3 left-3 flex flex-wrap gap-1">
-                            {product?.variants?.map((item: ProductVariant, idx: number) => (
-                                <div
-                                    key={idx}
-                                    className={cn(
-                                        item.size
-                                            ? "bg-background/90 backdrop-blur-sm text-foreground px-3 py-1 rounded-full text-xs font-semibold border border-border shadow-md"
-                                            : "hidden"
-                                    )}
-                                >
-                                    UK: {item.size}
-                                </div>
-                            ))}
-                        </div>
-
-                        {outOfStock && (
-                            <div className="absolute inset-0 bg-black/35 flex items-center justify-center">
-                                <Badge className="text-sm backdrop-blur-sm" variant="contrast">
-                                    Out of Stock
-                                </Badge>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="py-4 px-2 space-y-2 flex flex-col flex-1">
-                        <div className="flex-1">
-                            <p className="sr-only">{product.name}</p>
-                            <PriceLabel priceInfo={priceInfo} />
-                        </div>
-                        <ProductActions product={product} />
-                    </div>
-                </div>
-            }
-            onOpenChange={dialogState.setOpen}
-        >
-            <ProductOverview isLiked={inWishlist} product={product} onClose={dialogState.close} />
-        </Overlay>
     );
 };
 

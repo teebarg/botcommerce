@@ -27,9 +27,9 @@ const ProductShare: React.FC<ProductShareProps> = ({ name }) => {
     };
 
     return (
-        <div className="relative group">
-            <button className="p-2 rounded-full hover:bg-card transition-colors">
-                <Share2 className="w-6 h-6 text-muted-foreground" />
+        <div className="relative group z-50">
+            <button className="p-2 rounded-full hover:bg-card transition-colors bg-primary/10">
+                <Share2 className="w-6 h-6 text-primary" />
             </button>
 
             <div className="absolute right-0 mt-2 w-48 bg-secondary rounded-lg shadow-lg p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">

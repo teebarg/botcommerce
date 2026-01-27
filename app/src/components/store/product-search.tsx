@@ -70,7 +70,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                     <SheetDescription>Search for products, categories, and more</SheetDescription>
                 </SheetHeader>
                 <div className="relative px-8 pb-8 overflow-y-auto max-h-screen min-h-[75vh]">
-                    <div className="w-full sticky top-0 z-10 bg-background py-4">
+                    <div className="w-full sticky top-0 z-20 bg-background py-4">
                         <div
                             className={cn(
                                 "flex items-center rounded-xl border transition-all duration-200 w-full max-w-96 mx-auto relative hover:border-primary/30"
@@ -176,7 +176,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
 
                                 <div>
                                     <div className="mb-4">
-                                        <h3 className="font-semibold text-sm tracking-wider">TRENDING PRODUCTS</h3>
+                                        <h3 className="font-semibold text-sm tracking-wider">TRENDING PRODUCTS2</h3>
                                     </div>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                         {trendingData?.products?.map((product: ProductSearch) => (

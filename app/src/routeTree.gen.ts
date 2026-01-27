@@ -22,7 +22,6 @@ import { Route as ApiPushEventRouteImport } from './routes/api/push-event'
 import { Route as AdminSharedRouteImport } from './routes/admin/shared'
 import { Route as MainLayoutWishlistRouteImport } from './routes/_mainLayout/wishlist'
 import { Route as MainLayoutFeaturedRouteImport } from './routes/_mainLayout/featured'
-import { Route as MainLayoutFeatureRouteImport } from './routes/_mainLayout/feature'
 import { Route as MainLayoutCartRouteImport } from './routes/_mainLayout/cart'
 import { Route as MainLayoutBulkRouteImport } from './routes/_mainLayout/bulk'
 import { Route as MainLayoutAccountRouteImport } from './routes/_mainLayout/account'
@@ -126,11 +125,6 @@ const MainLayoutWishlistRoute = MainLayoutWishlistRouteImport.update({
 const MainLayoutFeaturedRoute = MainLayoutFeaturedRouteImport.update({
   id: '/featured',
   path: '/featured',
-  getParentRoute: () => MainLayoutRoute,
-} as any)
-const MainLayoutFeatureRoute = MainLayoutFeatureRouteImport.update({
-  id: '/feature',
-  path: '/feature',
   getParentRoute: () => MainLayoutRoute,
 } as any)
 const MainLayoutCartRoute = MainLayoutCartRouteImport.update({
@@ -359,7 +353,6 @@ export interface FileRoutesByFullPath {
   '/account': typeof MainLayoutAccountRouteWithChildren
   '/bulk': typeof MainLayoutBulkRoute
   '/cart': typeof MainLayoutCartRoute
-  '/feature': typeof MainLayoutFeatureRoute
   '/featured': typeof MainLayoutFeaturedRoute
   '/wishlist': typeof MainLayoutWishlistRoute
   '/admin/shared': typeof AdminSharedRoute
@@ -412,7 +405,6 @@ export interface FileRoutesByTo {
   '/home': typeof AuthLayoutHomeRoute
   '/bulk': typeof MainLayoutBulkRoute
   '/cart': typeof MainLayoutCartRoute
-  '/feature': typeof MainLayoutFeatureRoute
   '/featured': typeof MainLayoutFeaturedRoute
   '/wishlist': typeof MainLayoutWishlistRoute
   '/admin/shared': typeof AdminSharedRoute
@@ -470,7 +462,6 @@ export interface FileRoutesById {
   '/_mainLayout/account': typeof MainLayoutAccountRouteWithChildren
   '/_mainLayout/bulk': typeof MainLayoutBulkRoute
   '/_mainLayout/cart': typeof MainLayoutCartRoute
-  '/_mainLayout/feature': typeof MainLayoutFeatureRoute
   '/_mainLayout/featured': typeof MainLayoutFeaturedRoute
   '/_mainLayout/wishlist': typeof MainLayoutWishlistRoute
   '/admin/shared': typeof AdminSharedRoute
@@ -527,7 +518,6 @@ export interface FileRouteTypes {
     | '/account'
     | '/bulk'
     | '/cart'
-    | '/feature'
     | '/featured'
     | '/wishlist'
     | '/admin/shared'
@@ -580,7 +570,6 @@ export interface FileRouteTypes {
     | '/home'
     | '/bulk'
     | '/cart'
-    | '/feature'
     | '/featured'
     | '/wishlist'
     | '/admin/shared'
@@ -637,7 +626,6 @@ export interface FileRouteTypes {
     | '/_mainLayout/account'
     | '/_mainLayout/bulk'
     | '/_mainLayout/cart'
-    | '/_mainLayout/feature'
     | '/_mainLayout/featured'
     | '/_mainLayout/wishlist'
     | '/admin/shared'
@@ -787,13 +775,6 @@ declare module '@tanstack/react-router' {
       path: '/featured'
       fullPath: '/featured'
       preLoaderRoute: typeof MainLayoutFeaturedRouteImport
-      parentRoute: typeof MainLayoutRoute
-    }
-    '/_mainLayout/feature': {
-      id: '/_mainLayout/feature'
-      path: '/feature'
-      fullPath: '/feature'
-      preLoaderRoute: typeof MainLayoutFeatureRouteImport
       parentRoute: typeof MainLayoutRoute
     }
     '/_mainLayout/cart': {
@@ -1127,7 +1108,6 @@ interface MainLayoutRouteChildren {
   MainLayoutAccountRoute: typeof MainLayoutAccountRouteWithChildren
   MainLayoutBulkRoute: typeof MainLayoutBulkRoute
   MainLayoutCartRoute: typeof MainLayoutCartRoute
-  MainLayoutFeatureRoute: typeof MainLayoutFeatureRoute
   MainLayoutFeaturedRoute: typeof MainLayoutFeaturedRoute
   MainLayoutWishlistRoute: typeof MainLayoutWishlistRoute
   MainLayoutIndexRoute: typeof MainLayoutIndexRoute
@@ -1151,7 +1131,6 @@ const MainLayoutRouteChildren: MainLayoutRouteChildren = {
   MainLayoutAccountRoute: MainLayoutAccountRouteWithChildren,
   MainLayoutBulkRoute: MainLayoutBulkRoute,
   MainLayoutCartRoute: MainLayoutCartRoute,
-  MainLayoutFeatureRoute: MainLayoutFeatureRoute,
   MainLayoutFeaturedRoute: MainLayoutFeaturedRoute,
   MainLayoutWishlistRoute: MainLayoutWishlistRoute,
   MainLayoutIndexRoute: MainLayoutIndexRoute,
@@ -1238,3 +1217,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

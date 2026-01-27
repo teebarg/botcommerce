@@ -34,8 +34,6 @@ function RouteComponent() {
     const { data } = useSuspenseQuery(productQueryOptions(search));
 
     return (
-        <div className="max-w-9xl mx-auto w-full py-4 px-2">
-            <SocialInfiniteScrollClient initialData={data} />
-        </div>
+        <SocialInfiniteScrollClient initialData={data} />
     );
 }

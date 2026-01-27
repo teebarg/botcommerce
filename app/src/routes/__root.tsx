@@ -139,12 +139,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                     <StoreProvider>
                         <CartProvider>
                             <ProgressBar className="h-1 bg-primary/30">
-                                <div className="relative flex flex-col min-h-screen">
+                                <div className="relative">
                                     <PushNotificationManager />
                                     <PushPermission />
                                     <InstallPrompt />
-                                    {/* <StoreProvider>
-                                <CartProvider> */}
                                     <WebSocketProvider
                                         url={import.meta.env.VITE_WS + "/api/ws/"}
                                         debug={true}
@@ -154,9 +152,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                         <InvalidateProvider>{children}</InvalidateProvider>
                                         <ImpersonationBanner />
                                     </WebSocketProvider>
-                                    {/* </CartProvider>
-                            </StoreProvider> */}
-
                                     {import.meta.env.MODE !== "production" && (
                                         <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
                                     )}
