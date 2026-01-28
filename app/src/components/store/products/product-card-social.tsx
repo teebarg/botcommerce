@@ -7,28 +7,30 @@ import { useUserCreateWishlist, useUserDeleteWishlist, useUserWishlist } from "@
 import type { Facet, ProductSearch } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import MediaDisplay from "@/components/media-display";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { IsNew } from "@/components/products/product-badges";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Filter, Heart, Music } from "lucide-react";
 import { ActionButton } from "../collections/action-button";
 import ShareButton2 from "@/components/share2";
 import Overlay from "@/components/overlay";
-import { FilterSidebar } from "../shared/filter-sidebar";
 import { useOverlayTriggerState } from "react-stately";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { FilterSidebarLogic, FilterSidebarRef } from "../shared/filter-sidebar-logic";
 
 interface ProductCardProps {
     product: ProductSearch;
     isActive?: boolean;
-    variant?: "mobile" | "desktop";
     facets?: Facet;
     onClick?: () => void;
 }
 
-const ProductCardSocial: React.FC<ProductCardProps> = ({ product, isActive, variant, facets, onClick }) => {
+const ProductCardSocial: React.FC<ProductCardProps> = ({ product, isActive, facets, onClick }) => {
     const editState = useOverlayTriggerState({});
     const { priceInfo, outOfStock } = useProductVariant(product);
     const { data } = useUserWishlist();
+    const sidebarRef = useRef<FilterSidebarRef>(null);
 
     const inWishlist = !!data?.wishlists?.find((wishlist) => wishlist.product_id === product.id);
     const isNew = useMemo(() => !!product?.is_new, [product]);
@@ -52,7 +54,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, isActive, vari
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 className="absolute inset-0"
             >
-                <MediaDisplay url={product.images?.[0]} alt={product.name} className="object-contain" />
+                <MediaDisplay url={product.images?.[0]} alt={product.name} className="object-none" />
             </motion.div>
 
             <DiscountBadge
@@ -78,12 +80,16 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, isActive, vari
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3, duration: 0.4 }}
-                className="absolute right-4 bottom-54 flex flex-col gap-5 z-20"
+                className="absolute right-4 bottom-60 flex flex-col gap-5 z-20"
                 onClick={(e) => e.stopPropagation()}
             >
                 <Overlay
                     open={editState.isOpen}
-                    title="Filters"
+                    title={
+                        <div className="flex items-center justify-between w-full">
+                            <h2 className="font-semibold">FILTER & SORT</h2>
+                        </div>
+                    }
                     trigger={
                         <motion.button whileTap={{ scale: 0.85 }} className="flex flex-col items-center gap-1">
                             <div className="action-button bg-warning/10!">
@@ -93,8 +99,30 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, isActive, vari
                         </motion.button>
                     }
                     onOpenChange={editState.setOpen}
+                    showHeader={true}
                 >
-                    <FilterSidebar facets={facets} onApplyComplete={editState.close} />
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key="filter-sidebar"
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ delay: 0.2 }}
+                            className="flex-1 flex flex-col overflow-hidden"
+                        >
+                            <ScrollArea className="flex-1 px-6">
+                                <FilterSidebarLogic ref={sidebarRef} facets={facets} onClose={editState.close} />
+                            </ScrollArea>
+                            <div className="flex justify-center gap-2 p-4 border-t border-border">
+                                <Button className="w-full rounded-full py-6" onClick={() => sidebarRef.current?.apply()}>
+                                    Apply
+                                </Button>
+                                <Button className="w-full rounded-full py-6" variant="destructive" onClick={() => sidebarRef.current?.clear()}>
+                                    Clear
+                                </Button>
+                            </div>
+                        </motion.div>
+                    </AnimatePresence>
                 </Overlay>
                 <ActionButton
                     icon={Heart}
