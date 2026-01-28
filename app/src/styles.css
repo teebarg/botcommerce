@@ -80,6 +80,7 @@
   --animate-gift-open: gift-open 2s ease-in-out 0s infinite normal none running;
 
   @keyframes float {
+
     0%,
     100% {
       transform: translateY(0px);
@@ -103,6 +104,7 @@
   }
 
   @keyframes float {
+
     0%,
     100% {
       transform: translateY(0px);
@@ -114,6 +116,7 @@
   }
 
   @keyframes pulse-glow {
+
     0%,
     100% {
       box-shadow: 0 0 20px hsl(var(--gold) / 0.3);
@@ -473,26 +476,73 @@
       fill var(--tw-transition-duration) ease-in-out,
       box-shadow var(--tw-transition-duration) ease-in-out;
   }
+
+  /* Hide scrollbar for immersive experience */
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  ::-webkit-scrollbar {
+    width: 2px;
+    height: 2px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }
 
+
 @layer utilities {
-  .top-safe {
-    top: var(--safe-top);
+  .glass {
+    @apply bg-white/8 backdrop-blur-xl border border-white/12;
   }
 
-  .bottom-safe {
-    bottom: var(--safe-bottom);
+  .glass-strong {
+    @apply bg-white/15 backdrop-blur-2xl border border-white/20;
   }
 
-  .safe-top-mask {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 60;
-    pointer-events: none;
-    height: env(safe-area-inset-top);
-    background: black;
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(350 89% 60%), hsl(280 100% 65%));
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, hsl(350 89% 60%), hsl(280 100% 65%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .action-button {
+    @apply w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300;
+    @apply bg-white/10 backdrop-blur-lg hover:bg-white/20 active:scale-90;
+  }
+
+  .product-card {
+    @apply relative w-full h-screen snap-start snap-always flex items-end;
+  }
+
+  .product-overlay {
+    @apply absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent;
+  }
+
+  .floating-nav {
+    @apply fixed bottom-0 left-0 right-0 bg-white/15 backdrop-blur-2xl border border-white/20 z-50;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .pulse-dot {
+    @apply w-2 h-2 rounded-full bg-primary animate-pulse;
   }
 
   .text-gradient-gold {
@@ -505,22 +555,8 @@
   .chatbot-message li a {
     @apply text-blue-500 hover:text-blue-600;
   }
+
   .carousel-nav-link {
     @apply rounded-full bg-card-foreground hover:bg-foreground text-card shadow-md backdrop-blur disabled:opacity-40 disabled:pointer-events-none;
   }
-}
-
-/* Thin scrollbar for WebKit */
-::-webkit-scrollbar {
-  width: 2px;
-  height: 2px;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.3);
-  border-radius: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
 }

@@ -41,7 +41,7 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
     }
 
     return (
-        <Card className="w-full animate-fade-in mt-4">
+        <Card className="mt-4">
             <CardHeader className="text-center">
                 <CardTitle className="text-2xl font-semibold flex items-center justify-center space-x-2">
                     <MapPin className="h-6 w-6 text-primary" />

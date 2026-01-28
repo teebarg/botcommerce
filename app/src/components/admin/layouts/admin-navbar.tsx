@@ -9,7 +9,7 @@ import type { Session } from "start-authjs";
 
 const AdminNavbar = ({ session }: { session: Session | null }) => {
     return (
-        <NavigationBar className="h-16 bg-background">
+        <NavigationBar className="h-16 bg-background sticky top-0 z-50">
             <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
                 <NavbarBrand className="gap-3 max-w-fit hidden sm:block">
                     <LocalizedClientLink href="/admin">

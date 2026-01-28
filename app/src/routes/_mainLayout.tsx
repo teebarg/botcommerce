@@ -10,7 +10,6 @@ import GetApp from "@/components/get-app";
 import { SearchDialog } from "@/components/store/product-search";
 import LocalizedClientLink from "@/components/ui/link";
 import type { Session } from "start-authjs";
-import { useConfig } from "@/providers/store-provider";
 import { ShoppingBag } from "lucide-react";
 
 export const Route = createFileRoute("/_mainLayout")({
@@ -21,22 +20,19 @@ export const Route = createFileRoute("/_mainLayout")({
 });
 
 function MainLayoutComponent() {
-    const { config } = useConfig();
     const { session } = Route.useRouteContext();
     return (
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col">
             <StoreNavbar session={session as unknown as Session} />
-            <div className="safe-top-mask md:hidden" />
             <div className="md:hidden sticky top-[env(safe-area-inset-top)] z-40 bg-background">
                 <div className="flex items-center gap-2 px-2 py-3">
                     <div className="flex gap-2 items-center flex-1">
                         <BackButton />
-                        <LocalizedClientLink className="" href="/">
+                        <LocalizedClientLink href="/">
                             <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
                                 <ShoppingBag className="w-5 h-5 text-primary-foreground" />
                             </div>
                         </LocalizedClientLink>
-                        <span className="tracking-tighter font-bold text-lg uppercase">{config?.shop_name}</span>
                     </div>
                     <SearchDialog />
                     <GetApp />

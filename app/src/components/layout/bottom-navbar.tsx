@@ -4,6 +4,7 @@ import StoreMenuComp from "./store-mobile-menu-drawer";
 import { cn } from "@/utils";
 import { CartComponent } from "@/components/store/cart/cart-component";
 import LocalizedClientLink from "@/components/ui/link";
+import { motion } from "framer-motion";
 
 const ButtonNav = ({ className }: { className?: string }) => {
     interface NavLink {
@@ -38,12 +39,13 @@ const ButtonNav = ({ className }: { className?: string }) => {
             )}
         >
             {nav.map((item: NavLink, idx: number) => (
-                <div key={idx} className="flex flex-col items-center text-xs">
+                <motion.div whileTap={{ scale: 0.9 }} key={idx} className="flex flex-col items-center text-xs relative">
                     <LocalizedClientLink active="bg-primary text-white rounded-xl" aria-label={item.label} className="p-1.5" href={item.href}>
                         {item.icon}
                     </LocalizedClientLink>
                     {item.label}
-                </div>
+                    {idx === 0 && <motion.div layoutId="activeTab" className="absolute -top-1 w-1 h-1 rounded-full bg-primary" />}
+                </motion.div>
             ))}
             <span className="flex flex-col items-center text-xs">
                 <CartComponent />

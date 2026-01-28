@@ -136,13 +136,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             </head>
             <body className="min-h-screen">
                 <ThemeProvider>
-                    <ProgressBar className="h-1 bg-primary/30">
-                        <div className="relative flex flex-col min-h-screen">
-                            <PushNotificationManager />
-                            <PushPermission />
-                            <InstallPrompt />
-                            <StoreProvider>
-                                <CartProvider>
+                    <StoreProvider>
+                        <CartProvider>
+                            <ProgressBar className="h-1 bg-primary/30">
+                                <div className="relative">
+                                    <PushNotificationManager />
+                                    <PushPermission />
+                                    <InstallPrompt />
                                     <WebSocketProvider
                                         url={import.meta.env.VITE_WS + "/api/ws/"}
                                         debug={true}
@@ -152,15 +152,16 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                         <InvalidateProvider>{children}</InvalidateProvider>
                                         <ImpersonationBanner />
                                     </WebSocketProvider>
-                                </CartProvider>
-                            </StoreProvider>
-
-                            {import.meta.env.MODE !== "production" && <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />}
-                        </div>
-                    </ProgressBar>
-                    {/* {import.meta.env.MODE !== "production" && <TanStackRouterDevtoolsPanel />} */}
-                    <Toaster closeButton richColors duration={3000} expand={false} position="top-right" />
-                    <Scripts />
+                                    {import.meta.env.MODE !== "production" && (
+                                        <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
+                                    )}
+                                </div>
+                            </ProgressBar>
+                            {/* {import.meta.env.MODE !== "production" && <TanStackRouterDevtoolsPanel />} */}
+                            <Toaster closeButton richColors duration={3000} expand={false} position="top-right" />
+                            <Scripts />
+                        </CartProvider>
+                    </StoreProvider>
                 </ThemeProvider>
             </body>
         </html>

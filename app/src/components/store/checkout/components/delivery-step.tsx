@@ -46,7 +46,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
     }
 
     return (
-        <Card className="w-full animate-fade-in">
+        <Card>
             <CardHeader className="text-center">
                 <CardTitle className="text-xl md:text-2xl font-semibold">How would you like to receive your order?</CardTitle>
                 <CardDescription className="text-sm md:text-base">Choose between home delivery or store pickup</CardDescription>

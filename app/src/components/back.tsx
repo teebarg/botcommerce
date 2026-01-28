@@ -3,7 +3,7 @@ import { ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils";
-import { useLocation, useNavigate } from "@tanstack/react-router";
+import { useCanGoBack, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 
 interface Props {
     className?: string;
@@ -11,6 +11,8 @@ interface Props {
 }
 
 const BackButton: React.FC<Props> = ({ onClick, className }) => {
+    const router = useRouter();
+    const canGoBack = useCanGoBack();
     const navigate = useNavigate();
     const location = useLocation();
     const pathname = location.pathname;
@@ -21,10 +23,10 @@ const BackButton: React.FC<Props> = ({ onClick, className }) => {
             return;
         }
 
-        if (window.history.length > 1) {
-            navigate({delta: -1})
+        if (canGoBack) {
+            router.history.back();
         } else {
-            navigate({to: "/"});
+            navigate({ to: "/" });
         }
     };
 

@@ -21,6 +21,7 @@ import { Route as PaymentVerifyRouteImport } from './routes/payment.verify'
 import { Route as ApiPushEventRouteImport } from './routes/api/push-event'
 import { Route as AdminSharedRouteImport } from './routes/admin/shared'
 import { Route as MainLayoutWishlistRouteImport } from './routes/_mainLayout/wishlist'
+import { Route as MainLayoutFeaturedRouteImport } from './routes/_mainLayout/featured'
 import { Route as MainLayoutCartRouteImport } from './routes/_mainLayout/cart'
 import { Route as MainLayoutBulkRouteImport } from './routes/_mainLayout/bulk'
 import { Route as MainLayoutAccountRouteImport } from './routes/_mainLayout/account'
@@ -119,6 +120,11 @@ const AdminSharedRoute = AdminSharedRouteImport.update({
 const MainLayoutWishlistRoute = MainLayoutWishlistRouteImport.update({
   id: '/wishlist',
   path: '/wishlist',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+const MainLayoutFeaturedRoute = MainLayoutFeaturedRouteImport.update({
+  id: '/featured',
+  path: '/featured',
   getParentRoute: () => MainLayoutRoute,
 } as any)
 const MainLayoutCartRoute = MainLayoutCartRouteImport.update({
@@ -347,6 +353,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof MainLayoutAccountRouteWithChildren
   '/bulk': typeof MainLayoutBulkRoute
   '/cart': typeof MainLayoutCartRoute
+  '/featured': typeof MainLayoutFeaturedRoute
   '/wishlist': typeof MainLayoutWishlistRoute
   '/admin/shared': typeof AdminSharedRoute
   '/api/push-event': typeof ApiPushEventRoute
@@ -398,6 +405,7 @@ export interface FileRoutesByTo {
   '/home': typeof AuthLayoutHomeRoute
   '/bulk': typeof MainLayoutBulkRoute
   '/cart': typeof MainLayoutCartRoute
+  '/featured': typeof MainLayoutFeaturedRoute
   '/wishlist': typeof MainLayoutWishlistRoute
   '/admin/shared': typeof AdminSharedRoute
   '/api/push-event': typeof ApiPushEventRoute
@@ -454,6 +462,7 @@ export interface FileRoutesById {
   '/_mainLayout/account': typeof MainLayoutAccountRouteWithChildren
   '/_mainLayout/bulk': typeof MainLayoutBulkRoute
   '/_mainLayout/cart': typeof MainLayoutCartRoute
+  '/_mainLayout/featured': typeof MainLayoutFeaturedRoute
   '/_mainLayout/wishlist': typeof MainLayoutWishlistRoute
   '/admin/shared': typeof AdminSharedRoute
   '/api/push-event': typeof ApiPushEventRoute
@@ -509,6 +518,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/bulk'
     | '/cart'
+    | '/featured'
     | '/wishlist'
     | '/admin/shared'
     | '/api/push-event'
@@ -560,6 +570,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/bulk'
     | '/cart'
+    | '/featured'
     | '/wishlist'
     | '/admin/shared'
     | '/api/push-event'
@@ -615,6 +626,7 @@ export interface FileRouteTypes {
     | '/_mainLayout/account'
     | '/_mainLayout/bulk'
     | '/_mainLayout/cart'
+    | '/_mainLayout/featured'
     | '/_mainLayout/wishlist'
     | '/admin/shared'
     | '/api/push-event'
@@ -756,6 +768,13 @@ declare module '@tanstack/react-router' {
       path: '/wishlist'
       fullPath: '/wishlist'
       preLoaderRoute: typeof MainLayoutWishlistRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_mainLayout/featured': {
+      id: '/_mainLayout/featured'
+      path: '/featured'
+      fullPath: '/featured'
+      preLoaderRoute: typeof MainLayoutFeaturedRouteImport
       parentRoute: typeof MainLayoutRoute
     }
     '/_mainLayout/cart': {
@@ -1089,6 +1108,7 @@ interface MainLayoutRouteChildren {
   MainLayoutAccountRoute: typeof MainLayoutAccountRouteWithChildren
   MainLayoutBulkRoute: typeof MainLayoutBulkRoute
   MainLayoutCartRoute: typeof MainLayoutCartRoute
+  MainLayoutFeaturedRoute: typeof MainLayoutFeaturedRoute
   MainLayoutWishlistRoute: typeof MainLayoutWishlistRoute
   MainLayoutIndexRoute: typeof MainLayoutIndexRoute
   MainLayoutstaticAboutRoute: typeof MainLayoutstaticAboutRoute
@@ -1111,6 +1131,7 @@ const MainLayoutRouteChildren: MainLayoutRouteChildren = {
   MainLayoutAccountRoute: MainLayoutAccountRouteWithChildren,
   MainLayoutBulkRoute: MainLayoutBulkRoute,
   MainLayoutCartRoute: MainLayoutCartRoute,
+  MainLayoutFeaturedRoute: MainLayoutFeaturedRoute,
   MainLayoutWishlistRoute: MainLayoutWishlistRoute,
   MainLayoutIndexRoute: MainLayoutIndexRoute,
   MainLayoutstaticAboutRoute: MainLayoutstaticAboutRoute,
