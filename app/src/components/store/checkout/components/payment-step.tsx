@@ -37,7 +37,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
     };
 
     return (
-        <Card className="animate-fade-in w-full">
+        <Card>
             <CardHeader>
                 <CardTitle className="text-2xl font-semibold flex items-center space-x-2">
                     <CreditCard className="h-6 w-6 text-primary" />

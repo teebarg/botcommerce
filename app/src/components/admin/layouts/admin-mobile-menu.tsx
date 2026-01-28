@@ -17,13 +17,12 @@ import {
     ShoppingCart,
     Tag,
 } from "lucide-react";
-import { useLocation, useRouteContext } from "@tanstack/react-router";
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useLocation } from "@tanstack/react-router";
 import LocalizedClientLink from "@/components/ui/link";
+import { AnimatePresence, motion } from "framer-motion";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const AdminMobileMenu: React.FC = () => {
-    const { session } = useRouteContext({ strict: false });
     const location = useLocation();
 
     const pathname = location.pathname;
@@ -48,58 +47,50 @@ const AdminMobileMenu: React.FC = () => {
     ];
 
     return (
-        <div className="h-screen rounded-[inherit] overflow-hidden overflow-y-auto">
-            <div className="p-4 bg-primary text-primary-foreground sticky top-safe z-10">
-                <div className="flex items-center space-x-3">
-                    <Avatar>
-                        <AvatarImage src={session?.user?.image!} />
-                        <AvatarFallback className="bg-secondary">{session?.user?.first_name[0] || ""}</AvatarFallback>
-                    </Avatar>
-
-                    <div>
-                        <div className="font-medium">
-                            {session?.user?.first_name} {session?.user?.last_name}
-                        </div>
-                        <div className="text-xs text-gray-300">{session?.user?.email}</div>
+        <AnimatePresence mode="wait">
+            <motion.div
+                key="menu"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="flex-1 flex flex-col overflow-hidden"
+            >
+                <div className="p-4 border-b">
+                    <div className="relative">
+                        <input
+                            className="w-full py-2 pl-8 pr-4 bg-background rounded-lg text-sm focus:outline-none border"
+                            placeholder="Search..."
+                            type="text"
+                        />
+                        <Search className="absolute left-2 top-2.5 text-muted-foreground" size={16} />
                     </div>
                 </div>
-            </div>
-
-            <div className="p-4 border-b">
-                <div className="relative">
-                    <input
-                        className="w-full py-2 pl-8 pr-4 bg-background rounded-lg text-sm focus:outline-none border"
-                        placeholder="Search..."
-                        type="text"
-                    />
-                    <Search className="absolute left-2 top-2.5 text-muted-foreground" size={16} />
+                <ScrollArea className="flex-1 px-2">
+                    <div className="py-2">
+                        {menuItems.map((item, idx: number) => (
+                            <LocalizedClientLink
+                                key={idx}
+                                className="flex items-center justify-between w-full p-3 text-left transition-colors"
+                                href={item.href}
+                                active="bg-primary/20 text-primary"
+                            >
+                                <div className="flex items-center space-x-3">
+                                    <span className={pathname === item.href ? "text-primary" : "text-muted-foreground"}>{item.icon}</span>
+                                    <span>{item.label}</span>
+                                </div>
+                                <ChevronRight className={pathname === item.href ? "text-primary" : "text-muted-foreground"} size={16} />
+                            </LocalizedClientLink>
+                        ))}
+                    </div>
+                </ScrollArea>
+                <div className="p-4 border-t">
+                    <button className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors w-full p-2">
+                        <LogOut size={20} />
+                        <span>Logout</span>
+                    </button>
                 </div>
-            </div>
-
-            <nav className="py-2">
-                {menuItems.map((item, idx: number) => (
-                    <LocalizedClientLink
-                        key={idx}
-                        className="flex items-center justify-between w-full p-3 text-left transition-colors"
-                        href={item.href}
-                        active="bg-primary/20 text-primary"
-                    >
-                        <div className="flex items-center space-x-3">
-                            <span className={pathname === item.href ? "text-primary" : "text-muted-foreground"}>{item.icon}</span>
-                            <span>{item.label}</span>
-                        </div>
-                        <ChevronRight className={pathname === item.href ? "text-primary" : "text-muted-foreground"} size={16} />
-                    </LocalizedClientLink>
-                ))}
-            </nav>
-
-            <div className="p-4 border-t sticky bottom-0 bg-background">
-                <button className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors w-full p-2">
-                    <LogOut size={20} />
-                    <span>Logout</span>
-                </button>
-            </div>
-        </div>
+            </motion.div>
+        </AnimatePresence>
     );
 };
 

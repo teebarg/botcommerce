@@ -6,7 +6,7 @@ import CartDetails from "@/components/store/cart/cart-details";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 import { useCart } from "@/providers/cart-provider";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingBag, ShoppingCart } from "lucide-react";
 
 const CartComponent: React.FC = () => {
     const { cart } = useCart();
@@ -22,7 +22,12 @@ const CartComponent: React.FC = () => {
         <Overlay
             open={state.isOpen}
             sheetClassName="min-w-[450px]"
-            title="Cart"
+            showHeader={true}
+            title={
+                <>
+                    <ShoppingBag className="w-6 h-6 text-primary" /> {`Your Cart (${totalItems})`}
+                </>
+            }
             trigger={
                 <Button size="icon" variant="ghost">
                     <ShoppingCart className="w-7 h-7" />

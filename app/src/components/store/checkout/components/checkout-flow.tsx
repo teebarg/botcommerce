@@ -7,8 +7,8 @@ import PaymentStep from "./payment-step";
 import CheckoutStepIndicator from "./checkout-step-indicator";
 import CheckoutLoginPrompt from "@/components/generic/auth/checkout-auth-prompt";
 import type { Cart } from "@/schemas";
-import { cn } from "@/utils";
 import { useRouteContext } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 
 export type CheckoutStep = "auth" | "delivery" | "address" | "payment";
 
@@ -69,34 +69,46 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose, cart }) => {
 
         switch (stepToRender) {
             case "auth":
-                return <CheckoutLoginPrompt />;
+                return (
+                    <motion.div key="auth" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="">
+                        <CheckoutLoginPrompt />
+                    </motion.div>
+                );
             case "delivery":
                 return (
-                    <DeliveryStep
-                        cart={cart}
-                        onComplete={() => {
-                            if (cart.shipping_method === "PICKUP") {
-                                setCurrentStep("payment");
-                            } else {
-                                setCurrentStep("address");
-                            }
-                        }}
-                    />
+                    <motion.div key="delivery" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                        <DeliveryStep
+                            cart={cart}
+                            onComplete={() => {
+                                if (cart.shipping_method === "PICKUP") {
+                                    setCurrentStep("payment");
+                                } else {
+                                    setCurrentStep("address");
+                                }
+                            }}
+                        />
+                    </motion.div>
                 );
             case "address":
-                return <AddressStep address={cart.shipping_address} onComplete={() => setCurrentStep("payment")} />;
+                return (
+                    <motion.div key="address" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                        <AddressStep address={cart.shipping_address} onComplete={() => setCurrentStep("payment")} />
+                    </motion.div>
+                );
             case "payment":
                 return (
-                    <PaymentStep
-                        cart={cart}
-                        onBack={() => {
-                            if (cart.shipping_method === "PICKUP") {
-                                setCurrentStep("delivery");
-                            } else {
-                                setCurrentStep("address");
-                            }
-                        }}
-                    />
+                    <motion.div key="payment" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}>
+                        <PaymentStep
+                            cart={cart}
+                            onBack={() => {
+                                if (cart.shipping_method === "PICKUP") {
+                                    setCurrentStep("delivery");
+                                } else {
+                                    setCurrentStep("address");
+                                }
+                            }}
+                        />
+                    </motion.div>
                 );
             default:
                 return null;
@@ -109,7 +121,7 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ onClose, cart }) => {
     return (
         <div className="space-y-6">
             {session && <CheckoutStepIndicator completedSteps={completedSteps} currentStep={activeStep} onStepClick={handleStepChange} />}
-            <div className={cn("transition-all duration-300", session ? "animate-fade-in" : "")}>{renderStep()}</div>
+            <AnimatePresence mode="wait">{renderStep()}</AnimatePresence>
         </div>
     );
 };
