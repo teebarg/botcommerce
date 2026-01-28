@@ -176,7 +176,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
 
                                 <div>
                                     <div className="mb-4">
-                                        <h3 className="font-semibold text-sm tracking-wider">TRENDING PRODUCTS2</h3>
+                                        <h3 className="font-semibold text-sm tracking-wider">TRENDING PRODUCTS</h3>
                                     </div>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                         {trendingData?.products?.map((product: ProductSearch) => (

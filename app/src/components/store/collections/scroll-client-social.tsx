@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import MobileFilterControl from "@/components/store/shared/mobile-filter-control";
 import { CollectionHeader } from "@/components/store/collections/collection-header";
@@ -33,32 +33,6 @@ export default function SocialInfiniteScrollClient({ initialData, collection_slu
         collections: collection_slug,
         search: searchTerm,
     });
-    // const [activeIndex, setActiveIndex] = useState(0);
-    // const [loading, setLoading] = useState(false);
-    // const containerRef = useRef<HTMLDivElement>(null);
-
-
-    // useEffect(() => {
-    //     const container = containerRef.current;
-    //     if (!container) return;
-
-    //     const handleScroll = () => {
-    //         if (isMobile) {
-    //             const scrollPosition = container.scrollTop;
-    //             const cardHeight = container.clientHeight;
-    //             const newIndex = Math.round(scrollPosition / cardHeight);
-    //             setActiveIndex(newIndex);
-    //         }
-
-    //         // const { scrollTop, scrollHeight, clientHeight } = container;
-    //         // if (scrollTop + clientHeight >= scrollHeight - 500) {
-    //         //     loadMore();
-    //         // }
-    //     };
-
-    //     container.addEventListener("scroll", handleScroll);
-    //     return () => container.removeEventListener("scroll", handleScroll);
-    // }, [isMobile]);
 
     if (isLoading) {
         return <CollectionTemplateSkeleton />;
@@ -70,69 +44,61 @@ export default function SocialInfiniteScrollClient({ initialData, collection_slu
 
     if (isMobile) {
         return (
-            <div className="relative h-[calc(100dvh-36px)]!pppp h-screen w-full overflow-hidden">
+            <div className="relative h-[calc(100dvh-36px)]! w-full overflow-hidden">
                 {!isLoading && !hasProducts && <NoProductsFound />}
-                {
-                    !isLoading && hasProducts && (
-                        <InfiniteScroll
-                            onLoadMore={fetchNextPage}
-                            hasMore={!!hasNextPage}
-                            isLoading={isFetchingNextPage}
-                            loader={
-                                <div className="flex flex-col items-center justify-center text-blue-600">
-                                    <Loader className="h-8 w-8 animate-spin mb-2" />
-                                    <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
-                                </div>
-                            }
-                            className="h-full w-full overflow-y-scroll snap-y snap-mandatory hide-scrollbar"
-                        >
-                            {products.map((product: ProductSearch) => (
-                                <ProductCardSocial
-                                    key={product.id}
-                                    product={product}
-                                    isActive={true}
-                                    variant="mobile"
-                                    facets={facets}
-                                />
-                            ))}
-                        </InfiniteScroll>
-                    )
-                }
-            </div >
+                {!isLoading && hasProducts && (
+                    <InfiniteScroll
+                        onLoadMore={fetchNextPage}
+                        hasMore={!!hasNextPage}
+                        isLoading={isFetchingNextPage}
+                        loader={
+                            <div className="flex flex-col items-center justify-center text-blue-600">
+                                <Loader className="h-8 w-8 animate-spin mb-2" />
+                                <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
+                            </div>
+                        }
+                        className="h-full w-full overflow-y-scroll snap-y snap-mandatory hide-scrollbar"
+                    >
+                        {products.map((product: ProductSearch) => (
+                            <ProductCardSocial key={product.id} product={product} isActive={true} variant="mobile" facets={facets} />
+                        ))}
+                    </InfiniteScroll>
+                )}
+            </div>
         );
     }
 
     return (
         <div className="max-w-9xl mx-auto w-full py-4 px-2">
             <div className="flex gap-6">
-            <aside className="hidden lg:block w-96 shrink-0">
-                <div className="sticky top-24 max-h-[calc(100vh-5rem)] overflow-y-auto">
-                    <FilterSidebar facets={facets} />
+                <aside className="hidden lg:block w-96 shrink-0">
+                    <div className="sticky top-24 max-h-[calc(100vh-5rem)] overflow-y-auto">
+                        <FilterSidebar facets={facets} />
+                    </div>
+                </aside>
+                <div className="w-full flex-1 flex-col relative">
+                    <SaleBanner />
+                    <CollectionHeader />
+                    <MobileFilterControl facets={facets} setViewMode={setViewMode} viewMode={viewMode} />
+                    <main className="w-full px-2 md:px-1 md:rounded-xl py-4 min-h-[50vh]">
+                        {!isLoading && !hasProducts && <NoProductsFound />}
+                        {!isLoading && hasProducts && (
+                            <InfiniteScroll
+                                onLoadMore={fetchNextPage}
+                                hasMore={!!hasNextPage}
+                                isLoading={isFetchingNextPage}
+                                loader={
+                                    <div className="flex flex-col items-center justify-center text-blue-600">
+                                        <Loader className="h-8 w-8 animate-spin mb-2" />
+                                        <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
+                                    </div>
+                                }
+                            >
+                                <ProductCardListings className="w-full pb-4" products={products!} viewMode={viewMode} />
+                            </InfiniteScroll>
+                        )}
+                    </main>
                 </div>
-            </aside>
-            <div className="w-full flex-1 flex-col relative">
-                <SaleBanner />
-                <CollectionHeader />
-                <MobileFilterControl facets={facets} setViewMode={setViewMode} viewMode={viewMode} />
-                <main className="w-full px-2 md:px-1 md:rounded-xl py-4 min-h-[50vh]">
-                    {!isLoading && !hasProducts && <NoProductsFound />}
-                    {!isLoading && hasProducts && (
-                        <InfiniteScroll
-                            onLoadMore={fetchNextPage}
-                            hasMore={!!hasNextPage}
-                            isLoading={isFetchingNextPage}
-                            loader={
-                                <div className="flex flex-col items-center justify-center text-blue-600">
-                                    <Loader className="h-8 w-8 animate-spin mb-2" />
-                                    <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
-                                </div>
-                            }
-                        >
-                            <ProductCardListings className="w-full pb-4" products={products!} viewMode={viewMode} />
-                        </InfiniteScroll>
-                    )}
-                </main>
-            </div>
             </div>
         </div>
     );
