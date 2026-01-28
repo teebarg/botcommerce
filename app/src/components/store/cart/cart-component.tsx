@@ -21,7 +21,6 @@ const CartComponent: React.FC = () => {
     return (
         <Overlay
             open={state.isOpen}
-            sheetClassName="min-w-[450px]"
             showHeader={true}
             title={
                 <>

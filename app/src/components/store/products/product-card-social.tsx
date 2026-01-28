@@ -52,7 +52,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, isActive, vari
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 className="absolute inset-0"
             >
-                <MediaDisplay url={product.images?.[0]} alt={product.name} />
+                <MediaDisplay url={product.images?.[0]} alt={product.name} className="object-contain" />
             </motion.div>
 
             <DiscountBadge
@@ -115,8 +115,6 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, isActive, vari
                 className="relative z-10 p-6 pb-32 w-full max-w-full bg-gradient-to-t from-black/90 via-black/40 to-transparent"
             >
                 <h2 className="mb-1 font-bold text-white/80 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">{product.name}</h2>
-                <p className="text-sm line-clamp-2 font-semibold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">{product.description}</p>
-
                 <div className="flex items-baseline gap-2 mb-2">
                     <PriceLabel priceInfo={priceInfo} priceClassName="text-white text-2xl" oldPriceClassName="text-white/50" />
                 </div>
