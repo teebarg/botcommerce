@@ -529,7 +529,7 @@
   }
 
   .product-card {
-    @apply relative w-full h-screen snap-start snap-always flex items-end;
+    @apply relative w-full h-[calc(100dvh-36px)] snap-start snap-always flex items-end;
   }
 
   .product-overlay {

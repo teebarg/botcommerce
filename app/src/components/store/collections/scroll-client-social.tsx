@@ -47,7 +47,7 @@ export default function SocialInfiniteScrollClient({ initialData, collection_slu
 
     if (isMobile) {
         return (
-            <div className="relative h-[calc(100dvh-36px)]! w-full overflow-hidden">
+            <div>
                 {!isLoading && !hasProducts && <NoProductsFound />}
                 {!isLoading && hasProducts && (
                     <InfiniteScroll
@@ -60,10 +60,10 @@ export default function SocialInfiniteScrollClient({ initialData, collection_slu
                                 <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
                             </div>
                         }
-                        className="h-full w-full overflow-y-scroll snap-y snap-mandatory hide-scrollbar"
+                        className="h-[calc(100dvh-64px-88px)]! w-full overflow-y-scroll snap-y snap-mandatory hide-scrollbar"
                     >
                         {products.map((product: ProductSearch) => (
-                            <ProductCardSocial key={product.id} product={product} isActive={true} facets={facets} />
+                            <ProductCardSocial key={product.id} product={product} facets={facets} />
                         ))}
                     </InfiniteScroll>
                 )}
