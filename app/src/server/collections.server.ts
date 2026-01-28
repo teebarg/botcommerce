@@ -60,7 +60,7 @@ export const deleteCollectionFn = createServerFn({ method: "POST" })
         return await api.delete<Collection>(`/collection/${id}`);
     });
 
-// --- Shared Collection (Catalog) Hooks ---
+// --- Catalog Hooks ---
 export const getCatalogsFn = createServerFn({ method: "GET" })
     .inputValidator(z.boolean().optional())
     .handler(async ({ data: is_active }) => {

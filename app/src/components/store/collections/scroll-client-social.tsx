@@ -33,7 +33,7 @@ export default function SocialInfiniteScrollClient({ initialData, collection_slu
         collections: collection_slug,
         search: searchTerm,
     });
-    const [activeIndex, setActiveIndex] = useState(4);
+    // const [activeIndex, setActiveIndex] = useState(0);
     // const [loading, setLoading] = useState(false);
     // const containerRef = useRef<HTMLDivElement>(null);
 
@@ -70,7 +70,7 @@ export default function SocialInfiniteScrollClient({ initialData, collection_slu
 
     if (isMobile) {
         return (
-            <div className="relative h-[calc(100dvh-36px)]! w-full overflow-hidden">
+            <div className="relative h-[calc(100dvh-36px)]!pppp h-screen w-full overflow-hidden">
                 {!isLoading && !hasProducts && <NoProductsFound />}
                 {
                     !isLoading && hasProducts && (
@@ -86,11 +86,11 @@ export default function SocialInfiniteScrollClient({ initialData, collection_slu
                             }
                             className="h-full w-full overflow-y-scroll snap-y snap-mandatory hide-scrollbar"
                         >
-                            {products.map((product: ProductSearch, index: number) => (
+                            {products.map((product: ProductSearch) => (
                                 <ProductCardSocial
                                     key={product.id}
                                     product={product}
-                                    isActive={index === activeIndex}
+                                    isActive={true}
                                     variant="mobile"
                                     facets={facets}
                                 />
