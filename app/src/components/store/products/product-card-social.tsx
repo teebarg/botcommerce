@@ -52,9 +52,9 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
 
     return (
         <div ref={ref} className="relative h-[calc(100dvh-64px-88px)]! w-full snap-start snap-always">
-            <div className="absolute inset-0 overflow-hidden">
+            {/* <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute inset-0 bg-linear-to-t from-black/90 to-black/70 backdrop-blur-[2px]" />
-            </div>
+            </div> */}
 
             <div className="absolute top-0 left-0 right-0 h-[55%]p flex items-start justify-center p-4p pt-6p">
                 <img src={product.images?.[0]} alt={product.name} className="max-w-full max-h-full object-contain rounded-2xlp shadow-2xl" />
@@ -156,7 +156,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
                     </div>
                 ))}
 
-                <h2 className="text-xl font-bold text-white mb-2 line-clamp-2">{product.name}</h2>
+                <h2 className="font-bold text-white mb-2 line-clamp-2">{product.name}</h2>
                 <div className="flex items-baseline gap-2 mb-2">
                     <PriceLabel priceInfo={priceInfo} priceClassName="text-white text-2xl" oldPriceClassName="text-white/50" />
                 </div>
