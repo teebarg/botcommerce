@@ -12,8 +12,8 @@ from anyio import to_thread
 
 client = Client(settings.MEILI_HOST, settings.MEILI_MASTER_KEY)
 
-REQUIRED_FILTERABLES = ["id", "catalogs", "category_slugs", "collection_slugs", "name", "max_variant_price", "min_variant_price", "active", "sizes", "colors", "ages"]
-REQUIRED_SORTABLES = ["id", "created_at", "max_variant_price", "min_variant_price"]
+REQUIRED_FILTERABLES = ["id", "catalogs", "category_slugs", "collection_slugs", "name", "max_variant_price", "min_variant_price", "active", "sizes", "colors", "ages", "random_bucket"]
+REQUIRED_SORTABLES = ["id", "created_at", "max_variant_price", "min_variant_price", "random_bucket", "freshness_score"]
 
 
 class CustomEncoder(JSONEncoder):

@@ -9,6 +9,8 @@ from app.services.prisma import with_prisma_connection
 from app.services.websocket import manager
 from app.services.activity import log_activity
 from app.services.redis import invalidate_pattern, invalidate_key
+import random
+from datetime import datetime, timezone
 
 logger = get_logger(__name__)
 
@@ -243,6 +245,16 @@ async def reindex_image(image_ids: Union[str, List[str]]):
 
 
 def prepare_product_data_for_indexing(product: Product) -> dict:
+    created_at = getattr(product, "created_at", None)
+    if created_at:
+        age_hours = max(
+            (datetime.now(timezone.utc) - created_at).total_seconds() / 3600,
+            1
+        )
+        freshness_score = round(1 / age_hours, 6)
+    else:
+        freshness_score = 0
+
     product_dict = {
         "id": product.id,
         "name": product.name,
@@ -251,6 +263,8 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
         "sku": product.sku,
         "active": product.active,
         "is_new": getattr(product, "is_new", False),
+        "random_bucket": random.randint(0, 999),
+        "freshness_score": freshness_score,
     }
 
     product_dict["collection_slugs"] = [c.slug for c in (product.collections or [])]
