@@ -1,7 +1,7 @@
 import { api } from "@/utils/fetch-api";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { Product, PaginatedProductSearch, Message, ProductVariant, ProductSearch } from "@/schemas";
+import type { Product, PaginatedProductSearch, Message, ProductVariant, ProductSearch, ProductFeed } from "@/schemas";
 
 const SearchParamsSchema = z.object({
     search: z.string().optional(),
@@ -80,6 +80,22 @@ export const SearchSchema = z.object({
     collections: z.string().optional(),
 });
 
+export const FeedQuerySchema = z.object({
+    search: z.string().optional(),
+    sort: z.string().optional(),
+    show_facets: z.boolean().optional(),
+    show_suggestions: z.boolean().optional(),
+    cat_ids: z.string().optional(),
+    sizes: z.number().optional(),
+    colors: z.string().optional(),
+    ages: z.string().optional(),
+    min_price: z.number().optional(),
+    max_price: z.number().optional(),
+    collections: z.string().optional(),
+    feed_seed: z.number().optional(),
+    cursor: z.string().optional(),
+});
+
 export const RelatedProductSearchSchema = z.object({
     productId: z.number().optional(),
     limit: z.number().optional(),
@@ -92,12 +108,18 @@ export const getProductsFn = createServerFn({ method: "GET" })
         return res;
     });
 
+export const getProductsFeedFn = createServerFn()
+    .inputValidator(FeedQuerySchema)
+    .handler(async ({ data }) => {
+        const res = await api.get<ProductFeed>("/product/feed", { params: { limit: 24, ...data } });
+        return res;
+    });
+
 export const productSearchFn = createServerFn({ method: "GET" })
     .inputValidator(SearchParamsSchema)
     .handler(async ({ data: params }) => {
         return await api.get<PaginatedProductSearch>("/product/", { params });
     });
-
 
 export const getProductFn = createServerFn({ method: "GET" })
     .inputValidator((d: string) => d)
@@ -105,7 +127,6 @@ export const getProductFn = createServerFn({ method: "GET" })
         const res = await api.get<Product>(`/product/${data}`);
         return res;
     });
-
 
 export const getRelatedProductFn = createServerFn({ method: "GET" })
     .inputValidator((input: unknown) => RelatedProductSearchSchema.parse(input))
@@ -126,13 +147,11 @@ export const similarProductsFn = createServerFn({ method: "GET" })
         return await api.get<{ similar: ProductSearch[] }>(`/product/${productId}/similar`, { params: { limit } });
     });
 
-
 export const createProductFn = createServerFn({ method: "POST" })
     .inputValidator(InputAnySchema)
     .handler(async ({ data: input }) => {
         return await api.post<Product>("/product", input);
     });
-
 
 export const updateProductFn = createServerFn({ method: "POST" })
     .inputValidator(UpdateProductPayloadSchema)
@@ -153,7 +172,6 @@ export const createVariantFn = createServerFn({ method: "POST" })
         return await api.post<ProductVariant>(`/product/${productId}/variants`, variantData);
     });
 
-
 export const updateVariantFn = createServerFn({ method: "POST" })
     .inputValidator(UpdateVariantInputSchema)
     .handler(async ({ data: input }) => {
@@ -161,17 +179,15 @@ export const updateVariantFn = createServerFn({ method: "POST" })
         return await api.put<ProductVariant>(`/product/variants/${id}`, variantData);
     });
 
-
 export const deleteVariantFn = createServerFn({ method: "POST" })
     .inputValidator(ProductIdSchema)
     .handler(async ({ data: id }) => {
         return await api.delete<Message>(`/product/variants/${id}`);
     });
 
-export const reIndexProductsFn = createServerFn({ method: "POST" })
-    .handler(async () => {
-        return await api.post<Message>(`/product/reindex`);
-    });
+export const reIndexProductsFn = createServerFn({ method: "POST" }).handler(async () => {
+    return await api.post<Message>(`/product/reindex`);
+});
 
 export const uploadImageFn = createServerFn({ method: "POST" })
     .inputValidator(ImageUploadSchema)
@@ -191,24 +207,19 @@ export const deleteImagesFn = createServerFn({ method: "POST" })
         return await api.delete<Message>(`/product/${id}/images/${imageId}`);
     });
 
-
 export const reorderImagesFn = createServerFn({ method: "POST" })
     .inputValidator(ImageReorderSchema)
     .handler(async ({ data: { id, imageIds } }) => {
         return await api.patch<Message>(`/product/${id}/images/reorder`, imageIds);
     });
 
+export const bustCacheFn = createServerFn({ method: "POST" }).handler(async () => {
+    return await api.post<Message>("/cache/bust", { pattern: "products" });
+});
 
-export const bustCacheFn = createServerFn({ method: "POST" })
-    .handler(async () => {
-        return await api.post<Message>("/cache/bust", { pattern: "products" });
-    });
-
-export const flushCacheFn = createServerFn({ method: "POST" })
-    .handler(async () => {
-        return await api.post<Message>("/cache/clear", {});
-    });
-
+export const flushCacheFn = createServerFn({ method: "POST" }).handler(async () => {
+    return await api.post<Message>("/cache/clear", {});
+});
 
 export const createBundleFn = createServerFn({ method: "POST" })
     .inputValidator((d: any) => d)

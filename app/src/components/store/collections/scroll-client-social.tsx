@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import MobileFilterControl from "@/components/store/shared/mobile-filter-control";
 import { CollectionHeader } from "@/components/store/collections/collection-header";
 import NoProductsFound from "@/components/store/products/no-products";
-import { useProductInfiniteSearch } from "@/hooks/useProduct";
+import { useProductFeed } from "@/hooks/useProduct";
 import ProductCardListings from "@/components/store/products/product-card-listings";
 import SaleBanner from "@/components/store/sale-banner";
 import { useSearch } from "@tanstack/react-router";
@@ -27,7 +27,7 @@ export default function SocialInfiniteScrollClient({ initialData, collection_slu
         strict: false,
     });
     const [viewMode, setViewMode] = useState<"grid" | "list">("list");
-    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useProductInfiniteSearch(initialData, {
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useProductFeed(initialData, {
         ...search,
         show_facets: true,
         collections: collection_slug,
@@ -110,8 +110,8 @@ export default function SocialInfiniteScrollClient({ initialData, collection_slu
                         }
                         className="h-[calc(100dvh-64px-88px)]! w-full overflow-y-scroll snap-y snap-mandatory hide-scrollbar"
                     >
-                        {products.map((product: ProductSearch) => (
-                            <ProductCardSocial key={product.id} product={product} facets={facets} />
+                        {products.map((product: ProductSearch, idx: number) => (
+                            <ProductCardSocial key={idx} product={product} facets={facets} />
                         ))}
                     </InfiniteScroll>
                 )}

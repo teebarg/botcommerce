@@ -245,17 +245,17 @@ async def reindex_image(image_ids: Union[str, List[str]]):
 
 
 def prepare_product_data_for_indexing(product: Product) -> dict:
-    created_at = getattr(product, "created_at", None)
+    created_at: Any | None = getattr(product, "created_at", None)
     if created_at:
-        age_hours = max(
+        age_hours: int = max(
             (datetime.now(timezone.utc) - created_at).total_seconds() / 3600,
             1
         )
-        freshness_score = round(1 / age_hours, 6)
+        freshness_score: float = round(1 / age_hours, 6)
     else:
         freshness_score = 0
 
-    product_dict = {
+    product_dict: dict[str, bool | int | str | Unknown | None] = {
         "id": product.id,
         "name": product.name,
         "slug": product.slug,
@@ -263,7 +263,7 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
         "sku": product.sku,
         "active": product.active,
         "is_new": getattr(product, "is_new", False),
-        "random_bucket": random.randint(0, 999),
+        "random_score": random.random(),
         "freshness_score": freshness_score,
     }
 
@@ -309,4 +309,3 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict["catalogs"] = [sc.slug for sc in (product.shared_collections or [])]
 
     return product_dict
-
