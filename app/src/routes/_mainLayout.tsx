@@ -29,8 +29,8 @@ function MainLayoutComponent() {
                     <div className="flex gap-2 items-center flex-1">
                         <BackButton />
                         <LocalizedClientLink href="/">
-                            <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-                                <ShoppingBag className="w-5 h-5 text-primary-foreground" />
+                            <div className="w-9 h-9 rounded-lg gradient-primary flex items-center justify-center">
+                                <ShoppingBag className="w-5 h-5 text-white" />
                             </div>
                         </LocalizedClientLink>
                     </div>

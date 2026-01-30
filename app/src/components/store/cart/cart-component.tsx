@@ -30,7 +30,7 @@ const CartComponent: React.FC = () => {
             trigger={
                 <Button size="icon" variant="ghost">
                     <ShoppingCart className="w-7 h-7" />
-                    <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 gradient-primary text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
                         {totalItems.toString()}
                     </span>
                 </Button>

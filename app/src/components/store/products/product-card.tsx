@@ -13,6 +13,7 @@ import { cn } from "@/utils";
 import MediaDisplay from "@/components/media-display";
 import { useMemo } from "react";
 import { IsNew } from "@/components/products/product-badges";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -20,6 +21,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale" }) => {
+    const isMobile = useIsMobile();
     const { priceInfo, outOfStock } = useProductVariant(product);
     const dialogState = useOverlayTriggerState({});
     const { data } = useUserWishlist();
@@ -29,9 +31,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale" }) 
 
     return (
         <Overlay
+            sheetClassName="h-[100dvh]!"
             open={dialogState.isOpen}
-            sheetClassName="min-w-[30vw]"
-            title="Details"
             trigger={
                 <div className="h-full group relative bg-card flex flex-col rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
                     <div className="relative aspect-3/4 overflow-hidden">
@@ -85,6 +86,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale" }) 
                 </div>
             }
             onOpenChange={dialogState.setOpen}
+            side={isMobile ? "bottom" : "right"}
         >
             <ProductOverview isLiked={inWishlist} product={product} onClose={dialogState.close} />
         </Overlay>

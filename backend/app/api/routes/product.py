@@ -16,7 +16,7 @@ from app.models.product import (
     ProductCreate,
     ProductUpdate,
     VariantWithStatus,
-    Product, SearchProducts,
+    Product, SearchProducts, FeedProducts,
     ProductCreateBundle,
 )
 from app.services.meilisearch import (
@@ -135,7 +135,204 @@ async def get_recommendations(request: Request, user: CurrentUser, limit: int = 
 #     products = await service.get_popular_products(limit)
 #     return products
 
+@router.get("/feed")
+@cache_response("products")
+async def feed(
+    request: Request,
+    search: str = "",
+    sort: str = "id:desc",
+    cat_ids: str = Query(default=""),
+    collections: str = Query(default=""),
+    max_price: int = Query(default=1000000, gt=0),
+    min_price: int = Query(default=1, gt=0),
+    sizes: str = Query(default=""),
+    colors: str = Query(default=""),
+    ages: str = Query(default=""),
+    limit: int = Query(default=20, le=100),
+    active: bool = Query(default=True),
+    show_suggestions: bool = Query(default=False),
+    show_facets: bool = Query(default=False),
+    feed_seed: float | None = Query(default=None),
+    cursor: str | None = Query(default=None),
+) -> FeedProducts:
+    """
+    Cursor-based discovery feed using Meilisearch-compatible pagination.
+    """
+    use_search = search != ""
 
+    import random, json, base64
+
+    def encode_cursor(hit: dict) -> str:
+        payload = {
+            "r": hit["random_score"],
+            "f": hit["freshness_score"],
+            "id": hit["id"],
+        }
+        return base64.urlsafe_b64encode(
+            json.dumps(payload).encode()
+        ).decode()
+
+    def decode_cursor(cursor: str) -> dict:
+        return json.loads(
+            base64.urlsafe_b64decode(cursor.encode()).decode()
+        )
+
+    base_filters = []
+
+    if cat_ids:
+        base_filters.append(f"category_slugs IN {url_to_list(cat_ids)}")
+
+    if collections:
+        base_filters.append(f"collection_slugs IN [{collections}]")
+
+    if min_price and max_price:
+        base_filters.append(
+            f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}"
+        )
+
+    base_filters.append(f"active = {active}")
+
+    if sizes:
+        base_filters.append(f"sizes IN [{sizes}]")
+
+    if colors:
+        base_filters.append(f"colors IN [{colors}]")
+
+    if ages:
+        age_values: str = ", ".join([f'"{age}"' for age in [ages]])
+        base_filters.append(f"ages IN [{age_values}]")
+
+    if feed_seed is None:
+        feed_seed = random.random()
+
+    index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
+    use_search: bool = True if any([search, cat_ids, collections, sizes, colors, ages]) else False
+
+    try:
+        hits: list[dict] = []
+        total_count = 0
+
+        if not use_search:
+            cursor_filter = ""
+
+            if cursor:
+                c = decode_cursor(cursor)
+                print(c)
+                cursor_filter = (
+                    f"(random_score > {c['r']} OR "
+                    f"(random_score = {c['r']} AND freshness_score < {c['f']}) OR "
+                    f"(random_score = {c['r']} AND freshness_score = {c['f']} AND id > {c['id']}))"
+                )
+
+            seed_filter: str = f"random_score >= {feed_seed}"
+
+            filters = " AND ".join(
+                f for f in [
+                    seed_filter,
+                    cursor_filter,
+                    *base_filters,
+                ] if f
+            )
+
+            res = index.search(
+                "",
+                {
+                    "limit": limit,
+                    "sort": [
+                        "random_score:asc",
+                        "freshness_score:desc",
+                        "id:desc",
+                    ],
+                    "filter": filters,
+                },
+            )
+
+            hits = res["hits"]
+            total_count = res["estimatedTotalHits"]
+
+            if len(hits) < limit and not cursor:
+                remaining = limit - len(hits)
+
+                wrap_filters = " AND ".join(
+                    f for f in [
+                        f"random_score < {feed_seed}",
+                        *base_filters,
+                    ] if f
+                )
+
+                wrap_res = index.search(
+                    "",
+                    {
+                        "limit": remaining,
+                        "sort": [
+                            "random_score:asc",
+                            "freshness_score:desc",
+                            "id:desc",
+                        ],
+                        "filter": wrap_filters,
+                    },
+                )
+
+                hits.extend(wrap_res["hits"])
+                total_count += wrap_res["estimatedTotalHits"]
+        else:
+            print("in normal search")
+            search_params = {
+                "limit": limit,
+                "sort": [sort],
+            }
+
+            if base_filters:
+                search_params["filter"] = " AND ".join(base_filters)
+
+            if show_facets:
+                search_params["facets"] = [
+                    "category_slugs",
+                    "sizes",
+                    "colors",
+                    "ages",
+                ]
+
+            res = index.search(search, search_params)
+            hits = res["hits"]
+            total_count = res["estimatedTotalHits"]
+
+        suggestions = []
+        if show_suggestions and search:
+            suggestions_raw = index.search(
+                search,
+                {
+                    "limit": 4,
+                    "attributesToRetrieve": ["name"],
+                    "matchingStrategy": "all",
+                },
+            )
+            suggestions = list(
+                {hit["name"] for hit in suggestions_raw["hits"] if "name" in hit}
+            )
+
+    except MeilisearchApiError as e:
+        logger.error(f"Meilisearch error: {e}")
+        raise HTTPException(
+            status_code=502,
+            detail="Search service temporarily unavailable",
+        )
+
+    next_cursor: str | None = (
+        encode_cursor(hits[-1])
+        if hits and total_count > limit
+        else None
+    )
+
+    return {
+        "products": hits,
+        "facets": res.get("facetDistribution", {}),
+        "limit": limit,
+        "total_count": total_count,
+        "feed_seed": feed_seed,
+        "next_cursor": next_cursor,
+        "suggestions": suggestions,
+    }
 
 @router.get("/")
 @cache_response("products")

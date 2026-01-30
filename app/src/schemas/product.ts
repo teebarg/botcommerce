@@ -175,6 +175,16 @@ export const PaginatedProductSearchSchema = PagSchema.extend({
     suggestions: z.array(z.string()),
 });
 
+export const ProductFeedSchema = z.object({
+    products: z.array(ProductSearchSchema),
+    facets: FacetSchema.optional(),
+    suggestions: z.array(z.string()),
+    feed_seed: z.number(),
+    next_cursor: z.string(),
+    limit: z.number(),
+    total_count: z.number(),
+});
+
 export const WishItemSchema = z.object({
     id: z.number(),
     name: z.string(),
@@ -257,6 +267,7 @@ export type DBCatalog = z.infer<typeof DBCatalogSchema>;
 export type Product = z.infer<typeof ProductSchema>;
 export type ProductSearch = z.infer<typeof ProductSearchSchema>;
 export type PaginatedProductSearch = z.infer<typeof PaginatedProductSearchSchema>;
+export type ProductFeed = z.infer<typeof ProductFeedSchema>;
 export type Facet = z.infer<typeof FacetSchema>;
 
 export type Category = z.infer<typeof CategorySchema>;

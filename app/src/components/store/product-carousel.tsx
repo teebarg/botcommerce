@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/store/products/product-card";
 import type { ProductSearch } from "@/schemas";
 import ComponentLoader from "@/components/component-loader";
-import { cn } from "@/utils";
 
 interface ScrollState {
     atStart: boolean;
@@ -14,13 +13,11 @@ interface ScrollState {
 
 interface IconCollectionsProps {
     products: ProductSearch[];
-    title?: string;
-    description?: string;
     isLoading?: boolean;
     variant?: "sale" | "electric";
 }
 
-const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, description, isLoading = false, variant = "sale" }) => {
+const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, isLoading = false, variant = "sale" }) => {
     const headingId = useId();
     const listRef = useRef<HTMLUListElement>(null);
     const [scrollState, setScrollState] = useState<ScrollState>({
@@ -104,52 +101,38 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
     );
 
     return (
-        <section aria-labelledby={headingId} aria-live="polite" className="relative overflow-hidden">
-            <div className="relative mx-auto flex max-w-[1400px] flex-col pb-4 pt-2">
-                <header className="flex gap-6 sm:items-end justify-between">
-                    <div>
-                        <h2 className={cn("font-semibold font-display text-xl", !title && "hidden")}>{title}</h2>
-                        <p className={cn("font-medium text-muted-foreground", !description && "hidden")} id={headingId}>
-                            {description}
-                        </p>
-                    </div>
-                    <div aria-label="carousel controls" className="hidden md:flex items-center gap-3" role="group">
-                        <Button
-                            aria-label="Scroll collections backward"
-                            className="h-12 w-12 rounded-full text-gray-800 dark:text-gray-100 border border-gray-600 dark:border-gray-200"
-                            disabled={scrollState.activeIndex <= 0}
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => scrollToIndex(scrollState.activeIndex - 1)}
+        <section aria-labelledby={headingId} aria-live="polite" className="relative">
+            <Button
+                aria-label="Scroll backward"
+                className="carousel-nav-link absolute top-1/2 -translate-y-1/2 z-10 h-12 w-12 -left-6 hidden md:flex"
+                size="icon"
+                onClick={() => scrollToIndex(scrollState.activeIndex - 1)}
+                disabled={scrollState.activeIndex <= 0}
+            >
+                <ChevronLeft className="h-5 w-5" strokeWidth={2} />
+            </Button>
+            <Button
+                aria-label="Scroll forward"
+                className="carousel-nav-link absolute top-1/2 -translate-y-1/2 z-10 h-12 w-12 -right-6 hidden md:flex"
+                size="icon"
+                onClick={() => scrollToIndex(scrollState.activeIndex + 1)}
+                disabled={scrollState.activeIndex >= products.length - 1}
+            >
+                <ChevronRight className="h-5 w-5" strokeWidth={2} />
+            </Button>
+            <div className="relative pb-4 pt-2 overflow-hidden">
+                {isLoading && <ComponentLoader className="h-[400px]" />}
+                <ul ref={listRef} aria-label="Products" className="m-0 flex list-none snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth">
+                    {products?.map((product: ProductSearch, idx: number) => (
+                        <li
+                            key={idx}
+                            data-card
+                            className="group/card relative shrink-0 basis-[50%] snap-start snap-always sm:basis-[22%] min-w-[280px]"
                         >
-                            <ChevronLeft className="h-5 w-5" strokeWidth={1.5} />
-                        </Button>
-                        <Button
-                            aria-label="Scroll collections forward"
-                            className="h-12 w-12 rounded-full text-gray-800 dark:text-gray-100 border border-gray-600 dark:border-gray-200"
-                            disabled={scrollState.activeIndex >= products.length - 1}
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => scrollToIndex(scrollState.activeIndex + 1)}
-                        >
-                            <ChevronRight className="h-5 w-5" strokeWidth={1.5} />
-                        </Button>
-                    </div>
-                </header>
-                <div className="relative mt-10">
-                    {isLoading && <ComponentLoader className="h-[400px]" />}
-                    <ul ref={listRef} aria-label="Products" className="m-0 flex list-none snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth">
-                        {products?.map((product: ProductSearch, idx: number) => (
-                            <li
-                                key={idx}
-                                data-card
-                                className="group/card relative shrink-0 basis-[70%] snap-start snap-always sm:basis-[22%] min-w-[280px]"
-                            >
-                                <ProductCard product={product} variant={variant} />
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                            <ProductCard product={product} variant={variant} />
+                        </li>
+                    ))}
+                </ul>
             </div>
         </section>
     );

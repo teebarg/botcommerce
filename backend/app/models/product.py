@@ -111,6 +111,15 @@ class Facets(BaseModel):
     colors: Optional[dict[str, int]] = None
     ages: Optional[dict[str, int]] = None
 
+class FeedProducts(BaseModel):
+    products: List[SearchProduct]
+    facets: Facets
+    total_count: int
+    suggestions: List[str]
+    limit: int
+    feed_seed: float | None
+    next_cursor: str | None
+
 class SearchProducts(BaseModel):
     products: List[SearchProduct]
     facets: Facets

@@ -56,3 +56,12 @@ export const AGE_OPTIONS = [
     "10-12 years",
     "12+ years",
 ];
+
+export const HERO_IMAGES = [
+  "https://res.cloudinary.com/dj7ubhgys/image/upload/v1769793694/h5_t5dv1x.jpg",
+  "https://res.cloudinary.com/dj7ubhgys/image/upload/v1769793694/h4_tu4ham.jpg",
+  "https://res.cloudinary.com/dj7ubhgys/image/upload/v1769793694/h3_ydbkmz.jpg",
+  "https://res.cloudinary.com/dj7ubhgys/image/upload/v1769793694/h2_tfzcyr.jpg",
+  "https://res.cloudinary.com/dj7ubhgys/image/upload/v1769793694/h1_zaixjo.jpg",
+];
+
