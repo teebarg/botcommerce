@@ -1,14 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
+import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import { tryCatch } from "@/utils/try-catch";
 import z from "zod";
 import { getCollectionFn } from "@/server/collections.server";
 import { seo } from "@/utils/seo";
-import { productFeedOptions } from "@/hooks/useProduct";
+import { productQueryOptions } from "@/hooks/useProduct";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import SocialInfiniteScrollClient from "@/components/store/collections/scroll-client-social";
 
-const FeedQuerySchema = z.object({
+const productSearchSchema = z.object({
     sort: z.enum(["min_variant_price:asc", "min_variant_price:desc", "id:desc", "created_at:desc"]).optional(),
+    limit: z.number().optional(),
+    skip: z.number().optional(),
     max_price: z.number().optional(),
     min_price: z.number().optional(),
     cat_ids: z.string().optional(),
@@ -17,8 +19,8 @@ const FeedQuerySchema = z.object({
     ages: z.string().optional(),
 });
 
-export const Route = createFileRoute("/_mainLayout/collections/$slug")({
-    validateSearch: FeedQuerySchema,
+export const Route = createFileRoute("/_mainLayout/collections-old/$slug")({
+    validateSearch: productSearchSchema,
     beforeLoad: ({ search }) => {
         return {
             search,
@@ -26,7 +28,7 @@ export const Route = createFileRoute("/_mainLayout/collections/$slug")({
     },
     loader: async ({ params: { slug }, context: { queryClient, search, config } }) => {
         const { data: collection } = await tryCatch(getCollectionFn({ data: slug }));
-        await queryClient.ensureQueryData(productFeedOptions({ collections: collection?.slug, ...search }));
+        await queryClient.ensureQueryData(productQueryOptions({ limit: 36, collections: collection?.slug, ...search }));
         return {
             collection,
             config,
@@ -58,11 +60,11 @@ export const Route = createFileRoute("/_mainLayout/collections/$slug")({
 function RouteComponent() {
     const { slug } = Route.useParams();
     const search = Route.useSearch();
-    const { data } = useSuspenseQuery(productFeedOptions({ collections: slug, ...search }));
+    const { data } = useSuspenseQuery(productQueryOptions({ limit: 36, collections: slug, ...search }));
 
     return (
         <div className="max-w-9xl mx-auto w-full py-4 px-2">
-            <SocialInfiniteScrollClient initialData={data} collection_slug={slug!} />
+            <InfiniteScrollClient initialData={data} collection_slug={slug!} />
         </div>
     );
 }

@@ -62,6 +62,12 @@
     --background-image-gradient-sale: var(--gradient-sale);
     --background-image-gradient-gold: var(--gradient-gold);
 
+    --gradient-action: linear-gradient(135deg, hsl(340, 82%, 52%) 0%, hsl(15, 90%, 60%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0, 0%, 10%) 0%, hsl(0, 0%, 6%) 100%);
+    --gradient-glass: linear-gradient(135deg, hsla(0, 0%, 100%, 0.1) 0%, hsla(0, 0%, 100%, 0.05) 100%);
+    --shadow-glow: 0 0 40px hsla(340, 82%, 52%, 0.3);
+    --shadow-card: 0 8px 32px hsla(0, 0%, 0%, 0.4);
+
     --aspect-product: 4 / 5;
 
     --container-8xl: 88rem;
@@ -215,6 +221,11 @@
     --gradient-sale: linear-gradient(135deg, hsl(0 85% 60%) 0%, hsl(14 100% 57%) 100%);
     --gradient-success: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(152 50% 45%) 100%);
     --gradient-gold: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(45 95% 70%) 50%, hsl(var(--gold)) 100%);
+    --gradient-action: linear-gradient(135deg, hsl(340, 82%, 52%) 0%, hsl(15, 90%, 60%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0, 0%, 10%) 0%, hsl(0, 0%, 6%) 100%);
+    --gradient-glass: linear-gradient(135deg, hsla(0, 0%, 100%, 0.1) 0%, hsla(0, 0%, 100%, 0.05) 100%);
+    --shadow-glow: 0 0 40px hsla(340, 82%, 52%, 0.3);
+    --shadow-card: 0 8px 32px hsla(0, 0%, 0%, 0.4);
 
     --warning: #f59e0b;
     --warning-foreground: #ffffff;
@@ -464,9 +475,13 @@
     .bg-muted,
     .bg-accent,
     .bg-destructive {
-        transition: background-color var(--tw-transition-duration) ease-in-out, color var(--tw-transition-duration) ease-in-out,
-            border-color var(--tw-transition-duration) ease-in-out, outline-color var(--tw-transition-duration) ease-in-out,
-            fill var(--tw-transition-duration) ease-in-out, box-shadow var(--tw-transition-duration) ease-in-out;
+        transition:
+            background-color var(--tw-transition-duration) ease-in-out,
+            color var(--tw-transition-duration) ease-in-out,
+            border-color var(--tw-transition-duration) ease-in-out,
+            outline-color var(--tw-transition-duration) ease-in-out,
+            fill var(--tw-transition-duration) ease-in-out,
+            box-shadow var(--tw-transition-duration) ease-in-out;
     }
 
     /* Hide scrollbar for immersive experience */
@@ -520,9 +535,37 @@
         background-clip: text;
     }
 
+    .gradient-action {
+        background: var(--gradient-action);
+    }
+
+    .gradient-card {
+        background: var(--gradient-card);
+    }
+
+    .gradient-glass {
+        background: var(--gradient-glass);
+        backdrop-filter: blur(20px);
+    }
+
+    .shadow-glow {
+        box-shadow: var(--shadow-glow);
+    }
+
+    .shadow-card {
+        box-shadow: var(--shadow-card);
+    }
+
+    .text-gradient {
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
     .action-button {
         @apply w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300;
-        @apply bg-white/10 backdrop-blur-lg hover:bg-white/20 active:scale-90;
+        @apply bg-white/20 backdrop-blur-lg hover:bg-white/20 active:scale-90;
     }
 
     .product-card {
@@ -530,7 +573,7 @@
     }
 
     .product-overlay {
-        @apply absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent;
+        @apply absolute inset-0 bg-gradient-to-t from-black via-black/90 to-transparent;
     }
 
     .floating-nav {
@@ -555,5 +598,10 @@
 
     .carousel-nav-link {
         @apply rounded-full bg-card-foreground hover:bg-foreground text-card shadow-md backdrop-blur disabled:opacity-40 disabled:pointer-events-none;
+    }
+
+    .fade-to-black {
+        mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0) 100%);
+        -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0) 100%);
     }
 }

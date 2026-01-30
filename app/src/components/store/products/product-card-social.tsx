@@ -10,7 +10,6 @@ import { useMemo, useRef } from "react";
 import { IsNew } from "@/components/products/product-badges";
 import { AnimatePresence, motion } from "framer-motion";
 import { Filter, Heart, Music } from "lucide-react";
-import { ActionButton } from "../collections/action-button";
 import ShareButton2 from "@/components/share2";
 import Overlay from "@/components/overlay";
 import { useOverlayTriggerState } from "react-stately";
@@ -18,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FilterSidebarLogic, FilterSidebarRef } from "../shared/filter-sidebar-logic";
 import { useInView } from "react-intersection-observer";
+import { cn } from "@/utils";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -51,14 +51,14 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
     };
 
     return (
-        <div ref={ref} className="relative h-[calc(100dvh-64px-88px)]! w-full snap-start snap-always">
+        <div ref={ref} className="relative h-[calc(100dvh-64px-88px)]! w-full snap-start snap-always bg-[#121212]">
             {/* <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute inset-0 bg-linear-to-t from-black/90 to-black/70 backdrop-blur-[2px]" />
             </div> */}
 
-            <div className="absolute top-0 left-0 right-0 h-[55%]p flex items-start justify-center p-4p pt-6p">
-                <img src={product.images?.[0]} alt={product.name} className="max-w-full max-h-full object-contain rounded-2xlp shadow-2xl" />
-                <div className="absolute -bottom-4 left-0 right-0 h-20 bg-linear-to-t from-black/90 via-black/40 to-transparent backdrop-blur-[2px]" />
+            <div className="absolute top-0 left-0 right-0 h-[55%]p flex items-start justify-center">
+                <img src={product.images?.[0]} alt={product.name} className="max-w-full max-h-full object-contain shadow-2xl fade-to-black" />
+                {/* <div className="pointer-events-none absolute bottom-0 left-0 h-40 w-full bg-gradient-to-t from-[#121212] via-[#121212]/60 to-transparent" /> */}
             </div>
 
             <DiscountBadge
@@ -69,9 +69,6 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
             />
 
             {isNew && <IsNew className="top-4 left-4" />}
-            {/* Gradient Overlay */}
-            <div className="product-overlay" />
-
             {outOfStock && (
                 <div className="absolute inset-0 bg-black/35 flex items-center justify-center">
                     <Badge className="text-sm backdrop-blur-sm" variant="contrast">
@@ -84,7 +81,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
                 transition={{ delay: 0.3, duration: 0.4 }}
-                className="absolute right-3 bottom-48 flex flex-col gap-4"
+                className="absolute right-4 bottom-32 flex flex-col gap-4"
                 onClick={(e) => e.stopPropagation()}
             >
                 <Overlay
@@ -95,11 +92,11 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
                         </div>
                     }
                     trigger={
-                        <motion.button whileTap={{ scale: 0.85 }} className="flex flex-col items-center gap-1">
-                            <div className="action-button bg-warning/10!">
-                                <Filter className="w-6 h-6 transition-colors text-warning" fill="currentColor" />
+                        <motion.button whileTap={{ scale: 0.85 }} className="flex flex-col items-center gap-1 text-white/80">
+                            <div className="action-button">
+                                <Filter className="w-6 h-6 transition-colors" fill="currentColor" />
                             </div>
-                            <span className="text-xs font-bold text-warning/80">Filter</span>
+                            <span className="text-xs font-bold">Filter</span>
                         </motion.button>
                     }
                     onOpenChange={editState.setOpen}
@@ -127,16 +124,22 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
                         </motion.div>
                     </AnimatePresence>
                 </Overlay>
-                <ActionButton
-                    icon={Heart}
-                    isActive={inWishlist}
+                <motion.button
+                    whileTap={{ scale: 0.85 }}
+                    whileHover={{ scale: 1.05 }}
                     onClick={() => {
                         inWishlist ? removeWishlist() : addWishlist();
                     }}
-                    activeColor="text-destructive"
-                    activeBackgroundColor="bg-destructive/20!"
-                    label="Wishlist"
-                />
+                    className="flex flex-col items-center gap-1 text-white/80"
+                >
+                    <div className={cn("action-button", inWishlist ? "bg-destructive/20!" : "")}>
+                        <Heart
+                            className={`w-6 h-6 transition-colors ${inWishlist ? "text-destructive" : "text-white/80"}`}
+                            fill={inWishlist ? "currentColor" : "none"}
+                        />
+                    </div>
+                    <span className={`text-xs font-bold ${inWishlist ? "text-destructive" : "text-white/80"}`}>Wishlist</span>
+                </motion.button>
                 <ShareButton2 />
             </motion.div>
 
@@ -156,7 +159,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
                     </div>
                 ))}
 
-                <h2 className="font-bold text-white mb-2 line-clamp-2">{product.name}</h2>
+                <h2 className="font-bold text-white mb-2 truncatep line-clamp-2 pr-24">{product.name}</h2>
                 <div className="flex items-baseline gap-2 mb-2">
                     <PriceLabel priceInfo={priceInfo} priceClassName="text-white text-2xl" oldPriceClassName="text-white/50" />
                 </div>

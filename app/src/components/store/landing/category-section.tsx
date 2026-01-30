@@ -19,7 +19,8 @@ const CategoriesSection: React.FC = () => {
                             <Link
                                 key={idx}
                                 className="shrink-0 snap-start relative w-32 h-32 rounded-2xl overflow-hidden"
-                                to={`/collections?cat_ids=${category.slug}`}
+                                to="/collections"
+                                search={(prev) => ({ ...prev, cat_ids: category.slug })}
                             >
                                 <img src={category.image || "/placeholder.jpg"} alt={category.name} className="w-full h-full object-cover" />
                                 <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent flex items-end">

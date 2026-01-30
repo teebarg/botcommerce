@@ -44,7 +44,6 @@ const Menu: React.FC = () => {
                 <NavLink href="/checkout" icon={<CreditCard className="h-6 w-6" />} title="Checkout" />
                 {session && <NavLink href="/wishlist" icon={<Heart className="h-6 w-6" />} title="Favorites" />}
                 {session?.user?.isAdmin && <NavLink href="/admin" icon={<User2 className="h-6 w-6" />} title="Admin" />}
-                {session?.user?.isAdmin && <NavLink href="/featured" icon={<User2 className="h-6 w-6" />} title="Featured" />}
             </div>
 
             <Separator className="my-8" />

@@ -1,19 +1,16 @@
-import { ArrowRight, Heart, Sparkles, Star } from "lucide-react";
-
+import { ArrowRight, Sparkles, Star } from "lucide-react";
 import { BtnLink } from "@/components/ui/btnLink";
 import { Link } from "@tanstack/react-router";
 import { currency } from "@/utils";
 
-const HeroSection: React.FC = () => {
-    const featuredProduct = {
-        name: "Premium Collection",
-        description: "Discover our curated collection of premium fashion pieces that define elegance and sophistication.",
-        price: 29999,
-        image_url: "https://images.unsplash.com/photo-1525845859779-54d477ff291f?w=800&h=1000&fit=crop",
-    };
+interface HeroSectionProps {
+    image: string;
+}
+
+const HeroSection: React.FC<HeroSectionProps> = ({ image }) => {
     return (
         <div>
-            <div className="relative min-h-[92vh] md:min-h-[80vh] hidden md:flex items-center justify-center overflow-hidden">
+            <div className="relative min-h-[80vh] hidden md:flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
                     <div className="absolute inset-0 bg-linear-to-b from-background/80 via-background/60 to-background" />
                 </div>
@@ -28,7 +25,7 @@ const HeroSection: React.FC = () => {
                     <Sparkles className="w-5 h-5 text-contrast opacity-70" />
                 </div>
 
-                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         <div className="text-left space-y-2 lg:space-y-7 animate-fade-in">
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-contrast/10 border border-contrast/20 text-contrast backdrop-blur-sm">
@@ -37,7 +34,7 @@ const HeroSection: React.FC = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <h1 className="text-3xl md:text-5xl font-display font-bold text-foreground tracking-tight leading-tight">
+                                <h1 className="text-5xl font-display font-bold text-foreground tracking-tight leading-tight">
                                     Discover Your
                                     <span className="text-primary block">Perfect Style</span>
                                 </h1>
@@ -61,8 +58,8 @@ const HeroSection: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="flex flex-col sm:flex-row gap-4 pt-2">
-                                <BtnLink className="group" href="/collections" size="lg">
+                            <div className="flex gap-4 pt-2">
+                                <BtnLink className="group" href="/collection" size="lg">
                                     Shop Collection
                                     <ArrowRight className="w-5 h-5 ml-1 transition-transform group-hover:translate-x-1" />
                                 </BtnLink>
@@ -138,29 +135,27 @@ const HeroSection: React.FC = () => {
                     </div>
                 </div>
             </div>
-            {featuredProduct && (
-                <section className="md:hidden relative screen-height w-full overflow-hidden">
-                    <img src={featuredProduct.image_url} alt={featuredProduct.name} className="absolute inset-0 w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-linear-to-t from-black via-black/50 to-transparent" />
-                    <div className="absolute bottom-32 left-0 right-0 px-6 space-y-4">
-                        <div className="inline-block bg-white text-black text-xs font-semibold px-3 py-1 rounded-full mb-2">FEATURED</div>
-                        <h1 className="text-4xl font-bold leading-tight">{featuredProduct.name}</h1>
-                        <p className="text-lg text-gray-300">{featuredProduct.description}</p>
-                        <div className="flex items-center gap-4 pt-2">
-                            <span className="text-3xl font-bold">{currency(featuredProduct.price)}</span>
-                            <Link
-                                to="/featured"
-                                className="flex-1 bg-white text-black font-semibold py-4 rounded-full hover:bg-gray-100 transition-colors"
-                            >
-                                Shop Now
-                            </Link>
-                            <button className="p-4 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-colors">
-                                <Heart className="w-6 h-6" />
-                            </button>
+            <section className="md:hidden relative screen-height w-full overflow-hidden">
+                <img src={image} alt="image" className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-linear-to-t from-black via-black/50 to-transparent" />
+                <div className="absolute bottom-32 left-0 right-0 px-6 space-y-4">
+                    <div className="inline-block bg-white text-black text-xs font-semibold px-3 py-1 rounded-full mb-2">FEATURED</div>
+                    <h1 className="text-4xl font-bold leading-tight text-gray-100">Premium Collection</h1>
+                    <p className="text-lg text-gray-300">Premium Collection</p>
+                    <div className="flex items-center gap-4 pt-2">
+                        <div className="flex flex-col">
+                            <span>as low as</span>
+                            <span className="text-3xl font-bold text-gray-100">{currency(2000)}</span>
                         </div>
+                        <Link
+                            to="/collections"
+                            className="flex-1 flex items-center justify-center bg-white text-black font-semibold py-4 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                            Shop Now
+                        </Link>
                     </div>
-                </section>
-            )}
+                </div>
+            </section>
         </div>
     );
 };

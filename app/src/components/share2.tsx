@@ -59,11 +59,11 @@ export default function ShareButton2() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <motion.button whileTap={{ scale: 0.85 }} whileHover={{ scale: 1.05 }} className="flex flex-col items-center gap-1">
-                    <div className="action-button bg-primary/10!">
-                        <Share2 className="w-6 h-6 transition-colors text-primary" fill="currentColor" />
+                <motion.button whileTap={{ scale: 0.85 }} whileHover={{ scale: 1.05 }} className="flex flex-col items-center gap-1 z-50 text-white/80">
+                    <div className="action-button">
+                        <Share2 className="w-6 h-6" fill="currentColor" />
                     </div>
-                    <span className="text-xs font-semibold text-primary/80">Share</span>
+                    <span className="text-xs font-semibold">Share</span>
                 </motion.button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64 p-2 shadow-hover bg-secondary">

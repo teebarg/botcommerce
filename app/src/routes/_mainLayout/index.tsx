@@ -13,6 +13,7 @@ import NewArrivals from "@/components/store/home/arrival";
 import NewsletterSection from "@/components/store/landing/newsletter-section";
 import { getCategoriesProductsFn } from "@/server/categories.server";
 import CategoriesWithProductsSection from "@/components/store/home/categories-products";
+import { HERO_IMAGES } from "@/utils/constants";
 
 const categoriesProductsQueryOptions = () => ({
     queryKey: ["products", "home"],
@@ -22,9 +23,11 @@ const categoriesProductsQueryOptions = () => ({
 export const Route = createFileRoute("/_mainLayout/")({
     component: Home,
     loader: async ({ context: { queryClient } }) => {
+        const image = HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)];
         const data = await queryClient.ensureQueryData(categoriesProductsQueryOptions());
         return {
             data,
+            heroImage: image
         };
     },
 });
@@ -33,7 +36,7 @@ function Home() {
     const loaderData = Route.useLoaderData();
     return (
         <div>
-            <HeroSection />
+            <HeroSection image={loaderData.heroImage} />
             <CategoriesSection />
             <SaleBanner />
             <SizesGrid />
