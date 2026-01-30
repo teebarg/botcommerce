@@ -17,12 +17,12 @@ const StoreNavbar = ({ session }: { session: Session | null }) => {
             <NavbarContent className="flex flex-1 max-w-9xl mx-auto">
                 <NavbarBrand className="flex items-center font-semibold">
                     <LocalizedClientLink href="/" className="flex items-center gap-2">
-                        <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-                            <ShoppingBag className="w-5 h-5 text-primary-foreground" />
+                        <div className="w-9 h-9 rounded-lg gradient-primary flex items-center justify-center">
+                            <ShoppingBag className="w-5 h-5 text-white" />
                         </div>
                         <span className="font-display text-xl font-semibold text-foreground hidden sm:block">{config?.shop_name}</span>
                     </LocalizedClientLink>
-                    <LocalizedClientLink className="hidden md:block" href={"/collections"}>
+                    <LocalizedClientLink className="hidden md:block" href="/collections">
                         Explore
                     </LocalizedClientLink>
                 </NavbarBrand>

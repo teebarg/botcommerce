@@ -1,5 +1,5 @@
 import type React from "react";
-import { Link } from "@tanstack/react-router"
+import { Link } from "@tanstack/react-router";
 import { Heart } from "lucide-react";
 
 import type { ProductImage } from "@/schemas";
@@ -27,7 +27,7 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, slug, name, images }) =
                 </div>
             </div>
             <div className="space-y-1 px-1">
-                <Link className="font-medium line-clamp-1 text-lg" to={`/products/${slug}`}>
+                <Link className="font-medium line-clamp-1 text-lg" to="/products/$slug" params={{ slug }}>
                     {name}
                 </Link>
             </div>

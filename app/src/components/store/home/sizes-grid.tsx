@@ -8,7 +8,6 @@ const SizesGrid = () => {
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-4">
                     <h2 className="text-base md:text-3xl font-bold">Shop by Size</h2>
-                    {/* <p className="text-muted-foreground max-w-2xl mx-auto text-lg">Find your perfect fit with our size-specific collections</p> */}
                 </div>
                 <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4">
                     {sizes?.map((item: string, idx: number) => (

@@ -22,13 +22,13 @@ export default function SignInPage() {
                 <div className="mt-6 text-center">
                     <p className="text-sm text-muted-foreground">
                         By signing in, you agree to our{" "}
-                        <a className="text-contrast font-medium" href="#">
+                        <Link className="text-contrast font-medium" to="/terms">
                             Terms of Service
-                        </a>{" "}
+                        </Link>{" "}
                         and{" "}
-                        <a className="text-contrast font-medium" href="#">
+                        <Link className="text-contrast font-medium" to="/privacy">
                             Privacy Policy
-                        </a>
+                        </Link>
                     </p>
                 </div>
             </div>

@@ -52,10 +52,6 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
 
     return (
         <div ref={ref} className="relative h-[calc(100dvh-64px-88px)]! w-full snap-start snap-always bg-[#121212]">
-            {/* <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute inset-0 bg-linear-to-t from-black/90 to-black/70 backdrop-blur-[2px]" />
-            </div> */}
-
             <div className="absolute top-0 left-0 right-0 h-[55%]p flex items-start justify-center">
                 <img src={product.images?.[0]} alt={product.name} className="max-w-full max-h-full object-contain shadow-2xl fade-to-black" />
                 {/* <div className="pointer-events-none absolute bottom-0 left-0 h-40 w-full bg-gradient-to-t from-[#121212] via-[#121212]/60 to-transparent" /> */}
@@ -143,7 +139,6 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
                 <ShareButton2 />
             </motion.div>
 
-            {/* Product details overlay */}
             <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
@@ -159,7 +154,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
                     </div>
                 ))}
 
-                <h2 className="font-bold text-white mb-2 truncatep line-clamp-2 pr-24">{product.name}</h2>
+                <h2 className="font-bold text-white mb-2 line-clamp-2 pr-24">{product.name}</h2>
                 <div className="flex items-baseline gap-2 mb-2">
                     <PriceLabel priceInfo={priceInfo} priceClassName="text-white text-2xl" oldPriceClassName="text-white/50" />
                 </div>
@@ -172,7 +167,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
                             transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
                             className="text-xs text-muted-foreground whitespace-nowrap"
                         >
-                            🎵 Trending Sound • Shop the look • Limited Edition Drop
+                            🎵 Trending Styles • Shop the look • Limited Edition Drop
                         </motion.p>
                     </div>
                 </div>

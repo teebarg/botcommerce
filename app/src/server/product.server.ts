@@ -111,7 +111,7 @@ export const getProductsFn = createServerFn({ method: "GET" })
 export const getProductsFeedFn = createServerFn()
     .inputValidator(FeedQuerySchema)
     .handler(async ({ data }) => {
-        const res = await api.get<ProductFeed>("/product/feed", { params: { limit: 24, ...data } });
+        const res = await api.get<ProductFeed>("/product/feed", { params: { limit: 40, ...data } });
         return res;
     });
 
