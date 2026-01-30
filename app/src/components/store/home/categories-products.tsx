@@ -137,7 +137,7 @@ const ProductsCarousel = ({ name, slug, products }: { name: string; slug: string
                             <li
                                 key={idx}
                                 data-card
-                                className="group/card relative shrink-0 basis-[70%] snap-start snap-always sm:basis-[22%] min-w-[280px]"
+                                className="group/card relative shrink-0 basis-[50%] snap-start snap-always sm:basis-[22%] min-w-[280px]"
                             >
                                 <ProductCard product={product} />
                             </li>

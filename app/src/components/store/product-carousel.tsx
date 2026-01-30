@@ -136,14 +136,14 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, title, des
                         </Button>
                     </div>
                 </header>
-                <div className="relative mt-10">
+                <div className="relative">
                     {isLoading && <ComponentLoader className="h-[400px]" />}
                     <ul ref={listRef} aria-label="Products" className="m-0 flex list-none snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth">
                         {products?.map((product: ProductSearch, idx: number) => (
                             <li
                                 key={idx}
                                 data-card
-                                className="group/card relative shrink-0 basis-[70%] snap-start snap-always sm:basis-[22%] min-w-[280px]"
+                                className="group/card relative shrink-0 basis-[50%] snap-start snap-always sm:basis-[22%] min-w-[280px]"
                             >
                                 <ProductCard product={product} variant={variant} />
                             </li>

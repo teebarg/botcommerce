@@ -83,8 +83,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
                                 <motion.button
                                     whileTap={{ scale: 0.98 }}
                                     onClick={() => router.navigate({ to: "/checkout" })}
-                                    className="w-full h-14 rounded-2xl gradient-primary text-primary-foreground font-semibold flex items-center justify-center gap-2"
-                                    style={{ boxShadow: "0 8px 32px hsl(350 89% 60% / 0.4)" }}
+                                    className="w-full h-14 rounded-2xl gradient-primary text-white font-semibold flex items-center justify-center gap-2 shadow-background/30 shadow-xl"
                                 >
                                     Proceed to Checkout
                                     <ArrowRight className="w-5 h-5" />
