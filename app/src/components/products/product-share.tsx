@@ -1,6 +1,7 @@
 import type React from "react";
 import { Separator } from "@/components/ui/separator";
 import { Facebook, Link2, Linkedin, Share2, Twitter } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface ProductShareProps {
     name: string;
@@ -28,9 +29,12 @@ const ProductShare: React.FC<ProductShareProps> = ({ name }) => {
 
     return (
         <div className="relative group">
-            <button className="p-2 rounded-full hover:bg-card transition-colors">
-                <Share2 className="w-6 h-6 text-muted-foreground" />
-            </button>
+            <motion.button
+                whileTap={{ scale: 0.95 }}
+                className="p-3 rounded-xl border bg-background border-border hover:border-primary transition-colors"
+            >
+                <Share2 className="w-6 h-6 text-foreground" />
+            </motion.button>
 
             <div className="absolute right-0 mt-2 w-48 bg-secondary rounded-lg shadow-lg p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
                 <div className="space-y-2">

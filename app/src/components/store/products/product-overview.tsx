@@ -338,7 +338,7 @@ const ProductOverview: React.FC<{
                 </div>
                 <div className="flex gap-2">
                     <Button
-                        className="w-full gradient-action"
+                        className="w-full bg-gradient-action"
                         disabled={loading || !selectedVariant || outOfStock}
                         isLoading={loading}
                         size="lg"

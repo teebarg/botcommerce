@@ -26,21 +26,24 @@ export const paymentInfoMap: Record<string, { title: string; description: string
 
 export const SIZE_OPTIONS = ["6", "8", "10", "12", "14", "16", "18", "20", "22", "24"];
 export const COLOR_OPTIONS = [
-    "Red",
-    "Blue",
-    "Green",
-    "Black",
-    "White",
-    "Gray",
-    "Yellow",
-    "Purple",
-    "Orange",
-    "Pink",
-    "Brown",
-    "Magenta",
-    "Indigo",
-    "Wine",
+    { name: "Black", value: "#000000" },
+    { name: "White", value: "#FFFFFF" },
+    { name: "Navy", value: "#1e3a5f" },
+    { name: "Red", value: "#dc2626" },
+    { name: "Pink", value: "#ec4899" },
+    { name: "Beige", value: "#d4b896" },
+    { name: "Brown", value: "#78350f" },
+    { name: "Green", value: "#16a34a" },
+    { name: "Blue", value: "#2563eb" },
+    { name: "Gray", value: "#6b7280" },
+    { name: "Yellow", value: "#f59e0b" },
+    { name: "Purple", value: "#9333ea" },
+    { name: "Orange", value: "#ef4444" },
+    { name: "Magenta", value: "#d946ef" },
+    { name: "Indigo", value: "#4f46e5" },
+    { name: "Wine", value: "#955251" },
 ];
+
 export const AGE_OPTIONS = [
     "0-6 months",
     "6-12 months",
@@ -58,10 +61,9 @@ export const AGE_OPTIONS = [
 ];
 
 export const HERO_IMAGES = [
-  "https://res.cloudinary.com/dj7ubhgys/image/upload/v1769793694/h5_t5dv1x.jpg",
-  "https://res.cloudinary.com/dj7ubhgys/image/upload/v1769793694/h4_tu4ham.jpg",
-  "https://res.cloudinary.com/dj7ubhgys/image/upload/v1769793694/h3_ydbkmz.jpg",
-  "https://res.cloudinary.com/dj7ubhgys/image/upload/v1769793694/h2_tfzcyr.jpg",
-  "https://res.cloudinary.com/dj7ubhgys/image/upload/v1769793694/h1_zaixjo.jpg",
+    "https://res.cloudinary.com/dj7ubhgys/image/upload/v1769793694/h5_t5dv1x.jpg",
+    "https://res.cloudinary.com/dj7ubhgys/image/upload/v1769793694/h4_tu4ham.jpg",
+    "https://res.cloudinary.com/dj7ubhgys/image/upload/v1769793694/h3_ydbkmz.jpg",
+    "https://res.cloudinary.com/dj7ubhgys/image/upload/v1769793694/h2_tfzcyr.jpg",
+    "https://res.cloudinary.com/dj7ubhgys/image/upload/v1769793694/h1_zaixjo.jpg",
 ];
-

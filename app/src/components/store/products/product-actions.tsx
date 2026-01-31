@@ -9,7 +9,8 @@ import { useRouteContext } from "@tanstack/react-router";
 
 const ProductActions: React.FC<{
     product: ProductSearch;
-}> = ({ product }) => {
+    actionColor?: string;
+}> = ({ product, actionColor = "gradient-primary" }) => {
     const { selectedVariant, handleAddToCart, handleWhatsAppPurchase, loading, outOfStock, isAdded } = useProductVariant(product);
 
     const { session } = useRouteContext({ strict: false });
@@ -34,7 +35,7 @@ const ProductActions: React.FC<{
 
     return (
         <div className="flex gap-1">
-            <Button className="w-full h-12! gradient-action" disabled={loading || !selectedVariant || outOfStock} size="sm" onClick={handleAddToCartAndTrack}>
+            <Button className={`w-full h-12! ${actionColor}`} disabled={loading || !selectedVariant || outOfStock} size="sm" onClick={handleAddToCartAndTrack}>
                 {loading ? (
                     "Adding..."
                 ) : (

@@ -94,7 +94,7 @@ export default function SharedInfinite({ slug, initialCatalog }: Props) {
                         <div className={cn("grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4", viewMode === "grid" ? "" : "grid-cols-1")}>
                             {products?.map((product: ProductSearch, idx: number) => (
                                 <div key={`product-${idx}`}>
-                                    <ProductCard product={product} />
+                                    <ProductCard product={product} index={idx} />
                                 </div>
                             ))}
                         </div>

@@ -6,10 +6,13 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { COLOR_OPTIONS, SIZE_OPTIONS, AGE_OPTIONS } from "@/utils/constants";
-import { cn } from "@/utils";
-import RangeSlider from "@/components/ui/range-slider";
+import { cn, currency } from "@/utils";
 import type { Facet } from "@/schemas/product";
 import { useSearch } from "@tanstack/react-router";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider";
+import { motion } from "framer-motion";
 
 export interface FilterSidebarRef {
     apply: () => void;
@@ -50,8 +53,8 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
             colors: new Set(search.colors?.split(",").filter(Boolean)),
             ages: new Set(search.ages?.split(",").filter(Boolean)),
             categories: new Set(search.cat_ids?.split(",").filter(Boolean)),
-            minPrice: search.min_price?.toString() ?? "",
-            maxPrice: search.max_price?.toString() ?? "",
+            minPrice: search.min_price?.toString() ?? "0",
+            maxPrice: search.max_price?.toString() ?? "50000",
         };
     }, [search]);
 
@@ -133,203 +136,157 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
     }));
 
     return (
-        <>
-            <div className="mb-6">
-                <Button
-                    className="justify-between w-full p-0 font-semibold mb-3 hover:bg-transparent"
-                    variant="ghost"
-                    onClick={() => toggleSection("categories" as any)}
-                >
-                    CATEGORIES
-                    {(openSections as any) && (openSections as any).categories ? (
-                        <ChevronUp className="h-4 w-4" />
-                    ) : (
-                        <ChevronDown className="h-4 w-4" />
-                    )}
-                </Button>
-
-                {(openSections as any).categories && (
-                    <div className="grid grid-cols-2 gap-2 max-h-64 overflow-auto pr-1">
-                        {categories?.map((cat) => {
-                            const active = draft.categories.has(cat.slug);
-
-                            return (
-                                <Button
-                                    key={cat.id}
-                                    className={cn("justify-between bg-card h-12", active && "bg-primary hover:bg-primary/90 text-white")}
-                                    size="sm"
-                                    variant={active ? "default" : "outline"}
-                                    onClick={() => onToggleCategory(cat.slug)}
-                                >
-                                    {cat.name}
-                                    <span className={cn("", !facets && "hidden")}>({facets?.category_slugs?.[cat.slug] || 0})</span>
-                                </Button>
-                            );
-                        })}
+        <div className="space-y-6">
+            <Collapsible open={openSections.categories} onOpenChange={() => toggleSection("categories")}>
+                <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
+                    <span className="font-medium">Categories</span>
+                    <ChevronDown className={`h-4 w-4 transition-transform ${openSections.categories ? "rotate-180" : ""}`} />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="max-h-52 overflow-auto">
+                    <div className="space-y-2 pt-2">
+                        {categories?.map((category) => (
+                            <div key={category.id} className="flex items-center space-x-2">
+                                <Checkbox
+                                    id={`cat-${category.id}`}
+                                    checked={draft.categories.has(category.slug)}
+                                    onCheckedChange={() => onToggleCategory(category.slug)}
+                                />
+                                <Label htmlFor={`cat-${category.id}`} className="text-sm cursor-pointer flex-1">
+                                    {category.name}
+                                </Label>
+                                <span className="text-xs text-muted-foreground">{facets?.category_slugs?.[category.slug] || 0}</span>
+                            </div>
+                        ))}
                     </div>
-                )}
-            </div>
-
-            <div className="mb-6">
-                <Button
-                    className="justify-between w-full p-0 font-semibold mb-3 hover:bg-transparent"
-                    variant="ghost"
-                    onClick={() => toggleSection("price" as any)}
-                >
-                    PRICE RANGE
-                    {(openSections as any) && (openSections as any).price ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </Button>
-
-                {(openSections as any).price && (
-                    <RangeSlider
-                        defaultValue={[Number(search.min_price ?? 1000), Number(search.max_price ?? 50000)]}
-                        label="Price Range"
-                        max={100000}
-                        min={0}
-                        step={500}
-                        onChange={onPriceChange}
-                    />
-                )}
-            </div>
-
-            <div className="mb-6">
-                <Button
-                    className="justify-between w-full p-0 font-semibold mb-3 hover:bg-transparent"
-                    variant="ghost"
-                    onClick={() => toggleSection("sort")}
-                >
-                    SORT BY
-                    {openSections.sort ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </Button>
-
-                {openSections.sort && (
-                    <RadioGroup value={sort} onValueChange={setSort}>
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem id="price-low" value="min_variant_price:asc" />
-                            <Label className="text-sm" htmlFor="price-low">
-                                Price: Low to High
-                            </Label>
+                </CollapsibleContent>
+            </Collapsible>
+            {/* Price Range */}
+            <Collapsible open={openSections.price} onOpenChange={() => toggleSection("price")}>
+                <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
+                    <span className="font-medium">Price Range</span>
+                    <ChevronDown className={`h-4 w-4 transition-transform ${openSections.price ? "rotate-180" : ""}`} />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <div className="pt-4 px-1">
+                        <Slider
+                            value={[Number(draft.minPrice ?? 1000), Number(draft.maxPrice ?? 50000)]}
+                            min={0}
+                            max={50000}
+                            step={500}
+                            onValueChange={(value) => onPriceChange(value as [number, number])}
+                            className="mb-4 mx-auto w-full max-w-sm"
+                        />
+                        <div className="flex justify-between text-sm text-muted-foreground">
+                            <span>{currency(Number(draft.minPrice))}</span>
+                            <span>{currency(Number(draft.maxPrice))}</span>
                         </div>
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem id="price-high" value="min_variant_price:desc" />
-                            <Label className="text-sm" htmlFor="price-high">
-                                Price: High to Low
-                            </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem id="newest" value="id:desc" />
-                            <Label className="text-sm" htmlFor="newest">
-                                Newest
-                            </Label>
-                        </div>
-                    </RadioGroup>
-                )}
-            </div>
-
-            <div className="mb-6">
-                <Button
-                    className="justify-between w-full p-0 font-semibold mb-3 hover:bg-transparent"
-                    variant="ghost"
-                    onClick={() => toggleSection("size")}
-                >
-                    SIZE
-                    {openSections.size ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </Button>
-
-                {openSections.size && (
-                    <div className="grid grid-cols-4 lg:grid-cols-3 gap-2">
-                        {SIZE_OPTIONS.map((size) => {
-                            const active = draft.sizes.has(size);
-
-                            return (
-                                <Button
-                                    key={size}
-                                    className={cn("h-12 text-base bg-card hover:bg-primary/90 hover:text-white", active && "bg-primary text-white")}
-                                    size="sm"
-                                    variant={active ? "default" : "outline"}
-                                    onClick={() => onToggleSize(size)}
-                                >
-                                    UK {size}
-                                    <span className={cn("ml-2", !facets && "hidden")}>({facets?.sizes?.[size] || 0})</span>
-                                </Button>
-                            );
-                        })}
                     </div>
-                )}
-            </div>
+                </CollapsibleContent>
+            </Collapsible>
 
-            <div className="mb-6">
-                <Button
-                    className="justify-between w-full p-0 font-semibold mb-3 hover:bg-transparent"
-                    variant="ghost"
-                    onClick={() => toggleSection("color")}
-                >
-                    COLOR
-                    {openSections.color ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </Button>
-
-                {openSections.color && (
-                    <div className="grid grid-cols-4 lg:grid-cols-3 gap-4">
-                        {COLOR_OPTIONS.map((color) => {
-                            const active = draft.colors.has(color);
-
-                            return (
-                                <button
-                                    key={color}
-                                    aria-pressed={active}
-                                    className={cn(
-                                        "flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity",
-                                        active && "opacity-100"
-                                    )}
-                                    onClick={() => onToggleColor(color)}
-                                >
-                                    <div
-                                        className={cn("w-8 h-8 rounded-full border border-border", active && "ring-2 ring-primary ring-offset-2")}
-                                        style={{ backgroundColor: color }}
-                                    />
-                                    <Label className="text-center text-sm" htmlFor={color}>
-                                        {color}
-                                        <span className={cn("ml-0.5", !facets && "hidden")}>({facets?.colors?.[color] || 0})</span>
-                                    </Label>
-                                </button>
-                            );
-                        })}
+            <Collapsible open={openSections.sort} onOpenChange={() => toggleSection("sort")}>
+                <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
+                    <span className="font-medium">Sort By</span>
+                    <ChevronDown className={`h-4 w-4 transition-transform ${openSections.sort ? "rotate-180" : ""}`} />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <div className="pt-2">
+                        <RadioGroup value={sort} onValueChange={setSort} className="gap-1">
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem id="price-low" value="min_variant_price:asc" />
+                                <Label className="text-sm" htmlFor="price-low">
+                                    Price: Low to High
+                                </Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem id="price-high" value="min_variant_price:desc" />
+                                <Label className="text-sm" htmlFor="price-high">
+                                    Price: High to Low
+                                </Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem id="newest" value="id:desc" />
+                                <Label className="text-sm" htmlFor="newest">
+                                    Newest
+                                </Label>
+                            </div>
+                        </RadioGroup>
                     </div>
-                )}
-            </div>
+                </CollapsibleContent>
+            </Collapsible>
 
-            <div className="space-y-3">
-                <button className="flex items-center justify-between w-full" onClick={() => setOpenSections((prev) => ({ ...prev, age: !prev.age }))}>
-                    <h3 className="font-medium">Age Range</h3>
-                    {openSections.age ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </button>
-
-                {openSections.age && (
-                    <div className="grid grid-cols-2 gap-2">
-                        {AGE_OPTIONS.map((age) => {
-                            const active = draft.ages.has(age);
-
-                            return (
-                                <button
-                                    key={age}
-                                    aria-pressed={active}
-                                    className={cn(
-                                        "flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity p-2 rounded-md border",
-                                        active && "bg-primary text-primary-foreground"
-                                    )}
-                                    onClick={() => onToggleAge(age)}
-                                >
-                                    <Label className="text-center text-sm" htmlFor={age}>
-                                        {age}
-                                        <span className={cn("ml-0.5", !facets && "hidden")}>({facets?.ages?.[age] || 0})</span>
-                                    </Label>
-                                </button>
-                            );
-                        })}
+            <Collapsible open={openSections.size} onOpenChange={() => toggleSection("size")}>
+                <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
+                    <span className="font-medium">Sizes</span>
+                    <ChevronDown className={`h-4 w-4 transition-transform ${openSections.size ? "rotate-180" : ""}`} />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <div className="flex flex-wrap gap-2 pt-2">
+                        {SIZE_OPTIONS.map((size) => (
+                            <motion.button
+                                key={size}
+                                onClick={() => onToggleSize(size)}
+                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                                    draft.sizes.has(size)
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-secondary text-secondary-foreground hover:bg-muted"
+                                }`}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                {size}
+                            </motion.button>
+                        ))}
                     </div>
-                )}
-            </div>
-        </>
+                </CollapsibleContent>
+            </Collapsible>
+
+            <Collapsible open={openSections.color} onOpenChange={() => toggleSection("color")}>
+                <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
+                    <span className="font-medium">Colors</span>
+                    <ChevronDown className={`h-4 w-4 transition-transform ${openSections.color ? "rotate-180" : ""}`} />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <div className="flex flex-wrap gap-2 pt-2">
+                        {COLOR_OPTIONS.map((color) => (
+                            <motion.button
+                                key={color.name}
+                                onClick={() => onToggleColor(color.name)}
+                                className={`relative w-8 h-8 rounded-full border-2 transition-all ${
+                                    draft.colors.has(color.name)
+                                        ? "border-primary ring-2 ring-primary ring-offset-2 ring-offset-background"
+                                        : "border-border hover:border-muted-foreground"
+                                }`}
+                                style={{ backgroundColor: color.value }}
+                                whileTap={{ scale: 0.9 }}
+                                title={color.name}
+                            >
+                                {color.name === "White" && <span className="absolute inset-0 rounded-full border border-border" />}
+                            </motion.button>
+                        ))}
+                    </div>
+                </CollapsibleContent>
+            </Collapsible>
+
+            {/* Age Groups */}
+            <Collapsible open={openSections.age} onOpenChange={() => toggleSection("age")}>
+                <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
+                    <span className="font-medium">Age Group</span>
+                    <ChevronDown className={`h-4 w-4 transition-transform ${openSections.age ? "rotate-180" : ""}`} />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="max-h-48 overflow-auto">
+                    <div className="space-y-2 pt-2">
+                        {AGE_OPTIONS.map((age: string) => (
+                            <div key={age} className="flex items-center space-x-2">
+                                <Checkbox id={`age-${age}`} checked={draft.ages.has(age)} onCheckedChange={() => onToggleAge(age)} />
+                                <Label htmlFor={`age-${age}`} className="text-sm cursor-pointer">
+                                    {age}
+                                </Label>
+                            </div>
+                        ))}
+                    </div>
+                </CollapsibleContent>
+            </Collapsible>
+        </div>
     );
 });
 
