@@ -94,30 +94,30 @@ function RouteComponent() {
     const { data: product } = useSuspenseQuery(productQueryOptions(slug));
 
     return (
-        <main className="flex flex-col gap-y-8">
-            <ProductView product={product} />
+        <main className="flex flex-col">
+                <ProductView product={product} />
 
-            <section className="related-products">
-                <Suspense fallback={<div>Loading related products...</div>}>
-                    <SuspenseQuery queryOptions={relatedProductsQueryOptions(product.id, 4)}>
-                        {(related: { similar: ProductSearch[] }) => (
-                            <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4 w-full">
-                                <RelatedProducts similar={related.similar} productId={product.id} />
-                            </div>
-                        )}
-                    </SuspenseQuery>
-                </Suspense>
-            </section>
+                <section className="related-products">
+                    <Suspense fallback={<div>Loading related products...</div>}>
+                        <SuspenseQuery queryOptions={relatedProductsQueryOptions(product.id, 4)}>
+                            {(related: { similar: ProductSearch[] }) => (
+                                <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4 w-full">
+                                    <RelatedProducts similar={related.similar} productId={product.id} />
+                                </div>
+                            )}
+                        </SuspenseQuery>
+                    </Suspense>
+                </section>
 
-            <section className="reviews">
-                <Suspense fallback={<div>Loading reviews...</div>}>
-                    <SuspenseQuery queryOptions={reviewsQueryOptions(product.id)}>
-                        {(reviews: PaginatedReview) => (
-                            <ReviewsSection productName={product?.name} product_id={product?.id} paginatedReviews={reviews} />
-                        )}
-                    </SuspenseQuery>
-                </Suspense>
-            </section>
+                <section className="reviews">
+                    <Suspense fallback={<div className="text-center p-4">Loading reviews...</div>}>
+                        <SuspenseQuery queryOptions={reviewsQueryOptions(product.id)}>
+                            {(reviews: PaginatedReview) => (
+                                <ReviewsSection productName={product?.name} product_id={product?.id} paginatedReviews={reviews} />
+                            )}
+                        </SuspenseQuery>
+                    </Suspense>
+                </section>
         </main>
     );
 }

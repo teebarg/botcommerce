@@ -23,7 +23,7 @@ const discountBadgeVariants = cva(
         variants: {
             variant: {
                 sale: [
-                    "bg-gradient-sale px-3 py-1.5 rounded-lg",
+                    "bg-gradient-action px-3 py-1.5 rounded-lg",
                     "shadow-[var(--shadow-discount)_hsl(var(--discount-sale-glow)/0.5)]",
                     "hover:shadow-[var(--shadow-intense)_hsl(var(--discount-sale-glow)/0.8)]",
                     "hover:scale-110",

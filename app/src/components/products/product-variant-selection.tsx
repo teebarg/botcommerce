@@ -1,12 +1,14 @@
 import type React from "react";
 import { useEffect } from "react";
-import { MessageCircleMore } from "lucide-react";
+import { MessageCircleMore, Minus, Plus } from "lucide-react";
 import type { ProductVariant } from "@/schemas";
 import { cn, currency } from "@/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useProductVariant } from "@/hooks/useProductVariant";
 import type { Product } from "@/schemas/product";
+import { motion } from "framer-motion";
+import { SIZE_OPTIONS } from "@/utils/constants";
 
 interface VariantSelectionProps {
     product: Product;
@@ -44,74 +46,43 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
 
     return (
         <div className="space-y-6 mt-4">
+            {/* Size selector */}
             {sizes?.length > 0 && (
-                <div className="space-y-3">
-                    <h3 className="text-sm font-medium">Size</h3>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}>
+                    <p className="text-sm font-medium text-foreground mb-3">Select Size</p>
                     <div className="flex flex-wrap gap-2">
-                        {sizes?.map((size) => {
-                            if (!size) {
-                                return null;
-                            }
-                            const available = isOptionAvailable("size", size!);
-                            const isSelected = selectedSize === size;
-
-                            return (
-                                <button
-                                    key={size}
-                                    className={cn(
-                                        "px-6 py-2 text-sm font-medium border border-border rounded-md transition-all duration-200",
-                                        isSelected
-                                            ? "bg-contrast text-contrast-foreground"
-                                            : available
-                                              ? "bg-card"
-                                              : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
-                                    )}
-                                    disabled={!available}
-                                    onClick={() => available && toggleSizeSelect(size)}
-                                >
-                                    {size}
-                                </button>
-                            );
-                        })}
+                        {sizes.map((size) => (
+                            <button
+                                key={size}
+                                onClick={() => isOptionAvailable("size", size!) && toggleSizeSelect(size)}
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                                    selectedSize === size ? "bg-primary text-primary-foreground" : "bg-muted text-foreground hover:bg-muted/80"
+                                }`}
+                            >
+                                {size}
+                            </button>
+                        ))}
                     </div>
-                </div>
+                </motion.div>
             )}
 
+            {/* Color Selector */}
             {colors.length > 0 && (
-                <div className="space-y-3">
-                    <h3 className="text-sm font-medium">Color</h3>
-                    <div className="flex flex-wrap gap-3">
-                        {colors.map((color) => {
-                            if (!color) {
-                                return null;
-                            }
-                            const available = isOptionAvailable("color", color);
-                            const isSelected = selectedColor === color;
-
-                            return (
-                                <button
-                                    key={color}
-                                    className={cn(
-                                        "relative p-0.5 rounded-full border-2 transition-all duration-200",
-                                        isSelected ? "border-contrast" : available ? "" : "cursor-not-allowed opacity-60"
-                                    )}
-                                    disabled={!available}
-                                    onClick={() => available && toggleColorSelect(color)}
-                                >
-                                    <div
-                                        className={cn("w-10 h-10 rounded-full border border-border", !available && "opacity-50")}
-                                        style={{ backgroundColor: color.toLowerCase() }}
-                                    />
-                                    {!available && (
-                                        <div className="absolute inset-0 flex items-center justify-center">
-                                            <div className="w-6 h-0.5 bg-card rotate-45" />
-                                        </div>
-                                    )}
-                                </button>
-                            );
-                        })}
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mb-6">
+                    <h3 className="text-sm font-medium text-foreground mb-3">Color: {selectedColor}</h3>
+                    <div className="flex gap-3">
+                        {colors.map((color: string) => (
+                            <button
+                                key={color}
+                                onClick={() => isOptionAvailable("color", color) && toggleColorSelect(color)}
+                                className={`w-10 h-10 rounded-full border-2 transition-all ${
+                                    selectedColor === color ? "border-primary scale-110" : "border-transparent"
+                                }`}
+                                style={{ backgroundColor: color.toLowerCase() }}
+                            />
+                        ))}
                     </div>
-                </div>
+                </motion.div>
             )}
 
             {ages?.length > 0 && (
@@ -203,39 +174,19 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                 </div>
             )}
 
-            <div className="flex items-center gap-4">
-                <label className="text-sm font-medium">Quantity:</label>
-                <div className="flex items-center border rounded-md">
-                    <Button size="sm" variant="ghost" onClick={() => setQuantity(Math.max(1, quantity - 1))}>
-                        -
-                    </Button>
-                    <span className="px-4">{quantity}</span>
-                    <Button size="sm" variant="ghost" onClick={() => setQuantity(quantity + 1)}>
-                        +
-                    </Button>
+            {/* Quantity selector */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="flex items-center gap-4">
+                <p className="text-sm font-medium text-foreground">Quantity</p>
+                <div className="flex items-center gap-3 bg-muted rounded-lg p-1">
+                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-2 rounded-md hover:bg-background transition-colors">
+                        <Minus className="w-4 h-4" />
+                    </button>
+                    <span className="w-8 text-center font-medium">{quantity}</span>
+                    <button onClick={() => setQuantity(quantity + 1)} className="p-2 rounded-md hover:bg-background transition-colors">
+                        <Plus className="w-4 h-4" />
+                    </button>
                 </div>
-            </div>
-
-            {selectedVariant?.status === "OUT_OF_STOCK" ? (
-                <Button className="mt-4 w-max px-16 py-6" disabled={true}>
-                    Out of Stock
-                </Button>
-            ) : (
-                <div className="flex items-center gap-4 mt-4">
-                    <Button className="w-auto" disabled={loading || !selectedVariant || outOfStock} size="lg" onClick={handleAddToCart}>
-                        {loading ? "Adding to cart..." : outOfStock ? "Out of Stock" : "Add to Cart"}
-                    </Button>
-                    <Button
-                        className="gap-2 bg-[#075e54] hover:bg-[#128c7e] text-white w-auto"
-                        disabled={loading || !selectedVariant || outOfStock}
-                        size="lg"
-                        onClick={handleWhatsAppPurchase}
-                    >
-                        <MessageCircleMore className="w-4 h-4" />
-                        <span>Buy on WhatsApp</span>
-                    </Button>
-                </div>
-            )}
+            </motion.div>
         </div>
     );
 };
