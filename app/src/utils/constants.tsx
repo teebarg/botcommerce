@@ -25,7 +25,12 @@ export const paymentInfoMap: Record<string, { title: string; description: string
 };
 
 export const SIZE_OPTIONS = ["6", "8", "10", "12", "14", "16", "18", "20", "22", "24"];
-export const COLOR_OPTIONS = [
+
+export type ColorOption = {
+    name: string;
+    value: string;
+};
+export const COLOR_OPTIONS: ColorOption[] = [
     { name: "Black", value: "#000000" },
     { name: "White", value: "#FFFFFF" },
     { name: "Navy", value: "#1e3a5f" },

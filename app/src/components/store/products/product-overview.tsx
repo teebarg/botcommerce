@@ -109,7 +109,7 @@ const ProductOverview: React.FC<{
             className="flex-1 flex flex-col overflow-hidden"
         >
             <div className="relative max-h-[50vh] w-full aspect-3/4">
-                <MediaDisplay alt={product.name} className="object-containp" url={selectedImage || product.images?.[0]} />
+                <MediaDisplay alt={product.name} url={selectedImage || product.images?.[0]} />
                 <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
 
                 <DiscountBadge className="top-10" discount={priceInfo.maxDiscountPercent} isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice} />

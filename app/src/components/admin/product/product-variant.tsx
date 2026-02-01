@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn, currency } from "@/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { ProductVariant } from "@/schemas";
-import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/utils/constants";
+import { COLOR_OPTIONS, ColorOption, SIZE_OPTIONS } from "@/utils/constants";
 import { AgeRangeSelector } from "@/components/ui/age-selector";
 
 interface VariantCreationProps {
@@ -101,9 +101,9 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
                                     <SelectValue placeholder="Select Color" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {COLOR_OPTIONS.map((color: string) => (
-                                        <SelectItem key={color} value={color}>
-                                            {color}
+                                    {COLOR_OPTIONS.map((color: ColorOption) => (
+                                        <SelectItem key={color.value} value={color.value}>
+                                            {color.name}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -198,11 +198,7 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
                                                             {variant.color}
                                                         </Badge>
                                                     )}
-                                                    {variant.measurement && (
-                                                        <Badge className="text-xs">
-                                                            {variant.measurement}
-                                                        </Badge>
-                                                    )}
+                                                    {variant.measurement && <Badge className="text-xs">{variant.measurement}</Badge>}
                                                     {variant.age && (
                                                         <Badge className="text-xs" variant="emerald">
                                                             {variant.age}

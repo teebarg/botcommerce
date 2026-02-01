@@ -1,12 +1,11 @@
 import { useState, forwardRef, useImperativeHandle, useMemo } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import { useCategories } from "@/hooks/useCategories";
-import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { COLOR_OPTIONS, SIZE_OPTIONS, AGE_OPTIONS } from "@/utils/constants";
-import { cn, currency } from "@/utils";
+import { COLOR_OPTIONS, SIZE_OPTIONS, AGE_OPTIONS, ColorOption } from "@/utils/constants";
+import { currency } from "@/utils";
 import type { Facet } from "@/schemas/product";
 import { useSearch } from "@tanstack/react-router";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -247,7 +246,7 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <div className="flex flex-wrap gap-2 pt-2">
-                        {COLOR_OPTIONS.map((color) => (
+                        {COLOR_OPTIONS.map((color: ColorOption) => (
                             <motion.button
                                 key={color.name}
                                 onClick={() => onToggleColor(color.name)}

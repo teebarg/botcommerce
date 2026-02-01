@@ -12,7 +12,7 @@ import type { GalleryProduct, Product, ProductVariant } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useCreateImageMetadata, useUpdateImageMetadata } from "@/hooks/useGallery";
 import { Textarea } from "@/components/ui/textarea";
-import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/utils/constants";
+import { COLOR_OPTIONS, ColorOption, SIZE_OPTIONS } from "@/utils/constants";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ImageDownloadButton } from "@/components/store/image-download";
 import { AgeRangeSelector } from "@/components/ui/age-selector";
@@ -207,9 +207,9 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                                 <SelectValue placeholder="Select Color" />
                             </SelectTrigger>
                             <SelectContent>
-                                {COLOR_OPTIONS.map((color: string) => (
-                                    <SelectItem key={color} value={color}>
-                                        {color}
+                                {COLOR_OPTIONS.map((color: ColorOption) => (
+                                    <SelectItem key={color.value} value={color.value}>
+                                        {color.name}
                                     </SelectItem>
                                 ))}
                             </SelectContent>

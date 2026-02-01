@@ -1,14 +1,8 @@
 import type React from "react";
-import { useEffect } from "react";
-import { Heart, MessageCircleMore, Minus, Plus, Share2, ShoppingCart } from "lucide-react";
-import type { ProductVariant } from "@/schemas";
-import { cn, currency } from "@/utils";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Heart, ShoppingCart } from "lucide-react";
 import { useProductVariant } from "@/hooks/useProductVariant";
 import type { Product } from "@/schemas/product";
 import { motion } from "framer-motion";
-import { SIZE_OPTIONS } from "@/utils/constants";
 import { useUserCreateWishlist, useUserDeleteWishlist } from "@/hooks/useUser";
 import ProductShare from "./product-share";
 
@@ -18,51 +12,22 @@ interface VariantSelectionProps {
 }
 
 export const ProductVariantActions: React.FC<VariantSelectionProps> = ({ product, inWishlist }) => {
-    const {
-        selectedColor,
-        selectedSize,
-        selectedMeasurement,
-        selectedAge,
-        quantity,
-        selectedVariant,
-        setQuantity,
-        sizes,
-        colors,
-        measurements,
-        ages,
-        isAdded,
-        isOptionAvailable,
-        toggleSizeSelect,
-        toggleColorSelect,
-        toggleMeasurementSelect,
-        toggleAgeSelect,
-        handleAddToCart,
-        handleWhatsAppPurchase,
-        loading,
-        outOfStock,
-    } = useProductVariant(product);
+    const { isAdded, handleAddToCart, outOfStock } = useProductVariant(product);
 
     const { mutate: createWishlist } = useUserCreateWishlist();
     const { mutate: deleteWishlist } = useUserDeleteWishlist();
 
     const addWishlist = async () => {
         createWishlist(product.id);
-        // handleUserInteraction("WISHLIST_ADD");
     };
 
     const removeWishlist = async () => {
         deleteWishlist(product.id);
-        // handleUserInteraction("WISHLIST_REMOVE");
     };
 
     return (
         <>
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.45 }}
-                className="flex gap-3"
-            >
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }} className="flex gap-3">
                 <motion.button
                     whileTap={{ scale: 0.95 }}
                     onClick={(e) => {
@@ -87,8 +52,8 @@ export const ProductVariantActions: React.FC<VariantSelectionProps> = ({ product
                         outOfStock
                             ? "bg-muted text-muted-foreground cursor-not-allowed"
                             : isAdded
-                              ? "bg-green-500 text-white"
-                              : "bg-primary text-primary-foreground hover:bg-primary/90"
+                            ? "bg-green-500 text-white"
+                            : "bg-primary text-primary-foreground hover:bg-primary/90"
                     }`}
                 >
                     {outOfStock ? (

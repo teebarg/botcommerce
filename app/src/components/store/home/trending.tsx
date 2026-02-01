@@ -5,7 +5,7 @@ import LocalizedClientLink from "@/components/ui/link";
 import { TrendingUp } from "lucide-react";
 
 export default function Trending() {
-    const { data, isLoading } = useProductSearch({ collections: "trending", limit: 6 });
+    const { data } = useProductSearch({ collections: "trending", limit: 6 });
 
     return (
         <div className="max-w-[1400px] mx-auto">
