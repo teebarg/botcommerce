@@ -1,9 +1,9 @@
 import type React from "react";
 import { ArrowLeft } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { cn } from "@/utils";
-import { useCanGoBack, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
+import { useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
+import { motion } from "framer-motion";
 
 interface Props {
     className?: string;
@@ -14,12 +14,9 @@ const BackButton: React.FC<Props> = ({ onClick, className }) => {
     const router = useRouter();
     const canGoBack = useCanGoBack();
     const navigate = useNavigate();
-    const location = useLocation();
-    const pathname = location.pathname;
     const handleGoBack = () => {
         if (onClick) {
             onClick();
-
             return;
         }
 
@@ -31,15 +28,15 @@ const BackButton: React.FC<Props> = ({ onClick, className }) => {
     };
 
     return (
-        <Button
-            aria-label="back button"
-            className={cn(className, "text-foreground h-auto w-auto md:hidden", pathname == "/" && "hidden")}
-            size="icon"
-            variant="ghost"
+        <motion.button
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            className={cn(className, "p-2.5 rounded-full bg-background/80 backdrop-blur-sm shadow-lg border border-border", !canGoBack && "hidden")}
             onClick={handleGoBack}
         >
-            <ArrowLeft className="h-8 w-8" />
-        </Button>
+            <ArrowLeft className="w-5 h-5 text-foreground" />
+        </motion.button>
     );
 };
 

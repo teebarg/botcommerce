@@ -97,6 +97,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
                     }
                     onOpenChange={editState.setOpen}
                     showHeader={true}
+                    side="left"
                 >
                     <AnimatePresence mode="wait">
                         <motion.div
@@ -158,7 +159,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
                 <div className="flex items-baseline gap-2 mb-2">
                     <PriceLabel priceInfo={priceInfo} priceClassName="text-white text-2xl" oldPriceClassName="text-white/50" />
                 </div>
-                <ProductActions product={product} />
+                <ProductActions product={product} actionColor="bg-gradient-action" />
                 <div className="flex items-center gap-2 mt-4">
                     <Music className="w-3 h-3 text-muted-foreground" />
                     <div className="flex-1 h-4 overflow-hidden">

@@ -5,7 +5,7 @@ import { useCategories } from "@/hooks/useCategories";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { COLOR_OPTIONS, SIZE_OPTIONS, AGE_OPTIONS } from "@/utils/constants";
+import { COLOR_OPTIONS, SIZE_OPTIONS, AGE_OPTIONS, ColorOption } from "@/utils/constants";
 import { cn } from "@/utils";
 import RangeSlider from "@/components/ui/range-slider";
 import type { Facet } from "@/schemas/product";
@@ -267,26 +267,26 @@ export function FilterSidebar({ facets, onApplyComplete }: Props) {
 
                 {openSections.color && (
                     <div className="grid grid-cols-4 lg:grid-cols-3 gap-4">
-                        {COLOR_OPTIONS.map((color) => {
-                            const active = colorSet.has(color);
+                        {COLOR_OPTIONS.map((color: ColorOption) => {
+                            const active = colorSet.has(color.name);
 
                             return (
                                 <button
-                                    key={color}
+                                    key={color.name}
                                     aria-pressed={active}
                                     className={cn(
                                         "flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity",
                                         active && "opacity-100"
                                     )}
-                                    onClick={() => onToggleColor(color)}
+                                    onClick={() => onToggleColor(color.name)}
                                 >
                                     <div
                                         className={cn("w-8 h-8 rounded-full border border-border", active && "ring-2 ring-primary ring-offset-2")}
-                                        style={{ backgroundColor: color }}
+                                        style={{ backgroundColor: color.value }}
                                     />
-                                    <Label className="text-center text-sm" htmlFor={color}>
-                                        {color}
-                                        <span className={cn("ml-0.5", !facets && "hidden")}>({facets?.colors?.[color] || 0})</span>
+                                    <Label className="text-center text-sm" htmlFor={color.name}>
+                                        {color.name}
+                                        <span className={cn("ml-0.5", !facets && "hidden")}>({facets?.colors?.[color.name] || 0})</span>
                                     </Label>
                                 </button>
                             );

@@ -5,7 +5,7 @@ import LocalizedClientLink from "@/components/ui/link";
 import { TrendingUp } from "lucide-react";
 
 export default function Trending() {
-    const { data, isLoading } = useProductSearch({ collections: "trending", limit: 6 });
+    const { data } = useProductSearch({ collections: "trending", limit: 6 });
 
     return (
         <div className="max-w-[1400px] mx-auto">
@@ -21,8 +21,8 @@ export default function Trending() {
                         </LocalizedClientLink>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
-                        {data?.products?.map((product: ProductSearch) => (
-                            <ProductCard product={product} variant="electric" />
+                        {data?.products?.map((product: ProductSearch, idx: number) => (
+                            <ProductCard product={product} variant="electric" index={idx} />
                         ))}
                     </div>
                 </section>

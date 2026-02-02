@@ -18,7 +18,7 @@ const ProductCardListings: React.FC<ProductCardProps> = ({ products, className, 
             {inView && (
                 <div className={cn("grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 lg:gap-4", viewMode === "list" && "grid-cols-1", className)}>
                     {products?.map((product, idx) => (
-                        <ProductCard key={idx} product={product} />
+                        <ProductCard key={idx} product={product} index={idx} />
                     ))}
                 </div>
             )}

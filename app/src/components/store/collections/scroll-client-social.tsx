@@ -1,5 +1,4 @@
-import { useRef, useState } from "react";
-import MobileFilterControl from "@/components/store/shared/mobile-filter-control";
+import { useRef } from "react";
 import { CollectionHeader } from "@/components/store/collections/collection-header";
 import NoProductsFound from "@/components/store/products/no-products";
 import { useProductFeed } from "@/hooks/useProduct";
@@ -26,7 +25,6 @@ export default function SocialInfiniteScrollClient({ initialData, collection_slu
     const search = useSearch({
         strict: false,
     });
-    const [viewMode, setViewMode] = useState<"grid" | "list">("list");
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useProductFeed(initialData, {
         ...search,
         show_facets: true,
@@ -46,7 +44,7 @@ export default function SocialInfiniteScrollClient({ initialData, collection_slu
         <div>
             <div className="hidden md:block max-w-9xl mx-auto w-full py-4 px-2">
                 <div className="flex gap-6">
-                    <aside className="h-[calc(100vh-5rem)] w-96 flex flex-col overflow-hidden sticky top-24">
+                    <aside className="h-[calc(100vh-6rem)] w-96 flex flex-col overflow-hidden sticky top-24">
                         <div className="flex items-center justify-between w-full">
                             <h2 className="font-semibold">FILTER & SORT</h2>
                             <Button
@@ -57,7 +55,7 @@ export default function SocialInfiniteScrollClient({ initialData, collection_slu
                                 Clear All
                             </Button>
                         </div>
-                        <ScrollArea className="flex-1">
+                        <ScrollArea className="flex-1 px-2">
                             <FilterSidebarLogic ref={sidebarRef} facets={facets} />
                         </ScrollArea>
                         <div className="flex justify-center gap-2 p-4 mt-2 border-t border-border">
@@ -72,8 +70,7 @@ export default function SocialInfiniteScrollClient({ initialData, collection_slu
                     <div className="w-full flex-1 flex-col relative">
                         <SaleBanner />
                         <CollectionHeader />
-                        <MobileFilterControl facets={facets} setViewMode={setViewMode} viewMode={viewMode} />
-                        <main className="w-full px-2 md:px-1 md:rounded-xl py-4 min-h-[50vh]">
+                        <main className="w-full px-1 rounded-xl py-4 min-h-[50vh]">
                             {!isLoading && !hasProducts && <NoProductsFound />}
                             {!isLoading && hasProducts && (
                                 <InfiniteScroll
@@ -87,7 +84,7 @@ export default function SocialInfiniteScrollClient({ initialData, collection_slu
                                         </div>
                                     }
                                 >
-                                    <ProductCardListings className="w-full pb-4" products={products!} viewMode={viewMode} />
+                                    <ProductCardListings className="w-full pb-4" products={products!} />
                                 </InfiniteScroll>
                             )}
                         </main>

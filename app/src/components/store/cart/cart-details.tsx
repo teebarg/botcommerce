@@ -65,7 +65,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
                     </ScrollArea>
 
                     {cart?.items && cart?.items?.length > 0 && (
-                        <div className="p-6 border-t border-border space-y-4">
+                        <div className="px-6 pt-4 border-t border-border space-y-4">
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Subtotal</span>
                                 <span className="font-medium">{currency(cart?.subtotal || 0)}</span>

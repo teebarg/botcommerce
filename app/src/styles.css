@@ -61,10 +61,9 @@
 
     --background-image-gradient-sale: var(--gradient-sale);
     --background-image-gradient-gold: var(--gradient-gold);
-
-    --gradient-action: linear-gradient(135deg, hsl(340, 82%, 52%) 0%, hsl(15, 90%, 60%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0, 0%, 10%) 0%, hsl(0, 0%, 6%) 100%);
-    --gradient-glass: linear-gradient(135deg, hsla(0, 0%, 100%, 0.1) 0%, hsla(0, 0%, 100%, 0.05) 100%);
+    --background-image-gradient-action: var(--gradient-action);
+    --background-image-gradient-card: var(--gradient-card);
+ 
     --shadow-glow: 0 0 40px hsla(340, 82%, 52%, 0.3);
     --shadow-card: 0 8px 32px hsla(0, 0%, 0%, 0.4);
 
@@ -389,68 +388,6 @@
     --sidebar-ring: 214 100% 55%;
 }
 
-/* AliExpress Red Theme */
-/* [data-theme="aliexpress-red"] {
-    --background: 0 30% 99%;
-    --foreground: 0 10% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 10% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 10% 10%;
-    --primary: 8 90% 50%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 8 30% 95%;
-    --secondary-foreground: 8 60% 30%;
-    --muted: 8 15% 95%;
-    --muted-foreground: 8 10% 45%;
-    --accent: 8 70% 92%;
-    --accent-foreground: 8 90% 40%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 8 20% 88%;
-    --input: 8 20% 88%;
-    --ring: 8 90% 50%;
-    --radius: 0.375rem;
-    --sidebar-background: 8 25% 97%;
-    --sidebar-foreground: 8 60% 20%;
-    --sidebar-primary: 8 90% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 8 70% 92%;
-    --sidebar-accent-foreground: 8 90% 40%;
-    --sidebar-border: 8 20% 88%;
-    --sidebar-ring: 8 90% 50%;
-} */
-
-/* [data-theme="aliexpress-red"].dark,
-.dark[data-theme="aliexpress-red"] {
-    --background: 0 30% 5%;
-    --foreground: 0 10% 98%;
-    --card: 0 25% 8%;
-    --card-foreground: 0 10% 98%;
-    --popover: 0 25% 8%;
-    --popover-foreground: 0 10% 98%;
-    --primary: 8 85% 55%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 8 25% 14%;
-    --secondary-foreground: 0 10% 98%;
-    --muted: 8 20% 14%;
-    --muted-foreground: 8 10% 60%;
-    --accent: 8 35% 18%;
-    --accent-foreground: 8 80% 70%;
-    --destructive: 0 62% 50%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 8 25% 16%;
-    --input: 8 25% 16%;
-    --ring: 8 85% 55%;
-    --sidebar-background: 0 25% 8%;
-    --sidebar-foreground: 0 10% 98%;
-    --sidebar-primary: 8 85% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 8 35% 18%;
-    --sidebar-accent-foreground: 8 80% 70%;
-    --sidebar-border: 8 25% 16%;
-    --sidebar-ring: 8 85% 55%;
-} */
 
 @layer base {
     * {
@@ -511,7 +448,7 @@
 
 @layer utilities {
     .screen-height {
-        @apply h-[calc(100dvh-5rem-4rem)];
+        @apply h-[calc(100dvh-5rem-4.5rem)];
     }
     .gradient-primary {
         @apply bg-linear-to-br from-primary to-foreground/80 dark:to-accent;
@@ -524,23 +461,11 @@
         @apply bg-white/15 backdrop-blur-2xl border border-white/20;
     }
 
-    .gradient-primary2 {
-        background: linear-gradient(135deg, hsl(350 89% 60%), hsl(280 100% 65%));
-    }
-
     .gradient-text {
         background: linear-gradient(135deg, hsl(350 89% 60%), hsl(280 100% 65%));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-    }
-
-    .gradient-action {
-        background: var(--gradient-action);
-    }
-
-    .gradient-card {
-        background: var(--gradient-card);
     }
 
     .gradient-glass {
@@ -570,19 +495,6 @@
 
     .product-card {
         @apply relative w-full h-[calc(100dvh-36px)] snap-start snap-always flex items-end;
-    }
-
-    .product-overlay {
-        @apply absolute inset-0 bg-gradient-to-t from-black via-black/90 to-transparent;
-    }
-
-    .floating-nav {
-        @apply fixed bottom-0 left-0 right-0 bg-white/15 backdrop-blur-2xl border border-white/20 z-50;
-        padding-bottom: env(safe-area-inset-bottom);
-    }
-
-    .pulse-dot {
-        @apply w-2 h-2 rounded-full bg-primary animate-pulse;
     }
 
     .text-gradient-gold {

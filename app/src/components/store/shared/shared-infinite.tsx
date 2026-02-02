@@ -52,55 +52,53 @@ export default function SharedInfinite({ slug, initialCatalog }: Props) {
     const totalProducts = data?.pages[0].total_count || 0;
 
     return (
-        <main className="w-full py-2">
-            <div className="flex gap-6">
-                <aside className="hidden lg:block w-80 shrink-0">
-                    <div className="sticky top-24 max-h-[calc(100vh-5rem)] overflow-y-auto">
-                        <FilterSidebar />
-                    </div>
-                </aside>
-
-                <div className="flex-1">
-                    <MobileFilterControl setViewMode={setViewMode} viewMode={viewMode} />
-
-                    <div className="hidden lg:flex items-center justify-between mb-6">
-                        <p className="text-sm text-muted-foreground">Showing {totalProducts} products</p>
-                    </div>
-
-                    {!products.length && (
-                        <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-                            <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-6">
-                                <Grid3X3 className="w-12 h-12 text-muted-foreground" />
-                            </div>
-                            <h3 className="text-xl font-semibold mb-2">No products found</h3>
-                            <p className="text-muted-foreground mb-6 max-w-md">
-                                {`We couldn't find any products matching your search criteria. Try adjusting your filters or search terms.`}
-                            </p>
-                            <Button onClick={onClearAll}>Clear all filters</Button>
-                        </div>
-                    )}
-
-                    <InfiniteScroll
-                        onLoadMore={fetchNextPage}
-                        hasMore={!!hasNextPage}
-                        isLoading={isFetchingNextPage}
-                        loader={
-                            <div className="flex flex-col items-center justify-center text-blue-600">
-                                <Loader className="h-8 w-8 animate-spin mb-2" />
-                                <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
-                            </div>
-                        }
-                    >
-                        <div className={cn("grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4", viewMode === "grid" ? "" : "grid-cols-1")}>
-                            {products?.map((product: ProductSearch, idx: number) => (
-                                <div key={`product-${idx}`}>
-                                    <ProductCard product={product} />
-                                </div>
-                            ))}
-                        </div>
-                    </InfiniteScroll>
+        <div className="flex gap-6 w-full py-2">
+            <aside className="hidden lg:block w-80 shrink-0">
+                <div className="sticky top-24 max-h-[calc(100vh-5rem)] overflow-y-auto">
+                    <FilterSidebar />
                 </div>
+            </aside>
+
+            <div className="flex-1">
+                <MobileFilterControl setViewMode={setViewMode} viewMode={viewMode} />
+
+                <div className="hidden lg:flex items-center justify-between mb-6">
+                    <p className="text-sm text-muted-foreground">Showing {totalProducts} products</p>
+                </div>
+
+                {!products.length && (
+                    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                        <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-6">
+                            <Grid3X3 className="w-12 h-12 text-muted-foreground" />
+                        </div>
+                        <h3 className="text-xl font-semibold mb-2">No products found</h3>
+                        <p className="text-muted-foreground mb-6 max-w-md">
+                            {`We couldn't find any products matching your search criteria. Try adjusting your filters or search terms.`}
+                        </p>
+                        <Button onClick={onClearAll}>Clear all filters</Button>
+                    </div>
+                )}
+
+                <InfiniteScroll
+                    onLoadMore={fetchNextPage}
+                    hasMore={!!hasNextPage}
+                    isLoading={isFetchingNextPage}
+                    loader={
+                        <div className="flex flex-col items-center justify-center text-blue-600">
+                            <Loader className="h-8 w-8 animate-spin mb-2" />
+                            <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
+                        </div>
+                    }
+                >
+                    <div className={cn("grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4", viewMode === "grid" ? "" : "grid-cols-1")}>
+                        {products?.map((product: ProductSearch, idx: number) => (
+                            <div key={`product-${idx}`}>
+                                <ProductCard product={product} index={idx} />
+                            </div>
+                        ))}
+                    </div>
+                </InfiniteScroll>
             </div>
-        </main>
+        </div>
     );
 }

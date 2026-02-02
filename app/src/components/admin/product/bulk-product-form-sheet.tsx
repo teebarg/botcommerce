@@ -11,7 +11,7 @@ import MultiSelect, { type SelectOption } from "@/components/ui/multi-select";
 import { Button } from "@/components/ui/button";
 import { useBulkProductUpdate } from "@/hooks/useGallery";
 import { Checkbox } from "@/components/ui/checkbox";
-import { COLOR_OPTIONS, SIZE_OPTIONS } from "@/utils/constants";
+import { COLOR_OPTIONS, ColorOption, SIZE_OPTIONS } from "@/utils/constants";
 import { Separator } from "@/components/ui/separator";
 import { AgeRangeSelector } from "@/components/ui/age-selector";
 
@@ -283,9 +283,9 @@ export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetForm
                                         <SelectValue placeholder="Select Color" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {COLOR_OPTIONS.map((color: string) => (
-                                            <SelectItem key={color} value={color}>
-                                                {color}
+                                        {COLOR_OPTIONS.map((color: ColorOption) => (
+                                            <SelectItem key={color.value} value={color.value}>
+                                                {color.name}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
