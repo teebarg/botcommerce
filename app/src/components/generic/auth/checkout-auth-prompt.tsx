@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MagicLinkForm } from "@/components/generic/auth/magic-link";
 import { useLocation } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 
 const CheckoutLoginPrompt: React.FC = () => {
     const location = useLocation();
@@ -14,7 +15,7 @@ const CheckoutLoginPrompt: React.FC = () => {
         <div className="max-w-md mx-auto overflow-hidden md:max-w-2xl my-8">
             <div className="p-8">
                 <div className="flex justify-center mb-6">
-                    <div className="bg-blue-100 p-4 rounded-full">
+                    <div className="bg-primary/10 p-4 rounded-full">
                         <Lock className="w-12 h-12 text-primary" />
                     </div>
                 </div>
@@ -33,26 +34,19 @@ const CheckoutLoginPrompt: React.FC = () => {
                             <DialogHeader>
                                 <DialogTitle>Log in</DialogTitle>
                             </DialogHeader>
-                            <MagicLinkForm callbackUrl={pathname} />
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 20 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <MagicLinkForm callbackUrl={pathname} />
+                                </motion.div>
+                            </AnimatePresence>
                         </DialogContent>
                     </Dialog>
                 </div>
-                {/* <div className="mt-6 text-center text-sm text-muted-foreground">
-                    <Dialog>
-                        <DialogTrigger>
-                            <p>
-                                {`Don't have an account?`}
-                                <span className="font-medium text-primary hover:text-primary/80 ml-1">Create one now</span>
-                            </p>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Sign Up</DialogTitle>
-                            </DialogHeader>
-                            <SignUpForm />
-                        </DialogContent>
-                    </Dialog>
-                </div> */}
             </div>
         </div>
     );

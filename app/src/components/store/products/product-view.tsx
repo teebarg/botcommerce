@@ -20,45 +20,11 @@ interface Props {
     product: Product;
 }
 
-// Mobile slide-up transition (TikTok/Instagram style)
-// const mobileVariants = {
-//     initial: { y: "100%" as const, opacity: 0 },
-//     animate: {
-//         y: 0,
-//         opacity: 1,
-//         transition: { type: "spring" as const, damping: 25, stiffness: 300 },
-//     },
-//     exit: {
-//         y: "100%" as const,
-//         opacity: 0,
-//         transition: { type: "spring" as const, damping: 30, stiffness: 300 },
-//     },
-// };
-
-// // Desktop fade-scale transition
-// const desktopVariants = {
-//     initial: { opacity: 0, scale: 0.95 },
-//     animate: {
-//         opacity: 1,
-//         scale: 1,
-//         transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
-//     },
-//     exit: {
-//         opacity: 0,
-//         scale: 0.95,
-//         transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
-//     },
-// };
-
 const ProductView: React.FC<Props> = ({ product }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const { outOfStock } = useProductVariant(product);
     const isMobile = useIsMobile();
     const isNew = useMemo(() => !!product?.is_new, [product]);
-    // const [selectedImageId, setSelectedImageId] = useState<number>(product.images?.[0]?.id || 0);
-
-    // const selectedImage = product.images?.find((img: ProductImage) => img.id === selectedImageId) || product.images?.[0];
-
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(product.variants?.[0]);
 
     const { session } = useRouteContext({ strict: false });
@@ -145,9 +111,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
             transition={pageTransition}
             className="min-h-screen bg-background relative"
         >
-            {/* Main content */}
-            {/* <div className="md:max-w-6xl md:mx-auto md:py-8 md:px-4"> */}
-            <div className="md:max-w-6xl md:mx-auto md:py-8 md:px-4 md:grid md:grid-cols-2 md:gap-8 md:items-start">
+            <div className="max-w-6xl mx-auto md:py-8 md:px-4 md:grid md:grid-cols-2 md:gap-8 md:items-start">
                 <motion.div
                     initial={{ opacity: 0, x: isMobile ? 0 : -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -195,13 +159,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
                     >
                         <ChevronRight className="w-5 h-5" />
                     </button>
-
-                    {/* Discount Badge */}
-                    {/* {discount > 0 && (
-                            <div className="absolute top-4 right-4 text-sm font-semibold text-primary-foreground bg-primary px-3 py-1 rounded-full">
-                                -{discount}% OFF
-                            </div>
-                        )} */}
                 </motion.div>
 
                 <motion.div
@@ -225,7 +182,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         {product.name}
                     </motion.h1>
 
-                    {/* Price */}
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="flex items-baseline gap-3">
                         <span className="text-3xl md:text-4xl font-bold text-foreground">{currency(selectedVariant?.price)}</span>
                         {selectedVariant?.old_price > selectedVariant?.price && (
@@ -280,16 +236,11 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         </div>
                     ) : null}
 
-                    {/* Action buttons */}
                     <ProductVariantActions product={product} inWishlist={inWishlist} />
 
-                    {/* Description */}
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="pt-4 border-t border-border">
                         <p className="text-sm font-medium text-foreground mb-2">Description</p>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                            Premium quality product with exceptional craftsmanship. Perfect for everyday use with durable materials and modern design.
-                            Experience comfort and style combined.
-                        </p>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{product.description}</p>
                     </motion.div>
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -310,7 +261,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
                     </motion.div>
                 </motion.div>
             </div>
-            {/* </div> */}
         </motion.div>
     );
 };

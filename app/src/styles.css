@@ -59,6 +59,7 @@
     --color-sidebar-border: hsl(var(--sidebar-border));
     --color-sidebar-ring: hsl(var(--sidebar-ring));
 
+    --background-image-gradient-primary: var(--gradient-primary);
     --background-image-gradient-sale: var(--gradient-sale);
     --background-image-gradient-gold: var(--gradient-gold);
     --background-image-gradient-action: var(--gradient-action);
@@ -451,7 +452,7 @@
         @apply h-[calc(100dvh-5rem-4.5rem)];
     }
     .gradient-primary {
-        @apply bg-linear-to-br from-primary to-foreground/80 dark:to-accent;
+        @apply bg-linear-to-br from-primary to-foreground/80 dark:to-accent text-white;
     }
     .glass {
         @apply bg-white/8 backdrop-blur-xl border border-white/12;

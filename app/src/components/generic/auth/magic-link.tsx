@@ -38,7 +38,7 @@ const MagicLinkForm: React.FC<Props> = ({ callbackUrl }) => {
                 />
                 <Button
                     aria-label="send magic link"
-                    className="w-full mt-6"
+                    className="w-full mt-6 gradient-primary"
                     data-testid="magic-link-button"
                     size="lg"
                     type="submit"

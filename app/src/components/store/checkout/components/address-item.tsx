@@ -52,7 +52,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
 
     return (
         <div
-            className={`relative p-4 rounded-xl cursor-pointer transition-all duration-300 group overflow-hidden ${
+            className={`relative p-4 rounded-xl cursor-pointer transition-all duration-300 group overflow-hidden w-full ${
                 isSelected ? "ring-2 ring-primary/20 bg-primary/10" : "border border-input bg-secondary hover:border-primary/50 hover:shadow-md"
             }`}
             onClick={() => !isSelected && handleSelect(address.id)}
@@ -67,33 +67,30 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                 </div>
             </div>
 
-            <div className="pr-16">
-                <div className="flex items-center gap-3 mb-3">
+            <div>
+                <div className="flex items-start gap-3 mb-3">
                     <div
                         className={`p-2.5 rounded-lg transition-colors ${
-                            isSelected ? "bg-primary text-white" : "bg-secondary text-muted-foreground group-hover:bg-primary/10"
+                            isSelected ? "bg-primary text-white" : "bg-primary/10 text-muted-foreground group-hover:bg-primary/10"
                         }`}
                     >
                         {getTypeIcon(address.address_type)}
                     </div>
                     <div>
-                        <h3 className="font-semibold text-lg">{address.label}</h3>
-                        <p className="text-muted-foreground text-sm">{address?.first_name + " " + address?.last_name}</p>
+                        <p className="font-semibold">{address?.first_name + " " + address?.last_name}</p>
+                        <p className="text-muted-foreground font-medium text-sm truncate text-wrap">{address.address_1}</p>
+                        <p className="text-muted-foreground text-sm">
+                            {address.city}, {address.state}
+                        </p>
                     </div>
                 </div>
 
-                <div className="space-y-0.5 text-sm">
-                    <p className="text-foreground font-medium">{address.address_1}</p>
-                    <p className="text-muted-foreground">
-                        {address.city}, {address.state}
+                {address.phone && (
+                    <p className="flex items-center gap-2 text-muted-foreground text-sm">
+                        <Phone className="w-3.5 h-3.5" />
+                        <span>{address.phone}</span>
                     </p>
-                    {address.phone && (
-                        <p className="flex items-center gap-2 text-muted-foreground mt-2">
-                            <Phone className="w-3.5 h-3.5" />
-                            <span>{address.phone}</span>
-                        </p>
-                    )}
-                </div>
+                )}
             </div>
 
             <div className="absolute bottom-3 right-3 flex gap-1.5 md:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
