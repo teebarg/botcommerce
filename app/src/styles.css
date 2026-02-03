@@ -517,4 +517,8 @@
         mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0) 100%);
         -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0) 100%);
     }
+
+    .bg-blur {
+        @apply bg-background/80 backdrop-blur-2xl;
+    }
 }

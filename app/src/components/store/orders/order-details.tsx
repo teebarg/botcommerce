@@ -1,7 +1,5 @@
-import { ArrowLeft, Package, MapPin, Download } from "lucide-react";
-
+import { Package, MapPin, Download } from "lucide-react";
 import OrderOverview from "./order-overview";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,29 +8,24 @@ import type { Order, OrderItem } from "@/schemas";
 import { currency } from "@/utils";
 import { useConfig } from "@/providers/store-provider";
 import ImageDisplay from "@/components/image-display";
+import { motion } from "framer-motion";
 
 interface OrderDetailsProps {
     order: Order;
-    onBack: () => void;
 }
 
-const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
+const OrderDetails = ({ order }: OrderDetailsProps) => {
     const { config } = useConfig();
 
     return (
-        <div className="space-y-6 px-4 md:px-8 py-6">
-            <div className="flex items-center gap-4 sticky top-0 z-10 bg-background py-4">
-                <Button className="flex items-center gap-2" size="sm" variant="outline" onClick={onBack}>
-                    <ArrowLeft className="h-4 w-4" />
-                    Back to Orders
-                </Button>
-                <div>
-                    <h2 className="text-2xl font-bold">Order Details</h2>
-                    <p className="text-muted-foreground">{order.order_number}</p>
-                </div>
-            </div>
-
-            <div className="grid gap-6 lg:grid-cols-3">
+        <motion.div
+            key="orderDetails"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="flex-1 flex flex-col overflow-hidden"
+        >
+            <div className="grid gap-6 lg:grid-cols-3 overflow-y-auto px-2">
                 <div className="lg:col-span-2 space-y-6">
                     <OrderOverview order={order} />
                     <Card>
@@ -177,7 +170,7 @@ const OrderDetails = ({ order, onBack }: OrderDetailsProps) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type React from "react";
 import { useOverlayTriggerState } from "react-stately";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Edit3, Home, Plus, Trash2 } from "lucide-react";
 import type { Address } from "@/schemas";
 import Overlay from "@/components/overlay";
 import { Button } from "@/components/ui/button";
@@ -12,13 +12,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { addressesQueryOptions, useDeleteAddress } from "@/hooks/useAddress";
 import { Confirm } from "@/components/generic/confirm";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "framer-motion";
 
 type AddressItemProps = {
     address: Address;
     isActive?: boolean;
+    index: number;
 };
 
-const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false }) => {
+const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false, index }) => {
     const editState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
 
@@ -31,60 +33,69 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false }) 
     };
 
     return (
-        <div
-            className={cn("bg-card border border-border rounded-lg p-5 min-h-[200px] h-full w-full flex flex-col justify-between transition-colors", {
-                "border-primary": isActive,
-            })}
-            data-testid="address-container"
+        <motion.div
+            key={address.id}
+            layout
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20, scale: 0.9 }}
+            transition={{ delay: index * 0.05 }}
+            className={cn("bg-card rounded-2xl border-2 overflow-hidden transition-all duration-300", isActive ? "border-primary" : "border-border")}
         >
-            <div className="flex flex-col">
-                <h3 className="text-left text-sm font-semibold" data-testid="address-name">
-                    {address?.first_name} {address?.last_name}
-                </h3>
-                <p className="flex flex-col text-left mt-2 font-semibold">
-                    <span data-testid="address-address">
-                        {address.address_1}
-                        {address.address_2 && <span>, {address.address_2}</span>}
-                    </span>
-                    <span data-testid="address-city">{address.city}</span>
-                    <span data-testid="address-state-country">{address.state && `${address.state}`}</span>
-                </p>
+            <div className="p-4">
+                <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 gradient-primary">
+                        <Home className="w-5 h-5 text-white" />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold">
+                                {address?.first_name} {address?.last_name}
+                            </h3>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                            {address.address_1}
+                            {address.address_2 && <span>, {address.address_2}</span>}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                            {address.city}, {address.state}
+                        </p>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
+                    <Overlay
+                        open={editState.isOpen}
+                        title="Edit address"
+                        trigger={
+                            <Button variant="ghost" size="sm" onClick={editState.open} className="text-xs">
+                                <Edit3 className="w-3 h-3 mr-1" />
+                                Edit
+                            </Button>
+                        }
+                        onOpenChange={editState.setOpen}
+                        showHeader={true}
+                    >
+                        <EditAddressForm address={address} onClose={editState.close} />
+                    </Overlay>
+                    <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
+                        <DialogTrigger asChild>
+                            <Button variant="ghost" size="sm" onClick={deleteState.open} className="text-xs text-destructive hover:text-destructive">
+                                <Trash2 className="w-3 h-3 mr-1" />
+                                Delete
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader className="sr-only">
+                                <DialogTitle>Delete Category</DialogTitle>
+                            </DialogHeader>
+                            <Confirm onConfirm={onConfirmDelete} />
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </div>
-            <div className="flex items-center gap-2">
-                <Overlay
-                    open={editState.isOpen}
-                    sheetClassName="min-w-[30vw]"
-                    title="Edit address"
-                    trigger={
-                        <Button aria-label="edit address" data-testid="address-edit-button" size="icon" onClick={editState.open}>
-                            <Pencil className="h-5 w-5" />
-                        </Button>
-                    }
-                    onOpenChange={editState.setOpen}
-                >
-                    <EditAddressForm address={address} onClose={editState.close} />
-                </Overlay>
-                <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
-                    <DialogTrigger asChild>
-                        <Button
-                            aria-label="delete address"
-                            data-testid="address-delete-button"
-                            size="icon"
-                            variant="destructive"
-                            onClick={deleteState.open}
-                        >
-                            <Trash2 className="h-5 w-5" />
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader className="sr-only">
-                            <DialogTitle>Delete Category</DialogTitle>
-                        </DialogHeader>
-                        <Confirm onConfirm={onConfirmDelete} />
-                    </DialogContent>
-                </Dialog>
-            </div>
-        </div>
+        </motion.div>
     );
 };
 
@@ -100,34 +111,31 @@ function RouteComponent() {
     const { data } = useSuspenseQuery(addressesQueryOptions());
 
     return (
-        <div className="w-full px-2" data-testid="addresses-page-wrapper">
-            <div className="mb-8 flex flex-col gap-y-2">
-                <h1 className="text-xl font-semibold">Shipping Addresses</h1>
-                <p className="text-sm text-muted-foreground">
-                    View and update your shipping addresses, you can add as many as you like. Saving your addresses will make them available during
-                    checkout.
-                </p>
-            </div>
-            <div className="w-full">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 mt-4">
-                    <Overlay
-                        open={addState.isOpen}
-                        sheetClassName="min-w-[30vw]"
-                        title="Add new address"
-                        trigger={
-                            <Button onClick={addState.open}>
-                                <Plus className="h-5 w-5" />
-                                <span className="font-semibold">Add new address</span>
-                            </Button>
-                        }
-                        onOpenChange={addState.setOpen}
-                    >
-                        <AddAddressForm onClose={addState.close} />
-                    </Overlay>
-                    {data?.addresses?.map((address, idx: number) => {
-                        return <AddressItem key={idx} address={address} />;
+        <div className="w-full px-2">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-4">
+                <h2 className="text-2xl font-bold mb-2">My Addresses</h2>
+                <p className="text-muted-foreground">Manage your delivery addresses</p>
+            </motion.div>
+            <Overlay
+                open={addState.isOpen}
+                title="Add new address"
+                trigger={
+                    <Button onClick={addState.open}>
+                        <Plus className="h-5 w-5" />
+                        <span className="font-semibold">Add new address</span>
+                    </Button>
+                }
+                onOpenChange={addState.setOpen}
+                showHeader={true}
+            >
+                <AddAddressForm onClose={addState.close} />
+            </Overlay>
+            <div className="space-y-3 mt-4">
+                <AnimatePresence mode="popLayout">
+                    {data?.addresses?.map((address, index: number) => {
+                        return <AddressItem key={index} index={index} address={address} />;
                     })}
-                </div>
+                </AnimatePresence>
             </div>
         </div>
     );

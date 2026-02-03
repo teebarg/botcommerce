@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { User, Lock, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Camera } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -15,6 +15,7 @@ import { tryCatch } from "@/utils/try-catch";
 import { Separator } from "@/components/ui/separator";
 import { updateMeFn, updatePasswordFn } from "@/server/users.server";
 import { updateAuthSession } from "@/utils/auth-client";
+import { motion } from "framer-motion";
 
 const profileSchema = z.object({
     first_name: z.string().min(1, "First name is required").max(255, "First name is too long"),
@@ -115,25 +116,43 @@ function RouteComponent() {
     }
 
     return (
-        <div>
-            <div className="border-border border-b transition-colors duration-300">
-                <div className="max-w-5xl mx-auto py-4 flex justify-between items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold">Profile Settings</h1>
-                        <p className="text-sm text-muted-foreground mt-1">Manage your account information and preferences</p>
-                    </div>
-                </div>
-            </div>
+        <div className="space-y-6">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
+                <h2 className="text-2xl font-bold mb-2">Profile Details</h2>
+                <p className="text-muted-foreground">Manage your personal information</p>
+            </motion.div>
 
-            <div className="max-w-5xl mx-auto py-8">
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1 }}
+                className="flex flex-col items-center"
+            >
+                <div className="relative">
+                    <div className="w-24 h-24 rounded-full gradient-primary p-1">
+                        <div className="w-full h-full rounded-full bg-secondary flex items-center justify-center overflow-hidden">
+                            <span className="text-3xl font-bold">
+                                {session?.user?.first_name[0]}
+                                {session?.user?.last_name?.[0]}
+                            </span>
+                        </div>
+                    </div>
+                    <button className="absolute bottom-0 right-0 w-8 h-8 rounded-full gradient-primary flex items-center justify-center shadow-lg">
+                        <Camera className="w-4 h-4 text-white" />
+                    </button>
+                </div>
+                <p className="mt-3 font-semibold">
+                    {session?.user?.first_name} {session?.user?.last_name}
+                </p>
+                <p className="text-sm text-muted-foreground">{session?.user?.email}</p>
+            </motion.div>
+
+            <div className="py-8 px-2 md:px-0">
                 <div className="bg-card rounded-xl shadow-sm border border-border mb-6 transition-colors duration-300">
-                    <div className="md:flex items-center justify-between p-6">
-                        <div className="flex items-center space-x-3">
-                            <User className="w-5 h-5" />
-                            <div>
-                                <h3 className="text-lg font-semibold">Profile Information</h3>
-                                <p className="text-sm text-muted-foreground">Update your personal details</p>
-                            </div>
+                    <div className="flex items-center justify-between p-6">
+                        <div>
+                            <h3 className="text-lg font-semibold">Profile Information</h3>
+                            <p className="text-sm text-muted-foreground">Update your personal details</p>
                         </div>
                         {editingSection !== "profile" && (
                             <Button className="mt-2 md:mt-0" onClick={() => handleEdit("profile")}>
@@ -207,16 +226,12 @@ function RouteComponent() {
                         </Form>
                     </div>
                 </div>
-
                 <div className="bg-card rounded-xl shadow-sm border border-border transition-colors duration-300">
                     <div className="p-6 border-b border-border">
-                        <div className="md:flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                                <Lock className={`w-5 h-5`} />
-                                <div>
-                                    <h3 className="text-lg font-semibold">Password</h3>
-                                    <p className="text-sm text-muted-foreground">Update your password to keep your account secure</p>
-                                </div>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h3 className="text-lg font-semibold">Password</h3>
+                                <p className="text-sm text-muted-foreground">Update your password</p>
                             </div>
                             {editingSection !== "password" && (
                                 <Button className="mt-2 md:mt-0" onClick={() => handleEdit("password")}>

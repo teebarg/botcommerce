@@ -1,66 +1,57 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ordersQueryOptions } from "@/hooks/useOrder";
-import PromotionalBanner from "@/components/promotion";
-import { currency } from "@/utils";
-import { ChevronDown } from "lucide-react";
+import { cn, currency, formatDate } from "@/utils";
+import { ChevronRight, Clock, Heart, MapPin, Package } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
-import type { Order, Session } from "@/schemas";
+import type { Order } from "@/schemas";
 import Overlay from "@/components/overlay";
 import OrderDetails from "@/components/store/orders/order-details";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 
-const getProfileCompletion = (customer: Omit<Session, "password_hash"> | null) => {
-    let count = 0;
-
-    if (!customer) {
-        return 0;
-    }
-
-    if (customer.email) {
-        count++;
-    }
-
-    if (customer.first_name && customer.last_name) {
-        count++;
-    }
-
-    if (customer.addresses?.length) {
-        count++;
-    }
-
-    return (count / 3) * 100;
-};
-
-const OrderItem: React.FC<{ order: Order }> = ({ order }) => {
+const OrderItem: React.FC<{ order: Order; idx: number }> = ({ order, idx }) => {
     const state = useOverlayTriggerState({});
 
     return (
-        <li>
-            <Overlay
-                open={state.isOpen}
-                sheetClassName="min-w-[70vw]"
-                trigger={
-                    <div className="shadow-lg flex justify-between items-center p-4 rounded-lg cursor-pointer">
-                        <div className="grid grid-cols-3 grid-rows-2 text-sm gap-x-4 flex-1">
-                            <span className="font-semibold">Date placed</span>
-                            <span className="font-semibold">Order number</span>
-                            <span className="font-semibold">Total amount</span>
-                            <span data-testid="order-created-date">{new Date(order.created_at).toDateString()}</span>
-                            <span data-testid="order-id" data-value={order.order_number}>
-                                #{order.order_number}
+        <Overlay
+            open={state.isOpen}
+            trigger={
+                <motion.div
+                    key={order.id + idx}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.25 + idx * 0.05 }}
+                    className="bg-card rounded-2xl p-4 border border-border flex items-center gap-4"
+                >
+                    <img src={order.order_items[0].image} alt="Order item" className="w-14 h-14 rounded-xl object-cover" />
+                    <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm">{order.order_number}</p>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {formatDate(order.created_at)}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                            <span
+                                className={cn(
+                                    "text-xs px-2 py-0.5 rounded-full",
+                                    order.status === "DELIVERED" ? "bg-accent text-accent-foreground" : "bg-primary/20 text-primary"
+                                )}
+                            >
+                                {order.status}
                             </span>
-                            <span data-testid="order-amount">{currency(order.total)}</span>
+                            <span className="text-xs text-muted-foreground">{order.order_items.length} items</span>
                         </div>
-                        <button aria-label="open" className="flex items-center justify-between" data-testid="open-order-button">
-                            <ChevronDown className="-rotate-90" />
-                        </button>
                     </div>
-                }
-                onOpenChange={state.setOpen}
-            >
-                <OrderDetails order={order} onBack={state.close} />
-            </Overlay>
-        </li>
+                    <p className="font-semibold">{currency(order.total)}</p>
+                </motion.div>
+            }
+            onOpenChange={state.setOpen}
+            showHeader={true}
+            sheetClassName="md:max-w-6xl"
+            title={<div className="text-base">Order Details ({order.order_number})</div>}
+        >
+            <OrderDetails order={order} />
+        </Overlay>
     );
 };
 
@@ -76,66 +67,81 @@ function RouteComponent() {
     const { data } = useSuspenseQuery(ordersQueryOptions({}));
 
     return (
-        <div className="px-2 md:px-0" data-testid="overview-page-wrapper">
-            <div>
-                <PromotionalBanner
-                    btnClass="text-purple-600"
-                    outerClass="from-purple-500 via-pink-500 to-orange-400 md:mx-auto max-w-8xl"
-                    subtitle="Get up to 50% OFF on select products."
-                    title="Big Sale on Top Brands!"
-                />
-                <div className="text-xl hidden md:flex justify-between items-center mt-4">
-                    <span data-testid="welcome-message" data-value={session?.user?.first_name}>
-                        Hello {session?.user?.first_name}
-                    </span>
-                    <span className="text-sm text-foreground">
-                        Signed in as:{" "}
-                        <span className="font-semibold" data-testid="customer-email" data-value={session?.user?.email}>
-                            {session?.user?.email}
+        <div className="px-2 md:px-0 space-y-4">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center py-6">
+                <div className="w-20 h-20 mx-auto rounded-full gradient-primary p-1 mb-4">
+                    <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
+                        <span className="text-2xl font-bold">
+                            {session?.user?.first_name?.charAt(0).toUpperCase() + session?.user?.last_name?.charAt(0).toUpperCase()}
                         </span>
-                    </span>
-                </div>
-                <div className="flex flex-col py-2 border-t border-gray-200 mt-2">
-                    <div className="flex flex-col gap-y-4 h-full col-span-1 row-span-2 flex-1">
-                        <div className="grid grid-cols-2 gap-x-2 max-w-xl">
-                            <div className="flex flex-col bg-pink-100 dark:bg-pink-900 rounded-lg py-2 px-4">
-                                <h3 className="font-semibold">Profile</h3>
-                                <div className="flex items-center gap-x-2">
-                                    <span data-testid="customer-profile-completion" data-value={getProfileCompletion(session?.user!)}>
-                                        {getProfileCompletion(session?.user!).toFixed(2)}%
-                                    </span>
-                                    <span className="uppercase">Completed</span>
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col bg-yellow-100 dark:bg-yellow-900 rounded-lg py-2 px-4">
-                                <h3 className="font-semibold">Addresses</h3>
-                                <div className="flex items-center gap-x-2">
-                                    <span data-testid="addresses-count" data-value={session?.user?.addresses?.length || 0}>
-                                        {session?.user?.addresses?.length || 0}
-                                    </span>
-                                    <span className="uppercase">Saved</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="hidden sm:flex flex-col gap-y-4 mt-4">
-                            <div className="flex items-center gap-x-2">
-                                <h3 className="text-lg">Recent orders</h3>
-                            </div>
-                            <ul className="flex flex-col gap-y-4" data-testid="orders-wrapper">
-                                {data?.orders && data?.orders?.length > 0 ? (
-                                    data?.orders.slice(0, 5)?.map((order: Order, idx: number) => {
-                                        return <OrderItem key={idx} data-testid="order-wrapper" data-value={order.order_number} order={order} />;
-                                    })
-                                ) : (
-                                    <span data-testid="no-orders-message">No recent orders</span>
-                                )}
-                            </ul>
-                        </div>
                     </div>
                 </div>
-            </div>
+                <h2 className="text-xl font-bold">Welcome back, {session?.user?.first_name}!</h2>
+                <p className="text-muted-foreground text-sm">Member since January 2024</p>
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="grid grid-cols-3 gap-3">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.1 }}
+                    className="bg-card rounded-2xl p-4 text-center border border-border"
+                >
+                    <div className="w-10 h-10 mx-auto rounded-xl gradient-primary flex items-center justify-center mb-2">
+                        <Heart className="w-5 h-5 text-white" />
+                    </div>
+                    <p className="text-2xl font-bold">{data?.orders?.length}</p>
+                    <p className="text-xs text-muted-foreground">Total Orders</p>
+                </motion.div>
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.15 }}
+                    className="bg-card rounded-2xl p-4 text-center border border-border"
+                >
+                    <div className="w-10 h-10 mx-auto rounded-xl gradient-primary flex items-center justify-center mb-2">
+                        <MapPin className="w-5 h-5 text-white" />
+                    </div>
+                    <p className="text-2xl font-bold">0</p>
+                    <p className="text-xs text-muted-foreground">Wishlist Items</p>
+                </motion.div>
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="bg-card rounded-2xl p-4 text-center border border-border"
+                >
+                    <div className="w-10 h-10 mx-auto rounded-xl gradient-primary flex items-center justify-center mb-2">
+                        <Package className="w-5 h-5 text-white" />
+                    </div>
+                    <p className="text-2xl font-bold">1</p>
+                    <p className="text-xs text-muted-foreground">Saved Addresses</p>
+                </motion.div>
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold">Recent Orders</h3>
+                    <Link to="/account/orders" className="text-sm text-primary flex items-center gap-1">
+                        View All
+                        <ChevronRight className="w-4 h-4" />
+                    </Link>
+                </div>
+
+                <div className="space-y-3">
+                    {data?.orders?.slice(0, 5)?.map((order: Order, idx: number) => (
+                        <OrderItem order={order} idx={idx} />
+                    ))}
+                    {data?.orders?.length === 0 && (
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.25 }}
+                            className="bg-card rounded-2xl p-4 border border-border flex items-center gap-4"
+                        >
+                            No orders found
+                        </motion.div>
+                    )}
+                </div>
+            </motion.div>
         </div>
     );
 }

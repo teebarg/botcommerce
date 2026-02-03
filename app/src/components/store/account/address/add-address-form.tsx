@@ -8,6 +8,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCreateAddress } from "@/hooks/useAddress";
 import { states } from "@/components/store/collections/data";
+import { motion } from "framer-motion";
 
 const addressSchema = z.object({
     address_type: z.enum(["HOME", "WORK", "BILLING", "SHIPPING", "OTHER"]),
@@ -51,11 +52,16 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
     };
 
     return (
-        <div className="px-2 md:px-4 pt-4">
-            <h2 className="text-lg font-semibold mb-4">Add new address</h2>
+        <motion.div
+            key="cart"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="flex-1 flex flex-col"
+        >
             <Form {...form}>
-                <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-                    <div className="grid grid-cols-1 gap-y-2">
+                <form className="flex-1 flex flex-col overflow-hidden" onSubmit={form.handleSubmit(onSubmit)}>
+                    <div className="overflow-y-auto flex-1 px-4 space-y-4">
                         <FormField
                             control={form.control}
                             name="address_type"
@@ -204,17 +210,17 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
                             )}
                         />
                     </div>
-                    <div className="flex gap-3 mt-6 justify-end">
+                    <div className="flex gap-3 mt-6 justify-end px-4 py-2 border-t border-border">
                         <Button aria-label="cancel" data-testid="cancel-button" type="button" variant="destructive" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button aria-label="save" data-testid="save-button" isLoading={createAddress.isPending} type="submit">
+                        <Button aria-label="save" className="gradient-primary" data-testid="save-button" isLoading={createAddress.isPending} type="submit">
                             Save
                         </Button>
                     </div>
                 </form>
             </Form>
-        </div>
+        </motion.div>
     );
 };
 

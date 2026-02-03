@@ -56,7 +56,6 @@ const OrderOverview = ({ order }: { order: Order }) => {
 
     return (
         <div className={cn("bg-card rounded-lg p-6 space-y-4 mb-4")}>
-            <h3 className="text-xl font-semibold">Order Details</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
                 <div className="space-y-2">
                     <div className="flex items-center space-x-2">

@@ -1,8 +1,6 @@
 import AccountNav from "@/components/layout/account-nav";
-import RecommendedProducts from "@/components/store/products/recommended";
-import LocalizedClientLink from "@/components/ui/link";
-import { Separator } from "@/components/ui/separator";
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 import { Box, MapPin, Package, User } from "lucide-react";
 
 export const Route = createFileRoute("/_mainLayout/account")({
@@ -12,25 +10,25 @@ export const Route = createFileRoute("/_mainLayout/account")({
 const navLinks = [
     {
         href: "/account",
-        icon: <Box className="h-8 w-8" />,
+        icon: <Box className="h-6 w-6" />,
         label: "Overview",
         dataTestid: "overview-link",
     },
     {
         href: "/account/profile",
-        icon: <User className="h-8 w-8" />,
+        icon: <User className="h-6 w-6" />,
         label: "Profile",
         dataTestid: "addresses-link",
     },
     {
         href: "/account/addresses",
-        icon: <MapPin className="h-8 w-8" />,
+        icon: <MapPin className="h-6 w-6" />,
         label: "Addresses",
         dataTestid: "addresses-link",
     },
     {
         href: "/account/orders",
-        icon: <Package className="h-8 w-8" />,
+        icon: <Package className="h-6 w-6" />,
         label: "Orders",
         dataTestid: "orders-link",
     },
@@ -39,63 +37,51 @@ const navLinks = [
 function RouteComponent() {
     const { session } = Route.useRouteContext();
     return (
-        <div className="flex-1 sm:py-4 px-2 md:px-0" data-testid="account-page">
-            <div className="bg-card text-secondary-foreground p-6 md:hidden">
-                <div className="flex items-center gap-4">
-                    <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center">
-                        <User className="h-10 w-10" />
-                    </div>
-                    <div>
-                        <h1 className="text-xl font-bold">
-                            {session?.user?.first_name} {session?.user?.last_name}
-                        </h1>
-                        <p>{session?.user?.email}</p>
-                    </div>
-                </div>
-            </div>
-            <div className="bg-card md:hidden" data-testid="mobile-account-nav">
-                <ul className="grid grid-cols-4 gap-4 px-6">
+        <div className="flex-1">
+            <div className="bg-blur md:hidden sticky top-16 z-10">
+                <motion.ul initial={{ y: 100 }} animate={{ y: 0 }} className="grid grid-cols-4 gap-4 px-6">
                     {navLinks.map((link, idx: number) => (
                         <li key={idx}>
-                            <LocalizedClientLink
-                                active="bg-primary/20 text-primary"
+                            <Link
+                                activeProps={{ className: "bg-primary/20 text-primary" }}
+                                activeOptions={{ exact: true }}
                                 className="text-xs font-semibold"
                                 data-testid={link.dataTestid}
-                                href={link.href}
+                                to={link.href}
                             >
-                                <div className="flex flex-col items-center p-4">
-                                    {link.icon}
+                                <div className="flex flex-col items-center p-4 gap-1">
+                                    <div className="bg-secondary p-2 rounded-xl">{link.icon}</div>
                                     <span>{link.label}</span>
                                 </div>
-                            </LocalizedClientLink>
+                            </Link>
                         </li>
                     ))}
-                </ul>
+                </motion.ul>
             </div>
-            <div className="flex-1 h-full max-w-7xl mx-auto flex flex-col rounded-md md:px-8">
-                <div className="md:flex md:gap-4 py-4 md:py-12">
-                    <div className="md:min-w-60">{session?.user && <AccountNav />}</div>
-                    <div className="md:flex-1">
+            <div className="max-w-7xl mx-auto flex md:gap-4 pb-12 pt-8">
+                <div className="md:w-60 hidden md:block">
+                    <div className="md:sticky md:top-16">{session?.user && <AccountNav />}</div>
+                </div>
+                <AnimatePresence mode="wait" custom={0}>
+                    <motion.div
+                        custom={0}
+                        variants={{
+                            enter: { opacity: 0, x: -300 },
+                            exit: { opacity: 0, x: 300 },
+                            center: { opacity: 1, x: 0 },
+                        }}
+                        initial="enter"
+                        animate="center"
+                        exit="exit"
+                        transition={{
+                            x: { type: "spring", stiffness: 300, damping: 30 },
+                            opacity: { duration: 0.2 },
+                        }}
+                        className="flex-1"
+                    >
                         <Outlet />
-                    </div>
-                </div>
-                <Separator className="my-4" />
-                <div className="flex flex-col sm:flex-row items-end justify-between py-4 px-2 md:px-0 gap-8">
-                    <div>
-                        <h3 className="text-lg font-medium">Got questions?</h3>
-                        <span className="text-sm">You can find frequently asked questions and answers on our customer service page.</span>
-                    </div>
-                    <div>
-                        <LocalizedClientLink className="text-contrast" href="/customer-service">
-                            Customer Service
-                        </LocalizedClientLink>
-                    </div>
-                </div>
-                <div className="mt-8 px-2 md:px-0">
-                    <p className="text:sm md:text-lg font-semibold">More to love</p>
-                    <Separator className="my-2" />
-                    <RecommendedProducts />
-                </div>
+                    </motion.div>
+                </AnimatePresence>
             </div>
         </div>
     );

@@ -1,9 +1,7 @@
-import { Link, useLocation, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import type React from "react";
 import { startTransition } from "react";
-
 import { useProgressBar } from "@/components/ui/progress-bar";
-import { cn } from "@/utils";
 
 interface TransitionLinkProps {
     children: React.ReactNode;
@@ -15,8 +13,6 @@ interface TransitionLinkProps {
 
 const LocalizedClientLink: React.FC<TransitionLinkProps> = ({ children, href, className, active, ...props }) => {
     const navigate = useNavigate();
-    // const location = useLocation();
-    // const pathname = location.pathname;
     const progress = useProgressBar();
 
     return (

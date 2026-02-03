@@ -1,5 +1,4 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
-
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { BackButton } from "@/components/back";
 import ChatBotWrapper from "@/components/generic/chatbot";
 import Cookie from "@/components/store/cookie-consent";
@@ -8,7 +7,6 @@ import StoreNavbar from "@/components/layout/store-nav";
 import ButtonNav from "@/components/layout/bottom-navbar";
 import GetApp from "@/components/get-app";
 import { SearchDialog } from "@/components/store/product-search";
-import LocalizedClientLink from "@/components/ui/link";
 import type { Session } from "start-authjs";
 import { ShoppingBag } from "lucide-react";
 
@@ -24,15 +22,15 @@ function MainLayoutComponent() {
     return (
         <div className="flex flex-col min-h-screen">
             <StoreNavbar session={session as unknown as Session} />
-            <div className="md:hidden sticky top-[env(safe-area-inset-top)] z-40 bg-background">
+            <div className="md:hidden sticky top-[env(safe-area-inset-top)] z-40 bg-blur">
                 <div className="flex items-center gap-2 px-2 py-3">
                     <div className="flex gap-2 items-center flex-1">
                         <BackButton />
-                        <LocalizedClientLink href="/">
+                        <Link to="/">
                             <div className="w-9 h-9 rounded-lg gradient-primary flex items-center justify-center">
                                 <ShoppingBag className="w-5 h-5 text-white" />
                             </div>
-                        </LocalizedClientLink>
+                        </Link>
                     </div>
                     <SearchDialog />
                     <GetApp />
