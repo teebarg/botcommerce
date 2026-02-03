@@ -116,7 +116,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                     initial={{ opacity: 0, x: isMobile ? 0 : -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="relative aspect-square md:aspect-[4/5] md:rounded-3xl md:overflow-hidden md:sticky md:top-16"
+                    className="relative aspect-square md:aspect-product md:rounded-3xl md:overflow-hidden md:sticky md:top-16"
                 >
                     <img
                         key={currentImageIndex}
@@ -201,7 +201,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                         </span>
                                     </div>
                                     {v.inventory > 0 && (
-                                        <Button size="sm" variant="warning" onClick={() => handleMarkVariantOutOfStock(v)}>
+                                        <Button size="sm" variant="destructive" onClick={() => handleMarkVariantOutOfStock(v)}>
                                             Mark out of stock
                                         </Button>
                                     )}
@@ -215,26 +215,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
                     <div className="mt-4">
                         <p className="line-clamp-3 text-base text-muted-foreground">{product.description}</p>
                     </div>
-                    {session?.user?.isAdmin && product?.variants?.length ? (
-                        <div className="flex flex-col gap-2 mt-4">
-                            {product.variants?.map((v) => (
-                                <div key={v.id} className="flex lg:flex-row items-center justify-between text-sm gap-2 bg-secondary p-2">
-                                    <div className="flex flex-col md:flex-row md:items-center gap-3">
-                                        <span>SKU: {v.sku}</span>
-                                        <span>Inventory: {v.inventory}</span>
-                                        <span className={v.inventory > 0 ? "text-emerald-600" : "text-red-600"}>
-                                            {v.inventory > 0 ? "IN_STOCK" : "OUT_OF_STOCK"}
-                                        </span>
-                                    </div>
-                                    {v.inventory > 0 && (
-                                        <Button size="sm" variant="warning" onClick={() => handleMarkVariantOutOfStock(v)}>
-                                            Mark out of stock
-                                        </Button>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    ) : null}
 
                     <ProductVariantActions product={product} inWishlist={inWishlist} />
 

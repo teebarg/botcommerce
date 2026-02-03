@@ -1,8 +1,6 @@
 import { createFileRoute, useLocation } from "@tanstack/react-router";
-
 import WishlistItem from "@/components/store/wishlist";
 import { BtnLink } from "@/components/ui/btnLink";
-import PromotionalBanner from "@/components/promotion";
 import ServerError from "@/components/generic/server-error";
 import type { WishItem } from "@/schemas";
 import { userWishlistQueryOptions } from "@/hooks/useUser";
@@ -23,7 +21,7 @@ export const Route = createFileRoute("/_mainLayout/wishlist")({
 });
 
 function RouteComponent() {
-    const location = useLocation()
+    const location = useLocation();
     const wishlistQuery = useSuspenseQuery(userWishlistQueryOptions(location.href));
 
     if (wishlistQuery.isLoading) {
@@ -41,17 +39,10 @@ function RouteComponent() {
     const wishlists = wishlistQuery.data?.wishlists ?? [];
 
     return (
-        <div className="max-w-7xl mx-auto w-full mt-2 mb-4 py-8 px-2 md:px-0">
-            <PromotionalBanner
-                btnClass="text-purple-600"
-                outerClass="from-purple-500 via-pink-500 to-orange-400 mx-2 md:mx-auto max-w-8xl"
-                subtitle="Get up to 50% OFF on select products."
-                title="Big Sale on Top Brands!"
-            />
-
+        <div className="max-w-6xl mx-auto w-full mb-4 py-8 px-2 md:px-0">
             {wishlists.length > 0 ? (
                 <div>
-                    <h1 className="text-2xl font-bold text-center mt-4">Your Wishlist</h1>
+                    <h1 className="text-2xl font-bold text-center">Your Wishlist</h1>
                     <p className="text-center text-muted-foreground">Curate your luxury collection.</p>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 lg:gap-8 mt-6 px-1">
                         {wishlists?.map((item: WishItem, idx: number) => (

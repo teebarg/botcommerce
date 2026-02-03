@@ -12,11 +12,9 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
     });
     const [showDetails, setShowDetails] = useState(false);
 
-    console.error(error);
-
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 relative transition-colors duration-300">
-            <div className="max-w-md w-full text-center animate-fade-in">
+        <div className="flex-1 flex items-center justify-center px-4 md:py-16 relative">
+            <div className="max-w-md w-full text-center">
                 <div className="relative mb-8">
                     <div className="w-32 h-32 mx-auto relative animate-float">
                         <div className="absolute inset-0 flex items-center justify-center">
