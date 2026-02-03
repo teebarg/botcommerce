@@ -2,10 +2,9 @@ import FailedPayment from "./order-failed";
 import PendingPayment from "./order-pending";
 import OrderPickup from "./order-pickup";
 import SuccessConfirmation from "./order-success";
-
 import { orderQueryOptions } from "@/hooks/useOrder";
 import { useNavigate } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 type OrderConfirmationProps = {
     orderNumber: string;
@@ -14,10 +13,10 @@ type OrderConfirmationProps = {
 
 const OrderConfirmation: React.FC<OrderConfirmationProps> = (props) => {
     const navigate = useNavigate();
-    const { data: order } = useSuspenseQuery(orderQueryOptions(props.orderNumber));
+    const { data: order } = useQuery(orderQueryOptions(props.orderNumber));
 
     const onContinueShopping = () => {
-        navigate({to: "/collections"});
+        navigate({ to: "/collections" });
     };
 
     if (!order) {

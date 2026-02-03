@@ -53,13 +53,11 @@ export default function Footer() {
     const categories = cat?.filter((cat: Category) => !cat.parent_id).slice(0, 6);
 
     return (
-        <footer className="flex w-full flex-col pb-20 md:pb-12 border-t border-border/50">
+        <footer className="flex w-full flex-col pb-12 border-t border-border/50">
             <div className="hidden md:block mx-auto max-w-7xl px-6 pb-8 pt-8 sm:pt-24 lg:px-8 md:pt-32">
                 <div className="hidden md:grid md:grid-cols-3 md:gap-8">
                     <div className="md:pr-8">
-                        <h3 className="text-xl font-semibold">
-                            {config?.shop_name}
-                        </h3>
+                        <h3 className="text-xl font-semibold">{config?.shop_name}</h3>
                         <p className="text-sm text-muted-foreground">
                             {`We are a dedicated online store offering a wide range of high-quality and fun products for kids. Our mission is to bring
                             joy and happiness to every child's life.`}

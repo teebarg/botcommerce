@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_mainLayout")({
 function MainLayoutComponent() {
     const { session } = Route.useRouteContext();
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col min-h-screen">
             <StoreNavbar session={session as unknown as Session} />
             <div className="md:hidden sticky top-[env(safe-area-inset-top)] z-40 bg-background">
                 <div className="flex items-center gap-2 px-2 py-3">
