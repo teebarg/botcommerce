@@ -20,7 +20,7 @@ const Overlay: React.FC<OverlayProps> = ({
     onOpenChange,
     title = "Header Content",
     sheetClassName = "",
-    showHeader = false,
+    showHeader = true,
     side = "right",
 }) => {
     return (

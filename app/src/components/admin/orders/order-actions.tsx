@@ -19,7 +19,7 @@ const OrderActions: React.FC<OrderActionsProps> = ({ order }) => {
         <div className="flex items-center flex-wrap gap-2">
             <Overlay
                 open={state.isOpen}
-                sheetClassName="min-w-[70vw]"
+                sheetClassName="md:max-w-7xl"
                 title="Order Details"
                 trigger={
                     <Button className="flex-1" onClick={state.open}>
