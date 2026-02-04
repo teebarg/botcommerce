@@ -1,16 +1,13 @@
 import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
-
 import { FaqForm } from "./faq-form";
-
 import { Button } from "@/components/ui/button";
 import type { FAQ } from "@/schemas";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Confirm } from "@/components/generic/confirm";
 import { useInvalidate } from "@/hooks/useApi";
-import Overlay from "@/components/overlay";
 import { useDeleteFaq } from "@/hooks/useFaq";
+import SheetDrawer from "@/components/sheet-drawer";
+import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 
 interface FaqActionsProps {
     faq: FAQ;
@@ -22,7 +19,7 @@ const FaqActions = ({ faq }: FaqActionsProps) => {
     const deleteState = useOverlayTriggerState({});
     const editState = useOverlayTriggerState({});
 
-    const { mutateAsync } = useDeleteFaq();
+    const { mutateAsync, isPending } = useDeleteFaq();
 
     const handleDelete = async () => {
         if (!faqToDelete) return;
@@ -35,7 +32,7 @@ const FaqActions = ({ faq }: FaqActionsProps) => {
 
     return (
         <div className="flex items-center gap-1 shrink-0">
-            <Overlay
+            <SheetDrawer
                 open={editState.isOpen}
                 title="Edit FAQ"
                 trigger={
@@ -51,20 +48,23 @@ const FaqActions = ({ faq }: FaqActionsProps) => {
                         editState.close();
                     }}
                 />
-            </Overlay>
-            <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
-                <DialogTrigger asChild>
-                    <Button className="bg-red-50 text-red-800" size="icon" variant="ghost" onClick={() => setFaqToDelete(faq.id)}>
+            </SheetDrawer>
+            <ConfirmDrawer
+                open={deleteState.isOpen}
+                onOpenChange={deleteState.setOpen}
+                trigger={
+                    <Button className="bg-red-50 text-red-800 hover:bg-red-100" size="icon" variant="ghost" onClick={() => setFaqToDelete(faq.id)}>
                         <Trash2 className="h-5 w-5" />
                     </Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader className="sr-only">
-                        <DialogTitle>Delete</DialogTitle>
-                    </DialogHeader>
-                    <Confirm onClose={deleteState.close} onConfirm={handleDelete} />
-                </DialogContent>
-            </Dialog>
+                }
+                onClose={deleteState.close}
+                onConfirm={handleDelete}
+                title="Delete FAQ"
+                description="Are you sure you want to delete this FAQ? This action cannot be undone."
+                confirmText="Delete"
+                variant="destructive"
+                isLoading={isPending}
+            />
         </div>
     );
 };

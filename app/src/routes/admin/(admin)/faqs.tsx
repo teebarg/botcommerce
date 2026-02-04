@@ -3,7 +3,6 @@ import { Plus } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { Button } from "@/components/ui/button";
 import { FaqForm } from "@/components/admin/faq/faq-form";
-import Overlay from "@/components/overlay";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { getFaqsFn } from "@/server/faq.server";
 import { Eye, EyeOff, Tag } from "lucide-react";
@@ -11,6 +10,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { FAQ } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
 import FaqActions from "@/components/admin/faq/faq-actions";
+import SheetDrawer from "@/components/sheet-drawer";
 
 const useFaqsQuery = () =>
     queryOptions({
@@ -43,9 +43,8 @@ function RouteComponent() {
         <div className="px-2 md:px-10 py-8">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Manage FAQs</h1>
-                <Overlay
+                <SheetDrawer
                     open={state.isOpen}
-                    sheetClassName="min-w-[450px]"
                     title="Add New FAQ"
                     trigger={
                         <Button onClick={state.open}>
@@ -56,7 +55,7 @@ function RouteComponent() {
                     onOpenChange={state.setOpen}
                 >
                     <FaqForm onCancel={() => state.close()} />
-                </Overlay>
+                </SheetDrawer>
             </div>
             <div className="space-y-4">
                 {faqs.map((faq: FAQ, idx: number) => (

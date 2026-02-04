@@ -50,62 +50,59 @@ const BankDetailsForm: React.FC<BankDetailsFormProps> = ({ onClose }) => {
     };
 
     return (
-        <div className="px-2 md:px-4 pt-4">
-            <h2 className="text-2xl font-semibold mb-4">Add Bank Details</h2>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
-                    <div className="space-y-4">
-                        <FormField
-                            control={form.control}
-                            name="bank_name"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Bank Name</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Enter bank name" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="account_name"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Account Name</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Enter account name" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="account_number"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Account Number</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Enter account number" type="number" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                    <div className="flex justify-end space-x-2 mt-8 w-full">
-                        <Button aria-label="close" className="min-w-36" type="button" variant="outline" onClick={onClose}>
-                            Close
-                        </Button>
-                        <Button aria-label="delete" className="min-w-36" isLoading={isPending} type="submit">
-                            Submit
-                        </Button>
-                    </div>
-                </form>
-            </Form>
-        </div>
+        <Form {...form}>
+            <form className="flex-1 flex flex-col overflow-hidden" onSubmit={form.handleSubmit(onSubmit)}>
+                <div className="flex-1 overflow-y-auto py-2 px-4 space-y-4">
+                    <FormField
+                        control={form.control}
+                        name="bank_name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Bank Name</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Enter bank name" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="account_name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Account Name</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Enter account name" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="account_number"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Account Number</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Enter account number" type="number" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+                <div className="sheet-footer">
+                    <Button aria-label="close" className="min-w-36" type="button" variant="outline" onClick={onClose}>
+                        Close
+                    </Button>
+                    <Button aria-label="delete" className="min-w-36" isLoading={isPending} type="submit">
+                        Submit
+                    </Button>
+                </div>
+            </form>
+        </Form>
     );
 };
 

@@ -31,88 +31,82 @@ const CustomerFilter = ({ open, onOpenChange }: CustomerFilterProps) => {
     };
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle>Filter Customers</DialogTitle>
-                </DialogHeader>
-
-                <div className="py-4 space-y-5">
-                    <div className="space-y-2">
-                        <h3 className="text-sm font-medium">Purchase History</h3>
-                        <div className="space-y-3">
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    checked={filters.minOrders !== undefined}
-                                    id="min-orders"
-                                    onCheckedChange={(checked) =>
-                                        setFilters((prev) => ({
-                                            ...prev,
-                                            minOrders: checked ? 1 : undefined,
-                                        }))
-                                    }
-                                />
-                                <Label htmlFor="min-orders">Has placed orders</Label>
-                            </div>
-
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    checked={filters.minSpent !== undefined}
-                                    id="min-spent"
-                                    onCheckedChange={(checked) =>
-                                        setFilters((prev) => ({
-                                            ...prev,
-                                            minSpent: checked ? 100 : undefined,
-                                        }))
-                                    }
-                                />
-                                <Label htmlFor="min-spent">Has spent money</Label>
-                            </div>
+        <div className="pb-4 md:pb-2 px-4">
+            <div className="py-4 space-y-5">
+                <div className="space-y-2">
+                    <h3 className="text-sm font-medium">Purchase History</h3>
+                    <div className="space-y-3">
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                checked={filters.minOrders !== undefined}
+                                id="min-orders"
+                                onCheckedChange={(checked) =>
+                                    setFilters((prev) => ({
+                                        ...prev,
+                                        minOrders: checked ? 1 : undefined,
+                                    }))
+                                }
+                            />
+                            <Label htmlFor="min-orders">Has placed orders</Label>
                         </div>
-                    </div>
 
-                    <div className="space-y-2">
-                        <h3 className="text-sm font-medium">Contact Information</h3>
-                        <div className="space-y-3">
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    checked={filters.hasPhone}
-                                    id="has-phone"
-                                    onCheckedChange={(checked) =>
-                                        setFilters((prev) => ({
-                                            ...prev,
-                                            hasPhone: checked ? true : undefined,
-                                        }))
-                                    }
-                                />
-                                <Label htmlFor="has-phone">Has phone number</Label>
-                            </div>
-
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    checked={filters.hasAddress}
-                                    id="has-address"
-                                    onCheckedChange={(checked) =>
-                                        setFilters((prev) => ({
-                                            ...prev,
-                                            hasAddress: checked ? true : undefined,
-                                        }))
-                                    }
-                                />
-                                <Label htmlFor="has-address">Has shipping address</Label>
-                            </div>
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                checked={filters.minSpent !== undefined}
+                                id="min-spent"
+                                onCheckedChange={(checked) =>
+                                    setFilters((prev) => ({
+                                        ...prev,
+                                        minSpent: checked ? 100 : undefined,
+                                    }))
+                                }
+                            />
+                            <Label htmlFor="min-spent">Has spent money</Label>
                         </div>
                     </div>
                 </div>
 
-                <DialogFooter className="flex sm:justify-between gap-2">
-                    <Button variant="contrast" onClick={handleReset}>
-                        Reset
-                    </Button>
-                    <Button onClick={handleApply}>Apply Filters</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                <div className="space-y-2">
+                    <h3 className="text-sm font-medium">Contact Information</h3>
+                    <div className="space-y-3">
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                checked={filters.hasPhone}
+                                id="has-phone"
+                                onCheckedChange={(checked) =>
+                                    setFilters((prev) => ({
+                                        ...prev,
+                                        hasPhone: checked ? true : undefined,
+                                    }))
+                                }
+                            />
+                            <Label htmlFor="has-phone">Has phone number</Label>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                checked={filters.hasAddress}
+                                id="has-address"
+                                onCheckedChange={(checked) =>
+                                    setFilters((prev) => ({
+                                        ...prev,
+                                        hasAddress: checked ? true : undefined,
+                                    }))
+                                }
+                            />
+                            <Label htmlFor="has-address">Has shipping address</Label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex justify-end gap-2 mt-4">
+                <Button variant="contrast" onClick={handleReset}>
+                    Reset
+                </Button>
+                <Button onClick={handleApply}>Apply Filters</Button>
+            </div>
+        </div>
     );
 };
 

@@ -13,6 +13,7 @@ import CustomerCard from "@/components/admin/customers/customer-card";
 import z from "zod";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { getUsersFn } from "@/server/users.server";
+import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 
 const LIMIT = 10;
 
@@ -71,7 +72,6 @@ function RouteComponent() {
             </div>
             <>
                 <div key="table" className="md:block hidden bg-card">
-                    <CustomerFilter open={filterOpen} onOpenChange={setFilterOpen} />
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -133,9 +133,20 @@ function RouteComponent() {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
-                            <button className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setFilterOpen(true)}>
-                                <SlidersHorizontal className="text-muted-foreground" size={18} />
-                            </button>
+                            <ConfirmDrawer
+                                open={filterOpen}
+                                onOpenChange={setFilterOpen}
+                                trigger={
+                                    <button className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setFilterOpen(true)}>
+                                        <SlidersHorizontal className="text-muted-foreground" size={18} />
+                                    </button>
+                                }
+                                content={<CustomerFilter open={filterOpen} onOpenChange={setFilterOpen} />}
+                                onClose={() => setFilterOpen(false)}
+                                title="Filter Customers"
+                                description=""
+                                hideActionBtn
+                            />
                         </div>
                         <div className="mt-4 py-2">
                             {users?.map((user: User, idx: number) => (
@@ -149,8 +160,6 @@ function RouteComponent() {
                             </div>
                         )}
                     </div>
-
-                    <CustomerFilter open={filterOpen} onOpenChange={setFilterOpen} />
                 </div>
                 {pagination?.total_pages > 1 && <PaginationUI key="pagination" pagination={pagination} />}
             </>

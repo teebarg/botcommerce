@@ -89,192 +89,199 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
     };
 
     return (
-        <div className="space-y-4 px-4 pt-6">
-            <div>
-                <h2 className="text-xl font-semibold text-card-foreground">Product Details</h2>
-                <p className="text-muted-foreground">Provide essential information about your product that customers will see.</p>
-            </div>
-
-            {currentProduct && <ImageDownloadButton fallbackName={currentProduct.slug} url={currentProduct.image} />}
-
-            <div className="grid gap-6">
-                <Card className="p-4 shadow-sm">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-medium flex items-center gap-2" htmlFor="name">
-                            <Package className="w-4 h-4 text-primary" />
-                            Product Name
-                        </Label>
-                        <Input
-                            className={errors.name ? "border-destructive" : ""}
-                            id="name"
-                            placeholder="Enter product name"
-                            value={product.name}
-                            onChange={(e) => updateField("name", e.target.value)}
-                        />
-                        {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
-                    </div>
-                </Card>
-                <Card className="p-4 shadow-sm">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-medium flex items-center gap-2" htmlFor="description">
-                            <FileText className="w-4 h-4 text-primary" />
-                            Description
-                        </Label>
-                        <Textarea
-                            className="min-h-[100px] resize-none"
-                            id="description"
-                            placeholder="Describe your product, benefits, and specifications..."
-                            value={product.description}
-                            onChange={(e) => updateField("description", e.target.value)}
-                        />
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                            <span>Help customers understand what makes your product special</span>
-                            <span>{product.description?.length || 0}/500</span>
-                        </div>
-                    </div>
-                </Card>
-
-                <div className="grid sm:grid-cols-2 gap-4">
-                    <div className="flex items-center gap-2">
-                        <Checkbox checked={product.active} id="active" onCheckedChange={(checked) => updateField("active", checked)} />
-                        <Label className="text-sm font-medium" htmlFor="active">
-                            Show in Store
-                        </Label>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <Checkbox checked={product.is_new} id="is_new" onCheckedChange={(checked) => updateField("is_new", checked)} />
-                        <Label className="text-sm font-medium" htmlFor="is_new">
-                            Is New
-                        </Label>
-                    </div>
+        <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="space-y-4 px-2 py-4 flex-1 overflow-y-auto">
+                <div>
+                    <h2 className="text-lg font-semibold">Product Details</h2>
+                    <p className="text-muted-foreground text-sm">Provide essential information about your product that customers will see.</p>
                 </div>
 
-                <div className="grid sm:grid-cols-2 gap-4">
+                {currentProduct && <ImageDownloadButton fallbackName={currentProduct.slug} url={currentProduct.image} />}
+
+                <div className="grid gap-6">
                     <Card className="p-4 shadow-sm">
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium flex items-center gap-2">
-                                <Tag className="w-4 h-4 text-primary" />
-                                Categories
+                            <Label className="text-sm font-medium flex items-center gap-2" htmlFor="name">
+                                <Package className="w-4 h-4 text-primary" />
+                                Product Name
                             </Label>
-                            <MultiSelect
-                                name="categories"
-                                options={categories?.map((category) => ({ value: category.id, label: category.name }))}
-                                value={product.categories}
-                                onChange={(value) => updateField("categories", value)}
+                            <Input
+                                className={errors.name ? "border-destructive" : ""}
+                                id="name"
+                                placeholder="Enter product name"
+                                value={product.name}
+                                onChange={(e) => updateField("name", e.target.value)}
                             />
+                            {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+                        </div>
+                    </Card>
+                    <Card className="p-4 shadow-sm">
+                        <div className="space-y-2">
+                            <Label className="text-sm font-medium flex items-center gap-2" htmlFor="description">
+                                <FileText className="w-4 h-4 text-primary" />
+                                Description
+                            </Label>
+                            <Textarea
+                                className="min-h-[100px] resize-none"
+                                id="description"
+                                placeholder="Describe your product, benefits, and specifications..."
+                                value={product.description}
+                                onChange={(e) => updateField("description", e.target.value)}
+                            />
+                            <div className="flex justify-between text-xs text-muted-foreground">
+                                <span>Help customers understand what makes your product special</span>
+                                <span>{product.description?.length || 0}/500</span>
+                            </div>
                         </div>
                     </Card>
 
-                    <Card className="p-4 shadow-sm">
-                        <div className="space-y-2">
-                            <Label className="text-sm font-medium flex items-center gap-2">
-                                <Tag className="w-4 h-4 text-primary" />
-                                Collection
+                    <div className="grid sm:grid-cols-2 gap-4">
+                        <div className="flex items-center gap-2">
+                            <Checkbox checked={product.active} id="active" onCheckedChange={(checked) => updateField("active", checked)} />
+                            <Label className="text-sm font-medium" htmlFor="active">
+                                Show in Store
                             </Label>
-                            <MultiSelect
-                                name="collections"
-                                options={collections?.map((collection) => ({ value: collection.id, label: collection.name }))}
-                                value={product.collections}
-                                onChange={(value) => updateField("collections", value)}
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <Checkbox checked={product.is_new} id="is_new" onCheckedChange={(checked) => updateField("is_new", checked)} />
+                            <Label className="text-sm font-medium" htmlFor="is_new">
+                                Is New
+                            </Label>
+                        </div>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-4">
+                        <Card className="p-4 shadow-sm">
+                            <div className="space-y-2">
+                                <Label className="text-sm font-medium flex items-center gap-2">
+                                    <Tag className="w-4 h-4 text-primary" />
+                                    Categories
+                                </Label>
+                                <MultiSelect
+                                    name="categories"
+                                    options={categories?.map((category) => ({ value: category.id, label: category.name }))}
+                                    value={product.categories}
+                                    onChange={(value) => updateField("categories", value)}
+                                />
+                            </div>
+                        </Card>
+
+                        <Card className="p-4 shadow-sm">
+                            <div className="space-y-2">
+                                <Label className="text-sm font-medium flex items-center gap-2">
+                                    <Tag className="w-4 h-4 text-primary" />
+                                    Collection
+                                </Label>
+                                <MultiSelect
+                                    name="collections"
+                                    options={collections?.map((collection) => ({ value: collection.id, label: collection.name }))}
+                                    value={product.collections}
+                                    onChange={(value) => updateField("collections", value)}
+                                />
+                            </div>
+                        </Card>
+                    </div>
+                </div>
+                <Card className="p-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label className="text-sm">Size</Label>
+                            <Select value={newVariant.size.toString()} onValueChange={(value) => setNewVariant((prev) => ({ ...prev, size: value }))}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select Size" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {SIZE_OPTIONS.map((size: string) => (
+                                        <SelectItem key={size} value={size}>
+                                            {size}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label className="text-sm">Color</Label>
+                            <Select
+                                value={newVariant.color.toString()}
+                                onValueChange={(value) => setNewVariant((prev) => ({ ...prev, color: value }))}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select Color" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {COLOR_OPTIONS.map((color: ColorOption) => (
+                                        <SelectItem key={color.value} value={color.value}>
+                                            {color.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label className="text-sm">Measurement</Label>
+                            <Input
+                                placeholder="Example: 41,42,43"
+                                type="number"
+                                value={newVariant.measurement || ""}
+                                onChange={(e) => setNewVariant((prev) => ({ ...prev, measurement: parseFloat(e.target.value) || undefined }))}
                             />
                         </div>
-                    </Card>
-                </div>
+
+                        <div className="col-span-2">
+                            <AgeRangeSelector
+                                selectedRange={newVariant.age}
+                                onChange={(range) => setNewVariant((prev) => ({ ...prev, age: range }))}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label className="text-sm" htmlFor="price">
+                                Price
+                            </Label>
+                            <Input
+                                id="price"
+                                placeholder="1200"
+                                step="1"
+                                type="number"
+                                value={newVariant.price || ""}
+                                onChange={(e) => setNewVariant((prev) => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label className="text-sm" htmlFor="old_price">
+                                Old Price
+                            </Label>
+                            <Input
+                                id="old_price"
+                                placeholder="0"
+                                step="1"
+                                type="number"
+                                value={newVariant.old_price || ""}
+                                onChange={(e) => setNewVariant((prev) => ({ ...prev, old_price: parseFloat(e.target.value) || 0 }))}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label className="text-sm" htmlFor="inventory">
+                                Inventory
+                            </Label>
+                            <Input
+                                id="inventory"
+                                min="0"
+                                placeholder="0"
+                                type="number"
+                                value={newVariant.inventory}
+                                onChange={(e) => setNewVariant((prev) => ({ ...prev, inventory: parseInt(e.target.value) || 0 }))}
+                            />
+                        </div>
+                    </div>
+                </Card>
             </div>
-            <Card className="p-4">
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm">Size</Label>
-                        <Select value={newVariant.size.toString()} onValueChange={(value) => setNewVariant((prev) => ({ ...prev, size: value }))}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select Size" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {SIZE_OPTIONS.map((size: string) => (
-                                    <SelectItem key={size} value={size}>
-                                        {size}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label className="text-sm">Color</Label>
-                        <Select value={newVariant.color.toString()} onValueChange={(value) => setNewVariant((prev) => ({ ...prev, color: value }))}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select Color" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {COLOR_OPTIONS.map((color: ColorOption) => (
-                                    <SelectItem key={color.value} value={color.value}>
-                                        {color.name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label className="text-sm">Measurement</Label>
-                        <Input
-                            placeholder="Example: 41,42,43"
-                            type="number"
-                            value={newVariant.measurement || ""}
-                            onChange={(e) => setNewVariant((prev) => ({ ...prev, measurement: parseFloat(e.target.value) || undefined }))}
-                        />
-                    </div>
-
-                    <div className="col-span-2">
-                        <AgeRangeSelector selectedRange={newVariant.age} onChange={(range) => setNewVariant((prev) => ({ ...prev, age: range }))} />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label className="text-sm" htmlFor="price">
-                            Price
-                        </Label>
-                        <Input
-                            id="price"
-                            placeholder="1200"
-                            step="1"
-                            type="number"
-                            value={newVariant.price || ""}
-                            onChange={(e) => setNewVariant((prev) => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label className="text-sm" htmlFor="old_price">
-                            Old Price
-                        </Label>
-                        <Input
-                            id="old_price"
-                            placeholder="0"
-                            step="1"
-                            type="number"
-                            value={newVariant.old_price || ""}
-                            onChange={(e) => setNewVariant((prev) => ({ ...prev, old_price: parseFloat(e.target.value) || 0 }))}
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label className="text-sm" htmlFor="inventory">
-                            Inventory
-                        </Label>
-                        <Input
-                            id="inventory"
-                            min="0"
-                            placeholder="0"
-                            type="number"
-                            value={newVariant.inventory}
-                            onChange={(e) => setNewVariant((prev) => ({ ...prev, inventory: parseInt(e.target.value) || 0 }))}
-                        />
-                    </div>
-                </div>
-            </Card>
-
-            <div className="flex justify-end gap-2 sticky bottom-0 bg-background -mx-4 py-4 px-4">
+            <div className="sheet-footer">
                 <Button variant="destructive" onClick={onClose}>
                     Close
                 </Button>

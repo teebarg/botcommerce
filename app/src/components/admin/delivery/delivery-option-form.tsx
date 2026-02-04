@@ -66,10 +66,9 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
     };
 
     return (
-        <div className="px-4 py-4">
-            <h3 className="text-xl font-semibold mb-4">{initialData ? "Edit" : "Add"} Delivery Option</h3>
-            <Form {...form}>
-                <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
+        <Form {...form}>
+            <form className="flex-1 flex flex-col overflow-hidden" onSubmit={form.handleSubmit(handleSubmit)}>
+                <div className="flex-1 overflow-y-auto py-2 px-4 space-y-4">
                     <FormField
                         control={form.control}
                         name="name"
@@ -163,17 +162,16 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
                             </FormItem>
                         )}
                     />
-
-                    <div className="flex justify-end space-x-2 sticky bottom-0">
-                        <Button type="button" variant="outline" onClick={onClose}>
-                            Cancel
-                        </Button>
-                        <Button disabled={form.formState.isSubmitting} isLoading={form.formState.isSubmitting} type="submit">
-                            {initialData ? "Update" : "Create"}
-                        </Button>
-                    </div>
-                </form>
-            </Form>
-        </div>
+                </div>
+                <div className="sheet-footer">
+                    <Button type="button" variant="outline" onClick={onClose}>
+                        Cancel
+                    </Button>
+                    <Button disabled={form.formState.isSubmitting} isLoading={form.formState.isSubmitting} type="submit">
+                        {initialData ? "Update" : "Create"}
+                    </Button>
+                </div>
+            </form>
+        </Form>
     );
 }

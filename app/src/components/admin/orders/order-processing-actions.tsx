@@ -1,13 +1,10 @@
 import type React from "react";
 import { useOverlayTriggerState } from "react-stately";
-
 import PaymentStatusManager from "./order-payment-status";
-
 import { Button } from "@/components/ui/button";
 import type { Order, OrderStatus } from "@/schemas";
 import { useChangeOrderStatus } from "@/hooks/useOrder";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
+import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 
 interface OrderProcessingActionProps {
     order: Order;
@@ -83,18 +80,17 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
     return (
         <>
             {order.payment_status !== "SUCCESS" && (
-                <Dialog open={paymentState.isOpen} onOpenChange={paymentState.setOpen}>
-                    <DialogTrigger asChild>
+                <ConfirmDrawer
+                    open={paymentState.isOpen}
+                    onOpenChange={paymentState.setOpen}
+                    trigger={
                         <Button className="flex-1 w-full" variant="emerald">
                             Update Payment
                         </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader className="sr-only">
-                            <DialogTitle>Update Payment Status</DialogTitle>
-                        </DialogHeader>
-                        {hasOutOfStock ? (
-                            <div className="p-4">
+                    }
+                    content={
+                        hasOutOfStock ? (
+                            <div className="px-4 pb-12">
                                 <p className="text-sm text-muted-foreground">
                                     This order has out of stock items. Please resolve the issue before updating the payment status.
                                 </p>
@@ -106,45 +102,29 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
                                 orderNumber={order.order_number}
                                 onClose={paymentState.close}
                             />
-                        )}
-                    </DialogContent>
-                </Dialog>
+                        )
+                    }
+                    onClose={paymentState.close}
+                    title="Update Payment Status"
+                    hideActionBtn
+                />
             )}
             {order.payment_status === "SUCCESS" && config.nextStatus && (
-                <Dialog open={stateState.isOpen} onOpenChange={stateState.setOpen}>
-                    <DialogTrigger asChild>
+                <ConfirmDrawer
+                    open={stateState.isOpen}
+                    onOpenChange={stateState.setOpen}
+                    trigger={
                         <Button className="flex-1 w-full" disabled={isPending} isLoading={isPending} variant={config.variant}>
                             {config.actionLabel}
                         </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader className="sr-only">
-                            <DialogTitle>Update Order Status</DialogTitle>
-                        </DialogHeader>
-                        <div className="mx-auto w-full">
-                            <div>
-                                <h2 className="text-lg font-semibold leading-6">Update Order Status</h2>
-                                <Separator />
-                                <p className="text-sm text-muted-foreground mt-2 font-medium">
-                                    Are you sure you want to change the status of this order?
-                                </p>
-                                <div className="flex justify-end gap-2 mt-8">
-                                    <Button aria-label="close" className="min-w-36" variant="destructive" onClick={stateState.close}>
-                                        Close
-                                    </Button>
-                                    <Button
-                                        aria-label="confirm"
-                                        className="min-w-36"
-                                        isLoading={isPending}
-                                        onClick={() => handleStatusChange(order.id, config.nextStatus)}
-                                    >
-                                        Confirm
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-                    </DialogContent>
-                </Dialog>
+                    }
+                    onClose={stateState.close}
+                    onConfirm={() => handleStatusChange(order.id, config.nextStatus)}
+                    title="Update Order Status"
+                    description="Are you sure you want to update the status of this order?"
+                    confirmText="Update"
+                    isLoading={isPending}
+                />
             )}
         </>
     );

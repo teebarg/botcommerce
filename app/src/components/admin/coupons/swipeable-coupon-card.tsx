@@ -1,19 +1,16 @@
 import { useState } from "react";
 import { useSwipeable } from "react-swipeable";
 import { Trash2, Power, PowerOff, Copy } from "lucide-react";
-
 import { AssignmentDialog } from "./assignment-dialog";
 import { CouponUsageDialog } from "./coupon-usage-dialog";
 import { EditCouponDialog } from "./edit-coupon-dialog";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Coupon } from "@/schemas/common";
 import { cn, currency, formatDate } from "@/utils";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Confirm } from "@/components/generic/confirm";
 import { useOverlayTriggerState } from "react-stately";
+import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 
 interface SwipeableCouponCardProps {
     coupon: Coupon;
@@ -92,19 +89,20 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
                                 <Button className="h-9 w-9" size="icon" variant="ghost" onClick={() => onToggleStatus(coupon.id, coupon.is_active)}>
                                     {coupon.is_active ? <PowerOff className="h-4 w-4" /> : <Power className="h-4 w-4" />}
                                 </Button>
-                                <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
-                                    <DialogTrigger asChild>
+                                <ConfirmDrawer
+                                    open={deleteState.isOpen}
+                                    onOpenChange={deleteState.setOpen}
+                                    trigger={
                                         <Button className="h-9 w-9" size="icon" variant="ghost">
                                             <Trash2 className="text-red-500 h-4 w-4 cursor-pointer" />
                                         </Button>
-                                    </DialogTrigger>
-                                    <DialogContent>
-                                        <DialogHeader className="sr-only">
-                                            <DialogTitle>Delete</DialogTitle>
-                                        </DialogHeader>
-                                        <Confirm onClose={deleteState.close} onConfirm={() => onDelete(coupon.id, coupon.code)} />
-                                    </DialogContent>
-                                </Dialog>
+                                    }
+                                    onClose={deleteState.close}
+                                    onConfirm={() => onDelete(coupon.id, coupon.code)}
+                                    title="Delete"
+                                    confirmText="Delete"
+                                    variant="destructive"
+                                />
                             </div>
                         </div>
                     </CardHeader>

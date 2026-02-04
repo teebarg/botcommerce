@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/button";
 import type { DeliveryOption, Message } from "@/schemas";
 import { useAdminDeliveryOptions } from "@/hooks/useApi";
 import { useInvalidate } from "@/hooks/useApi";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Confirm } from "@/components/generic/confirm";
 import { Badge } from "@/components/ui/badge";
 import { currency } from "@/utils";
 import ServerError from "@/components/generic/server-error";
@@ -17,11 +15,15 @@ import Overlay from "@/components/overlay";
 import ComponentLoader from "@/components/component-loader";
 import { ZeroState } from "@/components/zero";
 import { deleteDeliveryFn } from "@/server/generic.server";
+import SheetDrawer from "@/components/sheet-drawer";
+import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
+import { useState } from "react";
 
 const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
     const editState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
     const invalidate = useInvalidate();
+    const [isPending, setIsPending] = useState<boolean>(false);
 
     const getIcon = (iconName: string) => {
         const iconMap: Record<string, React.FC<LucideProps>> = {
@@ -35,6 +37,7 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
     };
 
     const handleDelete = async () => {
+        setIsPending(true);
         const { error } = await tryCatch<Message>(deleteDeliveryFn({ data: option.id }));
 
         if (!error) {
@@ -42,6 +45,7 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
             invalidate("delivery");
             deleteState.close();
         }
+        setIsPending(false);
     };
 
     return (
@@ -74,7 +78,7 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
                     </div>
 
                     <div className="flex items-center ml-4">
-                        <Overlay
+                        <SheetDrawer
                             open={editState.isOpen}
                             title="Edit Delivery Option"
                             trigger={
@@ -85,20 +89,22 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
                             onOpenChange={editState.setOpen}
                         >
                             <DeliveryOptionForm initialData={option} onClose={editState.close} />
-                        </Overlay>
-                        <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
-                            <DialogTrigger asChild>
+                        </SheetDrawer>
+                        <ConfirmDrawer
+                            open={deleteState.isOpen}
+                            onOpenChange={deleteState.setOpen}
+                            trigger={
                                 <Button className="p-2 text-red-600 bg-red-50 hover:bg-red-100" size="icon">
                                     <Trash2 className="w-4 h-4" />
                                 </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader className="sr-only">
-                                    <DialogTitle>Delete</DialogTitle>
-                                </DialogHeader>
-                                <Confirm onClose={deleteState.close} onConfirm={handleDelete} />
-                            </DialogContent>
-                        </Dialog>
+                            }
+                            onClose={deleteState.close}
+                            onConfirm={handleDelete}
+                            title="Delete"
+                            confirmText="Delete"
+                            isLoading={isPending}
+                            variant="destructive"
+                        />
                     </div>
                 </div>
             </div>
@@ -129,7 +135,7 @@ const DeliveryOverview: React.FC = () => {
         <div className="container mx-auto py-6">
             <div className="flex flex-row items-center justify-between py-2">
                 <h3 className="text-lg font-semibold">Delivery Options</h3>
-                <Overlay
+                <SheetDrawer
                     open={addState.isOpen}
                     title="Add Delivery Option"
                     trigger={
@@ -141,7 +147,7 @@ const DeliveryOverview: React.FC = () => {
                     onOpenChange={addState.setOpen}
                 >
                     <DeliveryOptionForm onClose={addState.close} />
-                </Overlay>
+                </SheetDrawer>
             </div>
 
             <div className="space-y-4">

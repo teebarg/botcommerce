@@ -118,7 +118,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
     const { data: timeline } = useOrderTimeline(order?.id);
 
     return (
-        <div className="px-4 sm:px-6 pb-4 overflow-y-auto">
+        <div className="px-2 sm:px-6 pb-4 overflow-y-auto">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
                 <div>
                     <h1 className="text-2xl font-bold">Order: {order.order_number}</h1>
@@ -135,7 +135,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-border py-4">
+                        <div className="border-b border-border py-4 px-2">
                             <h2 className="text-lg font-medium">Order Items</h2>
                         </div>
                         <div className="divide-y divide-border">
@@ -173,13 +173,13 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                     </div>
 
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-input py-4">
+                        <div className="border-b border-input py-4 px-2">
                             <h2 className="text-lg font-medium flex items-center">
                                 <User className="w-5 h-5 mr-2 text-muted-foreground" />
-                                Customer Information
+                                Customer Information2
                             </h2>
                         </div>
-                        <div className="px-2 py-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="px-4 py-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <h3 className="text-sm font-medium text-muted-foreground">Contact Details</h3>
                                 <p className="font-medium">
@@ -209,7 +209,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                     </div>
 
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-input py-4">
+                        <div className="border-b border-input py-4 px-2">
                             <h2 className="text-lg font-medium flex items-center">
                                 <CreditCard className="w-5 h-5 mr-2 text-muted-foreground" />
                                 Payment Information
@@ -228,7 +228,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                     </div>
 
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-input py-4">
+                        <div className="border-b border-input py-4 px-2">
                             <h2 className="text-lg font-medium flex items-center">
                                 <Truck className="w-5 h-5 mr-2 text-muted-foreground" />
                                 Shipping Information
@@ -251,7 +251,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
 
                 <div className="space-y-6">
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-input py-4">
+                        <div className="border-b border-input py-4 px-2">
                             <h2 className="text-lg font-medium">Actions</h2>
                         </div>
                         <div className="px-2 py-6 space-y-4">
@@ -270,10 +270,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                     </div>
 
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden pb-6">
-                        <div className="border-b border-input py-4">
+                        <div className="border-b border-input py-4 px-2">
                             <h2 className="text-lg font-medium">Order Timeline</h2>
                         </div>
-                        <div className="px-2 py-6">
+                        <div className="px-4 py-6">
                             <div className="flow-root">
                                 <ul className="-mb-8">
                                     <li>

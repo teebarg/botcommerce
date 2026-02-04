@@ -20,7 +20,7 @@ function RouteComponent() {
     const categories = data?.filter((cat: Category) => !cat.parent_id);
 
     return (
-        <div className="max-w-7xl w-full mx-auto px-2 md:px-4">
+        <div className="max-w-7xl w-full mx-auto">
             {isLoading ? <ComponentLoader className="h-[80vh]" /> : <CategoryTree data={categories} />}
         </div>
     );

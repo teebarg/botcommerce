@@ -9,6 +9,7 @@ interface CatalogBulkProductUpdateProps {
     selectedCount: number;
     selectedImageIds: number[];
     selectedProductIds?: number[];
+    onClose: () => void;
 }
 
 const CatalogItem: React.FC<{ catalog: Shared; selectedProductIds: number[] }> = ({ catalog, selectedProductIds }) => {
@@ -42,19 +43,24 @@ const CatalogItem: React.FC<{ catalog: Shared; selectedProductIds: number[] }> =
     );
 };
 
-export const CatalogBulkProductUpdate = ({ selectedProductIds = [] }: CatalogBulkProductUpdateProps) => {
+export const CatalogBulkProductUpdate = ({ selectedProductIds = [], onClose }: CatalogBulkProductUpdateProps) => {
     const { data: sharedCollections } = useCatalogs(true);
 
     return (
-        <div className="p-4">
-            <p className="text-sm text-muted-foreground mb-3">Select a catalog to add {selectedProductIds.length} product(s).</p>
-            <ScrollArea className="h-[60vh]">
+        <div className="flex-1 overflow-hidden flex flex-col">
+            <p className="text-sm text-muted-foreground mb-3 mx-2">Select a catalog to add {selectedProductIds.length} product(s).</p>
+            <ScrollArea className="flex-1 px-2">
                 <div className="space-y-2">
                     {sharedCollections?.shared?.map((collection: any) => (
                         <CatalogItem key={collection.id} catalog={collection} selectedProductIds={selectedProductIds} />
                     ))}
                 </div>
             </ScrollArea>
+            <div className="sheet-footer">
+                <Button variant="destructive" onClick={onClose}>
+                    Close
+                </Button>
+            </div>
         </div>
     );
 };

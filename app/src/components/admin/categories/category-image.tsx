@@ -88,7 +88,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
     });
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 px-2 md:px-0 py-2">
             <div
                 {...getRootProps()}
                 className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors

@@ -2,18 +2,15 @@ import type React from "react";
 import { Edit, Trash2, Eye } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { toast } from "sonner";
-
 import CustomerForm from "./customer-form";
-
 import type { User } from "@/schemas";
 import { useDeleteUser, useInvalidateMe } from "@/hooks/useUser";
 import { Button } from "@/components/ui/button";
-import Overlay from "@/components/overlay";
-import { Confirm } from "@/components/generic/confirm";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useInvalidateCart } from "@/hooks/useCart";
 import { updateAuthSession } from "@/utils/auth-client";
 import { useRouteContext, useRouter } from "@tanstack/react-router";
+import SheetDrawer from "@/components/sheet-drawer";
+import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 
 interface CustomerActionsProps {
     user: User;
@@ -23,7 +20,7 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
     const { session } = useRouteContext({
         strict: false,
     });
-    const { mutateAsync } = useDeleteUser();
+    const { mutateAsync, isPending } = useDeleteUser();
     const router = useRouter();
     const editState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
@@ -62,7 +59,7 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
                     <Eye className="h-5 w-5" />
                 </Button>
             )}
-            <Overlay
+            <SheetDrawer
                 open={editState.isOpen}
                 title="Edit Customer"
                 trigger={
@@ -73,20 +70,22 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
                 onOpenChange={editState.setOpen}
             >
                 <CustomerForm user={user} onClose={editState.close} />
-            </Overlay>
-            <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
-                <DialogTrigger asChild>
+            </SheetDrawer>
+            <ConfirmDrawer
+                open={deleteState.isOpen}
+                onOpenChange={deleteState.setOpen}
+                trigger={
                     <Button size="icon" variant="ghost">
                         <Trash2 className="text-red-500 h-5 w-5 cursor-pointer" />
                     </Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader className="sr-only">
-                        <DialogTitle>Delete {user?.first_name}</DialogTitle>
-                    </DialogHeader>
-                    <Confirm onClose={deleteState.close} onConfirm={onDelete} />
-                </DialogContent>
-            </Dialog>
+                }
+                onClose={deleteState.close}
+                onConfirm={onDelete}
+                title={`Delete ${user?.first_name}`}
+                confirmText="Delete"
+                isLoading={isPending}
+                variant="destructive"
+            />
         </div>
     );
 };

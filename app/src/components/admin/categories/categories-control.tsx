@@ -1,15 +1,13 @@
 import type React from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { ArrowDownAZ, ArrowUpAZ, Edit, Trash2 } from "lucide-react";
-
 import type { Category } from "@/schemas/product";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { CategoryForm } from "@/components/admin/categories/category-form";
-import Overlay from "@/components/overlay";
 import { useDeleteCategory } from "@/hooks/useCategories";
-import { Confirm } from "@/components/generic/confirm";
 import { cn } from "@/utils";
+import SheetDrawer from "@/components/sheet-drawer";
+import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 
 interface Props {
     category: Category;
@@ -33,8 +31,8 @@ const CategoryAction: React.FC<Props> = ({ category, index, categoriesLength, on
     };
 
     return (
-        <div className="flex items-center gap-2">
-            <Overlay
+        <div className="flex items-center flex-wrap">
+            <SheetDrawer
                 open={editState.isOpen}
                 title={`Edit Category ${category?.name}`}
                 trigger={
@@ -51,7 +49,7 @@ const CategoryAction: React.FC<Props> = ({ category, index, categoriesLength, on
                     type="update"
                     onClose={editState.close}
                 />
-            </Overlay>
+            </SheetDrawer>
             <Button
                 className={cn("", index === 0 ? "opacity-50 cursor-not-allowed" : "")}
                 disabled={index === 0}
@@ -72,17 +70,21 @@ const CategoryAction: React.FC<Props> = ({ category, index, categoriesLength, on
             >
                 <ArrowDownAZ className="h-5 w-5" />
             </Button>
-            <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
-                <DialogTrigger>
-                    <Trash2 className="text-rose-500 h-5 w-5 cursor-pointer" />
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader className="sr-only">
-                        <DialogTitle>Delete Category</DialogTitle>
-                    </DialogHeader>
-                    <Confirm onClose={deleteState.close} onConfirm={onConfirmDelete} />
-                </DialogContent>
-            </Dialog>
+            <ConfirmDrawer
+                open={deleteState.isOpen}
+                onOpenChange={deleteState.setOpen}
+                trigger={
+                    <Button size="icon" variant="ghost">
+                        <Trash2 className="text-red-500 h-5 w-5 cursor-pointer" />
+                    </Button>
+                }
+                onClose={deleteState.close}
+                onConfirm={onConfirmDelete}
+                title={`Delete ${category.name}`}
+                confirmText="Delete"
+                isLoading={deleteMutation.isPending}
+                variant="destructive"
+            />
         </div>
     );
 };

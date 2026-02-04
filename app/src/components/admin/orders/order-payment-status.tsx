@@ -67,7 +67,7 @@ const PaymentStatusManager: React.FC<PaymentStatusManagerProps> = ({ id, current
 
     return (
         <Card className="w-full max-w-md bg-inherit border-0">
-            <CardHeader className="pb-4">
+            <CardHeader className="md:px-0 pt-2 pb-4">
                 <CardTitle className="flex items-center gap-2 text-lg">
                     <CreditCard className="h-5 w-5" />
                     Payment Status
@@ -75,9 +75,9 @@ const PaymentStatusManager: React.FC<PaymentStatusManagerProps> = ({ id, current
                 <p className="text-sm text-muted-foreground">Order #{orderNumber}</p>
             </CardHeader>
 
-            <CardContent className="space-y-6">
-                <div className={`p-4 rounded-lg border ${currentConfig.bgClass}`}>
-                    <div className="flex items-center gap-3">
+            <CardContent className="space-y-6 md:px-0">
+                <div className={`py-4 rounded-lg border ${currentConfig.bgClass}`}>
+                    <div className="flex items-center gap-3 px-2">
                         <div className={currentConfig.textClass}>{currentConfig.icon}</div>
                         <div className="flex-1">
                             <div className="flex items-center gap-2">

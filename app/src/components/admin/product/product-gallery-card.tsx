@@ -70,16 +70,13 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
                         </div>
                     )}
 
-                    {image.product?.is_new && <IsNew className="top-4 left-2" />}
+                    {image.product?.is_new && <IsNew className="bottom-0 right-1 top-auto left-auto" />}
 
                     <div className="absolute bottom-2 left-2 flex flex-wrap gap-1">
                         {image.product?.variants?.length == 0 ||
                             (image.product?.variants?.every((v) => v.inventory <= 0) && <Badge variant="destructive">Out of stock</Badge>)}
                     </div>
 
-                    <div className="absolute bottom-2 right-2">
-                        <p className="text-lg font-bold text-amber-600">#{image.id}</p>
-                    </div>
                     {image.product && (
                         <div className="absolute top-2 left-1/2 -translate-x-1/2">
                             <Badge variant="indigo" className="text-base font-bold">{currency(image.product.variants?.[0]?.price)}</Badge>

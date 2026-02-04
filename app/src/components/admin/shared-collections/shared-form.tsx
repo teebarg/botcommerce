@@ -3,12 +3,10 @@ import { Save } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import type { DBCatalog } from "@/schemas";
 import { useUpdateCatalog, useCreateCatalog } from "@/hooks/useCollection";
@@ -52,10 +50,9 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
     };
 
     return (
-        <div className="px-4 py-4">
-            <h2 className="text-lg font-semibold mb-4">{current ? "Update" : "Create"} Catalog</h2>
-            <Form {...form}>
-                <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
+        <Form {...form}>
+            <form className="space-y-8 flex-1 flex flex-col overflow-hidden" onSubmit={handleSubmit(onSubmit)}>
+                <div className="flex-1 overflow-y-auto px-4 space-y-4">
                     <FormField
                         control={control}
                         name="title"
@@ -100,19 +97,19 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
                             </FormItem>
                         )}
                     />
-                    <div className="flex justify-end gap-2">
-                        {onClose && (
-                            <Button type="button" variant="destructive" onClick={onClose}>
-                                Cancel
-                            </Button>
-                        )}
-                        <Button disabled={isLoading || !form.watch("title")} isLoading={isLoading} type="submit">
-                            <Save className="h-5 w-5" />
-                            {current ? "Update" : "Create"}
+                </div>
+                <div className="sheet-footer">
+                    {onClose && (
+                        <Button type="button" variant="destructive" onClick={onClose}>
+                            Cancel
                         </Button>
-                    </div>
-                </form>
-            </Form>
-        </div>
+                    )}
+                    <Button disabled={isLoading || !form.watch("title")} isLoading={isLoading} type="submit">
+                        <Save className="h-5 w-5" />
+                        {current ? "Update" : "Create"}
+                    </Button>
+                </div>
+            </form>
+        </Form>
     );
 };

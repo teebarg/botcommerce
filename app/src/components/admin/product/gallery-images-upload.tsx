@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { useBulkUploadImages } from "@/hooks/useGallery";
+import { useBulkUploadImages, useReIndexGallery } from "@/hooks/useGallery";
 
 declare global {
     interface Window {
@@ -9,6 +9,7 @@ declare global {
 }
 
 export function GalleryImagesUpload() {
+    const { mutateAsync: reIndexGallery, isPending: isReIndexing } = useReIndexGallery();
     const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [isCloudinaryLoaded, setIsCloudinaryLoaded] = useState(false);
 
@@ -71,7 +72,7 @@ export function GalleryImagesUpload() {
     };
 
     return (
-        <div className="space-y-6 flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap mb-4">
             <Button variant="outline" onClick={openImageUpload} disabled={!isCloudinaryLoaded}>
                 Upload Images
             </Button>
@@ -85,6 +86,9 @@ export function GalleryImagesUpload() {
                     {isPending ? "Saving..." : "Complete"}
                 </Button>
             )}
+            <Button className="min-w-32" disabled={isReIndexing} isLoading={isReIndexing} variant="emerald" onClick={() => reIndexGallery()}>
+                Re-index
+            </Button>
         </div>
     );
 }

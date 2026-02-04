@@ -3,16 +3,14 @@ import { toast } from "sonner";
 import { useOverlayTriggerState } from "react-stately";
 import { ShieldAlert } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
-
 import BankDetailsForm from "./bank-details-form";
-
 import { Switch } from "@/components/ui/switch";
 import type { BankDetails, ShopSettings } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import Overlay from "@/components/overlay";
 import { useBankDetails } from "@/hooks/useApi";
 import { useSyncShopDetails } from "@/hooks/useGeneric";
 import { deleteBankDetailsFn } from "@/server/generic.server";
+import SheetDrawer from "@/components/sheet-drawer";
 
 interface ShopPaymentsProps {
     settings: ShopSettings[];
@@ -122,14 +120,14 @@ export function ShopPayments({ settings }: ShopPaymentsProps) {
             <div className="bg-card px-2 py-4">
                 <div className="flex items-center justify-between">
                     <h3 className="font-medium">Bank Details</h3>
-                    <Overlay
+                    <SheetDrawer
                         open={addState.isOpen}
                         title="Add Bank Details"
                         trigger={<Button type="button">Add Bank Details</Button>}
                         onOpenChange={addState.setOpen}
                     >
                         <BankDetailsForm onClose={addState.close} />
-                    </Overlay>
+                    </SheetDrawer>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 rounded-lg">
                     {bankDetails?.map((detail: BankDetails, idx: number) => {

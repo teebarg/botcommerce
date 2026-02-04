@@ -1,7 +1,6 @@
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -54,100 +53,95 @@ export default function CustomerForm({ user, onClose }: ReviewFormProps) {
     }
 
     return (
-        <div className="pt-4 px-4">
-            <h3 className="text-lg font-medium mb-4">Update Customer</h3>
-            <Form {...form}>
-                <form className="space-y-6 h-full flex-1" onSubmit={form.handleSubmit(onSubmit)}>
-                    <div className="w-full h-full">
-                        <div className="space-y-4">
-                            <FormField
-                                control={form.control}
-                                name="first_name"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>First Name</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Enter first name" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="last_name"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Last Name</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Enter last name" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="role"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Role</FormLabel>
-                                        <FormControl>
-                                            <Select defaultValue={field.value} onValueChange={field.onChange}>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select role" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="ADMIN">Admin</SelectItem>
-                                                    <SelectItem value="CUSTOMER">Customer</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="status"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Status</FormLabel>
-                                        <FormControl>
-                                            <Select defaultValue={field.value} onValueChange={field.onChange}>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select status" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="PENDING">Pending</SelectItem>
-                                                    <SelectItem value="ACTIVE">Active</SelectItem>
-                                                    <SelectItem value="INACTIVE">Inactive</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+        <Form {...form}>
+            <form className="space-y-6 h-full flex-1 flex flex-col overflow-hidden" onSubmit={form.handleSubmit(onSubmit)}>
+                <div className="flex-1 overflow-auto space-y-4 px-4 py-4">
+                    <FormField
+                        control={form.control}
+                        name="first_name"
+                        render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Email</FormLabel>
+                                <FormLabel>First Name</FormLabel>
                                 <FormControl>
-                                    <Input readOnly value={user?.email} />
+                                    <Input placeholder="Enter first name" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
-                            <div className="flex gap-2 justify-end md:col-span-2 pb-2">
-                                <Button className="min-w-32" type="button" variant="destructive" onClick={() => onClose?.()}>
-                                    Close
-                                </Button>
-                                <Button className="min-w-32" disabled={loading} isLoading={loading} type="submit">
-                                    {user?.id ? "Update" : "Create"}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </Form>
-        </div>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="last_name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Last Name</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Enter last name" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="role"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Role</FormLabel>
+                                <FormControl>
+                                    <Select defaultValue={field.value} onValueChange={field.onChange}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select role" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="ADMIN">Admin</SelectItem>
+                                            <SelectItem value="CUSTOMER">Customer</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="status"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Status</FormLabel>
+                                <FormControl>
+                                    <Select defaultValue={field.value} onValueChange={field.onChange}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="PENDING">Pending</SelectItem>
+                                            <SelectItem value="ACTIVE">Active</SelectItem>
+                                            <SelectItem value="INACTIVE">Inactive</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                            <Input readOnly value={user?.email} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                </div>
+                <div className="flex gap-2 justify-end p-4 border-t border-border">
+                    <Button className="min-w-32" type="button" variant="destructive" onClick={() => onClose?.()}>
+                        Close
+                    </Button>
+                    <Button className="min-w-32" disabled={loading} isLoading={loading} type="submit">
+                        {user?.id ? "Update" : "Create"}
+                    </Button>
+                </div>
+            </form>
+        </Form>
     );
 }

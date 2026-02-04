@@ -144,225 +144,224 @@ export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetForm
     };
 
     return (
-        <div className="space-y-4 px-4 pt-4">
-            <h2 className="text-xl font-semibold text-card-foreground">Bulk Product Details</h2>
-
-            <Card className="p-4 bg-muted/50">
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                        <Settings className="w-4 h-4 text-primary" />
-                        <Label className="text-sm font-medium">Select Fields</Label>
-                    </div>
-                    <div className="flex gap-2">
-                        <Button
-                            disabled={selectedFields.size === Object.keys(FIELD_CONFIG).length}
-                            size="sm"
-                            variant="outline"
-                            onClick={selectAllFields}
-                        >
-                            Select All
-                        </Button>
-                        <Button disabled={selectedFields.size === 0} size="sm" variant="outline" onClick={deselectAllFields}>
-                            Deselect All
-                        </Button>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {Object.entries(FIELD_CONFIG).map(([field, config]) => (
-                        <div key={field} className="flex items-center space-x-2">
-                            <Checkbox
-                                checked={selectedFields.has(field as FieldKey)}
-                                id={field}
-                                onCheckedChange={() => toggleFieldSelection(field as FieldKey)}
-                            />
-                            <Label className="text-sm" htmlFor={field}>
-                                {config.label}
-                            </Label>
+        <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="space-y-4 px-2 py-4 flex-1 overflow-y-auto">
+                <Card className="p-4 bg-muted/50">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                            <Settings className="w-4 h-4 text-primary" />
+                            <Label className="text-sm font-medium">Select Fields</Label>
                         </div>
-                    ))}
-                </div>
-            </Card>
-
-            <Separator />
-
-            <div className="grid gap-6">
-                {(selectedFields.has("active") || selectedFields.has("is_new")) && (
-                    <div className="grid sm:grid-cols-2 gap-4">
-                        {selectedFields.has("active") && (
-                            <div className="flex items-center gap-2">
-                                <Checkbox checked={product.active} id="active" onCheckedChange={(checked) => updateField("active", checked)} />
-                                <Label className="text-sm font-medium" htmlFor="active">
-                                    Show in Store
-                                </Label>
-                            </div>
-                        )}
-
-                        {selectedFields.has("is_new") && (
-                            <div className="flex items-center gap-2">
-                                <Checkbox checked={product.is_new} id="is_new" onCheckedChange={(checked) => updateField("is_new", checked)} />
-                                <Label className="text-sm font-medium" htmlFor="is_new">
-                                    Is New
-                                </Label>
-                            </div>
-                        )}
+                        <div className="flex gap-2">
+                            <Button
+                                disabled={selectedFields.size === Object.keys(FIELD_CONFIG).length}
+                                size="sm"
+                                variant="outline"
+                                onClick={selectAllFields}
+                            >
+                                Select All
+                            </Button>
+                            <Button disabled={selectedFields.size === 0} size="sm" variant="outline" onClick={deselectAllFields}>
+                                Deselect All
+                            </Button>
+                        </div>
                     </div>
-                )}
 
-                {(selectedFields.has("categories") || selectedFields.has("collections")) && (
-                    <div className="grid sm:grid-cols-2 gap-4">
-                        {selectedFields.has("categories") && (
-                            <Card className="p-4 bg-card shadow-sm">
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-medium flex items-center gap-2">
-                                        <Tag className="w-4 h-4 text-primary" />
-                                        Categories
-                                    </Label>
-                                    <MultiSelect
-                                        name="categories"
-                                        options={categories?.map((category) => ({ value: category.id, label: category.name }))}
-                                        value={product.categories}
-                                        onChange={(value) => updateField("categories", value)}
-                                    />
-                                </div>
-                            </Card>
-                        )}
-
-                        {selectedFields.has("collections") && (
-                            <Card className="p-4 bg-card shadow-sm">
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-medium flex items-center gap-2">
-                                        <Tag className="w-4 h-4 text-primary" />
-                                        Collection
-                                    </Label>
-                                    <MultiSelect
-                                        name="collections"
-                                        options={collections?.map((collection) => ({ value: collection.id, label: collection.name }))}
-                                        value={product.collections}
-                                        onChange={(value) => updateField("collections", value)}
-                                    />
-                                </div>
-                            </Card>
-                        )}
-                    </div>
-                )}
-            </div>
-
-            {(selectedFields.has("size") ||
-                selectedFields.has("color") ||
-                selectedFields.has("age") ||
-                selectedFields.has("measurement") ||
-                selectedFields.has("price") ||
-                selectedFields.has("old_price") ||
-                selectedFields.has("inventory")) && (
-                <Card className="p-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        {selectedFields.has("size") && (
-                            <div className="space-y-2">
-                                <Label className="text-sm">Size</Label>
-                                <Select value={product.size.toString()} onValueChange={(value) => updateField("size", value)}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select Size" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {SIZE_OPTIONS.map((size: string) => (
-                                            <SelectItem key={size} value={size}>
-                                                {size}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        )}
-
-                        {selectedFields.has("color") && (
-                            <div className="space-y-2">
-                                <Label className="text-sm">Color</Label>
-                                <Select value={product.color.toString()} onValueChange={(value) => updateField("color", value)}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select Color" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {COLOR_OPTIONS.map((color: ColorOption) => (
-                                            <SelectItem key={color.value} value={color.value}>
-                                                {color.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        )}
-
-                        {selectedFields.has("age") && (
-                            <div className="col-span-2">
-                                <AgeRangeSelector selectedRange={product.age} onChange={(range) => updateField("age", range)} />
-                            </div>
-                        )}
-
-                        {selectedFields.has("measurement") && (
-                            <div className="space-y-2">
-                                <Label className="text-sm">Measurement</Label>
-                                <Input
-                                    placeholder="Example: 41,42,43"
-                                    type="number"
-                                    value={product.measurement || ""}
-                                    onChange={(e) => updateField("measurement", parseFloat(e.target.value) || 0)}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {Object.entries(FIELD_CONFIG).map(([field, config]) => (
+                            <div key={field} className="flex items-center space-x-2">
+                                <Checkbox
+                                    checked={selectedFields.has(field as FieldKey)}
+                                    id={field}
+                                    onCheckedChange={() => toggleFieldSelection(field as FieldKey)}
                                 />
-                            </div>
-                        )}
-
-                        {selectedFields.has("price") && (
-                            <div className="space-y-2">
-                                <Label className="text-sm" htmlFor="price">
-                                    Price
+                                <Label className="text-sm" htmlFor={field}>
+                                    {config.label}
                                 </Label>
-                                <Input
-                                    id="price"
-                                    placeholder="1200"
-                                    step="1"
-                                    type="number"
-                                    value={product.price || ""}
-                                    onChange={(e) => updateField("price", parseFloat(e.target.value) || 0)}
-                                />
                             </div>
-                        )}
-
-                        {selectedFields.has("old_price") && (
-                            <div className="space-y-2">
-                                <Label className="text-sm" htmlFor="old_price">
-                                    Old Price
-                                </Label>
-                                <Input
-                                    id="old_price"
-                                    placeholder="0"
-                                    step="1"
-                                    type="number"
-                                    value={product.old_price || ""}
-                                    onChange={(e) => updateField("old_price", parseFloat(e.target.value) || 0)}
-                                />
-                            </div>
-                        )}
-
-                        {selectedFields.has("inventory") && (
-                            <div className="space-y-2">
-                                <Label className="text-sm" htmlFor="inventory">
-                                    Inventory
-                                </Label>
-                                <Input
-                                    id="inventory"
-                                    min="0"
-                                    placeholder="0"
-                                    type="number"
-                                    value={product.inventory}
-                                    onChange={(e) => updateField("inventory", parseInt(e.target.value) || 0)}
-                                />
-                            </div>
-                        )}
+                        ))}
                     </div>
                 </Card>
-            )}
 
-            <div className="flex justify-end gap-2 sticky bottom-0 bg-background -mx-4 py-4 px-4">
+                <Separator />
+
+                <div className="grid gap-6">
+                    {(selectedFields.has("active") || selectedFields.has("is_new")) && (
+                        <div className="grid sm:grid-cols-2 gap-4">
+                            {selectedFields.has("active") && (
+                                <div className="flex items-center gap-2">
+                                    <Checkbox checked={product.active} id="active" onCheckedChange={(checked) => updateField("active", checked)} />
+                                    <Label className="text-sm font-medium" htmlFor="active">
+                                        Show in Store
+                                    </Label>
+                                </div>
+                            )}
+
+                            {selectedFields.has("is_new") && (
+                                <div className="flex items-center gap-2">
+                                    <Checkbox checked={product.is_new} id="is_new" onCheckedChange={(checked) => updateField("is_new", checked)} />
+                                    <Label className="text-sm font-medium" htmlFor="is_new">
+                                        Is New
+                                    </Label>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {(selectedFields.has("categories") || selectedFields.has("collections")) && (
+                        <div className="grid sm:grid-cols-2 gap-4">
+                            {selectedFields.has("categories") && (
+                                <Card className="p-4 bg-card shadow-sm">
+                                    <div className="space-y-2">
+                                        <Label className="text-sm font-medium flex items-center gap-2">
+                                            <Tag className="w-4 h-4 text-primary" />
+                                            Categories
+                                        </Label>
+                                        <MultiSelect
+                                            name="categories"
+                                            options={categories?.map((category) => ({ value: category.id, label: category.name }))}
+                                            value={product.categories}
+                                            onChange={(value) => updateField("categories", value)}
+                                        />
+                                    </div>
+                                </Card>
+                            )}
+
+                            {selectedFields.has("collections") && (
+                                <Card className="p-4 bg-card shadow-sm">
+                                    <div className="space-y-2">
+                                        <Label className="text-sm font-medium flex items-center gap-2">
+                                            <Tag className="w-4 h-4 text-primary" />
+                                            Collection
+                                        </Label>
+                                        <MultiSelect
+                                            name="collections"
+                                            options={collections?.map((collection) => ({ value: collection.id, label: collection.name }))}
+                                            value={product.collections}
+                                            onChange={(value) => updateField("collections", value)}
+                                        />
+                                    </div>
+                                </Card>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                {(selectedFields.has("size") ||
+                    selectedFields.has("color") ||
+                    selectedFields.has("age") ||
+                    selectedFields.has("measurement") ||
+                    selectedFields.has("price") ||
+                    selectedFields.has("old_price") ||
+                    selectedFields.has("inventory")) && (
+                    <Card className="p-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            {selectedFields.has("size") && (
+                                <div className="space-y-2">
+                                    <Label className="text-sm">Size</Label>
+                                    <Select value={product.size.toString()} onValueChange={(value) => updateField("size", value)}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Size" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {SIZE_OPTIONS.map((size: string) => (
+                                                <SelectItem key={size} value={size}>
+                                                    {size}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
+
+                            {selectedFields.has("color") && (
+                                <div className="space-y-2">
+                                    <Label className="text-sm">Color</Label>
+                                    <Select value={product.color.toString()} onValueChange={(value) => updateField("color", value)}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Color" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {COLOR_OPTIONS.map((color: ColorOption) => (
+                                                <SelectItem key={color.value} value={color.value}>
+                                                    {color.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
+
+                            {selectedFields.has("age") && (
+                                <div className="col-span-2">
+                                    <AgeRangeSelector selectedRange={product.age} onChange={(range) => updateField("age", range)} />
+                                </div>
+                            )}
+
+                            {selectedFields.has("measurement") && (
+                                <div className="space-y-2">
+                                    <Label className="text-sm">Measurement</Label>
+                                    <Input
+                                        placeholder="Example: 41,42,43"
+                                        type="number"
+                                        value={product.measurement || ""}
+                                        onChange={(e) => updateField("measurement", parseFloat(e.target.value) || 0)}
+                                    />
+                                </div>
+                            )}
+
+                            {selectedFields.has("price") && (
+                                <div className="space-y-2">
+                                    <Label className="text-sm" htmlFor="price">
+                                        Price
+                                    </Label>
+                                    <Input
+                                        id="price"
+                                        placeholder="1200"
+                                        step="1"
+                                        type="number"
+                                        value={product.price || ""}
+                                        onChange={(e) => updateField("price", parseFloat(e.target.value) || 0)}
+                                    />
+                                </div>
+                            )}
+
+                            {selectedFields.has("old_price") && (
+                                <div className="space-y-2">
+                                    <Label className="text-sm" htmlFor="old_price">
+                                        Old Price
+                                    </Label>
+                                    <Input
+                                        id="old_price"
+                                        placeholder="0"
+                                        step="1"
+                                        type="number"
+                                        value={product.old_price || ""}
+                                        onChange={(e) => updateField("old_price", parseFloat(e.target.value) || 0)}
+                                    />
+                                </div>
+                            )}
+
+                            {selectedFields.has("inventory") && (
+                                <div className="space-y-2">
+                                    <Label className="text-sm" htmlFor="inventory">
+                                        Inventory
+                                    </Label>
+                                    <Input
+                                        id="inventory"
+                                        min="0"
+                                        placeholder="0"
+                                        type="number"
+                                        value={product.inventory}
+                                        onChange={(e) => updateField("inventory", parseInt(e.target.value) || 0)}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    </Card>
+                )}
+            </div>
+            <div className="sheet-footer">
                 <Button variant="destructive" onClick={onClose}>
                     Close
                 </Button>

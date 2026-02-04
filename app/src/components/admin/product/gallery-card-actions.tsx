@@ -1,11 +1,9 @@
-import { Edit2, Trash2 } from "lucide-react";
+import { Edit2 } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { ProductSheetForm } from "./product-form-sheet";
 import { Button } from "@/components/ui/button";
 import type { GalleryImageItem } from "@/schemas";
 import Overlay from "@/components/overlay";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Confirm } from "@/components/generic/confirm";
 import { useDeleteGalleryImage } from "@/hooks/useGallery";
 
 interface GalleryCardActionProps {
@@ -27,7 +25,6 @@ export function GalleryCardActions({ image }: GalleryCardActionProps) {
         <div className="flex items-center gap-2">
             <Overlay
                 open={editState.isOpen}
-                sheetClassName="min-w-[40vw]"
                 title="Create Metadata"
                 trigger={
                     <Button className="bg-white/90 text-black hover:bg-white p-2" size="icon" onClick={editState.open}>
@@ -38,7 +35,7 @@ export function GalleryCardActions({ image }: GalleryCardActionProps) {
             >
                 <ProductSheetForm currentProduct={image.product} imageId={image.id} onClose={editState.close} />
             </Overlay>
-            <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
+            {/* <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
                 <DialogTrigger asChild>
                     <Button className="p-2 text-red-600 bg-red-50 hover:bg-red-100" size="icon">
                         <Trash2 className="w-4 h-4" />
@@ -50,7 +47,7 @@ export function GalleryCardActions({ image }: GalleryCardActionProps) {
                     </DialogHeader>
                     <Confirm onClose={deleteState.close} onConfirm={handleDelete} />
                 </DialogContent>
-            </Dialog>
+            </Dialog> */}
         </div>
     );
 }

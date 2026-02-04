@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { ChevronDown, FileImage, Plus, Save } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
-
 import CategoryAction from "./categories-control";
 import CategoryImageManager from "./category-image";
 import { CategoryForm } from "./category-form";
-
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import type { Category } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import Overlay from "@/components/overlay";
 import { useReorderCategories } from "@/hooks/useCategories";
 import { ZeroState } from "@/components/zero";
+import SheetDrawer from "@/components/sheet-drawer";
+import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 
 interface Props {
     data?: Category[];
@@ -22,19 +20,19 @@ const CategoryImage: React.FC<{ image: string | undefined; categoryId: number }>
     const stateState = useOverlayTriggerState({});
 
     return (
-        <Dialog open={stateState.isOpen} onOpenChange={stateState.setOpen}>
-            <DialogTrigger>
+        <ConfirmDrawer
+            open={stateState.isOpen}
+            onOpenChange={stateState.setOpen}
+            onClose={stateState.close}
+            trigger={
                 <div className="relative w-20 h-20 overflow-hidden rounded-xl">
                     <img alt={image || "placeholder"} className="cursor-pointer w-full h-full object-cover" src={image || "/placeholder.jpg"} />
                 </div>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader className="sr-only">
-                    <DialogTitle>Update Category Image</DialogTitle>
-                </DialogHeader>
-                <CategoryImageManager categoryId={categoryId} initialImage={image} onClose={stateState.close} />
-            </DialogContent>
-        </Dialog>
+            }
+            content={<CategoryImageManager categoryId={categoryId} initialImage={image} onClose={stateState.close} />}
+            title="Update Category Image"
+            hideActionBtn
+        />
     );
 };
 
@@ -97,7 +95,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                                 </span>
                             </div>
                         </div>
-                        <Overlay
+                        <SheetDrawer
                             open={addState.isOpen}
                             title="Create Category"
                             trigger={
@@ -109,7 +107,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                             onOpenChange={addState.setOpen}
                         >
                             <CategoryForm type="create" onClose={addState.close} />
-                        </Overlay>
+                        </SheetDrawer>
                     </div>
                 </div>
 
@@ -142,7 +140,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-start justify-between gap-4">
                                                 <div className="min-w-0 flex-1">
-                                                    <h3 className="text-xl font-semibold mb-2 truncate">{category.name}</h3>
+                                                    <h3 className="text-xl font-semibold mb-2 truncate line-clamp-1">{category.name}</h3>
                                                     <div className="flex flex-wrap items-center gap-3">
                                                         <Badge variant={category.is_active ? "emerald" : "destructive"}>
                                                             {category.is_active ? "Active" : "Inactive"}

@@ -1,24 +1,23 @@
 import type React from "react";
 import { useOverlayTriggerState } from "react-stately";
-
 import { Button } from "@/components/ui/button";
 import { CollectionForm } from "@/components/admin/collections/collection-form";
-import Overlay from "@/components/overlay";
+import SheetDrawer from "@/components/sheet-drawer";
 
-type Props = {}
+type Props = {};
 
 const CreateCollection: React.FC<Props> = () => {
     const state = useOverlayTriggerState({});
 
     return (
-        <Overlay
+        <SheetDrawer
             open={state.isOpen}
             title="Create Collection"
             trigger={<Button onClick={state.open}>Create Collection</Button>}
             onOpenChange={state.setOpen}
         >
             <CollectionForm type="create" onClose={state.close} />
-        </Overlay>
+        </SheetDrawer>
     );
 };
 

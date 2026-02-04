@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -59,11 +58,9 @@ export function FaqForm({ faq, onCancel }: FaqFormProps) {
     };
 
     return (
-        <div className="py-4 px-3">
-            <h2 className="text-xl font-semibold mb-4">{faq ? "Edit FAQ" : "Create New FAQ"}</h2>
-
-            <Form {...form}>
-                <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+        <Form {...form}>
+            <form className="space-y-4 flex-1 flex flex-col overflow-hidden" onSubmit={form.handleSubmit(onSubmit)}>
+                <div className="flex-1 overflow-y-auto space-y-4 px-4">
                     <FormField
                         control={form.control}
                         name="question"
@@ -129,17 +126,16 @@ export function FaqForm({ faq, onCancel }: FaqFormProps) {
                             </FormItem>
                         )}
                     />
-
-                    <div className="flex justify-end space-x-2">
-                        <Button className="min-w-32" type="button" variant="destructive" onClick={onCancel}>
-                            Cancel
-                        </Button>
-                        <Button disabled={loading} isLoading={loading} type="submit">
-                            {faq ? "Update FAQ" : "Create FAQ"}
-                        </Button>
-                    </div>
-                </form>
-            </Form>
-        </div>
+                </div>
+                <div className="sheet-footer">
+                    <Button className="min-w-32" type="button" variant="destructive" onClick={onCancel}>
+                        Cancel
+                    </Button>
+                    <Button disabled={loading} isLoading={loading} type="submit">
+                        {faq ? "Update FAQ" : "Create FAQ"}
+                    </Button>
+                </div>
+            </form>
+        </Form>
     );
 }

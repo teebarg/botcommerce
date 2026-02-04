@@ -1,14 +1,12 @@
 import type React from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { Pencil, Trash2 } from "lucide-react";
-
-import { Confirm } from "@/components/generic/confirm";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { CollectionForm } from "@/components/admin/collections/collection-form";
 import type { Collection } from "@/schemas/product";
-import Overlay from "@/components/overlay";
 import { Button } from "@/components/ui/button";
 import { useDeleteCollection } from "@/hooks/useCollection";
+import SheetDrawer from "@/components/sheet-drawer";
+import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 
 interface Props {
     collection: Collection;
@@ -16,19 +14,18 @@ interface Props {
 
 const CollectionActions: React.FC<Props> = ({ collection }) => {
     const editState = useOverlayTriggerState({});
-    const state = useOverlayTriggerState({});
-
+    const deleteState = useOverlayTriggerState({});
     const deleteCollection = useDeleteCollection();
 
     const onConfirmDelete = async () => {
         deleteCollection.mutateAsync(collection.id).then(() => {
-            state.close();
+            deleteState.close();
         });
     };
 
     return (
         <div className="relative flex items-center">
-            <Overlay
+            <SheetDrawer
                 open={editState.isOpen}
                 title="Edit Collection"
                 trigger={
@@ -39,20 +36,22 @@ const CollectionActions: React.FC<Props> = ({ collection }) => {
                 onOpenChange={editState.setOpen}
             >
                 <CollectionForm collection={collection} type="update" onClose={editState.close} />
-            </Overlay>
-            <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
-                <DialogTrigger asChild>
+            </SheetDrawer>
+            <ConfirmDrawer
+                open={deleteState.isOpen}
+                onOpenChange={deleteState.setOpen}
+                trigger={
                     <Button size="icon" variant="ghost">
                         <Trash2 className="text-red-500 h-5 w-5 cursor-pointer" />
                     </Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader className="sr-only">
-                        <DialogTitle>Delete</DialogTitle>
-                    </DialogHeader>
-                    <Confirm onClose={state.close} onConfirm={onConfirmDelete} />
-                </DialogContent>
-            </Dialog>
+                }
+                onClose={deleteState.close}
+                onConfirm={onConfirmDelete}
+                title={`Delete ${collection.name}`}
+                confirmText="Delete"
+                isLoading={deleteCollection.isPending}
+                variant="destructive"
+            />
         </div>
     );
 };

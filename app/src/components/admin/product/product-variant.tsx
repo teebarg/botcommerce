@@ -66,7 +66,6 @@ export function VariantCreation({ variants, onVariantsChange }: VariantCreationP
                 <p className="text-muted-foreground">Add different options for your product like sizes, colors, or styles. This step is optional.</p>
             </div>
 
-            {/* Add New Variant */}
             <Card className="p-4 bg-card shadow-sm">
                 <div className="space-y-4">
                     <Label className="text-sm font-medium flex items-center gap-2">

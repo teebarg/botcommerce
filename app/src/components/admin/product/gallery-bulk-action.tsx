@@ -1,14 +1,11 @@
 import { Trash2, Edit3, X, Boxes } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
-
 import { BulkProductSheetForm } from "./bulk-product-form-sheet";
 import { CatalogBulkProductUpdate } from "./bulk-product-catalog-update";
-
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Overlay from "@/components/overlay";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Confirm } from "@/components/generic/confirm";
+import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 
 interface ProductBulkActionsProps {
     selectedCount: number;
@@ -42,8 +39,7 @@ export const ProductBulkActions = ({
             <div className="flex items-center gap-1 sm:gap-2">
                 <Overlay
                     open={editState.isOpen}
-                    sheetClassName="min-w-[40vw]"
-                    title="Create Metadata"
+                    title="Bulk Products Update"
                     trigger={
                         <Button className="h-8 px-2 sm:px-3" size="sm" variant="ghost" onClick={editState.open}>
                             <Edit3 className="h-5 w-5 sm:mr-1" />
@@ -57,8 +53,7 @@ export const ProductBulkActions = ({
 
                 <Overlay
                     open={addToSharedState.isOpen}
-                    sheetClassName="min-w-[40vw]"
-                    title="Add to Shared Collection"
+                    title="Update Catalog"
                     trigger={
                         <Button className="h-8 px-2 sm:px-3" disabled={isLoading} size="sm" variant="ghost" onClick={addToSharedState.open}>
                             <Boxes className="h-5 w-5 sm:mr-1" />
@@ -71,11 +66,14 @@ export const ProductBulkActions = ({
                         selectedCount={selectedCount}
                         selectedImageIds={selectedImageIds}
                         selectedProductIds={selectedProductIds}
+                        onClose={addToSharedState.close}
                     />
                 </Overlay>
 
-                <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
-                    <DialogTrigger asChild>
+                <ConfirmDrawer
+                    open={deleteState.isOpen}
+                    onOpenChange={deleteState.setOpen}
+                    trigger={
                         <Button
                             className="h-8 px-2 sm:px-3 text-destructive hover:text-destructive-foreground"
                             disabled={isLoading}
@@ -85,14 +83,14 @@ export const ProductBulkActions = ({
                             <Trash2 className="h-5 w-5 sm:mr-1" />
                             <span className="hidden sm:inline">Delete</span>
                         </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader className="sr-only">
-                            <DialogTitle>Delete</DialogTitle>
-                        </DialogHeader>
-                        <Confirm onClose={deleteState.close} onConfirm={onDelete} />
-                    </DialogContent>
-                </Dialog>
+                    }
+                    onClose={deleteState.close}
+                    onConfirm={onDelete}
+                    title="Delete Products"
+                    description="Are you sure you want to delete these products?"
+                    confirmText="Delete"
+                    isLoading={isLoading}
+                />
 
                 <div className="w-px h-4 bg-border mx-1" />
 

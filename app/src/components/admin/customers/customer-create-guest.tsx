@@ -2,12 +2,11 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useOverlayTriggerState } from "react-stately";
-
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useCreateGuestUser } from "@/hooks/useUser";
+import SheetDrawer from "@/components/sheet-drawer";
 
 const formSchema = z.object({
     first_name: z.string().min(1, { message: "First name is required" }),
@@ -36,16 +35,19 @@ export default function CustomerCreateGuest() {
     };
 
     return (
-        <Dialog open={createState.isOpen} onOpenChange={createState.setOpen}>
-            <DialogTrigger asChild>
-                <Button>Create Guest User</Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Create Guest User</DialogTitle>
-                </DialogHeader>
-                <Form {...form}>
-                    <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+        <SheetDrawer
+            title="Create Guest User"
+            trigger={
+                <Button size="sm" variant="outline">
+                    Create Guest User
+                </Button>
+            }
+            open={createState.isOpen}
+            onOpenChange={createState.toggle}
+        >
+            <Form {...form}>
+                <form className="space-y-4 flex-1 flex flex-col" onSubmit={form.handleSubmit(onSubmit)}>
+                    <div className="flex-1 overflow-y-auto space-y-4 px-4">
                         <FormField
                             control={form.control}
                             name="first_name"
@@ -72,17 +74,17 @@ export default function CustomerCreateGuest() {
                                 </FormItem>
                             )}
                         />
-                        <div className="flex justify-end gap-2 pt-2">
-                            <Button type="button" variant="destructive" onClick={() => createState.close()}>
-                                Cancel
-                            </Button>
-                            <Button disabled={isPending} isLoading={isPending} type="submit">
-                                Create
-                            </Button>
-                        </div>
-                    </form>
-                </Form>
-            </DialogContent>
-        </Dialog>
+                    </div>
+                    <div className="flex justify-end gap-2 px-4 py-4 border-t border-border">
+                        <Button type="button" variant="destructive" onClick={() => createState.close()}>
+                            Cancel
+                        </Button>
+                        <Button disabled={isPending} isLoading={isPending} type="submit">
+                            Create
+                        </Button>
+                    </div>
+                </form>
+            </Form>
+        </SheetDrawer>
     );
 }

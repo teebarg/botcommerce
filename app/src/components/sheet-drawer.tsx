@@ -2,7 +2,7 @@ import { cn } from "@/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AnimatePresence } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 
 interface OverlayProps {
     trigger: React.ReactNode;
@@ -30,10 +30,9 @@ const SheetDrawer: React.FC<OverlayProps> = ({
         return (
             <Drawer open={open} onOpenChange={onOpenChange}>
                 <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-                <DrawerContent className="data-[vaul-drawer-direction=right]:h-dvh data-[vaul-drawer-direction=right]:max-w-lg data-[vaul-drawer-direction=bottom]:max-h-[50vh] data-[vaul-drawer-direction=top]:max-h-[50vh]x">
+                <DrawerContent className="data-[vaul-drawer-direction=bottom]:max-h-[50vh]p">
                     <DrawerHeader>
-                        <DrawerTitle>Are you absolutely sure?</DrawerTitle>
-                        <DrawerDescription>This action cannot be undone.</DrawerDescription>
+                        <DrawerTitle>{title}</DrawerTitle>
                     </DrawerHeader>
                     <AnimatePresence mode="wait">{children}</AnimatePresence>
                 </DrawerContent>

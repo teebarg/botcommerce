@@ -5,7 +5,7 @@ import { LayoutDashboard, Loader, RectangleVertical } from "lucide-react";
 import { GalleryCard } from "@/components/admin/product/product-gallery-card";
 import { ProductBulkActions } from "@/components/admin/product/gallery-bulk-action";
 import { GalleryImagesUpload } from "@/components/admin/product/gallery-images-upload";
-import { useImageGalleryInfinite, useBulkDeleteGalleryImages, useReIndexGallery } from "@/hooks/useGallery";
+import { useImageGalleryInfinite, useBulkDeleteGalleryImages } from "@/hooks/useGallery";
 import ComponentLoader from "@/components/component-loader";
 import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
@@ -34,11 +34,9 @@ function RouteComponent() {
     const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
     const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(32, initialImages);
     const images = data?.pages?.flatMap((p: any) => p.images) || [];
-
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { lastMessage } = useWebSocket();
     const { mutateAsync: bulkDeleteImages, isPending: isDeleting } = useBulkDeleteGalleryImages();
-    const { mutateAsync: reIndexGallery, isPending: isReIndexing } = useReIndexGallery();
 
     const selectedProductIds = useMemo(() => {
         const ids = new Set<number>();
@@ -93,17 +91,12 @@ function RouteComponent() {
     };
 
     return (
-        <div className="px-4 py-8">
+        <div className="px-2">
             <div className="mb-8">
                 <h3 className="text-lg font-semibold">Image Gallery</h3>
                 <p className="text-sm text-muted-foreground">Manage your product images.</p>
             </div>
-            <div className="mb-8 max-w-xl flex gap-2">
-                <GalleryImagesUpload />
-                <Button className="min-w-32" disabled={isReIndexing} isLoading={isReIndexing} variant="emerald" onClick={() => reIndexGallery()}>
-                    Re-index
-                </Button>
-            </div>
+            <GalleryImagesUpload />
 
             {isImagesLoading ? (
                 <ComponentLoader />

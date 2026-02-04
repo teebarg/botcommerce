@@ -31,7 +31,7 @@ function cleanMarkdown(md: string) {
 
 const ChatViewer: React.FC<{ chat: Chat; onClose: () => void }> = ({ chat, onClose }) => {
     return (
-        <div className="flex-1 flex flex-col max-h-[80vh] md:max-h-none md:h-[calc(100vh-1.5rem)]">
+        <div className="flex-1 flex flex-col overflow-hidden">
             <div className="bg-background border-b border-border py-4 px-1 md:px-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
