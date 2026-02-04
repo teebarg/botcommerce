@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
-
 import { type Address, AddressSchema } from "@/schemas/address";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -53,151 +52,146 @@ const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onCl
     };
 
     return (
-        <div className="pt-4 px-4">
-            <h2 className="text-lg font-semibold mb-4">Address</h2>
-            <Form {...form}>
-                <form className="grid gap-6" onSubmit={form.handleSubmit(onSubmit)}>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <FormField
-                            control={form.control}
-                            name="address_type"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Address Type</FormLabel>
-                                    <Select value={field.value} onValueChange={field.onChange}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select type" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="HOME">Home</SelectItem>
-                                            <SelectItem value="WORK">Work</SelectItem>
-                                            <SelectItem value="BILLING">Billing</SelectItem>
-                                            <SelectItem value="SHIPPING">Shipping</SelectItem>
-                                            <SelectItem value="OTHER">Other</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="label"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Label (Optional)</FormLabel>
+        <Form {...form}>
+            <form className="flex-1 flex flex-col overflow-hidden" onSubmit={form.handleSubmit(onSubmit)}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1 overflow-y-auto px-2.5 pb-4 space-y-4">
+                    <FormField
+                        control={form.control}
+                        name="address_type"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Address Type</FormLabel>
+                                <Select value={field.value} onValueChange={field.onChange}>
                                     <FormControl>
-                                        <Input placeholder="e.g., Home, Office, Mum's place" {...field} />
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select type" />
+                                        </SelectTrigger>
                                     </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="first_name"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>First name</FormLabel>
+                                    <SelectContent>
+                                        <SelectItem value="HOME">Home</SelectItem>
+                                        <SelectItem value="WORK">Work</SelectItem>
+                                        <SelectItem value="BILLING">Billing</SelectItem>
+                                        <SelectItem value="SHIPPING">Shipping</SelectItem>
+                                        <SelectItem value="OTHER">Other</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="label"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Label (Optional)</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="e.g., Home, Office, Mum's place" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="first_name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>First name</FormLabel>
+                                <FormControl>
+                                    <Input required autoComplete="given-name" data-testid="shipping-first_name-input" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="last_name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Last name</FormLabel>
+                                <FormControl>
+                                    <Input required autoComplete="family-name" data-testid="shipping-last_name-input" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="address_1"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Address</FormLabel>
+                                <FormControl>
+                                    <Input required autoComplete="address-line1" data-testid="shipping-address-input" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="city"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>City</FormLabel>
+                                <FormControl>
+                                    <Input required autoComplete="address-level2" data-testid="shipping-city-input" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="state"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>State</FormLabel>
+                                <Select value={field.value} onValueChange={field.onChange}>
                                     <FormControl>
-                                        <Input required autoComplete="given-name" data-testid="shipping-first_name-input" {...field} />
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select state" />
+                                        </SelectTrigger>
                                     </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="last_name"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Last name</FormLabel>
-                                    <FormControl>
-                                        <Input required autoComplete="family-name" data-testid="shipping-last_name-input" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="address_1"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Address</FormLabel>
-                                    <FormControl>
-                                        <Input required autoComplete="address-line1" data-testid="shipping-address-input" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="city"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>City</FormLabel>
-                                    <FormControl>
-                                        <Input required autoComplete="address-level2" data-testid="shipping-city-input" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="state"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>State</FormLabel>
-                                    <Select value={field.value} onValueChange={field.onChange}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select state" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {states.map((item) => (
-                                                <SelectItem key={item.id} value={item.id}>
-                                                    {item.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="phone"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Phone</FormLabel>
-                                    <FormControl>
-                                        <Input autoComplete="tel" data-testid="shipping-phone-input" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                    <Button
-                        aria-label="continue"
-                        className="mt-6"
-                        data-testid="submit-address-button"
-                        disabled={updateAddress.isPending}
-                        isLoading={updateAddress.isPending}
-                        type="submit"
-                    >
+                                    <SelectContent>
+                                        {states.map((item) => (
+                                            <SelectItem key={item.id} value={item.id}>
+                                                {item.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Phone</FormLabel>
+                                <FormControl>
+                                    <Input autoComplete="tel" data-testid="shipping-phone-input" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+                <div className="sheet-footer">
+                    <Button type="button" variant="destructive" onClick={onClose}>
+                        Cancel
+                    </Button>
+                    <Button disabled={updateAddress.isPending} isLoading={updateAddress.isPending} type="submit">
                         Update
                     </Button>
-                </form>
-            </Form>
-        </div>
+                </div>
+            </form>
+        </Form>
     );
 };
 

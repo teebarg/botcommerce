@@ -1,15 +1,12 @@
 import type React from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { Pencil, Trash2 } from "lucide-react";
-
 import { UpdateReviewForm } from "./reviews-form";
-
-import { Confirm } from "@/components/generic/confirm";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import type { Review } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import Overlay from "@/components/overlay";
 import { useDeleteReview, useUpdateReview } from "@/hooks/useReview";
+import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
+import SheetDrawer from "@/components/sheet-drawer";
 
 interface Props {
     review: Review;
@@ -19,7 +16,7 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
     const editState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
     const { mutate: updateReview, isPending } = useUpdateReview();
-    const { mutateAsync: deleteReview } = useDeleteReview();
+    const { mutateAsync: deleteReview, isPending: deletePending } = useDeleteReview();
 
     const onConfirmDelete = async () => {
         deleteReview(review.id).then(() => {
@@ -33,7 +30,7 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
 
     return (
         <div className="relative flex items-center">
-            <Overlay
+            <SheetDrawer
                 open={editState.isOpen}
                 title="Edit Review"
                 trigger={
@@ -44,20 +41,22 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
                 onOpenChange={editState.setOpen}
             >
                 <UpdateReviewForm review={review} onClose={editState.close} />
-            </Overlay>
-            <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
-                <DialogTrigger asChild>
+            </SheetDrawer>
+            <ConfirmDrawer
+                open={deleteState.isOpen}
+                onOpenChange={deleteState.setOpen}
+                trigger={
                     <Button size="icon" variant="ghost">
                         <Trash2 className="h-5 w-5 text-destructive" />
                     </Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader className="sr-only">
-                        <DialogTitle>Delete</DialogTitle>
-                    </DialogHeader>
-                    <Confirm onClose={deleteState.close} onConfirm={onConfirmDelete} />
-                </DialogContent>
-            </Dialog>
+                }
+                onClose={deleteState.close}
+                onConfirm={onConfirmDelete}
+                title="Delete"
+                confirmText="Delete"
+                isLoading={deletePending}
+                variant="destructive"
+            />
             {review.verified ? (
                 <Button
                     aria-label="unpublish"

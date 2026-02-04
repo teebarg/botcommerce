@@ -8,11 +8,11 @@ import { Button } from "@/components/ui/button";
 import AddAddressForm from "@/components/store/account/address/add-address-form";
 import { cn } from "@/utils";
 import EditAddressForm from "@/components/store/account/address/edit-address-form";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { addressesQueryOptions, useDeleteAddress } from "@/hooks/useAddress";
-import { Confirm } from "@/components/generic/confirm";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
+import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
+import SheetDrawer from "@/components/sheet-drawer";
 
 type AddressItemProps = {
     address: Address;
@@ -65,11 +65,11 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false, in
                 </div>
 
                 <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
-                    <Overlay
+                    <SheetDrawer
                         open={editState.isOpen}
                         title="Edit address"
                         trigger={
-                            <Button variant="ghost" size="sm" onClick={editState.open} className="text-xs">
+                            <Button variant="ghost" size="sm" className="text-xs">
                                 <Edit3 className="w-3 h-3 mr-1" />
                                 Edit
                             </Button>
@@ -78,21 +78,23 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false, in
                         showHeader={true}
                     >
                         <EditAddressForm address={address} onClose={editState.close} />
-                    </Overlay>
-                    <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
-                        <DialogTrigger asChild>
-                            <Button variant="ghost" size="sm" onClick={deleteState.open} className="text-xs text-destructive hover:text-destructive">
+                    </SheetDrawer>
+                    <ConfirmDrawer
+                        open={deleteState.isOpen}
+                        onOpenChange={deleteState.setOpen}
+                        trigger={
+                            <Button variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive">
                                 <Trash2 className="w-3 h-3 mr-1" />
                                 Delete
                             </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader className="sr-only">
-                                <DialogTitle>Delete Category</DialogTitle>
-                            </DialogHeader>
-                            <Confirm onConfirm={onConfirmDelete} />
-                        </DialogContent>
-                    </Dialog>
+                        }
+                        onClose={deleteState.close}
+                        onConfirm={onConfirmDelete}
+                        title={`Delete ${address.first_name}`}
+                        confirmText="Delete"
+                        isLoading={deleteAddress.isPending}
+                        variant="destructive"
+                    />
                 </div>
             </div>
         </motion.div>

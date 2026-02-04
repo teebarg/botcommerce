@@ -1,19 +1,5 @@
 import type React from "react";
-import {
-    User,
-    CreditCard,
-    Truck,
-    Calendar,
-    Clock,
-    ArrowLeft,
-    ShieldAlert,
-    PackageCheck,
-    Download,
-    RefreshCw,
-    Package,
-    XCircle,
-    RotateCcw,
-} from "lucide-react";
+import { User, CreditCard, Truck, Calendar, Clock, ShieldAlert, PackageCheck, Download, RefreshCw, Package, XCircle, RotateCcw } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import OrderProcessingAction from "./order-processing-actions";
 import { OrderStatusBadge } from "./order-status-badge";
@@ -21,10 +7,10 @@ import { useOrderTimeline } from "@/hooks/useOrder";
 import type { Order, OrderItem } from "@/schemas";
 import { useReturnOrderItem } from "@/hooks/useOrder";
 import { currency, formatDate } from "@/utils";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Confirm } from "@/components/generic/confirm";
 import { Badge } from "@/components/ui/badge";
 import ImageDisplay from "@/components/image-display";
+import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
+import { Button } from "@/components/ui/button";
 
 interface OrderDetailsProps {
     order: Order;
@@ -71,7 +57,7 @@ const orderStatusMap = {
 
 const OrderItemCard: React.FC<{ orderItem: OrderItem; orderId: number }> = ({ orderItem, orderId }) => {
     const deleteState = useOverlayTriggerState({});
-    const { mutateAsync: returnItem } = useReturnOrderItem();
+    const { mutateAsync: returnItem, isPending } = useReturnOrderItem();
 
     const handleRemove = () => {
         returnItem({ orderId, itemId: orderItem.id }).then(() => {
@@ -80,7 +66,7 @@ const OrderItemCard: React.FC<{ orderItem: OrderItem; orderId: number }> = ({ or
     };
 
     return (
-        <div className="flex gap-4 px-2 py-4">
+        <div className="flex gap-4 px-2.5 py-4">
             <div className="h-28 w-28 rounded-lg overflow-hidden">
                 <ImageDisplay alt={orderItem.name} url={orderItem.image} />
             </div>
@@ -99,17 +85,17 @@ const OrderItemCard: React.FC<{ orderItem: OrderItem; orderId: number }> = ({ or
                     <div className="font-semibold">{currency(orderItem.price)}</div>
                 </div>
             </div>
-            <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
-                <DialogTrigger>
-                    <div className="font-semibold bg-destructive text-white px-4 py-2 rounded-md cursor-pointer">Return</div>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader className="sr-only">
-                        <DialogTitle>Delete {orderItem.name}</DialogTitle>
-                    </DialogHeader>
-                    <Confirm onClose={deleteState.close} onConfirm={handleRemove} />
-                </DialogContent>
-            </Dialog>
+            <ConfirmDrawer
+                open={deleteState.isOpen}
+                onOpenChange={deleteState.setOpen}
+                trigger={<Button variant="destructive">Return</Button>}
+                onClose={deleteState.close}
+                onConfirm={handleRemove}
+                title={`Return ${orderItem.name}`}
+                confirmText="Return"
+                isLoading={isPending}
+                variant="destructive"
+            />
         </div>
     );
 };

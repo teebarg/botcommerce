@@ -3,10 +3,8 @@
 import { HeadContent, Outlet, ScriptOnce, Scripts, createRootRouteWithContext, redirect } from "@tanstack/react-router";
 import { Toaster } from "sonner";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
 import { PushNotificationManager } from "@/components/pwa/notification-manager";
 import { InstallPrompt } from "@/components/pwa/prompt";
-import { ProgressBar } from "@/components/ui/progress-bar";
 import { CartProvider } from "@/providers/cart-provider";
 import { StoreProvider } from "@/providers/store-provider";
 import ImpersonationBanner from "@/components/impersonation-banner";
@@ -28,6 +26,7 @@ import { InvalidateProvider } from "@/providers/invalidate-provider";
 import { siteConfigQueryOptions } from "@/hooks/useGeneric";
 import { useEffect } from "react";
 import { initPulseMetrics } from "@/utils/pulsemetric";
+import PageTransitionLoader from "@/components/generic/page-transition-loader";
 
 interface RouterContext {
     session: AuthSession | null;
@@ -103,6 +102,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 function RootComponent() {
     return (
         <RootDocument>
+            <PageTransitionLoader />
             <Outlet />
         </RootDocument>
     );
@@ -138,25 +138,21 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 <ThemeProvider>
                     <StoreProvider>
                         <CartProvider>
-                            <ProgressBar className="h-1 bg-primary/30">
-                                <div className="relative">
-                                    <PushNotificationManager />
-                                    <PushPermission />
-                                    <InstallPrompt />
-                                    <WebSocketProvider
-                                        url={import.meta.env.VITE_WS + "/api/ws/"}
-                                        debug={true}
-                                        onOpen={() => console.log("WebSocket connected!")}
-                                        onClose={() => console.log("WebSocket disconnected!")}
-                                    >
-                                        <InvalidateProvider>{children}</InvalidateProvider>
-                                        <ImpersonationBanner />
-                                    </WebSocketProvider>
-                                    {import.meta.env.MODE !== "production" && (
-                                        <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
-                                    )}
-                                </div>
-                            </ProgressBar>
+                            <div className="relative">
+                                <PushNotificationManager />
+                                <PushPermission />
+                                <InstallPrompt />
+                                <WebSocketProvider
+                                    url={import.meta.env.VITE_WS + "/api/ws/"}
+                                    debug={true}
+                                    onOpen={() => console.log("WebSocket connected!")}
+                                    onClose={() => console.log("WebSocket disconnected!")}
+                                >
+                                    <InvalidateProvider>{children}</InvalidateProvider>
+                                    <ImpersonationBanner />
+                                </WebSocketProvider>
+                                {import.meta.env.MODE !== "production" && <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />}
+                            </div>
                             {/* {import.meta.env.MODE !== "production" && <TanStackRouterDevtoolsPanel />} */}
                             <Toaster closeButton richColors duration={3000} expand={false} position="top-right" />
                             <Scripts />

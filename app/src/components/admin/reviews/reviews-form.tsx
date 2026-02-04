@@ -45,10 +45,9 @@ const UpdateReviewForm: React.FC<Props> = ({ onClose, review }) => {
     };
 
     return (
-        <div className="py-4 px-2 md:px-4">
-            <h1 className="text-lg font-semibold mb-4">Update Review</h1>
-            <Form {...form}>
-                <form className="h-full flex flex-col gap-2" onSubmit={form.handleSubmit(onSubmit)}>
+        <Form {...form}>
+            <form className="flex-1 flex flex-col overflow-hidden" onSubmit={form.handleSubmit(onSubmit)}>
+                <div className="flex-1 overflow-y-auto px-2 space-y-4">
                     <FormField
                         control={form.control}
                         name="rating"
@@ -75,17 +74,17 @@ const UpdateReviewForm: React.FC<Props> = ({ onClose, review }) => {
                             </FormItem>
                         )}
                     />
-                    <div className="flex items-center justify-end py-4 space-x-2 mt-4">
-                        <Button aria-label="cancel" className="min-w-32" type="button" variant="destructive" onClick={onClose}>
-                            Cancel
-                        </Button>
-                        <Button aria-label="update" className="min-w-32" isLoading={isPending} type="submit">
-                            Update
-                        </Button>
-                    </div>
-                </form>
-            </Form>
-        </div>
+                </div>
+                <div className="sheet-footer">
+                    <Button aria-label="cancel" className="min-w-32" type="button" variant="destructive" onClick={onClose}>
+                        Cancel
+                    </Button>
+                    <Button aria-label="update" className="min-w-32" isLoading={isPending} type="submit">
+                        Update
+                    </Button>
+                </div>
+            </form>
+        </Form>
     );
 };
 

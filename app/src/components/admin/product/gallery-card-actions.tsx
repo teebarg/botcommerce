@@ -35,19 +35,6 @@ export function GalleryCardActions({ image }: GalleryCardActionProps) {
             >
                 <ProductSheetForm currentProduct={image.product} imageId={image.id} onClose={editState.close} />
             </Overlay>
-            {/* <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
-                <DialogTrigger asChild>
-                    <Button className="p-2 text-red-600 bg-red-50 hover:bg-red-100" size="icon">
-                        <Trash2 className="w-4 h-4" />
-                    </Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader className="sr-only">
-                        <DialogTitle>Delete</DialogTitle>
-                    </DialogHeader>
-                    <Confirm onClose={deleteState.close} onConfirm={handleDelete} />
-                </DialogContent>
-            </Dialog> */}
         </div>
     );
 }

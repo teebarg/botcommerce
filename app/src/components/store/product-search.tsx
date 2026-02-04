@@ -64,47 +64,41 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                     <span className="sr-only">Search</span>
                 </div>
             </SheetTrigger>
-            <SheetContent side="top">
+            <SheetContent side="top" className="h-screen flex">
                 <SheetHeader className="sr-only">
                     <SheetTitle>Search Products</SheetTitle>
                     <SheetDescription>Search for products, categories, and more</SheetDescription>
                 </SheetHeader>
-                <div className="relative px-8 pb-8 overflow-y-auto max-h-screen min-h-[75vh]">
-                    <div className="w-full sticky top-0 z-20 bg-background py-4">
-                        <div
+                <div className="flex-1 flex flex-col overflow-hidden">
+                    <div className="flex items-center rounded-xl border transition-all duration-200 w-full max-w-96 mx-auto relative hover:border-primary/30">
+                        <Search className="absolute left-4 w-5 h-5 text-muted-foreground" />
+                        <input
+                            ref={inputRef}
                             className={cn(
-                                "flex items-center rounded-xl border transition-all duration-200 w-full max-w-96 mx-auto relative hover:border-primary/30"
+                                "pl-12 pr-12 py-2.5 bg-transparent border-0 outline-0",
+                                "text-foreground placeholder:text-muted-foreground",
+                                "transition-all duration-200 w-full"
                             )}
-                        >
-                            <Search className="absolute left-4 w-5 h-5 text-muted-foreground" />
-                            <input
-                                ref={inputRef}
-                                className={cn(
-                                    "pl-12 pr-12 py-2.5 bg-transparent border-0 outline-0",
-                                    "text-foreground placeholder:text-muted-foreground",
-                                    "transition-all duration-200 w-full"
-                                )}
-                                placeholder={placeholder}
-                                type="text"
-                                value={query}
-                                onChange={(e) => {
-                                    setQuery(e.target.value);
+                            placeholder={placeholder}
+                            type="text"
+                            value={query}
+                            onChange={(e) => {
+                                setQuery(e.target.value);
+                            }}
+                        />
+                        {query && (
+                            <button
+                                className="absolute right-4 p-1 rounded-full hover:bg-muted transition-colors"
+                                onClick={() => {
+                                    setQuery("");
+                                    searchRef.current?.focus();
                                 }}
-                            />
-                            {query && (
-                                <button
-                                    className="absolute right-4 p-1 rounded-full hover:bg-muted transition-colors"
-                                    onClick={() => {
-                                        setQuery("");
-                                        searchRef.current?.focus();
-                                    }}
-                                >
-                                    <X className="w-4 h-4 text-muted-foreground" />
-                                </button>
-                            )}
-                        </div>
+                            >
+                                <X className="w-4 h-4 text-muted-foreground" />
+                            </button>
+                        )}
                     </div>
-                    <div className="h-full">
+                    <div className="flex-1 overflow-y-auto">
                         {isLoading && (
                             <div className="flex items-center justify-center py-8">
                                 <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent" />

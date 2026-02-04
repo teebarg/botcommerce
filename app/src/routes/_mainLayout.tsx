@@ -9,7 +9,6 @@ import GetApp from "@/components/get-app";
 import { SearchDialog } from "@/components/store/product-search";
 import type { Session } from "start-authjs";
 import { ShoppingBag } from "lucide-react";
-import PageTransitionLoader from "@/components/generic/page-transition-loader";
 
 export const Route = createFileRoute("/_mainLayout")({
     component: MainLayoutComponent,
@@ -38,7 +37,6 @@ function MainLayoutComponent() {
                 </div>
             </div>
             <main className="flex-1 flex flex-col">
-                <PageTransitionLoader />
                 <Outlet />
             </main>
             <Footer />

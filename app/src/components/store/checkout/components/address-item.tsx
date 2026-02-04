@@ -4,11 +4,10 @@ import { useOverlayTriggerState } from "react-stately";
 import ShippingAddressFormEdit from "../address-form-edit";
 import type { Address } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import Overlay from "@/components/overlay";
-import { Confirm } from "@/components/generic/confirm";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useUpdateCartDetails } from "@/hooks/useCart";
 import ComponentLoader from "@/components/component-loader";
+import SheetDrawer from "@/components/sheet-drawer";
+import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 
 interface AddressItemProp {
     address: Address;
@@ -94,9 +93,8 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
             </div>
 
             <div className="absolute bottom-3 right-3 flex gap-1.5 md:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <Overlay
+                <SheetDrawer
                     open={state.isOpen}
-                    sheetClassName="min-w-[600px]"
                     title="Address"
                     trigger={
                         <Button
@@ -111,9 +109,11 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                     onOpenChange={state.setOpen}
                 >
                     <ShippingAddressFormEdit address={address} onClose={state.close} />
-                </Overlay>
-                <Dialog open={deleteState.isOpen} onOpenChange={deleteState.setOpen}>
-                    <DialogTrigger asChild>
+                </SheetDrawer>
+                <ConfirmDrawer
+                    open={deleteState.isOpen}
+                    onOpenChange={deleteState.setOpen}
+                    trigger={
                         <Button
                             className="text-muted-foreground hover:text-red-600 hover:bg-red-50"
                             size="icon"
@@ -122,14 +122,11 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                         >
                             <Trash2 className="w-4 h-4" />
                         </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader className="sr-only">
-                            <DialogTitle>Delete Address</DialogTitle>
-                        </DialogHeader>
-                        <Confirm onClose={deleteState.close} onConfirm={onConfirmDelete} />
-                    </DialogContent>
-                </Dialog>
+                    }
+                    onClose={deleteState.close}
+                    onConfirm={onConfirmDelete}
+                    title="Delete Address"
+                />
             </div>
             {updateCartDetails.isPending && (
                 <div className="absolute top-0 left-0 w-full h-full bg-white/70 dark:bg-black/50 z-50 flex items-center justify-center">

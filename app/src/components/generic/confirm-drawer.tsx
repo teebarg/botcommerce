@@ -30,9 +30,9 @@ const ConfirmDrawer: React.FC<Props> = ({
     open,
     onOpenChange,
     description,
-    confirmText = "Confirm",
+    confirmText = "Delete",
     cancelText = "Cancel",
-    variant = "default",
+    variant = "destructive",
     isLoading = false,
     hideActionBtn = false,
 }) => {
@@ -86,7 +86,7 @@ const ConfirmDrawer: React.FC<Props> = ({
             <DialogTrigger asChild>{trigger}</DialogTrigger>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold tracking-tight">{title}</DialogTitle>
+                    <DialogTitle className="text-xl font-semibold tracking-tight">{title || "Confirm?"}</DialogTitle>
                     <DialogDescription className="text-sm text-gray-500 mt-1.5">{description ?? "This action cannot be undone."}</DialogDescription>
                 </DialogHeader>
                 {content}
