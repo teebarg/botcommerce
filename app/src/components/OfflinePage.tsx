@@ -25,7 +25,7 @@ const OfflinePage = () => {
     }, []);
 
     return (
-        <div className="fixed inset-0 z-50 min-h-screen flex items-center justify-center p-4 transition-colors duration-300">
+        <div className="fixed inset-0 z-50 min-h-screen flex items-center justify-center p-4 transition-colors duration-300 bg-background">
             <div className="max-w-md w-full text-center animate-fade-in">
                 <div className="relative mb-8">
                     <div className="w-32 h-32 mx-auto relative">
