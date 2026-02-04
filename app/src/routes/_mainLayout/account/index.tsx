@@ -128,7 +128,7 @@ function RouteComponent() {
 
                 <div className="space-y-3">
                     {data?.orders?.slice(0, 5)?.map((order: Order, idx: number) => (
-                        <OrderItem order={order} idx={idx} />
+                        <OrderItem key={idx} order={order} idx={idx} />
                     ))}
                     {data?.orders?.length === 0 && (
                         <motion.div
