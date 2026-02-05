@@ -1,7 +1,5 @@
 import { toast } from "sonner";
 import { Share2, Copy, Smartphone, Twitter, Facebook } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
 export default function ShareButton() {
@@ -60,10 +58,18 @@ export default function ShareButton() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="contrast">
-                    <Share2 className="h-4 w-4 mr-1" />
-                    Share
-                </Button>
+                <button className="z-50">
+                    <span className="hidden md:inline-flex items-center gap-1 px-3 py-2 rounded-md bg-contrast text-contrast-foreground cursor-pointer">
+                        <Share2 className="h-4 w-4" />
+                        Share
+                    </span>
+                    <span className="md:hidden flex flex-col items-center gap-1 text-white/80">
+                        <div className="action-button">
+                            <Share2 className="w-6 h-6" fill="currentColor" />
+                        </div>
+                        <span className="text-xs font-semibold">Share</span>
+                    </span>
+                </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64 p-2 shadow-hover bg-secondary">
                 <div className="px-2 py-1.5 mb-2">

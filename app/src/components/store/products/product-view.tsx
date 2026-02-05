@@ -120,7 +120,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                 >
                     <img
                         key={currentImageIndex}
-                        src={product.images[currentImageIndex].image}
+                        src={product.images?.[currentImageIndex]?.image}
                         alt={product.name}
                         className={`w-full h-full object-cover ${outOfStock ? "opacity-60 grayscale" : ""}`}
                     />

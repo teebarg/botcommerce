@@ -8,9 +8,8 @@ import type { Facet, ProductSearch, ProductVariant } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import { useMemo, useRef } from "react";
 import { IsNew } from "@/components/products/product-badges";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Filter, Heart, Music } from "lucide-react";
-import ShareButton2 from "@/components/share2";
 import Overlay from "@/components/overlay";
 import { useOverlayTriggerState } from "react-stately";
 import { Button } from "@/components/ui/button";
@@ -18,6 +17,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { FilterSidebarLogic, FilterSidebarRef } from "../shared/filter-sidebar-logic";
 import { useInView } from "react-intersection-observer";
 import { cn } from "@/utils";
+import ShareButton from "@/components/share";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -52,8 +52,8 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
 
     return (
         <div ref={ref} className="relative h-[calc(100dvh-64px-88px)]! w-full snap-start snap-always bg-[#121212]">
-            <div className="absolute top-0 left-0 right-0 h-[55%]p flex items-start justify-center">
-                <img src={product.images?.[0]} alt={product.name} className="max-w-full max-h-full object-contain shadow-2xl fade-to-black" />
+            <div className="absolute top-0 left-0 right-0 flex items-start justify-center">
+                <img src={product.images?.[0]} alt={product.name} className="max-w-full max-h-full object-contain fade-to-black" />
                 {/* <div className="pointer-events-none absolute bottom-0 left-0 h-40 w-full bg-gradient-to-t from-[#121212] via-[#121212]/60 to-transparent" /> */}
             </div>
 
@@ -88,12 +88,12 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
                         </div>
                     }
                     trigger={
-                        <motion.button whileTap={{ scale: 0.85 }} className="flex flex-col items-center gap-1 text-white/80">
+                        <button className="flex flex-col items-center gap-1 text-white/80">
                             <div className="action-button">
                                 <Filter className="w-6 h-6 transition-colors" fill="currentColor" />
                             </div>
                             <span className="text-xs font-bold">Filter</span>
-                        </motion.button>
+                        </button>
                     }
                     onOpenChange={editState.setOpen}
                     side="left"
@@ -112,9 +112,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
                         </div>
                     </div>
                 </Overlay>
-                <motion.button
-                    whileTap={{ scale: 0.85 }}
-                    whileHover={{ scale: 1.05 }}
+                <button
                     onClick={() => {
                         inWishlist ? removeWishlist() : addWishlist();
                     }}
@@ -127,8 +125,8 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
                         />
                     </div>
                     <span className={`text-xs font-bold ${inWishlist ? "text-destructive" : "text-white/80"}`}>Wishlist</span>
-                </motion.button>
-                <ShareButton2 />
+                </button>
+                <ShareButton />
             </motion.div>
 
             <motion.div

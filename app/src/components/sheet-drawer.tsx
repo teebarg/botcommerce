@@ -10,6 +10,7 @@ interface OverlayProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     title?: string | React.ReactNode;
+    drawerClassName?: string;
     sheetClassName?: string;
     showHeader?: boolean;
     side?: "top" | "right" | "bottom" | "left";
@@ -22,6 +23,7 @@ const SheetDrawer: React.FC<OverlayProps> = ({
     onOpenChange,
     title = "Header Content",
     sheetClassName = "",
+    drawerClassName = "",
     showHeader = true,
     side = "right",
 }) => {
@@ -30,7 +32,7 @@ const SheetDrawer: React.FC<OverlayProps> = ({
         return (
             <Drawer open={open} onOpenChange={onOpenChange}>
                 <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-                <DrawerContent className="data-[vaul-drawer-direction=bottom]:max-h-[90vh]">
+                <DrawerContent className={cn("data-[vaul-drawer-direction=bottom]:max-h-[90vh]", drawerClassName)}>
                     <DrawerHeader>
                         <DrawerTitle>{title}</DrawerTitle>
                     </DrawerHeader>
