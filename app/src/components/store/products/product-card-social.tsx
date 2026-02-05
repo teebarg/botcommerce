@@ -96,30 +96,21 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
                         </motion.button>
                     }
                     onOpenChange={editState.setOpen}
-                    showHeader={true}
                     side="left"
                 >
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key="filter-sidebar"
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
-                            className="flex-1 flex flex-col overflow-hidden"
-                        >
-                            <ScrollArea className="flex-1 px-6">
-                                <FilterSidebarLogic ref={sidebarRef} facets={facets} onClose={editState.close} />
-                            </ScrollArea>
-                            <div className="flex justify-center gap-2 p-4 border-t border-border">
-                                <Button className="w-full rounded-full py-6" onClick={() => sidebarRef.current?.apply()}>
-                                    Apply
-                                </Button>
-                                <Button className="w-full rounded-full py-6" variant="destructive" onClick={() => sidebarRef.current?.clear()}>
-                                    Clear
-                                </Button>
-                            </div>
-                        </motion.div>
-                    </AnimatePresence>
+                    <div className="flex-1 flex flex-col overflow-hidden">
+                        <ScrollArea className="flex-1 px-6">
+                            <FilterSidebarLogic ref={sidebarRef} facets={facets} onClose={editState.close} />
+                        </ScrollArea>
+                        <div className="flex justify-center gap-2 p-4 border-t border-border">
+                            <Button className="w-full rounded-full py-6" onClick={() => sidebarRef.current?.apply()}>
+                                Apply
+                            </Button>
+                            <Button className="w-full rounded-full py-6" variant="destructive" onClick={() => sidebarRef.current?.clear()}>
+                                Clear
+                            </Button>
+                        </div>
+                    </div>
                 </Overlay>
                 <motion.button
                     whileTap={{ scale: 0.85 }}

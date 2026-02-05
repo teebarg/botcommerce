@@ -32,7 +32,8 @@ const Overlay: React.FC<OverlayProps> = ({
                         <SheetTitle className="flex items-center gap-3 text-xl">{title}</SheetTitle>
                     </SheetHeader>
                 )}
-                <AnimatePresence mode="wait">{children}</AnimatePresence>
+                {children}
+                {/* <AnimatePresence mode="wait">{children}</AnimatePresence> */}
             </SheetContent>
         </Sheet>
     );

@@ -26,7 +26,6 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
     const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
     const inputRef = useRef<HTMLInputElement>(null);
-
     const searchRef = useRef<HTMLInputElement>(null);
 
     const { data, isLoading } = useProductSearch({ search: debouncedQuery, limit: 4, skip: 0, show_suggestions: true });
@@ -64,20 +63,19 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                     <span className="sr-only">Search</span>
                 </div>
             </SheetTrigger>
-            <SheetContent side="top" className="h-screen flex">
+            <SheetContent side="top" className="h-screen flex px-2.5">
                 <SheetHeader className="sr-only">
                     <SheetTitle>Search Products</SheetTitle>
                     <SheetDescription>Search for products, categories, and more</SheetDescription>
                 </SheetHeader>
                 <div className="flex-1 flex flex-col overflow-hidden">
-                    <div className="flex items-center rounded-xl border transition-all duration-200 w-full max-w-96 mx-auto relative hover:border-primary/30">
+                    <div className="flex items-center rounded-xl border w-full max-w-lg mx-auto relative">
                         <Search className="absolute left-4 w-5 h-5 text-muted-foreground" />
                         <input
                             ref={inputRef}
                             className={cn(
-                                "pl-12 pr-12 py-2.5 bg-transparent border-0 outline-0",
+                                "pl-12 pr-12 py-2.5 bg-transparent border-0 outline-0 w-full",
                                 "text-foreground placeholder:text-muted-foreground",
-                                "transition-all duration-200 w-full"
                             )}
                             placeholder={placeholder}
                             type="text"
@@ -154,7 +152,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                                         <TrendingUp className="h-5 w-5" />
                                         <h3 className="font-semibold text-sm tracking-wider">TRENDING SEARCHES</h3>
                                     </div>
-                                    <div className="flex flex-wrap gap-2">
+                                    <div className="flex flex-wrap gap-2 overflow-x-auto">
                                         {data?.suggestions?.map((term: string) => (
                                             <Button
                                                 key={term}
@@ -167,11 +165,8 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                                         ))}
                                     </div>
                                 </div>
-
                                 <div>
-                                    <div className="mb-4">
-                                        <h3 className="font-semibold text-sm tracking-wider">TRENDING PRODUCTS</h3>
-                                    </div>
+                                    <h3 className="font-semibold text-sm tracking-wider mb-4">TRENDING PRODUCTS</h3>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                         {trendingData?.products?.map((product: ProductSearch) => (
                                             <ProductCard key={product.id} product={product} />
