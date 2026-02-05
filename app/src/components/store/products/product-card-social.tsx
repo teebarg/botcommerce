@@ -53,7 +53,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
 
     return (
         <div ref={ref} className="relative h-[calc(100dvh-64px-88px)]! w-full snap-start snap-always bg-[#121212]">
-            <div>
+            <div className="absolute top-0 left-0 right-0 flex items-start justify-center">
                 <img src={product.images?.[0]} alt={product.name} className="max-w-full max-h-[70vh] object-contain fade-to-black" />
                 {/* <div className="pointer-events-none absolute bottom-0 left-0 h-40 w-full bg-gradient-to-t from-[#121212] via-[#121212]/60 to-transparent" /> */}
             </div>
