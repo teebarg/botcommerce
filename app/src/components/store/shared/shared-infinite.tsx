@@ -1,7 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Grid3X3, Loader } from "lucide-react";
 import { useState } from "react";
-
 import MobileFilterControl from "./mobile-filter-control";
 import ProductCard from "@/components/store/products/product-card";
 import type { Catalog, ProductSearch } from "@/schemas";
@@ -91,9 +90,9 @@ export default function SharedInfinite({ slug, initialCatalog }: Props) {
                     }
                 >
                     <div className={cn("grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4", viewMode === "grid" ? "" : "grid-cols-1")}>
-                        {products?.map((product: ProductSearch, idx: number) => (
-                            <div key={`product-${idx}`}>
-                                <ProductCard product={product} index={idx} />
+                        {products?.map((product: ProductSearch) => (
+                            <div key={`product-${product.id}`}>
+                                <ProductCard product={product} />
                             </div>
                         ))}
                     </div>

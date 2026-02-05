@@ -99,7 +99,7 @@ async def create(review: ReviewCreate, user: CurrentUser, background_tasks: Back
         where={"user_id": user.id, "status": {"in": ["DELIVERED"]}},
         include={"order_items": {"include": {"variant": True}}}
     )
-    has_purchased = any(
+    has_purchased: bool = any(
         any(item.variant.product_id == review.product_id for item in order.order_items)
         for order in user_orders
     )

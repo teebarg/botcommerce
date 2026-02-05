@@ -31,15 +31,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id, productName, paginatedRevi
         );
     }
 
-    return (
-        <ReviewsList
-            data={paginatedReviews!}
-            hasPurchased={hasPurchased}
-            hasReviewed={hasReviewed}
-            productName={productName}
-            product_id={product_id}
-        />
-    );
+    return <ReviewsList data={paginatedReviews!} hasPurchased={hasPurchased} hasReviewed={hasReviewed} product_id={product_id} />;
 };
 
 export default ReviewsSection;

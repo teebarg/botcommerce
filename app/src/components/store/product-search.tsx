@@ -63,7 +63,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                     <span className="sr-only">Search</span>
                 </div>
             </SheetTrigger>
-            <SheetContent side="top" className="h-screen flex px-2.5">
+            <SheetContent aria-describedby={undefined} side="top" className="h-screen flex px-2.5">
                 <SheetHeader className="sr-only">
                     <SheetTitle>Search Products</SheetTitle>
                     <SheetDescription>Search for products, categories, and more</SheetDescription>
@@ -75,7 +75,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                             ref={inputRef}
                             className={cn(
                                 "pl-12 pr-12 py-2.5 bg-transparent border-0 outline-0 w-full",
-                                "text-foreground placeholder:text-muted-foreground",
+                                "text-foreground placeholder:text-muted-foreground"
                             )}
                             placeholder={placeholder}
                             type="text"
@@ -122,8 +122,8 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                                     <div className="p-6">
                                         <h3 className="font-semibold text-sm tracking-wider mb-4">PRODUCTS</h3>
                                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                                            {data?.products?.map((product: ProductSearch, idx: number) => (
-                                                <ProductCard key={product.id} product={product} index={idx} />
+                                            {data?.products?.map((product: ProductSearch) => (
+                                                <ProductCard key={product.id} product={product} />
                                             ))}
                                         </div>
                                     </div>

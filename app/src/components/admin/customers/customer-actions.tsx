@@ -84,7 +84,6 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
                 title={`Delete ${user?.first_name}`}
                 confirmText="Delete"
                 isLoading={isPending}
-                variant="destructive"
             />
         </div>
     );

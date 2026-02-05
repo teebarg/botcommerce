@@ -10,6 +10,7 @@ interface InfiniteScrollProps {
     endMessage?: React.ReactNode;
     threshold?: number;
     className?: string;
+    scrollRef?: React.RefObject<HTMLElement | null>;
 }
 
 export const InfiniteScroll = ({
@@ -19,8 +20,9 @@ export const InfiniteScroll = ({
     isLoading,
     loader = <div className="text-center py-4">Loading...</div>,
     endMessage = null,
-    threshold = 500,
+    threshold = 800,
     className = "",
+    scrollRef,
 }: InfiniteScrollProps) => {
     const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -35,17 +37,18 @@ export const InfiniteScroll = ({
     );
 
     useEffect(() => {
-        const element = observerTarget.current;
-        const option = { threshold: 0, rootMargin: `${threshold}px` };
+        const observer = new IntersectionObserver(handleObserver, {
+            root: scrollRef?.current ?? null,
+            threshold: 0,
+            rootMargin: `${threshold}px`,
+        });
 
-        const observer = new IntersectionObserver(handleObserver, option);
+        if (observerTarget.current) {
+            observer.observe(observerTarget.current);
+        }
 
-        if (element) observer.observe(element);
-
-        return () => {
-            if (element) observer.unobserve(element);
-        };
-    }, [handleObserver, threshold]);
+        return () => observer.disconnect();
+    }, [handleObserver, threshold, scrollRef]);
 
     return (
         <div className={className}>

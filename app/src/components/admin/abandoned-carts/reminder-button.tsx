@@ -1,9 +1,8 @@
 import { Mail } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
-
 import { Button } from "@/components/ui/button";
 import { useSendCartReminder } from "@/hooks/useAbandonedCart";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 
 interface ReminderButtonProps {
     id: number;
@@ -20,37 +19,21 @@ export const ReminderButton = ({ id }: ReminderButtonProps) => {
     };
 
     return (
-        <Dialog open={state.isOpen} onOpenChange={state.setOpen}>
-            <DialogTrigger asChild>
+        <ConfirmDrawer
+            open={state.isOpen}
+            onOpenChange={state.setOpen}
+            trigger={
                 <Button disabled={sendReminderMutation.isPending}>
                     <Mail className="h-4 w-4" />
                     Send Reminder
                 </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader className="sr-only">
-                    <DialogTitle>Send Reminder</DialogTitle>
-                </DialogHeader>
-                <div>
-                    <div className="pb-2 border-b border-input">
-                        <h2 className="text-lg font-semibold leading-6 font-display">Send Reminder</h2>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-4 font-medium">Are you sure you want to send a reminder to this cart?</p>
-                    <div className="flex justify-end gap-2 mt-8">
-                        <Button aria-label="submit" className="min-w-36" variant="destructive" onClick={state.close}>
-                            Close
-                        </Button>
-                        <Button
-                            aria-label="submit"
-                            className="min-w-36"
-                            isLoading={sendReminderMutation.isPending}
-                            onClick={() => handleSendReminder()}
-                        >
-                            Send
-                        </Button>
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
+            }
+            onClose={state.close}
+            onConfirm={handleSendReminder}
+            title="Send Reminder"
+            confirmText="Send"
+            isLoading={sendReminderMutation.isPending}
+            variant="default"
+        />
     );
 };

@@ -64,7 +64,7 @@
     --background-image-gradient-gold: var(--gradient-gold);
     --background-image-gradient-action: var(--gradient-action);
     --background-image-gradient-card: var(--gradient-card);
- 
+
     --shadow-glow: 0 0 40px hsla(340, 82%, 52%, 0.3);
     --shadow-card: 0 8px 32px hsla(0, 0%, 0%, 0.4);
 
@@ -253,7 +253,7 @@
     --contrast-foreground: 20 14.3% 4.1%;
 }
 
-:root[data-theme="default"] {
+:root {
     --background: 0 0% 100%;
     --foreground: 0 0% 9%;
     --card: 0 0% 97%;
@@ -290,7 +290,7 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
-.dark[data-theme="default"] {
+.dark {
     --background: 0 0% 9%;
     --foreground: 0 0% 96%;
     --card: 0 0% 15%;
@@ -327,69 +327,6 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
-/* IBM Blue Theme */
-[data-theme="ibm-blue"] {
-    --background: 210 40% 99%;
-    --foreground: 214 32% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 214 32% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 214 32% 10%;
-    --primary: 214 100% 45%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 214 30% 94%;
-    --secondary-foreground: 214 32% 20%;
-    --muted: 214 20% 95%;
-    --muted-foreground: 214 15% 45%;
-    --accent: 214 90% 92%;
-    --accent-foreground: 214 100% 35%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 214 25% 88%;
-    --input: 214 25% 88%;
-    --ring: 214 100% 45%;
-    --sidebar-background: 214 30% 97%;
-    --sidebar-foreground: 214 32% 20%;
-    --sidebar-primary: 214 100% 45%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 214 90% 92%;
-    --sidebar-accent-foreground: 214 100% 35%;
-    --sidebar-border: 214 25% 88%;
-    --sidebar-ring: 214 100% 45%;
-}
-
-[data-theme="ibm-blue"].dark,
-.dark[data-theme="ibm-blue"] {
-    --background: 214 40% 6%;
-    --foreground: 210 40% 98%;
-    --card: 214 35% 9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 214 35% 9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 214 100% 55%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 214 30% 15%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 214 30% 15%;
-    --muted-foreground: 214 15% 60%;
-    --accent: 214 40% 20%;
-    --accent-foreground: 214 100% 70%;
-    --destructive: 0 62% 50%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 214 30% 18%;
-    --input: 214 30% 18%;
-    --ring: 214 100% 55%;
-    --sidebar-background: 214 35% 9%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 214 100% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 214 40% 20%;
-    --sidebar-accent-foreground: 214 100% 70%;
-    --sidebar-border: 214 30% 18%;
-    --sidebar-ring: 214 100% 55%;
-}
-
-
 @layer base {
     * {
         @apply border-border outline-ring/50;
@@ -401,25 +338,6 @@
 
     body {
         @apply bg-background text-foreground font-sans antialiased;
-    }
-
-    html,
-    body,
-    .border,
-    .bg-card,
-    .bg-background,
-    .bg-primary,
-    .bg-secondary,
-    .bg-muted,
-    .bg-accent,
-    .bg-destructive {
-        transition:
-            background-color var(--tw-transition-duration) ease-in-out,
-            color var(--tw-transition-duration) ease-in-out,
-            border-color var(--tw-transition-duration) ease-in-out,
-            outline-color var(--tw-transition-duration) ease-in-out,
-            fill var(--tw-transition-duration) ease-in-out,
-            box-shadow var(--tw-transition-duration) ease-in-out;
     }
 
     /* Hide scrollbar for immersive experience */

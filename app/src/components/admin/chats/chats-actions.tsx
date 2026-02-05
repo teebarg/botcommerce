@@ -49,7 +49,6 @@ const ChatsActions: React.FC<CustomerActionsProps> = ({ chat }) => {
                 title="Delete"
                 confirmText="Delete"
                 isLoading={isPending}
-                variant="destructive"
             />
         </div>
     );

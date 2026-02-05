@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-
-import { ProductQuery } from "./product-query";
-
 import { Badge } from "@/components/ui/badge";
 import { ProductActions } from "@/components/admin/product/product-actions";
 import type { Collection, PaginatedProductSearch, ProductSearch, ProductVariant } from "@/schemas/product";
@@ -78,8 +75,6 @@ export function ProductDetails() {
     return (
         <div>
             <div className="py-4">
-                <ProductQuery collections={collections} selectedCollections={selectedCollections} />
-
                 {selectedCollections.length > 0 && (
                     <div className="mb-4 flex gap-2 flex-wrap">
                         {selectedCollections.map((id: number, idx: number) => {

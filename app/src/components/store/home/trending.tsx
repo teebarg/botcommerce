@@ -21,8 +21,8 @@ export default function Trending() {
                         </LocalizedClientLink>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
-                        {data?.products?.map((product: ProductSearch, idx: number) => (
-                            <ProductCard product={product} variant="electric" index={idx} />
+                        {data?.products?.map((product: ProductSearch) => (
+                            <ProductCard key={product.id} product={product} variant="electric" />
                         ))}
                     </div>
                 </section>

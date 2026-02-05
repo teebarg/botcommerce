@@ -1,13 +1,11 @@
 import { MessageSquare, Star, Users, Package } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
-
 import { ReviewForm } from "./review-form";
-
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import Overlay from "@/components/overlay";
 import { BtnLink } from "@/components/ui/btnLink";
 import { useLocation, useRouteContext } from "@tanstack/react-router";
+import SheetDrawer from "@/components/sheet-drawer";
 
 interface ProductReviewsZeroStateProps {
     onWriteReview?: () => void;
@@ -18,8 +16,8 @@ interface ProductReviewsZeroStateProps {
 export const ProductReviewsZeroState = ({ productName, product_id }: ProductReviewsZeroStateProps) => {
     const { session } = useRouteContext({ strict: false });
     const state = useOverlayTriggerState({});
-    const location = useLocation()
-    const pathname = location.pathname
+    const location = useLocation();
+    const pathname = location.pathname;
 
     return (
         <Card className="w-full max-w-6xl mx-auto text-center border-dashed border-2">
@@ -74,15 +72,14 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
 
                 {session?.user ? (
                     <div className="space-y-3">
-                        <Overlay
+                        <SheetDrawer
                             open={state.isOpen}
-                            sheetClassName="min-w-120"
-                            title="Write the First Review"
+                            title={`Write a review for ${productName}`}
                             trigger={<Button className="w-full md:w-auto px-8">Write the First Review</Button>}
                             onOpenChange={state.setOpen}
                         >
-                            <ReviewForm productName={productName} product_id={product_id} onClose={state.close} />
-                        </Overlay>
+                            <ReviewForm product_id={product_id} onClose={state.close} />
+                        </SheetDrawer>
 
                         <p className="text-xs text-muted-foreground">Takes less than 2 minutes</p>
                     </div>

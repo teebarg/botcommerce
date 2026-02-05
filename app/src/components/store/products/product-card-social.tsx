@@ -22,16 +22,17 @@ import ShareButton from "@/components/share";
 interface ProductCardProps {
     product: ProductSearch;
     facets?: Facet;
+    scrollRef?: React.RefObject<HTMLElement | null>;
 }
 
-const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
+const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scrollRef }) => {
     const [ref, inView] = useInView({
+        root: scrollRef?.current,
         threshold: 0.6,
-        rootMargin: "0px",
-        triggerOnce: false,
+        triggerOnce: true,
     });
 
-    const editState = useOverlayTriggerState({});
+    const filterState = useOverlayTriggerState({});
     const { priceInfo, outOfStock } = useProductVariant(product);
     const { data } = useUserWishlist();
     const sidebarRef = useRef<FilterSidebarRef>(null);
@@ -81,7 +82,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
                 onClick={(e) => e.stopPropagation()}
             >
                 <Overlay
-                    open={editState.isOpen}
+                    open={filterState.isOpen}
                     title={
                         <div className="flex items-center justify-between w-full">
                             <h2 className="font-semibold">FILTER & SORT</h2>
@@ -95,12 +96,12 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
                             <span className="text-xs font-bold">Filter</span>
                         </button>
                     }
-                    onOpenChange={editState.setOpen}
+                    onOpenChange={filterState.setOpen}
                     side="left"
                 >
                     <div className="flex-1 flex flex-col overflow-hidden">
                         <ScrollArea className="flex-1 px-6">
-                            <FilterSidebarLogic ref={sidebarRef} facets={facets} onClose={editState.close} />
+                            <FilterSidebarLogic ref={sidebarRef} facets={facets} onClose={filterState.close} />
                         </ScrollArea>
                         <div className="flex justify-center gap-2 p-4 border-t border-border">
                             <Button className="w-full rounded-full py-6" onClick={() => sidebarRef.current?.apply()}>
@@ -135,8 +136,8 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets }) => {
                 transition={{ delay: 0.1, duration: 0.4 }}
                 className="absolute bottom-0 left-0 right-0 p-4 pb-6"
             >
-                {product?.variants?.map((item: ProductVariant, idx: number) => (
-                    <div key={idx} className={item.size ? "" : "hidden"}>
+                {product?.variants?.map((item: ProductVariant) => (
+                    <div key={item.id} className={item.size ? "" : "hidden"}>
                         <div className="w-12 h-12 rounded-full bg-linear-to-br from-primary to-accent flex flex-col items-center justify-center mb-3 text-white font-bold">
                             <span className="text-lg leading-none">{item.size}</span>
                             <span className="text-xs leading-none">UK</span>

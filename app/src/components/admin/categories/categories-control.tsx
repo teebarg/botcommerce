@@ -83,7 +83,6 @@ const CategoryAction: React.FC<Props> = ({ category, index, categoriesLength, on
                 title={`Delete ${category.name}`}
                 confirmText="Delete"
                 isLoading={deleteMutation.isPending}
-                variant="destructive"
             />
         </div>
     );

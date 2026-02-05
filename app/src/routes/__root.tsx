@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-import { HeadContent, Outlet, ScriptOnce, Scripts, createRootRouteWithContext, redirect } from "@tanstack/react-router";
+import { HeadContent, Outlet, Scripts, createRootRouteWithContext, redirect } from "@tanstack/react-router";
 import { Toaster } from "sonner";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { PushNotificationManager } from "@/components/pwa/notification-manager";
@@ -109,7 +109,6 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-    const loaderData = Route.useLoaderData();
     useEffect(() => {
         initPulseMetrics();
     }, []);
@@ -117,14 +116,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <html suppressHydrationWarning>
             <head>
                 <HeadContent />
-                <ScriptOnce
-                    children={`
-                        (function() {
-                            const siteConfig = ${JSON.stringify(loaderData?.config || {})};
-                            document.documentElement.setAttribute('data-theme', siteConfig.theme || 'default');
-                        })();
-                    `}
-                />
                 <link rel="manifest" href="/manifest.webmanifest" />
                 <meta name="theme-color" content="#0f172a" />
                 <meta name="mobile-web-app-capable" content="yes" />

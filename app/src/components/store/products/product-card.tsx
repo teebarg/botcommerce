@@ -9,27 +9,20 @@ import { cn } from "@/utils";
 import MediaDisplay from "@/components/media-display";
 import { useMemo } from "react";
 import { IsNew } from "@/components/products/product-badges";
-import { motion } from "framer-motion";
 import { useNavigate } from "@tanstack/react-router";
 
 interface ProductCardProps {
     product: ProductSearch;
     variant?: "sale" | "electric";
-    index?: number;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale", index = 0 }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale" }) => {
     const navigate = useNavigate();
     const { priceInfo, outOfStock } = useProductVariant(product);
     const isNew = useMemo(() => !!product?.is_new, [product]);
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05, duration: 0.3 }}
-            viewport={{ once: true }}
-            whileTap={{ scale: 0.98 }}
+        <div
             onClick={() => navigate({ to: `/products/${product.slug}` })}
             className="h-full shrink-0 cursor-pointer group relative bg-card flex flex-col rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover"
         >
@@ -77,7 +70,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale", in
                 </div>
                 <ProductActions product={product} />
             </div>
-        </motion.div>
+        </div>
     );
 };
 

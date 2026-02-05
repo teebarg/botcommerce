@@ -55,7 +55,6 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
                 title="Delete"
                 confirmText="Delete"
                 isLoading={deletePending}
-                variant="destructive"
             />
             {review.verified ? (
                 <Button

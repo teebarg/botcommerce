@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_mainLayout/")({
         const data = await queryClient.ensureQueryData(categoriesProductsQueryOptions());
         return {
             data,
-            heroImage: image
+            heroImage: image,
         };
     },
 });

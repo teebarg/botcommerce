@@ -22,16 +22,17 @@ interface Props {
 
 export default function SocialInfiniteScrollClient({ initialData, collection_slug, searchTerm }: Props) {
     const sidebarRef = useRef<FilterSidebarRef>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
     const search = useSearch({
         strict: false,
     });
-    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useProductFeed(initialData, {
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, ...rest } = useProductFeed(initialData, {
         ...search,
         show_facets: true,
         collections: collection_slug,
         search: searchTerm,
     });
-
+    
     if (isLoading) {
         return <CollectionTemplateSkeleton />;
     }
@@ -67,10 +68,10 @@ export default function SocialInfiniteScrollClient({ initialData, collection_slu
                             </Button>
                         </div>
                     </aside>
-                    <div className="w-full flex-1 flex-col relative">
+                    <div className="flex-1 relative">
                         <SaleBanner />
                         <CollectionHeader />
-                        <main className="w-full px-1 rounded-xl py-4 min-h-[50vh]">
+                        <main className="w-full px-1 rounded-xl py-4">
                             {!isLoading && !hasProducts && <NoProductsFound />}
                             {!isLoading && hasProducts && (
                                 <InfiniteScroll
@@ -83,6 +84,7 @@ export default function SocialInfiniteScrollClient({ initialData, collection_slu
                                             <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
                                         </div>
                                     }
+                                    scrollRef={scrollRef}
                                 >
                                     <ProductCardListings className="w-full pb-4" products={products!} />
                                 </InfiniteScroll>
@@ -96,6 +98,7 @@ export default function SocialInfiniteScrollClient({ initialData, collection_slu
                 {!isLoading && !hasProducts && <NoProductsFound />}
                 {!isLoading && hasProducts && (
                     <InfiniteScroll
+                        scrollRef={scrollRef}
                         onLoadMore={fetchNextPage}
                         hasMore={!!hasNextPage}
                         isLoading={isFetchingNextPage}
@@ -107,8 +110,8 @@ export default function SocialInfiniteScrollClient({ initialData, collection_slu
                         }
                         className="h-[calc(100dvh-64px-88px)]! w-full overflow-y-scroll snap-y snap-mandatory hide-scrollbar"
                     >
-                        {products.map((product: ProductSearch, idx: number) => (
-                            <ProductCardSocial key={idx} product={product} facets={facets} />
+                        {products.map((product: ProductSearch) => (
+                            <ProductCardSocial key={product.id} product={product} facets={facets} scrollRef={scrollRef} />
                         ))}
                     </InfiniteScroll>
                 )}

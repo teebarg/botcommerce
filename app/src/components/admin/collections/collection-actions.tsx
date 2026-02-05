@@ -50,7 +50,6 @@ const CollectionActions: React.FC<Props> = ({ collection }) => {
                 title={`Delete ${collection.name}`}
                 confirmText="Delete"
                 isLoading={deleteCollection.isPending}
-                variant="destructive"
             />
         </div>
     );

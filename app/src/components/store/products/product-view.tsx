@@ -120,7 +120,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                 >
                     <img
                         key={currentImageIndex}
-                        src={product.images?.[currentImageIndex]?.image}
+                        src={product.images?.[currentImageIndex]?.image || "/placeholder.jpg"}
                         alt={product.name}
                         className={`w-full h-full object-cover ${outOfStock ? "opacity-60 grayscale" : ""}`}
                     />
@@ -165,7 +165,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.15 }}
-                    className="py-6 space-y-5 md:py-0"
+                    className="py-6 px-2 space-y-5 md:py-0"
                 >
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">

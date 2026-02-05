@@ -47,7 +47,7 @@ const UpdateReviewForm: React.FC<Props> = ({ onClose, review }) => {
     return (
         <Form {...form}>
             <form className="flex-1 flex flex-col overflow-hidden" onSubmit={form.handleSubmit(onSubmit)}>
-                <div className="flex-1 overflow-y-auto px-2 space-y-4">
+                <div className="flex-1 overflow-y-auto px-2 pb-4 space-y-4">
                     <FormField
                         control={form.control}
                         name="rating"

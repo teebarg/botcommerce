@@ -21,7 +21,7 @@ const MenuComp: React.FC = () => {
             <DrawerTrigger className="md:hidden">
                 <MenuIcon className="h-8 w-8" />
             </DrawerTrigger>
-            <DrawerContent className="h-[calc(100vh-4rem)]">
+            <DrawerContent aria-describedby={undefined} className="h-[calc(100vh-4rem)]">
                 <DrawerHeader className="pb-0!">
                     <DrawerTitle>
                         <div className="flex items-center space-x-3 bg-primary -mx-4 -mt-4 p-4 overflow-hidden rounded-t-lg">

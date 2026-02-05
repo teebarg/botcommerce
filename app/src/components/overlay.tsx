@@ -26,7 +26,7 @@ const Overlay: React.FC<OverlayProps> = ({
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetTrigger asChild>{trigger}</SheetTrigger>
-            <SheetContent side={side} className={cn("w-full sm:max-w-lg px-0 py-2 flex flex-col", sheetClassName)}>
+            <SheetContent aria-describedby={undefined} side={side} className={cn("w-full sm:max-w-lg px-0 py-2 flex flex-col", sheetClassName)}>
                 {showHeader && (
                     <SheetHeader className="px-4 mt-1">
                         <SheetTitle className="flex items-center gap-3 text-xl">{title}</SheetTitle>

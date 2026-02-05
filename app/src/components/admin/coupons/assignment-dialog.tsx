@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Loader2, Users, X } from "lucide-react";
 import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
-
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -112,7 +111,7 @@ export const AssignmentDialog = ({ couponId, couponCode, assignedUsers }: Assign
                     Manage Users
                 </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto">
+            <DialogContent aria-describedby={undefined} className="max-w-2xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle className="text-lg md:text-xl">Manage Users for {couponCode}</DialogTitle>
                     <DialogDescription className="text-sm">Assign or remove users who can use this coupon</DialogDescription>

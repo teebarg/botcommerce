@@ -54,7 +54,6 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
 
     return (
         <div className="relative overflow-hidden rounded-lg">
-            {/* Delete Background (visible when swiping) */}
             <div
                 className="absolute inset-0 bg-destructive flex items-center justify-end px-6 rounded-lg transition-opacity"
                 style={{ opacity: deleteOpacity }}
@@ -101,7 +100,6 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
                                     onConfirm={() => onDelete(coupon.id, coupon.code)}
                                     title="Delete"
                                     confirmText="Delete"
-                                    variant="destructive"
                                 />
                             </div>
                         </div>

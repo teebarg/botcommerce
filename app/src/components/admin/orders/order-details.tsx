@@ -94,7 +94,6 @@ const OrderItemCard: React.FC<{ orderItem: OrderItem; orderId: number }> = ({ or
                 title={`Return ${orderItem.name}`}
                 confirmText="Return"
                 isLoading={isPending}
-                variant="destructive"
             />
         </div>
     );

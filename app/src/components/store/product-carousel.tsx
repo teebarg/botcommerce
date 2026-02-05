@@ -129,7 +129,7 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, isLoading 
                             data-card
                             className="group/card relative shrink-0 basis-[50%] snap-start snap-always sm:basis-[22%] min-w-[280px]"
                         >
-                            <ProductCard product={product} variant={variant} index={idx} />
+                            <ProductCard product={product} variant={variant} />
                         </li>
                     ))}
                 </ul>

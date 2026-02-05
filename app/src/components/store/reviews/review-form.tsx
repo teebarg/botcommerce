@@ -2,9 +2,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Star } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
@@ -21,11 +19,10 @@ type ReviewFormValues = z.infer<typeof reviewSchema>;
 
 interface ReviewFormProps {
     onClose: () => void;
-    productName: string;
     product_id: number;
 }
 
-export const ReviewForm = ({ onClose, productName, product_id }: ReviewFormProps) => {
+export const ReviewForm = ({ onClose, product_id }: ReviewFormProps) => {
     const addReview = useCreateReview();
     const form = useForm<ReviewFormValues>({
         resolver: zodResolver(reviewSchema),
@@ -50,12 +47,9 @@ export const ReviewForm = ({ onClose, productName, product_id }: ReviewFormProps
     };
 
     return (
-        <Card className="w-full max-w-2xl mx-auto p-6 h-full">
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-foreground">Write a Review for {productName}</h2>
-            </div>
-            <Form {...form}>
-                <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        <Form {...form}>
+            <form className="flex-1 flex flex-col overflow-hidden" onSubmit={handleSubmit(onSubmit)}>
+                <div className="flex-1 overflow-auto px-4 pb-4 space-y-4">
                     <FormField
                         control={form.control}
                         name="rating"
@@ -143,17 +137,16 @@ export const ReviewForm = ({ onClose, productName, product_id }: ReviewFormProps
                             </FormItem>
                         )}
                     />
-
-                    <div className="flex gap-3 pt-4">
-                        <Button className="flex-1" type="button" variant="outline" onClick={onClose}>
-                            Cancel
-                        </Button>
-                        <Button className="flex-1" disabled={!formState.isValid || addReview.isPending} isLoading={addReview.isPending} type="submit">
-                            Submit Review
-                        </Button>
-                    </div>
-                </form>
-            </Form>
-        </Card>
+                </div>
+                <div className="sheet-footer">
+                    <Button className="flex-1" type="button" variant="outline" onClick={onClose}>
+                        Cancel
+                    </Button>
+                    <Button className="flex-1" disabled={!formState.isValid || addReview.isPending} isLoading={addReview.isPending} type="submit">
+                        Submit Review
+                    </Button>
+                </div>
+            </form>
+        </Form>
     );
 };

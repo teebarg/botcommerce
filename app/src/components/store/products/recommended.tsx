@@ -25,7 +25,7 @@ export default function RecommendedProducts({ exclude = [] }: RecommendedProduct
         <ul className="grid grid-cols-1 md:grid-cols-4 gap-x-2 md:gap-x-4 gap-y-8">
             {data?.recommended?.map((product: ProductSearch, idx: number) => (
                 <li key={idx}>
-                    <ProductCard product={product} index={idx} />
+                    <ProductCard product={product} />
                 </li>
             ))}
         </ul>

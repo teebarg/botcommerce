@@ -103,7 +103,6 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
                             title="Delete"
                             confirmText="Delete"
                             isLoading={isPending}
-                            variant="destructive"
                         />
                     </div>
                 </div>
