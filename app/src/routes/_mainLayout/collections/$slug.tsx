@@ -61,7 +61,7 @@ function RouteComponent() {
     const { data } = useSuspenseQuery(productFeedOptions({ collections: slug, ...search }));
 
     return (
-        <div className="max-w-9xl mx-auto w-full py-4 px-2">
+        <div className="max-w-8xl mx-auto w-full py-4 px-2">
             <SocialInfiniteScrollClient initialData={data} collection_slug={slug!} />
         </div>
     );

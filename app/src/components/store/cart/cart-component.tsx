@@ -1,6 +1,5 @@
 import { useOverlayTriggerState } from "react-stately";
 import type React from "react";
-
 import type { CartItem } from "@/schemas";
 import CartDetails from "@/components/store/cart/cart-details";
 import { Button } from "@/components/ui/button";
@@ -21,7 +20,7 @@ const CartComponent: React.FC = () => {
     return (
         <Overlay
             open={state.isOpen}
-            showHeader={true}
+            onOpenChange={state.setOpen}
             title={
                 <>
                     <ShoppingBag className="w-6 h-6 text-primary" /> {`Your Cart (${totalItems})`}
@@ -35,7 +34,6 @@ const CartComponent: React.FC = () => {
                     </span>
                 </Button>
             }
-            onOpenChange={state.setOpen}
         >
             <CartDetails cart={cart!} shippingFee={cart?.shipping_fee} onClose={state.close} />
         </Overlay>

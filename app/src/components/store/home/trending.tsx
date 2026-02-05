@@ -8,7 +8,7 @@ export default function Trending() {
     const { data } = useProductSearch({ collections: "trending", limit: 6 });
 
     return (
-        <div className="max-w-[1400px] mx-auto">
+        <div className="max-w-8xl mx-auto">
             {data?.products?.length && data?.products?.length > 0 && (
                 <section className="py-8 px-2">
                     <div className="flex items-center justify-between mb-4">

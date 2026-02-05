@@ -7,7 +7,7 @@ export default function NewArrivals() {
     const { data, isLoading } = useProductSearch({ collections: "new-arrivals", limit: 10 });
 
     return (
-        <div className="max-w-[1400px] mx-auto py-8 px-2">
+        <div className="max-w-8xl mx-auto py-8 px-2">
             <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg md:text-xl font-bold text-foreground">New Arrivals</h2>
                 <LocalizedClientLink className="font-bold text-sm" href="/collections/new-arrivals">

@@ -7,7 +7,7 @@ import { Link } from "@tanstack/react-router";
 
 export default function CategoriesWithProductsSection({ categoriesWithProducts }: { categoriesWithProducts: CategoriesWithProducts[] }) {
     return (
-        <section className="max-w-[1400px] mx-auto px-4 py-6 space-y-8">
+        <section className="max-w-8xl mx-auto px-4 py-6 space-y-8">
             <div>
                 <h2 className="font-display text-xl font-semibold">Shop by Category</h2>
                 <p className="text-xs text-muted-foreground mt-0.5">Explore our collections</p>

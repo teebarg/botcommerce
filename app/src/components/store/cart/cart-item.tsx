@@ -14,7 +14,7 @@ const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
 
             <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-start mb-1">
-                    <h3 className="font-semibold line-clamp-2 leading-tight text-md">{item.name}</h3>
+                    <h3 className="font-semibold line-clamp-1 leading-tight text-md">{item.name}</h3>
                 </div>
 
                 {item.variant && (item.variant.size || item.variant.color || item.variant.measurement || item.variant.age) && (

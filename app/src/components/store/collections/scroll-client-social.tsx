@@ -42,7 +42,7 @@ export default function SocialInfiniteScrollClient({ initialData, collection_slu
 
     return (
         <div>
-            <div className="hidden md:block max-w-9xl mx-auto w-full py-4 px-2">
+            <div className="hidden md:block max-w-8xl mx-auto w-full py-4 px-2">
                 <div className="flex gap-6">
                     <aside className="h-[calc(100vh-6rem)] w-96 flex flex-col overflow-hidden sticky top-24">
                         <div className="flex items-center justify-between w-full">

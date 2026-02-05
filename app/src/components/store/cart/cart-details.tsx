@@ -6,7 +6,6 @@ import type { Cart } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { currency } from "@/utils";
 import { Separator } from "@/components/ui/separator";
-import { motion } from "framer-motion";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Props {
@@ -20,13 +19,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
     const routerState = useRouterState();
     const path = routerState.location.pathname;
     return (
-        <motion.div
-            key="cart"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="flex-1 flex flex-col overflow-hidden"
-        >
+        <div className="flex-1 flex flex-col overflow-hidden">
             {cart?.items && cart?.items?.length > 0 && (
                 <p className="bg-card text-card-foreground p-2 rounded flex gap-2 mx-4 mt-4" data-testid="urgentMessage-read">
                     <Info />
@@ -51,19 +44,12 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
                     <ScrollArea className="flex-1 px-6">
                         <div className="space-y-4 py-4">
                             {cart?.items?.map((item, index) => (
-                                <motion.div
-                                    key={`${item.id}-${index}`}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: index * 0.05 }}
-                                    className="flex gap-4 p-3 rounded-2xl bg-secondary/50"
-                                >
+                                <div className="p-3 rounded-2xl bg-secondary/50">
                                     <CartItemComponent key={index} item={item} />
-                                </motion.div>
+                                </div>
                             ))}
                         </div>
                     </ScrollArea>
-
                     {cart?.items && cart?.items?.length > 0 && (
                         <div className="px-6 pt-4 border-t border-border space-y-4">
                             <div className="flex justify-between text-sm">
@@ -80,14 +66,13 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
                                 <span>{currency(cart?.total || 0)}</span>
                             </div>
                             {path !== "/checkout" && (
-                                <motion.button
-                                    whileTap={{ scale: 0.98 }}
+                                <Button
                                     onClick={() => router.navigate({ to: "/checkout" })}
-                                    className="w-full h-14 rounded-2xl gradient-primary text-white font-semibold flex items-center justify-center gap-2 shadow-background/30 shadow-xl"
+                                    className="w-full h-14 rounded-2xl gradient-primary text-white font-semibold gap-2 shadow-background/30 shadow-xl"
                                 >
                                     Proceed to Checkout
                                     <ArrowRight className="w-5 h-5" />
-                                </motion.button>
+                                </Button>
                             )}
                             <button className="w-full text-primary py-2 text-sm hover:underline" onClick={onClose}>
                                 Continue Shopping
@@ -96,7 +81,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
                     )}
                 </>
             )}
-        </motion.div>
+        </div>
     );
 };
 

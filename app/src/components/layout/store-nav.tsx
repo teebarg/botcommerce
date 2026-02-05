@@ -14,7 +14,7 @@ const StoreNavbar = ({ session }: { session: Session | null }) => {
 
     return (
         <NavigationBar className="bg-background py-2 hidden md:block sticky top-0 z-50">
-            <NavbarContent className="flex flex-1 max-w-9xl mx-auto">
+            <NavbarContent className="flex flex-1 max-w-8xl mx-auto">
                 <NavbarBrand className="flex items-center font-semibold">
                     <LocalizedClientLink href="/" className="flex items-center gap-2">
                         <div className="w-9 h-9 rounded-lg gradient-primary flex items-center justify-center">
