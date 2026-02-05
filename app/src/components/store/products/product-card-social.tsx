@@ -8,7 +8,6 @@ import type { Facet, ProductSearch, ProductVariant } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import { useMemo, useRef } from "react";
 import { IsNew } from "@/components/products/product-badges";
-import { motion } from "framer-motion";
 import { Filter, Heart, Music } from "lucide-react";
 import Overlay from "@/components/overlay";
 import { useOverlayTriggerState } from "react-stately";
@@ -53,6 +52,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
 
     return (
         <div ref={ref} className="relative h-[calc(100dvh-64px-88px)]! w-full snap-start snap-always bg-[#121212]">
+            <div className="absolute inset-0 bg-[#121212]" />
             <div className="absolute top-0 left-0 right-0 flex items-start justify-center">
                 <img src={product.images?.[0]} alt={product.name} className="max-w-full max-h-[70vh] object-contain fade-to-black" />
                 {/* <div className="pointer-events-none absolute bottom-0 left-0 h-40 w-full bg-gradient-to-t from-[#121212] via-[#121212]/60 to-transparent" /> */}
@@ -74,11 +74,9 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
                 </div>
             )}
 
-            <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
-                transition={{ delay: 0.3, duration: 0.4 }}
-                className="absolute right-4 bottom-32 flex flex-col gap-4"
+            <div
+                data-visible={inView}
+                className="absolute data-[visible=true]:animate-fade-right right-4 bottom-32 flex flex-col gap-4"
                 onClick={(e) => e.stopPropagation()}
             >
                 <Overlay
@@ -128,13 +126,11 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
                     <span className={`text-xs font-bold ${inWishlist ? "text-destructive" : "text-white/80"}`}>Wishlist</span>
                 </button>
                 <ShareButton />
-            </motion.div>
+            </div>
 
-            <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-                transition={{ delay: 0.1, duration: 0.4 }}
-                className="absolute bottom-0 left-0 right-0 p-4 pb-6"
+            <div
+                data-visible={inView}
+                className="data-[visible=true]:animate-fade-in absolute bottom-0 left-0 right-0 p-4 pb-6 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
             >
                 {product?.variants?.map((item: ProductVariant) => (
                     <div key={item.id} className={item.size ? "" : "hidden"}>
@@ -152,17 +148,13 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
                 <ProductActions product={product} actionColor="bg-gradient-action" />
                 <div className="flex items-center gap-2 mt-4">
                     <Music className="w-3 h-3 text-muted-foreground" />
-                    <div className="flex-1 h-4 overflow-hidden">
-                        <motion.p
-                            animate={{ x: [0, -200] }}
-                            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                            className="text-xs text-muted-foreground whitespace-nowrap"
-                        >
+                    <div className="flex-1 h-4 overflow-hidden relative">
+                        <div className="whitespace-nowrap animate-marquee text-xs text-white/70">
                             🎵 Trending Styles • Shop the look • Limited Edition Drop
-                        </motion.p>
+                        </div>
                     </div>
                 </div>
-            </motion.div>
+            </div>
         </div>
     );
 };
