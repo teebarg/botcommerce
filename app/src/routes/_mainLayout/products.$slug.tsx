@@ -60,7 +60,7 @@ export const Route = createFileRoute("/_mainLayout/products/$slug")({
     },
     notFoundComponent: () => {
         return (
-            <div className="min-h-[50vh] flex items-center justify-center">
+            <div className="flex-1">
                 <div className="max-w-2xl mx-auto text-center px-4">
                     <TriangleAlert className="w-20 h-20 mx-auto text-destructive mb-8" />
                     <h1 className="text-4xl font-bold mb-4">Product Not Found</h1>
@@ -95,29 +95,29 @@ function RouteComponent() {
 
     return (
         <main className="flex flex-col">
-                <ProductView product={product} />
+            <ProductView product={product} />
 
-                <section className="related-products">
-                    <Suspense fallback={<div>Loading related products...</div>}>
-                        <SuspenseQuery queryOptions={relatedProductsQueryOptions(product.id, 4)}>
-                            {(related: { similar: ProductSearch[] }) => (
-                                <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4 w-full">
-                                    <RelatedProducts similar={related.similar} productId={product.id} />
-                                </div>
-                            )}
-                        </SuspenseQuery>
-                    </Suspense>
-                </section>
+            <section className="related-products">
+                <Suspense fallback={<div>Loading related products...</div>}>
+                    <SuspenseQuery queryOptions={relatedProductsQueryOptions(product.id, 4)}>
+                        {(related: { similar: ProductSearch[] }) => (
+                            <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4 w-full">
+                                <RelatedProducts similar={related.similar} productId={product.id} />
+                            </div>
+                        )}
+                    </SuspenseQuery>
+                </Suspense>
+            </section>
 
-                <section className="reviews">
-                    <Suspense fallback={<div className="text-center p-4">Loading reviews...</div>}>
-                        <SuspenseQuery queryOptions={reviewsQueryOptions(product.id)}>
-                            {(reviews: PaginatedReview) => (
-                                <ReviewsSection productName={product?.name} product_id={product?.id} paginatedReviews={reviews} />
-                            )}
-                        </SuspenseQuery>
-                    </Suspense>
-                </section>
+            <section className="reviews">
+                <Suspense fallback={<div className="text-center p-4">Loading reviews...</div>}>
+                    <SuspenseQuery queryOptions={reviewsQueryOptions(product.id)}>
+                        {(reviews: PaginatedReview) => (
+                            <ReviewsSection productName={product?.name} product_id={product?.id} paginatedReviews={reviews} />
+                        )}
+                    </SuspenseQuery>
+                </Suspense>
+            </section>
         </main>
     );
 }

@@ -95,8 +95,13 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
             )}
 
             <div
-                data-visible={inView}
-                className="absolute data-[visible=true]:animate-fade-right right-4 bottom-32 flex flex-col gap-4"
+                className="absolute right-4 bottom-32 space-y-4 z-20"
+                style={{
+                    opacity: inView && imageLoaded ? 1 : 0,
+                    transform: inView && imageLoaded ? "translateX(0)" : "translateX(20px)",
+                    transition: "opacity 0.4s ease 0.3s, transform 0.4s ease 0.3s",
+                    willChange: "opacity, transform",
+                }}
                 onClick={(e) => e.stopPropagation()}
             >
                 <Overlay

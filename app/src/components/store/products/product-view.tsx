@@ -21,7 +21,8 @@ interface Props {
 }
 
 const ProductView: React.FC<Props> = ({ product }) => {
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [imageLoaded, setImageLoaded] = useState<boolean>(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
     const { outOfStock } = useProductVariant(product);
     const isMobile = useIsMobile();
     const isNew = useMemo(() => !!product?.is_new, [product]);
@@ -122,7 +123,11 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         key={currentImageIndex}
                         src={product.images?.[currentImageIndex]?.image || "/placeholder.jpg"}
                         alt={product.name}
-                        className={`w-full h-full object-cover ${outOfStock ? "opacity-60 grayscale" : ""}`}
+                        data-loaded={imageLoaded}
+                        decoding="async"
+                        loading="lazy"
+                        onLoad={() => setImageLoaded(true)}
+                        className={`w-full h-full object-cover transition-opacity duration-300 opacity-0 data-[loaded=true]:opacity-100 ${outOfStock ? "opacity-60 grayscale" : ""}`}
                     />
 
                     <div className="absolute top-4 left-4 flex flex-col gap-2 md:top-6 md:left-6">
