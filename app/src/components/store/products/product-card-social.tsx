@@ -6,7 +6,7 @@ import { DiscountBadge } from "@/components/store/products/discount-badge";
 import { useUserCreateWishlist, useUserDeleteWishlist, useUserWishlist } from "@/hooks/useUser";
 import type { Facet, ProductSearch, ProductVariant } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { IsNew } from "@/components/products/product-badges";
 import { Filter, Heart, Music } from "lucide-react";
 import Overlay from "@/components/overlay";
@@ -30,7 +30,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
         threshold: 0.6,
         triggerOnce: true,
     });
-
+    const [imageLoaded, setImageLoaded] = useState<boolean>(false);
     const filterState = useOverlayTriggerState({});
     const { priceInfo, outOfStock } = useProductVariant(product);
     const { data } = useUserWishlist();
@@ -54,18 +54,28 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
         <div ref={ref} className="relative h-[calc(100dvh-64px-88px)]! w-full snap-start snap-always bg-[#121212]">
             <div className="absolute inset-0 bg-[#121212]" />
             <div className="absolute top-0 left-0 right-0 flex items-start justify-center">
+                {!imageLoaded && (
+                    <div className="absolute inset-0 flex items-start justify-center">
+                        <div
+                            className="max-w-full max-h-[70vh] w-full aspect-square bg-gradient-to-br from-zinc-800 to-zinc-900 animate-pulse"
+                            style={{ maxHeight: "70vh" }}
+                        />
+                    </div>
+                )}
+
                 <img
                     src={product.images?.[0]}
                     alt={product.name}
-                    className="max-w-full max-h-[70vh] object-contain fade-to-black"
+                    className="max-w-full max-h-[70vh] object-contain fade-to-black transition-opacity duration-300 opacity-0 data-[loaded=true]:opacity-100"
                     loading="lazy"
+                    data-loaded={imageLoaded}
                     decoding="async"
+                    onLoad={() => setImageLoaded(true)}
                     style={{
                         contentVisibility: "auto",
-                        willChange: "transform",
+                        willChange: "opacity",
                     }}
                 />
-                {/* <div className="pointer-events-none absolute bottom-0 left-0 h-40 w-full bg-gradient-to-t from-[#121212] via-[#121212]/60 to-transparent" /> */}
             </div>
 
             <DiscountBadge
