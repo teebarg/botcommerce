@@ -1,9 +1,17 @@
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import ProductCard from "@/components/store/products/product-card";
 import type { ProductSearch } from "@/schemas";
-import ComponentLoader from "@/components/component-loader";
+import ProductCard from "./products/product-card";
+
+interface ProductSectionProps {
+    title: string;
+    subtitle?: string;
+    products: ProductSearch[];
+    showGradient?: boolean;
+    href?: string;
+}
 
 interface ScrollState {
     atStart: boolean;
@@ -11,14 +19,7 @@ interface ScrollState {
     activeIndex: number;
 }
 
-interface IconCollectionsProps {
-    products: ProductSearch[];
-    isLoading?: boolean;
-    variant?: "sale" | "electric";
-}
-
-const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, isLoading = false, variant = "sale" }) => {
-    const headingId = useId();
+const ProductSection = ({ title, subtitle, products, href, showGradient = false }: ProductSectionProps) => {
     const listRef = useRef<HTMLUListElement>(null);
     const [scrollState, setScrollState] = useState<ScrollState>({
         atStart: true,
@@ -101,13 +102,13 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, isLoading 
     );
 
     return (
-        <section aria-labelledby={headingId} aria-live="polite" className="relative">
+        <section className="relative py-6 max-w-8xl mx-auto">
             <Button
                 aria-label="Scroll backward"
                 className="carousel-nav-link absolute top-1/2 -translate-y-1/2 z-10 h-12 w-12 -left-6 hidden md:flex"
                 size="icon"
                 onClick={() => scrollToIndex(scrollState.activeIndex - 1)}
-                disabled={scrollState.activeIndex <= 0}
+                disabled={scrollState.atStart}
             >
                 <ChevronLeft className="h-5 w-5" strokeWidth={2} />
             </Button>
@@ -116,26 +117,32 @@ const ProductsCarousel: React.FC<IconCollectionsProps> = ({ products, isLoading 
                 className="carousel-nav-link absolute top-1/2 -translate-y-1/2 z-10 h-12 w-12 -right-6 hidden md:flex"
                 size="icon"
                 onClick={() => scrollToIndex(scrollState.activeIndex + 1)}
-                disabled={scrollState.activeIndex >= products.length - 1}
+                disabled={scrollState.atEnd}
             >
                 <ChevronRight className="h-5 w-5" strokeWidth={2} />
             </Button>
-            <div className="relative pb-4 pt-2 overflow-hidden">
-                {isLoading && <ComponentLoader className="h-[400px]" />}
-                <ul ref={listRef} aria-label="Products" className="m-0 flex list-none snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth">
-                    {products?.map((product: ProductSearch, idx: number) => (
-                        <li
-                            key={idx}
-                            data-card
-                            className="group/card relative shrink-0 basis-[50%] snap-start snap-always sm:basis-[22%] min-w-[280px]"
-                        >
-                            <ProductCard product={product} variant={variant} />
-                        </li>
-                    ))}
-                </ul>
+            <div className="px-4 mb-4">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h2 className={`font-display text-xl font-semibold ${showGradient ? "text-gradient" : ""}`}>{title}</h2>
+                        {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
+                    </div>
+                    <Link to={href} className="flex items-center gap-1 text-sm text-primary font-medium">
+                        See All
+                        <ChevronRight className="w-4 h-4" />
+                    </Link>
+                </div>
             </div>
+
+            <ul ref={listRef} className="flex gap-4 overflow-x-auto hide-scrollbar px-2 md:px-0 pb-2">
+                {products.map((product) => (
+                    <li key={product.id} data-card>
+                        <ProductCard product={product} />
+                    </li>
+                ))}
+            </ul>
         </section>
     );
 };
 
-export default ProductsCarousel;
+export default ProductSection;

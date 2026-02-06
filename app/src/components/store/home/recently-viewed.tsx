@@ -1,6 +1,6 @@
 import { useUserRecentlyViewed } from "@/hooks/useUser";
-import ProductsCarousel from "@/components/store/product-carousel";
 import { useRouteContext } from "@tanstack/react-router";
+import ProductSection from "../product-section";
 
 interface RecentlyViewedSectionProps {
     limit?: number;
@@ -11,10 +11,5 @@ export default function RecentlyViewedSection({ limit = 5 }: RecentlyViewedSecti
     const { data, isLoading } = useUserRecentlyViewed(limit, Boolean(session?.user));
 
     if (!data || data.length === 0 || isLoading) return null;
-
-    return (
-        <div className="py-8 px-2 bg-linear-to-b from-card/30 to-background">
-            <ProductsCarousel products={data || []} />
-        </div>
-    );
+    return <ProductSection title="Featured" products={data || []} href="/collections/featured" showGradient />;
 }

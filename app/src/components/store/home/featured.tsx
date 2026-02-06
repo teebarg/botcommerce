@@ -1,19 +1,9 @@
-import LocalizedClientLink from "@/components/ui/link";
 import { useProductSearch } from "@/hooks/useProduct";
-import ProductsCarousel from "@/components/store/product-carousel";
+import ProductSection from "../product-section";
 
 export default function Featured() {
     const { data, isLoading } = useProductSearch({ collections: "featured", limit: 10 });
 
-    return (
-        <div className="max-w-8xl mx-auto py-8 px-2">
-            <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg md:text-xl font-bold text-foreground">Featured</h2>
-                <LocalizedClientLink className="font-bold" href="/collections/featured">
-                    View more
-                </LocalizedClientLink>
-            </div>
-            <ProductsCarousel isLoading={isLoading} products={data?.products || []} />
-        </div>
-    );
+    if (!data || data?.products?.length === 0 || isLoading) return null;
+    return <ProductSection title="Featured" products={data?.products || []} href="/collections/featured" showGradient />;
 }

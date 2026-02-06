@@ -11,10 +11,9 @@ interface ProductCardProps {
     product: ProductSearch;
     variant?: "sale" | "electric";
     index?: number;
-    compact?: boolean;
 }
 
-const ProductCardLight: React.FC<ProductCardProps> = ({ product, variant = "sale", index = 0, compact = false }) => {
+const ProductCardLight: React.FC<ProductCardProps> = ({ product, variant = "sale", index = 0 }) => {
     const navigate = useNavigate();
     const { priceInfo, outOfStock } = useProductVariant(product);
 
@@ -26,9 +25,9 @@ const ProductCardLight: React.FC<ProductCardProps> = ({ product, variant = "sale
             viewport={{ once: true }}
             whileTap={{ scale: 0.98 }}
             onClick={() => navigate({ to: `/products/${product.slug}` })}
-            className={`shrink-0 cursor-pointer group ${compact ? "w-44" : "w-auto"}`}
+            className="shrink-0 cursor-pointer group w-auto"
         >
-            <div className={`relative rounded-2xl overflow-hidden shadow-card ${compact ? "h-52" : "h-60"}`}>
+            <div className="relative rounded-2xl overflow-hidden shadow-card h-60 md:h-72">
                 <img
                     src={product.images?.[0] || "/placeholder.jpg"}
                     alt={product.name}

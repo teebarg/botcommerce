@@ -54,7 +54,7 @@ const ConfirmDrawer: React.FC<Props> = ({
                 <DrawerContent aria-describedby={undefined}>
                     <DrawerHeader className="pb-4">
                         <DrawerTitle>{title || "Confirm?"}</DrawerTitle>
-                        <DrawerDescription>{description ?? "This action cannot be undone."}</DrawerDescription>
+                        {description && <DrawerDescription>{description ?? "This action cannot be undone."}</DrawerDescription>}
                     </DrawerHeader>
                     {content}
                     {!hideActionBtn && (

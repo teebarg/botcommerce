@@ -34,11 +34,11 @@ export const PriceLabel: React.FC<PriceLabelProps> = ({
                         <span className={cn("text-2xl font-bold", priceClassName)}>{currency(minPrice)}</span>
                         <span className={cn("line-through text-sm", oldPriceClassName)}>{currency(maxCompareAtPrice!)}</span>
                     </div>
-                    {hasDiscount && (
+                    {/* {hasDiscount && (
                         <span className="text-xs text-green-600 dark:text-green-400 font-semibold">
                             Save {currency((maxCompareAtPrice || minPrice) - minPrice)}
                         </span>
-                    )}
+                    )} */}
                 </div>
             );
         }

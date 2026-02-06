@@ -1,8 +1,8 @@
 import { useProductSearch } from "@/hooks/useProduct";
 import { ProductSearch } from "@/schemas";
-import ProductCard from "../products/product-card";
 import LocalizedClientLink from "@/components/ui/link";
 import { TrendingUp } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 export default function Trending() {
     const { data } = useProductSearch({ collections: "trending", limit: 6 });
@@ -20,9 +20,15 @@ export default function Trending() {
                             View All
                         </LocalizedClientLink>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 px-2">
                         {data?.products?.map((product: ProductSearch) => (
-                            <ProductCard key={product.id} product={product} variant="electric" />
+                            <Link key={product.id} to="/collections/$slug" params={{ slug: "trending" }} className="w-full h-full">
+                                <img
+                                    src={product.images?.[0] || "/placeholder.jpg"}
+                                    alt={product.name}
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                />
+                            </Link>
                         ))}
                     </div>
                 </section>
