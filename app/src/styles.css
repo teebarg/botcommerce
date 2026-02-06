@@ -373,6 +373,8 @@
     .hide-scrollbar {
         -ms-overflow-style: none;
         scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: contain;
     }
 
     ::-webkit-scrollbar {
@@ -467,5 +469,22 @@
 
     .sheet-footer {
         @apply bg-background/80 backdrop-blur-2xl flex gap-2 justify-end p-4 border-t border-border;
+    }
+
+    /* Hardware acceleration for smoother scrolling */
+    .snap-y {
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Optimization for list items */
+    .snap-start {
+        /* Tells browser to optimize rendering for these properties */
+        will-change: transform;
+        /* Huge performance boost for long lists - renders items like they are off-screen until needed */
+        content-visibility: auto;
+        contain-intrinsic-size: 100vh; /* Approximate height of one card */
+        transform: translateZ(0);
+        backface-visibility: hidden;
     }
 }

@@ -54,7 +54,17 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
         <div ref={ref} className="relative h-[calc(100dvh-64px-88px)]! w-full snap-start snap-always bg-[#121212]">
             <div className="absolute inset-0 bg-[#121212]" />
             <div className="absolute top-0 left-0 right-0 flex items-start justify-center">
-                <img src={product.images?.[0]} alt={product.name} className="max-w-full max-h-[70vh] object-contain fade-to-black" />
+                <img
+                    src={product.images?.[0]}
+                    alt={product.name}
+                    className="max-w-full max-h-[70vh] object-contain fade-to-black"
+                    loading="lazy"
+                    decoding="async"
+                    style={{
+                        contentVisibility: "auto",
+                        willChange: "transform",
+                    }}
+                />
                 {/* <div className="pointer-events-none absolute bottom-0 left-0 h-40 w-full bg-gradient-to-t from-[#121212] via-[#121212]/60 to-transparent" /> */}
             </div>
 
@@ -128,10 +138,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
                 <ShareButton />
             </div>
 
-            <div
-                data-visible={inView}
-                className="data-[visible=true]:animate-fade-in absolute bottom-0 left-0 right-0 p-4 pb-6 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
-            >
+            <div className="absolute bottom-0 left-0 right-0 p-4 pb-6 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
                 {product?.variants?.map((item: ProductVariant) => (
                     <div key={item.id} className={item.size ? "" : "hidden"}>
                         <div className="w-12 h-12 rounded-full bg-linear-to-br from-primary to-accent flex flex-col items-center justify-center mb-3 text-white font-bold">
