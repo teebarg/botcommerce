@@ -115,16 +115,17 @@ async def search(
     sort: str = "id:desc",
     categories: str = Query(default=""),
     collections: str = Query(default=""),
-    max_price: int = Query(default=1000000, gt=0),
+    max_price: int = Query(default=1_000_000, gt=0),
     min_price: int = Query(default=1, gt=0),
     sizes: str = Query(default=""),
     colors: str = Query(default=""),
-    skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
+    cursor: int | None = Query(default=None),
 ) -> Catalog:
     """
-    Retrieve products using Meilisearch, sorted by latest.
+    Meilisearch keyset pagination (cursor-based)
     """
+
     where = {"slug": slug}
     if user is None or user.role != "ADMIN":
         where["is_active"] = True
@@ -133,71 +134,55 @@ async def search(
         raise HTTPException(status_code=404, detail="Catalog not found")
 
     filters = [f"catalogs IN [{slug}]"]
+
     if categories:
         filters.append(f"category_slugs IN {url_to_list(categories)}")
+
     if collections:
         filters.append(f"collection_slugs IN [{collections}]")
+
     if min_price and max_price:
         filters.append(
-            f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}")
+            f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}"
+        )
+
     if sizes:
         filters.append(f"sizes IN [{sizes}]")
+
     if colors:
         filters.append(f"colors IN [{colors}]")
 
+    if cursor is not None:
+        filters.append(f"id < {cursor}")
+
     search_params = {
         "limit": limit,
-        "offset": skip,
         "sort": [sort],
+        
+        "filter": " AND ".join(filters),
     }
 
-    if filters:
-        search_params["filter"] = " AND ".join(filters)
-
     index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
+
     try:
-        search_results = index.search(
-            search,
-            {
-                **search_params
-            }
-        )
+        search_results = index.search(search, search_params)
 
     except MeilisearchApiError as e:
-        error_code = getattr(e, "code", None)
-        if error_code in {"invalid_search_facets", "invalid_search_filter", "invalid_search_sort"}:
-            logger.warning(f"Invalid filter detected, attempting to auto-configure filterable attributes: {e}")
+        ensure_index_ready(index)
+        search_results = index.search(search, search_params)
 
-            ensure_index_ready(index)
-
-            search_results = index.search(
-                search,
-                {
-                    **search_params
-                }
-            )
-        logger.error(f"Meilisearch error: {e}")
-        raise HTTPException(status_code=502, detail="Search service temporarily unavailable")
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(
-            status_code=400,
-            detail=e.message
-        )
-
-    total_count = search_results["estimatedTotalHits"]
-    total_pages = (total_count // limit) + (total_count % limit > 0)
+    hits = search_results["hits"]
+    next_cursor = hits[-1]["id"] if hits and len(hits) >= limit else None
 
     return {
         "title": obj.title,
         "description": obj.description,
         "is_active": obj.is_active,
         "view_count": obj.view_count,
-        "products": search_results["hits"],
-        "skip": skip,
+        "products": hits,
         "limit": limit,
-        "total_count": total_count,
-        "total_pages": total_pages,
+        "next_cursor": next_cursor,
+        "total_count": search_results.get("estimatedTotalHits"),
     }
 
 
