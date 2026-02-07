@@ -14,6 +14,7 @@ import NewsletterSection from "@/components/store/landing/newsletter-section";
 import { getCategoriesProductsFn } from "@/server/categories.server";
 import CategoriesWithProductsSection from "@/components/store/home/categories-products";
 import { HERO_IMAGES } from "@/utils/constants";
+import InfiniteFeed from "@/components/store/collections/infinite-feed";
 
 const categoriesProductsQueryOptions = () => ({
     queryKey: ["products", "home"],
@@ -63,6 +64,13 @@ function Home() {
             <LazyInView>
                 <NewArrivals />
             </LazyInView>
+            <div className="max-w-8xl mx-auto">
+                <div className="px-4 mb-4">
+                    <h2 className="font-display text-xl font-semibold">For You</h2>
+                    <p className="text-xs text-muted-foreground">Personalized picks based on your style</p>
+                </div>
+                <InfiniteFeed />
+            </div>
             <ContactSection />
             <NewsletterSection />
         </div>

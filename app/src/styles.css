@@ -230,55 +230,6 @@
 }
 
 :root {
-    --gold: 45 90% 50%;
-    --error: 15 90% 60%;
-    --error-light: 15 100% 97%;
-    --error-border: 15 80% 85%;
-
-    --discount-sale-glow: 0 100% 70%;
-
-    --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.1);
-    --shadow-discount: 0 4px 20px -2px;
-    --shadow-intense: 0 8px 32px -4px;
-    --shadow-soft: 0 4px 24px -4px hsl(222 47% 11% / 0.08);
-    --shadow-glow: 0 0 40px hsl(35 92% 55% / 0.2);
-
-    --gradient-sale: linear-gradient(135deg, hsl(0 85% 60%) 0%, hsl(14 100% 57%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(152 50% 45%) 100%);
-    --gradient-gold: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(45 95% 70%) 50%, hsl(var(--gold)) 100%);
-    --gradient-action: linear-gradient(135deg, hsl(340, 82%, 52%) 0%, hsl(15, 90%, 60%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0, 0%, 10%) 0%, hsl(0, 0%, 6%) 100%);
-    --gradient-glass: linear-gradient(135deg, hsla(0, 0%, 100%, 0.1) 0%, hsla(0, 0%, 100%, 0.05) 100%);
-    --shadow-glow: 0 0 40px hsla(340, 82%, 52%, 0.3);
-    --shadow-card: 0 8px 32px hsla(0, 0%, 0%, 0.4);
-
-    --warning: #f59e0b;
-    --warning-foreground: #ffffff;
-
-    --contrast: 14 90% 58%;
-    --contrast-foreground: 0 0% 100%;
-
-    --radius: 0.5rem;
-
-    --safe-top: env(safe-area-inset-top);
-    --safe-bottom: env(safe-area-inset-bottom);
-    --safe-left: env(safe-area-inset-left);
-    --safe-right: env(safe-area-inset-right);
-}
-
-.dark {
-    --error: 15 85% 55%;
-    --error-light: 15 40% 15%;
-    --error-border: 15 50% 30%;
-
-    --shadow-soft: 0 4px 24px -4px hsl(0 0% 0% / 0.3);
-    --shadow-glow: 0 0 40px hsl(35 92% 55% / 0.15);
-
-    --contrast: 43 74% 66%;
-    --contrast-foreground: 20 14.3% 4.1%;
-}
-
-:root {
     --background: 0 0% 100%;
     --foreground: 0 0% 9%;
     --card: 0 0% 97%;
@@ -300,10 +251,41 @@
     --input: 0 0% 90%;
     --ring: 219 100% 53%;
 
-    /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(219 100% 53%), hsl(219 100% 48%));
-    --gradient-secondary: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 96%));
-    --gradient-accent: linear-gradient(90deg, hsl(219 100% 53% / 0.05), hsl(219 100% 53% / 0.1));
+
+    --gold: 45 90% 50%;
+    --error: 15 90% 60%;
+    --error-light: 15 100% 97%;
+    --error-border: 15 80% 85%;
+
+    --discount-sale-glow: 0 100% 70%;
+
+    --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.1);
+    --shadow-discount: 0 4px 20px -2px;
+    --shadow-intense: 0 8px 32px -4px;
+    --shadow-soft: 0 4px 24px -4px hsl(222 47% 11% / 0.08);
+    --shadow-glow: 0 0 40px hsl(35 92% 55% / 0.2);
+
+    --gradient-sale: linear-gradient(135deg, hsl(0 85% 60%) 0%, hsl(14 100% 57%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(152 50% 45%) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(45 95% 70%) 50%, hsl(var(--gold)) 100%);
+    --gradient-action: linear-gradient(135deg, hsl(340, 82%, 52%) 0%, hsl(15, 90%, 60%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0, 0%, 10%) 0%, hsl(0, 0%, 6%) 100%);
+    --shadow-glow: 0 0 40px hsla(340, 82%, 52%, 0.3);
+    --shadow-card: 0 8px 32px hsla(0, 0%, 0%, 0.4);
+
+    --warning: #f59e0b;
+    --warning-foreground: #ffffff;
+
+    --contrast: 14 90% 58%;
+    --contrast-foreground: 0 0% 100%;
+
+    --radius: 0.5rem;
+
+    --safe-top: env(safe-area-inset-top);
+    --safe-bottom: env(safe-area-inset-bottom);
+    --safe-left: env(safe-area-inset-left);
+    --safe-right: env(safe-area-inset-right);
 
     --sidebar: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -337,10 +319,17 @@
     --input: 0 0% 22%;
     --ring: 219 100% 53%;
 
-    /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(219 100% 53%), hsl(219 100% 48%));
-    --gradient-secondary: linear-gradient(180deg, hsl(0 0% 9%), hsl(0 0% 15%));
-    --gradient-accent: linear-gradient(90deg, hsl(219 100% 53% / 0.05), hsl(219 100% 53% / 0.1));
+
+    --error: 15 85% 55%;
+    --error-light: 15 40% 15%;
+    --error-border: 15 50% 30%;
+
+    --shadow-soft: 0 4px 24px -4px hsl(0 0% 0% / 0.3);
+    --shadow-glow: 0 0 40px hsl(35 92% 55% / 0.15);
+
+    --contrast: 43 74% 66%;
+    --contrast-foreground: 20 14.3% 4.1%;
 
     --sidebar: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -355,10 +344,6 @@
 @layer base {
     * {
         @apply border-border outline-ring/50;
-    }
-
-    html {
-        touch-action: manipulation;
     }
 
     body {
@@ -402,22 +387,6 @@
         @apply bg-white/8 backdrop-blur-xl border border-white/12;
     }
 
-    .glass-strong {
-        @apply bg-white/15 backdrop-blur-2xl border border-white/20;
-    }
-
-    .gradient-text {
-        background: linear-gradient(135deg, hsl(350 89% 60%), hsl(280 100% 65%));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-
-    .gradient-glass {
-        background: var(--gradient-glass);
-        backdrop-filter: blur(20px);
-    }
-
     .shadow-glow {
         box-shadow: var(--shadow-glow);
     }
@@ -438,9 +407,9 @@
         @apply bg-white/20 backdrop-blur-lg hover:bg-white/20 active:scale-90;
     }
 
-    .product-card {
+    /* .product-card {
         @apply relative w-full h-[calc(100dvh-36px)] snap-start snap-always flex items-end;
-    }
+    } */
 
     .text-gradient-gold {
         background: var(--gradient-gold);

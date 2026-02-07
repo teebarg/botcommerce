@@ -6,6 +6,7 @@ import type { ProductSearch } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { useNavigate } from "@tanstack/react-router";
+import ProductCardActions from "./product-card-actions";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -45,8 +46,9 @@ const ProductCardLight: React.FC<ProductCardProps> = ({ product, variant = "sale
             </div>
 
             <div className="mt-3 space-y-1">
-                <h3 className="text-sm font-medium truncate">{product.name}</h3>
+                <h3 className="text-sm font-medium truncate sr-only">{product.name}</h3>
                 <PriceLabel priceInfo={priceInfo} />
+                <ProductCardActions product={product} actionColor="bg-gradient-action" />
             </div>
         </motion.div>
     );

@@ -5,7 +5,7 @@ import { getCollectionFn } from "@/server/collections.server";
 import { seo } from "@/utils/seo";
 import { productFeedOptions } from "@/hooks/useProduct";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import SocialInfiniteScrollClient from "@/components/store/collections/scroll-client-social";
+import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 
 const FeedQuerySchema = z.object({
     sort: z.enum(["min_variant_price:asc", "min_variant_price:desc", "id:desc", "created_at:desc"]).optional(),
@@ -60,9 +60,5 @@ function RouteComponent() {
     const search = Route.useSearch();
     const { data } = useSuspenseQuery(productFeedOptions({ collections: slug, ...search }));
 
-    return (
-        <div className="max-w-8xl mx-auto w-full py-4 px-2">
-            <SocialInfiniteScrollClient initialData={data} collection_slug={slug!} />
-        </div>
-    );
+    return <InfiniteScrollClient initialData={data} collection_slug={slug!} />;
 }

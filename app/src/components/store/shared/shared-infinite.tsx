@@ -1,16 +1,18 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Grid3X3, Loader } from "lucide-react";
-import { useState } from "react";
-import MobileFilterControl from "./mobile-filter-control";
-import ProductCard from "@/components/store/products/product-card";
+import { Loader } from "lucide-react";
 import type { Catalog, ProductSearch } from "@/schemas";
-import { FilterSidebar } from "@/components/store/shared/filter-sidebar";
 import { Button } from "@/components/ui/button";
-import { useUpdateQuery } from "@/hooks/useUpdateQuery";
-import { cn } from "@/utils";
 import { useSearch } from "@tanstack/react-router";
 import { getCatalogFn } from "@/server/catalog.server";
 import { InfiniteScroll } from "@/components/InfiniteScroll";
+import { useRef } from "react";
+import { CollectionHeader } from "@/components/store/collections/collection-header";
+import NoProductsFound from "@/components/store/products/no-products";
+import ProductCardListings from "@/components/store/products/product-card-listings";
+import SaleBanner from "@/components/store/sale-banner";
+import ProductCardSocial from "../products/product-card-social";
+import { FilterSidebarLogic, FilterSidebarRef } from "../shared/filter-sidebar-logic";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Props {
     slug: string;
@@ -18,85 +20,109 @@ interface Props {
 }
 
 export default function SharedInfinite({ slug, initialCatalog }: Props) {
+    const sidebarRef = useRef<FilterSidebarRef>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
     const search = useSearch({
         strict: false,
     });
-    const pageSize = initialCatalog.limit || 20;
-    const [viewMode, setViewMode] = useState<"grid" | "list">("list");
 
-    const { updateQuery } = useUpdateQuery();
-
-    const onClearAll = () => {
-        updateQuery([
-            { key: "sort", value: "id:desc" },
-            { key: "sizes", value: "" },
-            { key: "colors", value: "" },
-        ]);
-    };
-
-    const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery<Catalog>({
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery<Catalog>({
         queryKey: ["product", "catalog", slug, JSON.stringify(search)],
-        queryFn: ({ pageParam = 0 }) => getCatalogFn({ data: { skip: pageParam, ...search, slug } }),
-        initialPageParam: 0,
-        getNextPageParam: (lastPage: Catalog) => {
-            const nextSkip = (lastPage.skip || 0) + (lastPage.limit || pageSize);
-            const hasMore = nextSkip < (lastPage.total_count || 0);
-
-            return hasMore ? nextSkip : undefined;
-        },
-        initialData: { pages: [initialCatalog], pageParams: [0] },
+        queryFn: ({ pageParam }) =>
+            getCatalogFn({
+                data: {
+                    slug,
+                    ...search,
+                    cursor: pageParam ?? undefined,
+                },
+            }),
+        initialPageParam: undefined,
+        getNextPageParam: (lastPage: Catalog) => lastPage.next_cursor ?? undefined,
+        initialData: initialCatalog
+            ? {
+                  pages: [initialCatalog],
+                  pageParams: [undefined],
+              }
+            : undefined,
     });
 
     const products = data?.pages.flatMap((p) => p.products) || [];
-    const totalProducts = data?.pages[0].total_count || 0;
+    const hasProducts = products.length > 0;
 
     return (
-        <div className="flex gap-6 w-full py-2">
-            <aside className="hidden lg:block w-80 shrink-0">
-                <div className="sticky top-24 max-h-[calc(100vh-5rem)] overflow-y-auto">
-                    <FilterSidebar />
-                </div>
-            </aside>
-
-            <div className="flex-1">
-                <MobileFilterControl setViewMode={setViewMode} viewMode={viewMode} />
-
-                <div className="hidden lg:flex items-center justify-between mb-6">
-                    <p className="text-sm text-muted-foreground">Showing {totalProducts} products</p>
-                </div>
-
-                {!products.length && (
-                    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-                        <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-6">
-                            <Grid3X3 className="w-12 h-12 text-muted-foreground" />
+        <div>
+            <div className="hidden md:block max-w-8xl mx-auto w-full py-4 px-2">
+                <div className="flex gap-6">
+                    <aside className="h-[calc(100vh-6rem)] w-96 flex flex-col overflow-hidden sticky top-24">
+                        <div className="flex items-center justify-between w-full">
+                            <h2 className="font-semibold">FILTER & SORT</h2>
+                            <Button
+                                className="text-primary px-0 justify-end hover:bg-transparent"
+                                variant="ghost"
+                                onClick={() => sidebarRef.current?.clear()}
+                            >
+                                Clear All
+                            </Button>
                         </div>
-                        <h3 className="text-xl font-semibold mb-2">No products found</h3>
-                        <p className="text-muted-foreground mb-6 max-w-md">
-                            {`We couldn't find any products matching your search criteria. Try adjusting your filters or search terms.`}
-                        </p>
-                        <Button onClick={onClearAll}>Clear all filters</Button>
+                        <ScrollArea className="flex-1 px-2">
+                            <FilterSidebarLogic ref={sidebarRef} />
+                        </ScrollArea>
+                        <div className="flex justify-center gap-2 p-4 mt-2 border-t border-border">
+                            <Button className="w-full rounded-full py-6" onClick={() => sidebarRef.current?.apply()}>
+                                Apply
+                            </Button>
+                            <Button className="w-full rounded-full py-6" variant="destructive" onClick={() => sidebarRef.current?.clear()}>
+                                Clear
+                            </Button>
+                        </div>
+                    </aside>
+                    <div className="flex-1 relative">
+                        <SaleBanner />
+                        <CollectionHeader />
+                        <main className="w-full px-1 rounded-xl py-4">
+                            {!isLoading && !hasProducts && <NoProductsFound />}
+                            {!isLoading && hasProducts && (
+                                <InfiniteScroll
+                                    onLoadMore={fetchNextPage}
+                                    hasMore={!!hasNextPage}
+                                    isLoading={isFetchingNextPage}
+                                    loader={
+                                        <div className="flex flex-col items-center justify-center text-blue-600">
+                                            <Loader className="h-8 w-8 animate-spin mb-2" />
+                                            <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
+                                        </div>
+                                    }
+                                    scrollRef={scrollRef}
+                                >
+                                    <ProductCardListings className="w-full pb-4" products={products!} />
+                                </InfiniteScroll>
+                            )}
+                        </main>
                     </div>
-                )}
+                </div>
+            </div>
 
-                <InfiniteScroll
-                    onLoadMore={fetchNextPage}
-                    hasMore={!!hasNextPage}
-                    isLoading={isFetchingNextPage}
-                    loader={
-                        <div className="flex flex-col items-center justify-center text-blue-600">
-                            <Loader className="h-8 w-8 animate-spin mb-2" />
-                            <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
-                        </div>
-                    }
-                >
-                    <div className={cn("grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4", viewMode === "grid" ? "" : "grid-cols-1")}>
-                        {products?.map((product: ProductSearch) => (
-                            <div key={`product-${product.id}`}>
-                                <ProductCard product={product} />
+            <div className="block md:hidden">
+                {!isLoading && !hasProducts && <NoProductsFound />}
+                {!isLoading && hasProducts && (
+                    <InfiniteScroll
+                        scrollRef={scrollRef}
+                        onLoadMore={fetchNextPage}
+                        hasMore={!!hasNextPage}
+                        isLoading={isFetchingNextPage}
+                        loader={
+                            <div className="flex flex-col items-center justify-center text-blue-600">
+                                <Loader className="h-8 w-8 animate-spin mb-2" />
+                                <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
                             </div>
+                        }
+                        className="h-[calc(100dvh-64px-88px)]! w-full overflow-y-scroll snap-y snap-mandatory hide-scrollbar"
+                    >
+                        {products.map((product: ProductSearch, idx: number) => (
+                            <ProductCardSocial key={product.id + product.slug + idx} product={product} scrollRef={scrollRef} />
                         ))}
-                    </div>
-                </InfiniteScroll>
+                    </InfiniteScroll>
+                )}
             </div>
         </div>
     );
