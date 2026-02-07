@@ -1,5 +1,4 @@
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from "@/components/navbar";
-
 import ActivityTray from "@/components/generic/activities/activity-tray";
 import LocalizedClientLink from "@/components/ui/link";
 import MenuComp from "@/components/layout/admin-mobile-menu-drawer";

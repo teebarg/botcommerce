@@ -15,12 +15,16 @@ import { useUserWishlist } from "@/hooks/useUser";
 import { useProductVariant } from "@/hooks/useProductVariant";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ProductVariantActions } from "@/components/products/product-variant-actions";
+import ShareButton from "@/components/share";
+import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
+import { useOverlayTriggerState } from "react-stately";
 
 interface Props {
     product: Product;
 }
 
 const ProductView: React.FC<Props> = ({ product }) => {
+    const confirmState = useOverlayTriggerState({});
     const [imageLoaded, setImageLoaded] = useState<boolean>(false);
     const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
     const { outOfStock } = useProductVariant(product);
@@ -40,23 +44,28 @@ const ProductView: React.FC<Props> = ({ product }) => {
         if (!variant?.id) return;
         const previousInventory = typeof variant.inventory === "number" ? variant.inventory : 0;
 
-        updateVariant.mutateAsync({ id: variant.id, inventory: 0 }).then(() => {
-            toast.success(`Variant ${variant.sku} marked out of stock`, {
-                action: {
-                    label: "Undo",
-                    onClick: async () => {
-                        await updateVariant.mutateAsync({ id: variant.id, inventory: previousInventory });
+        updateVariant
+            .mutateAsync({ id: variant.id, inventory: 0 })
+            .then(() => {
+                toast.success(`Variant ${variant.sku} marked out of stock`, {
+                    action: {
+                        label: "Undo",
+                        onClick: async () => {
+                            await updateVariant.mutateAsync({ id: variant.id, inventory: previousInventory });
+                        },
                     },
-                },
-                duration: 10000,
-                onAutoClose: () => {
-                    window.location.reload();
-                },
-                onDismiss: () => {
-                    window.location.reload();
-                },
+                    duration: 10000,
+                    onAutoClose: () => {
+                        window.location.reload();
+                    },
+                    onDismiss: () => {
+                        window.location.reload();
+                    },
+                });
+            })
+            .finally(() => {
+                confirmState.close();
             });
-        });
     };
 
     useEffect(() => {
@@ -172,10 +181,11 @@ const ProductView: React.FC<Props> = ({ product }) => {
                     transition={{ delay: 0.15 }}
                     className="py-6 px-2 space-y-5 md:py-0"
                 >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-between">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
                             <span className="text-sm font-bold text-white">R</span>
                         </div>
+                        <ShareButton />
                     </div>
 
                     <motion.h1
@@ -206,9 +216,21 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                         </span>
                                     </div>
                                     {v.inventory > 0 && (
-                                        <Button size="sm" variant="destructive" onClick={() => handleMarkVariantOutOfStock(v)}>
-                                            Mark out of stock
-                                        </Button>
+                                        <ConfirmDrawer
+                                            open={confirmState.isOpen}
+                                            onOpenChange={confirmState.setOpen}
+                                            trigger={
+                                                <Button size="sm" variant="destructive">
+                                                    Mark out of stock
+                                                </Button>
+                                            }
+                                            onClose={confirmState.close}
+                                            onConfirm={() => handleMarkVariantOutOfStock(v)}
+                                            title="Mark out of stock"
+                                            description="Are you sure you want to mark this variant as out of stock?"
+                                            confirmText="Confirm"
+                                            isLoading={updateVariant.isPending}
+                                        />
                                     )}
                                 </div>
                             ))}
