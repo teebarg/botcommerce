@@ -17,7 +17,7 @@ export default function InfiniteFeed() {
             hasMore={!!hasNextPage}
             isLoading={isFetchingNextPage}
             onLoadMore={fetchNextPage}
-            endMessage={<p className="py-12 text-center text-muted-foreground">You’ve reached the end ✨</p>}
+            // endMessage={<p className="py-12 text-center text-muted-foreground">You’ve reached the end ✨</p>}
         >
             <div className="grid grid-cols-2 md:grid-cols-6 px-2 md:gap-4 gap-2">
                 {products.map((product: ProductSearch, idx: number) => (
