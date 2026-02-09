@@ -1,7 +1,7 @@
-import { getSessionFromContext } from "@/server/auth.server";
+// import { getSessionFromContext } from "@/server/auth.server";
 import { redirect } from "@tanstack/react-router";
-import type { Session } from "start-authjs";
-import { deleteCookie } from "@tanstack/react-start/server";
+// import type { Session } from "start-authjs";
+import { deleteCookie, getCookies } from "@tanstack/react-start/server";
 
 const baseURL = process.env.API_URL || "http://localhost.dev";
 
@@ -16,7 +16,8 @@ type RequestOptions = RequestInit & {
 };
 
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-    const session = (await getSessionFromContext()) as unknown as Session;
+    // const session = (await getSessionFromContext()) as unknown as Session;
+    const cookies = getCookies();
     const { params, from, ...restOptions } = options;
 
     const url = new URL(`/api${endpoint}`, baseURL);
@@ -28,10 +29,16 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         });
     }
 
+    const cookieHeader = Object.entries(cookies)
+        .map(([key, value]) => `${key}=${value}`)
+        .join("; ");
+
+    console.log("🚀 ~ file: fetch-api.ts:37 ~ cookieHeader:", cookieHeader);
+
     const headers = {
         "Content-Type": "application/json",
-        "X-Auth": session?.accessToken ?? "jwt",
         ...options.headers,
+        Cookie: cookieHeader,
     };
 
     const response = await fetch(url, {

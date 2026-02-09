@@ -2,7 +2,8 @@ import type { StartAuthJSConfig } from "start-authjs";
 import Google from "@auth/core/providers/google";
 import { UpstashRedisAdapter } from "@auth/upstash-redis-adapter";
 import { Redis } from "@upstash/redis";
-import { SignJWT } from "jose";
+import { SignJWT, jwtVerify } from "jose";
+// import { sign, verify } from "jsonwebtoken";
 
 import { tryCatch } from "@/utils/try-catch";
 import type { User, Address, Role, Status, Message } from "@/schemas";
@@ -78,6 +79,26 @@ export const authConfig: StartAuthJSConfig = {
     session: {
         strategy: "jwt",
         maxAge: 60 * 60 * 24 * 30 * 12,
+    },
+    jwt: {
+        async encode({ secret, token }) {
+            // 1. Resolve the secret to a single string
+            const secretValue = Array.isArray(secret) ? secret[0] : secret;
+
+            // 2. Convert to Uint8Array for 'jose'
+            const secretKey = new TextEncoder().encode(secretValue);
+
+            return await new SignJWT(token).setProtectedHeader({ alg: "HS256" }).sign(secretKey);
+        },
+        async decode({ secret, token }) {
+            if (!token) return null;
+
+            const secretValue = Array.isArray(secret) ? secret[0] : secret;
+            const secretKey = new TextEncoder().encode(secretValue);
+
+            const { payload } = await jwtVerify(token, secretKey);
+            return payload;
+        },
     },
     pages: {
         signIn: "/auth/signin",

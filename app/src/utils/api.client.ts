@@ -22,7 +22,6 @@ async function clientRequest<T>(endpoint: string, options: ClientRequestOptions 
         credentials: "include", // sends cookies automatically
         headers: {
             "Content-Type": "application/json",
-            "X-Auth": accessToken ?? "jwt",
             ...rest.headers,
         },
     });
