@@ -206,10 +206,9 @@ export const CatalogSchema = z.object({
     view_count: z.number(),
     is_active: z.boolean(),
     products: z.array(ProductSearchSchema),
-    skip: z.number(),
     limit: z.number(),
     total_count: z.number(),
-    total_pages: z.number(),
+    next_cursor: z.number().optional(),
 });
 
 export const DBCatalogSchema = z.object({

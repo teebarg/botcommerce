@@ -3,12 +3,10 @@ import z from "zod";
 import { seo } from "@/utils/seo";
 import { getCatalogFn } from "@/server/catalog.server";
 import { SharedCollectionVisitTracker } from "@/components/store/shared/shared-collection-visit-tracker";
-import ShareButton from "@/components/share";
 import SharedInfinite from "@/components/store/shared/shared-infinite";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 export const CatalogSearchSchema = z.object({
-    limit: z.number().optional(),
     sort: z.string().optional(),
     sizes: z.number().optional(),
     colors: z.string().optional(),
@@ -62,20 +60,9 @@ function RouteComponent() {
     const { data: catalog } = useSuspenseQuery(catalogQueryOptions(slug, search));
 
     return (
-        <div>
-            <div className="max-w-8xl mx-auto w-full py-4 px-1.5 lg:px-0">
-                <SharedCollectionVisitTracker slug={slug} />
-                <div className="flex lg:flex-row flex-col lg:justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold">{catalog.title}</h1>
-                        {catalog.description && <p className="text-lg text-muted-foreground">{catalog.description}</p>}
-                    </div>
-                    <div className="flex justify-end">
-                        <ShareButton />
-                    </div>
-                </div>
-                <SharedInfinite initialCatalog={catalog} slug={slug} />
-            </div>
+        <div className="max-w-8xl mx-auto w-full py-4 px-1.5 lg:px-0">
+            <SharedCollectionVisitTracker slug={slug} />
+            <SharedInfinite initialCatalog={catalog} slug={slug} />
         </div>
     );
 }

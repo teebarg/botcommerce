@@ -33,7 +33,7 @@ const SharedActions: React.FC<Props> = ({ item }) => {
             </Button>
             <SheetDrawer
                 open={editState.isOpen}
-                title="Edit Shared Collection"
+                title="Edit Catalog"
                 trigger={
                     <Button className="bg-contrast/10" variant="ghost">
                         <Edit className="h-5 w-5 text-contrast" />
@@ -55,9 +55,8 @@ const SharedActions: React.FC<Props> = ({ item }) => {
                 onClose={deleteState.close}
                 onConfirm={onConfirmDelete}
                 title={`Delete ${item.title}`}
-                confirmText="Delete"
+                description="This action cannot be undone. This will permanently delete the catalog."
                 isLoading={deleteMutation.isPending}
-                variant="destructive"
             />
         </div>
     );

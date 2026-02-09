@@ -11,7 +11,6 @@ import { Badge } from "@/components/ui/badge";
 import { currency } from "@/utils";
 import ServerError from "@/components/generic/server-error";
 import { tryCatch } from "@/utils/try-catch";
-import Overlay from "@/components/overlay";
 import ComponentLoader from "@/components/component-loader";
 import { ZeroState } from "@/components/zero";
 import { deleteDeliveryFn } from "@/server/generic.server";
@@ -114,7 +113,7 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
 const DeliveryOverview: React.FC = () => {
     const addState = useOverlayTriggerState({});
 
-    const { data: deliveryOptions, isLoading, error } = useAdminDeliveryOptions();
+    const { data: deliveryOptions, isLoading, error } = useAdminDeliveryOptions(); 
 
     if (error) {
         return <ServerError error={error.message} scenario="delivery" stack={error.stack} />;
