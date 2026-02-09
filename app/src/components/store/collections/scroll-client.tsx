@@ -110,8 +110,8 @@ export default function InfiniteScrollClient({ initialData, collection_slug, sea
                         }
                         className="h-[calc(100dvh-64px-88px)]! w-full overflow-y-scroll snap-y snap-mandatory hide-scrollbar"
                     >
-                        {products.map((product: ProductSearch, idx: number) => (
-                            <ProductCardSocial key={product.id + idx} product={product} facets={facets} scrollRef={scrollRef} />
+                        {products?.map((product: ProductSearch, idx: number) => (
+                            <ProductCardSocial key={product.id + product.slug + idx} product={product} facets={facets} scrollRef={scrollRef} />
                         ))}
                     </InfiniteScroll>
                 )}

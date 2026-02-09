@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_mainLayout/search/$query")({
         };
     },
     loader: async ({ params: { query }, context }) => {
-        const { data, error } = await tryCatch(getProductsFeedFn({ data: { search: query, ...context.search, feed_seed: Math.random() } }));
+        const { data, error } = await tryCatch(getProductsFeedFn({ data: { search: query, ...context.search } }));
         return {
             query,
             data,

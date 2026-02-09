@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { PaginatedProductSearch, ProductFeed } from "@/schemas";
+import type { ProductFeed } from "@/schemas";
 import {
     bustCacheFn,
     createProductFn,
@@ -9,7 +9,6 @@ import {
     deleteProductFn,
     deleteVariantFn,
     flushCacheFn,
-    getProductsFeedFn,
     getProductsFn,
     productSearchFn,
     recommendedProductsFn,
@@ -22,6 +21,7 @@ import {
     uploadImagesFn,
 } from "@/server/product.server";
 import { useRef } from "react";
+import { clientApi } from "@/utils/api.client";
 
 // Type definitions matching the Server Function inputs
 type SearchParams = {
@@ -77,11 +77,6 @@ export const productQueryOptions = (params: SearchParams) => ({
     queryFn: () => getProductsFn({ data: params }),
 });
 
-export const productFeedOptions = (params: FeedParams) => ({
-    queryKey: ["products", "feed", JSON.stringify(params)],
-    queryFn: () => getProductsFeedFn({ data: {...params, feed_seed: Math.random()} }),
-});
-
 export const useProductSearch = (params: SearchParams) => {
     return useQuery({
         queryKey: ["products", "search", params],
@@ -89,43 +84,16 @@ export const useProductSearch = (params: SearchParams) => {
     });
 };
 
-export const useProductInfiniteSearch = (initialData: PaginatedProductSearch, search?: SearchParams) => {
-    return useInfiniteQuery({
-        queryKey: ["products", "search", "infinite", JSON.stringify(search)],
-        queryFn: ({ pageParam = 0 }) => getProductsFn({ data: { skip: pageParam, limit: 24, ...search } }),
-        getNextPageParam: (lastPage) => {
-            const nextSkip = lastPage.skip + lastPage.limit;
-            const hasMore = nextSkip < lastPage.total_count;
-
-            return hasMore ? nextSkip : undefined;
-        },
-        initialPageParam: 0,
-        initialData: initialData
-            ? {
-                  pages: [
-                      {
-                          ...initialData,
-                      },
-                  ],
-                  pageParams: [0],
-              }
-            : undefined,
-    });
-};
-
 export const useProductFeed = (initialData: ProductFeed | null, search?: FeedParams) => {
     const feedSeedRef = useRef<number | null>(initialData?.feed_seed ?? null);
     return useInfiniteQuery<ProductFeed, Error, InfiniteData<ProductFeed>, [string, string, string, FeedParams | {}], string | null>({
         queryKey: ["products", "feed", `${feedSeedRef.current}` || "", search ?? {}],
-        queryFn: ({ pageParam }) =>
-            getProductsFeedFn({
-                data: {
-                    cursor: pageParam ?? undefined,
-                    feed_seed: feedSeedRef.current ?? undefined,
-                    ...search,
-                },
-            }),
-
+        queryFn: async ({ pageParam }) => {
+            const res = await clientApi.get<ProductFeed>("/product/feed", {
+                params: { cursor: pageParam ?? undefined, feed_seed: feedSeedRef.current ?? undefined, ...search },
+            });
+            return res;
+        },
         getNextPageParam: (lastPage) => {
             if (!feedSeedRef.current) {
                 feedSeedRef.current = lastPage.feed_seed;

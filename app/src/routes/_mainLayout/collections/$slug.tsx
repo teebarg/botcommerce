@@ -3,9 +3,8 @@ import { tryCatch } from "@/utils/try-catch";
 import z from "zod";
 import { getCollectionFn } from "@/server/collections.server";
 import { seo } from "@/utils/seo";
-import { productFeedOptions } from "@/hooks/useProduct";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
+import { getProductsFeedFn } from "@/server/product.server";
 
 const FeedQuerySchema = z.object({
     sort: z.enum(["min_variant_price:asc", "min_variant_price:desc", "id:desc", "created_at:desc"]).optional(),
@@ -24,12 +23,13 @@ export const Route = createFileRoute("/_mainLayout/collections/$slug")({
             search,
         };
     },
-    loader: async ({ params: { slug }, context: { queryClient, search, config } }) => {
+    loader: async ({ params: { slug }, context: { search, config } }) => {
         const { data: collection } = await tryCatch(getCollectionFn({ data: slug }));
-        await queryClient.ensureQueryData(productFeedOptions({ collections: collection?.slug, ...search }));
+        const res = await getProductsFeedFn({ data: { collections: collection?.slug, ...search, feed_seed: Math.random() } });
         return {
             collection,
             config,
+            data: res,
         };
     },
     head: ({ loaderData }) => {
@@ -57,8 +57,7 @@ export const Route = createFileRoute("/_mainLayout/collections/$slug")({
 
 function RouteComponent() {
     const { slug } = Route.useParams();
-    const search = Route.useSearch();
-    const { data } = useSuspenseQuery(productFeedOptions({ collections: slug, ...search }));
+    const { data } = Route.useLoaderData();
 
     return <InfiniteScrollClient initialData={data} collection_slug={slug!} />;
 }

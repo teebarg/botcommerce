@@ -20,8 +20,8 @@ export default function InfiniteFeed() {
             // endMessage={<p className="py-12 text-center text-muted-foreground">You’ve reached the end ✨</p>}
         >
             <div className="grid grid-cols-2 md:grid-cols-6 px-2 md:gap-4 gap-2">
-                {products.map((product: ProductSearch, idx: number) => (
-                    <ProductCardLight key={product.id + product.name + idx + "-mobile"} product={product} />
+                {products?.map((product: ProductSearch, idx: number) => (
+                    <ProductCardLight key={product.id + product.slug + idx} product={product} />
                 ))}
             </div>
         </InfiniteList>
