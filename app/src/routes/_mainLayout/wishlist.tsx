@@ -1,12 +1,9 @@
-import { createFileRoute, useLocation } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import WishlistItem from "@/components/store/wishlist";
 import { BtnLink } from "@/components/ui/btnLink";
-import ServerError from "@/components/generic/server-error";
 import type { WishItem } from "@/schemas";
-import { userWishlistQueryOptions } from "@/hooks/useUser";
-import ComponentLoader from "@/components/component-loader";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { redirect } from "@tanstack/react-router";
+import { getWishlistFn } from "@/server/users.server";
 
 export const Route = createFileRoute("/_mainLayout/wishlist")({
     beforeLoad: ({ context, location }) => {
@@ -14,29 +11,17 @@ export const Route = createFileRoute("/_mainLayout/wishlist")({
             throw redirect({ to: "/auth/signin", search: { callbackUrl: location.href } });
         }
     },
-    loader: async ({ context, location }) => {
-        await context.queryClient.ensureQueryData(userWishlistQueryOptions(location.href));
+    loader: async ({ location }) => {
+        const res = await getWishlistFn({ data: location.href });
+        return {
+            wishlists: res.wishlists,
+        };
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const location = useLocation();
-    const wishlistQuery = useSuspenseQuery(userWishlistQueryOptions(location.href));
-
-    if (wishlistQuery.isLoading) {
-        return (
-            <div className="max-w-7xl mx-auto mt-2 mb-4 w-full">
-                <ComponentLoader className="h-[55vh]" />
-            </div>
-        );
-    }
-
-    if (wishlistQuery.error) {
-        return <ServerError error={wishlistQuery.error.message} scenario="wishlist" stack={wishlistQuery.error.stack} />;
-    }
-
-    const wishlists = wishlistQuery.data?.wishlists ?? [];
+    const { wishlists } = Route.useLoaderData();
 
     return (
         <div className="max-w-6xl mx-auto w-full mb-4 py-8 px-2 md:px-0">

@@ -8,11 +8,11 @@ import { Button } from "@/components/ui/button";
 import AddAddressForm from "@/components/store/account/address/add-address-form";
 import { cn } from "@/utils";
 import EditAddressForm from "@/components/store/account/address/edit-address-form";
-import { addressesQueryOptions, useDeleteAddress } from "@/hooks/useAddress";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useDeleteAddress } from "@/hooks/useAddress";
 import { AnimatePresence, motion } from "framer-motion";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import SheetDrawer from "@/components/sheet-drawer";
+import { getUserAddressesFn } from "@/server/address.server";
 
 type AddressItemProps = {
     address: Address;
@@ -102,15 +102,18 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false, in
 };
 
 export const Route = createFileRoute("/_mainLayout/account/addresses")({
-    loader: async ({ context }) => {
-        await context.queryClient.ensureQueryData(addressesQueryOptions());
+    loader: async () => {
+        const res = await getUserAddressesFn();
+        return {
+            addresses: res.addresses,
+        };
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
     const addState = useOverlayTriggerState({});
-    const { data } = useSuspenseQuery(addressesQueryOptions());
+    const { addresses } = Route.useLoaderData();
 
     return (
         <div className="w-full px-2">
@@ -134,7 +137,7 @@ function RouteComponent() {
             </Overlay>
             <div className="space-y-3 mt-4">
                 <AnimatePresence mode="popLayout">
-                    {data?.addresses?.map((address, index: number) => {
+                    {addresses?.map((address: Address, index: number) => {
                         return <AddressItem key={index} index={index} address={address} />;
                     })}
                 </AnimatePresence>

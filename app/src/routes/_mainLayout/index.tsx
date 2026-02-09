@@ -11,23 +11,15 @@ import Featured from "@/components/store/home/featured";
 import Trending from "@/components/store/home/trending";
 import NewArrivals from "@/components/store/home/arrival";
 import NewsletterSection from "@/components/store/landing/newsletter-section";
-import { getCategoriesProductsFn } from "@/server/categories.server";
 import CategoriesWithProductsSection from "@/components/store/home/categories-products";
 import { HERO_IMAGES } from "@/utils/constants";
 import InfiniteFeed from "@/components/store/collections/infinite-feed";
 
-const categoriesProductsQueryOptions = () => ({
-    queryKey: ["products", "home"],
-    queryFn: () => getCategoriesProductsFn(),
-});
-
 export const Route = createFileRoute("/_mainLayout/")({
     component: Home,
-    loader: async ({ context: { queryClient } }) => {
+    loader: async () => {
         const image = HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)];
-        const data = await queryClient.ensureQueryData(categoriesProductsQueryOptions());
         return {
-            data,
             heroImage: image,
         };
     },
@@ -60,7 +52,9 @@ function Home() {
                 subtitle="Get up to 50% OFF on select products."
                 title="Big Sale on Top Brands!"
             />
-            <CategoriesWithProductsSection categoriesWithProducts={loaderData.data} />
+            <LazyInView>
+                <CategoriesWithProductsSection />
+            </LazyInView>
             <LazyInView>
                 <NewArrivals />
             </LazyInView>

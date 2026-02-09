@@ -38,13 +38,6 @@ const UpdateReviewInputSchema = z.object({
 
 const ReviewIdSchema = z.number();
 
-// --- Server Functions ---
-export const getProductReviewFn = createServerFn({ method: "GET" })
-    .inputValidator((input: unknown) => UserSearchSchema.parse(input))
-    .handler(async ({ data }) => {
-        const res = await api.get<PaginatedReview>("/reviews/", { params: { ...data } });
-        return res;
-    });
 
 export const getReviewsFn = createServerFn({ method: "GET" })
     .inputValidator(ReviewsParamsSchema)

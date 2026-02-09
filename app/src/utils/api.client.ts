@@ -1,11 +1,12 @@
 const baseURL = import.meta.env.VITE_API_URL ?? "https://api.yourdomain.com";
 
 type ClientRequestOptions = RequestInit & {
-    params?: Record<string, string | number | boolean | null | undefined>;
+    params?: Record<string, string | number | boolean | null | undefined | object>;
+    accessToken?: string | null;
 };
 
 async function clientRequest<T>(endpoint: string, options: ClientRequestOptions = {}): Promise<T> {
-    const { params, ...rest } = options;
+    const { params, accessToken, ...rest } = options;
 
     const url = new URL(`/api${endpoint}`, baseURL);
 
@@ -21,6 +22,7 @@ async function clientRequest<T>(endpoint: string, options: ClientRequestOptions 
         credentials: "include", // sends cookies automatically
         headers: {
             "Content-Type": "application/json",
+            "X-Auth": accessToken ?? "jwt",
             ...rest.headers,
         },
     });

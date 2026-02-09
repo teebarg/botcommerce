@@ -3,7 +3,6 @@ import { Loader } from "lucide-react";
 import type { Catalog, ProductSearch } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useSearch } from "@tanstack/react-router";
-import { getCatalogFn } from "@/server/catalog.server";
 import { InfiniteScroll } from "@/components/InfiniteScroll";
 import { useRef } from "react";
 import { CollectionHeader } from "@/components/store/collections/collection-header";
@@ -13,6 +12,7 @@ import SaleBanner from "@/components/store/sale-banner";
 import ProductCardSocial from "../products/product-card-social";
 import { FilterSidebarLogic, FilterSidebarRef } from "../shared/filter-sidebar-logic";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { clientApi } from "@/utils/api.client";
 
 interface Props {
     slug: string;
@@ -28,14 +28,10 @@ export default function SharedInfinite({ slug, initialCatalog }: Props) {
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery<Catalog>({
         queryKey: ["product", "catalog", slug, JSON.stringify(search)],
-        queryFn: ({ pageParam }) =>
-            getCatalogFn({
-                data: {
-                    slug,
-                    ...search,
-                    cursor: pageParam ?? undefined,
-                },
-            }),
+        queryFn: async ({ pageParam }) => {
+            const res = await clientApi.get<Catalog>(`/shared/${slug}`, { params: { slug, ...search, cursor: pageParam ?? undefined } });
+            return res;
+        },
         initialPageParam: undefined,
         getNextPageParam: (lastPage: Catalog) => lastPage.next_cursor ?? undefined,
         initialData: initialCatalog

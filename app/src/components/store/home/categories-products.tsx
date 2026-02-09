@@ -4,8 +4,14 @@ import { ProductSearch } from "@/schemas";
 import ProductCardLight from "../products/product-card-light";
 import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
+import { clientApi } from "@/utils/api.client";
+import { useQuery } from "@tanstack/react-query";
 
-export default function CategoriesWithProductsSection({ categoriesWithProducts }: { categoriesWithProducts: CategoriesWithProducts[] }) {
+export default function CategoriesWithProductsSection() {
+    const { data: categoriesWithProducts } = useQuery({
+        queryKey: ["products", "home"],
+        queryFn: async () => await clientApi.get<CategoriesWithProducts[]>("/category/home/products"),
+    });
     return (
         <section className="max-w-8xl mx-auto px-4 py-6 space-y-8">
             <div>
@@ -13,7 +19,7 @@ export default function CategoriesWithProductsSection({ categoriesWithProducts }
                 <p className="text-xs text-muted-foreground mt-0.5">Explore our collections</p>
             </div>
 
-            {categoriesWithProducts.map((category: CategoriesWithProducts, categoryIndex: number) => {
+            {categoriesWithProducts?.map((category: CategoriesWithProducts, categoryIndex: number) => {
                 if (category.products.length === 0) return null;
 
                 return (

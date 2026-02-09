@@ -1,13 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ordersQueryOptions } from "@/hooks/useOrder";
 import { cn, currency, formatDate } from "@/utils";
 import { ChevronRight, Clock, Heart, MapPin, Package } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import type { Order } from "@/schemas";
 import Overlay from "@/components/overlay";
 import OrderDetails from "@/components/store/orders/order-details";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import { getOrdersFn } from "@/server/order.server";
 
 const OrderItem: React.FC<{ order: Order; idx: number }> = ({ order, idx }) => {
     const state = useOverlayTriggerState({});
@@ -56,15 +55,18 @@ const OrderItem: React.FC<{ order: Order; idx: number }> = ({ order, idx }) => {
 };
 
 export const Route = createFileRoute("/_mainLayout/account/")({
-    loader: async ({ context }) => {
-        await context.queryClient.ensureQueryData(ordersQueryOptions({}));
+    loader: async () => {
+        const paginatedOrders = await getOrdersFn({ data: {} });
+        return {
+            paginatedOrders,
+        };
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
     const { session } = Route.useRouteContext();
-    const { data } = useSuspenseQuery(ordersQueryOptions({}));
+    const { paginatedOrders } = Route.useLoaderData();
 
     return (
         <div className="px-2 md:px-0 space-y-4">
@@ -89,7 +91,7 @@ function RouteComponent() {
                     <div className="w-10 h-10 mx-auto rounded-xl gradient-primary flex items-center justify-center mb-2">
                         <Heart className="w-5 h-5 text-white" />
                     </div>
-                    <p className="text-2xl font-bold">{data?.orders?.length}</p>
+                    <p className="text-2xl font-bold">{paginatedOrders?.orders?.length}</p>
                     <p className="text-xs text-muted-foreground">Total Orders</p>
                 </motion.div>
                 <motion.div
@@ -127,10 +129,10 @@ function RouteComponent() {
                 </div>
 
                 <div className="space-y-3">
-                    {data?.orders?.slice(0, 5)?.map((order: Order, idx: number) => (
+                    {paginatedOrders?.orders?.slice(0, 5)?.map((order: Order, idx: number) => (
                         <OrderItem key={idx} order={order} idx={idx} />
                     ))}
-                    {data?.orders?.length === 0 && (
+                    {paginatedOrders?.orders?.length === 0 && (
                         <motion.div
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}

@@ -42,7 +42,7 @@ const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShoppi
                     <div className="space-y-1">
                         <div className="flex justify-between">
                             <span className="text-muted-foreground text-sm">Address</span>
-                            <span className="font-medium">{settings?.address}</span>
+                            <span className="font-medium">{config?.address}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-muted-foreground text-sm">Opening Hours</span>

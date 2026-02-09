@@ -1,11 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { Search } from "lucide-react";
-
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { Order } from "@/schemas";
 import { currency } from "@/utils";
-import { ordersQueryOptions, useOrders } from "@/hooks/useOrder";
 import OrderCard from "@/components/admin/orders/order-card";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import PaginationUI from "@/components/pagination";
@@ -13,7 +11,7 @@ import OrderFilters from "@/components/admin/orders/order-filters";
 import { OrderStatusBadge, PaymentStatusBadge } from "@/components/admin/orders/order-status-badge";
 import OrderActions from "@/components/admin/orders/order-actions";
 import z from "zod";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { getOrdersFn } from "@/server/order.server";
 
 const LIMIT = 10;
 
@@ -27,17 +25,20 @@ export const Route = createFileRoute("/admin/(store)/orders")({
     }),
     loaderDeps: ({ search: { skip, status, start_date, end_date } }) => ({ skip, status, start_date, end_date }),
     loader: async ({ context, deps: { skip, status, start_date, end_date } }) => {
-        await context.queryClient.ensureQueryData(ordersQueryOptions({ skip, status, start_date, end_date, take: LIMIT }));
+        const paginatedOrders = await getOrdersFn({ data: { skip, status, start_date, end_date, take: LIMIT } });
+        return {
+            paginatedOrders,
+        };
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
+    const { paginatedOrders } = Route.useLoaderData();
     const search = Route.useSearch();
-    const { data } = useSuspenseQuery(ordersQueryOptions({ ...search }));
     const { updateQuery } = useUpdateQuery(200);
 
-    const { orders, ...pagination } = data ?? { skip: 0, limit: 0, total_pages: 0, total_count: 0 };
+    const { orders, ...pagination } = paginatedOrders ?? { skip: 0, limit: 0, total_pages: 0, total_count: 0 };
     return (
         <div className="px-4 md:px-10 py-8">
             <div className="mb-6 flex flex-col">

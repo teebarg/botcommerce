@@ -1,12 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router";
-import OrderConfirmation from "@/components/store/orders/order-confirmation";
-import { orderQueryOptions } from "@/hooks/useOrder";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useOneTimeConfetti } from "@/hooks/useOneTimeConfetti";
+import OrderPickup from "@/components/store/orders/order-pickup";
+import SuccessConfirmation from "@/components/store/orders/order-success";
+import PendingPayment from "@/components/store/orders/order-pending";
+import FailedPayment from "@/components/store/orders/order-failed";
+import { getOrderFn } from "@/server/order.server";
 
 export const Route = createFileRoute("/_mainLayout/order/confirmed/$id")({
-    loader: async ({ context: { queryClient }, params: { id } }) => {
+    loader: async ({ params: { id } }) => {
         try {
-            await queryClient.ensureQueryData(orderQueryOptions(id));
+            const order = await getOrderFn({ data: id });
+            return {
+                order,
+            };
         } catch (err) {
             throw new Error("ORDER_NOT_FOUND");
         }
@@ -30,5 +36,30 @@ function RouteComponent() {
     const { id } = Route.useParams();
     useOneTimeConfetti(id, "firework");
 
-    return <OrderConfirmation orderNumber={id} />;
+    const navigate = useNavigate();
+    const { order } = Route.useLoaderData();
+
+    const onContinueShopping = () => {
+        navigate({ to: "/collections" });
+    };
+
+    if (!order) {
+        return <div className="flex items-center justify-center py-12 px-2 bg-secondary">Order not found</div>;
+    }
+
+    if (order?.payment_method === "CASH_ON_DELIVERY") {
+        return (
+            <div className="px-2 pb-8">
+                <OrderPickup onContinueShopping={onContinueShopping} order={order} />
+            </div>
+        );
+    }
+
+    return (
+        <div className="px-2 pb-8">
+            {order?.payment_status === "SUCCESS" && <SuccessConfirmation onContinueShopping={onContinueShopping} order={order} />}
+            {order?.payment_status === "PENDING" && <PendingPayment onContinueShopping={onContinueShopping} order={order} />}
+            {order?.payment_status === "FAILED" && <FailedPayment onContinueShopping={onContinueShopping} order={order} />}
+        </div>
+    );
 }

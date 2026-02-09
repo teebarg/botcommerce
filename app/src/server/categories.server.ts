@@ -46,12 +46,6 @@ export const CategoriesProductsSchema = z.object({
 
 export type CategoriesWithProducts = z.infer<typeof CategoriesProductsSchema>;
 
-export const getCategoriesProductsFn = createServerFn()
-    .handler(async () => {
-        const res = await api.get<CategoriesWithProducts[]>("/category/home/products");
-        return res;
-    });
-
 
 export const getCategoriesFn = createServerFn({ method: "GET" })
     .inputValidator(z.string().optional())

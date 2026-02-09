@@ -1,39 +1,8 @@
-import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { changeOrderStatusFn, changePaymentStatusFn, getOrderFn, getOrdersFn, getOrderTimelineFn, returnOrderItemFn } from "@/server/order.server";
+import { changeOrderStatusFn, changePaymentStatusFn, getOrderFn, getOrderTimelineFn, returnOrderItemFn } from "@/server/order.server";
 import type { OrderStatus, PaymentStatus } from "@/schemas";
 
-interface OrderSearchParams {
-    order_number?: string;
-    status?: string;
-    skip?: number;
-    take?: number;
-    customer_id?: number;
-    sort?: string;
-    start_date?: string;
-    end_date?: string;
-}
-
-export const ordersQueryOptions = (searchParams: OrderSearchParams) =>
-    queryOptions({
-        queryKey: ["orders", JSON.stringify(searchParams)],
-        queryFn: () => getOrdersFn({ data: { ...searchParams } }),
-    });
-
-export const useOrders = (searchParams: OrderSearchParams) => {
-    // const { data: session } = useSession();
-
-    return useQuery({
-        queryKey: ["orders", JSON.stringify(searchParams)],
-        queryFn: () => getOrdersFn({ data: searchParams }),
-        // enabled: Boolean(session?.user),
-    });
-};
-
-export const orderQueryOptions = (orderNumber: string) => ({
-    queryKey: ["order", orderNumber],
-    queryFn: () => getOrderFn({ data: orderNumber }),
-});
 
 export const useOrder = (orderNumber: string) => {
     return useQuery({

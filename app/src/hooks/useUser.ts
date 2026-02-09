@@ -104,12 +104,6 @@ export const useDeleteUser = () => {
     });
 };
 
-export const userWishlistQueryOptions = (from: string) =>
-    queryOptions({
-        queryKey: ["products", "wishlist"],
-        queryFn: () => getWishlistFn({ data: from }),
-    });
-
 export const useUserWishlist = () => {
     return useQuery({
         queryKey: ["products", "wishlist"],

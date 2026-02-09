@@ -3,11 +3,6 @@ import { toast } from "sonner";
 import { createAddressFn, deleteAddressFn, getUserAddressesFn, updateAddressFn } from "@/server/address.server";
 import { useRouteContext } from "@tanstack/react-router";
 
-export const addressesQueryOptions = () => ({
-    queryKey: ["addresses"],
-    queryFn: () => getUserAddressesFn(),
-});
-
 export const useUserAddresses = () => {
     const { session } = useRouteContext({ strict: false });
 

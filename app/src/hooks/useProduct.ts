@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { ProductFeed } from "@/schemas";
+import type { PaginatedProductSearch, ProductFeed } from "@/schemas";
 import {
     bustCacheFn,
     createProductFn,
@@ -9,8 +9,6 @@ import {
     deleteProductFn,
     deleteVariantFn,
     flushCacheFn,
-    getProductsFn,
-    productSearchFn,
     recommendedProductsFn,
     reIndexProductsFn,
     reorderImagesFn,
@@ -72,15 +70,10 @@ type UploadImageInput = { id: number; data: any };
 type DeleteImageInput = { id: number; imageId: number };
 type ReorderImagesInput = { id: number; imageIds: number[] };
 
-export const productQueryOptions = (params: SearchParams) => ({
-    queryKey: ["products", "query", JSON.stringify(params)],
-    queryFn: () => getProductsFn({ data: params }),
-});
-
 export const useProductSearch = (params: SearchParams) => {
     return useQuery({
         queryKey: ["products", "search", params],
-        queryFn: () => productSearchFn({ data: params }),
+        queryFn: async () => await clientApi.get<PaginatedProductSearch>("/product/", { params }),
     });
 };
 
@@ -98,7 +91,7 @@ export const useProductFeed = (initialData: ProductFeed | null, search?: FeedPar
             if (!feedSeedRef.current) {
                 feedSeedRef.current = lastPage.feed_seed;
             }
-            return lastPage.next_cursor ?? undefined;
+            return lastPage.next_cursor ?? undefined; 
         },
 
         initialPageParam: null,

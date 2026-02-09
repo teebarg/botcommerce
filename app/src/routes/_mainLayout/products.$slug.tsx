@@ -1,48 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { Suspense } from "react";
 import RelatedProducts from "@/components/store/products/related-products";
 import ReviewsSection from "@/components/products/product-reviews";
-import { getProductFn, getRelatedProductFn } from "@/server/product.server";
-import SuspenseQuery from "@/utils/query";
-import { getProductReviewFn } from "@/server/review.server";
-import type { PaginatedReview, ProductSearch } from "@/schemas";
+import { getProductFn } from "@/server/product.server";
 import ProductView from "@/components/store/products/product-view";
-import { ordersQueryOptions } from "@/hooks/useOrder";
 import { seo } from "@/utils/seo";
 import { ArrowUpRight, RefreshCcw, TriangleAlert } from "lucide-react";
 import { BtnLink } from "@/components/ui/btnLink";
 import { Button } from "@/components/ui/button";
-
-const productQueryOptions = (slug: string) => ({
-    queryKey: ["product", slug],
-    queryFn: () => getProductFn({ data: slug }),
-});
-
-const reviewsQueryOptions = (productId: number) => ({
-    queryKey: ["reviews", productId],
-    queryFn: () => getProductReviewFn({ data: { product_id: productId, limit: 5 } }),
-});
-
-const relatedProductsQueryOptions = (productId: number, limit: number) => ({
-    queryKey: ["products", "similar", productId, limit],
-    queryFn: () => getRelatedProductFn({ data: { productId, limit } }),
-});
+import { LazyInView } from "@/components/LazyInView";
 
 export const Route = createFileRoute("/_mainLayout/products/$slug")({
     loader: async ({ context: { queryClient }, params: { slug } }) => {
-        const data = await queryClient.ensureQueryData(productQueryOptions(slug));
-
-        queryClient.prefetchQuery(reviewsQueryOptions(data.id));
-        queryClient.prefetchQuery(relatedProductsQueryOptions(data.id, 4));
-        queryClient.prefetchQuery(ordersQueryOptions({}));
-
+        const product = await getProductFn({ data: slug });
         return {
-            data,
+            product,
         };
     },
     head: ({ loaderData }) => {
-        const product = loaderData?.data;
+        const product = loaderData?.product;
         const baseUrl = import.meta.env.VITE_BASE_URL;
         const title = product?.name || "";
 
@@ -90,34 +65,18 @@ export const Route = createFileRoute("/_mainLayout/products/$slug")({
 });
 
 function RouteComponent() {
-    const { slug } = Route.useParams();
-    const { data: product } = useSuspenseQuery(productQueryOptions(slug));
+    const { product } = Route.useLoaderData();
 
     return (
         <main className="flex flex-col">
             <ProductView product={product} />
 
-            <section className="related-products">
-                <Suspense fallback={<div>Loading related products...</div>}>
-                    <SuspenseQuery queryOptions={relatedProductsQueryOptions(product.id, 4)}>
-                        {(related: { similar: ProductSearch[] }) => (
-                            <div className="max-w-7xl mx-1 md:mx-auto px-2 md:px-6 my-4 w-full">
-                                <RelatedProducts similar={related.similar} productId={product.id} />
-                            </div>
-                        )}
-                    </SuspenseQuery>
-                </Suspense>
-            </section>
-
-            <section className="reviews">
-                <Suspense fallback={<div className="text-center p-4">Loading reviews...</div>}>
-                    <SuspenseQuery queryOptions={reviewsQueryOptions(product.id)}>
-                        {(reviews: PaginatedReview) => (
-                            <ReviewsSection productName={product?.name} product_id={product?.id} paginatedReviews={reviews} />
-                        )}
-                    </SuspenseQuery>
-                </Suspense>
-            </section>
+            <LazyInView>
+                <RelatedProducts productId={product.id} />
+            </LazyInView>
+            <LazyInView>
+                <ReviewsSection productName={product?.name} product_id={product?.id} />
+            </LazyInView>
         </main>
     );
 }

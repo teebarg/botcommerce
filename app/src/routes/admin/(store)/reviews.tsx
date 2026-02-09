@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowUpDown, Search } from "lucide-react";
-
 import type { Review } from "@/schemas";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -10,7 +9,6 @@ import PaginationUI from "@/components/pagination";
 import { ReviewActions } from "@/components/admin/reviews/reviews-actions";
 import ReviewItem from "@/components/admin/reviews/review-item";
 import z from "zod";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { getReviewsFn } from "@/server/review.server";
 
 type ReviewsParams = {
@@ -20,12 +18,6 @@ type ReviewsParams = {
     sort?: string;
 };
 
-const useReviewsQuery = (params: ReviewsParams) =>
-    queryOptions({
-        queryKey: ["reviews", JSON.stringify(params)],
-        queryFn: () => getReviewsFn({ data: params }),
-    });
-
 export const Route = createFileRoute("/admin/(store)/reviews")({
     validateSearch: z.object({
         product_id: z.number().optional(),
@@ -33,21 +25,23 @@ export const Route = createFileRoute("/admin/(store)/reviews")({
         sort: z.string().optional(),
     }),
     loaderDeps: ({ search: { product_id, skip, sort } }) => ({ product_id, skip, sort }),
-    loader: async ({ context, deps: { product_id, skip, sort } }) => {
-        await context.queryClient.ensureQueryData(useReviewsQuery({ product_id, skip, sort, limit: 20 }));
+    loader: async ({ deps: { product_id, skip, sort } }) => {
+        const paginatedReviews = await getReviewsFn({ data: { product_id, skip, sort, limit: 20 } });
+        return {
+            paginatedReviews,
+        };
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const search = Route.useSearch();
-    const { data } = useSuspenseQuery(useReviewsQuery({ ...search }));
+    const { paginatedReviews } = Route.useLoaderData();
 
-    if (!data) {
+    if (!paginatedReviews) {
         return <div className="px-2 md:px-12 py-48">No reviews found</div>;
     }
 
-    const { reviews, ...pagination } = data;
+    const { reviews, ...pagination } = paginatedReviews;
     return (
         <div className="px-3 md:px-12 py-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

@@ -101,13 +101,6 @@ export const RelatedProductSearchSchema = z.object({
     limit: z.number().optional(),
 });
 
-export const getProductsFn = createServerFn({ method: "GET" })
-    .inputValidator(SearchSchema)
-    .handler(async ({ data }) => {
-        const res = await api.get<PaginatedProductSearch>("/product/", { params: { skip: 0, ...data } });
-        return res;
-    });
-
 export const getProductsFeedFn = createServerFn()
     .inputValidator(FeedQuerySchema)
     .handler(async ({ data }) => {
@@ -115,23 +108,10 @@ export const getProductsFeedFn = createServerFn()
         return res;
     });
 
-export const productSearchFn = createServerFn({ method: "GET" })
-    .inputValidator(SearchParamsSchema)
-    .handler(async ({ data: params }) => {
-        return await api.get<PaginatedProductSearch>("/product/", { params });
-    });
-
 export const getProductFn = createServerFn({ method: "GET" })
     .inputValidator((d: string) => d)
     .handler(async ({ data }) => {
         const res = await api.get<Product>(`/product/${data}`);
-        return res;
-    });
-
-export const getRelatedProductFn = createServerFn({ method: "GET" })
-    .inputValidator((input: unknown) => RelatedProductSearchSchema.parse(input))
-    .handler(async ({ data: { productId, limit = 4 } }) => {
-        const res = await api.get<{ similar: ProductSearch[] }>(`/product/${productId}/similar`, { params: { limit } });
         return res;
     });
 

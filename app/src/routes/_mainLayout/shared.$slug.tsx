@@ -4,17 +4,11 @@ import { seo } from "@/utils/seo";
 import { getCatalogFn } from "@/server/catalog.server";
 import { SharedCollectionVisitTracker } from "@/components/store/shared/shared-collection-visit-tracker";
 import SharedInfinite from "@/components/store/shared/shared-infinite";
-import { useSuspenseQuery } from "@tanstack/react-query";
 
 export const CatalogSearchSchema = z.object({
     sort: z.string().optional(),
     sizes: z.number().optional(),
     colors: z.string().optional(),
-});
-
-const catalogQueryOptions = (slug: string, params: any) => ({
-    queryKey: ["product", slug, JSON.stringify(params)],
-    queryFn: () => getCatalogFn({ data: { ...params, slug } }),
 });
 
 export const Route = createFileRoute("/_mainLayout/shared/$slug")({
@@ -24,16 +18,15 @@ export const Route = createFileRoute("/_mainLayout/shared/$slug")({
             search,
         };
     },
-    loader: async ({ params: { slug }, context: { queryClient, search } }) => {
-        const data = await queryClient.ensureQueryData(catalogQueryOptions(slug, { ...search }));
-
+    loader: async ({ params: { slug }, context: { search } }) => {
+        const res = await getCatalogFn({ data: { ...search, slug } });
         return {
-            data,
+            catalog: res,
             slug,
         };
     },
     head: ({ loaderData }) => {
-        const catalog = loaderData?.data;
+        const catalog = loaderData?.catalog;
         const name = catalog?.title || "";
         const title = name;
         const description = catalog?.description || `Curated product list: ${name}`;
@@ -55,14 +48,11 @@ export const Route = createFileRoute("/_mainLayout/shared/$slug")({
 });
 
 function RouteComponent() {
-    const { slug } = Route.useParams();
-    const search = Route.useSearch();
-    const { data: catalog } = useSuspenseQuery(catalogQueryOptions(slug, search));
-
+    const { catalog, slug } = Route.useLoaderData();
     return (
-        <div className="max-w-8xl mx-auto w-full py-4 px-1.5 lg:px-0">
+        <>
             <SharedCollectionVisitTracker slug={slug} />
             <SharedInfinite initialCatalog={catalog} slug={slug} />
-        </div>
+        </>
     );
 }

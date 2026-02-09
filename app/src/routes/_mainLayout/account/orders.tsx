@@ -1,19 +1,21 @@
-import { ordersQueryOptions } from "@/hooks/useOrder";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import type { Order } from "@/schemas";
 import OrderCard from "@/components/store/orders/order-card";
 import { BtnLink } from "@/components/ui/btnLink";
+import { getOrdersFn } from "@/server/order.server";
 
 export const Route = createFileRoute("/_mainLayout/account/orders")({
-    loader: async ({ context }) => {
-        await context.queryClient.ensureQueryData(ordersQueryOptions({ take: 20 }));
+    loader: async () => {
+        const paginatedOrders = await getOrdersFn({ data: { take: 20 } });
+        return {
+            paginatedOrders,
+        };
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { data } = useSuspenseQuery(ordersQueryOptions({take: 20}));
+    const { paginatedOrders } = Route.useLoaderData();
     return (
         <div className="w-full px-2" data-testid="orders-page-wrapper">
             <div className="mb-8">
@@ -23,9 +25,9 @@ function RouteComponent() {
                 </p>
             </div>
             <div>
-                {data?.orders?.length ? (
+                {paginatedOrders?.orders?.length ? (
                     <div className="flex flex-col gap-y-8 w-full">
-                        {data.orders?.map((o: Order, idx: number) => (
+                        {paginatedOrders.orders?.map((o: Order, idx: number) => (
                             <OrderCard key={idx} order={o} idx={idx} />
                         ))}
                     </div>

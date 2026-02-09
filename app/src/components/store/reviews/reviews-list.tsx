@@ -17,9 +17,9 @@ interface ReviewsListProps {
 }
 
 export const ReviewsList = ({ data, product_id, hasPurchased, hasReviewed }: ReviewsListProps) => {
+    const { updateQuery } = useUpdateQuery(200);
     const state = useOverlayTriggerState({});
     const { reviews, ratings } = data;
-    const { updateQuery } = useUpdateQuery(200);
     const sort = "newest";
 
     const getPercentage = (count: number) => (count / ratings?.count) * 100;

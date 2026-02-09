@@ -75,12 +75,10 @@ declare module "@auth/core/types" {
 export const authConfig: StartAuthJSConfig = {
     secret: process.env.AUTH_SECRET,
     adapter: UpstashRedisAdapter(redis),
-
     session: {
         strategy: "jwt",
         maxAge: 60 * 60 * 24 * 30 * 12,
     },
-
     pages: {
         signIn: "/auth/signin",
         error: "/auth/error",
