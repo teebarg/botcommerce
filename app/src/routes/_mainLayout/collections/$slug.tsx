@@ -1,10 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tryCatch } from "@/utils/try-catch";
 import z from "zod";
-import { getCollectionFn } from "@/server/collections.server";
 import { seo } from "@/utils/seo";
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
-import { productFeedQuery } from "@/queries/user.queries";
+import { collectionQuery, productFeedQuery } from "@/queries/user.queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 const FeedQuerySchema = z.object({
@@ -25,7 +23,7 @@ export const Route = createFileRoute("/_mainLayout/collections/$slug")({
         };
     },
     loader: async ({ params: { slug }, context: { search, config, queryClient } }) => {
-        const { data: collection } = await tryCatch(getCollectionFn({ data: slug }));
+        const collection = await queryClient.ensureQueryData(collectionQuery(slug));
         await queryClient.ensureQueryData(productFeedQuery({ collections: collection?.slug, ...search }));
         return {
             collection,

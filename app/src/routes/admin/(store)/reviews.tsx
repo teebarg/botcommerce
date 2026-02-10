@@ -9,14 +9,8 @@ import PaginationUI from "@/components/pagination";
 import { ReviewActions } from "@/components/admin/reviews/reviews-actions";
 import ReviewItem from "@/components/admin/reviews/review-item";
 import z from "zod";
-import { getReviewsFn } from "@/server/review.server";
-
-type ReviewsParams = {
-    product_id?: number;
-    skip?: number;
-    limit?: number;
-    sort?: string;
-};
+import { reviewsQuery } from "@/queries/user.queries";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/admin/(store)/reviews")({
     validateSearch: z.object({
@@ -25,17 +19,14 @@ export const Route = createFileRoute("/admin/(store)/reviews")({
         sort: z.string().optional(),
     }),
     loaderDeps: ({ search: { product_id, skip, sort } }) => ({ product_id, skip, sort }),
-    loader: async ({ deps: { product_id, skip, sort } }) => {
-        const paginatedReviews = await getReviewsFn({ data: { product_id, skip, sort, limit: 20 } });
-        return {
-            paginatedReviews,
-        };
+    loader: async ({ context: { queryClient }, deps: { product_id, skip, sort } }) => {
+        await queryClient.ensureQueryData(reviewsQuery({ product_id, skip, sort }));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { paginatedReviews } = Route.useLoaderData();
+    const { data: paginatedReviews } = useSuspenseQuery(reviewsQuery(Route.useSearch()));
 
     if (!paginatedReviews) {
         return <div className="px-2 md:px-12 py-48">No reviews found</div>;

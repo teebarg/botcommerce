@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-
 import { ActivityListItem } from "@/components/generic/activities/ActivityList";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getActivitiesFn } from "@/server/activities.server";

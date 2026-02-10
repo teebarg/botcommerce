@@ -13,6 +13,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import SheetDrawer from "@/components/sheet-drawer";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { userAddressesQuery } from "@/queries/user.queries";
 
 type AddressItemProps = {
     address: Address;

@@ -12,15 +12,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useDeleteCoupon, useToggleCouponStatus } from "@/hooks/useCoupon";
 import { SwipeableCouponCard } from "@/components/admin/coupons/swipeable-coupon-card";
 
-const couponQueryOptions = (query?: string, isActive?: boolean, skip?: number, limit?: number) => ({
-    queryKey: ["coupons", query, isActive, skip, limit],
-    queryFn: () => getCouponsFn({ data: { query, isActive, skip, limit } }),
+const couponQueryOptions = (query?: string, isActive?: boolean, skip?: number) => ({
+    queryKey: ["coupons", query, isActive, skip],
+    queryFn: () => getCouponsFn({ data: { query, isActive, skip } }),
 });
 
 const couponSearchSchema = z.object({
     query: z.string().optional(),
     isActive: z.boolean().optional(),
-    limit: z.number().optional(),
     skip: z.number().optional(),
 });
 
@@ -33,14 +32,14 @@ export const Route = createFileRoute("/admin/(store)/coupons")({
     },
     loaderDeps: ({ search: { query, skip, isActive } }) => ({ query, skip, isActive }),
     loader: async ({ context: { queryClient, search } }) => {
-        await queryClient.ensureQueryData(couponQueryOptions(search.query, search.isActive, search.skip, search.limit));
+        await queryClient.ensureQueryData(couponQueryOptions(search.query, search.isActive, search.skip));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { isActive, query, skip, limit } = Route.useSearch();
-    const { data } = useSuspenseQuery(couponQueryOptions(query, isActive, skip, limit));
+    const { isActive, query, skip } = Route.useSearch();
+    const { data } = useSuspenseQuery(couponQueryOptions(query, isActive, skip));
     const coupons = data?.coupons || [];
     const toggleMutation = useToggleCouponStatus();
     const deleteMutation = useDeleteCoupon();

@@ -1,7 +1,7 @@
 const baseURL = import.meta.env.VITE_API_URL ?? "https://api.yourdomain.com";
 
 type ClientRequestOptions = RequestInit & {
-    params?: Record<string, string | number | boolean | null | undefined | object>;
+    params?: Record<string, string | number | boolean | null | undefined | object | unknown>;
     accessToken?: string | null;
 };
 

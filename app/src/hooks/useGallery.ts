@@ -6,14 +6,13 @@ import {
     bulkUploadImagesFn,
     createImageMetadataFn,
     deleteGalleryImageFn,
-    getGalleryImagesFn,
     reIndexGalleryFn,
     updateImageMetadataFn,
 } from "@/server/gallery.server";
-import { Catalog, GalleryImage, type GalleryImageItem } from "@/schemas";
+import { type GalleryImageItem } from "@/schemas";
+import { clientApi } from "@/utils/api.client";
 
 type ImageMetadataInput = { imageId: number; input: any };
-type BulkDeleteInput = { imageIds: number[] };
 type BulkUpdateInput = { imageIds: number[]; input: any };
 type BulkUploadInput = { urls: string[] };
 
@@ -22,11 +21,14 @@ interface PaginatedGalleryResponse {
     next_cursor: number | null;
 }
 
-export const useImageGalleryInfinite = (pageSize: number = 20, initial: PaginatedGalleryResponse) => {
+export const useImageGalleryInfinite = (initial: PaginatedGalleryResponse) => {
     return useInfiniteQuery({
         queryKey: ["gallery"],
-        queryFn: ({ pageParam = 0 }) => getGalleryImagesFn({ data: { cursor: pageParam, limit: pageSize } }),
-        getNextPageParam: (lastPage) => lastPage.next_cursor,
+        queryFn: ({ pageParam = 0 }) => clientApi.get<PaginatedGalleryResponse>("/gallery/", { params: { cursor: pageParam } }),
+        getNextPageParam: (lastPage) => {
+            console.log("🚀 ~ file: useGallery.ts:30 ~ lastPage:", lastPage);
+            return lastPage.next_cursor ?? 200;
+        },
         initialPageParam: null as number | null,
         initialData: { pages: [initial], pageParams: [0] },
     });

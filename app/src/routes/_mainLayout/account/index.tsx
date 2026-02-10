@@ -6,7 +6,8 @@ import type { Order } from "@/schemas";
 import Overlay from "@/components/overlay";
 import OrderDetails from "@/components/store/orders/order-details";
 import { motion } from "framer-motion";
-import { getOrdersFn } from "@/server/order.server";
+import { ordersQuery } from "@/queries/user.queries";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 const OrderItem: React.FC<{ order: Order; idx: number }> = ({ order, idx }) => {
     const state = useOverlayTriggerState({});
@@ -55,18 +56,15 @@ const OrderItem: React.FC<{ order: Order; idx: number }> = ({ order, idx }) => {
 };
 
 export const Route = createFileRoute("/_mainLayout/account/")({
-    loader: async () => {
-        const paginatedOrders = await getOrdersFn({ data: {} });
-        return {
-            paginatedOrders,
-        };
+    loader: async ({ context: { queryClient } }) => {
+        await queryClient.ensureQueryData(ordersQuery({}));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
     const { session } = Route.useRouteContext();
-    const { paginatedOrders } = Route.useLoaderData();
+    const { data: paginatedOrders } = useSuspenseQuery(ordersQuery({}));
 
     return (
         <div className="px-2 md:px-0 space-y-4">

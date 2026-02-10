@@ -4,6 +4,7 @@ import { z } from "zod";
 import type { Collection, PaginatedShared, Shared } from "@/schemas";
 import type { CollectionFormValues } from "@/components/admin/collections/collection-form";
 import type { SharedFormValues } from "@/components/admin/shared-collections/shared-form";
+import { clientApi } from "@/utils/api.client";
 
 // Using z.custom since the schema definitions are not provided
 const CollectionFormValuesSchema = z.custom<CollectionFormValues>();
@@ -64,7 +65,7 @@ export const deleteCollectionFn = createServerFn({ method: "POST" })
 export const getCatalogsFn = createServerFn({ method: "GET" })
     .inputValidator(z.boolean().optional())
     .handler(async ({ data: is_active }) => {
-        return await api.get<PaginatedShared>("/shared/", { params: { is_active: is_active ?? null } });
+        return await clientApi.get<PaginatedShared>("/shared/", { params: { is_active: is_active ?? null } });
     });
 
 export const createCatalogFn = createServerFn({ method: "POST" })
