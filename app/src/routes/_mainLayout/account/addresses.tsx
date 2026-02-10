@@ -12,7 +12,7 @@ import { useDeleteAddress } from "@/hooks/useAddress";
 import { AnimatePresence, motion } from "framer-motion";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import SheetDrawer from "@/components/sheet-drawer";
-import { getUserAddressesFn } from "@/server/address.server";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 type AddressItemProps = {
     address: Address;
@@ -44,7 +44,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false, in
         >
             <div className="p-4">
                 <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 gradient-primary">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 gradient-primary">
                         <Home className="w-5 h-5 text-white" />
                     </div>
 
@@ -102,18 +102,16 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false, in
 };
 
 export const Route = createFileRoute("/_mainLayout/account/addresses")({
-    loader: async () => {
-        const res = await getUserAddressesFn();
-        return {
-            addresses: res.addresses,
-        };
+    loader: async ({ context: { queryClient } }) => {
+        await queryClient.ensureQueryData(userAddressesQuery());
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
     const addState = useOverlayTriggerState({});
-    const { addresses } = Route.useLoaderData();
+    const { data } = useSuspenseQuery(userAddressesQuery());
+    const addresses = data.addresses;
 
     return (
         <div className="w-full px-2">

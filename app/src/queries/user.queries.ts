@@ -1,6 +1,9 @@
 import { queryOptions } from "@tanstack/react-query";
-import { getProductsFeedFn } from "@/server/product.server";
+import { getProductFn, getProductsFeedFn } from "@/server/product.server";
 import { getCatalogFn } from "@/server/catalog.server";
+import { getWishlistFn } from "@/server/users.server";
+import { getOrderFn, getOrdersFn } from "@/server/order.server";
+import { getUserAddressesFn } from "@/server/address.server";
 
 type FeedParams = {
     search?: string;
@@ -25,10 +28,41 @@ export const productFeedQuery = (params: FeedParams) =>
         staleTime: 5_000,
     });
 
-
 export const catalogFeedQuery = (params: CatalogFeedParams) =>
     queryOptions({
         queryKey: ["products", "catalog", "feed", JSON.stringify(params)],
         queryFn: () => getCatalogFn({ data: params }),
         staleTime: 5_000,
+    });
+
+export const wishlistQuery = (from: string) =>
+    queryOptions({
+        queryKey: ["products", "wishlist"],
+        queryFn: () => getWishlistFn({ data: from }),
+    });
+
+export const productQuery = (slug: string) =>
+    queryOptions({
+        queryKey: ["products", "product", slug],
+        queryFn: () => getProductFn({ data: slug }),
+    });
+
+export const orderQuery = (orderNumber: string) =>
+    queryOptions({
+        queryKey: ["order", orderNumber],
+        queryFn: () => getOrderFn({ data: orderNumber }),
+    });
+
+
+export const ordersQuery = (params: { take?: number; skip?: number, status?: any, start_date?: string, end_date?: string }) =>
+    queryOptions({
+        queryKey: ["orders"],
+        queryFn: () => getOrdersFn({ data: params }),
+    });
+
+
+export const userAddressesQuery = () =>
+    queryOptions({
+        queryKey: ["addresses"],
+        queryFn: () => getUserAddressesFn(),
     });

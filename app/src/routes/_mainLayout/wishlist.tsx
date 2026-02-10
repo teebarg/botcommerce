@@ -3,7 +3,8 @@ import WishlistItem from "@/components/store/wishlist";
 import { BtnLink } from "@/components/ui/btnLink";
 import type { WishItem } from "@/schemas";
 import { redirect } from "@tanstack/react-router";
-import { getWishlistFn } from "@/server/users.server";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { wishlistQuery } from "@/queries/user.queries";
 
 export const Route = createFileRoute("/_mainLayout/wishlist")({
     beforeLoad: ({ context, location }) => {
@@ -11,26 +12,23 @@ export const Route = createFileRoute("/_mainLayout/wishlist")({
             throw redirect({ to: "/auth/signin", search: { callbackUrl: location.href } });
         }
     },
-    loader: async ({ location }) => {
-        const res = await getWishlistFn({ data: location.href });
-        return {
-            wishlists: res.wishlists,
-        };
+    loader: async ({ context: { queryClient } }) => {
+        await queryClient.ensureQueryData(wishlistQuery("/wishlist"));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { wishlists } = Route.useLoaderData();
+    const { data } = useSuspenseQuery(wishlistQuery("/wishlist"));
 
     return (
         <div className="max-w-6xl mx-auto w-full mb-4 py-8 px-2 md:px-0">
-            {wishlists.length > 0 ? (
+            {data.wishlists.length > 0 ? (
                 <div>
                     <h1 className="text-2xl font-bold text-center">Your Wishlist</h1>
                     <p className="text-center text-muted-foreground">Curate your luxury collection.</p>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 lg:gap-8 mt-6 px-1">
-                        {wishlists?.map((item: WishItem, idx: number) => (
+                        {data.wishlists.map((item: WishItem, idx: number) => (
                             <WishlistItem key={idx} {...item.product} />
                         ))}
                     </div>

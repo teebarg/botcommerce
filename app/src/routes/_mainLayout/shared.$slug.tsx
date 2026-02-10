@@ -47,7 +47,7 @@ export const Route = createFileRoute("/_mainLayout/shared/$slug")({
 });
 
 function RouteComponent() {
-    const { search } = Route.useSearch();
+    const search = Route.useSearch();
     const { slug } = Route.useParams();
     const { data: catalog } = useSuspenseQuery(catalogFeedQuery({ ...search, slug }));
     return (

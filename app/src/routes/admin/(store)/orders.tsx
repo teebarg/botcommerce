@@ -12,6 +12,7 @@ import { OrderStatusBadge, PaymentStatusBadge } from "@/components/admin/orders/
 import OrderActions from "@/components/admin/orders/order-actions";
 import z from "zod";
 import { getOrdersFn } from "@/server/order.server";
+import { ordersQuery } from "@/queries/user.queries";
 
 const LIMIT = 10;
 
@@ -24,7 +25,8 @@ export const Route = createFileRoute("/admin/(store)/orders")({
         end_date: z.string().optional(),
     }),
     loaderDeps: ({ search: { skip, status, start_date, end_date } }) => ({ skip, status, start_date, end_date }),
-    loader: async ({ context, deps: { skip, status, start_date, end_date } }) => {
+    loader: async ({ context: { queryClient }, deps: { skip, status, start_date, end_date } }) => {
+        await queryClient.ensureQueryData(ordersQuery({ skip, status, start_date, end_date }));
         const paginatedOrders = await getOrdersFn({ data: { skip, status, start_date, end_date, take: LIMIT } });
         return {
             paginatedOrders,

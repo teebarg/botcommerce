@@ -1,15 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { changeOrderStatusFn, changePaymentStatusFn, getOrderFn, getOrderTimelineFn, returnOrderItemFn } from "@/server/order.server";
+import { changeOrderStatusFn, changePaymentStatusFn, getOrderTimelineFn, returnOrderItemFn } from "@/server/order.server";
 import type { OrderStatus, PaymentStatus } from "@/schemas";
-
-
-export const useOrder = (orderNumber: string) => {
-    return useQuery({
-        queryKey: ["order", orderNumber],
-        queryFn: () => getOrderFn({ data: orderNumber }),
-    });
-};
 
 export const useChangeOrderStatus = () => {
     return useMutation({
