@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ShopDetails } from "@/components/admin/settings/shop-details";
 import { FeatureToggles } from "@/components/admin/settings/feature-toggles";

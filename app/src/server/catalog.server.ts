@@ -13,10 +13,7 @@ export const CatalogSearchSchema = z.object({
 
 export const getCatalogFn = createServerFn({ method: "GET" })
     .inputValidator((input: unknown) => CatalogSearchSchema.parse(input))
-    .handler(async ({ data }) => {
-        const res = await api.get<Catalog>(`/shared/${data.slug}`, { params: { ...data } });
-        return res;
-    });
+    .handler(async ({ data }) => await api.get<Catalog>(`/shared/${data.slug}`, { params: { ...data } }));
 
 interface VisitTrackerResponse {
     success: boolean;

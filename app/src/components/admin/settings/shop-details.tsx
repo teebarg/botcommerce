@@ -9,7 +9,7 @@ interface ShopDetailsProps {
 }
 
 export function ShopDetails({ settings }: ShopDetailsProps) {
-    const themeSetting = settings.find((s) => s.key === "theme");
+    const themeSetting = settings?.find((s) => s.key === "theme");
     const syncShopDetailsMutation = useSyncShopDetails();
     const onUpdate = (e: string) => {
         syncShopDetailsMutation.mutateAsync({ theme: e }).then(() => {

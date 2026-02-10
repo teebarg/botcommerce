@@ -1,24 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-
-import { useState } from "react";
-
-import CustomerFilter from "@/components/admin/chats/chats-filter";
 import ChatsActions from "@/components/admin/chats/chats-actions";
 import ChatsCard from "@/components/admin/chats/chats-card";
-
 import type { Chat, ConversationStatus } from "@/schemas";
 import PaginationUI from "@/components/pagination";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { getChatsFn } from "@/server/generic.server";
 import z from "zod";
 
-const LIMIT = 20;
-
 interface ConversationParams {
     user_id?: number;
     status?: ConversationStatus;
     skip?: number;
-    limit?: number;
 }
 
 const useChatsQuery = (searchParams: ConversationParams) =>
@@ -29,18 +21,17 @@ const useChatsQuery = (searchParams: ConversationParams) =>
 
 export const Route = createFileRoute("/admin/(admin)/chats")({
     validateSearch: z.object({
-        skip: z.number().optional(),
+        skip: z.number().optional().default(0),
         status: z.enum(["ACTIVE", "COMPLETED", "ABANDONED"]).optional(),
     }),
     loaderDeps: ({ search: { skip, status } }) => ({ skip, status }),
     loader: async ({ context, deps: { skip, status } }) => {
-        await context.queryClient.ensureQueryData(useChatsQuery({ skip, status, limit: LIMIT }));
+        await context.queryClient.ensureQueryData(useChatsQuery({ skip, status }));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const [filterOpen, setFilterOpen] = useState<boolean>(false);
     const search = Route.useSearch();
     const { data } = useSuspenseQuery(useChatsQuery({ ...search }));
 
@@ -52,18 +43,16 @@ function RouteComponent() {
             <p className="text-muted-foreground text-sm mb-4">Manage your chats.</p>
             <div className="pb-4">
                 <div>
-                    <div>
-                        {chats?.map((chat: Chat, idx: number) => (
-                            <ChatsCard key={idx} actions={<ChatsActions chat={chat} />} chat={chat} />
-                        ))}
-                    </div>
-
-                    {chats?.length === 0 && (
-                        <div className="text-center py-10 bg-card">
-                            <p className="text-muted-foreground">No chat found</p>
-                        </div>
-                    )}
+                    {chats?.map((chat: Chat, idx: number) => (
+                        <ChatsCard key={idx} actions={<ChatsActions chat={chat} />} chat={chat} />
+                    ))}
                 </div>
+
+                {chats?.length === 0 && (
+                    <div className="text-center py-10 bg-card">
+                        <p className="text-muted-foreground">No chat found</p>
+                    </div>
+                )}
             </div>
             {pagination?.total_pages > 1 && <PaginationUI key="pagination" pagination={pagination} />}
         </div>

@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import z from "zod";
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
-import { getProductsFeedFn } from "@/server/product.server";
+import { productFeedQuery } from "@/queries/user.queries";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 const FeedQuerySchema = z.object({
     sort: z.enum(["min_variant_price:asc", "min_variant_price:desc", "id:desc", "created_at:desc"]).optional(),
@@ -21,14 +22,13 @@ export const Route = createFileRoute("/_mainLayout/collections/")({
             search,
         };
     },
-    loader: async ({ context: { search } }) => {
-        const res = await getProductsFeedFn({ data: { ...search, feed_seed: Math.random() } });
-        return { data: res };
+    loader: async ({ context: { search, queryClient } }) => {
+        await queryClient.ensureQueryData(productFeedQuery({ ...search }));
     },
 });
 
 function RouteComponent() {
-    const { data } = Route.useLoaderData();
+    const { data } = useSuspenseQuery(productFeedQuery(Route.useSearch()));
 
     return <InfiniteScrollClient initialData={data} />;
 }

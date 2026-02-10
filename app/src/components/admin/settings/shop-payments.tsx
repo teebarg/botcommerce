@@ -98,8 +98,8 @@ export function ShopPayments({ settings }: ShopPaymentsProps) {
     return (
         <div className="space-y-8">
             <div className="space-y-4 bg-card px-2 py-4">
-                {defaultFeatures.map((feature, idx: number) => {
-                    const existingToggle = settings.find((t) => t.key === feature.key);
+                {defaultFeatures?.map((feature, idx: number) => {
+                    const existingToggle = settings?.find((t) => t.key === feature.key);
                     const isEnabled = existingToggle ? existingToggle.value === "true" : false;
 
                     return (
