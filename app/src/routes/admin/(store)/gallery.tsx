@@ -35,7 +35,6 @@ interface PaginatedGalleryResponse {
 
 function RouteComponent() {
     const { data: initialImages } = useSuspenseQuery(galleryInfiniteQuery());
-    console.log("🚀 ~ file: gallery.tsx:32 ~ initialImages:", initialImages);
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
@@ -46,7 +45,7 @@ function RouteComponent() {
         isFetchingNextPage,
         isLoading: isImagesLoading,
     } = useInfiniteQuery<PaginatedGalleryResponse>({
-        queryKey: ["gallery", "cursor"],
+        queryKey: ["gallery", "infinite"],
         queryFn: async ({ pageParam }) => await clientApi.get<PaginatedGalleryResponse>("/gallery/", { params: { cursor: pageParam } }),
         initialPageParam: undefined,
         getNextPageParam: (lastPage: PaginatedGalleryResponse) => lastPage.next_cursor ?? undefined,

@@ -26,22 +26,18 @@ meilisearch_client = MeilisearchClient(settings.MEILI_HOST, settings.MEILI_MASTE
 supabase: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
 
 # SessionDep = Annotated[Session, Depends(get_db)]
-TokenDep = Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]
-TokenDep2 = Annotated[Union[str, None], Cookie(alias="authjs.session-token" if settings.ENVIRONMENT == "local" else "__Secure-authjs.session-token")]
+# TokenDep = Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]
+TokenDep = Annotated[Union[str, None], Cookie(alias="authjs.session-token" if settings.ENVIRONMENT == "local" else "__Secure-authjs.session-token")]
 
 RedisClient = Annotated[redis.Redis, Depends(get_redis_dependency)]
 
-async def get_user_token(access_token: TokenDep2) -> TokenPayload | None:
-    print("🚀 ~ file: deps.py:35 ~ access_token:", access_token)
+async def get_user_token(access_token: TokenDep) -> TokenPayload | None:
     try:
         payload = jwt.decode(
             access_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
-        print("🚀 ~ file: deps.py:38 ~ payload:", payload)
         token_data = TokenPayload(sub=payload.get("email"))
-        print("🚀 ~ file: deps.py:42 ~ token_data:", token_data)
     except (InvalidTokenError, ValidationError) as e:
-        print("🚀 ~ file: deps.py:44 ~ e:", e)
         return None
 
     return token_data

@@ -3,8 +3,6 @@ import Google from "@auth/core/providers/google";
 import { UpstashRedisAdapter } from "@auth/upstash-redis-adapter";
 import { Redis } from "@upstash/redis";
 import { SignJWT, jwtVerify } from "jose";
-// import { sign, verify } from "jsonwebtoken";
-
 import { tryCatch } from "@/utils/try-catch";
 import type { User, Address, Role, Status, Message } from "@/schemas";
 import { api } from "./fetch-api";
@@ -82,10 +80,7 @@ export const authConfig: StartAuthJSConfig = {
     },
     jwt: {
         async encode({ secret, token }) {
-            // 1. Resolve the secret to a single string
             const secretValue = Array.isArray(secret) ? secret[0] : secret;
-
-            // 2. Convert to Uint8Array for 'jose'
             const secretKey = new TextEncoder().encode(secretValue);
 
             return await new SignJWT(token).setProtectedHeader({ alg: "HS256" }).sign(secretKey);

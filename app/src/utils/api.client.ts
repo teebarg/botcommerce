@@ -2,11 +2,10 @@ const baseURL = import.meta.env.VITE_API_URL ?? "https://api.yourdomain.com";
 
 type ClientRequestOptions = RequestInit & {
     params?: Record<string, string | number | boolean | null | undefined | object | unknown>;
-    accessToken?: string | null;
 };
 
 async function clientRequest<T>(endpoint: string, options: ClientRequestOptions = {}): Promise<T> {
-    const { params, accessToken, ...rest } = options;
+    const { params, ...rest } = options;
 
     const url = new URL(`/api${endpoint}`, baseURL);
 
@@ -19,7 +18,7 @@ async function clientRequest<T>(endpoint: string, options: ClientRequestOptions 
 
     const response = await fetch(url.toString(), {
         ...rest,
-        credentials: "include", // sends cookies automatically
+        credentials: "include",
         headers: {
             "Content-Type": "application/json",
             ...rest.headers,
@@ -27,7 +26,6 @@ async function clientRequest<T>(endpoint: string, options: ClientRequestOptions 
     });
 
     if (response.status === 401) {
-        // client-side redirect (no server CPU)
         window.location.href = `/auth/signin?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
         throw new Error("Unauthorized");
     }
@@ -37,7 +35,7 @@ async function clientRequest<T>(endpoint: string, options: ClientRequestOptions 
         try {
             const body = await response.json();
             message = body?.detail || body?.message || message;
-        } catch {}
+        } catch { }
         throw new Error(message);
     }
 
