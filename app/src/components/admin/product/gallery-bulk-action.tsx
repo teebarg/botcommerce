@@ -88,7 +88,6 @@ export const ProductBulkActions = ({
                     onConfirm={onDelete}
                     title="Delete Products"
                     description="Are you sure you want to delete these products?"
-                    confirmText="Delete"
                     isLoading={isLoading}
                 />
 

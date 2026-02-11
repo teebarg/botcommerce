@@ -22,7 +22,6 @@ const AbandonedCartSearchParams = z.object({
     search: z.string().optional(),
     hours_threshold: z.number().optional(),
     skip: z.number().optional(),
-    limit: z.number().optional(),
 });
 
 export const getAbandonedCartsFn = createServerFn({ method: "GET" })

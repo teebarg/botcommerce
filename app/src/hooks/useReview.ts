@@ -1,13 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { createReviewFn, deleteReviewFn, getReviewsFn, updateReviewFn } from "@/server/review.server";
-
-type ReviewsParams = {
-    product_id?: number;
-    skip?: number;
-    limit?: number;
-    sort?: string;
-};
+import { createReviewFn, deleteReviewFn, updateReviewFn } from "@/server/review.server";
 
 type CreateReviewInput = {
     product_id: number;
@@ -26,12 +19,6 @@ type UpdateReviewPayload = {
     };
 };
 
-export const useReviews = (params: ReviewsParams) => {
-    return useQuery({
-        queryKey: ["reviews", JSON.stringify(params)],
-        queryFn: () => getReviewsFn({ data: params }),
-    });
-};
 
 export const useCreateReview = () => {
     const queryClient = useQueryClient();

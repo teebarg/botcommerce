@@ -1,10 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { Category } from "@/schemas";
 import { api } from "@/utils/fetch-api";
 import type { Coupon } from "@/schemas";
 
-// --- Type Definitions for API Response Schemas ---
 interface PaginatedCouponsResponse {
     coupons: Coupon[];
     skip: number;
@@ -13,7 +11,6 @@ interface PaginatedCouponsResponse {
     total_pages: number;
 }
 
-// This structure matches the response for useCouponsAnalytics
 interface CouponAnalyticsResponse {
     total_coupons: number;
     used_coupons: number;
@@ -31,11 +28,9 @@ const GetCouponsParamsSchema = z
         query: z.string().optional(),
         isActive: z.boolean().optional(),
         skip: z.number().optional(),
-        limit: z.number().optional(),
     })
     .optional();
 
-// Schema for creating a coupon
 const CreateCouponSchema = z.object({
     code: z.string(),
     discount_type: z.enum(["PERCENTAGE", "FIXED_AMOUNT"]),
@@ -50,13 +45,11 @@ const CreateCouponSchema = z.object({
     is_active: z.boolean(),
 });
 
-// Schema for updating a coupon (all fields optional, but includes ID)
 const UpdateCouponPayloadSchema = z.object({
     id: z.number(),
     data: CreateCouponSchema.partial(),
 });
 
-// Schema for assigning coupons to users
 const AssignCouponSchema = z.object({
     id: z.number(),
     userIds: z.array(z.number()),
@@ -70,7 +63,6 @@ export const getCouponsFn = createServerFn({ method: "GET" })
             query: data?.query || "",
             is_active: data?.isActive,
             skip: data?.skip,
-            limit: data?.limit,
         };
         return await api.get<PaginatedCouponsResponse>("/coupon/", { params });
     });
@@ -103,13 +95,11 @@ export const removeCouponFn = createServerFn({ method: "POST" }).handler(async (
     return await api.post<void>("/coupon/remove");
 });
 
-
 export const toggleCouponStatusFn = createServerFn({ method: "POST" })
     .inputValidator(z.number())
     .handler(async ({ data: id }) => {
         return await api.patch<Coupon>(`/coupon/${id}/toggle-status`);
     });
-
 
 export const assignCouponFn = createServerFn({ method: "POST" })
     .inputValidator(AssignCouponSchema)

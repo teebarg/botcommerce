@@ -100,7 +100,7 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
                             onClose={deleteState.close}
                             onConfirm={handleDelete}
                             title="Delete"
-                            confirmText="Delete"
+                            description="This action cannot be undone. This will permanently delete the delivery option."
                             isLoading={isPending}
                         />
                     </div>

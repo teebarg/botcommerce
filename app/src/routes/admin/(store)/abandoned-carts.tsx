@@ -13,34 +13,28 @@ import { AbandonedCartStats } from "@/components/admin/abandoned-carts/stat";
 import { getAbandonedCartsFn, getAbandonedCartStatsFn } from "@/server/abandoned-cart.server";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-const LIMIT = 20;
-
 interface AbandonedCartParams {
     search?: string;
     hours_threshold?: number;
     skip?: number;
-    limit?: number;
 }
 
-const abandonedCartStatsQueryOptions = (limit: number) => ({
-    queryKey: ["abandoned-carts", "stats", JSON.stringify({ limit })],
-    queryFn: () => getAbandonedCartStatsFn({ data: limit }),
+const abandonedCartStatsQuery = (hours_threshold: number) => ({
+    queryKey: ["abandoned-carts", "stats", JSON.stringify({ hours_threshold })],
+    queryFn: () => getAbandonedCartStatsFn({ data: hours_threshold }),
 });
 
-const abandonedCartsQueryOptions = (params: AbandonedCartParams) => ({
+const abandonedCartsQuery = (params: AbandonedCartParams) => ({
     queryKey: ["abandoned-carts", JSON.stringify(params)],
     queryFn: () => getAbandonedCartsFn({ data: params }),
 });
 
 export const Route = createFileRoute("/admin/(store)/abandoned-carts")({
     loader: async ({ context: { queryClient } }) => {
-        await queryClient.ensureQueryData(abandonedCartStatsQueryOptions(24));
-        await queryClient.ensureQueryData(
-            abandonedCartsQueryOptions({
-                hours_threshold: 24,
-                limit: LIMIT,
-            })
-        );
+        await Promise.all([
+            queryClient.ensureQueryData(abandonedCartStatsQuery(24)),
+            queryClient.ensureQueryData(abandonedCartsQuery({ hours_threshold: 24 })),
+        ]);
     },
     component: RouteComponent,
 });
@@ -48,13 +42,8 @@ export const Route = createFileRoute("/admin/(store)/abandoned-carts")({
 function RouteComponent() {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [timeFilter, setTimeFilter] = useState<string>("24");
-    const { data: stats } = useSuspenseQuery(abandonedCartStatsQueryOptions(parseInt(timeFilter)));
-    const { data: abandonedCartsData } = useSuspenseQuery(
-        abandonedCartsQueryOptions({
-            hours_threshold: parseInt(timeFilter),
-            limit: LIMIT,
-        })
-    );
+    const { data: stats } = useSuspenseQuery(abandonedCartStatsQuery(parseInt(timeFilter)));
+    const { data: abandonedCartsData } = useSuspenseQuery(abandonedCartsQuery({ hours_threshold: parseInt(timeFilter) }));
     const { mutate: sendReminders, isPending: sendRemindersLoading } = useSendCartReminders();
 
     const { carts: allCarts, ...pagination } = abandonedCartsData ?? {

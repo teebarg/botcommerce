@@ -61,7 +61,6 @@ const FaqActions = ({ faq }: FaqActionsProps) => {
                 onConfirm={handleDelete}
                 title="Delete FAQ"
                 description="Are you sure you want to delete this FAQ? This action cannot be undone."
-                confirmText="Delete"
                 isLoading={isPending}
             />
         </div>

@@ -99,7 +99,7 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
                                     onClose={deleteState.close}
                                     onConfirm={() => onDelete(coupon.id, coupon.code)}
                                     title="Delete"
-                                    confirmText="Delete"
+                                    description="Are you sure you want to delete this coupon?"
                                 />
                             </div>
                         </div>

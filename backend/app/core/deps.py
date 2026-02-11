@@ -1,7 +1,7 @@
-from typing import Annotated
+from typing import Annotated, Union
 
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Cookie
 from fastapi.security import APIKeyHeader, OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from pydantic import ValidationError
@@ -26,7 +26,8 @@ meilisearch_client = MeilisearchClient(settings.MEILI_HOST, settings.MEILI_MASTE
 supabase: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
 
 # SessionDep = Annotated[Session, Depends(get_db)]
-TokenDep = Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]
+# TokenDep = Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]
+TokenDep = Annotated[Union[str, None], Cookie(alias="authjs.session-token" if settings.ENVIRONMENT == "local" else "__Secure-authjs.session-token")]
 
 RedisClient = Annotated[redis.Redis, Depends(get_redis_dependency)]
 
@@ -35,8 +36,8 @@ async def get_user_token(access_token: TokenDep) -> TokenPayload | None:
         payload = jwt.decode(
             access_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
-        token_data = TokenPayload(**payload)
-    except (InvalidTokenError, ValidationError):
+        token_data = TokenPayload(sub=payload.get("email"))
+    except (InvalidTokenError, ValidationError) as e:
         return None
 
     return token_data

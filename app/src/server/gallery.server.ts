@@ -8,12 +8,6 @@ interface PaginatedGalleryResponse {
     next_cursor: number | null;
 }
 
-// Schema for parameters used in useImageGalleryInfinite
-const GetGalleryParamsSchema = z.object({
-    cursor: z.number().nullable().optional(),
-    limit: z.number().default(20),
-});
-
 const ImageMetadataPayloadSchema = z.object({
     imageId: z.number(),
     input: z.unknown(),
@@ -37,15 +31,9 @@ const BulkUploadSchema = z.object({
     urls: z.array(z.string().url()),
 });
 
-export const getGalleryImagesFn = createServerFn({ method: "GET" })
-    .inputValidator(GetGalleryParamsSchema.partial())
-    .handler(async ({ data }) => {
-        const params = {
-            cursor: data?.cursor,
-            limit: data?.limit,
-        };
-        return await api.get<PaginatedGalleryResponse>("/gallery/", { params });
-    });
+export const getGalleryImagesFn = createServerFn({ method: "GET" }).handler(async () => {
+    return await api.get<PaginatedGalleryResponse>("/gallery/");
+});
 
 export const createImageMetadataFn = createServerFn({ method: "POST" })
     .inputValidator(ImageMetadataPayloadSchema)

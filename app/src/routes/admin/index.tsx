@@ -1,27 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
 import RecentOrdersList from "@/components/admin/dashboard";
 import StatComponent from "@/components/admin/dashboard/stat-component";
-import { getStatsTrendsFn } from "@/server/admin.server";
-import { getOrdersFn } from "@/server/order.server";
+import { statsTrendsQuery } from "@/queries/admin.queries";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { ordersQuery } from "@/queries/user.queries";
 
 export const Route = createFileRoute("/admin/")({
-    loader: async () => {
-        const paginatedOrders = await getOrdersFn({ data: { take: 5 } });
-        const statsTrends = await getStatsTrendsFn();
-        return {
-            paginatedOrders,
-            statsTrends,
-        };
+    loader: async ({ context: { queryClient } }) => {
+        await Promise.all([queryClient.ensureQueryData(ordersQuery({ take: 5 })), queryClient.ensureQueryData(statsTrendsQuery())]);
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { paginatedOrders, statsTrends } = Route.useLoaderData();
+    const { data: paginatedOrders } = useSuspenseQuery(ordersQuery({ take: 5 }));
+    const { data: statsTrends } = useSuspenseQuery(statsTrendsQuery());
+
     return (
-        <div>   
-            <StatComponent summary={statsTrends?.summary} />
-            <RecentOrdersList orders={paginatedOrders?.orders} />
+        <div>
+            <StatComponent summary={statsTrends.summary} />
+            <RecentOrdersList orders={paginatedOrders.orders} />
         </div>
     );
 }

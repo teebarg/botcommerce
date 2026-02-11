@@ -9,13 +9,14 @@ import {
     createCollectionFn,
     deleteCatalogFn,
     deleteCollectionFn,
-    getCatalogsFn,
     getCollectionsFn,
     removeProductFromCatalogFn,
     updateCatalogFn,
     updateCollectionFn,
 } from "@/server/collections.server";
 import { useRouteContext } from "@tanstack/react-router";
+import { clientApi } from "@/utils/api.client";
+import { PaginatedShared } from "@/schemas";
 
 export const collectionsQuery = (query?: string) =>
     queryOptions({
@@ -67,7 +68,7 @@ export const useCatalogs = (is_active?: boolean) => {
 
     return useQuery({
         queryKey: ["catalog", is_active],
-        queryFn: () => getCatalogsFn({ data: is_active }),
+        queryFn: () => clientApi.get<PaginatedShared>("/shared/", { params: { is_active: is_active ?? null } }),
         enabled: Boolean(session?.user?.isAdmin),
     });
 };

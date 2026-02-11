@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-
 import { ActivityListItem } from "@/components/generic/activities/ActivityList";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getActivitiesFn } from "@/server/activities.server";
@@ -8,7 +7,7 @@ import { ActivityIcon } from "lucide-react";
 import z from "zod";
 import PaginationUI from "@/components/pagination";
 
-const activitiesQueryOptions = (skip: number = 0) => ({
+const activitiesQuery = (skip: number = 0) => ({
     queryKey: ["activities"],
     queryFn: () => getActivitiesFn({ data: { skip } }),
 });
@@ -19,14 +18,14 @@ export const Route = createFileRoute("/admin/(admin)/activities")({
     }),
     loaderDeps: ({ search: { skip } }) => ({ skip }),
     loader: async ({ deps: { skip }, context: { queryClient } }) => {
-        await queryClient.ensureQueryData(activitiesQueryOptions(skip));
+        await queryClient.ensureQueryData(activitiesQuery(skip));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
     const { skip = 0 } = Route.useSearch();
-    const { data } = useSuspenseQuery(activitiesQueryOptions(skip));
+    const { data } = useSuspenseQuery(activitiesQuery(skip));
     const { activities, ...pagination } = data ?? { skip: 0, limit: 0, total_pages: 0, total_count: 0 };
 
     if (activities && !activities?.length) {

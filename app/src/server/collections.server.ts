@@ -1,7 +1,7 @@
 import { api } from "@/utils/fetch-api";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { Collection, PaginatedShared, Shared } from "@/schemas";
+import type { Collection, Shared } from "@/schemas";
 import type { CollectionFormValues } from "@/components/admin/collections/collection-form";
 import type { SharedFormValues } from "@/components/admin/shared-collections/shared-form";
 
@@ -61,12 +61,6 @@ export const deleteCollectionFn = createServerFn({ method: "POST" })
     });
 
 // --- Catalog Hooks ---
-export const getCatalogsFn = createServerFn({ method: "GET" })
-    .inputValidator(z.boolean().optional())
-    .handler(async ({ data: is_active }) => {
-        return await api.get<PaginatedShared>("/shared/", { params: { is_active: is_active ?? null } });
-    });
-
 export const createCatalogFn = createServerFn({ method: "POST" })
     .inputValidator(SharedFormValuesSchema)
     .handler(async ({ data }) => {

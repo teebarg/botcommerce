@@ -4,15 +4,13 @@ import OrderPickup from "@/components/store/orders/order-pickup";
 import SuccessConfirmation from "@/components/store/orders/order-success";
 import PendingPayment from "@/components/store/orders/order-pending";
 import FailedPayment from "@/components/store/orders/order-failed";
-import { getOrderFn } from "@/server/order.server";
+import { orderQuery } from "@/queries/user.queries";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_mainLayout/order/confirmed/$id")({
-    loader: async ({ params: { id } }) => {
+    loader: async ({ params: { id }, context: { queryClient } }) => {
         try {
-            const order = await getOrderFn({ data: id });
-            return {
-                order,
-            };
+            await queryClient.ensureQueryData(orderQuery(id));
         } catch (err) {
             throw new Error("ORDER_NOT_FOUND");
         }
@@ -37,7 +35,7 @@ function RouteComponent() {
     useOneTimeConfetti(id, "firework");
 
     const navigate = useNavigate();
-    const { order } = Route.useLoaderData();
+    const { data: order } = useSuspenseQuery(orderQuery(id));
 
     const onContinueShopping = () => {
         navigate({ to: "/collections" });

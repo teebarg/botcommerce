@@ -2,20 +2,18 @@ import { createFileRoute } from "@tanstack/react-router";
 import type { Order } from "@/schemas";
 import OrderCard from "@/components/store/orders/order-card";
 import { BtnLink } from "@/components/ui/btnLink";
-import { getOrdersFn } from "@/server/order.server";
+import { ordersQuery } from "@/queries/user.queries";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_mainLayout/account/orders")({
-    loader: async () => {
-        const paginatedOrders = await getOrdersFn({ data: { take: 20 } });
-        return {
-            paginatedOrders,
-        };
+    loader: async ({ context: { queryClient } }) => {
+        await queryClient.ensureQueryData(ordersQuery({ take: 20 }));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { paginatedOrders } = Route.useLoaderData();
+    const { data: paginatedOrders } = useSuspenseQuery(ordersQuery({ take: 20 }));
     return (
         <div className="w-full px-2" data-testid="orders-page-wrapper">
             <div className="mb-8">

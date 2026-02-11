@@ -5,34 +5,57 @@ import { LayoutDashboard, Loader, RectangleVertical } from "lucide-react";
 import { GalleryCard } from "@/components/admin/product/product-gallery-card";
 import { ProductBulkActions } from "@/components/admin/product/gallery-bulk-action";
 import { GalleryImagesUpload } from "@/components/admin/product/gallery-images-upload";
-import { useImageGalleryInfinite, useBulkDeleteGalleryImages } from "@/hooks/useGallery";
+import { useBulkDeleteGalleryImages } from "@/hooks/useGallery";
 import ComponentLoader from "@/components/component-loader";
 import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
 import type { GalleryImageItem } from "@/schemas";
 import { useWebSocket } from "pulsews";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { getGalleryImagesFn } from "@/server/gallery.server";
 import { InfiniteScroll } from "@/components/InfiniteScroll";
+import { clientApi } from "@/utils/api.client";
 
-const galleryInfiniteQueryOptions = (limit: number) => ({
-    queryKey: ["gallery", JSON.stringify({ limit })],
-    queryFn: () => getGalleryImagesFn({ data: { limit } }),
+const galleryInfiniteQuery = () => ({
+    queryKey: ["gallery"],
+    queryFn: () => getGalleryImagesFn(),
 });
 
 export const Route = createFileRoute("/admin/(store)/gallery")({
     loader: async ({ context: { queryClient } }) => {
-        await queryClient.ensureQueryData(galleryInfiniteQueryOptions(32));
+        await queryClient.ensureQueryData(galleryInfiniteQuery());
     },
     component: RouteComponent,
 });
 
+interface PaginatedGalleryResponse {
+    images: GalleryImageItem[];
+    next_cursor: number | null;
+}
+
 function RouteComponent() {
-    const { data: initialImages } = useSuspenseQuery(galleryInfiniteQueryOptions(32));
+    const { data: initialImages } = useSuspenseQuery(galleryInfiniteQuery());
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
-    const { data, isLoading: isImagesLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useImageGalleryInfinite(32, initialImages);
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading: isImagesLoading,
+    } = useInfiniteQuery<PaginatedGalleryResponse>({
+        queryKey: ["gallery", "infinite"],
+        queryFn: async ({ pageParam }) => await clientApi.get<PaginatedGalleryResponse>("/gallery/", { params: { cursor: pageParam } }),
+        initialPageParam: undefined,
+        getNextPageParam: (lastPage: PaginatedGalleryResponse) => lastPage.next_cursor ?? undefined,
+        initialData: initialImages
+            ? {
+                  pages: [initialImages],
+                  pageParams: [undefined],
+              }
+            : undefined,
+    });
     const images = data?.pages?.flatMap((p: any) => p.images) || [];
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { lastMessage } = useWebSocket();

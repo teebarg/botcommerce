@@ -15,14 +15,11 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { getUsersFn } from "@/server/users.server";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 
-const LIMIT = 10;
-
 interface UsersParams {
     query?: string;
     role?: "ADMIN" | "CUSTOMER";
     status?: "ACTIVE" | "INACTIVE" | "PENDING";
     skip?: number;
-    limit?: number;
     sort?: string;
 }
 
@@ -34,18 +31,18 @@ export const useUsers = (searchParams: UsersParams) =>
 
 export const Route = createFileRoute("/admin/(admin)/users")({
     validateSearch: z.object({
-        skip: z.number().optional(),
+        skip: z.number().optional().default(0),
     }),
     loaderDeps: ({ search: { skip } }) => ({ skip }),
     loader: async ({ deps: { skip }, context }) => {
-        await context.queryClient.ensureQueryData(useUsers({ skip: skip || 0, limit: LIMIT }));
+        await context.queryClient.ensureQueryData(useUsers({ skip }));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
     const { skip = 0 } = Route.useSearch();
-    const { data } = useSuspenseQuery(useUsers({ skip: skip || 0, limit: LIMIT }));
+    const { data } = useSuspenseQuery(useUsers({ skip }));
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [filterOpen, setFilterOpen] = useState<boolean>(false);
 

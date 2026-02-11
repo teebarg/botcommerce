@@ -11,9 +11,8 @@ import OrderFilters from "@/components/admin/orders/order-filters";
 import { OrderStatusBadge, PaymentStatusBadge } from "@/components/admin/orders/order-status-badge";
 import OrderActions from "@/components/admin/orders/order-actions";
 import z from "zod";
-import { getOrdersFn } from "@/server/order.server";
-
-const LIMIT = 10;
+import { ordersQuery } from "@/queries/user.queries";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/admin/(store)/orders")({
     validateSearch: z.object({
@@ -24,18 +23,17 @@ export const Route = createFileRoute("/admin/(store)/orders")({
         end_date: z.string().optional(),
     }),
     loaderDeps: ({ search: { skip, status, start_date, end_date } }) => ({ skip, status, start_date, end_date }),
-    loader: async ({ context, deps: { skip, status, start_date, end_date } }) => {
-        const paginatedOrders = await getOrdersFn({ data: { skip, status, start_date, end_date, take: LIMIT } });
-        return {
-            paginatedOrders,
-        };
+    loader: async ({ context: { queryClient }, deps: { skip, status, start_date, end_date } }) => {
+        await queryClient.ensureQueryData(ordersQuery({ skip, status, start_date, end_date }));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { paginatedOrders } = Route.useLoaderData();
     const search = Route.useSearch();
+    const { data: paginatedOrders } = useSuspenseQuery(
+        ordersQuery({ skip: search.skip, status: search.status, start_date: search.start_date, end_date: search.end_date })
+    );
     const { updateQuery } = useUpdateQuery(200);
 
     const { orders, ...pagination } = paginatedOrders ?? { skip: 0, limit: 0, total_pages: 0, total_count: 0 };

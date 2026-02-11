@@ -142,7 +142,7 @@ router = APIRouter()
 async def image_gallery(
     request: Request,
     cursor: Optional[int] = Query(default=None),
-    limit: int = Query(default=10, le=100),
+    limit: int = Query(default=40, le=100),
 ):
     """
     Gallery endpoint using cursor-based pagination.

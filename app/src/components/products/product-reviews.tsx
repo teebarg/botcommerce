@@ -19,7 +19,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id, productName }) => {
     });
     const { data } = useQuery({
         queryKey: ["orders", JSON.stringify({})],
-        queryFn: async () => await clientApi.get<PaginatedOrder>("/order/", { accessToken: session?.accessToken }),
+        queryFn: async () => await clientApi.get<PaginatedOrder>("/order/", { }),
     });
     const hasReviewed = session && reviewsData?.reviews?.some((r) => r.user?.id === session?.id);
     let hasPurchased = false;

@@ -10,10 +10,7 @@ type RelatedProductsProps = {
 export default function RelatedProducts({ productId }: RelatedProductsProps) {
     const { data } = useQuery({
         queryKey: ["products", "similar", productId],
-        queryFn: async () => {
-            const res = await clientApi.get<{ similar: ProductSearch[] }>(`/product/${productId}/similar`, { params: { limit: 12 } });
-            return res;
-        },
+        queryFn: async () => await clientApi.get<{ similar: ProductSearch[] }>(`/product/${productId}/similar`, { params: { limit: 12 } }),
     });
     const productPreviews = data?.similar?.filter((item: ProductSearch) => item.id !== productId);
     if (!productPreviews?.length) {

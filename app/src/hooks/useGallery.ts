@@ -1,4 +1,4 @@
-import { useMutation, useInfiniteQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
     bulkDeleteGalleryImagesFn,
@@ -6,31 +6,13 @@ import {
     bulkUploadImagesFn,
     createImageMetadataFn,
     deleteGalleryImageFn,
-    getGalleryImagesFn,
     reIndexGalleryFn,
     updateImageMetadataFn,
 } from "@/server/gallery.server";
-import { Catalog, GalleryImage, type GalleryImageItem } from "@/schemas";
 
 type ImageMetadataInput = { imageId: number; input: any };
-type BulkDeleteInput = { imageIds: number[] };
 type BulkUpdateInput = { imageIds: number[]; input: any };
 type BulkUploadInput = { urls: string[] };
-
-interface PaginatedGalleryResponse {
-    images: GalleryImageItem[];
-    next_cursor: number | null;
-}
-
-export const useImageGalleryInfinite = (pageSize: number = 20, initial: PaginatedGalleryResponse) => {
-    return useInfiniteQuery({
-        queryKey: ["gallery"],
-        queryFn: ({ pageParam = 0 }) => getGalleryImagesFn({ data: { cursor: pageParam, limit: pageSize } }),
-        getNextPageParam: (lastPage) => lastPage.next_cursor,
-        initialPageParam: null as number | null,
-        initialData: { pages: [initial], pageParams: [0] },
-    });
-};
 
 export const useCreateImageMetadata = () => {
     return useMutation({

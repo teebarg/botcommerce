@@ -1,17 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import RelatedProducts from "@/components/store/products/related-products";
 import ReviewsSection from "@/components/products/product-reviews";
-import { getProductFn } from "@/server/product.server";
 import ProductView from "@/components/store/products/product-view";
 import { seo } from "@/utils/seo";
 import { ArrowUpRight, RefreshCcw, TriangleAlert } from "lucide-react";
 import { BtnLink } from "@/components/ui/btnLink";
 import { Button } from "@/components/ui/button";
 import { LazyInView } from "@/components/LazyInView";
+import { productQuery } from "@/queries/user.queries";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_mainLayout/products/$slug")({
     loader: async ({ context: { queryClient }, params: { slug } }) => {
-        const product = await getProductFn({ data: slug });
+        const product = await queryClient.ensureQueryData(productQuery(slug));
         return {
             product,
         };
@@ -65,7 +66,7 @@ export const Route = createFileRoute("/_mainLayout/products/$slug")({
 });
 
 function RouteComponent() {
-    const { product } = Route.useLoaderData();
+    const { data: product } = useSuspenseQuery(productQuery(Route.useParams().slug));
 
     return (
         <main className="flex flex-col">

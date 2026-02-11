@@ -69,6 +69,7 @@
     --shadow-card: 0 8px 32px hsla(0, 0%, 0%, 0.4);
 
     --aspect-product: 4 / 5;
+    --aspect-gallery: 4 / 6;
 
     --container-8xl: 88rem;
     --container-9xl: 96rem;
