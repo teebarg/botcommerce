@@ -1,15 +1,12 @@
-import { useProductSearch } from "@/hooks/useProduct";
 import { ProductSearch } from "@/schemas";
 import LocalizedClientLink from "@/components/ui/link";
 import { TrendingUp } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
-export default function Trending() {
-    const { data } = useProductSearch({ collections: "trending", limit: 6 });
-
+export default function Trending({ products }: { products: ProductSearch[] }) {
     return (
         <div className="max-w-8xl mx-auto">
-            {data?.products?.length && data?.products?.length > 0 && (
+            {products?.length && products?.length > 0 && (
                 <section className="py-8 px-2">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
@@ -21,7 +18,7 @@ export default function Trending() {
                         </LocalizedClientLink>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 px-2">
-                        {data?.products?.map((product: ProductSearch) => (
+                        {products?.map((product: ProductSearch) => (
                             <Link key={product.id} to="/collections/$slug" params={{ slug: "trending" }} className="w-full h-full">
                                 <img
                                     src={product.images?.[0] || "/placeholder.jpg"}

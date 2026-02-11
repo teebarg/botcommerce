@@ -17,7 +17,7 @@ from app.models.product import (
     ProductUpdate,
     VariantWithStatus,
     Product, SearchProducts, FeedProducts,
-    ProductCreateBundle,
+    ProductCreateBundle, IndexProducts
 )
 from app.services.meilisearch import (
     clear_index,
@@ -333,6 +333,52 @@ async def feed(
         "next_cursor": next_cursor,
         "suggestions": suggestions,
     }
+
+
+@router.get("/index-products")
+@cache_response("products")
+async def index_products(request: Request) -> IndexProducts:
+    """
+    Retrieve index products using Meilisearch.
+    """
+    result = {"new-arrivals": [], "featured": [], "trending": []}
+    collections: list[str] = ["trending", "new-arrivals", "featured" ]
+    index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
+    for col in collections:
+        filters: list[str] = ["active = True", f'collection_slugs = "{col}"']
+        search_params = {
+            "limit": 8,
+            "sort": ["id:desc"],
+        }
+
+        search_params["filter"] = " AND ".join(filters)
+        try:
+            search_results = index.search("", search_params)
+        except MeilisearchApiError as e:
+            error_code = getattr(e, "code", None)
+            if error_code in {"invalid_search_facets", "invalid_search_filter", "invalid_search_sort"}:
+                logger.warning("Invalid filter detected, attempting recovery")
+                ensure_index_ready(index)
+                try:
+                    search_results = index.search("", search_params)
+                except Exception:
+                    logger.error(f"Meilisearch retry failed: {e}")
+                    raise HTTPException(status_code=502, detail="Search service unavailable")
+                return
+
+            logger.error(f"Meilisearch error: {e}")
+            raise HTTPException(
+                status_code=502, detail="Search service temporarily unavailable")
+        except Exception as e:
+            logger.error(f"search index error {e}")
+            raise HTTPException(
+                status_code=400,
+                detail=str(e)
+            )
+
+        result["arrival" if col == "new-arrivals" else col] = search_results["hits"]
+
+    return result
 
 @router.get("/")
 @cache_response("products")

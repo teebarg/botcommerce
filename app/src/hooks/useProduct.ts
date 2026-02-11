@@ -4,10 +4,7 @@ import type { PaginatedProductSearch, ProductFeed } from "@/schemas";
 import {
     bustCacheFn,
     createProductFn,
-    createVariantFn,
     deleteImagesFn,
-    deleteProductFn,
-    deleteVariantFn,
     flushCacheFn,
     recommendedProductsFn,
     reIndexProductsFn,
@@ -21,7 +18,6 @@ import {
 import { useRef } from "react";
 import { clientApi } from "@/utils/api.client";
 
-// Type definitions matching the Server Function inputs
 type SearchParams = {
     search?: string;
     categories?: string;
@@ -145,30 +141,6 @@ export const useUpdateProduct = () => {
     });
 };
 
-export const useDeleteProduct = () => {
-    return useMutation({
-        mutationFn: async (id: number) => await deleteProductFn({ data: id }),
-        onSuccess: () => {
-            toast.success("Product deleted");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to delete product");
-        },
-    });
-};
-
-export const useCreateVariant = () => {
-    return useMutation({
-        mutationFn: async (input: CreateVariantInput) => await createVariantFn({ data: input }),
-        onSuccess: () => {
-            toast.success("Variant created");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to create variant");
-        },
-    });
-};
-
 export const useUpdateVariant = (showToast = true) => {
     return useMutation({
         mutationFn: async (input: UpdateVariantInput) => await updateVariantFn({ data: input }),
@@ -177,18 +149,6 @@ export const useUpdateVariant = (showToast = true) => {
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to update variant");
-        },
-    });
-};
-
-export const useDeleteVariant = () => {
-    return useMutation({
-        mutationFn: async (id: number) => await deleteVariantFn({ data: id }),
-        onSuccess: () => {
-            toast.success("Variant deleted");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to delete variant");
         },
     });
 };

@@ -3,7 +3,6 @@ import { Clock, Search, TrendingUp, X } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import { useOverlayTriggerState } from "react-stately";
 import { Button } from "@/components/ui/button";
-import ProductCard from "@/components/store/products/product-card";
 import type { ProductSearch } from "@/schemas";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/utils";
@@ -11,6 +10,7 @@ import { useProductSearch } from "@/hooks/useProduct";
 import { Separator } from "@/components/ui/separator";
 import LocalizedClientLink from "@/components/ui/link";
 import { useNavigate } from "@tanstack/react-router";
+import ProductCardLight from "@/components/store/products/product-card-light";
 
 interface SearchDialogProps {
     initialQuery?: string;
@@ -123,7 +123,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                                         <h3 className="font-semibold text-sm tracking-wider mb-4">PRODUCTS</h3>
                                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                                             {data?.products?.map((product: ProductSearch) => (
-                                                <ProductCard key={product.id} product={product} />
+                                                <ProductCardLight key={product.id} product={product} />
                                             ))}
                                         </div>
                                     </div>
@@ -169,7 +169,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                                     <h3 className="font-semibold text-sm tracking-wider mb-4">TRENDING PRODUCTS</h3>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                         {trendingData?.products?.map((product: ProductSearch) => (
-                                            <ProductCard key={product.id} product={product} />
+                                            <ProductCardLight key={product.id} product={product} />
                                         ))}
                                     </div>
                                 </div>

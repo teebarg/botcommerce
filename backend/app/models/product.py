@@ -129,6 +129,11 @@ class SearchProducts(BaseModel):
     total_count: int
     total_pages: int
 
+class IndexProducts(BaseModel):
+    featured: List[SearchProduct]
+    arrival: List[SearchProduct]
+    trending: List[SearchProduct]
+
 class Products(BaseModel):
     products: list[Product]
     skip: int

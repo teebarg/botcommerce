@@ -1,9 +1,8 @@
-import { useProductSearch } from "@/hooks/useProduct";
 import ProductSection from "../product-section";
+import { ProductSearch } from "@/schemas";
 
-export default function NewArrivals() {
-    const { data } = useProductSearch({ collections: "new-arrivals", limit: 10 });
+export default function NewArrivals({products}: {products: ProductSearch[]}) {
     
-    if (!data || data?.products?.length === 0) return null;
-    return <ProductSection title="New Arrivals" products={data?.products || []} href="/collections/new-arrivals" showGradient />;
+    if (!products || products?.length === 0) return null;
+    return <ProductSection title="New Arrivals" products={products} href="/collections/new-arrivals" showGradient />;
 }

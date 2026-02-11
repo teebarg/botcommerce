@@ -1,9 +1,8 @@
-import { useProductSearch } from "@/hooks/useProduct";
 import ProductSection from "../product-section";
+import { ProductSearch } from "@/schemas";
 
-export default function Featured() {
-    const { data, isLoading } = useProductSearch({ collections: "featured", limit: 10 });
+export default function Featured({products}: {products: ProductSearch[]}) {
 
-    if (!data || data?.products?.length === 0 || isLoading) return null;
-    return <ProductSection title="Featured" products={data?.products || []} href="/collections/featured" showGradient />;
+    if (products?.length === 0) return null;
+    return <ProductSection title="Featured" products={products} href="/collections/featured" showGradient />;
 }

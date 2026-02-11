@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { getProductFn, getProductsFeedFn } from "@/server/product.server";
+import { getIndexCategoriesProductsFn, getIndexProductsFn, getProductFn, getProductsFeedFn } from "@/server/product.server";
 import { getCatalogFn } from "@/server/catalog.server";
 import { getWishlistFn } from "@/server/users.server";
 import { getOrderFn, getOrdersFn } from "@/server/order.server";
@@ -23,10 +23,22 @@ type CatalogFeedParams = {
     colors?: string;
 };
 
+export const indexProductQuery = () =>
+    queryOptions({
+        queryKey: ["products", "index"],
+        queryFn: () => getIndexProductsFn(),
+    });
+
+export const indexCategoriesProductsQuery = () =>
+    queryOptions({
+        queryKey: ["products", "home"],
+        queryFn: () => getIndexCategoriesProductsFn(),
+    });
+
 export const productFeedQuery = (params: FeedParams) =>
     queryOptions({
         queryKey: ["products", "feed", JSON.stringify(params)],
-        queryFn: () => getProductsFeedFn({ data: { ...params, feed_seed: Math.random() } }),
+        queryFn: () => getProductsFeedFn({ data: { ...params, feed_seed: Math.random() * 0.5 } }),
     });
 
 export const catalogFeedQuery = (params: CatalogFeedParams) =>
