@@ -3,7 +3,6 @@ import type React from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { Edit3, Home, Plus, Trash2 } from "lucide-react";
 import type { Address } from "@/schemas";
-import Overlay from "@/components/overlay";
 import { Button } from "@/components/ui/button";
 import AddAddressForm from "@/components/store/account/address/add-address-form";
 import { cn } from "@/utils";
@@ -67,6 +66,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false, in
 
                 <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
                     <SheetDrawer
+                        drawerClassName="h-[90dvh]"
                         open={editState.isOpen}
                         title="Edit address"
                         trigger={
@@ -119,7 +119,8 @@ function RouteComponent() {
                 <h2 className="text-2xl font-bold mb-2">My Addresses</h2>
                 <p className="text-muted-foreground">Manage your delivery addresses</p>
             </motion.div>
-            <Overlay
+            <SheetDrawer
+                drawerClassName="h-[90dvh]"
                 open={addState.isOpen}
                 title="Add new address"
                 trigger={
@@ -132,7 +133,7 @@ function RouteComponent() {
                 showHeader={true}
             >
                 <AddAddressForm onClose={addState.close} />
-            </Overlay>
+            </SheetDrawer>
             <div className="space-y-3 mt-4">
                 <AnimatePresence mode="popLayout">
                     {addresses?.map((address: Address, index: number) => {

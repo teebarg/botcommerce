@@ -28,7 +28,7 @@ const ProductCardLight: React.FC<ProductCardProps> = ({ product, variant = "sale
             onClick={() => navigate({ to: `/products/${product.slug}` })}
             className="shrink-0 cursor-pointer group w-auto"
         >
-            <div className="relative rounded-2xl overflow-hidden shadow-card h-60 md:h-72">
+            <div className="relative rounded-2xl overflow-hidden shadow-card aspect-product-light">
                 <img
                     src={product.images?.[0] || "/placeholder.jpg"}
                     alt={product.name}

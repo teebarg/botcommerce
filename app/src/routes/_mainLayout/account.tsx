@@ -1,9 +1,14 @@
 import AccountNav from "@/components/layout/account-nav";
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, redirect } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { Box, MapPin, Package, User } from "lucide-react";
 
 export const Route = createFileRoute("/_mainLayout/account")({
+    beforeLoad: ({ context, location }) => {
+        if (!context.session) {
+            throw redirect({ to: "/auth/signin", search: { callbackUrl: location.href } });
+        }
+    },
     component: RouteComponent,
 });
 
