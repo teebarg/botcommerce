@@ -54,19 +54,11 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
         <div ref={ref} className="relative h-[calc(100dvh-64px-88px)]! w-full snap-start snap-always bg-[#121212]">
             <div className="absolute inset-0 bg-[#121212]" />
             <div className="absolute top-0 left-0 right-0 flex items-start justify-center">
-                {!imageLoaded && (
-                    <div className="absolute inset-0 flex items-start justify-center">
-                        <div
-                            className="max-w-full max-h-[70vh] w-full aspect-square bg-gradient-to-br from-zinc-800 to-zinc-900 animate-pulse"
-                            style={{ maxHeight: "70vh" }}
-                        />
-                    </div>
-                )}
-
+                {!imageLoaded && <div className="absolute inset-0 max-w-full h-full max-h-[70vh] w-full aspect-square bg-zinc-800 animate-pulse" />}
                 <img
                     src={product.images?.[0]}
                     alt={product.name}
-                    className="max-w-full max-h-[70vh] object-contain fade-to-black transition-opacity duration-300 opacity-0 data-[loaded=true]:opacity-100"
+                    className="max-w-full h-full max-h-[70vh] object-contain fade-to-black transition-all duration-500 ease-out opacity-0 scale-[1.03] blur-sm data-[loaded=true]:opacity-100 data-[loaded=true]:scale-100 data-[loaded=true]:blur-none"
                     loading="lazy"
                     data-loaded={imageLoaded}
                     decoding="async"

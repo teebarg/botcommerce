@@ -22,7 +22,7 @@ function AdminLayoutComponent() {
     return (
         <SidebarProvider>
             <AdminSidebar />
-            <main className="flex-1">
+            <main className="flex-1 flex flex-col">
                 <AdminNavbar session={session as unknown as Session} />
                 <Outlet />
             </main>

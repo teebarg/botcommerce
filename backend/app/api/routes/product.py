@@ -347,7 +347,7 @@ async def index_products(request: Request) -> IndexProducts:
     for col in collections:
         filters: list[str] = ["active = True", f'collection_slugs = "{col}"']
         search_params = {
-            "limit": 8,
+            "limit": 6 if col == "trending" else 8,
             "sort": ["id:desc"],
         }
 
