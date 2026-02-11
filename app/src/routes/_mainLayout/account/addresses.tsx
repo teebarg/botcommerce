@@ -92,9 +92,8 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false, in
                         onClose={deleteState.close}
                         onConfirm={onConfirmDelete}
                         title={`Delete ${address.first_name}`}
-                        confirmText="Delete"
+                        description="Are you sure you want to delete this address? This action cannot be undone."
                         isLoading={deleteAddress.isPending}
-                        variant="destructive"
                     />
                 </div>
             </div>

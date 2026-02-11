@@ -47,7 +47,7 @@ const ChatsActions: React.FC<CustomerActionsProps> = ({ chat }) => {
                 onClose={deleteState.close}
                 onConfirm={onDelete}
                 title="Delete"
-                confirmText="Delete"
+                description="This action cannot be undone. This will permanently delete the chat."
                 isLoading={isPending}
             />
         </div>

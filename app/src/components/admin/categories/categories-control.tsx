@@ -81,7 +81,7 @@ const CategoryAction: React.FC<Props> = ({ category, index, categoriesLength, on
                 onClose={deleteState.close}
                 onConfirm={onConfirmDelete}
                 title={`Delete ${category.name}`}
-                confirmText="Delete"
+                description="This action cannot be undone. This will permanently delete the category and all its subcategories."
                 isLoading={deleteMutation.isPending}
             />
         </div>

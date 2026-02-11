@@ -53,7 +53,7 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
                 onClose={deleteState.close}
                 onConfirm={onConfirmDelete}
                 title="Delete"
-                confirmText="Delete"
+                description="Are you sure you want to delete this review? This action cannot be undone."
                 isLoading={deletePending}
             />
             {review.verified ? (

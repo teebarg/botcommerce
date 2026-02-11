@@ -48,7 +48,7 @@ const CollectionActions: React.FC<Props> = ({ collection }) => {
                 onClose={deleteState.close}
                 onConfirm={onConfirmDelete}
                 title={`Delete ${collection.name}`}
-                confirmText="Delete"
+                description="This action cannot be undone. This will permanently delete the collection and all its products."
                 isLoading={deleteCollection.isPending}
             />
         </div>

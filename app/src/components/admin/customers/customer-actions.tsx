@@ -82,7 +82,7 @@ const CustomerActions: React.FC<CustomerActionsProps> = ({ user }) => {
                 onClose={deleteState.close}
                 onConfirm={onDelete}
                 title={`Delete ${user?.first_name}`}
-                confirmText="Delete"
+                description="This action cannot be undone. This will permanently delete the customer."
                 isLoading={isPending}
             />
         </div>
