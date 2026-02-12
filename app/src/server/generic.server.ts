@@ -48,12 +48,6 @@ const ConversationParamsSchema = z
     })
     .optional();
 
-const ChatInputSchema = z.object({
-    user_id: z.number().nullable().optional(),
-    conversation_uuid: z.string().optional(),
-    user_message: z.string(),
-});
-
 export const getBankDetailsFn = createServerFn({ method: "GET" }).handler(async () => {
     return await api.get<BankDetails[]>("/bank-details/");
 });
@@ -75,6 +69,12 @@ export const deleteBankDetailsFn = createServerFn({ method: "POST" })
     .handler(async ({ data: id }) => {
         return await api.delete<Message>(`/bank-details/${id}`);
     });
+
+const ChatInputSchema = z.object({
+    user_id: z.number().nullable().optional(),
+    conversation_uuid: z.string().nullable().optional(),
+    user_message: z.string(),
+});
 
 export const chatMutationFn = createServerFn({ method: "POST" })
     .inputValidator(ChatInputSchema)

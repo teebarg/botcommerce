@@ -1,12 +1,9 @@
 import type React from "react";
 import { useState, useEffect } from "react";
-import { useOverlayTriggerState } from "react-stately";
-
 import ChatBotComponent from "./chat/chatbot";
-
 import { useConfig } from "@/providers/store-provider";
 
-type Props = {}
+type Props = {};
 
 const ChatBotWrapper: React.FC = () => {
     const { config } = useConfig();
@@ -28,7 +25,6 @@ const WhatsAppSvg: React.FC = () => {
 const ChatBot: React.FC<Props> = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [hasBeenClosed, setHasBeenClosed] = useState<boolean>(true);
-    const state = useOverlayTriggerState({});
 
     useEffect(() => {
         const savedIsOpen = localStorage.getItem("chatbotOpen") !== "false";
@@ -52,7 +48,6 @@ const ChatBot: React.FC<Props> = () => {
     };
 
     const minimize = () => {
-        state.close();
         setIsOpen(false);
         localStorage.setItem("chatbotOpen", "false");
     };

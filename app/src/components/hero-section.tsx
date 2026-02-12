@@ -141,7 +141,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ image }) => {
                 <div className="absolute bottom-32 left-0 right-0 px-6 space-y-4">
                     <div className="inline-block bg-white text-black text-xs font-semibold px-3 py-1 rounded-full mb-2">FEATURED</div>
                     <h1 className="text-4xl font-bold leading-tight text-gray-100">Premium Collection</h1>
-                    <p className="text-lg text-gray-300">Premium Collection</p>
+                    <p className="text-lg text-gray-300">Premium look. Budget-friendly</p>
                     <div className="flex items-center gap-4 pt-2">
                         <div className="flex flex-col">
                             <span>as low as</span>
