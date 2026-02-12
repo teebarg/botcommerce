@@ -1,4 +1,4 @@
-import { queryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import {
@@ -7,10 +7,8 @@ import {
     createWishlistItemFn,
     deleteUserFn,
     deleteWishlistItemFn,
-    getMeFn,
     getRecentlyViewedFn,
     getUsersFn,
-    getWishlistFn,
     getWishlistListingFn,
     updateUserFn,
 } from "@/server/users.server";
@@ -27,14 +25,6 @@ interface UsersParams {
 interface UsersQueryOptions {
     enabled?: boolean;
 }
-
-export const useMe = () => {
-    return useQuery({
-        queryKey: ["me"],
-        queryFn: () => getMeFn(),
-        enabled: typeof window !== "undefined",
-    });
-};
 
 export const useUsers = (searchParams: UsersParams, options?: UsersQueryOptions) => {
     return useQuery({

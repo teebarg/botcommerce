@@ -28,7 +28,7 @@ class CouponBase(BaseModel):
     valid_until: Optional[datetime] = None
     max_uses: int = Field(1, ge=1, description="Maximum number of times coupon can be used")
     max_uses_per_user: int = Field(1, ge=1, description="Maximum number of times coupon can be used per user")
-    scope: CouponScope = CouponScope.GENERAL
+    scope: Optional[CouponScope] = CouponScope.GENERAL
     is_active: bool = True
 
 

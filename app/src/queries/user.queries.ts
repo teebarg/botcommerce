@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { getIndexCategoriesProductsFn, getIndexProductsFn, getProductFn, getProductsFeedFn } from "@/server/product.server";
 import { getCatalogFn } from "@/server/catalog.server";
-import { getWishlistFn } from "@/server/users.server";
+import { getMeFn, getWishlistFn } from "@/server/users.server";
 import { getOrderFn, getOrdersFn } from "@/server/order.server";
 import { getUserAddressesFn } from "@/server/address.server";
 import { getCollectionFn } from "@/server/collections.server";
@@ -22,6 +22,12 @@ type CatalogFeedParams = {
     sizes?: number;
     colors?: string;
 };
+
+export const meQuery = () =>
+    queryOptions({
+        queryKey: ["user", "me"],
+        queryFn: () => getMeFn(),
+    });
 
 export const indexProductQuery = () =>
     queryOptions({

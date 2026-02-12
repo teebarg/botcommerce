@@ -21,7 +21,6 @@ type CreateCouponData = {
     valid_until: string;
     max_uses: number;
     max_uses_per_user: number;
-    scope: "GENERAL" | "SPECIFIC_USERS";
     is_active: boolean;
 };
 

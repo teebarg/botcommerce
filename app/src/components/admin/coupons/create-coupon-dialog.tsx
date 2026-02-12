@@ -8,8 +8,8 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useCreateCoupon } from "@/hooks/useCoupon";
-import Overlay from "@/components/overlay";
 import { useOverlayTriggerState } from "react-stately";
+import SheetDrawer from "@/components/sheet-drawer";
 
 const couponSchema = z.object({
     code: z.string().min(3).max(20).toUpperCase(),
@@ -21,7 +21,7 @@ const couponSchema = z.object({
     valid_until: z.string(),
     max_uses: z.number().min(1),
     max_uses_per_user: z.number().min(1),
-    scope: z.enum(["GENERAL", "SPECIFIC_USERS"]),
+    // scope: z.enum(["GENERAL", "SPECIFIC_USERS"]),
     status: z.enum(["active", "inactive"]),
 });
 
@@ -39,7 +39,7 @@ export const CreateCouponDialog = () => {
             value: 10,
             max_uses: 100,
             max_uses_per_user: 1,
-            scope: "GENERAL",
+            // scope: "GENERAL",
             status: "active",
             valid_from: new Date().toISOString().split("T")[0],
             valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
@@ -58,7 +58,7 @@ export const CreateCouponDialog = () => {
                 valid_until: new Date(data.valid_until + "T23:59:59Z").toISOString(),
                 max_uses: data.max_uses,
                 max_uses_per_user: data.max_uses_per_user,
-                scope: data.scope,
+                // scope: data.scope,
                 is_active: data.status === "active",
             };
 
@@ -74,7 +74,8 @@ export const CreateCouponDialog = () => {
     };
 
     return (
-        <Overlay
+        <SheetDrawer
+            drawerClassName="h-[85dvh]"
             open={state.isOpen}
             title="Create Coupon"
             trigger={
@@ -87,7 +88,7 @@ export const CreateCouponDialog = () => {
         >
             <Form {...form}>
                 <form className="flex-1 flex flex-col overflow-hidden" onSubmit={form.handleSubmit(onSubmit)}>
-                    <div className="flex-1 overflow-y-auto p-2 space-y-4">
+                    <div className="flex-1 overflow-y-auto px-2.5 pt-2 space-y-4">
                         <div className="grid grid-cols-2 gap-1">
                             <FormField
                                 control={form.control}
@@ -269,30 +270,6 @@ export const CreateCouponDialog = () => {
                                 )}
                             />
                         </div>
-
-                        <div className="grid grid-cols-2 gap-1">
-                            <FormField
-                                control={form.control}
-                                name="scope"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Scope</FormLabel>
-                                        <Select defaultValue={field.value} onValueChange={field.onChange}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="GENERAL">General Use</SelectItem>
-                                                <SelectItem value="SPECIFIC_USERS">Specific Users</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
                     </div>
                     <div className="sheet-footer">
                         <Button disabled={createMutation.isPending} type="button" variant="outline" onClick={state.close}>
@@ -304,6 +281,6 @@ export const CreateCouponDialog = () => {
                     </div>
                 </form>
             </Form>
-        </Overlay>
+        </SheetDrawer>
     );
 };

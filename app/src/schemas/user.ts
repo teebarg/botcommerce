@@ -5,6 +5,15 @@ import { AuditSchema } from "./base";
 
 import { PagSchema } from "./index";
 
+export const WalletTrnxSchema = z.object({
+    id: z.number(),
+    user_id: z.number(),
+    amount: z.number(),
+    type: z.enum(["CASHBACK", "WITHDRAWAL", "ADJUSTMENT", "REVERSAL"]),
+    referenceId: z.string(),
+    created_at: z.string(),
+});
+
 export const UserSchema = z
     .object({
         id: z.number(),
@@ -16,9 +25,12 @@ export const UserSchema = z
         hashed_password: z.string(),
         image: z.string().optional(),
         role: z.enum(["ADMIN", "CUSTOMER"]),
+        referral_code: z.string().optional(),
+        wallet_ballance: z.number().optional(),
         // addresses: z.array(z.lazy(() => AddressSchema)).optional(),
         addresses: z.array(AddressSchema).optional(),
         orders: z.array(z.any()).optional(),
+        walletTxns: z.array(WalletTrnxSchema)
     })
     .merge(AuditSchema);
 
@@ -56,6 +68,7 @@ export const UserSessionSchema = z.object({
     impersonatedBy: z.string().optional(),
 });
 
+export type WalletTrnx = z.infer<typeof WalletTrnxSchema>;
 export type User = z.infer<typeof UserSchema>;
 export type PaginatedUser = z.infer<typeof PaginatedUserSchema>;
 export type Session = z.infer<typeof SessionSchema>;

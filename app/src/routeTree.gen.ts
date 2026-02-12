@@ -45,6 +45,7 @@ import { Route as MainLayoutSharedSlugRouteImport } from './routes/_mainLayout/s
 import { Route as MainLayoutSearchQueryRouteImport } from './routes/_mainLayout/search.$query'
 import { Route as MainLayoutProductsSlugRouteImport } from './routes/_mainLayout/products.$slug'
 import { Route as MainLayoutCollectionsSlugRouteImport } from './routes/_mainLayout/collections/$slug'
+import { Route as MainLayoutAccountReferralsRouteImport } from './routes/_mainLayout/account/referrals'
 import { Route as MainLayoutAccountProfileRouteImport } from './routes/_mainLayout/account/profile'
 import { Route as MainLayoutAccountOrdersRouteImport } from './routes/_mainLayout/account/orders'
 import { Route as MainLayoutAccountAddressesRouteImport } from './routes/_mainLayout/account/addresses'
@@ -244,6 +245,12 @@ const MainLayoutCollectionsSlugRoute =
     path: '/collections/$slug',
     getParentRoute: () => MainLayoutRoute,
   } as any)
+const MainLayoutAccountReferralsRoute =
+  MainLayoutAccountReferralsRouteImport.update({
+    id: '/referrals',
+    path: '/referrals',
+    getParentRoute: () => MainLayoutAccountRoute,
+  } as any)
 const MainLayoutAccountProfileRoute =
   MainLayoutAccountProfileRouteImport.update({
     id: '/profile',
@@ -368,6 +375,7 @@ export interface FileRoutesByFullPath {
   '/account/addresses': typeof MainLayoutAccountAddressesRoute
   '/account/orders': typeof MainLayoutAccountOrdersRoute
   '/account/profile': typeof MainLayoutAccountProfileRoute
+  '/account/referrals': typeof MainLayoutAccountReferralsRoute
   '/collections/$slug': typeof MainLayoutCollectionsSlugRoute
   '/products/$slug': typeof MainLayoutProductsSlugRoute
   '/search/$query': typeof MainLayoutSearchQueryRoute
@@ -419,6 +427,7 @@ export interface FileRoutesByTo {
   '/account/addresses': typeof MainLayoutAccountAddressesRoute
   '/account/orders': typeof MainLayoutAccountOrdersRoute
   '/account/profile': typeof MainLayoutAccountProfileRoute
+  '/account/referrals': typeof MainLayoutAccountReferralsRoute
   '/collections/$slug': typeof MainLayoutCollectionsSlugRoute
   '/products/$slug': typeof MainLayoutProductsSlugRoute
   '/search/$query': typeof MainLayoutSearchQueryRoute
@@ -475,6 +484,7 @@ export interface FileRoutesById {
   '/_mainLayout/account/addresses': typeof MainLayoutAccountAddressesRoute
   '/_mainLayout/account/orders': typeof MainLayoutAccountOrdersRoute
   '/_mainLayout/account/profile': typeof MainLayoutAccountProfileRoute
+  '/_mainLayout/account/referrals': typeof MainLayoutAccountReferralsRoute
   '/_mainLayout/collections/$slug': typeof MainLayoutCollectionsSlugRoute
   '/_mainLayout/products/$slug': typeof MainLayoutProductsSlugRoute
   '/_mainLayout/search/$query': typeof MainLayoutSearchQueryRoute
@@ -530,6 +540,7 @@ export interface FileRouteTypes {
     | '/account/addresses'
     | '/account/orders'
     | '/account/profile'
+    | '/account/referrals'
     | '/collections/$slug'
     | '/products/$slug'
     | '/search/$query'
@@ -581,6 +592,7 @@ export interface FileRouteTypes {
     | '/account/addresses'
     | '/account/orders'
     | '/account/profile'
+    | '/account/referrals'
     | '/collections/$slug'
     | '/products/$slug'
     | '/search/$query'
@@ -636,6 +648,7 @@ export interface FileRouteTypes {
     | '/_mainLayout/account/addresses'
     | '/_mainLayout/account/orders'
     | '/_mainLayout/account/profile'
+    | '/_mainLayout/account/referrals'
     | '/_mainLayout/collections/$slug'
     | '/_mainLayout/products/$slug'
     | '/_mainLayout/search/$query'
@@ -926,6 +939,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainLayoutCollectionsSlugRouteImport
       parentRoute: typeof MainLayoutRoute
     }
+    '/_mainLayout/account/referrals': {
+      id: '/_mainLayout/account/referrals'
+      path: '/referrals'
+      fullPath: '/account/referrals'
+      preLoaderRoute: typeof MainLayoutAccountReferralsRouteImport
+      parentRoute: typeof MainLayoutAccountRoute
+    }
     '/_mainLayout/account/profile': {
       id: '/_mainLayout/account/profile'
       path: '/profile'
@@ -1072,6 +1092,7 @@ interface MainLayoutAccountRouteChildren {
   MainLayoutAccountAddressesRoute: typeof MainLayoutAccountAddressesRoute
   MainLayoutAccountOrdersRoute: typeof MainLayoutAccountOrdersRoute
   MainLayoutAccountProfileRoute: typeof MainLayoutAccountProfileRoute
+  MainLayoutAccountReferralsRoute: typeof MainLayoutAccountReferralsRoute
   MainLayoutAccountIndexRoute: typeof MainLayoutAccountIndexRoute
 }
 
@@ -1079,6 +1100,7 @@ const MainLayoutAccountRouteChildren: MainLayoutAccountRouteChildren = {
   MainLayoutAccountAddressesRoute: MainLayoutAccountAddressesRoute,
   MainLayoutAccountOrdersRoute: MainLayoutAccountOrdersRoute,
   MainLayoutAccountProfileRoute: MainLayoutAccountProfileRoute,
+  MainLayoutAccountReferralsRoute: MainLayoutAccountReferralsRoute,
   MainLayoutAccountIndexRoute: MainLayoutAccountIndexRoute,
 }
 

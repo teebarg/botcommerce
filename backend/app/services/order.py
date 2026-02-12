@@ -378,13 +378,28 @@ async def send_payment_receipt(order_id: int, notification: Notification):
         logger.error(f"Failed to generate invoice email: {e}")
 
 
-async def process_order_payment(order_id: int, notification: Notification):
+async def process_order_payment(order_id: int, notification: Notification) -> None:
+    order = await db.order.find_unique(
+        where={"id": order_id}, 
+        include={
+            "order_items": {
+                "include": {
+                    "variant": True,
+                }
+            }, 
+            "user": True
+        }
+    )
     await create_invoice(order_id)
     await send_payment_receipt(order_id, notification)
     try:
         await decrement_variant_inventory_for_order(order_id, notification)
     except Exception as e:
         logger.error(f"Failed to decrement variant inventory for order {order_id}: {e}")
+    try:
+        await process_referral(order, notification)
+    except Exception as e:
+        logger.error(f"An error occurred while processing referral for order {order_id}: {e}")
 
 
 async def return_order_item(order_id: int, item_id: int, background_tasks: BackgroundTasks) -> OrderResponse:
@@ -474,3 +489,17 @@ async def return_order_item(order_id: int, item_id: int, background_tasks: Backg
     background_tasks.add_task(invalidate_caches)
 
     return {"message": "Item returned successfully"}
+
+async def process_referral(order, notification=None) -> None:
+    coupon_owner = await db.user.find_unique(where={"referral_code": order.coupon_code})
+    async with db.tx() as tx:
+        await tx.wallettransaction.create(
+                data={
+                    "user": {"connect": {"id": coupon_owner.id}},
+                    "amount": order.discount_amount,
+                    "type": "CASHBACK",
+                    "referenceId": order.id,
+                },
+            )
+        await tx.user.update(where={"id": coupon_owner.id}, data={"wallet_balance": {"increment": order.discount_amount}})
+

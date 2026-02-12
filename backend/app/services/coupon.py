@@ -61,18 +61,18 @@ class CouponService:
                         detail="You have reached the maximum usage limit for this coupon."
                     )
 
-        if coupon.scope == CouponScope.SPECIFIC_USERS:
-            if not user_id:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Coupon is only available for specific users. Please log in."
-                )
+        # if coupon.scope == CouponScope.SPECIFIC_USERS:
+        #     if not user_id:
+        #         raise HTTPException(
+        #             status_code=400,
+        #             detail="Coupon is only available for specific users. Please log in."
+        #         )
 
-            if not any(user.id == user_id for user in coupon.users):
-                raise HTTPException(
-                    status_code=403,
-                    detail="This coupon is not available for your account"
-                )
+        #     if not any(user.id == user_id for user in coupon.users):
+        #         raise HTTPException(
+        #             status_code=403,
+        #             detail="This coupon is not available for your account"
+        #         )
 
         # Validate cart requirements
         if cart:

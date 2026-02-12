@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useSwipeable } from "react-swipeable";
 import { Trash2, Power, PowerOff, Copy } from "lucide-react";
-import { AssignmentDialog } from "./assignment-dialog";
 import { CouponUsageDialog } from "./coupon-usage-dialog";
 import { EditCouponDialog } from "./edit-coupon-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -78,7 +77,6 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
                             <div className="flex flex-wrap items-center gap-2">
                                 <CardTitle className="text-lg md:text-xl font-semibold">{coupon.code}</CardTitle>
                                 <Badge variant={coupon.is_active ? "emerald" : "destructive"}>{coupon.is_active ? "Active" : "Inactive"}</Badge>
-                                {coupon.scope === "SPECIFIC_USERS" && <Badge variant="warning">VIP Only</Badge>}
                             </div>
                             <div className="flex gap-2 self-start sm:self-auto">
                                 <Button className="h-9 w-9" size="icon" variant="ghost" onClick={() => onCopy(coupon.code)}>
@@ -104,13 +102,7 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
                             </div>
                         </div>
                     </CardHeader>
-                    {coupon.scope === "SPECIFIC_USERS" && (
-                        <CardContent className="pb-3 pt-0">
-                            <AssignmentDialog assignedUsers={coupon.users ?? []} couponCode={coupon.code} couponId={coupon.id} />
-                        </CardContent>
-                    )}
                     <CardContent className="space-y-3">
-                        {coupon.scope === "SPECIFIC_USERS" ? "" : " "}
                         <div className="flex items-center justify-between pb-3 border-b">
                             <CouponUsageDialog couponCode={coupon.code} couponType={coupon.discount_type} usageHistory={coupon.usages || []} />
                         </div>

@@ -251,17 +251,21 @@ class RedisStreamConsumer:
         import uuid
         try:
             notification = self.get_notification()
+            code: str = f"{event['first_name']}{uuid.uuid4().hex[:4].upper()}"
+            print(code)
             coupon = await db.coupon.create(data={
-                "code": f"WELCOME{uuid.uuid4().hex[:3].upper()}",
+                "code": code,
                 "discount_type": "PERCENTAGE",
                 "discount_value": 10,
                 "min_cart_value": 5000,
-                "min_item_quantity": 0,
+                # "min_item_quantity": 0,
                 "valid_from": datetime.now(),
-                "valid_until": datetime.now() + timedelta(days=14),
-                "scope": "SPECIFIC_USERS",
+                "valid_until": datetime.now() + timedelta(weeks=500),
+                # "scope": "SPECIFIC_USERS",
                 "users": {"connect": [{"id": int(event["id"])}]}
             })
+            # update user table
+            await db.user.update(where={"id": int(event["id"])}, data={"referral_code": code})
             welcome_email = await generate_welcome_email(
                 email_to=event["email"],
                 first_name=event["first_name"],
@@ -274,6 +278,7 @@ class RedisStreamConsumer:
                 message=welcome_email.html_content
             )
             await invalidate_pattern("coupons")
+            await invalidate_pattern("users")
         except Exception as e:
             logger.error(f"Failed to send welcome email: {str(e)}")
             raise Exception(f"Email error: {str(e)}")

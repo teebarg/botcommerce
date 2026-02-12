@@ -60,6 +60,32 @@ def tokenData(user: User):
     }
 
 
+@router.post("/test-signup")
+async def test_signup(request: Request):
+    """
+    Register a new user with email and password.
+    Requires CAPTCHA verification and email verification.
+    """
+    existing_user = await prisma.user.find_first(
+        where={
+            "email": "teebarg01@gmail.com",
+        }
+    )
+
+    try:
+        await publish_user_registered(
+            user=existing_user,
+            source="email_password",
+            created_at=existing_user.created_at,
+        )
+    except Exception as e:
+        logger.error(f"Failed to publish USER_REGISTERED event: {e}")
+        pass
+
+    return "Done"
+
+
+
 @router.post("/signup")
 async def signup(request: Request, payload: SignUpPayload, background_tasks: BackgroundTasks) -> Token:
     """

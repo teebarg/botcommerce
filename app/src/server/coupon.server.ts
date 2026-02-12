@@ -41,7 +41,6 @@ const CreateCouponSchema = z.object({
     valid_until: z.string(),
     max_uses: z.number(),
     max_uses_per_user: z.number(),
-    scope: z.enum(["GENERAL", "SPECIFIC_USERS"]),
     is_active: z.boolean(),
 });
 
