@@ -144,9 +144,7 @@ const OrderDetails = ({ order }: OrderDetailsProps) => {
                                         {order.shipping_address?.first_name} {order.shipping_address?.last_name}
                                     </p>
                                     <p className="text-muted-foreground">{order.shipping_address?.address_1}</p>
-                                    <p className="text-muted-foreground">
-                                        {order.shipping_address?.city}, {order.shipping_address?.state}
-                                    </p>
+                                    <p className="text-muted-foreground">{order.shipping_address?.state}</p>
                                     <p className="text-muted-foreground">{order.shipping_address?.phone}</p>
                                 </div>
                             )}

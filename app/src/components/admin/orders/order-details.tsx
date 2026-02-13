@@ -180,9 +180,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                 ) : (
                                     <>
                                         <p>{order.shipping_address?.address_1},</p>
-                                        <p>
-                                            {order.shipping_address?.city}, {order.shipping_address?.state}.
-                                        </p>
+                                        <p>{order.shipping_address?.state}.</p>
                                     </>
                                 )}
                             </div>

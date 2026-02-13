@@ -95,10 +95,7 @@ const PaginationUI: React.FC<Props> = ({ pagination, range = 2 }) => {
     return (
         <Pagination className="mt-4">
             <PaginationContent>
-                {/* Mobile view */}
                 <div className="flex sm:hidden">{renderCompact()}</div>
-
-                {/* Desktop view */}
                 <div className="hidden sm:flex">
                     <PaginationItem>
                         <PaginationPrevious disabled={page === 1} onClick={onPreviousPage} />

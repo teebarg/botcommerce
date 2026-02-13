@@ -46,8 +46,8 @@ async def calculate_cart_totals(cart: Cart):
                     data={"coupon_id": None}
                 )
 
-    new_subtotal = subtotal - discount_amount
-    tax = new_subtotal * (tax_rate / 100)
+    new_subtotal: float = subtotal - discount_amount
+    tax: float = new_subtotal * (tax_rate / 100)
 
     total = new_subtotal + tax + cart.shipping_fee
 
@@ -211,6 +211,8 @@ async def update_cart(cart_update: CartUpdate, user: UserDep, cartId: str = Head
 
         update_data["shipping_address"] = {"connect": {"id": address.id}}
         update_data["billing_address"] = {"connect": {"id": address.id}}
+        await invalidate_key(f"addresses:{user.id}")
+        await invalidate_key(f"address:{address.id}")
 
 
     if cart_update.status:
@@ -240,13 +242,11 @@ async def update_cart(cart_update: CartUpdate, user: UserDep, cartId: str = Head
         data=update_data,
     )
 
-    if cart_update.shipping_address:
-        await invalidate_key(f"addresses:{user.id}")
-
     await bust(f"cart:{cart.cart_number}")
     if cart.user_id:
         await bust(f"cart:{cart.user_id}")
     await invalidate_pattern("abandoned-carts")
+    await invalidate_pattern("cart")
 
     return updated_cart
 

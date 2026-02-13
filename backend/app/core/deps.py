@@ -1,4 +1,4 @@
-from typing import Annotated, Union
+from typing import Annotated
 
 import jwt
 from fastapi import Depends, HTTPException, status, Cookie
@@ -25,13 +25,11 @@ reusable_oauth2 = OAuth2PasswordBearer(
 meilisearch_client = MeilisearchClient(settings.MEILI_HOST, settings.MEILI_MASTER_KEY, timeout=1.5)
 supabase: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
 
-# SessionDep = Annotated[Session, Depends(get_db)]
-# TokenDep = Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]
-TokenDep = Annotated[Union[str, None], Cookie(alias="authjs.session-token" if settings.ENVIRONMENT == "local" else "__Secure-authjs.session-token")]
+TokenDep = Annotated[str | None, Cookie(alias="authjs.session-token" if settings.ENVIRONMENT == "local" else "__Secure-authjs.session-token")]
 
 RedisClient = Annotated[redis.Redis, Depends(get_redis_dependency)]
 
-async def get_user_token(access_token: TokenDep) -> TokenPayload | None:
+async def get_user_token(access_token: TokenDep = None) -> TokenPayload | None:
     try:
         payload = jwt.decode(
             access_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
@@ -42,9 +40,11 @@ async def get_user_token(access_token: TokenDep) -> TokenPayload | None:
 
     return token_data
 
+# SessionDep = Annotated[Session, Depends(get_db)]
+# TokenDep = Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]
 TokenUser = Annotated[TokenPayload, Depends(get_user_token)]
 
-async def get_user(token_data: TokenUser ) -> User | None:
+async def get_user(token_data: TokenUser = None ) -> User | None:
     if not token_data:
         return None
 

@@ -15,15 +15,14 @@ DEFAULT_EXPIRATION = int(timedelta(days=7).total_seconds())
 def handle_redis_errors(default: Any = None):
     def decorator(func: Callable):
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs):
             try:
-                return func(*args, **kwargs)
+                return await func(*args, **kwargs)
             except Exception as e:
                 logger.error(f"Redis error in {func.__name__}: {str(e)}")
                 return default
         return wrapper
     return decorator
-
 
 class EnhancedJSONEncoder(json.JSONEncoder):
     def default(self, o):
@@ -101,26 +100,34 @@ def cache_response(key_prefix: str, key: Union[str, Callable[..., str], None] = 
     return decorator
 
 
-async def invalidate_pattern(pattern: str):
-    import asyncio
-    await asyncio.sleep(1)
+@handle_redis_errors(default=None)
+async def invalidate_pattern(pattern: str) -> None:
+    """
+    Delete all Redis keys matching pattern and notify websocket clients.
+    """
     try:
-        await invalidate_list(pattern)
+        keys = await redis_client.keys(f"{pattern}*")
+        if keys:
+            await redis_client.delete(*keys)
+
         await manager.broadcast_to_all(
-            data={
-                "key": pattern,
-            },
+            data={"key": pattern},
             message_type="invalidate",
         )
     except Exception as e:
         logger.error(f"Error invalidating pattern {pattern}: {e}")
 
 
-async def invalidate_key(key: str):
-    await bust(key)
-    await manager.broadcast_to_all(
-        data={
-            "key": key,
-        },
-        message_type="invalidate",
-    )
+@handle_redis_errors(default=None)
+async def invalidate_key(key: str) -> None:
+    """
+    Delete a specific Redis key and notify websocket clients.
+    """
+    try:
+        await redis_client.delete(key)
+        await manager.broadcast_to_all(
+            data={"key": key},
+            message_type="invalidate",
+        )
+    except Exception as e:
+        logger.error(f"Error invalidating key {key}: {e}")

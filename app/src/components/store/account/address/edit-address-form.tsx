@@ -7,19 +7,17 @@ import { Button } from "@/components/ui/button";
 import type { Address } from "@/schemas";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AddressTypeSchema } from "@/schemas";
 import { states } from "@/components/store/collections/data";
 import { useUpdateAddress } from "@/hooks/useAddress";
 
 const addressSchema = z.object({
-    address_type: AddressTypeSchema,
     first_name: z.string().min(1, "First name is required"),
     last_name: z.string().min(1, "Last name is required"),
     address_1: z.string().min(1, "Address is required"),
     address_2: z.string().optional(),
-    city: z.string().min(1, "City is required"),
+    city: z.string().optional(),
     state: z.string().min(1, "State is required"),
-    phone: z.string().min(1, "Phone number is required"),
+    phone: z.string().min(1),
 });
 
 type AddressFormValues = z.infer<typeof addressSchema>;
@@ -41,7 +39,6 @@ const EditAddressForm: React.FC<EditAddressProps> = ({ address, isActive = false
             city: address.city || "",
             state: address.state || "",
             phone: address.phone || "",
-            address_type: address.address_type || "HOME",
         },
     });
 
@@ -55,28 +52,6 @@ const EditAddressForm: React.FC<EditAddressProps> = ({ address, isActive = false
         <Form {...form}>
             <form className="flex-1 flex flex-col overflow-hidden" onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="overflow-y-auto flex-1 px-4 space-y-4">
-                    <FormField
-                        control={form.control}
-                        name="address_type"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Address Type</FormLabel>
-                                <Select value={field.value} onValueChange={field.onChange}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select type" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="HOME">Home</SelectItem>
-                                        <SelectItem value="WORK">Work</SelectItem>
-                                        <SelectItem value="BILLING">Billing</SelectItem>
-                                        <SelectItem value="SHIPPING">Shipping</SelectItem>
-                                        <SelectItem value="OTHER">Other</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
                     <div className="grid grid-cols-2 gap-x-2">
                         <FormField
                             control={form.control}
@@ -131,21 +106,6 @@ const EditAddressForm: React.FC<EditAddressProps> = ({ address, isActive = false
                             </FormItem>
                         )}
                     />
-                    <div className="grid grid-cols-[144px_1fr] gap-x-2">
-                        <FormField
-                            control={form.control}
-                            name="city"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>City</FormLabel>
-                                    <FormControl>
-                                        <Input required autoComplete="locality" data-testid="city-input" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
                     <FormField
                         control={form.control}
                         name="state"

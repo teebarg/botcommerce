@@ -5,14 +5,14 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { Cart } from "@/schemas";
 import { useMyCart } from "@/hooks/useCart";
 
-import { update, get, del } from "idb-keyval";
+import { get, del } from "idb-keyval";
 import { addToCartFn } from "@/server/cart.server";
 
 const CART_KEY = "offline-cart";
 
-export const addToOfflineCart = async (item: { variant_id: number; quantity: number }) => {
-    return update(CART_KEY, (items = []) => [...items, item]);
-};
+// export const addToOfflineCart = async (item: { variant_id: number; quantity: number }) => {
+//     return update(CART_KEY, (items = []) => [...items, item]);
+// };
 
 export const getOfflineCart = async () => {
     return (await get(CART_KEY)) || [];
@@ -28,7 +28,7 @@ type AddItem = {
 };
 
 interface CartContextType {
-    addItem: (item: AddItem) => Promise<void>;
+    // addItem: (item: AddItem) => Promise<void>;
     syncOfflineCart: () => Promise<void>;
     isSyncing: boolean;
     cart?: Cart;
@@ -53,14 +53,14 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     const queryClient = useQueryClient();
     const { data: cart, isLoading, error } = useMyCart();
 
-    const addItem = async (item: AddItem) => {
-        if (!navigator.onLine) {
-            await addToOfflineCart(item);
-            toast.success("Added to cart (offline)");
+    // const addItem = async (item: AddItem) => {
+    //     if (!navigator.onLine) {
+    //         await addToOfflineCart(item);
+    //         toast.success("Added to cart (offline)");
 
-            return;
-        }
-    };
+    //         return;
+    //     }
+    // };
 
     const syncOfflineCart = async () => {
         const offlineCart = await getOfflineCart();
@@ -95,7 +95,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     return (
         <CartContext.Provider
             value={{
-                addItem,
+                // addItem,
                 syncOfflineCart,
                 isSyncing,
                 cart,

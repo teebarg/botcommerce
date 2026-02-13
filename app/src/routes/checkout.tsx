@@ -32,7 +32,7 @@ function RouteComponent() {
         return <ServerError error={error.message} scenario="checkout" stack={error.stack} />;
     }
     return (
-        <div className="max-w-7xl mx-auto w-full h-screen flex flex-col">
+        <div className="max-w-7xl mx-auto w-full h-screen flex flex-col overflow-hidden">
             <motion.header
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -59,7 +59,7 @@ function RouteComponent() {
             ) : !cart ? (
                 <EmptyCartMessage />
             ) : (
-                <main className="flex-1 flex md:gap-8">
+                <main className="flex-1 flex md:gap-8 overflow-hidden">
                     <CheckoutFlow cart={cart} />
                     <div className="mb-24 md:mb-0 hidden md:block">
                         <CheckoutSummary />

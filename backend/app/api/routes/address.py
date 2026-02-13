@@ -14,7 +14,7 @@ from app.models.generic import Message
 from app.prisma_client import prisma as db
 from prisma.errors import PrismaError
 from app.core.logging import get_logger
-from app.services.redis import cache_response, invalidate_key
+from app.services.redis import bust, cache_response, invalidate_key, invalidate_pattern
 
 logger = get_logger(__name__)
 
@@ -127,12 +127,24 @@ async def delete(id: int, user: CurrentUser) -> Message:
         )
 
     try:
-        await db.address.delete(
-            where={"id": id}
-        )
+        async with db.tx() as tx:
+            cart = await tx.cart.find_first(where={"shipping_address_id": id, "status": "ACTIVE"})
+            if cart:
+                await tx.cart.update(
+                    where={"id": cart.id},
+                    data={
+                        "shipping_address": { "disconnect": {"id": id}},
+                        "billing_address": { "disconnect": {"id": id}}
+                    }
+                )
+                
+            await tx.address.delete(where={"id": id})
+
+        await invalidate_pattern("cart")
         await invalidate_key(f"addresses:{user.id}")
         await invalidate_key(f"address:{id}")
+        
         return Message(message="Address deleted successfully")
     except PrismaError as e:
-        raise HTTPException(
-            status_code=500, detail=f"Database error: {str(e)}")
+        logger.error(e)
+        raise HTTPException(status_code=500, detail=str(e))

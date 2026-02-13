@@ -61,6 +61,7 @@ class Order(BaseModel):
     payment: Optional[Payment]
     payment_method: PaymentMethod
     shipping_fee: float
+    coupon_code: Optional[str] = None
     coupon_id: Optional[int]
     coupon: Optional[Coupon]
     cart_id: Optional[int]

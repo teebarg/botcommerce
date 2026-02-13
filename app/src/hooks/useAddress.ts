@@ -7,7 +7,7 @@ export const useUserAddresses = () => {
     const { session } = useRouteContext({ strict: false });
 
     return useQuery({
-        queryKey: ["addresses"],
+        queryKey: ["addresses", session?.id?.toString()],
         queryFn: () => getUserAddressesFn(),
         enabled: Boolean(session?.user),
     });

@@ -16,7 +16,7 @@ const addressSchema = z.object({
     last_name: z.string().min(1, "Last name is required"),
     address_1: z.string().min(1, "Address is required"),
     address_2: z.string().optional(),
-    city: z.string().min(1, "City is required"),
+    city: z.string().optional(),
     state: z.string().min(1, "State is required"),
     phone: z.string().optional(),
 });
@@ -157,21 +157,6 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
                                 </FormItem>
                             )}
                         />
-                        <div className="grid grid-cols-[144px_1fr] gap-x-2">
-                            <FormField
-                                control={form.control}
-                                name="city"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>City</FormLabel>
-                                        <FormControl>
-                                            <Input required autoComplete="locality" data-testid="city-input" {...field} placeholder="City" />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
                         <FormField
                             control={form.control}
                             name="state"

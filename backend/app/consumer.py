@@ -210,7 +210,7 @@ class RedisStreamConsumer:
             if int(event.get("time_spent", 0)) > 0:
                 metadata["time_spent"] = int(event.get("time_spent", 0))
 
-            key = f"user:{event['user_id']}:history"
+            key: str = f"user:{event['user_id']}:history"
             async with self.redis.pipeline(transaction=True) as pipe:
                 pipe.lpush(key, event['product_id'])
                 pipe.ltrim(key, 0, 49)
@@ -247,21 +247,19 @@ class RedisStreamConsumer:
         recent_service = PopularProductsService()
         await recent_service.track_product_interaction(product_id=product_id, interaction_type=interaction_type)
 
-    async def handle_user_registered(self, event):
+    async def handle_user_registered(self, event) -> None:
         import uuid
         try:
             notification = self.get_notification()
-            code: str = f"{event['first_name']}{uuid.uuid4().hex[:4].upper()}"
-            print(code)
+            code: str = f"{event['first_name'][:4]}{uuid.uuid4().hex[:4]}".upper()
             coupon = await db.coupon.create(data={
                 "code": code,
                 "discount_type": "PERCENTAGE",
                 "discount_value": 10,
                 "min_cart_value": 5000,
-                # "min_item_quantity": 0,
+                "max_uses": 1000,
                 "valid_from": datetime.now(),
                 "valid_until": datetime.now() + timedelta(weeks=500),
-                # "scope": "SPECIFIC_USERS",
                 "users": {"connect": [{"id": int(event["id"])}]}
             })
             # update user table
