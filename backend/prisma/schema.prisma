@@ -342,6 +342,7 @@ model Order {
   subtotal        Float           @db.DoublePrecision
   tax             Float           @db.DoublePrecision
   discount_amount Float           @default(0) @db.DoublePrecision
+  wallet_used     Float           @default(0) @db.DoublePrecision
   status          OrderStatus     @default(PENDING)
   payment         Payment?
   payment_method  PaymentMethod
@@ -475,6 +476,7 @@ model Cart {
   tax             Float           @default(0) @db.DoublePrecision
   shipping_fee    Float           @default(0) @db.DoublePrecision
   discount_amount Float           @default(0) @db.DoublePrecision
+  wallet_used     Float           @default(0) @db.DoublePrecision
   payment_method  PaymentMethod?
   shipping_method ShippingMethod?
   coupon_code     String?
@@ -538,7 +540,7 @@ model User {
   preferences                UserPreference[]
   coupons                    Coupon[]          @relation("CouponAllowedUser")
   referral_code              String?           @unique
-  wallet_ballance            Float             @default(0) @db.DoublePrecision
+  wallet_balance            Float             @default(0) @db.DoublePrecision
 
   Conversation         Conversation[]
   SharedCollectionView SharedCollectionView[]

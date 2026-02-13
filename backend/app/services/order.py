@@ -484,5 +484,5 @@ async def process_referral(order, notification=None) -> None:
                     "referenceId": order.order_number,
                 }
             )
-        await tx.user.update(where={"id": coupon_owner.id}, data={"wallet_ballance": {"increment": order.discount_amount}})
+        await tx.user.update(where={"id": coupon_owner.id}, data={"wallet_balance": {"increment": order.discount_amount}})
 

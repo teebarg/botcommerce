@@ -140,27 +140,6 @@ const ShippingAddressForm = ({ onClose }: { onClose?: () => void }) => {
                         )}
                     />
 
-                    {/* <FormField
-                        control={form.control}
-                        name="city"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>City</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        required
-                                        autoComplete="address-level2"
-                                        data-testid="shipping-city-input"
-                                        placeholder="City"
-                                        startContent={<MapPin className="h-4 w-4 text-muted-foreground" />}
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    /> */}
-
                     <FormField
                         control={form.control}
                         name="state"

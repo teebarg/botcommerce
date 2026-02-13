@@ -26,7 +26,7 @@ export const UserSchema = z
         image: z.string().optional(),
         role: z.enum(["ADMIN", "CUSTOMER"]),
         referral_code: z.string().optional(),
-        wallet_ballance: z.number().optional(),
+        wallet_balance: z.number().optional(),
         // addresses: z.array(z.lazy(() => AddressSchema)).optional(),
         addresses: z.array(AddressSchema).optional(),
         orders: z.array(z.any()).optional(),

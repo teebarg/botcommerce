@@ -91,7 +91,7 @@ function RouteComponent() {
                     <div className="w-10 h-10 mx-auto rounded-xl bg-gradient-to-br flex items-center justify-center mb-2 from-primary to-accent">
                         <Wallet className="w-5 h-5 text-white" />
                     </div>
-                    <p className="text-xl font-bold">{currency(me.wallet_ballance!)}</p>
+                    <p className="text-xl font-bold">{currency(me.wallet_balance!)}</p>
                     <p className="text-xs text-muted-foreground">Wallet Balance</p>
                 </motion.div>
             </motion.div>

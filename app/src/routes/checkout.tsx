@@ -9,8 +9,12 @@ import ComponentLoader from "@/components/component-loader";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { motion } from "framer-motion";
 import { BackButton } from "@/components/back";
+import { meQuery } from "@/queries/user.queries";
 
 export const Route = createFileRoute("/checkout")({
+    loader: async ({ context: { queryClient } }) => {
+        await queryClient.ensureQueryData(meQuery());
+    },
     head: () => ({
         meta: [
             {

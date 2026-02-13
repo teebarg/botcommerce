@@ -22,7 +22,6 @@ const couponSchema = z.object({
     valid_until: z.string(),
     max_uses: z.number().min(1),
     max_uses_per_user: z.number().min(1),
-    // scope: z.enum(["GENERAL", "SPECIFIC_USERS"]),
     status: z.enum(["active", "inactive"]),
 });
 

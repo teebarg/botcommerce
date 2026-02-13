@@ -21,7 +21,6 @@ const couponSchema = z.object({
     valid_until: z.string(),
     max_uses: z.number().min(1),
     max_uses_per_user: z.number().min(1),
-    // scope: z.enum(["GENERAL", "SPECIFIC_USERS"]),
     status: z.enum(["active", "inactive"]),
 });
 
@@ -39,7 +38,6 @@ export const CreateCouponDialog = () => {
             value: 10,
             max_uses: 100,
             max_uses_per_user: 1,
-            // scope: "GENERAL",
             status: "active",
             valid_from: new Date().toISOString().split("T")[0],
             valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
@@ -58,7 +56,6 @@ export const CreateCouponDialog = () => {
                 valid_until: new Date(data.valid_until + "T23:59:59Z").toISOString(),
                 max_uses: data.max_uses,
                 max_uses_per_user: data.max_uses_per_user,
-                // scope: data.scope,
                 is_active: data.status === "active",
             };
 
