@@ -1,16 +1,17 @@
-from app.models.base import BM
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import Optional
+from app.models.user import User
 
-class ReviewBase(BM):
-    comment: str = Field(..., min_length=1, description="Comment is required")
-    rating: int = 1
+class ReviewBase(BaseModel):
+    comment: str
+    rating: int
     author: str
     title: str
 
 class Review(ReviewBase):
     id: int
     verified: bool
+    user: Optional[User]
 
 
 class ReviewCreate(ReviewBase):

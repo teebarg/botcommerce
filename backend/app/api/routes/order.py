@@ -52,7 +52,7 @@ async def get_orders(
     end_date: Optional[str] = None,
     customer_id: Optional[int] = None,
 ) -> Orders:
-    return await list_orders(
+    orders = await list_orders(
         user_id=user.id,
         skip=skip,
         take=take,
@@ -64,6 +64,8 @@ async def get_orders(
         user_role=user.role,
         sort=sort
     )
+    print(orders)
+    return orders
 
 @router.delete("/{order_id}", dependencies=[Depends(get_current_superuser)])
 async def delete_order(order_id: int):

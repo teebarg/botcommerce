@@ -3,15 +3,16 @@ from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel
 
 from app.core.utils import generate_id, generate_abandoned_cart_email, send_email
-from app.models.cart import CartUpdate, CartItemCreate, CartItemResponse, CartResponse
+from app.models.cart import CartUpdate, CartItemCreate, CartItemResponse, CartResponse, CartLite
 from fastapi import APIRouter, Header, HTTPException, Request, BackgroundTasks, Depends
 from app.prisma_client import prisma as db
-from app.core.deps import UserDep, get_current_superuser
+from app.core.deps import UserDep, get_current_superuser, CurrentUser
 from prisma.models import Cart
 from app.services.redis import cache_response, invalidate_key, bust, invalidate_pattern
 from app.core.logging import get_logger
 from app.services.shop_settings import ShopSettingsService
 from prisma.enums import CartStatus
+from app.models.generic import Message
 
 logger = get_logger(__name__)
 
@@ -20,8 +21,8 @@ router = APIRouter()
 async def calculate_cart_totals(cart: Cart):
     """Helper function to calculate cart totals"""
     from app.services.coupon import CouponService
-
     service = ShopSettingsService()
+
     tax_rate = float(await service.get("tax_rate"))
     cart_items = await db.cartitem.find_many(where={"cart_id": cart.id})
 
@@ -46,21 +47,28 @@ async def calculate_cart_totals(cart: Cart):
                     data={"coupon_id": None}
                 )
 
-    new_subtotal: float = subtotal - discount_amount
+    wallet_used = 0
+    if cart.wallet_used > 0:
+        wallet_used = cart.wallet_used
+
+    new_subtotal: float = max(subtotal - discount_amount, 0)
     tax: float = new_subtotal * (tax_rate / 100)
+    shipping_fee = cart.shipping_fee or 0
+    total = new_subtotal + tax + shipping_fee
 
-    total = new_subtotal + tax + cart.shipping_fee
+    total_after_wallet = max(total - wallet_used, 0)
 
-    await db.cart.update(
-        where={"id": cart.id},
-        data={
-            "subtotal": subtotal,
-            "tax": tax,
-            "discount_amount": discount_amount,
-            "total": total
-        }
-    )
+    data={
+        "subtotal": subtotal,
+        "tax": tax,
+        "discount_amount": discount_amount,
+        "total": total_after_wallet,
+    }
 
+    if total <= 0:
+        data["payment_method"] = "WALLET"
+
+    await db.cart.update(where={"id": cart.id}, data=data)
     await invalidate_pattern("abandoned-carts")
     await invalidate_pattern("cart")
 
@@ -174,8 +182,8 @@ async def get_cart_items(user: UserDep, cartId: str = Header()):
     return await db.cartitem.find_many(where={"cart_number": cart.cart_number}, include={"variant": True})
 
 
-@router.put("/", response_model=CartResponse)
-async def update_cart(cart_update: CartUpdate, user: UserDep, cartId: str = Header(default=None)):
+@router.put("/")
+async def update_cart(cart_update: CartUpdate, user: UserDep, cartId: str = Header(default=None)) -> CartLite:
     """Update cart status"""
     cart = await get_or_create_cart(cart_number=cartId, user_id=user.id if user else None)
     if not cart:
@@ -590,3 +598,85 @@ async def get_abandoned_carts_stats(request: Request, hours_threshold: int = 24)
             status_code=500,
             detail=f"Failed to get abandoned carts stats: {str(e)}"
         )
+
+@router.post("/apply-wallet")
+async def apply_wallet(user: CurrentUser, cartId: str = Header(default=None)) -> Message:
+    """
+    Apply wallet balance to a cart.
+    """
+    cart = await get_or_create_cart(cart_number=cartId, user_id=user.id)
+    if not cart:
+        raise HTTPException(status_code=404, detail="Cart not found")
+
+    if not user.wallet_balance or user.wallet_balance <= 0:
+        raise HTTPException(status_code=400, detail="Wallet balance is empty")
+
+    subtotal = cart.subtotal or 0
+    tax = cart.tax or 0
+    shipping = cart.shipping_fee or 0
+    discount = cart.discount_amount or 0
+
+    total = subtotal + tax + shipping - discount
+    wallet_to_use = min(user.wallet_balance, total)
+    total -= wallet_to_use
+
+    data: dict[str, float] = {
+        "wallet_used": wallet_to_use,
+        "total": max(total, 0),
+    }
+
+    if total <= 0:
+        data["payment_method"] = "WALLET"
+
+    try:
+        async with db.tx() as tx:
+            await tx.cart.update(where={"id": cart.id}, data=data)
+            await tx.wallettransaction.create(
+                data={
+                    "user": {"connect": {"id": user.id}},
+                    "amount": wallet_to_use,
+                    "reference_code": "WALLET_PAYMENT",
+                    "type": "WITHDRAWAL",
+                    "reference_id": cart.id,
+                }
+            )
+            await tx.user.update(where={"id": user.id}, data={"wallet_balance": {"decrement": wallet_to_use}})
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to update cart")
+
+    await invalidate_pattern("cart")
+    await invalidate_pattern("user")
+
+    return Message(message="Wallet applied")
+
+
+@router.post("/remove-wallet")
+async def remove_wallet(user: CurrentUser, cartId: str = Header(default=None)):
+    """
+    Remove wallet usage from the cart, refund the wallet, and recalculate totals.
+    """
+    cart = await get_or_create_cart(cart_number=cartId, user_id=user.id)
+    if not cart:
+        raise HTTPException(status_code=404, detail="Cart not found")
+
+    wallet_used = cart.wallet_used or 0.0
+    if wallet_used <= 0:
+        return Message(message="No Wallet applied")
+
+    try:
+        async with db.tx() as tx:
+            await tx.user.update(where={"id": user.id}, data={"wallet_balance": {"increment": wallet_used}})
+            await tx.wallettransaction.update_many(
+                where={"user_id": user.id, "reference_id": cart.id, "reference_code": "WALLET_PAYMENT"},
+                data={"type": "REVERSAL", "amount": 0}
+            )
+            await tx.cart.update(where={"id": cart.id}, data={"wallet_used": 0.0, "payment_method": None})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to remove wallet: {e}")
+
+    from app.services.cart import calculate_cart_totals
+    cart_summary = await calculate_cart_totals(cart)
+
+    await invalidate_pattern("user")
+
+    return Message(message="Wallet removed successfully")

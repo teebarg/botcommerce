@@ -1,9 +1,19 @@
+from app.models.product import ProductVariant
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
-
-from prisma.models import Address, Payment, OrderItem, User, Coupon
+from prisma.models import Address, Payment, Coupon
 from prisma.enums import PaymentMethod, ShippingMethod, OrderStatus, PaymentStatus
+from app.models.user import User
+
+class OrderItemLite(BaseModel):
+    id: int
+    name: Optional[str]
+    variant_id: Optional[int]
+    variant: Optional[ProductVariant]
+    price: float
+    quantity: int
+    image: Optional[str]
 
 class OrderItemCreate(BaseModel):
     variant_id: int
@@ -28,6 +38,7 @@ class OrderResponse(BaseModel):
     subtotal: float
     tax: float
     discount_amount: float
+    wallet_used: Optional[float]
     status: OrderStatus
     payment_status: PaymentStatus
     shipping_method: ShippingMethod
@@ -36,7 +47,7 @@ class OrderResponse(BaseModel):
     shipping_fee: float
     coupon_id: Optional[int]
     cart_id: Optional[int]
-    order_items: Optional[list[OrderItem]]
+    order_items: Optional[list[OrderItemLite]]
     created_at: datetime
     updated_at: datetime
     order_notes: Optional[str] = None
@@ -55,6 +66,7 @@ class Order(BaseModel):
     subtotal: float
     tax: float
     discount_amount: float
+    wallet_used: Optional[float]
     status: OrderStatus
     payment_status: PaymentStatus
     shipping_method: ShippingMethod
@@ -65,7 +77,7 @@ class Order(BaseModel):
     coupon_id: Optional[int]
     coupon: Optional[Coupon]
     cart_id: Optional[int]
-    order_items: list[OrderItem]
+    order_items: list[OrderItemLite]
     created_at: datetime
     updated_at: datetime
     order_notes: Optional[str] = None

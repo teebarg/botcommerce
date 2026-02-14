@@ -37,6 +37,7 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
             "tax": cart.tax,
             "shipping_fee": cart.shipping_fee,
             "discount_amount": cart.discount_amount,
+            "wallet_used": cart.wallet_used,
             "status": order_in.status,
             "payment_status": order_in.payment_status,
             "shipping_method": cart.shipping_method,
@@ -480,8 +481,9 @@ async def process_referral(order, notification=None) -> None:
                 data={
                     "user": {"connect": {"id": coupon_owner.id}},
                     "amount": order.discount_amount,
+                    "reference_code": order.coupon_code,
                     "type": "CASHBACK",
-                    "referenceId": order.order_number,
+                    "reference_id": order.order_number,
                 }
             )
         await tx.user.update(where={"id": coupon_owner.id}, data={"wallet_balance": {"increment": order.discount_amount}})

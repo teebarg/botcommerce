@@ -44,6 +44,7 @@ enum PaymentMethod {
   BANK_TRANSFER
   PAYSTACK
   COUPON
+  WALLET
 }
 
 enum ProductStatus {
@@ -540,7 +541,7 @@ model User {
   preferences                UserPreference[]
   coupons                    Coupon[]          @relation("CouponAllowedUser")
   referral_code              String?           @unique
-  wallet_balance            Float             @default(0) @db.DoublePrecision
+  wallet_balance             Float             @default(0) @db.DoublePrecision
 
   Conversation         Conversation[]
   SharedCollectionView SharedCollectionView[]
@@ -737,19 +738,20 @@ model PushSubscription {
   userId Int?
   user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-  createdAt DateTime? @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
 
   @@map("push_subscriptions")
 }
 
 model WalletTransaction {
-  id          String                @id @default(uuid())
-  user_id     Int
-  amount      Float                 @db.DoublePrecision
-  type        WalletTransactionType
-  referenceId String? // orderId or cartId
-  createdAt   DateTime              @default(now())
+  id             String                @id @default(uuid())
+  user_id        Int
+  amount         Float                 @db.DoublePrecision
+  type           WalletTransactionType
+  reference_code String?
+  reference_id   String? // orderId or cartId
+  created_at     DateTime?             @default(now())
 
   user User @relation(fields: [user_id], references: [id])
 

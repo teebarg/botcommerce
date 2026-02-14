@@ -1,9 +1,22 @@
 from typing import List, Optional
 from pydantic import BaseModel, Field
 from app.models.generic import ImageUpload
-
 from app.models.base import BM
-from prisma.models import Category, Collection, Tag, ProductImage, Review, ProductVariant
+from prisma.models import Category, Collection, ProductImage
+from prisma.enums import ProductStatus
+from app.models.reviews import Review
+
+class ProductVariant(BaseModel):
+    id: int
+    sku: str
+    status: ProductStatus
+    price: float
+    old_price: float
+    inventory: int
+    age: Optional[str]
+    size: Optional[str]
+    color: Optional[str]
+    measurement: Optional[int]
 
 class VariantWithStatus(BaseModel):
     id: Optional[int] = None
@@ -54,7 +67,7 @@ class Product(BM):
     categories: Optional[List[Category]] = []
     collections: Optional[List[Collection]] = []
     # brand: Optional[Brand] = None
-    tags: Optional[List[Tag]] = []
+    # tags: Optional[List[Tag]] = []
     images: Optional[List[ProductImage]] = []
     reviews: Optional[List[Review]] = []
     active: Optional[bool] = True
@@ -168,3 +181,11 @@ class ImagesBulkUpdate(BaseModel):
 
 class ProductImageBulkUrls(BaseModel):
     urls: list[str]
+
+class ProductLite(BaseModel):
+    id: int
+    name: str
+    slug: str
+    sku: str
+    variants: Optional[List[ProductVariant]] = []
+    images: Optional[List[ProductImage]] = []

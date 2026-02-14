@@ -1,12 +1,11 @@
 # from enum import Enum
 from pydantic import BaseModel, Field
-from prisma.models import PaymentStatus
 
-# class PaymentStatus(str, Enum):
-#     pending = "pending"
-#     success = "success"
-#     failed = "failed"
-#     refunded = "refunded"
+class PaymentStatus(str, Enum):
+    PENDING = "PENDING"
+    SUCCESS = "SUCCESS"
+    FAILED = "FAILED"
+    REFUNDED = "REFUNDED"
 
 class Payment(BaseModel):
     id: int = Field(default_factory=lambda: nextval("payments_id_seq"))

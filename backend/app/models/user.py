@@ -1,30 +1,45 @@
 from typing import Optional, Literal
-from pydantic import EmailStr, BaseModel, Field
+from datetime import datetime
+from pydantic import BaseModel, EmailStr, Field
 
-from app.models.base import BM
-
-
-# Shared properties
-class UserBase(BM):
-    # email: EmailStr | None = Field(unique=True, index=True, max_length=255)
-    status: Literal["PENDING", "ACTIVE", "INACTIVE"] = "PENDING"
-    first_name: str | None = Field(default=None, max_length=255)
-    last_name: str | None = Field(default=None, max_length=255)
+class UserBase(BaseModel):
+    first_name: Optional[str] = Field(default=None, max_length=255)
+    last_name: Optional[str] = Field(default=None, max_length=255)
     image: Optional[str] = None
     role: Literal["ADMIN", "CUSTOMER"] = "CUSTOMER"
+    status: Literal["PENDING", "ACTIVE", "INACTIVE"] = "PENDING"
 
+class UserCreate(UserBase):
+    email: EmailStr
+    password: str
 
-# Properties to receive via API on update, all are optional
 class UserUpdate(UserBase):
     pass
 
-
 class UserUpdateMe(BaseModel):
-    first_name: str | None = Field(default=None, max_length=255)
-    last_name: str | None = Field(default=None, max_length=255)
-    email: EmailStr | None = Field(default=None, max_length=255)
-
+    first_name: Optional[str] = Field(default=None, max_length=255)
+    last_name: Optional[str] = Field(default=None, max_length=255)
+    email: Optional[EmailStr] = None
 
 class User(UserBase):
     id: int
-    hashed_password: str = ""
+
+class UserSelf(User):
+    email: EmailStr
+    wallet_balance: Optional[float] = None
+    created_at: datetime
+    updated_at: datetime
+
+class UserAdmin(User):
+    email: EmailStr
+    created_at: datetime
+    updated_at: datetime
+    wallet_balance: Optional[float] = None
+
+class UserInternal(UserBase):
+    id: int
+    email: EmailStr
+    hashed_password: str
+    wallet_balance: Optional[float] = None
+    created_at: datetime
+    updated_at: datetime

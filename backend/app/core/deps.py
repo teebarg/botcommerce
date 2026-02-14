@@ -12,7 +12,7 @@ from app.models.generic import TokenPayload
 from app.services.notification import EmailChannel, NotificationService, SlackChannel, WhatsAppChannel
 from app.prisma_client import prisma
 from meilisearch import Client as MeilisearchClient
-from prisma.models import User
+from app.models.user import UserInternal as User
 from supabase import create_client, Client
 from app.services.redis import get_redis_dependency
 import redis.asyncio as redis
