@@ -1,27 +1,18 @@
-from app.models.base import BM
-from pydantic import BaseModel, Field
+from typing import Optional
+from pydantic import BaseModel
 
 
-class BrandBase(BM):
-    name: str = Field(..., min_length=1, description="Variant name is required")
+class BrandBase(BaseModel):
+    name: str
     is_active: bool = True
 
 class Brand(BrandBase):
     id: int
-    slug: str = Field(..., min_length=1)
-
+    slug: str
 
 class BrandCreate(BrandBase):
     pass
 
-
-class BrandUpdate(BrandBase):
-    pass
-
-
-class Brands(BaseModel):
-    brands: list[Brand]
-    skip: int
-    limit: int
-    total_count: int
-    total_pages: int
+class BrandUpdate(BaseModel):
+    name: Optional[str]
+    is_active: Optional[bool]
