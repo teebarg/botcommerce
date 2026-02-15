@@ -17,6 +17,7 @@ import { FilterSidebarLogic, FilterSidebarRef } from "../shared/filter-sidebar-l
 import { useInView } from "react-intersection-observer";
 import { cn } from "@/utils";
 import ShareButton from "@/components/share";
+import { Link } from "@tanstack/react-router";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -155,7 +156,9 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
                     </div>
                 ))}
 
-                <h2 className="font-bold text-white mb-2 line-clamp-2 pr-24">{product.name}</h2>
+                <h2 className="font-bold text-white mb-2 line-clamp-2 pr-24">
+                    <Link to={`/products/${product.slug}`}>{product.name}</Link>
+                </h2>
                 <div className="flex items-baseline gap-2 mb-2">
                     <PriceLabel priceInfo={priceInfo} priceClassName="text-white text-2xl" oldPriceClassName="text-white/50" />
                 </div>

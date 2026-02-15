@@ -24,6 +24,7 @@ from fastapi.responses import JSONResponse
 from app.consumer import RedisStreamConsumer
 from app.core.deps import ShopSettingsServiceDep
 from pydantic import BaseModel
+from fastapi.exceptions import RequestValidationError
 
 STREAM_NAME = "EVENT_STREAMS"
 GROUP_NAME = "notifications"
@@ -61,6 +62,18 @@ if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
     sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
 
 app = FastAPI(title="Botcommerce", openapi_url="/api/openapi.json", lifespan=lifespan)
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    errors = []
+    for err in exc.errors():
+        field = err["loc"][-1]
+        errors.append(f"{field}: {err['msg']}")
+
+    return JSONResponse(
+        status_code=422,
+        content={"detail": " | ".join(errors)},
+    )
 
 # # Custom middleware to capture the client host
 # class ClientHostMiddleware(BaseHTTPMiddleware):

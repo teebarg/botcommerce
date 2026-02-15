@@ -25,22 +25,17 @@ async function clientRequest<T>(endpoint: string, options: ClientRequestOptions 
         },
     });
 
-    console.log("🚀 ~ file: api.client.ts:20 ~ response:", response)
-
     if (response.status === 401) {
         window.location.href = `/auth/signin?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
         throw new Error("Unauthorized");
     }
 
     if (!response.ok) {
-        console.log("in here....")
         let message = "Request failed";
         try {
             const body = await response.json();
             message = body?.detail || body?.message || message;
         } catch { }
-        console.log("message.......")
-        console.log(message)
         throw new Error(message);
     }
 

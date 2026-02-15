@@ -1,12 +1,12 @@
 import type React from "react";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
-import type { z } from "zod";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { BankDetailsSchema, Message } from "@/schemas/common";
+import { Message } from "@/schemas/common";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { clientApi } from "@/utils/api.client";
 
@@ -14,18 +14,20 @@ interface BankDetailsFormProps {
     onClose: () => void;
 }
 
-const bankDetailsFormSchema = BankDetailsSchema.omit({
-    id: true,
-    is_active: true,
-    created_at: true,
-    updated_at: true,
+const formSchema = z.object({
+    bank_name: z.string().min(1, { message: "Bank name is required" }),
+    account_name: z.string().min(1, { message: "Account name is required" }),
+    account_number: z
+        .string()
+        .min(10, { message: "Account number must be at least 10 characters long" })
+        .max(12, { message: "Account number must be at most 12 characters long" }),
 });
 
-type BankDetailsFormValues = z.infer<typeof bankDetailsFormSchema>;
+type BankDetailsFormValues = z.infer<typeof formSchema>;
 
 const BankDetailsForm: React.FC<BankDetailsFormProps> = ({ onClose }) => {
     const form = useForm<BankDetailsFormValues>({
-        resolver: zodResolver(bankDetailsFormSchema),
+        resolver: zodResolver(formSchema),
         defaultValues: {
             bank_name: "",
             account_name: "",

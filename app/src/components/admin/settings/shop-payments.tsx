@@ -11,6 +11,7 @@ import { useBankDetails } from "@/hooks/useApi";
 import { useSyncShopDetails } from "@/hooks/useGeneric";
 import { deleteBankDetailsFn } from "@/server/generic.server";
 import SheetDrawer from "@/components/sheet-drawer";
+import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 
 interface ShopPaymentsProps {
     settings: ShopSettings[];
@@ -44,6 +45,7 @@ interface BankDetailsProps {
 }
 
 const BankDetailComponent: React.FC<BankDetailsProps> = ({ bank }) => {
+    const deleteState = useOverlayTriggerState({});
     const deleteMutation = useMutation({
         mutationFn: async (id: number) => await deleteBankDetailsFn({ data: id }),
         onSuccess: () => {
@@ -65,15 +67,20 @@ const BankDetailComponent: React.FC<BankDetailsProps> = ({ bank }) => {
                 <p className="font-semibold">{bank.account_name}</p>
                 <p className="text-muted-foreground">{bank.account_number}</p>
             </div>
-            <Button
-                aria-label="delete"
-                className="min-w-32"
+            <ConfirmDrawer
+                open={deleteState.isOpen}
+                onOpenChange={deleteState.setOpen}
+                trigger={
+                    <Button aria-label="delete" className="min-w-32" variant="destructive">
+                        Delete
+                    </Button>
+                }
+                onClose={deleteState.close}
+                onConfirm={() => handleDeleteBankDetails(bank.id)}
+                title="Delete details"
+                description="This action cannot be undone. This will permanently delete the category and all its subcategories."
                 isLoading={deleteMutation.isPending}
-                variant="destructive"
-                onClick={() => handleDeleteBankDetails(bank.id)}
-            >
-                Delete
-            </Button>
+            />
         </div>
     );
 };

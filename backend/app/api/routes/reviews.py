@@ -1,13 +1,10 @@
-
-from app.models.reviews import Reviews, ReviewCreate, ReviewUpdate
-from fastapi import ( APIRouter, HTTPException, Depends, HTTPException, Query, BackgroundTasks)
-
+from app.models.reviews import Review, Reviews, ReviewCreate, ReviewUpdate
+from fastapi import APIRouter, HTTPException, Depends, HTTPException, Query, BackgroundTasks
 from app.core.deps import CurrentUser, get_current_superuser
 from app.models.generic import Message
 from app.prisma_client import prisma as db
 from prisma.errors import PrismaError
 from math import ceil
-from prisma.models import Review
 from app.services.product import reindex_product
 
 router = APIRouter()
@@ -40,8 +37,8 @@ async def index(
 
     if product_id:
         stats_query = """
-            SELECT 
-                ROUND(AVG(rating)::numeric, 2) as average_rating, 
+            SELECT
+                ROUND(AVG(rating)::numeric, 2) as average_rating,
                 COUNT(*) as ratings_count
             FROM "reviews"
             WHERE product_id = $1
@@ -56,8 +53,8 @@ async def index(
         breakdown_result = await db.query_raw(breakdown_query, product_id)
     else:
         stats_query = """
-            SELECT 
-                ROUND(AVG(rating)::numeric, 2) as average_rating, 
+            SELECT
+                ROUND(AVG(rating)::numeric, 2) as average_rating,
                 COUNT(*) as ratings_count
             FROM "reviews"
         """
