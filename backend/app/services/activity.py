@@ -1,9 +1,9 @@
 from typing import Optional
-from prisma.models import ActivityLog
 from app.prisma_client import prisma as db
 from app.services.websocket import manager
 from app.core.logging import logger
 from app.services.redis import invalidate_pattern
+from app.models.activities import Activity
 
 async def log_activity(
     user_id: int,
@@ -11,7 +11,7 @@ async def log_activity(
     description: str,
     action_download_url: Optional[str] = None,
     is_success: bool = True
-) -> Optional[ActivityLog]:
+) -> Optional[Activity]:
     """
     Log a user activity
     """

@@ -1,34 +1,18 @@
 from fastapi import APIRouter, HTTPException, Query, Depends
-
 from app.prisma_client import prisma as db
-from prisma.models import FAQ
-from pydantic import BaseModel
+from app.models.faq import FAQ, FAQCreate, FAQUpdate
 from typing import Optional, List
 from app.core.deps import get_current_superuser
+from app.models.generic import Message
 
 router = APIRouter()
 
-class FAQBase(BaseModel):
-    category: Optional[str] = None
-
-class FAQCreate(FAQBase):
-    question: str
-    answer: str
-    is_active: bool = True
-
-
-class FAQUpdate(FAQBase):
-    question: Optional[str] = None
-    answer: Optional[str] = None
-    is_active: Optional[bool] = None
-
-
-@router.get("/", response_model=List[FAQ])
+@router.get("/")
 async def list_faqs(
     query: Optional[str] = Query(None, min_length=1, description="Search query for FAQ questions"),
     category: Optional[str] = Query(None, description="Filter by category"),
     is_active: Optional[bool] = Query(None, description="Filter by active status")
-):
+)-> List[FAQ]:
     """List FAQ entries with optional filtering"""
     where = {}
     if query is not None:
@@ -41,9 +25,8 @@ async def list_faqs(
     faqs = await db.faq.find_many(where=where, order={"created_at": "desc"})
     return faqs
 
-
-@router.post("/", dependencies=[Depends(get_current_superuser)], response_model=FAQ)
-async def create_faq(faq: FAQCreate):
+@router.post("/", dependencies=[Depends(get_current_superuser)])
+async def create_faq(faq: FAQCreate)-> FAQ:
     """Create a new FAQ entry"""
     try:
         new_faq = await db.faq.create(
@@ -61,8 +44,8 @@ async def create_faq(faq: FAQCreate):
         raise
 
 
-@router.patch("/{id}", dependencies=[Depends(get_current_superuser)], response_model=FAQ)
-async def update_faq(faq_update: FAQUpdate, id: int):
+@router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
+async def update_faq(faq_update: FAQUpdate, id: int)-> FAQ:
     """Update a FAQ entry"""
     existing_faq = await db.faq.find_unique(where={"id": id})
     if not existing_faq:
@@ -89,13 +72,12 @@ async def update_faq(faq_update: FAQUpdate, id: int):
             raise HTTPException(status_code=400, detail="A FAQ with this question already exists")
         raise
 
-
 @router.delete("/{id}", dependencies=[Depends(get_current_superuser)])
-async def delete_faq(id: int):
+async def delete_faq(id: int)-> Message:
     """Delete a FAQ entry"""
     existing_faq = await db.faq.find_unique(where={"id": id})
     if not existing_faq:
         raise HTTPException(status_code=404, detail="FAQ not found")
 
     await db.faq.delete(where={"id": id})
-    return None
+    return Message(detail="FAQ deleted successfully")

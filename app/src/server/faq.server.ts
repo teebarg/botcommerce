@@ -16,12 +16,6 @@ export const getFaqsFn = createServerFn({ method: "GET" }).handler(async () => {
     return await api.get<FAQ[]>("/faq/");
 });
 
-export const createFaqFn = createServerFn({ method: "POST" })
-    .inputValidator(FaqFormValuesSchema)
-    .handler(async ({ data }) => {
-        return await api.post<Message>("/faq", data);
-    });
-
 export const updateFaqFn = createServerFn({ method: "POST" })
     .inputValidator(UpdateFaqPayloadSchema)
     .handler(async ({ data }) => {

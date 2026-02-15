@@ -2,13 +2,15 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useInvalidate } from "./useApi";
 import type { FaqFormValues } from "@/components/admin/faq/faq-form";
-import { createFaqFn, deleteFaqFn, updateFaqFn } from "@/server/faq.server";
+import { deleteFaqFn, updateFaqFn } from "@/server/faq.server";
+import { clientApi } from "@/utils/api.client";
+import { Message } from "@/schemas";
 
 export const useCreateFaq = () => {
     const invalidate = useInvalidate();
 
     return useMutation({
-        mutationFn: async (data: FaqFormValues) => await createFaqFn({ data }),
+        mutationFn: async (data: FaqFormValues) => clientApi.post<Message>("/faq", data),
         onSuccess: () => {
             invalidate("faqs");
             toast.success("FAQ created successfully");
