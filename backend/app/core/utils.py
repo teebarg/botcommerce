@@ -9,7 +9,7 @@ from typing import Any, Optional
 import emails  # type: ignore
 from app.core.config import settings
 from app.core.logging import logger
-from app.models.order import OrderResponse
+from app.models.order import Order
 from app.models.user import User
 from jinja2 import Environment, FileSystemLoader, Template
 from app.services.shop_settings import ShopSettingsService
@@ -291,7 +291,7 @@ def generate_test_email(email_to: str) -> EmailData:
     return EmailData(html_content=html_content, subject="Test email")
 
 
-async def generate_invoice_email(order: OrderResponse, user: User) -> EmailData:
+async def generate_invoice_email(order: Order, user: User) -> EmailData:
     service = ShopSettingsService()
     header_title = "Your order has been processed successfully"
     template_name = "paid_invoice.html"
@@ -328,7 +328,7 @@ async def generate_invoice_email(order: OrderResponse, user: User) -> EmailData:
     return EmailData(html_content=html_content, subject=f"Order Confirmation for {order.order_number}")
 
 
-async def generate_payment_receipt(order: OrderResponse, user: User) -> EmailData:
+async def generate_payment_receipt(order: Order, user: User) -> EmailData:
     html_content = render_email_template(
         template_name="payment_receipt.html",
         context={

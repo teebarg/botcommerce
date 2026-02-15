@@ -2,7 +2,7 @@ from typing import Optional
 import uuid
 from fastapi import HTTPException, BackgroundTasks
 from app.prisma_client import prisma as db
-from app.models.order import OrderResponse, OrderCreate
+from app.models.order import Order, OrderCreate
 from app.core.utils import generate_invoice_email, generate_payment_receipt
 from app.core.logging import logger
 from app.services.invoice import invoice_service
@@ -15,7 +15,7 @@ from app.services.events import publish_order_event
 from app.services.redis import invalidate_key, invalidate_pattern
 from app.services.shop_settings import ShopSettingsService
 
-async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_number: str) -> OrderResponse:
+async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_number: str) -> Order:
     """
     Create a new order from a cart
     """
@@ -80,7 +80,7 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
 
     return new_order
 
-async def retrieve_order(order_id: str) -> OrderResponse:
+async def retrieve_order(order_id: str) -> Order:
     """
     Get a specific order by order_number
     """
@@ -97,7 +97,7 @@ async def retrieve_order(order_id: str) -> OrderResponse:
         },
     )
     if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
+        raise HTTPException(status_code=404, detail="order not found")
     return order
 
 async def list_orders(
@@ -249,8 +249,8 @@ async def create_invoice(order_id: int) -> str:
     try:
         order = await db.order.find_unique(where={"id": order_id}, include={"order_items": True, "user": True, "shipping_address": True})
         if not order:
-            logger.error(f"Order not found for ID: {order_id}")
-            raise Exception("Order not found")
+            logger.error(f"order not found for ID: {order_id}")
+            raise Exception("order not found")
         settings = await db.shopsettings.find_many()
         settings_dict = {setting.key: setting.value for setting in settings}
 
@@ -372,8 +372,8 @@ async def process_order_payment(order_id: int, notification: Notification) -> No
         }
     )
     if not order:
-        logger.error(f"Order not found for ID: {order_id}")
-        raise Exception("Order not found")
+        logger.error(f"order not found for ID: {order_id}")
+        raise Exception("order not found")
     await create_invoice(order_id)
     await send_payment_receipt(order=order, notification=notification)
     try:
@@ -386,7 +386,7 @@ async def process_order_payment(order_id: int, notification: Notification) -> No
         logger.error(f"An error occurred while processing referral for order {order_id}: {e}")
 
 
-async def return_order_item(order_id: int, item_id: int, background_tasks: BackgroundTasks) -> OrderResponse:
+async def return_order_item(order_id: int, item_id: int, background_tasks: BackgroundTasks) -> Order:
     """
     Return an item from an order:
     - Remove the order item
@@ -401,7 +401,7 @@ async def return_order_item(order_id: int, item_id: int, background_tasks: Backg
     )
 
     if not order_item or order_item.order_id != order_id:
-        raise HTTPException(status_code=404, detail="Order item not found")
+        raise HTTPException(status_code=404, detail="order item not found")
 
     variant_id = order_item.variant_id
     quantity = order_item.quantity

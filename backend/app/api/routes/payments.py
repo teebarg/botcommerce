@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 from app.core.config import settings
 from app.schemas.payment import PaymentInitialize
-from app.models.order import OrderCreate, OrderResponse
+from app.models.order import OrderCreate, Order
 from app.core.deps import CurrentUser, Notification, get_current_user, get_current_superuser
 from app.models.user import User
 import httpx
@@ -81,8 +81,8 @@ async def create_payment(
 
     return await initialize_payment(cart, current_user)
 
-@router.get("/verify/{reference}", response_model=OrderResponse)
-async def verify_payment(reference: str, user: CurrentUser):
+@router.get("/verify/{reference}")
+async def verify_payment(reference: str, user: CurrentUser) -> Order:
     """Verify a payment"""
     async with httpx.AsyncClient() as client:
         response = await client.get(
@@ -140,7 +140,7 @@ async def create(*, create: PaymentCreate, notification: Notification, backgroun
     """
     order = await db.order.find_unique(where={"id": create.order_id})
     if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
+        raise HTTPException(status_code=404, detail="order not found")
     async with db.tx() as tx:
         await tx.order.update(
             where={"id": create.order_id},
@@ -160,16 +160,16 @@ async def create(*, create: PaymentCreate, notification: Notification, backgroun
     return payment
 
 
-@router.patch("/{id}/status", dependencies=[Depends(get_current_superuser)], response_model=OrderResponse)
-async def payment_status(id: int, status: PaymentStatus):
+@router.patch("/{id}/status", dependencies=[Depends(get_current_superuser)])
+async def payment_status(id: int, status: PaymentStatus) -> Order:
     """Change payment status"""
     order = await db.order.find_unique(where={"id": id}, include={"order_items": {"include": {"variant": True}}})
     if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
+        raise HTTPException(status_code=404, detail="order not found")
 
     for item in order.order_items:
         if item.variant.inventory < item.quantity:
-            raise HTTPException(status_code=400, detail="Order has out of stock items, cannot update payment status")
+            raise HTTPException(status_code=400, detail="order has out of stock items, cannot update payment status")
 
     data = {"payment_status": status}
 

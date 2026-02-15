@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, B
 from app.core.deps import CurrentUser, get_current_superuser
 from typing import Optional
 from app.prisma_client import prisma as db
-from app.models.order import OrderResponse, OrderCreate, Orders
+from app.models.order import Order, OrderCreate, Orders
 from prisma.enums import OrderStatus
 from app.services.order import create_order_from_cart, retrieve_order, list_orders, return_order_item
 from app.services.redis import cache_response, invalidate_key, invalidate_pattern
@@ -15,12 +15,12 @@ logger = get_logger(__name__)
 
 router = APIRouter()
 
-@router.post("/", response_model=OrderResponse)
+@router.post("/")
 async def create_order(
     order_in: OrderCreate,
     user: CurrentUser,
     cartId: str = Header(default=None),
-):
+) -> Order:
     try:
         order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cartId)
         await invalidate_pattern("orders")
@@ -30,12 +30,12 @@ async def create_order(
         logger.error(f"Failed to create order in create_order: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/{order_id}", response_model=OrderResponse)
+@router.get("/{order_id}")
 @cache_response(key_prefix="order", key=lambda request, order_id: order_id)
 async def get_order(
     request: Request,
     order_id: str,
-):
+) -> Order:
     return await retrieve_order(order_id)
 
 @router.get("/")
@@ -64,30 +64,29 @@ async def get_orders(
         user_role=user.role,
         sort=sort
     )
-    print(orders)
     return orders
 
 @router.delete("/{order_id}", dependencies=[Depends(get_current_superuser)])
 async def delete_order(order_id: int):
     order = await db.order.find_unique(where={"id": order_id})
     if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
+        raise HTTPException(status_code=404, detail="order not found")
 
     await db.order.delete(where={"id": order_id})
     await invalidate_pattern("orders")
     await invalidate_key(f"order:{order_id}")
-    return {"message": "Order deleted successfully"}
+    return {"message": "order deleted successfully"}
 
 
-@router.patch("/{id}/status", dependencies=[Depends(get_current_superuser)], response_model=OrderResponse)
-async def order_status(id: int, status: OrderStatus):
+@router.patch("/{id}/status", dependencies=[Depends(get_current_superuser)])
+async def order_status(id: int, status: OrderStatus) -> Order:
     """Change order status"""
     order = await db.order.find_unique(where={"id": id})
     if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
+        raise HTTPException(status_code=404, detail="order not found")
 
     if order.status == status:
-        raise HTTPException(status_code=400, detail="Order status is already the same")
+        raise HTTPException(status_code=400, detail="order status is already the same")
 
     data = {"status": status}
     async with db.tx() as tx:
@@ -111,11 +110,11 @@ async def order_status(id: int, status: OrderStatus):
 class OrderNotesUpdate(BaseModel):
     notes: str
 
-@router.patch("/{order_id}/notes", response_model=OrderResponse)
-async def update_order_notes(order_id: int, notes_update: OrderNotesUpdate, user: CurrentUser = None):
+@router.patch("/{order_id}/notes")
+async def update_order_notes(order_id: int, notes_update: OrderNotesUpdate, user: CurrentUser = None) -> Order:
     order = await db.order.find_unique(where={"id": order_id})
     if not order or order.user_id != user.id:
-        raise HTTPException(status_code=404, detail="Order not found")
+        raise HTTPException(status_code=404, detail="order not found")
     updated_order = await db.order.update(
         where={"id": order_id},
         data={"order_notes": notes_update.notes}
@@ -129,7 +128,7 @@ async def update_order_notes(order_id: int, notes_update: OrderNotesUpdate, user
 async def get_order_timeline(order_id: int):
     order = await db.order.find_unique(where={"id": order_id})
     if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
+        raise HTTPException(status_code=404, detail="order not found")
     entries = await db.ordertimeline.find_many(
         where={"order_id": order_id}, order={"created_at": "asc"}
     )

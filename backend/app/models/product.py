@@ -11,7 +11,7 @@ class ProductVariant(BaseModel):
     sku: str
     status: ProductStatus
     price: float
-    old_price: float
+    old_price: Optional[float]
     inventory: int
     age: Optional[str]
     size: Optional[str]

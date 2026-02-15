@@ -1,9 +1,7 @@
-from typing import Any, Optional
-from fastapi import APIRouter, HTTPException, Query, Depends, Request, status
+from typing import Optional
+from fastapi import APIRouter, HTTPException, Query, Depends, Request
 from pydantic import BaseModel, Field
-
 from app.core.deps import CurrentUser, get_current_superuser
-from app.models.order import OrderResponse
 from app.models.wishlist import Wishlists, WishlistCreate
 from app.models.generic import Message
 from app.models.user import UserUpdateMe, UserUpdate
@@ -260,18 +258,6 @@ async def remove_wishlist_item(
         return Message(message="Product deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-
-
-@router.get("/orders", response_model=list[OrderResponse])
-async def get_user_orders(current_user: CurrentUser, skip: int = 0, take: int = 20):
-    orders = await db.order.find_many(
-        where={"user_id": current_user.id},
-        skip=skip,
-        take=take,
-        order={"created_at": "desc"},
-        include={"order_items": True}
-    )
-    return orders
 
 
 @router.post("/change-password", response_model=Message)

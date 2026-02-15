@@ -268,13 +268,13 @@ async def generate_sitemap(request: Request):
 # async def update_order():
 #     connection = await aio_pika.connect_robust(settings.RABBITMQ_HOST)
 #     channel = await connection.channel()
-#     message = "Order 1 status: 10"
+#     message = "order 1 status: 10"
 #     # Declaring queue
 #     queue = await channel.declare_queue("notifications")
 #     await channel.default_exchange.publish(
 #         aio_pika.Message(body=message.encode()), routing_key=queue.name
 #     )
-#     return {"message": "Order status update sent"}
+#     return {"message": "order status update sent"}
 
 # @app.on_event("startup")
 # async def listen_for_notifications():

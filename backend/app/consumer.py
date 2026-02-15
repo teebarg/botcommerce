@@ -157,7 +157,7 @@ class RedisStreamConsumer:
             await db.ordertimeline.create(
                 data={
                     "order": {"connect": {"id": int(event["order_id"])}},
-                    "message": f'Order {event["order_number"]} created',
+                    "message": f'order {event["order_number"]} created',
                     "from_status": OrderStatus.PENDING,
                     "to_status": OrderStatus.PENDING,
                 }
