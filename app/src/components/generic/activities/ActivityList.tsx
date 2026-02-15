@@ -1,15 +1,12 @@
 import type React from "react";
 import { formatDistanceToNow } from "date-fns";
-import { Download, Trash2, Activity as ActivityIcon, FileSpreadsheet, AlertCircle, CheckCircle2 } from "lucide-react";
-
+import { Download, Trash2, FileSpreadsheet, AlertCircle, CheckCircle2 } from "lucide-react";
 import type { Activity } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useDeleteActivity } from "@/hooks/useActivities";
-
-interface ActivityListProps {
-    activities: Activity[];
-}
+import { ConfirmDrawer } from "../confirm-drawer";
+import { useOverlayTriggerState } from "react-stately";
 
 const ActivityTypeIcon = ({ type, isSuccess }: { type: string; isSuccess: boolean }) => {
     if (type === "PRODUCT_EXPORT") {
@@ -28,6 +25,7 @@ const StatusBadge = ({ isSuccess, activityType }: { isSuccess: boolean; activity
 };
 
 export const ActivityListItem: React.FC<{ activity: Activity }> = ({ activity }) => {
+    const deleteState = useOverlayTriggerState({});
     const { mutateAsync: deleteActivity, isPending } = useDeleteActivity();
 
     const handleDeleteActivity = async (id: number) => {
@@ -61,17 +59,25 @@ export const ActivityListItem: React.FC<{ activity: Activity }> = ({ activity })
                     </div>
 
                     <div className="flex flex-col sm:flex-row-reverse items-start sm:items-center justify-between space-y-3 sm:space-y-0 pt-2">
-                        <Button
-                            aria-label={`Remove ${activity.description}`}
-                            disabled={isPending}
+                        <ConfirmDrawer
+                            open={deleteState.isOpen}
+                            onOpenChange={deleteState.setOpen}
+                            trigger={
+                                <Button
+                                    aria-label={`Remove ${activity.description}`}
+                                    size="sm"
+                                    startContent={<Trash2 className="w-4 h-4" />}
+                                    variant="destructive"
+                                >
+                                    Delete
+                                </Button>
+                            }
+                            onClose={deleteState.close}
+                            onConfirm={() => handleDeleteActivity(activity.id)}
+                            title="Delete"
+                            description="This action cannot be undone. This will permanently delete the chat."
                             isLoading={isPending}
-                            size="sm"
-                            startContent={<Trash2 className="w-4 h-4" />}
-                            variant="destructive"
-                            onClick={() => handleDeleteActivity(activity.id)}
-                        >
-                            Delete
-                        </Button>
+                        />
                         {activity.action_download_url && (
                             <a
                                 download
@@ -84,30 +90,6 @@ export const ActivityListItem: React.FC<{ activity: Activity }> = ({ activity })
                         )}
                     </div>
                 </div>
-            </div>
-        </div>
-    );
-};
-
-export const ActivityList: React.FC<ActivityListProps> = ({ activities }) => {
-    if (!activities.length) {
-        return (
-            <div className="text-center py-12 bg-secondary">
-                <div className="w-16 h-16 mx-auto mb-4 bg-contrast/10 rounded-full flex items-center justify-center">
-                    <ActivityIcon className="w-8 h-8 text-contrast" />
-                </div>
-                <h3 className="text-xl font-medium">No activities yet</h3>
-                <p className="text-muted-foreground">Activities will appear here</p>
-            </div>
-        );
-    }
-
-    return (
-        <div className="max-w-6xl mx-auto py-4 px-1 md:px-6 md:py-12">
-            <div className="space-y-2 sm:space-y-6">
-                {activities?.map((activity: Activity, idx: number) => (
-                    <ActivityListItem key={idx} activity={activity} />
-                ))}
             </div>
         </div>
     );

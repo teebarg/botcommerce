@@ -2,14 +2,13 @@
 from fastapi import APIRouter, HTTPException, Depends, Query, Request
 from typing import List
 from math import ceil
-
 from app.core.deps import CurrentUser, get_current_superuser
 from app.models.generic import Message
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
-from prisma.models import ActivityLog
 from app.services.redis import cache_response, invalidate_pattern
 from app.services.websocket import manager
+from app.models.activities import PaginatedActivities, Activity
 
 router = APIRouter()
 
@@ -19,7 +18,7 @@ async def index(
     request: Request,
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
-):
+) -> PaginatedActivities:
     """
     Retrieve activities.
     """
@@ -37,9 +36,9 @@ async def index(
         "total_count":total,
     }
 
-@router.get("/me", response_model=List[ActivityLog])
+@router.get("/me")
 @cache_response("activity", key=lambda request, user: user.id)
-async def get_recent_activities(request: Request, user: CurrentUser):
+async def get_recent_activities(request: Request, user: CurrentUser) -> List[Activity]:
     """
     Get current user's activities
     """
@@ -51,8 +50,8 @@ async def get_recent_activities(request: Request, user: CurrentUser):
     )
 
 
-@router.delete("/{id}", response_model=Message)
-async def delete_activity(id: int, user: CurrentUser):
+@router.delete("/{id}")
+async def delete_activity(id: int, user: CurrentUser) -> Message:
     existing = await db.activitylog.find_unique(where={"id": id})
     if not existing:
         raise HTTPException(status_code=404, detail="Activity not found")
