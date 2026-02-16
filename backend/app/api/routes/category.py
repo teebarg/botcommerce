@@ -69,11 +69,11 @@ async def create(*, data: CategoryCreate) -> Category:
 
 
 @router.patch("/reorder", dependencies=[Depends(get_current_superuser)])
-async def reorder_categories(order_data: BulkOrderUpdate) -> Message:
+async def reorder_categories(data: BulkOrderUpdate) -> Message:
     """Update display order for categories"""
     async with db.tx() as tx:
         try:
-            for category_update in order_data.categories:
+            for category_update in data.categories:
                 category = await tx.category.find_unique(where={"id": category_update.id})
                 if category:
                     await tx.category.update(

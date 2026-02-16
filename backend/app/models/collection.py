@@ -1,22 +1,22 @@
-from app.models.base import BM
+from typing import Optional
 from pydantic import BaseModel, Field
 
 
-class CollectionBase(BM):
+class Collection(BaseModel):
+    id: int
+    name: str
+    slug: str
+    is_active: bool = True
+
+
+class CollectionCreate(BaseModel):
     name: str = Field(..., min_length=1, description="Name is required")
     is_active: bool = True
 
-class Collection(CollectionBase):
-    id: int
-    slug: str = Field(..., min_length=1)
 
-
-class CollectionCreate(CollectionBase):
-    pass
-
-
-class CollectionUpdate(CollectionBase):
-    pass
+class CollectionUpdate(BaseModel):
+    name: Optional[str] = None
+    is_active: Optional[bool] = None
 
 
 class Collections(BaseModel):
@@ -25,7 +25,3 @@ class Collections(BaseModel):
     limit: int
     total_count: int
     total_pages: int
-
-
-class Search(BaseModel):
-    results: list[Collection]

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import type { Message } from "@/schemas";
 import { tryCatch } from "@/utils/try-catch";
-import { deleteCategoryImageFn, updateCategoryImageFn } from "@/server/categories.server";
+import { clientApi } from "@/utils/api.client";
 
 interface ProductImageManagerProps {
     categoryId: number;
@@ -21,7 +21,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
         setIsDeleting(true);
         void (async () => {
             try {
-                const { error } = await tryCatch<Message>(deleteCategoryImageFn({ data: categoryId }));
+                const { error } = await tryCatch<Message>(clientApi.delete<Message>(`/category/${categoryId}/image`));
 
                 if (error) {
                     toast.error(error);
@@ -60,13 +60,10 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
 
                     try {
                         const { error } = await tryCatch<Message>(
-                            updateCategoryImageFn({
-                                data: {
-                                    id: categoryId,
-                                    file: base64.split(",")[1]!, // Remove the data URL prefix
-                                    file_name: fileName,
-                                    content_type: file.type,
-                                },
+                            clientApi.patch<Message>(`/category/${categoryId}/image`, {
+                                file: base64.split(",")[1]!, // Remove the data URL prefix
+                                file_name: fileName,
+                                content_type: file.type,
                             })
                         );
 
@@ -103,9 +100,9 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
             </div>
 
             {initialImage && (
-                <div className="relative group rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+                <div className="relative group rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow h-44 w-full">
                     <img alt="Category image" className="object-cover" src={initialImage || "/placeholder.jpg"} />
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black/50 transition-all flex items-center justify-center">
                         <Button className="rounded-full" size="icon" variant="destructive" onClick={deleteImage}>
                             <Trash2 className="w-5 h-5" />
                         </Button>

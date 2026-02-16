@@ -1,20 +1,22 @@
 import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { CategoryFormValues } from "@/components/admin/categories/category-form";
-import { createCategoryFn, deleteCategoryFn, getCategoriesFn, reorderCategoriesFn, updateCategoryFn } from "@/server/categories.server";
+import { getCategoriesFn } from "@/server/categories.server";
+import { clientApi } from "@/utils/api.client";
+import { Category } from "@/schemas";
 
-export const categoriesQuery = (query?: string) => queryOptions({
-    queryKey: ["categories", query],
-    staleTime: 1000 * 60 * 60, // 1 hour
-    queryFn: () => getCategoriesFn({ data: query }),
-});
+export const categoriesQuery = (query?: string) =>
+    queryOptions({
+        queryKey: ["categories", query],
+        staleTime: 1000 * 60 * 60, // 1 hour
+        queryFn: () => getCategoriesFn({ data: query }),
+    });
 
 export const useCategories = (query?: string) => useQuery(categoriesQuery(query));
 
-
 export const useCreateCategory = () => {
     return useMutation({
-        mutationFn: async (data: CategoryFormValues) => await createCategoryFn({ data }),
+        mutationFn: async (data: CategoryFormValues) => await clientApi.post<Category>("/category/", data),
         onSuccess: () => {
             toast.success("Category created successfully");
         },
@@ -26,7 +28,7 @@ export const useCreateCategory = () => {
 
 export const useUpdateCategory = () => {
     return useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: CategoryFormValues }) => await updateCategoryFn({ data: { id, data } }),
+        mutationFn: async ({ id, data }: { id: number; data: CategoryFormValues }) => await clientApi.patch<Category>(`/category/${id}`, data),
         onSuccess: () => {
             toast.success("Category updated successfully");
         },
@@ -38,7 +40,7 @@ export const useUpdateCategory = () => {
 
 export const useDeleteCategory = () => {
     return useMutation({
-        mutationFn: async (id: number) => await deleteCategoryFn({ data: id }),
+        mutationFn: async (id: number) => await clientApi.delete<Category>(`/category/${id}`),
         onSuccess: () => {
             toast.success("Category deleted successfully");
         },
@@ -50,7 +52,8 @@ export const useDeleteCategory = () => {
 
 export const useReorderCategories = () => {
     return useMutation({
-        mutationFn: async (data: { id: number; display_order: number }[]) => await reorderCategoriesFn({ data: { categories: data } }),
+        mutationFn: async (data: { id: number; display_order: number }[]) =>
+            await clientApi.patch<Category>(`/category/reorder`, { categories: data }),
         onSuccess: () => {
             toast.success("Category reordered successfully");
         },
