@@ -116,9 +116,6 @@ if settings.all_cors_origins:
         allow_headers=["*"],
     )
 
-# Add this temporarily after add_middleware to verify
-print("CORS Origins:", settings.all_cors_origins)
-
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 

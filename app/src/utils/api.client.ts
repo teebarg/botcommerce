@@ -24,10 +24,10 @@ async function clientRequest<T>(endpoint: string, options: ClientRequestOptions 
         },
     });
 
-    // if (response.status === 401) {
-    //     window.location.href = `/auth/signin?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
-    //     throw new Error("Unauthorized");
-    // }
+    if (response.status === 401) {
+        window.location.href = `/auth/signin?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
+        throw new Error("Unauthorized");
+    }
 
     if (!response.ok) {
         let message = "Request failed";

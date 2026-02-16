@@ -16,6 +16,7 @@ export const getCartFn = createServerFn({ method: "GET" }).handler(async () => {
             maxAge: 60 * 60 * 24 * 30, // 30 days
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
+            sameSite: "none",
         });
     }
 

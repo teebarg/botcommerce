@@ -1,13 +1,10 @@
 from typing import Optional
 
-from app.models.category import Category, CategoryCreate, CategoryUpdate, CategoryWithProducts
-from app.models.generic import Message
+from fastapi import APIRouter, Depends, HTTPException, Request
+from app.models.category import Category, CategoryCreate, CategoryUpdate, CategoryWithProducts, BulkOrderUpdate
+from app.models.generic import Message, ImageUpload
 from app.core.utils import slugify
-from fastapi import (APIRouter, Depends, HTTPException, Request)
-from pydantic import BaseModel
 from app.core.storage import upload, delete_image
-from app.models.generic import ImageUpload
-
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
 from app.services.redis import cache_response, invalidate_pattern
@@ -18,10 +15,6 @@ from app.services.product import prepare_product_data_for_indexing
 logger = get_logger(__name__)
 
 router = APIRouter()
-
-class Search(BaseModel):
-    results: list[Category]
-
 
 @router.get("/home/products")
 @cache_response(key_prefix="products", key="home")
@@ -75,15 +68,8 @@ async def create(*, data: CategoryCreate) -> Category:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-class CategoryOrderUpdate(BaseModel):
-    id: int
-    display_order: int
-
-class BulkOrderUpdate(BaseModel):
-    categories: list[CategoryOrderUpdate]
-
 @router.patch("/reorder", dependencies=[Depends(get_current_superuser)])
-async def reorder_categories(order_data: BulkOrderUpdate):
+async def reorder_categories(order_data: BulkOrderUpdate) -> Message:
     """Update display order for categories"""
     async with db.tx() as tx:
         try:

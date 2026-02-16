@@ -1,9 +1,9 @@
-from app.models.base import BM
 from pydantic import BaseModel, Field
 from typing import Optional, List
+from app.models.product import SearchProduct
 
-class CategoryBase(BM):
-    name: str = Field(..., min_length=1, description="Name is required")
+class CategoryBase(BaseModel):
+    name: str
     is_active: bool = True
     parent_id: Optional[int] = None
     image: Optional[str] = None
@@ -12,7 +12,7 @@ class CategoryBase(BM):
 
 class Category(CategoryBase):
     id: int
-    slug: str = Field(..., min_length=1)
+    slug: str
     parent: Optional[list["Category"]] = None
     parent_id: Optional[int] = None
     subcategories: Optional[list["Category"]] = None
@@ -36,8 +36,12 @@ class CategoryWithProducts(BaseModel):
     id: int
     name: Optional[str] = None
     slug: str = Field(..., min_length=1)
-    products: Optional[list[dict]] = None
+    products: Optional[List[SearchProduct]] = None
+
+class CategoryOrderUpdate(BaseModel):
+    id: int
+    display_order: int
 
 
-class Search(BaseModel):
-    results: list[Category]
+class BulkOrderUpdate(BaseModel):
+    categories: list[CategoryOrderUpdate]
