@@ -100,13 +100,10 @@ export const CouponSchema = z.object({
 
 export const CouponUsageSchema = z.object({
     id: z.number(),
-    coupon: CouponSchema,
-    user: UserSchema,
     name: z.string(),
     email: z.string().email(),
     discount_amount: z.number(),
     created_at: z.string(),
-    updated_at: z.string(),
 });
 
 export type DeliveryOption = z.infer<typeof DeliveryOptionSchema>;

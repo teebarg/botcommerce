@@ -67,7 +67,7 @@ export const CouponUsageDialog = ({ couponCode, usageHistory, couponType, assign
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {usageHistory.map((record) => (
+                                        {usageHistory.map((record: CouponUsage) => (
                                             <TableRow key={record.id}>
                                                 <TableCell className="font-medium">{record.name}</TableCell>
                                                 <TableCell className="text-muted-foreground">{record.email}</TableCell>
@@ -88,7 +88,7 @@ export const CouponUsageDialog = ({ couponCode, usageHistory, couponType, assign
 
                         <ScrollArea className="md:hidden h-[400px]">
                             <div className="space-y-3">
-                                {usageHistory.map((record) => (
+                                {usageHistory.map((record: CouponUsage) => (
                                     <Card key={record.id}>
                                         <CardContent className="p-4 space-y-2">
                                             <div className="flex justify-between items-start">

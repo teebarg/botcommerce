@@ -1,24 +1,39 @@
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
-from prisma.enums import DiscountType
-from enum import Enum
-from prisma.models import CouponUsage
+from prisma.enums import DiscountType, CouponScope
+from app.models.user import User
 
-class CouponScope(str, Enum):
-    GENERAL = "GENERAL"
-    SPECIFIC_USERS = "SPECIFIC_USERS"
-
-class User(BaseModel):
+class CouponUsage(BaseModel):
     id: int
-    email: Optional[str]
-    first_name: Optional[str]
-    last_name: Optional[str]
-
-    model_config = ConfigDict(from_attributes=True)
+    coupon_id: int
+    user_id: int
+    name: str
+    email: str
+    discount_amount: float
+    created_at: datetime
 
 
 class CouponBase(BaseModel):
+    id: int
+    code: str
+    discount_type: DiscountType
+    discount_value: float
+    min_cart_value: Optional[float]
+    min_item_quantity: Optional[int]
+    valid_from: Optional[datetime]
+    valid_until: Optional[datetime]
+    max_uses: int
+    max_uses_per_user: int
+    current_uses: int
+    scope: CouponScope
+    is_active: bool
+
+class Coupon(CouponBase):
+    usages: Optional[List[CouponUsage]] = None
+    users: Optional[List[User]] = None
+
+class CouponCreate(BaseModel):
     code: str = Field(..., min_length=3, max_length=20, description="Coupon code")
     discount_type: DiscountType
     discount_value: float = Field(..., gt=0, description="Discount value")
@@ -30,10 +45,6 @@ class CouponBase(BaseModel):
     max_uses_per_user: int = Field(1, ge=1, description="Maximum number of times coupon can be used per user")
     scope: Optional[CouponScope] = CouponScope.GENERAL
     is_active: bool = True
-
-
-class CouponCreate(CouponBase):
-    pass
 
 
 class CouponUpdate(BaseModel):
@@ -50,18 +61,6 @@ class CouponUpdate(BaseModel):
     is_active: Optional[bool] = None
 
 
-class CouponResponse(CouponBase):
-    id: int
-    usages: Optional[List[CouponUsage]] = None
-    users: Optional[List[User]] = None
-    current_uses: int
-    created_at: datetime
-    updated_at: datetime
-
-    class Config:
-        from_attributes = True
-
-
 class CouponValidateRequest(BaseModel):
     code: str
     cart_id: Optional[int] = None
@@ -70,19 +69,19 @@ class CouponValidateRequest(BaseModel):
 
 class CouponValidateResponse(BaseModel):
     valid: bool
-    coupon: Optional[CouponResponse] = None
+    coupon: Optional[Coupon] = None
     discount_amount: Optional[float] = None
     message: Optional[str] = None
 
 
-class CouponsList(BaseModel):
-    coupons: List[CouponResponse]
+class PaginatedCoupons(BaseModel):
+    coupons: List[Coupon]
     skip: int
     limit: int
     total_count: int
     total_pages: int
 
-class CouponAnalyticsResponse(BaseModel):
+class CouponAnalytics(BaseModel):
     total_coupons: int
     used_coupons: int
     total_redemptions: int

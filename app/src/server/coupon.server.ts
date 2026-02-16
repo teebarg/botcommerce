@@ -3,7 +3,7 @@ import { z } from "zod";
 import { api } from "@/utils/fetch-api";
 import type { Coupon } from "@/schemas";
 
-interface PaginatedCouponsResponse {
+interface PaginatedCoupons {
     coupons: Coupon[];
     skip: number;
     limit: number;
@@ -11,7 +11,7 @@ interface PaginatedCouponsResponse {
     total_pages: number;
 }
 
-interface CouponAnalyticsResponse {
+interface CouponAnalytics {
     total_coupons: number;
     used_coupons: number;
     total_redemptions: number;
@@ -31,30 +31,6 @@ const GetCouponsParamsSchema = z
     })
     .optional();
 
-const CreateCouponSchema = z.object({
-    code: z.string(),
-    discount_type: z.enum(["PERCENTAGE", "FIXED_AMOUNT"]),
-    discount_value: z.number(),
-    min_cart_value: z.number().nullable().optional(),
-    min_item_quantity: z.number().nullable().optional(),
-    valid_from: z.string(),
-    valid_until: z.string(),
-    max_uses: z.number(),
-    max_uses_per_user: z.number(),
-    is_active: z.boolean(),
-});
-
-const UpdateCouponPayloadSchema = z.object({
-    id: z.number(),
-    data: CreateCouponSchema.partial(),
-});
-
-const AssignCouponSchema = z.object({
-    id: z.number(),
-    userIds: z.array(z.number()),
-});
-
-// --- Server Functions ---
 export const getCouponsFn = createServerFn({ method: "GET" })
     .inputValidator(GetCouponsParamsSchema)
     .handler(async ({ data }) => {
@@ -63,49 +39,9 @@ export const getCouponsFn = createServerFn({ method: "GET" })
             is_active: data?.isActive,
             skip: data?.skip,
         };
-        return await api.get<PaginatedCouponsResponse>("/coupon/", { params });
-    });
-
-export const createCouponFn = createServerFn({ method: "POST" })
-    .inputValidator(CreateCouponSchema)
-    .handler(async ({ data }) => {
-        return await api.post<Coupon>("/coupon/", data);
-    });
-
-export const updateCouponFn = createServerFn({ method: "POST" })
-    .inputValidator(UpdateCouponPayloadSchema)
-    .handler(async ({ data }) => {
-        return await api.patch<Coupon>(`/coupon/${data.id}`, data.data);
-    });
-
-export const deleteCouponFn = createServerFn({ method: "POST" })
-    .inputValidator(z.number())
-    .handler(async ({ data: id }) => {
-        return await api.delete<void>(`/coupon/${id}`);
-    });
-
-export const applyCouponFn = createServerFn({ method: "POST" })
-    .inputValidator(z.string())
-    .handler(async ({ data: code }) => {
-        return await api.post<Coupon>("/coupon/apply", null, { params: { code } });
-    });
-
-export const removeCouponFn = createServerFn({ method: "POST" }).handler(async () => {
-    return await api.post<void>("/coupon/remove");
-});
-
-export const toggleCouponStatusFn = createServerFn({ method: "POST" })
-    .inputValidator(z.number())
-    .handler(async ({ data: id }) => {
-        return await api.patch<Coupon>(`/coupon/${id}/toggle-status`);
-    });
-
-export const assignCouponFn = createServerFn({ method: "POST" })
-    .inputValidator(AssignCouponSchema)
-    .handler(async ({ data }) => {
-        return await api.post<void>(`/coupon/${data.id}/assign`, data.userIds);
+        return await api.get<PaginatedCoupons>("/coupon/", { params });
     });
 
 export const getCouponsAnalyticsFn = createServerFn({ method: "GET" }).handler(async () => {
-    return await api.get<CouponAnalyticsResponse>("/coupon/analytics");
+    return await api.get<CouponAnalytics>("/coupon/analytics");
 });

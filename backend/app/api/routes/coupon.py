@@ -1,13 +1,14 @@
+from app.models.generic import Message
 from typing import Optional, List
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Header
 from app.core.deps import get_current_superuser, UserDep, CurrentUser
 from app.models.coupon import (
     CouponCreate,
     CouponUpdate,
-    CouponResponse,
+    Coupon,
     CouponValidateRequest,
     CouponValidateResponse,
-    CouponsList, CouponScope, CouponAnalyticsResponse
+    PaginatedCoupons, CouponScope, CouponAnalytics
 )
 from app.services.coupon import CouponService
 from app.prisma_client import prisma as db
@@ -29,7 +30,7 @@ async def get_coupons(
     is_active: Optional[bool] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100)
-):
+) -> PaginatedCoupons:
     """
     Get all coupons with pagination for admin.
     """
@@ -50,18 +51,17 @@ async def get_coupons(
     )
 
     total_count = await db.coupon.count(where=where_clause)
+    return {
+        "coupons": coupons,
+        "skip": skip,
+        "limit": limit,
+        "total_count": total_count,
+        "total_pages": (total_count + limit - 1) // limit
+    }
 
-    return CouponsList(
-        coupons=coupons,
-        skip=skip,
-        limit=limit,
-        total_count=total_count,
-        total_pages=(total_count + limit - 1) // limit
-    )
 
-
-@router.post("/", dependencies=[Depends(get_current_superuser)], response_model=CouponResponse)
-async def create_coupon(coupon_data: CouponCreate):
+@router.post("/", dependencies=[Depends(get_current_superuser)])
+async def create_coupon(coupon_data: CouponCreate) -> Coupon:
     """
     Create a new coupon (Admin only).
     """
@@ -83,8 +83,8 @@ async def create_coupon(coupon_data: CouponCreate):
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.patch("/{id}", dependencies=[Depends(get_current_superuser)], response_model=CouponResponse)
-async def update_coupon(id: int, coupon_data: CouponUpdate):
+@router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
+async def update_coupon(id: int, coupon_data: CouponUpdate) -> Coupon:
     """
     Update a coupon (Admin only).
     """
@@ -135,12 +135,12 @@ async def delete_coupon(id: int):
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.post("/validate", response_model=CouponValidateResponse)
+@router.post("/validate")
 async def validate_coupon(
     request: CouponValidateRequest,
     user: UserDep = None,
     cartId: Optional[str] = None
-):
+) -> CouponValidateResponse:
     """
     Validate a coupon code for a cart.
     """
@@ -187,12 +187,12 @@ async def validate_coupon(
         )
 
 
-@router.post("/apply", response_model=CouponResponse)
+@router.post("/apply")
 async def apply_coupon(
     code: str = Query(..., description="Coupon code to apply"),
     user: CurrentUser = None,
     cartId: Optional[str] = Header(default=None)
-):
+) -> Message:
     """
     Apply a coupon to a cart.
     """
@@ -222,7 +222,7 @@ async def apply_coupon(
     await invalidate_pattern("cart")
     await invalidate_pattern("coupons")
 
-    return coupon
+    return Message(message="Coupon applied successfully")
 
 
 @router.post("/remove", response_model=dict)
@@ -263,6 +263,7 @@ async def remove_coupon(
 async def assign_coupon(id: int, user_ids: List[int]):
     """
     Share a coupon with specific users (Admin only).
+
     """
     coupon = await db.coupon.find_unique(where={"id": id})
     if not coupon:
@@ -281,8 +282,8 @@ async def assign_coupon(id: int, user_ids: List[int]):
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.patch("/{id}/toggle-status", dependencies=[Depends(get_current_superuser)], response_model=CouponResponse)
-async def toggle_coupon_status(id: int):
+@router.patch("/{id}/toggle-status", dependencies=[Depends(get_current_superuser)])
+async def toggle_coupon_status(id: int) -> Coupon:
     """
     Toggle coupon active status (Admin only).
     """
@@ -303,11 +304,11 @@ async def toggle_coupon_status(id: int):
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.get("/analytics", response_model=CouponAnalyticsResponse)
+@router.get("/analytics")
 async def get_coupon_analytics(
     start_date: Optional[date] = Query(None, description="Filter coupons created from this date"),
     end_date: Optional[date] = Query(None, description="Filter coupons created until this date")
-):
+) -> CouponAnalytics:
     """
     Get comprehensive coupon analytics with optional date range filtering.
     """
@@ -373,7 +374,7 @@ async def get_coupon_analytics(
     
     avg_redemption_rate = (used_coupons / total_coupons * 100) if total_coupons > 0 else 0.0
     
-    return CouponAnalyticsResponse(
+    return CouponAnalytics(
         total_coupons=total_coupons,
         used_coupons=used_coupons,
         total_redemptions=total_redemptions,

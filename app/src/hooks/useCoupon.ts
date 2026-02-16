@@ -1,15 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import {
-    applyCouponFn,
-    assignCouponFn,
-    createCouponFn,
-    deleteCouponFn,
-    getCouponsAnalyticsFn,
-    removeCouponFn,
-    toggleCouponStatusFn,
-    updateCouponFn,
-} from "@/server/coupon.server";
+import { getCouponsAnalyticsFn } from "@/server/coupon.server";
+import { clientApi } from "@/utils/api.client";
+import { Coupon } from "@/schemas";
 
 type CreateCouponData = {
     code: string;
@@ -33,12 +26,9 @@ export const useCreateCoupon = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (data: CreateCouponData) => {
-            return await createCouponFn({ data });
-        },
+        mutationFn: async (data: CreateCouponData) => await clientApi.post<Coupon>("/coupon/", data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["coupons"] });
-            toast.success("Coupon created successfully");
         },
         onError: (error: any) => {
             toast.error("Failed to create coupon: " + (error?.message || "Unknown error"));
@@ -50,7 +40,7 @@ export const useUpdateCoupon = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ id, data }: UpdateCouponInput) => await updateCouponFn({ data: { id, data } }),
+        mutationFn: async ({ id, data }: UpdateCouponInput) => await clientApi.patch<Coupon>(`/coupon/${id}`, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["coupons"] });
             toast.success("Coupon updated successfully");
@@ -65,7 +55,7 @@ export const useDeleteCoupon = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (id: number) => await deleteCouponFn({ data: id }),
+        mutationFn: async (id: number) => await clientApi.delete<void>(`/coupon/${id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["coupons"] });
             toast.success("Coupon deleted successfully");
@@ -80,7 +70,7 @@ export const useApplyCoupon = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (code: string) => await applyCouponFn({ data: code }),
+        mutationFn: async (code: string) => await clientApi.post<Coupon>("/coupon/apply", null, { params: { code } }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Coupon applied successfully");
@@ -98,7 +88,7 @@ export const useRemoveCoupon = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async () => await removeCouponFn({}),
+        mutationFn: async () => await clientApi.post<void>("/coupon/remove"),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Coupon removed successfully");
@@ -113,7 +103,7 @@ export const useToggleCouponStatus = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (id: number) => await toggleCouponStatusFn({ data: id }),
+        mutationFn: async (id: number) => await clientApi.patch<Coupon>(`/coupon/${id}/toggle-status`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["coupons"] });
         },
@@ -127,7 +117,7 @@ export const useAssignCoupon = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ id, userIds }: { id: number; userIds: number[] }) => await assignCouponFn({ data: { id, userIds } }),
+        mutationFn: async ({ id, userIds }: { id: number; userIds: number[] }) => await clientApi.post<void>(`/coupon/${id}/assign`, userIds),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["coupons"] });
         },
@@ -137,22 +127,9 @@ export const useAssignCoupon = () => {
     });
 };
 
-// type CouponAnalyticsResponse = {
-//     total_coupons: number;
-//     used_coupons: number;
-//     total_redemptions: number;
-//     active_coupons: number;
-//     avg_redemption_rate: number;
-//     date_range: {
-//         start_date: string;
-//         end_date: string;
-//     };
-// };
-
 export const useCouponsAnalytics = () => {
     return useQuery({
         queryKey: ["coupons"],
         queryFn: async () => getCouponsAnalyticsFn(),
-        // select: (data) => data as CouponAnalyticsResponse,
     });
 };

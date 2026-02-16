@@ -13,7 +13,7 @@ from app.models.order import Order
 from app.models.user import User
 from jinja2 import Environment, FileSystemLoader, Template
 from app.services.shop_settings import ShopSettingsService
-from app.models.coupon import CouponResponse
+from app.models.coupon import Coupon
 
 
 @dataclass
@@ -55,7 +55,7 @@ def url_to_list(url: str) -> list[str]:
 def format_date(date: datetime) -> str:
     return date.strftime("%B %d, %Y")
 
-def format_discount(coupon: CouponResponse) -> str:
+def format_discount(coupon: Coupon) -> str:
     if coupon.discount_type == "PERCENTAGE":
         return f"{int(coupon.discount_value) if coupon.discount_value.is_integer() else coupon.discount_value}%"
     return f"₦{coupon.discount_value:,.2f}"
@@ -430,7 +430,7 @@ async def generate_magic_link_email(email_to: str, magic_link: str, first_name: 
     return EmailData(html_content=html_content, subject="Sign in to your account")
 
 
-async def generate_welcome_email(email_to: str, first_name: str, coupon: CouponResponse) -> EmailData:
+async def generate_welcome_email(email_to: str, first_name: str, coupon: Coupon) -> EmailData:
     service = ShopSettingsService()
     shop_name = await service.get("shop_name")
 
