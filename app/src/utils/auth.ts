@@ -73,14 +73,18 @@ declare module "@auth/core/types" {
 
 export const authConfig: StartAuthJSConfig = {
     secret: process.env.AUTH_SECRET,
+    useSecureCookies: process.env.NODE_ENV === "production",
     cookies: {
         sessionToken: {
-            name: process.env.NODE_ENV === "production" ? "__Secure-authjs.session-token" : "authjs.session-token", // No __Secure- prefix in dev
+            name: process.env.NODE_ENV === "production" ? "__Secure-authjs.session-token" : "authjs.session-token",
             options: {
                 httpOnly: true,
-                sameSite: "lax",
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
                 path: "/",
-                secure: process.env.NODE_ENV === "production", // false in dev
+                secure: process.env.NODE_ENV === "production",
+                ...(process.env.NODE_ENV === "production" && {
+                    domain: ".revoque.com.ng",
+                }),
             },
         },
     },
