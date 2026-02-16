@@ -8,12 +8,12 @@ import httpx
 from datetime import datetime
 from app.prisma_client import prisma as db
 from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
-from pydantic import BaseModel
-from prisma.models import Cart
 from app.services.order import create_order_from_cart, process_order_payment
 from app.core.logging import get_logger
 from app.services.events import publish_event, publish_order_event
 from app.services.redis import invalidate_pattern, invalidate_key
+from app.models.cart import Cart
+from app.schemas.payment import PaymentCreate
 
 logger = get_logger(__name__)
 
@@ -21,12 +21,6 @@ router = APIRouter()
 
 PAYSTACK_SECRET_KEY = settings.PAYSTACK_SECRET_KEY
 PAYSTACK_BASE_URL = "https://api.paystack.co"
-
-class PaymentCreate(BaseModel):
-    order_id: int
-    amount: float
-    reference: str
-    transaction_id: str
 
 async def initialize_payment(cart: Cart, user: User) -> PaymentInitialize:
     """Initialize a Paystack payment"""
@@ -130,7 +124,7 @@ async def verify_payment(reference: str, user: CurrentUser) -> Order:
                 "payment_method": PaymentMethod.PAYSTACK,
             }
             await publish_event(event=event)
-            raise HTTPException(status_code=500, detail="Payment verification failed")
+            raise HTTPException(status_code=500, detail="payment verification failed")
 
 
 @router.post("/", dependencies=[Depends(get_current_user)])

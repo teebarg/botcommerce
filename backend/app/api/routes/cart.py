@@ -1,13 +1,10 @@
 from typing import Optional
 from datetime import datetime, timedelta, timezone
-from pydantic import BaseModel
-
 from app.core.utils import generate_id, generate_abandoned_cart_email, send_email
-from app.models.cart import CartUpdate, CartItemCreate, CartItemResponse, CartResponse, CartLite
+from app.models.cart import CartUpdate, CartItemCreate, CartItemResponse, Cart, CartLite, SendAbandonedCartReminders
 from fastapi import APIRouter, Header, HTTPException, Request, BackgroundTasks, Depends
 from app.prisma_client import prisma as db
 from app.core.deps import UserDep, get_current_superuser, CurrentUser
-from prisma.models import Cart
 from app.services.redis import cache_response, invalidate_key, bust, invalidate_pattern
 from app.core.logging import get_logger
 from app.services.shop_settings import ShopSettingsService
@@ -143,9 +140,9 @@ async def add_item_to_cart(
     return item
 
 
-@router.get("/", response_model=Optional[CartResponse])
+@router.get("/")
 @cache_response(key_prefix="cart", key=lambda request, user, cartId, **kwargs: user.id if user else cartId)
-async def get_cart(request: Request, user: UserDep, cartId: str = Header()):
+async def get_cart(request: Request, user: UserDep, cartId: str = Header()) -> Optional[Cart]:
     """Get a specific cart by ID"""
     include_query = {
         "items": {"include": {"variant": True}},
@@ -335,15 +332,15 @@ async def send_abandoned_cart_reminder(cart_id: int):
         )
 
         if not cart:
-            logger.error(f"Cart with ID {cart_id} not found")
+            logger.error(f"cart with ID {cart_id} not found")
             return
 
         if not cart.user:
-            logger.warning(f"Cart {cart_id} has no associated user, skipping email")
+            logger.warning(f"cart {cart_id} has no associated user, skipping email")
             return
 
         if not cart.email and not cart.user.email:
-            logger.warning(f"Cart {cart_id} has no email address, skipping email")
+            logger.warning(f"cart {cart_id} has no email address, skipping email")
             return
 
         cart_data = {
@@ -384,11 +381,6 @@ async def send_abandoned_cart_reminder(cart_id: int):
 
     except Exception as e:
         logger.error(f"Failed to send abandoned cart reminder for cart {cart_id}: {str(e)}")
-
-
-class SendAbandonedCartReminders(BaseModel):
-    hours_threshold: int
-    limit: int = 50
 
 
 @router.post("/abandoned-carts/send-reminders")
@@ -524,7 +516,7 @@ async def send_cart_reminder(
         )
 
         if not cart:
-            raise HTTPException(status_code=404, detail="Cart not found")
+            raise HTTPException(status_code=404, detail="cart not found")
 
         background_tasks.add_task(send_abandoned_cart_reminder, cart.id)
 
@@ -606,7 +598,7 @@ async def apply_wallet(user: CurrentUser, cartId: str = Header(default=None)) ->
     """
     cart = await get_or_create_cart(cart_number=cartId, user_id=user.id)
     if not cart:
-        raise HTTPException(status_code=404, detail="Cart not found")
+        raise HTTPException(status_code=404, detail="cart not found")
 
     if not user.wallet_balance or user.wallet_balance <= 0:
         raise HTTPException(status_code=400, detail="Wallet balance is empty")
@@ -657,7 +649,7 @@ async def remove_wallet(user: CurrentUser, cartId: str = Header(default=None)):
     """
     cart = await get_or_create_cart(cart_number=cartId, user_id=user.id)
     if not cart:
-        raise HTTPException(status_code=404, detail="Cart not found")
+        raise HTTPException(status_code=404, detail="cart not found")
 
     wallet_used = cart.wallet_used or 0.0
     if wallet_used <= 0:

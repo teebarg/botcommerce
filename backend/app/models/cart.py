@@ -14,14 +14,14 @@ class CartStatus(str, Enum):
     CONVERTED = "CONVERTED"
 
 class CartAddress(BaseModel):
-    id: Optional[int]
+    id: Optional[int] = None
     first_name: str
     last_name: str
     address_type: Optional[str]
     label: Optional[str]
     address_1: str
     address_2: Optional[str]
-    city: Optional[str]
+    # city: Optional[str]
     state: Optional[str]
     phone: Optional[str]
     is_billing: bool
@@ -61,7 +61,7 @@ class CartItemResponse(CartItemBase):
     created_at: datetime
     updated_at: datetime
 
-class CartResponse(BaseModel):
+class Cart(BaseModel):
     id: int
     user_id: Optional[int]
     user: Optional[User]
@@ -103,7 +103,6 @@ class CartLite(BaseModel):
     coupon_code: Optional[str]
     coupon_id: Optional[int]
 
-class PaginatedCarts(BaseModel):
-    data: List[CartResponse]
-    next_cursor: Optional[int]
-    limit: int
+class SendAbandonedCartReminders(BaseModel):
+    hours_threshold: int
+    limit: int = 50

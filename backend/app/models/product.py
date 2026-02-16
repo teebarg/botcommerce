@@ -2,9 +2,15 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 from app.models.generic import ImageUpload
 from app.models.base import BM
-from prisma.models import Category, Collection, ProductImage
 from prisma.enums import ProductStatus
 from app.models.reviews import Review
+# from app.models.category import Category
+from app.models.collection import Collection
+
+class ProductImage(BaseModel):
+    id: int
+    image: Optional[str] = None
+    order: int = 1
 
 class ProductVariant(BaseModel):
     id: int
@@ -55,7 +61,7 @@ class ReviewCreate(BaseModel):
     rating: int = Field(..., ge=1, le=5, description="Rating must be between 1 and 5")
 
 
-class Product(BM):
+class Product(BaseModel):
     id: int
     name: Optional[str] = None
     sku: Optional[str] = None
@@ -64,7 +70,7 @@ class Product(BM):
     image: Optional[str] = None
     variants: Optional[List[ProductVariant]] = None
     ratings: float
-    categories: Optional[List[Category]] = []
+    # categories: Optional[List[Category]] = []
     collections: Optional[List[Collection]] = []
     # brand: Optional[Brand] = None
     # tags: Optional[List[Tag]] = []

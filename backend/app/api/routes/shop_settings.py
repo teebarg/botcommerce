@@ -1,15 +1,23 @@
 from typing import Any
 from fastapi import APIRouter, HTTPException, Request, Depends
 from app.prisma_client import prisma as db
-from prisma.models import ShopSettings
 from app.core.logging import get_logger
 from app.services.redis import cache_response, invalidate_pattern
 from app.services.shop_settings import ShopSettingsService
 from app.core.deps import get_current_superuser
+from pydantic import BaseModel
+from datetime import datetime
 
 logger = get_logger(__name__)
 
 router = APIRouter()
+
+class ShopSettings(BaseModel):
+    id: int
+    key: str
+    value: str
+    type: str
+    created_at: datetime
 
 @router.get("/")
 @cache_response(key_prefix="shop-settings", key="all")

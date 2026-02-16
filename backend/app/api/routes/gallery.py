@@ -31,7 +31,7 @@ from app.core.deps import get_current_superuser
 logger = get_logger(__name__)
 
 
-async def process_bulk_delete_images(images: list[ProductImage]):
+async def process_bulk_delete_images(images: list[ProductImage]) -> None:
     """
     Process bulk deletion of gallery images.
     """

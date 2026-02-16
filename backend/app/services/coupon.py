@@ -3,8 +3,8 @@ from typing import Optional
 from fastapi import HTTPException
 from app.prisma_client import prisma as db
 from prisma.enums import DiscountType
-from app.models.coupon import CouponScope
-from prisma.models import Coupon, Cart
+from app.models.coupon import Coupon
+from app.models.cart import Cart
 from app.core.logging import get_logger
 
 logger = get_logger(__name__)

@@ -1,6 +1,4 @@
 from app.prisma_client import prisma as db
-from prisma.models import ShopSettings
-
 from app.redis_client import redis_client
 import json
 from typing import Any
@@ -29,7 +27,7 @@ class ShopSettingsService:
             return setting.value
         return None
 
-    async def set(self, key: str, value: str, type_: str = "SHOP_DETAIL") -> ShopSettings:
+    async def set(self, key: str, value: str, type_: str = "SHOP_DETAIL"):
         """
         Upsert a setting and refresh Redis
         """

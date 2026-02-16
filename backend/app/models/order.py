@@ -2,9 +2,9 @@ from app.models.product import ProductVariant
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
-from prisma.models import Address, Payment, Coupon
 from prisma.enums import PaymentMethod, ShippingMethod, OrderStatus, PaymentStatus
 from app.models.user import User
+from app.models.address import Address
 
 class OrderItemLite(BaseModel):
     id: int
@@ -42,16 +42,16 @@ class Order(BaseModel):
     status: OrderStatus
     payment_status: PaymentStatus
     shipping_method: ShippingMethod
-    payment: Optional[Payment]
+    # payment: Optional[Payment]
     payment_method: PaymentMethod
     shipping_fee: float
     # coupon_id: Optional[int]
     coupon_code: Optional[str] = None
     # cart_id: Optional[int]
     order_items: Optional[list[OrderItemLite]]
-    created_at: datetime
     order_notes: Optional[str] = None
     invoice_url: Optional[str] = None
+    created_at: datetime
 
 class Orders(BaseModel):
     orders: list[Order]
