@@ -1,11 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query, Request, Depends, BackgroundTasks
 from typing import List
-from app.models.collection import (
-    SharedCollections, SharedCollectionCreate, SharedCollectionUpdate,
-    SharedCollection, SharedCollectionView, Catalog, SharedCollectionBulkAdd
-)
 from app.prisma_client import prisma as db
-from app.services.shared_collection import SharedCollectionService
+from app.services.catalog import CatalogService
 from math import ceil
 from app.services.redis import cache_response, invalidate_list, invalidate_pattern
 from app.services.product import reindex_catalog, reindex_catalogs
@@ -18,12 +14,13 @@ from app.services.meilisearch import get_or_create_index, ensure_index_ready
 from app.core.config import settings
 from meilisearch.errors import MeilisearchApiError
 from app.services.websocket import manager
+from app.models.catalog import Catalog, Catalogs, CatalogView, CursorPaginatedCatalog, CatalogCreate, CatalogUpdate, CatalogBulkAdd
 
 logger = get_logger(__name__)
 
 router = APIRouter()
 
-async def invalidate_catalog():
+async def invalidate_catalog() -> None:
     await invalidate_list("catalog")
     await manager.broadcast_to_all(
             data={
@@ -33,20 +30,20 @@ async def invalidate_catalog():
         )
 
 
-@router.get("/views", response_model=List[SharedCollectionView])
-async def list_shared_collection_views():
+@router.get("/views")
+async def list_catalogs_views() -> List[CatalogView]:
     return await db.sharedcollectionview.find_many()
 
 
-@router.get("/", dependencies=[Depends(get_current_superuser)], response_model=SharedCollections)
+@router.get("/", dependencies=[Depends(get_current_superuser)])
 @cache_response(key_prefix="catalog")
-async def list_shared_collections(
+async def list_catalogs(
     request: Request,
     is_active: bool | None = None,
     product_id: int | None = None,
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
-):
+) -> Catalogs:
     filters = []
     # if query:
     #     filters.append(f"(sc.title ILIKE '%{query}%' OR sc.slug ILIKE '%{query}%')")
@@ -57,9 +54,9 @@ async def list_shared_collections(
 
     where_clause = " AND ".join(filters) if filters else "TRUE"
 
-    shared_rows = await db.query_raw(
+    catalog_rows = await db.query_raw(
         f"""
-        SELECT sc.id, sc.slug, sc.title, sc.description, sc.is_active, sc.view_count,
+        SELECT sc.id, sc.slug, sc.title, sc.description, sc.is_active, sc.view_count, created_at,
                COUNT(ps."A") AS products_count
         FROM "shared_collections" sc
         LEFT JOIN "_SharedCollectionProducts" ps ON sc.id = ps."B"
@@ -70,20 +67,6 @@ async def list_shared_collections(
         LIMIT {limit}
         """
     )
-
-    shared_transformed = [
-        SharedCollection(
-            id=row["id"],
-            slug=row["slug"],
-            title=row["title"],
-            description=row["description"],
-            is_active=row["is_active"],
-            view_count=row["view_count"],
-            products_count=row["products_count"],
-            products=[],
-        )
-        for row in shared_rows
-    ]
 
     total_result = await db.query_raw(
         f"""
@@ -98,7 +81,7 @@ async def list_shared_collections(
     total = total_result[0]["count"]
 
     return {
-        "shared": shared_transformed,
+        "catalogs": catalog_rows,
         "skip": skip,
         "limit": limit,
         "total_pages": ceil(total / limit) if limit else 1,
@@ -121,7 +104,7 @@ async def search(
     colors: str = Query(default=""),
     limit: int = Query(default=20, le=100),
     cursor: int | None = Query(default=None),
-) -> Catalog:
+) -> CursorPaginatedCatalog:
     """
     Meilisearch keyset pagination (cursor-based)
     """
@@ -187,7 +170,7 @@ async def search(
 
 
 @router.post("/{slug}/track-visit")
-async def track_shared_collection_visit(
+async def track_catalog_visit(
     request: Request,
     slug: str,
     user: UserDep,
@@ -209,8 +192,8 @@ async def track_shared_collection_visit(
 
     user_agent = request.headers.get("user-agent")
 
-    is_new_visit = await SharedCollectionService.track_visit(
-        shared_collection_id=obj.id,
+    is_new_visit = await CatalogService.track_visit(
+        catalog_id=obj.id,
         user_id=user.id if user else None,
         ip_address=client_ip,
         user_agent=user_agent
@@ -225,11 +208,11 @@ async def track_shared_collection_visit(
     }
 
 @router.post("/", dependencies=[Depends(get_current_superuser)])
-async def create_shared_collection(data: SharedCollectionCreate):
+async def create_catalog(data: CatalogCreate) -> Catalog:
     create_data = data.model_dump(exclude_unset=True)
 
-    if data.products is not None:
-        create_data["products"] = {"connect": [{"id": id} for id in data.products]}
+    # if data.products is not None:
+    #     create_data["products"] = {"connect": [{"id": id} for id in data.products]}
 
     create_data["slug"] = slugify(data.title)
     res = await db.sharedcollection.create(data=create_data)
@@ -238,7 +221,7 @@ async def create_shared_collection(data: SharedCollectionCreate):
     return res
 
 @router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
-async def update_shared_collection(id: int, data: SharedCollectionUpdate):
+async def update_catalog(id: int, data: CatalogUpdate) -> Catalog:
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:
         raise HTTPException(status_code=404, detail="Catalog not found")
@@ -254,7 +237,7 @@ async def update_shared_collection(id: int, data: SharedCollectionUpdate):
     return res
 
 @router.delete("/{id}", dependencies=[Depends(get_current_superuser)])
-async def delete_shared_collection(id: int) -> Message:
+async def delete_catalog(id: int) -> Message:
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:
         raise HTTPException(status_code=404, detail="Catalog not found")
@@ -264,10 +247,10 @@ async def delete_shared_collection(id: int) -> Message:
     return {"message": "Catalog deleted successfully"}
 
 @router.post("/{id}/add-product/{product_id}", dependencies=[Depends(get_current_superuser)])
-async def add_product_to_shared_collection(id: int, product_id: int, background_tasks: BackgroundTasks) -> Message:
+async def add_product_to_catalog(id: int, product_id: int, background_tasks: BackgroundTasks) -> Message:
     """Add a product to a catalog"""
-    shared_collection = await db.sharedcollection.find_unique(where={"id": id})
-    if not shared_collection:
+    catalog = await db.sharedcollection.find_unique(where={"id": id})
+    if not catalog:
         raise HTTPException(status_code=404, detail="Catalog not found")
 
     product = await db.product.find_unique(where={"id": product_id})
@@ -284,10 +267,10 @@ async def add_product_to_shared_collection(id: int, product_id: int, background_
     return {"message": "Product added to catalog successfully"}
 
 @router.delete("/{id}/remove-product/{product_id}", dependencies=[Depends(get_current_superuser)])
-async def remove_product_from_shared_collection(id: int, product_id: int, background_tasks: BackgroundTasks) -> Message:
+async def remove_product_from_catalog(id: int, product_id: int, background_tasks: BackgroundTasks) -> Message:
     """Remove a product from a catalog"""
-    shared_collection = await db.sharedcollection.find_unique(where={"id": id})
-    if not shared_collection:
+    catalog = await db.sharedcollection.find_unique(where={"id": id})
+    if not catalog:
         raise HTTPException(status_code=404, detail="Catalog not found")
 
     await db.sharedcollection.update(
@@ -305,10 +288,10 @@ async def remove_product_from_shared_collection(id: int, product_id: int, backgr
 
 
 @router.post("/{id}/add-products", dependencies=[Depends(get_current_superuser)])
-async def bulk_add_products_to_shared_collection(id: int, data: SharedCollectionBulkAdd, background_tasks: BackgroundTasks) -> Message:
+async def bulk_add_products_to_catalog(id: int, data: CatalogBulkAdd, background_tasks: BackgroundTasks) -> Message:
     """Bulk add products to a catalog"""
-    shared_collection = await db.sharedcollection.find_unique(where={"id": id})
-    if not shared_collection:
+    catalog = await db.sharedcollection.find_unique(where={"id": id})
+    if not catalog:
         raise HTTPException(status_code=404, detail="Catalog not found")
 
     if not data.product_ids:
@@ -331,10 +314,10 @@ async def bulk_add_products_to_shared_collection(id: int, data: SharedCollection
 
 
 @router.post("/{id}/remove-products", dependencies=[Depends(get_current_superuser)])
-async def bulk_remove_products_from_shared_collection(id: int, data: SharedCollectionBulkAdd, background_tasks: BackgroundTasks) -> Message:
+async def bulk_remove_products_from_catalog(id: int, data: CatalogBulkAdd, background_tasks: BackgroundTasks) -> Message:
     """Bulk remove products from a catalog"""
-    shared_collection = await db.sharedcollection.find_unique(where={"id": id})
-    if not shared_collection:
+    catalog = await db.sharedcollection.find_unique(where={"id": id})
+    if not catalog:
         raise HTTPException(status_code=404, detail="Catalog not found")
 
     if not data.product_ids:

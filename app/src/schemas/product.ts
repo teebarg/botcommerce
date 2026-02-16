@@ -145,7 +145,7 @@ export const ProductSearchSchema = z.object({
     is_new: z.boolean().optional(),
 });
 
-export const SharedSchema = z
+export const CatalogSchema = z
     .object({
         id: z.number(),
         title: z.string(),
@@ -158,8 +158,8 @@ export const SharedSchema = z
     })
     .merge(AuditSchema);
 
-export const PaginatedSharedSchema = PagSchema.extend({
-    shared: z.array(SharedSchema),
+export const PaginatedCatalogSchema = PagSchema.extend({
+    catalogs: z.array(CatalogSchema),
 });
 
 export const FacetSchema = z.object({
@@ -200,7 +200,7 @@ export const WishlistSchema = z.object({
     wishlists: z.array(WishItemSchema),
 });
 
-export const CatalogSchema = z.object({
+export const SearchCatalogSchema = z.object({
     title: z.string(),
     description: z.string().optional(),
     view_count: z.number(),
@@ -281,7 +281,6 @@ export type Wishlist = z.infer<typeof WishlistSchema>;
 export type ProductImage = z.infer<typeof ProductImageSchema>;
 export type ProductVariant = z.infer<typeof ProductVariantSchema>;
 
-export type Shared = z.infer<typeof SharedSchema>;
-export type PaginatedShared = z.infer<typeof PaginatedSharedSchema>;
-
 export type Catalog = z.infer<typeof CatalogSchema>;
+export type SearchCatalog = z.infer<typeof SearchCatalogSchema>;
+export type PaginatedCatalog = z.infer<typeof PaginatedCatalogSchema>;

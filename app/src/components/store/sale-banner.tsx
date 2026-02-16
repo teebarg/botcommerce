@@ -7,7 +7,7 @@ import { useNavigate } from "@tanstack/react-router";
 
 const SaleBanner: React.FC = () => {
     const { data } = useCatalogs(true);
-    const catalog = data?.shared?.[0];
+    const catalog = data?.catalogs?.[0];
     const navigate = useNavigate();
 
     if (!catalog) return null;
@@ -51,7 +51,7 @@ const SaleBanner: React.FC = () => {
                     <Button
                         className="bg-linear-to-r from-yellow-400 to-orange-500 text-black hover:from-yellow-300 hover:to-orange-400 font-semibold shadow-lg hover:shadow-xl hover:scale-105"
                         size="lg"
-                        onClick={() => navigate({ to: `/shared/${catalog?.slug}` })}
+                        onClick={() => navigate({ to: `/catalog/${catalog?.slug}` })}
                     >
                         Shop Now
                         <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />

@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useBulkAddProductsToCatalog, useCatalogs } from "@/hooks/useCollection";
-import type { Shared } from "@/schemas";
+import type { Catalog } from "@/schemas";
 
 interface CatalogBulkProductUpdateProps {
     selectedCount: number;
@@ -12,7 +12,7 @@ interface CatalogBulkProductUpdateProps {
     onClose: () => void;
 }
 
-const CatalogItem: React.FC<{ catalog: Shared; selectedProductIds: number[] }> = ({ catalog, selectedProductIds }) => {
+const CatalogItem: React.FC<{ catalog: Catalog; selectedProductIds: number[] }> = ({ catalog, selectedProductIds }) => {
     const { mutateAsync: bulkAddToCatalog, isPending: isAdding } = useBulkAddProductsToCatalog();
 
     return (
@@ -33,7 +33,7 @@ const CatalogItem: React.FC<{ catalog: Shared; selectedProductIds: number[] }> =
                     isLoading={isAdding}
                     size="sm"
                     onClick={async () => {
-                        await bulkAddToCatalog({ collectionId: catalog.id, productIds: selectedProductIds });
+                        await bulkAddToCatalog({ catalogId: catalog.id, productIds: selectedProductIds });
                     }}
                 >
                     Add {selectedProductIds.length} product(s)
@@ -44,14 +44,14 @@ const CatalogItem: React.FC<{ catalog: Shared; selectedProductIds: number[] }> =
 };
 
 export const CatalogBulkProductUpdate = ({ selectedProductIds = [], onClose }: CatalogBulkProductUpdateProps) => {
-    const { data: sharedCollections } = useCatalogs(true);
+    const { data } = useCatalogs(true);
 
     return (
         <div className="flex-1 overflow-hidden flex flex-col">
             <p className="text-sm text-muted-foreground mb-3 mx-2">Select a catalog to add {selectedProductIds.length} product(s).</p>
             <ScrollArea className="flex-1 px-2">
                 <div className="space-y-2">
-                    {sharedCollections?.shared?.map((collection: any) => (
+                    {data?.catalogs?.map((collection: any) => (
                         <CatalogItem key={collection.id} catalog={collection} selectedProductIds={selectedProductIds} />
                     ))}
                 </div>

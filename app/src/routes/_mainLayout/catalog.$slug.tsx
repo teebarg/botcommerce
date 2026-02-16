@@ -1,17 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import z from "zod";
 import { seo } from "@/utils/seo";
-import { SharedCollectionVisitTracker } from "@/components/store/shared/shared-collection-visit-tracker";
-import SharedInfinite from "@/components/store/shared/shared-infinite";
+import { CatalogVisitTracker } from "@/components/store/catalog/catalog-visit-tracker";
 import { catalogFeedQuery } from "@/queries/user.queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import CatalogInfinite from "@/components/store/catalog/catalog-infinite";
 
 export const CatalogSearchSchema = z.object({
     sizes: z.number().optional(),
     colors: z.string().optional(),
 });
 
-export const Route = createFileRoute("/_mainLayout/shared/$slug")({
+export const Route = createFileRoute("/_mainLayout/catalog/$slug")({
     validateSearch: CatalogSearchSchema,
     beforeLoad: ({ search }) => {
         return {
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/_mainLayout/shared/$slug")({
                 ...seo({
                     title,
                     description,
-                    url: `${import.meta.env.VITE_BASE_URL}/shared/${loaderData?.slug}`,
+                    url: `${import.meta.env.VITE_BASE_URL}/catalog/${loaderData?.slug}`,
                     image: "/default-og.png",
                     name: title,
                 }),
@@ -52,8 +52,8 @@ function RouteComponent() {
     const { data: catalog } = useSuspenseQuery(catalogFeedQuery({ ...search, slug }));
     return (
         <>
-            <SharedCollectionVisitTracker slug={slug} />
-            <SharedInfinite initialCatalog={catalog} slug={slug} />
+            <CatalogVisitTracker slug={slug} />
+            <CatalogInfinite initialData={catalog} slug={slug} />
         </>
     );
 }

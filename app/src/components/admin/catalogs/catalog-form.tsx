@@ -11,7 +11,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import type { DBCatalog } from "@/schemas";
 import { useUpdateCatalog, useCreateCatalog } from "@/hooks/useCollection";
 
-interface SharedFormProps {
+interface CatalogFormPropd {
     current?: DBCatalog;
     onClose?: () => void;
 }
@@ -22,10 +22,10 @@ export const FormSchema = z.object({
     is_active: z.boolean(),
 });
 
-export type SharedFormValues = z.infer<typeof FormSchema>;
+export type CatalogFormValues = z.infer<typeof FormSchema>;
 
-export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
-    const form = useForm<SharedFormValues>({
+export const CatalogForm: React.FC<CatalogFormPropd> = ({ current, onClose }) => {
+    const form = useForm<CatalogFormValues>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
             title: current?.title || "",
@@ -41,7 +41,7 @@ export const SharedForm: React.FC<SharedFormProps> = ({ current, onClose }) => {
 
     const { handleSubmit, control } = form;
 
-    const onSubmit = async (values: SharedFormValues) => {
+    const onSubmit = async (values: CatalogFormValues) => {
         if (current?.id) {
             updateShared.mutateAsync({ id: current?.id!, data: values });
         } else {

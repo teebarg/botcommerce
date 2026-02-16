@@ -1,7 +1,7 @@
 import { SlidersHorizontal, RectangleVertical, LayoutDashboard } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 
-import { FilterSidebar } from "@/components/store/shared/filter-sidebar";
+import { FilterSidebar } from "@/components/store/catalog/filter-sidebar";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 import { cn } from "@/utils";

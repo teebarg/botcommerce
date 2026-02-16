@@ -1,22 +1,11 @@
 import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { CollectionFormValues } from "@/components/admin/collections/collection-form";
-import type { SharedFormValues } from "@/components/admin/shared-collections/shared-form";
-import {
-    addProductToCatalogFn,
-    bulkAddProductsToCatalogFn,
-    createCatalogFn,
-    createCollectionFn,
-    deleteCatalogFn,
-    deleteCollectionFn,
-    getCollectionsFn,
-    removeProductFromCatalogFn,
-    updateCatalogFn,
-    updateCollectionFn,
-} from "@/server/collections.server";
+import type { CatalogFormValues } from "@/components/admin/catalogs/catalog-form";
+import { createCollectionFn, deleteCollectionFn, getCollectionsFn, updateCollectionFn } from "@/server/collections.server";
 import { useRouteContext } from "@tanstack/react-router";
 import { clientApi } from "@/utils/api.client";
-import { PaginatedShared } from "@/schemas";
+import { Catalog, Message, PaginatedCatalog } from "@/schemas";
 
 export const collectionsQuery = (query?: string) =>
     queryOptions({
@@ -68,77 +57,77 @@ export const useCatalogs = (is_active?: boolean) => {
 
     return useQuery({
         queryKey: ["catalog", is_active],
-        queryFn: () => clientApi.get<PaginatedShared>("/shared/", { params: { is_active: is_active ?? null } }),
+        queryFn: () => clientApi.get<PaginatedCatalog>("/catalog/", { params: { is_active: is_active ?? null } }),
         enabled: Boolean(session?.user?.isAdmin),
     });
 };
 
 export const useCreateCatalog = () => {
     return useMutation({
-        mutationFn: async (data: SharedFormValues) => await createCatalogFn({ data }),
+        mutationFn: async (data: CatalogFormValues) => await clientApi.post<Catalog>("/catalog/", data),
         onSuccess: () => {
-            toast.success("Shared collection created successfully");
+            toast.success("catalog created successfully");
         },
         onError: (error) => {
-            toast.error("Failed to create shared collection" + error);
+            toast.error("Failed to create catalog" + error);
         },
     });
 };
 
 export const useUpdateCatalog = () => {
     return useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: SharedFormValues }) => await updateCatalogFn({ data: { id, data } }),
+        mutationFn: async ({ id, data }: { id: number; data: CatalogFormValues }) => await clientApi.patch<Catalog>(`/catalog/${id}`, data),
         onSuccess: () => {
-            toast.success("Shared collection updated successfully");
+            toast.success("catalog updated successfully");
         },
         onError: (error) => {
-            toast.error("Failed to update shared collection: " + error);
+            toast.error("Failed to catalog: " + error);
         },
     });
 };
 
 export const useDeleteCatalog = () => {
     return useMutation({
-        mutationFn: async (id: number) => await deleteCatalogFn({ data: id }),
+        mutationFn: async (id: number) => clientApi.delete<Message>(`/catalog/${id}`),
         onSuccess: () => {
-            toast.success("Shared collection deleted successfully");
+            toast.success("catalog deleted successfully");
         },
         onError: (error) => {
-            toast.error("Failed to delete shared collection" + error);
+            toast.error("Failed to delete catalog" + error);
         },
     });
 };
 
 export const useAddProductToCatalog = () => {
     return useMutation({
-        mutationFn: async ({ collectionId, productId }: { collectionId: number; productId: number }) =>
-            await addProductToCatalogFn({ data: { collectionId, productId } }),
+        mutationFn: async ({ catalogId, productId }: { catalogId: number; productId: number }) =>
+            await clientApi.post<{ message: string }>(`/catalog/${catalogId}/add-product/${productId}`),
         onSuccess: () => {
-            toast.success("Product added to collection successfully");
+            toast.success("Product added to catalog successfully");
         },
         onError: (error) => {
-            toast.error("Failed to add product to collection: " + error);
+            toast.error("Failed to add product to catalog: " + error);
         },
     });
 };
 
 export const useRemoveProductFromCatalog = () => {
     return useMutation({
-        mutationFn: async ({ collectionId, productId }: { collectionId: number; productId: number }) =>
-            await removeProductFromCatalogFn({ data: { collectionId, productId } }),
+        mutationFn: async ({ catalogId, productId }: { catalogId: number; productId: number }) =>
+            await clientApi.delete<{ message: string }>(`/catalog/${catalogId}/remove-product/${productId}`),
         onSuccess: () => {
-            toast.success("Product removed from collection successfully");
+            toast.success("Product removed from catalog successfully");
         },
         onError: (error) => {
-            toast.error("Failed to remove product from collection: " + error);
+            toast.error("Failed to remove product from catalog: " + error);
         },
     });
 };
 
 export const useBulkAddProductsToCatalog = () => {
     return useMutation({
-        mutationFn: async ({ collectionId, productIds }: { collectionId: number; productIds: number[] }) =>
-            await bulkAddProductsToCatalogFn({ data: { collectionId, productIds } }),
+        mutationFn: async ({ catalogId, productIds }: { catalogId: number; productIds: number[] }) =>
+            await clientApi.post<{ message: string }>(`/catalog/${catalogId}/add-products`, { product_ids: productIds }),
         onError: (error) => {
             toast.error("Failed to add products to catalog: " + error);
         },

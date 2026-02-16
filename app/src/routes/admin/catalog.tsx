@@ -1,15 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
-import { SharedCard } from "@/components/admin/shared-collections/shared-card";
-import { SharedForm } from "@/components/admin/shared-collections/shared-form";
+import { CatalogCard } from "@/components/admin/catalogs/catalog-card";
+import { CatalogForm } from "@/components/admin/catalogs/catalog-form";
 import ComponentLoader from "@/components/component-loader";
 import type { DBCatalog } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useCatalogs } from "@/hooks/useCollection";
 import SheetDrawer from "@/components/sheet-drawer";
 
-export const Route = createFileRoute("/admin/shared")({
+export const Route = createFileRoute("/admin/catalog")({
     component: RouteComponent,
 });
 
@@ -34,15 +34,15 @@ function RouteComponent() {
                         }
                         onOpenChange={state.setOpen}
                     >
-                        <SharedForm current={undefined} onClose={() => state.close()} />
+                        <CatalogForm current={undefined} onClose={() => state.close()} />
                     </SheetDrawer>
                 </div>
-                {data?.shared?.length === 0 ? (
+                {data?.catalogs?.length === 0 ? (
                     <div>No Catalogs found.</div>
                 ) : (
                     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                        {data?.shared?.map((col: DBCatalog, idx: number) => (
-                            <SharedCard key={idx} catalog={col} />
+                        {data?.catalogs?.map((col: DBCatalog, idx: number) => (
+                            <CatalogCard key={idx} catalog={col} />
                         ))}
                     </div>
                 )}

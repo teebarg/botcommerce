@@ -1,12 +1,12 @@
 import { Calendar, Eye, Package } from "lucide-react";
 import { SocialShare } from "./social-share";
-import { SharedActions } from "./shared-actions";
+import { CatalogActions } from "./catalog-actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { DBCatalog } from "@/schemas";
 import { formatDate } from "@/utils";
 
-export const SharedCard: React.FC<{ catalog: DBCatalog }> = ({ catalog }) => (
+export const CatalogCard: React.FC<{ catalog: DBCatalog }> = ({ catalog }) => (
     <Card className="group hover:shadow-lg transition-all duration-200">
         <CardHeader className="pb-3">
             <div className="flex items-start justify-between">
@@ -49,7 +49,7 @@ export const SharedCard: React.FC<{ catalog: DBCatalog }> = ({ catalog }) => (
                     </div>
                 </div>
 
-                <SharedActions item={catalog} />
+                <CatalogActions item={catalog} />
             </div>
         </CardContent>
     </Card>

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { tryCatch } from "@/utils/try-catch";
-import { trackVisitFn } from "@/server/catalog.server";
+import { clientApi } from "@/utils/api.client";
 
-interface SharedCollectionVisitTrackerProps {
+interface CatalogVisitTrackerProps {
     slug: string;
 }
 
@@ -12,14 +12,14 @@ interface VisitTrackerResponse {
     view_count: number;
 }
 
-export function SharedCollectionVisitTracker({ slug }: SharedCollectionVisitTrackerProps) {
+export function CatalogVisitTracker({ slug }: CatalogVisitTrackerProps) {
     const [hasTracked, setHasTracked] = useState<boolean>(false);
 
     useEffect(() => {
         const trackVisit = async () => {
             if (hasTracked) return;
 
-            const { data } = await tryCatch<VisitTrackerResponse>(trackVisitFn({ data: slug }));
+            const { data } = await tryCatch<VisitTrackerResponse>(clientApi.post<VisitTrackerResponse>(`/catalog/${slug}/track-visit`));
 
             if (data) {
                 setHasTracked(true);

@@ -65,12 +65,12 @@ export const ManageSlate: React.FC<ManageSlateProps> = ({ product }) => {
                         <h4 className="font-medium mb-2">Available Collections:</h4>
                         {isLoading ? (
                             <ComponentLoader className="h-32" />
-                        ) : data?.shared && data?.shared?.length === 0 ? (
+                        ) : data?.catalogs && data?.catalogs?.length === 0 ? (
                             <p className="text-sm text-muted-foreground">No catalogs available.</p>
                         ) : (
                             <ScrollArea className="h-[calc(100vh-250px)]">
                                 <div className="space-y-2">
-                                    {data?.shared?.map((catalog: DBCatalog, idx: number) => (
+                                    {data?.catalogs?.map((catalog: DBCatalog, idx: number) => (
                                         <CollectionItem key={idx} catalog={catalog} product={product} />
                                     ))}
                                 </div>
@@ -96,14 +96,14 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ catalog, product }) => 
 
     const handleAddToCollection = async () => {
         await addProductMutation.mutateAsync({
-            collectionId: catalog.id,
+            catalogId: catalog.id,
             productId: product.id!,
         });
     };
 
     const handleRemoveFromCollection = async () => {
         await removeProductMutation.mutateAsync({
-            collectionId: catalog.id,
+            catalogId: catalog.id,
             productId: product.id!,
         });
     };

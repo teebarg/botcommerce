@@ -17,7 +17,7 @@ export const ProductCollectionIndicator: React.FC<ProductCollectionIndicatorProp
         return null;
     }
 
-    const activeCollections = data?.shared?.filter((catalog) => catalog.is_active) || [];
+    const activeCollections = data?.catalogs?.filter((catalog) => catalog.is_active) || [];
     const collectionsWithProduct = activeCollections.filter((catalog) => catalog.products?.some((p) => p.id === product.id));
 
     if (collectionsWithProduct.length === 0) {

@@ -23,7 +23,7 @@ from app.api.routes import (
     base,
     carousel,
     user_interaction,
-    shared_collection,
+    catalog,
     notification,
     coupon,
     wallet
@@ -53,6 +53,6 @@ api_router.include_router(shop_settings.router, prefix="/shop-settings", tags=["
 api_router.include_router(delivery.router, prefix="/delivery", tags=["delivery"])
 api_router.include_router(carousel.router, prefix="/carousel", tags=["carousel"])
 api_router.include_router(user_interaction.router, prefix="/user-interactions", tags=["user-interactions"])
-api_router.include_router(shared_collection.router, prefix="/shared", tags=["shared"])
+api_router.include_router(catalog.router, prefix="/catalog", tags=["catalog"])
 api_router.include_router(coupon.router, prefix="/coupon", tags=["coupon"])
 api_router.include_router(wallet.router, prefix="/wallet", tags=["wallet"])

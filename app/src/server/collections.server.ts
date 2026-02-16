@@ -1,32 +1,15 @@
 import { api } from "@/utils/fetch-api";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { Collection, Shared } from "@/schemas";
+import type { Collection } from "@/schemas";
 import type { CollectionFormValues } from "@/components/admin/collections/collection-form";
-import type { SharedFormValues } from "@/components/admin/shared-collections/shared-form";
 
 // Using z.custom since the schema definitions are not provided
 const CollectionFormValuesSchema = z.custom<CollectionFormValues>();
-const SharedFormValuesSchema = z.custom<SharedFormValues>();
 
 const CollectionUpdateSchema = z.object({
     id: z.number(),
     data: CollectionFormValuesSchema,
-});
-
-const SharedUpdateSchema = z.object({
-    id: z.number(),
-    data: SharedFormValuesSchema,
-});
-
-const AddRemoveProductSchema = z.object({
-    collectionId: z.number(),
-    productId: z.number(),
-});
-
-const BulkAddProductsSchema = z.object({
-    collectionId: z.number(),
-    productIds: z.array(z.number()),
 });
 
 export const getCollectionFn = createServerFn({ method: "GET" })
@@ -58,41 +41,4 @@ export const deleteCollectionFn = createServerFn({ method: "POST" })
     .inputValidator(z.number())
     .handler(async ({ data: id }) => {
         return await api.delete<Collection>(`/collection/${id}`);
-    });
-
-// --- Catalog Hooks ---
-export const createCatalogFn = createServerFn({ method: "POST" })
-    .inputValidator(SharedFormValuesSchema)
-    .handler(async ({ data }) => {
-        return await api.post<Shared>("/shared/", data);
-    });
-
-export const updateCatalogFn = createServerFn({ method: "POST" })
-    .inputValidator(SharedUpdateSchema)
-    .handler(async ({ data }) => {
-        return await api.patch<Shared>(`/shared/${data.id}`, data.data);
-    });
-
-export const deleteCatalogFn = createServerFn({ method: "POST" })
-    .inputValidator(z.number())
-    .handler(async ({ data: id }) => {
-        return await api.delete<Shared>(`/shared/${id}`);
-    });
-
-export const addProductToCatalogFn = createServerFn({ method: "POST" })
-    .inputValidator(AddRemoveProductSchema)
-    .handler(async ({ data }) => {
-        return await api.post<{ message: string }>(`/shared/${data.collectionId}/add-product/${data.productId}`);
-    });
-
-export const removeProductFromCatalogFn = createServerFn({ method: "POST" })
-    .inputValidator(AddRemoveProductSchema)
-    .handler(async ({ data }) => {
-        return await api.delete<{ message: string }>(`/shared/${data.collectionId}/remove-product/${data.productId}`);
-    });
-
-export const bulkAddProductsToCatalogFn = createServerFn({ method: "POST" })
-    .inputValidator(BulkAddProductsSchema)
-    .handler(async ({ data }) => {
-        return await api.post<{ message: string }>(`/shared/${data.collectionId}/add-products`, { product_ids: data.productIds });
     });

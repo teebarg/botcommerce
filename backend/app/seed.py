@@ -150,7 +150,7 @@ async def seed():
         "account_number": "0123456789",
     })
 
-    logger.info("Seeding shared collections...")
+    logger.info("Seeding catalogs...")
     shared_collections = [
         {"title": "Summer Sale", "slug": "summer-sale", "description": "Summer Sale", "is_active": True},
         {"title": "New Arrivals", "slug": "new-arrivals", "description": "New Arrivals", "is_active": True},

@@ -2,7 +2,7 @@ import type React from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { Edit, Trash2 } from "lucide-react";
 import { Eye } from "lucide-react";
-import { SharedForm } from "./shared-form";
+import { CatalogForm } from "./catalog-form";
 import { Button } from "@/components/ui/button";
 import { useDeleteCatalog } from "@/hooks/useCollection";
 import type { DBCatalog } from "@/schemas/product";
@@ -14,7 +14,7 @@ interface Props {
     item: DBCatalog;
 }
 
-const SharedActions: React.FC<Props> = ({ item }) => {
+const CatalogActions: React.FC<Props> = ({ item }) => {
     const deleteState = useOverlayTriggerState({});
     const editState = useOverlayTriggerState({});
     const navigate = useNavigate();
@@ -28,7 +28,7 @@ const SharedActions: React.FC<Props> = ({ item }) => {
 
     return (
         <div className="relative flex items-center justify-end gap-2 mt-4">
-            <Button className="bg-primary/10" size="icon" variant="ghost" onClick={() => navigate({ to: `/shared/${item.slug}` })}>
+            <Button className="bg-primary/10" size="icon" variant="ghost" onClick={() => navigate({ to: `/catalog/${item.slug}` })}>
                 <Eye className="h-5 w-5 text-primary" />
             </Button>
             <SheetDrawer
@@ -41,7 +41,7 @@ const SharedActions: React.FC<Props> = ({ item }) => {
                 }
                 onOpenChange={editState.setOpen}
             >
-                <SharedForm current={item} onClose={editState.close} />
+                <CatalogForm current={item} onClose={editState.close} />
             </SheetDrawer>
             <ConfirmDrawer
                 open={deleteState.isOpen}
@@ -62,4 +62,4 @@ const SharedActions: React.FC<Props> = ({ item }) => {
     );
 };
 
-export { SharedActions };
+export { CatalogActions };

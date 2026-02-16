@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Loader } from "lucide-react";
-import type { Catalog, ProductSearch } from "@/schemas";
+import type { ProductSearch, SearchCatalog } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useSearch } from "@tanstack/react-router";
 import { InfiniteScroll } from "@/components/InfiniteScroll";
@@ -10,33 +10,33 @@ import NoProductsFound from "@/components/store/products/no-products";
 import ProductCardListings from "@/components/store/products/product-card-listings";
 import SaleBanner from "@/components/store/sale-banner";
 import ProductCardSocial from "../products/product-card-social";
-import { FilterSidebarLogic, FilterSidebarRef } from "../shared/filter-sidebar-logic";
+import { FilterSidebarLogic, FilterSidebarRef } from "./filter-sidebar-logic";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { clientApi } from "@/utils/api.client";
 
 interface Props {
     slug: string;
-    initialCatalog: Catalog;
+    initialData: SearchCatalog;
 }
 
-export default function SharedInfinite({ slug, initialCatalog }: Props) {
+export default function CatalogInfinite({ slug, initialData }: Props) {
     const sidebarRef = useRef<FilterSidebarRef>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
     const search = useSearch({
         strict: false,
     });
 
-    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery<Catalog>({
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery<SearchCatalog>({
         queryKey: ["product", "catalog", slug, JSON.stringify(search)],
         queryFn: async ({ pageParam }) => {
-            const res = await clientApi.get<Catalog>(`/shared/${slug}`, { params: { slug, ...search, cursor: pageParam ?? undefined } });
+            const res = await clientApi.get<SearchCatalog>(`/catalog/${slug}`, { params: { slug, ...search, cursor: pageParam ?? undefined } });
             return res;
         },
         initialPageParam: undefined,
-        getNextPageParam: (lastPage: Catalog) => lastPage.next_cursor ?? undefined,
-        initialData: initialCatalog
+        getNextPageParam: (lastPage: SearchCatalog) => lastPage.next_cursor ?? undefined,
+        initialData: initialData
             ? {
-                  pages: [initialCatalog],
+                  pages: [initialData],
                   pageParams: [undefined],
               }
             : undefined,

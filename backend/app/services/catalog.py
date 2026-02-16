@@ -3,30 +3,30 @@ from typing import Optional
 from app.core.logging import logger
 
 
-class SharedCollectionService:
+class CatalogService:
     @staticmethod
     async def track_visit(
-        shared_collection_id: int,
+        catalog_id: int,
         user_id: Optional[int] = None,
         ip_address: Optional[str] = None,
         user_agent: Optional[str] = None
     ) -> bool:
         """
-        Track a unique visit to a shared collection.
+        Track a unique visit to a catalog.
         """
         async with db.tx() as tx:
             try:
                 if user_id:
                     existing_view = await db.sharedcollectionview.find_first(
                         where={
-                            "shared_collection_id": shared_collection_id,
+                            "shared_collection_id": catalog_id,
                             "user_id": user_id
                         }
                     )
                 else:
                     existing_view = await db.sharedcollectionview.find_first(
                         where={
-                            "shared_collection_id": shared_collection_id,
+                            "shared_collection_id": catalog_id,
                             "user_id": None,
                             "ip_address": ip_address,
                             "user_agent": user_agent
@@ -37,7 +37,7 @@ class SharedCollectionService:
                     return False
                 
                 data = {
-                    "shared_collection": {"connect": {"id": shared_collection_id}},
+                    "shared_collection": {"connect": {"id": catalog_id}},
                     "ip_address": ip_address,
                     "user_agent": user_agent
                 }
@@ -47,7 +47,7 @@ class SharedCollectionService:
                 await tx.sharedcollectionview.create(data=data)
                 
                 await tx.sharedcollection.update(
-                    where={"id": shared_collection_id},
+                    where={"id": catalog_id},
                     data={"view_count": {"increment": 1}}
                 )
                 
@@ -58,13 +58,13 @@ class SharedCollectionService:
                 return False
     
     @staticmethod
-    async def get_visit_count(shared_collection_id: int) -> int:
+    async def get_visit_count(catalog_id: int) -> int:
         """
-        Get the total number of unique visits for a shared collection.
+        Get the total number of unique visits for a catalog.
         """
         try:
             count = await db.sharedcollectionview.count(
-                where={"shared_collection_id": shared_collection_id}
+                where={"shared_collection_id": catalog_id}
             )
             return count
         except Exception as e:

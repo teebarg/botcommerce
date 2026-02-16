@@ -19,7 +19,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as MainLayoutIndexRouteImport } from './routes/_mainLayout/index'
 import { Route as PaymentVerifyRouteImport } from './routes/payment.verify'
 import { Route as ApiPushEventRouteImport } from './routes/api/push-event'
-import { Route as AdminSharedRouteImport } from './routes/admin/shared'
+import { Route as AdminCatalogRouteImport } from './routes/admin/catalog'
 import { Route as MainLayoutWishlistRouteImport } from './routes/_mainLayout/wishlist'
 import { Route as MainLayoutCartRouteImport } from './routes/_mainLayout/cart'
 import { Route as MainLayoutBulkRouteImport } from './routes/_mainLayout/bulk'
@@ -41,10 +41,10 @@ import { Route as AdminadminOnlineRouteImport } from './routes/admin/(admin)/onl
 import { Route as AdminadminFaqsRouteImport } from './routes/admin/(admin)/faqs'
 import { Route as AdminadminChatsRouteImport } from './routes/admin/(admin)/chats'
 import { Route as AdminadminActivitiesRouteImport } from './routes/admin/(admin)/activities'
-import { Route as MainLayoutSharedSlugRouteImport } from './routes/_mainLayout/shared.$slug'
 import { Route as MainLayoutSearchQueryRouteImport } from './routes/_mainLayout/search.$query'
 import { Route as MainLayoutProductsSlugRouteImport } from './routes/_mainLayout/products.$slug'
 import { Route as MainLayoutCollectionsSlugRouteImport } from './routes/_mainLayout/collections/$slug'
+import { Route as MainLayoutCatalogSlugRouteImport } from './routes/_mainLayout/catalog.$slug'
 import { Route as MainLayoutAccountReferralsRouteImport } from './routes/_mainLayout/account/referrals'
 import { Route as MainLayoutAccountProfileRouteImport } from './routes/_mainLayout/account/profile'
 import { Route as MainLayoutAccountOrdersRouteImport } from './routes/_mainLayout/account/orders'
@@ -112,9 +112,9 @@ const ApiPushEventRoute = ApiPushEventRouteImport.update({
   path: '/api/push-event',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminSharedRoute = AdminSharedRouteImport.update({
-  id: '/shared',
-  path: '/shared',
+const AdminCatalogRoute = AdminCatalogRouteImport.update({
+  id: '/catalog',
+  path: '/catalog',
   getParentRoute: () => AdminRoute,
 } as any)
 const MainLayoutWishlistRoute = MainLayoutWishlistRouteImport.update({
@@ -224,11 +224,6 @@ const AdminadminActivitiesRoute = AdminadminActivitiesRouteImport.update({
   path: '/activities',
   getParentRoute: () => AdminRoute,
 } as any)
-const MainLayoutSharedSlugRoute = MainLayoutSharedSlugRouteImport.update({
-  id: '/shared/$slug',
-  path: '/shared/$slug',
-  getParentRoute: () => MainLayoutRoute,
-} as any)
 const MainLayoutSearchQueryRoute = MainLayoutSearchQueryRouteImport.update({
   id: '/search/$query',
   path: '/search/$query',
@@ -245,6 +240,11 @@ const MainLayoutCollectionsSlugRoute =
     path: '/collections/$slug',
     getParentRoute: () => MainLayoutRoute,
   } as any)
+const MainLayoutCatalogSlugRoute = MainLayoutCatalogSlugRouteImport.update({
+  id: '/catalog/$slug',
+  path: '/catalog/$slug',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
 const MainLayoutAccountReferralsRoute =
   MainLayoutAccountReferralsRouteImport.update({
     id: '/referrals',
@@ -355,7 +355,7 @@ export interface FileRoutesByFullPath {
   '/bulk': typeof MainLayoutBulkRoute
   '/cart': typeof MainLayoutCartRoute
   '/wishlist': typeof MainLayoutWishlistRoute
-  '/admin/shared': typeof AdminSharedRoute
+  '/admin/catalog': typeof AdminCatalogRoute
   '/api/push-event': typeof ApiPushEventRoute
   '/payment/verify': typeof PaymentVerifyRoute
   '/': typeof MainLayoutIndexRoute
@@ -376,10 +376,10 @@ export interface FileRoutesByFullPath {
   '/account/orders': typeof MainLayoutAccountOrdersRoute
   '/account/profile': typeof MainLayoutAccountProfileRoute
   '/account/referrals': typeof MainLayoutAccountReferralsRoute
+  '/catalog/$slug': typeof MainLayoutCatalogSlugRoute
   '/collections/$slug': typeof MainLayoutCollectionsSlugRoute
   '/products/$slug': typeof MainLayoutProductsSlugRoute
   '/search/$query': typeof MainLayoutSearchQueryRoute
-  '/shared/$slug': typeof MainLayoutSharedSlugRoute
   '/admin/activities': typeof AdminadminActivitiesRoute
   '/admin/chats': typeof AdminadminChatsRoute
   '/admin/faqs': typeof AdminadminFaqsRoute
@@ -407,7 +407,7 @@ export interface FileRoutesByTo {
   '/bulk': typeof MainLayoutBulkRoute
   '/cart': typeof MainLayoutCartRoute
   '/wishlist': typeof MainLayoutWishlistRoute
-  '/admin/shared': typeof AdminSharedRoute
+  '/admin/catalog': typeof AdminCatalogRoute
   '/api/push-event': typeof ApiPushEventRoute
   '/payment/verify': typeof PaymentVerifyRoute
   '/': typeof MainLayoutIndexRoute
@@ -428,10 +428,10 @@ export interface FileRoutesByTo {
   '/account/orders': typeof MainLayoutAccountOrdersRoute
   '/account/profile': typeof MainLayoutAccountProfileRoute
   '/account/referrals': typeof MainLayoutAccountReferralsRoute
+  '/catalog/$slug': typeof MainLayoutCatalogSlugRoute
   '/collections/$slug': typeof MainLayoutCollectionsSlugRoute
   '/products/$slug': typeof MainLayoutProductsSlugRoute
   '/search/$query': typeof MainLayoutSearchQueryRoute
-  '/shared/$slug': typeof MainLayoutSharedSlugRoute
   '/admin/activities': typeof AdminadminActivitiesRoute
   '/admin/chats': typeof AdminadminChatsRoute
   '/admin/faqs': typeof AdminadminFaqsRoute
@@ -464,7 +464,7 @@ export interface FileRoutesById {
   '/_mainLayout/bulk': typeof MainLayoutBulkRoute
   '/_mainLayout/cart': typeof MainLayoutCartRoute
   '/_mainLayout/wishlist': typeof MainLayoutWishlistRoute
-  '/admin/shared': typeof AdminSharedRoute
+  '/admin/catalog': typeof AdminCatalogRoute
   '/api/push-event': typeof ApiPushEventRoute
   '/payment/verify': typeof PaymentVerifyRoute
   '/_mainLayout/': typeof MainLayoutIndexRoute
@@ -485,10 +485,10 @@ export interface FileRoutesById {
   '/_mainLayout/account/orders': typeof MainLayoutAccountOrdersRoute
   '/_mainLayout/account/profile': typeof MainLayoutAccountProfileRoute
   '/_mainLayout/account/referrals': typeof MainLayoutAccountReferralsRoute
+  '/_mainLayout/catalog/$slug': typeof MainLayoutCatalogSlugRoute
   '/_mainLayout/collections/$slug': typeof MainLayoutCollectionsSlugRoute
   '/_mainLayout/products/$slug': typeof MainLayoutProductsSlugRoute
   '/_mainLayout/search/$query': typeof MainLayoutSearchQueryRoute
-  '/_mainLayout/shared/$slug': typeof MainLayoutSharedSlugRoute
   '/admin/(admin)/activities': typeof AdminadminActivitiesRoute
   '/admin/(admin)/chats': typeof AdminadminChatsRoute
   '/admin/(admin)/faqs': typeof AdminadminFaqsRoute
@@ -520,7 +520,7 @@ export interface FileRouteTypes {
     | '/bulk'
     | '/cart'
     | '/wishlist'
-    | '/admin/shared'
+    | '/admin/catalog'
     | '/api/push-event'
     | '/payment/verify'
     | '/'
@@ -541,10 +541,10 @@ export interface FileRouteTypes {
     | '/account/orders'
     | '/account/profile'
     | '/account/referrals'
+    | '/catalog/$slug'
     | '/collections/$slug'
     | '/products/$slug'
     | '/search/$query'
-    | '/shared/$slug'
     | '/admin/activities'
     | '/admin/chats'
     | '/admin/faqs'
@@ -572,7 +572,7 @@ export interface FileRouteTypes {
     | '/bulk'
     | '/cart'
     | '/wishlist'
-    | '/admin/shared'
+    | '/admin/catalog'
     | '/api/push-event'
     | '/payment/verify'
     | '/'
@@ -593,10 +593,10 @@ export interface FileRouteTypes {
     | '/account/orders'
     | '/account/profile'
     | '/account/referrals'
+    | '/catalog/$slug'
     | '/collections/$slug'
     | '/products/$slug'
     | '/search/$query'
-    | '/shared/$slug'
     | '/admin/activities'
     | '/admin/chats'
     | '/admin/faqs'
@@ -628,7 +628,7 @@ export interface FileRouteTypes {
     | '/_mainLayout/bulk'
     | '/_mainLayout/cart'
     | '/_mainLayout/wishlist'
-    | '/admin/shared'
+    | '/admin/catalog'
     | '/api/push-event'
     | '/payment/verify'
     | '/_mainLayout/'
@@ -649,10 +649,10 @@ export interface FileRouteTypes {
     | '/_mainLayout/account/orders'
     | '/_mainLayout/account/profile'
     | '/_mainLayout/account/referrals'
+    | '/_mainLayout/catalog/$slug'
     | '/_mainLayout/collections/$slug'
     | '/_mainLayout/products/$slug'
     | '/_mainLayout/search/$query'
-    | '/_mainLayout/shared/$slug'
     | '/admin/(admin)/activities'
     | '/admin/(admin)/chats'
     | '/admin/(admin)/faqs'
@@ -757,11 +757,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPushEventRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/shared': {
-      id: '/admin/shared'
-      path: '/shared'
-      fullPath: '/admin/shared'
-      preLoaderRoute: typeof AdminSharedRouteImport
+    '/admin/catalog': {
+      id: '/admin/catalog'
+      path: '/catalog'
+      fullPath: '/admin/catalog'
+      preLoaderRoute: typeof AdminCatalogRouteImport
       parentRoute: typeof AdminRoute
     }
     '/_mainLayout/wishlist': {
@@ -911,13 +911,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminadminActivitiesRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/_mainLayout/shared/$slug': {
-      id: '/_mainLayout/shared/$slug'
-      path: '/shared/$slug'
-      fullPath: '/shared/$slug'
-      preLoaderRoute: typeof MainLayoutSharedSlugRouteImport
-      parentRoute: typeof MainLayoutRoute
-    }
     '/_mainLayout/search/$query': {
       id: '/_mainLayout/search/$query'
       path: '/search/$query'
@@ -937,6 +930,13 @@ declare module '@tanstack/react-router' {
       path: '/collections/$slug'
       fullPath: '/collections/$slug'
       preLoaderRoute: typeof MainLayoutCollectionsSlugRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_mainLayout/catalog/$slug': {
+      id: '/_mainLayout/catalog/$slug'
+      path: '/catalog/$slug'
+      fullPath: '/catalog/$slug'
+      preLoaderRoute: typeof MainLayoutCatalogSlugRouteImport
       parentRoute: typeof MainLayoutRoute
     }
     '/_mainLayout/account/referrals': {
@@ -1121,10 +1121,10 @@ interface MainLayoutRouteChildren {
   MainLayoutstaticReturnsRoute: typeof MainLayoutstaticReturnsRoute
   MainLayoutstaticShippingRoute: typeof MainLayoutstaticShippingRoute
   MainLayoutstaticTermsRoute: typeof MainLayoutstaticTermsRoute
+  MainLayoutCatalogSlugRoute: typeof MainLayoutCatalogSlugRoute
   MainLayoutCollectionsSlugRoute: typeof MainLayoutCollectionsSlugRoute
   MainLayoutProductsSlugRoute: typeof MainLayoutProductsSlugRoute
   MainLayoutSearchQueryRoute: typeof MainLayoutSearchQueryRoute
-  MainLayoutSharedSlugRoute: typeof MainLayoutSharedSlugRoute
   MainLayoutCollectionsIndexRoute: typeof MainLayoutCollectionsIndexRoute
   MainLayoutOrderConfirmedIdRoute: typeof MainLayoutOrderConfirmedIdRoute
 }
@@ -1143,10 +1143,10 @@ const MainLayoutRouteChildren: MainLayoutRouteChildren = {
   MainLayoutstaticReturnsRoute: MainLayoutstaticReturnsRoute,
   MainLayoutstaticShippingRoute: MainLayoutstaticShippingRoute,
   MainLayoutstaticTermsRoute: MainLayoutstaticTermsRoute,
+  MainLayoutCatalogSlugRoute: MainLayoutCatalogSlugRoute,
   MainLayoutCollectionsSlugRoute: MainLayoutCollectionsSlugRoute,
   MainLayoutProductsSlugRoute: MainLayoutProductsSlugRoute,
   MainLayoutSearchQueryRoute: MainLayoutSearchQueryRoute,
-  MainLayoutSharedSlugRoute: MainLayoutSharedSlugRoute,
   MainLayoutCollectionsIndexRoute: MainLayoutCollectionsIndexRoute,
   MainLayoutOrderConfirmedIdRoute: MainLayoutOrderConfirmedIdRoute,
 }
@@ -1167,7 +1167,7 @@ const AdminstoreCouponsRouteWithChildren =
   AdminstoreCouponsRoute._addFileChildren(AdminstoreCouponsRouteChildren)
 
 interface AdminRouteChildren {
-  AdminSharedRoute: typeof AdminSharedRoute
+  AdminCatalogRoute: typeof AdminCatalogRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminadminActivitiesRoute: typeof AdminadminActivitiesRoute
   AdminadminChatsRoute: typeof AdminadminChatsRoute
@@ -1185,7 +1185,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
-  AdminSharedRoute: AdminSharedRoute,
+  AdminCatalogRoute: AdminCatalogRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminadminActivitiesRoute: AdminadminActivitiesRoute,
   AdminadminChatsRoute: AdminadminChatsRoute,

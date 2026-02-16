@@ -13,7 +13,7 @@ import Overlay from "@/components/overlay";
 import { useOverlayTriggerState } from "react-stately";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FilterSidebarLogic, FilterSidebarRef } from "../shared/filter-sidebar-logic";
+import { FilterSidebarLogic, FilterSidebarRef } from "../catalog/filter-sidebar-logic";
 import { useInView } from "react-intersection-observer";
 import { cn } from "@/utils";
 import ShareButton from "@/components/share";

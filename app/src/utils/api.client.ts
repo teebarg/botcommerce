@@ -6,7 +6,6 @@ type ClientRequestOptions = RequestInit & {
 
 async function clientRequest<T>(endpoint: string, options: ClientRequestOptions = {}): Promise<T> {
     const { params, ...rest } = options;
-
     const url = new URL(`/api${endpoint}`, baseURL);
 
     if (params) {

@@ -73,6 +73,17 @@ declare module "@auth/core/types" {
 
 export const authConfig: StartAuthJSConfig = {
     secret: process.env.AUTH_SECRET,
+    cookies: {
+        sessionToken: {
+            name: process.env.NODE_ENV === "production" ? "__Secure-authjs.session-token" : "authjs.session-token", // No __Secure- prefix in dev
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: process.env.NODE_ENV === "production", // false in dev
+            },
+        },
+    },
     adapter: UpstashRedisAdapter(redis),
     session: {
         strategy: "jwt",

@@ -10,7 +10,7 @@ import { CollectionTemplateSkeleton } from "./skeleton";
 import { Loader } from "lucide-react";
 import ProductCardSocial from "../products/product-card-social";
 import { ProductSearch } from "@/schemas";
-import { FilterSidebarLogic, FilterSidebarRef } from "../shared/filter-sidebar-logic";
+import { FilterSidebarLogic, FilterSidebarRef } from "../catalog/filter-sidebar-logic";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 

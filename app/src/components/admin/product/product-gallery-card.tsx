@@ -30,7 +30,7 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
             onClick={selectionMode ? undefined : onClick}
         >
             <CardContent className="p-0 md:p-0">
-                <div className="relative overflow-hidden h-72 w-full">
+                <div className="relative overflow-hidden aspect-gallery">
                     <MediaDisplay url={image.image} alt={image.product?.name || ""} />
                     <div
                         className={cn(
