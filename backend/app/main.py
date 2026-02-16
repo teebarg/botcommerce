@@ -24,6 +24,7 @@ from fastapi.responses import JSONResponse
 from app.consumer import RedisStreamConsumer
 from app.core.deps import ShopSettingsServiceDep
 from pydantic import BaseModel
+from fastapi.exceptions import RequestValidationError
 
 STREAM_NAME = "EVENT_STREAMS"
 GROUP_NAME = "notifications"
@@ -61,6 +62,18 @@ if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
     sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
 
 app = FastAPI(title="Botcommerce", openapi_url="/api/openapi.json", lifespan=lifespan)
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    errors = []
+    for err in exc.errors():
+        field = err["loc"][-1]
+        errors.append(f"{field}: {err['msg']}")
+
+    return JSONResponse(
+        status_code=422,
+        content={"detail": " | ".join(errors)},
+    )
 
 # # Custom middleware to capture the client host
 # class ClientHostMiddleware(BaseHTTPMiddleware):
@@ -268,13 +281,13 @@ async def generate_sitemap(request: Request):
 # async def update_order():
 #     connection = await aio_pika.connect_robust(settings.RABBITMQ_HOST)
 #     channel = await connection.channel()
-#     message = "Order 1 status: 10"
+#     message = "order 1 status: 10"
 #     # Declaring queue
 #     queue = await channel.declare_queue("notifications")
 #     await channel.default_exchange.publish(
 #         aio_pika.Message(body=message.encode()), routing_key=queue.name
 #     )
-#     return {"message": "Order status update sent"}
+#     return {"message": "order status update sent"}
 
 # @app.on_event("startup")
 # async def listen_for_notifications():

@@ -29,16 +29,6 @@ function RouteComponent() {
     const { data: faqs } = useSuspenseQuery(useFaqsQuery());
     const state = useOverlayTriggerState({});
 
-    if (faqs.length === 0) {
-        return (
-            <Card className="bg-card">
-                <CardContent className="py-8">
-                    <p className="text-center text-muted-foreground">No FAQs found</p>
-                </CardContent>
-            </Card>
-        );
-    }
-
     return (
         <div className="px-2 md:px-10 py-8">
             <div className="flex justify-between items-center mb-6">
@@ -89,6 +79,13 @@ function RouteComponent() {
                         </CardContent>
                     </Card>
                 ))}
+                {faqs.length === 0 && (
+                    <Card className="bg-card">
+                        <CardContent className="py-8">
+                            <p className="text-center text-muted-foreground">No FAQs found</p>
+                        </CardContent>
+                    </Card>
+                )}
             </div>
         </div>
     );

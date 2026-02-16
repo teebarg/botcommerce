@@ -44,6 +44,7 @@ enum PaymentMethod {
   BANK_TRANSFER
   PAYSTACK
   COUPON
+  WALLET
 }
 
 enum ProductStatus {
@@ -108,6 +109,13 @@ enum MessageSender {
   USER
   BOT
   SYSTEM
+}
+
+enum WalletTransactionType {
+  CASHBACK
+  WITHDRAWAL
+  ADJUSTMENT
+  REVERSAL
 }
 
 model ActivityLog {
@@ -335,12 +343,14 @@ model Order {
   subtotal        Float           @db.DoublePrecision
   tax             Float           @db.DoublePrecision
   discount_amount Float           @default(0) @db.DoublePrecision
+  wallet_used     Float           @default(0) @db.DoublePrecision
   status          OrderStatus     @default(PENDING)
   payment         Payment?
   payment_method  PaymentMethod
   payment_status  PaymentStatus?  @default(PENDING)
   shipping_method ShippingMethod?
   shipping_fee    Float           @db.DoublePrecision
+  coupon_code     String?
   coupon          Coupon?         @relation(fields: [coupon_id], references: [id], onDelete: NoAction)
   coupon_id       Int?
   cart            Cart?           @relation(fields: [cart_id], references: [id], onDelete: NoAction) // Optional link to originating cart
@@ -414,7 +424,7 @@ model Coupon {
   discount_type     DiscountType  @default(PERCENTAGE)
   discount_value    Float         @db.DoublePrecision
   min_cart_value    Float?        @db.DoublePrecision
-  min_item_quantity Int?
+  min_item_quantity Int?          @default(0)
   valid_from        DateTime?
   valid_until       DateTime?
   max_uses          Int           @default(1)
@@ -467,8 +477,10 @@ model Cart {
   tax             Float           @default(0) @db.DoublePrecision
   shipping_fee    Float           @default(0) @db.DoublePrecision
   discount_amount Float           @default(0) @db.DoublePrecision
+  wallet_used     Float           @default(0) @db.DoublePrecision
   payment_method  PaymentMethod?
   shipping_method ShippingMethod?
+  coupon_code     String?
   coupon          Coupon?         @relation(fields: [coupon_id], references: [id], onDelete: SetNull)
   coupon_id       Int?
 
@@ -528,13 +540,17 @@ model User {
   interactions               UserInteraction[]
   preferences                UserPreference[]
   coupons                    Coupon[]          @relation("CouponAllowedUser")
+  referral_code              String?           @unique
+  wallet_balance             Float             @default(0) @db.DoublePrecision
 
-  created_at           DateTime?              @default(now())
-  updated_at           DateTime?              @updatedAt
   Conversation         Conversation[]
   SharedCollectionView SharedCollectionView[]
   CouponUsage          CouponUsage[]
   PushSubscription     PushSubscription[]
+  walletTxns           WalletTransaction[]
+
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
 
   @@index([first_name, last_name, email])
   @@map("users")
@@ -722,8 +738,24 @@ model PushSubscription {
   userId Int?
   user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-  createdAt DateTime? @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
 
   @@map("push_subscriptions")
+}
+
+model WalletTransaction {
+  id             String                @id @default(uuid())
+  user_id        Int
+  amount         Float                 @db.DoublePrecision
+  type           WalletTransactionType
+  reference_code String?
+  reference_id   String? // orderId or cartId
+  created_at     DateTime?             @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+  @@index([type])
+  @@map("wallet_transactions")
 }

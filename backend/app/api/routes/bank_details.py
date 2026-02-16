@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
-from prisma.models import BankDetails
-from app.models.bank_details import BankDetailsCreate, BankDetailsUpdate
+from app.models.bank_details import BankDetails, BankDetailsCreate, BankDetailsUpdate
 from app.core.deps import get_current_superuser
 from app.prisma_client import prisma as db
 from app.services.redis import cache_response, invalidate_pattern

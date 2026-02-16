@@ -31,6 +31,12 @@ class CouponService:
         if not coupon.is_active:
             raise HTTPException(status_code=400, detail="Coupon is inactive")
 
+        if any(user.id == user_id for user in coupon.users):
+            raise HTTPException(
+                status_code=403,
+                detail="Self-referral not allowed"
+            )
+
         now = datetime.now(timezone.utc)
         if coupon.valid_from > now:
             raise HTTPException(
@@ -50,10 +56,7 @@ class CouponService:
         if coupon.max_uses_per_user > 0:
             if user_id:
                 usage_count = await db.couponusage.count(
-                    where={
-                        "coupon_id": coupon.id,
-                        "user_id": user_id
-                    }
+                    where={"coupon_id": coupon.id, "user_id": user_id}
                 )
                 if usage_count >= coupon.max_uses_per_user:
                     raise HTTPException(
@@ -61,18 +64,12 @@ class CouponService:
                         detail="You have reached the maximum usage limit for this coupon."
                     )
 
-        if coupon.scope == CouponScope.SPECIFIC_USERS:
-            if not user_id:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Coupon is only available for specific users. Please log in."
-                )
+        # if coupon.scope == CouponScope.SPECIFIC_USERS:
+        #     if not user_id:
+        #         raise HTTPException(status_code=400, detail="Coupon is only available for specific users. Please log in.")
 
-            if not any(user.id == user_id for user in coupon.users):
-                raise HTTPException(
-                    status_code=403,
-                    detail="This coupon is not available for your account"
-                )
+        #     if not any(user.id == user_id for user in coupon.users):
+        #         raise HTTPException(status_code=403, detail="This coupon is not available for your account")
 
         # Validate cart requirements
         if cart:
@@ -121,10 +118,11 @@ class CouponService:
         """
         Apply coupon to cart and update totals.
         """
-        discount_amount = await self.calculate_discount(coupon, cart.subtotal)
+        discount_amount: float = await self.calculate_discount(coupon, cart.subtotal)
         total = cart.subtotal + cart.tax + cart.shipping_fee - discount_amount
-        data = {
+        data: dict[str, float] = {
             "coupon_id": coupon.id,
+            "coupon_code": coupon.code,
             "discount_amount": discount_amount,
             "total": total,
         }

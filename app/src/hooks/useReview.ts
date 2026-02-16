@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { createReviewFn, deleteReviewFn, updateReviewFn } from "@/server/review.server";
+import { deleteReviewFn, updateReviewFn } from "@/server/review.server";
+import { clientApi } from "@/utils/api.client";
+import { Review } from "@/schemas";
 
 type CreateReviewInput = {
     product_id: number;
@@ -19,12 +21,11 @@ type UpdateReviewPayload = {
     };
 };
 
-
 export const useCreateReview = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (input: CreateReviewInput) => await createReviewFn({ data: input }),
+        mutationFn: async (input: CreateReviewInput) => await clientApi.post<Review>("/reviews/", input),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["reviews"] });
             toast.success("Review successfully created");

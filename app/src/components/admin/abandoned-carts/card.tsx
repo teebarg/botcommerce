@@ -59,7 +59,7 @@ export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
                                     {cart.shipping_address && (
                                         <span className="flex items-center gap-1.5">
                                             <MapPin className="h-4 w-4" />
-                                            {cart.shipping_address.city}, {cart.shipping_address.state}
+                                            {cart.shipping_address.state}
                                         </span>
                                     )}
                                 </div>

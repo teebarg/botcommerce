@@ -7,8 +7,6 @@ import CheckoutStepIndicator from "./checkout-step-indicator";
 import CheckoutLoginPrompt from "@/components/generic/auth/checkout-auth-prompt";
 import type { Cart } from "@/schemas";
 import { useRouteContext } from "@tanstack/react-router";
-import { AnimatePresence, motion } from "framer-motion";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 export type CheckoutStep = "auth" | "delivery" | "address" | "payment";
 
@@ -16,47 +14,9 @@ interface CheckoutFlowProps {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
 }
 
-const steps: CheckoutStep[] = ["auth", "delivery", "address", "payment"];
-
-const stepMobileVariants = {
-    enter: (direction: number) => ({
-        x: direction > 0 ? "100%" : "-100%",
-        opacity: 0,
-    }),
-    center: {
-        x: 0,
-        opacity: 1,
-    },
-    exit: (direction: number) => ({
-        x: direction > 0 ? "-100%" : "100%",
-        opacity: 0,
-    }),
-};
-
-const stepDesktopVariants = {
-    enter: (direction: number) => ({
-        x: direction > 0 ? 50 : -50,
-        opacity: 0,
-        scale: 0.98,
-    }),
-    center: {
-        x: 0,
-        opacity: 1,
-        scale: 1,
-    },
-    exit: (direction: number) => ({
-        x: direction > 0 ? -50 : 50,
-        opacity: 0,
-        scale: 0.98,
-    }),
-};
-
 const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ cart }) => {
-    const isMobile = useIsMobile();
     const { session } = useRouteContext({ strict: false });
     const [currentStep, setCurrentStep] = useState<CheckoutStep>("auth");
-    const [direction, setDirection] = useState(1);
-    const stepVariants = isMobile ? stepMobileVariants : stepDesktopVariants;
 
     const getStep = () => {
         if (!session) {
@@ -98,11 +58,6 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ cart }) => {
     };
 
     const handleStepChange = (step: CheckoutStep) => {
-        if (steps.indexOf(step) > steps.indexOf(currentStep)) {
-            setDirection(1);
-        } else {
-            setDirection(-1);
-        }
         setCurrentStep(step);
     };
 
@@ -149,27 +104,9 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ cart }) => {
     const activeStep = currentStep === "auth" ? getStep() : currentStep;
 
     return (
-        <div className="w-full flex-1 flex flex-col">
+        <div className="w-full flex-1 flex flex-col overflow-hidden">
             {session && <CheckoutStepIndicator completedSteps={completedSteps} currentStep={activeStep} onStepClick={handleStepChange} />}
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={currentStep}
-                    custom={direction}
-                    variants={stepVariants}
-                    initial="enter"
-                    animate="center"
-                    exit="exit"
-                    transition={{
-                        type: isMobile ? "spring" : "tween",
-                        stiffness: 300,
-                        damping: 30,
-                        duration: isMobile ? undefined : 0.3,
-                    }}
-                    className="flex flex-col flex-1 pt-4"
-                >
-                    {renderStep()}
-                </motion.div>
-            </AnimatePresence>
+            {renderStep()}
         </div>
     );
 };

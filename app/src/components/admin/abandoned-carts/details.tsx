@@ -108,7 +108,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                                 {cart?.user?.addresses?.[0] ? (
                                     <p className="font-medium flex items-center gap-1.5">
                                         <MapPin className="h-4 w-4" />
-                                        {cart?.user?.addresses?.[0]?.city}
+                                        {cart?.user?.addresses?.[0]?.state}
                                     </p>
                                 ) : (
                                     <p className="font-medium">N/A</p>

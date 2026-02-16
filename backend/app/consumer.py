@@ -157,7 +157,7 @@ class RedisStreamConsumer:
             await db.ordertimeline.create(
                 data={
                     "order": {"connect": {"id": int(event["order_id"])}},
-                    "message": f'Order {event["order_number"]} created',
+                    "message": f'order {event["order_number"]} created',
                     "from_status": OrderStatus.PENDING,
                     "to_status": OrderStatus.PENDING,
                 }
@@ -210,7 +210,7 @@ class RedisStreamConsumer:
             if int(event.get("time_spent", 0)) > 0:
                 metadata["time_spent"] = int(event.get("time_spent", 0))
 
-            key = f"user:{event['user_id']}:history"
+            key: str = f"user:{event['user_id']}:history"
             async with self.redis.pipeline(transaction=True) as pipe:
                 pipe.lpush(key, event['product_id'])
                 pipe.ltrim(key, 0, 49)
@@ -247,21 +247,23 @@ class RedisStreamConsumer:
         recent_service = PopularProductsService()
         await recent_service.track_product_interaction(product_id=product_id, interaction_type=interaction_type)
 
-    async def handle_user_registered(self, event):
+    async def handle_user_registered(self, event) -> None:
         import uuid
         try:
             notification = self.get_notification()
+            code: str = f"{event['first_name'][:4]}{uuid.uuid4().hex[:4]}".upper()
             coupon = await db.coupon.create(data={
-                "code": f"WELCOME{uuid.uuid4().hex[:3].upper()}",
+                "code": code,
                 "discount_type": "PERCENTAGE",
                 "discount_value": 10,
                 "min_cart_value": 5000,
-                "min_item_quantity": 0,
+                "max_uses": 1000,
                 "valid_from": datetime.now(),
-                "valid_until": datetime.now() + timedelta(days=14),
-                "scope": "SPECIFIC_USERS",
+                "valid_until": datetime.now() + timedelta(weeks=500),
                 "users": {"connect": [{"id": int(event["id"])}]}
             })
+            # update user table
+            await db.user.update(where={"id": int(event["id"])}, data={"referral_code": code})
             welcome_email = await generate_welcome_email(
                 email_to=event["email"],
                 first_name=event["first_name"],
@@ -274,6 +276,7 @@ class RedisStreamConsumer:
                 message=welcome_email.html_content
             )
             await invalidate_pattern("coupons")
+            await invalidate_pattern("users")
         except Exception as e:
             logger.error(f"Failed to send welcome email: {str(e)}")
             raise Exception(f"Email error: {str(e)}")

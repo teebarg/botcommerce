@@ -58,9 +58,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false, in
                             {address.address_1}
                             {address.address_2 && <span>, {address.address_2}</span>}
                         </p>
-                        <p className="text-sm text-muted-foreground">
-                            {address.city}, {address.state}
-                        </p>
+                        <p className="text-sm text-muted-foreground">{address.state}</p>
                     </div>
                 </div>
 

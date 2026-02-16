@@ -15,7 +15,8 @@ from app.models.generic import Message, ImageBulkDelete
 from app.models.product import (
     ProductImageMetadata,
     ImagesBulkUpdate,
-    ProductImageBulkUrls
+    ProductImageBulkUrls,
+    ProductImage
 )
 from app.prisma_client import prisma as db
 from prisma.errors import UniqueViolationError
@@ -25,7 +26,6 @@ from app.services.recently_viewed import RecentlyViewedService
 from app.services.websocket import manager
 from app.services.generic import remove_image_from_storage
 from app.services.redis import invalidate_pattern
-from app.models.product import ProductImage
 from app.core.deps import get_current_superuser
 
 logger = get_logger(__name__)

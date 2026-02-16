@@ -1,16 +1,14 @@
-from typing import Any, Optional
-from fastapi import APIRouter, HTTPException, Query, Depends, Request, status
+from typing import Optional
+from fastapi import APIRouter, HTTPException, Query, Depends, Request
 from pydantic import BaseModel, Field
-
 from app.core.deps import CurrentUser, get_current_superuser
-from app.models.order import OrderResponse
-from app.models.wishlist import Wishlist, Wishlists, WishlistCreate
+from app.models.wishlist import Wishlists, WishlistCreate
 from app.models.generic import Message
 from app.models.user import UserUpdateMe, UserUpdate
 from app.prisma_client import prisma as db
 from prisma.errors import PrismaError
 from prisma.enums import Role, Status
-from prisma.models import User
+from app.models.user import User, UserSelf, UserAdmin
 from math import ceil
 from app.core.security import verify_password, get_password_hash
 from app.services.recently_viewed import RecentlyViewedService
@@ -27,7 +25,7 @@ class PasswordChange(BaseModel):
 @router.get("/get-user")
 async def get_user(
     email: str,
-):
+) -> User:
     user = await db.user.find_first(
         where={
             "email": email,
@@ -39,7 +37,7 @@ async def get_user(
 @router.get("/me")
 async def read_user_me(
     user: CurrentUser
-):
+) -> UserSelf:
     """Get current user with caching."""
     return user
 
@@ -48,7 +46,7 @@ async def read_user_me(
 async def update_user_me(
     user_in: UserUpdateMe,
     user: CurrentUser,
-) -> Any:
+) -> User:
     """
     Update own user.
     """
@@ -162,7 +160,7 @@ async def update(
     *,
     id: int,
     update_data: UserUpdate,
-) -> User:
+) -> UserAdmin:
     """
     Update a user.
     """
@@ -216,8 +214,8 @@ async def read_wishlist(
     return {"wishlists": favorites}
 
 
-@router.post("/wishlist", response_model=Wishlist)
-async def create_user_wishlist_item(item: WishlistCreate, user: CurrentUser):
+@router.post("/wishlist")
+async def create_user_wishlist_item(item: WishlistCreate, user: CurrentUser) -> Message:
     try:
         favorite = await db.favorite.create(
             data={
@@ -226,16 +224,16 @@ async def create_user_wishlist_item(item: WishlistCreate, user: CurrentUser):
             }
         )
         await bust(f"products:wishlist:{user.id}")
-        return favorite
+        return Message(message="Product added to wishlist")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.delete("/wishlist/{product_id}", response_model=Message)
+@router.delete("/wishlist/{product_id}")
 async def remove_wishlist_item(
     product_id: int,
     user: CurrentUser,
-):
+) -> Message:
     existing = await db.favorite.find_unique(
         where={
             'user_id_product_id': {
@@ -260,18 +258,6 @@ async def remove_wishlist_item(
         return Message(message="Product deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-
-
-@router.get("/orders", response_model=list[OrderResponse])
-async def get_user_orders(current_user: CurrentUser, skip: int = 0, take: int = 20):
-    orders = await db.order.find_many(
-        where={"user_id": current_user.id},
-        skip=skip,
-        take=take,
-        order={"created_at": "desc"},
-        include={"order_items": True}
-    )
-    return orders
 
 
 @router.post("/change-password", response_model=Message)

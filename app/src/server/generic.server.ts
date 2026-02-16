@@ -52,18 +52,6 @@ export const getBankDetailsFn = createServerFn({ method: "GET" }).handler(async 
     return await api.get<BankDetails[]>("/bank-details/");
 });
 
-const BankDetailsSchema = z.object({
-    bank_name: z.string(),
-    account_name: z.string(),
-    account_number: z.string(),
-});
-
-export const createBankDetailsFn = createServerFn({ method: "POST" })
-    .inputValidator(BankDetailsSchema)
-    .handler(async ({ data }) => {
-        return await api.post<Message>("/bank-details/", data);
-    });
-
 export const deleteBankDetailsFn = createServerFn({ method: "POST" })
     .inputValidator(z.number())
     .handler(async ({ data: id }) => {

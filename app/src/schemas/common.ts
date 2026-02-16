@@ -91,7 +91,6 @@ export const CouponSchema = z.object({
     max_uses: z.number().min(1),
     max_uses_per_user: z.number().min(1),
     current_uses: z.number().optional(),
-    scope: z.enum(["GENERAL", "SPECIFIC_USERS"]),
     is_active: z.boolean(),
     users: z.array(UserSchema).optional(),
     usages: z.array(z.any()).optional(),

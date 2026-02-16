@@ -4,8 +4,7 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Cart } from "@/schemas";
 import { useMyCart } from "@/hooks/useCart";
-
-import { update, get, del } from "idb-keyval";
+import { get, del, update } from "idb-keyval";
 import { addToCartFn } from "@/server/cart.server";
 
 const CART_KEY = "offline-cart";

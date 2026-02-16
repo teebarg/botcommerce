@@ -145,7 +145,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                 {import.meta.env.MODE !== "production" && <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />}
                             </div>
                             {/* {import.meta.env.MODE !== "production" && <TanStackRouterDevtoolsPanel />} */}
-                            <Toaster closeButton richColors duration={3000} expand={false} position="top-right" />
+                            <Toaster closeButton richColors duration={5000} expand={false} position="top-right" />
                             <Scripts />
                         </CartProvider>
                     </StoreProvider>

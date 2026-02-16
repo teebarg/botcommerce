@@ -2,7 +2,7 @@ from typing import Optional
 import uuid
 from fastapi import HTTPException, BackgroundTasks
 from app.prisma_client import prisma as db
-from app.models.order import OrderResponse, OrderCreate
+from app.models.order import Order, OrderCreate
 from app.core.utils import generate_invoice_email, generate_payment_receipt
 from app.core.logging import logger
 from app.services.invoice import invoice_service
@@ -15,7 +15,7 @@ from app.services.events import publish_order_event
 from app.services.redis import invalidate_key, invalidate_pattern
 from app.services.shop_settings import ShopSettingsService
 
-async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_number: str) -> OrderResponse:
+async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_number: str) -> Order:
     """
     Create a new order from a cart
     """
@@ -37,6 +37,7 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
             "tax": cart.tax,
             "shipping_fee": cart.shipping_fee,
             "discount_amount": cart.discount_amount,
+            "wallet_used": cart.wallet_used,
             "status": order_in.status,
             "payment_status": order_in.payment_status,
             "shipping_method": cart.shipping_method,
@@ -58,6 +59,7 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
 
     if cart.coupon_id:
         data["coupon"] = {"connect": {"id": cart.coupon_id}}
+        data["coupon_code"] = cart.coupon_code
         from app.services.coupon import CouponService
         coupon_service = CouponService()
         await coupon_service.increment_coupon_usage(coupon_id=cart.coupon_id, user_id=user_id, discount_amount=cart.discount_amount)
@@ -78,7 +80,7 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
 
     return new_order
 
-async def retrieve_order(order_id: str) -> OrderResponse:
+async def retrieve_order(order_id: str) -> Order:
     """
     Get a specific order by order_number
     """
@@ -95,7 +97,7 @@ async def retrieve_order(order_id: str) -> OrderResponse:
         },
     )
     if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
+        raise HTTPException(status_code=404, detail="order not found")
     return order
 
 async def list_orders(
@@ -247,15 +249,15 @@ async def create_invoice(order_id: int) -> str:
     try:
         order = await db.order.find_unique(where={"id": order_id}, include={"order_items": True, "user": True, "shipping_address": True})
         if not order:
-            logger.error(f"Order not found for ID: {order_id}")
-            raise Exception("Order not found")
+            logger.error(f"order not found for ID: {order_id}")
+            raise Exception("order not found")
         settings = await db.shopsettings.find_many()
         settings_dict = {setting.key: setting.value for setting in settings}
 
         pdf_bytes = invoice_service.generate_invoice_pdf(order=order, company_info=settings_dict)
 
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"invoice_{order.order_number}_{timestamp}_{uuid.uuid4().hex[:8]}.pdf"
+        timestamp: str = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename: str = f"invoice_{order.order_number}_{timestamp}_{uuid.uuid4().hex[:8]}.pdf"
 
         try:
             result = supabase.storage.from_("invoices").upload(filename, pdf_bytes, {
@@ -270,10 +272,7 @@ async def create_invoice(order_id: int) -> str:
 
         public_url = supabase.storage.from_("invoices").get_public_url(filename, {"download": filename})
 
-        await db.order.update(
-            where={"id": order_id},
-            data={"invoice_url": public_url}
-        )
+        await db.order.update(where={"id": order_id}, data={"invoice_url": public_url})
 
         await invalidate_pattern("orders")
         await invalidate_key(f"order:{order_id}")
@@ -284,18 +283,10 @@ async def create_invoice(order_id: int) -> str:
         raise Exception("An unexpected error occurred while generating the invoice")
 
 
-async def decrement_variant_inventory_for_order(order_id: int, notification=None):
+async def decrement_variant_inventory_for_order(order, notification=None) -> None:
     """
     Decrement inventory for each variant in the order. If inventory reaches 0, set status to OUT_OF_STOCK and send notification.
     """
-    order = await db.order.find_unique(
-        where={"id": order_id},
-        include={"order_items": {"include": {"variant": True}}}
-    )
-    if not order:
-        logger.error(f"Order not found for ID: {order_id}")
-        raise Exception("Order not found")
-
     out_of_stock_variants = []
 
     try:
@@ -304,7 +295,7 @@ async def decrement_variant_inventory_for_order(order_id: int, notification=None
             quantity = item.quantity
             variant = await db.productvariant.find_unique(where={"id": variant_id})
             if not variant:
-                logger.info(f"Variant {variant_id} not found for order {order_id}")
+                logger.info(f"Variant {variant_id} not found for order {order.id}")
                 continue
             new_inventory = max(0, variant.inventory - quantity)
             update_data = {"inventory": new_inventory}
@@ -316,15 +307,15 @@ async def decrement_variant_inventory_for_order(order_id: int, notification=None
             await reindex_product(product_id=variant.product_id)
             if out_of_stock:
                 out_of_stock_variants.append(variant)
-            logger.info(f"Decrementing inventory for variant {variant_id} in order {order_id}")
+            logger.info(f"Decrementing inventory for variant {variant_id} in order {order.id}")
         await invalidate_pattern("gallery")
     except Exception as e:
-        logger.error(f"Failed to decrement variant inventory for order {order_id}: {e}")
+        logger.error(f"Failed to decrement variant inventory for order {order.id}: {e}")
         raise Exception("Failed to decrement variant inventory for order")
 
     if out_of_stock_variants and notification:
-        logger.info(f"Out of stock variants found for order {order_id}: {out_of_stock_variants}")
-        # subject = f"Product Variants OUT OF STOCK in Order {order_id}"
+        logger.info(f"Out of stock variants found for order {order.id}: {out_of_stock_variants}")
+        # subject = f"Product Variants OUT OF STOCK in Order {order.id}"
         # message_lines = [
         #     f"The following product variants are now OUT OF STOCK due to order {order_id}:"
         # ]
@@ -342,7 +333,7 @@ async def decrement_variant_inventory_for_order(order_id: int, notification=None
         # except Exception as e:
         #     logger.error(f"Failed to send out-of-stock email: {e}")
         try:
-            slack_text = f"🚨 *OUT OF STOCK* 🚨\nOrder ID: {order_id}\n" + "\n".join([
+            slack_text: str = f"🚨 *OUT OF STOCK* 🚨\nOrder ID: {order.id}\n" + "\n".join([
                 f"• SKU: {v.sku}, Product ID: {v.product_id}" for v in out_of_stock_variants
             ])
             await notification.send_notification(
@@ -354,18 +345,12 @@ async def decrement_variant_inventory_for_order(order_id: int, notification=None
             logger.error(f"Failed to send out-of-stock slack: {e}")
 
 
-async def send_payment_receipt(order_id: int, notification: Notification):
-    order = await db.order.find_unique(where={"id": order_id}, include={"order_items": {
-                    "include": {
-                        "variant": True,
-                    }
-                }, "user": True}
-            )
+async def send_payment_receipt(order, notification: Notification) -> None:
     try:
         email_data = await generate_payment_receipt(order=order, user=order.user)
         service = ShopSettingsService()
-        shop_email = await service.get("shop_email")
-        cc_list = [shop_email] if shop_email else []
+        shop_email: str | None = await service.get("shop_email")
+        cc_list: list[str] | list[Unknown] = [shop_email] if shop_email else []
         await notification.send_notification(
             channel_name="email",
             recipient=order.user.email,
@@ -378,16 +363,30 @@ async def send_payment_receipt(order_id: int, notification: Notification):
         logger.error(f"Failed to generate invoice email: {e}")
 
 
-async def process_order_payment(order_id: int, notification: Notification):
+async def process_order_payment(order_id: int, notification: Notification) -> None:
+    order = await db.order.find_unique(
+        where={"id": order_id}, 
+        include={
+            "order_items": {"include": { "variant": True }}, 
+            "user": True
+        }
+    )
+    if not order:
+        logger.error(f"order not found for ID: {order_id}")
+        raise Exception("order not found")
     await create_invoice(order_id)
-    await send_payment_receipt(order_id, notification)
+    await send_payment_receipt(order=order, notification=notification)
     try:
-        await decrement_variant_inventory_for_order(order_id, notification)
+        await decrement_variant_inventory_for_order(order=order, notification=notification)
     except Exception as e:
         logger.error(f"Failed to decrement variant inventory for order {order_id}: {e}")
+    try:
+        await process_referral(order=order, notification=notification)
+    except Exception as e:
+        logger.error(f"An error occurred while processing referral for order {order_id}: {e}")
 
 
-async def return_order_item(order_id: int, item_id: int, background_tasks: BackgroundTasks) -> OrderResponse:
+async def return_order_item(order_id: int, item_id: int, background_tasks: BackgroundTasks) -> Order:
     """
     Return an item from an order:
     - Remove the order item
@@ -402,7 +401,7 @@ async def return_order_item(order_id: int, item_id: int, background_tasks: Backg
     )
 
     if not order_item or order_item.order_id != order_id:
-        raise HTTPException(status_code=404, detail="Order item not found")
+        raise HTTPException(status_code=404, detail="order item not found")
 
     variant_id = order_item.variant_id
     quantity = order_item.quantity
@@ -460,7 +459,7 @@ async def return_order_item(order_id: int, item_id: int, background_tasks: Backg
         except Exception as e:
             logger.error(f"Failed to append order timeline for return: {e}")
 
-    async def invalidate_caches():
+    async def invalidate_caches() -> None:
         try:
             await invalidate_pattern("orders")
             await invalidate_key(f"order:{order_id}")
@@ -474,3 +473,18 @@ async def return_order_item(order_id: int, item_id: int, background_tasks: Backg
     background_tasks.add_task(invalidate_caches)
 
     return {"message": "Item returned successfully"}
+
+async def process_referral(order, notification=None) -> None:
+    coupon_owner = await db.user.find_unique(where={"referral_code": order.coupon_code})
+    async with db.tx() as tx:
+        await tx.wallettransaction.create(
+                data={
+                    "user": {"connect": {"id": coupon_owner.id}},
+                    "amount": order.discount_amount,
+                    "reference_code": order.coupon_code,
+                    "type": "CASHBACK",
+                    "reference_id": order.order_number,
+                }
+            )
+        await tx.user.update(where={"id": coupon_owner.id}, data={"wallet_balance": {"increment": order.discount_amount}})
+

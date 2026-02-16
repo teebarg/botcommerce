@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { useUpdateCoupon } from "@/hooks/useCoupon";
 import type { Coupon } from "@/schemas";
 import { useOverlayTriggerState } from "react-stately";
-import Overlay from "@/components/overlay";
+import SheetDrawer from "@/components/sheet-drawer";
 
 const couponSchema = z.object({
     code: z.string().min(3).max(20),
@@ -22,7 +22,6 @@ const couponSchema = z.object({
     valid_until: z.string(),
     max_uses: z.number().min(1),
     max_uses_per_user: z.number().min(1),
-    scope: z.enum(["GENERAL", "SPECIFIC_USERS"]),
     status: z.enum(["active", "inactive"]),
 });
 
@@ -45,18 +44,6 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
         return "FIXED_AMOUNT";
     };
 
-    const getScope = (): "GENERAL" | "SPECIFIC_USERS" => {
-        if ((coupon as any).scope) {
-            const scope = (coupon as any).scope;
-
-            if (scope === "GENERAL" || scope === "general") return "GENERAL";
-
-            return "SPECIFIC_USERS";
-        }
-
-        return "GENERAL";
-    };
-
     const form = useForm<CouponFormValues>({
         resolver: zodResolver(couponSchema),
         defaultValues: {
@@ -67,7 +54,6 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
             min_item_quantity: coupon.min_item_quantity ?? undefined,
             max_uses: coupon.max_uses ?? 1,
             max_uses_per_user: coupon.max_uses_per_user ?? 1,
-            scope: getScope(),
             status: coupon.is_active ? "active" : "inactive",
             valid_from: coupon.valid_from ? new Date(coupon.valid_from).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
             valid_until: coupon.valid_until ? new Date(coupon.valid_until).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
@@ -84,7 +70,6 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
                 min_item_quantity: coupon.min_item_quantity ?? undefined,
                 max_uses: coupon.max_uses ?? 1,
                 max_uses_per_user: coupon.max_uses_per_user ?? 1,
-                scope: getScope(),
                 status: coupon.is_active ? "active" : "inactive",
                 valid_from: coupon.valid_from ? new Date(coupon.valid_from).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
                 valid_until: coupon.valid_until ? new Date(coupon.valid_until).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
@@ -104,7 +89,6 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
                 valid_until: new Date(data.valid_until + "T23:59:59Z").toISOString(),
                 max_uses: data.max_uses,
                 max_uses_per_user: data.max_uses_per_user,
-                scope: data.scope,
                 is_active: data.status === "active",
             };
 
@@ -114,7 +98,8 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
     };
 
     return (
-        <Overlay
+        <SheetDrawer
+            drawerClassName="h-[85dvh]"
             open={state.isOpen}
             title="Edit Coupon"
             trigger={
@@ -126,7 +111,7 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
         >
             <Form {...form}>
                 <form className="flex-1 flex flex-col overflow-hidden" onSubmit={form.handleSubmit(onSubmit)}>
-                    <div className="flex-1 overflow-y-auto p-2 space-y-4">
+                    <div className="flex-1 overflow-y-auto px-2.5 pt-2 space-y-4">
                         <div className="grid grid-cols-2 gap-1">
                             <FormField
                                 control={form.control}
@@ -308,30 +293,6 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
                                 )}
                             />
                         </div>
-
-                        <div className="grid grid-cols-2 gap-1">
-                            <FormField
-                                control={form.control}
-                                name="scope"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Scope</FormLabel>
-                                        <Select value={field.value} onValueChange={field.onChange}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="GENERAL">General Use</SelectItem>
-                                                <SelectItem value="SPECIFIC_USERS">Specific Users</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
                     </div>
                     <div className="sheet-footer">
                         <Button disabled={updateMutation.isPending} type="button" variant="outline" onClick={state.close}>
@@ -343,6 +304,6 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
                     </div>
                 </form>
             </Form>
-        </Overlay>
+        </SheetDrawer>
     );
 };

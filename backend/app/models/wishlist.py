@@ -1,30 +1,14 @@
 from typing import Optional
-from app.models.base import BM
 from pydantic import BaseModel
-from prisma.models import ProductVariant
-from app.models.product import Product
+from app.models.product import ProductLite
 
 
-class WishlistBase(BM):
-    product_id: int
-
-class Wishlist(WishlistBase):
+class Wishlist(BaseModel):
     id: int
-    product: Optional[Product] = None
-    variants: list[ProductVariant] = []
-
+    product: Optional[ProductLite] = None
 
 class WishlistCreate(BaseModel):
     product_id: int
 
-
-class WishlistUpdate(BaseModel):
-    product_id: int
-
-
 class Wishlists(BaseModel):
     wishlists: list[Wishlist]
-
-
-class Search(BaseModel):
-    results: list[Wishlist]

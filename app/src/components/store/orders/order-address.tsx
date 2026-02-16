@@ -36,9 +36,7 @@ const OrderAddress: React.FC<{ order: Order }> = ({ order }) => {
                             {order.shipping_address?.first_name} {order.shipping_address?.last_name}
                         </p>
                         <p>{order.shipping_address?.address_1}</p>
-                        <p>
-                            {order.shipping_address?.city}, {order.shipping_address?.state}
-                        </p>
+                        <p>{order.shipping_address?.state}</p>
                     </div>
                 </div>
             </div>

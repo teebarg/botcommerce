@@ -25,14 +25,14 @@ const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onCl
     const updateAddress = useUpdateAddress();
 
     const defaultValues: AddressEditFormValues = {
-        label: address?.label || "",
-        address_type: address?.address_type || "HOME",
+        label: address?.label || "Home",
+        address_type: "HOME",
         first_name: address?.first_name || "",
         last_name: address?.last_name || "",
         address_1: address?.address_1 || "",
         address_2: address?.address_2 || "",
         city: address?.city || "",
-        state: address?.state || "",
+        state: address?.state || "Lagos",
         phone: address?.phone || "",
         is_billing: address?.is_billing ?? false,
     };
@@ -55,30 +55,6 @@ const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onCl
         <Form {...form}>
             <form className="flex-1 flex flex-col overflow-hidden" onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1 overflow-y-auto px-2.5 pb-4 space-y-4">
-                    <FormField
-                        control={form.control}
-                        name="address_type"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Address Type</FormLabel>
-                                <Select value={field.value} onValueChange={field.onChange}>
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select type" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        <SelectItem value="HOME">Home</SelectItem>
-                                        <SelectItem value="WORK">Work</SelectItem>
-                                        <SelectItem value="BILLING">Billing</SelectItem>
-                                        <SelectItem value="SHIPPING">Shipping</SelectItem>
-                                        <SelectItem value="OTHER">Other</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
                     <FormField
                         control={form.control}
                         name="label"
@@ -126,19 +102,6 @@ const ShippingAddressFormEdit = ({ address, onClose }: { address?: Address; onCl
                                 <FormLabel>Address</FormLabel>
                                 <FormControl>
                                     <Input required autoComplete="address-line1" data-testid="shipping-address-input" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="city"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>City</FormLabel>
-                                <FormControl>
-                                    <Input required autoComplete="address-level2" data-testid="shipping-city-input" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

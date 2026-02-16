@@ -11,9 +11,10 @@ import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { useDeleteCoupon, useToggleCouponStatus } from "@/hooks/useCoupon";
 import { SwipeableCouponCard } from "@/components/admin/coupons/swipeable-coupon-card";
+import PaginationUI from "@/components/pagination";
 
 const couponQueryOptions = (query?: string, isActive?: boolean, skip?: number) => ({
-    queryKey: ["coupons", query, isActive, skip],
+    queryKey: ["coupons", `${query}-${isActive}-${skip}`],
     queryFn: () => getCouponsFn({ data: { query, isActive, skip } }),
 });
 
@@ -40,7 +41,7 @@ export const Route = createFileRoute("/admin/(store)/coupons")({
 function RouteComponent() {
     const { isActive, query, skip } = Route.useSearch();
     const { data } = useSuspenseQuery(couponQueryOptions(query, isActive, skip));
-    const coupons = data?.coupons || [];
+    const { coupons, ...pagination } = data;
     const toggleMutation = useToggleCouponStatus();
     const deleteMutation = useDeleteCoupon();
 
@@ -66,7 +67,7 @@ function RouteComponent() {
         } catch (error) {}
     };
     return (
-        <div className="container mx-auto max-w-5xl py-8 px-4">
+        <div className="mx-auto max-w-5xl py-8 px-4">
             <div className="flex md:flex-row flex-col md:items-center md:justify-between mb-6 gap-2">
                 <div>
                     <h1 className="text-3xl font-bold">Coupon Management</h1>
@@ -97,6 +98,7 @@ function RouteComponent() {
                     </Card>
                 )}
             </div>
+            {pagination?.total_pages > 1 && <PaginationUI key="pagination" pagination={pagination} />}
         </div>
     );
 }

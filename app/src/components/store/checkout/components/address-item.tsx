@@ -8,6 +8,7 @@ import { useUpdateCartDetails } from "@/hooks/useCart";
 import ComponentLoader from "@/components/component-loader";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
+import { useDeleteAddress } from "@/hooks/useAddress";
 
 interface AddressItemProp {
     address: Address;
@@ -32,6 +33,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
 
     const state = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
+    const deleteAddress = useDeleteAddress();
 
     const handleSelect = async (id: number) => {
         const savedAddress = addresses.find((a) => a.id === id);
@@ -46,7 +48,9 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
     };
 
     const onConfirmDelete = async () => {
-        // delete address
+        deleteAddress.mutateAsync(address.id).then(() => {
+            deleteState.close();
+        });
     };
 
     return (
@@ -54,7 +58,6 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
             className={`relative p-4 rounded-xl cursor-pointer transition-all duration-300 group overflow-hidden w-full ${
                 isSelected ? "ring-2 ring-primary/20 bg-primary/10" : "border border-input bg-secondary hover:border-primary/50 hover:shadow-md"
             }`}
-            onClick={() => !isSelected && handleSelect(address.id)}
         >
             <div className="absolute top-3 right-3 flex items-center gap-2">
                 <div
@@ -66,7 +69,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                 </div>
             </div>
 
-            <div>
+            <div onClick={() => !isSelected && handleSelect(address.id)}>
                 <div className="flex items-start gap-3 mb-3">
                     <div
                         className={`p-2.5 rounded-lg transition-colors ${
@@ -78,9 +81,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                     <div>
                         <p className="font-semibold">{address?.first_name + " " + address?.last_name}</p>
                         <p className="text-muted-foreground font-medium text-sm truncate text-wrap">{address.address_1}</p>
-                        <p className="text-muted-foreground text-sm">
-                            {address.city}, {address.state}
-                        </p>
+                        <p className="text-muted-foreground text-sm">{address.state}</p>
                     </div>
                 </div>
 
@@ -92,7 +93,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                 )}
             </div>
 
-            <div className="absolute bottom-3 right-3 flex gap-1.5 md:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <div className="absolute bottom-3 right-3 flex gap-1.5 md:opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
                 <SheetDrawer
                     open={state.isOpen}
                     title="Address"
@@ -114,18 +115,15 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                     open={deleteState.isOpen}
                     onOpenChange={deleteState.setOpen}
                     trigger={
-                        <Button
-                            className="text-muted-foreground hover:text-red-600 hover:bg-red-50"
-                            size="icon"
-                            variant="ghost"
-                            onClick={(e) => e.stopPropagation()}
-                        >
+                        <Button size="icon" variant="destructive" onClick={(e) => e.stopPropagation()}>
                             <Trash2 className="w-4 h-4" />
                         </Button>
                     }
                     onClose={deleteState.close}
                     onConfirm={onConfirmDelete}
+                    isLoading={deleteAddress.isPending}
                     title="Delete Address"
+                    description="Are you sure you want to delete this address?"
                 />
             </div>
             {updateCartDetails.isPending && (

@@ -7,6 +7,7 @@ from fastapi import (
 
 from app.core.deps import get_current_user, get_current_superuser
 from app.models.brand import (
+    Brand,
     BrandCreate,
     BrandUpdate,
 )
@@ -14,7 +15,6 @@ from app.models.generic import Message
 from app.prisma_client import prisma as db
 from app.core.utils import slugify
 from prisma.errors import PrismaError
-from prisma.models import Brand
 
 router = APIRouter()
 

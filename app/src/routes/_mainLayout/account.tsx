@@ -1,7 +1,7 @@
 import AccountNav from "@/components/layout/account-nav";
 import { createFileRoute, Link, Outlet, redirect } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
-import { Box, MapPin, Package, User } from "lucide-react";
+import { Box, Gift, MapPin, Package, User } from "lucide-react";
 
 export const Route = createFileRoute("/_mainLayout/account")({
     beforeLoad: ({ context, location }) => {
@@ -37,14 +37,20 @@ const navLinks = [
         label: "Orders",
         dataTestid: "orders-link",
     },
+    {
+        href: "/account/referrals",
+        icon: <Gift className="h-6 w-6" />,
+        label: "Referrals",
+        dataTestid: "referrals-link",
+    },
 ];
 
 function RouteComponent() {
     const { session } = Route.useRouteContext();
     return (
         <div className="flex-1">
-            <div className="bg-blur md:hidden sticky top-16 z-10">
-                <motion.ul initial={{ y: 100 }} animate={{ y: 0 }} className="grid grid-cols-4 gap-4 px-6">
+            <div className="bg-blur md:hidden sticky top-16 z-20">
+                <motion.ul initial={{ y: 100 }} animate={{ y: 0 }} className="grid grid-cols-5 px-2">
                     {navLinks.map((link, idx: number) => (
                         <li key={idx}>
                             <Link
