@@ -3,18 +3,18 @@ from fastapi import (
     HTTPException,
     Request
 )
-
 from app.core.deps import CurrentUser
 from app.models.address import (
+    Address,
+    Addresses,
     AddressCreate,
     AddressUpdate,
 )
-from app.models.address import Address
 from app.models.generic import Message
 from app.prisma_client import prisma as db
 from prisma.errors import PrismaError
 from app.core.logging import get_logger
-from app.services.redis import bust, cache_response, invalidate_key, invalidate_pattern
+from app.services.redis import cache_response, invalidate_key, invalidate_pattern
 
 logger = get_logger(__name__)
 
@@ -26,7 +26,7 @@ router = APIRouter()
 async def index(
     request: Request,
     user: CurrentUser
-):
+) -> Addresses:
     """Get current user addresses."""
     addresses = await db.address.find_many(
         where={"user_id": user.id},

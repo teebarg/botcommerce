@@ -1,9 +1,20 @@
-from app.models.base import BM
 from pydantic import BaseModel, Field, field_validator
 from prisma.enums import AddressType
 
+class Address(BaseModel):
+    id: int
+    first_name: str
+    last_name: str | None
+    address_1: str
+    address_2: str | None
+    address_type: AddressType | None
+    label: str | None
+    state: str | None
+    phone: str | None
+    is_billing: bool
 
-class AddressBase(BM):
+
+class AddressCreate(BaseModel):
     first_name: str = Field(..., max_length=255)
     last_name: str | None = Field(default=None, max_length=255)
     address_1: str = Field(..., max_length=1255)
@@ -22,15 +33,7 @@ class AddressBase(BM):
         return v
 
 
-class Address(AddressBase):
-    id: int
-
-
-class AddressCreate(AddressBase):
-    pass
-
-
-class AddressUpdate(AddressBase):
+class AddressUpdate(BaseModel):
     first_name: str | None = Field(default=None, max_length=255)
     last_name: str | None = Field(default=None, max_length=255)
     address_1: str | None = Field(default=None, max_length=1255)
@@ -44,10 +47,3 @@ class AddressUpdate(AddressBase):
 
 class Addresses(BaseModel):
     addresses: list[Address]
-    skip: int
-    limit: int
-    total_count: int
-    total_pages: int
-
-class Search(BaseModel):
-    results: list[Address]
