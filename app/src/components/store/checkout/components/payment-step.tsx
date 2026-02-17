@@ -27,6 +27,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
     const { config } = useConfig();
     const updateCartDetails = useUpdateCartDetails();
     const [selectedPaymentMethod, setSelectedPaymentMethod] = React.useState<PaymentMethod | null>(null);
+    const canContinue = Boolean(cart?.phone) && Boolean(cart?.payment_method);
 
     const handleChange = (providerId: PaymentMethod) => {
         setSelectedPaymentMethod(providerId);
@@ -34,7 +35,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
     };
 
     return (
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto pb-4">
             <div className="space-y-6 px-4">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
                     <h2 className="text-2xl font-bold mb-2">Payment Details</h2>
@@ -92,9 +93,9 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                     </motion.div>
                 )}
             </div>
-            {cart?.payment_method === "PAYSTACK" && <PaystackPayment amount={cart.total} cartNumber={cart.cart_number} />}
-            {cart?.payment_method === "BANK_TRANSFER" && <BankTransfer amount={cart.total} />}
-            {cart?.payment_method === "CASH_ON_DELIVERY" && <Pickup amount={cart.total} />}
+            {cart?.payment_method === "PAYSTACK" && <PaystackPayment amount={cart.total} cartNumber={cart.cart_number} canContinue={canContinue} />}
+            {cart?.payment_method === "BANK_TRANSFER" && <BankTransfer amount={cart.total} canContinue={canContinue} />}
+            {cart?.payment_method === "CASH_ON_DELIVERY" && <Pickup amount={cart.total} canContinue={canContinue} />}
         </div>
     );
 };

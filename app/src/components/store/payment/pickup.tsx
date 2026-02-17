@@ -5,10 +5,11 @@ import { useCompleteCart } from "@/hooks/useCart";
 
 interface PickupProps {
     amount: number;
+    canContinue: boolean;
     onSuccess?: () => void;
 }
 
-const Pickup: React.FC<PickupProps> = ({ amount }) => {
+const Pickup: React.FC<PickupProps> = ({ amount, canContinue }) => {
     const { config } = useConfig();
     const completeCart = useCompleteCart();
 
@@ -44,7 +45,7 @@ const Pickup: React.FC<PickupProps> = ({ amount }) => {
             </div>
             <div className="flex justify-end py-2 sticky px-4 bottom-0 border-t md:border-t-0 bg-background mt-4">
                 <Button
-                    disabled={completeCart.isPending}
+                    disabled={completeCart.isPending || !canContinue}
                     isLoading={completeCart.isPending}
                     size="lg"
                     onClick={onPaymentCompleted}

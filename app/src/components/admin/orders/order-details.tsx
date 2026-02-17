@@ -161,7 +161,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                         <div className="border-b border-input py-4 px-2">
                             <h2 className="text-lg font-medium flex items-center">
                                 <User className="w-5 h-5 mr-2 text-muted-foreground" />
-                                Customer Information2
+                                Customer Information
                             </h2>
                         </div>
                         <div className="px-4 py-6 grid grid-cols-1 md:grid-cols-2 gap-6">

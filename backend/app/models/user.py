@@ -8,6 +8,7 @@ class UserBase(BaseModel):
     image: Optional[str] = None
     role: Literal["ADMIN", "CUSTOMER"] = "CUSTOMER"
     status: Literal["PENDING", "ACTIVE", "INACTIVE"] = "PENDING"
+    referral_code: Optional[str] = None
 
 class UserCreate(UserBase):
     email: EmailStr
@@ -28,7 +29,6 @@ class UserSelf(User):
     email: EmailStr
     wallet_balance: Optional[float] = None
     created_at: datetime
-    updated_at: datetime
 
 class UserAdmin(User):
     email: EmailStr

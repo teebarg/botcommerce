@@ -40,7 +40,6 @@ export const ReviewForm = ({ onClose, product_id }: ReviewFormProps) => {
     const comment = watch("comment");
 
     const onSubmit = (values: ReviewFormValues) => {
-        console.log("🚀 ~ onSubmit ~ values:", values)
         addReview.mutateAsync({ product_id, ...values }).then(() => {
             reset();
             onClose();

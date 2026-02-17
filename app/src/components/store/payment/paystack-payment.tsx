@@ -5,20 +5,21 @@ import { Button } from "@/components/ui/button";
 import type { PaymentInitialize } from "@/types/payment";
 import { currency } from "@/utils";
 import { tryCatch } from "@/utils/try-catch";
-import { createPaymentFn } from "@/server/payment.server";
+import { clientApi } from "@/utils/api.client";
 
 interface PaystackPaymentProps {
     cartNumber: string;
     amount: number;
+    canContinue: boolean;
     onSuccess?: () => void;
 }
 
-export function PaystackPayment({ cartNumber, amount }: PaystackPaymentProps) {
+export function PaystackPayment({ cartNumber, amount, canContinue }: PaystackPaymentProps) {
     const [loading, setLoading] = useState<boolean>(false);
 
     const handlePayment = async () => {
         setLoading(true);
-        const { data, error } = await tryCatch<PaymentInitialize>(createPaymentFn({ data: cartNumber }));
+        const { data, error } = await tryCatch<PaymentInitialize>(clientApi.post<PaymentInitialize>(`/payment/initialize/${cartNumber}`));
 
         setLoading(false);
 
@@ -64,7 +65,7 @@ export function PaystackPayment({ cartNumber, amount }: PaystackPaymentProps) {
             </div>
             <div className="flex justify-end py-2 sticky px-4 bottom-0 border-t md:border-t-0 bg-background mt-4">
                 <Button
-                    disabled={loading}
+                    disabled={loading || !canContinue}
                     isLoading={loading}
                     size="lg"
                     onClick={handlePayment}

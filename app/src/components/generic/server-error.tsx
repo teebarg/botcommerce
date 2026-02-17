@@ -1,7 +1,8 @@
 import type React from "react";
 import { useEffect } from "react";
 import NotFound from "@/components/generic/not-found";
-import { createErrorFn } from "@/server/generic.server";
+import { clientApi } from "@/utils/api.client";
+import { Message } from "@/schemas";
 
 const ServerError: React.FC<{ error?: string; scenario?: string; stack?: string }> = ({ error, scenario, stack }) => {
     useEffect(() => {
@@ -11,7 +12,7 @@ const ServerError: React.FC<{ error?: string; scenario?: string; stack?: string 
                 scenario,
                 stack,
             };
-            createErrorFn({ data: errorData });
+            clientApi.post<Message>("/log-error", errorData)
         }
     }, [error]);
 

@@ -10,8 +10,14 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { motion } from "framer-motion";
 import { BackButton } from "@/components/back";
 import { meQuery } from "@/queries/user.queries";
+import { redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/checkout")({
+    beforeLoad: ({ context, location }) => {
+        if (!context.session) {
+            throw redirect({ to: "/auth/signin", search: { callbackUrl: location.href } });
+        }
+    },
     loader: async ({ context: { queryClient } }) => {
         await queryClient.ensureQueryData(meQuery());
     },

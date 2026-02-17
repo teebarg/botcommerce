@@ -6,7 +6,7 @@ from app.models.order import Order, OrderCreate
 from app.core.utils import generate_invoice_email, generate_payment_receipt
 from app.core.logging import logger
 from app.services.invoice import invoice_service
-
+from prisma.enums import CartStatus
 from datetime import datetime
 from app.core.deps import supabase, Notification
 from app.services.product import reindex_product
@@ -15,16 +15,28 @@ from app.services.events import publish_order_event
 from app.services.redis import invalidate_key, invalidate_pattern
 from app.services.shop_settings import ShopSettingsService
 
+async def get_cart(cart_number: Optional[str], user_id: Optional[str]):
+    """Retrieve an existing cart or create a new one if it doesn't exist"""
+    if user_id:
+        cart = await db.cart.find_first(
+            where={"user_id": user_id, "status": CartStatus.ACTIVE},
+            include={"items": True},
+            order={"created_at": "desc"}
+        )
+        if cart:
+            return cart
+
+    if cart_number:
+        cart = await db.cart.find_unique(where={"cart_number": cart_number}, include={"items": True})
+        if cart:
+            return cart
+
 async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_number: str) -> Order:
     """
     Create a new order from a cart
     """
     order_number = f"ORD{uuid.uuid4().hex[:8].upper()}"
-
-    cart = await db.cart.find_unique(
-        where={"cart_number": cart_number},
-        include={"items": True}
-    )
+    cart = await get_cart(cart_number=cart_number, user_id=user_id)
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
 
@@ -285,7 +297,8 @@ async def create_invoice(order_id: int) -> str:
 
 async def decrement_variant_inventory_for_order(order, notification=None) -> None:
     """
-    Decrement inventory for each variant in the order. If inventory reaches 0, set status to OUT_OF_STOCK and send notification.
+    Decrement inventory for each variant in the order. 
+    If inventory reaches 0, set status to OUT_OF_STOCK and send notification.
     """
     out_of_stock_variants = []
 

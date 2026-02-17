@@ -1,7 +1,7 @@
 import { api } from "@/utils/fetch-api";
 import { createServerFn } from "@tanstack/react-start";
 import z from "zod";
-import type { Order, PaginatedOrder, OrderStatus, PaymentStatus } from "@/schemas";
+import type { Order, PaginatedOrder } from "@/schemas";
 
 const OrderSearchParamsSchema = z
     .object({
@@ -26,28 +26,6 @@ export const getOrderFn = createServerFn({ method: "GET" })
         return await api.get<Order>(`/order/${data}`);
     });
 
-export const changeOrderStatusFn = createServerFn({ method: "POST" })
-    .inputValidator(
-        z.object({
-            id: z.number(),
-            status: z.custom<OrderStatus>(),
-        })
-    )
-    .handler(async ({ data }) => {
-        return await api.patch<Order>(`/order/${data.id}/status?status=${data.status}`, {});
-    });
-
-export const changePaymentStatusFn = createServerFn({ method: "POST" })
-    .inputValidator(
-        z.object({
-            id: z.number(),
-            status: z.custom<PaymentStatus>(),
-        })
-    )
-    .handler(async ({ data }) => {
-        return await api.patch<Order>(`/payment/${data.id}/status?status=${data.status}`, {});
-    });
-
 export interface OrderTimelineEntry {
     id: number;
     order_id: number;
@@ -61,26 +39,4 @@ export const getOrderTimelineFn = createServerFn({ method: "GET" })
     .inputValidator(z.number())
     .handler(async ({ data: orderId }) => {
         return await api.get<OrderTimelineEntry[]>(`/order/${orderId}/timeline`);
-    });
-
-export const returnOrderItemFn = createServerFn({ method: "POST" })
-    .inputValidator(
-        z.object({
-            orderId: z.number(),
-            itemId: z.number(),
-        })
-    )
-    .handler(async ({ data }) => {
-        return await api.post<Order>(`/order/${data.orderId}/return`, { item_id: data.itemId });
-    });
-
-export const createOrderNoteFn = createServerFn({ method: "POST" })
-    .inputValidator(
-        z.object({
-            orderId: z.number(),
-            notes: z.string(),
-        })
-    )
-    .handler(async ({ data: { orderId, notes } }) => {
-        return await api.patch<Order>(`/order/${orderId}/notes`, { notes });
     });

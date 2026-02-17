@@ -15,7 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { tryCatch } from "@/utils/try-catch";
 import type { Message } from "@/schemas";
 import { useConfig } from "@/providers/store-provider";
-import { bulkRequestFn } from "@/server/generic.server";
+import { clientApi } from "@/utils/api.client";
 
 export const Route = createFileRoute("/_mainLayout/bulk")({
     component: RouteComponent,
@@ -102,7 +102,7 @@ function RouteComponent() {
 
     const onSubmit = async (formData: BulkPurchaseFormValues) => {
         setIsSubmitting(true);
-        const { error } = await tryCatch<Message>(bulkRequestFn({ data: formData }));
+        const { error } = await tryCatch<Message>(clientApi.post<Message>("/bulk-purchase", formData));
 
         setIsSubmitting(false);
 

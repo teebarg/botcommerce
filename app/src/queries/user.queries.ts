@@ -1,11 +1,13 @@
 import { queryOptions } from "@tanstack/react-query";
 import { getIndexCategoriesProductsFn, getIndexProductsFn, getProductFn, getProductsFeedFn } from "@/server/product.server";
 import { getCatalogFn } from "@/server/catalog.server";
-import { getMeFn, getWishlistFn } from "@/server/users.server";
+import { getMeFn } from "@/server/users.server";
 import { getOrderFn, getOrdersFn } from "@/server/order.server";
 import { getUserAddressesFn } from "@/server/address.server";
 import { getCollectionFn } from "@/server/collections.server";
 import { getReviewsFn } from "@/server/review.server";
+import { Wishlist } from "@/schemas";
+import { clientApi } from "@/utils/api.client";
 
 type FeedParams = {
     search?: string;
@@ -53,10 +55,10 @@ export const catalogFeedQuery = (params: CatalogFeedParams) =>
         queryFn: () => getCatalogFn({ data: params }),
     });
 
-export const wishlistQuery = (from: string) =>
+export const wishlistQuery = () =>
     queryOptions({
         queryKey: ["products", "wishlist"],
-        queryFn: () => getWishlistFn({ data: from }),
+        queryFn: () => clientApi.get<Wishlist>("/users/wishlist"),
     });
 
 export const productQuery = (slug: string) =>

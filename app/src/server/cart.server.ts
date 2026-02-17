@@ -32,11 +32,16 @@ export const addToCartFn = createServerFn({ method: "POST" })
     )
     .handler(async ({ data: { variant_id, quantity } }) => {
         const cartId = getCookie(CART_COOKIE);
-        
         const res = await api.post<Cart>("/cart/items", { variant_id, quantity }, { headers: { cartId: cartId ?? "" } });
 
         if (res.cart_number) {
-            setCookie(CART_COOKIE, res.cart_number, { path: "/" });
+            setCookie(CART_COOKIE, res.cart_number, {
+                path: "/",
+                maxAge: 60 * 60 * 24 * 30, // 30 days
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "none",
+            });
         }
 
         return res;
@@ -72,7 +77,6 @@ export const completeCartFn = createServerFn({ method: "POST" })
     .inputValidator(z.any())
     .handler(async ({ data }) => {
         const cartId = getCookie(CART_COOKIE);
-
         const res = await api.post<Order>("/order/", data, { headers: { cartId: cartId ?? "" } });
 
         deleteCookie(CART_COOKIE, { path: "/" });

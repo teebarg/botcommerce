@@ -51,6 +51,7 @@ async def create(
             }
         )
         await invalidate_key(f"addresses:{user.id}")
+        await invalidate_pattern("addresses")
         return address
     except PrismaError as e:
         logger.error(e)
@@ -102,7 +103,7 @@ async def update(
                 **update_data
             }
         )
-        await invalidate_key(f"addresses:{user.id}")
+        await invalidate_pattern("addresses")
         await invalidate_key(f"address:{id}")
         return update
     except PrismaError as e:
@@ -141,6 +142,7 @@ async def delete(id: int, user: CurrentUser) -> Message:
             await tx.address.delete(where={"id": id})
 
         await invalidate_pattern("cart")
+        await invalidate_pattern("addresses")
         await invalidate_key(f"addresses:{user.id}")
         await invalidate_key(f"address:{id}")
         

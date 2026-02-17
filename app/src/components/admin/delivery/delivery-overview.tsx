@@ -13,10 +13,10 @@ import ServerError from "@/components/generic/server-error";
 import { tryCatch } from "@/utils/try-catch";
 import ComponentLoader from "@/components/component-loader";
 import { ZeroState } from "@/components/zero";
-import { deleteDeliveryFn } from "@/server/generic.server";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { useState } from "react";
+import { clientApi } from "@/utils/api.client";
 
 const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
     const editState = useOverlayTriggerState({});
@@ -37,7 +37,7 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
 
     const handleDelete = async () => {
         setIsPending(true);
-        const { error } = await tryCatch<Message>(deleteDeliveryFn({ data: option.id }));
+        const { error } = await tryCatch<Message>(clientApi.delete<Message>(`/delivery/${option.id}`));
 
         if (!error) {
             toast.success("Delivery option deleted successfully");

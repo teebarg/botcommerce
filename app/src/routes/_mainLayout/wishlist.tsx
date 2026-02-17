@@ -13,13 +13,13 @@ export const Route = createFileRoute("/_mainLayout/wishlist")({
         }
     },
     loader: async ({ context: { queryClient } }) => {
-        await queryClient.ensureQueryData(wishlistQuery("/wishlist"));
+        await queryClient.ensureQueryData(wishlistQuery());
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { data } = useSuspenseQuery(wishlistQuery("/wishlist"));
+    const { data } = useSuspenseQuery(wishlistQuery());
 
     return (
         <div className="max-w-6xl mx-auto w-full mb-4 py-8 px-2 md:px-0">

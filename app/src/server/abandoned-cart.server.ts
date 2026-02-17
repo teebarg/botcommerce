@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createServerFn } from "@tanstack/react-start";
-import type { Cart, Message } from "@/schemas";
+import type { Cart } from "@/schemas";
 import { api } from "@/utils/fetch-api";
 
 interface AbandonedCartStats {
@@ -10,7 +10,7 @@ interface AbandonedCartStats {
     potential_revenue: number;
 }
 
-interface AbandonedCartResponse {
+interface AbandonedCart {
     carts: Cart[];
     skip: number;
     limit: number;
@@ -26,35 +26,11 @@ const AbandonedCartSearchParams = z.object({
 
 export const getAbandonedCartsFn = createServerFn({ method: "GET" })
     .inputValidator((input: unknown) => AbandonedCartSearchParams.parse(input))
-    .handler(async ({ data }) => {
-        const res = await api.get<AbandonedCartResponse>("/cart/abandoned-carts", { params: data });
-        return res;
-    });
+    .handler(async ({ data }) => await api.get<AbandonedCart>("/cart/abandoned-carts", { params: data }));
 
 export const getAbandonedCartStatsFn = createServerFn({ method: "GET" })
     .inputValidator(z.number())
     .handler(async ({ data }) => {
         const url = `/cart/abandoned-carts/stats?hours_threshold=${data}`;
         return await api.get<AbandonedCartStats>(url);
-    });
-
-export const sendCartReminderFn = createServerFn({ method: "POST" })
-    .inputValidator(
-        z.object({
-            cartId: z.number(),
-        })
-    )
-    .handler(async ({ data: { cartId } }) => {
-        return await api.post<Message>(`/cart/abandoned-carts/${cartId}/send-reminder`);
-    });
-
-export const sendCartRemindersFn = createServerFn({ method: "POST" })
-    .inputValidator(
-        z.object({
-            hours_threshold: z.number(),
-            limit: z.number().optional(),
-        })
-    )
-    .handler(async ({ data }) => {
-        return await api.post<Message>("/cart/abandoned-carts/send-reminders", data);
     });

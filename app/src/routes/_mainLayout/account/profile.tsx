@@ -13,9 +13,9 @@ import { useInvalidate } from "@/hooks/useApi";
 import ServerError from "@/components/generic/server-error";
 import { tryCatch } from "@/utils/try-catch";
 import { Separator } from "@/components/ui/separator";
-import { updateMeFn, updatePasswordFn } from "@/server/users.server";
 import { updateAuthSession } from "@/utils/auth-client";
 import { motion } from "framer-motion";
+import { clientApi } from "@/utils/api.client";
 
 const profileSchema = z.object({
     first_name: z.string().min(1, "First name is required").max(255, "First name is too long"),
@@ -66,7 +66,7 @@ function RouteComponent() {
 
     const handleProfileSave = async (data: ProfileFormValues) => {
         setIsPending(true);
-        const { error } = await tryCatch<Message>(updateMeFn({ data }));
+        const { error } = await tryCatch<Message>(clientApi.patch<Message>("/users/me", data));
 
         if (error) {
             toast.error(error);
@@ -86,7 +86,12 @@ function RouteComponent() {
 
     const handlePasswordSave = async (data: PasswordFormValues) => {
         setIsPending(true);
-        const { error } = await tryCatch<Message>(updatePasswordFn({ data }));
+        const { error } = await tryCatch<Message>(
+            clientApi.post<Message>("/users/change-password", {
+                old_password: data.currentPassword,
+                new_password: data.newPassword,
+            })
+        );
 
         if (error) {
             toast.error(error);

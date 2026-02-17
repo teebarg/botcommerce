@@ -98,7 +98,7 @@ const EditAddressForm: React.FC<EditAddressProps> = ({ address, isActive = false
                         name="address_2"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Apartment, suite, etc.</FormLabel>
+                                <FormLabel>Apartment, suite, etc.(Optional)</FormLabel>
                                 <FormControl>
                                     <Input autoComplete="address-line2" data-testid="address-2-input" {...field} />
                                 </FormControl>

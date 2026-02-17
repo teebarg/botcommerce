@@ -16,9 +16,3 @@ export const getActivitiesFn = createServerFn({ method: "GET" })
 export const getMyActivitiesFn = createServerFn({ method: "GET" }).handler(async () => {
     return await api.get<Activity[]>(`/activities/me`);
 });
-
-export const deleteActivityFn = createServerFn({ method: "POST" })
-    .inputValidator(z.number())
-    .handler(async ({ data: id }) => {
-        return await api.delete<void>(`/activities/${id}`);
-    });

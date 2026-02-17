@@ -1,11 +1,13 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { changeOrderStatusFn, changePaymentStatusFn, getOrderTimelineFn, returnOrderItemFn } from "@/server/order.server";
-import type { OrderStatus, PaymentStatus } from "@/schemas";
+import { getOrderTimelineFn } from "@/server/order.server";
+import type { Order, OrderStatus, PaymentStatus } from "@/schemas";
+import { clientApi } from "@/utils/api.client";
 
 export const useChangeOrderStatus = () => {
     return useMutation({
-        mutationFn: async ({ id, status }: { id: number; status: OrderStatus }) => await changeOrderStatusFn({ data: { id, status } }),
+        mutationFn: async ({ id, status }: { id: number; status: OrderStatus }) =>
+            await clientApi.patch<Order>(`/order/${id}/status?status=${status}`, {}),
         onSuccess: () => {
             toast.success("Successfully changed order status");
         },
@@ -17,7 +19,8 @@ export const useChangeOrderStatus = () => {
 
 export const useChangePaymentStatus = () => {
     return useMutation({
-        mutationFn: async ({ id, status }: { id: number; status: PaymentStatus }) => await changePaymentStatusFn({ data: { id, status } }),
+        mutationFn: async ({ id, status }: { id: number; status: PaymentStatus }) =>
+            await clientApi.patch<Order>(`/payment/${id}/status?status=${status}`, {}),
         onSuccess: () => {
             toast.success("Successful!", {
                 description: "Payment status changed successfully",
@@ -50,7 +53,8 @@ export const useOrderTimeline = (orderId?: number) => {
 
 export const useReturnOrderItem = () => {
     return useMutation({
-        mutationFn: async ({ orderId, itemId }: { orderId: number; itemId: number }) => await returnOrderItemFn({ data: { orderId, itemId } }),
+        mutationFn: async ({ orderId, itemId }: { orderId: number; itemId: number }) =>
+            await clientApi.post<Order>(`/order/${orderId}/return`, { item_id: itemId }),
         onSuccess: () => {
             toast.success("Item returned. Inventory updated and totals recalculated.");
         },

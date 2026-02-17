@@ -1,42 +1,11 @@
 import { api } from "@/utils/fetch-api";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { Product, Message, ProductVariant, ProductSearch, ProductFeed } from "@/schemas";
+import type { Product, ProductSearch, ProductFeed } from "@/schemas";
 import { CategoriesWithProducts } from "./categories.server";
 
 const ProductIdSchema = z.number();
 const ProductLimitSchema = z.number().default(20);
-const InputAnySchema = z.unknown();
-
-const UpdateProductPayloadSchema = z.object({
-    id: ProductIdSchema,
-    input: InputAnySchema,
-});
-
-const UpdateVariantInputSchema = z.object({
-    id: ProductIdSchema,
-    price: z.number().optional(),
-    old_price: z.number().optional(),
-    inventory: z.number().optional(),
-    status: z.enum(["IN_STOCK", "OUT_OF_STOCK"]).optional(),
-    size: z.string().optional(),
-    color: z.string().optional(),
-    measurement: z.number().optional(),
-    age: z.string().optional(),
-});
-
-const ImageUploadSchema = z.object({
-    id: ProductIdSchema,
-    data: InputAnySchema,
-});
-const ImageDeleteSchema = z.object({
-    id: ProductIdSchema,
-    imageId: z.number(),
-});
-const ImageReorderSchema = z.object({
-    id: ProductIdSchema,
-    imageIds: z.array(z.number()),
-});
 
 export const SearchSchema = z.object({
     search: z.string().optional(),
@@ -76,9 +45,9 @@ export const RelatedProductSearchSchema = z.object({
 });
 
 interface IndexProducts {
-    arrival: ProductSearch[]
-    featured: ProductSearch[]
-    trending: ProductSearch[]
+    arrival: ProductSearch[];
+    featured: ProductSearch[];
+    trending: ProductSearch[];
 }
 
 export const getIndexProductsFn = createServerFn().handler(async () => await api.get<IndexProducts>("/product/index-products"));
@@ -109,58 +78,3 @@ export const similarProductsFn = createServerFn({ method: "GET" })
     .handler(async ({ data: { productId, limit } }) => {
         return await api.get<{ similar: ProductSearch[] }>(`/product/${productId}/similar`, { params: { limit } });
     });
-
-export const createProductFn = createServerFn({ method: "POST" })
-    .inputValidator(InputAnySchema)
-    .handler(async ({ data: input }) => {
-        return await api.post<Product>("/product", input);
-    });
-
-export const updateProductFn = createServerFn({ method: "POST" })
-    .inputValidator(UpdateProductPayloadSchema)
-    .handler(async ({ data: { id, input } }) => {
-        return await api.put<Product>(`/product/${id}`, input);
-    });
-
-export const updateVariantFn = createServerFn({ method: "POST" })
-    .inputValidator(UpdateVariantInputSchema)
-    .handler(async ({ data: input }) => {
-        const { id, ...variantData } = input;
-        return await api.put<ProductVariant>(`/product/variants/${id}`, variantData);
-    });
-
-export const reIndexProductsFn = createServerFn({ method: "POST" }).handler(async () => {
-    return await api.post<Message>(`/product/reindex`);
-});
-
-export const uploadImageFn = createServerFn({ method: "POST" })
-    .inputValidator(ImageUploadSchema)
-    .handler(async ({ data: { id, data } }) => {
-        return await api.patch<Message>(`/product/${id}/image`, data);
-    });
-
-export const uploadImagesFn = createServerFn({ method: "POST" })
-    .inputValidator(ImageUploadSchema)
-    .handler(async ({ data: { id, data } }) => {
-        return await api.post<Message>(`/product/${id}/images`, data);
-    });
-
-export const deleteImagesFn = createServerFn({ method: "POST" })
-    .inputValidator(ImageDeleteSchema)
-    .handler(async ({ data: { id, imageId } }) => {
-        return await api.delete<Message>(`/product/${id}/images/${imageId}`);
-    });
-
-export const reorderImagesFn = createServerFn({ method: "POST" })
-    .inputValidator(ImageReorderSchema)
-    .handler(async ({ data: { id, imageIds } }) => {
-        return await api.patch<Message>(`/product/${id}/images/reorder`, imageIds);
-    });
-
-export const bustCacheFn = createServerFn({ method: "POST" }).handler(async () => {
-    return await api.post<Message>("/cache/bust", { pattern: "products" });
-});
-
-export const flushCacheFn = createServerFn({ method: "POST" }).handler(async () => {
-    return await api.post<Message>("/cache/clear", {});
-});

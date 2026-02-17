@@ -1,10 +1,8 @@
 import { api } from "@/utils/fetch-api";
 import { createServerFn } from "@tanstack/react-start";
 import z from "zod";
-import type { Message, PaginatedReview, Review } from "@/schemas";
+import type { PaginatedReview } from "@/schemas";
 
-
-// --- Zod Schemas for Validation ---
 export const UserSearchSchema = z.object({
     product_id: z.number().optional(),
     skip: z.number().optional(),
@@ -19,35 +17,8 @@ const ReviewsParamsSchema = z.object({
     sort: z.string().optional(),
 }).partial(); // Make all fields optional for convenience in validation
 
-const UpdateReviewInputSchema = z.object({
-    id: z.number(),
-    input: z.object({
-        rating: z.number().min(1).max(5).optional(),
-        comment: z.string().optional(),
-        verified: z.boolean().optional(),
-    }),
-});
-
-const ReviewIdSchema = z.number();
-
-
 export const getReviewsFn = createServerFn({ method: "GET" })
     .inputValidator(ReviewsParamsSchema)
     .handler(async ({ data: params }) => {
         return await api.get<PaginatedReview>("/reviews/", { params });
-    });
-
-export const updateReviewFn = createServerFn({ method: "POST" }) // RPC uses POST, API uses PATCH
-    .inputValidator(UpdateReviewInputSchema)
-    .handler(async ({ data: { id, input } }) => {
-        // Internal API call uses PATCH
-        return await api.patch<Review>(`/reviews/${id}`, input);
-    });
-
-
-export const deleteReviewFn = createServerFn({ method: "POST" }) // RPC uses POST, API uses DELETE
-    .inputValidator(ReviewIdSchema)
-    .handler(async ({ data: id }) => {
-        // Internal API call uses DELETE
-        return await api.delete<Message>(`/reviews/${id}`);
     });

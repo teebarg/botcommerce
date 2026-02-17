@@ -1,12 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { chatMutationFn, deleteChatFn, getAdminDeliveryOptionsFn, getBankDetailsFn, getDeliveryOptionsFn } from "@/server/generic.server";
+import { getAdminDeliveryOptionsFn, getDeliveryOptionsFn } from "@/server/generic.server";
 import { useRouteContext } from "@tanstack/react-router";
+import { clientApi } from "@/utils/api.client";
+import { BankDetails, Message } from "@/schemas";
 
 export const useBankDetails = () => {
     return useQuery({
         queryKey: ["bank-details"],
-        queryFn: () => getBankDetailsFn(),
+        queryFn: () => clientApi.get<BankDetails[]>("/bank-details/"),
     });
 };
 
@@ -22,7 +24,7 @@ export const useChatMutation = () => {
                 user_message: message,
             };
 
-            return await chatMutationFn({ data: body });
+            return await clientApi.post<{ reply: string; conversation_uuid: string }>("/chat/", body);
         },
         onError: (error) => {
             toast.error("Failed to chat" + error);
@@ -34,7 +36,7 @@ export const useDeleteChat = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (id: number) => await deleteChatFn({ data: id }),
+        mutationFn: async (id: number) => await clientApi.delete<Message>(`/chat/${id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["chats"] });
             toast.success("Chat deleted successfully");

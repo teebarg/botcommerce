@@ -5,13 +5,13 @@ import { ShieldAlert } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import BankDetailsForm from "./bank-details-form";
 import { Switch } from "@/components/ui/switch";
-import type { BankDetails, ShopSettings } from "@/schemas";
+import type { BankDetails, Message, ShopSettings } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useBankDetails } from "@/hooks/useApi";
 import { useSyncShopDetails } from "@/hooks/useGeneric";
-import { deleteBankDetailsFn } from "@/server/generic.server";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
+import { clientApi } from "@/utils/api.client";
 
 interface ShopPaymentsProps {
     settings: ShopSettings[];
@@ -47,7 +47,7 @@ interface BankDetailsProps {
 const BankDetailComponent: React.FC<BankDetailsProps> = ({ bank }) => {
     const deleteState = useOverlayTriggerState({});
     const deleteMutation = useMutation({
-        mutationFn: async (id: number) => await deleteBankDetailsFn({ data: id }),
+        mutationFn: async (id: number) => await clientApi.delete<Message>(`/bank-details/${id}`),
         onSuccess: () => {
             toast.success("Bank details deleted successfully");
         },
@@ -152,3 +152,7 @@ export function ShopPayments({ settings }: ShopPaymentsProps) {
         </div>
     );
 }
+function mutationFn(variables: number, context: MutationFunctionContext): Promise<Message> {
+    throw new Error("Function not implemented.");
+}
+

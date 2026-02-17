@@ -1,7 +1,9 @@
 import { queryOptions, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { ContactFormValues } from "@/components/store/contact-form";
-import { contactFormFn, getShopSettingsPublicFn, subscribeNewsletterFn, syncShopDetailsFn } from "@/server/generic.server";
+import { getShopSettingsPublicFn } from "@/server/generic.server";
+import { Message, ShopSettings } from "@/schemas";
+import { clientApi } from "@/utils/api.client";
 
 export const siteConfigQueryOptions = () =>
     queryOptions({
@@ -12,7 +14,7 @@ export const siteConfigQueryOptions = () =>
 
 export const useSyncShopDetails = () => {
     return useMutation({
-        mutationFn: async (input: Record<string, string>) => await syncShopDetailsFn({ data: input }),
+        mutationFn: async (input: Record<string, string>) => await clientApi.patch<ShopSettings>("/shop-settings/sync-shop-details", input),
         onSuccess: () => {
             toast.success("Shop details synced successfully");
         },
@@ -24,7 +26,7 @@ export const useSyncShopDetails = () => {
 
 export const useSubscribeNewsletter = () => {
     return useMutation({
-        mutationFn: async (data: { email: string }) => await subscribeNewsletterFn({ data }),
+        mutationFn: async (data: { email: string }) => await clientApi.post<Message>(`/newsletter`, data),
         onSuccess: () => {
             toast.success("Successfully subscribed to newsletter");
         },
@@ -36,7 +38,7 @@ export const useSubscribeNewsletter = () => {
 
 export const useContactForm = () => {
     return useMutation({
-        mutationFn: async (data: ContactFormValues) => await contactFormFn({ data }),
+        mutationFn: async (data: ContactFormValues) => await clientApi.post<Message>("/contact-form", data),
         onSuccess: () => {
             toast.success("Successfully sent message");
         },

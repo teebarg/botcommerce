@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { sendUserInteractionsFn } from "@/server/generic.server";
+import { clientApi } from "@/utils/api.client";
+import { Message } from "@/schemas";
 
 export type UserInteractionType = "VIEW" | "PURCHASE" | "CART_ADD" | "WISHLIST_ADD" | "WISHLIST_REMOVE";
 
@@ -20,7 +21,7 @@ const flushBuffer = async () => {
 
     buffer = [];
     try {
-        await sendUserInteractionsFn({ data: batch });
+        await clientApi.post<Message>("/user-interactions/batch", batch)
         retryCount = 0;
     } catch (err: any) {
         retryCount++;

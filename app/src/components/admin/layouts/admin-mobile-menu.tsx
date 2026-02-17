@@ -30,7 +30,7 @@ const AdminMobileMenu: React.FC = () => {
         { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/admin" },
         { id: "orders", label: "Orders", icon: <ClipboardList size={20} />, href: "/admin/orders" },
         { id: "gallery", label: "Gallery", icon: <Box size={20} />, href: "/admin/gallery" },
-        { id: "customers", label: "Customers", icon: <Users size={20} />, href: "/admin/users" },
+        { id: "users", label: "Customers", icon: <Users size={20} />, href: "/admin/users" },
         { id: "catalogs", label: "Catalogs", icon: <LayoutGrid size={20} />, href: "/admin/catalog" },
         { id: "categories", label: "Categories", icon: <Layers size={20} />, href: "/admin/categories" },
         { id: "collections", label: "Collections", icon: <LayoutGrid size={20} />, href: "/admin/collections" },

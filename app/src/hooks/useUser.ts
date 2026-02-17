@@ -1,17 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-
-import {
-    createGuestUserFn,
-    createUserFn,
-    createWishlistItemFn,
-    deleteUserFn,
-    deleteWishlistItemFn,
-    getRecentlyViewedFn,
-    getUsersFn,
-    getWishlistListingFn,
-    updateUserFn,
-} from "@/server/users.server";
+import { getRecentlyViewedFn, getUsersFn, getWishlistListingFn } from "@/server/users.server";
+import { clientApi } from "@/utils/api.client";
+import { User, Wishlist } from "@/schemas";
 
 interface UsersParams {
     query?: string;
@@ -38,7 +29,7 @@ export const useCreateUser = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (input: any) => await createUserFn({ data: input }),
+        mutationFn: async (input: any) => await clientApi.post<User>("/users", input),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["users"] });
             toast.success("User created successfully");
@@ -51,9 +42,8 @@ export const useCreateUser = () => {
 
 export const useUpdateUser = () => {
     const queryClient = useQueryClient();
-
     return useMutation({
-        mutationFn: async ({ id, input }: { id: number; input: any }) => await updateUserFn({ data: { id, input } }),
+        mutationFn: async ({ id, input }: { id: number; input: any }) => await clientApi.patch<User>(`/users/${id}`, input),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["users"] });
             toast.success("User updated successfully");
@@ -68,7 +58,7 @@ export const useCreateGuestUser = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (input: { first_name: string; last_name: string }) => await createGuestUserFn({ data: input }),
+        mutationFn: async (input: { first_name: string; last_name: string }) => await clientApi.post<User>("/users/create-guest", input),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["users"] });
             toast.success("Guest user created successfully");
@@ -83,7 +73,7 @@ export const useDeleteUser = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (id: number) => await deleteUserFn({ data: id }),
+        mutationFn: async (id: number) => await clientApi.delete<User>(`/users/${id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["users"] });
             toast.success("User deleted successfully");
@@ -112,7 +102,7 @@ export const useUserRecentlyViewed = (limit: number = 12, enabled: boolean = tru
 export const useUserCreateWishlist = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (product_id: number) => await createWishlistItemFn({ data: product_id }),
+        mutationFn: async (product_id: number) => await clientApi.post<Wishlist>("/users/wishlist", { product_id }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products", "wishlist"] });
             toast.success("Wishlist created successfully");
@@ -126,7 +116,7 @@ export const useUserCreateWishlist = () => {
 export const useUserDeleteWishlist = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (id: number) => await deleteWishlistItemFn({ data: id }),
+        mutationFn: async (id: number) => await clientApi.delete<Wishlist>(`/users/wishlist/${id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products", "wishlist"] });
             toast.success("Wishlist deleted successfully");

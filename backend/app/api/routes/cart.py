@@ -46,14 +46,14 @@ async def calculate_cart_totals(cart: Cart):
 
     wallet_used = 0
     if cart.wallet_used > 0:
-        wallet_used = cart.wallet_used
+        wallet_used: float = cart.wallet_used
 
     new_subtotal: float = max(subtotal - discount_amount, 0)
     tax: float = new_subtotal * (tax_rate / 100)
     shipping_fee = cart.shipping_fee or 0
-    total = new_subtotal + tax + shipping_fee
+    total: float = new_subtotal + tax + shipping_fee
 
-    total_after_wallet = max(total - wallet_used, 0)
+    total_after_wallet: float = max(total - wallet_used, 0)
 
     data={
         "subtotal": subtotal,

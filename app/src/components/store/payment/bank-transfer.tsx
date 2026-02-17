@@ -7,10 +7,11 @@ import { Label } from "@/components/ui/label";
 
 interface BankTransferProps {
     amount: number;
+    canContinue: boolean;
     onSuccess?: () => void;
 }
 
-const BankTransfer: React.FC<BankTransferProps> = ({ amount }) => {
+const BankTransfer: React.FC<BankTransferProps> = ({ amount, canContinue }) => {
     const completeCart = useCompleteCart();
 
     const { data: bankDetails } = useBankDetails();
@@ -58,7 +59,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({ amount }) => {
             </div>
             <div className="flex justify-end py-2 sticky px-4 bottom-0 border-t md:border-t-0 bg-background mt-4">
                 <Button
-                    disabled={completeCart.isPending}
+                    disabled={completeCart.isPending || !canContinue}
                     isLoading={completeCart.isPending}
                     onClick={onPaymentCompleted}
                     size="lg"

@@ -10,12 +10,11 @@ interface HeaderOptions {
 type RequestOptions = RequestInit & {
     params?: Record<string, string | number | boolean | null | undefined>;
     headers?: HeaderOptions;
-    from?: string;
 };
 
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
     const cookies = getCookies();
-    const { params, from, ...restOptions } = options;
+    const { params, ...restOptions } = options;
 
     const url = new URL(`/api${endpoint}`, baseURL);
 
@@ -41,7 +40,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         headers,
     });
 
-    if (response.status === 401 && from) {
+    if (response.status === 401) {
         deleteCookie("__Secure-authjs.session-token", {
             path: "/",
             secure: true,
@@ -52,7 +51,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         throw redirect({
             to: "/auth/signin",
             search: {
-                callbackUrl: from,
+                callbackUrl: "/",
             },
         });
     }

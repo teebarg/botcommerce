@@ -1,76 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
 import { api } from "@/utils/fetch-api";
-import type { GalleryImageItem, Message } from "@/schemas";
+import type { GalleryImageItem } from "@/schemas";
 
 interface PaginatedGalleryResponse {
     images: GalleryImageItem[];
     next_cursor: number | null;
 }
 
-const ImageMetadataPayloadSchema = z.object({
-    imageId: z.number(),
-    input: z.unknown(),
-});
-
-const DeleteGalleryImageSchema = z.object({
-    id: z.number(),
-});
-
-const BulkDeleteSchema = z.object({
-    imageIds: z.array(z.number()),
-});
-
-const BulkProductUpdateSchema = z.object({
-    imageIds: z.array(z.number()),
-    // 'input' is typed as 'any' in the original code
-    input: z.unknown(),
-});
-
-const BulkUploadSchema = z.object({
-    urls: z.array(z.string().url()),
-});
-
 export const getGalleryImagesFn = createServerFn({ method: "GET" }).handler(async () => {
     return await api.get<PaginatedGalleryResponse>("/gallery/");
 });
-
-export const createImageMetadataFn = createServerFn({ method: "POST" })
-    .inputValidator(ImageMetadataPayloadSchema)
-    .handler(async ({ data }) => {
-        return await api.post<Message>(`/gallery/${data.imageId}/metadata`, data.input);
-    });
-
-export const updateImageMetadataFn = createServerFn({ method: "POST" })
-    .inputValidator(ImageMetadataPayloadSchema)
-    .handler(async ({ data }) => {
-        return await api.patch<Message>(`/gallery/${data.imageId}/metadata`, data.input);
-    });
-
-export const reIndexGalleryFn = createServerFn({ method: "POST" }).handler(async () => {
-    return await api.post<Message>(`/gallery/reindex`);
-});
-
-export const deleteGalleryImageFn = createServerFn({ method: "POST" })
-    .inputValidator(DeleteGalleryImageSchema)
-    .handler(async ({ data }) => {
-        return await api.delete<Message>(`/gallery/${data.id}`);
-    });
-
-export const bulkDeleteGalleryImagesFn = createServerFn({ method: "POST" })
-    .inputValidator(BulkDeleteSchema)
-    .handler(async ({ data }) => {
-        return await api.post<Message>(`/gallery/bulk-delete`, { files: data.imageIds });
-    });
-
-export const bulkProductUpdateFn = createServerFn({ method: "POST" })
-    .inputValidator(BulkProductUpdateSchema)
-    .handler(async ({ data }) => {
-        return await api.patch<Message>("/gallery/bulk-update", { image_ids: data.imageIds, data: data.input });
-    });
-
-export const bulkUploadImagesFn = createServerFn({ method: "POST" })
-    .inputValidator(BulkUploadSchema)
-    .handler(async ({ data }) => {
-        return await api.post<Message>("/gallery/bulk-upload", { urls: data.urls });
-    });

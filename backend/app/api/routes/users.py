@@ -1,7 +1,7 @@
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Query, Depends, Request
 from pydantic import BaseModel, Field
-from app.core.deps import CurrentUser, get_current_superuser
+from app.core.deps import CurrentUser, get_current_superuser, UserDep
 from app.models.wishlist import Wishlists, WishlistCreate
 from app.models.generic import Message
 from app.models.user import UserUpdateMe, UserUpdate
@@ -201,11 +201,13 @@ async def delete(id: int) -> Message:
 
 
 @router.get("/wishlist")
-@cache_response("products:wishlist", key=lambda request, user: user.id)
+@cache_response("products:wishlist", key=lambda request, user: user.id if user else None)
 async def read_wishlist(
     request: Request,
-    user: CurrentUser
+    user: UserDep
 ) -> Wishlists:
+    if not user:
+        return {"wishlists": []}
     favorites = await db.favorite.find_many(
         where={"user_id": user.id},
         order={"created_at": "desc"},

@@ -144,7 +144,7 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
                             name="address_2"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Apartment, suite, etc.</FormLabel>
+                                    <FormLabel>Apartment, suite, etc.(Optional)</FormLabel>
                                     <FormControl>
                                         <Input
                                             autoComplete="address-line2"

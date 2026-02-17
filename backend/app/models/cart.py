@@ -1,9 +1,8 @@
 from pydantic import BaseModel
 from enum import Enum
 from prisma.enums import PaymentMethod, ShippingMethod
-from typing import Optional, List
+from typing import Optional
 from datetime import datetime
-from pydantic import BaseModel
 from enum import Enum
 from app.models.user import User
 from app.models.product import ProductVariant
@@ -70,7 +69,7 @@ class Cart(BaseModel):
     phone: Optional[str]
     status: Optional[CartStatus]
     items: Optional[list[CartItemResponse]] = []
-    payment_method: Optional[PaymentMethod]
+    payment_method: Optional[PaymentMethod] = None
     shipping_method: Optional[ShippingMethod]
     shipping_address_id: Optional[int] = None
     shipping_address: Optional[CartAddress]
@@ -91,7 +90,7 @@ class CartLite(BaseModel):
     email: Optional[str]
     phone: Optional[str]
     status: Optional[CartStatus]
-    payment_method: Optional[PaymentMethod]
+    payment_method: Optional[PaymentMethod] = None
     shipping_method: Optional[ShippingMethod]
     shipping_address_id: Optional[int] = None
     total: float = 0

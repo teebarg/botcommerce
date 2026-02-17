@@ -1,20 +1,7 @@
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
+import { useQuery, useMutation, useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { PaginatedProductSearch, ProductFeed } from "@/schemas";
-import {
-    bustCacheFn,
-    createProductFn,
-    deleteImagesFn,
-    flushCacheFn,
-    recommendedProductsFn,
-    reIndexProductsFn,
-    reorderImagesFn,
-    similarProductsFn,
-    updateProductFn,
-    updateVariantFn,
-    uploadImageFn,
-    uploadImagesFn,
-} from "@/server/product.server";
+import type { Message, PaginatedProductSearch, ProductFeed, ProductVariant } from "@/schemas";
+import { recommendedProductsFn, similarProductsFn } from "@/server/product.server";
 import { useRef } from "react";
 import { clientApi } from "@/utils/api.client";
 
@@ -39,17 +26,6 @@ type FeedParams = {
     max_price?: number;
     sort?: string;
     show_facets?: boolean;
-};
-
-type UpdateProductInput = { id: number; input: any };
-type CreateVariantInput = {
-    productId: number;
-    sku?: string;
-    price: number;
-    old_price?: number;
-    inventory: number;
-    size?: string;
-    color?: string;
 };
 type UpdateVariantInput = {
     id: number;
@@ -87,7 +63,7 @@ export const useProductFeed = (initialData: ProductFeed | null, search?: FeedPar
             if (!feedSeedRef.current) {
                 feedSeedRef.current = lastPage.feed_seed;
             }
-            return lastPage.next_cursor ?? undefined; 
+            return lastPage.next_cursor ?? undefined;
         },
 
         initialPageParam: null,
@@ -117,33 +93,12 @@ export const useSimilarProducts = (productId: number, limit: number = 20) => {
     });
 };
 
-export const useCreateProduct = () => {
-    return useMutation({
-        mutationFn: async (input: any) => await createProductFn({ data: input }),
-        onSuccess: () => {
-            toast.success("Product created");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to create product");
-        },
-    });
-};
-
-export const useUpdateProduct = () => {
-    return useMutation({
-        mutationFn: async ({ id, input }: UpdateProductInput) => await updateProductFn({ data: { id, input } }),
-        onSuccess: () => {
-            toast.success("Product updated");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to update product");
-        },
-    });
-};
-
 export const useUpdateVariant = (showToast = true) => {
     return useMutation({
-        mutationFn: async (input: UpdateVariantInput) => await updateVariantFn({ data: input }),
+        mutationFn: async (input: UpdateVariantInput) => {
+            const { id, ...variantData } = input;
+            return await clientApi.put<ProductVariant>(`/product/variants/${id}`, variantData);
+        },
         onSuccess: () => {
             showToast && toast.success("Variant updated");
         },
@@ -155,7 +110,7 @@ export const useUpdateVariant = (showToast = true) => {
 
 export const useReIndexProducts = () => {
     return useMutation({
-        mutationFn: async () => await reIndexProductsFn({}),
+        mutationFn: async () => await clientApi.post<Message>("/product/reindex"),
         onSuccess: () => {
             toast.success("Products re-indexed successfully");
         },
@@ -165,21 +120,9 @@ export const useReIndexProducts = () => {
     });
 };
 
-export const useUploadImage = () => {
-    return useMutation({
-        mutationFn: async ({ id, data }: UploadImageInput) => await uploadImageFn({ data: { id, data } }),
-        onSuccess: () => {
-            toast.success("Image uploaded successfully");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to upload image");
-        },
-    });
-};
-
 export const useUploadImages = () => {
     return useMutation({
-        mutationFn: async ({ id, data }: UploadImageInput) => await uploadImagesFn({ data: { id, data } }),
+        mutationFn: async ({ id, data }: UploadImageInput) => await clientApi.post<Message>(`/product/${id}/images`, data),
         onSuccess: () => {
             toast.success("Images uploaded successfully");
         },
@@ -191,7 +134,7 @@ export const useUploadImages = () => {
 
 export const useDeleteImages = () => {
     return useMutation({
-        mutationFn: async ({ id, imageId }: DeleteImageInput) => await deleteImagesFn({ data: { id, imageId } }),
+        mutationFn: async ({ id, imageId }: DeleteImageInput) => await clientApi.delete<Message>(`/product/${id}/images/${imageId}`),
         onSuccess: () => {
             toast.success("Image deleted successfully");
         },
@@ -203,42 +146,12 @@ export const useDeleteImages = () => {
 
 export const useReorderImages = () => {
     return useMutation({
-        mutationFn: async ({ id, imageIds }: ReorderImagesInput) => await reorderImagesFn({ data: { id, imageIds } }),
+        mutationFn: async ({ id, imageIds }: ReorderImagesInput) => await clientApi.patch<Message>(`/product/${id}/images/reorder`, imageIds),
         onSuccess: () => {
             toast.success("Images reordered successfully");
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to reorder images");
-        },
-    });
-};
-
-export const useBustCache = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: async () => await bustCacheFn({}),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
-            toast.success("Cache busted successfully");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to bust cache");
-        },
-    });
-};
-
-export const useFlushCache = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: async () => await flushCacheFn({}),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] });
-            toast.success("Cache cleared successfully");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to clear cache");
         },
     });
 };
