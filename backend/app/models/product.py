@@ -108,9 +108,9 @@ class SearchProduct(BaseModel):
     description: Optional[str] = None
     image: Optional[str] = None
     categories: Optional[List[SearchCategory]] = []
-    category_slugs: List[str]
+    # category_slugs: List[str]
     collections: Optional[List[SearchCollection]] = []
-    collection_slugs: List[str]
+    # collection_slugs: List[str]
     images: Optional[List[str]] = []
     favorites: Optional[List[str]] = []
     variants: Optional[List[SearchVariant]] = []
