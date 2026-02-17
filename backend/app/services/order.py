@@ -3,7 +3,7 @@ import uuid
 from fastapi import HTTPException, BackgroundTasks
 from app.prisma_client import prisma as db
 from app.models.order import Order, OrderCreate
-from app.core.utils import generate_invoice_email, generate_payment_receipt
+from app.core.utils import generate_invoice_email, generate_payment_receipt, generate_referral_cashback_email
 from app.core.logging import logger
 from app.services.invoice import invoice_service
 from prisma.enums import CartStatus
@@ -441,14 +441,14 @@ async def return_order_item(order_id: int, item_id: int, background_tasks: Backg
         if not order:
             raise HTTPException(status_code=404, detail="Order not found")
 
-        line_amount = float(order_item.price) * int(order_item.quantity)
-        new_subtotal = max(0.0, float(order.subtotal or 0) - line_amount)
+        line_amount: float = float(order_item.price) * int(order_item.quantity)
+        new_subtotal: float = max(0.0, float(order.subtotal or 0) - line_amount)
 
         settings_service = ShopSettingsService()
         tax_rate_str = await settings_service.get("tax_rate")
         tax_rate = float(tax_rate_str or 0)
-        new_tax = new_subtotal * (tax_rate / 100.0)
-        new_total = new_subtotal + new_tax + float(order.shipping_fee or 0)
+        new_tax: float = new_subtotal * (tax_rate / 100.0)
+        new_total: float = new_subtotal + new_tax + float(order.shipping_fee or 0)
 
         updated_order = await tx.order.update(
             where={"id": order_id},
@@ -460,7 +460,7 @@ async def return_order_item(order_id: int, item_id: int, background_tasks: Backg
         )
 
         try:
-            message = f"Returned item: {order_item.name} x{order_item.quantity}"
+            message: str = f"Returned item: {order_item.name} x{order_item.quantity}"
             await tx.ordertimeline.create(
                 data={
                     "order": {"connect": {"id": order_id}},
@@ -500,4 +500,20 @@ async def process_referral(order, notification=None) -> None:
                 }
             )
         await tx.user.update(where={"id": coupon_owner.id}, data={"wallet_balance": {"increment": order.discount_amount}})
-
+    
+    # try:
+    #     email_data = await generate_referral_cashback_email(order=order, coupon_owner=coupon_owner)
+    #     service = ShopSettingsService()
+    #     shop_email = await service.get("shop_email")
+    #     cc_list = [shop_email] if shop_email else []
+    #     await notification.send_notification(
+    #         channel_name="email",
+    #         recipient=coupon_owner.email,
+    #         subject=email_data.subject,
+    #         message=email_data.html_content,
+    #         cc_list=cc_list,
+    #     )
+    #     logger.info(f"Referral cashback email sent to user: {coupon_owner.id}")
+    # except Exception as e:
+    #     logger.error(f"Failed to generate referral cashback email: {e}")
+    #     return

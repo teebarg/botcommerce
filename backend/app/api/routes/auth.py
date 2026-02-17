@@ -60,37 +60,37 @@ def tokenData(user: User):
     }
 
 
-# @router.post("/test-signup")
-# async def test_signup(request: Request):
-#     """
-#     Register a new user with email and password.
-#     Requires CAPTCHA verification and email verification.
-#     """
-#     from app.services.events import publish_order_event
-#     # existing_user = await prisma.user.find_first(
-#     #     where={
-#     #         "email": "teebarg01@gmail.com",
-#     #     }
-#     # )
+@router.post("/test-signup")
+async def test_signup(request: Request):
+    """
+    Register a new user with email and password.
+    Requires CAPTCHA verification and email verification.
+    """
+    from app.services.events import publish_order_event
+    # existing_user = await prisma.user.find_first(
+    #     where={
+    #         "email": "teebarg01@gmail.com",
+    #     }
+    # )
 
-#     existing_order = await prisma.order.find_first(
-#         where={
-#             "order_number": "ORDE1612788",
-#         }
-#     )
+    existing_order = await prisma.order.find_first(
+        where={
+            "order_number": "ORD018F4771",
+        }
+    )
 
-#     try:
-#         # await publish_user_registered(
-#         #     user=existing_user,
-#         #     source="email_password",
-#         #     created_at=existing_user.created_at,
-#         # )
-#         await publish_order_event(order=existing_order, type="ORDER_PAID")
-#     except Exception as e:
-#         logger.error(f"Failed to publish USER_REGISTERED event: {e}")
-#         pass
+    try:
+        # await publish_user_registered(
+        #     user=existing_user,
+        #     source="email_password",
+        #     created_at=existing_user.created_at,
+        # )
+        await publish_order_event(order=existing_order, type="ORDER_PAID")
+    except Exception as e:
+        logger.error(f"Failed to publish USER_REGISTERED event: {e}")
+        pass
 
-#     return "Done"
+    return "Done"
 
 
 

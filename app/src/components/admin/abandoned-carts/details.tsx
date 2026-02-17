@@ -1,9 +1,8 @@
-import { MapPin, Clock, Package, Copy, ExternalLink, User, X } from "lucide-react";
+import { MapPin, Clock, Package, Copy, ExternalLink, User } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import { useOverlayTriggerState } from "react-stately";
 import { ReminderButton } from "./reminder-button";
-
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Overlay from "@/components/overlay";
@@ -58,7 +57,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
         <Overlay
             open={state.isOpen}
             sheetClassName="min-w-[30vw]"
-            title="Cart Details"
+            title={<div className="py-1.5">{cart.status !== "CONVERTED" && <ReminderButton id={cart.id} />}</div>}
             trigger={
                 <Button variant="contrast" onClick={state.open}>
                     View Details
@@ -66,19 +65,13 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
             }
             onOpenChange={state.setOpen}
         >
-            <div className="max-w-4xl px-2">
-                <div className="-mx-2 px-2 py-6 bg-background sticky top-0 z-10">
-                    <div className="flex items-center justify-between mt-4">
-                        <h3 className="font-semibold text-lg flex items-center gap-2">
+            <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="space-y-6 flex-1 px-2.5 overflow-auto">
+                    <div>
+                        <h3 className="font-semibold text-lg flex items-center gap-2 mb-2">
                             <User className="h-5 w-5" />
                             Customer Information
                         </h3>
-                        {cart.status !== "CONVERTED" && <ReminderButton id={cart.id} />}
-                    </div>
-                </div>
-
-                <div className="space-y-6">
-                    <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg border bg-linear-to-br from-contrast/5 to-primary/5">
                             <div className="space-y-1">
                                 <p className="text-sm text-muted-foreground">Name</p>
@@ -197,7 +190,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                     </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t -mx-2 px-2 py-4 bg-background sticky bottom-0">
+                <div className="sheet-footer">
                     {cart?.user?.email && (
                         <Button variant="contrast" onClick={handleImpersonation}>
                             <ExternalLink className="h-4 w-4" />
@@ -205,8 +198,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                         </Button>
                     )}
                     <Button variant="outline" onClick={() => state.close()}>
-                        <X className="h-4 w-4" />
-                        Close
+                        Cancel
                     </Button>
                 </div>
             </div>

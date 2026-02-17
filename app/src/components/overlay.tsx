@@ -1,6 +1,5 @@
 import { cn } from "@/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { AnimatePresence } from "framer-motion";
 
 interface OverlayProps {
     trigger: React.ReactNode;

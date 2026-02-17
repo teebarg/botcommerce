@@ -399,6 +399,28 @@ async def generate_newsletter_email(email: str) -> EmailData:
     return EmailData(html_content=html_content, subject="Welcome to our newsletter")
 
 
+async def generate_referral_cashback_email(order: Order, coupon_owner: User) -> EmailData:
+    header_title = "You just got paid!"
+    description = "Your order has been processed"
+
+    html_content = render_email_template(
+        template_name="referral_cashback_email.html",
+        context={
+            "referral": coupon_owner.first_name,
+            "cash_back": order.discount_amount,
+            "order_value": order.subtotal,
+            "referred": order.user.first_name,
+            "created_at": order.created_at,
+            "current_year": datetime.now().year,
+            "header_title": header_title,
+            "cta_url": "account/referrals",
+            "cta_text": "View My Wallet",
+            **(await merge_metadata({"description": description}))
+        },
+    )
+    return EmailData(html_content=html_content, subject=f"Order Confirmation for {order.order_number}")
+
+
 def generate_sku(prefix: str = "PRD") -> str:
     """
     Generate a unique product SKU.
