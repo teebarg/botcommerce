@@ -138,7 +138,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                                 </div>
                             ))}
                         </div>
-                        <div className="p-4 rounded-lg border bg-muted/50 space-y-3">
+                        <div className="p-4 rounded-lg border bg-muted/50 space-y-2">
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Subtotal</span>
                                 <span className="font-medium">{currency(cart.subtotal)}</span>

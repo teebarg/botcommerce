@@ -1,7 +1,7 @@
 from typing import Optional
 from datetime import datetime, timedelta, timezone
 from app.core.utils import generate_id, generate_abandoned_cart_email, send_email
-from app.models.cart import CartUpdate, CartItemCreate, CartItemResponse, Cart, CartLite, SendAbandonedCartReminders
+from app.models.cart import CartUpdate, CartItemCreate, CartItem, Cart, CartLite, SendAbandonedCartReminders
 from fastapi import APIRouter, Header, HTTPException, Request, BackgroundTasks, Depends
 from app.prisma_client import prisma as db
 from app.core.deps import UserDep, get_current_superuser, CurrentUser
@@ -89,7 +89,7 @@ async def get_or_create_cart(cart_number: Optional[str], user_id: Optional[str])
     return await db.cart.create(data={"cart_number": new_cart_id, "user_id": user_id})
 
 
-@router.post("/items", response_model=CartItemResponse)
+@router.post("/items", response_model=CartItem)
 async def add_item_to_cart(
     item_in: CartItemCreate,
     user: UserDep,
@@ -170,7 +170,7 @@ async def get_cart(request: Request, user: UserDep, cartId: str = Header()) -> O
     )
 
 
-@router.get("/items", response_model=Optional[list[CartItemResponse]])
+@router.get("/items", response_model=Optional[list[CartItem]])
 async def get_cart_items(user: UserDep, cartId: str = Header()):
     """Get all items in a specific cart"""
     cart = await get_or_create_cart(cart_number=cartId, user_id=user.id if user else None)
@@ -283,7 +283,7 @@ async def delete_cart_item(item_id: int, user: UserDep, cartId: str = Header(def
     return {"message": "Item removed from cart successfully"}
 
 
-@router.put("/items/{item_id}", response_model=CartItemResponse)
+@router.put("/items/{item_id}", response_model=CartItem)
 async def update_cart_item(item_id: int, quantity: int, user: UserDep, background_tasks: BackgroundTasks, cartId: str = Header(default=None)):
     cart = await get_or_create_cart(cart_number=cartId, user_id=user.id if user else None)
     cart_item = await db.cartitem.find_unique(
@@ -629,11 +629,12 @@ async def apply_wallet(user: CurrentUser, cartId: str = Header(default=None)) ->
                     "amount": wallet_to_use,
                     "reference_code": "WALLET_PAYMENT",
                     "type": "WITHDRAWAL",
-                    "reference_id": cart.id,
+                    "reference_id": cart.cart_number,
                 }
             )
             await tx.user.update(where={"id": user.id}, data={"wallet_balance": {"decrement": wallet_to_use}})
-    except Exception:
+    except Exception as e:
+        logger.error(e)
         raise HTTPException(status_code=500, detail="Failed to update cart")
 
     await invalidate_pattern("cart")
@@ -643,7 +644,7 @@ async def apply_wallet(user: CurrentUser, cartId: str = Header(default=None)) ->
 
 
 @router.post("/remove-wallet")
-async def remove_wallet(user: CurrentUser, cartId: str = Header(default=None)):
+async def remove_wallet(user: CurrentUser, cartId: str = Header(default=None)) -> Message:
     """
     Remove wallet usage from the cart, refund the wallet, and recalculate totals.
     """
@@ -651,24 +652,30 @@ async def remove_wallet(user: CurrentUser, cartId: str = Header(default=None)):
     if not cart:
         raise HTTPException(status_code=404, detail="cart not found")
 
-    wallet_used = cart.wallet_used or 0.0
+    wallet_used = cart.wallet_used or 0
     if wallet_used <= 0:
         return Message(message="No Wallet applied")
 
     try:
         async with db.tx() as tx:
             await tx.user.update(where={"id": user.id}, data={"wallet_balance": {"increment": wallet_used}})
-            await tx.wallettransaction.update_many(
-                where={"user_id": user.id, "reference_id": cart.id, "reference_code": "WALLET_PAYMENT"},
-                data={"type": "REVERSAL", "amount": 0}
+            await tx.wallettransaction.create(
+                data={
+                    "user": {"connect": {"id": user.id}},
+                    "amount": wallet_used,
+                    "reference_code": "WALLET_REVERSAL",
+                    "type": "REVERSAL",
+                    "reference_id": cart.cart_number,
+                }
             )
-            await tx.cart.update(where={"id": cart.id}, data={"wallet_used": 0.0, "payment_method": None})
+            data = {"wallet_used": 0}
+            if cart.payment_method == "WALLET":
+                data["payment_method"] = None
+            await tx.cart.update(where={"id": cart.id}, data=data)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to remove wallet: {e}")
 
-    from app.services.cart import calculate_cart_totals
-    cart_summary = await calculate_cart_totals(cart)
-
+    await calculate_cart_totals(cart)
     await invalidate_pattern("user")
 
     return Message(message="Wallet removed successfully")

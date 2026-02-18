@@ -27,10 +27,16 @@ const OrderSummary: React.FC<{ order: Order }> = ({ order }) => {
                     <span className="text-muted-foreground">Tax</span>
                     <span className="font-semibold">{currency(order.tax)}</span>
                 </div>
-                {typeof order.discount_amount === "number" && order.discount_amount > 0 && (
+                {order.discount_amount > 0 && (
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">Discount</span>
                         <span className="font-semibold text-green-600">-{currency(order.discount_amount)}</span>
+                    </div>
+                )}
+                {order.wallet_used > 0 && (
+                    <div className="flex justify-between">
+                        <span className="text-muted-foreground">Wallet Used</span>
+                        <span className="font-semibold text-green-600">-{currency(order.wallet_used)}</span>
                     </div>
                 )}
                 <Separator />

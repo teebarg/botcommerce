@@ -13,7 +13,7 @@ const SummaryMobile = ({ cart }: SummaryProps) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     if (!cart) return;
-    const { shipping_fee, discount_amount, subtotal, tax, total } = cart;
+    const { shipping_fee, discount_amount, subtotal, tax, total, wallet_used } = cart;
 
     const toggleSummary = () => {
         setIsExpanded(!isExpanded);
@@ -45,11 +45,19 @@ const SummaryMobile = ({ cart }: SummaryProps) => {
                     <p>Taxes</p>
                     <p>{currency(tax)}</p>
                 </div>
-                {!!discount_amount && (
+                {discount_amount > 0 && (
                     <div className="flex items-center justify-between text-sm font-medium">
                         <p>Discount</p>
                         <p className="text-rose-500" data-testid="cart-discount" data-value={discount_amount || 0}>
                             - {currency(discount_amount)}
+                        </p>
+                    </div>
+                )}
+                {wallet_used > 0 && (
+                    <div className="flex items-center justify-between text-sm font-medium">
+                        <p>Wallet Used</p>
+                        <p className="text-rose-500" data-testid="cart-wallet_used" data-value={wallet_used || 0}>
+                            - {currency(wallet_used)}
                         </p>
                     </div>
                 )}

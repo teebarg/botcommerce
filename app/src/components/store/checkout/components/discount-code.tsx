@@ -72,10 +72,10 @@ const DiscountCode: React.FC = () => {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="flex items-center justify-between p-4 gap-4 text-sm mt-2 w-fit border-emerald-800 border rounded-xl"
+                        className="flex items-center justify-between p-4 gap-4 text-sm mt-2 w-fit border-primary border rounded-xl"
                     >
                         <div className="flex items-center gap-3">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-800">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary">
                                 <Check className="h-4 w-4 text-white" />
                             </div>
                             <div>

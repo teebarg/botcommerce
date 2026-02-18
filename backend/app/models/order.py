@@ -32,22 +32,18 @@ class Order(BaseModel):
     order_number: str
     user_id: int
     user: Optional[User]
-    # billing_address: Optional[Address]
     shipping_address: Optional[Address]
     total: float
     subtotal: float
     tax: float
-    discount_amount: float
+    discount_amount: float = 0
     wallet_used: Optional[float] = 0
     status: OrderStatus
     payment_status: PaymentStatus
     shipping_method: ShippingMethod
-    # payment: Optional[Payment]
     payment_method: PaymentMethod
     shipping_fee: float
-    # coupon_id: Optional[int]
     coupon_code: Optional[str] = None
-    # cart_id: Optional[int]
     order_items: Optional[list[OrderItemLite]]
     order_notes: Optional[str] = None
     invoice_url: Optional[str] = None

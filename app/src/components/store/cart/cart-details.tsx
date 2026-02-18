@@ -43,23 +43,39 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
                 <>
                     <ScrollArea className="flex-1 px-6">
                         <div className="space-y-4 py-4">
-                            {cart?.items?.map((item, index) => (
-                                <div className="p-3 rounded-2xl bg-secondary/50">
+                            {cart?.items?.map((item, index: number) => (
+                                <div key={index} className="p-3 rounded-2xl bg-secondary/50">
                                     <CartItemComponent key={index} item={item} />
                                 </div>
                             ))}
                         </div>
                     </ScrollArea>
                     {cart?.items && cart?.items?.length > 0 && (
-                        <div className="px-6 pt-4 border-t border-border space-y-4">
+                        <div className="px-6 pt-4 border-t border-border space-y-2">
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Subtotal</span>
                                 <span className="font-medium">{currency(cart?.subtotal || 0)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Tax</span>
+                                <span className="font-medium">{currency(cart?.tax)}</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Shipping</span>
                                 <span className="font-medium text-primary">{shippingFee === 0 ? "Free" : `${currency(shippingFee || 0)}`}</span>
                             </div>
+                            {cart?.discount_amount > 0 && (
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">Discount</span>
+                                    <span className="font-medium text-primary">-{currency(cart?.discount_amount)}</span>
+                                </div>
+                            )}
+                            {cart?.wallet_used > 0 && (
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">Wallet Used</span>
+                                    <span className="font-medium text-primary">-{currency(cart?.wallet_used)}</span>
+                                </div>
+                            )}
                             <Separator />
                             <div className="flex justify-between text-lg font-bold">
                                 <span>Total</span>

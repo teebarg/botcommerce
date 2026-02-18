@@ -11,6 +11,7 @@ import DiscountCode from "./discount-code";
 import CartContactForm from "../contact";
 import { ZeroPayment } from "../../payment/zero-payment";
 import { motion } from "framer-motion";
+import WalletDeduction from "./wallet-deduction";
 
 const payMethods: { id: string; provider_id: PaymentMethod }[] = [
     { id: "pickup", provider_id: "CASH_ON_DELIVERY" },
@@ -35,7 +36,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
     };
 
     return (
-        <div className="flex-1 overflow-y-auto pb-4">
+        <div className="flex-1 overflow-y-auto">
             <div className="space-y-6 px-4">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
                     <h2 className="text-2xl font-bold mb-2">Payment Details</h2>
@@ -43,6 +44,8 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                 </motion.div>
 
                 <DiscountCode />
+
+                <WalletDeduction cart={cart!} />
 
                 <CartContactForm />
 
@@ -52,7 +55,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                             <ZeroPayment />
                         ) : (
                             <RadioGroupWithLabel
-                                className="grid grid-cols-1 md:grid-cols-3 gap-2"
+                                className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4"
                                 label="Payment Method"
                                 value={cart?.payment_method || ""}
                                 onValueChange={(value: string) => {

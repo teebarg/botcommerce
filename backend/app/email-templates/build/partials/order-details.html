@@ -171,7 +171,6 @@
                 </tr>
                 {% endif %}
 
-                <!-- Discount Row (if exists) -->
                 {% if order.discount_amount %}
                 <tr>
                     <td style="padding-bottom: 5px;">
@@ -184,6 +183,25 @@
                                 <td align="right"
                                     style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 14px; color: green;">
                                     - {{ order.discount_amount | naira }}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                {% endif %}
+
+                {% if order.wallet_used %}
+                <tr>
+                    <td style="padding-bottom: 5px;">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td align="left"
+                                    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #111827;">
+                                    Wallet Used:
+                                </td>
+                                <td align="right"
+                                    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 14px; color: green;">
+                                    - {{ order.wallet_used | naira }}
                                 </td>
                             </tr>
                         </table>

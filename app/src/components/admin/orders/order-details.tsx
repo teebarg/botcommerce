@@ -141,12 +141,20 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                 <p>Tax</p>
                                 <p className="font-semibold">{currency(order.tax)}</p>
                             </div>
-                            {typeof order.discount_amount === "number" && order.discount_amount > 0 && (
+                            {order.discount_amount > 0 && (
                                 <div className="flex justify-between text-sm font-medium">
                                     <p>Discount</p>
-                                    <p className="font-semibold text-green-600">
+                                    <p className="font-semibold text-primary">
                                         -{currency(order.discount_amount)}
                                         {order.coupon && ` (${order.coupon.code})`}
+                                    </p>
+                                </div>
+                            )}
+                            {order.wallet_used > 0 && (
+                                <div className="flex justify-between text-sm font-medium">
+                                    <p>Wallet</p>
+                                    <p className="font-semibold text-primary">
+                                        -{currency(order.wallet_used)}
                                     </p>
                                 </div>
                             )}

@@ -1,4 +1,4 @@
-import { MapPin, Package, User } from "lucide-react";
+import { Gift, MapPin, Package, User } from "lucide-react";
 import LocalizedClientLink from "@/components/ui/link";
 import { useInvalidateMe } from "@/hooks/useUser";
 
@@ -35,6 +35,12 @@ const AccountNav = () => {
             icon: <Package className="h-8 w-8" />,
             label: "Orders",
             dataTestid: "orders-link",
+        },
+        {
+            href: "/account/referrals",
+            icon: <Gift className="h-6 w-6" />,
+            label: "Referrals",
+            dataTestid: "referrals-link",
         },
     ];
 

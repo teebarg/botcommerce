@@ -27,19 +27,19 @@ class User(UserBase):
 
 class UserSelf(User):
     email: EmailStr
-    wallet_balance: Optional[float] = None
+    wallet_balance: Optional[float] = 0
     created_at: datetime
 
 class UserAdmin(User):
     email: EmailStr
     created_at: datetime
     updated_at: datetime
-    wallet_balance: Optional[float] = None
+    wallet_balance: Optional[float] = 0
 
 class UserInternal(UserBase):
     id: int
     email: EmailStr
     hashed_password: str
-    wallet_balance: Optional[float] = None
+    wallet_balance: Optional[float] = 0
     created_at: datetime
     updated_at: datetime

@@ -13,7 +13,7 @@ const CartTotals: React.FC = () => {
 
     if (!cart) return null;
 
-    const { discount_amount, tax, total, subtotal } = cart;
+    const { discount_amount, tax, total, wallet_used, subtotal } = cart;
 
     return (
         <>
@@ -40,10 +40,10 @@ const CartTotals: React.FC = () => {
                         </dd>
                     </div>
                     <div className="flex justify-between">
-                        <dt className="text-sm text-muted-foreground">Delivery</dt>
+                        <dt className="text-sm text-muted-foreground">Shipping</dt>
                         <dd className="text-sm font-semibold">
                             <span data-testid="cart-shipping" data-value={cart.shipping_fee || 0}>
-                                {currency(cart.shipping_fee)}
+                                {cart.shipping_fee === 0 ? "Free" : `${currency(cart.shipping_fee || 0)}`}
                             </span>
                         </dd>
                     </div>
@@ -55,12 +55,22 @@ const CartTotals: React.FC = () => {
                             </span>
                         </dd>
                     </div>
-                    {!!discount_amount && (
+                    {discount_amount > 0 && (
                         <div className="flex justify-between">
                             <dt className="text-sm text-muted-foreground">Discount</dt>
                             <dd className="text-sm font-semibold">
-                                <span className="text-emerald-600" data-testid="cart-discount" data-value={discount_amount || 0}>
+                                <span className="text-primary" data-testid="cart-discount" data-value={discount_amount || 0}>
                                     - {currency(discount_amount)}
+                                </span>
+                            </dd>
+                        </div>
+                    )}
+                    {wallet_used > 0 && (
+                        <div className="flex justify-between">
+                            <dt className="text-sm text-muted-foreground">Wallet Used</dt>
+                            <dd className="text-sm font-semibold">
+                                <span className="text-primary" data-testid="cart-wallet_used" data-value={wallet_used}>
+                                    -{currency(wallet_used)}
                                 </span>
                             </dd>
                         </div>

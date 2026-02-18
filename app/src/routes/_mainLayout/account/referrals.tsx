@@ -1,21 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { meQuery } from "@/queries/user.queries";
+import { meQuery, meTxnsQuery } from "@/queries/user.queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Check, Copy, Gift, Share2, Wallet } from "lucide-react";
+import { ArrowDownLeft, Check, Copy, Gift, Share2, ShoppingBag, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
-import { currency } from "@/utils";
+import { cn, currency, formatDate } from "@/utils";
 
 export const Route = createFileRoute("/_mainLayout/account/referrals")({
     loader: async ({ context: { queryClient } }) => {
         await queryClient.ensureQueryData(meQuery());
+        await queryClient.ensureQueryData(meTxnsQuery());
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
     const { data: me } = useSuspenseQuery(meQuery());
+    const { data } = useSuspenseQuery(meTxnsQuery());
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async () => {
@@ -91,9 +93,52 @@ function RouteComponent() {
                     <div className="w-10 h-10 mx-auto rounded-xl bg-gradient-to-br flex items-center justify-center mb-2 from-primary to-accent">
                         <Wallet className="w-5 h-5 text-white" />
                     </div>
-                    <p className="text-xl font-bold">{currency(me.wallet_balance!)}</p>
+                    <p className="text-xl font-bold">{currency(me.wallet_balance)}</p>
                     <p className="text-xs text-muted-foreground">Wallet Balance</p>
                 </motion.div>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold">Wallet Transactions</h3>
+                    <span className="text-xs text-muted-foreground">{data.txns.length} transactions</span>
+                </div>
+                <div className="space-y-2">
+                    {data.txns.map((txn, i) => {
+                        const isCredit = txn.type === "CASHBACK" || txn.type === "REVERSAL";
+                        const TxnIcon = isCredit ? ArrowDownLeft : ShoppingBag;
+                        return (
+                            <motion.div
+                                key={txn.id}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.25 + i * 0.04 }}
+                                className="bg-card rounded-2xl p-4 border border-border flex items-center gap-3"
+                            >
+                                <div
+                                    className={cn(
+                                        "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
+                                        isCredit ? "bg-emerald-100 text-emerald-800" : "bg-destructive/10 text-destructive"
+                                    )}
+                                >
+                                    <TxnIcon className="w-5 h-5" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className={cn("font-medium text-sm")}>{txn.type}</p>
+                                    <p className="text-xs text-muted-foreground truncate">{txn.reference_code}</p>
+                                    {txn.reference_id && <p className="text-xs text-muted-foreground truncate">({txn.reference_id})</p>}
+                                </div>
+                                <div className="text-right shrink-0">
+                                    <p className={cn("font-semibold text-sm tabular-nums", isCredit ? "text-emerald-600" : "text-destructive")}>
+                                        {isCredit ? "+" : ""}
+                                        {currency(txn.amount)}
+                                    </p>
+                                    <p className="text-[10px] text-muted-foreground">{formatDate(txn.created_at)}</p>
+                                </div>
+                            </motion.div>
+                        );
+                    })}
+                </div>
             </motion.div>
 
             <motion.div

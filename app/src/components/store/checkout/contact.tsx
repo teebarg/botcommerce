@@ -26,7 +26,7 @@ const CartContactForm = () => {
     const form = useForm<ContactFormValues>({
         resolver: zodResolver(ContactFormSchema),
         defaultValues: {
-            phone: cart?.phone,
+            phone: cart?.phone || "",
         },
     });
 

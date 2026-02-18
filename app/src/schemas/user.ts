@@ -3,7 +3,7 @@ import { z } from "zod";
 import { AddressSchema } from "./address";
 import { AuditSchema } from "./base";
 
-import { PagSchema } from "./index";
+import { CursorSchema, PagSchema } from "./index";
 
 export const UserLiteSchema = z.object({
     id: z.number(),
@@ -15,7 +15,7 @@ export const UserLiteSchema = z.object({
     image: z.string().optional(),
 });
 
-export const WalletTrnxLiteSchema = z.object({
+export const WalletTxnsLiteSchema = z.object({
     id: z.string(),
     amount: z.number(),
     type: z.enum(["CASHBACK", "WITHDRAWAL", "ADJUSTMENT", "REVERSAL"]),
@@ -24,7 +24,7 @@ export const WalletTrnxLiteSchema = z.object({
     created_at: z.string(),
 });
 
-export const WalletTrnxSchema = z.object({
+export const WalletTxnsSchema = z.object({
     id: z.string(),
     user_id: z.number(),
     user: UserLiteSchema,
@@ -33,6 +33,10 @@ export const WalletTrnxSchema = z.object({
     reference_id: z.string().optional(),
     reference_code: z.string().optional(),
     created_at: z.string(),
+});
+
+export const PaginatedWalletTxnsSchema = CursorSchema.extend({
+    txns: z.array(WalletTxnsSchema),
 });
 
 export const UserSchema = z
@@ -47,10 +51,9 @@ export const UserSchema = z
         image: z.string().optional(),
         role: z.enum(["ADMIN", "CUSTOMER"]),
         referral_code: z.string().optional(),
-        wallet_balance: z.number().optional(),
+        wallet_balance: z.number(),
         addresses: z.array(AddressSchema).optional(),
         orders: z.array(z.any()).optional(),
-        walletTxns: z.array(WalletTrnxLiteSchema).optional(),
     })
     .merge(AuditSchema);
 
@@ -88,14 +91,8 @@ export const UserSessionSchema = z.object({
     impersonatedBy: z.string().optional(),
 });
 
-export const PaginatedWalletTransactionsSchema = z.object({
-    data: z.array(WalletTrnxSchema),
-    next_cursor: z.string().optional(),
-    limit: z.number(),
-});
-
-export type WalletTrnx = z.infer<typeof WalletTrnxSchema>;
-export type PaginatedWalletTrnx = z.infer<typeof PaginatedWalletTransactionsSchema>;
+export type WalletTxns = z.infer<typeof WalletTxnsSchema>;
+export type PaginatedWalletTxns = z.infer<typeof PaginatedWalletTxnsSchema>;
 export type User = z.infer<typeof UserSchema>;
 export type PaginatedUser = z.infer<typeof PaginatedUserSchema>;
 export type Session = z.infer<typeof SessionSchema>;

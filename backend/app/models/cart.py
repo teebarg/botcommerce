@@ -52,13 +52,12 @@ class CartItemBase(BaseModel):
     slug: Optional[str]
     image: Optional[str]
 
-class CartItemResponse(CartItemBase):
+class CartItem(CartItemBase):
     id: int
     cart_id: int
     cart_number: str
     variant: Optional[ProductVariant]
     created_at: datetime
-    updated_at: datetime
 
 class Cart(BaseModel):
     id: int
@@ -68,7 +67,7 @@ class Cart(BaseModel):
     email: Optional[str]
     phone: Optional[str]
     status: Optional[CartStatus]
-    items: Optional[list[CartItemResponse]] = []
+    items: Optional[list[CartItem]] = []
     payment_method: Optional[PaymentMethod] = None
     shipping_method: Optional[ShippingMethod]
     shipping_address_id: Optional[int] = None

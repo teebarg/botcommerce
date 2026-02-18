@@ -38,10 +38,10 @@ const OrderItemComponent: React.FC<{ item: OrderItem }> = ({ item }) => {
                 )}
 
                 <div className="flex items-center gap-2 mb-2">
-                    <span>{item.quantity}x</span> <span className="font-semibold text-foreground text-sm">{currency(Number(item.price) || 0)}</span>
+                    <span>{item.quantity}x</span> <span className="font-semibold text-muted-foreground text-sm">{currency(Number(item.price) || 0)}</span>
                 </div>
 
-                <p className="text-lg font-semibold text-muted-foreground mt-1">Subtotal: {currency((Number(item.price) || 0) * item.quantity)}</p>
+                <p className="font-semibold mt-1">Subtotal: {currency((Number(item.price) || 0) * item.quantity)}</p>
             </div>
         </div>
     );

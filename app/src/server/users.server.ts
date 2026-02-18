@@ -1,7 +1,7 @@
 import { api } from "@/utils/fetch-api";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { PaginatedUser, ProductSearch, User, Wishlist } from "@/schemas";
+import type { PaginatedUser, PaginatedWalletTxns, ProductSearch, User, Wishlist } from "@/schemas";
 
 export const UserSearchSchema = z.object({
     query: z.string().optional(),
@@ -39,3 +39,7 @@ export const getRecentlyViewedFn = createServerFn({ method: "GET" })
             params: { limit: limit || 12 },
         });
     });
+
+export const getMeTrxnFn = createServerFn().handler(async () => {
+    return await api.get<PaginatedWalletTxns>("/wallet/me");
+});

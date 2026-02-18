@@ -75,7 +75,7 @@ async def test_signup(request: Request):
 
     existing_order = await prisma.order.find_first(
         where={
-            "order_number": "ORD018F4771",
+            "order_number": "ORD4395C971",
         }
     )
 

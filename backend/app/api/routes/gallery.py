@@ -154,10 +154,10 @@ async def image_gallery(
 
         images = await db.productimage.find_many(
             where=where_clause,
-            take=limit,
+            take=limit + 1,
             skip=1 if cursor else 0,
             cursor={"id": cursor} if cursor else None,
-            order={"id": "desc"},
+            order={"created_at": "desc"},
             include={
                 "product": {
                     "include": {
@@ -170,10 +170,12 @@ async def image_gallery(
                 }
             },
         )
+        items = images[:limit]
 
         return {
             "images": images,
-            "next_cursor": images[-1].id if images else None,
+            "next_cursor": items[-1].id if len(images) > limit else None,
+            "limit": limit
         }
 
     except Exception as e:

@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { getIndexCategoriesProductsFn, getIndexProductsFn, getProductFn, getProductsFeedFn } from "@/server/product.server";
 import { getCatalogFn } from "@/server/catalog.server";
-import { getMeFn } from "@/server/users.server";
+import { getMeFn, getMeTrxnFn } from "@/server/users.server";
 import { getOrderFn, getOrdersFn } from "@/server/order.server";
 import { getUserAddressesFn } from "@/server/address.server";
 import { getCollectionFn } from "@/server/collections.server";
@@ -29,6 +29,12 @@ export const meQuery = () =>
     queryOptions({
         queryKey: ["user", "me"],
         queryFn: () => getMeFn(),
+    });
+
+export const meTxnsQuery = () =>
+    queryOptions({
+        queryKey: ["wallet"],
+        queryFn: () => getMeTrxnFn(),
     });
 
 export const indexProductQuery = () =>

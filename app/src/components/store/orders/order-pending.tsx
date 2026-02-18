@@ -63,7 +63,7 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
 
             {order?.payment_method === "BANK_TRANSFER" && (
                 <FadeInComponent delay="200ms">
-                    <div className="mb-8 p-6 bg-contrast/10 rounded-2xl">
+                    <div className="mb-8 p-4 bg-contrast/10 rounded-2xl">
                         <div className="flex items-center justify-center gap-2 mb-4">
                             <AlertCircle className="w-6 h-6 text-contrast" />
                             <span className="font-semibold">Payment Pending</span>

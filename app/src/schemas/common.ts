@@ -7,6 +7,11 @@ export const TokenSchema = z.object({
     token_type: z.string().default("bearer"),
 });
 
+export const CursorSchema = z.object({
+    next_cursor: z.string().optional(),
+    limit: z.number(),
+});
+
 export const PagSchema = z.object({
     skip: z.number(),
     limit: z.number(),

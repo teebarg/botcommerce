@@ -99,7 +99,7 @@ const OrderDetails = ({ order }: OrderDetailsProps) => {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">Payment Summary</CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-3">
+                        <CardContent className="space-y-2">
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Subtotal</span>
                                 <span className="text-foreground">{currency(order.subtotal)}</span>
@@ -112,10 +112,16 @@ const OrderDetails = ({ order }: OrderDetailsProps) => {
                                 <span className="text-muted-foreground">Tax</span>
                                 <span className="text-foreground">{currency(order.tax)}</span>
                             </div>
-                            {typeof order.discount_amount === "number" && order.discount_amount > 0 && (
+                            {order.discount_amount > 0 && (
                                 <div className="flex justify-between text-sm">
                                     <span className="text-muted-foreground">Discount</span>
-                                    <span className="font-semibold text-green-600">-{currency(order.discount_amount)}</span>
+                                    <span className="font-semibold text-primary">-{currency(order.discount_amount)}</span>
+                                </div>
+                            )}
+                            {order.wallet_used > 0 && (
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">Wallet Used</span>
+                                    <span className="font-semibold text-primary">-{currency(order.wallet_used)}</span>
                                 </div>
                             )}
                             <Separator />

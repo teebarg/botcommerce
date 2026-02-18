@@ -105,7 +105,7 @@ class CouponService:
         Calculate discount amount based on coupon type and cart subtotal.
         """
         if coupon.discount_type == DiscountType.PERCENTAGE:
-            discount = cart_subtotal * (coupon.discount_value / 100)
+            discount: float = cart_subtotal * (coupon.discount_value / 100)
             return min(discount, cart_subtotal)
         else:
             return min(coupon.discount_value, cart_subtotal)
@@ -119,12 +119,15 @@ class CouponService:
         Apply coupon to cart and update totals.
         """
         discount_amount: float = await self.calculate_discount(coupon, cart.subtotal)
-        total = cart.subtotal + cart.tax + cart.shipping_fee - discount_amount
+        wallet_used = 0
+        if cart.wallet_used > 0:
+            wallet_used: float = cart.wallet_used
+        total: float = cart.subtotal + cart.tax + cart.shipping_fee - discount_amount - wallet_used
         data: dict[str, float] = {
             "coupon_id": coupon.id,
             "coupon_code": coupon.code,
             "discount_amount": discount_amount,
-            "total": total,
+            "total": max(total, 0),
         }
         if total < 1:
             data["payment_method"] = "COUPON"
@@ -137,14 +140,17 @@ class CouponService:
         """
         Remove coupon from cart and recalculate totals.
         """
-        updated_cart = await db.cart.update(
-            where={"id": cart.id},
-            data={
-                "coupon_id": None,
-                "discount_amount": 0.0,
-                "total": cart.subtotal + cart.tax + cart.shipping_fee
-            }
-        )
+        wallet_used = 0
+        if cart.wallet_used > 0:
+            wallet_used: float = cart.wallet_used
+        data={
+            "coupon_id": None,
+            "discount_amount": 0.0,
+            "total": cart.subtotal + cart.tax + cart.shipping_fee - wallet_used
+        }
+        if cart.payment_method == "COUPON":
+            data["payment_method"] = None
+        updated_cart = await db.cart.update(where={"id": cart.id}, data=data)
 
         return updated_cart
 
