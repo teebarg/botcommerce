@@ -1,4 +1,4 @@
-from typing import Optional, Literal
+from typing import Optional, Literal, List
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, Field
 
@@ -43,3 +43,8 @@ class UserInternal(UserBase):
     wallet_balance: Optional[float] = 0
     created_at: datetime
     updated_at: datetime
+
+class PaginatedUsers(BaseModel):
+    items: List[UserAdmin]
+    next_cursor: str | int | None
+    limit: int
