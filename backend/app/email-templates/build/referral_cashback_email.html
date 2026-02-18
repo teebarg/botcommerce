@@ -1,545 +1,4 @@
-<!-- <!doctype html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>You've Earned Cashback!</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap"
-        rel="stylesheet" />
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #0d0d0d;
-            font-family: "DM Sans", sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .email-wrapper {
-            max-width: 620px;
-            margin: 0 auto;
-            background: #0d0d0d;
-        }
-
-        /* ── HEADER ── */
-        .header {
-            background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
-            padding: 48px 48px 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: "";
-            position: absolute;
-            top: -80px;
-            right: -80px;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle,
-                    rgba(212, 175, 55, 0.18) 0%,
-                    transparent 70%);
-            border-radius: 50%;
-        }
-
-        .header::after {
-            content: "";
-            position: absolute;
-            bottom: 30px;
-            left: -60px;
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle,
-                    rgba(212, 175, 55, 0.08) 0%,
-                    transparent 70%);
-            border-radius: 50%;
-        }
-
-        .logo {
-            font-family: "Playfair Display", serif;
-            font-size: 22px;
-            font-weight: 900;
-            color: #d4af37;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            position: relative;
-            z-index: 1;
-        }
-
-        .logo span {
-            color: #fff;
-        }
-
-        /* ── HERO ── */
-        .hero {
-            background: #1a1a1a;
-            margin: 0 48px;
-            border-radius: 24px;
-            padding: 52px 40px 44px;
-            position: relative;
-            overflow: hidden;
-            margin-top: 36px;
-        }
-
-        .hero::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(ellipse at 80% 20%,
-                    rgba(212, 175, 55, 0.12) 0%,
-                    transparent 60%),
-                radial-gradient(ellipse at 10% 80%,
-                    rgba(212, 175, 55, 0.06) 0%,
-                    transparent 50%);
-        }
-
-        .confetti-row {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 28px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-
-        .dot-gold {
-            background: #d4af37;
-        }
-
-        .dot-white {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .dot-sm {
-            width: 5px;
-            height: 5px;
-            margin-top: 2px;
-        }
-
-        .eyebrow {
-            font-size: 11px;
-            font-weight: 500;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: #d4af37;
-            margin-bottom: 14px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero-heading {
-            font-family: "Playfair Display", serif;
-            font-size: 42px;
-            font-weight: 900;
-            line-height: 1.1;
-            color: #ffffff;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero-heading em {
-            font-style: normal;
-            color: #d4af37;
-        }
-
-        .hero-subtext {
-            font-size: 15px;
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 300;
-            line-height: 1.6;
-            margin-top: 14px;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* ── CASHBACK CARD ── */
-        .cashback-card {
-            background: linear-gradient(135deg,
-                    #d4af37 0%,
-                    #f0d060 50%,
-                    #c9a227 100%);
-            border-radius: 20px;
-            padding: 36px 36px 32px;
-            margin: 36px 48px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cashback-card::before {
-            content: "₿";
-            position: absolute;
-            right: -10px;
-            top: -20px;
-            font-size: 140px;
-            color: rgba(0, 0, 0, 0.06);
-            font-weight: 900;
-            line-height: 1;
-        }
-
-        .cashback-label {
-            font-size: 11px;
-            font-weight: 500;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: rgba(0, 0, 0, 0.5);
-            margin-bottom: 8px;
-        }
-
-        .cashback-amount {
-            font-family: "Playfair Display", serif;
-            font-size: 68px;
-            font-weight: 900;
-            color: #0d0d0d;
-            line-height: 1;
-            letter-spacing: -2px;
-        }
-
-        .cashback-amount sup {
-            font-size: 32px;
-            vertical-align: super;
-            letter-spacing: 0;
-        }
-
-        .cashback-meta {
-            font-size: 13px;
-            color: rgba(0, 0, 0, 0.55);
-            margin-top: 10px;
-            font-weight: 400;
-        }
-
-        .cashback-meta strong {
-            color: rgba(0, 0, 0, 0.75);
-            font-weight: 500;
-        }
-
-        .card-divider {
-            border: none;
-            border-top: 1px solid rgba(0, 0, 0, 0.12);
-            margin: 22px 0;
-        }
-
-        .cashback-detail-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .detail-item {}
-
-        .detail-item .d-label {
-            font-size: 11px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: rgba(0, 0, 0, 0.45);
-            margin-bottom: 2px;
-        }
-
-        .detail-item .d-value {
-            font-size: 14px;
-            font-weight: 500;
-            color: #0d0d0d;
-        }
-
-        /* ── BODY TEXT ── */
-        .body-section {
-            padding: 0 48px 32px;
-        }
-
-        .body-section p {
-            font-size: 15px;
-            color: rgba(255, 255, 255, 0.55);
-            line-height: 1.75;
-            font-weight: 300;
-        }
-
-        .body-section p strong {
-            color: rgba(255, 255, 255, 0.85);
-            font-weight: 500;
-        }
-
-        /* ── REFERRAL STEPS ── */
-        .steps-section {
-            margin: 0 48px 40px;
-            background: #161616;
-            border-radius: 20px;
-            padding: 32px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-        }
-
-        .steps-title {
-            font-size: 11px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.3);
-            margin-bottom: 24px;
-        }
-
-        .step {
-            display: flex;
-            align-items: flex-start;
-            gap: 18px;
-            margin-bottom: 22px;
-        }
-
-        .step:last-child {
-            margin-bottom: 0;
-        }
-
-        .step-num {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 1px solid rgba(212, 175, 55, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 500;
-            color: #d4af37;
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-
-        .step-content {}
-
-        .step-content .s-title {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.85);
-            font-weight: 500;
-            margin-bottom: 3px;
-        }
-
-        .step-content .s-desc {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.35);
-            font-weight: 300;
-            line-height: 1.5;
-        }
-
-        /* ── CTA ── */
-        .cta-section {
-            padding: 0 48px 48px;
-            text-align: center;
-        }
-
-        .cta-btn {
-            display: inline-block;
-            background: linear-gradient(135deg, #d4af37, #f0d060);
-            color: #0d0d0d;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 500;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            padding: 18px 48px;
-            border-radius: 50px;
-            box-shadow: 0 12px 40px rgba(212, 175, 55, 0.3);
-        }
-
-        .cta-note {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.2);
-            margin-top: 18px;
-            font-weight: 300;
-        }
-
-        /* ── DIVIDER ── */
-        .section-divider {
-            margin: 0 48px 36px;
-            height: 1px;
-            background: linear-gradient(to right,
-                    transparent,
-                    rgba(255, 255, 255, 0.08),
-                    transparent);
-        }
-
-        /* ── FOOTER ── */
-        .footer {
-            background: #0a0a0a;
-            padding: 40px 48px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .footer-logo {
-            font-family: "Playfair Display", serif;
-            font-size: 14px;
-            font-weight: 700;
-            color: rgba(212, 175, 55, 0.6);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 16px;
-        }
-
-        .footer p {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.2);
-            line-height: 1.7;
-            font-weight: 300;
-        }
-
-        .footer a {
-            color: rgba(212, 175, 55, 0.5);
-            text-decoration: none;
-        }
-
-        .footer-links {
-            margin-top: 20px;
-            display: flex;
-            gap: 24px;
-        }
-
-        .footer-links a {
-            font-size: 11px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.2);
-            text-decoration: none;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="email-wrapper">
-        <!-- HEADER -->
-        <div class="header">
-            <div class="logo">Shop<span>Vault</span></div>
-        </div>
-
-        <!-- HERO -->
-        <div style="background: #0d0d0d; padding: 0 0 0 0">
-            <div class="hero">
-                <div class="confetti-row">
-                    <div class="dot dot-gold"></div>
-                    <div class="dot dot-white"></div>
-                    <div class="dot dot-gold dot-sm"></div>
-                    <div class="dot dot-white dot-sm"></div>
-                    <div class="dot dot-gold"></div>
-                </div>
-                <div class="eyebrow">Referral Reward</div>
-                <div class="hero-heading">
-                    Your friend<br />just made you<br /><em>richer.</em>
-                </div>
-                <p class="hero-subtext">
-                    Your referral link did the work — now your cashback is on its way.
-                </p>
-            </div>
-        </div>
-
-        <!-- CASHBACK CARD -->
-        <div class="cashback-card">
-            <div class="cashback-label">Cashback Earned</div>
-            <div class="cashback-amount">{{ cash_back | naira }}</div>
-            <div class="cashback-meta">
-                Added to your wallet · <strong>Available immediately</strong>
-            </div>
-            <hr class="card-divider" />
-            <div class="cashback-detail-row">
-                <div class="detail-item">
-                    <div class="d-label">Referred by you</div>
-                    <div class="d-value">{{ referral }}</div>
-                </div>
-                <div class="detail-item" style="text-align: center">
-                    <div class="d-label">Date</div>
-                    <div class="d-value">{{ created_at | date }}</div>
-                </div>
-                <div class="detail-item" style="text-align: right">
-                    <div class="d-label">Order Value</div>
-                    <div class="d-value">{{ order_value | naira }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- BODY TEXT -->
-        <div class="body-section">
-            <p>
-                Hey <strong>{{ referral }}</strong>, great news — your friend
-                <strong>{{ referred }}</strong> just completed their first purchase
-                using your referral link. As a thank you,
-                <strong>{{ cash_back | naira }} in cashback</strong> has been added
-                directly to your {{ project_name }} wallet and is ready to use on your next
-                order.
-            </p>
-        </div>
-
-        <div class="section-divider"></div>
-
-        <!-- STEPS -->
-        <div class="steps-section">
-            <div class="steps-title">How to use your cashback</div>
-            <div class="step">
-                <div class="step-num">1</div>
-                <div class="step-content">
-                    <div class="s-title">Head to your wallet</div>
-                    <div class="s-desc">
-                        Visit your account dashboard and go to the Wallet section to see
-                        your balance.
-                    </div>
-                </div>
-            </div>
-            <div class="step">
-                <div class="step-num">2</div>
-                <div class="step-content">
-                    <div class="s-title">Apply at checkout</div>
-                    <div class="s-desc">
-                        Select "Use Wallet Balance" at checkout — it's automatically
-                        applied to your order total.
-                    </div>
-                </div>
-            </div>
-            <div class="step">
-                <div class="step-num">3</div>
-                <div class="step-content">
-                    <div class="s-title">Keep referring, keep earning</div>
-                    <div class="s-desc">
-                        Share your referral link again — every new friend who shops earns
-                        you more.
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- CTA -->
-        <div class="cta-section">
-            <a href="#" class="cta-btn">View My Wallet</a>
-            <p class="cta-note">
-                Cashback is valid for 12 months from date of issue
-            </p>
-        </div>
-
-        <!-- FOOTER -->
-        <div class="footer">
-            <div class="footer-logo">{{ project_name }}</div>
-            <p>
-                You're receiving this email because you have a {{ project_name }} account and
-                earned a referral reward. Questions? Contact us at
-                <a href="mailto:{{ support_email }}">{{ support_email }}</a>
-            </p>
-            <div class="footer-links">
-                <a href="#">Unsubscribe</a>
-                <a href="#">Privacy</a>
-                <a href="#">Terms</a>
-            </div>
-        </div>
-    </div>
-</body>
-
-</html>
-
-<!DOCTYPE html
-    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 
 <head>
@@ -639,16 +98,14 @@
     <!-- ════════════════════════════════════════════════ -->
     <!-- FULL-WIDTH OUTER WRAPPER                        -->
     <!-- ════════════════════════════════════════════════ -->
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
-        style="background-color:#f0f0f0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f0f0f0;">
         <tr>
             <td align="center" style="padding:32px 12px;">
 
                 <!-- ════════════════════════════════════════ -->
                 <!-- EMAIL SHELL — 600px                      -->
                 <!-- ════════════════════════════════════════ -->
-                <table class="email-container" role="presentation" cellpadding="0" cellspacing="0" border="0"
-                    width="600"
+                <table class="email-container" role="presentation" cellpadding="0" cellspacing="0" border="0" width="600"
                     style="max-width:600px;width:100%;background-color:#ffffff;border-radius:16px;overflow:hidden;">
 
                     <!-- ─────────────────────────────────────── -->
@@ -662,10 +119,10 @@
                                         <!-- Logo pill -->
                                         <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                                             <tr>
-                                                <td
-                                                    style="background-color:#0a7aff;border-radius:8px;padding:8px 16px;line-height:1;">
+                                                <td style="background-color:#0a7aff;border-radius:8px;padding:8px 16px;line-height:1;">
                                                     <span
-                                                        style="font-family:Inter,Arial,sans-serif;font-size:15px;font-weight:700;color:#ffffff;display:block;letter-spacing:-0.2px;">{{ project_name }}</span>
+                                                        style="font-family:Inter,Arial,sans-serif;font-size:15px;font-weight:700;color:#ffffff;display:block;letter-spacing:-0.2px;">{{
+                                                        project_name }}</span>
                                                 </td>
                                             </tr>
                                         </table>
@@ -692,8 +149,7 @@
                                     <td style="padding-bottom:18px;">
                                         <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                                             <tr>
-                                                <td
-                                                    style="background-color:rgba(255,255,255,0.18);border-radius:100px;padding:5px 16px;">
+                                                <td style="background-color:rgba(255,255,255,0.18);border-radius:100px;padding:5px 16px;">
                                                     <span
                                                         style="font-family:Inter,Arial,sans-serif;font-size:10px;font-weight:700;color:#ffffff;letter-spacing:2px;text-transform:uppercase;display:block;">Cashback
                                                         Earned</span>
@@ -744,14 +200,11 @@
                                             You earned</p>
                                         <p class="amount-big"
                                             style="font-family:Inter,Arial,sans-serif;font-size:64px;font-weight:700;color:#0d0d0d;line-height:1;letter-spacing:-2px;margin:0 0 6px 0;">
-                                            <span
-                                                style="font-size:30px;letter-spacing:-0.5px;vertical-align:baseline;line-height:1;">$</span>15<span
-                                                style="font-size:28px;letter-spacing:-0.5px;">.00</span>
+                                            {{ cash_back | naira }}
                                         </p>
-                                        <p
-                                            style="font-family:Inter,Arial,sans-serif;font-size:13px;font-weight:400;color:rgba(0,0,0,0.5);margin:0;">
-                                            Added to your wallet &nbsp;&middot;&nbsp; <strong
-                                                style="color:rgba(0,0,0,0.7);font-weight:600;">Available now</strong>
+                                        <p style="font-family:Inter,Arial,sans-serif;font-size:13px;font-weight:400;color:rgba(0,0,0,0.5);margin:0;">
+                                            Added to your wallet &nbsp;&middot;&nbsp; <strong style="color:rgba(0,0,0,0.7);font-weight:600;">Available
+                                                now</strong>
                                         </p>
                                     </td>
                                 </tr>
@@ -759,11 +212,9 @@
                                 <!-- Thin rule -->
                                 <tr>
                                     <td style="padding:0 32px;">
-                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0"
-                                            width="100%">
+                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                                             <tr>
-                                                <td
-                                                    style="border-top:1px solid rgba(0,0,0,0.12);font-size:0;line-height:0;">
+                                                <td style="border-top:1px solid rgba(0,0,0,0.12);font-size:0;line-height:0;">
                                                     &nbsp;</td>
                                             </tr>
                                         </table>
@@ -773,34 +224,28 @@
                                 <!-- 3-col detail row -->
                                 <tr>
                                     <td style="padding:18px 32px 28px;">
-                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0"
-                                            width="100%">
+                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                                             <tr>
                                                 <td class="detail-col" width="34%" style="vertical-align:top;">
                                                     <p
                                                         style="font-family:Inter,Arial,sans-serif;font-size:10px;font-weight:600;color:rgba(0,0,0,0.4);letter-spacing:1.5px;text-transform:uppercase;margin:0 0 4px 0;">
                                                         Referred by you</p>
-                                                    <p
-                                                        style="font-family:Inter,Arial,sans-serif;font-size:14px;font-weight:600;color:#0d0d0d;margin:0;">
-                                                        Alex Johnson</p>
+                                                    <p style="font-family:Inter,Arial,sans-serif;font-size:14px;font-weight:600;color:#0d0d0d;margin:0;">
+                                                        {{ referral }}</p>
                                                 </td>
-                                                <td class="detail-col" width="33%" align="center"
-                                                    style="vertical-align:top;">
+                                                <td class="detail-col" width="33%" align="center" style="vertical-align:top;">
                                                     <p
                                                         style="font-family:Inter,Arial,sans-serif;font-size:10px;font-weight:600;color:rgba(0,0,0,0.4);letter-spacing:1.5px;text-transform:uppercase;margin:0 0 4px 0;">
                                                         Date</p>
-                                                    <p
-                                                        style="font-family:Inter,Arial,sans-serif;font-size:14px;font-weight:600;color:#0d0d0d;margin:0;">
-                                                        Feb 17, 2026</p>
+                                                    <p style="font-family:Inter,Arial,sans-serif;font-size:14px;font-weight:600;color:#0d0d0d;margin:0;">
+                                                        {{ created_at | date }}</p>
                                                 </td>
-                                                <td class="detail-col" width="33%" align="right"
-                                                    style="vertical-align:top;">
+                                                <td class="detail-col" width="33%" align="right" style="vertical-align:top;">
                                                     <p
                                                         style="font-family:Inter,Arial,sans-serif;font-size:10px;font-weight:600;color:rgba(0,0,0,0.4);letter-spacing:1.5px;text-transform:uppercase;margin:0 0 4px 0;">
                                                         Order Value</p>
-                                                    <p
-                                                        style="font-family:Inter,Arial,sans-serif;font-size:14px;font-weight:600;color:#0d0d0d;margin:0;">
-                                                        $149.99</p>
+                                                    <p style="font-family:Inter,Arial,sans-serif;font-size:14px;font-weight:600;color:#0d0d0d;margin:0;">
+                                                        {{ order_value | naira }}</p>
                                                 </td>
                                             </tr>
                                         </table>
@@ -816,13 +261,12 @@
                     <!-- ─────────────────────────────────────── -->
                     <tr>
                         <td style="padding:28px 40px 8px;" class="mobile-pad">
-                            <p
-                                style="font-family:Inter,Arial,sans-serif;font-size:15px;font-weight:400;color:#525252;line-height:1.75;margin:0;">
-                                Hey <strong style="color:#171717;font-weight:600;">Jamie</strong>, your friend
-                                <strong style="color:#171717;font-weight:600;">Alex Johnson</strong> just completed
+                            <p style="font-family:Inter,Arial,sans-serif;font-size:15px;font-weight:400;color:#525252;line-height:1.75;margin:0;">
+                                Hey <strong style="color:#171717;font-weight:600;">{{ referral }}</strong>, your friend
+                                <strong style="color:#171717;font-weight:600;">{{ referred }}</strong> just completed
                                 their first purchase using
                                 your referral link. As a thank-you,
-                                <strong style="color:#0a7aff;font-weight:600;">$15.00 cashback</strong>
+                                <strong style="color:#0a7aff;font-weight:600;">{{ cash_back | naira }} cashback</strong>
                                 has been added to your {{ project_name }} wallet and is ready to use right now.
                             </p>
                         </td>
@@ -848,12 +292,10 @@
                                 <!-- Step 1 -->
                                 <tr>
                                     <td style="padding:0 28px 18px;">
-                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0"
-                                            width="100%">
+                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                                             <tr>
                                                 <td width="36" style="vertical-align:top;padding-top:1px;">
-                                                    <table role="presentation" cellpadding="0" cellspacing="0"
-                                                        border="0">
+                                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                                                         <tr>
                                                             <td width="32" height="32"
                                                                 style="width:32px;height:32px;background-color:#0a7aff;border-radius:50%;text-align:center;vertical-align:middle;">
@@ -880,12 +322,10 @@
                                 <!-- Step 2 -->
                                 <tr>
                                     <td style="padding:0 28px 18px;">
-                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0"
-                                            width="100%">
+                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                                             <tr>
                                                 <td width="36" style="vertical-align:top;padding-top:1px;">
-                                                    <table role="presentation" cellpadding="0" cellspacing="0"
-                                                        border="0">
+                                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                                                         <tr>
                                                             <td width="32" height="32"
                                                                 style="width:32px;height:32px;background-color:#0a7aff;border-radius:50%;text-align:center;vertical-align:middle;">
@@ -912,12 +352,10 @@
                                 <!-- Step 3 -->
                                 <tr>
                                     <td style="padding:0 28px 26px;">
-                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0"
-                                            width="100%">
+                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                                             <tr>
                                                 <td width="36" style="vertical-align:top;padding-top:1px;">
-                                                    <table role="presentation" cellpadding="0" cellspacing="0"
-                                                        border="0">
+                                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                                                         <tr>
                                                             <td width="32" height="32"
                                                                 style="width:32px;height:32px;background-color:#0a7aff;border-radius:50%;text-align:center;vertical-align:middle;">
@@ -957,8 +395,7 @@
                                         <p
                                             style="font-family:Inter,Arial,sans-serif;font-size:10px;font-weight:700;color:#0a7aff;letter-spacing:2px;text-transform:uppercase;margin:0 0 8px 0;">
                                             Your Referral Link</p>
-                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0"
-                                            width="100%"
+                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
                                             style="background-color:#ffffff;border-radius:8px;border:1px solid #d6e5ff;">
                                             <tr>
                                                 <td style="padding:10px 14px;">
@@ -968,8 +405,7 @@
                                                 </td>
                                             </tr>
                                         </table>
-                                        <p
-                                            style="font-family:Inter,Arial,sans-serif;font-size:12px;font-weight:400;color:#737373;margin:10px 0 0 0;">
+                                        <p style="font-family:Inter,Arial,sans-serif;font-size:12px;font-weight:400;color:#737373;margin:10px 0 0 0;">
                                             Share this link to keep earning for every new friend who shops.</p>
                                     </td>
                                 </tr>
@@ -1004,8 +440,7 @@
                                     </td>
                                 </tr>
                             </table>
-                            <p
-                                style="font-family:Inter,Arial,sans-serif;font-size:12px;font-weight:400;color:#a3a3a3;margin:14px 0 0 0;">
+                            <p style="font-family:Inter,Arial,sans-serif;font-size:12px;font-weight:400;color:#a3a3a3;margin:14px 0 0 0;">
                                 Cashback is valid for 12 months from the date of issue.</p>
                         </td>
                     </tr>
@@ -1014,14 +449,11 @@
                     <!-- ROW 8 · FOOTER                         -->
                     <!-- ─────────────────────────────────────── -->
                     <tr>
-                        <td style="background-color:#f7f7f7;border-top:1px solid #e6e6e6;padding:28px 40px 24px;"
-                            class="mobile-pad">
-                            <p
-                                style="font-family:Inter,Arial,sans-serif;font-size:12px;font-weight:400;color:#a3a3a3;line-height:1.7;margin:0 0 12px 0;">
+                        <td style="background-color:#f7f7f7;border-top:1px solid #e6e6e6;padding:28px 40px 24px;" class="mobile-pad">
+                            <p style="font-family:Inter,Arial,sans-serif;font-size:12px;font-weight:400;color:#a3a3a3;line-height:1.7;margin:0 0 12px 0;">
                                 You're receiving this email because you have a {{ project_name }} account and earned a referral
                                 reward.
-                                Questions? Email us at <a href="mailto:{{ support_email }}"
-                                    style="color:#0a7aff;text-decoration:none;">{{ support_email }}</a>
+                                Questions? Email us at <a href="mailto:{{ support_email }}" style="color:#0a7aff;text-decoration:none;">{{ support_email }}</a>
                             </p>
                             <p style="font-family:Inter,Arial,sans-serif;font-size:12px;font-weight:400;margin:0;">
                                 <a href="#" style="color:#a3a3a3;text-decoration:none;">Unsubscribe</a>
@@ -1035,10 +467,8 @@
 
                     <!-- Legal bottom bar -->
                     <tr>
-                        <td style="background-color:#f7f7f7;border-top:1px solid #e6e6e6;padding:14px 40px;"
-                            class="mobile-pad">
-                            <p
-                                style="font-family:Inter,Arial,sans-serif;font-size:11px;font-weight:400;color:#c4c4c4;margin:0;text-align:center;">
+                        <td style="background-color:#f7f7f7;border-top:1px solid #e6e6e6;padding:14px 40px;" class="mobile-pad">
+                            <p style="font-family:Inter,Arial,sans-serif;font-size:11px;font-weight:400;color:#c4c4c4;margin:0;text-align:center;">
                                 &copy; 2026 {{ project_name }} Inc. &nbsp;&middot;&nbsp; 123 Commerce St, San Francisco, CA 94103
                             </p>
                         </td>

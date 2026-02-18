@@ -85,7 +85,7 @@ async def merge_metadata(metadata: Optional[dict[str, Any]] = {}) -> dict[str, A
     service = ShopSettingsService()
     shop_name = await service.get("shop_name")
     shop_address = await service.get("address")
-    shop_phone = await service.get("contact_phone")  
+    shop_phone = await service.get("contact_phone")
 
     return {
         "project_name": shop_name,
@@ -418,7 +418,7 @@ async def generate_referral_cashback_email(order: Order, coupon_owner: User) -> 
             **(await merge_metadata({"description": description}))
         },
     )
-    return EmailData(html_content=html_content, subject=f"Order Confirmation for {order.order_number}")
+    return EmailData(html_content=html_content, subject=f"You just got paid!")
 
 
 def generate_sku(prefix: str = "PRD") -> str:

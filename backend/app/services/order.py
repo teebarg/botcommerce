@@ -297,7 +297,7 @@ async def create_invoice(order_id: int) -> str:
 
 async def decrement_variant_inventory_for_order(order, notification=None) -> None:
     """
-    Decrement inventory for each variant in the order. 
+    Decrement inventory for each variant in the order.
     If inventory reaches 0, set status to OUT_OF_STOCK and send notification.
     """
     out_of_stock_variants = []
@@ -378,9 +378,9 @@ async def send_payment_receipt(order, notification: Notification) -> None:
 
 async def process_order_payment(order_id: int, notification: Notification) -> None:
     order = await db.order.find_unique(
-        where={"id": order_id}, 
+        where={"id": order_id},
         include={
-            "order_items": {"include": { "variant": True }}, 
+            "order_items": {"include": { "variant": True }},
             "user": True
         }
     )
@@ -500,20 +500,20 @@ async def process_referral(order, notification=None) -> None:
                 }
             )
         await tx.user.update(where={"id": coupon_owner.id}, data={"wallet_balance": {"increment": order.discount_amount}})
-    
-    # try:
-    #     email_data = await generate_referral_cashback_email(order=order, coupon_owner=coupon_owner)
-    #     service = ShopSettingsService()
-    #     shop_email = await service.get("shop_email")
-    #     cc_list = [shop_email] if shop_email else []
-    #     await notification.send_notification(
-    #         channel_name="email",
-    #         recipient=coupon_owner.email,
-    #         subject=email_data.subject,
-    #         message=email_data.html_content,
-    #         cc_list=cc_list,
-    #     )
-    #     logger.info(f"Referral cashback email sent to user: {coupon_owner.id}")
-    # except Exception as e:
-    #     logger.error(f"Failed to generate referral cashback email: {e}")
-    #     return
+
+    try:
+        email_data = await generate_referral_cashback_email(order=order, coupon_owner=coupon_owner)
+        service = ShopSettingsService()
+        shop_email = await service.get("shop_email")
+        cc_list = [shop_email] if shop_email else []
+        await notification.send_notification(
+            channel_name="email",
+            recipient=coupon_owner.email,
+            subject=email_data.subject,
+            message=email_data.html_content,
+            cc_list=cc_list,
+        )
+        logger.info(f"Referral cashback email sent to user: {coupon_owner.id}")
+    except Exception as e:
+        logger.error(f"Failed to generate referral cashback email: {e}")
+        return
