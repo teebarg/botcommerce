@@ -94,7 +94,6 @@ async def index(
 
     users = await db.user.find_many(
         where=where_clause,
-        include={"orders": True},
         order={"created_at": sort},
         skip=1 if cursor else 0,
         take=limit + 1,

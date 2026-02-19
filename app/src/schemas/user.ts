@@ -52,8 +52,6 @@ export const UserSchema = z
         role: z.enum(["ADMIN", "CUSTOMER"]),
         referral_code: z.string().optional(),
         wallet_balance: z.number(),
-        addresses: z.array(AddressSchema).optional(),
-        orders: z.array(z.any()).optional(),
     })
     .merge(AuditSchema);
 
