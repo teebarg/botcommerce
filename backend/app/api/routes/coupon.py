@@ -28,8 +28,8 @@ async def get_coupons(
     request: Request,
     query: Optional[str] = Query(""),
     is_active: Optional[bool] = None,
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100)
+    cursor: int | None = None,
+    limit: int = Query(default=4, le=100)
 ) -> PaginatedCoupons:
     """
     Get all coupons with pagination for admin.
@@ -44,19 +44,18 @@ async def get_coupons(
 
     coupons = await db.coupon.find_many(
         where=where_clause,
-        skip=skip,
-        take=limit,
+        skip=1 if cursor else 0,
+        take=limit + 1,
+        cursor={"id": cursor} if cursor else None,
         order={"created_at": "desc"},
         include={"users": True, "usages": True}
     )
+    items = coupons[:limit]
 
-    total_count = await db.coupon.count(where=where_clause)
     return {
-        "coupons": coupons,
-        "skip": skip,
-        "limit": limit,
-        "total_count": total_count,
-        "total_pages": (total_count + limit - 1) // limit
+        "items": items,
+        "next_cursor": items[-1].id if len(coupons) > limit else None,
+        "limit": limit
     }
 
 

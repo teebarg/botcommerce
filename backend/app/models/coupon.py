@@ -75,11 +75,9 @@ class CouponValidateResponse(BaseModel):
 
 
 class PaginatedCoupons(BaseModel):
-    coupons: List[Coupon]
-    skip: int
+    items: List[Coupon]
+    next_cursor: int | None
     limit: int
-    total_count: int
-    total_pages: int
 
 class CouponAnalytics(BaseModel):
     total_coupons: int

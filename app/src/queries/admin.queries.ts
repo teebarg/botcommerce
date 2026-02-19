@@ -2,6 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { clientApi } from "@/utils/api.client";
 import { StatsTrends } from "@/types/models";
 import { getUsersFn } from "@/server/users.server";
+import { getCouponsFn } from "@/server/coupon.server";
 
 export const statsTrendsQuery = () =>
     queryOptions({
@@ -22,3 +23,13 @@ export const usersQuery = (params: UsersParams) =>
         queryKey: ["users", params],
         queryFn: () => getUsersFn({ data: { ...params } }),
     });
+
+export interface CouponParams {
+    query?: string;
+    isActive?: boolean
+}
+
+export const couponsQuery = (params: UsersParams) => ({
+    queryKey: ["coupons", params],
+    queryFn: () => getCouponsFn({ data: params }),
+});

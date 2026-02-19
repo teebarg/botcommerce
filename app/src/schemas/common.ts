@@ -100,7 +100,6 @@ export const CouponSchema = z.object({
     users: z.array(UserSchema).optional(),
     usages: z.array(z.any()).optional(),
     created_at: z.string(),
-    updated_at: z.string(),
 });
 
 export const CouponUsageSchema = z.object({
@@ -111,9 +110,14 @@ export const CouponUsageSchema = z.object({
     created_at: z.string(),
 });
 
+export const PaginatedCouponsSchema = CursorSchema.extend({
+    items: z.array(CouponSchema),
+});
+
 export type DeliveryOption = z.infer<typeof DeliveryOptionSchema>;
 export type ImageUpload = z.infer<typeof ImageUploadSchema>;
 export type Coupon = z.infer<typeof CouponSchema>;
+export type PaginatedCoupons = z.infer<typeof PaginatedCouponsSchema>
 export type CouponUsage = z.infer<typeof CouponUsageSchema>;
 
 export type Token = z.infer<typeof TokenSchema>;

@@ -1,3 +1,4 @@
+import { Loader2 } from "lucide-react";
 import type React from "react";
 import { useRef, useEffect, useCallback } from "react";
 
@@ -18,7 +19,12 @@ export const InfiniteScroll = ({
     onLoadMore,
     hasMore,
     isLoading,
-    loader = <div className="text-center py-4">Loading...</div>,
+    loader = (
+        <div className="flex items-center gap-2 text-muted-foreground">
+            <Loader2 className="w-5 h-5 animate-spin text-primary" />
+            <span className="text-sm">Loading more...</span>
+        </div>
+    ),
     endMessage = null,
     threshold = 800,
     className = "",
