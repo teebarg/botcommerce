@@ -114,8 +114,8 @@ async def retrieve_order(order_id: str) -> Order:
 
 async def list_orders(
     user_id: int,
-    skip: int = 0,
-    take: int = 20,
+    cursor: Optional[int] = None,
+    limit: int = 20,
     status: Optional[str] = None,
     order_number: Optional[str] = None,
     start_date: Optional[str] = None,
@@ -143,9 +143,10 @@ async def list_orders(
 
     orders = await db.order.find_many(
         where=where,
-        skip=skip,
-        take=take,
         order={"created_at": sort},
+        skip=1 if cursor else 0,
+        take=limit + 1,
+        cursor={"id": cursor} if cursor else None,
         include={
             "order_items": {
                 "include": {
@@ -157,13 +158,12 @@ async def list_orders(
             "coupon": True,
         }
     )
-    total = await db.order.count(where=where)
+    items = orders[:limit]
+
     return {
-        "orders": orders,
-        "skip": skip,
-        "limit": take,
-        "total_pages": (total + take - 1) // take,
-        "total_count": total,
+        "items": items,
+        "next_cursor": items[-1].id if len(orders) > limit else None,
+        "limit": limit
     }
 
 

@@ -19,7 +19,7 @@ function RouteComponent() {
     return (
         <div>
             <StatComponent summary={statsTrends.summary} />
-            <RecentOrdersList orders={paginatedOrders.orders} />
+            <RecentOrdersList orders={paginatedOrders.items} />
         </div>
     );
 }

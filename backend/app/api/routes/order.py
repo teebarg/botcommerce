@@ -2,12 +2,11 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, B
 from app.core.deps import CurrentUser, get_current_superuser
 from typing import Optional
 from app.prisma_client import prisma as db
-from app.models.order import Order, OrderCreate, Orders
+from app.models.order import Order, OrderCreate, OrderTimelineEntry, PaginatedOrders
 from prisma.enums import OrderStatus
 from app.services.order import create_order_from_cart, retrieve_order, list_orders, return_order_item
 from app.services.redis import cache_response, invalidate_key, invalidate_pattern
 from pydantic import BaseModel
-from app.models.order import OrderTimelineEntry
 from app.core.logging import get_logger
 from app.models.generic import Message
 
@@ -43,19 +42,19 @@ async def get_order(
 async def get_orders(
     request: Request,
     user: CurrentUser,
-    skip: int = Query(default=0, ge=0),
-    take: int = Query(default=20, ge=1, le=100),
+    cursor: int | None = None,
+    take: int = Query(default=20, le=100),
     status: Optional[OrderStatus] = None,
     sort: Optional[str] = "desc",
     order_number: Optional[str] = None,
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
     customer_id: Optional[int] = None,
-) -> Orders:
+) -> PaginatedOrders:
     orders = await list_orders(
         user_id=user.id,
-        skip=skip,
-        take=take,
+        cursor=cursor,
+        limit=take,
         status=status,
         order_number=order_number,
         start_date=start_date,

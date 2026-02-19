@@ -77,7 +77,7 @@ router = APIRouter()
 @router.get("/{id}/similar")
 @cache_response("products")
 async def recommend(request: Request, id: int, limit: int = Query(default=20, le=100)):
-    key = f"product:{id}:similar"
+    key: str = f"product:{id}:similar"
     ids = await redis_client.lrange(key, 0, -1)
 
     if not ids:

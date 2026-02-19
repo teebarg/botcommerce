@@ -14,8 +14,7 @@ import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 
 export const Route = createFileRoute("/_mainLayout/account/referrals")({
     loader: async ({ context: { queryClient } }) => {
-        await queryClient.ensureQueryData(meQuery());
-        await queryClient.ensureQueryData(meTxnsQuery());
+        await Promise.all([queryClient.ensureQueryData(meQuery()), queryClient.ensureQueryData(meTxnsQuery())]);
     },
     component: RouteComponent,
 });

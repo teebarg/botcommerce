@@ -1,13 +1,12 @@
 import { api } from "@/utils/fetch-api";
 import { createServerFn } from "@tanstack/react-start";
 import z from "zod";
-import type { Order, PaginatedOrder } from "@/schemas";
+import type { Order, PaginatedOrders } from "@/schemas";
 
 const OrderSearchParamsSchema = z
     .object({
         order_number: z.string().optional(),
         status: z.string().optional(),
-        skip: z.number().optional(),
         take: z.number().optional(),
         customer_id: z.number().optional(),
         sort: z.string().optional(),
@@ -17,7 +16,7 @@ const OrderSearchParamsSchema = z
 export const getOrdersFn = createServerFn({ method: "GET" })
     .inputValidator((input: unknown) => OrderSearchParamsSchema.parse(input))
     .handler(async ({ data }) => {
-        return await api.get<PaginatedOrder>("/order/", { params: data });
+        return await api.get<PaginatedOrders>("/order/", { params: data });
     });
 
 export const getOrderFn = createServerFn({ method: "GET" })

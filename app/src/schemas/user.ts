@@ -3,7 +3,7 @@ import { z } from "zod";
 import { AddressSchema } from "./address";
 import { AuditSchema } from "./base";
 
-import { CursorSchema, PagSchema } from "./index";
+import { CursorSchema } from "./index";
 
 export const UserLiteSchema = z.object({
     id: z.number(),

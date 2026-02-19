@@ -1,16 +1,37 @@
 import { OrderStatusBadge, PaymentStatusBadge } from "./order-status-badge";
 import type { Order } from "@/schemas";
 import { currency, formatDate } from "@/utils";
+import OrderActions from "./order-actions";
 
 interface OrderCardProps {
     order: Order;
-    actions?: React.ReactNode;
 }
 
-const OrderCard = ({ order, actions }: OrderCardProps) => {
+const OrderCard = ({ order }: OrderCardProps) => {
     return (
-        <div className="bg-card rounded-lg shadow-sm overflow-hidden mb-3">
-            <div className="p-4">
+        <div className="bg-card rounded-lg shadow-sm overflow-hidden md:even:bg-background">
+            <div className="hidden md:grid grid-cols-[140px_180px_200px_120px_140px_160px_1fr] items-center gap-4 px-4 text-sm py-2">
+                <p className="truncate">{order.order_number}</p>
+
+                <p>{formatDate(order.created_at)}</p>
+
+                <p className="truncate">
+                    {order.user?.first_name} {order.user?.last_name}
+                </p>
+
+                <p className="text-right">{currency(order.total)}</p>
+
+                <div className="justify-self-start">
+                    <OrderStatusBadge status={order.status} />
+                </div>
+                <div className="justify-self-start">
+                    <PaymentStatusBadge status={order.payment_status} />
+                </div>
+                <div>
+                    <OrderActions order={order} />
+                </div>
+            </div>
+            <div className="p-4 md:hidden">
                 <div className="flex items-center justify-between mb-3">
                     <h3 className="font-medium">{order.order_number}</h3>
                     <PaymentStatusBadge status={order.payment_status} />
@@ -43,7 +64,7 @@ const OrderCard = ({ order, actions }: OrderCardProps) => {
                     <OrderStatusBadge status={order.status} />
                 </div>
 
-                {actions}
+                <OrderActions order={order} />
             </div>
         </div>
     );

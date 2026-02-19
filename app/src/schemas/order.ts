@@ -1,11 +1,10 @@
 import { z } from "zod";
-
 import { OrderStatusSchema, ShippingMethodSchema, PaymentMethodSchema, PaymentStatusSchema } from "./enums";
 import { UserSchema } from "./user";
 import { AddressSchema } from "./address";
 import { ProductVariantSchema } from "./product";
 import { AuditSchema } from "./base";
-import { PagSchema, CouponSchema } from "./common";
+import { CursorSchema } from "./common";
 
 export const OrderItemSchema = z
     .object({
@@ -38,8 +37,7 @@ export const OrderSchema = z
         shipping_fee: z.number(),
         total: z.number(),
         wallet_used: z.number(),
-        coupon: CouponSchema.optional(),
-        billing_address: AddressSchema,
+        coupon_code: z.string().optional(),
         shipping_address: AddressSchema,
         shipping_method: ShippingMethodSchema,
         payment_method: PaymentMethodSchema,
@@ -49,10 +47,10 @@ export const OrderSchema = z
     })
     .merge(AuditSchema);
 
-export const PaginatedOrderSchema = PagSchema.extend({
-    orders: z.array(OrderSchema),
+export const PaginatedOrdersSchema = CursorSchema.extend({
+    items: z.array(OrderSchema),
 });
 
 export type Order = z.infer<typeof OrderSchema>;
 export type OrderItem = z.infer<typeof OrderItemSchema>;
-export type PaginatedOrder = z.infer<typeof PaginatedOrderSchema>;
+export type PaginatedOrders = z.infer<typeof PaginatedOrdersSchema>;

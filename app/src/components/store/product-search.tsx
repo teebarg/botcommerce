@@ -28,8 +28,8 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
     const inputRef = useRef<HTMLInputElement>(null);
     const searchRef = useRef<HTMLInputElement>(null);
 
-    const { data, isLoading } = useProductSearch({ search: debouncedQuery, limit: 4, skip: 0, show_suggestions: true });
-    const { data: trendingData } = useProductSearch({ collections: "trending", limit: 4, skip: 0 });
+    const { data, isLoading } = useProductSearch({ search: debouncedQuery, limit: 4, show_suggestions: true });
+    const { data: trendingData } = useProductSearch({ collections: "trending", limit: 4 });
 
     useEffect(() => {
         const savedHistory = localStorage.getItem("searchHistory");

@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_mainLayout/account/orders")({
 });
 
 function RouteComponent() {
-    const { data: paginatedOrders } = useSuspenseQuery(ordersQuery({ take: 20 }));
+    const { data } = useSuspenseQuery(ordersQuery({ take: 20 }));
     return (
         <div className="w-full px-2" data-testid="orders-page-wrapper">
             <div className="mb-8">
@@ -23,9 +23,9 @@ function RouteComponent() {
                 </p>
             </div>
             <div>
-                {paginatedOrders?.orders?.length ? (
+                {data?.items?.length ? (
                     <div className="flex flex-col gap-y-8 w-full">
-                        {paginatedOrders.orders?.map((o: Order, idx: number) => (
+                        {data?.items?.map((o: Order, idx: number) => (
                             <OrderCard key={idx} order={o} idx={idx} />
                         ))}
                     </div>

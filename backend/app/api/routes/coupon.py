@@ -29,7 +29,7 @@ async def get_coupons(
     query: Optional[str] = Query(""),
     is_active: Optional[bool] = None,
     cursor: int | None = None,
-    limit: int = Query(default=4, le=100)
+    limit: int = Query(default=20, le=100)
 ) -> PaginatedCoupons:
     """
     Get all coupons with pagination for admin.

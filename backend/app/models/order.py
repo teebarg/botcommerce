@@ -49,12 +49,10 @@ class Order(BaseModel):
     invoice_url: Optional[str] = None
     created_at: datetime
 
-class Orders(BaseModel):
-    orders: list[Order]
-    skip: int
+class PaginatedOrders(BaseModel):
+    items: list[Order]
+    next_cursor: int | None
     limit: int
-    total_count: int
-    total_pages: int
 
 class OrderTimelineEntry(BaseModel):
     id: int

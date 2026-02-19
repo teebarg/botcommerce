@@ -1,126 +1,80 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { format } from "date-fns";
 import { Search } from "lucide-react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import type { Order } from "@/schemas";
-import { currency } from "@/utils";
+import type { Order, PaginatedOrders } from "@/schemas";
 import OrderCard from "@/components/admin/orders/order-card";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
-import PaginationUI from "@/components/pagination";
 import OrderFilters from "@/components/admin/orders/order-filters";
-import { OrderStatusBadge, PaymentStatusBadge } from "@/components/admin/orders/order-status-badge";
-import OrderActions from "@/components/admin/orders/order-actions";
 import z from "zod";
 import { ordersQuery } from "@/queries/user.queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { useInfiniteResource } from "@/hooks/useInfiniteResource";
+import { clientApi } from "@/utils/api.client";
+import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 
 export const Route = createFileRoute("/admin/(store)/orders")({
     validateSearch: z.object({
         search: z.string().optional(),
-        skip: z.number().optional(),
         status: z.enum(["ACTIVE", "COMPLETED", "ABANDONED", "DELIVERED"]).optional(),
         start_date: z.string().optional(),
         end_date: z.string().optional(),
     }),
-    loaderDeps: ({ search: { skip, status, start_date, end_date } }) => ({ skip, status, start_date, end_date }),
-    loader: async ({ context: { queryClient }, deps: { skip, status, start_date, end_date } }) => {
-        await queryClient.ensureQueryData(ordersQuery({ skip, status, start_date, end_date }));
+    loaderDeps: ({ search }) => search,
+    loader: async ({ context: { queryClient }, deps }) => {
+        await queryClient.ensureQueryData(ordersQuery(deps));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const search = Route.useSearch();
-    const { data: paginatedOrders } = useSuspenseQuery(
-        ordersQuery({ skip: search.skip, status: search.status, start_date: search.start_date, end_date: search.end_date })
-    );
+    const params = Route.useSearch();
+    const { data: initialData } = useSuspenseQuery(ordersQuery(params));
     const { updateQuery } = useUpdateQuery(200);
 
-    const { orders, ...pagination } = paginatedOrders ?? { skip: 0, limit: 0, total_pages: 0, total_count: 0 };
+    const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteResource<PaginatedOrders, Order>({
+        queryKey: ["coupons", "infinite", params],
+        queryFn: (cursor) => clientApi.get<PaginatedOrders>("/order/", { params: { cursor, ...params } }),
+        getItems: (page) => page.items,
+        getNextCursor: (page) => page.next_cursor,
+        initialData: initialData,
+    });
+
     return (
         <div className="px-4 md:px-10 py-8">
             <div className="mb-6 flex flex-col">
                 <h1 className="text-2xl font-medium">Order view</h1>
                 <p className="text-muted-foreground text-sm">Manage your orders.</p>
             </div>
-            <div className="md:block hidden">
+            <div className="pb-4">
+                <div className="relative mb-4">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Search className="text-gray-400" size={18} />
+                    </div>
+                    <input
+                        className="pl-10 pr-4 py-2 w-full border border-input rounded-lg focus:outline-none"
+                        placeholder="Search orders..."
+                        type="text"
+                        value={params.search ?? ""}
+                        onChange={(e) => updateQuery([{ key: "search", value: e.target.value }])}
+                    />
+                </div>
                 <OrderFilters />
-            </div>
-            <div key="table" className="md:block hidden bg-card mt-4">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Order</TableHead>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Customer</TableHead>
-                            <TableHead>Total</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Payment Status</TableHead>
-                            <TableHead>Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {orders?.length === 0 ? (
-                            <TableRow key="no-orders">
-                                <TableCell className="text-center" colSpan={7}>
-                                    No orders found
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            orders?.map((order: Order, idx: number) => (
-                                <TableRow key={idx} className="odd:bg-background">
-                                    <TableCell className="font-semibold">{order.order_number}</TableCell>
-                                    <TableCell>{format(new Date(order.created_at), "MMM d, yyyy")}</TableCell>
-                                    <TableCell>
-                                        {order.user?.first_name} {order.user?.last_name}
-                                    </TableCell>
-                                    <TableCell>{currency(order.total)}</TableCell>
-                                    <TableCell>
-                                        <OrderStatusBadge status={order.status} />
-                                    </TableCell>
-                                    <TableCell>
-                                        <PaymentStatusBadge status={order.payment_status} />
-                                    </TableCell>
-                                    <TableCell>
-                                        <OrderActions order={order} />
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
-            <div key="mobile" className="md:hidden">
-                <div className="pb-4">
-                    <div className="relative mb-4">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Search className="text-gray-400" size={18} />
-                        </div>
-                        <input
-                            className="pl-10 pr-4 py-2 w-full border border-input rounded-lg focus:outline-none"
-                            placeholder="Search orders..."
-                            type="text"
-                            value={search.search ?? ""}
-                            onChange={(e) => updateQuery([{ key: "search", value: e.target.value }])}
+                <div className="mt-4">
+                    {!isLoading && items.length > 0 && (
+                        <InfiniteResourceList
+                            items={items}
+                            onLoadMore={fetchNextPage}
+                            hasMore={hasNextPage}
+                            isLoading={isFetchingNextPage}
+                            renderItem={(item: Order) => <OrderCard key={item.id} order={item} />}
                         />
-                    </div>
-
-                    <OrderFilters />
-
-                    <div>
-                        {orders?.map((order: Order, idx: number) => (
-                            <OrderCard key={idx} actions={<OrderActions order={order} />} order={order} />
-                        ))}
-
-                        {orders?.length === 0 && (
-                            <div className="text-center py-8">
-                                <p className="text-muted-foreground">No orders found</p>
-                            </div>
-                        )}
-                    </div>
+                    )}
+                    {!isLoading && items.length === 0 && (
+                        <div className="text-center py-8">
+                            <p className="text-muted-foreground">No orders found</p>
+                        </div>
+                    )}
                 </div>
             </div>
-            {pagination?.total_pages > 1 && <PaginationUI key="pagination" pagination={pagination} />}
         </div>
     );
 }

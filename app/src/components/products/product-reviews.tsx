@@ -1,7 +1,7 @@
 import type React from "react";
 import { ProductReviewsZeroState } from "../store/reviews/review-zero";
 import { ReviewsList } from "../store/reviews/reviews-list";
-import type { PaginatedOrder, PaginatedReview } from "@/schemas";
+import type { Order, PaginatedOrders, PaginatedReview } from "@/schemas";
 import { useRouteContext } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { clientApi } from "@/utils/api.client";
@@ -19,13 +19,13 @@ const ReviewsSection: React.FC<Prop> = ({ product_id, productName }) => {
     });
     const { data } = useQuery({
         queryKey: ["orders", JSON.stringify({})],
-        queryFn: async () => await clientApi.get<PaginatedOrder>("/order/", { }),
+        queryFn: async () => await clientApi.get<PaginatedOrders>("/order/", { }),
     });
     const hasReviewed = session && reviewsData?.reviews?.some((r) => r.user?.id === session?.id);
     let hasPurchased = false;
 
-    if (session && data?.orders) {
-        hasPurchased = data.orders.some((order) => order.order_items.some((item) => item.variant?.product_id === product_id));
+    if (session && data?.items) {
+        hasPurchased = data.items.some((order: Order) => order.order_items.some((item) => item.variant?.product_id === product_id));
     }
 
     if (reviewsData?.reviews?.length === 0) {

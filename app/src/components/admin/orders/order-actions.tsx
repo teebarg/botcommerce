@@ -14,7 +14,7 @@ const OrderActions: React.FC<OrderActionsProps> = ({ order }) => {
     const state = useOverlayTriggerState({});
 
     return (
-        <div className="flex items-center flex-wrap gap-2">
+        <div className="flex items-center flex-wrap gap-2 w-full">
             <Overlay
                 open={state.isOpen}
                 sheetClassName="md:max-w-7xl"
