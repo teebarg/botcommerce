@@ -1,23 +1,18 @@
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Query, Depends, Request
-from pydantic import BaseModel, Field
 from app.core.deps import CurrentUser, get_current_superuser, UserDep
 from app.models.wishlist import Wishlists, WishlistCreate
 from app.models.generic import Message
 from app.prisma_client import prisma as db
 from prisma.errors import PrismaError
 from prisma.enums import Role, Status
-from app.models.user import User, UserSelf, UserAdmin, UserUpdateMe, UserUpdate, PaginatedUsers
+from app.models.user import User, UserSelf, UserAdmin, UserUpdateMe, UserUpdate, PaginatedUsers, GuestUserCreate, PasswordChange
 from app.core.security import verify_password, get_password_hash
 from app.services.recently_viewed import RecentlyViewedService
 from app.models.product import SearchProduct
 from app.services.redis import cache_response, bust
 
 router = APIRouter()
-
-class PasswordChange(BaseModel):
-    old_password: str = Field(min_length=8, max_length=40)
-    new_password: str = Field(min_length=8, max_length=40)
 
 
 @router.get("/get-user")
@@ -76,8 +71,8 @@ async def index(
     role: Optional[Role] = None,
     status: Optional[Status] = None,
     sort: Optional[str] = "desc",
-    cursor: str | None = None,
-    limit: int = Query(default=4, le=100),
+    cursor: int | None = None,
+    limit: int = Query(default=20, le=100),
 ) -> PaginatedUsers:
     """
     Retrieve users with Redis caching.
@@ -99,10 +94,11 @@ async def index(
 
     users = await db.user.find_many(
         where=where_clause,
+        include={"orders": True},
+        order={"created_at": sort},
         skip=1 if cursor else 0,
         take=limit + 1,
-        order={"created_at": sort},
-        include={"orders": True}
+        cursor={"id": cursor} if cursor else None,
     )
     items = users[:limit]
 
@@ -111,11 +107,6 @@ async def index(
         "next_cursor": items[-1].id if len(users) > limit else None,
         "limit": limit
     }
-
-
-class GuestUserCreate(BaseModel):
-    first_name: str = Field(min_length=1, max_length=255)
-    last_name: str = Field(min_length=1, max_length=255)
 
 
 @router.post("/create-guest", dependencies=[Depends(get_current_superuser)])

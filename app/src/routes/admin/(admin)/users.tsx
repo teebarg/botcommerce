@@ -1,70 +1,45 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Loader, Search, SlidersHorizontal } from "lucide-react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import type { Order, PaginatedUsers, Status, User } from "@/schemas";
-import { currency } from "@/utils";
-import PaginationUI from "@/components/pagination";
+import type { PaginatedUsers, User } from "@/schemas";
 import CustomerCreateGuest from "@/components/admin/customers/customer-create-guest";
 import CustomerFilter from "@/components/admin/customers/customer-filter";
-import CustomerActions from "@/components/admin/customers/customer-actions";
 import CustomerCard from "@/components/admin/customers/customer-card";
 import z from "zod";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { getUsersFn } from "@/server/users.server";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { usersQuery } from "@/queries/admin.queries";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { clientApi } from "@/utils/api.client";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 
-// interface UsersParams {
-//     query?: string;
-//     role?: "ADMIN" | "CUSTOMER";
-//     status?: "ACTIVE" | "INACTIVE" | "PENDING";
-//     sort?: string;
-// }
-
-// export const useUsers = (searchParams: UsersParams) =>
-//     queryOptions({
-//         queryKey: ["users", JSON.stringify(searchParams)],
-//         queryFn: () => getUsersFn({ data: { ...searchParams } }),
-//     });
-
 export const Route = createFileRoute("/admin/(admin)/users")({
-    loader: async ({ context }) => {
-        await context.queryClient.ensureQueryData(usersQuery({}));
+    validateSearch: z.object({
+        sort: z.enum(["asc", "desc"]).optional(),
+        query: z.string().optional(),
+        role: z.enum(["ADMIN", "CUSTOMER"]).optional(),
+        status: z.enum(["ACTIVE", "INACTIVE", "PENDING"]).optional(),
+    }),
+    loaderDeps: ({ search }) => search,
+    loader: async ({ deps, context }) => {
+        await context.queryClient.ensureQueryData(usersQuery(deps));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
     const params = Route.useSearch();
-    console.log("🚀 ~ file: users.tsx:43 ~ params:", params);
-    const params2 = Route.useParams();
-    console.log("🚀 ~ file: users.tsx:43 ~ params:", params2);
-    const { data: initialUsers } = useSuspenseQuery(usersQuery({}));
+    const { data: initialUsers } = useSuspenseQuery(usersQuery({ ...params }));
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [filterOpen, setFilterOpen] = useState<boolean>(false);
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteResource<PaginatedUsers, User>({
         queryKey: ["users", "infinite", params],
-        queryFn: (cursor) => clientApi.get<PaginatedUsers>("/users/", { params: { cursor } }),
+        queryFn: (cursor) => clientApi.get<PaginatedUsers>("/users/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
         initialData: initialUsers,
     });
-
-    const getStatusBadge = (status?: Status) => {
-        const variants: Record<Status, "destructive" | "emerald" | "warning"> = {
-            ["PENDING"]: "warning",
-            ["ACTIVE"]: "emerald",
-            ["INACTIVE"]: "destructive",
-        };
-
-        return <Badge variant={variants[status ?? "PENDING"]}>{status}</Badge>;
-    };
 
     return (
         <div className="px-3 md:px-10 py-8">
@@ -104,9 +79,6 @@ function RouteComponent() {
                         />
                     </div>
                     <div className="mt-4 py-2">
-                        {/* {users?.map((user: User, idx: number) => (
-                            <CustomerCard key={idx} actions={<CustomerActions user={user} />} user={user} />
-                        ))} */}
                         {!isLoading && items.length > 0 && (
                             <InfiniteResourceList
                                 items={items}
@@ -119,7 +91,7 @@ function RouteComponent() {
                                         <p className="text-sm font-medium text-muted-foreground">Loading more transactions...</p>
                                     </div>
                                 }
-                                renderItem={(item: User) => <CustomerCard key={item.id} actions={<CustomerActions user={item} />} user={item} />}
+                                renderItem={(item: User) => <CustomerCard key={item.id} user={item} />}
                             />
                         )}
                     </div>
