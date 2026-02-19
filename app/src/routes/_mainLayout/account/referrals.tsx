@@ -2,10 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { meQuery, meTxnsQuery } from "@/queries/user.queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { ArrowDownLeft, Check, Copy, Gift, Share2, ShoppingBag, Wallet } from "lucide-react";
+import { Check, Copy, Gift, Loader, Share2, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
-import { cn, currency, formatDate } from "@/utils";
+import { currency } from "@/utils";
+import { clientApi } from "@/utils/api.client";
+import { PaginatedWalletTxns, WalletTxn } from "@/schemas";
+import { WalletTxnCard } from "@/components/store/account/WalletTxnCard";
+import { useInfiniteResource } from "@/hooks/useInfiniteResource";
+import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 
 export const Route = createFileRoute("/_mainLayout/account/referrals")({
     loader: async ({ context: { queryClient } }) => {
@@ -17,8 +22,25 @@ export const Route = createFileRoute("/_mainLayout/account/referrals")({
 
 function RouteComponent() {
     const { data: me } = useSuspenseQuery(meQuery());
-    const { data } = useSuspenseQuery(meTxnsQuery());
-    const [copied, setCopied] = useState(false);
+    const { data: initialTxns } = useSuspenseQuery(meTxnsQuery());
+    const [copied, setCopied] = useState<boolean>(false);
+
+    const {
+        items: txns,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+    } = useInfiniteResource<PaginatedWalletTxns, WalletTxn>({
+        queryKey: ["wallet", "infinite"],
+        queryFn: (cursor) =>
+            clientApi.get("/wallet/me", {
+                params: { cursor },
+            }),
+        getItems: (page) => page.txns,
+        getNextCursor: (page) => page.next_cursor,
+        initialData: initialTxns,
+    });
 
     const handleCopy = async () => {
         await navigator.clipboard.writeText(me?.referral_code!);
@@ -98,49 +120,28 @@ function RouteComponent() {
                 </motion.div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+            <div>
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="font-semibold">Wallet Transactions</h3>
-                    <span className="text-xs text-muted-foreground">{data.txns.length} transactions</span>
+                    <span className="text-xs text-muted-foreground">{txns.length} transactions</span>
                 </div>
-                <div className="space-y-2">
-                    {data.txns.map((txn, i) => {
-                        const isCredit = txn.type === "CASHBACK" || txn.type === "REVERSAL";
-                        const TxnIcon = isCredit ? ArrowDownLeft : ShoppingBag;
-                        return (
-                            <motion.div
-                                key={txn.id}
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.25 + i * 0.04 }}
-                                className="bg-card rounded-2xl p-4 border border-border flex items-center gap-3"
-                            >
-                                <div
-                                    className={cn(
-                                        "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
-                                        isCredit ? "bg-emerald-100 text-emerald-800" : "bg-destructive/10 text-destructive"
-                                    )}
-                                >
-                                    <TxnIcon className="w-5 h-5" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className={cn("font-medium text-sm")}>{txn.type}</p>
-                                    <p className="text-xs text-muted-foreground truncate">{txn.reference_code}</p>
-                                    {txn.reference_id && <p className="text-xs text-muted-foreground truncate">({txn.reference_id})</p>}
-                                </div>
-                                <div className="text-right shrink-0">
-                                    <p className={cn("font-semibold text-sm tabular-nums", isCredit ? "text-emerald-600" : "text-destructive")}>
-                                        {isCredit ? "+" : ""}
-                                        {currency(txn.amount)}
-                                    </p>
-                                    <p className="text-[10px] text-muted-foreground">{formatDate(txn.created_at)}</p>
-                                </div>
-                            </motion.div>
-                        );
-                    })}
-                </div>
-            </motion.div>
 
+                {!isLoading && txns.length > 0 && (
+                    <InfiniteResourceList
+                        items={txns}
+                        onLoadMore={fetchNextPage}
+                        hasMore={hasNextPage}
+                        isLoading={isFetchingNextPage}
+                        loader={
+                            <div className="flex flex-col items-center justify-center text-blue-600">
+                                <Loader className="h-8 w-8 animate-spin mb-2" />
+                                <p className="text-sm font-medium text-muted-foreground">Loading more transactions...</p>
+                            </div>
+                        }
+                        renderItem={(txn, i) => <WalletTxnCard key={txn.id} txn={txn} index={i} />}
+                    />
+                )}
+            </div>
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

@@ -1,7 +1,7 @@
 import { api } from "@/utils/fetch-api";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { PaginatedUser, PaginatedWalletTxns, ProductSearch, User, Wishlist } from "@/schemas";
+import type { PaginatedUsers, PaginatedWalletTxns, ProductSearch, User, Wishlist } from "@/schemas";
 
 export const UserSearchSchema = z.object({
     query: z.string().optional(),
@@ -25,7 +25,7 @@ export const getUserFn = createServerFn({ method: "GET" })
 export const getUsersFn = createServerFn({ method: "GET" })
     .inputValidator((input: unknown) => UserSearchSchema.parse(input))
     .handler(async ({ data }) => {
-        return await api.get<PaginatedUser>("/users/", { params: data });
+        return await api.get<PaginatedUsers>("/users/", { params: data });
     });
 
 export const getWishlistListingFn = createServerFn().handler(async () => {

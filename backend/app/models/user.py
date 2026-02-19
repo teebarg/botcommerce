@@ -1,4 +1,4 @@
-from typing import Optional, Literal
+from typing import Optional, Literal, List
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, Field
 
@@ -33,7 +33,7 @@ class UserSelf(User):
 class UserAdmin(User):
     email: EmailStr
     created_at: datetime
-    updated_at: datetime
+    updated_at: Optional[datetime] = None
     wallet_balance: Optional[float] = 0
 
 class UserInternal(UserBase):
@@ -42,4 +42,17 @@ class UserInternal(UserBase):
     hashed_password: str
     wallet_balance: Optional[float] = 0
     created_at: datetime
-    updated_at: datetime
+    updated_at: Optional[datetime] = None
+
+class PaginatedUsers(BaseModel):
+    items: List[UserAdmin]
+    next_cursor: int | None
+    limit: int
+
+class GuestUserCreate(BaseModel):
+    first_name: str = Field(min_length=1, max_length=255)
+    last_name: str = Field(min_length=1, max_length=255)
+
+class PasswordChange(BaseModel):
+    old_password: str = Field(min_length=8, max_length=40)
+    new_password: str = Field(min_length=8, max_length=40)

@@ -9,7 +9,7 @@ from app.models.user import User
 from datetime import datetime
 from prisma.enums import WalletTransactionType
 
-class WalletTxns(BaseModel):
+class WalletTxn(BaseModel):
     id: str
     user_id: int
     user: User
@@ -20,7 +20,7 @@ class WalletTxns(BaseModel):
     created_at: datetime
 
 class PaginatedWalletTxns(BaseModel):
-    txns: list[WalletTxns]
+    txns: list[WalletTxn]
     next_cursor: Optional[str]
     limit: int
 

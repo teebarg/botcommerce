@@ -1,33 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { getRecentlyViewedFn, getUsersFn, getWishlistListingFn } from "@/server/users.server";
+import { getRecentlyViewedFn, getWishlistListingFn } from "@/server/users.server";
 import { clientApi } from "@/utils/api.client";
 import { User, Wishlist } from "@/schemas";
 
-interface UsersParams {
-    query?: string;
-    role?: "ADMIN" | "CUSTOMER";
-    status?: "ACTIVE" | "INACTIVE" | "PENDING";
-    skip?: number;
-    limit?: number;
-    sort?: string;
-}
-
-interface UsersQueryOptions {
-    enabled?: boolean;
-}
-
-export const useUsers = (searchParams: UsersParams, options?: UsersQueryOptions) => {
-    return useQuery({
-        queryKey: ["users", JSON.stringify(searchParams)],
-        queryFn: () => getUsersFn({ data: searchParams }),
-        enabled: options?.enabled,
-    });
-};
-
 export const useCreateUser = () => {
     const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: async (input: any) => await clientApi.post<User>("/users", input),
         onSuccess: () => {

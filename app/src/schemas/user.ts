@@ -15,7 +15,7 @@ export const UserLiteSchema = z.object({
     image: z.string().optional(),
 });
 
-export const WalletTxnsLiteSchema = z.object({
+export const WalletTxnLiteSchema = z.object({
     id: z.string(),
     amount: z.number(),
     type: z.enum(["CASHBACK", "WITHDRAWAL", "ADJUSTMENT", "REVERSAL"]),
@@ -24,7 +24,7 @@ export const WalletTxnsLiteSchema = z.object({
     created_at: z.string(),
 });
 
-export const WalletTxnsSchema = z.object({
+export const WalletTxnSchema = z.object({
     id: z.string(),
     user_id: z.number(),
     user: UserLiteSchema,
@@ -36,7 +36,7 @@ export const WalletTxnsSchema = z.object({
 });
 
 export const PaginatedWalletTxnsSchema = CursorSchema.extend({
-    txns: z.array(WalletTxnsSchema),
+    txns: z.array(WalletTxnSchema),
 });
 
 export const UserSchema = z
@@ -52,13 +52,11 @@ export const UserSchema = z
         role: z.enum(["ADMIN", "CUSTOMER"]),
         referral_code: z.string().optional(),
         wallet_balance: z.number(),
-        addresses: z.array(AddressSchema).optional(),
-        orders: z.array(z.any()).optional(),
     })
     .merge(AuditSchema);
 
-export const PaginatedUserSchema = PagSchema.extend({
-    users: z.array(UserSchema),
+export const PaginatedUsersSchema = CursorSchema.extend({
+    items: z.array(UserSchema),
 });
 
 export const SessionSchema = z.object({
@@ -91,10 +89,10 @@ export const UserSessionSchema = z.object({
     impersonatedBy: z.string().optional(),
 });
 
-export type WalletTxns = z.infer<typeof WalletTxnsSchema>;
+export type WalletTxn = z.infer<typeof WalletTxnSchema>;
 export type PaginatedWalletTxns = z.infer<typeof PaginatedWalletTxnsSchema>;
 export type User = z.infer<typeof UserSchema>;
-export type PaginatedUser = z.infer<typeof PaginatedUserSchema>;
+export type PaginatedUsers = z.infer<typeof PaginatedUsersSchema>;
 export type Session = z.infer<typeof SessionSchema>;
 export type UserSession = z.infer<typeof UserSessionSchema>;
 
