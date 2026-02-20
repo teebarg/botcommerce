@@ -1,58 +1,51 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Search } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AbandonedCartCard } from "@/components/admin/abandoned-carts/card";
-import type { Cart } from "@/schemas";
+import type { Cart, PaginatedAbandonedCarts } from "@/schemas";
 import { useSendCartReminders } from "@/hooks/useAbandonedCart";
-import PaginationUI from "@/components/pagination";
 import { AbandonedCartStats } from "@/components/admin/abandoned-carts/stat";
-import { getAbandonedCartsFn, getAbandonedCartStatsFn } from "@/server/abandoned-cart.server";
 import { useSuspenseQuery } from "@tanstack/react-query";
-
-interface AbandonedCartParams {
-    search?: string;
-    hours_threshold?: number;
-    skip?: number;
-}
-
-const abandonedCartStatsQuery = (hours_threshold: number) => ({
-    queryKey: ["abandoned-carts", "stats", JSON.stringify({ hours_threshold })],
-    queryFn: () => getAbandonedCartStatsFn({ data: hours_threshold }),
-});
-
-const abandonedCartsQuery = (params: AbandonedCartParams) => ({
-    queryKey: ["abandoned-carts", JSON.stringify(params)],
-    queryFn: () => getAbandonedCartsFn({ data: params }),
-});
+import { abandonedCartsQuery, abandonedCartStatsQuery } from "@/queries/admin.queries";
+import { clientApi } from "@/utils/api.client";
+import { useInfiniteResource } from "@/hooks/useInfiniteResource";
+import { InfiniteResourceList } from "@/components/InfiniteResourceList";
+import { z } from "zod";
+import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 
 export const Route = createFileRoute("/admin/(store)/abandoned-carts")({
-    loader: async ({ context: { queryClient } }) => {
+    validateSearch: z.object({
+        search: z.string().optional(),
+        time: z.string().optional().default("24"),
+    }),
+    loaderDeps: ({ search }) => (search),
+    loader: async ({ deps, context: { queryClient } }) => {
         await Promise.all([
-            queryClient.ensureQueryData(abandonedCartStatsQuery(24)),
-            queryClient.ensureQueryData(abandonedCartsQuery({ hours_threshold: 24 })),
+            queryClient.ensureQueryData(abandonedCartStatsQuery(deps.time)),
+            queryClient.ensureQueryData(abandonedCartsQuery({ hours_threshold: deps.time })),
         ]);
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const [searchQuery, setSearchQuery] = useState<string>("");
+    const params = Route.useSearch()
     const [timeFilter, setTimeFilter] = useState<string>("24");
-    const { data: stats } = useSuspenseQuery(abandonedCartStatsQuery(parseInt(timeFilter)));
-    const { data: abandonedCartsData } = useSuspenseQuery(abandonedCartsQuery({ hours_threshold: parseInt(timeFilter) }));
+    const { data: stats } = useSuspenseQuery(abandonedCartStatsQuery(params.time));
+    const { data } = useSuspenseQuery(abandonedCartsQuery({ hours_threshold: params.time }));
+    const { updateQuery } = useUpdateQuery(200);
     const { mutate: sendReminders, isPending: sendRemindersLoading } = useSendCartReminders();
 
-    const { carts: allCarts, ...pagination } = abandonedCartsData ?? {
-        carts: [],
-        skip: 0,
-        limit: 0,
-        total_pages: 0,
-        total_count: 0,
-    };
+    const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteResource<PaginatedAbandonedCarts, Cart>({
+        queryKey: ["abandoned-carts", "infinite"],
+        queryFn: (cursor) => clientApi.get<PaginatedAbandonedCarts>("/cart/abandoned-carts", { params: { cursor, ...params } }),
+        getItems: (page) => page.items,
+        getNextCursor: (page) => page.next_cursor,
+        initialData: data,
+    });
 
     const handleSendReminders = () => {
         sendReminders({ hours_threshold: parseInt(timeFilter) });
@@ -73,8 +66,8 @@ function RouteComponent() {
                             <Input
                                 className="pl-10 bg-card"
                                 placeholder="Search by customer name or email..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                value={params.search}
+                                onChange={(e) => updateQuery([{ key: "search", value: e.target.value ?? "" }])}
                             />
                         </div>
                         <div className="flex items-center gap-2">
@@ -101,21 +94,21 @@ function RouteComponent() {
                 {stats && <AbandonedCartStats stat={stats} />}
 
                 <div className="mt-4 space-y-4">
-                    {allCarts.length > 0 ? (
-                        allCarts.map((cart: Cart) => <AbandonedCartCard key={cart.id} cart={cart} />)
-                    ) : (
-                        <Card>
-                            <CardContent className="py-12 text-center">
-                                <p className="text-muted-foreground">No converted carts found, adjust the time range or search query</p>
-                            </CardContent>
-                        </Card>
+                    {!isLoading && items.length > 0 && (
+                        <InfiniteResourceList
+                            items={items}
+                            onLoadMore={fetchNextPage}
+                            hasMore={hasNextPage}
+                            isLoading={isFetchingNextPage}
+                            renderItem={(item: Cart) => <AbandonedCartCard key={item.id} cart={item} />}
+                        />
+                    )}
+                    {!isLoading && items?.length === 0 && (
+                        <div className="text-center py-12 bg-secondary">
+                            <p className="text-muted-foreground">No abandoned carts found, adjust the time range or search query</p>
+                        </div>
                     )}
                 </div>
-                {pagination.total_pages > 1 && (
-                    <div className="mt-8">
-                        <PaginationUI pagination={pagination} />
-                    </div>
-                )}
             </div>
         </div>
     );

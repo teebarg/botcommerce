@@ -3,6 +3,8 @@ import { clientApi } from "@/utils/api.client";
 import { StatsTrends } from "@/types/models";
 import { getUsersFn } from "@/server/users.server";
 import { getCouponsFn } from "@/server/coupon.server";
+import { getActivitiesFn } from "@/server/activities.server";
+import { getAbandonedCartsFn, getAbandonedCartStatsFn } from "@/server/abandoned-cart.server";
 
 export const statsTrendsQuery = () =>
     queryOptions({
@@ -26,10 +28,25 @@ export const usersQuery = (params: UsersParams) =>
 
 export interface CouponParams {
     query?: string;
-    isActive?: boolean
+    isActive?: boolean;
 }
 
 export const couponsQuery = (params: UsersParams) => ({
     queryKey: ["coupons", params],
     queryFn: () => getCouponsFn({ data: params }),
+});
+
+export const activitiesQuery = () => ({
+    queryKey: ["activities"],
+    queryFn: () => getActivitiesFn(),
+});
+
+export const abandonedCartStatsQuery = (hours_threshold: string) => ({
+    queryKey: ["abandoned-carts", "stats", JSON.stringify({ hours_threshold })],
+    queryFn: () => getAbandonedCartStatsFn({ data: hours_threshold }),
+});
+
+export const abandonedCartsQuery = (params: { search?: string; hours_threshold?: string }) => ({
+    queryKey: ["abandoned-carts", JSON.stringify(params)],
+    queryFn: () => getAbandonedCartsFn({ data: params }),
 });

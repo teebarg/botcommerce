@@ -1,7 +1,7 @@
 from typing import Optional
 from datetime import datetime, timedelta, timezone
 from app.core.utils import generate_id, generate_abandoned_cart_email, send_email
-from app.models.cart import CartUpdate, CartItemCreate, CartItem, Cart, CartLite, SendAbandonedCartReminders
+from app.models.cart import CartUpdate, CartItemCreate, CartItem, Cart, CartLite, SendAbandonedCartReminders, PaginatedAbandonedCarts
 from fastapi import APIRouter, Header, HTTPException, Request, BackgroundTasks, Depends
 from app.prisma_client import prisma as db
 from app.core.deps import UserDep, get_current_superuser, CurrentUser
@@ -439,9 +439,9 @@ async def get_admin_abandoned_carts(
     request: Request,
     search: Optional[str] = None,
     hours_threshold: int = 24,
-    skip: int = 0,
+    cursor: int | None = None,
     limit: int = 20
-):
+) -> PaginatedAbandonedCarts:
     """
     Get abandoned carts for admin dashboard with filtering and pagination.
     """
@@ -465,8 +465,9 @@ async def get_admin_abandoned_carts(
 
         carts = await db.cart.find_many(
             where=where_clause,
-            skip=skip,
-            take=limit,
+            skip=1 if cursor else 0,
+            take=limit + 1,
+            cursor={"id": cursor} if cursor else None,
             order={"updated_at": "desc"},
             include={
                 "user": True,
@@ -484,14 +485,12 @@ async def get_admin_abandoned_carts(
             }
         )
 
-        total_count = await db.cart.count(where=where_clause)
+        items = carts[:limit]
 
         return {
-            "carts": carts,
-            "skip": skip,
-            "limit": limit,
-            "total_count": total_count,
-            "total_pages": (total_count + limit - 1) // limit
+            "items": items,
+            "next_cursor": items[-1].id if len(carts) > limit else None,
+            "limit": limit
         }
 
     except Exception as e:

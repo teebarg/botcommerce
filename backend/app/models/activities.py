@@ -11,8 +11,6 @@ class Activity(BaseModel):
     created_at: datetime
 
 class PaginatedActivities(BaseModel):
-    activities: list[Activity]
-    skip: int
+    items: list[Activity]
+    next_cursor: int | None
     limit: int
-    total_count: int
-    total_pages: int

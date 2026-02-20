@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Loader, Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal } from "lucide-react";
 import type { PaginatedUsers, User } from "@/schemas";
 import CustomerCreateGuest from "@/components/admin/customers/customer-create-guest";
 import CustomerFilter from "@/components/admin/customers/customer-filter";
@@ -85,18 +85,12 @@ function RouteComponent() {
                                 onLoadMore={fetchNextPage}
                                 hasMore={hasNextPage}
                                 isLoading={isFetchingNextPage}
-                                loader={
-                                    <div className="flex flex-col items-center justify-center text-blue-600">
-                                        <Loader className="h-8 w-8 animate-spin mb-2" />
-                                        <p className="text-sm font-medium text-muted-foreground">Loading more transactions...</p>
-                                    </div>
-                                }
                                 renderItem={(item: User) => <CustomerCard key={item.id} user={item} />}
                             />
                         )}
                     </div>
 
-                    {items?.length === 0 && (
+                    {!isLoading && items?.length === 0 && (
                         <div className="text-center py-10">
                             <p className="text-muted-foreground">No users found</p>
                         </div>

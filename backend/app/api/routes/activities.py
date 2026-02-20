@@ -1,7 +1,6 @@
 
 from fastapi import APIRouter, HTTPException, Depends, Query, Request
 from typing import List
-from math import ceil
 from app.core.deps import CurrentUser, get_current_superuser
 from app.models.generic import Message
 from prisma.errors import PrismaError
@@ -16,24 +15,24 @@ router = APIRouter()
 @cache_response("activities")
 async def index(
     request: Request,
-    skip: int = Query(default=0, ge=0),
+    cursor: int | None = None,
     limit: int = Query(default=20, le=100),
 ) -> PaginatedActivities:
     """
     Retrieve activities.
     """
     activities = await db.activitylog.find_many(
-        skip=skip,
-        take=limit,
+        skip=1 if cursor else 0,
+        take=limit + 1,
+        cursor={"id": cursor} if cursor else None,
         order={"created_at": "desc"},
     )
-    total = await db.activitylog.count()
+    items = activities[:limit]
+
     return {
-        "activities": activities,
-        "skip": skip,
-        "limit":limit,
-        "total_pages":ceil(total/limit),
-        "total_count":total,
+        "items": items,
+        "next_cursor": items[-1].id if len(activities) > limit else None,
+        "limit": limit
     }
 
 @router.get("/me")

@@ -14,6 +14,7 @@ import { ProductVariantSchema } from "./product";
 import { type Address, AddressSchema } from "./address";
 import { AuditSchema } from "./base";
 import { UserSchema } from "./user";
+import { CursorSchema } from "./common";
 
 export const CartItemSchema = z
     .object({
@@ -59,8 +60,13 @@ export const CartSchema = z
     })
     .merge(AuditSchema);
 
+export const PaginatedAbandonedCartsSchema = CursorSchema.extend({
+    items: z.array(CartSchema),
+})
+
 export type CartItem = z.infer<typeof CartItemSchema>;
 export type Cart = z.infer<typeof CartSchema>;
+export type PaginatedAbandonedCarts = z.infer<typeof PaginatedAbandonedCartsSchema>;
 
 export type CartUpdate = {
     status?: CartStatus;

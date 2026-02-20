@@ -24,7 +24,7 @@ const StatusBadge = ({ isSuccess, activityType }: { isSuccess: boolean; activity
     return <Badge variant="blue">Success</Badge>;
 };
 
-export const ActivityListItem: React.FC<{ activity: Activity }> = ({ activity }) => {
+export const ActivityItem: React.FC<{ activity: Activity }> = ({ activity }) => {
     const deleteState = useOverlayTriggerState({});
     const { mutateAsync: deleteActivity, isPending } = useDeleteActivity();
 

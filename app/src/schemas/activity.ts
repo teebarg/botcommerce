@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { PagSchema } from "./common";
-import { UserSchema } from "./user";
+import { CursorSchema } from "./common";
+import { UserLiteSchema, UserSchema } from "./user";
 import { ProductSchema } from "./product";
 import { InteractionTypeSchema } from "./enums";
 
@@ -12,13 +12,12 @@ export const ActivitySchema = z.object({
     description: z.string(),
     action_download_url: z.string().optional(),
     is_success: z.boolean(),
-    user: UserSchema,
+    user: UserLiteSchema,
     created_at: z.string(),
-    updated_at: z.string(),
 });
 
-export const PaginatedActivitySchema = PagSchema.extend({
-    activities: z.array(ActivitySchema),
+export const PaginatedActivitiesSchema = CursorSchema.extend({
+    items: z.array(ActivitySchema),
 });
 
 export const UserInteractionSchema = z.object({
@@ -35,5 +34,5 @@ export const UserInteractionSchema = z.object({
 });
 
 export type Activity = z.infer<typeof ActivitySchema>;
-export type PaginatedActivity = z.infer<typeof PaginatedActivitySchema>;
+export type PaginatedActivities = z.infer<typeof PaginatedActivitiesSchema>;
 export type UserInteraction = z.infer<typeof UserInteractionSchema>;

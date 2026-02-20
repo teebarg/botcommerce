@@ -104,3 +104,8 @@ class CartLite(BaseModel):
 class SendAbandonedCartReminders(BaseModel):
     hours_threshold: int
     limit: int = 50
+
+class PaginatedAbandonedCarts(BaseModel):
+    items: list[Cart]
+    next_cursor: int | None
+    limit: int
