@@ -1,17 +1,15 @@
 import { queryOptions } from "@tanstack/react-query";
-import { clientApi } from "@/utils/api.client";
-import { StatsTrends } from "@/types/models";
 import { getUsersFn } from "@/server/users.server";
 import { getCouponsFn } from "@/server/coupon.server";
 import { getActivitiesFn } from "@/server/activities.server";
 import { getAbandonedCartsFn, getAbandonedCartStatsFn } from "@/server/abandoned-cart.server";
-import { getChatsFn } from "@/server/generic.server";
+import { getChatsFn, getStatTrendsFn } from "@/server/generic.server";
 import { ConversationStatus } from "@/schemas";
 
 export const statsTrendsQuery = () =>
     queryOptions({
-        queryKey: ["admin", "stats", "trends"],
-        queryFn: () => clientApi.get<StatsTrends>("/stats/trends"),
+        queryKey: ["stats", "trends"],
+        queryFn: () => getStatTrendsFn(),
         staleTime: 50_000,
     });
 

@@ -8,7 +8,6 @@ const AccountNav = () => {
     const handleLogout = async () => {
         window.location.href = "/api/auth/signout";
         invalidate();
-        window.location.href = "/";
     };
 
     const navLinks = [

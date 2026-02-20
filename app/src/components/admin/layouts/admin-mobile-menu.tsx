@@ -20,11 +20,18 @@ import {
 import { useLocation } from "@tanstack/react-router";
 import LocalizedClientLink from "@/components/ui/link";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useInvalidateMe } from "@/hooks/useUser";
 
 const AdminMobileMenu: React.FC = () => {
     const location = useLocation();
+    const invalidate = useInvalidateMe();
 
     const pathname = location.pathname;
+
+    const handleLogout = async () => {
+        window.location.href = "/api/auth/signout";
+        invalidate();
+    };
 
     const menuItems = [
         { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} />, href: "/admin" },
@@ -75,7 +82,7 @@ const AdminMobileMenu: React.FC = () => {
                 </div>
             </ScrollArea>
             <div className="p-4 border-t">
-                <button className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors w-full p-2">
+                <button onClick={handleLogout} className="flex items-center space-x-2 text-red-500 w-full p-2">
                     <LogOut size={20} />
                     <span>Logout</span>
                 </button>

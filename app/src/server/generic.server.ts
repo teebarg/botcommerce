@@ -2,6 +2,9 @@ import { z } from "zod";
 import { createServerFn } from "@tanstack/react-start";
 import { api } from "@/utils/fetch-api";
 import { ConversationStatusSchema, type ChatMessage, type DeliveryOption, type PaginatedChats, type ShopSettings } from "@/schemas";
+import { StatsTrends } from "@/types/models";
+
+export const getStatTrendsFn = createServerFn().handler(async () => await api.get<StatsTrends>("/stats/trends"));
 
 export const getShopSettingsFn = createServerFn({ method: "GET" }).handler(async () => {
     return await api.get<ShopSettings[]>("/shop-settings/");
