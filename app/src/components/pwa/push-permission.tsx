@@ -62,7 +62,7 @@ function storeSubscriptionKeys(sub: PushSubscription) {
 export default function PushPermission() {
     const [permission, setPermission] = useState("granted");
     const [subscription, setSubscription] = useState<PushSubscription | any | null>(null);
-    const [isDismissed, setIsDismissed] = useState<boolean>(false);
+    const [isDismissed, setIsDismissed] = useState<boolean>(true);
 
     useEffect(() => {
         const dismissedAt = localStorage.getItem("push_dismissed_at");

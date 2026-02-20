@@ -12,7 +12,7 @@ import { CreateCollection } from "@/components/admin/collections/create-collecti
 import { CollectionActions } from "@/components/admin/collections/collection-actions";
 import CollectionItem from "@/components/admin/collections/collection-items";
 
-export const Route = createFileRoute("/admin/(store)/collections")({
+export const Route = createFileRoute("/_adminLayout/admin/(store)/collections")({
     component: RouteComponent,
 });
 

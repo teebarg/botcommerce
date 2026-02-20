@@ -16,7 +16,7 @@ import { Coupon, PaginatedCoupons } from "@/schemas";
 import { clientApi } from "@/utils/api.client";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 
-export const Route = createFileRoute("/admin/(store)/coupons")({
+export const Route = createFileRoute("/_adminLayout/admin/(store)/coupons")({
     validateSearch: z.object({
         query: z.string().optional(),
         isActive: z.boolean().optional(),

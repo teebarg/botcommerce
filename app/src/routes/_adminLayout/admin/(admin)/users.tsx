@@ -13,7 +13,7 @@ import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { clientApi } from "@/utils/api.client";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 
-export const Route = createFileRoute("/admin/(admin)/users")({
+export const Route = createFileRoute("/_adminLayout/admin/(admin)/users")({
     validateSearch: z.object({
         sort: z.enum(["asc", "desc"]).optional(),
         query: z.string().optional(),

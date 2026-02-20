@@ -21,7 +21,7 @@ const galleryInfiniteQuery = () => ({
     queryFn: () => getGalleryImagesFn(),
 });
 
-export const Route = createFileRoute("/admin/(store)/gallery")({
+export const Route = createFileRoute("/_adminLayout/admin/(store)/gallery")({
     loader: async ({ context: { queryClient } }) => {
         await queryClient.ensureQueryData(galleryInfiniteQuery());
     },

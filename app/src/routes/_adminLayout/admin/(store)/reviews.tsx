@@ -12,7 +12,7 @@ import z from "zod";
 import { reviewsQuery } from "@/queries/user.queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-export const Route = createFileRoute("/admin/(store)/reviews")({
+export const Route = createFileRoute("/_adminLayout/admin/(store)/reviews")({
     validateSearch: z.object({
         product_id: z.number().optional(),
         skip: z.number().optional(),

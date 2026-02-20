@@ -8,7 +8,7 @@ import { clientApi } from "@/utils/api.client";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 
-export const Route = createFileRoute("/admin/(admin)/chats")({
+export const Route = createFileRoute("/_adminLayout/admin/(admin)/chats")({
     validateSearch: z.object({
         status: ConversationStatusSchema.optional(),
     }),

@@ -62,7 +62,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Shipping</span>
-                                <span className="font-medium text-primary">{shippingFee === 0 ? "Free" : `${currency(shippingFee || 0)}`}</span>
+                                <span className="font-medium">{shippingFee === 0 ? "Free" : `${currency(shippingFee || 0)}`}</span>
                             </div>
                             {cart?.discount_amount > 0 && (
                                 <div className="flex justify-between text-sm">

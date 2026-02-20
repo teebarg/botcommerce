@@ -204,8 +204,8 @@ async def send_notification(id: int, user_id: int, notification):
             logger.error(f"Failed to generate invoice email: {e}")
             return
 
-        order_link = f"{settings.FRONTEND_HOST}/order/confirmed/{order.order_number}"
-        items_overview = "\n".join(
+        order_link: str = f"{settings.FRONTEND_HOST}/order/confirmed/{order.order_number}"
+        items_overview: str = "\n".join(
             [f"• {it.name} x{it.quantity} - {it.price}" for it in (order.order_items or [])]
         ) or "No items found"
 

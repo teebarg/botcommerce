@@ -19,7 +19,7 @@ interface Session {
     name: string;
 }
 
-export const Route = createFileRoute("/admin/(admin)/online")({
+export const Route = createFileRoute("/_adminLayout/admin/(admin)/online")({
     component: RouteComponent,
 });
 

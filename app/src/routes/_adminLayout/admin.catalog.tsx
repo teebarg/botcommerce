@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useCatalogs } from "@/hooks/useCollection";
 import SheetDrawer from "@/components/sheet-drawer";
 
-export const Route = createFileRoute("/admin/catalog")({
+export const Route = createFileRoute("/_adminLayout/admin/catalog")({
     component: RouteComponent,
 });
 

@@ -8,7 +8,7 @@ import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { clientApi } from "@/utils/api.client";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 
-export const Route = createFileRoute("/admin/(admin)/activities")({
+export const Route = createFileRoute("/_adminLayout/admin/(admin)/activities")({
     loader: async ({ context: { queryClient } }) => {
         await queryClient.ensureQueryData(activitiesQuery());
     },

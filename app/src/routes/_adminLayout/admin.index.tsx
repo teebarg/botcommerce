@@ -5,7 +5,7 @@ import { statsTrendsQuery } from "@/queries/admin.queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ordersQuery } from "@/queries/user.queries";
 
-export const Route = createFileRoute("/admin/")({
+export const Route = createFileRoute("/_adminLayout/admin/")({
     loader: async ({ context: { queryClient } }) => {
         await Promise.all([queryClient.ensureQueryData(ordersQuery({ take: 5 })), queryClient.ensureQueryData(statsTrendsQuery())]);
     },

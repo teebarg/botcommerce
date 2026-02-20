@@ -16,7 +16,7 @@ import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { z } from "zod";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 
-export const Route = createFileRoute("/admin/(store)/abandoned-carts")({
+export const Route = createFileRoute("/_adminLayout/admin/(store)/abandoned-carts")({
     validateSearch: z.object({
         search: z.string().optional(),
         time: z.string().optional().default("24"),

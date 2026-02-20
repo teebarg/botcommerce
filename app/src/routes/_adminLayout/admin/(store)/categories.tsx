@@ -6,7 +6,7 @@ import CategoryTree from "@/components/admin/categories/tree";
 import type { Category } from "@/schemas/product";
 import ComponentLoader from "@/components/component-loader";
 
-export const Route = createFileRoute("/admin/(store)/categories")({
+export const Route = createFileRoute("/_adminLayout/admin/(store)/categories")({
     component: RouteComponent,
 });
 

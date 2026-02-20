@@ -237,7 +237,7 @@ async def update_cart(cart_update: CartUpdate, user: UserDep, cartId: str = Head
 
     if cart_update.shipping_fee is not None:
         update_data["shipping_fee"] = cart_update.shipping_fee
-        update_data["total"] = cart.subtotal + cart.tax + update_data["shipping_fee"] - cart.discount_amount
+        update_data["total"] = cart.subtotal + cart.tax + update_data["shipping_fee"] - cart.discount_amount - cart.wallet_used
 
     if user:
         update_data["user"] = {"connect": {"id": user.id}}

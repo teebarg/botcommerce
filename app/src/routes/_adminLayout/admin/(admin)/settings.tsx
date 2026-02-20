@@ -13,7 +13,7 @@ const useShopSettingsQuery = () =>
         queryFn: () => getShopSettingsFn(),
     });
 
-export const Route = createFileRoute("/admin/(admin)/settings")({
+export const Route = createFileRoute("/_adminLayout/admin/(admin)/settings")({
     loader: async ({ context }) => {
         await context.queryClient.ensureQueryData(useShopSettingsQuery());
     },

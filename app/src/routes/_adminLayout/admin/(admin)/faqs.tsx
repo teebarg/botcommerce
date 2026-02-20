@@ -18,7 +18,7 @@ const useFaqsQuery = () =>
         queryFn: () => getFaqsFn(),
     });
 
-export const Route = createFileRoute("/admin/(admin)/faqs")({
+export const Route = createFileRoute("/_adminLayout/admin/(admin)/faqs")({
     loader: async ({ context }) => {
         await context.queryClient.ensureQueryData(useFaqsQuery());
     },

@@ -1,11 +1,10 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-
 import AdminNavbar from "@/components/admin/layouts/admin-navbar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/layout/admin-sidebar";
 import type { Session } from "start-authjs";
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/_adminLayout")({
     beforeLoad: ({ context, location }) => {
         if (!context.session) {
             throw redirect({ to: "/auth/signin", search: { callbackUrl: location.href } });
@@ -14,10 +13,10 @@ export const Route = createFileRoute("/admin")({
             throw redirect({ to: "/" });
         }
     },
-    component: AdminLayoutComponent,
+    component: RouteComponent,
 });
 
-function AdminLayoutComponent() {
+function RouteComponent() {
     const { session } = Route.useRouteContext();
     return (
         <SidebarProvider>

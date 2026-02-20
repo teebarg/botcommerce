@@ -11,7 +11,7 @@ import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { clientApi } from "@/utils/api.client";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 
-export const Route = createFileRoute("/admin/(store)/orders")({
+export const Route = createFileRoute("/_adminLayout/admin/(store)/orders")({
     validateSearch: z.object({
         search: z.string().optional(),
         status: z.enum(["ACTIVE", "COMPLETED", "ABANDONED", "DELIVERED"]).optional(),
