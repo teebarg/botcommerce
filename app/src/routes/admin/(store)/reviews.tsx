@@ -18,21 +18,21 @@ export const Route = createFileRoute("/admin/(store)/reviews")({
         skip: z.number().optional(),
         sort: z.string().optional(),
     }),
-    loaderDeps: ({ search: { product_id, skip, sort } }) => ({ product_id, skip, sort }),
-    loader: async ({ context: { queryClient }, deps: { product_id, skip, sort } }) => {
-        await queryClient.ensureQueryData(reviewsQuery({ product_id, skip, sort }));
+    loaderDeps: ({ search }) => (search),
+    loader: async ({ context: { queryClient }, deps }) => {
+        await queryClient.ensureQueryData(reviewsQuery(deps));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { data: paginatedReviews } = useSuspenseQuery(reviewsQuery(Route.useSearch()));
+    const { data } = useSuspenseQuery(reviewsQuery(Route.useSearch()));
 
-    if (!paginatedReviews) {
+    if (!data) {
         return <div className="px-2 md:px-12 py-48">No reviews found</div>;
     }
 
-    const { reviews, ...pagination } = paginatedReviews;
+    const { reviews, ...pagination } = data;
     return (
         <div className="px-3 md:px-12 py-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

@@ -7,10 +7,9 @@ from app.models.carousel import (
     CarouselBannerCreate,
     CarouselBannerUpdate,
 )
-from app.models.generic import Message
 from app.prisma_client import prisma as db
 from app.core.storage import upload, delete_image
-from app.models.generic import ImageUpload
+from app.models.generic import ImageUpload, Message
 
 router = APIRouter()
 

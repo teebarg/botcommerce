@@ -61,3 +61,9 @@ class OrderTimelineEntry(BaseModel):
     to_status: Optional[OrderStatus] = None
     message: Optional[str] = None
     created_at: datetime
+
+class OrderNotesUpdate(BaseModel):
+    notes: str
+
+class ReturnItemPayload(BaseModel):
+    item_id: int

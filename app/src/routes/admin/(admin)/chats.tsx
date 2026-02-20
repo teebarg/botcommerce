@@ -1,60 +1,54 @@
 import { createFileRoute } from "@tanstack/react-router";
-import ChatsActions from "@/components/admin/chats/chats-actions";
 import ChatsCard from "@/components/admin/chats/chats-card";
-import type { Chat, ConversationStatus } from "@/schemas";
-import PaginationUI from "@/components/pagination";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { getChatsFn } from "@/server/generic.server";
+import { ConversationStatusSchema, type Chat, type PaginatedChats } from "@/schemas";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import z from "zod";
-
-interface ConversationParams {
-    user_id?: number;
-    status?: ConversationStatus;
-    skip?: number;
-}
-
-const useChatsQuery = (searchParams: ConversationParams) =>
-    queryOptions({
-        queryKey: ["chats"],
-        queryFn: () => getChatsFn({ data: searchParams }),
-    });
+import { chatsQuery } from "@/queries/admin.queries";
+import { clientApi } from "@/utils/api.client";
+import { InfiniteResourceList } from "@/components/InfiniteResourceList";
+import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 
 export const Route = createFileRoute("/admin/(admin)/chats")({
     validateSearch: z.object({
-        skip: z.number().optional().default(0),
-        status: z.enum(["ACTIVE", "COMPLETED", "ABANDONED"]).optional(),
+        status: ConversationStatusSchema.optional(),
     }),
-    loaderDeps: ({ search: { skip, status } }) => ({ skip, status }),
-    loader: async ({ context, deps: { skip, status } }) => {
-        await context.queryClient.ensureQueryData(useChatsQuery({ skip, status }));
+    loaderDeps: ({ search }) => search,
+    loader: async ({ context, deps }) => {
+        await context.queryClient.ensureQueryData(chatsQuery(deps));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const search = Route.useSearch();
-    const { data } = useSuspenseQuery(useChatsQuery({ ...search }));
+    const params = Route.useSearch();
+    const { data } = useSuspenseQuery(chatsQuery(params));
 
-    const { chats, ...pagination } = data ?? { skip: 0, limit: 0, total_pages: 0, total_count: 0 };
+    const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteResource<PaginatedChats, Chat>({
+        queryKey: ["chats", "infinite", params],
+        queryFn: (cursor) => clientApi.get<PaginatedChats>("/chat/", { params: { cursor, ...params } }),
+        getItems: (page) => page.items,
+        getNextCursor: (page) => page.next_cursor,
+        initialData: data,
+    });
 
     return (
         <div className="px-2 md:px-10 py-8">
             <h3 className="text-2xl font-medium">Chats view</h3>
             <p className="text-muted-foreground text-sm mb-4">Manage your chats.</p>
-            <div className="pb-4">
-                <div>
-                    {chats?.map((chat: Chat, idx: number) => (
-                        <ChatsCard key={idx} actions={<ChatsActions chat={chat} />} chat={chat} />
-                    ))}
+            {!isLoading && items.length > 0 && (
+                <InfiniteResourceList
+                    items={items}
+                    onLoadMore={fetchNextPage}
+                    hasMore={hasNextPage}
+                    isLoading={isFetchingNextPage}
+                    renderItem={(item: Chat) => <ChatsCard key={item.id} chat={item} />}
+                />
+            )}
+            {!isLoading && items?.length === 0 && (
+                <div className="text-center py-10 bg-card">
+                    <p className="text-muted-foreground">No chat found</p>
                 </div>
-
-                {chats?.length === 0 && (
-                    <div className="text-center py-10 bg-card">
-                        <p className="text-muted-foreground">No chat found</p>
-                    </div>
-                )}
-            </div>
-            {pagination?.total_pages > 1 && <PaginationUI key="pagination" pagination={pagination} />}
+            )}
         </div>
     );
 }

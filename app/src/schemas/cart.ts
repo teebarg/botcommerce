@@ -21,7 +21,7 @@ export const CartItemSchema = z
         id: z.number(),
         name: z.string(),
         slug: z.string(),
-        variant_id: z.number(),
+        // variant_id: z.number(),
         variant: ProductVariantSchema,
         image: z.string().optional(),
         quantity: z.number(),
@@ -42,7 +42,6 @@ export const CartSchema = z
             .optional(),
         status: CartStatusSchema,
         items: z.array(CartItemSchema),
-        checkout_step: z.enum(["address", "delivery", "payment"]).default("address").optional(),
         subtotal: z.number(),
         tax: z.number(),
         shipping_fee: z.number(),
@@ -50,13 +49,12 @@ export const CartSchema = z
         discount_amount: z.number(),
         discounts: z.any().optional(),
         coupon_id: z.number().optional(),
+        coupon_code: z.string().optional(),
         total: z.number(),
-        billing_address: AddressSchema.optional(),
         shipping_address_id: z.number().optional(),
         shipping_address: AddressSchema.optional(),
         shipping_method: ShippingMethodSchema.optional(),
         payment_method: PaymentMethodSchema.optional(),
-        gift_cards: z.any().optional(),
     })
     .merge(AuditSchema);
 

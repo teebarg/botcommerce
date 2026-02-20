@@ -4,7 +4,6 @@ from app.models.generic import ImageUpload
 from app.models.base import BM
 from prisma.enums import ProductStatus
 from app.models.reviews import Review
-# from app.models.category import Category
 from app.models.collection import Collection
 
 class ProductImage(BaseModel):
@@ -195,3 +194,7 @@ class ProductLite(BaseModel):
     sku: str
     variants: Optional[List[ProductVariant]] = []
     images: Optional[List[ProductImage]] = []
+
+class ReviewStatus(BaseModel):
+    has_purchased: bool
+    has_reviewed: bool

@@ -3,7 +3,6 @@ from enum import Enum
 from prisma.enums import PaymentMethod, ShippingMethod
 from typing import Optional
 from datetime import datetime
-from enum import Enum
 from app.models.user import User
 from app.models.product import ProductVariant
 
@@ -29,7 +28,6 @@ class CartItemCreate(BaseModel):
     variant_id: int
     quantity: int
 
-
 class CartUpdate(BaseModel):
     total: Optional[float] = None
     subtotal: Optional[float] = None
@@ -54,8 +52,6 @@ class CartItemBase(BaseModel):
 
 class CartItem(CartItemBase):
     id: int
-    cart_id: int
-    cart_number: str
     variant: Optional[ProductVariant]
     created_at: datetime
 
@@ -72,7 +68,7 @@ class Cart(BaseModel):
     shipping_method: Optional[ShippingMethod]
     shipping_address_id: Optional[int] = None
     shipping_address: Optional[CartAddress]
-    billing_address: Optional[CartAddress]
+    # billing_address: Optional[CartAddress]
     total: float = 0
     subtotal: float = 0
     tax: float = 0

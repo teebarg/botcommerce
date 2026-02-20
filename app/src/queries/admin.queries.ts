@@ -5,6 +5,8 @@ import { getUsersFn } from "@/server/users.server";
 import { getCouponsFn } from "@/server/coupon.server";
 import { getActivitiesFn } from "@/server/activities.server";
 import { getAbandonedCartsFn, getAbandonedCartStatsFn } from "@/server/abandoned-cart.server";
+import { getChatsFn } from "@/server/generic.server";
+import { ConversationStatus } from "@/schemas";
 
 export const statsTrendsQuery = () =>
     queryOptions({
@@ -50,3 +52,9 @@ export const abandonedCartsQuery = (params: { search?: string; hours_threshold?:
     queryKey: ["abandoned-carts", JSON.stringify(params)],
     queryFn: () => getAbandonedCartsFn({ data: params }),
 });
+
+export const chatsQuery = (params: { user_id?: number; status?: ConversationStatus }) =>
+    queryOptions({
+        queryKey: ["chats", JSON.stringify(params)],
+        queryFn: () => getChatsFn({ data: params }),
+    });

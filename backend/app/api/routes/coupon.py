@@ -12,7 +12,6 @@ from app.models.coupon import (
 )
 from app.services.coupon import CouponService
 from app.prisma_client import prisma as db
-
 from app.core.logging import get_logger
 from app.services.redis import cache_response, invalidate_pattern
 from prisma.errors import PrismaError

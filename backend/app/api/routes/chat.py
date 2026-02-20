@@ -2,23 +2,16 @@ from fastapi import APIRouter, HTTPException, Query
 
 from app.prisma_client import prisma as db
 from typing import Optional
-from pydantic import BaseModel
 from uuid import uuid4
 from app.services.chat import assistant
-
 from prisma.enums import ConversationStatus
-from math import ceil
+from app.models.chat import PaginatedChats, Chat, ChatRequest
+from app.models.generic import Message
 
 router = APIRouter()
 
-class ChatRequest(BaseModel):
-    user_message: str
-    user_id: Optional[int] = None
-    conversation_uuid: Optional[str] = None
-
-
 @router.post("/")
-async def chat_endpoint(payload: ChatRequest):
+async def chat_endpoint(payload: ChatRequest) -> dict[str, str]:
     if payload.conversation_uuid:
         conversation = await db.conversation.find_unique(
             where={"conversation_uuid": payload.conversation_uuid}
@@ -49,7 +42,7 @@ async def chat_endpoint(payload: ChatRequest):
         [f"User: {h['user']}\nAssistant: {h['assistant']}" for h in history]
     )
 
-    reply = await assistant.chat(payload.user_message, history_text)
+    reply: str = await assistant.chat(payload.user_message, history_text)
 
     async with db.tx() as tx:
         await tx.message.create(
@@ -77,12 +70,12 @@ async def chat_endpoint(payload: ChatRequest):
     }
 
 @router.get("/")
-async def list_chats(
+async def index(
     user_id: Optional[int] = Query(None),
     status: Optional[ConversationStatus] = Query(None),
-    skip: int = Query(default=0, ge=0),
+    cursor: int | None = None,
     limit: int = Query(default=100, ge=1, le=100)
-):
+) -> PaginatedChats:
     """List chats with optional filtering"""
     where = {}
     if user_id is not None:
@@ -92,23 +85,23 @@ async def list_chats(
 
     chats = await db.conversation.find_many(
         where=where,
-        skip=skip,
-        take=limit,
+        skip=1 if cursor else 0,
+        take=limit + 1,
+        cursor={"id": cursor} if cursor else None,
         order={"last_active": "desc"},
         include={"user": True, "messages": True}
     )
-    total = await db.conversation.count(where=where)
+    items = chats[:limit]
+
     return {
-        "chats":chats,
-        "skip":skip,
-        "limit":limit,
-        "total_pages":ceil(total/limit),
-        "total_count":total,
+        "items": items,
+        "next_cursor": items[-1].id if len(chats) > limit else None,
+        "limit": limit
     }
 
 
 @router.get("/{uid}")
-async def get_chat(uid: str):
+async def get_chat(uid: str) -> Chat:
     """Get a chat and all its messages"""
     chat = await db.conversation.find_unique(where={"conversation_uuid": uid}, include={"messages": True})
     if not chat:
@@ -118,7 +111,7 @@ async def get_chat(uid: str):
 
 
 @router.delete("/{id}")
-async def delete_chat(id: int):
+async def delete_chat(id: int) -> Message:
     """Delete a chat and all its messages"""
     existing_chat = await db.conversation.find_unique(where={"id": id})
     if not existing_chat:

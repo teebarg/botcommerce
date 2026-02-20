@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 from app.core.config import settings
-from app.schemas.payment import PaymentInitialize
+from app.schemas.payment import PaymentInitialize, PaymentCreate
 from app.models.order import OrderCreate, Order
 from app.core.deps import CurrentUser, Notification, get_current_user, get_current_superuser
 from app.models.user import User
@@ -13,7 +13,6 @@ from app.core.logging import get_logger
 from app.services.events import publish_event, publish_order_event
 from app.services.redis import invalidate_pattern, invalidate_key
 from app.models.cart import Cart
-from app.schemas.payment import PaymentCreate
 
 logger = get_logger(__name__)
 

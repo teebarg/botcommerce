@@ -2,11 +2,10 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, B
 from app.core.deps import CurrentUser, get_current_superuser
 from typing import Optional
 from app.prisma_client import prisma as db
-from app.models.order import Order, OrderCreate, OrderTimelineEntry, PaginatedOrders
+from app.models.order import Order, OrderCreate, OrderTimelineEntry, PaginatedOrders, OrderNotesUpdate, ReturnItemPayload
 from prisma.enums import OrderStatus
 from app.services.order import create_order_from_cart, retrieve_order, list_orders, return_order_item
 from app.services.redis import cache_response, invalidate_key, invalidate_pattern
-from pydantic import BaseModel
 from app.core.logging import get_logger
 from app.models.generic import Message
 
@@ -106,9 +105,6 @@ async def order_status(id: int, status: OrderStatus) -> Order:
         await invalidate_key(f"order-timeline:{id}")
         return updated_order
 
-class OrderNotesUpdate(BaseModel):
-    notes: str
-
 @router.patch("/{order_id}/notes")
 async def update_order_notes(order_id: int, notes_update: OrderNotesUpdate, user: CurrentUser = None) -> Order:
     order = await db.order.find_unique(where={"id": order_id})
@@ -132,10 +128,6 @@ async def get_order_timeline(order_id: int):
         where={"order_id": order_id}, order={"created_at": "asc"}
     )
     return entries
-
-
-class ReturnItemPayload(BaseModel):
-    item_id: int
 
 
 @router.post("/{order_id}/return", dependencies=[Depends(get_current_superuser)], response_model=Message)

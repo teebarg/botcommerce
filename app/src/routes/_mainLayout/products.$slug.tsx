@@ -71,7 +71,6 @@ function RouteComponent() {
     return (
         <main className="flex flex-col">
             <ProductView product={product} />
-
             <LazyInView>
                 <RelatedProducts productId={product.id} />
             </LazyInView>

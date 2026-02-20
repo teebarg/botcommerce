@@ -8,7 +8,7 @@ from fastapi import (
     BackgroundTasks,
     Request
 )
-from app.core.deps import CurrentUser, get_current_superuser
+from app.core.deps import CurrentUser, get_current_superuser, UserDep
 from app.core.logging import get_logger
 from app.core.utils import slugify, url_to_list, generate_sku
 from app.models.generic import Message, ImageUpload
@@ -17,7 +17,7 @@ from app.models.product import (
     ProductUpdate,
     VariantWithStatus,
     Product, SearchProducts, FeedProducts,
-    ProductCreateBundle, IndexProducts
+    ProductCreateBundle, IndexProducts, ReviewStatus
 )
 from app.services.meilisearch import (
     clear_index,
@@ -40,6 +40,8 @@ from app.services.generic import remove_image_from_storage
 from app.services.redis import invalidate_pattern
 from app.redis_client import redis_client
 from collections import Counter
+import asyncio
+from prisma.enums import PaymentStatus
 
 logger = get_logger(__name__)
 
@@ -73,6 +75,51 @@ def build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any
     return data
 
 router = APIRouter()
+
+@router.get("/{product_id}/review-status")
+@cache_response("products")
+async def get_review_status(
+    request: Request,
+    product_id: int,
+    user: UserDep,
+) -> ReviewStatus:
+    """
+    Check if a user has purchased and reviewed a product.
+    """
+    if not user:
+        return ReviewStatus(has_purchased=False, has_reviewed=False)
+
+    user_id: int = user.id
+    purchase_count_task = db.order.count(
+        where={
+            "user_id": user_id,
+            "payment_status": PaymentStatus.SUCCESS,
+            "order_items": {
+                "some": {
+                    "variant": {
+                        "product_id": product_id,
+                    }
+                }
+            },
+        }
+    )
+
+    review_count_task = db.review.count(
+        where={
+            "user_id": user_id,
+            "product_id": product_id,
+        }
+    )
+
+    purchase_count, review_count = await asyncio.gather(
+        purchase_count_task,
+        review_count_task,
+    )
+
+    return ReviewStatus(
+        has_purchased=purchase_count > 0,
+        has_reviewed=review_count > 0,
+    )
 
 @router.get("/{id}/similar")
 @cache_response("products")

@@ -1,17 +1,12 @@
-from app.models.generic import Message
 from fastapi import APIRouter, HTTPException, status, BackgroundTasks, Request, Header
 from pydantic import EmailStr, BaseModel, Field
-from app.core.config import settings
-
 from app.core import security
 from app.core.config import settings
 from app.core.utils import generate_magic_link_email, send_email, generate_verification_email
 from app.models.user import User
-from app.prisma_client import prisma
 from app.services.events import publish_user_registered
 from datetime import datetime, timedelta
-from pydantic import BaseModel
-from app.models.generic import Token
+from app.models.generic import Token, Message
 from app.prisma_client import prisma as db
 
 import httpx
@@ -60,37 +55,37 @@ def tokenData(user: User):
     }
 
 
-@router.post("/test-signup")
-async def test_signup(request: Request):
-    """
-    Register a new user with email and password.
-    Requires CAPTCHA verification and email verification.
-    """
-    from app.services.events import publish_order_event
-    # existing_user = await prisma.user.find_first(
-    #     where={
-    #         "email": "teebarg01@gmail.com",
-    #     }
-    # )
+# @router.post("/test-signup")
+# async def test_signup(request: Request):
+#     """
+#     Register a new user with email and password.
+#     Requires CAPTCHA verification and email verification.
+#     """
+#     from app.services.events import publish_order_event
+#     # existing_user = await db.user.find_first(
+#     #     where={
+#     #         "email": "teebarg01@gmail.com",
+#     #     }
+#     # )
 
-    existing_order = await prisma.order.find_first(
-        where={
-            "order_number": "ORD4395C971",
-        }
-    )
+#     existing_order = await db.order.find_first(
+#         where={
+#             "order_number": "ORD4395C971",
+#         }
+#     )
 
-    try:
-        # await publish_user_registered(
-        #     user=existing_user,
-        #     source="email_password",
-        #     created_at=existing_user.created_at,
-        # )
-        await publish_order_event(order=existing_order, type="ORDER_PAID")
-    except Exception as e:
-        logger.error(f"Failed to publish USER_REGISTERED event: {e}")
-        pass
+#     try:
+#         # await publish_user_registered(
+#         #     user=existing_user,
+#         #     source="email_password",
+#         #     created_at=existing_user.created_at,
+#         # )
+#         await publish_order_event(order=existing_order, type="ORDER_PAID")
+#     except Exception as e:
+#         logger.error(f"Failed to publish USER_REGISTERED event: {e}")
+#         pass
 
-    return "Done"
+#     return "Done"
 
 
 
@@ -100,7 +95,7 @@ async def signup(request: Request, payload: SignUpPayload, background_tasks: Bac
     Register a new user with email and password.
     Requires CAPTCHA verification and email verification.
     """
-    existing_user = await prisma.user.find_first(
+    existing_user = await db.user.find_first(
         where={
             "email": payload.email,
         }
@@ -117,7 +112,7 @@ async def signup(request: Request, payload: SignUpPayload, background_tasks: Bac
     verification_token = security.create_email_verification_token(
         payload.email)
 
-    user = await prisma.user.create(
+    user = await db.user.create(
         data={
             "email": payload.email,
             "hashed_password": hashed_password,
@@ -174,7 +169,7 @@ async def verify_email(payload: VerifyEmailPayload, cartId: str = Header(default
             detail="Invalid or expired verification token",
         )
 
-    user = await prisma.user.find_first(
+    user = await db.user.find_first(
         where={
             "email": email,
             "email_verification_token": payload.token,
@@ -190,7 +185,7 @@ async def verify_email(payload: VerifyEmailPayload, cartId: str = Header(default
             detail="Invalid or expired verification token",
         )
 
-    await prisma.user.update(
+    await db.user.update(
         where={"id": user.id},
         data={
             "status": "ACTIVE",
@@ -222,7 +217,7 @@ async def verify_email(payload: VerifyEmailPayload, cartId: str = Header(default
 @router.get("/oauth/google")
 async def google_oauth_url():
     """Generate Google OAuth URL"""
-    auth_url = (
+    auth_url: str = (
         "https://accounts.google.com/o/oauth2/v2/auth"
         f"?client_id={settings.GOOGLE_CLIENT_ID}"
         f"&redirect_uri={settings.FRONTEND_HOST}/auth/google/callback"
@@ -271,8 +266,8 @@ async def google_oauth_callback(request: Request, payload: OAuthCallback) -> Tok
 
         user_info = user_response.json()
 
-        user_before = await prisma.user.find_first(where={"email": user_info["email"]})
-        user = await prisma.user.upsert(
+        user_before = await db.user.find_first(where={"email": user_info["email"]})
+        user = await db.user.upsert(
             where={"email": user_info["email"]},
             data={
                 "create": {
@@ -309,8 +304,8 @@ async def google_oauth_callback(request: Request, payload: OAuthCallback) -> Tok
 @router.post("/google")
 async def google(request: Request, payload: GooglePayload) -> Token:
     """Handle Google OAuth callback"""
-    user_before = await prisma.user.find_first(where={"email": payload.email})
-    user = await prisma.user.upsert(
+    user_before = await db.user.find_first(where={"email": payload.email})
+    user = await db.user.upsert(
         where={"email": payload.email},
         data={
             "create": {
@@ -364,17 +359,17 @@ async def send_magic_link(
     Request a magic link for passwordless authentication.
     The link will be sent to the user's email if they have an account.
     """
-    email = payload.email
-    url = payload.url
+    email: str = payload.email
+    url: str = payload.url
 
-    user = await prisma.user.find_first(
+    user = await db.user.find_first(
         where={
             "email": email,
         }
     )
 
     if not user:
-        user = await prisma.user.create(
+        user = await db.user.create(
             data={
                 "email": email,
                 "first_name": "",
@@ -419,13 +414,13 @@ class SyncUserPayload(BaseModel):
 
 @router.post("/sync-user")
 async def sync_user(request: Request, payload: SyncUserPayload, cartId: str = Header(default=None)) -> Message:
-    user = await prisma.user.find_first(
+    user = await db.user.find_first(
         where={
             "email": payload.email,
         }
     )
     if not user:
-        user = await prisma.user.create(
+        user = await db.user.create(
             data={
                 "email": payload.email,
                 "first_name": payload.first_name,
@@ -463,7 +458,7 @@ async def test(request: Request, id: int):
     """
     Test job
     """
-    user = await prisma.user.find_first(
+    user = await db.user.find_first(
         where={
             "id": id,
         }

@@ -1,10 +1,9 @@
-from app.core.deps import CurrentUser
 from typing import Optional
 from fastapi import APIRouter, Depends, Request, Query
 from pydantic import BaseModel
 from app.prisma_client import prisma as db
 from app.services.redis import cache_response
-from app.core.deps import get_current_superuser
+from app.core.deps import get_current_superuser, CurrentUser
 from app.models.user import User
 from datetime import datetime
 from prisma.enums import WalletTransactionType

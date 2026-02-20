@@ -1,7 +1,6 @@
 import type React from "react";
 import { Bot, User, MoreVertical, ArrowLeft, Mail, UserX, Eye } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-
 import type { Chat, ChatMessage, ConversationStatus } from "@/schemas";
 import { formatDate } from "@/utils";
 import { Badge } from "@/components/ui/badge";
@@ -47,7 +46,7 @@ const ChatViewer: React.FC<{ chat: Chat; onClose: () => void }> = ({ chat, onClo
                             {!chat.user ? (
                                 <UserX size={20} />
                             ) : (
-                                <img alt={chat.user?.first_name} className="w-full h-full object-contain" src={chat.user?.image} />
+                                <img alt={chat.user?.first_name} className="w-full h-full object-contain" src={chat.user?.image ?? "/placeholder.jpg"} />
                             )}
                         </div>
 

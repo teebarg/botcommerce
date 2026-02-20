@@ -254,6 +254,11 @@ export const GalleryImageSchema = z.object({
     next_cursor: z.number().optional(),
 });
 
+export const ReviewStatusSchema = z.object({
+    has_purchased: z.boolean(),
+    has_reviewed: z.boolean(),
+});
+
 export type GalleryProduct = z.infer<typeof GalleryProductSchema>;
 export type GalleryImageItem = z.infer<typeof GalleryImageItemSchema>;
 export type GalleryImage = z.infer<typeof GalleryImageSchema>;
@@ -284,3 +289,5 @@ export type ProductVariant = z.infer<typeof ProductVariantSchema>;
 export type Catalog = z.infer<typeof CatalogSchema>;
 export type SearchCatalog = z.infer<typeof SearchCatalogSchema>;
 export type PaginatedCatalog = z.infer<typeof PaginatedCatalogSchema>;
+
+export type ReviewStatus = z.infer<typeof ReviewStatusSchema>;
