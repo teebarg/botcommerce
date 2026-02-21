@@ -3,9 +3,8 @@ import { useState, useEffect, useMemo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { currency } from "@/utils";
-import type { ProductVariant } from "@/schemas";
 import { ProductVariantSelection } from "@/components/products/product-variant-selection";
-import type { Product } from "@/schemas/product";
+import type { Product, ProductVariantLite } from "@/schemas";
 import { type UserInteractionType, useTrackUserInteraction } from "@/hooks/useUserInteraction";
 import { Button } from "@/components/ui/button";
 import { useUpdateVariant } from "@/hooks/useProduct";
@@ -13,7 +12,6 @@ import { useRouteContext } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useUserWishlist } from "@/hooks/useUser";
 import { useProductVariant } from "@/hooks/useProductVariant";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { ProductVariantActions } from "@/components/products/product-variant-actions";
 import ShareButton from "@/components/share";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
@@ -28,9 +26,8 @@ const ProductView: React.FC<Props> = ({ product }) => {
     const [imageLoaded, setImageLoaded] = useState<boolean>(false);
     const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
     const { outOfStock } = useProductVariant(product);
-    const isMobile = useIsMobile();
     const isNew = useMemo(() => !!product?.is_new, [product]);
-    const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(product.variants?.[0]);
+    const [selectedVariant, setSelectedVariant] = useState<ProductVariantLite | undefined>(product.variants?.[0]);
 
     const { session } = useRouteContext({ strict: false });
     const trackInteraction = useTrackUserInteraction();
@@ -40,7 +37,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
 
     const inWishlist = !!data?.wishlists?.find((wishlist) => wishlist.product_id === product.id);
 
-    const handleMarkVariantOutOfStock = async (variant: ProductVariant) => {
+    const handleMarkVariantOutOfStock = async (variant: ProductVariantLite) => {
         if (!variant?.id) return;
         const previousInventory = typeof variant.inventory === "number" ? variant.inventory : 0;
 
@@ -89,41 +86,26 @@ const ProductView: React.FC<Props> = ({ product }) => {
         }
     };
 
-    const pageVariants = isMobile
-        ? {
-              initial: { y: "100%", opacity: 0 },
-              animate: { y: 0, opacity: 1 },
-              exit: { y: "100%", opacity: 0 },
-          }
-        : {
-              initial: { opacity: 0, scale: 0.95 },
-              animate: { opacity: 1, scale: 1 },
-              exit: { opacity: 0, scale: 0.95 },
-          };
-
-    const pageTransition = isMobile
-        ? {
-              type: "spring" as const,
-              damping: 30,
-              stiffness: 300,
-          }
-        : {
-              duration: 0.3,
-              ease: [0.4, 0, 0.2, 1] as const,
-          };
-
     return (
         <motion.div
             initial="initial"
             animate="animate"
             exit="exit"
-            variants={pageVariants}
-            transition={pageTransition}
+            variants={{
+                initial: { y: "100%", opacity: 0 },
+                animate: { y: 0, opacity: 1 },
+                exit: { y: "100%", opacity: 0 },
+            }}
+            transition={{
+                type: "spring" as const,
+                damping: 30,
+                stiffness: 300,
+            }}
             className="min-h-screen bg-background relative"
         >
             <div className="max-w-6xl mx-auto md:py-8 md:px-4 md:grid md:grid-cols-2 md:gap-8 md:items-start">
                 <motion.div
-                    initial={{ opacity: 0, x: isMobile ? 0 : -20 }}
+                    initial={{ opacity: 0, x: 0 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.1 }}
                     className="relative aspect-square md:aspect-product md:rounded-3xl md:overflow-hidden md:sticky md:top-16"
@@ -197,12 +179,19 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         {product.name}
                     </motion.h1>
 
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="flex items-baseline gap-3">
-                        <span className="text-3xl md:text-4xl font-bold text-foreground">{currency(selectedVariant?.price)}</span>
-                        {selectedVariant?.old_price > selectedVariant?.price && (
-                            <span className="text-lg text-muted-foreground line-through">{currency(selectedVariant?.old_price)}</span>
-                        )}
-                    </motion.div>
+                    {selectedVariant && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.3 }}
+                            className="flex items-baseline gap-3"
+                        >
+                            <span className="text-3xl md:text-4xl font-bold text-foreground">{currency(selectedVariant?.price)}</span>
+                            {selectedVariant?.old_price > selectedVariant?.price && (
+                                <span className="text-lg text-muted-foreground line-through">{currency(selectedVariant?.old_price)}</span>
+                            )}
+                        </motion.div>
+                    )}
 
                     {session?.user?.isAdmin && product?.variants?.length ? (
                         <div className="flex flex-col gap-2 mt-4">

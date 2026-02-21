@@ -2,7 +2,7 @@ import { z } from "zod";
 import { OrderStatusSchema, ShippingMethodSchema, PaymentMethodSchema, PaymentStatusSchema } from "./enums";
 import { UserSchema } from "./user";
 import { AddressSchema } from "./address";
-import { ProductVariantSchema } from "./product";
+import { ProductVariantLiteSchema } from "./product";
 import { AuditSchema } from "./base";
 import { CursorSchema } from "./common";
 
@@ -12,7 +12,7 @@ export const OrderItemSchema = z
         name: z.string(),
         order_id: z.number(),
         variant_id: z.string(),
-        variant: ProductVariantSchema,
+        variant: ProductVariantLiteSchema,
         image: z.string().optional(),
         quantity: z.number(),
         price: z.number(),

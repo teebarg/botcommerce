@@ -47,7 +47,7 @@ const OrderCard = ({ order, idx }: { order: Order; idx: number }) => {
                                 key={idx}
                                 className="aspect-product h-40 w-40 relative group-hover:scale-105 transition-transform duration-200 rounded-lg overflow-hidden"
                             >
-                                {item.image && <ImageDisplay alt={item.variant?.product?.name || item.image} url={item.image} />}
+                                {item.image && <ImageDisplay alt={item?.name || item.image} url={item.image} />}
                             </div>
                         ))}
                         {order.order_items.length > 6 && (

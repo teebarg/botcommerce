@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
-from app.models.product import SearchProduct
 
 class CategoryBase(BaseModel):
     name: str
@@ -31,12 +30,6 @@ class CategoryUpdate(BaseModel):
     is_active: Optional[bool] = None
     parent_id: Optional[int] = None
     display_order: Optional[int] = None
-
-class CategoryWithProducts(BaseModel):
-    id: int
-    name: Optional[str] = None
-    slug: str = Field(..., min_length=1)
-    products: Optional[List[SearchProduct]] = None
 
 class CategoryOrderUpdate(BaseModel):
     id: int

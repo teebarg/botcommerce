@@ -5,6 +5,7 @@ import { getActivitiesFn } from "@/server/activities.server";
 import { getAbandonedCartsFn, getAbandonedCartStatsFn } from "@/server/abandoned-cart.server";
 import { getChatsFn, getStatTrendsFn } from "@/server/generic.server";
 import { ConversationStatus } from "@/schemas";
+import { getProductImagesFn } from "@/server/gallery.server";
 
 export const statsTrendsQuery = () =>
     queryOptions({
@@ -56,3 +57,8 @@ export const chatsQuery = (params: { user_id?: number; status?: ConversationStat
         queryKey: ["chats", JSON.stringify(params)],
         queryFn: () => getChatsFn({ data: params }),
     });
+
+export const galleryQuery = () => ({
+    queryKey: ["gallery"],
+    queryFn: () => getProductImagesFn(),
+});

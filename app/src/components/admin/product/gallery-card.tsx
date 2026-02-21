@@ -3,12 +3,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn, currency } from "@/utils";
-import type { Collection, GalleryImageItem, ProductVariant } from "@/schemas";
+import type { Collection, ProductImage, ProductVariantLite } from "@/schemas";
 import MediaDisplay from "@/components/media-display";
 import { IsNew } from "@/components/products/product-badges";
 
 interface GalleryCardProps {
-    image: GalleryImageItem;
+    image: ProductImage;
     onClick?: () => void;
     isSelected?: boolean;
     onSelectionChange?: (imageId: number, selected: boolean) => void;
@@ -53,7 +53,7 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
                         ))}
                     </div>
                     <div className="absolute top-2 right-2 flex flex-wrap gap-1">
-                        {image.product?.variants?.map((item: ProductVariant, idx: number) => (
+                        {image.product?.variants?.map((item: ProductVariantLite, idx: number) => (
                             <Badge key={idx} className={cn(item.size ? "" : "hidden")} variant="emerald">
                                 UK: {item.size}
                             </Badge>
@@ -62,7 +62,7 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
 
                     {image.product?.variants?.[0]?.age && (
                         <div className="absolute top-2 right-2 flex flex-wrap gap-1">
-                            {image.product?.variants?.map((item: ProductVariant, idx: number) => (
+                            {image.product?.variants?.map((item: ProductVariantLite, idx: number) => (
                                 <Badge key={idx} variant="emerald">
                                     {item.age}
                                 </Badge>
@@ -79,7 +79,7 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
 
                     {image.product && (
                         <div className="absolute top-2 left-1/2 -translate-x-1/2">
-                            <Badge variant="indigo" className="text-base font-bold">{currency(image.product.variants?.[0]?.price)}</Badge>
+                            <Badge variant="indigo" className="text-base font-bold">{currency(image.product.variants?.[0]?.price || 0)}</Badge>
                         </div>
                     )}
                 </div>

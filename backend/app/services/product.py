@@ -43,7 +43,7 @@ async def reindex_catalog(product_id: int):
         )
 
         if not product:
-            logger.warning(f"Product with id {product_id} not found for re-indexing.")
+            logger.warning(f"product with id {product_id} not found for re-indexing.")
             return
 
         await reindex_image(image_ids=[image.id for image in product.images])
@@ -64,7 +64,7 @@ async def reindex_catalogs(product_ids: list[int]):
         )
 
         if not products:
-            logger.warning(f"Products with ids {product_ids} not found for re-indexing.")
+            logger.warning(f"products with ids {product_ids} not found for re-indexing.")
             return
 
         image_ids = list(set([image.id for product in products for image in product.images]))
@@ -87,7 +87,7 @@ async def reindex_product(product_id: int):
 
         if not product:
             logger.warning(
-                f"Product with id {product_id} not found for re-indexing.")
+                f"product with id {product_id} not found for re-indexing.")
             return
 
         try:

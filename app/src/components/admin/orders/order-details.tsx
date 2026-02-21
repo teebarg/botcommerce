@@ -146,7 +146,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                     <p>Discount</p>
                                     <p className="font-semibold text-primary">
                                         -{currency(order.discount_amount)}
-                                        {order.coupon && ` (${order.coupon.code})`}
+                                        {order.coupon_code && ` (${order.coupon_code})`}
                                     </p>
                                 </div>
                             )}

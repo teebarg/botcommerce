@@ -154,7 +154,7 @@ async def get_recommendations(request: Request, user: CurrentUser, limit: int = 
     seen = set(product_ids)
 
     for pid in product_ids:
-        key = f"product:{pid}:similar"
+        key: str = f"product:{pid}:similar"
         similar_ids = await redis.lrange(key, 0, -1)
         for sid in similar_ids:
             if sid not in seen:
@@ -167,7 +167,7 @@ async def get_recommendations(request: Request, user: CurrentUser, limit: int = 
     if not top_ids:
         return {"recommended": []}
 
-    filter_str = " OR ".join([f"id = {pid}" for pid in top_ids])
+    filter_str: str = " OR ".join([f"id = {pid}" for pid in top_ids])
     results = index.search("", {"filter": filter_str, "limit": limit})
 
     return {"recommended": results["hits"]}
@@ -463,7 +463,7 @@ async def search(
     if colors:
         filters.append(f"colors IN [{colors}]")
     if ages:
-        age_values = ", ".join([f'"{age}"' for age in [ages]])
+        age_values: str = ", ".join([f'"{age}"' for age in [ages]])
         filters.append(f"ages IN [{age_values}]")
 
     search_params = {
@@ -1060,13 +1060,13 @@ async def config_delete_index(index_name: str) -> dict:
 
 
 @router.patch("/{id}/images/reorder", dependencies=[Depends(get_current_superuser)])
-async def reorder_images(id: int, image_ids: list[int]):
+async def reorder_images(id: int, image_ids: list[int]) -> Message:
     """
     Reorder product images.
     """
     product = await db.product.find_unique(where={"id": id})
     if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
+        raise HTTPException(status_code=404, detail="product not found")
 
     for index, image_id in enumerate(image_ids):
         try:
@@ -1079,5 +1079,4 @@ async def reorder_images(id: int, image_ids: list[int]):
             raise HTTPException(status_code=400, detail=str(e))
 
     await reindex_product(product_id=id)
-
-    return {"success": True}
+    return Message(message="Image re-ordered successfully.")

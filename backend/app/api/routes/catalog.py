@@ -255,7 +255,7 @@ async def add_product_to_catalog(id: int, product_id: int, background_tasks: Bac
 
     product = await db.product.find_unique(where={"id": product_id})
     if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
+        raise HTTPException(status_code=404, detail="product not found")
 
     await db.sharedcollection.update(
         where={"id": id},
@@ -264,7 +264,7 @@ async def add_product_to_catalog(id: int, product_id: int, background_tasks: Bac
 
     background_tasks.add_task(reindex_catalog, product_id=product_id)
 
-    return {"message": "Product added to catalog successfully"}
+    return {"message": "product added to catalog successfully"}
 
 @router.delete("/{id}/remove-product/{product_id}", dependencies=[Depends(get_current_superuser)])
 async def remove_product_from_catalog(id: int, product_id: int, background_tasks: BackgroundTasks) -> Message:
@@ -284,7 +284,7 @@ async def remove_product_from_catalog(id: int, product_id: int, background_tasks
 
     background_tasks.add_task(reindex_catalog, product_id=product_id)
 
-    return {"message": "Product removed from collection successfully"}
+    return {"message": "product removed from collection successfully"}
 
 
 @router.post("/{id}/add-products", dependencies=[Depends(get_current_superuser)])

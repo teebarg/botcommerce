@@ -21,7 +21,7 @@ interface SearchDialogProps {
 export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder = "Search for products..." }: SearchDialogProps) => {
     const searchState = useOverlayTriggerState({});
     const navigate = useNavigate();
-    const [query, setQuery] = useState(initialQuery);
+    const [query, setQuery] = useState<string>(initialQuery);
     const [debouncedQuery] = useDebounce(query, searchDelay);
     const [recentSearches, setRecentSearches] = useState<string[]>([]);
 

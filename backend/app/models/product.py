@@ -5,6 +5,7 @@ from app.models.base import BM
 from prisma.enums import ProductStatus
 from app.models.reviews import Review
 from app.models.collection import Collection
+from app.models.category import Category
 
 class ProductImage(BaseModel):
     id: int
@@ -16,7 +17,7 @@ class ProductVariant(BaseModel):
     sku: str
     status: ProductStatus
     price: float
-    old_price: Optional[float]
+    old_price: Optional[float] = 0.0
     inventory: int
     age: Optional[str]
     size: Optional[str]
@@ -60,6 +61,25 @@ class ReviewCreate(BaseModel):
     rating: int = Field(..., ge=1, le=5, description="Rating must be between 1 and 5")
 
 
+class ProductLite(BaseModel):
+    id: int
+    name: Optional[str] = None
+    sku: Optional[str] = None
+    slug: str
+    description: Optional[str] = None
+    # image: Optional[str] = None
+    variants: Optional[List[ProductVariant]] = None
+    ratings: float
+    categories: Optional[List[Category]] = []
+    collections: Optional[List[Collection]] = []
+    # brand: Optional[Brand] = None
+    # tags: Optional[List[Tag]] = []
+    # images: Optional[List[ProductImage]] = []
+    # reviews: Optional[List[Review]] = []
+    active: Optional[bool] = True
+    is_new: Optional[bool] = False
+
+
 class Product(BaseModel):
     id: int
     name: Optional[str] = None
@@ -77,7 +97,7 @@ class Product(BaseModel):
     reviews: Optional[List[Review]] = []
     active: Optional[bool] = True
     is_new: Optional[bool] = False
-    embedding: Optional[List[float]] = None
+    # embedding: Optional[List[float]] = None
 
 class SearchCategory(BaseModel):
     id: int
@@ -91,8 +111,8 @@ class SearchCollection(BaseModel):
 
 class SearchVariant(BaseModel):
     id: int
-    price: Optional[float] = None
-    old_price: Optional[float] = None
+    price: Optional[float] = 0
+    old_price: Optional[float] = 0
     inventory: int = 0
     size: Optional[str] = None
     color: Optional[str] = None
@@ -107,11 +127,8 @@ class SearchProduct(BaseModel):
     description: Optional[str] = None
     image: Optional[str] = None
     categories: Optional[List[SearchCategory]] = []
-    # category_slugs: List[str]
     collections: Optional[List[SearchCollection]] = []
-    # collection_slugs: List[str]
     images: Optional[List[str]] = []
-    favorites: Optional[List[str]] = []
     variants: Optional[List[SearchVariant]] = []
     average_rating: Optional[float] = None
     review_count: Optional[int] = None
@@ -152,13 +169,6 @@ class IndexProducts(BaseModel):
     arrival: List[SearchProduct]
     trending: List[SearchProduct]
 
-class Products(BaseModel):
-    products: list[Product]
-    skip: int
-    limit: int
-    total_count: int
-    total_pages: int
-
 class ProductCreateBundle(ProductCreate):
     images: Optional[List[ImageUpload]] = None
     variants: Optional[List[VariantWithStatus]] = None
@@ -177,8 +187,8 @@ class ImageMetadata(BaseModel):
     inventory: Optional[int] = None
     active: Optional[bool] = None
     is_new: Optional[bool] = None
-    price: Optional[float] = None
-    old_price: Optional[float] = None
+    price: Optional[float] = 0
+    old_price: Optional[float] = 0
 
 class ImagesBulkUpdate(BaseModel):
     image_ids: List[int]
@@ -198,3 +208,9 @@ class ProductLite(BaseModel):
 class ReviewStatus(BaseModel):
     has_purchased: bool
     has_reviewed: bool
+
+class CategoryWithProducts(BaseModel):
+    id: int
+    name: Optional[str] = None
+    slug: str = Field(..., min_length=1)
+    products: Optional[List[SearchProduct]] = None

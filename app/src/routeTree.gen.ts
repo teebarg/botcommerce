@@ -46,6 +46,7 @@ import { Route as AuthLayoutAuthVerifyRequestRouteImport } from './routes/_authL
 import { Route as AuthLayoutAuthSignupRouteImport } from './routes/_authLayout/auth/signup'
 import { Route as AuthLayoutAuthSigninRouteImport } from './routes/_authLayout/auth/signin'
 import { Route as AuthLayoutAuthErrorRouteImport } from './routes/_authLayout/auth/error'
+import { Route as AdminLayoutAdminSettingsRouteImport } from './routes/_adminLayout/admin.settings'
 import { Route as AdminLayoutAdminCatalogRouteImport } from './routes/_adminLayout/admin.catalog'
 import { Route as MainLayoutOrderConfirmedIdRouteImport } from './routes/_mainLayout/order.confirmed.$id'
 import { Route as AdminLayoutAdminstoreReviewsRouteImport } from './routes/_adminLayout/admin/(store)/reviews'
@@ -56,7 +57,6 @@ import { Route as AdminLayoutAdminstoreCollectionsRouteImport } from './routes/_
 import { Route as AdminLayoutAdminstoreCategoriesRouteImport } from './routes/_adminLayout/admin/(store)/categories'
 import { Route as AdminLayoutAdminstoreAbandonedCartsRouteImport } from './routes/_adminLayout/admin/(store)/abandoned-carts'
 import { Route as AdminLayoutAdminadminUsersRouteImport } from './routes/_adminLayout/admin/(admin)/users'
-import { Route as AdminLayoutAdminadminSettingsRouteImport } from './routes/_adminLayout/admin/(admin)/settings'
 import { Route as AdminLayoutAdminadminOnlineRouteImport } from './routes/_adminLayout/admin/(admin)/online'
 import { Route as AdminLayoutAdminadminFaqsRouteImport } from './routes/_adminLayout/admin/(admin)/faqs'
 import { Route as AdminLayoutAdminadminChatsRouteImport } from './routes/_adminLayout/admin/(admin)/chats'
@@ -254,6 +254,12 @@ const AuthLayoutAuthErrorRoute = AuthLayoutAuthErrorRouteImport.update({
   path: '/auth/error',
   getParentRoute: () => AuthLayoutRoute,
 } as any)
+const AdminLayoutAdminSettingsRoute =
+  AdminLayoutAdminSettingsRouteImport.update({
+    id: '/admin/settings',
+    path: '/admin/settings',
+    getParentRoute: () => AdminLayoutRoute,
+  } as any)
 const AdminLayoutAdminCatalogRoute = AdminLayoutAdminCatalogRouteImport.update({
   id: '/admin/catalog',
   path: '/admin/catalog',
@@ -313,12 +319,6 @@ const AdminLayoutAdminadminUsersRoute =
     path: '/admin/users',
     getParentRoute: () => AdminLayoutRoute,
   } as any)
-const AdminLayoutAdminadminSettingsRoute =
-  AdminLayoutAdminadminSettingsRouteImport.update({
-    id: '/admin/(admin)/settings',
-    path: '/admin/settings',
-    getParentRoute: () => AdminLayoutRoute,
-  } as any)
 const AdminLayoutAdminadminOnlineRoute =
   AdminLayoutAdminadminOnlineRouteImport.update({
     id: '/admin/(admin)/online',
@@ -362,6 +362,7 @@ export interface FileRoutesByFullPath {
   '/payment/verify': typeof PaymentVerifyRoute
   '/': typeof MainLayoutIndexRoute
   '/admin/catalog': typeof AdminLayoutAdminCatalogRoute
+  '/admin/settings': typeof AdminLayoutAdminSettingsRoute
   '/auth/error': typeof AuthLayoutAuthErrorRoute
   '/auth/signin': typeof AuthLayoutAuthSigninRoute
   '/auth/signup': typeof AuthLayoutAuthSignupRoute
@@ -390,7 +391,6 @@ export interface FileRoutesByFullPath {
   '/admin/chats': typeof AdminLayoutAdminadminChatsRoute
   '/admin/faqs': typeof AdminLayoutAdminadminFaqsRoute
   '/admin/online': typeof AdminLayoutAdminadminOnlineRoute
-  '/admin/settings': typeof AdminLayoutAdminadminSettingsRoute
   '/admin/users': typeof AdminLayoutAdminadminUsersRoute
   '/admin/abandoned-carts': typeof AdminLayoutAdminstoreAbandonedCartsRoute
   '/admin/categories': typeof AdminLayoutAdminstoreCategoriesRoute
@@ -413,6 +413,7 @@ export interface FileRoutesByTo {
   '/payment/verify': typeof PaymentVerifyRoute
   '/': typeof MainLayoutIndexRoute
   '/admin/catalog': typeof AdminLayoutAdminCatalogRoute
+  '/admin/settings': typeof AdminLayoutAdminSettingsRoute
   '/auth/error': typeof AuthLayoutAuthErrorRoute
   '/auth/signin': typeof AuthLayoutAuthSigninRoute
   '/auth/signup': typeof AuthLayoutAuthSignupRoute
@@ -441,7 +442,6 @@ export interface FileRoutesByTo {
   '/admin/chats': typeof AdminLayoutAdminadminChatsRoute
   '/admin/faqs': typeof AdminLayoutAdminadminFaqsRoute
   '/admin/online': typeof AdminLayoutAdminadminOnlineRoute
-  '/admin/settings': typeof AdminLayoutAdminadminSettingsRoute
   '/admin/users': typeof AdminLayoutAdminadminUsersRoute
   '/admin/abandoned-carts': typeof AdminLayoutAdminstoreAbandonedCartsRoute
   '/admin/categories': typeof AdminLayoutAdminstoreCategoriesRoute
@@ -469,6 +469,7 @@ export interface FileRoutesById {
   '/payment/verify': typeof PaymentVerifyRoute
   '/_mainLayout/': typeof MainLayoutIndexRoute
   '/_adminLayout/admin/catalog': typeof AdminLayoutAdminCatalogRoute
+  '/_adminLayout/admin/settings': typeof AdminLayoutAdminSettingsRoute
   '/_authLayout/auth/error': typeof AuthLayoutAuthErrorRoute
   '/_authLayout/auth/signin': typeof AuthLayoutAuthSigninRoute
   '/_authLayout/auth/signup': typeof AuthLayoutAuthSignupRoute
@@ -497,7 +498,6 @@ export interface FileRoutesById {
   '/_adminLayout/admin/(admin)/chats': typeof AdminLayoutAdminadminChatsRoute
   '/_adminLayout/admin/(admin)/faqs': typeof AdminLayoutAdminadminFaqsRoute
   '/_adminLayout/admin/(admin)/online': typeof AdminLayoutAdminadminOnlineRoute
-  '/_adminLayout/admin/(admin)/settings': typeof AdminLayoutAdminadminSettingsRoute
   '/_adminLayout/admin/(admin)/users': typeof AdminLayoutAdminadminUsersRoute
   '/_adminLayout/admin/(store)/abandoned-carts': typeof AdminLayoutAdminstoreAbandonedCartsRoute
   '/_adminLayout/admin/(store)/categories': typeof AdminLayoutAdminstoreCategoriesRoute
@@ -523,6 +523,7 @@ export interface FileRouteTypes {
     | '/payment/verify'
     | '/'
     | '/admin/catalog'
+    | '/admin/settings'
     | '/auth/error'
     | '/auth/signin'
     | '/auth/signup'
@@ -551,7 +552,6 @@ export interface FileRouteTypes {
     | '/admin/chats'
     | '/admin/faqs'
     | '/admin/online'
-    | '/admin/settings'
     | '/admin/users'
     | '/admin/abandoned-carts'
     | '/admin/categories'
@@ -574,6 +574,7 @@ export interface FileRouteTypes {
     | '/payment/verify'
     | '/'
     | '/admin/catalog'
+    | '/admin/settings'
     | '/auth/error'
     | '/auth/signin'
     | '/auth/signup'
@@ -602,7 +603,6 @@ export interface FileRouteTypes {
     | '/admin/chats'
     | '/admin/faqs'
     | '/admin/online'
-    | '/admin/settings'
     | '/admin/users'
     | '/admin/abandoned-carts'
     | '/admin/categories'
@@ -629,6 +629,7 @@ export interface FileRouteTypes {
     | '/payment/verify'
     | '/_mainLayout/'
     | '/_adminLayout/admin/catalog'
+    | '/_adminLayout/admin/settings'
     | '/_authLayout/auth/error'
     | '/_authLayout/auth/signin'
     | '/_authLayout/auth/signup'
@@ -657,7 +658,6 @@ export interface FileRouteTypes {
     | '/_adminLayout/admin/(admin)/chats'
     | '/_adminLayout/admin/(admin)/faqs'
     | '/_adminLayout/admin/(admin)/online'
-    | '/_adminLayout/admin/(admin)/settings'
     | '/_adminLayout/admin/(admin)/users'
     | '/_adminLayout/admin/(store)/abandoned-carts'
     | '/_adminLayout/admin/(store)/categories'
@@ -943,6 +943,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLayoutAuthErrorRouteImport
       parentRoute: typeof AuthLayoutRoute
     }
+    '/_adminLayout/admin/settings': {
+      id: '/_adminLayout/admin/settings'
+      path: '/admin/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminLayoutAdminSettingsRouteImport
+      parentRoute: typeof AdminLayoutRoute
+    }
     '/_adminLayout/admin/catalog': {
       id: '/_adminLayout/admin/catalog'
       path: '/admin/catalog'
@@ -1013,13 +1020,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLayoutAdminadminUsersRouteImport
       parentRoute: typeof AdminLayoutRoute
     }
-    '/_adminLayout/admin/(admin)/settings': {
-      id: '/_adminLayout/admin/(admin)/settings'
-      path: '/admin/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof AdminLayoutAdminadminSettingsRouteImport
-      parentRoute: typeof AdminLayoutRoute
-    }
     '/_adminLayout/admin/(admin)/online': {
       id: '/_adminLayout/admin/(admin)/online'
       path: '/admin/online'
@@ -1075,12 +1075,12 @@ const AdminLayoutAdminstoreCouponsRouteWithChildren =
 
 interface AdminLayoutRouteChildren {
   AdminLayoutAdminCatalogRoute: typeof AdminLayoutAdminCatalogRoute
+  AdminLayoutAdminSettingsRoute: typeof AdminLayoutAdminSettingsRoute
   AdminLayoutAdminIndexRoute: typeof AdminLayoutAdminIndexRoute
   AdminLayoutAdminadminActivitiesRoute: typeof AdminLayoutAdminadminActivitiesRoute
   AdminLayoutAdminadminChatsRoute: typeof AdminLayoutAdminadminChatsRoute
   AdminLayoutAdminadminFaqsRoute: typeof AdminLayoutAdminadminFaqsRoute
   AdminLayoutAdminadminOnlineRoute: typeof AdminLayoutAdminadminOnlineRoute
-  AdminLayoutAdminadminSettingsRoute: typeof AdminLayoutAdminadminSettingsRoute
   AdminLayoutAdminadminUsersRoute: typeof AdminLayoutAdminadminUsersRoute
   AdminLayoutAdminstoreAbandonedCartsRoute: typeof AdminLayoutAdminstoreAbandonedCartsRoute
   AdminLayoutAdminstoreCategoriesRoute: typeof AdminLayoutAdminstoreCategoriesRoute
@@ -1093,12 +1093,12 @@ interface AdminLayoutRouteChildren {
 
 const AdminLayoutRouteChildren: AdminLayoutRouteChildren = {
   AdminLayoutAdminCatalogRoute: AdminLayoutAdminCatalogRoute,
+  AdminLayoutAdminSettingsRoute: AdminLayoutAdminSettingsRoute,
   AdminLayoutAdminIndexRoute: AdminLayoutAdminIndexRoute,
   AdminLayoutAdminadminActivitiesRoute: AdminLayoutAdminadminActivitiesRoute,
   AdminLayoutAdminadminChatsRoute: AdminLayoutAdminadminChatsRoute,
   AdminLayoutAdminadminFaqsRoute: AdminLayoutAdminadminFaqsRoute,
   AdminLayoutAdminadminOnlineRoute: AdminLayoutAdminadminOnlineRoute,
-  AdminLayoutAdminadminSettingsRoute: AdminLayoutAdminadminSettingsRoute,
   AdminLayoutAdminadminUsersRoute: AdminLayoutAdminadminUsersRoute,
   AdminLayoutAdminstoreAbandonedCartsRoute:
     AdminLayoutAdminstoreAbandonedCartsRoute,

@@ -195,12 +195,12 @@ async def read_wishlist(
 ) -> Wishlists:
     if not user:
         return {"wishlists": []}
-    favorites = await db.favorite.find_many(
+    items = await db.favorite.find_many(
         where={"user_id": user.id},
         order={"created_at": "desc"},
         include={"product": {"include" : {"images": True}}}
     )
-    return {"wishlists": favorites}
+    return {"wishlists": items}
 
 
 @router.post("/wishlist")

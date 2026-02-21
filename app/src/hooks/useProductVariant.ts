@@ -1,14 +1,13 @@
 import type React from "react";
 import { useEffect, useMemo, useState } from "react";
-
 import { useAddToCart, useChangeCartQuantity } from "./useCart";
 import { currency } from "@/utils";
 import { useConfig } from "@/providers/store-provider";
-import type { ProductVariant } from "@/schemas";
-import type { Product, ProductSearch } from "@/schemas/product";
+import type { Product, ProductSearch, ProductVariantLite } from "@/schemas/product";
 import { useCart } from "@/providers/cart-provider";
 import { isFirstWhatsAppMessage, markFirstWhatsAppMessageSent } from "@/utils/whatsapp-message-state";
 import { analytics } from "@/utils/pulsemetric";
+import { CartItem } from "@/schemas";
 
 export const useProductVariant = (product: Product | ProductSearch) => {
     const { cart } = useCart();
@@ -24,7 +23,7 @@ export const useProductVariant = (product: Product | ProductSearch) => {
     const [selectedMeasurement, setSelectedMeasurement] = useState<number | null>(product?.variants?.[0]?.measurement || null);
     const [selectedAge, setSelectedAge] = useState<string | null>(product?.variants?.[0]?.age || null);
     const [quantity, setQuantity] = useState<number>(1);
-    const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>();
+    const [selectedVariant, setSelectedVariant] = useState<ProductVariantLite | undefined>();
 
     const sizes = useMemo(() => {
         return [...new Set(product?.variants?.filter((v) => v.size).map((v) => v.size))];
@@ -43,8 +42,8 @@ export const useProductVariant = (product: Product | ProductSearch) => {
     }, [product?.variants]);
 
     const priceInfo = useMemo(() => {
-        const prices = product?.variants?.map((v: ProductVariant) => v.price) || [];
-        const comparePrices = product?.variants?.map((v: ProductVariant) => v.old_price || v.price) || [];
+        const prices = product?.variants?.map((v: ProductVariantLite) => v.price) || [];
+        const comparePrices = product?.variants?.map((v: ProductVariantLite) => v.old_price || v.price) || [];
 
         const minPrice = Math.min(...prices);
         const maxPrice = Math.max(...prices);
@@ -68,7 +67,7 @@ export const useProductVariant = (product: Product | ProductSearch) => {
     }, [product?.variants]);
 
     const variantInCart = useMemo(() => {
-        return cart?.items?.find((item) => item.variant_id == selectedVariant?.id);
+        return cart?.items?.find((item: CartItem) => item.variant_id == selectedVariant?.id);
     }, [cart, selectedVariant]);
 
     const findMatchingVariant = (size: string | null, color: string | null, measurement: number | null, age: string | null) => {
@@ -206,12 +205,12 @@ export const useProductVariant = (product: Product | ProductSearch) => {
 
         if (isFirstWhatsAppMessage()) {
             message = `Hi! I'd like to order:\n\n${variantInfo}\nQuantity: ${quantity}\n\n*Total: ${currency(
-                selectedVariant?.price * quantity
+                selectedVariant?.price || 0 * quantity
             )}*\n\n${typeof window !== "undefined" ? window.location.origin : ""}/products/${
                 product.slug
             }\n\nPlease let me know the next steps for payment and delivery. Thank you!`;
         } else {
-            message = `${variantInfo}\nQuantity: ${quantity}\n\n*Total: ${currency(selectedVariant?.price * quantity)}*\n\n${
+            message = `${variantInfo}\nQuantity: ${quantity}\n\n*Total: ${currency(selectedVariant?.price || 0 * quantity)}*\n\n${
                 typeof window !== "undefined" ? window.location.origin : ""
             }/products/${product.slug}`;
         }

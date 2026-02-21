@@ -2,7 +2,7 @@ import type React from "react";
 import { useProductVariant } from "@/hooks/useProductVariant";
 import { PriceLabel } from "@/components/store/products/price-label";
 import { DiscountBadge } from "@/components/store/products/discount-badge";
-import type { ProductSearch, ProductVariant } from "@/schemas/product";
+import type { ProductSearch, SearchVariant } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/utils";
 import MediaDisplay from "@/components/media-display";
@@ -34,7 +34,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale" }) 
                 )}
 
                 <div className="absolute bottom-3 left-3 flex flex-wrap gap-1">
-                    {product?.variants?.map((item: ProductVariant, idx: number) => (
+                    {product?.variants?.map((item: SearchVariant, idx: number) => (
                         <div
                             key={idx}
                             className={cn(

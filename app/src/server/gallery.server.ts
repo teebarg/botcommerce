@@ -1,12 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { api } from "@/utils/api.server";
-import type { GalleryImageItem } from "@/schemas";
+import type { PaginatedProductImages } from "@/schemas";
 
-interface PaginatedGalleryResponse {
-    images: GalleryImageItem[];
-    next_cursor: number | null;
-}
-
-export const getGalleryImagesFn = createServerFn({ method: "GET" }).handler(async () => {
-    return await api.get<PaginatedGalleryResponse>("/gallery/");
-});
+export const getProductImagesFn = createServerFn().handler(async () => await api.get<PaginatedProductImages>("/gallery/"));

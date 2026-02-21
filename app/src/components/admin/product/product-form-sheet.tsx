@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { FileText, Package, Tag } from "lucide-react";
-
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,25 +7,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useCollections } from "@/hooks/useCollection";
 import { useCategories } from "@/hooks/useCategories";
 import MultiSelect, { type SelectOption } from "@/components/ui/multi-select";
-import type { GalleryProduct, Product, ProductVariant } from "@/schemas";
+import type { ProductLite, Product, ProductVariantLite } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useCreateImageMetadata, useUpdateImageMetadata } from "@/hooks/useGallery";
 import { Textarea } from "@/components/ui/textarea";
 import { COLOR_OPTIONS, ColorOption, SIZE_OPTIONS } from "@/utils/constants";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ImageDownloadButton } from "@/components/store/image-download";
 import { AgeRangeSelector } from "@/components/ui/age-selector";
 
 type FormProduct = Omit<Partial<Product>, "images" | "variants" | "categories" | "collections"> & {
     categories: { value: number; label: string }[];
     collections: { value: number; label: string }[];
-    variants: ProductVariant[];
+    variants: ProductVariantLite[];
 };
 
 interface ProductSheetFormProps {
     imageId: number;
     onClose: () => void;
-    currentProduct?: GalleryProduct;
+    currentProduct?: ProductLite;
 }
 
 export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSheetFormProps) {
@@ -57,7 +55,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
         }
     };
 
-    const [newVariant, setNewVariant] = useState<Partial<ProductVariant>>({
+    const [newVariant, setNewVariant] = useState<Partial<ProductVariantLite>>({
         id: currentProduct?.variants?.[0]?.id ?? undefined,
         size: currentProduct?.variants?.[0]?.size ?? "",
         color: currentProduct?.variants?.[0]?.color ?? "",
@@ -68,7 +66,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
         inventory: currentProduct?.variants?.[0]?.inventory ?? 0,
     });
 
-    const isDisabled = newVariant.price < 2;
+    const isDisabled = (newVariant?.price || 0) < 2;
 
     const handleSubmit = () => {
         const input: any = {
@@ -95,8 +93,6 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                     <h2 className="text-lg font-semibold">Product Details</h2>
                     <p className="text-muted-foreground text-sm">Provide essential information about your product that customers will see.</p>
                 </div>
-
-                {currentProduct && <ImageDownloadButton fallbackName={currentProduct.slug} url={currentProduct.image} />}
 
                 <div className="grid gap-6">
                     <Card className="p-4 shadow-sm">
@@ -187,7 +183,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label className="text-sm">Size</Label>
-                            <Select value={newVariant.size.toString()} onValueChange={(value) => setNewVariant((prev) => ({ ...prev, size: value }))}>
+                            <Select value={newVariant?.size?.toString()} onValueChange={(value) => setNewVariant((prev) => ({ ...prev, size: value }))}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select Size" />
                                 </SelectTrigger>
@@ -204,7 +200,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                         <div className="space-y-2">
                             <Label className="text-sm">Color</Label>
                             <Select
-                                value={newVariant.color.toString()}
+                                value={newVariant?.color?.toString()}
                                 onValueChange={(value) => setNewVariant((prev) => ({ ...prev, color: value }))}
                             >
                                 <SelectTrigger>
@@ -232,7 +228,7 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
 
                         <div className="col-span-2">
                             <AgeRangeSelector
-                                selectedRange={newVariant.age}
+                                selectedRange={newVariant.age || ""}
                                 onChange={(range) => setNewVariant((prev) => ({ ...prev, age: range }))}
                             />
                         </div>

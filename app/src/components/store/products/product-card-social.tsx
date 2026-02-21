@@ -4,7 +4,7 @@ import { useProductVariant } from "@/hooks/useProductVariant";
 import { PriceLabel } from "@/components/store/products/price-label";
 import { DiscountBadge } from "@/components/store/products/discount-badge";
 import { useUserCreateWishlist, useUserDeleteWishlist, useUserWishlist } from "@/hooks/useUser";
-import type { Facet, ProductSearch, ProductVariant } from "@/schemas/product";
+import type { Facet, ProductSearch, SearchVariant } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import { useMemo, useRef, useState } from "react";
 import { IsNew } from "@/components/products/product-badges";
@@ -147,7 +147,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
             </div>
 
             <div className="absolute bottom-0 left-0 right-0 p-4 pb-6 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
-                {product?.variants?.map((item: ProductVariant) => (
+                {product?.variants?.map((item: SearchVariant) => (
                     <div key={item.id} className={item.size ? "" : "hidden"}>
                         <div className="w-12 h-12 rounded-full bg-linear-to-br from-primary to-accent flex flex-col items-center justify-center mb-3 text-white font-bold">
                             <span className="text-lg leading-none">{item.size}</span>

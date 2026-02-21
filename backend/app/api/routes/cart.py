@@ -104,9 +104,9 @@ async def add_item_to_cart(
     )
 
     if not variant:
-        raise HTTPException(status_code=400, detail="Product does not exist")
+        raise HTTPException(status_code=400, detail="product does not exist")
     if variant.status != "IN_STOCK":
-        raise HTTPException(status_code=400, detail="Product is out of stock")
+        raise HTTPException(status_code=400, detail="product is out of stock")
 
     if item_in.quantity > variant.inventory:
         available_quantity = variant.inventory - item_in.quantity
@@ -267,7 +267,7 @@ async def delete_cart_item(item_id: int, user: UserDep, cartId: str = Header(def
     subtotal = cart.subtotal - decrement
     service = ShopSettingsService()
     tax = subtotal * (float(await service.get("tax_rate")) / 100)
-    total = subtotal + tax + cart.shipping_fee - cart.discount_amount
+    total = subtotal + tax + cart.shipping_fee - cart.discount_amount - cart.wallet_used
 
     async with db.tx() as tx:
         await tx.cartitem.delete(where={"id": item_id})

@@ -1,7 +1,8 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from app.models.category import Category, CategoryCreate, CategoryUpdate, CategoryWithProducts, BulkOrderUpdate
+from app.models.category import Category, CategoryCreate, CategoryUpdate, BulkOrderUpdate
+from app.models.product import CategoryWithProducts
 from app.models.generic import Message, ImageUpload
 from app.core.utils import slugify
 from app.core.storage import upload, delete_image

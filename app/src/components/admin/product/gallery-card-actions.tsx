@@ -2,12 +2,12 @@ import { Edit2 } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { ProductSheetForm } from "./product-form-sheet";
 import { Button } from "@/components/ui/button";
-import type { GalleryImageItem } from "@/schemas";
+import type { ProductImage } from "@/schemas";
 import Overlay from "@/components/overlay";
 import { useDeleteGalleryImage } from "@/hooks/useGallery";
 
 interface GalleryCardActionProps {
-    image: GalleryImageItem;
+    image: ProductImage;
 }
 
 export function GalleryCardActions({ image }: GalleryCardActionProps) {

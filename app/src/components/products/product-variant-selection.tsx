@@ -1,19 +1,16 @@
 import type React from "react";
 import { useEffect } from "react";
-import { MessageCircleMore, Minus, Plus } from "lucide-react";
-import type { ProductVariant } from "@/schemas";
+import { Minus, Plus } from "lucide-react";
 import { cn, currency } from "@/utils";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { useProductVariant } from "@/hooks/useProductVariant";
-import type { Product } from "@/schemas/product";
+import type { Product, ProductVariantLite } from "@/schemas/product";
 import { motion } from "framer-motion";
-import { SIZE_OPTIONS } from "@/utils/constants";
 
 interface VariantSelectionProps {
     product: Product;
-    selectedVariant?: ProductVariant;
-    onVariantChange: (variant: ProductVariant | undefined) => void;
+    selectedVariant?: ProductVariantLite;
+    onVariantChange: (variant: ProductVariantLite | undefined) => void;
 }
 
 export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ product, onVariantChange }) => {
@@ -39,6 +36,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
         loading,
         outOfStock,
     } = useProductVariant(product);
+    const safeColors = colors.filter((c): c is string => typeof c === "string");
 
     useEffect(() => {
         onVariantChange(selectedVariant);
@@ -46,7 +44,6 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
 
     return (
         <div className="space-y-6 mt-4">
-            {/* Size selector */}
             {sizes?.length > 0 && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}>
                     <p className="text-sm font-medium text-foreground mb-3">Select Size</p>
@@ -66,14 +63,13 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                 </motion.div>
             )}
 
-            {/* Color Selector */}
-            {colors.length > 0 && (
+            {safeColors.length > 0 && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mb-6">
                     <h3 className="text-sm font-medium text-foreground mb-3">Color: {selectedColor}</h3>
                     <div className="flex gap-3">
-                        {colors.map((color: string) => (
+                        {safeColors.map((color: string, idx: number) => (
                             <button
-                                key={color}
+                                key={idx}
                                 onClick={() => isOptionAvailable("color", color) && toggleColorSelect(color)}
                                 className={`w-10 h-10 rounded-full border-2 transition-all ${
                                     selectedColor === color ? "border-primary scale-110" : "border-transparent"
@@ -174,7 +170,6 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                 </div>
             )}
 
-            {/* Quantity selector */}
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="flex items-center gap-4">
                 <p className="text-sm font-medium text-foreground">Quantity</p>
                 <div className="flex items-center gap-3 bg-muted rounded-lg p-1">

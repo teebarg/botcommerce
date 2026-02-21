@@ -1,75 +1,55 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { LayoutDashboard, Loader, RectangleVertical } from "lucide-react";
-import { GalleryCard } from "@/components/admin/product/product-gallery-card";
+import { LayoutDashboard, RectangleVertical } from "lucide-react";
+import { GalleryCard } from "@/components/admin/product/gallery-card";
 import { ProductBulkActions } from "@/components/admin/product/gallery-bulk-action";
 import { GalleryImagesUpload } from "@/components/admin/product/gallery-images-upload";
 import { useBulkDeleteGalleryImages } from "@/hooks/useGallery";
-import ComponentLoader from "@/components/component-loader";
 import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
-import type { GalleryImageItem } from "@/schemas";
+import type { PaginatedProductImages, ProductImage } from "@/schemas";
 import { useWebSocket } from "pulsews";
-import { useInfiniteQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { getGalleryImagesFn } from "@/server/gallery.server";
-import { InfiniteScroll } from "@/components/InfiniteScroll";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { clientApi } from "@/utils/api.client";
-
-const galleryInfiniteQuery = () => ({
-    queryKey: ["gallery"],
-    queryFn: () => getGalleryImagesFn(),
-});
+import { galleryQuery } from "@/queries/admin.queries";
+import { InfiniteResourceList } from "@/components/InfiniteResourceList";
+import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/gallery")({
     loader: async ({ context: { queryClient } }) => {
-        await queryClient.ensureQueryData(galleryInfiniteQuery());
+        await queryClient.ensureQueryData(galleryQuery());
     },
     component: RouteComponent,
 });
 
-interface PaginatedGalleryResponse {
-    images: GalleryImageItem[];
-    next_cursor: number | null;
-}
-
 function RouteComponent() {
-    const { data: initialImages } = useSuspenseQuery(galleryInfiniteQuery());
+    const params = Route.useSearch();
+    const { data } = useSuspenseQuery(galleryQuery());
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
-    const {
-        data,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-        isLoading: isImagesLoading,
-    } = useInfiniteQuery<PaginatedGalleryResponse>({
-        queryKey: ["gallery", "infinite"],
-        queryFn: async ({ pageParam }) => await clientApi.get<PaginatedGalleryResponse>("/gallery/", { params: { cursor: pageParam } }),
-        initialPageParam: undefined,
-        getNextPageParam: (lastPage: PaginatedGalleryResponse) => lastPage.next_cursor ?? undefined,
-        initialData: initialImages
-            ? {
-                  pages: [initialImages],
-                  pageParams: [undefined],
-              }
-            : undefined,
-    });
-    const images = data?.pages?.flatMap((p: any) => p.images) || [];
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { lastMessage } = useWebSocket();
     const { mutateAsync: bulkDeleteImages, isPending: isDeleting } = useBulkDeleteGalleryImages();
 
+    const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedProductImages, ProductImage>({
+        queryKey: ["gallery", "infinite", params],
+        queryFn: (cursor) => clientApi.get<PaginatedProductImages>("/gallery/", { params: { cursor, ...params } }),
+        getItems: (page) => page.items,
+        getNextCursor: (page) => page.next_cursor,
+        initialData: data,
+    });
+
     const selectedProductIds = useMemo(() => {
         const ids = new Set<number>();
 
-        for (const img of images) {
+        for (const img of items) {
             if (selectedImages.has(img.id) && img.product_id) ids.add(img.product_id);
         }
 
         return Array.from(ids);
-    }, [selectedImages, images]);
+    }, [selectedImages, items]);
 
     useEffect(() => {
         if (!lastMessage) return;
@@ -121,9 +101,7 @@ function RouteComponent() {
             </div>
             <GalleryImagesUpload />
 
-            {isImagesLoading ? (
-                <ComponentLoader />
-            ) : images.length === 0 ? (
+            {items.length === 0 ? (
                 <div className="text-center">No images found</div>
             ) : (
                 <div>
@@ -166,36 +144,26 @@ function RouteComponent() {
                             </Button>
                         </div>
                     </div>
-                    {!isLoading && images.length > 0 && (
-                        <InfiniteScroll
+                    {items.length > 0 && (
+                        <InfiniteResourceList
+                            className={cn(
+                                "mb-8 w-full grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 lg:gap-4",
+                                viewMode === "grid" ? "" : "grid-cols-1"
+                            )}
+                            items={items}
                             onLoadMore={fetchNextPage}
-                            hasMore={!!hasNextPage}
+                            hasMore={hasNextPage}
                             isLoading={isFetchingNextPage}
-                            loader={
-                                <div className="flex flex-col items-center justify-center text-blue-600">
-                                    <Loader className="h-8 w-8 animate-spin mb-2" />
-                                    <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
-                                </div>
-                            }
-                            endMessage={<div className="text-center py-8 text-muted-foreground">You've viewed all products</div>}
-                        >
-                            <div
-                                className={cn(
-                                    "mb-8 w-full grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 lg:gap-4",
-                                    viewMode === "grid" ? "" : "grid-cols-1"
-                                )}
-                            >
-                                {images.map((img: GalleryImageItem, idx: number) => (
-                                    <GalleryCard
-                                        key={idx}
-                                        image={img}
-                                        isSelected={selectedImages.has(img.id)}
-                                        selectionMode={selectionMode}
-                                        onSelectionChange={handleSelectionChange}
-                                    />
-                                ))}
-                            </div>
-                        </InfiniteScroll>
+                            renderItem={(item: ProductImage, idx: number) => (
+                                <GalleryCard
+                                    key={idx}
+                                    image={item}
+                                    isSelected={selectedImages.has(item.id)}
+                                    selectionMode={selectionMode}
+                                    onSelectionChange={handleSelectionChange}
+                                />
+                            )}
+                        />
                     )}
                     {selectedImages.size > 0 && (
                         <ProductBulkActions

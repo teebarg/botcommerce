@@ -27,9 +27,9 @@ from app.services.websocket import manager
 from app.services.generic import remove_image_from_storage
 from app.services.redis import invalidate_pattern
 from app.core.deps import get_current_superuser
+from app.models.gallery import PaginatedProductImages
 
 logger = get_logger(__name__)
-
 
 async def process_bulk_delete_images(images: list[ProductImage]) -> None:
     """
@@ -80,7 +80,7 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
         for index, image in enumerate(images):
             try:
                 if image.product_id is None:
-                    name = f"{random.choice(['Classic', 'Premium', 'Superior', 'Deluxe', 'Luxury'])} {random.randint(10000, 99999)}"
+                    name: str = f"{random.choice(['Classic', 'Premium', 'Superior', 'Deluxe', 'Luxury'])} {random.randint(10000, 99999)}"
                     product_data: dict[str, Any] = {
                         "name": name,
                         "slug": slugify(name),
@@ -136,24 +136,19 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images):
 
 router = APIRouter()
 
-
 @router.get("/")
 @cache_response("gallery")
 async def image_gallery(
     request: Request,
     cursor: Optional[int] = Query(default=None),
-    limit: int = Query(default=40, le=100),
-):
+    limit: int = Query(default=36, le=100),
+) -> PaginatedProductImages:
     """
     Gallery endpoint using cursor-based pagination.
     """
     try:
-        where_clause = {
-            "order": 0,
-        }
-
         images = await db.productimage.find_many(
-            where=where_clause,
+            where={"order": 0},
             take=limit + 1,
             skip=1 if cursor else 0,
             cursor={"id": cursor} if cursor else None,
@@ -164,16 +159,13 @@ async def image_gallery(
                         "categories": True,
                         "collections": True,
                         "variants": True,
-                        "images": True,
-                        "shared_collections": True,
                     }
                 }
             },
         )
         items = images[:limit]
-
         return {
-            "images": images,
+            "items": images,
             "next_cursor": items[-1].id if len(images) > limit else None,
             "limit": limit
         }
@@ -235,7 +227,7 @@ async def delete_gallery_image(image_id: int, background_tasks: BackgroundTasks)
     background_tasks.add_task(delete_image_index, images=image)
     background_tasks.add_task(remove_image_from_storage, image_urls)
 
-    return Message(message="Product and all related data deleted successfully")
+    return Message(message="image and all related data deleted successfully")
 
 
 @router.post("/bulk-upload", dependencies=[Depends(get_current_superuser)])
@@ -383,7 +375,7 @@ async def create_image_metadata(
             return {"success": True}
         except UniqueViolationError:
             raise HTTPException(
-                status_code=400, detail="Product with this name already exists")
+                status_code=400, detail="product with this name already exists")
         except HTTPException:
             raise
         except Exception as e:
@@ -477,7 +469,7 @@ async def update_image_metadata(
             return {"success": True}
         except UniqueViolationError:
             raise HTTPException(
-                status_code=400, detail="Product with this name already exists")
+                status_code=400, detail="product with this name already exists")
         except HTTPException:
             raise
         except Exception as e:
@@ -486,7 +478,7 @@ async def update_image_metadata(
 
 
 @router.patch("/bulk-update", dependencies=[Depends(get_current_superuser)])
-async def bulk_update_products(payload: ImagesBulkUpdate, background_tasks: BackgroundTasks):
+async def bulk_update_products(payload: ImagesBulkUpdate, background_tasks: BackgroundTasks) -> Message:
     images = await db.productimage.find_many(
         where={"id": {"in": payload.image_ids}},
         include={"product": {"include": {"variants": True}}},
@@ -497,4 +489,4 @@ async def bulk_update_products(payload: ImagesBulkUpdate, background_tasks: Back
 
     background_tasks.add_task(handle_bulk_update_products, payload, images)
 
-    return {"message": "Products update started"}
+    return {"message": "products update started"}
