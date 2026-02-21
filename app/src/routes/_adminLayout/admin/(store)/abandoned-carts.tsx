@@ -19,13 +19,13 @@ import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 export const Route = createFileRoute("/_adminLayout/admin/(store)/abandoned-carts")({
     validateSearch: z.object({
         search: z.string().optional(),
-        time: z.string().optional().default("24"),
+        time: z.string().optional(),
     }),
     loaderDeps: ({ search }) => (search),
     loader: async ({ deps, context: { queryClient } }) => {
         await Promise.all([
-            queryClient.ensureQueryData(abandonedCartStatsQuery(deps.time)),
-            queryClient.ensureQueryData(abandonedCartsQuery({ hours_threshold: deps.time })),
+            queryClient.ensureQueryData(abandonedCartStatsQuery(deps.time || "24")),
+            queryClient.ensureQueryData(abandonedCartsQuery({ hours_threshold: deps.time || "24" })),
         ]);
     },
     component: RouteComponent,
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/abandoned-cart
 function RouteComponent() {
     const params = Route.useSearch()
     const [timeFilter, setTimeFilter] = useState<string>("24");
-    const { data: stats } = useSuspenseQuery(abandonedCartStatsQuery(params.time));
+    const { data: stats } = useSuspenseQuery(abandonedCartStatsQuery(params.time || "24"));
     const { data } = useSuspenseQuery(abandonedCartsQuery({ hours_threshold: params.time }));
     const { updateQuery } = useUpdateQuery(200);
     const { mutate: sendReminders, isPending: sendRemindersLoading } = useSendCartReminders();

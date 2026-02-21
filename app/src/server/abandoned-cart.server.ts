@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createServerFn } from "@tanstack/react-start";
 import type { PaginatedAbandonedCarts } from "@/schemas";
-import { api } from "@/utils/fetch-api";
+import { api } from "@/utils/api.server";
 
 interface AbandonedCartStats {
     active_count: number;

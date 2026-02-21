@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { api } from "@/utils/fetch-api";
+import { api } from "@/utils/api.server";
 import type { PaginatedCoupons } from "@/schemas";
 
 interface CouponAnalytics {
@@ -34,6 +34,4 @@ export const getCouponsFn = createServerFn({ method: "GET" })
             })
     );
 
-export const getCouponsAnalyticsFn = createServerFn({ method: "GET" }).handler(async () => {
-    return await api.get<CouponAnalytics>("/coupon/analytics");
-});
+export const getCouponsAnalyticsFn = createServerFn({ method: "GET" }).handler(async () => await api.get<CouponAnalytics>("/coupon/analytics"));

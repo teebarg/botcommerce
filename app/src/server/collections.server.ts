@@ -1,4 +1,4 @@
-import { api } from "@/utils/fetch-api";
+import { api } from "@/utils/api.server";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { Collection } from "@/schemas";
@@ -12,6 +12,4 @@ export const getCollectionFn = createServerFn({ method: "GET" })
 
 export const getCollectionsFn = createServerFn({ method: "GET" })
     .inputValidator(z.string().optional())
-    .handler(async ({ data: query }) => {
-        return await api.get<Collection[]>("/collection/", { params: { query: query || "" } });
-    });
+    .handler(async ({ data: query }) => api.get<Collection[]>("/collection/", { params: { query: query || "" } }));

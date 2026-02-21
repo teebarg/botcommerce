@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { api } from "@/utils/fetch-api";
+import { api } from "@/utils/api.server";
 import type { Address } from "@/schemas";
 
 export const getUserAddressesFn = createServerFn({ method: "GET" }).handler(async () => {

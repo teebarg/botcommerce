@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createServerFn } from "@tanstack/react-start";
 import type { Cart, Message, Order } from "@/schemas";
-import { api } from "@/utils/fetch-api";
+import { api } from "@/utils/api.server";
 import { setCookie, getCookie, deleteCookie } from "@tanstack/react-start/server";
 
 const CART_COOKIE = "_cart_id";

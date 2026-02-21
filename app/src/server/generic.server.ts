@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createServerFn } from "@tanstack/react-start";
-import { api } from "@/utils/fetch-api";
+import { api } from "@/utils/api.server";
 import { ConversationStatusSchema, type ChatMessage, type DeliveryOption, type PaginatedChats, type ShopSettings } from "@/schemas";
 import { StatsTrends } from "@/types/models";
 

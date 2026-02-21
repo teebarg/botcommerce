@@ -1,5 +1,5 @@
 import { SearchCatalog } from "@/schemas";
-import { api } from "@/utils/fetch-api";
+import { api } from "@/utils/api.server";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
@@ -11,6 +11,6 @@ export const CatalogSearchSchema = z.object({
     cursor: z.number().optional(),
 });
 
-export const getCatalogFn = createServerFn({ method: "GET" })
+export const getCatalogFn = createServerFn()
     .inputValidator((input: unknown) => CatalogSearchSchema.parse(input))
     .handler(async ({ data }) => await api.get<SearchCatalog>(`/catalog/${data.slug}`, { params: { ...data } }));

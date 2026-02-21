@@ -5,7 +5,7 @@ import { Redis } from "@upstash/redis";
 import { SignJWT, jwtVerify } from "jose";
 import { tryCatch } from "@/utils/try-catch";
 import type { User, Address, Role, Status, Message } from "@/schemas";
-import { api } from "./fetch-api";
+import { api } from "./api.server";
 import { getUserFn } from "@/server/users.server";
 
 const redis = new Redis({

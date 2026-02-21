@@ -1,4 +1,4 @@
-import { api } from "@/utils/fetch-api";
+import { api } from "@/utils/api.server";
 import { createServerFn } from "@tanstack/react-start";
 import type { Activity, PaginatedActivities } from "@/schemas";
 
