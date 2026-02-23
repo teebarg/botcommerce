@@ -45,7 +45,7 @@ function RouteComponent() {
         const ids = new Set<number>();
 
         for (const img of items) {
-            if (selectedImages.has(img.id) && img.product_id) ids.add(img.product_id);
+            if (selectedImages.has(img?.id) && img.product_id) ids.add(img.product_id);
         }
 
         return Array.from(ids);
