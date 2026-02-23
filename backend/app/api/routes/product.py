@@ -574,10 +574,6 @@ async def create_product(product: ProductCreate, background_tasks: BackgroundTas
         collection_connect = [{"id": id} for id in product.collection_ids]
         data["collections"] = {"connect": collection_connect}
 
-    if product.tags_ids:
-        tag_connect = [{"id": id} for id in product.tags_ids]
-        data["tags"] = {"connect": tag_connect}
-
     try:
         created_product = await db.product.create(data=data)
     except UniqueViolationError as e:
@@ -622,10 +618,6 @@ async def create_product_bundle(
             if payload.collection_ids:
                 data["collections"] = {"connect": [{"id": id}
                                                    for id in payload.collection_ids]}
-
-            if payload.tags_ids:
-                data["tags"] = {"connect": [{"id": id}
-                                            for id in payload.tags_ids]}
 
             product = await tx.product.create(data=data)
 

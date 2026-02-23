@@ -31,10 +31,6 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
         toggleColorSelect,
         toggleMeasurementSelect,
         toggleAgeSelect,
-        handleAddToCart,
-        handleWhatsAppPurchase,
-        loading,
-        outOfStock,
     } = useProductVariant(product);
     const safeColors = colors.filter((c): c is string => typeof c === "string");
 
@@ -51,7 +47,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                         {sizes.map((size) => (
                             <button
                                 key={size}
-                                onClick={() => isOptionAvailable("size", size!) && toggleSizeSelect(size)}
+                                onClick={() => isOptionAvailable("size", size!) && toggleSizeSelect(size!)}
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                                     selectedSize === size ? "bg-primary text-primary-foreground" : "bg-muted text-foreground hover:bg-muted/80"
                                 }`}

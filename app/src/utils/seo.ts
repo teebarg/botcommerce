@@ -13,7 +13,7 @@ export const seo = ({
     url?: string;
     name?: string;
 }) => {
-    const tags = [
+    return [
         { title },
         { name: "description", content: description },
         { name: "keywords", content: keywords },
@@ -30,6 +30,4 @@ export const seo = ({
         { name: "twitter:description", content: description },
         { name: "twitter:image", content: image },
     ];
-
-    return tags;
 };

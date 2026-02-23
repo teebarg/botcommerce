@@ -96,7 +96,7 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         setSelectedVariant(matchingVariant ?? undefined);
     }, [selectedSize, selectedColor, selectedMeasurement, selectedAge]);
 
-    const isOptionAvailable = (type: "size" | "color" | "measurement" | "age", value: string) => {
+    const isOptionAvailable = (type: "size" | "color" | "measurement" | "age", value: string | number) => {
         if (type === "size") {
             return product?.variants?.some(
                 (v) =>
@@ -118,7 +118,6 @@ export const useProductVariant = (product: Product | ProductSearch) => {
         } else if (type === "measurement") {
             return product?.variants?.some(
                 (v) =>
-                    v.measurement === parseInt(value) &&
                     (!selectedSize || v.size === selectedSize) &&
                     (!selectedColor || v.color === selectedColor) &&
                     (!selectedAge || v.age === selectedAge) &&

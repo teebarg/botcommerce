@@ -44,6 +44,7 @@ export const CollectionSchema = z
 export const ProductVariantLiteSchema = z.object({
     id: z.number(),
     sku: z.string(),
+    product_id: z.number(),
     status: ProductStatusSchema,
     price: z.number(),
     old_price: z.number(),
@@ -106,7 +107,6 @@ export const ProductSchema = z
         ratings: z.number(),
         categories: z.array(CategorySchema),
         collections: z.array(CollectionSchema),
-        tags: z.null(),
         images: z.array(ProductImageSchema),
         reviews: z.array(ReviewSchema),
         active: z.boolean(),
@@ -117,6 +117,7 @@ export const ProductSchema = z
 export const SearchVariantSchema = z.object({
     id: z.number(),
     sku: z.string(),
+    product_id: z.number(),
     status: ProductStatusSchema,
     price: z.number(),
     old_price: z.number(),

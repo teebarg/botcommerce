@@ -15,6 +15,7 @@ class ProductImage(BaseModel):
 class ProductVariant(BaseModel):
     id: int
     sku: str
+    product_id: int
     status: ProductStatus
     price: float
     old_price: Optional[float] = 0.0
@@ -72,10 +73,6 @@ class ProductLite(BaseModel):
     ratings: float
     categories: Optional[List[Category]] = []
     collections: Optional[List[Collection]] = []
-    # brand: Optional[Brand] = None
-    # tags: Optional[List[Tag]] = []
-    # images: Optional[List[ProductImage]] = []
-    # reviews: Optional[List[Review]] = []
     active: Optional[bool] = True
     is_new: Optional[bool] = False
 
@@ -89,15 +86,13 @@ class Product(BaseModel):
     image: Optional[str] = None
     variants: Optional[List[ProductVariant]] = None
     ratings: float
-    # categories: Optional[List[Category]] = []
+    categories: Optional[List[Category]] = []
     collections: Optional[List[Collection]] = []
     # brand: Optional[Brand] = None
-    # tags: Optional[List[Tag]] = []
     images: Optional[List[ProductImage]] = []
     reviews: Optional[List[Review]] = []
     active: Optional[bool] = True
     is_new: Optional[bool] = False
-    # embedding: Optional[List[float]] = None
 
 class SearchCategory(BaseModel):
     id: int

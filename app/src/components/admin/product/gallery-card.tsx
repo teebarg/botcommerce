@@ -16,6 +16,8 @@ interface GalleryCardProps {
 }
 
 export function GalleryCard({ image, onClick, isSelected = false, onSelectionChange, selectionMode = false }: GalleryCardProps) {
+    if (!image) return;
+    
     const handleSelectionChange = (checked: boolean) => {
         onSelectionChange?.(image.id, checked);
     };
@@ -79,7 +81,9 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
 
                     {image.product && (
                         <div className="absolute top-2 left-1/2 -translate-x-1/2">
-                            <Badge variant="indigo" className="text-base font-bold">{currency(image.product.variants?.[0]?.price || 0)}</Badge>
+                            <Badge variant="indigo" className="text-base font-bold">
+                                {currency(image.product.variants?.[0]?.price || 0)}
+                            </Badge>
                         </div>
                     )}
                 </div>

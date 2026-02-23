@@ -92,7 +92,7 @@ function RouteComponent() {
                             <div>
                                 <h3 className="text-lg font-semibold text-yellow-900 mb-2">Return Requirements</h3>
                                 <ul className="text-yellow-800 space-y-1">
-                                    <li>• Items must be in original condition with tags attached</li>
+                                    <li>• Items must be in original condition</li>
                                     <li>• Electronics must include all original accessories and packaging</li>
                                     <li>• Some items like personalized products are not returnable</li>
                                     <li>• Clearance items are final sale unless defective</li>

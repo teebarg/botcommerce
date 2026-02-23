@@ -1,7 +1,6 @@
 import { Star } from "lucide-react";
 
 import { ReviewActions } from "./reviews-actions";
-
 import { Card } from "@/components/ui/card";
 import type { Review } from "@/schemas";
 

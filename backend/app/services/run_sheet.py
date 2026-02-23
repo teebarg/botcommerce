@@ -102,8 +102,8 @@ async def generate_excel_file(email: str) -> str:
     workbook.save(output)
     output.seek(0)
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"product_export_{timestamp}.xlsx"
+    timestamp: str = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename: str = f"product_export_{timestamp}.xlsx"
 
     # Convert BytesIO to bytes to match the expected input type
     output_bytes = output.getvalue()
