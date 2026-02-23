@@ -192,14 +192,6 @@ class ImagesBulkUpdate(BaseModel):
 class ProductImageBulkUrls(BaseModel):
     urls: list[str]
 
-class ProductLite(BaseModel):
-    id: int
-    name: str
-    slug: str
-    sku: str
-    variants: Optional[List[ProductVariant]] = []
-    images: Optional[List[ProductImage]] = []
-
 class ReviewStatus(BaseModel):
     has_purchased: bool
     has_reviewed: bool
