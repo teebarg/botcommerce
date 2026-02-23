@@ -158,7 +158,7 @@ function RouteComponent() {
                                 <GalleryCard
                                     key={idx}
                                     image={item}
-                                    isSelected={selectedImages.has(item.id)}
+                                    isSelected={selectedImages.has(item?.id)}
                                     selectionMode={selectionMode}
                                     onSelectionChange={handleSelectionChange}
                                 />
