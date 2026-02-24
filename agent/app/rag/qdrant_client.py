@@ -8,16 +8,48 @@ from functools import lru_cache
 from typing import Optional
 import uuid
 import logging
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-# ── Embedding model ──────────────────────────────────────────────────────────
-# all-MiniLM-L6-v2: ~90MB, fast, great quality for semantic search
-# Cached so it only loads once
+MODEL_NAME = "all-MiniLM-L6-v2"
+MODEL_CACHE_DIR = "/agent/models"
+# MODEL_PATH = "/agent/models/all-MiniLM-L6-v2"
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+LOCAL_MODEL_DIR = BASE_DIR / "models" / MODEL_NAME
+
 @lru_cache()
 def get_embedding_model() -> SentenceTransformer:
-    logger.info("Loading embedding model: all-MiniLM-L6-v2 (~90MB, one-time load)")
-    return SentenceTransformer("all-MiniLM-L6-v2")
+    # if ENV == "dev":
+    if LOCAL_MODEL_DIR.exists():
+        print(f"Loading embedding model from local path: {LOCAL_MODEL_DIR}")
+        return SentenceTransformer(str(LOCAL_MODEL_DIR))
+    else:
+        print("Model not found locally. Downloading and saving to disk...")
+        model = SentenceTransformer(MODEL_NAME)
+        LOCAL_MODEL_DIR.parent.mkdir(parents=True, exist_ok=True)
+        model.save(str(LOCAL_MODEL_DIR))
+        return model
+
+    # else:
+    #     # Prod behavior: always download normally (no manual save)
+    #     print("Production mode: loading from HuggingFace Hub")
+    #     return SentenceTransformer(MODEL_NAME)
+
+# Cached so it only loads once
+# @lru_cache()
+# def get_embedding_model() -> SentenceTransformer:
+#     logger.info("Loading embedding model: all-MiniLM-L6-v2 (~90MB, one-time load)")
+#     return SentenceTransformer("all-MiniLM-L6-v2")
+
+# @lru_cache()
+# def get_embedding_model2() -> SentenceTransformer:
+#     model = SentenceTransformer("all-MiniLM-L6-v2")
+#     model.save("/agent/models/all-MiniLM-L6-v2")
+#     logger.info(f"Loading embedding model from {MODEL_CACHE_DIR} (no internet needed)")
+#     return SentenceTransformer(MODEL_PATH)
+#     # return SentenceTransformer(MODEL_NAME, cache_folder=MODEL_CACHE_DIR)
 
 
 EMBEDDING_DIM = 384  # dimension for all-MiniLM-L6-v2

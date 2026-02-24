@@ -25,3 +25,4 @@ jsconfig.json
 meilisearch-data
 
 app/dist
+agent/models

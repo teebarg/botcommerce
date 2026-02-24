@@ -113,7 +113,7 @@ async def health_check():
 
     return HealthResponse(
         status="healthy",
-        # llm="groq" if settings.env == "production" else "ollama",
+        llm="groq",
         qdrant=qdrant_status,
         redis=redis_status,
         environment=settings.env,
