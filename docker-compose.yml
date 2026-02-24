@@ -211,7 +211,10 @@ services:
       - traefik.http.routers.redisinsight-http.entrypoints=http
 
   agent:
-    build: .
+    image: 'shop-agent:${TAG-latest}'
+    build:
+      context: ./agent
+      dockerfile: Dockerfile
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik-public
@@ -222,8 +225,8 @@ services:
       - traefik.http.routers.agent-http.rule=Host(`agent.localhost`)
       - traefik.http.routers.agent-http.entrypoints=http
     ports:
-      - 7010:8000"
-    env_file: .env
+      - "7010:8000"
+    env_file: ./agent/.env
     environment:
       ENV: development
       REDIS_URL: redis://redis:6379
@@ -231,16 +234,15 @@ services:
       QDRANT_API_KEY: ""          # no auth needed for local Qdrant
       OLLAMA_BASE_URL: http://ollama:11434
     volumes:
-      - ./app:/app/app             # hot reload — code changes reflect immediately
-      - ./data:/app/data
+      - ./agent:/app/agent
     depends_on:
       redis:
         condition: service_healthy
       qdrant:
         condition: service_healthy
-      ollama:
-        condition: service_started
-    command: uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      # ollama:
+      #   condition: service_started
+    command: fastapi run --reload app/main.py
     networks:
       - traefik-public
       - default
