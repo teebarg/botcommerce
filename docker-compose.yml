@@ -56,7 +56,7 @@ services:
   #     - traefik.constraint-label=traefik-public
 
   #     - traefik.http.services.shop-app.loadbalancer.server.port=5173
-      
+
   #     - traefik.http.routers.shop-app-http.rule=Host(`app.localhost`)
   #     - traefik.http.routers.shop-app-http.entrypoints=http
   #     # - traefik.http.routers.shop-app-http.service=shop-app
@@ -270,24 +270,6 @@ services:
       timeout: 5s
       retries: 5
 
-  ollama:
-    image: ollama/ollama:latest
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama-models:/root/.ollama   # persists downloaded models between restarts
-    networks:
-      - traefik-public
-      - default
-    # Uncomment if you have an NVIDIA GPU:
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
-
   # celery:
   #   image: 'shop-worker:${TAG-latest}'
   #   build:
@@ -348,7 +330,6 @@ volumes:
   meili-data:
   redis-data:
   qdrant-data:
-  ollama-models:
 
 networks:
   traefik-public:

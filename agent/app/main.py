@@ -56,7 +56,7 @@ app.add_middleware(
 async def chat(request: ChatRequest):
     """
     Main chat endpoint.
-    
+
     - Maintains conversation history per session_id
     - Automatically routes to RAG or API tools
     - Returns whether the conversation was escalated to a human
@@ -113,7 +113,7 @@ async def health_check():
 
     return HealthResponse(
         status="healthy",
-        llm="groq" if settings.env == "production" else "ollama",
+        # llm="groq" if settings.env == "production" else "ollama",
         qdrant=qdrant_status,
         redis=redis_status,
         environment=settings.env,
@@ -129,6 +129,7 @@ async def delete_session(session_id: str):
 
 @app.get("/", tags=["System"])
 async def root():
+    # TODO: Add more info
     return {
         "name": "Customer Support Agent",
         "status": "running",

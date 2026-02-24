@@ -10,15 +10,17 @@ import asyncio
 import argparse
 import logging
 import asyncpg
-import os
 from app.rag.qdrant_client import upsert_documents
+from app.config import get_settings
+
+settings = get_settings()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 async def get_connection() -> asyncpg.Connection:
-    url: str | None = os.environ.get("DATABASE_URL")
+    url: str | None = settings.DATABASE_URL
     if not url:
         raise RuntimeError("DATABASE_URL is not set in your .env")
     return await asyncpg.connect(url)

@@ -37,7 +37,7 @@ class IngestRequest(BaseModel):
 
 class HealthResponse(BaseModel):
     status: str
-    llm: str
+    llm: Optional[str] = None
     qdrant: str
     redis: str
     environment: str

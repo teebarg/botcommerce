@@ -54,6 +54,10 @@ prep:
 prep-docker:
 	docker exec shop-backend ./scripts/prestart.sh
 
+.PHONY: serve-agent
+serve-agent:
+	@cd agent; uvicorn app.main:app --host 0.0.0.0 --reload --workers 4
+
 .PHONY: serve-backend
 serve-backend:
 	@cd backend; uvicorn app.main:app --host 0.0.0.0 --reload --workers 4
@@ -68,7 +72,7 @@ sync:
 
 .PHONY: dev
 dev:
-	make -j 2 serve-backend serve-app
+	make -j 3 serve-backend serve-app serve-agent
 
 .PHONY: deploy
 deploy:
