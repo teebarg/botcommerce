@@ -1,7 +1,7 @@
 # 🤖 Customer Support Agent
 
 An agentic AI customer support system built with **LangChain**, **Qdrant**, **RAG**, and **FastAPI**.
-Runs on Ollama locally and Groq (free) in production — deployable on Render's 500MB free tier.
+Runs on Groq — deployable on 500MB free tier servers.
 
 ---
 
@@ -34,7 +34,6 @@ Your App
 
 ### Prerequisites
 - Python 3.11+
-- [Ollama](https://ollama.ai) installed and running
 - Docker (optional, for Redis)
 
 ### 1. Clone & Install
@@ -49,18 +48,12 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-### 3. Pull Ollama Model
-```bash
-ollama pull llama3
-# Or for a smaller model: ollama pull phi3
-```
-
-### 4. Start Redis (with Docker)
+### 3. Start Redis (with Docker)
 ```bash
 docker run -d -p 6379:6379 redis:alpine
 ```
 
-### 5. Ingest Your Data
+### 4. Ingest Your Data
 ```bash
 # Load all collections (products, FAQs, policies)
 python -m app.rag.ingest --collection all
@@ -70,12 +63,12 @@ python -m app.rag.ingest --collection products
 python -m app.rag.ingest --collection faqs
 ```
 
-### 6. Start the Server
+### 5. Start the Server
 ```bash
 uvicorn app.main:app --reload --port 8000
 ```
 
-### 7. Test It
+### 6. Test It
 ```bash
 curl -X POST http://localhost:8000/chat \
   -H "Content-Type: application/json" \
@@ -129,7 +122,7 @@ curl -X POST https://your-render-app.onrender.com/ingest \
 customer-support-agent/
 ├── app/
 │   ├── main.py              # FastAPI entry point & endpoints
-│   ├── config.py            # Settings & LLM factory (Ollama ↔ Groq)
+│   ├── config.py            # Settings & LLM factory (Groq)
 │   ├── agent/
 │   │   ├── agent.py         # LangChain ReAct agent loop
 │   │   ├── tools.py         # All agent tools (RAG + shop API)
@@ -178,8 +171,7 @@ const data = await response.json();
 
 Whenever you add new products, FAQs, or update policies:
 
-1. Edit the files in `data/`
-2. Call the ingest endpoint:
+1. Call the ingest endpoint:
 ```bash
 curl -X POST https://your-agent.onrender.com/ingest \
   -d '{"collection": "products", "force_reload": true}'
@@ -198,17 +190,5 @@ curl -X POST https://your-agent.onrender.com/ingest \
 - **Redis** — distributed session state and conversation memory
 - **Docker** — containerization, multi-stage builds, health checks
 - **Prompt Engineering** — ReAct format, agent behavior control
-- **Model-agnostic design** — Ollama (local) / Groq (production) switching
-- **Groq API / Ollama** — LLM inference, open-source model deployment
-
----
-
-## 🔮 Scaling Up (When You Have Budget)
-
-| Component | Free Tier | Paid Upgrade |
-|---|---|---|
-| LLM | Groq free | Claude API / GPT-4 |
-| Vector DB | Qdrant 1GB free | Qdrant paid / Pinecone |
-| Memory | Redis free | Redis Cloud |
-| Hosting | Render 500MB | Render 2GB+ / Railway |
-| Embeddings | all-MiniLM | OpenAI text-embedding-3 |
+- **Model-agnostic design** — Claude / Groq switching
+- **Groq API** — LLM inference, open-source model deployment

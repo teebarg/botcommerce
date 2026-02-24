@@ -3,53 +3,34 @@ from qdrant_client.models import (
     Distance, VectorParams, PointStruct, Filter,
     FieldCondition, MatchValue
 )
-from sentence_transformers import SentenceTransformer
+# from sentence_transformers import SentenceTransformer
 from functools import lru_cache
 from typing import Optional
 import uuid
 import logging
 from pathlib import Path
+from fastembed import TextEmbedding
 
 logger = logging.getLogger(__name__)
 
-MODEL_NAME = "all-MiniLM-L6-v2"
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+# MODEL_NAME = "all-MiniLM-L6-v2"
 MODEL_CACHE_DIR = "/agent/models"
-# MODEL_PATH = "/agent/models/all-MiniLM-L6-v2"
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 LOCAL_MODEL_DIR = BASE_DIR / "models" / MODEL_NAME
 
-@lru_cache()
-def get_embedding_model() -> SentenceTransformer:
-    # if ENV == "dev":
-    if LOCAL_MODEL_DIR.exists():
-        print(f"Loading embedding model from local path: {LOCAL_MODEL_DIR}")
-        return SentenceTransformer(str(LOCAL_MODEL_DIR))
-    else:
-        print("Model not found locally. Downloading and saving to disk...")
-        model = SentenceTransformer(MODEL_NAME)
-        LOCAL_MODEL_DIR.parent.mkdir(parents=True, exist_ok=True)
-        model.save(str(LOCAL_MODEL_DIR))
-        return model
-
-    # else:
-    #     # Prod behavior: always download normally (no manual save)
-    #     print("Production mode: loading from HuggingFace Hub")
-    #     return SentenceTransformer(MODEL_NAME)
-
-# Cached so it only loads once
-# @lru_cache()
-# def get_embedding_model() -> SentenceTransformer:
-#     logger.info("Loading embedding model: all-MiniLM-L6-v2 (~90MB, one-time load)")
-#     return SentenceTransformer("all-MiniLM-L6-v2")
-
 # @lru_cache()
 # def get_embedding_model2() -> SentenceTransformer:
-#     model = SentenceTransformer("all-MiniLM-L6-v2")
-#     model.save("/agent/models/all-MiniLM-L6-v2")
-#     logger.info(f"Loading embedding model from {MODEL_CACHE_DIR} (no internet needed)")
-#     return SentenceTransformer(MODEL_PATH)
-#     # return SentenceTransformer(MODEL_NAME, cache_folder=MODEL_CACHE_DIR)
+#     if LOCAL_MODEL_DIR.exists():
+#         print(f"Loading embedding model from local path: {LOCAL_MODEL_DIR}")
+#         return SentenceTransformer(str(LOCAL_MODEL_DIR))
+#     else:
+#         print("Model not found locally. Downloading and saving to disk...")
+#         model = SentenceTransformer(MODEL_NAME)
+#         LOCAL_MODEL_DIR.parent.mkdir(parents=True, exist_ok=True)
+#         model.save(str(LOCAL_MODEL_DIR))
+#         return model
 
 
 EMBEDDING_DIM = 384  # dimension for all-MiniLM-L6-v2
@@ -60,6 +41,13 @@ COLLECTIONS = {
     "policies": "shop_policies",
 }
 
+@lru_cache()
+def get_embedding_model() -> TextEmbedding:
+    logger.info(f"Loading FastEmbed model: {MODEL_NAME} (ONNX, no PyTorch)")
+    return TextEmbedding(
+        model_name=MODEL_NAME,
+        cache_dir=MODEL_CACHE_DIR,
+    )
 
 @lru_cache()
 def get_qdrant_client() -> QdrantClient:
@@ -104,12 +92,14 @@ def upsert_documents(collection_key: str, documents: list[dict]) -> int:
     client = get_qdrant_client()
 
     texts = [doc["text"] for doc in documents]
-    embeddings = model.encode(texts, show_progress_bar=True).tolist()
+    # embeddings = model.encode(texts, show_progress_bar=True).tolist()
+    embeddings = list(model.embed(texts))
 
     points = [
         PointStruct(
             id=str(uuid.uuid4()),
-            vector=embedding,
+            # vector=embedding,
+            vector=embedding.tolist(),
             payload=doc,  # full doc stored as payload
         )
         for doc, embedding in zip(documents, embeddings)
@@ -136,7 +126,8 @@ def search_collection(
     model = get_embedding_model()
     client = get_qdrant_client()
 
-    query_vector = model.encode(query).tolist()
+    # query_vector = model.encode(query).tolist()
+    query_vector = list(model.embed([query]))[0].tolist()
 
     # Build optional filter (e.g. filter by category)
     qdrant_filter = None

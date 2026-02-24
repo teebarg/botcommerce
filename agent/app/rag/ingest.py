@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 async def get_connection() -> asyncpg.Connection:
     url: str | None = settings.DATABASE_URL
     if not url:
-        raise RuntimeError("DATABASE_URL is not set in your .env")
+        raise RuntimeError("DATABASE_URL is not set in .env")
     return await asyncpg.connect(url)
 
 async def load_products(conn: asyncpg.Connection) -> list[dict]:

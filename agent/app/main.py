@@ -30,7 +30,7 @@ async def lifespan(app: FastAPI):
         get_embedding_model()  # loads and caches the model
         logger.info("✅ Embedding model loaded")
     except Exception as e:
-        logger.error(f"⚠️  Could not pre-load embedding model: {e}")
+        logger.error(f"⚠️  Could not pre-load embedding model....: {e}")
 
     yield
 
@@ -52,8 +52,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/chat", response_model=ChatResponse, tags=["Chat"])
-async def chat(request: ChatRequest):
+@app.post("/chat", tags=["Chat"])
+async def chat(request: ChatRequest) -> ChatResponse:
     """
     Main chat endpoint.
 
@@ -85,31 +85,29 @@ async def ingest_data(request: IngestRequest, background_tasks: BackgroundTasks)
     }
 
 
-@app.get("/health", response_model=HealthResponse, tags=["System"])
-async def health_check():
+@app.get("/health", tags=["System"])
+async def health_check() -> HealthResponse:
     """
     Health check endpoint. Render uses this to verify the service is running.
     Checks connectivity to Qdrant and Redis.
     """
     settings = get_settings()
 
-    # Check Qdrant
     qdrant_status = "ok"
     try:
         from app.rag.qdrant_client import get_qdrant_client
         client = get_qdrant_client()
         client.get_collections()
     except Exception as e:
-        qdrant_status = f"error: {str(e)[:50]}"
+        qdrant_status: str = f"error: {str(e)[:50]}"
 
-    # Check Redis
     redis_status = "ok"
     try:
         from app.agent.memory import get_redis
         r = get_redis()
         r.ping()
     except Exception as e:
-        redis_status = f"error: {str(e)[:50]}"
+        redis_status: str = f"error: {str(e)[:50]}"
 
     return HealthResponse(
         status="healthy",
@@ -129,7 +127,6 @@ async def delete_session(session_id: str):
 
 @app.get("/", tags=["System"])
 async def root():
-    # TODO: Add more info
     return {
         "name": "Customer Support Agent",
         "status": "running",

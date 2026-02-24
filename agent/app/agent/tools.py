@@ -29,7 +29,7 @@ def _shop_request(method: str, path: str, **kwargs) -> dict:
         "Authorization": f"Bearer {settings.api_key}",
         "Content-Type": "application/json",
     }
-    url = f"{settings.api_base_url}{path}"
+    url: str = f"{settings.api_base_url}{path}"
     try:
         with httpx.Client(timeout=10.0) as client:
             response = client.request(method, url, headers=headers, **kwargs)
@@ -130,7 +130,7 @@ def check_order_status(order_id: str) -> str:
     if not order_id.isdigit():
         return f"'{order_id}' doesn't look like a valid order ID. Order IDs are numbers only (e.g. 12345). Please ask the customer to double-check."
 
-    result = _shop_request("GET", f"/api/orders/{order_id}")
+    result = _shop_request("GET", f"/api/order/{order_id}")
 
     if "error" in result:
         return f"Could not retrieve order #{order_id}: {result['error']}"

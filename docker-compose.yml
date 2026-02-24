@@ -65,51 +65,55 @@ services:
   #     - traefik-public
   #     - default
 
-  # backend:
-  #   image: 'shop-backend:${TAG-latest}'
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.docker.network=traefik-public
-  #     - traefik.constraint-label=traefik-public
+  backend:
+    image: 'shop-backend:${TAG-latest}'
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.constraint-label=traefik-public
 
-  #     - traefik.http.services.shop-backend.loadbalancer.server.port=8000
+      - traefik.http.services.shop-backend.loadbalancer.server.port=8000
 
-  #     - traefik.http.routers.shop-backend-http.rule=Host(`api.localhost`)
-  #     - traefik.http.routers.shop-backend-http.entrypoints=http
-  #   ports:
-  #     - "7002:8000"
-  #   networks:
-  #     - traefik-public
-  #     - default
-  #   env_file:
-  #     - ./backend/.env.docker
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile.dev
-  #     args:
-  #       INSTALL_DEV: ${INSTALL_DEV-false}
-  #   platform: linux/amd64 # Patch for M1 Mac
-  #   depends_on:
-  #     - db
-  #     - meilisearch
-  #   command:
-  #     - fastapi
-  #     - run
-  #     - --reload
-  #     - "app/main.py"
-  #   develop:
-  #     watch:
-  #       - path: ./backend
-  #         action: sync
-  #         target: /app
-  #         ignore:
-  #           - ./backend/.venv
-  #           - .venv
-  #       - path: ./backend/pyproject.toml
-  #         action: rebuild
-  #   volumes:
-  #     - ./backend/:/app
-  #     - /app/.venv
+      - traefik.http.routers.shop-backend-http.rule=Host(`api.localhost`)
+      - traefik.http.routers.shop-backend-http.entrypoints=http
+    ports:
+      - "7002:8000"
+    networks:
+      - traefik-public
+      - default
+    env_file:
+      - ./backend/.env.docker
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+      args:
+        INSTALL_DEV: ${INSTALL_DEV-false}
+    platform: linux/amd64 # Patch for M1 Mac
+    depends_on:
+      redis:
+        condition: service_healthy
+      meilisearch:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    command:
+      - fastapi
+      - run
+      - --reload
+      - "app/main.py"
+    develop:
+      watch:
+        - path: ./backend
+          action: sync
+          target: /app
+          ignore:
+            - ./backend/.venv
+            - .venv
+        - path: ./backend/pyproject.toml
+          action: rebuild
+    volumes:
+      - ./backend/:/app
+      - /app/.venv
 
   db:
     image: postgres:15
@@ -152,6 +156,11 @@ services:
 
       - traefik.http.routers.meilisearch-http.rule=Host(`meilisearch.localhost`)
       - traefik.http.routers.meilisearch-http.entrypoints=http
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   adminer:
     image: adminer:5.3.0
@@ -214,7 +223,7 @@ services:
     image: 'shop-agent:${TAG-latest}'
     build:
       context: ./agent
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik-public
@@ -227,26 +236,30 @@ services:
     ports:
       - "7010:8000"
     env_file: ./agent/.env
-    environment:
-      ENV: development
-      REDIS_URL: redis://redis:6379
-      QDRANT_URL: http://qdrant:6333
-      QDRANT_API_KEY: ""          # no auth needed for local Qdrant
-      OLLAMA_BASE_URL: http://ollama:11434
     volumes:
-      - ./agent:/app/agent
-      - model-cache:/app/models
+      - ./agent:/app
+      - /app/.venv
     depends_on:
       redis:
         condition: service_healthy
       qdrant:
         condition: service_healthy
-      # ollama:
-      #   condition: service_started
+      db:
+        condition: service_healthy
     command: fastapi run --reload app/main.py
     networks:
       - traefik-public
       - default
+    develop:
+      watch:
+        - path: ./agent
+          action: sync
+          target: /app
+          ignore:
+            - ./agent/.venv
+            - .venv
+        - path: ./agent/pyproject.toml
+          action: rebuild
 
   qdrant:
     image: qdrant/qdrant:latest
@@ -268,28 +281,10 @@ services:
       - traefik-public
       - default
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:6333/healthz"]
+      test: ["CMD-SHELL", "timeout 1s bash -c ':> /dev/tcp/127.0.0.1/6333' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
-
-  # ollama:
-  #   image: ollama/ollama:latest
-  #   ports:
-  #     - "11434:11434"
-  #   volumes:
-  #     - ollama-models:/root/.ollama   # persists downloaded models between restarts
-  #   networks:
-  #     - traefik-public
-  #     - default
-  #   # Uncomment if you have an NVIDIA GPU:
-  #   # deploy:
-  #   #   resources:
-  #   #     reservations:
-  #   #       devices:
-  #   #         - driver: nvidia
-  #   #           count: 1
-  #   #           capabilities: [gpu]
 
   # celery:
   #   image: 'shop-worker:${TAG-latest}'
@@ -351,8 +346,6 @@ volumes:
   meili-data:
   redis-data:
   qdrant-data:
-  # ollama-models:
-  model-cache:
 
 networks:
   traefik-public:

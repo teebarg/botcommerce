@@ -95,6 +95,14 @@ docker-push:
 	@docker push $(DOCKER_HUB)/$(APP_NAME):latest
 	@docker push $(DOCKER_HUB)/$(APP_NAME):$(shell git rev-parse HEAD)
 
+.PHONY: activate-env-windows
+activate-env-windows:
+	.venv\Scripts\Activate.ps1
+
+.PHONY: activate-env
+activate-env:
+	source .venv/bin/activate
+
 .PHONY: help
 help:
 	@echo "Available commands:"
