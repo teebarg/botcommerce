@@ -270,6 +270,24 @@ services:
       timeout: 5s
       retries: 5
 
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   ports:
+  #     - "11434:11434"
+  #   volumes:
+  #     - ollama-models:/root/.ollama   # persists downloaded models between restarts
+  #   networks:
+  #     - traefik-public
+  #     - default
+  #   # Uncomment if you have an NVIDIA GPU:
+  #   # deploy:
+  #   #   resources:
+  #   #     reservations:
+  #   #       devices:
+  #   #         - driver: nvidia
+  #   #           count: 1
+  #   #           capabilities: [gpu]
+
   # celery:
   #   image: 'shop-worker:${TAG-latest}'
   #   build:
@@ -330,6 +348,7 @@ volumes:
   meili-data:
   redis-data:
   qdrant-data:
+  # ollama-models:
 
 networks:
   traefik-public:

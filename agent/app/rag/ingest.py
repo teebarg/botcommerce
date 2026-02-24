@@ -210,6 +210,6 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    from dotenv import load_dotenv
-    load_dotenv()
+    # from dotenv import load_dotenv
+    # load_dotenv()
     asyncio.run(ingest(args.collection))
