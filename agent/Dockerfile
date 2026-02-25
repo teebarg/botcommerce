@@ -1,4 +1,4 @@
-# --- Stage 1: Build & Model Preparation ---
+# ── Stage 1: Build & Model Preparation ───────────────────────────────────────
 FROM python:3.11-slim AS builder
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
@@ -16,36 +16,35 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --frozen --no-install-project --no-dev
 
-# Bake models into the image so they don't download at runtime
-RUN . /venv/bin/activate && \
-    python -c "from fastembed import TextEmbedding; TextEmbedding('sentence-transformers/all-MiniLM-L6-v2', cache_dir='/app/models')"
-
 # Copy source and sync project
 COPY . .
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev
 
+# Bake model into image — script avoids inline python -c indentation issues.
+RUN . /venv/bin/activate && python scripts/download_model.py
+
 # --- Stage 2: Final Runtime ---
 FROM python:3.11-slim
 
-WORKDIR /app
+WORKDIR /app/agent
 
 # Copy virtual environment and baked models from builder
 COPY --from=builder /venv /venv
-COPY --from=builder /app/models /app/models
-COPY --from=builder /app /app
+# COPY --from=builder /app/models /app/models
+COPY --from=builder /app /app/agent
 
-# Production Environment Variables
+USER root
+RUN chmod -R 777 /app/agent/models
+
 ENV PATH="/venv/bin:$PATH" \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    FASTEMBED_CACHE_PATH=/app/models
+    FASTEMBED_CACHE_PATH="/app/agent/models" \
+    PYTHONPATH="/app/agent"
 
-# Use a non-privileged user for security
-RUN groupadd -r appuser && useradd -r -g appuser appuser
-RUN chown -R appuser:appuser /app
-USER appuser
+USER 1000
 
 EXPOSE 8000
 
-CMD ["fastapi", "run", "app/main.py", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]

@@ -10,15 +10,22 @@ import uuid
 import logging
 from pathlib import Path
 from fastembed import TextEmbedding
+import os
 
 logger = logging.getLogger(__name__)
 
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 # MODEL_NAME = "all-MiniLM-L6-v2"
-MODEL_CACHE_DIR = "/agent/models"
+# MODEL_CACHE_DIR = "/agent/models"
+MODEL_CACHE_DIR = "/app/agent/models"
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 LOCAL_MODEL_DIR = BASE_DIR / "models" / MODEL_NAME
+
+BASE_DIR = Path(__file__).resolve().parent.parent # Points to 'agent' folder
+LOCAL_MODELS = str(BASE_DIR / "models")
+
+MODEL_CACHE_DIR = os.environ.get("FASTEMBED_CACHE_PATH", LOCAL_MODELS)
 
 # @lru_cache()
 # def get_embedding_model2() -> SentenceTransformer:
@@ -47,6 +54,7 @@ def get_embedding_model() -> TextEmbedding:
     return TextEmbedding(
         model_name=MODEL_NAME,
         cache_dir=MODEL_CACHE_DIR,
+        local_files_only=True,
     )
 
 @lru_cache()
