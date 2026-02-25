@@ -6,6 +6,7 @@ from functools import lru_cache
 class Settings(BaseSettings):
     env: str = Field(default="development", alias="ENV")
     DATABASE_URL: str = ""
+    SECRET_KEY: str = "specialsecret"
 
     groq_api_key: str = Field(default="", alias="GROQ_API_KEY")
     groq_model: str = Field(default="llama-3.3-70b-versatile", alias="GROQ_MODEL")

@@ -9,6 +9,7 @@ build:
 
 .PHONY: up
 up:
+# 	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) up --build
 	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) up
 
 .PHONY: update

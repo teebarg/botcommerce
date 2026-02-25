@@ -16,16 +16,11 @@ logger = logging.getLogger(__name__)
 
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 # MODEL_NAME = "all-MiniLM-L6-v2"
-# MODEL_CACHE_DIR = "/agent/models"
-MODEL_CACHE_DIR = "/app/agent/models"
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-LOCAL_MODEL_DIR = BASE_DIR / "models" / MODEL_NAME
-
-BASE_DIR = Path(__file__).resolve().parent.parent # Points to 'agent' folder
 LOCAL_MODELS = str(BASE_DIR / "models")
 
-MODEL_CACHE_DIR = os.environ.get("FASTEMBED_CACHE_PATH", LOCAL_MODELS)
+MODEL_CACHE_DIR: str = os.environ.get("FASTEMBED_CACHE_PATH", LOCAL_MODELS)
 
 # @lru_cache()
 # def get_embedding_model2() -> SentenceTransformer:
@@ -106,14 +101,13 @@ def upsert_documents(collection_key: str, documents: list[dict]) -> int:
     points = [
         PointStruct(
             id=str(uuid.uuid4()),
-            # vector=embedding,
-            vector=embedding.tolist(),
+            vector=embedding,
             payload=doc,  # full doc stored as payload
         )
         for doc, embedding in zip(documents, embeddings)
     ]
 
-    client.upsert(collection_name=collection_name, points=points)
+    client.upsert(collection_name=collection_name, points=points, wait=False)
     logger.info(f"Upserted {len(points)} docs into '{collection_name}'")
     return len(points)
 
@@ -121,7 +115,7 @@ def upsert_documents(collection_key: str, documents: list[dict]) -> int:
 def search_collection(
     collection_key: str,
     query: str,
-    top_k: int = 3,
+    top_k: int = 5,
     score_threshold: float = 0.5,
     filters: Optional[dict] = None,
 ) -> list[dict]:
@@ -159,3 +153,30 @@ def search_collection(
         {**hit.payload, "_score": round(hit.score, 3)}
         for hit in results
     ]
+
+def clear_collection(collection_key: str) -> None:
+    """
+    Remove all points from a Qdrant collection
+    while keeping the collection schema intact.
+    """
+    collection_name: str = COLLECTIONS[collection_key]
+    client = get_qdrant_client()
+
+    client.delete(
+        collection_name=collection_name,
+        points_selector=Filter(must=[]),
+        wait=True,
+    )
+
+    logger.info(f"Cleared all points from '{collection_name}'")
+
+
+def delete_collection(collection_key: str) -> None:
+    """
+    Completely delete a Qdrant collection.
+    """
+    collection_name: str = COLLECTIONS[collection_key]
+    client = get_qdrant_client()
+
+    client.delete_collection(collection_name)
+    logger.info(f"Deleted collection '{collection_name}'")

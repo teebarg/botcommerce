@@ -1,10 +1,10 @@
-from typing import Annotated
+from typing import Annotated, Literal, Optional
 
 import jwt
 from fastapi import Depends, HTTPException, status, Cookie
-from fastapi.security import APIKeyHeader, OAuth2PasswordBearer
+from fastapi.security import APIKeyHeader, OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
 from jwt.exceptions import InvalidTokenError
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 
 from app.core import security
 from app.core.config import settings
@@ -17,6 +17,9 @@ from supabase import create_client, Client
 from app.services.redis import get_redis_dependency
 import redis.asyncio as redis
 from app.services.shop_settings import ShopSettingsService
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token"
@@ -28,6 +31,46 @@ supabase: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
 TokenDep = Annotated[str | None, Cookie(alias="authjs.session-token" if settings.ENVIRONMENT == "local" else "__Secure-authjs.session-token")]
 
 RedisClient = Annotated[redis.Redis, Depends(get_redis_dependency)]
+
+internal_bearer = HTTPBearer(auto_error=False)
+
+class ServicePrincipal:
+    def __init__(self, name: str, role: str) -> None:
+        self.name = name
+        self.role = role
+        self.type = "service"
+
+class Principal(BaseModel):
+    id: str
+    role: str
+    type: Literal["user", "service"]
+    user_id: Optional[int] = None
+
+
+async def get_internal_service(
+    credentials: HTTPAuthorizationCredentials | None = Depends(internal_bearer),
+) -> ServicePrincipal | None:
+    if not credentials:
+        return None
+
+    try:
+        payload = jwt.decode(
+            credentials.credentials,
+            settings.SECRET_KEY,
+            algorithms=[security.ALGORITHM],
+        )
+
+        return ServicePrincipal(
+            name=payload.get("sub"),
+            role=payload.get("role", "ADMIN"),
+        )
+
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid service token",
+        )
 
 async def get_user_token(access_token: TokenDep = None) -> TokenPayload | None:
     try:
@@ -95,6 +138,28 @@ def get_current_superuser(current_user: CurrentUser) -> User:
 
 
 AdminUser = Annotated[User, Depends(get_current_superuser)]
+
+async def get_principal(
+    service: ServicePrincipal | None = Depends(get_internal_service),
+    user: User | None = Depends(get_user),
+) -> Principal:
+    if service:
+        return Principal(
+            id=service.name,
+            role=service.role,
+            type="service",
+        )
+    if not user:
+        raise HTTPException(status_code=401, detail="Unauthenticated")
+
+    return Principal(
+        id=str(user.id),
+        role=user.role,
+        type="user",
+        user_id=user.id,
+    )
+
+PrincipalDep = Annotated[Principal, Depends(get_principal)]
 
 def get_notification_service() -> NotificationService:
     notification_service = NotificationService()

@@ -4,10 +4,7 @@ from app.core.config import settings
 from app.core.logging import get_logger
 from app.services.meilisearch import add_documents_to_index, update_document, clear_index, delete_document
 from app.models.product import Product, ProductImage
-from app.services.run_sheet import process_products, generate_excel_file
 from app.services.prisma import with_prisma_connection
-from app.services.websocket import manager
-from app.services.activity import log_activity
 from app.services.redis import invalidate_pattern, invalidate_key
 import random
 from datetime import datetime, timezone
@@ -120,52 +117,6 @@ async def index_products():
             logger.debug(f"Error re-indexing products images: {e}")
     except Exception as e:
         logger.error(f"Error during product re-indexing: {e}")
-
-
-@with_prisma_connection
-async def product_upload(user_id: str):
-    logger.info("Starting product upload processing...")
-    try:
-        num_rows = await process_products(user_id=user_id)
-
-        await index_products()
-        logger.info("Re-indexing completed.")
-        await manager.send_to_user(
-            user_id=user_id,
-            data={
-                "status": "completed",
-                "total_rows": num_rows,
-                "processed_rows": num_rows,
-            },
-            message_type="sheet-processor",
-        )
-
-        await log_activity(
-            user_id=user_id,
-            activity_type="PRODUCT_UPLOAD",
-            description=f"Uploaded products from google sheet",
-            is_success=True
-        )
-    except Exception as e:
-        logger.error(f"Error processing data from file: {e}")
-        await log_activity(
-            user_id=user_id,
-            activity_type="PRODUCT_UPLOAD",
-            description=f"Failed to upload products from google sheet",
-            is_success=False
-        )
-
-
-@with_prisma_connection
-async def product_export(email: str, user_id: str):
-    download_url = await generate_excel_file(email=email)
-
-    await log_activity(
-        user_id=user_id,
-        activity_type="PRODUCT_EXPORT",
-        description="Exported products to Excel",
-        action_download_url=download_url
-    )
 
 
 @with_prisma_connection

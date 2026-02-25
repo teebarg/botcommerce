@@ -3,9 +3,8 @@ from functools import wraps
 from typing import Any, Callable, Union
 
 import json
-
+import inspect
 from fastapi import Request
-
 from app.redis_client import redis_client
 from app.core.logging import logger
 from app.services.websocket import manager
@@ -40,7 +39,7 @@ async def publish_event(event_name: str, payload: dict[str, Any]) -> bool:
     Append an event to a Redis Stream for durable consumption by consumers.
     Stream key format: "events:{event_name}". Payload is stored under the "data" field as JSON.
     """
-    stream_key = f"events:{event_name}"
+    stream_key: str = f"events:{event_name}"
     data = {"data": json.dumps(payload, cls=EnhancedJSONEncoder)}
     await redis_client.xadd(stream_key, data)
     return True
@@ -69,24 +68,28 @@ async def bust(key: str) -> bool:
 async def get_redis_dependency(request: Request):
     return request.app.state.redis
 
-
 def cache_response(key_prefix: str, key: Union[str, Callable[..., str], None] = None, expire: int = DEFAULT_EXPIRATION):
     def decorator(func: Callable):
         @wraps(func)
         async def wrapper(*args, **kwargs):
-            request: Request = kwargs["request"]
+            request: Request = kwargs.get("request")
             if not request:
                 raise ValueError("FastAPI Request not found")
 
             redis = request.app.state.redis
 
             if isinstance(key, str):
-                raw_key = f"{key_prefix}:{key}"
+                raw_key: str = f"{key_prefix}:{key}"
             elif callable(key):
-                dynamic_key = key(*args, **kwargs)
-                raw_key = f"{key_prefix}:{dynamic_key}"
+                sig = inspect.signature(key)
+                allowed_params = sig.parameters.keys()
+                filtered_kwargs = {
+                    k: v for k, v in kwargs.items() if k in allowed_params
+                }
+                dynamic_key: str = key(**filtered_kwargs)
+                raw_key: str = f"{key_prefix}:{dynamic_key}"
             else:
-                raw_key = f"{key_prefix}:{request.url.path}?{request.url.query}"
+                raw_key: str = f"{key_prefix}:{request.url.path}?{request.url.query}"
 
             cached = await redis.get(raw_key)
             if cached is not None:
@@ -94,7 +97,6 @@ def cache_response(key_prefix: str, key: Union[str, Callable[..., str], None] = 
 
             result = await func(*args, **kwargs)
             await redis.setex(raw_key, expire, json.dumps(result, cls=EnhancedJSONEncoder))
-
             return result
         return wrapper
     return decorator

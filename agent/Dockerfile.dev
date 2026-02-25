@@ -20,11 +20,6 @@ ENV FASTEMBED_CACHE_PATH=/app/models
 
 WORKDIR /app
 
-# Install system dependencies (build-essential often needed for compiling wheels)
-# RUN apt-get update && apt-get install -y \
-#     build-essential \
-#     && rm -rf /var/lib/apt/lists/*
-
 # Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
@@ -36,6 +31,7 @@ COPY pyproject.toml uv.lock* ./
 # BAKE THE MODEL: Run python using the newly created venv
 # RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2')"
 RUN python -c "from fastembed import TextEmbedding; TextEmbedding('sentence-transformers/all-MiniLM-L6-v2', cache_dir='/app/models')"
+# RUN . /venv/bin/activate && python scripts/download_model.py
 
 COPY . .
 

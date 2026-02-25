@@ -1,11 +1,10 @@
 """
 Bakes the FastEmbed model into the Docker image at build time.
-Run via Dockerfile — never runs at container startup.
 """
 import os
 from fastembed import TextEmbedding
 
-cache_dir = os.environ.get("FASTEMBED_CACHE_PATH", "/app/models")
+cache_dir: str = os.environ.get("FASTEMBED_CACHE_PATH", "/app/models")
 os.makedirs(cache_dir, exist_ok=True)
 
 print(f"Downloading model to {cache_dir}...")

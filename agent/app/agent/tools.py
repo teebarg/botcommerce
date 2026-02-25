@@ -1,6 +1,5 @@
 """
 Each tool is a function decorated with @tool.
-The docstring is CRITICAL — the agent reads it to decide when to use the tool.
 Write docstrings like instructions to a smart employee.
 
 Tools:
@@ -12,10 +11,11 @@ Tools:
   6. check_stock         — Check if a product is in stock
   7. escalate_to_human   — Hand off to a human agent
 """
-
+import jwt, time
 import httpx
 import logging
 from langchain.tools import tool
+# from langchain_core.tools import tool
 from app.rag.qdrant_client import search_collection
 from app.config import get_settings
 
@@ -25,8 +25,19 @@ logger = logging.getLogger(__name__)
 def _shop_request(method: str, path: str, **kwargs) -> dict:
     """Internal helper for calling shop API."""
     settings = get_settings()
+    payload = {
+        "sub": "agent",
+        "role": "ADMIN",
+        "exp": int(time.time()) + 300,
+    }
+
+    token = jwt.encode(
+        payload,
+        settings.SECRET_KEY,
+        algorithm="HS256"
+    )
     headers = {
-        "Authorization": f"Bearer {settings.api_key}",
+        "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",
     }
     url: str = f"{settings.api_base_url}{path}"
@@ -63,7 +74,7 @@ def search_products(query: str) -> str:
     for i, r in enumerate(results, 1):
         output += (
             f"{i}. **{r['name']}** (SKU: {r.get('sku', 'N/A')})\n"
-            f"   Price: ${r['price']} | Category: {r['category']}\n"
+            f"   Price: ₦{r['price']} | Category: {r['category']}\n"
             f"   {r['description']}\n\n"
         )
     return output
@@ -97,7 +108,7 @@ def search_policies(query: str) -> str:
     Use when the customer asks about:
     - How to return or exchange an item
     - Refund timelines and eligibility
-    - Shipping times, costs, or carriers
+    - Shipping times, costs
     - Warranty coverage
     Input: what policy information the customer needs.
     """
@@ -110,9 +121,6 @@ def search_policies(query: str) -> str:
         r["text"] for r in results
     )
 
-
-# ── Shop API Tools ──────────────────────────────────────────────────────────
-
 @tool
 def check_order_status(order_id: str) -> str:
     """
@@ -122,13 +130,9 @@ def check_order_status(order_id: str) -> str:
     - What is the status of order #XXXXX?
     - Has my order shipped?
     - When will my order arrive?
-    Input: the order ID number (digits only, e.g. '12345').
+    Input: the order ID number (e.g. 'ORDFCC4E3EB').
     """
-    # Strip common prefixes customers might include
     order_id = order_id.strip().lstrip("#").strip()
-
-    if not order_id.isdigit():
-        return f"'{order_id}' doesn't look like a valid order ID. Order IDs are numbers only (e.g. 12345). Please ask the customer to double-check."
 
     result = _shop_request("GET", f"/api/order/{order_id}")
 
@@ -138,16 +142,15 @@ def check_order_status(order_id: str) -> str:
     # Format order info clearly for the agent to relay
     status = result.get("status", "Unknown")
     tracking = result.get("tracking_number", "Not yet assigned")
-    carrier = result.get("carrier", "")
     estimated = result.get("estimated_delivery", "Not available")
-    items = result.get("items", [])
+    items = result.get("order_items", [])
 
     item_list: str = ", ".join([f"{i.get('name')} x{i.get('quantity', 1)}" for i in items]) or "N/A"
 
     return (
         f"Order #{order_id} Status: **{status}**\n"
         f"Items: {item_list}\n"
-        f"Tracking: {tracking} ({carrier})\n"
+        f"Tracking: {tracking}\n"
         f"Estimated Delivery: {estimated}"
     )
 
@@ -194,9 +197,6 @@ def request_refund(order_id: str, reason: str) -> str:
     """
     order_id = order_id.strip().lstrip("#").strip()
 
-    if not order_id.isdigit():
-        return f"Invalid order ID '{order_id}'. Please confirm the correct order number."
-
     result = _shop_request(
         "POST",
         "/api/refunds",
@@ -240,6 +240,98 @@ def escalate_to_human(reason: str) -> str:
         "Please let the customer know a human agent will follow up shortly."
     )
 
+@tool
+def guide_checkout(dummy: str = "") -> str:
+    """
+    Explains how a customer can place an order.
+    This tool takes no real input. You can pass an empty string.
+    """
+    return (
+        "To place an order:\n"
+        "1. Browse the products and select the items you want.\n"
+        "2. Add items to your cart.\n"
+        "3. Go to checkout.\n"
+        "4. Enter shipping and billing information.\n"
+        "5. Choose your payment method and confirm the order.\n"
+        "6. You'll receive a confirmation email with order details."
+    )
+
+@tool
+def guide_payment_methods(dummy: str = "") -> str:
+    """
+    Explains available payment methods.
+    Use when the customer asks about:
+    - How they can pay
+    - Accepted cards, wallets
+    Input: pass empty string.
+    """
+    return (
+        "We accept payment via:\n"
+        "- Credit/Debit cards (Visa, Mastercard, Verve)\n"
+        "- Mobile wallets (Paystack, Flutterwave)\n"
+        "- Bank transfer\n"
+        "Payments are secure and encrypted."
+    )
+
+@tool
+def guide_return_process(dummy: str = "") -> str:
+    """
+    Explains how to request a return or exchange.
+    Input: pass empty string.
+    """
+    return "We currently do not support returns or exchanges."
+
+
+@tool
+def guide_discounts(dummy: str = "") -> str:
+    """
+    Explains current promotions, sales, or loyalty programs.
+    Input: empty string.
+    """
+    return (
+        "Current promotions:\n"
+        "- 10% off for first-time buyers\n"
+        "- Free shipping on orders over ₦50,000\n"
+        "- Loyalty points for every purchase (redeemable for discounts)"
+    )
+
+@tool
+def guide_account(dummy: str = "") -> str:
+    """
+    Helps customers with login, password reset, and profile issues.
+    Input: empty string.
+    """
+    return (
+        "For account issues:\n"
+        "- Forgot password? Use 'Forgot Password' link to reset.\n"
+        "- Can't log in? Ensure email/username is correct and try again.\n"
+        "- Need to update profile? Go to Account Settings after logging in."
+    )
+
+@tool
+def report_fraud(issue: str) -> str:
+    """
+    Customer reports payment or account fraud.
+    Input: description of the issue.
+    """
+    logger.warning(f"[FRAUD REPORT] {issue}")
+    return (
+        "⚠️ We've flagged this as a security issue. "
+        "Our fraud team will review your case and contact you shortly."
+    )
+
+@tool
+def fallback_response(query: str) -> str:
+    """
+    Handles any queries that the LLM cannot confidently answer.
+    Input: the customer's query.
+    """
+    return (
+        f"I'm not certain about '{query}'. "
+        "I've forwarded your question to our support team, "
+        "and someone will get back to you soon."
+    )
+
 def get_all_tools() -> list:
     return [
         search_products,
@@ -249,4 +341,11 @@ def get_all_tools() -> list:
         check_stock,
         request_refund,
         escalate_to_human,
+        guide_checkout,
+        guide_payment_methods,
+        guide_return_process,
+        guide_discounts,
+        guide_account,
+        report_fraud,
+        fallback_response,
     ]

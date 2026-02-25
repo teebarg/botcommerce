@@ -174,7 +174,7 @@ Whenever you add new products, FAQs, or update policies:
 1. Call the ingest endpoint:
 ```bash
 curl -X POST https://your-agent.onrender.com/ingest \
-  -d '{"collection": "products", "force_reload": true}'
+  -d '{"collection": "products"}'
 ```
 
 ---

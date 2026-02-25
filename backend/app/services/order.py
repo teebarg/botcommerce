@@ -92,7 +92,7 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
 
     return new_order
 
-async def retrieve_order(order_id: str) -> Order:
+async def retrieve_order(order_id: str, principal) -> Order:
     """
     Get a specific order by order_number
     """
@@ -110,6 +110,12 @@ async def retrieve_order(order_id: str) -> Order:
     )
     if not order:
         raise HTTPException(status_code=404, detail="order not found")
+
+    if principal.role == "ADMIN" or principal.type == "service":
+        return order
+
+    if order.user_id != principal.user_id:
+        raise HTTPException(status_code=403, detail="Forbidden")
     return order
 
 async def list_orders(

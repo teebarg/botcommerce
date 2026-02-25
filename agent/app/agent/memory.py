@@ -2,6 +2,7 @@ import json
 import logging
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.schema import HumanMessage, AIMessage
+# from langchain_core.messages import HumanMessage, AIMessage
 import redis as redis_client
 
 logger = logging.getLogger(__name__)

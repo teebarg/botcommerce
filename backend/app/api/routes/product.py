@@ -31,7 +31,7 @@ from app.prisma_client import prisma as db
 from app.core.storage import upload
 from app.core.config import settings
 from prisma.errors import UniqueViolationError
-from app.services.product import reindex_product, product_upload, index_images, delete_image_index
+from app.services.product import reindex_product, index_images, delete_image_index
 from app.services.redis import cache_response, invalidate_pattern
 from meilisearch.errors import MeilisearchApiError
 from app.services.recently_viewed import RecentlyViewedService
@@ -985,15 +985,6 @@ async def delete_product_image(id: int, image_id: int, background_tasks: Backgro
         background_tasks.add_task(reindex_product, product_id=id)
 
         return {"success": True}
-
-
-@router.post("/upload-products/", dependencies=[Depends(get_current_superuser)])
-async def upload_products(
-    user: CurrentUser,
-    background_tasks: BackgroundTasks,
-):
-    background_tasks.add_task(product_upload, user_id=user.id)
-    return {"message": "Upload started"}
 
 
 @router.post("/configure-filterable-attributes")

@@ -32,8 +32,6 @@ class ChatResponse(BaseModel):
 
 class IngestRequest(BaseModel):
     collection: str = Field(..., description="Collection name: products | faqs | policies")
-    force_reload: bool = Field(default=False, description="Re-ingest even if collection exists")
-
 
 class HealthResponse(BaseModel):
     status: str

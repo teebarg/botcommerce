@@ -58,17 +58,17 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
 
     documents = []
     for r in rows:
-        price_range = ""
+        price = ""
         if r["min_price"] is not None:
             if r["min_price"] == r["max_price"]:
-                price_range: str = f"${r['min_price']:.2f}"
+                price: str = f"₦{r['min_price']:.2f}"
             else:
-                price_range: str = f"${r['min_price']:.2f} – ${r['max_price']:.2f}"
+                price: str = f"₦{r['min_price']:.2f} – ₦{r['max_price']:.2f}"
 
         variants_summary: str = " | ".join(filter(None, [
             f"Sizes: {r['sizes']}"          if r["sizes"]  else None,
             f"Colors: {r['colors']}"        if r["colors"] else None,
-            f"Price: {price_range}"         if price_range else None,
+            f"Price: {price}"         if price else None,
             f"{r['in_stock_variants']}/{r['total_variants']} variants in stock"
                                             if r["total_variants"] else None,
         ]))
@@ -91,7 +91,7 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
             "category": r["categories"] or "",
             "is_new": r["is_new"],
             "variants_summary": variants_summary,
-            "price_range": price_range,
+            "price": price,
             "type": "product",
         })
 
@@ -210,6 +210,4 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    # from dotenv import load_dotenv
-    # load_dotenv()
     asyncio.run(ingest(args.collection))
