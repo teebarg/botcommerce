@@ -1,21 +1,22 @@
 """
 Each tool is a function decorated with @tool.
-Write docstrings like instructions to a smart employee.
 
 Tools:
   1. search_products     — RAG over product catalog
   2. search_faqs         — RAG over FAQ knowledge base
   3. search_policies     — RAG over return/shipping/warranty policies
   4. check_order_status  — Real-time order lookup via shop API
-  5. request_refund      — Initiate a refund via shop API
-  6. check_stock         — Check if a product is in stock
+  5. check_stock         — Check if a product is in stock
+  6. request_refund      — Initiate a refund via shop API
   7. escalate_to_human   — Hand off to a human agent
+  8. shop_guide          — Checkout, payment, returns, discounts, account, fraud, fallback
+                           (collapsed from 7 tools → 1 to stay within Groq's reliable tool limit)
 """
-import jwt, time
+import jwt
+import time
 import httpx
 import logging
 from langchain.tools import tool
-# from langchain_core.tools import tool
 from app.rag.qdrant_client import search_collection
 from app.config import get_settings
 
@@ -23,23 +24,14 @@ logger = logging.getLogger(__name__)
 
 
 def _shop_request(method: str, path: str, **kwargs) -> dict:
-    """Internal helper for calling shop API."""
+    """Internal helper for calling the shop API with a short-lived JWT."""
     settings = get_settings()
-    payload = {
-        "sub": "agent",
-        "role": "ADMIN",
-        "exp": int(time.time()) + 300,
-    }
-
     token = jwt.encode(
-        payload,
+        {"sub": "agent", "role": "ADMIN", "exp": int(time.time()) + 300},
         settings.SECRET_KEY,
-        algorithm="HS256"
+        algorithm="HS256",
     )
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json",
-    }
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     url: str = f"{settings.api_base_url}{path}"
     try:
         with httpx.Client(timeout=10.0) as client:
@@ -61,12 +53,10 @@ def search_products(query: str) -> str:
     Use when the customer asks about:
     - What products are available
     - Product features, specs, or descriptions
-    - Product pricing
-    - Product categories
+    - Product pricing or categories
     Input: a natural language search query about the product.
     """
-    results = search_collection("products", query, top_k=3, score_threshold=0.45)
-
+    results = search_collection("products", query, top_k=5, score_threshold=0.45)
     if not results:
         return "No matching products found in our catalog for that query."
 
@@ -74,7 +64,8 @@ def search_products(query: str) -> str:
     for i, r in enumerate(results, 1):
         output += (
             f"{i}. **{r['name']}** (SKU: {r.get('sku', 'N/A')})\n"
-            f"   Price: ₦{r['price']} | Category: {r['category']}\n"
+            f"   Image: {r.get('image', '')}\n"
+            f"   Price: {r['price']} | Category: {r['category']}\n"
             f"   {r['description']}\n\n"
         )
     return output
@@ -87,11 +78,9 @@ def search_faqs(query: str) -> str:
     Use when the customer asks about:
     - How something works (payment, checkout, account)
     - General store questions not related to a specific order
-    - Questions that might have a standard answer
     Input: the customer's question as-is.
     """
     results = search_collection("faqs", query, top_k=2, score_threshold=0.5)
-
     if not results:
         return "No FAQ entry found for that question."
 
@@ -104,22 +93,18 @@ def search_faqs(query: str) -> str:
 @tool
 def search_policies(query: str) -> str:
     """
-    Search store policies (return policy, shipping policy, warranty).
+    Search store policies: returns, shipping, warranty.
     Use when the customer asks about:
     - How to return or exchange an item
     - Refund timelines and eligibility
-    - Shipping times, costs
+    - Shipping times and costs
     - Warranty coverage
     Input: what policy information the customer needs.
     """
     results = search_collection("policies", query, top_k=2, score_threshold=0.45)
-
     if not results:
         return "No relevant policy information found."
-
-    return "Here's our relevant policy:\n\n" + "\n\n---\n\n".join(
-        r["text"] for r in results
-    )
+    return "Here's our relevant policy:\n\n" + "\n\n---\n\n".join(r["text"] for r in results)
 
 @tool
 def check_order_status(order_id: str) -> str:
@@ -128,94 +113,74 @@ def check_order_status(order_id: str) -> str:
     Use when the customer asks:
     - Where is my order?
     - What is the status of order #XXXXX?
-    - Has my order shipped?
-    - When will my order arrive?
-    Input: the order ID number (e.g. 'ORDFCC4E3EB').
+    - Has my order shipped / when will it arrive?
+    Input: the order ID (e.g. 'ORDFCC4E3EB').
     """
     order_id = order_id.strip().lstrip("#").strip()
-
     result = _shop_request("GET", f"/api/order/{order_id}")
-    print("🚀 ~ file: tools.py:136 ~ result:", result)
 
     if "error" in result:
         return f"Could not retrieve order #{order_id}: {result['error']}"
 
-    # Format order info clearly for the agent to relay
-    status = result.get("status", "Unknown")
-    tracking = result.get("tracking_number", "Not yet assigned")
-    estimated = result.get("estimated_delivery", "Not available")
-    items = result.get("order_items", [])
-
-    item_list: str = ", ".join([f"{i.get('name')} x{i.get('quantity', 1)}" for i in items]) or "N/A"
+    item_list = ", ".join(
+        f"{i.get('name')} x{i.get('quantity', 1)}" for i in result.get("order_items", [])
+    ) or "N/A"
 
     return (
-        f"Order #{order_id} Status: **{status}**\n"
+        f"Order #{order_id} Status: **{result.get('status', 'Unknown')}**\n"
         f"Items: {item_list}\n"
-        f"Tracking: {tracking}\n"
-        f"Estimated Delivery: {estimated}"
+        f"Tracking: {result.get('tracking_number', 'Not yet assigned')}\n"
+        f"Estimated Delivery: {result.get('estimated_delivery', 'Not available')}"
     )
 
 
 @tool
-def check_stock(product_sku: str) -> str:
+def check_stock(product_slug: str) -> str:
     """
     Check if a specific product is in stock.
     Use when the customer asks:
     - Is this product available?
     - Do you have [product] in stock?
-    - Can I order [product] right now?
-    Input: the product SKU code (e.g. 'SHOE-RED-42').
-    If you don't have the SKU, use search_products first to find it.
+    Input: the product slug (e.g. 'shoe-red-42').
+    If you don't have the slug, call search_products first to find it.
     """
-    product_sku = product_sku.strip().upper()
-    result = _shop_request("GET", f"/api/products/{product_sku}/stock")
+    product_slug: str = product_slug.strip().lower()
+    result = _shop_request("GET", f"/api/product/{product_slug}")
 
     if "error" in result:
-        return f"Could not check stock for SKU '{product_sku}': {result['error']}"
+        return f"Could not check stock for slug '{product_slug}': {result['error']}"
 
-    in_stock = result.get("in_stock", False)
-    quantity = result.get("quantity", 0)
-    restock_date = result.get("restock_date")
+    if result.get("active"):
+        return f"✅ Slug '{product_slug}' is **in stock** (1 unit available)."
 
-    if in_stock:
-        return f"✅ SKU '{product_sku}' is **in stock** ({quantity} units available)."
-    else:
-        msg = f"❌ SKU '{product_sku}' is currently **out of stock**."
-        if restock_date:
-            msg += f" Expected restock: {restock_date}."
-        return msg
+    msg: str = f"❌ Slug '{product_slug}' is currently **out of stock**."
+    if result.get("restock_date"):
+        msg += f" Expected restock: {result['restock_date']}."
+    return msg
 
 
 @tool
 def request_refund(order_id: str, reason: str) -> str:
     """
     Initiate a refund request for a customer order.
-    Only use this tool after:
-    1. You have confirmed the order ID with the customer
-    2. You have asked for the reason for the refund
-    3. You have confirmed the customer wants to proceed
-    Input: order_id (numbers only) and reason (customer's explanation).
+    Only call this tool after you have:
+    1. Confirmed the order ID with the customer
+    2. Asked for and received the reason for the refund
+    3. Confirmed the customer wants to proceed
+    Input: order_id and reason.
     """
     order_id = order_id.strip().lstrip("#").strip()
-
-    result = _shop_request(
-        "POST",
-        "/api/refunds",
-        json={"order_id": order_id, "reason": reason},
-    )
+    result = _shop_request("POST", "/api/refunds", json={"order_id": order_id, "reason": reason})
 
     if "error" in result:
         return f"Could not process refund for order #{order_id}: {result['error']}"
 
-    refund_id = result.get("refund_id", "N/A")
-    timeline = result.get("processing_days", "3-5 business days")
-
     return (
-        f"✅ Refund request submitted successfully!\n"
-        f"Refund ID: {refund_id}\n"
+        f"✅ Refund submitted!\n"
+        f"Refund ID: {result.get('refund_id', 'N/A')}\n"
         f"Order: #{order_id}\n"
-        f"Expected processing time: {timeline}\n"
-        f"The customer will receive a confirmation email shortly."
+        f"Processing time: {result.get('processing_days', '3-5 business days')}\n"
+        f"A confirmation email will be sent to the customer shortly."
     )
 
 
@@ -223,130 +188,98 @@ def request_refund(order_id: str, reason: str) -> str:
 def escalate_to_human(reason: str) -> str:
     """
     Escalate the conversation to a human support agent.
-    Use this tool when:
-    - The customer is very angry or upset
-    - The issue is complex and beyond your abilities
+    Use when:
+    - The customer is angry or upset
+    - The issue is too complex to resolve with available tools
     - The customer explicitly asks to speak to a human
-    - You've tried to help but the customer is not satisfied
     - The issue involves fraud, legal matters, or account security
-    Input: a brief summary of the reason for escalation.
+    Input: a brief summary of why escalation is needed.
     """
-    # In production: we will create a ticket in Zendesk/Intercom
-    # For now, log and return a message
-    logger.warning(f"[ESCALATION] Human agent requested. Reason: {reason}")
-
+    logger.warning(f"[ESCALATION] {reason}")
     return (
         "ESCALATED_TO_HUMAN: "
-        f"I've flagged this conversation for a human agent. Reason: {reason}. "
-        "Please let the customer know a human agent will follow up shortly."
+        f"I've flagged this for a human agent. Reason: {reason}. "
+        "A human agent will follow up with the customer shortly."
     )
 
-@tool
-def guide_checkout(dummy: str = "") -> str:
-    """
-    Explains how a customer can place an order.
-    This tool takes no real input. You can pass an empty string.
-    """
-    return (
+
+# ── Consolidated guide tool
+_GUIDE_CONTENT = {
+    "checkout": (
         "To place an order:\n"
-        "1. Browse the products and select the items you want.\n"
-        "2. Add items to your cart.\n"
-        "3. Go to checkout.\n"
-        "4. Enter shipping and billing information.\n"
-        "5. Choose your payment method and confirm the order.\n"
-        "6. You'll receive a confirmation email with order details."
-    )
-
-@tool
-def guide_payment_methods(dummy: str = "") -> str:
-    """
-    Explains available payment methods.
-    Use when the customer asks about:
-    - How they can pay
-    - Accepted cards, wallets
-    Input: pass empty string.
-    """
-    return (
-        "We accept payment via:\n"
+        "1. Browse products and add items to your cart.\n"
+        "2. Go to checkout.\n"
+        "3. Enter your shipping and billing information.\n"
+        "4. Choose a payment method and confirm.\n"
+        "5. You'll receive a confirmation email with your order details."
+    ),
+    "payment": (
+        "We accept:\n"
         "- Credit/Debit cards (Visa, Mastercard, Verve)\n"
-        "- Mobile wallets (Paystack, Flutterwave)\n"
+        "- (Paystack, Flutterwave)\n"
         "- Bank transfer\n"
-        "Payments are secure and encrypted."
-    )
-
-@tool
-def guide_return_process(dummy: str = "") -> str:
-    """
-    Explains how to request a return or exchange.
-    Input: pass empty string.
-    """
-    return "We currently do not support returns or exchanges."
-
-
-@tool
-def guide_discounts(dummy: str = "") -> str:
-    """
-    Explains current promotions, sales, or loyalty programs.
-    Input: empty string.
-    """
-    return (
+        "All payments are secure and encrypted."
+    ),
+    "returns": "We currently do not support returns or exchanges.",
+    "discounts": (
         "Current promotions:\n"
         "- 10% off for first-time buyers\n"
         "- Free shipping on orders over ₦50,000\n"
-        "- Loyalty points for every purchase (redeemable for discounts)"
-    )
-
-@tool
-def guide_account(dummy: str = "") -> str:
-    """
-    Helps customers with login, password reset, and profile issues.
-    Input: empty string.
-    """
-    return (
+        "- Loyalty points on every purchase (redeemable for discounts)"
+    ),
+    "account": (
         "For account issues:\n"
-        "- Forgot password? Use 'Forgot Password' link to reset.\n"
-        "- Can't log in? Ensure email/username is correct and try again.\n"
-        "- Need to update profile? Go to Account Settings after logging in."
-    )
+        "- Forgot password? Use the 'Forgot Password' link to reset.\n"
+        "- Can't log in? Double-check your email/username.\n"
+        "- Update profile? Go to Account Settings after logging in."
+    ),
+}
+
 
 @tool
-def report_fraud(issue: str) -> str:
+def shop_guide(topic: str) -> str:
     """
-    Customer reports payment or account fraud.
-    Input: description of the issue.
+    General shop guidance for common how-to and policy questions.
+    Use this tool when the customer asks about:
+    - "checkout"   — how to place an order
+    - "payment"    — accepted payment methods
+    - "returns"    — return or exchange policy
+    - "discounts"  — promotions, offers, loyalty points
+    - "account"    — login, password reset, profile settings
+    - "fraud"      — customer reporting a security or fraud issue (append details after a colon)
+    - "other"      — anything you cannot answer with another tool
+
+    Input examples: "checkout", "payment", "fraud: unauthorized charge on my account"
     """
-    logger.warning(f"[FRAUD REPORT] {issue}")
+    key = topic.strip().lower()
+
+    for name, content in _GUIDE_CONTENT.items():
+        if key.startswith(name):
+            return content
+
+    if key.startswith("fraud"):
+        detail = key[5:].lstrip(": ").strip() or topic
+        logger.warning(f"[FRAUD REPORT] {detail}")
+        return (
+            "⚠️ We've flagged this as a security issue. "
+            "Our fraud team will review your case and contact you shortly."
+        )
+
+    detail = topic.lstrip("other:").strip() or topic
     return (
-        "⚠️ We've flagged this as a security issue. "
-        "Our fraud team will review your case and contact you shortly."
+        f"I've noted your question about '{detail}' and passed it to our support team. "
+        "Someone will follow up with you shortly."
     )
 
-@tool
-def fallback_response(query: str) -> str:
-    """
-    Handles any queries that the LLM cannot confidently answer.
-    Input: the customer's query.
-    """
-    return (
-        f"I'm not certain about '{query}'. "
-        "I've forwarded your question to our support team, "
-        "and someone will get back to you soon."
-    )
-
+# ── Tool registry
 def get_all_tools() -> list:
     return [
-        search_products,
-        search_faqs,
-        search_policies,
-        check_order_status,
-        check_stock,
-        request_refund,
-        escalate_to_human,
-        guide_checkout,
-        guide_payment_methods,
-        guide_return_process,
-        guide_discounts,
-        guide_account,
-        report_fraud,
-        fallback_response,
+        search_products,    # 1
+        search_faqs,        # 2
+        search_policies,    # 3
+        check_order_status, # 4
+        check_stock,        # 5
+        request_refund,     # 6
+        escalate_to_human,  # 7
+        shop_guide,         # 8
     ]

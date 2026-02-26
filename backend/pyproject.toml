@@ -28,13 +28,12 @@ dependencies = [
     "google-genai==1.46.0",
 ]
 
-[tool.uv]
-dev-dependencies = [
-    "pytest<8.0.0,>=7.4.3",
-    "mypy<2.0.0,>=1.8.0",
-    "ruff<1.0.0,>=0.2.2",
-    "pre-commit<4.0.0,>=3.6.2",
-    "types-passlib<2.0.0.0,>=1.7.7.20240106",
+[dependency-groups]
+dev = [
+    "pytest==8.2.2",
+    "pytest-asyncio==0.23.7",
+    "ruff==0.8.4",
+    "mypy==1.14.1",
     "coverage<8.0.0,>=7.4.3",
     "faker==37.0.0",
 ]

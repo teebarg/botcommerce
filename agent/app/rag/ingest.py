@@ -37,6 +37,7 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
             p.sku,
             p.description,
             p.is_new,
+            img.image                                   AS image,
             STRING_AGG(DISTINCT c.name, ', ')           AS categories,
             MIN(pv.price)                               AS min_price,
             MAX(pv.price)                               AS max_price,
@@ -48,11 +49,18 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
                 WHERE pv.status = 'IN_STOCK'
             )                                           AS in_stock_variants
         FROM products p
+        LEFT JOIN LATERAL (
+            SELECT pi.image
+            FROM product_images pi
+            WHERE pi.product_id = p.id
+            ORDER BY pi.order ASC
+            LIMIT 1
+        ) img ON TRUE
         LEFT JOIN "_ProductCategories" pc ON pc."A" = p.id
         LEFT JOIN categories c       ON c.id = pc."B"
         LEFT JOIN product_variants pv ON pv.product_id = p.id
         WHERE p.active = true
-        GROUP BY p.id, p.name, p.sku, p.description, p.is_new
+        GROUP BY p.id, p.name, p.sku, p.description, p.is_new, img.image
         ORDER BY p.id
     """)
 
@@ -75,6 +83,7 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
 
         text: str = " ".join(filter(None, [
             f"Product: {r['name']}.",
+            f"Image: {r['image']}.",
             f"Category: {r['categories']}." if r["categories"] else None,
             f"Description: {r['description']}." if r["description"] else None,
             f"SKU: {r['sku']}.",
@@ -87,6 +96,7 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
             "product_id": r["id"],
             "name": r["name"],
             "sku": r["sku"],
+            "image": r["image"],
             "description": r["description"] or "",
             "category": r["categories"] or "",
             "is_new": r["is_new"],
@@ -138,10 +148,10 @@ async def load_policies(conn: asyncpg.Connection) -> list[dict]:
     """)
 
     for r in delivery_rows:
-        text = " ".join(filter(None, [
+        text: str = " ".join(filter(None, [
             f"Shipping option: {r['name']}.",
             f"Method: {r['method']}.",
-            f"Cost: ${r['amount']:.2f}.",
+            f"Cost: ₦{r['amount']:.2f}.",
             f"Estimated duration: {r['duration']}." if r["duration"] else None,
             r["description"] if r["description"] else None,
         ]))
@@ -156,13 +166,13 @@ async def load_policies(conn: asyncpg.Connection) -> list[dict]:
             "policy_type": "shipping",
         })
 
-    # Shop settings — only ones with meaningful text content
+    # Shop settings
     settings_rows = await conn.fetch("""
         SELECT key, value
         FROM shop_settings
         WHERE type IN ('SHOP_DETAIL', 'FEATURE')
           AND value IS NOT NULL
-          AND LENGTH(value) > 20
+          AND LENGTH(value) > 5
         ORDER BY key
     """)
 

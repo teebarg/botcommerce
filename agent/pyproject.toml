@@ -20,6 +20,8 @@ dependencies = [
     "python-multipart==0.0.9",
     "asyncpg==0.29.0",
     "langchain-classic>=1.0.1",
+    "langchain-google-genai==3.2.0",
+    "langchain-cerebras==0.8.2",
 ]
 
 [project.optional-dependencies]

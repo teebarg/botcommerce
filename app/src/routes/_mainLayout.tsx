@@ -9,6 +9,7 @@ import GetApp from "@/components/get-app";
 import { SearchDialog } from "@/components/store/product-search";
 import type { Session } from "start-authjs";
 import { ShoppingBag } from "lucide-react";
+import ChatWidget from "@/components/store/chat-widget";
 
 export const Route = createFileRoute("/_mainLayout")({
     component: MainLayoutComponent,
@@ -42,6 +43,7 @@ function MainLayoutComponent() {
             <Footer />
             <Cookie />
             <ChatBotWrapper />
+            <ChatWidget customerId={session?.user?.id} />
             <ButtonNav />
         </div>
     );

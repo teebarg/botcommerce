@@ -28,6 +28,7 @@ class ChatResponse(BaseModel):
     sources: list[str] = Field(default=[], description="RAG sources used (FAQ/product names)")
     escalated: bool = Field(default=False, description="True if agent escalated to human")
     timestamp: datetime = Field(default_factory=datetime.utcnow)
+    products: list[dict] = []
 
 
 class IngestRequest(BaseModel):

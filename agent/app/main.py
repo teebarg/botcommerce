@@ -6,8 +6,7 @@ import sys
 
 from app.schemas.models import ChatRequest, ChatResponse, IngestRequest, HealthResponse
 # from app.agent.agent import run_agent
-# from app.agent.agent_smith import run_agent
-from app.agent.agent_tesl import run_agent
+from app.agent.agent_graph import run_agent
 from app.agent.memory import clear_session
 from app.config import get_settings
 
@@ -133,6 +132,15 @@ async def root():
         "name": "Customer Support Agent",
         "status": "running",
         "docs": "/docs",
+    }
+
+@app.post("/clear-collections", tags=["System"])
+async def clear_collection():
+    from app.rag.qdrant_client import delete_collection
+    for collection in ["products", "faqs", "policies"]:
+        delete_collection(collection)
+    return {
+        "status": "ok"
     }
 
 @app.get("/test-micro", tags=["System"])
