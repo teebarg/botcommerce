@@ -57,7 +57,7 @@ prep-docker:
 
 .PHONY: serve-agent
 serve-agent:
-	@cd agent; uvicorn app.main:app --host 0.0.0.0 --reload --workers 4
+	@cd agent; uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload --workers 4
 
 .PHONY: serve-backend
 serve-backend:

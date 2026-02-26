@@ -2,22 +2,28 @@ from app.agent.tools import get_all_tools
 from app.agent.state import AgentState
 
 
-async def execute_tool_node(state: AgentState) -> AgentState:
+async def execute_tool_node(state: AgentState) -> dict:
     """Generic node that calls the chosen tool (works for 12 out of 14 tools)."""
     tools = get_all_tools()
     tool = next((t for t in tools if t.name == state.intent), None)
 
     if not tool:
-        state.reply = "Sorry, something went wrong finding the right tool."
-        return state
+        return {
+            "reply": "Sorry, something went wrong finding the right tool.",
+            "sources": [],
+            "escalated": False
+        }
 
     # Special pre-check for refund (follows your original rule)
     if state.intent == "request_refund" and not state.params.get("order_id"):
-        state.reply = (
-            "Sure, I'd be happy to help with a refund! "
-            "Could you please give me the order ID and the reason (e.g. damaged, wrong item)?"
-        )
-        return state
+        return {
+            "reply": (
+                "Sure, I'd be happy to help with a refund! "
+                "Could you please give me the order ID and the reason (e.g. damaged, wrong item)?"
+            ),
+            "sources": [],
+            "escalated": False
+        }
 
     # Prepare input for the tool
     invocation_input = state.params
@@ -29,9 +35,9 @@ async def execute_tool_node(state: AgentState) -> AgentState:
 
         # Most of your tools already return a user-friendly string or dict
         if isinstance(result, dict):
-            state.reply = str(result)   # TODO: pretty-print if you want nicer formatting
+            reply_text = str(result)   # TODO: pretty-print if you want nicer formatting
         else:
-            state.reply = str(result)
+            reply_text = str(result)
 
         # Nice source names for the frontend
         source_map = {
@@ -46,22 +52,32 @@ async def execute_tool_node(state: AgentState) -> AgentState:
             "guide_discounts": "Discounts",
             "guide_account": "Account Guide",
         }
-        state.sources = [source_map.get(state.intent, state.intent.replace("_", " ").title())]
+        sources = [source_map.get(state.intent, state.intent.replace("_", " ").title())]
+
+        return {
+            "reply": reply_text,
+            "sources": sources,
+            "escalated": False
+        }
 
     except Exception as e:
-        state.reply = f"Sorry, I had trouble with that request: {str(e)}"
+        return {
+            "reply": f"Sorry, I had trouble with that request: {str(e)}",
+            "sources": [],
+            "escalated": False
+        }
 
-    return state
 
-
-async def escalate_node(state: AgentState) -> AgentState:
+async def escalate_node(state: AgentState) -> dict:
     """Special node for human handover."""
-    state.reply = "I'm really sorry I couldn't solve this for you. Let me transfer you to a human agent right now — they'll take care of it!"
-    state.escalated = True
-    return state
+    return {
+        "reply": "I'm really sorry I couldn't solve this for you. Let me transfer you to a human agent right now — they'll take care of it!",
+        "sources": [],
+        "escalated": True
+    }
 
 
-async def fallback_node(state: AgentState) -> AgentState:
+async def fallback_node(state: AgentState) -> dict:
     """Fallback tool or generic polite reply."""
     tools = get_all_tools()
     fallback_tool = next((t for t in tools if t.name == "fallback_response"), None)
@@ -69,10 +85,14 @@ async def fallback_node(state: AgentState) -> AgentState:
     if fallback_tool:
         try:
             result = await fallback_tool.ainvoke({"input": state.message})
-            state.reply = str(result)
+            reply_text = str(result)
         except Exception:
-            state.reply = "I'm sorry, I didn't quite catch that. Could you rephrase? I'm here to help with orders, products, returns, or policies!"
+            reply_text = "I'm sorry, I didn't quite catch that. Could you rephrase? I'm here to help with orders, products, returns, or policies!"
     else:
-        state.reply = "I'm sorry, I didn't quite catch that. Could you rephrase? I'm here to help with orders, products, returns, or policies!"
+        reply_text = "I'm sorry, I didn't quite catch that. Could you rephrase? I'm here to help with orders, products, returns, or policies!"
 
-    return state
+    return {
+        "reply": reply_text,
+        "sources": [],
+        "escalated": False
+    }

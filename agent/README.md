@@ -97,7 +97,6 @@ Set these in your Render service settings:
 | `QDRANT_API_KEY` | From cloud.qdrant.io |
 | `REDIS_URL` | From Render Redis service |
 | `API_BASE_URL` | Your shop API URL |
-| `API_KEY` | Your shop API key |
 
 ### Deploy Steps
 1. Push your code to GitHub

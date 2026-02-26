@@ -17,7 +17,6 @@ class Settings(BaseSettings):
     redis_url: str = Field(default="redis://localhost:6379", alias="REDIS_URL")
 
     api_base_url: str = Field(alias="API_BASE_URL")
-    api_key: str = Field(alias="API_KEY")
 
     # Agent
     agent_max_iterations: int = Field(default=6, alias="AGENT_MAX_ITERATIONS")

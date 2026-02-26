@@ -84,12 +84,15 @@ async def run_agent(
     )
 
     llm = get_llm()
-    graph = build_support_graph(llm)
+    graph = build_support_graph()
 
     try:
-        result: AgentState = await graph.ainvoke(state)
+        result = await graph.ainvoke(state)  # ← result is dict, not AgentState
 
-        reply = result.reply or "I'm sorry, I had trouble with that. Could you rephrase?"
+        # Extract values from the dict returned by the last executed node
+        reply = result.get("reply", "I'm sorry, I had trouble with that. Could you rephrase?")
+        sources = result.get("sources", [])
+        escalated = result.get("escalated", False)
 
         memory = load_memory_from_redis(session_id)
         memory.chat_memory.add_user_message(message)
@@ -99,8 +102,8 @@ async def run_agent(
         return {
             "reply": reply,
             "session_id": session_id,
-            "sources": result.sources,
-            "escalated": result.escalated,
+            "sources": sources,
+            "escalated": escalated,
         }
 
     except Exception as e:

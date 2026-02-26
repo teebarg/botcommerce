@@ -135,6 +135,7 @@ def check_order_status(order_id: str) -> str:
     order_id = order_id.strip().lstrip("#").strip()
 
     result = _shop_request("GET", f"/api/order/{order_id}")
+    print("🚀 ~ file: tools.py:136 ~ result:", result)
 
     if "error" in result:
         return f"Could not retrieve order #{order_id}: {result['error']}"

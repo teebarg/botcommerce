@@ -5,8 +5,9 @@ import logging
 import sys
 
 from app.schemas.models import ChatRequest, ChatResponse, IngestRequest, HealthResponse
-from app.agent.agent import run_agent
+# from app.agent.agent import run_agent
 # from app.agent.agent_smith import run_agent
+from app.agent.agent_tesl import run_agent
 from app.agent.memory import clear_session
 from app.config import get_settings
 
@@ -139,11 +140,11 @@ async def test_micro():
     from app.agent.tools import _shop_request
     from app.rag.qdrant_client import search_collection, delete_collection
     # result = _shop_request("GET", "/api/order/ORD-C0B7CD56")
-    # delete_collection("faqs")
-    results = search_collection("faqs", "How do I place an order", top_k=3, score_threshold=0.45)
-    print("🚀 ~ file: main.py:142 ~ results:", results)
+    delete_collection("products")
+    # results = search_collection("faqs", "How do I place an order", top_k=3, score_threshold=0.45)
+    # print("🚀 ~ file: main.py:142 ~ results:", results)
     return {
         # "result": result,
-        "resultssss": results,
+        # "resultssss": results,
         "status": "ok"
     }
