@@ -1,120 +1,103 @@
 import { motion } from "framer-motion";
-import { ThumbsUp, ThumbsDown, Headphones } from "lucide-react";
+import { Bot, User, AlertTriangle } from "lucide-react";
 import { ChatMessage as ChatMessageType } from "./types";
-import { OrderCard } from "./OrderCard";
 import { ProductRecommendationCard } from "./ProductRecommendationCard";
-import { cn } from "@/utils";
+import { formatTime } from "@/utils";
 
-interface Props {
-    message: ChatMessageType;
-    onReact: (id: string, reaction: "thumbs-up" | "thumbs-down") => void;
+const EscalationCard = () => (
+    <div className="mt-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 flex items-center gap-3">
+        <AlertTriangle className="w-5 h-5 text-destructive flex-shrink-0" />
+        <div>
+            <p className="text-xs font-semibold text-foreground">Escalated to Human Agent</p>
+            <p className="text-[10px] text-muted-foreground">Average wait time: ~2 minutes</p>
+        </div>
+    </div>
+);
+
+function SourceBadges({ sources }: { sources: string[] }) {
+    if (!sources?.length) return null;
+    const icons: Record<string, string> = {
+        Products: "🛍️",
+        Faqs: "❓",
+        Policies: "📋",
+    };
+    return (
+        <div className="flex gap-1.5 flex-wrap mt-2">
+            {sources.map((s) => (
+                <span
+                    key={s}
+                    className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200 font-medium tracking-wide"
+                >
+                    {icons[s] ?? "📄"} {s}
+                </span>
+            ))}
+        </div>
+    );
 }
 
-export const ChatMessageBubble = ({ message, onReact }: Props) => {
-    const isUser = message.role === "user";
-    const isSystem = message.role === "system";
+function renderText(text: string): React.ReactNode {
+    return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) => {
+        if (part.startsWith("**") && part.endsWith("**"))
+            return (
+                <strong key={i} className="font-semibold">
+                    {part.slice(2, -2)}
+                </strong>
+            );
+        return part.split("\n").map((line, j, arr) => (
+            <span key={`${i}-${j}`}>
+                {line}
+                {j < arr.length - 1 && <br />}
+            </span>
+        ));
+    });
+}
 
-    if (isSystem) {
-        return (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-center px-4 py-1">
-                <span className="text-xs text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">{message.content}</span>
-            </motion.div>
-        );
+const ChatMessage = ({ message, index }: { message: ChatMessageType; index: number }) => {
+    const isAgent = message.role === "agent";
+    if (message.text !== undefined && message.text !== null && message.text.trim() === "") {
+        return null;
     }
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 12, scale: 0.97 }}
+            initial={{ opacity: 0, y: 12, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            className={cn("flex gap-2.5 px-4", isUser ? "flex-row-reverse" : "flex-row")}
+            transition={{ delay: index * 0.05, type: "spring", stiffness: 500, damping: 30 }}
+            className={`flex gap-2 px-2.5 ${isAgent ? "justify-start" : "justify-end"}`}
         >
-            {/* Avatar */}
-            {!isUser && (
-                <div className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center shrink-0 mt-1">
-                    <span className="text-xs font-bold text-primary-foreground">AI</span>
+            {isAgent && (
+                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                    <Bot className="w-4 h-4 text-primary" />
                 </div>
             )}
 
-            <div className={cn("flex flex-col gap-1 max-w-[80%]", isUser && "items-end")}>
-                {/* Text bubble */}
-                {message.content && (
+            <div className={`max-w-[80%] space-y-2 ${isAgent ? "" : "order-first"}`}>
+                {message.text && (
                     <div
-                        className={cn(
-                            "rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
-                            isUser ? "gradient-primary text-primary-foreground rounded-tr-sm" : "glass rounded-tl-sm text-foreground"
-                        )}
+                        className={`rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
+                            isAgent
+                                ? "bg-card text-card-foreground rounded-tl-md border border-border"
+                                : "bg-primary text-primary-foreground rounded-tr-md"
+                        }`}
                     >
-                        {message.content}
+                        {renderText(message.text)}
                     </div>
                 )}
 
-                {/* Order card */}
-                {message.contentType === "order-card" && message.order && <OrderCard order={message.order} />}
+                {message.escalated && <EscalationCard />}
+                {!!message.products?.length && <ProductRecommendationCard products={message.products || []} />}
+                {isAgent && <SourceBadges sources={message.sources ?? []} />}
 
-                {/* Product recommendations */}
-                {message.contentType === "product-card" && message.products && <ProductRecommendationCard products={message.products} />}
-
-                {/* Escalation card */}
-                {message.contentType === "escalation" && (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="glass rounded-2xl p-4 space-y-3 max-w-xs"
-                    >
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
-                                <Headphones className="w-4 h-4 text-accent" />
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium text-foreground">Connect to human agent</p>
-                                <p className="text-xs text-muted-foreground">Avg. wait: ~2 min</p>
-                            </div>
-                        </div>
-                        <motion.button
-                            whileTap={{ scale: 0.95 }}
-                            className="w-full py-2 rounded-xl border border-accent/40 text-sm text-accent font-medium hover:bg-accent/10 transition-colors"
-                        >
-                            Request Live Agent
-                        </motion.button>
-                    </motion.div>
-                )}
-
-                {/* Reactions + timestamp */}
-                {!isUser && message.contentType !== "quick-replies" && (
-                    <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[10px] text-muted-foreground">
-                            {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                        </span>
-                        <div className="flex gap-1">
-                            <button
-                                onClick={() => onReact(message.id, "thumbs-up")}
-                                className={cn(
-                                    "p-1 rounded-md hover:bg-muted transition-colors",
-                                    message.reaction === "thumbs-up" && "bg-primary/20 text-primary"
-                                )}
-                            >
-                                <ThumbsUp className="w-3 h-3" />
-                            </button>
-                            <button
-                                onClick={() => onReact(message.id, "thumbs-down")}
-                                className={cn(
-                                    "p-1 rounded-md hover:bg-muted transition-colors",
-                                    message.reaction === "thumbs-down" && "bg-destructive/20 text-destructive"
-                                )}
-                            >
-                                <ThumbsDown className="w-3 h-3" />
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {isUser && (
-                    <span className="text-[10px] text-muted-foreground">
-                        {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                    </span>
-                )}
+                <p className={`text-[10px] text-muted-foreground ${isAgent ? "text-left" : "text-right"}`}>{formatTime(message.timestamp)}</p>
             </div>
+
+            {!isAgent && (
+                <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 mt-1">
+                    <User className="w-4 h-4 text-secondary-foreground" />
+                </div>
+            )}
         </motion.div>
     );
 };
+
+export default ChatMessage;

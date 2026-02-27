@@ -33,40 +33,10 @@ class Settings(BaseSettings):
 def get_settings() -> Settings:
     return Settings()
 
-from langchain_google_genai import ChatGoogleGenerativeAI
 
 def get_llm():
-    from langchain_cerebras import ChatCerebras
     settings = get_settings()
-    return ChatCerebras(
-        model="gpt-oss-120b",
-        cerebras_api_key="csk-fwrp924y5v5jx82d4m3tw3c4vfkpwv5vd5552ptdxyhhde44",
-        temperature=0,
-    )
-
-def get_llm1():
-    return ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
-        google_api_key="AIzaSyBDcGBDgTcjkeLIkNzorIOYESP7vxrN9Do",
-        temperature=0,
-        max_retries=0,
-    )
-
-def get_llm2():
-    from langchain_groq import ChatGroq
-    settings = get_settings()
-    print(f"[LLM] Using Groq → {settings.groq_model}")
-    return ChatGroq(
-        model="llama-3.3-70b-versatile",
-        api_key=settings.groq_api_key,
-        temperature=0.2,
-        max_tokens=1024,
-    )
-
-
-# config.py
-def get_llm():
-    provider = settings.LLM_PROVIDER  # "groq" | "gemini" | "cerebras"
+    provider: str = settings.LLM_PROVIDER  # "groq" | "gemini" | "cerebras"
 
     if provider == "gemini":
         from langchain_google_genai import ChatGoogleGenerativeAI
@@ -83,10 +53,20 @@ def get_llm():
             cerebras_api_key=settings.CEREBRAS_API_KEY,
             temperature=0,
         )
-    else:  # groq (default)
+    elif provider == "ollama":
+        from langchain_ollama import ChatOllama
+        return ChatOllama(
+            # model="llama3.2:3b",
+            # model="llama3:latest",
+            model="qwen2.5:3b",
+            base_url="http://ollama:11434",
+            temperature=0,
+        )
+    else:
         from langchain_groq import ChatGroq
         return ChatGroq(
             model=settings.GROQ_MODEL,
             groq_api_key=settings.GROQ_API_KEY,
             temperature=0,
+            max_tokens=1024,
         )

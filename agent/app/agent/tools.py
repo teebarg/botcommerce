@@ -1,17 +1,4 @@
-"""
-Each tool is a function decorated with @tool.
-
-Tools:
-  1. search_products     — RAG over product catalog
-  2. search_faqs         — RAG over FAQ knowledge base
-  3. search_policies     — RAG over return/shipping/warranty policies
-  4. check_order_status  — Real-time order lookup via shop API
-  5. check_stock         — Check if a product is in stock
-  6. request_refund      — Initiate a refund via shop API
-  7. escalate_to_human   — Hand off to a human agent
-  8. shop_guide          — Checkout, payment, returns, discounts, account, fraud, fallback
-                           (collapsed from 7 tools → 1 to stay within Groq's reliable tool limit)
-"""
+import json
 import jwt
 import time
 import httpx
@@ -60,14 +47,27 @@ def search_products(query: str) -> str:
     if not results:
         return "No matching products found in our catalog for that query."
 
+    # Return both human-readable text AND structured JSON the agent can use
     output = "Here are the most relevant products I found:\n\n"
     for i, r in enumerate(results, 1):
         output += (
             f"{i}. **{r['name']}** (SKU: {r.get('sku', 'N/A')})\n"
-            f"   Image: {r.get('image', '')}\n"
-            f"   Price: {r['price']} | Category: {r['category']}\n"
-            f"   {r['description']}\n\n"
+            f"   - Image: {r.get('image', '')}\n"
+            f"   - Price: {r['price']} | Category: {r['category']}\n"
+            f"   - {r['description']}\n\n"
         )
+
+    structured = [
+        {
+            "name": r["name"],
+            "sku": r.get("sku", ""),
+            "image_url": r.get("image", "") or None,
+            "price": str(r["price"]),
+            "description": r.get("description", ""),
+        }
+        for r in results
+    ]
+    output += f"\n<!-- PRODUCTS_JSON:{json.dumps(structured)} -->"
     return output
 
 
@@ -271,15 +271,14 @@ def shop_guide(topic: str) -> str:
         "Someone will follow up with you shortly."
     )
 
-# ── Tool registry
 def get_all_tools() -> list:
     return [
-        search_products,    # 1
-        search_faqs,        # 2
-        search_policies,    # 3
-        check_order_status, # 4
-        check_stock,        # 5
-        request_refund,     # 6
-        escalate_to_human,  # 7
-        shop_guide,         # 8
+        search_products,
+        search_faqs,
+        search_policies,
+        check_order_status,
+        check_stock,
+        request_refund,
+        escalate_to_human,
+        shop_guide,
     ]

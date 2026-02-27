@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
+import { Bot } from "lucide-react";
 
-export const TypingIndicator = () => (
+const TypingIndicator = () => (
     <div className="flex items-start gap-3 px-4">
         <div className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center shrink-0">
-            <span className="text-xs font-bold text-primary-foreground">AI</span>
+            <Bot className="w-4 h-4 text-primary" />
         </div>
         <div className="glass rounded-2xl rounded-tl-sm px-4 py-3 flex gap-1.5 items-center">
             {[0, 1, 2].map((i) => (
@@ -17,3 +18,5 @@ export const TypingIndicator = () => (
         </div>
     </div>
 );
+
+export default TypingIndicator;

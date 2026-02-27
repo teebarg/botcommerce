@@ -38,7 +38,7 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
                 )}
             </AnimatePresence>
 
-            <div className="flex items-end gap-2">
+            <div className="flex items-center gap-2">
                 <button
                     onClick={() => fileRef.current?.click()}
                     className="p-2.5 rounded-xl hover:bg-muted transition-colors text-muted-foreground shrink-0"

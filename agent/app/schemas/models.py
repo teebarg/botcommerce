@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field
-from typing import Optional
 from datetime import datetime
-import uuid
+from typing import  Optional
 
 
 class ChatRequest(BaseModel):
@@ -21,14 +20,14 @@ class ChatRequest(BaseModel):
         "customer_id": "cust-456"
     }}}
 
-
 class ChatResponse(BaseModel):
-    reply: str = Field(..., description="Agent's response")
-    session_id: str = Field(..., description="Session ID for follow-up messages")
-    sources: list[str] = Field(default=[], description="RAG sources used (FAQ/product names)")
-    escalated: bool = Field(default=False, description="True if agent escalated to human")
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    reply: str
+    session_id: str
+    sources: list[str] = []
+    escalated: bool = False
     products: list[dict] = []
+    quick_replies: list[str] = []
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 
 class IngestRequest(BaseModel):

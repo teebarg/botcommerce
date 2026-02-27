@@ -22,6 +22,7 @@ dependencies = [
     "langchain-classic>=1.0.1",
     "langchain-google-genai==3.2.0",
     "langchain-cerebras==0.8.2",
+    "langchain-ollama>=1.0.1",
 ]
 
 [project.optional-dependencies]

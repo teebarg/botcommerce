@@ -237,52 +237,113 @@ _graph = build_graph()
 # ── Product extractor ─────────────────────────────────────────────────────────
 
 def _extract_products(messages: list) -> list[dict]:
-    """
-    Parse the text output of search_products ToolMessages into structured dicts
-    so the frontend can render product cards.
+    import re as _re, json as _json
+    pattern = _re.compile(r"<!-- PRODUCTS_JSON:(.+?) -->", _re.DOTALL)
 
-    Parses the format emitted by tools.py search_products:
-        1. **Product Name** (SKU: ABC123)
-           https://storage.com/products/tween.png
-           Price: ₦1000.00 | Category: clothing
-           Description text
-    """
-    import re as _re
-
-    block_re = _re.compile(
-        r"\d+\.\s+\*\*(.+?)\*\*\s+\(SKU:\s*([^)]+)\)\s*\n"
-        r"\s+Price:\s*([^|]+)\|[^\n]*\n"
-        r"\s+(.*?)(?=\n\s*\d+\.|\Z)",
-        _re.DOTALL,
-    )
-
-    products = []
-    seen_skus: set = set()
-
-    # Walk backwards — only parse the most recent search_products call
-    found = False
     for msg in reversed(messages):
-        if not isinstance(msg, ToolMessage):
-            if found:
-                break
+        if not isinstance(msg, ToolMessage) or msg.name != "search_products":
             continue
-        if msg.name != "search_products":
-            continue
-        found = True
-        for m in block_re.finditer(str(msg.content)):
-            sku = m.group(2).strip()
-            if sku in seen_skus:
-                continue
-            seen_skus.add(sku)
-            products.append({
-                "name": m.group(1).strip(),
-                "sku": sku,
-                "image_url": m.group(3).strip() or None,
-                "price": m.group(4).strip(),
-                "description": m.group(5).strip(),
-            })
+        m = pattern.search(str(msg.content))
+        if m:
+            try:
+                return _json.loads(m.group(1))
+            except Exception:
+                pass
+    return []
 
-    return products
+
+# ── Quick replies ─────────────────────────────────────────────────────────────
+
+# Complexity signals — if any match, we use the LLM to generate smart replies
+_COMPLEX_SIGNALS = re.compile(
+    r"(order|refund|return|payment|track|ship|stock|availab|broken|wrong|missing|complaint|issue|problem|help|human|agent)",
+    re.IGNORECASE,
+)
+
+def _rule_based_quick_replies(message: str, sources: list[str], escalated: bool) -> list[str]:
+    """Fast, zero-cost quick replies based on message content and tool sources used."""
+    msg: str = message.lower()
+
+    if escalated:
+        return ["Check order status", "Browse products", "Return policy"]
+
+    if "order" in msg or "track" in msg or "status" in msg:
+        return ["Track another order", "Request refund", "Speak to human"]
+
+    if "refund" in msg or "return" in msg or "exchange" in msg:
+        return ["Start a return", "Track my order", "Speak to human"]
+
+    if "stock" in msg or "available" in msg or "availab" in msg:
+        return ["Browse products", "Notify when available", "See alternatives"]
+
+    if "pay" in msg or "payment" in msg or "checkout" in msg:
+        return ["Browse products", "Track my order", "Return policy"]
+
+    if "Products" in sources:
+        return ["Check stock", "How to order", "See more products", "Return policy"]
+
+    if "Faqs" in sources or "Policies" in sources:
+        return ["Track my order", "Browse products", "Speak to human"]
+
+    # Default / greeting / unrecognised
+    return ["Track my order", "Browse products", "Return policy", "Speak to human"]
+
+
+async def _llm_quick_replies(
+    user_message: str,
+    agent_reply: str,
+    llm,
+) -> list[str]:
+    """
+    Ask the LLM to generate context-aware quick replies.
+    Returns 2-4 short button labels. Falls back to [] on any error.
+    """
+    import json as _json
+
+    prompt: str = (
+        f"Customer said: \"{user_message}\"\n"
+        f"Agent replied: \"{agent_reply[:300]}\"\n\n"
+        "Suggest 2-4 quick reply button labels the customer might click next. "
+        "Rules: max 5 words each, action-oriented, relevant to the conversation. "
+        "Return ONLY a valid JSON array of strings, nothing else.\n"
+        "Example: [\"Track my order\", \"Request refund\", \"Speak to human\"]"
+    )
+    try:
+        resp = await llm.ainvoke([HumanMessage(content=prompt)])
+        match = re.search(r"\[.*?\]", resp.content, re.DOTALL)
+        if match:
+            parsed = _json.loads(match.group())
+            # Sanitise: keep only short strings
+            return [str(r).strip() for r in parsed if len(str(r)) <= 40][:4]
+    except Exception as exc:
+        logger.debug(f"[quick_replies] LLM fallback failed: {exc}")
+    return []
+
+
+async def _get_quick_replies(
+    user_message: str,
+    agent_reply: str,
+    sources: list[str],
+    escalated: bool,
+    llm,
+) -> list[str]:
+    """
+    Combined strategy:
+    - Simple / greeting messages → rule-based (instant, no cost)
+    - Complex messages (orders, refunds, complaints) → LLM-generated with rule-based fallback
+    """
+    is_complex = bool(_COMPLEX_SIGNALS.search(user_message))
+
+    if not is_complex:
+        return _rule_based_quick_replies(user_message, sources, escalated)
+
+    # Try LLM first for complex cases
+    llm_replies: list[str] = await _llm_quick_replies(user_message, agent_reply, llm)
+    if llm_replies:
+        return llm_replies
+
+    # LLM failed — fall back to rules
+    return _rule_based_quick_replies(user_message, sources, escalated)
 
 
 async def run_agent(
@@ -308,7 +369,8 @@ async def run_agent(
             session_id,
             history + [HumanMessage(content=message), AIMessage(content=reply)],
         )
-        return {"reply": reply, "session_id": session_id, "sources": [], "escalated": False}
+        quick_replies: list[str] = await _get_quick_replies(message, reply, [], False, llm)
+        return {"reply": reply, "session_id": session_id, "sources": [], "escalated": False, "quick_replies": quick_replies}
 
     initial_state: AgentState = {
         "messages": history + [HumanMessage(content=message)],
@@ -334,16 +396,23 @@ async def run_agent(
             reply = "I'm sorry, I had trouble with that. Could you give me more details?"
 
         # Extract structured products from search_products tool messages.
+        # We scan all ToolMessages in this conversation for search_products calls
+        # and parse their text output back into dicts for the UI to render as cards.
         products = _extract_products(final_state["messages"])
 
         save_messages_to_redis(session_id, final_state["messages"])
 
+        sources = final_state.get("sources", [])
+        escalated = final_state.get("escalated", False)
+        quick_replies = await _get_quick_replies(message, reply, sources, escalated, get_llm())
+
         return {
             "reply": reply,
             "session_id": session_id,
-            "sources": final_state.get("sources", []),
-            "escalated": final_state.get("escalated", False),
+            "sources": sources,
+            "escalated": escalated,
             "products": products,
+            "quick_replies": quick_replies,
         }
 
     except Exception as e:
@@ -360,4 +429,5 @@ async def run_agent(
             "session_id": session_id,
             "sources": [],
             "escalated": False,
+            "quick_replies": [],
         }

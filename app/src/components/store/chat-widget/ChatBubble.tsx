@@ -3,17 +3,22 @@ import { MessageCircle, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChatWidget } from "./ChatWidget";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useConfig } from "@/providers/store-provider";
 
 export const ChatBubble = () => {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
     const isMobile = useIsMobile();
+
+    const { config } = useConfig();
+    if (config?.feature_chatbot != "true") {
+        return null;
+    }
 
     return (
         <>
             <AnimatePresence>
                 {isOpen && (
                     <>
-                        {/* Mobile: full screen overlay */}
                         {isMobile ? (
                             <motion.div
                                 initial={{ y: "100%" }}
@@ -41,10 +46,9 @@ export const ChatBubble = () => {
                                     </button>
                                 </div>
 
-                                <ChatWidget embedded />
+                                <ChatWidget />
                             </motion.div>
                         ) : (
-                            /* Desktop: floating panel */
                             <motion.div
                                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -52,7 +56,6 @@ export const ChatBubble = () => {
                                 transition={{ type: "spring", stiffness: 400, damping: 25 }}
                                 className="fixed bottom-24 right-6 z-[60] w-[400px] h-[600px] rounded-3xl border border-border bg-background shadow-2xl overflow-hidden flex flex-col"
                             >
-                                {/* Header */}
                                 <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-card">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center">
@@ -71,7 +74,7 @@ export const ChatBubble = () => {
                                     </button>
                                 </div>
 
-                                <ChatWidget embedded />
+                                <ChatWidget />
                             </motion.div>
                         )}
                     </>
@@ -88,11 +91,10 @@ export const ChatBubble = () => {
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={() => setIsOpen(true)}
-                        className="fixed bottom-20 md:bottom-8 right-4 md:right-6 z-[55] w-14 h-14 rounded-full gradient-primary shadow-lg flex items-center justify-center"
+                        className="fixed bottom-20 md:bottom-8 right-24 md:right-6p z-[55] w-14 h-14 rounded-full gradient-primary bg-green-600 shadow-lg flex items-center justify-center"
                         style={{ boxShadow: "0 0 30px hsl(350 89% 60% / 0.4)" }}
                     >
                         <MessageCircle className="w-6 h-6 text-primary-foreground" />
-                        {/* Notification dot */}
                         <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-green-400 border-2 border-background" />
                     </motion.button>
                 )}
