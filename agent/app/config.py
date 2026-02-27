@@ -17,9 +17,9 @@ class Settings(BaseSettings):
     qdrant_url: str = Field(alias="QDRANT_URL")
     qdrant_api_key: str = Field(alias="QDRANT_API_KEY")
 
-    redis_url: str = Field(default="redis://localhost:6379", alias="REDIS_URL")
+    REDIS_URL: str = Field(default="redis://localhost:6379")
 
-    api_base_url: str = Field(alias="API_BASE_URL")
+    API_BASE_URL: str = Field(default="http://localhost:8000")
 
     agent_max_iterations: int = Field(default=6, alias="AGENT_MAX_ITERATIONS")
     agent_verbose: bool = Field(default=True, alias="AGENT_VERBOSE")
@@ -67,7 +67,7 @@ def get_llm2():
 # config.py
 def get_llm():
     provider = settings.LLM_PROVIDER  # "groq" | "gemini" | "cerebras"
-    
+
     if provider == "gemini":
         from langchain_google_genai import ChatGoogleGenerativeAI
         return ChatGoogleGenerativeAI(

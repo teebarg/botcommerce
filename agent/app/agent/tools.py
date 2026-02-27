@@ -32,7 +32,7 @@ def _shop_request(method: str, path: str, **kwargs) -> dict:
         algorithm="HS256",
     )
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
-    url: str = f"{settings.api_base_url}{path}"
+    url: str = f"{settings.API_BASE_URL}{path}"
     try:
         with httpx.Client(timeout=10.0) as client:
             response = client.request(method, url, headers=headers, **kwargs)

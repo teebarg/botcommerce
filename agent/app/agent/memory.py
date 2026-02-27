@@ -16,7 +16,7 @@
 # def get_redis() -> redis_client.Redis:
 #     from app.config import get_settings
 #     settings = get_settings()
-#     return redis_client.from_url(settings.redis_url, decode_responses=True)
+#     return redis_client.from_url(settings.REDIS_URL, decode_responses=True)
 
 
 # def _redis_key(session_id: str) -> str:
@@ -121,7 +121,7 @@ _MESSAGE_TYPES = {
 
 def _get_redis() -> redis.Redis:
     settings = get_settings()
-    return redis.from_url(settings.redis_url, decode_responses=True)
+    return redis.from_url(settings.REDIS_URL, decode_responses=True)
 
 
 def _serialise(messages: list[BaseMessage]) -> str:
