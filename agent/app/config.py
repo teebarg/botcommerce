@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     qdrant_url: str = Field(alias="QDRANT_URL")
     qdrant_api_key: str = Field(alias="QDRANT_API_KEY")
 
-    OLLAMA_URL: str = Field(default="http://ollama:11434")
+    OLLAMA_URL: str = Field(default="http://localhost:11434")
     REDIS_URL: str = Field(default="redis://localhost:6379")
 
     API_BASE_URL: str = Field(default="http://localhost:8000")
@@ -57,7 +57,6 @@ def get_llm():
     elif provider == "ollama":
         from langchain_ollama import ChatOllama
         return ChatOllama(
-            # model="llama3.2:3b",
             # model="llama3:latest",
             model="qwen2.5:3b",
             base_url=settings.OLLAMA_URL,

@@ -48,6 +48,10 @@ SYSTEM_PROMPT = (
     "Never make up product details, prices, or order information — always use tools. "
     "Tool usage rules: "
     "(1) For product questions: call search_products once with the customer query. "
+    "When search_products returns results, do NOT list the products in your reply — "
+    "they are displayed as visual cards in the UI automatically. "
+    "Instead, just tell the customer how many options you found and invite them to ask for details. "
+    "Example: 'I found 3 options for you! Let me know if you'd like more details on any of them.' "
     "(2) For order questions: call check_order_status with the order ID. "
     "(3) For stock questions: call check_stock only when the customer explicitly asks if something is in stock. "
     "(4) For policy or how-to questions: call search_faqs or search_policies. "
@@ -190,6 +194,29 @@ def build_graph():
     tool_node = ToolNode(tools)
 
     async def process_tool_results(state: AgentState) -> dict:
+        # For search_products results, append a UI note so the model doesn't
+        # re-list products in its text reply (they render as cards in the UI)
+        messages = list(state["messages"])
+        patched: list[BaseMessage] = []
+        for msg in messages:
+            if (
+                isinstance(msg, ToolMessage)
+                and msg.name == "search_products"
+                and "<!-- UI_CARDS -->" not in str(msg.content)
+                and "No matching products" not in str(msg.content)
+            ):
+                count = str(msg.content).count("(SKU:")
+                note = (
+                    f"\n\n<!-- UI_CARDS: {count} product card(s) will be shown in the UI automatically. "
+                    "Do NOT list them in your text reply. Just acknowledge the count warmly and invite questions. -->"
+                )
+                msg = ToolMessage(
+                    content=str(msg.content) + note,
+                    tool_call_id=msg.tool_call_id,
+                    name=msg.name,
+                )
+            patched.append(msg)
+
         # Log current batch observations
         _log_observations(state)
 
