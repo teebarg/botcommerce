@@ -398,7 +398,16 @@ async def run_agent(
         # Extract structured products from search_products tool messages.
         # We scan all ToolMessages in this conversation for search_products calls
         # and parse their text output back into dicts for the UI to render as cards.
-        products = _extract_products(final_state["messages"])
+        last_human_idx = max(
+            (i for i, m in enumerate(final_state["messages"]) if isinstance(m, HumanMessage)),
+            default=0,
+        )
+        current_turn_msgs = final_state["messages"][last_human_idx:]
+        called_search = any(
+            isinstance(m, ToolMessage) and m.name == "search_products"
+            for m in current_turn_msgs
+        )
+        products = _extract_products(final_state["messages"]) if called_search else []
 
         save_messages_to_redis(session_id, final_state["messages"])
 

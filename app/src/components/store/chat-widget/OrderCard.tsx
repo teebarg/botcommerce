@@ -23,7 +23,6 @@ export const OrderCard = ({ order }: { order: OrderInfo }) => {
                 </span>
             </div>
 
-            {/* Progress bar */}
             <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                 <motion.div
                     initial={{ width: 0 }}

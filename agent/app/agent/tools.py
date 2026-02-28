@@ -3,7 +3,7 @@ import jwt
 import time
 import httpx
 import logging
-from langchain.tools import tool
+from langchain_classic.tools import tool
 from app.rag.qdrant_client import search_collection
 from app.config import get_settings
 
@@ -47,7 +47,6 @@ def search_products(query: str) -> str:
     if not results:
         return "No matching products found in our catalog for that query."
 
-    # Return both human-readable text AND structured JSON the agent can use
     output = "Here are the most relevant products I found:\n\n"
     for i, r in enumerate(results, 1):
         output += (
@@ -203,7 +202,7 @@ def escalate_to_human(reason: str) -> str:
     )
 
 
-# ── Consolidated guide tool
+# Consolidated guide tool
 _GUIDE_CONTENT = {
     "checkout": (
         "To place an order:\n"

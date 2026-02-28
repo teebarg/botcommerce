@@ -11,12 +11,13 @@ class Settings(BaseSettings):
     CEREBRAS_API_KEY: str = Field(default="", alias="CEREBRAS_API_KEY")
     GOOGLE_API_KEY: str = Field(default="", alias="GOOGLE_API_KEY")
 
-    groq_api_key: str = Field(default="", alias="GROQ_API_KEY")
-    groq_model: str = Field(default="llama-3.3-70b-versatile", alias="GROQ_MODEL")
+    GROQ_API_KEY: str = Field(default="", alias="GROQ_API_KEY")
+    GROQ_MODEL: str = Field(default="llama-3.3-70b-versatile", alias="GROQ_MODEL")
 
     qdrant_url: str = Field(alias="QDRANT_URL")
     qdrant_api_key: str = Field(alias="QDRANT_API_KEY")
 
+    OLLAMA_URL: str = Field(default="http://ollama:11434")
     REDIS_URL: str = Field(default="redis://localhost:6379")
 
     API_BASE_URL: str = Field(default="http://localhost:8000")
@@ -36,7 +37,7 @@ def get_settings() -> Settings:
 
 def get_llm():
     settings = get_settings()
-    provider: str = settings.LLM_PROVIDER  # "groq" | "gemini" | "cerebras"
+    provider: str = settings.LLM_PROVIDER
 
     if provider == "gemini":
         from langchain_google_genai import ChatGoogleGenerativeAI
@@ -59,7 +60,7 @@ def get_llm():
             # model="llama3.2:3b",
             # model="llama3:latest",
             model="qwen2.5:3b",
-            base_url="http://ollama:11434",
+            base_url=settings.OLLAMA_URL,
             temperature=0,
         )
     else:

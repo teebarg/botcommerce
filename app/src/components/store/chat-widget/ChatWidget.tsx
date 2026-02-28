@@ -10,7 +10,7 @@ import ChatMessage from "./ChatMessage";
 export const ChatWidget = () => {
     const { messages, isTyping, sendMessage, reactToMessage, clearHistory } = useSupportChat();
     const scrollRef = useRef<HTMLDivElement>(null);
-    const hasHistory = messages.length > 2; // more than just welcome messages
+    const hasHistory = messages.length > 2;
 
     useEffect(() => {
         scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
