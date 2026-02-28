@@ -74,9 +74,6 @@ export type CartUpdate = {
     billing_address?: Omit<Address, "id">;
     shipping_method?: ShippingMethod;
     payment_method?: PaymentMethod;
-    total?: number;
-    subtotal?: number;
-    tax?: number;
     shipping_fee?: number;
 };
 

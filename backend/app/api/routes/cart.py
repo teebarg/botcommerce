@@ -190,70 +190,71 @@ async def update_cart(cart_update: CartUpdate, user: UserDep, cartId: str = Head
             },
         )
 
-    update_data = {}
+    async with db.tx() as tx:
+        update_data = {}
 
-    if cart_update.shipping_address:
-        if cart_update.shipping_address.id:
-            address = await db.address.upsert(
-                where={"id": cart_update.shipping_address.id},
-                data={
-                    "create": {
-                        **cart_update.shipping_address.model_dump(exclude={"id"}),
-                        "user_id": user.id if user else None
-                    },
-                    "update": {
-                        **cart_update.shipping_address.model_dump(exclude={"id", "user_id"}),
+        if cart_update.shipping_address:
+            if cart_update.shipping_address.id:
+                address = await tx.address.upsert(
+                    where={"id": cart_update.shipping_address.id},
+                    data={
+                        "create": {
+                            **cart_update.shipping_address.model_dump(exclude={"id"}),
+                            "user_id": user.id if user else None
+                        },
+                        "update": {
+                            **cart_update.shipping_address.model_dump(exclude={"id", "user_id"}),
+                        }
                     }
-                }
-            )
-        else:
-            address = await db.address.create(
-                data={
-                    **cart_update.shipping_address.model_dump(exclude={"id"}),
-                    "user": {"connect": {"id": user.id}} if user else None
-                }
-            )
+                )
+            else:
+                address = await tx.address.create(
+                    data={
+                        **cart_update.shipping_address.model_dump(exclude={"id"}),
+                        "user": {"connect": {"id": user.id}} if user else None
+                    }
+                )
 
-        update_data["shipping_address"] = {"connect": {"id": address.id}}
-        update_data["billing_address"] = {"connect": {"id": address.id}}
-        await invalidate_key(f"addresses:{user.id}")
-        await invalidate_key(f"address:{address.id}")
+            update_data["shipping_address"] = {"connect": {"id": address.id}}
+            update_data["billing_address"] = {"connect": {"id": address.id}}
+            await invalidate_key(f"addresses:{user.id}")
+            await invalidate_key(f"address:{address.id}")
 
 
-    if cart_update.status:
-        update_data["status"] = cart_update.status
+        if cart_update.status is not None:
+            update_data["status"] = cart_update.status
 
-    if cart_update.email:
-        update_data["email"] = cart_update.email
+        if cart_update.email is not None:
+            update_data["email"] = cart_update.email
 
-    if cart_update.phone:
-        update_data["phone"] = cart_update.phone
+        if cart_update.phone is not None:
+            update_data["phone"] = cart_update.phone
 
-    if cart_update.payment_method:
-        update_data["payment_method"] = cart_update.payment_method
+        if cart_update.payment_method is not None:
+            update_data["payment_method"] = cart_update.payment_method
 
-    if cart_update.shipping_method:
-        update_data["shipping_method"] = cart_update.shipping_method
+        if cart_update.shipping_method is not None:
+            update_data["shipping_method"] = cart_update.shipping_method
 
-    if cart_update.shipping_fee is not None:
-        update_data["shipping_fee"] = cart_update.shipping_fee
-        update_data["total"] = cart.subtotal + cart.tax + update_data["shipping_fee"] - cart.discount_amount - cart.wallet_used
+        if cart_update.shipping_fee is not None:
+            update_data["shipping_fee"] = cart_update.shipping_fee
+            update_data["total"] = cart.subtotal + cart.tax + update_data["shipping_fee"] - cart.discount_amount - cart.wallet_used
 
-    if user:
-        update_data["user"] = {"connect": {"id": user.id}}
+        if user:
+            update_data["user"] = {"connect": {"id": user.id}}
 
-    updated_cart = await db.cart.update(
-        where={"cart_number": cart.cart_number},
-        data=update_data,
-    )
+        updated_cart = await tx.cart.update(
+            where={"cart_number": cart.cart_number},
+            data=update_data,
+        )
 
-    await bust(f"cart:{cart.cart_number}")
-    if cart.user_id:
-        await bust(f"cart:{cart.user_id}")
-    await invalidate_pattern("abandoned-carts")
-    await invalidate_pattern("cart")
+        await bust(f"cart:{cart.cart_number}")
+        if cart.user_id:
+            await bust(f"cart:{cart.user_id}")
+        await invalidate_pattern("abandoned-carts")
+        await invalidate_pattern("cart")
 
-    return updated_cart
+        return updated_cart
 
 
 @router.delete("/items/{item_id}")

@@ -5,7 +5,6 @@ import logging
 import sys
 
 from app.schemas.models import ChatRequest, ChatResponse, IngestRequest, HealthResponse
-# from app.agent.agent import run_agent
 from app.agent.agent_graph import run_agent
 from app.agent.memory import clear_session
 from app.config import get_settings
@@ -145,13 +144,11 @@ async def clear_collection():
 
 @app.get("/test-micro", tags=["System"])
 async def test_micro():
-    from app.agent.tools import _shop_request
+    # from app.agent.tools import _shop_request
     from app.rag.qdrant_client import search_collection
     # result = _shop_request("GET", "/api/order/ORD-C0B7CD56")
-    results = search_collection("faqs", "How do I place an order", top_k=3, score_threshold=0.45)
-    # print("🚀 ~ file: main.py:142 ~ results:", results)
+    result = search_collection("faqs", "How do I place an order", top_k=3, score_threshold=0.45)
     return {
         "result": result,
-        # "resultssss": results,
         "status": "ok"
     }

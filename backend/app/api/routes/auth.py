@@ -3,7 +3,7 @@ from pydantic import EmailStr, BaseModel, Field
 from app.core import security
 from app.core.config import settings
 from app.core.utils import generate_magic_link_email, send_email, generate_verification_email
-from app.models.user import User
+from app.models.user import User, EmailData, SyncUserPayload, GooglePayload
 from app.services.events import publish_user_registered
 from datetime import datetime, timedelta
 from app.models.generic import Token, Message
@@ -12,15 +12,14 @@ from app.prisma_client import prisma as db
 import httpx
 from typing import Optional
 from app.core.logging import get_logger
+from app.core.decorators import limit
 
 logger = get_logger(__name__)
 
 router = APIRouter()
 
-
 class TokenPayload(BaseModel):
     token: str
-
 
 class SignUpPayload(BaseModel):
     email: EmailStr
@@ -28,20 +27,12 @@ class SignUpPayload(BaseModel):
     first_name: str = Field(max_length=255)
     last_name: str = Field(max_length=255)
 
-
 class VerifyEmailPayload(BaseModel):
     token: str
 
 class OAuthCallback(BaseModel):
     code: str
     state: Optional[str] = None
-
-
-class GooglePayload(BaseModel):
-    email: str
-    first_name: str
-    last_name: str
-    image: Optional[str] = None
 
 
 def tokenData(user: User):
@@ -53,41 +44,6 @@ def tokenData(user: User):
         "status": user.status,
         "role": user.role
     }
-
-
-# @router.post("/test-signup")
-# async def test_signup(request: Request):
-#     """
-#     Register a new user with email and password.
-#     Requires CAPTCHA verification and email verification.
-#     """
-#     from app.services.events import publish_order_event
-#     # existing_user = await db.user.find_first(
-#     #     where={
-#     #         "email": "teebarg01@gmail.com",
-#     #     }
-#     # )
-
-#     existing_order = await db.order.find_first(
-#         where={
-#             "order_number": "ORD4395C971",
-#         }
-#     )
-
-#     try:
-#         # await publish_user_registered(
-#         #     user=existing_user,
-#         #     source="email_password",
-#         #     created_at=existing_user.created_at,
-#         # )
-#         await publish_order_event(order=existing_order, type="ORDER_PAID")
-#     except Exception as e:
-#         logger.error(f"Failed to publish USER_REGISTERED event: {e}")
-#         pass
-
-#     return "Done"
-
-
 
 @router.post("/signup")
 async def signup(request: Request, payload: SignUpPayload, background_tasks: BackgroundTasks) -> Token:
@@ -343,43 +299,64 @@ async def logout():
     return Message(message="Logout successful")
 
 
-class EmailData(BaseModel):
-    email: str
-    url: str
-
-
 @router.post("/send-magic-link")
+@limit("3/minute")
 async def send_magic_link(
     request: Request,
-    background_tasks: BackgroundTasks,
     payload: EmailData,
     cartId: str = Header(default=None)
 ) -> Message:
     """
     Request a magic link for passwordless authentication.
-    The link will be sent to the user's email if they have an account.
+    A user will only be created if:
+      - Email is valid
+      - Magic link email is successfully sent
     """
+
     email: str = payload.email
     url: str = payload.url
 
     user = await db.user.find_first(
-        where={
-            "email": email,
-        }
+        where={"email": email}
     )
 
+    is_new_user = False
+
     if not user:
-        user = await db.user.create(
-            data={
-                "email": email,
-                "first_name": "",
-                "last_name": "",
-                "image": "",
-                "status": "ACTIVE",
-                "role": "CUSTOMER",
-                "hashed_password": "password"
-            }
+        is_new_user = True
+        user_data = {
+            "email": email,
+            "first_name": "",
+            "last_name": "",
+            "image": "",
+            "status": "PENDING",
+            "role": "CUSTOMER",
+            "hashed_password": "password"
+        }
+    else:
+        user_data = None
+
+    try:
+        email_data = await generate_magic_link_email(
+            email_to=email,
+            magic_link=url,
+            first_name=user.first_name if user else ""
         )
+
+        await send_email(
+            email_to=email,
+            subject=email_data.subject,
+            html_content=email_data.html_content,
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unable to send magic link at this time."
+        )
+
+    if is_new_user:
+        user = await db.user.create(data=user_data)
 
         try:
             await publish_user_registered(
@@ -390,26 +367,12 @@ async def send_magic_link(
         except Exception:
             pass
 
-    async def send_magic_link_email(name: str, email: str, url: Optional[str] = None):
-        email_data = await generate_magic_link_email(email_to=email, magic_link=url, first_name=name)
-        await send_email(
-            email_to=email,
-            subject=email_data.subject,
-            html_content=email_data.html_content,
-        )
+    if cartId:
+        await merge_cart(user_id=user.id, cart_number=cartId)
 
-    await merge_cart(user_id=user.id, cart_number=cartId)
-
-    background_tasks.add_task(send_magic_link_email, user.first_name, email, url)
-
-    return {"message": "If an account exists with this email, you will receive a magic link"}
-
-
-class SyncUserPayload(BaseModel):
-    email: str
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    image: Optional[str] = None
+    return {
+        "message": "If an account exists with this email, you will receive a magic link"
+    }
 
 
 @router.post("/sync-user")
@@ -452,26 +415,25 @@ async def merge_cart(user_id: str, cart_number: str | None = None):
         data={"user_id": user_id},
     )
 
+# @router.post("/test-job")
+# async def test(request: Request, id: int):
+#     """
+#     Test job
+#     """
+#     user = await db.user.find_first(
+#         where={
+#             "id": id,
+#         }
+#     )
 
-@router.post("/test-job")
-async def test(request: Request, id: int):
-    """
-    Test job
-    """
-    user = await db.user.find_first(
-        where={
-            "id": id,
-        }
-    )
+#     try:
+#         await publish_user_registered(
+#             user=user,
+#             source="email_password",
+#             created_at=user.created_at,
+#         )
+#     except Exception as e:
+#         logger.error(f"Failed to publish USER_REGISTERED event: {e}")
+#         pass
 
-    try:
-        await publish_user_registered(
-            user=user,
-            source="email_password",
-            created_at=user.created_at,
-        )
-    except Exception as e:
-        logger.error(f"Failed to publish USER_REGISTERED event: {e}")
-        pass
-
-    return {"message": "User registered successfully"}
+#     return {"message": "User registered successfully"}
