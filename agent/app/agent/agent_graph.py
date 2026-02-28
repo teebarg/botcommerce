@@ -233,7 +233,7 @@ def build_graph():
             if msg.name == "escalate_to_human":
                 escalated = True
 
-        return {"sources": sources, "escalated": escalated}
+        return {"messages": patched, "sources": sources, "escalated": escalated}
 
     def should_continue(state: AgentState) -> Literal["tools", "end"]:
         if state.get("iterations", 0) >= MAX_ITERATIONS:
@@ -278,6 +278,38 @@ def _extract_products(messages: list) -> list[dict]:
                 pass
     return []
 
+# ── Reply cleaner ─────────────────────────────────────────────────────────────
+
+def _strip_product_listing(reply: str, has_products: bool) -> str:
+    """
+    When structured product cards are returned, strip any duplicate product
+    listing the model included in the reply text.
+    """
+    if not has_products:
+        return reply
+
+    import re as _re
+
+    # Remove lead-in phrases like "Here are some examples:"
+    reply = _re.sub(
+        r"(Here are some (examples|options|products)[^:\n]*:\s*\n)",
+        "",
+        reply,
+        flags=_re.IGNORECASE,
+    )
+
+    # Remove numbered product blocks: "1. **Name** ..." up to next item or end
+    reply = _re.sub(
+        r"\n?\d+\.\s+\*\*[^*]+\*\*.*?(?=\n\d+\.\s+\*\*|\Z)",
+        "",
+        reply,
+        flags=_re.DOTALL,
+    )
+
+    # Collapse excess blank lines
+    reply = _re.sub(r"\n{3,}", "\n\n", reply)
+
+    return reply.strip()
 
 # ── Quick replies ─────────────────────────────────────────────────────────────
 
@@ -289,7 +321,7 @@ _COMPLEX_SIGNALS = re.compile(
 
 def _rule_based_quick_replies(message: str, sources: list[str], escalated: bool) -> list[str]:
     """Fast, zero-cost quick replies based on message content and tool sources used."""
-    msg: str = message.lower()
+    msg = message.lower()
 
     if escalated:
         return ["Check order status", "Browse products", "Return policy"]
@@ -327,7 +359,7 @@ async def _llm_quick_replies(
     """
     import json as _json
 
-    prompt: str = (
+    prompt = (
         f"Customer said: \"{user_message}\"\n"
         f"Agent replied: \"{agent_reply[:300]}\"\n\n"
         "Suggest 2-4 quick reply button labels the customer might click next. "
@@ -365,12 +397,13 @@ async def _get_quick_replies(
         return _rule_based_quick_replies(user_message, sources, escalated)
 
     # Try LLM first for complex cases
-    llm_replies: list[str] = await _llm_quick_replies(user_message, agent_reply, llm)
+    llm_replies = await _llm_quick_replies(user_message, agent_reply, llm)
     if llm_replies:
         return llm_replies
 
     # LLM failed — fall back to rules
     return _rule_based_quick_replies(user_message, sources, escalated)
+
 
 
 async def run_agent(
@@ -396,7 +429,7 @@ async def run_agent(
             session_id,
             history + [HumanMessage(content=message), AIMessage(content=reply)],
         )
-        quick_replies: list[str] = await _get_quick_replies(message, reply, [], False, llm)
+        quick_replies = await _get_quick_replies(message, reply, [], False, llm)
         return {"reply": reply, "session_id": session_id, "sources": [], "escalated": False, "quick_replies": quick_replies}
 
     initial_state: AgentState = {
@@ -425,6 +458,8 @@ async def run_agent(
         # Extract structured products from search_products tool messages.
         # We scan all ToolMessages in this conversation for search_products calls
         # and parse their text output back into dicts for the UI to render as cards.
+        # Only extract products if search_products was called in THIS turn.
+        # Check for ToolMessages added after the last HumanMessage.
         last_human_idx = max(
             (i for i, m in enumerate(final_state["messages"]) if isinstance(m, HumanMessage)),
             default=0,
@@ -435,6 +470,9 @@ async def run_agent(
             for m in current_turn_msgs
         )
         products = _extract_products(final_state["messages"]) if called_search else []
+
+        # Strip product listing from reply text when cards are returned
+        reply = _strip_product_listing(reply, has_products=bool(products))
 
         save_messages_to_redis(session_id, final_state["messages"])
 

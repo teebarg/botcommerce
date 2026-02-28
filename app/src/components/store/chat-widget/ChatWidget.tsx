@@ -19,7 +19,7 @@ export const ChatWidget = () => {
     return (
         <>
             {hasHistory && (
-                <div className="flex justify-end px-4 pt-3">
+                <div className="flex justify-end px-4 pb-1 pt-3">
                     <button
                         onClick={clearHistory}
                         className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-destructive transition-colors"
@@ -38,7 +38,6 @@ export const ChatWidget = () => {
 
                 {isTyping && <TypingIndicator />}
 
-                {/* Show latest quick replies at the bottom */}
                 {!isTyping && messages.at(-1)?.quick_replies && (
                     <QuickReplies replies={messages.at(-1)!.quick_replies || []} onSelect={(r) => sendMessage(r)} />
                 )}
