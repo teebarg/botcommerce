@@ -56,10 +56,10 @@ def get_embedding_model() -> TextEmbedding:
 def get_qdrant_client() -> QdrantClient:
     from app.config import get_settings
     settings = get_settings()
-    logger.info(f"Connecting to Qdrant: {settings.qdrant_url}")
+    logger.info(f"Connecting to Qdrant: {settings.QDRANT_URL}")
     return QdrantClient(
-        url=settings.qdrant_url,
-        api_key=settings.qdrant_api_key,
+        url=settings.QDRANT_URL,
+        api_key=settings.QDRANT_API_KEY,
     )
 
 

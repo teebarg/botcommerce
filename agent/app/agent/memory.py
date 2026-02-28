@@ -87,12 +87,6 @@
 #     except Exception as e:
 #         logger.warning(f"Could not clear session {session_id}: {e}")
 
-
-"""
-app/agent/memory.py
-Redis-backed message persistence for LangGraph.
-Stores/loads lists of LangChain BaseMessage objects as JSON.
-"""
 import json
 import logging
 from typing import Optional

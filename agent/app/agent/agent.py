@@ -1,6 +1,5 @@
 from langchain.agents import AgentExecutor, create_react_agent
 from langchain.prompts import PromptTemplate
-from langchain_groq import ChatGroq
 from langchain_core.runnables import RunnableConfig
 from langchain_core.messages import HumanMessage, SystemMessage
 import logging
@@ -13,9 +12,7 @@ from app.agent.memory import load_memory_from_redis, save_memory_to_redis
 
 logger = logging.getLogger(__name__)
 
-# ── Conversational shortcut ───────────────────────────────────────────────────
 # Messages that match these patterns never enter the ReAct loop.
-
 CONVERSATIONAL_PATTERNS = re.compile(
     r"^\s*(hi+|hey+|hello+|howdy|good\s*(morning|afternoon|evening)|"
     r"who are you|what are you|are you (a |an )?(bot|ai|robot|human|person|agent)|"
@@ -53,7 +50,7 @@ async def _handle_conversational(
     return response.content.strip()
 
 
-# ── ReAct prompt ──────────────────────────────────────────────────────────────
+# ReAct prompt
 SYSTEM_PROMPT = """You are Alex, a friendly customer support agent for an online shop.
 Never reveal you are an AI, bot, or mention any AI company.
 
@@ -126,13 +123,12 @@ async def run_agent(
 
     logger.info(f"[Agent] Session: {session_id} | Customer: {customer_id} | Message: {message[:80]}")
 
-    # ── Conversational shortcut
+    # Conversational
     if CONVERSATIONAL_PATTERNS.match(message.strip()):
         logger.info("[Agent] Conversational message — skipping ReAct loop")
         llm = get_llm()
         reply = await _handle_conversational(message, customer_id, llm)
 
-        # Still save to memory so context carries forward
         memory = load_memory_from_redis(session_id)
         memory.chat_memory.add_user_message(message)
         memory.chat_memory.add_ai_message(reply)
@@ -145,7 +141,6 @@ async def run_agent(
             "escalated": False,
         }
 
-    # ── ReAct agent for everything else ──────────────────────────────────────
     contextualized: str = f"[Customer ID: {customer_id}] {message}" if customer_id else message
     executor, memory = _create_executor(session_id)
 

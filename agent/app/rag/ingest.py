@@ -1,11 +1,3 @@
-"""
-Run whenever your products, FAQs, or policies change:
-  uv run python -m app.rag.ingest --collection all
-  uv run python -m app.rag.ingest --collection products
-  uv run python -m app.rag.ingest --collection faqs
-  uv run python -m app.rag.ingest --collection policies
-"""
-
 import asyncio
 import argparse
 import logging
@@ -28,7 +20,6 @@ async def get_connection() -> asyncpg.Connection:
 async def load_products(conn: asyncpg.Connection) -> list[dict]:
     """
     Load active products with their variants, and categories.
-    One query with JOINs — no ORM overhead.
     """
     rows = await conn.fetch("""
         SELECT

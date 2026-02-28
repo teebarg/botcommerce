@@ -107,7 +107,6 @@ export const useSupportChat = () => {
                 };
 
                 setMessages((prev) => [...prev, agentMsg]);
-                // if (!open) setUnread((n) => n + 1);
             } catch {
                 setMessages((prev) => [
                     ...prev,

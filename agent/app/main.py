@@ -21,7 +21,6 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """
     Runs on startup: pre-load the embedding model so the first request isn't slow.
-    This is important for Render — cold starts can be slow without this.
     """
     logger.info("🚀 Pre-loading embedding model...")
 

@@ -14,8 +14,8 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str = Field(default="", alias="GROQ_API_KEY")
     GROQ_MODEL: str = Field(default="llama-3.3-70b-versatile", alias="GROQ_MODEL")
 
-    qdrant_url: str = Field(alias="QDRANT_URL")
-    qdrant_api_key: str = Field(alias="QDRANT_API_KEY")
+    QDRANT_URL: str = Field(alias="QDRANT_URL")
+    QDRANT_API_KEY: str = Field(alias="QDRANT_API_KEY")
 
     OLLAMA_URL: str = Field(default="http://localhost:11434")
     REDIS_URL: str = Field(default="redis://localhost:6379")

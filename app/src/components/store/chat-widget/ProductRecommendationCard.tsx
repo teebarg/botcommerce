@@ -20,14 +20,10 @@ export const ProductRecommendationCard = ({ products }: { products: Product[] })
                     </div>
                     <div className="p-3 space-y-2">
                         <p className="text-xs font-medium text-foreground truncate">{product.name}</p>
-                        {/* <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{product.brand}</p> */}
-                        <motion.button
-                            whileTap={{ scale: 0.9 }}
-                            className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg gradient-primary text-xs font-medium text-primary-foreground"
-                        >
+                        <button className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg gradient-primary text-xs font-medium text-primary-foreground">
                             <ShoppingBag className="w-3 h-3" />
                             Add
-                        </motion.button>
+                        </button>
                     </div>
                 </motion.div>
             ))}

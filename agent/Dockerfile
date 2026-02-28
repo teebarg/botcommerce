@@ -1,4 +1,4 @@
-# ── Stage 1: Build & Model Preparation ───────────────────────────────────────
+# Stage 1: Build & Model Preparation
 FROM python:3.11-slim AS builder
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
@@ -24,14 +24,13 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Bake model into image — script avoids inline python -c indentation issues.
 RUN . /venv/bin/activate && python scripts/download_model.py
 
-# --- Stage 2: Final Runtime ---
+# Stage 2: Final Runtime
 FROM python:3.11-slim
 
 WORKDIR /app/agent
 
 # Copy virtual environment and baked models from builder
 COPY --from=builder /venv /venv
-# COPY --from=builder /app/models /app/models
 COPY --from=builder /app /app/agent
 
 USER root
