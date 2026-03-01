@@ -1,7 +1,6 @@
 *.pyc
 *.pyo
 __pycache__
-.dockerignore
 .docker
 .git
 .env
@@ -25,3 +24,4 @@ jsconfig.json
 meilisearch-data
 
 app/dist
+agent/models

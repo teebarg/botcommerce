@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+import re
+from pydantic import BaseModel, EmailStr, field_validator
 from enum import Enum
 from prisma.enums import PaymentMethod, ShippingMethod
 from typing import Optional
@@ -29,17 +30,35 @@ class CartItemCreate(BaseModel):
     quantity: int
 
 class CartUpdate(BaseModel):
-    total: Optional[float] = None
-    subtotal: Optional[float] = None
-    tax: Optional[float] = None
     shipping_fee: Optional[float] = None
     shipping_address: Optional[CartAddress] = None
     billing_address: Optional[CartAddress] = None
-    email: Optional[str] = None
+    email: Optional[EmailStr] = None
     phone: Optional[str] = None
     shipping_method: Optional[ShippingMethod] = None
     payment_method: Optional[PaymentMethod] = None
     status: Optional[CartStatus] = None
+
+    @field_validator("phone")
+    @classmethod
+    def validate_phone(cls, value: Optional[str]) -> Optional[str]:
+        if not value:
+            return value
+
+        digits = re.sub(r"\D", "", value)
+
+        # Normalize to 234XXXXXXXXXX
+        if digits.startswith("0"):
+            digits = "234" + digits[1:]
+
+        if not digits.startswith("234"):
+            raise ValueError("Invalid phone number")
+
+        # Must match valid NG mobile pattern
+        if not re.fullmatch(r"234[789][01]\d{8}", digits):
+            raise ValueError("Invalid mobile number")
+
+        return digits  # canonical format
 
 
 class CartItemBase(BaseModel):

@@ -280,7 +280,7 @@ async def send_email(
         )
     except Exception as e:
         logger.error(f"Email sending failed: {str(e)}")
-        raise
+        raise Exception(f"Email sending failed: {str(e)}")
 
 
 def generate_test_email(email_to: str) -> EmailData:

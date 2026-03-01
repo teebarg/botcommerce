@@ -1,6 +1,6 @@
 from typing import Optional, Literal, List
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, HttpUrl
 
 class UserBase(BaseModel):
     first_name: Optional[str] = Field(default=None, max_length=255)
@@ -17,6 +17,22 @@ class UserCreate(UserBase):
 class UserUpdate(UserBase):
     pass
 
+class EmailData(BaseModel):
+    email: EmailStr
+    url: HttpUrl
+
+class SyncUserPayload(BaseModel):
+    email: EmailStr
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    image: Optional[str] = None
+
+class GooglePayload(BaseModel):
+    email: EmailStr
+    first_name: str
+    last_name: str
+    image: Optional[str] = None
+
 class UserUpdateMe(BaseModel):
     first_name: Optional[str] = Field(default=None, max_length=255)
     last_name: Optional[str] = Field(default=None, max_length=255)
@@ -24,14 +40,13 @@ class UserUpdateMe(BaseModel):
 
 class User(UserBase):
     id: int
+    email: EmailStr
 
 class UserSelf(User):
-    email: EmailStr
     wallet_balance: Optional[float] = 0
     created_at: datetime
 
 class UserAdmin(User):
-    email: EmailStr
     created_at: datetime
     updated_at: Optional[datetime] = None
     wallet_balance: Optional[float] = 0

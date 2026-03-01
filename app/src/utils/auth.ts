@@ -191,7 +191,6 @@ export const authConfig: StartAuthJSConfig = {
                 session.user.status = user.status as Status;
                 session.user.isAdmin = user.role === "ADMIN";
                 session.user.isActive = user.status === "ACTIVE";
-                session.user.addresses = user.addresses as Address[];
 
                 session.accessToken = token.accessToken as string;
                 session.impersonated = token.impersonated as boolean;

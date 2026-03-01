@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, BackgroundTasks
-from app.core.deps import CurrentUser, get_current_superuser
+from app.core.deps import CurrentUser, get_current_superuser, PrincipalDep
 from typing import Optional
 from app.prisma_client import prisma as db
 from app.models.order import Order, OrderCreate, OrderTimelineEntry, PaginatedOrders, OrderNotesUpdate, ReturnItemPayload
@@ -29,12 +29,17 @@ async def create_order(
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/{order_id}")
-@cache_response(key_prefix="order", key=lambda request, order_id: order_id)
+@cache_response(key_prefix="order", key=lambda request, order_id, principal: (
+    f"{order_id}:admin"
+    if principal.role == "ADMIN"
+    else f"{order_id}:user:{principal.user_id}"
+))
 async def get_order(
     request: Request,
     order_id: str,
+    principal: PrincipalDep,
 ) -> Order:
-    return await retrieve_order(order_id)
+    return await retrieve_order(order_id=order_id, principal=principal)
 
 @router.get("/")
 @cache_response(key_prefix="orders")

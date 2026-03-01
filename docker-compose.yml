@@ -56,7 +56,7 @@ services:
   #     - traefik.constraint-label=traefik-public
 
   #     - traefik.http.services.shop-app.loadbalancer.server.port=5173
-      
+
   #     - traefik.http.routers.shop-app-http.rule=Host(`app.localhost`)
   #     - traefik.http.routers.shop-app-http.entrypoints=http
   #     # - traefik.http.routers.shop-app-http.service=shop-app
@@ -90,8 +90,12 @@ services:
         INSTALL_DEV: ${INSTALL_DEV-false}
     platform: linux/amd64 # Patch for M1 Mac
     depends_on:
-      - db
-      - meilisearch
+      redis:
+        condition: service_healthy
+      meilisearch:
+        condition: service_healthy
+      db:
+        condition: service_healthy
     command:
       - fastapi
       - run
@@ -152,6 +156,11 @@ services:
 
       - traefik.http.routers.meilisearch-http.rule=Host(`meilisearch.localhost`)
       - traefik.http.routers.meilisearch-http.entrypoints=http
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   adminer:
     image: adminer:5.3.0
@@ -181,6 +190,11 @@ services:
       - default
     volumes:
       - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   redisinsight:
     image: redis/redisinsight:latest
@@ -204,6 +218,75 @@ services:
 
       - traefik.http.routers.redisinsight-http.rule=Host(`redisinsight.localhost`)
       - traefik.http.routers.redisinsight-http.entrypoints=http
+
+  agent:
+    image: 'shop-agent:${TAG-latest}'
+    build:
+      context: ./agent
+      dockerfile: Dockerfile.dev
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.constraint-label=traefik-public
+
+      - traefik.http.services.agent.loadbalancer.server.port=8000
+
+      - traefik.http.routers.agent-http.rule=Host(`agent.localhost`)
+      - traefik.http.routers.agent-http.entrypoints=http
+    ports:
+      - "7010:8000"
+    env_file: ./agent/.env
+    environment:
+      - FASTEMBED_CACHE_PATH=/app/models
+    volumes:
+      - ./agent:/app
+      - /app/.venv
+    depends_on:
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    command: fastapi run --reload app/main.py
+    networks:
+      - traefik-public
+      - default
+    develop:
+      watch:
+        - path: ./agent
+          action: sync
+          target: /app
+          ignore:
+            - ./agent/.venv
+            - .venv
+        - path: ./agent/pyproject.toml
+          action: rebuild
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.constraint-label=traefik-public
+
+      - traefik.http.services.qdrant.loadbalancer.server.port=6333
+
+      - traefik.http.routers.qdrant-http.rule=Host(`qdrant.localhost`)
+      - traefik.http.routers.qdrant-http.entrypoints=http
+    ports:
+      - "7033:6333"   # REST API  → http://localhost:6333/dashboard
+      - "7034:6334"   # gRPC
+    volumes:
+      - qdrant-data:/qdrant/storage
+    networks:
+      - traefik-public
+      - default
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 1s bash -c ':> /dev/tcp/127.0.0.1/6333' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # celery:
   #   image: 'shop-worker:${TAG-latest}'
@@ -260,32 +343,11 @@ services:
   #     - ./worker/:/app
   #     - /app/.venv
 
-  # qdrant:
-  #   image: qdrant/qdrant
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.docker.network=traefik-public
-  #     - traefik.constraint-label=traefik-public
-
-  #     - traefik.http.services.qdrant.loadbalancer.server.port=6333
-
-  #     - traefik.http.routers.qdrant-http.rule=Host(`qdrant.localhost`)
-  #     - traefik.http.routers.qdrant-http.entrypoints=http
-  #   ports:
-  #     - "7033:6333"
-  #     - "7034:6334"
-  #   volumes:
-  #     - qdrant-data:/qdrant/storage
-  #   networks:
-  #     - traefik-public
-  #     - default
-
 volumes:
   db-data:
   meili-data:
   redis-data:
   qdrant-data:
-
 
 networks:
   traefik-public:

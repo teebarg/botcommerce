@@ -9,7 +9,7 @@ build:
 
 .PHONY: up
 up:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) up
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) up --build
 
 .PHONY: update
 update:
@@ -54,6 +54,10 @@ prep:
 prep-docker:
 	docker exec shop-backend ./scripts/prestart.sh
 
+.PHONY: serve-agent
+serve-agent:
+	@cd agent; uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload --workers 4
+
 .PHONY: serve-backend
 serve-backend:
 	@cd backend; uvicorn app.main:app --host 0.0.0.0 --reload --workers 4
@@ -68,7 +72,7 @@ sync:
 
 .PHONY: dev
 dev:
-	make -j 2 serve-backend serve-app
+	make -j 3 serve-backend serve-app serve-agent
 
 .PHONY: deploy
 deploy:
@@ -90,6 +94,14 @@ docker-build:
 docker-push:
 	@docker push $(DOCKER_HUB)/$(APP_NAME):latest
 	@docker push $(DOCKER_HUB)/$(APP_NAME):$(shell git rev-parse HEAD)
+
+.PHONY: activate-env-windows
+activate-env-windows:
+	.venv\Scripts\Activate.ps1
+
+.PHONY: activate-env
+activate-env:
+	source .venv/bin/activate
 
 .PHONY: help
 help:
