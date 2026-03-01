@@ -87,7 +87,6 @@ class Cart(BaseModel):
     shipping_method: Optional[ShippingMethod]
     shipping_address_id: Optional[int] = None
     shipping_address: Optional[CartAddress]
-    # billing_address: Optional[CartAddress]
     total: float = 0
     subtotal: float = 0
     tax: float = 0
@@ -96,6 +95,7 @@ class Cart(BaseModel):
     wallet_used: float = 0
     coupon_code: Optional[str]
     coupon_id: Optional[int]
+    created_at: datetime
 
 class CartLite(BaseModel):
     id: int
