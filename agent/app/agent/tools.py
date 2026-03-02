@@ -182,7 +182,6 @@ def request_refund(order_id: str, reason: str) -> str:
         f"A confirmation email will be sent to the customer shortly."
     )
 
-
 @tool
 def escalate_to_human(reason: str) -> str:
     """
@@ -195,11 +194,7 @@ def escalate_to_human(reason: str) -> str:
     Input: a brief summary of why escalation is needed.
     """
     logger.warning(f"[ESCALATION] {reason}")
-    return (
-        "ESCALATED_TO_HUMAN: "
-        f"I've flagged this for a human agent. Reason: {reason}. "
-        "A human agent will follow up with the customer shortly."
-    )
+    return f"ESCALATED: {reason}"
 
 
 # Consolidated guide tool

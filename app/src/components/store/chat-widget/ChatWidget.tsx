@@ -8,7 +8,7 @@ import TypingIndicator from "./TypingIndicator";
 import ChatMessage from "./ChatMessage";
 
 export const ChatWidget = () => {
-    const { messages, isTyping, sendMessage, reactToMessage, clearHistory } = useSupportChat();
+    const { messages, isTyping, sendMessage, reactToMessage, clearHistory, isDisabled } = useSupportChat();
     const scrollRef = useRef<HTMLDivElement>(null);
     const hasHistory = messages.length > 2;
 
@@ -31,9 +31,12 @@ export const ChatWidget = () => {
             )}
             <div ref={scrollRef} className="flex-1 overflow-y-auto hide-scrollbar py-4 space-y-3">
                 <AnimatePresence mode="popLayout">
-                    {messages.map((msg, index) => (
-                        <ChatMessage key={msg.id} message={msg} index={index} />
-                    ))}
+                    {messages.map((msg, index) => {
+                        const lastUserIdx = messages.reduce((acc, m, idx) => (m.role === "user" ? idx : acc), -1);
+                        return (
+                            <ChatMessage key={msg.id} message={msg} index={index} isLastUserMessage={index === lastUserIdx} onSend={sendMessage} />
+                        );
+                    })}
                 </AnimatePresence>
 
                 {isTyping && <TypingIndicator />}
@@ -43,7 +46,7 @@ export const ChatWidget = () => {
                 )}
             </div>
 
-            <ChatInput onSend={sendMessage} disabled={isTyping} />
+            <ChatInput onSend={sendMessage} disabled={isTyping || isDisabled} />
         </>
     );
 };

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { ChatMessage, ChatResponse } from "./types";
 
 const generateId = () => Math.random().toString(36).slice(2, 10);
@@ -57,6 +57,10 @@ export const useSupportChat = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);
 
+    const isDisabled = useMemo(() => {
+        return loading || isTyping || messages.at(-1)?.escalated;
+    }, [loading, isTyping]);
+
     useEffect(() => {
         saveHistory(messages);
     }, [messages]);
@@ -104,6 +108,7 @@ export const useSupportChat = () => {
                     sources: data?.sources || [],
                     escalated: data?.escalated || false,
                     products: data?.products || [],
+                    form: data?.form || null
                 };
 
                 setMessages((prev) => [...prev, agentMsg]);
@@ -132,5 +137,5 @@ export const useSupportChat = () => {
         setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, reaction: m.reaction === reaction ? null : reaction } : m)));
     }, []);
 
-    return { messages, isTyping, loading, sendMessage, reactToMessage, clearHistory };
+    return { messages, isTyping, loading, sendMessage, reactToMessage, clearHistory, lastMessage: messages.at(-1), isDisabled };
 };

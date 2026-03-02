@@ -25,6 +25,8 @@ class Settings(BaseSettings):
     agent_max_iterations: int = Field(default=6, alias="AGENT_MAX_ITERATIONS")
     agent_verbose: bool = Field(default=True, alias="AGENT_VERBOSE")
 
+    SLACK_WEBHOOK_URL: str | None = ""
+
     class Config:
         env_file = ".env"
         populate_by_name = True
@@ -34,10 +36,11 @@ class Settings(BaseSettings):
 def get_settings() -> Settings:
     return Settings()
 
+settings = get_settings()
 
 def get_llm():
-    settings = get_settings()
-    provider: str = settings.LLM_PROVIDER
+    # provider: str = settings.LLM_PROVIDER
+    provider = "gemini"
 
     if provider == "gemini":
         from langchain_google_genai import ChatGoogleGenerativeAI

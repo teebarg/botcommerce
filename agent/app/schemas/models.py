@@ -27,6 +27,7 @@ class ChatResponse(BaseModel):
     escalated: bool = False
     products: list[dict] = []
     quick_replies: list[str] = []
+    form: dict | None = None
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 

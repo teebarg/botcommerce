@@ -24,6 +24,7 @@ export interface ChatMessage {
     escalated?: boolean;
     products?: Product[];
     quick_replies?: string[];
+    form?: any;
     reaction?: "thumbs-up" | "thumbs-down" | null;
     replies_used?: boolean; // true once a quick reply is clicked — hides buttons
 }
@@ -35,6 +36,7 @@ export interface ChatResponse {
     escalated: boolean;
     products: Product[];
     quick_replies?: string[];
+    form?: any;
     reaction?: "thumbs-up" | "thumbs-down" | null;
     timestamp: Date;
 }
