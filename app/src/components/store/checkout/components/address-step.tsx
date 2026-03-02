@@ -1,7 +1,6 @@
 import type React from "react";
 import { useState, useMemo } from "react";
 import { ChevronRight, Plus } from "lucide-react";
-import ShippingAddressForm from "../address-form";
 import { AddressCard } from "./address-item";
 import { Label } from "@/components/ui/label";
 import { RadioGroup } from "@/components/ui/radio-group";
@@ -12,6 +11,7 @@ import { useUserAddresses } from "@/hooks/useAddress";
 import { motion } from "framer-motion";
 import SheetDrawer from "@/components/sheet-drawer";
 import { useOverlayTriggerState } from "react-stately";
+import CheckoutAddressForm from "../checkout-address-form";
 
 interface AddressStepProps {
     address: Address | null | undefined;
@@ -60,7 +60,6 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
                             ))}
                         </RadioGroup>
                     </div>
-
                     <SheetDrawer
                         open={state.isOpen}
                         title="Address"
@@ -77,7 +76,7 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
                         }
                         onOpenChange={state.setOpen}
                     >
-                        <ShippingAddressForm onClose={state.close} />
+                        <CheckoutAddressForm onClose={state.close} />
                     </SheetDrawer>
                 </div>
             </div>

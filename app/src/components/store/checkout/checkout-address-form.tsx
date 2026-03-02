@@ -4,98 +4,83 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useCreateAddress } from "@/hooks/useAddress";
 import { states } from "@/components/store/collections/data";
-import { phoneSchema } from "@/libs/validation";
+import { useUpdateCartDetails } from "@/hooks/useCart";
+import type { Address, CartUpdate } from "@/schemas";
+import { checkoutAddressSchema } from "@/lib/validation";
+
+type FormValues = z.infer<typeof checkoutAddressSchema>;
+
+type Props = {
+    address?: Address;
+    onClose?: () => void;
+};
 
 const formatPhone = (value: string) => {
     const digits = value.replace(/\D/g, "");
+    if (!digits) return "";
 
     if (digits.startsWith("0")) {
-        return digits.replace(/^(\d{4})(\d{3})(\d{0,4})$/, (_, a, b, c) => [a, b, c].filter(Boolean).join(" "));
+        return `+234${digits.slice(1)}`;
     }
 
-    if (digits.startsWith("234")) {
-        const local = digits.slice(3);
-        const formattedLocal = local.replace(/^(\d{3})(\d{3})(\d{0,4})$/, (_, a, b, c) => [a, b, c].filter(Boolean).join(" "));
-        return `+234 ${formattedLocal}`.trim();
-    }
-
-    return value;
+    return digits.startsWith("+") ? digits : `+${digits}`;
 };
 
-const addressSchema = z.object({
-    address_type: z.enum(["HOME", "WORK", "BILLING", "SHIPPING", "OTHER"]),
-    first_name: z.string().min(1, "First name is required"),
-    last_name: z.string().min(1, "Last name is required"),
-    address_1: z.string().min(1, "Address is required"),
-    address_2: z.string().optional(),
-    city: z.string().optional(),
-    state: z.string().min(1, "State is required"),
-    phone: phoneSchema.optional(),
-});
+const CheckoutAddressForm: React.FC<Props> = ({ address, onClose }) => {
+    const updateCartDetails = useUpdateCartDetails();
 
-type AddressFormValues = z.infer<typeof addressSchema>;
-
-interface AddAddressFormProps {
-    onClose?: () => void;
-}
-
-const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
-    const createAddress = useCreateAddress();
-
-    const form = useForm<AddressFormValues>({
-        resolver: zodResolver(addressSchema),
-        mode: "onChange",
+    const form = useForm<FormValues>({
+        resolver: zodResolver(checkoutAddressSchema),
         defaultValues: {
-            address_type: "HOME",
-            first_name: "",
-            last_name: "",
-            address_1: "",
-            address_2: "",
-            city: "",
-            state: "Lagos",
-            phone: "",
+            label: address?.label ?? "Home",
+            first_name: address?.first_name ?? "",
+            last_name: address?.last_name ?? "",
+            address_1: address?.address_1 ?? "",
+            address_2: address?.address_2 ?? "",
+            city: address?.city ?? "",
+            state: address?.state ?? "Lagos",
+            phone: address?.phone ?? "",
         },
     });
 
-    const onSubmit = async (data: AddressFormValues) => {
-        await createAddress.mutateAsync(data);
+    const onSubmit = async (values: FormValues) => {
+        const payload: CartUpdate = {
+            shipping_address: {
+                ...values,
+                address_2: "",
+                address_type: "HOME",
+                is_billing: false,
+                city: "",
+            },
+        };
+
+        updateCartDetails.mutate(payload);
+
         onClose?.();
-        form.reset();
     };
 
     return (
         <Form {...form}>
             <form className="flex-1 flex flex-col overflow-hidden" onSubmit={form.handleSubmit(onSubmit)}>
-                <div className="overflow-y-auto flex-1 px-4 space-y-4">
+                <div className="space-y-4 px-3 flex-1 overflow-y-auto pb-4">
                     <FormField
                         control={form.control}
-                        name="address_type"
+                        name="label"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Address Type</FormLabel>
-                                <Select value={field.value} onValueChange={field.onChange}>
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select type" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        <SelectItem value="HOME">Home</SelectItem>
-                                        <SelectItem value="WORK">Work</SelectItem>
-                                        <SelectItem value="BILLING">Billing</SelectItem>
-                                        <SelectItem value="SHIPPING">Shipping</SelectItem>
-                                        <SelectItem value="OTHER">Other</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <FormLabel>Label (Optional)</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="e.g., Home, Office" {...field} />
+                                </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
-                    <div className="grid grid-cols-2 gap-x-2">
+
+                    <div className="grid grid-cols-2 gap-3">
                         <FormField
                             control={form.control}
                             name="first_name"
@@ -109,6 +94,7 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
                                 </FormItem>
                             )}
                         />
+
                         <FormField
                             control={form.control}
                             name="last_name"
@@ -123,6 +109,7 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
                             )}
                         />
                     </div>
+
                     <FormField
                         control={form.control}
                         name="address_1"
@@ -136,6 +123,7 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
                             </FormItem>
                         )}
                     />
+
                     <FormField
                         control={form.control}
                         name="state"
@@ -149,9 +137,9 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {states.map((state, idx) => (
-                                            <SelectItem key={idx} value={state.id}>
-                                                {state.name}
+                                        {states.map((item) => (
+                                            <SelectItem key={item.id} value={item.id}>
+                                                {item.name}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -160,6 +148,7 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
                             </FormItem>
                         )}
                     />
+
                     <FormField
                         control={form.control}
                         name="phone"
@@ -168,11 +157,10 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
                                 <FormLabel>Phone</FormLabel>
                                 <FormControl>
                                     <Input
-                                        inputMode="tel"
+                                        {...field}
                                         autoComplete="tel"
-                                        placeholder="0803 123 4567"
-                                        value={formatPhone(field.value || "")}
-                                        onChange={(e) => field.onChange(e.target.value.replace(/\D/g, ""))}
+                                        placeholder="+2348012345678"
+                                        onChange={(e) => field.onChange(formatPhone(e.target.value))}
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -180,12 +168,13 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
                         )}
                     />
                 </div>
-                <div className="flex gap-3 mt-6 justify-end px-4 py-2 border-t border-border">
+
+                <div className="sheet-footer flex gap-3 justify-end p-4 border-t">
                     <Button type="button" variant="destructive" onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button type="submit" isLoading={createAddress.isPending}>
-                        Save
+                    <Button type="submit" disabled={updateCartDetails.isPending} isLoading={updateCartDetails.isPending}>
+                        Continue
                     </Button>
                 </div>
             </form>
@@ -193,4 +182,4 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onClose }) => {
     );
 };
 
-export default AddAddressForm;
+export default CheckoutAddressForm;
