@@ -14,6 +14,23 @@ export const normalizePhone = (value: string) => {
     return digits;
 };
 
+export const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, "");
+
+    if (!digits) return "";
+
+    // Simple international-friendly format
+    if (digits.startsWith("234")) {
+        return `+${digits}`;
+    }
+
+    if (digits.startsWith("0")) {
+        return `+234${digits.slice(1)}`;
+    }
+
+    return `+${digits}`;
+};
+
 export const phoneSchema = z
     .string()
     .transform((val) => normalizePhone(val))
@@ -22,13 +39,6 @@ export const phoneSchema = z
     });
 
 export const emailSchema = z.string().email("Enter a valid email address").toLowerCase();
-
-// export const phoneSchema = z
-//     .string()
-//     .trim()
-//     .regex(/^\+?[0-9]{7,15}$/, "Invalid phone number")
-//     .optional()
-//     .or(z.literal(""));
 
 export const addressSchema = z.object({
     address_type: z.enum(["HOME", "WORK", "BILLING", "SHIPPING", "OTHER"]),

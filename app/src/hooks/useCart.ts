@@ -1,18 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { Cart, CartComplete, CartUpdate } from "@/schemas";
+import type { Cart, CartComplete, CartUpdate, Message, Order } from "@/schemas";
 import { useNavigate } from "@tanstack/react-router";
 import {
     addToCartFn,
-    completeCartFn,
     deleteCartItemFn,
     getCartFn,
     updateCartDetailsFn,
     updateCartQuantityFn,
-    applyWalletCreditFn,
-    removeWalletCreditFn,
 } from "@/server/cart.server";
 import { analytics } from "@/utils/pulsemetric";
+import { clientApi } from "@/utils/api.client";
 
 export const useMyCart = () => {
     return useQuery({
@@ -144,7 +142,7 @@ export const useCompleteCart = () => {
     const navigate = useNavigate();
 
     return useMutation({
-        mutationFn: async (complete: CartComplete) => await completeCartFn({ data: complete }),
+        mutationFn: async (complete: CartComplete) => await clientApi.post<Order>("/order/", complete),
         onSuccess: async (data) => {
             navigate({ to: `/order/confirmed/${data?.order_number}` });
             analytics.checkout({
@@ -162,7 +160,7 @@ export const useCompleteCart = () => {
 export const useApplyWalletCredit = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async () => await applyWalletCreditFn(),
+        mutationFn: async () => clientApi.post<Message>("/cart/apply-wallet", {}),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Wallet credit applied");
@@ -176,7 +174,7 @@ export const useApplyWalletCredit = () => {
 export const useRemoveWalletCredit = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async () => await removeWalletCreditFn(),
+        mutationFn: async () => clientApi.post<Message>("/cart/remove-wallet", {}),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Wallet credit removed");

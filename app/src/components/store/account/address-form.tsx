@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { states } from "@/components/store/collections/data";
 import { useCreateAddress, useUpdateAddress } from "@/hooks/useAddress";
 import type { Address } from "@/schemas";
-import { addressSchema } from "@/lib/validation";
+import { addressSchema, formatPhone } from "@/lib/validation";
 
 type AddressFormValues = z.infer<typeof addressSchema>;
 
@@ -18,23 +18,6 @@ type AddressFormProps = {
     mode: "create" | "edit";
     address?: Address;
     onClose?: () => void;
-};
-
-const formatPhone = (value: string) => {
-    const digits = value.replace(/\D/g, "");
-
-    if (!digits) return "";
-
-    // Simple international-friendly format
-    if (digits.startsWith("234")) {
-        return `+${digits}`;
-    }
-
-    if (digits.startsWith("0")) {
-        return `+234${digits.slice(1)}`;
-    }
-
-    return `+${digits}`;
 };
 
 const AddressForm: React.FC<AddressFormProps> = ({ mode, address, onClose }) => {

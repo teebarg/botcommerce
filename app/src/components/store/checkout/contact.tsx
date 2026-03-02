@@ -9,38 +9,7 @@ import { useUpdateCartDetails } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Label } from "@/components/ui/label";
-
-const formatPhone = (value: string) => {
-    const digits = value.replace(/\D/g, "");
-
-    // Local format: 08031234567 → 0803 123 4567
-    if (digits.startsWith("0")) {
-        return digits.replace(/^(\d{4})(\d{3})(\d{0,4})$/, (_, a, b, c) => [a, b, c].filter(Boolean).join(" "));
-    }
-
-    // International: 2348031234567 → +234 803 123 4567
-    if (digits.startsWith("234")) {
-        const local = digits.slice(3);
-        const formattedLocal = local.replace(/^(\d{3})(\d{3})(\d{0,4})$/, (_, a, b, c) => [a, b, c].filter(Boolean).join(" "));
-        return `+234 ${formattedLocal}`.trim();
-    }
-
-    return value;
-};
-
-const normalizePhone = (value: string) => {
-    const digits = value.replace(/\D/g, "");
-
-    if (digits.startsWith("0")) {
-        return "234" + digits.slice(1);
-    }
-
-    if (digits.startsWith("234")) {
-        return digits;
-    }
-
-    return digits;
-};
+import { formatPhone, normalizePhone } from "@/lib/validation";
 
 const ContactFormSchema = z.object({
     phone: z

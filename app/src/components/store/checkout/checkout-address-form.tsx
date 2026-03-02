@@ -9,23 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { states } from "@/components/store/collections/data";
 import { useUpdateCartDetails } from "@/hooks/useCart";
 import type { CartUpdate } from "@/schemas";
-import { addressSchema } from "@/lib/validation";
+import { addressSchema, formatPhone } from "@/lib/validation";
 
 type FormValues = z.infer<typeof addressSchema>;
 
 type Props = {
     onClose?: () => void;
-};
-
-const formatPhone = (value: string) => {
-    const digits = value.replace(/\D/g, "");
-    if (!digits) return "";
-
-    if (digits.startsWith("0")) {
-        return `+234${digits.slice(1)}`;
-    }
-
-    return digits.startsWith("+") ? digits : `+${digits}`;
 };
 
 const CheckoutAddressForm: React.FC<Props> = ({ onClose }) => {

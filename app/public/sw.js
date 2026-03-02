@@ -1,5 +1,5 @@
 const broadcast = new BroadcastChannel("sw-messages");
-const CACHE_NAME = "shop-app-v4";
+const CACHE_NAME = "shop-app-v5";
 
 const STATIC_PAGES = [
     "/favicon.ico",

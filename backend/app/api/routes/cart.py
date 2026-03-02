@@ -1,8 +1,8 @@
-from typing import Optional
+from typing import Optional, Annotated
 from datetime import datetime, timedelta, timezone
 from app.core.utils import generate_id, generate_abandoned_cart_email, send_email
 from app.models.cart import CartUpdate, CartItemCreate, CartItem, Cart, CartLite, SendAbandonedCartReminders, PaginatedAbandonedCarts
-from fastapi import APIRouter, Header, HTTPException, Request, BackgroundTasks, Depends
+from fastapi import APIRouter, Header, HTTPException, Request, BackgroundTasks, Depends, Cookie
 from app.prisma_client import prisma as db
 from app.core.deps import UserDep, get_current_superuser, CurrentUser
 from app.services.redis import cache_response, invalidate_key, bust, invalidate_pattern
@@ -81,7 +81,7 @@ async def get_or_create_cart(cart_number: Optional[str], user_id: Optional[str])
             return cart
 
     if cart_number:
-        cart = await db.cart.find_unique(where={"cart_number": cart_number})
+        cart = await db.cart.find_unique(where={"cart_number": cart_number, "status": CartStatus.ACTIVE})
         if cart:
             return cart
 
@@ -592,11 +592,11 @@ async def get_abandoned_carts_stats(request: Request, hours_threshold: int = 24)
         )
 
 @router.post("/apply-wallet")
-async def apply_wallet(user: CurrentUser, cartId: str = Header(default=None)) -> Message:
+async def apply_wallet(user: CurrentUser, _cart_id: Annotated[str | None, Cookie()] = None) -> Message:
     """
     Apply wallet balance to a cart.
     """
-    cart = await get_or_create_cart(cart_number=cartId, user_id=user.id)
+    cart = await get_or_create_cart(cart_number=_cart_id, user_id=user.id)
     if not cart:
         raise HTTPException(status_code=404, detail="cart not found")
 
@@ -609,7 +609,7 @@ async def apply_wallet(user: CurrentUser, cartId: str = Header(default=None)) ->
     discount = cart.discount_amount or 0
 
     total = subtotal + tax + shipping - discount
-    wallet_to_use = min(user.wallet_balance, total)
+    wallet_to_use: float = min(user.wallet_balance, total)
     total -= wallet_to_use
 
     data: dict[str, float] = {
@@ -644,11 +644,11 @@ async def apply_wallet(user: CurrentUser, cartId: str = Header(default=None)) ->
 
 
 @router.post("/remove-wallet")
-async def remove_wallet(user: CurrentUser, cartId: str = Header(default=None)) -> Message:
+async def remove_wallet(user: CurrentUser,  _cart_id: Annotated[str | None, Cookie()] = None) -> Message:
     """
     Remove wallet usage from the cart, refund the wallet, and recalculate totals.
     """
-    cart = await get_or_create_cart(cart_number=cartId, user_id=user.id)
+    cart = await get_or_create_cart(cart_number=_cart_id, user_id=user.id)
     if not cart:
         raise HTTPException(status_code=404, detail="cart not found")
 
@@ -670,7 +670,7 @@ async def remove_wallet(user: CurrentUser, cartId: str = Header(default=None)) -
             )
             data = {"wallet_used": 0}
             if cart.payment_method == "WALLET":
-                data["payment_method"] = None
+                data["payment_method"] = "BANK_TRANSFER"
             await tx.cart.update(where={"id": cart.id}, data=data)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to remove wallet: {e}")

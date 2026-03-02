@@ -1,13 +1,11 @@
 from app.models.generic import Message
-from typing import Optional, List
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, Header
+from typing import Annotated, Optional, List
+from fastapi import APIRouter, Depends, HTTPException, Cookie, Query, Request
 from app.core.deps import get_current_superuser, UserDep, CurrentUser
 from app.models.coupon import (
     CouponCreate,
     CouponUpdate,
     Coupon,
-    CouponValidateRequest,
-    CouponValidateResponse,
     PaginatedCoupons, CouponScope, CouponAnalytics
 )
 from app.services.coupon import CouponService
@@ -16,6 +14,7 @@ from app.core.logging import get_logger
 from app.services.redis import cache_response, invalidate_pattern
 from prisma.errors import PrismaError
 from datetime import datetime, date
+from app.services.cart import get_cart
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -61,9 +60,9 @@ async def get_coupons(
 @router.post("/", dependencies=[Depends(get_current_superuser)])
 async def create_coupon(coupon_data: CouponCreate) -> Coupon:
     """
-    Create a new coupon (Admin only).
+    Create a new coupon.
     """
-    code = coupon_data.code.upper()
+    code: str = coupon_data.code.upper()
 
     existing = await db.coupon.find_unique(where={"code": code})
     if existing:
@@ -84,7 +83,7 @@ async def create_coupon(coupon_data: CouponCreate) -> Coupon:
 @router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
 async def update_coupon(id: int, coupon_data: CouponUpdate) -> Coupon:
     """
-    Update a coupon (Admin only).
+    Update a coupon.
     """
     coupon = await db.coupon.find_unique(where={"id": id})
     if not coupon:
@@ -133,77 +132,17 @@ async def delete_coupon(id: int):
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.post("/validate")
-async def validate_coupon(
-    request: CouponValidateRequest,
-    user: UserDep = None,
-    cartId: Optional[str] = None
-) -> CouponValidateResponse:
-    """
-    Validate a coupon code for a cart.
-    """
-    service = CouponService()
-    cart = None
-    if cartId:
-        cart = await db.cart.find_unique(where={"cart_number": cartId})
-    elif request.cart_id:
-        cart = await db.cart.find_unique(where={"id": request.cart_id})
-    elif user:
-        cart = await db.cart.find_first(
-            where={"user_id": user.id, "status": "ACTIVE"},
-            order={"updated_at": "desc"}
-        )
-
-    try:
-        coupon = await service.validate_coupon(
-            code=request.code,
-            cart=cart,
-            user_id=user.id if user else None
-        )
-
-        if cart:
-            discount_amount = await service.calculate_discount(coupon, cart.subtotal)
-        else:
-            discount_amount = None
-
-        return CouponValidateResponse(
-            valid=True,
-            coupon=coupon,
-            discount_amount=discount_amount,
-            message="Coupon is valid"
-        )
-    except HTTPException as e:
-        return CouponValidateResponse(
-            valid=False,
-            message=str(e.detail)
-        )
-    except Exception as e:
-        logger.error(f"Error validating coupon: {str(e)}")
-        return CouponValidateResponse(
-            valid=False,
-            message="An error occurred while validating the coupon"
-        )
-
-
 @router.post("/apply")
 async def apply_coupon(
     code: str = Query(..., description="Coupon code to apply"),
     user: CurrentUser = None,
-    cartId: Optional[str] = Header(default=None)
+    _cart_id: Annotated[str | None, Cookie()] = None
 ) -> Message:
     """
     Apply a coupon to a cart.
     """
     service = CouponService()
-    cart = None
-    if cartId:
-        cart = await db.cart.find_unique(where={"cart_number": cartId})
-    elif user:
-        cart = await db.cart.find_first(
-            where={"user_id": user.id, "status": "ACTIVE"},
-            order={"updated_at": "desc"}
-        )
-
+    cart = await get_cart(cart_number=_cart_id, user_id=user.id if user else None)
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
 
@@ -226,20 +165,13 @@ async def apply_coupon(
 @router.post("/remove", response_model=dict)
 async def remove_coupon(
     user: UserDep = None,
-    cartId: Optional[str] = None
-):
+    _cart_id: Annotated[str | None, Cookie()] = None
+) -> Message:
     """
     Remove coupon from cart.
     """
     service = CouponService()
-    cart = None
-    if cartId:
-        cart = await db.cart.find_unique(where={"cart_number": cartId})
-    elif user:
-        cart = await db.cart.find_first(
-            where={"user_id": user.id, "status": "ACTIVE"},
-            order={"updated_at": "desc"}
-        )
+    cart = await get_cart(cart_number=_cart_id, user_id=user.id if user else None)
 
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
@@ -260,7 +192,7 @@ async def remove_coupon(
 @router.post("/{id}/assign", dependencies=[Depends(get_current_superuser)])
 async def assign_coupon(id: int, user_ids: List[int]):
     """
-    Share a coupon with specific users (Admin only).
+    Share a coupon with specific users.
 
     """
     coupon = await db.coupon.find_unique(where={"id": id})
@@ -283,7 +215,7 @@ async def assign_coupon(id: int, user_ids: List[int]):
 @router.patch("/{id}/toggle-status", dependencies=[Depends(get_current_superuser)])
 async def toggle_coupon_status(id: int) -> Coupon:
     """
-    Toggle coupon active status (Admin only).
+    Toggle coupon active status.
     """
     coupon = await db.coupon.find_unique(where={"id": id})
     if not coupon:

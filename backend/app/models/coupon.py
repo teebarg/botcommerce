@@ -61,19 +61,6 @@ class CouponUpdate(BaseModel):
     is_active: Optional[bool] = None
 
 
-class CouponValidateRequest(BaseModel):
-    code: str
-    cart_id: Optional[int] = None
-    cart_number: Optional[str] = None
-
-
-class CouponValidateResponse(BaseModel):
-    valid: bool
-    coupon: Optional[Coupon] = None
-    discount_amount: Optional[float] = None
-    message: Optional[str] = None
-
-
 class PaginatedCoupons(BaseModel):
     items: List[Coupon]
     next_cursor: int | None

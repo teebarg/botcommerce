@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, BackgroundTasks, Cookie
 from app.core.deps import CurrentUser, get_current_superuser, PrincipalDep
-from typing import Optional
+from typing import Annotated, Optional
 from app.prisma_client import prisma as db
 from app.models.order import Order, OrderCreate, OrderTimelineEntry, PaginatedOrders, OrderNotesUpdate, ReturnItemPayload
 from prisma.enums import OrderStatus
@@ -17,10 +17,10 @@ router = APIRouter()
 async def create_order(
     order_in: OrderCreate,
     user: CurrentUser,
-    cartId: str = Header(default=None),
+    _cart_id: Annotated[str | None, Cookie()] = None
 ) -> Order:
     try:
-        order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cartId)
+        order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=_cart_id)
         await invalidate_pattern("orders")
         await invalidate_pattern("cart")
         return order
