@@ -4,55 +4,77 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import type { Address } from "@/schemas";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { states } from "@/components/store/collections/data";
-import { useUpdateAddress } from "@/hooks/useAddress";
+import { useUpdateCartDetails } from "@/hooks/useCart";
+import type { CartUpdate } from "@/schemas";
+import { addressSchema, formatPhone } from "@/lib/validation";
 
-const addressSchema = z.object({
-    first_name: z.string().min(1, "First name is required"),
-    last_name: z.string().min(1, "Last name is required"),
-    address_1: z.string().min(1, "Address is required"),
-    address_2: z.string().optional(),
-    city: z.string().optional(),
-    state: z.string().min(1, "State is required"),
-    phone: z.string().min(1),
-});
+type FormValues = z.infer<typeof addressSchema>;
 
-type AddressFormValues = z.infer<typeof addressSchema>;
-
-type EditAddressProps = {
-    address: Address;
-    isActive?: boolean;
+type Props = {
     onClose?: () => void;
 };
 
-const EditAddressForm: React.FC<EditAddressProps> = ({ address, isActive = false, onClose }) => {
-    const form = useForm<AddressFormValues>({
+const CheckoutAddressForm: React.FC<Props> = ({ onClose }) => {
+    const updateCartDetails = useUpdateCartDetails();
+
+    const form = useForm<FormValues>({
         resolver: zodResolver(addressSchema),
         defaultValues: {
-            first_name: address?.first_name || "",
-            last_name: address?.last_name || "",
-            address_1: address.address_1 || "",
-            address_2: address.address_2 || "",
-            city: address.city || "",
-            state: address.state || "",
-            phone: address.phone || "",
+            address_type: "HOME",
+            first_name: "",
+            last_name: "",
+            address_1: "",
+            state: "Lagos",
+            phone: "",
         },
     });
 
-    const updateAddress = useUpdateAddress();
+    const onSubmit = async (values: FormValues) => {
+        const payload: CartUpdate = {
+            shipping_address: {
+                ...values,
+                is_billing: false,
+            },
+        };
 
-    const onSubmit = async (data: AddressFormValues) => {
-        updateAddress.mutate({ id: address.id!, input: data });
+        updateCartDetails.mutateAsync(payload).then(() => {
+            onClose?.();
+        });
     };
 
     return (
         <Form {...form}>
             <form className="flex-1 flex flex-col overflow-hidden" onSubmit={form.handleSubmit(onSubmit)}>
-                <div className="overflow-y-auto flex-1 px-4 space-y-4">
-                    <div className="grid grid-cols-2 gap-x-2">
+                <div className="space-y-4 px-3 flex-1 overflow-y-auto pb-4">
+                    <FormField
+                        control={form.control}
+                        name="address_type"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Address Type</FormLabel>
+                                <Select value={field.value} onValueChange={field.onChange}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select type" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="HOME">Home</SelectItem>
+                                        <SelectItem value="WORK">Work</SelectItem>
+                                        <SelectItem value="BILLING">Billing</SelectItem>
+                                        <SelectItem value="SHIPPING">Shipping</SelectItem>
+                                        <SelectItem value="OTHER">Other</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <div className="grid grid-cols-2 gap-3">
                         <FormField
                             control={form.control}
                             name="first_name"
@@ -60,12 +82,13 @@ const EditAddressForm: React.FC<EditAddressProps> = ({ address, isActive = false
                                 <FormItem>
                                     <FormLabel>First name</FormLabel>
                                     <FormControl>
-                                        <Input required autoComplete="given-name" data-testid="first-name-input" {...field} />
+                                        <Input {...field} autoComplete="given-name" placeholder="John" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
+
                         <FormField
                             control={form.control}
                             name="last_name"
@@ -73,13 +96,14 @@ const EditAddressForm: React.FC<EditAddressProps> = ({ address, isActive = false
                                 <FormItem>
                                     <FormLabel>Last name</FormLabel>
                                     <FormControl>
-                                        <Input required autoComplete="family-name" data-testid="last-name-input" {...field} />
+                                        <Input {...field} autoComplete="family-name" placeholder="Doe" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
                     </div>
+
                     <FormField
                         control={form.control}
                         name="address_1"
@@ -87,41 +111,29 @@ const EditAddressForm: React.FC<EditAddressProps> = ({ address, isActive = false
                             <FormItem>
                                 <FormLabel>Address</FormLabel>
                                 <FormControl>
-                                    <Input required autoComplete="address-line1" data-testid="address-1-input" {...field} />
+                                    <Input {...field} autoComplete="address-line1" placeholder="123 Main St" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
-                    <FormField
-                        control={form.control}
-                        name="address_2"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Apartment, suite, etc.(Optional)</FormLabel>
-                                <FormControl>
-                                    <Input autoComplete="address-line2" data-testid="address-2-input" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+
                     <FormField
                         control={form.control}
                         name="state"
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>State</FormLabel>
-                                <Select data-testid="state-input" defaultValue={field.value} onValueChange={field.onChange}>
+                                <Select value={field.value} onValueChange={field.onChange}>
                                     <FormControl>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select state" />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {states.map((state, idx: number) => (
-                                            <SelectItem key={idx} value={state.id}>
-                                                {state.name}
+                                        {states.map((item) => (
+                                            <SelectItem key={item.id} value={item.id}>
+                                                {item.name}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -130,6 +142,7 @@ const EditAddressForm: React.FC<EditAddressProps> = ({ address, isActive = false
                             </FormItem>
                         )}
                     />
+
                     <FormField
                         control={form.control}
                         name="phone"
@@ -137,25 +150,25 @@ const EditAddressForm: React.FC<EditAddressProps> = ({ address, isActive = false
                             <FormItem>
                                 <FormLabel>Phone</FormLabel>
                                 <FormControl>
-                                    <Input autoComplete="phone" data-testid="phone-input" {...field} />
+                                    <Input
+                                        {...field}
+                                        autoComplete="tel"
+                                        placeholder="+2348012345678"
+                                        onChange={(e) => field.onChange(formatPhone(e.target.value))}
+                                    />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
                 </div>
-                <div className="sheet-footer">
-                    <Button aria-label="cancel" data-testid="cancel-button" type="button" variant="destructive" onClick={onClose}>
+
+                <div className="sheet-footer flex gap-3 justify-end p-4 border-t">
+                    <Button type="button" variant="destructive" onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button
-                        className="gradient-primary"
-                        aria-label="update"
-                        data-testid="save-button"
-                        isLoading={updateAddress.isPending}
-                        type="submit"
-                    >
-                        Update
+                    <Button type="submit" disabled={updateCartDetails.isPending} isLoading={updateCartDetails.isPending}>
+                        Continue
                     </Button>
                 </div>
             </form>
@@ -163,4 +176,4 @@ const EditAddressForm: React.FC<EditAddressProps> = ({ address, isActive = false
     );
 };
 
-export default EditAddressForm;
+export default CheckoutAddressForm;

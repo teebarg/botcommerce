@@ -35,10 +35,11 @@ async def index(
     address_list = [address.dict() for address in addresses]
     return {"addresses": address_list}
 
-
 @router.post("/")
 async def create(
-    *, user: CurrentUser, create_data: AddressCreate
+    *,
+    user: CurrentUser,
+    create_data: AddressCreate
 ) -> Address:
     """
     Create new address.
@@ -46,17 +47,21 @@ async def create(
     try:
         address = await db.address.create(
             data={
-                **create_data.model_dump(),
+                **create_data.model_dump(exclude_none=True),
                 "user": {"connect": {"id": user.id}},
             }
         )
+
         await invalidate_key(f"addresses:{user.id}")
         await invalidate_pattern("addresses")
         return address
+
     except PrismaError as e:
         logger.error(e)
         raise HTTPException(
-            status_code=400, detail=f"Database error: {str(e)}")
+            status_code=400,
+            detail="Database error while creating address"
+        )
 
 
 @router.get("/{id}")
@@ -73,42 +78,50 @@ async def read(request: Request, id: int, user: CurrentUser) -> Address:
 
     return address
 
-
 @router.patch("/{id}")
 async def update(
     id: int,
     user: CurrentUser,
-    update: AddressUpdate,
+    update_data: AddressUpdate,
 ) -> Address:
     """
-    Update a address.
+    Update an address.
     """
-    existing = await db.address.find_unique(
-        where={"id": id}
-    )
+
+    existing = await db.address.find_unique(where={"id": id})
+
     if not existing:
         raise HTTPException(status_code=404, detail="Address not found")
 
-    update_data = update.dict(exclude_unset=True)
-
-    if not user.role == "ADMIN" and user.id != existing.user_id:
+    if user.role != "ADMIN" and user.id != existing.user_id:
         raise HTTPException(
-            status_code=401, detail="Unauthorized to access this address."
+            status_code=403,
+            detail="Unauthorized to access this address."
+        )
+
+    update_payload = update_data.model_dump(
+        exclude_unset=True,
+        exclude_none=True
+    )
+
+    if not update_payload:
+        raise HTTPException(
+            status_code=400,
+            detail="No fields provided for update"
         )
 
     try:
-        update = await db.address.update(
+        updated = await db.address.update(
             where={"id": id},
-            data={
-                **update_data
-            }
+            data=update_payload
         )
         await invalidate_pattern("addresses")
         await invalidate_key(f"address:{id}")
-        return update
+        return updated
+
     except PrismaError as e:
-        raise HTTPException(
-            status_code=500, detail=f"Database error: {str(e)}")
+        logger.error(e)
+        raise HTTPException(status_code=500, detail="Database error while updating address")
 
 
 @router.delete("/{id}")
@@ -138,14 +151,14 @@ async def delete(id: int, user: CurrentUser) -> Message:
                         "billing_address": { "disconnect": {"id": id}}
                     }
                 )
-                
+
             await tx.address.delete(where={"id": id})
 
         await invalidate_pattern("cart")
         await invalidate_pattern("addresses")
         await invalidate_key(f"addresses:{user.id}")
         await invalidate_key(f"address:{id}")
-        
+
         return Message(message="Address deleted successfully")
     except PrismaError as e:
         logger.error(e)

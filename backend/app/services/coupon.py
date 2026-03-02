@@ -149,7 +149,7 @@ class CouponService:
             "total": cart.subtotal + cart.tax + cart.shipping_fee - wallet_used
         }
         if cart.payment_method == "COUPON":
-            data["payment_method"] = None
+            data["payment_method"] = "BANK_TRANSFER"
         updated_cart = await db.cart.update(where={"id": cart.id}, data=data)
 
         return updated_cart

@@ -1,7 +1,6 @@
 import { omit } from "@/utils";
 import { Building, Check, Edit3, Home, MapPin, Phone, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
-import ShippingAddressFormEdit from "../address-form-edit";
 import type { Address } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useUpdateCartDetails } from "@/hooks/useCart";
@@ -9,6 +8,7 @@ import ComponentLoader from "@/components/component-loader";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { useDeleteAddress } from "@/hooks/useAddress";
+import AddressForm from "../../account/address-form";
 
 interface AddressItemProp {
     address: Address;
@@ -109,7 +109,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                     }
                     onOpenChange={state.setOpen}
                 >
-                    <ShippingAddressFormEdit address={address} onClose={state.close} />
+                    <AddressForm mode="edit" address={address} onClose={state.close} />
                 </SheetDrawer>
                 <ConfirmDrawer
                     open={deleteState.isOpen}

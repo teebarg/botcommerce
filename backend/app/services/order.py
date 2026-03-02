@@ -6,7 +6,6 @@ from app.models.order import Order, OrderCreate
 from app.core.utils import generate_invoice_email, generate_payment_receipt, generate_referral_cashback_email
 from app.core.logging import logger
 from app.services.invoice import invoice_service
-from prisma.enums import CartStatus
 from datetime import datetime
 from app.core.deps import supabase, Notification
 from app.services.product import reindex_product
@@ -14,28 +13,13 @@ from app.core.config import settings
 from app.services.events import publish_order_event
 from app.services.redis import invalidate_key, invalidate_pattern
 from app.services.shop_settings import ShopSettingsService
-
-async def get_cart(cart_number: Optional[str], user_id: Optional[str]):
-    """Retrieve an existing cart or create a new one if it doesn't exist"""
-    if user_id:
-        cart = await db.cart.find_first(
-            where={"user_id": user_id, "status": CartStatus.ACTIVE},
-            include={"items": True},
-            order={"created_at": "desc"}
-        )
-        if cart:
-            return cart
-
-    if cart_number:
-        cart = await db.cart.find_unique(where={"cart_number": cart_number}, include={"items": True})
-        if cart:
-            return cart
+from app.services.cart import get_cart
 
 async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_number: str) -> Order:
     """
     Create a new order from a cart
     """
-    order_number = f"ORD{uuid.uuid4().hex[:8].upper()}"
+    order_number: str = f"ORD{uuid.uuid4().hex[:8].upper()}"
     cart = await get_cart(cart_number=cart_number, user_id=user_id)
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")

@@ -17,11 +17,10 @@ class CartAddress(BaseModel):
     first_name: str
     last_name: str
     address_type: Optional[str]
-    label: Optional[str]
+    label: Optional[str] = None
     address_1: str
-    address_2: Optional[str]
-    # city: Optional[str]
-    state: Optional[str]
+    address_2: Optional[str] = None
+    state: Optional[str] = None
     phone: Optional[str]
     is_billing: bool
 
@@ -87,7 +86,6 @@ class Cart(BaseModel):
     shipping_method: Optional[ShippingMethod]
     shipping_address_id: Optional[int] = None
     shipping_address: Optional[CartAddress]
-    # billing_address: Optional[CartAddress]
     total: float = 0
     subtotal: float = 0
     tax: float = 0
@@ -96,6 +94,7 @@ class Cart(BaseModel):
     wallet_used: float = 0
     coupon_code: Optional[str]
     coupon_id: Optional[int]
+    created_at: datetime
 
 class CartLite(BaseModel):
     id: int

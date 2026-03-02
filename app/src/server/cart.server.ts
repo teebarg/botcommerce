@@ -69,29 +69,6 @@ export const deleteCartItemFn = createServerFn({ method: "POST" })
         return await api.delete<Message>(`/cart/items/${item_id}`, { headers: { cartId: cartId ?? "" } });
     });
 
-export const completeCartFn = createServerFn({ method: "POST" })
-    .inputValidator(z.any())
-    .handler(async ({ data }) => {
-        const cartId = getCookie(CART_COOKIE);
-        const res = await api.post<Order>("/order/", data, { headers: { cartId: cartId ?? "" } });
-
-        deleteCookie(CART_COOKIE, { path: "/" });
-
-        return res;
-    });
-
-export const applyWalletCreditFn = createServerFn({ method: "POST" })
-    .handler(async () => {
-        const cartId = getCookie(CART_COOKIE);
-        return await api.post<Message>("/cart/apply-wallet", {}, { headers: { cartId: cartId ?? "" } });
-    });
-
-export const removeWalletCreditFn = createServerFn({ method: "POST" })
-    .handler(async () => {
-        const cartId = getCookie(CART_COOKIE);
-        return await api.post<Message>("/cart/remove-wallet", {}, { headers: { cartId: cartId ?? "" } });
-    });
-
 export const invalidateCartFn = createServerFn({ method: "POST" }).handler(async () => {
     deleteCookie(CART_COOKIE, { path: "/" });
     return { success: true };

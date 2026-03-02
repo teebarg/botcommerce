@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { tryCatch } from "@/utils/try-catch";
 import { Gift, Sparkles, Star } from "lucide-react";
@@ -7,29 +7,34 @@ import { AnimatePresence, motion } from "framer-motion";
 import { clientApi } from "@/utils/api.client";
 import { Message } from "@/schemas";
 
-const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
-const CHECK_INTERVAL = 60 * 60 * 1000; // Check every hour
+const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000;
+const CHECK_INTERVAL = 60 * 60 * 1000;
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
-    try {
-        // Add padding to make length a multiple of 4
-        const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-        const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+    const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
 
-        // Decode the base64 string
-        const rawData = window.atob(base64);
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
 
-        // Convert binary string to Uint8Array
-        const outputArray = new Uint8Array(rawData.length);
-
-        for (let i = 0; i < rawData.length; ++i) {
-            outputArray[i] = rawData.charCodeAt(i);
-        }
-
-        return outputArray;
-    } catch (error) {
-        throw new Error(`Error decoding Base64 string - ${error}`);
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
     }
+
+    return outputArray;
+}
+
+function getDismissState(): boolean {
+    const dismissedUntil = localStorage.getItem("push_dismissed_until");
+
+    if (!dismissedUntil) return false;
+
+    if (Date.now() > Number(dismissedUntil)) {
+        localStorage.removeItem("push_dismissed_until");
+        return false;
+    }
+
+    return true;
 }
 
 function getStoredSubscriptionKeys() {
@@ -60,62 +65,30 @@ function storeSubscriptionKeys(sub: PushSubscription) {
 }
 
 export default function PushPermission() {
-    const [permission, setPermission] = useState("granted");
-    const [subscription, setSubscription] = useState<PushSubscription | any | null>(null);
-    const [isDismissed, setIsDismissed] = useState<boolean>(true);
+    const [permission, setPermission] = useState<NotificationPermission>("default");
+    const [subscription, setSubscription] = useState<PushSubscription | null>(null);
+    const [isDismissed, setIsDismissed] = useState<boolean>(false);
 
     useEffect(() => {
-        const dismissedAt = localStorage.getItem("push_dismissed_at");
-        if (dismissedAt) {
-            const dismissedTime = parseInt(dismissedAt, 10);
-            const now = Date.now();
+        if (typeof window === "undefined") return;
 
-            if (now - dismissedTime < DISMISS_DURATION) {
-                setIsDismissed(true);
-            } else {
-                localStorage.removeItem("push_dismissed_at");
-                setIsDismissed(false);
-            }
+        if ("Notification" in window) {
+            setPermission(Notification.permission);
         }
 
         if (localStorage.getItem("push_synced") === "true") {
             setIsDismissed(true);
+            return;
         }
 
-        if (typeof window !== "undefined" && "Notification" in window) {
-            setPermission(Notification.permission);
-        }
-
-        if (permission === "granted" && localStorage.getItem("push_synced") !== "true") {
+        if (getDismissState()) {
             setIsDismissed(true);
-            registerServiceWorker();
+            return;
         }
-    }, [permission]);
+        setIsDismissed(false);
+    }, []);
 
-    useEffect(() => {
-        if (permission !== "granted") return;
-
-        const checkSubscriptionChanges = async () => {
-            try {
-                const registration = await navigator.serviceWorker.ready;
-                const sub = await registration.pushManager.getSubscription();
-
-                if (sub && hasSubscriptionChanged(sub)) {
-                    console.log("Subscription changed, syncing with backend...");
-                    await syncSubscriptionToBackend(sub);
-                }
-            } catch (error) {
-                console.error("Error checking subscription:", error);
-            }
-        };
-
-        checkSubscriptionChanges();
-        const intervalId = setInterval(checkSubscriptionChanges, CHECK_INTERVAL);
-
-        return () => clearInterval(intervalId);
-    }, [permission]);
-
-    async function syncSubscriptionToBackend(sub: PushSubscription) {
+    const syncSubscriptionToBackend = useCallback(async (sub: PushSubscription) => {
         const subscriptionData = {
             endpoint: sub.endpoint,
             p256dh: sub.toJSON().keys?.p256dh || "",
@@ -133,43 +106,41 @@ export default function PushPermission() {
         setSubscription(sub);
         localStorage.setItem("push_synced", "true");
         return true;
-    }
+    }, []);
 
-    async function registerServiceWorker() {
-        const registration = await navigator.serviceWorker.ready;
-        const sub = await registration.pushManager.getSubscription();
+    useEffect(() => {
+        if (permission !== "granted") return;
 
-        if (!sub) {
-            setIsDismissed(false);
-            return;
-        }
+        const checkSubscription = async () => {
+            try {
+                const registration = await navigator.serviceWorker.ready;
+                const sub = await registration.pushManager.getSubscription();
 
-        if (hasSubscriptionChanged(sub)) {
-            await syncSubscriptionToBackend(sub);
-        } else {
-            setSubscription(sub);
-        }
-    }
+                if (!sub) return;
 
-    async function handleNotificationOptIn() {
-        if (!("serviceWorker" in navigator)) throw new Error("SW not supported");
-        if (!("PushManager" in window)) throw new Error("Push not supported");
-        if (subscription) return;
-        if (permission === "denied") {
-            toast.error("You blocked notifications. Please re-enable in browser settings.", {
-                duration: 5000,
-            });
-            return;
-        }
-        await subscribeToPush();
-    }
+                if (hasSubscriptionChanged(sub)) {
+                    await syncSubscriptionToBackend(sub);
+                } else {
+                    setSubscription(sub);
+                }
+            } catch (err) {
+                console.error("Subscription check failed", err);
+            }
+        };
+
+        checkSubscription();
+
+        const interval = setInterval(checkSubscription, CHECK_INTERVAL);
+
+        return () => clearInterval(interval);
+    }, [permission, syncSubscriptionToBackend]);
 
     async function subscribeToPush() {
         const perm = await Notification.requestPermission();
 
         setPermission(perm);
 
-        if (perm !== "granted") return null;
+        if (perm !== "granted") return;
         const registration = await navigator.serviceWorker.ready;
         const sub = await registration.pushManager.subscribe({
             userVisibleOnly: true,
@@ -178,18 +149,31 @@ export default function PushPermission() {
         });
 
         if (!sub) {
-            toast.error("You blocked notifications. Please re-enable in browser settings.", {
-                duration: 5000,
-            });
+            toast.error("You blocked notifications. Please re-enable in browser settings.");
             return;
         }
 
         await syncSubscriptionToBackend(sub);
     }
 
+    async function handleOptIn() {
+        if (!("serviceWorker" in navigator)) throw new Error("Service worker not supported");
+
+        if (!("PushManager" in window)) throw new Error("Push not supported");
+
+        if (subscription) return;
+
+        if (permission === "denied") {
+            toast.error("You blocked notifications. Please re-enable in browser settings.", { duration: 5000 });
+            return;
+        }
+
+        await subscribeToPush();
+    }
+
     function handleDismiss() {
+        localStorage.setItem("push_dismissed_until", (Date.now() + DISMISS_DURATION).toString());
         setIsDismissed(true);
-        localStorage.setItem("push_dismissed_at", Date.now().toString());
     }
 
     if (isDismissed || permission === "granted") return null;
@@ -280,7 +264,7 @@ export default function PushPermission() {
                                 Maybe later
                             </button>
                             <button
-                                onClick={handleNotificationOptIn}
+                                onClick={handleOptIn}
                                 className="w-full py-4 text-center font-semibold text-primary hover:bg-primary/5 active:bg-primary/10 transition-colors"
                             >
                                 Claim My Gift!

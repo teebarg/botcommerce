@@ -4,15 +4,14 @@ import { useOverlayTriggerState } from "react-stately";
 import { Edit3, Home, Plus, Trash2 } from "lucide-react";
 import type { Address } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import AddAddressForm from "@/components/store/account/address/add-address-form";
 import { cn } from "@/utils";
-import EditAddressForm from "@/components/store/account/address/edit-address-form";
 import { useDeleteAddress } from "@/hooks/useAddress";
 import { AnimatePresence, motion } from "framer-motion";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import SheetDrawer from "@/components/sheet-drawer";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { userAddressesQuery } from "@/queries/user.queries";
+import AddressForm from "@/components/store/account/address-form";
 
 type AddressItemProps = {
     address: Address;
@@ -76,7 +75,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false, in
                         onOpenChange={editState.setOpen}
                         showHeader={true}
                     >
-                        <EditAddressForm address={address} onClose={editState.close} />
+                        <AddressForm mode="edit" address={address} onClose={editState.close} />
                     </SheetDrawer>
                     <ConfirmDrawer
                         open={deleteState.isOpen}
@@ -130,7 +129,7 @@ function RouteComponent() {
                 onOpenChange={addState.setOpen}
                 showHeader={true}
             >
-                <AddAddressForm onClose={addState.close} />
+                <AddressForm mode="create" onClose={addState.close} />
             </SheetDrawer>
             <div className="space-y-3 mt-4">
                 <AnimatePresence mode="popLayout">
