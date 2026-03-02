@@ -49,7 +49,6 @@ const AddressForm: React.FC<AddressFormProps> = ({ mode, address, onClose }) => 
             last_name: address?.last_name ?? "",
             address_1: address?.address_1 ?? "",
             address_2: address?.address_2 ?? "",
-            city: address?.city ?? "",
             state: address?.state ?? "Lagos",
             phone: address?.phone ?? "",
         },
@@ -65,7 +64,6 @@ const AddressForm: React.FC<AddressFormProps> = ({ mode, address, onClose }) => 
                 last_name: address.last_name ?? "",
                 address_1: address.address_1 ?? "",
                 address_2: address.address_2 ?? "",
-                city: address.city ?? "",
                 state: address.state ?? "Lagos",
                 phone: address.phone ?? "",
             });
@@ -74,18 +72,22 @@ const AddressForm: React.FC<AddressFormProps> = ({ mode, address, onClose }) => 
 
     const onSubmit = async (data: AddressFormValues) => {
         if (mode === "create") {
-            await createAddress.mutateAsync(data);
-            form.reset();
-        }
-
-        if (mode === "edit" && address) {
-            await updateAddress.mutateAsync({
-                id: address.id!,
-                input: data,
+            createAddress.mutateAsync(data).then(() => {
+                form.reset();
+                onClose?.();
             });
         }
 
-        onClose?.();
+        if (mode === "edit" && address) {
+            updateAddress
+                .mutateAsync({
+                    id: address.id!,
+                    input: data,
+                })
+                .then(() => {
+                    onClose?.();
+                });
+        }
     };
 
     const isLoading = mode === "create" ? createAddress.isPending : updateAddress.isPending;
@@ -131,7 +133,7 @@ const AddressForm: React.FC<AddressFormProps> = ({ mode, address, onClose }) => 
                                 <FormItem>
                                     <FormLabel>First name</FormLabel>
                                     <FormControl>
-                                        <Input {...field} autoComplete="given-name" />
+                                        <Input {...field} autoComplete="given-name" placeholder="John" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -145,7 +147,7 @@ const AddressForm: React.FC<AddressFormProps> = ({ mode, address, onClose }) => 
                                 <FormItem>
                                     <FormLabel>Last name</FormLabel>
                                     <FormControl>
-                                        <Input {...field} autoComplete="family-name" />
+                                        <Input {...field} autoComplete="family-name" placeholder="Doe" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -160,7 +162,7 @@ const AddressForm: React.FC<AddressFormProps> = ({ mode, address, onClose }) => 
                             <FormItem>
                                 <FormLabel>Address</FormLabel>
                                 <FormControl>
-                                    <Input {...field} autoComplete="address-line1" />
+                                    <Input {...field} autoComplete="address-line1" placeholder="123 Main St" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -174,7 +176,7 @@ const AddressForm: React.FC<AddressFormProps> = ({ mode, address, onClose }) => 
                             <FormItem>
                                 <FormLabel>Apartment, suite, etc. (Optional)</FormLabel>
                                 <FormControl>
-                                    <Input {...field} autoComplete="address-line2" />
+                                    <Input {...field} autoComplete="address-line2" placeholder="Apartment, suite, etc." />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -211,7 +213,7 @@ const AddressForm: React.FC<AddressFormProps> = ({ mode, address, onClose }) => 
                         name="phone"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Phone (Optional)</FormLabel>
+                                <FormLabel>Phone</FormLabel>
                                 <FormControl>
                                     <Input
                                         {...field}

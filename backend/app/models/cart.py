@@ -17,11 +17,10 @@ class CartAddress(BaseModel):
     first_name: str
     last_name: str
     address_type: Optional[str]
-    label: Optional[str]
+    label: Optional[str] = None
     address_1: str
-    address_2: Optional[str]
-    # city: Optional[str]
-    state: Optional[str]
+    address_2: Optional[str] = None
+    state: Optional[str] = None
     phone: Optional[str]
     is_billing: bool
 

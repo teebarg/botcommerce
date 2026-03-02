@@ -8,13 +8,12 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { states } from "@/components/store/collections/data";
 import { useUpdateCartDetails } from "@/hooks/useCart";
-import type { Address, CartUpdate } from "@/schemas";
-import { checkoutAddressSchema } from "@/lib/validation";
+import type { CartUpdate } from "@/schemas";
+import { addressSchema } from "@/lib/validation";
 
-type FormValues = z.infer<typeof checkoutAddressSchema>;
+type FormValues = z.infer<typeof addressSchema>;
 
 type Props = {
-    address?: Address;
     onClose?: () => void;
 };
 
@@ -29,20 +28,18 @@ const formatPhone = (value: string) => {
     return digits.startsWith("+") ? digits : `+${digits}`;
 };
 
-const CheckoutAddressForm: React.FC<Props> = ({ address, onClose }) => {
+const CheckoutAddressForm: React.FC<Props> = ({ onClose }) => {
     const updateCartDetails = useUpdateCartDetails();
 
     const form = useForm<FormValues>({
-        resolver: zodResolver(checkoutAddressSchema),
+        resolver: zodResolver(addressSchema),
         defaultValues: {
-            label: address?.label ?? "Home",
-            first_name: address?.first_name ?? "",
-            last_name: address?.last_name ?? "",
-            address_1: address?.address_1 ?? "",
-            address_2: address?.address_2 ?? "",
-            city: address?.city ?? "",
-            state: address?.state ?? "Lagos",
-            phone: address?.phone ?? "",
+            address_type: "HOME",
+            first_name: "",
+            last_name: "",
+            address_1: "",
+            state: "Lagos",
+            phone: "",
         },
     });
 
@@ -50,16 +47,13 @@ const CheckoutAddressForm: React.FC<Props> = ({ address, onClose }) => {
         const payload: CartUpdate = {
             shipping_address: {
                 ...values,
-                address_2: "",
-                address_type: "HOME",
                 is_billing: false,
-                city: "",
             },
         };
 
-        updateCartDetails.mutate(payload);
-
-        onClose?.();
+        updateCartDetails.mutateAsync(payload).then(() => {
+            onClose?.();
+        });
     };
 
     return (
@@ -68,13 +62,24 @@ const CheckoutAddressForm: React.FC<Props> = ({ address, onClose }) => {
                 <div className="space-y-4 px-3 flex-1 overflow-y-auto pb-4">
                     <FormField
                         control={form.control}
-                        name="label"
+                        name="address_type"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Label (Optional)</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="e.g., Home, Office" {...field} />
-                                </FormControl>
+                                <FormLabel>Address Type</FormLabel>
+                                <Select value={field.value} onValueChange={field.onChange}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select type" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="HOME">Home</SelectItem>
+                                        <SelectItem value="WORK">Work</SelectItem>
+                                        <SelectItem value="BILLING">Billing</SelectItem>
+                                        <SelectItem value="SHIPPING">Shipping</SelectItem>
+                                        <SelectItem value="OTHER">Other</SelectItem>
+                                    </SelectContent>
+                                </Select>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -88,7 +93,7 @@ const CheckoutAddressForm: React.FC<Props> = ({ address, onClose }) => {
                                 <FormItem>
                                     <FormLabel>First name</FormLabel>
                                     <FormControl>
-                                        <Input {...field} autoComplete="given-name" />
+                                        <Input {...field} autoComplete="given-name" placeholder="John" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -102,7 +107,7 @@ const CheckoutAddressForm: React.FC<Props> = ({ address, onClose }) => {
                                 <FormItem>
                                     <FormLabel>Last name</FormLabel>
                                     <FormControl>
-                                        <Input {...field} autoComplete="family-name" />
+                                        <Input {...field} autoComplete="family-name" placeholder="Doe" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -117,7 +122,7 @@ const CheckoutAddressForm: React.FC<Props> = ({ address, onClose }) => {
                             <FormItem>
                                 <FormLabel>Address</FormLabel>
                                 <FormControl>
-                                    <Input {...field} autoComplete="address-line1" />
+                                    <Input {...field} autoComplete="address-line1" placeholder="123 Main St" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

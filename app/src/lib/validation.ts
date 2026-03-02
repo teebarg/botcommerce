@@ -31,7 +31,7 @@ export const emailSchema = z.string().email("Enter a valid email address").toLow
 //     .or(z.literal(""));
 
 export const addressSchema = z.object({
-    address_type: z.enum(["HOME", "WORK", "BILLING", "SHIPPING", "OTHER"]).optional(),
+    address_type: z.enum(["HOME", "WORK", "BILLING", "SHIPPING", "OTHER"]),
     first_name: z.string().min(1, "First name is required"),
     last_name: z.string().min(1, "Last name is required"),
     address_1: z.string().min(1, "Address is required"),
@@ -39,19 +39,4 @@ export const addressSchema = z.object({
     city: z.string().optional(),
     state: z.string().min(1, "State is required"),
     phone: phoneSchema,
-});
-
-export const checkoutAddressSchema = z.object({
-    label: z.string().optional(),
-    first_name: z.string().min(1, "First name is required"),
-    last_name: z.string().min(1, "Last name is required"),
-    address_1: z.string().min(1, "Address is required"),
-    address_2: z.string().optional(),
-    city: z.string().optional(),
-    state: z.string().min(1, "State is required"),
-    phone: phoneSchema,
-    // phone: z
-    //     .string()
-    //     .trim()
-    //     .regex(/^\+?[0-9]{7,15}$/, "Invalid phone number"),
 });

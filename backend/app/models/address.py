@@ -11,6 +11,7 @@ class Address(BaseModel):
     address_2: str | None
     address_type: AddressType | None
     label: str | None
+    city: str | None
     state: str | None
     phone: str | None
     is_billing: bool
@@ -24,7 +25,7 @@ class AddressCreate(BaseModel):
     address_type: AddressType | None = Field(default=None)
     label: str | None = Field(default=None, max_length=255)
     city: str | None = Field(default=None, max_length=255)
-    state: str = Field(..., max_length=255)  # make required (frontend requires)
+    state: str = Field(..., max_length=255)
     phone: str | None = Field(default=None, max_length=20)
     is_billing: bool = Field(default=False)
 
