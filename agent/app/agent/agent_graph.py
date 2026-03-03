@@ -4,7 +4,6 @@ LangGraph customer support agent.
 import logging
 import re
 import uuid
-from datetime import datetime
 from typing import Annotated, Literal
 
 from langchain_core.messages import (
@@ -24,6 +23,8 @@ from typing_extensions import TypedDict
 from app.agent.memory import load_messages_from_redis, save_messages_to_redis
 from app.agent.tools import get_all_tools
 from app.config import get_llm
+from app.utils import _notify_slack_escalation
+from app.agent.tools import escalate_to_human
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +59,11 @@ SYSTEM_PROMPT = (
     "(3) For stock questions: call check_stock only when the customer explicitly asks if something is in stock. "
     "(4) For policy or how-to questions: call search_faqs or search_policies. "
     "(5) For refunds: confirm order ID and reason before calling request_refund. "
-    "(6) The system may collect details before escalating to a human. Only call escalate_to_human when the system instructs you to do so."
+    "If you believe this issue requires human support (fraud, legal threat, abuse, complex billing issue),"
+    "respond ONLY with:"
+    "ESCALATION_REQUIRED: <short reason>"
+    "Do not call any tools in this case."
+    "Do not add extra text."
     "Never escalate just because a product was not found — tell the customer politely instead. "
     "Keep replies concise and warm."
 )
@@ -79,8 +84,6 @@ _REACT_RE = re.compile(
     r"^(Thought:|Action:|Action Input:|Observation:|Final Answer:)",
     re.MULTILINE,
 )
-
-
 
 def _sanitize_prompt(messages: list) -> list:
     """Strip old ReAct-style messages that cause XML tool call output."""
@@ -120,66 +123,6 @@ def _log_observations(state: AgentState) -> None:
         if len(str(msg.content)) > 300:
             preview += "..."
         logger.info(f"[Observation] ({msg.name}) {preview}")
-
-
-# ── Slack escalation notifier ─────────────────────────────────────────────────
-
-async def _notify_slack_escalation(
-    session_id: str | None,
-    customer_id: str | None,
-    reason: str,
-) -> None:
-    """
-    Post an escalation alert to Slack via incoming webhook.
-    Fails silently — a notification failure should never break the agent response.
-    """
-    import httpx
-    from datetime import timezone
-    from app.config import settings
-
-    webhook_url: str | None = settings.SLACK_WEBHOOK_URL
-    if not webhook_url:
-        logger.warning("[Escalation] SLACK_WEBHOOK_URL not set — skipping Slack notification")
-        return
-
-    # Strip internal prefixes from the reason string
-    reason_clean = reason.replace("ESCALATED_TO_HUMAN: ", "").replace("ESCALATED: ", "").strip()
-    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-
-    payload = {
-        "blocks": [
-            {
-                "type": "header",
-                "text": {"type": "plain_text", "text": "🚨 Escalation: Customer Needs Human Support"},
-            },
-            {
-                "type": "section",
-                "fields": [
-                    {"type": "mrkdwn", "text": "*Session ID:*\n`" + (session_id or "unknown") + "`"},
-                    {"type": "mrkdwn", "text": "*Customer ID:*\n`" + (customer_id or "guest") + "`"},
-                    {"type": "mrkdwn", "text": "*Time:*\n" + timestamp},
-                    {"type": "mrkdwn", "text": "*Reason:*\n" + reason_clean},
-                ],
-            },
-            {"type": "divider"},
-            {
-                "type": "context",
-                "elements": [
-                    {"type": "mrkdwn", "text": "Reply to this thread once the customer has been contacted."}
-                ],
-            },
-        ]
-    }
-
-    try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            resp = await client.post(webhook_url, json=payload)
-            if resp.status_code == 200:
-                logger.info(f"[Escalation] Slack notified for session {session_id}")
-            else:
-                logger.warning(f"[Escalation] Slack returned {resp.status_code}: {resp.text}")
-    except Exception as exc:
-        logger.error(f"[Escalation] Slack notification failed: {exc}")
 
 
 # ── Form definitions ──────────────────────────────────────────────────────────
@@ -237,35 +180,6 @@ _FORM_DETECTION_PROMPT = (
     "Agent reply: {reply} "
     "Reply with ONLY one of: escalation_details, complaint, contact_update, null."
 )
-
-
-async def _detect_form(message: str, reply: str, escalated: bool, llm) -> dict | None:
-    """Rule-based + LLM form detection. Returns a FORMS entry or None."""
-    import json as _json
-
-    if escalated:
-        return FORMS["escalation_details"]
-
-    m = _FORM_TRIGGER_RULES.search(message)
-    if m:
-        if m.group("escalation"):
-            return FORMS["escalation_details"]
-        if m.group("complaint"):
-            return FORMS["complaint"]
-        if m.group("contact_update"):
-            return FORMS["contact_update"]
-
-    try:
-        prompt = _FORM_DETECTION_PROMPT.format(message=message[:300], reply=reply[:300])
-        resp = await llm.ainvoke([HumanMessage(content=prompt)])
-        result = resp.content.strip().strip('"').lower()
-        if result in FORMS:
-            logger.info(f"[Form] LLM detected form: {result}")
-            return FORMS[result]
-    except Exception as exc:
-        logger.debug(f"[Form] LLM detection failed: {exc}")
-
-    return None
 
 
 # ── Graph ─────────────────────────────────────────────────────────────────────
@@ -559,31 +473,45 @@ async def _get_quick_replies(
     # LLM failed — fall back to rules
     return _rule_based_quick_replies(user_message, sources, escalated)
 
+# ── Intent Router ───────────────────────────────────────────────────────────
+
+class Intent:
+    ESCALATION_REQUEST = "escalation_request"
+    COMPLAINT = "complaint"
+    CONTACT_UPDATE = "contact_update"
+    NORMAL = "normal"
+
+
+def _classify_intent(message: str) -> str:
+    msg = message.strip().lower()
+
+    # Escalation request
+    if re.search(r"(speak to (a )?human|talk to (a )?human|human agent|call me)", msg):
+        return Intent.ESCALATION_REQUEST
+
+    # Complaint
+    if re.search(r"(complain|bad experience|wrong item|damaged|overcharged|poor service|unsatisfied)", msg):
+        return Intent.COMPLAINT
+
+    # Contact update
+    if re.search(r"(update.{0,15}(contact|address|email|phone)|change.{0,15}(address|email|phone|details))", msg):
+        return Intent.CONTACT_UPDATE
+
+    return Intent.NORMAL
+
 
 async def run_agent(
     message: str,
     session_id: str | None = None,
     customer_id: str | None = None,
 ) -> dict:
+
     if not session_id:
         session_id = str(uuid.uuid4())
 
-    logger.info(f"[Agent] Session: {session_id} | Customer: {customer_id} | Message: {message[:80]}")
-
-    # Escalation intent detected → show form first (DO NOT escalate yet)
-    if _FORM_TRIGGER_RULES.search(message):
-        match = _FORM_TRIGGER_RULES.search(message)
-
-        if match and match.group("escalation"):
-            return {
-                "reply": "Sure — I’ll connect you with a support agent. First, please provide a few details.",
-                "session_id": session_id,
-                "sources": [],
-                "products": [],
-                "escalated": False,   # 🚫 not escalated yet
-                "quick_replies": [],
-                "form": FORMS["escalation_details"],
-            }
+    logger.info(
+        f"[Agent] Session: {session_id} | Customer: {customer_id} | Message: {message[:80] if len(message) > 80 else message}"
+    )
 
     history: list[BaseMessage] = load_messages_from_redis(session_id)
 
@@ -601,28 +529,39 @@ async def run_agent(
         quick_replies = await _get_quick_replies(message, reply, [], False, llm)
         return {"reply": reply, "session_id": session_id, "sources": [], "escalated": False, "quick_replies": quick_replies}
 
-    # Escalation form submission → now call escalate tool directly
-    if message.lower().startswith("[escalation details form]"):
-        from app.agent.tools import escalate_to_human
+    intent = _classify_intent(message)
 
-        result = await escalate_to_human({
-            "reason": message
-        })
-
-        await _notify_slack_escalation(
-            session_id=session_id,
-            customer_id=customer_id,
-            reason=message,
-        )
-
+    if intent == Intent.ESCALATION_REQUEST:
         return {
-            "reply": "Thank you. A human support agent will contact you shortly.",
+            "reply": "Sure — I’ll connect you with a support agent. First, please provide a few details.",
             "session_id": session_id,
             "sources": [],
             "products": [],
-            "escalated": True,
+            "escalated": False,
             "quick_replies": [],
-            "form": None,
+            "form": FORMS["escalation_details"],
+        }
+
+    if intent == Intent.COMPLAINT:
+        return {
+            "reply": "I'm sorry about your experience. Please provide more details so we can investigate.",
+            "session_id": session_id,
+            "sources": [],
+            "products": [],
+            "escalated": False,
+            "quick_replies": [],
+            "form": FORMS["complaint"],
+        }
+
+    if intent == Intent.CONTACT_UPDATE:
+        return {
+            "reply": "Sure — please provide the updated details below.",
+            "session_id": session_id,
+            "sources": [],
+            "products": [],
+            "escalated": False,
+            "quick_replies": [],
+            "form": FORMS["contact_update"],
         }
 
     initial_state: AgentState = {
@@ -649,23 +588,51 @@ async def run_agent(
         if not reply:
             reply = "I'm sorry, I had trouble with that. Could you give me more details?"
 
-        # Extract structured products from search_products tool messages.
-        # We scan all ToolMessages in this conversation for search_products calls
-        # and parse their text output back into dicts for the UI to render as cards.
-        # Only extract products if search_products was called in THIS turn.
-        # Check for ToolMessages added after the last HumanMessage.
+        if reply.startswith("ESCALATION_REQUIRED:"):
+            reason = reply.replace("ESCALATION_REQUIRED:", "").strip()
+
+            high_risk = any(
+                word in reason.lower()
+                for word in ["fraud", "legal", "lawsuit", "chargeback", "threat"]
+            )
+
+            if high_risk:
+                await escalate_to_human({"reason": reason})
+                await _notify_slack_escalation(session_id, customer_id, reason)
+
+                return {
+                    "reply": "A human specialist has been alerted and will assist you shortly.",
+                    "session_id": session_id,
+                    "sources": [],
+                    "products": [],
+                    "escalated": True,
+                    "quick_replies": [],
+                    "form": None,
+                }
+
+            return {
+                "reply": "I’m going to connect you with a support agent. Please provide a few details.",
+                "session_id": session_id,
+                "sources": [],
+                "products": [],
+                "escalated": False,
+                "quick_replies": [],
+                "form": FORMS["escalation_details"],
+            }
+
         last_human_idx = max(
             (i for i, m in enumerate(final_state["messages"]) if isinstance(m, HumanMessage)),
             default=0,
         )
+
         current_turn_msgs = final_state["messages"][last_human_idx:]
         called_search = any(
             isinstance(m, ToolMessage) and m.name == "search_products"
             for m in current_turn_msgs
         )
+
         products = _extract_products(final_state["messages"]) if called_search else []
 
-        # Strip product listing from reply text when cards are returned
         reply = _strip_product_listing(reply, has_products=bool(products))
 
         save_messages_to_redis(session_id, final_state["messages"])
@@ -675,31 +642,22 @@ async def run_agent(
 
         llm = get_llm()
         quick_replies = await _get_quick_replies(message, reply, sources, escalated, llm)
-        form = await _detect_form(message, reply, escalated, llm)
-        if form:
-            quick_replies = []
 
         return {
             "reply": reply,
             "session_id": session_id,
             "sources": sources,
-            "escalated": escalated,
             "products": products,
+            "escalated": escalated,
             "quick_replies": quick_replies,
-            "form": form,
+            "form": None,
         }
 
     except Exception as e:
-        err = str(e)
-        if "429" in err or "quota" in err.lower() or "ResourceExhausted" in err or "rate_limit" in err.lower():
-            reply = "I'm currently experiencing high demand. Please try again in a few minutes."
-            logger.warning(f"[Agent] Rate limit hit for session {session_id}")
-        else:
-            logger.error(f"[Agent] Error for session {session_id}: {e}", exc_info=True)
-            reply = "Something went wrong on my end. Please try again or contact support directly."
+        logger.error(f"[Agent] Error: {e}", exc_info=True)
 
         return {
-            "reply": reply,
+            "reply": "Something went wrong on my end. Please try again.",
             "session_id": session_id,
             "sources": [],
             "products": [],

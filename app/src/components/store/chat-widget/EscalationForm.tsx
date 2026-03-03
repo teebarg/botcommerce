@@ -3,10 +3,10 @@ import { motion } from "framer-motion";
 import { Send, User, Mail, FileText, CheckCircle } from "lucide-react";
 
 interface EscalationFormProps {
-    onSubmit: (message: string) => void;
+    onSubmitForm: (formType: string, formData: any) => void;
 }
 
-const EscalationForm = ({ onSubmit }: EscalationFormProps) => {
+const EscalationForm = ({ onSubmitForm }: EscalationFormProps) => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [summary, setSummary] = useState("");
@@ -30,8 +30,7 @@ const EscalationForm = ({ onSubmit }: EscalationFormProps) => {
             return;
         }
         setSubmitted(true);
-        // onSubmit({ name: name.trim(), email: email.trim(), summary: summary.trim() });
-        onSubmit(`${name.trim()} ${email.trim()} ${summary.trim()}`)
+        onSubmitForm("escalation_details", { name: name.trim(), email: email.trim(), summary: summary.trim() });
     };
 
     if (submitted) {

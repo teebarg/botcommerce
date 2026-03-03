@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "specialsecret"
     LLM_PROVIDER: str = Field(default="groq", alias="LLM_PROVIDER")
     CEREBRAS_API_KEY: str = Field(default="", alias="CEREBRAS_API_KEY")
-    GOOGLE_API_KEY: str = Field(default="", alias="GOOGLE_API_KEY")
+    GOOGLE_API_KEY: str = Field(default="")
 
     GROQ_API_KEY: str = Field(default="", alias="GROQ_API_KEY")
     GROQ_MODEL: str = Field(default="llama-3.3-70b-versatile", alias="GROQ_MODEL")
@@ -45,7 +45,7 @@ def get_llm():
     if provider == "gemini":
         from langchain_google_genai import ChatGoogleGenerativeAI
         return ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash",
             google_api_key=settings.GOOGLE_API_KEY,
             temperature=0,
             max_retries=0,

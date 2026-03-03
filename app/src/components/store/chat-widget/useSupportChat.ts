@@ -90,6 +90,7 @@ export const useSupportChat = () => {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
+                        type: "message",
                         message: text,
                         session_id: getSessionId(),
                         customer_id: "Beaf",
@@ -108,7 +109,7 @@ export const useSupportChat = () => {
                     sources: data?.sources || [],
                     escalated: data?.escalated || false,
                     products: data?.products || [],
-                    form: data?.form || null
+                    form: data?.form || null,
                 };
 
                 setMessages((prev) => [...prev, agentMsg]);
@@ -133,9 +134,58 @@ export const useSupportChat = () => {
         [addMessage]
     );
 
+    const sendFormSubmission = useCallback(
+        async (formType: string, formData: any) => {
+            try {
+                const res = await fetch(`${import.meta.env.VITE_AGENT_API}/chat`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        type: "form_submission",
+                        form_type: formType,
+                        data: formData,
+                        session_id: getSessionId(),
+                        customer_id: "Beaf",
+                    }),
+                });
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+                const data: ChatResponse = await res.json();
+                const agentMsg: ChatMessage = {
+                    id: (Date.now() + 1).toString(),
+                    role: "agent",
+                    text: data?.reply || "",
+                    timestamp: new Date(),
+                    sources: data?.sources || [],
+                    escalated: data?.escalated || false,
+                    products: data?.products || [],
+                    form: data?.form || null,
+                };
+                setMessages((prev) => [...prev, agentMsg]);
+            } catch {
+                setMessages((prev) => [
+                    ...prev,
+                    {
+                        id: Date.now().toString(),
+                        role: "agent",
+                        text: "Sorry, I couldn't connect. Please try again.",
+                        timestamp: new Date(),
+                        sources: [],
+                        escalated: false,
+                        products: [],
+                    },
+                ]);
+            } finally {
+                setLoading(false);
+            }
+        },
+        []
+    );
+
     const reactToMessage = useCallback((id: string, reaction: "thumbs-up" | "thumbs-down") => {
         setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, reaction: m.reaction === reaction ? null : reaction } : m)));
     }, []);
 
-    return { messages, isTyping, loading, sendMessage, reactToMessage, clearHistory, lastMessage: messages.at(-1), isDisabled };
+    return { messages, isTyping, loading, sendMessage, sendFormSubmission, reactToMessage, clearHistory, lastMessage: messages.at(-1), isDisabled };
 };

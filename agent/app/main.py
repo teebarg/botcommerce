@@ -8,6 +8,7 @@ from app.schemas.models import ChatRequest, ChatResponse, IngestRequest, HealthR
 from app.agent.agent_graph import run_agent
 from app.agent.memory import clear_session
 from app.config import get_settings
+from app.utils import _notify_slack_escalation
 
 logging.basicConfig(
     level=logging.INFO,
@@ -51,7 +52,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/chat", tags=["Chat"])
+@app.post("/chat2", tags=["Chat"])
 async def chat(request: ChatRequest) -> ChatResponse:
     """
     Main chat endpoint.
@@ -65,6 +66,47 @@ async def chat(request: ChatRequest) -> ChatResponse:
         session_id=request.session_id,
         customer_id=request.customer_id,
     )
+    return ChatResponse(**result)
+
+@app.post("/chat", tags=["Chat"])
+async def chat(request: ChatRequest) -> ChatResponse:
+    if request.type == "form_submission":
+
+        if request.form_type == "escalation_details":
+
+            from app.agent.tools import escalate_to_human
+
+            reason = (
+                f"Escalation request:\n"
+                f"Name: {request.data.get('name')}\n"
+                f"Phone: {request.data.get('phone')}\n"
+                f"Summary: {request.data.get('summary')}"
+            )
+
+            # await escalate_to_human(reason=reason)
+
+            await _notify_slack_escalation(
+                session_id=request.session_id,
+                customer_id=request.customer_id,
+                reason=reason,
+            )
+
+            return ChatResponse(
+                reply="Thank you. A human support agent will contact you shortly.",
+                session_id=request.session_id,
+                sources=[],
+                products=[],
+                escalated=True,
+                quick_replies=[],
+                form=None,
+            )
+
+    result = await run_agent(
+        message=request.message or "",
+        session_id=request.session_id,
+        customer_id=request.customer_id,
+    )
+
     return ChatResponse(**result)
 
 

@@ -8,7 +8,7 @@ import TypingIndicator from "./TypingIndicator";
 import ChatMessage from "./ChatMessage";
 
 export const ChatWidget = () => {
-    const { messages, isTyping, sendMessage, reactToMessage, clearHistory, isDisabled } = useSupportChat();
+    const { messages, isTyping, sendMessage, sendFormSubmission, clearHistory, isDisabled } = useSupportChat();
     const scrollRef = useRef<HTMLDivElement>(null);
     const hasHistory = messages.length > 2;
 
@@ -34,7 +34,14 @@ export const ChatWidget = () => {
                     {messages.map((msg, index) => {
                         const lastUserIdx = messages.reduce((acc, m, idx) => (m.role === "user" ? idx : acc), -1);
                         return (
-                            <ChatMessage key={msg.id} message={msg} index={index} isLastUserMessage={index === lastUserIdx} onSend={sendMessage} />
+                            <ChatMessage
+                                key={msg.id}
+                                message={msg}
+                                index={index}
+                                isLastUserMessage={index === lastUserIdx}
+                                onSend={sendMessage}
+                                onSubmitForm={sendFormSubmission}
+                            />
                         );
                     })}
                 </AnimatePresence>

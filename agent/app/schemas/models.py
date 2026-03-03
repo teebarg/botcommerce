@@ -1,10 +1,12 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import  Optional
-
+from typing import Optional, Literal, Dict, Any
 
 class ChatRequest(BaseModel):
-    message: str = Field(..., min_length=1, max_length=2000, description="User's message")
+    type: Literal["message", "form_submission"] = "message"
+    message: Optional[str] = Field(default=None, max_length=2000, description="User's message")
+    form_type: Optional[str] = None
+    data: Optional[Dict[str, Any]] = None
     session_id: Optional[str] = Field(
         default=None,
         description="Session ID for conversation continuity. Auto-generated if not provided."
@@ -15,6 +17,7 @@ class ChatRequest(BaseModel):
     )
 
     model_config = {"json_schema_extra": {"example": {
+        "type": "message",
         "message": "Where is my order #12345?",
         "session_id": "abc-123",
         "customer_id": "cust-456"

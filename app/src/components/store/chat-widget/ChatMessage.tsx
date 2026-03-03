@@ -56,12 +56,13 @@ function renderText(text: string): React.ReactNode {
 
 interface ChatMessageProps {
     onSend: (message: string, file?: File) => void;
+    onSubmitForm: (formType: string, formData: any) => void;
     message: ChatMessageType;
     index: number;
     isLastUserMessage: boolean;
 }
 
-const ChatMessage = ({ message, index, onSend, isLastUserMessage }: ChatMessageProps) => {
+const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage }: ChatMessageProps) => {
     const isAgent = message.role === "agent";
     const [isEditing, setIsEditing] = useState(false);
     const [editValue, setEditValue] = useState(message.text);
@@ -138,11 +139,9 @@ const ChatMessage = ({ message, index, onSend, isLastUserMessage }: ChatMessageP
                         )}
 
                         {message.escalated && <EscalationCard />}
-                        {message.form?.type === "contact-form" && <EscalationForm onSubmit={onSend} />}
+                        {message.form?.type === "escalation_details" && <EscalationForm onSubmitForm={onSubmitForm} />}
                         {!!message.products?.length && <ProductRecommendationCard products={message.products || []} />}
                         {isAgent && <SourceBadges sources={message.sources ?? []} />}
-
-                        {/* <p className={`text-[10px] text-muted-foreground ${isAgent ? "text-left" : "text-right"}`}>{formatTime(message.timestamp)}</p> */}
                         <div className={`flex items-center gap-1.5 mt-1 ${isAgent ? "justify-start" : "justify-end"}`}>
                             <p className="text-[10px] text-muted-foreground">{formatTime(message.timestamp)}</p>
                             {!isAgent && isLastUserMessage && (
