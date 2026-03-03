@@ -600,7 +600,7 @@ model Conversation {
   user_id           Int?
   user              User?              @relation(fields: [user_id], references: [id], onDelete: SetNull)
   support_id        Int?
-  support           User?              @relation(fields: [support_id], references: [id], onDelete: SetNull)
+  support_name      String?
   status            ConversationStatus @default(ACTIVE)
   is_escalated      Boolean            @default(false) // user requested human
   human_connected   Boolean            @default(false) // human agent joined

@@ -6,7 +6,7 @@ from app.models.chat import PaginatedChats, Chat, ChatRequest
 from app.models.generic import Message
 from app.services.websocket import manager
 from app.redis_client import redis_client
-from app.core.deps import get_current_superuser
+from app.core.deps import get_current_superuser, AdminUser
 from datetime import datetime
 from app.services.chat import get_conversation
 
@@ -77,7 +77,7 @@ async def handoff(payload: ChatRequest, user: AdminUser) -> Message:
 
     await db.conversation.update(
         where={"id": conversation.id},
-        data={"user": {"connect": {"id": user.id}}, "human_connected": True, "last_active": datetime.utcnow() },
+        data={"support_id": user.id, "support_name": f"{user.first_name} {user.last_name}" ,"human_connected": True, "last_active": datetime.utcnow() },
     )
 
     await manager.send_to_user(
@@ -90,15 +90,15 @@ async def handoff(payload: ChatRequest, user: AdminUser) -> Message:
 
 @router.get("/", dependencies=[Depends(get_current_superuser)])
 async def index(
-    user_id: Optional[int] = Query(None),
+    uuid: Optional[str] = Query(None),
     status: Optional[ConversationStatus] = Query(None),
     cursor: int | None = None,
     limit: int = Query(default=100, ge=1, le=100)
 ) -> PaginatedChats:
     """List chats with optional filtering"""
     where = {}
-    if user_id is not None:
-        where["user_id"] = user_id
+    if uuid is not None:
+        where["conversation_uuid"] = uuid
     if status is not None:
         where["status"] = status
 

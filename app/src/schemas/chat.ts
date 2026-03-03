@@ -17,7 +17,7 @@ export const ChatSchema = z.object({
     user_id: z.number().optional(),
     user: UserLiteSchema.optional(),
     support_id: z.number().optional(),
-    support: UserLiteSchema.optional(),
+    support_name: z.string().optional(),
     status: ConversationStatusSchema,
     messages: z.array(ChatMessageSchema),
     is_escalated: z.boolean().optional(),

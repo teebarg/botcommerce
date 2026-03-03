@@ -17,7 +17,7 @@ class Chat(BaseModel):
     user_id: Optional[int] = None
     user: Optional[User] = None
     support_id: Optional[int] = None
-    support: Optional[User] = None
+    support_name: Optional[str] = None
     status: ConversationStatus
     messages: list[ChatMessage] = []
     is_escalated: bool = False

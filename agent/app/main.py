@@ -67,9 +67,6 @@ async def chat(request: ChatRequest) -> ChatResponse:
 
     if not request.user_id:
         # Also store reverse mapping IP → session_id so promote_connection can update it
-        # redis_client.set(f"chat_session:{connection_key}", {
-        #     "session_id": request.session_id,
-        # })
         redis_client.set(f"chat_session:{connection_key}", request.session_id, ex=86400)
 
     if request.type == "form_submission":
