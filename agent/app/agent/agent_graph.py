@@ -1,6 +1,7 @@
 """
 LangGraph customer support agent.
 """
+import json
 import logging
 import re
 import uuid
@@ -76,6 +77,18 @@ CONVERSATIONAL_PATTERNS = re.compile(
     r"help|what can you do|how can you help)\s*[?!.]*\s*$",
     re.IGNORECASE,
 )
+
+def _trim_persistent_history(messages: list[BaseMessage]) -> list[BaseMessage]:
+    """
+    Trim conversation history before saving to Redis.
+    Removes old tool messages and keeps only recent turns.
+    """
+    filtered = [m for m in messages if not isinstance(m, ToolMessage)]
+    MAX_KEEP = 10
+    if len(filtered) > MAX_KEEP:
+        filtered = filtered[-MAX_KEEP:]
+
+    return filtered
 
 
 # ── Prompt sanitizer ──────────────────────────────────────────────────────────
@@ -209,7 +222,7 @@ def build_graph():
 
         trimmed = trim_messages(
             state["messages"],
-            max_tokens=6000,
+            max_tokens=5000,
             strategy="last",
             token_counter=_count_tokens,
             include_system=False,
@@ -301,8 +314,18 @@ def build_graph():
                     customer_id=state.get("customer_id"),
                     reason=str(msg.content),
                 )
+        # Only return patched tool messages for this turn
+        new_tool_msgs = [
+            m for m in patched
+            if isinstance(m, ToolMessage)
+            and m.tool_call_id in {tm.tool_call_id for tm in state["messages"] if isinstance(tm, ToolMessage)}
+        ]
 
-        return {"messages": patched, "sources": sources, "escalated": escalated}
+        return {
+            "messages": new_tool_msgs,
+            "sources": sources,
+            "escalated": escalated,
+        }
 
     def should_continue(state: AgentState) -> Literal["tools", "end"]:
         if state.get("iterations", 0) >= MAX_ITERATIONS:
@@ -346,6 +369,13 @@ def _extract_products(messages: list) -> list[dict]:
             except Exception:
                 pass
     return []
+
+def _extract_orders(messages):
+    for m in messages:
+        if isinstance(m, ToolMessage) and "ORDERS_JSON:" in m.content:
+            raw = m.content.split("ORDERS_JSON:")[1].split("-->")[0]
+            return json.loads(raw.strip())
+    return None
 
 # ── Reply cleaner ─────────────────────────────────────────────────────────────
 
@@ -473,6 +503,26 @@ async def _get_quick_replies(
     # LLM failed — fall back to rules
     return _rule_based_quick_replies(user_message, sources, escalated)
 
+
+def _extract_text_content(content) -> str:
+    """
+    Normalize LLM content into a plain string.
+    Handles:
+    - str
+    - list of content blocks (Gemini style)
+    """
+    if isinstance(content, str):
+        return content
+
+    if isinstance(content, list):
+        texts = []
+        for block in content:
+            if isinstance(block, dict) and block.get("type") == "text":
+                texts.append(block.get("text", ""))
+        return "\n".join(texts)
+
+    return str(content)
+
 # ── Intent Router ───────────────────────────────────────────────────────────
 
 class Intent:
@@ -521,7 +571,8 @@ async def run_agent(
         resp = await llm.ainvoke(
             [SystemMessage(content=SYSTEM_PROMPT), *history, HumanMessage(content=message)]
         )
-        reply = resp.content.strip()
+
+        reply = _extract_text_content(resp.content).strip()
         save_messages_to_redis(
             session_id,
             history + [HumanMessage(content=message), AIMessage(content=reply)],
@@ -582,16 +633,16 @@ async def run_agent(
         reply = ""
         for msg in reversed(final_state["messages"]):
             if isinstance(msg, AIMessage) and not msg.tool_calls:
-                reply = msg.content.strip()
+                reply: str = _extract_text_content(msg.content).strip()
                 break
 
         if not reply:
             reply = "I'm sorry, I had trouble with that. Could you give me more details?"
 
         if reply.startswith("ESCALATION_REQUIRED:"):
-            reason = reply.replace("ESCALATION_REQUIRED:", "").strip()
+            reason: str = reply.replace("ESCALATION_REQUIRED:", "").strip()
 
-            high_risk = any(
+            high_risk: bool = any(
                 word in reason.lower()
                 for word in ["fraud", "legal", "lawsuit", "chargeback", "threat"]
             )
@@ -631,11 +682,18 @@ async def run_agent(
             for m in current_turn_msgs
         )
 
+        called_check_order_status: bool = any(
+            isinstance(m, ToolMessage) and m.name == "check_order_status"
+            for m in current_turn_msgs
+        )
+
         products = _extract_products(final_state["messages"]) if called_search else []
+        extracted_order = _extract_orders(final_state["messages"]) if called_check_order_status else None
 
         reply = _strip_product_listing(reply, has_products=bool(products))
 
-        save_messages_to_redis(session_id, final_state["messages"])
+        clean_history = _trim_persistent_history(final_state["messages"])
+        save_messages_to_redis(session_id, clean_history)
 
         sources = final_state.get("sources", [])
         escalated = final_state.get("escalated", False)
@@ -651,6 +709,7 @@ async def run_agent(
             "escalated": escalated,
             "quick_replies": quick_replies,
             "form": None,
+            "order": extracted_order,
         }
 
     except Exception as e:
@@ -664,4 +723,5 @@ async def run_agent(
             "escalated": False,
             "quick_replies": [],
             "form": None,
+            "order": None,
         }

@@ -39,6 +39,7 @@ export const ChatWidget = () => {
                                 message={msg}
                                 index={index}
                                 isLastUserMessage={index === lastUserIdx}
+                                isLastMessage={index === messages.length - 1}
                                 onSend={sendMessage}
                                 onSubmitForm={sendFormSubmission}
                             />

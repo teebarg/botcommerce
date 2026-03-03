@@ -109,6 +109,7 @@ export const useSupportChat = () => {
                     sources: data?.sources || [],
                     escalated: data?.escalated || false,
                     products: data?.products || [],
+                    order: data?.order || null,
                     form: data?.form || null,
                 };
 

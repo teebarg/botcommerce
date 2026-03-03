@@ -5,6 +5,7 @@ import { ProductRecommendationCard } from "./ProductRecommendationCard";
 import { formatTime } from "@/utils";
 import EscalationForm from "./EscalationForm";
 import { useState } from "react";
+import { OrderCard } from "./OrderCard";
 
 const EscalationCard = () => (
     <div className="mt-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 flex items-center gap-3">
@@ -60,9 +61,10 @@ interface ChatMessageProps {
     message: ChatMessageType;
     index: number;
     isLastUserMessage: boolean;
+    isLastMessage: boolean;
 }
 
-const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage }: ChatMessageProps) => {
+const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage, isLastMessage }: ChatMessageProps) => {
     const isAgent = message.role === "agent";
     const [isEditing, setIsEditing] = useState(false);
     const [editValue, setEditValue] = useState(message.text);
@@ -95,7 +97,7 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage }
                 </div>
             )}
 
-            <div className={`max-w-[80%] ${isAgent ? "" : "order-first"}`}>
+            <div className={`max-w-[80%] space-y-1.5 ${isAgent ? "" : "order-first"}`}>
                 {isEditing ? (
                     <div className="space-y-2">
                         <textarea
@@ -139,7 +141,8 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage }
                         )}
 
                         {message.escalated && <EscalationCard />}
-                        {message.form?.type === "escalation_details" && <EscalationForm onSubmitForm={onSubmitForm} />}
+                        {message.order && <OrderCard order={message.order} />}
+                        {message.form?.type === "escalation_details" && <EscalationForm onSubmitForm={onSubmitForm} isLastMessage={isLastMessage} />}
                         {!!message.products?.length && <ProductRecommendationCard products={message.products || []} />}
                         {isAgent && <SourceBadges sources={message.sources ?? []} />}
                         <div className={`flex items-center gap-1.5 mt-1 ${isAgent ? "justify-start" : "justify-end"}`}>
@@ -156,41 +159,6 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage }
                     </>
                 )}
             </div>
-
-            {/* <div className={`max-w-[80%] space-y-2 ${isAgent ? "" : "order-first"}`}>
-                {message.text && (
-                    <div
-                        className={`rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
-                            isAgent
-                                ? "bg-card text-card-foreground rounded-tl-md border border-border"
-                                : "bg-primary text-primary-foreground rounded-tr-md"
-                        }`}
-                    >
-                        {renderText(message.text)}
-                    </div>
-                )}
-
-                {message.escalated && <EscalationCard />}
-                {message.form?.type === "contact-form" && <EscalationForm onSubmit={onSend} />}
-                {!!message.products?.length && <ProductRecommendationCard products={message.products || []} />}
-                {isAgent && <SourceBadges sources={message.sources ?? []} />}
-
-                <p className={`text-[10px] text-muted-foreground ${isAgent ? "text-left" : "text-right"}`}>{formatTime(message.timestamp)}</p>
-                <div className={`flex items-center gap-1.5 mt-1 ${isAgent ? "justify-start" : "justify-end"}`}>
-                    <p className="text-[10px] text-muted-foreground">
-                        {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                    </p>
-                    {!isAgent && isLastUserMessage && (
-                        <button
-                            onClick={() => setIsEditing(true)}
-                            className="text-[10px] text-muted-foreground hover:text-foreground transition-colors underline"
-                        >
-                            Edit
-                        </button>
-                    )}
-                </div>
-            </div> */}
-
             {!isAgent && (
                 <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 mt-1">
                     <User className="w-4 h-4 text-secondary-foreground" />

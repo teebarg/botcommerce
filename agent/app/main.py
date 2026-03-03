@@ -52,7 +52,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/chat2", tags=["Chat"])
+@app.post("/chat", tags=["Chat"])
 async def chat(request: ChatRequest) -> ChatResponse:
     """
     Main chat endpoint.
@@ -61,29 +61,14 @@ async def chat(request: ChatRequest) -> ChatResponse:
     - Automatically routes to RAG or API tools
     - Returns whether the conversation was escalated to a human
     """
-    result = await run_agent(
-        message=request.message,
-        session_id=request.session_id,
-        customer_id=request.customer_id,
-    )
-    return ChatResponse(**result)
-
-@app.post("/chat", tags=["Chat"])
-async def chat(request: ChatRequest) -> ChatResponse:
     if request.type == "form_submission":
-
         if request.form_type == "escalation_details":
-
-            from app.agent.tools import escalate_to_human
-
-            reason = (
+            reason: str = (
                 f"Escalation request:\n"
                 f"Name: {request.data.get('name')}\n"
                 f"Phone: {request.data.get('phone')}\n"
                 f"Summary: {request.data.get('summary')}"
             )
-
-            # await escalate_to_human(reason=reason)
 
             await _notify_slack_escalation(
                 session_id=request.session_id,

@@ -4,12 +4,14 @@ import { Send, User, Mail, FileText, CheckCircle } from "lucide-react";
 
 interface EscalationFormProps {
     onSubmitForm: (formType: string, formData: any) => void;
+    isLastMessage: boolean;
 }
 
-const EscalationForm = ({ onSubmitForm }: EscalationFormProps) => {
+const EscalationForm = ({ onSubmitForm, isLastMessage }: EscalationFormProps) => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [summary, setSummary] = useState("");
+    const [orderId, setOrderId] = useState("");
     const [submitted, setSubmitted] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -30,10 +32,10 @@ const EscalationForm = ({ onSubmitForm }: EscalationFormProps) => {
             return;
         }
         setSubmitted(true);
-        onSubmitForm("escalation_details", { name: name.trim(), email: email.trim(), summary: summary.trim() });
+        onSubmitForm("escalation_details", { name: name.trim(), email: email.trim(), summary: summary.trim(), order_number: orderId.trim() });
     };
 
-    if (submitted) {
+    if (!isLastMessage || submitted) {
         return (
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -114,6 +116,24 @@ const EscalationForm = ({ onSubmitForm }: EscalationFormProps) => {
                     />
                 </div>
                 {errors.summary && <p className="text-[10px] text-destructive pl-1">{errors.summary}</p>}
+            </div>
+
+            <div className="space-y-1">
+                <div className="relative">
+                    <FileText className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-muted-foreground" />
+                    <textarea
+                        value={orderId}
+                        onChange={(e) => {
+                            setOrderId(e.target.value);
+                            setErrors((p) => ({ ...p, orderId: "" }));
+                        }}
+                        placeholder="Order ID (optional)"
+                        rows={2}
+                        maxLength={500}
+                        className="w-full bg-secondary rounded-lg pl-8 pr-3 py-2 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-shadow resize-none"
+                    />
+                </div>
+                {errors.orderId && <p className="text-[10px] text-destructive pl-1">{errors.orderId}</p>}
             </div>
 
             <motion.button
