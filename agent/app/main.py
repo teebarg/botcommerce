@@ -8,7 +8,8 @@ from app.schemas.models import ChatRequest, ChatResponse, IngestRequest, HealthR
 from app.agent.agent_graph import run_agent
 from app.agent.memory import clear_session
 from app.config import get_settings
-from app.utils import _notify_slack_escalation
+from app.utils import _notify_slack_escalation, is_human_connected
+import redis as redis_client
 
 logging.basicConfig(
     level=logging.INFO,
@@ -61,6 +62,16 @@ async def chat(request: ChatRequest) -> ChatResponse:
     - Automatically routes to RAG or API tools
     - Returns whether the conversation was escalated to a human
     """
+    connection_key = request.customer_id or request.client_ip
+    redis_client.set(f"chat_user:{request.session_id}", connection_key, ex=86400)
+
+    if not request.user_id:
+        # Also store reverse mapping IP → session_id so promote_connection can update it
+        # redis_client.set(f"chat_session:{connection_key}", {
+        #     "session_id": request.session_id,
+        # })
+        redis_client.set(f"chat_session:{connection_key}", request.session_id, ex=86400)
+
     if request.type == "form_submission":
         if request.form_type == "escalation_details":
             reason: str = (
@@ -85,6 +96,19 @@ async def chat(request: ChatRequest) -> ChatResponse:
                 quick_replies=[],
                 form=None,
             )
+
+    if await is_human_connected(request.session_id):
+        # AI is silent — save the user message and tell them to wait
+        # await save_message(session_id, message, "USER")
+        return ChatResponse(
+            reply="You're connected with a support agent. They'll respond shortly.",
+            session_id=request.session_id,
+            sources=[],
+            products=[],
+            escalated=True,
+            quick_replies=[],
+            form=None,
+        )
 
     result = await run_agent(
         message=request.message or "",

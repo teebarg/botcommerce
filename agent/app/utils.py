@@ -57,3 +57,7 @@ async def _notify_slack_escalation(
                 logger.warning(f"[Escalation] Slack returned {resp.status_code}: {resp.text}")
     except Exception as exc:
         logger.error(f"[Escalation] Slack notification failed: {exc}")
+
+
+async def is_human_connected(session_id: str) -> bool:
+    return False

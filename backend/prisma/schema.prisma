@@ -599,7 +599,11 @@ model Conversation {
   conversation_uuid String             @unique
   user_id           Int?
   user              User?              @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  support_id        Int?
+  support           User?              @relation(fields: [support_id], references: [id], onDelete: SetNull)
   status            ConversationStatus @default(ACTIVE)
+  is_escalated      Boolean            @default(false) // user requested human
+  human_connected   Boolean            @default(false) // human agent joined
   messages          Message[]
   started_at        DateTime           @default(now())
   last_active       DateTime           @updatedAt
@@ -616,6 +620,7 @@ model Message {
   content         String        @db.Text
   sender          MessageSender
   timestamp       DateTime      @default(now())
+  metadata        Json?
 
   @@index([conversation_id, timestamp])
   @@map("messages")

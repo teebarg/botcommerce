@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { ChatMessage, ChatResponse } from "./types";
+import { useWebSocket } from "pulsews";
 
 const generateId = () => Math.random().toString(36).slice(2, 10);
 const STORAGE_KEY = "support-chat-history";
@@ -53,6 +54,8 @@ function getSessionId(): string {
 }
 
 export const useSupportChat = () => {
+    const { lastMessage } = useWebSocket();
+    console.log("🚀 ~ file: useSupportChat.ts:58 ~ lastMessage:", lastMessage)
     const [messages, setMessages] = useState<ChatMessage[]>(loadHistory);
     const [loading, setLoading] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);

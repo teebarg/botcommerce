@@ -3,6 +3,7 @@ from datetime import datetime
 from app.core.config import settings
 from app.services.rag import format_search_results_for_llm, smart_search
 from typing import List, Dict
+from app.prisma_client import prisma as db
 
 client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
@@ -94,3 +95,12 @@ class ConversationalRAG:
         self.conversation_history = []
 
 assistant = ConversationalRAG()
+
+
+async def get_conversation(uuid: str):
+    conversation = await db.conversation.find_unique(
+        where={"conversation_uuid": uuid}
+    )
+    if not conversation:
+        raise HTTPException(status_code=404, detail="conversation not found")
+    return conversation

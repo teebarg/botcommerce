@@ -40,12 +40,15 @@ settings = get_settings()
 
 def get_llm():
     # provider: str = settings.LLM_PROVIDER
-    provider = "gemini"
+    # provider = "ollama"
+    # provider = "gemini"
+    provider = "cerebras7"
 
     if provider == "gemini":
         from langchain_google_genai import ChatGoogleGenerativeAI
         return ChatGoogleGenerativeAI(
             model="gemini-2.5-flash",
+            # model="gemini-2.5-flash-lite",
             google_api_key=settings.GOOGLE_API_KEY,
             temperature=0,
             max_retries=0,
@@ -53,7 +56,7 @@ def get_llm():
     elif provider == "cerebras":
         from langchain_cerebras import ChatCerebras
         return ChatCerebras(
-            model="llama-3.3-70b",
+            model="llama3.1-8b",
             cerebras_api_key=settings.CEREBRAS_API_KEY,
             temperature=0,
         )
