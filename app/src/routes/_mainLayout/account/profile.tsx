@@ -121,7 +121,7 @@ function RouteComponent() {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 pt-12 md:pt-6">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
                 <h2 className="text-2xl font-bold mb-2">Profile Details</h2>
                 <p className="text-muted-foreground">Manage your personal information</p>
@@ -136,7 +136,7 @@ function RouteComponent() {
                 <div className="relative">
                     <div className="w-24 h-24 rounded-full gradient-primary p-1">
                         <div className="w-full h-full rounded-full bg-secondary flex items-center justify-center overflow-hidden">
-                            <span className="text-3xl font-bold">
+                            <span className="text-3xl font-bold text-foreground">
                                 {session?.user?.first_name[0]}
                                 {session?.user?.last_name?.[0]}
                             </span>
@@ -152,7 +152,7 @@ function RouteComponent() {
                 <p className="text-sm text-muted-foreground">{session?.user?.email}</p>
             </motion.div>
 
-            <div className="py-8 px-2 md:px-0">
+            <div className="px-2 md:px-0">
                 <div className="bg-card rounded-xl shadow-sm border border-border mb-6 transition-colors duration-300">
                     <div className="flex items-center justify-between p-6">
                         <div>

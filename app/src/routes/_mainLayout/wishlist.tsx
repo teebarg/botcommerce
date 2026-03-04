@@ -22,7 +22,7 @@ function RouteComponent() {
     const { data } = useSuspenseQuery(wishlistQuery());
 
     return (
-        <div className="max-w-6xl mx-auto w-full mb-4 py-8 px-2 md:px-0">
+        <div className="max-w-6xl mx-auto w-full mb-12 px-2 md:px-0 mt-18 md:mt-6">
             {data.wishlists.length > 0 ? (
                 <div>
                     <h1 className="text-2xl font-bold text-center">Your Wishlist</h1>

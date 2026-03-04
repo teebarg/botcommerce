@@ -6,7 +6,6 @@ import ProductCardListings from "@/components/store/products/product-card-listin
 import SaleBanner from "@/components/store/sale-banner";
 import { useSearch } from "@tanstack/react-router";
 import { InfiniteScroll } from "@/components/InfiniteScroll";
-import { CollectionTemplateSkeleton } from "./skeleton";
 import { Loader } from "lucide-react";
 import ProductCardSocial from "../products/product-card-social";
 import { ProductSearch } from "@/schemas";
@@ -26,23 +25,19 @@ export default function InfiniteScrollClient({ initialData, collection_slug, sea
     const search = useSearch({
         strict: false,
     });
-    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useProductFeed(initialData, {
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useProductFeed(initialData, {
         ...search,
         show_facets: true,
         collections: collection_slug,
         search: searchTerm,
     });
-    
-    if (isLoading) {
-        return <CollectionTemplateSkeleton />;
-    }
     const products = data?.pages?.flatMap((page) => page.products) ?? initialData;
     const facets = data?.pages?.[0]?.facets || {};
 
     const hasProducts = products.length > 0;
 
     return (
-        <div>
+        <>
             <div className="hidden md:block max-w-8xl mx-auto w-full py-4 px-2">
                 <div className="flex gap-6">
                     <aside className="h-[calc(100vh-6rem)] w-96 flex flex-col overflow-hidden sticky top-24">
@@ -72,8 +67,8 @@ export default function InfiniteScrollClient({ initialData, collection_slug, sea
                         <SaleBanner />
                         <CollectionHeader />
                         <main className="w-full px-1 rounded-xl py-4">
-                            {!isLoading && !hasProducts && <NoProductsFound />}
-                            {!isLoading && hasProducts && (
+                            {!hasProducts && <NoProductsFound />}
+                            {hasProducts && (
                                 <InfiniteScroll
                                     onLoadMore={fetchNextPage}
                                     hasMore={!!hasNextPage}
@@ -93,10 +88,9 @@ export default function InfiniteScrollClient({ initialData, collection_slug, sea
                     </div>
                 </div>
             </div>
-
-            <div className="block md:hidden">
-                {!isLoading && !hasProducts && <NoProductsFound />}
-                {!isLoading && hasProducts && (
+            <div className="md:hidden fixed inset-0 bg-black overflow-hidden">
+                {!hasProducts && <NoProductsFound />}
+                {hasProducts && (
                     <InfiniteScroll
                         scrollRef={scrollRef}
                         onLoadMore={fetchNextPage}
@@ -108,7 +102,7 @@ export default function InfiniteScrollClient({ initialData, collection_slug, sea
                                 <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
                             </div>
                         }
-                        className="h-[calc(100dvh-64px-88px)]! w-full overflow-y-scroll snap-y snap-mandatory hide-scrollbar"
+                        className="h-svh w-full overflow-y-auto snap-y snap-mandatory hide-scrollbar scroll-smooth"
                     >
                         {products?.map((product: ProductSearch, idx: number) => (
                             <ProductCardSocial key={product.id + product.slug + idx} product={product} facets={facets} scrollRef={scrollRef} />
@@ -116,6 +110,6 @@ export default function InfiniteScrollClient({ initialData, collection_slug, sea
                     </InfiniteScroll>
                 )}
             </div>
-        </div>
+        </>
     );
 }

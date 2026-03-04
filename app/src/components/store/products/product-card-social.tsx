@@ -52,22 +52,16 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
     };
 
     return (
-        <div ref={ref} className="relative h-[calc(100dvh-64px-88px)]! w-full snap-start snap-always bg-[#121212]">
-            <div className="absolute inset-0 bg-[#121212]" />
-            <div className="absolute top-0 left-0 right-0 flex items-start justify-center">
-                {!imageLoaded && <div className="absolute inset-0 max-w-full h-full max-h-[70vh] w-full aspect-square bg-zinc-800 animate-pulse" />}
+        <div ref={ref} className="relative h-svh w-full snap-start bg-[#1a1a1a] overflow-hidden flex flex-col">
+            <div className="absolute inset-0 bg-[#1a1a1a]" />
+            <div className="relative w-full flex-1 bg-[#1a1a1a] flex items-start justify-center pt-16">
+                {!imageLoaded && <div className="absolute inset-0 bg-[#2a2a2a] animate-pulse" />}
                 <img
                     src={product.images?.[0]}
                     alt={product.name}
-                    className="max-w-full h-full max-h-[70vh] object-contain fade-to-black transition-all duration-500 ease-out opacity-0 scale-[1.03] blur-sm data-[loaded=true]:opacity-100 data-[loaded=true]:scale-100 data-[loaded=true]:blur-none"
-                    loading="lazy"
-                    data-loaded={imageLoaded}
-                    decoding="async"
                     onLoad={() => setImageLoaded(true)}
-                    style={{
-                        contentVisibility: "auto",
-                        willChange: "opacity",
-                    }}
+                    className="max-h-[65svh] w-full object-contain transition-all duration-500 ease-out opacity-0 data-[loaded=true]:opacity-100"
+                    data-loaded={imageLoaded}
                 />
             </div>
 
@@ -75,7 +69,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
                 discount={priceInfo.maxDiscountPercent}
                 isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice}
                 variant="sale"
-                className="top-4 right-4"
+                className="top-16 right-4"
             />
 
             {isNew && <IsNew className="top-4 left-4" />}
@@ -88,7 +82,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
             )}
 
             <div
-                className="absolute right-4 bottom-32 space-y-4 z-20"
+                className="absolute right-4 bottom-[calc(env(safe-area-inset-bottom)+250px)] space-y-4 z-40"
                 style={{
                     opacity: inView && imageLoaded ? 1 : 0,
                     transform: inView && imageLoaded ? "translateX(0)" : "translateX(20px)",
@@ -146,7 +140,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
                 <ShareButton />
             </div>
 
-            <div className="absolute bottom-0 left-0 right-0 p-4 pb-6 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+            <div className="absolute bottom-0 left-0 right-0 p-4 pb-[calc(env(safe-area-inset-bottom)+100px)] bg-gradient-to-t from-black/95 via-black/65 to-transparent z-30">
                 {product?.variants?.map((item: SearchVariant) => (
                     <div key={item.id} className={item.size ? "" : "hidden"}>
                         <div className="w-12 h-12 rounded-full bg-linear-to-br from-primary to-accent flex flex-col items-center justify-center mb-3 text-white font-bold">
@@ -157,7 +151,9 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
                 ))}
 
                 <h2 className="font-bold text-white mb-2 line-clamp-2 pr-24">
-                    <Link to={`/products/${product.slug}`}>{product.name}</Link>
+                    <Link to="/products/$slug" params={{ slug: product.slug }}>
+                        {product.name}
+                    </Link>
                 </h2>
                 <div className="flex items-baseline gap-2 mb-2">
                     <PriceLabel priceInfo={priceInfo} priceClassName="text-white text-2xl" oldPriceClassName="text-white/50" />

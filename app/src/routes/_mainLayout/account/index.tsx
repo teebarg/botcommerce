@@ -68,10 +68,10 @@ function RouteComponent() {
 
     return (
         <div className="px-2 md:px-0 space-y-4">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center py-6">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center pt-12 md:pt-6 pb-6">
                 <div className="w-20 h-20 mx-auto rounded-full gradient-primary p-1 mb-4">
                     <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
-                        <span className="text-2xl font-bold">
+                        <span className="text-2xl font-bold text-foreground">
                             {session?.user?.first_name?.charAt(0).toUpperCase() + session?.user?.last_name?.charAt(0).toUpperCase()}
                         </span>
                     </div>

@@ -55,7 +55,7 @@ function getSessionId(): string {
 
 export const useSupportChat = () => {
     const { lastMessage } = useWebSocket();
-    console.log("🚀 ~ file: useSupportChat.ts:58 ~ lastMessage:", lastMessage)
+    console.debug("🚀 ~ file: useSupportChat.ts:58 ~ lastMessage:", lastMessage)
     const [messages, setMessages] = useState<ChatMessage[]>(loadHistory);
     const [loading, setLoading] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);
