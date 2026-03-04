@@ -69,7 +69,7 @@ function RouteComponent() {
     const { data: product } = useSuspenseQuery(productQuery(Route.useParams().slug));
 
     return (
-        <main className="flex flex-col">
+        <main className="flex flex-col pt-16">
             <ProductView product={product} />
             <LazyInView>
                 <RelatedProducts productId={product.id} />

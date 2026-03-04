@@ -78,7 +78,6 @@ async def websocket(ws: WebSocket):
                             "location": "Unknown"
                         }):
                             logger.info(f"Promoted connection from {ip} to {user_id}")
-                            # ← add this: update any active chat session mapping
                             session_id = redis_client.get(f"chat_session:{ip}")
                             if session_id:
                                 redis_client.set(f"chat_user:{session_id}", user_id, ex=86400)

@@ -26,7 +26,7 @@ export default function CatalogInfinite({ slug, initialData }: Props) {
         strict: false,
     });
 
-    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery<SearchCatalog>({
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery<SearchCatalog>({
         queryKey: ["product", "catalog", slug, JSON.stringify(search)],
         queryFn: async ({ pageParam }) => {
             const res = await clientApi.get<SearchCatalog>(`/catalog/${slug}`, { params: { slug, ...search, cursor: pageParam ?? undefined } });
@@ -76,8 +76,8 @@ export default function CatalogInfinite({ slug, initialData }: Props) {
                         <SaleBanner />
                         <CollectionHeader />
                         <main className="w-full px-1 rounded-xl py-4">
-                            {!isLoading && !hasProducts && <NoProductsFound />}
-                            {!isLoading && hasProducts && (
+                            {!hasProducts && <NoProductsFound />}
+                            {hasProducts && (
                                 <InfiniteScroll
                                     onLoadMore={fetchNextPage}
                                     hasMore={!!hasNextPage}
@@ -99,8 +99,8 @@ export default function CatalogInfinite({ slug, initialData }: Props) {
             </div>
 
             <div className="block md:hidden">
-                {!isLoading && !hasProducts && <NoProductsFound />}
-                {!isLoading && hasProducts && (
+                {!hasProducts && <NoProductsFound />}
+                {hasProducts && (
                     <InfiniteScroll
                         scrollRef={scrollRef}
                         onLoadMore={fetchNextPage}
@@ -112,7 +112,7 @@ export default function CatalogInfinite({ slug, initialData }: Props) {
                                 <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
                             </div>
                         }
-                        className="h-[calc(100dvh-64px-88px)]! w-full overflow-y-scroll snap-y snap-mandatory hide-scrollbar"
+                        className="h-svh w-full overflow-y-scroll snap-y snap-mandatory hide-scrollbar scroll-smooth"
                     >
                         {products?.map((product: ProductSearch, idx: number) => (
                             <ProductCardSocial key={product.id + product.slug + idx} product={product} scrollRef={scrollRef} />

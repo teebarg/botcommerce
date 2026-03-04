@@ -602,8 +602,8 @@ model Conversation {
   support_id        Int?
   support_name      String?
   status            ConversationStatus @default(ACTIVE)
-  is_escalated      Boolean            @default(false) // user requested human
-  human_connected   Boolean            @default(false) // human agent joined
+  is_escalated      Boolean            @default(false)
+  human_connected   Boolean            @default(false)
   messages          Message[]
   started_at        DateTime           @default(now())
   last_active       DateTime           @updatedAt

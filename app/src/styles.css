@@ -93,6 +93,19 @@
     --animate-wave: wave 1.5s ease-in-out infinite;
     --animate-expandFade: expandFade 2s ease-in-out infinite;
     --animate-rotateMorphReverse: rotateMorphReverse 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    --animate-ambient-move: ambientMove 10s ease-in-out infinite;
+
+    @keyframes ambientMove {
+        0% {
+            background-position: 30% 30%;
+        }
+        50% {
+            background-position: 70% 60%;
+        }
+        100% {
+            background-position: 30% 30%;
+        }
+    }
 
     @keyframes marquee {
         0% {
@@ -452,9 +465,6 @@
 }
 
 @layer utilities {
-    .screen-height {
-        @apply h-[calc(100dvh-5rem-4.5rem)];
-    }
     .gradient-primary {
         @apply bg-linear-to-br from-primary to-foreground/80 dark:to-accent text-white;
     }
@@ -481,10 +491,6 @@
         @apply w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300;
         @apply bg-white/20 backdrop-blur-lg hover:bg-white/20 active:scale-90;
     }
-
-    /* .product-card {
-        @apply relative w-full h-[calc(100dvh-36px)] snap-start snap-always flex items-end;
-    } */
 
     .text-gradient-gold {
         background: var(--gradient-gold);
