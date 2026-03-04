@@ -8,8 +8,9 @@ from app.schemas.models import ChatRequest, ChatResponse, IngestRequest, HealthR
 from app.agent.agent_graph import run_agent
 from app.agent.memory import clear_session
 from app.config import get_settings
-from app.utils import _notify_slack_escalation, is_human_connected
+from app.utils import _notify_slack_escalation
 import redis as redis_client
+from app.agent.db import is_human_connected
 
 logging.basicConfig(
     level=logging.INFO,

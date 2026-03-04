@@ -54,11 +54,10 @@ async def ensure_conversation_exists(
             """
             INSERT INTO conversation (
                 conversation_uuid,
-                customer_id,
-                status,
-                created_at
+                user_id,
+                last_active
             )
-            VALUES ($1, $2, 'AI_ACTIVE', NOW())
+            VALUES ($1, $2, NOW())
             RETURNING id
             """,
             session_id,
@@ -77,13 +76,13 @@ async def ensure_conversation_exists(
 
 async def is_human_connected(session_id: str) -> bool:
     """
-    Returns True if conversation status is HUMAN_ACTIVE
+    Returns True if human_connected is True
     """
     conn = await get_connection()
     try:
         row = await conn.fetchrow(
             """
-            SELECT status
+            SELECT human_connected
             FROM conversation
             WHERE conversation_uuid = $1
             """,
@@ -93,7 +92,7 @@ async def is_human_connected(session_id: str) -> bool:
         if not row:
             return False
 
-        return row["status"] == "HUMAN_ACTIVE"
+        return row["human_connected"]
 
     finally:
         await conn.close()
