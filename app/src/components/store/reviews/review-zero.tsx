@@ -29,7 +29,7 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
                         </div>
                         <div className="flex justify-center space-x-1">
                             {[...Array(5)].map((_, i) => (
-                                <Star key={i} className="w-4 h-4 text-muted-foreground/30" fill="none" />
+                                <Star key={i} className="w-4 h-4 text-muted-foreground" fill="none" />
                             ))}
                         </div>
                     </div>

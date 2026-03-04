@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "specialsecret"
     LLM_PROVIDER: str = Field(default="groq", alias="LLM_PROVIDER")
     CEREBRAS_API_KEY: str = Field(default="", alias="CEREBRAS_API_KEY")
-    GOOGLE_API_KEY: str = Field(default="", alias="GOOGLE_API_KEY")
+    GOOGLE_API_KEY: str = Field(default="")
 
     GROQ_API_KEY: str = Field(default="", alias="GROQ_API_KEY")
     GROQ_MODEL: str = Field(default="llama-3.3-70b-versatile", alias="GROQ_MODEL")
@@ -25,6 +25,8 @@ class Settings(BaseSettings):
     agent_max_iterations: int = Field(default=6, alias="AGENT_MAX_ITERATIONS")
     agent_verbose: bool = Field(default=True, alias="AGENT_VERBOSE")
 
+    SLACK_WEBHOOK_URL: str | None = ""
+
     class Config:
         env_file = ".env"
         populate_by_name = True
@@ -34,15 +36,19 @@ class Settings(BaseSettings):
 def get_settings() -> Settings:
     return Settings()
 
+settings = get_settings()
 
 def get_llm():
-    settings = get_settings()
-    provider: str = settings.LLM_PROVIDER
+    # provider: str = settings.LLM_PROVIDER
+    # provider = "ollama"
+    # provider = "gemini"
+    provider = "cerebras7"
 
     if provider == "gemini":
         from langchain_google_genai import ChatGoogleGenerativeAI
         return ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash",
+            # model="gemini-2.5-flash-lite",
             google_api_key=settings.GOOGLE_API_KEY,
             temperature=0,
             max_retries=0,
@@ -50,7 +56,7 @@ def get_llm():
     elif provider == "cerebras":
         from langchain_cerebras import ChatCerebras
         return ChatCerebras(
-            model="llama-3.3-70b",
+            model="llama3.1-8b",
             cerebras_api_key=settings.CEREBRAS_API_KEY,
             temperature=0,
         )

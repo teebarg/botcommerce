@@ -4,6 +4,7 @@ from app.core.logging import logger
 import json, time
 from app.services.websocket import manager
 from app.services.session_store import session_store, SessionStore
+from app.redis_client import redis_client
 
 router = APIRouter()
 
@@ -62,7 +63,7 @@ async def websocket(ws: WebSocket):
                     email = payload.get("email")
 
                     if user_id:
-                        user_session_key = f"session:{user_id}"
+                        user_session_key: str = f"session:{user_id}"
                         session_store.set(user_session_key, {
                             "type": "user",
                             "email": email or "Unknown",
@@ -77,6 +78,11 @@ async def websocket(ws: WebSocket):
                             "location": "Unknown"
                         }):
                             logger.info(f"Promoted connection from {ip} to {user_id}")
+                            session_id = redis_client.get(f"chat_session:{ip}")
+                            if session_id:
+                                redis_client.set(f"chat_user:{session_id}", user_id, ex=86400)
+                                redis_client.delete(f"chat_session:{ip}")
+                                logger.info(f"Updated chat mapping {session_id} → {user_id}")
                         else:
                             logger.debug(f"Failed to promote connection from {ip} to {user_id}")
                             continue

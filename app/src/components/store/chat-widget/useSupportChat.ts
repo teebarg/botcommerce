@@ -1,5 +1,6 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { ChatMessage, ChatResponse } from "./types";
+import { useWebSocket } from "pulsews";
 
 const generateId = () => Math.random().toString(36).slice(2, 10);
 const STORAGE_KEY = "support-chat-history";
@@ -53,9 +54,15 @@ function getSessionId(): string {
 }
 
 export const useSupportChat = () => {
+    const { lastMessage } = useWebSocket();
+    console.debug("🚀 ~ file: useSupportChat.ts:58 ~ lastMessage:", lastMessage)
     const [messages, setMessages] = useState<ChatMessage[]>(loadHistory);
     const [loading, setLoading] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);
+
+    const isDisabled = useMemo(() => {
+        return loading || isTyping || messages.at(-1)?.escalated;
+    }, [loading, isTyping]);
 
     useEffect(() => {
         saveHistory(messages);
@@ -86,6 +93,7 @@ export const useSupportChat = () => {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
+                        type: "message",
                         message: text,
                         session_id: getSessionId(),
                         customer_id: "Beaf",
@@ -104,6 +112,8 @@ export const useSupportChat = () => {
                     sources: data?.sources || [],
                     escalated: data?.escalated || false,
                     products: data?.products || [],
+                    order: data?.order || null,
+                    form: data?.form || null,
                 };
 
                 setMessages((prev) => [...prev, agentMsg]);
@@ -128,9 +138,58 @@ export const useSupportChat = () => {
         [addMessage]
     );
 
+    const sendFormSubmission = useCallback(
+        async (formType: string, formData: any) => {
+            try {
+                const res = await fetch(`${import.meta.env.VITE_AGENT_API}/chat`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        type: "form_submission",
+                        form_type: formType,
+                        data: formData,
+                        session_id: getSessionId(),
+                        customer_id: "Beaf",
+                    }),
+                });
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+                const data: ChatResponse = await res.json();
+                const agentMsg: ChatMessage = {
+                    id: (Date.now() + 1).toString(),
+                    role: "agent",
+                    text: data?.reply || "",
+                    timestamp: new Date(),
+                    sources: data?.sources || [],
+                    escalated: data?.escalated || false,
+                    products: data?.products || [],
+                    form: data?.form || null,
+                };
+                setMessages((prev) => [...prev, agentMsg]);
+            } catch {
+                setMessages((prev) => [
+                    ...prev,
+                    {
+                        id: Date.now().toString(),
+                        role: "agent",
+                        text: "Sorry, I couldn't connect. Please try again.",
+                        timestamp: new Date(),
+                        sources: [],
+                        escalated: false,
+                        products: [],
+                    },
+                ]);
+            } finally {
+                setLoading(false);
+            }
+        },
+        []
+    );
+
     const reactToMessage = useCallback((id: string, reaction: "thumbs-up" | "thumbs-down") => {
         setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, reaction: m.reaction === reaction ? null : reaction } : m)));
     }, []);
 
-    return { messages, isTyping, loading, sendMessage, reactToMessage, clearHistory };
+    return { messages, isTyping, loading, sendMessage, sendFormSubmission, reactToMessage, clearHistory, lastMessage: messages.at(-1), isDisabled };
 };

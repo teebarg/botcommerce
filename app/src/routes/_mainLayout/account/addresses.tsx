@@ -111,7 +111,7 @@ function RouteComponent() {
     const addresses = data.addresses;
 
     return (
-        <div className="w-full px-2">
+        <div className="w-full px-2 pt-12 md:pt-6">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-4">
                 <h2 className="text-2xl font-bold mb-2">My Addresses</h2>
                 <p className="text-muted-foreground">Manage your delivery addresses</p>

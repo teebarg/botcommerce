@@ -152,7 +152,7 @@ async def image_gallery(
             take=limit + 1,
             skip=1 if cursor else 0,
             cursor={"id": cursor} if cursor else None,
-            order={"created_at": "desc"},
+            order={"id": "desc"},
             include={
                 "product": {
                     "include": {

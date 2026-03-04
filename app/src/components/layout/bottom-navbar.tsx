@@ -31,16 +31,16 @@ const ButtonNav = () => {
     ];
 
     return (
-        <nav className="flex md:hidden z-30 w-full items-center justify-between fixed bottom-0 inset-x-0 py-4 px-8 bg-blur shadow-xl text-xs">
+        <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/60 backdrop-blur-md shadow-xl flex items-center justify-between px-8 pt-3 pb-[calc(env(safe-area-inset-bottom)+12px)] text-xs">
             {nav.map((item: NavLink, idx: number) => (
-                <motion.div whileTap={{ scale: 0.9 }} key={idx} className="flex flex-col items-center text-xs relative">
-                    <LocalizedClientLink active="gradient-primary text-white rounded-xl" aria-label={item.label} className="p-1.5" href={item.href}>
+                <motion.div whileTap={{ scale: 0.9 }} key={idx} className="flex flex-col items-center">
+                    <LocalizedClientLink active="gradient-primary text-white rounded-xl" className="p-1.5" href={item.href}>
                         {item.icon}
                     </LocalizedClientLink>
                     {item.label}
                 </motion.div>
             ))}
-            <span className="flex flex-col items-center text-xs">
+            <span className="flex flex-col items-center">
                 <CartComponent />
                 Cart
             </span>

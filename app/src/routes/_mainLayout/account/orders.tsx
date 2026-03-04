@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_mainLayout/account/orders")({
 function RouteComponent() {
     const { data } = useSuspenseQuery(ordersQuery({ take: 20 }));
     return (
-        <div className="w-full px-2" data-testid="orders-page-wrapper">
+        <div className="w-full px-2 pt-12 md:pt-6" data-testid="orders-page-wrapper">
             <div className="mb-8">
                 <h1 className="text-2xl">Orders</h1>
                 <p className="text-sm text-muted-foreground">

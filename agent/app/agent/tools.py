@@ -36,37 +36,32 @@ def _shop_request(method: str, path: str, **kwargs) -> dict:
 @tool
 def search_products(query: str) -> str:
     """
-    Search the product catalog for information about products.
-    Use when the customer asks about:
-    - What products are available
-    - Product features, specs, or descriptions
-    - Product pricing or categories
-    Input: a natural language search query about the product.
+    Search the product catalog for products.
+    Returns compact product summaries for agent reasoning.
     """
-    results = search_collection("products", query, top_k=5, score_threshold=0.45)
+    results = search_collection("products", query, top_k=3, score_threshold=0.45)
     if not results:
-        return "No matching products found in our catalog for that query."
+        return "No matching products found."
 
-    output = "Here are the most relevant products I found:\n\n"
-    for i, r in enumerate(results, 1):
-        output += (
-            f"{i}. **{r['name']}** (SKU: {r.get('sku', 'N/A')})\n"
-            f"   - Image: {r.get('image', '')}\n"
-            f"   - Price: {r['price']} | Category: {r['category']}\n"
-            f"   - {r['description']}\n\n"
+    summary_lines = []
+    structured = []
+
+    for r in results:
+        summary_lines.append(
+            f"- {r['name']} (SKU: {r.get('sku','N/A')}) | Price: {r['price']} | Category: {r['category']}"
         )
 
-    structured = [
-        {
+        structured.append({
             "name": r["name"],
             "sku": r.get("sku", ""),
-            "image_url": r.get("image", "") or None,
             "price": str(r["price"]),
-            "description": r.get("description", ""),
-        }
-        for r in results
-    ]
-    output += f"\n<!-- PRODUCTS_JSON:{json.dumps(structured)} -->"
+            "image_url": r.get("image") or None
+        })
+
+    output = "Top matching products:\n"
+    output += "\n".join(summary_lines)
+
+    output += f"\n\n<!-- PRODUCTS_JSON:{json.dumps(structured, separators=(',', ':'))} -->"
     return output
 
 
@@ -106,30 +101,69 @@ def search_policies(query: str) -> str:
     return "Here's our relevant policy:\n\n" + "\n\n---\n\n".join(r["text"] for r in results)
 
 @tool
-def check_order_status(order_id: str) -> str:
+def check_order_status(order_number: str) -> str:
     """
     Look up the real-time status of a customer order.
+
     Use when the customer asks:
     - Where is my order?
     - What is the status of order #XXXXX?
-    - Has my order shipped / when will it arrive?
-    Input: the order ID (e.g. 'ORDFCC4E3EB').
+    - Has my order been delivered?
+    - Is my payment confirmed?
+
+    Input: the order number (e.g. 'ORDFCC4E3EB').
     """
-    order_id = order_id.strip().lstrip("#").strip()
-    result = _shop_request("GET", f"/api/order/{order_id}")
+
+    order_number = order_number.strip().lstrip("#").strip().upper()
+    result = _shop_request("GET", f"/api/order/{order_number}")
 
     if "error" in result:
-        return f"Could not retrieve order #{order_id}: {result['error']}"
+        return f"Could not retrieve order #{order_number}: {result['error']}"
 
-    item_list = ", ".join(
-        f"{i.get('name')} x{i.get('quantity', 1)}" for i in result.get("order_items", [])
-    ) or "N/A"
+    status = (result.get("status") or "PENDING").upper()
+    payment_status = (result.get("payment_status") or "PENDING").upper()
+
+    items_payload = []
+    for item in result.get("order_items", []):
+        items_payload.append({
+            "product_id": item.get("product_id"),
+            "name": item.get("name"),
+            "image": item.get("image"),
+            "quantity": item.get("quantity", 1),
+            "price": item.get("price"),
+            "subtotal": item.get("subtotal"),
+        })
+
+    order_payload = {
+        "order_number": order_number,
+        "status": status,
+        "payment_status": payment_status,
+        "payment_method": result.get("payment_method"),
+        "shipping_method": result.get("shipping_method"),
+        "financials": {
+            "subtotal": result.get("subtotal"),
+            "tax": result.get("tax"),
+            "discount": result.get("discount_amount"),
+            "wallet_used": result.get("wallet_used"),
+            "shipping_fee": result.get("shipping_fee"),
+            "total": result.get("total"),
+        },
+        "items": items_payload,
+        "created_at": result.get("created_at"),
+    }
+
+    human_summary: str = (
+        f"Order #{order_number} is currently **{status.replace('_', ' ')}**.\n"
+        f"Payment Status: **{payment_status.replace('_', ' ')}**\n"
+        f"Total Paid: {result.get('total')}\n"
+        f"Placed On: {result.get('created_at')}"
+    )
 
     return (
-        f"Order #{order_id} Status: **{result.get('status', 'Unknown')}**\n"
-        f"Items: {item_list}\n"
-        f"Tracking: {result.get('tracking_number', 'Not yet assigned')}\n"
-        f"Estimated Delivery: {result.get('estimated_delivery', 'Not available')}"
+        human_summary
+        + "\n\n<!-- ORDERS_JSON: "
+        + json.dumps(order_payload)
+        + " -->"
     )
 
 
@@ -182,7 +216,6 @@ def request_refund(order_id: str, reason: str) -> str:
         f"A confirmation email will be sent to the customer shortly."
     )
 
-
 @tool
 def escalate_to_human(reason: str) -> str:
     """
@@ -195,11 +228,7 @@ def escalate_to_human(reason: str) -> str:
     Input: a brief summary of why escalation is needed.
     """
     logger.warning(f"[ESCALATION] {reason}")
-    return (
-        "ESCALATED_TO_HUMAN: "
-        f"I've flagged this for a human agent. Reason: {reason}. "
-        "A human agent will follow up with the customer shortly."
-    )
+    return f"ESCALATED: {reason}"
 
 
 # Consolidated guide tool

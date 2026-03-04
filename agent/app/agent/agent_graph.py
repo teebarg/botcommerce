@@ -1,6 +1,7 @@
 """
 LangGraph customer support agent.
 """
+import json
 import logging
 import re
 import uuid
@@ -23,6 +24,8 @@ from typing_extensions import TypedDict
 from app.agent.memory import load_messages_from_redis, save_messages_to_redis
 from app.agent.tools import get_all_tools
 from app.config import get_llm
+from app.utils import _notify_slack_escalation
+from app.agent.tools import escalate_to_human
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +35,7 @@ logger = logging.getLogger(__name__)
 class AgentState(TypedDict):
     messages: Annotated[list[BaseMessage], add_messages]
     customer_id: str | None
+    session_id: str | None
     escalated: bool
     sources: list[str]
     iterations: int
@@ -56,7 +60,11 @@ SYSTEM_PROMPT = (
     "(3) For stock questions: call check_stock only when the customer explicitly asks if something is in stock. "
     "(4) For policy or how-to questions: call search_faqs or search_policies. "
     "(5) For refunds: confirm order ID and reason before calling request_refund. "
-    "(6) Only escalate_to_human when the customer explicitly asks for a human, is abusive, or the issue involves fraud or legal matters. "
+    "If you believe this issue requires human support (fraud, legal threat, abuse, complex billing issue),"
+    "respond ONLY with:"
+    "ESCALATION_REQUIRED: <short reason>"
+    "Do not call any tools in this case."
+    "Do not add extra text."
     "Never escalate just because a product was not found — tell the customer politely instead. "
     "Keep replies concise and warm."
 )
@@ -69,6 +77,18 @@ CONVERSATIONAL_PATTERNS = re.compile(
     r"help|what can you do|how can you help)\s*[?!.]*\s*$",
     re.IGNORECASE,
 )
+
+def _trim_persistent_history(messages: list[BaseMessage]) -> list[BaseMessage]:
+    """
+    Trim conversation history before saving to Redis.
+    Removes old tool messages and keeps only recent turns.
+    """
+    filtered = [m for m in messages if not isinstance(m, ToolMessage)]
+    MAX_KEEP = 10
+    if len(filtered) > MAX_KEEP:
+        filtered = filtered[-MAX_KEEP:]
+
+    return filtered
 
 
 # ── Prompt sanitizer ──────────────────────────────────────────────────────────
@@ -118,6 +138,63 @@ def _log_observations(state: AgentState) -> None:
         logger.info(f"[Observation] ({msg.name}) {preview}")
 
 
+# ── Form definitions ──────────────────────────────────────────────────────────
+
+FORMS: dict[str, dict] = {
+    "escalation_details": {
+        "type": "escalation_details",
+        "title": "Before we connect you with an agent",
+        "subtitle": "This helps the support team assist you faster.",
+        "fields": [
+            {"name": "name",    "label": "Your name",          "type": "text",     "required": True,  "placeholder": "e.g. John Doe"},
+            {"name": "phone",   "label": "Phone number",       "type": "tel",      "required": False, "placeholder": "e.g. +234 801 234 5678"},
+            {"name": "summary", "label": "Describe the issue", "type": "textarea", "required": True,  "placeholder": "What is going wrong?"},
+        ],
+    },
+    "complaint": {
+        "type": "complaint",
+        "title": "Submit a Complaint or Feedback",
+        "subtitle": "We will review this and get back to you.",
+        "fields": [
+            {"name": "subject",  "label": "Subject",      "type": "text",     "required": True, "placeholder": "Brief subject line"},
+            {"name": "category", "label": "Category",     "type": "select",   "required": True,
+             "options": ["Wrong item received", "Damaged product", "Late delivery", "Poor service", "Billing issue", "Other"]},
+            {"name": "details",  "label": "Full details", "type": "textarea", "required": True, "placeholder": "Please describe your experience..."},
+        ],
+    },
+    "contact_update": {
+        "type": "contact_update",
+        "title": "Update Contact Information",
+        "subtitle": "We will update your details on file.",
+        "fields": [
+            {"name": "full_name", "label": "Full name",        "type": "text",     "required": False, "placeholder": "Leave blank to keep current"},
+            {"name": "email",     "label": "Email address",    "type": "email",    "required": False, "placeholder": "Leave blank to keep current"},
+            {"name": "phone",     "label": "Phone number",     "type": "tel",      "required": False, "placeholder": "Leave blank to keep current"},
+            {"name": "address",   "label": "Delivery address", "type": "textarea", "required": False, "placeholder": "Leave blank to keep current"},
+        ],
+    },
+}
+
+_FORM_TRIGGER_RULES = re.compile(
+    r"(?P<escalation>escalat|speak to (a )?human|talk to (a )?human|human agent|call me)"
+    r"|(?P<complaint>complain|feedback|bad experience|wrong item|damaged|overcharged|poor service|unsatisfied)"
+    r"|(?P<contact_update>update.{0,15}(contact|address|email|phone|number)|change.{0,15}(address|email|phone|number|details))",
+    re.IGNORECASE,
+)
+
+_FORM_DETECTION_PROMPT = (
+    "You are deciding whether a customer message needs a data-collection form. "
+    "Available forms: "
+    "escalation_details (customer wants human agent), "
+    "complaint (complaint or negative feedback), "
+    "contact_update (wants to update address/email/phone), "
+    "null (no form needed). "
+    "Customer message: {message} "
+    "Agent reply: {reply} "
+    "Reply with ONLY one of: escalation_details, complaint, contact_update, null."
+)
+
+
 # ── Graph ─────────────────────────────────────────────────────────────────────
 
 def build_graph():
@@ -145,7 +222,7 @@ def build_graph():
 
         trimmed = trim_messages(
             state["messages"],
-            max_tokens=6000,
+            max_tokens=5000,
             strategy="last",
             token_counter=_count_tokens,
             include_system=False,
@@ -232,8 +309,23 @@ def build_graph():
                     sources.append(label)
             if msg.name == "escalate_to_human":
                 escalated = True
+                await _notify_slack_escalation(
+                    session_id=state.get("session_id"),
+                    customer_id=state.get("customer_id"),
+                    reason=str(msg.content),
+                )
+        # Only return patched tool messages for this turn
+        new_tool_msgs = [
+            m for m in patched
+            if isinstance(m, ToolMessage)
+            and m.tool_call_id in {tm.tool_call_id for tm in state["messages"] if isinstance(tm, ToolMessage)}
+        ]
 
-        return {"messages": patched, "sources": sources, "escalated": escalated}
+        return {
+            "messages": new_tool_msgs,
+            "sources": sources,
+            "escalated": escalated,
+        }
 
     def should_continue(state: AgentState) -> Literal["tools", "end"]:
         if state.get("iterations", 0) >= MAX_ITERATIONS:
@@ -277,6 +369,13 @@ def _extract_products(messages: list) -> list[dict]:
             except Exception:
                 pass
     return []
+
+def _extract_orders(messages):
+    for m in messages:
+        if isinstance(m, ToolMessage) and "ORDERS_JSON:" in m.content:
+            raw = m.content.split("ORDERS_JSON:")[1].split("-->")[0]
+            return json.loads(raw.strip())
+    return None
 
 # ── Reply cleaner ─────────────────────────────────────────────────────────────
 
@@ -405,16 +504,64 @@ async def _get_quick_replies(
     return _rule_based_quick_replies(user_message, sources, escalated)
 
 
+def _extract_text_content(content) -> str:
+    """
+    Normalize LLM content into a plain string.
+    Handles:
+    - str
+    - list of content blocks (Gemini style)
+    """
+    if isinstance(content, str):
+        return content
+
+    if isinstance(content, list):
+        texts = []
+        for block in content:
+            if isinstance(block, dict) and block.get("type") == "text":
+                texts.append(block.get("text", ""))
+        return "\n".join(texts)
+
+    return str(content)
+
+# ── Intent Router ───────────────────────────────────────────────────────────
+
+class Intent:
+    ESCALATION_REQUEST = "escalation_request"
+    COMPLAINT = "complaint"
+    CONTACT_UPDATE = "contact_update"
+    NORMAL = "normal"
+
+
+def _classify_intent(message: str) -> str:
+    msg = message.strip().lower()
+
+    # Escalation request
+    if re.search(r"(speak to (a )?human|talk to (a )?human|human agent|call me)", msg):
+        return Intent.ESCALATION_REQUEST
+
+    # Complaint
+    if re.search(r"(complain|bad experience|wrong item|damaged|overcharged|poor service|unsatisfied)", msg):
+        return Intent.COMPLAINT
+
+    # Contact update
+    if re.search(r"(update.{0,15}(contact|address|email|phone)|change.{0,15}(address|email|phone|details))", msg):
+        return Intent.CONTACT_UPDATE
+
+    return Intent.NORMAL
+
 
 async def run_agent(
     message: str,
     session_id: str | None = None,
     customer_id: str | None = None,
 ) -> dict:
+
     if not session_id:
         session_id = str(uuid.uuid4())
 
-    logger.info(f"[Agent] Session: {session_id} | Customer: {customer_id} | Message: {message[:80]}")
+    logger.info(
+        f"[Agent] Session: {session_id} | Customer: {customer_id} | Message: {message[:80] if len(message) > 80 else message}"
+    )
 
     history: list[BaseMessage] = load_messages_from_redis(session_id)
 
@@ -424,7 +571,8 @@ async def run_agent(
         resp = await llm.ainvoke(
             [SystemMessage(content=SYSTEM_PROMPT), *history, HumanMessage(content=message)]
         )
-        reply = resp.content.strip()
+
+        reply = _extract_text_content(resp.content).strip()
         save_messages_to_redis(
             session_id,
             history + [HumanMessage(content=message), AIMessage(content=reply)],
@@ -432,9 +580,45 @@ async def run_agent(
         quick_replies = await _get_quick_replies(message, reply, [], False, llm)
         return {"reply": reply, "session_id": session_id, "sources": [], "escalated": False, "quick_replies": quick_replies}
 
+    intent = _classify_intent(message)
+
+    if intent == Intent.ESCALATION_REQUEST:
+        return {
+            "reply": "Sure — I’ll connect you with a support agent. First, please provide a few details.",
+            "session_id": session_id,
+            "sources": [],
+            "products": [],
+            "escalated": False,
+            "quick_replies": [],
+            "form": FORMS["escalation_details"],
+        }
+
+    if intent == Intent.COMPLAINT:
+        return {
+            "reply": "I'm sorry about your experience. Please provide more details so we can investigate.",
+            "session_id": session_id,
+            "sources": [],
+            "products": [],
+            "escalated": False,
+            "quick_replies": [],
+            "form": FORMS["complaint"],
+        }
+
+    if intent == Intent.CONTACT_UPDATE:
+        return {
+            "reply": "Sure — please provide the updated details below.",
+            "session_id": session_id,
+            "sources": [],
+            "products": [],
+            "escalated": False,
+            "quick_replies": [],
+            "form": FORMS["contact_update"],
+        }
+
     initial_state: AgentState = {
         "messages": history + [HumanMessage(content=message)],
         "customer_id": customer_id,
+        "session_id": session_id,
         "escalated": False,
         "sources": [],
         "iterations": 0,
@@ -449,59 +633,95 @@ async def run_agent(
         reply = ""
         for msg in reversed(final_state["messages"]):
             if isinstance(msg, AIMessage) and not msg.tool_calls:
-                reply = msg.content.strip()
+                reply: str = _extract_text_content(msg.content).strip()
                 break
 
         if not reply:
             reply = "I'm sorry, I had trouble with that. Could you give me more details?"
 
-        # Extract structured products from search_products tool messages.
-        # We scan all ToolMessages in this conversation for search_products calls
-        # and parse their text output back into dicts for the UI to render as cards.
-        # Only extract products if search_products was called in THIS turn.
-        # Check for ToolMessages added after the last HumanMessage.
+        if reply.startswith("ESCALATION_REQUIRED:"):
+            reason: str = reply.replace("ESCALATION_REQUIRED:", "").strip()
+
+            high_risk: bool = any(
+                word in reason.lower()
+                for word in ["fraud", "legal", "lawsuit", "chargeback", "threat"]
+            )
+
+            if high_risk:
+                await escalate_to_human({"reason": reason})
+                await _notify_slack_escalation(session_id, customer_id, reason)
+
+                return {
+                    "reply": "A human specialist has been alerted and will assist you shortly.",
+                    "session_id": session_id,
+                    "sources": [],
+                    "products": [],
+                    "escalated": True,
+                    "quick_replies": [],
+                    "form": None,
+                }
+
+            return {
+                "reply": "I’m going to connect you with a support agent. Please provide a few details.",
+                "session_id": session_id,
+                "sources": [],
+                "products": [],
+                "escalated": False,
+                "quick_replies": [],
+                "form": FORMS["escalation_details"],
+            }
+
         last_human_idx = max(
             (i for i, m in enumerate(final_state["messages"]) if isinstance(m, HumanMessage)),
             default=0,
         )
+
         current_turn_msgs = final_state["messages"][last_human_idx:]
         called_search = any(
             isinstance(m, ToolMessage) and m.name == "search_products"
             for m in current_turn_msgs
         )
-        products = _extract_products(final_state["messages"]) if called_search else []
 
-        # Strip product listing from reply text when cards are returned
+        called_check_order_status: bool = any(
+            isinstance(m, ToolMessage) and m.name == "check_order_status"
+            for m in current_turn_msgs
+        )
+
+        products = _extract_products(final_state["messages"]) if called_search else []
+        extracted_order = _extract_orders(final_state["messages"]) if called_check_order_status else None
+
         reply = _strip_product_listing(reply, has_products=bool(products))
 
-        save_messages_to_redis(session_id, final_state["messages"])
+        clean_history = _trim_persistent_history(final_state["messages"])
+        save_messages_to_redis(session_id, clean_history)
 
         sources = final_state.get("sources", [])
         escalated = final_state.get("escalated", False)
-        quick_replies = await _get_quick_replies(message, reply, sources, escalated, get_llm())
+
+        llm = get_llm()
+        quick_replies = await _get_quick_replies(message, reply, sources, escalated, llm)
 
         return {
             "reply": reply,
             "session_id": session_id,
             "sources": sources,
-            "escalated": escalated,
             "products": products,
+            "escalated": escalated,
             "quick_replies": quick_replies,
+            "form": None,
+            "order": extracted_order,
         }
 
     except Exception as e:
-        err = str(e)
-        if "429" in err or "quota" in err.lower() or "ResourceExhausted" in err or "rate_limit" in err.lower():
-            reply = "I'm currently experiencing high demand. Please try again in a few minutes."
-            logger.warning(f"[Agent] Rate limit hit for session {session_id}")
-        else:
-            logger.error(f"[Agent] Error for session {session_id}: {e}", exc_info=True)
-            reply = "Something went wrong on my end. Please try again or contact support directly."
+        logger.error(f"[Agent] Error: {e}", exc_info=True)
 
         return {
-            "reply": reply,
+            "reply": "Something went wrong on my end. Please try again.",
             "session_id": session_id,
             "sources": [],
+            "products": [],
             "escalated": False,
             "quick_replies": [],
+            "form": None,
+            "order": None,
         }
