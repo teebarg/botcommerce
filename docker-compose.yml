@@ -1,7 +1,4 @@
 services:
-  # -----------------------------------
-  # Shop API
-  # -----------------------------------
   api-shop:
     image: shop-backend:${TAG-latest}
     labels:
@@ -20,16 +17,11 @@ services:
       args:
         INSTALL_DEV: ${INSTALL_DEV-false}
     platform: linux/amd64 # Patch for M1 Mac
-    depends_on:
-      - db-shop
     command: ["fastapi", "run", "--reload", "app/main.py"]
     volumes:
       - ./backend/:/app
       - /app/.venv
 
-  # -----------------------------------
-  # Shared Agent service
-  # -----------------------------------
   agent:
     image: shop-agent:${TAG-latest}
     build:
@@ -42,12 +34,9 @@ services:
       - traefik.http.services.agent.loadbalancer.server.port=8000
       - traefik.http.routers.agent-http.rule=Host(`agent.localhost`)
       - traefik.http.routers.agent-http.entrypoints=http
-    depends_on:
-      - redis
-      - qdrant
-      - db-shop
     environment:
       - FASTEMBED_CACHE_PATH=/app/models
+    platform: linux/amd64 # Patch for M1 Mac
     volumes:
       - ./agent:/app
       - /app/.venv
