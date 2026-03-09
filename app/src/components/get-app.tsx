@@ -1,10 +1,6 @@
 import { RectangleVertical, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-// function isIos() {
-//     return /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
-// }
-
 function isInStandaloneMode() {
     return "standalone" in window.navigator && (window.navigator as any).standalone;
 }
@@ -35,8 +31,9 @@ const MAX_VIEWS = 5;
 const GetApp: React.FC = () => {
     const [isIOS, setIsIOS] = useState<boolean>(false);
     const [isStandalone, setIsStandalone] = useState<boolean>(false);
-    const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
     const [showIosBanner, setShowIosBanner] = useState<boolean>(false);
+    const [installPrompt, setInstallPrompt] = useState<any>(null);
+    const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
     useEffect(() => {
         setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream);
@@ -45,13 +42,25 @@ const GetApp: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        const handler = (e: Event) => {
+        if ((window as any).deferredPrompt) {
+            setInstallPrompt((window as any).deferredPrompt);
+        }
+
+        const handler = (e: any) => {
             e.preventDefault();
-            setDeferredPrompt(e as BeforeInstallPromptEvent);
+            setInstallPrompt(e);
         };
 
-        window.addEventListener("beforeinstallprompt", handler as EventListener);
-        window.addEventListener("appinstalled", () => setIsStandalone(true));
+        const manualHandler = () => {
+            setInstallPrompt((window as any).deferredPrompt);
+        };
+        const onOnline = () => setIsOffline(false);
+        const onOffline = () => setIsOffline(true);
+
+        window.addEventListener("beforeinstallprompt", handler);
+        window.addEventListener("pwa-install-available", manualHandler);
+        window.addEventListener("online", onOnline);
+        window.addEventListener("offline", onOffline);
 
         if (isIOS && !isInStandaloneMode()) {
             const dismissed = localStorage.getItem(DISMISSED_KEY) === "true";
@@ -64,17 +73,22 @@ const GetApp: React.FC = () => {
         }
 
         return () => {
-            window.removeEventListener("beforeinstallprompt", handler as EventListener);
+            window.removeEventListener("beforeinstallprompt", handler);
+            window.removeEventListener("pwa-install-available", manualHandler);
+            window.removeEventListener("online", onOnline);
+            window.removeEventListener("offline", onOffline);
         };
     }, []);
 
     const handleInstallClick = async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
+        const prompt = installPrompt || (window as any).deferredPrompt;
+        if (!prompt) return;
 
-            if (outcome === "accepted") setIsStandalone(true);
-            setDeferredPrompt(null);
+        prompt.prompt();
+        const { outcome } = await prompt.userChoice;
+        if (outcome === "accepted") {
+            setInstallPrompt(null);
+            (window as any).deferredPrompt = null;
         }
     };
 
@@ -86,6 +100,14 @@ const GetApp: React.FC = () => {
     const handleRemindLater = () => {
         setShowIosBanner(false);
     };
+
+    if (isOffline) {
+        return (
+            <div className="fixed top-0 left-0 w-full bg-destructive text-destructive-foreground py-1 text-center text-xs font-medium z-[200]">
+                No internet connection. Using offline mode.
+            </div>
+        );
+    }
 
     if (isStandalone) return null;
 
@@ -125,7 +147,7 @@ const GetApp: React.FC = () => {
         );
     }
 
-    if (!deferredPrompt) return null;
+    if (!installPrompt) return null;
 
     return (
         <button

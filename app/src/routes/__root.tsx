@@ -1,14 +1,10 @@
-/// <reference types="vite/client" />
-
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext, redirect } from "@tanstack/react-router";
 import { Toaster } from "sonner";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { PushNotificationManager } from "@/components/pwa/notification-manager";
-import { InstallPrompt } from "@/components/pwa/prompt";
 import { CartProvider } from "@/providers/cart-provider";
 import { StoreProvider } from "@/providers/store-provider";
 import ImpersonationBanner from "@/components/impersonation-banner";
-import PushPermission from "@/components/pwa/push-permission";
+import PushPermission from "@/components/push-permission";
 import { seo } from "@/utils/seo";
 import NotFound from "@/components/generic/not-found";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
@@ -27,6 +23,7 @@ import { siteConfigQueryOptions } from "@/hooks/useGeneric";
 import { useEffect } from "react";
 import { initPulseMetrics } from "@/utils/pulsemetric";
 import PageTransitionLoader from "@/components/generic/page-transition-loader";
+import PWABadge from "@/PWAbadge";
 
 interface RouterContext {
     session: AuthSession | null;
@@ -124,15 +121,25 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=false, viewport-fit=cover" />
                 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
                 <script src="https://pub-f4e5ec522d104f0c94def43905ff791e.r2.dev/sdk.js" onError={(e) => console.error("Failed to load SDK:", e)} />
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                        window.addEventListener('beforeinstallprompt', (e) => {
+                            e.preventDefault();
+                            window.deferredPrompt = e;
+                            // Dispatch a custom event so React can "wake up" and see it
+                            window.dispatchEvent(new CustomEvent('pwa-install-available'));
+                        });
+                        `,
+                    }}
+                />
             </head>
             <body className="min-h-screen">
                 <ThemeProvider>
                     <StoreProvider>
                         <CartProvider>
                             <div className="relative">
-                                <PushNotificationManager />
                                 <PushPermission />
-                                <InstallPrompt />
                                 <WebSocketProvider
                                     url={import.meta.env.VITE_WS + "/api/ws/"}
                                     debug={true}
@@ -146,6 +153,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                             </div>
                             {/* {import.meta.env.MODE !== "production" && <TanStackRouterDevtoolsPanel />} */}
                             <Toaster closeButton richColors duration={5000} expand={false} position="top-right" />
+                            <PWABadge />
                             <Scripts />
                         </CartProvider>
                     </StoreProvider>

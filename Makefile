@@ -13,7 +13,7 @@ up:
 
 .PHONY: update
 update:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) up -d
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) up -d --force-recreate $(s)
 
 .PHONY: stop
 stop:

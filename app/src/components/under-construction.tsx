@@ -12,7 +12,7 @@ const UnderConstruction: React.FC = () => {
     }, []);
 
     return (
-        <div className="flex-1 px-4 py-4 md:py-16">
+        <div className="flex-1 px-4 py-20 md:py-16">
             <div className="mx-auto max-w-4xl text-center">
                 <div className={`transform transition-all duration-1000 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
                     <div className="relative mb-8">

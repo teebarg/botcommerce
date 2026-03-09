@@ -25,3 +25,4 @@ meilisearch-data
 
 app/dist
 agent/models
+app/src/routeTree.gen.ts

@@ -77,7 +77,7 @@ There are no committed `.env.example` files in this repo. Create these locally:
 
 - **`API_URL`**: base URL of the backend (default in code is `http://localhost.dev`, so set this)
   - Local backend: `API_URL=http://localhost:8000`
-  - Docker backend via Traefik: `API_URL=http://api.localhost:7000` (see Docker section)
+  - Docker backend via Traefik: `API_URL=http://api-shop.localhost` (see Docker section)
 - (Optional) **`VITE_BASE_URL`**, **`VITE_WS`**, **`VITE_CONTACT_EMAIL`**, **`VITE_VAPID_PUBLIC_KEY`**: used in a few UI features and share links.
 
 #### `backend/.env`
@@ -137,14 +137,13 @@ make up
 
 Useful endpoints (from compose ports):
 
-- Traefik dashboard: `http://localhost:7001` (router host: `http://traefik.localhost`)
-- Backend (direct port): `http://localhost:7002`
-- Backend (via Traefik host rule): `http://api.localhost:7000`
-- Meilisearch: `http://localhost:7005` (or `http://meilisearch.localhost:7000`)
-- Adminer: `http://localhost:7006` (or `http://adminer.localhost:7000`)
-- Redis: `localhost:7007`
-- RedisInsight: `http://localhost:7008` (or `http://redisinsight.localhost:7000`)
-- Postgres: `localhost:7004`
+- Traefik dashboard: `http://localhost` (router host: `http://traefik.localhost`)
+- Backend (direct port): `http://localhost:8000`
+- Backend (via Traefik host rule): `http://api-shop.localhost`
+- Meilisearch: `http://meilisearch.localhost`
+- Adminer: `http://adminer.localhost`
+- Redis: `redis:6543`
+- RedisInsight: `http://redisinsight.localhost`
 
 Then run the frontend locally:
 
@@ -156,7 +155,7 @@ pnpm dev
 and set `app/.env`:
 
 ```
-API_URL=http://api.localhost:7000
+API_URL=http://api-shop.localhost
 ```
 
 ---
