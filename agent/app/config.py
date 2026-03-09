@@ -39,10 +39,7 @@ def get_settings() -> Settings:
 settings = get_settings()
 
 def get_llm():
-    # provider: str = settings.LLM_PROVIDER
-    # provider = "ollama"
-    # provider = "gemini"
-    provider = "cerebras7"
+    provider: str = settings.LLM_PROVIDER
 
     if provider == "gemini":
         from langchain_google_genai import ChatGoogleGenerativeAI

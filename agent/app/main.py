@@ -9,8 +9,8 @@ from app.agent.agent_graph import run_agent
 from app.agent.memory import clear_session
 from app.config import get_settings
 from app.utils import _notify_slack_escalation
-import redis as redis_client
-from app.agent.db import is_human_connected
+from app.agent.db import is_human_connected, save_message_db
+from app.redis_client import redis_client
 
 logging.basicConfig(
     level=logging.INFO,
@@ -54,8 +54,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+async def persist_turn_to_db(session_id: str, user_msg: str, ai_msg: str, metadata: dict) -> None:
+    """Saves both messages using the UPSERT-safe function."""
+    try:
+        await save_message_db(session_id=session_id, role="USER", content=user_msg)
+        await save_message_db(session_id=session_id, role="BOT", content=ai_msg, metadata=metadata)
+        logger.info(f"💾 Persisted turn for session {session_id} to DB")
+    except Exception as e:
+        logger.error(f"❌ Background DB Persistence Error: {e}")
+
+
 @app.post("/chat", tags=["Chat"])
-async def chat(request: ChatRequest) -> ChatResponse:
+async def chat(request: ChatRequest, background_tasks: BackgroundTasks) -> ChatResponse:
     """
     Main chat endpoint.
 
@@ -64,11 +74,10 @@ async def chat(request: ChatRequest) -> ChatResponse:
     - Returns whether the conversation was escalated to a human
     """
     connection_key = request.customer_id or request.client_ip
-    redis_client.set(f"chat_user:{request.session_id}", connection_key, ex=86400)
+    await redis_client.set(f"chat_user:{request.session_id}", connection_key, ex=86400)
 
-    if not request.user_id:
-        # Also store reverse mapping IP → session_id so promote_connection can update it
-        redis_client.set(f"chat_session:{connection_key}", request.session_id, ex=86400)
+    if not request.customer_id:
+        await redis_client.set(f"chat_session:{connection_key}", request.session_id, ex=86400)
 
     if request.type == "form_submission":
         if request.form_type == "escalation_details":
@@ -97,7 +106,7 @@ async def chat(request: ChatRequest) -> ChatResponse:
 
     if await is_human_connected(request.session_id):
         # AI is silent — save the user message and tell them to wait
-        # await save_message(session_id, message, "USER")
+        await save_message_db(session_id=request.session_id, content=request.message or "", role="USER")
         return ChatResponse(
             reply="You're connected with a support agent. They'll respond shortly.",
             session_id=request.session_id,
@@ -112,6 +121,14 @@ async def chat(request: ChatRequest) -> ChatResponse:
         message=request.message or "",
         session_id=request.session_id,
         customer_id=request.customer_id,
+    )
+
+    background_tasks.add_task(
+        persist_turn_to_db,
+        session_id=request.session_id,
+        user_msg=request.message or "",
+        ai_msg=result.get("reply", ""),
+        metadata={"sources": result.get("sources")}
     )
 
     return ChatResponse(**result)

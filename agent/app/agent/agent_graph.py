@@ -80,7 +80,7 @@ CONVERSATIONAL_PATTERNS = re.compile(
 
 def _trim_persistent_history(messages: list[BaseMessage]) -> list[BaseMessage]:
     """
-    Trim conversation history before saving to Redis.
+    Trim history before saving to Redis.
     Removes old tool messages and keeps only recent turns.
     """
     filtered = [m for m in messages if not isinstance(m, ToolMessage)]

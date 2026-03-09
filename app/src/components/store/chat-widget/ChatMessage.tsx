@@ -6,6 +6,7 @@ import { formatTime } from "@/utils";
 import EscalationForm from "./EscalationForm";
 import { useState } from "react";
 import { OrderCard } from "./OrderCard";
+import ComplaintForm from "./ComplaintForm";
 
 const EscalationCard = () => (
     <div className="mt-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 flex items-center gap-3">
@@ -143,6 +144,7 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage, 
                         {message.escalated && <EscalationCard />}
                         {message.order && <OrderCard order={message.order} />}
                         {message.form?.type === "escalation_details" && <EscalationForm onSubmitForm={onSubmitForm} isLastMessage={isLastMessage} />}
+                        {message.form?.type === "complaint" && <ComplaintForm onSubmitForm={onSubmitForm} form={message.form} />}
                         {!!message.products?.length && <ProductRecommendationCard products={message.products || []} />}
                         {isAgent && <SourceBadges sources={message.sources ?? []} />}
                         <div className={`flex items-center gap-1.5 mt-1 ${isAgent ? "justify-start" : "justify-end"}`}>
