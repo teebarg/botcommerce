@@ -51,7 +51,11 @@ const config = defineConfig({
             },
             injectManifest: {
                 globDirectory: ".output/public",
-                globPatterns: ["**/*.{js,css,html,png,svg,ico,woff2,,txt}"],
+                globPatterns: [
+                    "**/*.{js,css,html,png,svg,ico,woff2}",
+                    "assets/*.css",
+                    "_server/assets/*.css",
+                ],
             },
             devOptions: {
                 enabled: true,
