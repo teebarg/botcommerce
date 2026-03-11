@@ -1,28 +1,33 @@
 services:
-  api-shop:
-    image: shop-backend:${TAG-latest}
+  shop-api:
+    image: shop:${TAG-latest}
     labels:
       - traefik.enable=true
       - traefik.docker.network=dev-net
-      - traefik.http.services.shop-backend.loadbalancer.server.port=8000
-      - traefik.http.routers.shop-backend.rule=Host(`api.shop.lvh.me`)
-      - traefik.http.routers.shop-backend.entrypoints=http
+      - traefik.http.services.shop-api.loadbalancer.server.port=8000
+      - traefik.http.routers.shop-api.rule=Host(`api.shop.lvh.me`)
+      - traefik.http.routers.shop-api.entrypoints=https
+      - traefik.http.routers.shop-api.tls=true
+      - traefik.http.routers.shop-api-http.rule=Host(`api.shop.lvh.me`)
+      - traefik.http.routers.shop-api-http.entrypoints=http
+      - traefik.http.routers.shop-api-http.middlewares=redirect-to-https
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
     networks:
       - dev-net
     env_file:
-      - ./backend/.env.docker
+      - ./backend/.env
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
       args:
         INSTALL_DEV: ${INSTALL_DEV-false}
     platform: linux/amd64 # Patch for M1 Mac
-    command: ["fastapi", "run", "--reload", "app/main.py"]
+    command: fastapi run --reload app/main.py
     volumes:
       - ./backend/:/app
       - /app/.venv
 
-  agent:
+  agent-api:
     image: shop-agent:${TAG-latest}
     build:
       context: ./agent
@@ -31,9 +36,15 @@ services:
       - dev-net
     labels:
       - traefik.enable=true
-      - traefik.http.services.agent.loadbalancer.server.port=8000
-      - traefik.http.routers.agent-http.rule=Host(`agent.lvh.me`)
-      - traefik.http.routers.agent-http.entrypoints=http
+      - traefik.docker.network=dev-net
+      - traefik.http.services.agent-api.loadbalancer.server.port=8000
+      - traefik.http.routers.agent-api.rule=Host(`agent.lvh.me`)
+      - traefik.http.routers.agent-api.entrypoints=https
+      - traefik.http.routers.agent-api.tls=true
+      - traefik.http.routers.agent-api-http.rule=Host(`agent.lvh.me`)
+      - traefik.http.routers.agent-api-http.entrypoints=http
+      - traefik.http.routers.agent-api-http.middlewares=redirect-to-https
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
     environment:
       - FASTEMBED_CACHE_PATH=/app/models
     platform: linux/amd64 # Patch for M1 Mac
