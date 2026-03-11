@@ -5,7 +5,7 @@ services:
       - traefik.enable=true
       - traefik.docker.network=dev-net
       - traefik.http.services.shop-backend.loadbalancer.server.port=8000
-      - traefik.http.routers.shop-backend.rule=Host(`api-shop.localhost`)
+      - traefik.http.routers.shop-backend.rule=Host(`api.shop.lvh.me`)
       - traefik.http.routers.shop-backend.entrypoints=http
     networks:
       - dev-net
@@ -32,7 +32,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.services.agent.loadbalancer.server.port=8000
-      - traefik.http.routers.agent-http.rule=Host(`agent.localhost`)
+      - traefik.http.routers.agent-http.rule=Host(`agent.lvh.me`)
       - traefik.http.routers.agent-http.entrypoints=http
     environment:
       - FASTEMBED_CACHE_PATH=/app/models
