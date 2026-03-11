@@ -12,7 +12,8 @@
     "type": "module",
     "scripts": {
         "dev-debug": "echo 'Debug mode - container will stay alive' && tail -f /dev/null",
-        "dev": "vite dev --host 0.0.0.0",
+        "dev": "vite dev --host 0.0.0.0 --port 5174",
+        "dev2": "NODE_OPTIONS=--use-system-ca vite dev --host 0.0.0.0 --port 5174",
         "build": "vite build",
         "preview": "vite preview",
         "test": "vitest run",

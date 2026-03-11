@@ -141,7 +141,7 @@ router = APIRouter()
 async def image_gallery(
     request: Request,
     cursor: Optional[int] = Query(default=None),
-    limit: int = Query(default=36, le=100),
+    limit: int = Query(default=36, ge=1, le=100),
 ) -> PaginatedProductImages:
     """
     Gallery endpoint using cursor-based pagination.
@@ -165,8 +165,8 @@ async def image_gallery(
         )
         items = images[:limit]
         return {
-            "items": images,
-            "next_cursor": items[-1].id if len(images) > limit else None,
+            "items": items,
+            "next_cursor": items[-1].id if len(images) > limit and items else None,
             "limit": limit
         }
 
