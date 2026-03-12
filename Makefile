@@ -64,7 +64,7 @@ serve-backend:
 
 .PHONY: fe-dev
 fe-dev:
-	@cd app; pnpm dev
+	@cd app && pnpm dev
 
 .PHONY: sync
 sync:
