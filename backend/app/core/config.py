@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api"
     SECRET_KEY: str = "specialsecret"
 
+    CLERK_JWKS_URL: str = ""
+    CLERK_ISSUER_URL: str = ""
+
     DATABASE_URL: str = ""
 
     PAYSTACK_SECRET_KEY: str = "Pk_test_5029925955255255"

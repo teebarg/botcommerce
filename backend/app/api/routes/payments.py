@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 from app.core.config import settings
 from app.schemas.payment import PaymentInitialize, PaymentCreate
 from app.models.order import OrderCreate, Order
-from app.core.deps import CurrentUser, Notification, get_current_user, get_current_superuser
+from app.core.deps import CurrentUser, Notification
 from app.models.user import User
 import httpx
 from datetime import datetime
@@ -13,6 +13,7 @@ from app.core.logging import get_logger
 from app.services.events import publish_event, publish_order_event
 from app.services.redis import invalidate_pattern, invalidate_key
 from app.models.cart import Cart
+from app.core.permissions import require_admin, require_user
 
 logger = get_logger(__name__)
 
@@ -126,7 +127,7 @@ async def verify_payment(reference: str, user: CurrentUser) -> Order:
             raise HTTPException(status_code=500, detail="payment verification failed")
 
 
-@router.post("/", dependencies=[Depends(get_current_user)])
+@router.post("/", dependencies=[Depends(require_user)])
 async def create(*, create: PaymentCreate, notification: Notification, background_tasks: BackgroundTasks):
     """
     Create new payment.
@@ -153,7 +154,7 @@ async def create(*, create: PaymentCreate, notification: Notification, backgroun
     return payment
 
 
-@router.patch("/{id}/status", dependencies=[Depends(get_current_superuser)])
+@router.patch("/{id}/status", dependencies=[Depends(require_admin)])
 async def payment_status(id: int, status: PaymentStatus) -> Order:
     """Change payment status"""
     order = await db.order.find_unique(where={"id": id}, include={"order_items": {"include": {"variant": True}}})

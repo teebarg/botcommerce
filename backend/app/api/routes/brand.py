@@ -4,8 +4,6 @@ from fastapi import (
     Depends,
     HTTPException,
 )
-
-from app.core.deps import get_current_user, get_current_superuser
 from app.models.brand import (
     Brand,
     BrandCreate,
@@ -15,6 +13,7 @@ from app.models.generic import Message
 from app.prisma_client import prisma as db
 from app.core.utils import slugify
 from prisma.errors import PrismaError
+from app.core.permissions import require_admin
 
 router = APIRouter()
 
@@ -34,7 +33,7 @@ async def index(query: str = "") -> Optional[list[Brand]]:
     return await db.brand.find_many(where=where_clause, order={"created_at": "desc"})
 
 
-@router.post("/", dependencies=[Depends(get_current_superuser)])
+@router.post("/", dependencies=[Depends(require_admin)])
 async def create(*, create_data: BrandCreate) -> Brand:
     """
     Create new brand.
@@ -67,7 +66,7 @@ async def get_by_slug(slug: str) -> Brand:
 
 @router.patch(
     "/{id}",
-    dependencies=[Depends(get_current_user)]
+    dependencies=[Depends(require_admin)]
 )
 async def update(
     *,
@@ -96,7 +95,7 @@ async def update(
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.delete("/{id}", dependencies=[Depends(get_current_user)])
+@router.delete("/{id}", dependencies=[Depends(require_admin)])
 async def delete(id: int) -> Message:
     """
     Delete a brand.

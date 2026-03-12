@@ -1,17 +1,18 @@
 
 from fastapi import APIRouter, HTTPException, Depends, Query, Request
 from typing import List
-from app.core.deps import CurrentUser, get_current_superuser
+from app.core.deps import CurrentUser
 from app.models.generic import Message
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
 from app.services.redis import cache_response, invalidate_pattern
 from app.services.websocket import manager
 from app.models.activities import PaginatedActivities, Activity
+from app.core.permissions import require_admin
 
 router = APIRouter()
 
-@router.get("/", dependencies=[Depends(get_current_superuser)])
+@router.get("/", dependencies=[Depends(require_admin)])
 @cache_response("activities")
 async def index(
     request: Request,

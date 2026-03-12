@@ -3,15 +3,27 @@ import AdminNavbar from "@/components/admin/layouts/admin-navbar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/layout/admin-sidebar";
 import type { Session } from "start-authjs";
+import { SignIn } from "@clerk/tanstack-react-start";
 
 export const Route = createFileRoute("/_adminLayout")({
     beforeLoad: ({ context, location }) => {
-        if (!context.session) {
-            throw redirect({ to: "/auth/signin", search: { callbackUrl: location.href } });
+        if (!context.isAuthenticated) {
+            throw new Error("Not authenticated");
         }
-        if (!context.session.user.isAdmin) {
+        if (!["admin", "super-admin"].includes(context.user.role)) {
             throw redirect({ to: "/" });
         }
+    },
+    errorComponent: ({ error }) => {
+        if (error.message === "Not authenticated") {
+            return (
+                <div className="flex items-center justify-center p-12">
+                    <SignIn routing="hash" forceRedirectUrl={window.location.href} />
+                </div>
+            );
+        }
+
+        throw error;
     },
     component: RouteComponent,
 });

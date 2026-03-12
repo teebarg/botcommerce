@@ -24,6 +24,8 @@ import { useEffect } from "react";
 import { initPulseMetrics } from "@/utils/pulsemetric";
 import PageTransitionLoader from "@/components/generic/page-transition-loader";
 import PWABadge from "@/PWAbadge";
+import { ClerkProvider, SignIn } from "@clerk/tanstack-react-start";
+import { auth } from "@clerk/tanstack-react-start/server";
 
 interface RouterContext {
     session: AuthSession | null;
@@ -37,13 +39,37 @@ const fetchSession = createServerFn({ method: "GET" }).handler(async () => {
     return session;
 });
 
+const authStateFn = createServerFn().handler(async () => {
+    const { isAuthenticated, userId, sessionClaims } = await auth();
+    console.log("🚀 ~ file: __root.tsx:44 ~ userId:", userId);
+    console.log("🚀 ~ file: __root.tsx:44 ~ isAuthenticated:", isAuthenticated);
+
+    // if (!isAuthenticated) {
+    //     // This will error because you're redirecting to a path that doesn't exist yet
+    //     // You can create a sign-in route to handle this
+    //     // See https://clerk.com/docs/tanstack-react-start/guides/development/custom-sign-in-or-up-page
+    //     throw redirect({
+    //         to: "/sign-in",
+    //     });
+    // }
+
+    return { isAuthenticated, userId, sessionClaims };
+});
+
 export const Route = createRootRouteWithContext<RouterContext>()({
     beforeLoad: async ({ location }) => {
         if (process.env.MAINTENANCE_MODE === "true" && location.pathname !== "/maintenance") {
             throw redirect({ to: "/maintenance" });
         }
         const session = (await fetchSession()) as unknown as Session;
-        return { session };
+        const { isAuthenticated, userId, sessionClaims } = await authStateFn();
+        const user = {
+            firstName: (sessionClaims?.firstName as string) || "",
+            lastName: (sessionClaims?.lastName as string) || "",
+            role: (sessionClaims?.role as string) || "",
+            roles: (sessionClaims?.roles as string[]) || [],
+        };
+        return { session, isAuthenticated, userId, user };
     },
     loader: async ({ context: { queryClient } }) => {
         const [categories, collections, config] = await Promise.all([
@@ -85,13 +111,25 @@ export const Route = createRootRouteWithContext<RouterContext>()({
             ],
         };
     },
-    errorComponent: (props) => {
-        return (
-            <RootDocument>
-                <DefaultCatchBoundary {...props} />
-            </RootDocument>
-        );
+    errorComponent: ({ error }) => {
+        console.log("🚀 ~ file: __root.tsx:110 ~ error:", error);
+        if (error.message === "Not authenticated") {
+            return (
+                <div className="flex items-center justify-center p-12">
+                    <SignIn routing="hash" forceRedirectUrl={window.location.href} />
+                </div>
+            );
+        }
+
+        throw error;
     },
+    // errorComponent: (props) => {
+    //     return (
+    //         <RootDocument>
+    //             <DefaultCatchBoundary {...props} />
+    //         </RootDocument>
+    //     );
+    // },
     notFoundComponent: () => <NotFound />,
     component: RootComponent,
 });
@@ -135,29 +173,33 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 />
             </head>
             <body className="min-h-screen">
-                <ThemeProvider>
-                    <StoreProvider>
-                        <CartProvider>
-                            <div className="relative">
-                                <PushPermission />
-                                <WebSocketProvider
-                                    url={import.meta.env.VITE_WS + "/api/ws/"}
-                                    debug={true}
-                                    onOpen={() => console.log("WebSocket connected!")}
-                                    onClose={() => console.log("WebSocket disconnected!")}
-                                >
-                                    <InvalidateProvider>{children}</InvalidateProvider>
-                                    <ImpersonationBanner />
-                                </WebSocketProvider>
-                                {import.meta.env.MODE !== "production" && <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />}
-                            </div>
-                            {/* {import.meta.env.MODE !== "production" && <TanStackRouterDevtoolsPanel />} */}
-                            <Toaster closeButton richColors duration={5000} expand={false} position="top-right" />
-                            <PWABadge />
-                            <Scripts />
-                        </CartProvider>
-                    </StoreProvider>
-                </ThemeProvider>
+                <ClerkProvider>
+                    <ThemeProvider>
+                        <StoreProvider>
+                            <CartProvider>
+                                <div className="relative">
+                                    <PushPermission />
+                                    <WebSocketProvider
+                                        url={import.meta.env.VITE_WS + "/api/ws/"}
+                                        debug={true}
+                                        onOpen={() => console.log("WebSocket connected!")}
+                                        onClose={() => console.log("WebSocket disconnected!")}
+                                    >
+                                        <InvalidateProvider>{children}</InvalidateProvider>
+                                        <ImpersonationBanner />
+                                    </WebSocketProvider>
+                                    {import.meta.env.MODE !== "production" && (
+                                        <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
+                                    )}
+                                </div>
+                                {/* {import.meta.env.MODE !== "production" && <TanStackRouterDevtoolsPanel />} */}
+                                <Toaster closeButton richColors duration={5000} expand={false} position="top-right" />
+                                <PWABadge />
+                                <Scripts />
+                            </CartProvider>
+                        </StoreProvider>
+                    </ThemeProvider>
+                </ClerkProvider>
             </body>
         </html>
     );

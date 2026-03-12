@@ -1,3 +1,4 @@
+import { auth } from "@clerk/tanstack-react-start/server";
 import { redirect } from "@tanstack/react-router";
 import { deleteCookie, getCookies } from "@tanstack/react-start/server";
 
@@ -15,6 +16,9 @@ type RequestOptions = RequestInit & {
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
     const cookies = getCookies();
     const { params, ...restOptions } = options;
+    const { getToken } = await auth();
+    const token = await getToken({ template: "default" });
+    // console.log("🚀 ~ file: api.server.ts:21 ~ token:", token)
 
     const url = new URL(`/api${endpoint}`, baseURL);
 
@@ -29,10 +33,13 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         .map(([key, value]) => `${key}=${value}`)
         .join("; ");
 
+    // console.log("🚀 ~ file: api.server.ts:29 ~ cookieHeader:", cookieHeader)
+
     const headers = {
         "Content-Type": "application/json",
         ...options.headers,
         Cookie: cookieHeader,
+        Authorization: token ? `Bearer ${token}` : "",
     };
 
     const response = await fetch(url, {
@@ -40,21 +47,25 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         headers,
     });
 
-    if (response.status === 401) {
-        deleteCookie("__Secure-authjs.session-token", {
-            path: "/",
-            secure: true,
-            sameSite: "none",
-        });
-        deleteCookie("authjs.session-token");
-
-        throw redirect({
-            to: "/auth/signin",
-            search: {
-                callbackUrl: "/",
-            },
-        });
+    if (response.status === 403) {
+        console.log("insufficeinet permissions......")
     }
+
+    // if (response.status === 401) {
+    //     deleteCookie("__Secure-authjs.session-token", {
+    //         path: "/",
+    //         secure: true,
+    //         sameSite: "none",
+    //     });
+    //     deleteCookie("authjs.session-token");
+
+    //     throw redirect({
+    //         to: "/auth/signin",
+    //         search: {
+    //             callbackUrl: "/",
+    //         },
+    //     });
+    // }
 
     if (response.ok) {
         return response.json();

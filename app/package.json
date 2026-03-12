@@ -24,6 +24,7 @@
     "dependencies": {
         "@auth/core": "0.41.1",
         "@auth/upstash-redis-adapter": "^2.10.0",
+        "@clerk/tanstack-react-start": "^1.0.4",
         "@fontsource-variable/lexend": "^5.2.11",
         "@fontsource-variable/outfit": "^5.2.8",
         "@hookform/resolvers": "4.1.3",

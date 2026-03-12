@@ -31,7 +31,7 @@ bash:
 
 .PHONY: install
 install:
-	$(DOCKER_COMPOSE) exec $(SERVICE) pip install $(package)
+	$(DOCKER_COMPOSE) exec $(s) uv pip install $(package)
 
 .PHONY: clean
 clean:

@@ -1,5 +1,12 @@
+from __future__ import annotations
+
+from enum import Enum
+from typing import Annotated, Any, Union
+
+from fastapi import Cookie, Depends, HTTPException, status
+from pydantic import BaseModel
+from app.core.deps import verify_clerk_token
 from datetime import datetime, timedelta, timezone
-from typing import Union
 import jwt
 from passlib.context import CryptContext
 
@@ -8,6 +15,25 @@ from app.core.config import settings
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 ALGORITHM = "HS256"
+
+
+def require_roles(allowed_roles: list[str]):
+    def dependency(
+        current_user: Annotated[dict, Depends(verify_clerk_token)],
+    ) -> Any:
+        roles = current_user.get("roles", [])
+
+        if not isinstance(roles, list):
+            roles = [roles]
+
+        if not any(role in allowed_roles for role in roles):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Insufficient permissions",
+            )
+        return current_user
+
+    return dependency
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
