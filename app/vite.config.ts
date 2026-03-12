@@ -11,7 +11,10 @@ import { VitePWA } from "vite-plugin-pwa";
 const config = defineConfig({
     server: {
         port: 5173,
-        allowedHosts: true
+        allowedHosts: true,
+        watch: {
+            ignored: ["**/routeTree.gen.ts"]
+        }
     },
     plugins: [
         devtools(),
