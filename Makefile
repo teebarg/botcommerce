@@ -62,8 +62,8 @@ serve-agent:
 serve-backend:
 	@cd backend; uvicorn app.main:app --host 0.0.0.0 --reload --workers 4
 
-.PHONY: serve-app
-serve-app:
+.PHONY: fe-dev
+fe-dev:
 	@cd app; pnpm dev
 
 .PHONY: sync
@@ -72,7 +72,7 @@ sync:
 
 .PHONY: dev
 dev:
-	make -j 3 serve-backend serve-app serve-agent
+	make -j 3 serve-backend fe-dev serve-agent
 
 .PHONY: deploy
 deploy:

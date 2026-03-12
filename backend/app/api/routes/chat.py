@@ -108,7 +108,7 @@ async def index(
         take=limit + 1,
         cursor={"id": cursor} if cursor else None,
         order={"id": "desc"},
-        include={"user": True, "support": True, "messages": True}
+        include={"user": True, "messages": True}
     )
     items = chats[:limit]
 
