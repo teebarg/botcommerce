@@ -48,7 +48,9 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
     });
 
     if (response.status === 403) {
-        console.log("insufficeinet permissions......")
+        throw redirect({
+            to: "/forbidden",
+        });
     }
 
     // if (response.status === 401) {

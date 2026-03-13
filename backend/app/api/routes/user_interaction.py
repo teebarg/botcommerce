@@ -1,4 +1,4 @@
-from backend.app.core.deps import UserDep
+from app.core.deps import UserDep
 from fastapi import APIRouter, Query, Body, Request
 from typing import List, Optional
 from app.schemas.user_interaction import UserInteractionCreate, UserInteractionResponse

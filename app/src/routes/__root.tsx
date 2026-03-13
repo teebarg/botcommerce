@@ -27,6 +27,8 @@ import { auth } from "@clerk/tanstack-react-start/server";
 type SessionClaims = {
     firstName?: string;
     lastName?: string;
+    image?: string;
+    email?: string;
     role?: string;
     roles?: string[];
 };
@@ -34,6 +36,8 @@ type SessionClaims = {
 type AuthUser = {
     firstName?: string;
     lastName?: string;
+    image?: string;
+    email?: string;
     role?: string;
     roles?: string[];
     isAdmin?: boolean;
@@ -80,6 +84,8 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         const user = {
             firstName: sessionClaims?.firstName || "",
             lastName: sessionClaims?.lastName || "",
+            image: sessionClaims?.image || "",
+            email: sessionClaims?.email || "",
             role: sessionClaims?.role || "",
             roles: sessionClaims?.roles || [],
             isAdmin: sessionClaims?.roles?.includes("admin") || false,

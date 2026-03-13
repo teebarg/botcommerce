@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp, RefreshCw, ArrowLeft, ShoppingCart, AlertCircle } from "lucide-react";
 
 export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
+    console.log("🚀 ~ file: DefaultCatchBoundary.tsx:8 ~ error:", error);
+    // console.log("🚀 ~ file: DefaultCatchBoundary.tsx:8 ~ error:", error?.status);
     const navigate = useNavigate();
     const isRoot = useMatch({
         strict: false,
