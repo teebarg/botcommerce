@@ -79,7 +79,7 @@ registerRoute(
 registerRoute(
     ({ request, url }) => {
         const isNavigation = request.mode === "navigate";
-        const isApiRequest = url.pathname.startsWith("/api/") || url.hostname === "api.revoque.com.ng" || url.hostname === "api.shop.lvh.me";
+        const isApiRequest = url.pathname.startsWith("/api/") || url.hostname === "api.revoque.com.ng" || url.hostname === "api.shop.localhost";
 
         return isNavigation || isApiRequest;
     },

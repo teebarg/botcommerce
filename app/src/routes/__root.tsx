@@ -16,13 +16,13 @@ import type { QueryClient } from "@tanstack/react-query";
 import { categoriesQuery } from "@/hooks/useCategories";
 import { collectionsQuery } from "@/hooks/useCollection";
 import { InvalidateProvider } from "@/providers/invalidate-provider";
-import { siteConfigQueryOptions } from "@/hooks/useGeneric";
 import { useEffect } from "react";
 import { initPulseMetrics } from "@/utils/pulsemetric";
 import PageTransitionLoader from "@/components/generic/page-transition-loader";
 import PWABadge from "@/PWAbadge";
 import { ClerkProvider } from "@clerk/tanstack-react-start";
 import { auth } from "@clerk/tanstack-react-start/server";
+import { getShopSettingsPublicFn } from "@/server/generic.server";
 
 type SessionClaims = {
     firstName?: string;
@@ -98,14 +98,14 @@ export const Route = createRootRouteWithContext<RouterContext>()({
             impersonated: false,
             impersonatedBy: null,
         };
+        const config = await getShopSettingsPublicFn();
 
-        return { isAuthenticated, userId, session };
+        return { isAuthenticated, userId, session, config };
     },
-    loader: async ({ context: { queryClient } }) => {
-        const [categories, collections, config] = await Promise.all([
+    loader: async ({ context: { queryClient, config } }) => {
+        const [categories, collections] = await Promise.all([
             queryClient.ensureQueryData(categoriesQuery()),
-            queryClient.ensureQueryData(collectionsQuery()),
-            queryClient.ensureQueryData(siteConfigQueryOptions()),
+            queryClient.ensureQueryData(collectionsQuery())
         ]);
 
         return {

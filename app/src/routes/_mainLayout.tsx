@@ -1,5 +1,4 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import Cookie from "@/components/store/cookie-consent";
 import Footer from "@/components/layout/footer";
 import StoreNavbar from "@/components/layout/store-nav";
 import ButtonNav from "@/components/layout/bottom-navbar";
@@ -22,7 +21,6 @@ function MainLayoutComponent() {
                 <Outlet />
             </main>
             <Footer />
-            <Cookie />
             <ChatBubble />
             <ButtonNav />
         </div>
