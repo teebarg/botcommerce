@@ -1,6 +1,6 @@
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Query, Depends, Request
-from app.core.deps import CurrentUser, get_current_superuser, UserDep
+from app.core.deps import CurrentUser, UserDep
 from app.models.wishlist import Wishlists, WishlistCreate
 from app.models.generic import Message
 from app.prisma_client import prisma as db
@@ -11,6 +11,7 @@ from app.core.security import verify_password, get_password_hash
 from app.services.recently_viewed import RecentlyViewedService
 from app.models.product import SearchProduct
 from app.services.redis import cache_response, bust
+from app.core.permissions import require_admin
 
 router = APIRouter()
 
@@ -65,7 +66,7 @@ async def update_user_me(
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.get("/", dependencies=[Depends(get_current_superuser)])
+@router.get("/", dependencies=[Depends(require_admin)])
 async def index(
     query: str = "",
     role: Optional[Role] = None,
@@ -108,7 +109,7 @@ async def index(
     }
 
 
-@router.post("/create-guest", dependencies=[Depends(get_current_superuser)])
+@router.post("/create-guest", dependencies=[Depends(require_admin)])
 async def create_guest_user(payload: GuestUserCreate) -> User:
     """
     Admin-only: Create a new user with an email in the guest.com domain.
@@ -142,7 +143,7 @@ async def create_guest_user(payload: GuestUserCreate) -> User:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
+@router.patch("/{id}", dependencies=[Depends(require_admin)])
 async def update(
     *,
     id: int,
@@ -167,7 +168,7 @@ async def update(
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.delete("/{id}", dependencies=[Depends(get_current_superuser)])
+@router.delete("/{id}", dependencies=[Depends(require_admin)])
 async def delete(id: int) -> Message:
     """
     Delete a user.

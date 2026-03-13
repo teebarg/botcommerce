@@ -2,18 +2,81 @@ from typing import Optional, Annotated
 from datetime import datetime, timedelta, timezone
 from app.core.utils import generate_id, generate_abandoned_cart_email, send_email
 from app.models.cart import CartUpdate, CartItemCreate, CartItem, Cart, CartLite, SendAbandonedCartReminders, PaginatedAbandonedCarts
-from fastapi import APIRouter, Header, HTTPException, Request, BackgroundTasks, Depends, Cookie
+from fastapi import APIRouter, HTTPException, Request, BackgroundTasks, Depends, Cookie, Response
 from app.prisma_client import prisma as db
-from app.core.deps import UserDep, get_current_superuser, CurrentUser
+from app.core.deps import UserDep, CurrentUser
 from app.services.redis import cache_response, invalidate_key, bust, invalidate_pattern
 from app.core.logging import get_logger
 from app.services.shop_settings import ShopSettingsService
 from prisma.enums import CartStatus
 from app.models.generic import Message
+from app.core.permissions import require_admin
 
 logger = get_logger(__name__)
 
 router = APIRouter()
+
+JWT_MAX_AGE_SECONDS = 15 * 60 * 60
+
+def _set_sso_cookie(response: Response, token: str) -> None:
+    response.set_cookie(
+        key="_cart_id",
+        value=token,
+        max_age=JWT_MAX_AGE_SECONDS,
+        path="/",
+        httponly=True,
+        secure=True,
+        samesite="none",
+    )
+
+def _clear_sso_cookie(response: Response) -> None:
+    """Clear access_token cookie (logout)."""
+    response.delete_cookie(
+        key="_cart_id",
+        path="/",
+        httponly=True,
+        samesite="none",
+        secure=True,
+    )
+
+async def _handle_add_item(item_in: CartItemCreate, cart: Cart) -> CartItem:
+    variant = await db.productvariant.find_unique(
+        where={"id": item_in.variant_id},
+        include={"product": {"include": {"images": True}}}
+    )
+
+    if not variant:
+        raise HTTPException(status_code=400, detail="product does not exist")
+    if variant.status != "IN_STOCK":
+        raise HTTPException(status_code=400, detail="product is out of stock")
+
+    if item_in.quantity > variant.inventory:
+        available_quantity = variant.inventory - item_in.quantity
+        if available_quantity <= 0:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Not enough inventory. Only {variant.inventory} items available in stock."
+            )
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Not enough inventory. You can add {available_quantity} more items (only {variant.inventory} available in stock)."
+            )
+
+    item = await db.cartitem.create(
+        data={
+            "cart_id": cart.id,
+            "cart_number": cart.cart_number,
+            "name": variant.product.name,
+            "slug": variant.product.slug,
+            "variant_id": item_in.variant_id,
+            "quantity": item_in.quantity,
+            "price": variant.price,
+            "image": variant.product.images[0].image if variant.product.images else variant.product.image
+        },
+        include={"variant": True}
+    )
+    return item
 
 async def calculate_cart_totals(cart: Cart):
     """Helper function to calculate cart totals"""
@@ -70,8 +133,8 @@ async def calculate_cart_totals(cart: Cart):
     await invalidate_pattern("cart")
 
 
-async def get_or_create_cart(cart_number: Optional[str], user_id: Optional[str]):
-    """Retrieve an existing cart or create a new one if it doesn't exist"""
+async def get_cart(cart_number: Optional[str], user_id: Optional[str]):
+    """Retrieve an existing cart"""
     if user_id:
         cart = await db.cart.find_first(
             where={"user_id": user_id, "status": CartStatus.ACTIVE},
@@ -85,64 +148,74 @@ async def get_or_create_cart(cart_number: Optional[str], user_id: Optional[str])
         if cart:
             return cart
 
+    return None
+
+async def create_cart(user_id: Optional[str]):
+    """Create a new cart"""
     new_cart_id = generate_id()
     return await db.cart.create(data={"cart_number": new_cart_id, "user_id": user_id})
 
 
 @router.post("/items", response_model=CartItem)
 async def add_item_to_cart(
+    response: Response,
     item_in: CartItemCreate,
     user: UserDep,
     background_tasks: BackgroundTasks,
-    cartId: str = Header(default=None)
+    _cart_id: Annotated[str | None, Cookie()] = None
 ):
-    cart = await get_or_create_cart(cart_number=cartId, user_id=user.id if user else None)
+    cart = await get_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    if cart is None:
+        cart = await create_cart(user_id=user.id if user else None)
 
-    variant = await db.productvariant.find_unique(
-        where={"id": item_in.variant_id},
-        include={"product": {"include": {"images": True}}}
-    )
+    # variant = await db.productvariant.find_unique(
+    #     where={"id": item_in.variant_id},
+    #     include={"product": {"include": {"images": True}}}
+    # )
 
-    if not variant:
-        raise HTTPException(status_code=400, detail="product does not exist")
-    if variant.status != "IN_STOCK":
-        raise HTTPException(status_code=400, detail="product is out of stock")
+    # if not variant:
+    #     raise HTTPException(status_code=400, detail="product does not exist")
+    # if variant.status != "IN_STOCK":
+    #     raise HTTPException(status_code=400, detail="product is out of stock")
 
-    if item_in.quantity > variant.inventory:
-        available_quantity = variant.inventory - item_in.quantity
-        if available_quantity <= 0:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Not enough inventory. Only {variant.inventory} items available in stock."
-            )
-        else:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Not enough inventory. You can add {available_quantity} more items (only {variant.inventory} available in stock)."
-            )
+    # if item_in.quantity > variant.inventory:
+    #     available_quantity = variant.inventory - item_in.quantity
+    #     if available_quantity <= 0:
+    #         raise HTTPException(
+    #             status_code=400,
+    #             detail=f"Not enough inventory. Only {variant.inventory} items available in stock."
+    #         )
+    #     else:
+    #         raise HTTPException(
+    #             status_code=400,
+    #             detail=f"Not enough inventory. You can add {available_quantity} more items (only {variant.inventory} available in stock)."
+    #         )
 
-    item = await db.cartitem.create(
-        data={
-            "cart_id": cart.id,
-            "cart_number": cart.cart_number,
-            "name": variant.product.name,
-            "slug": variant.product.slug,
-            "variant_id": item_in.variant_id,
-            "quantity": item_in.quantity,
-            "price": variant.price,
-            "image": variant.product.images[0].image if variant.product.images else variant.product.image
-        },
-        include={"variant": True}
-    )
+    # item = await db.cartitem.create(
+    #     data={
+    #         "cart_id": cart.id,
+    #         "cart_number": cart.cart_number,
+    #         "name": variant.product.name,
+    #         "slug": variant.product.slug,
+    #         "variant_id": item_in.variant_id,
+    #         "quantity": item_in.quantity,
+    #         "price": variant.price,
+    #         "image": variant.product.images[0].image if variant.product.images else variant.product.image
+    #     },
+    #     include={"variant": True}
+    # )
+
+    item = await _handle_add_item(item_in, cart)
 
     background_tasks.add_task(calculate_cart_totals, cart=cart)
+    _set_sso_cookie(response, cart.cart_number)
 
     return item
 
 
 @router.get("/")
-@cache_response(key_prefix="cart", key=lambda request, user, cartId, **kwargs: user.id if user else cartId)
-async def get_cart(request: Request, user: UserDep, cartId: str = Header()) -> Optional[Cart]:
+# @cache_response(key_prefix="cart", key=lambda request, response, user, _cart_id, **kwargs: user.id if user else _cart_id)
+async def get_cart_index(request: Request, response: Response, user: UserDep, _cart_id: Annotated[str | None, Cookie()] = None) -> Optional[Cart]:
     """Get a specific cart by ID"""
     include_query = {
         "items": {"include": {"variant": True}},
@@ -156,14 +229,16 @@ async def get_cart(request: Request, user: UserDep, cartId: str = Header()) -> O
             include=include_query
         )
         if cart:
+            _set_sso_cookie(response, cart.cart_number)
             return cart
 
-    if cartId:
-        cart = await db.cart.find_unique(where={"cart_number": cartId}, include=include_query)
+    if _cart_id:
+        cart = await db.cart.find_unique(where={"cart_number": _cart_id}, include=include_query)
         if cart:
             return cart
 
     new_cart_id = generate_id()
+    _set_sso_cookie(response, new_cart_id)
     return await db.cart.create(
         data={"cart_number": new_cart_id, "user_id": user.id if user else None},
         include=include_query
@@ -171,24 +246,23 @@ async def get_cart(request: Request, user: UserDep, cartId: str = Header()) -> O
 
 
 @router.get("/items", response_model=Optional[list[CartItem]])
-async def get_cart_items(user: UserDep, cartId: str = Header()):
+async def get_cart_items(response: Response, user: UserDep, _cart_id: Annotated[str | None, Cookie()] = None):
     """Get all items in a specific cart"""
-    cart = await get_or_create_cart(cart_number=cartId, user_id=user.id if user else None)
-    if not cart:
-        return None
+    cart = await get_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    if cart is None:
+        cart = await create_cart(user_id=user.id if user else None)
+        _set_sso_cookie(response, cart.cart_number)
+        return []
     return await db.cartitem.find_many(where={"cart_number": cart.cart_number}, include={"variant": True})
 
 
 @router.put("/")
-async def update_cart(cart_update: CartUpdate, user: UserDep, cartId: str = Header(default=None)) -> CartLite:
+async def update_cart(response: Response,cart_update: CartUpdate, user: UserDep, _cart_id: Annotated[str | None, Cookie()] = None) -> CartLite:
     """Update cart status"""
-    cart = await get_or_create_cart(cart_number=cartId, user_id=user.id if user else None)
-    if not cart:
-        cart = await db.cart.create(
-            data={
-                "cart_number": cartId
-            },
-        )
+    cart = await get_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    if cart is None:
+        cart = await create_cart(user_id=user.id if user else None)
+        _set_sso_cookie(response, cart.cart_number)
 
     async with db.tx() as tx:
         update_data = {}
@@ -258,8 +332,13 @@ async def update_cart(cart_update: CartUpdate, user: UserDep, cartId: str = Head
 
 
 @router.delete("/items/{item_id}")
-async def delete_cart_item(item_id: int, user: UserDep, cartId: str = Header(default=None)):
-    cart = await get_or_create_cart(cart_number=cartId, user_id=user.id if user else None)
+async def delete_cart_item(response: Response, item_id: int, user: UserDep, _cart_id: Annotated[str | None, Cookie()] = None):
+    cart = await get_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    if cart is None:
+        cart = await create_cart(user_id=user.id if user else None)
+        _set_sso_cookie(response, cart.cart_number)
+        return {"message": "Item removed from cart successfully"}
+
     cart_item = await db.cartitem.find_unique(where={"id": item_id})
     if not cart_item or cart_item.cart_number != cart.cart_number:
         raise HTTPException(status_code=404, detail="cart item not found")
@@ -285,8 +364,16 @@ async def delete_cart_item(item_id: int, user: UserDep, cartId: str = Header(def
 
 
 @router.put("/items/{item_id}", response_model=CartItem)
-async def update_cart_item(item_id: int, quantity: int, user: UserDep, background_tasks: BackgroundTasks, cartId: str = Header(default=None)):
-    cart = await get_or_create_cart(cart_number=cartId, user_id=user.id if user else None)
+async def update_cart_item(response: Response, item_id: int, quantity: int, user: UserDep, background_tasks: BackgroundTasks, _cart_id: Annotated[str | None, Cookie()] = None):
+    cart = await get_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    if cart is None:
+        cart = await create_cart(user_id=user.id if user else None)
+        item_in = CartItemCreate(variant_id=item_id, quantity=quantity)
+        item = await _handle_add_item(item_in, cart)
+        background_tasks.add_task(calculate_cart_totals, cart=cart)
+        _set_sso_cookie(response, cart.cart_number)
+        return {"message": "Item removed from cart successfully"}
+
     cart_item = await db.cartitem.find_unique(
         where={"id": item_id},
         include={"variant": True}
@@ -434,7 +521,7 @@ async def send_abandoned_cart_reminders(
         )
 
 
-@router.get("/abandoned-carts", dependencies=[Depends(get_current_superuser)])
+@router.get("/abandoned-carts", dependencies=[Depends(require_admin)])
 @cache_response(key_prefix="abandoned-carts")
 async def get_admin_abandoned_carts(
     request: Request,
@@ -502,7 +589,7 @@ async def get_admin_abandoned_carts(
         )
 
 
-@router.post("/abandoned-carts/{cart_id}/send-reminder", dependencies=[Depends(get_current_superuser)])
+@router.post("/abandoned-carts/{cart_id}/send-reminder", dependencies=[Depends(require_admin)])
 async def send_cart_reminder(
     cart_id: int,
     background_tasks: BackgroundTasks
@@ -535,7 +622,7 @@ async def send_cart_reminder(
         )
 
 
-@router.get("/abandoned-carts/stats", dependencies=[Depends(get_current_superuser)])
+@router.get("/abandoned-carts/stats", dependencies=[Depends(require_admin)])
 @cache_response(key_prefix="abandoned-carts:stats")
 async def get_abandoned_carts_stats(request: Request, hours_threshold: int = 24):
     """
@@ -596,7 +683,7 @@ async def apply_wallet(user: CurrentUser, _cart_id: Annotated[str | None, Cookie
     """
     Apply wallet balance to a cart.
     """
-    cart = await get_or_create_cart(cart_number=_cart_id, user_id=user.id)
+    cart = await get_cart(cart_number=_cart_id, user_id=user.id)
     if not cart:
         raise HTTPException(status_code=404, detail="cart not found")
 
@@ -648,7 +735,7 @@ async def remove_wallet(user: CurrentUser,  _cart_id: Annotated[str | None, Cook
     """
     Remove wallet usage from the cart, refund the wallet, and recalculate totals.
     """
-    cart = await get_or_create_cart(cart_number=_cart_id, user_id=user.id)
+    cart = await get_cart(cart_number=_cart_id, user_id=user.id)
     if not cart:
         raise HTTPException(status_code=404, detail="cart not found")
 

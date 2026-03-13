@@ -17,6 +17,6 @@ async def log_user_interaction(user_id: int, product_id: int, type: str, metadat
         }
         await publish_event(event=event)
     except Exception as e:
-        logger.error(e)
+        logger.error("Error logging user interaction: " + str(e))
         raise HTTPException(status_code=400, detail=str(e)) 
     return None

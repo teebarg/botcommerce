@@ -9,9 +9,9 @@ from app.core.storage import upload, delete_image
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
 from app.services.redis import cache_response, invalidate_pattern
-from app.core.deps import get_current_superuser
 from app.core.logging import get_logger
 from app.services.product import prepare_product_data_for_indexing
+from app.core.permissions import require_admin
 
 logger = get_logger(__name__)
 
@@ -54,7 +54,7 @@ async def index(
         order={"display_order": "asc"},
     )
 
-@router.post("/", dependencies=[Depends(get_current_superuser)])
+@router.post("/", dependencies=[Depends(require_admin)])
 async def create(*, data: CategoryCreate) -> Category:
     """
     Create new category.
@@ -69,7 +69,7 @@ async def create(*, data: CategoryCreate) -> Category:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.patch("/reorder", dependencies=[Depends(get_current_superuser)])
+@router.patch("/reorder", dependencies=[Depends(require_admin)])
 async def reorder_categories(data: BulkOrderUpdate) -> Message:
     """Update display order for categories"""
     async with db.tx() as tx:
@@ -89,7 +89,7 @@ async def reorder_categories(data: BulkOrderUpdate) -> Message:
             raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
+@router.patch("/{id}", dependencies=[Depends(require_admin)])
 async def update(
     *,
     id: int,
@@ -116,7 +116,7 @@ async def update(
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.delete("/{id}", dependencies=[Depends(get_current_superuser)])
+@router.delete("/{id}", dependencies=[Depends(require_admin)])
 async def delete(id: int) -> Message:
     """
     Delete a category.
@@ -138,7 +138,7 @@ async def delete(id: int) -> Message:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.patch("/{id}/image", dependencies=[Depends(get_current_superuser)])
+@router.patch("/{id}/image", dependencies=[Depends(require_admin)])
 async def add_image(id: int, image_data: ImageUpload) -> Category:
     """
     Add an image to a category.
@@ -167,7 +167,7 @@ async def add_image(id: int, image_data: ImageUpload) -> Category:
         )
 
 
-@router.delete("/{id}/image", dependencies=[Depends(get_current_superuser)])
+@router.delete("/{id}/image", dependencies=[Depends(require_admin)])
 async def delete_image(id: int) -> Message:
     """
     Delete the image of a category.

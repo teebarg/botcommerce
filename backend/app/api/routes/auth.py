@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, BackgroundTasks, Request, Header
+from fastapi import APIRouter, HTTPException, status, BackgroundTasks, Request, Header, Cookie
 from pydantic import EmailStr, BaseModel, Field
 from app.core import security
 from app.core.config import settings
@@ -10,7 +10,7 @@ from app.models.generic import Token, Message
 from app.prisma_client import prisma as db
 
 import httpx
-from typing import Optional
+from typing import Annotated, Optional
 from app.core.logging import get_logger
 from app.core.decorators import limit
 
@@ -114,7 +114,7 @@ async def signup(request: Request, payload: SignUpPayload, background_tasks: Bac
 
 
 @router.post("/verify-email")
-async def verify_email(payload: VerifyEmailPayload, cartId: str = Header(default=None)) -> Token:
+async def verify_email(payload: VerifyEmailPayload, _cart_id: Annotated[str | None, Cookie()] = None) -> Token:
     """
     Verify user's email address and activate their account.
     """
@@ -150,7 +150,7 @@ async def verify_email(payload: VerifyEmailPayload, cartId: str = Header(default
         }
     )
 
-    await merge_cart(user_id=user.id, cart_number=cartId)
+    await merge_cart(user_id=user.id, cart_number=_cart_id)
 
     try:
         await publish_user_registered(
@@ -304,7 +304,7 @@ async def logout():
 async def send_magic_link(
     request: Request,
     payload: EmailData,
-    cartId: str = Header(default=None)
+    _cart_id: Annotated[str | None, Cookie()] = None
 ) -> Message:
     """
     Request a magic link for passwordless authentication.
@@ -367,8 +367,8 @@ async def send_magic_link(
         except Exception:
             pass
 
-    if cartId:
-        await merge_cart(user_id=user.id, cart_number=cartId)
+    if _cart_id:
+        await merge_cart(user_id=user.id, cart_number=_cart_id)
 
     return {
         "message": "If an account exists with this email, you will receive a magic link"
@@ -376,7 +376,7 @@ async def send_magic_link(
 
 
 @router.post("/sync-user")
-async def sync_user(request: Request, payload: SyncUserPayload, cartId: str = Header(default=None)) -> Message:
+async def sync_user(request: Request, payload: SyncUserPayload, _cart_id: Annotated[str | None, Cookie()] = None) -> Message:
     user = await db.user.find_first(
         where={
             "email": payload.email,
@@ -403,7 +403,7 @@ async def sync_user(request: Request, payload: SyncUserPayload, cartId: str = He
         except Exception as e:
             logger.error(f"Failed to publish USER_REGISTERED event: {e}")
 
-    await merge_cart(user_id=user.id, cart_number=cartId)
+    await merge_cart(user_id=user.id, cart_number=_cart_id)
     return {"message": "User synced successfully"}
 
 

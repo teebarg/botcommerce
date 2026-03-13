@@ -26,8 +26,8 @@ from app.services.recently_viewed import RecentlyViewedService
 from app.services.websocket import manager
 from app.services.generic import remove_image_from_storage
 from app.services.redis import invalidate_pattern
-from app.core.deps import get_current_superuser
 from app.models.gallery import PaginatedProductImages
+from app.core.permissions import require_admin
 
 logger = get_logger(__name__)
 
@@ -174,8 +174,8 @@ async def image_gallery(
         logger.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/reindex", dependencies=[Depends(get_current_superuser)], response_model=Message)
-async def reindex_images(background_tasks: BackgroundTasks):
+@router.post("/reindex", dependencies=[Depends(require_admin)])
+async def reindex_images(background_tasks: BackgroundTasks) -> Message:
     """
     Re-index all images in the db to Meilisearch.
     """
@@ -191,7 +191,7 @@ async def reindex_images(background_tasks: BackgroundTasks):
         )
 
 
-@router.delete("/{image_id}", dependencies=[Depends(get_current_superuser)])
+@router.delete("/{image_id}", dependencies=[Depends(require_admin)])
 async def delete_gallery_image(image_id: int, background_tasks: BackgroundTasks) -> Message:
     """
     Delete a gallery image.
@@ -230,7 +230,7 @@ async def delete_gallery_image(image_id: int, background_tasks: BackgroundTasks)
     return Message(message="image and all related data deleted successfully")
 
 
-@router.post("/bulk-upload", dependencies=[Depends(get_current_superuser)])
+@router.post("/bulk-upload", dependencies=[Depends(require_admin)])
 async def bulk_save_image_urls(payload: ProductImageBulkUrls, background_tasks: BackgroundTasks):
     """
     Save many image URLs into the gallery.
@@ -262,7 +262,7 @@ async def bulk_save_image_urls(payload: ProductImageBulkUrls, background_tasks: 
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/bulk-delete", dependencies=[Depends(get_current_superuser)])
+@router.post("/bulk-delete", dependencies=[Depends(require_admin)])
 async def bulk_delete_gallery_images(
     payload: ImageBulkDelete,
     background_tasks: BackgroundTasks,
@@ -308,7 +308,7 @@ async def bulk_delete_gallery_images(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.post("/{image_id}/metadata", dependencies=[Depends(get_current_superuser)])
+@router.post("/{image_id}/metadata", dependencies=[Depends(require_admin)])
 async def create_image_metadata(
     image_id: int,
     payload: ProductImageMetadata,
@@ -383,7 +383,7 @@ async def create_image_metadata(
             raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.patch("/{image_id}/metadata", dependencies=[Depends(get_current_superuser)])
+@router.patch("/{image_id}/metadata", dependencies=[Depends(require_admin)])
 async def update_image_metadata(
     image_id: int,
     payload: ProductImageMetadata,
@@ -477,7 +477,7 @@ async def update_image_metadata(
             raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.patch("/bulk-update", dependencies=[Depends(get_current_superuser)])
+@router.patch("/bulk-update", dependencies=[Depends(require_admin)])
 async def bulk_update_products(payload: ImagesBulkUpdate, background_tasks: BackgroundTasks) -> Message:
     images = await db.productimage.find_many(
         where={"id": {"in": payload.image_ids}},

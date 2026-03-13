@@ -14,8 +14,6 @@ export const Route = createFileRoute("/_adminLayout")({
         }
     },
     errorComponent: ({ error }) => {
-        console.log("🚀 ~ error:", error);
-        console.log("🚀 ~ error:", error.message === "Not authenticated");
         if (error.message === "Not authenticated") {
             return (
                 <div className="flex items-center justify-center p-12">

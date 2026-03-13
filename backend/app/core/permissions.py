@@ -7,7 +7,7 @@ async def require_user(user=Depends(verify_clerk_token)):
 
 
 def _get_roles(user):
-    roles = user.get("public_metadata", {}).get("roles", [])
+    roles = user.get("roles", [])
 
     if roles is None:
         return []
@@ -20,11 +20,10 @@ def _get_roles(user):
 
 async def require_admin(user=Depends(verify_clerk_token)):
     roles = _get_roles(user)
-
-    if not any(role in ["admin", "super-admin"] for role in roles):
+    if not any(role in ["admin"] for role in roles):
         raise HTTPException(
             status_code=403,
-            detail="Admin required"
+            detail="The user doesn't have enough privileges"
         )
 
     return user

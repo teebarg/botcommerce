@@ -1,7 +1,7 @@
 from app.models.generic import Message
 from typing import Annotated, Optional, List
 from fastapi import APIRouter, Depends, HTTPException, Cookie, Query, Request
-from app.core.deps import get_current_superuser, UserDep, CurrentUser
+from app.core.deps import UserDep, CurrentUser
 from app.models.coupon import (
     CouponCreate,
     CouponUpdate,
@@ -15,12 +15,13 @@ from app.services.redis import cache_response, invalidate_pattern
 from prisma.errors import PrismaError
 from datetime import datetime, date
 from app.services.cart import get_cart
+from app.core.permissions import require_admin
 
 logger = get_logger(__name__)
 router = APIRouter()
 
 
-@router.get("/", dependencies=[Depends(get_current_superuser)])
+@router.get("/", dependencies=[Depends(require_admin)])
 @cache_response(key_prefix="coupons")
 async def get_coupons(
     request: Request,
@@ -57,7 +58,7 @@ async def get_coupons(
     }
 
 
-@router.post("/", dependencies=[Depends(get_current_superuser)])
+@router.post("/", dependencies=[Depends(require_admin)])
 async def create_coupon(coupon_data: CouponCreate) -> Coupon:
     """
     Create a new coupon.
@@ -80,7 +81,7 @@ async def create_coupon(coupon_data: CouponCreate) -> Coupon:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
+@router.patch("/{id}", dependencies=[Depends(require_admin)])
 async def update_coupon(id: int, coupon_data: CouponUpdate) -> Coupon:
     """
     Update a coupon.
@@ -114,7 +115,7 @@ async def update_coupon(id: int, coupon_data: CouponUpdate) -> Coupon:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.delete("/{id}", dependencies=[Depends(get_current_superuser)])
+@router.delete("/{id}", dependencies=[Depends(require_admin)])
 async def delete_coupon(id: int):
     """
     Delete a coupon.
@@ -189,7 +190,7 @@ async def remove_coupon(
     return {"message": "Coupon removed successfully"}
 
 
-@router.post("/{id}/assign", dependencies=[Depends(get_current_superuser)])
+@router.post("/{id}/assign", dependencies=[Depends(require_admin)])
 async def assign_coupon(id: int, user_ids: List[int]):
     """
     Share a coupon with specific users.
@@ -212,7 +213,7 @@ async def assign_coupon(id: int, user_ids: List[int]):
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.patch("/{id}/toggle-status", dependencies=[Depends(get_current_superuser)])
+@router.patch("/{id}/toggle-status", dependencies=[Depends(require_admin)])
 async def toggle_coupon_status(id: int) -> Coupon:
     """
     Toggle coupon active status.

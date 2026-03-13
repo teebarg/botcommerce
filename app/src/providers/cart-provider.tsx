@@ -5,7 +5,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { Cart } from "@/schemas";
 import { useMyCart } from "@/hooks/useCart";
 import { get, del, update } from "idb-keyval";
-import { addToCartFn } from "@/server/cart.server";
 
 const CART_KEY = "offline-cart";
 
@@ -69,7 +68,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         setIsSyncing(true);
         try {
             for (const item of offlineCart) {
-                await addToCartFn({ data: item });
+                // TODO: Add item to cart
             }
             await clearOfflineCart();
             queryClient.invalidateQueries({ queryKey: ["cart"] });

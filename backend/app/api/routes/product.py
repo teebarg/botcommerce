@@ -1,5 +1,4 @@
 from typing import Any
-
 from fastapi import (
     APIRouter,
     Depends,
@@ -8,7 +7,7 @@ from fastapi import (
     BackgroundTasks,
     Request
 )
-from app.core.deps import CurrentUser, get_current_superuser, UserDep
+from app.core.deps import CurrentUser, UserDep
 from app.core.logging import get_logger
 from app.core.utils import slugify, url_to_list, generate_sku
 from app.models.generic import Message, ImageUpload
@@ -42,6 +41,7 @@ from app.redis_client import redis_client
 from collections import Counter
 import asyncio
 from prisma.enums import PaymentStatus
+from app.core.permissions import require_admin
 
 logger = get_logger(__name__)
 
@@ -552,7 +552,7 @@ async def search(
     }
 
 
-@router.post("/", dependencies=[Depends(get_current_superuser)])
+@router.post("/", dependencies=[Depends(require_admin)])
 async def create_product(product: ProductCreate, background_tasks: BackgroundTasks):
     slugified_name = slugify(product.name)
 
@@ -587,7 +587,7 @@ async def create_product(product: ProductCreate, background_tasks: BackgroundTas
     return created_product
 
 
-@router.post("/create-bundle", dependencies=[Depends(get_current_superuser)])
+@router.post("/create-bundle", dependencies=[Depends(require_admin)])
 async def create_product_bundle(
     payload: ProductCreateBundle,
     background_tasks: BackgroundTasks,
@@ -716,7 +716,7 @@ async def read(request: Request, slug: str):
     return product_dict
 
 
-@router.put("/{id}", dependencies=[Depends(get_current_superuser)])
+@router.put("/{id}", dependencies=[Depends(require_admin)])
 async def update_product(id: int, product: ProductUpdate, background_tasks: BackgroundTasks):
     existing_product = await db.product.find_unique(where={"id": id})
     if not existing_product:
@@ -768,7 +768,7 @@ async def update_product(id: int, product: ProductUpdate, background_tasks: Back
     return updated_product
 
 
-@router.delete("/{id}", dependencies=[Depends(get_current_superuser)])
+@router.delete("/{id}", dependencies=[Depends(require_admin)])
 async def delete_product(id: int) -> Message:
     """
     Delete a product.
@@ -800,7 +800,7 @@ async def delete_product(id: int) -> Message:
         return Message(message="Product deleted successfully")
 
 
-@router.post("/{id}/variants", dependencies=[Depends(get_current_superuser)])
+@router.post("/{id}/variants", dependencies=[Depends(require_admin)])
 async def create_variant(id: int, variant: VariantWithStatus, background_tasks: BackgroundTasks):
     product = await db.product.find_unique(where={"id": id})
     if not product:
@@ -835,7 +835,7 @@ async def create_variant(id: int, variant: VariantWithStatus, background_tasks: 
     return created_variant
 
 
-@router.put("/variants/{variant_id}", dependencies=[Depends(get_current_superuser)])
+@router.put("/variants/{variant_id}", dependencies=[Depends(require_admin)])
 async def update_variant(variant_id: int, variant: VariantWithStatus, background_tasks: BackgroundTasks):
     existing_variant = await db.productvariant.find_unique(where={"id": variant_id})
     if not existing_variant:
@@ -880,7 +880,7 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
     return updated_variant
 
 
-@router.delete("/variants/{variant_id}", dependencies=[Depends(get_current_superuser)])
+@router.delete("/variants/{variant_id}", dependencies=[Depends(require_admin)])
 async def delete_variant(variant_id: int, background_tasks: BackgroundTasks):
     try:
         variant = await db.productvariant.delete(where={"id": variant_id})
@@ -894,7 +894,7 @@ async def delete_variant(variant_id: int, background_tasks: BackgroundTasks):
     return {"success": True}
 
 
-@router.patch("/{id}/image", dependencies=[Depends(get_current_superuser)])
+@router.patch("/{id}/image", dependencies=[Depends(require_admin)])
 async def add_image(id: int, image_data: ImageUpload, background_tasks: BackgroundTasks) -> Product:
     """
     Add an image to a product.
@@ -924,7 +924,7 @@ async def add_image(id: int, image_data: ImageUpload, background_tasks: Backgrou
         )
 
 
-@router.post("/{id}/images", dependencies=[Depends(get_current_superuser)])
+@router.post("/{id}/images", dependencies=[Depends(require_admin)])
 async def upload_images(id: int, image_data: ImageUpload, background_tasks: BackgroundTasks):
     """
     Upload images to a product.
@@ -953,7 +953,7 @@ async def upload_images(id: int, image_data: ImageUpload, background_tasks: Back
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.delete("/{id}/images/{image_id}", dependencies=[Depends(get_current_superuser)])
+@router.delete("/{id}/images/{image_id}", dependencies=[Depends(require_admin)])
 async def delete_product_image(id: int, image_id: int, background_tasks: BackgroundTasks):
     """
     Delete an image from a product images.
@@ -1012,7 +1012,7 @@ async def configure_filterable_attributes(
         ) from e
 
 
-@router.get("/search/clear-index", dependencies=[Depends(get_current_superuser)], response_model=dict)
+@router.get("/search/clear-index", dependencies=[Depends(require_admin)], response_model=dict)
 async def config_clear_index():
     """
     Clear the products index in Meilisearch.
@@ -1027,7 +1027,7 @@ async def config_clear_index():
         ) from e
 
 
-@router.post("/search/delete-index", dependencies=[Depends(get_current_superuser)])
+@router.post("/search/delete-index", dependencies=[Depends(require_admin)])
 async def config_delete_index(index_name: str) -> dict:
     """
     Drop the products index in Meilisearch.
@@ -1042,7 +1042,7 @@ async def config_delete_index(index_name: str) -> dict:
         ) from e
 
 
-@router.patch("/{id}/images/reorder", dependencies=[Depends(get_current_superuser)])
+@router.patch("/{id}/images/reorder", dependencies=[Depends(require_admin)])
 async def reorder_images(id: int, image_ids: list[int]) -> Message:
     """
     Reorder product images.

@@ -2,8 +2,8 @@ from fastapi import APIRouter, HTTPException, Query, Depends
 from app.prisma_client import prisma as db
 from app.models.faq import FAQ, FAQCreate, FAQUpdate
 from typing import Optional, List
-from app.core.deps import get_current_superuser
 from app.models.generic import Message
+from app.core.permissions import require_admin
 
 router = APIRouter()
 
@@ -25,7 +25,7 @@ async def list_faqs(
     faqs = await db.faq.find_many(where=where, order={"created_at": "desc"})
     return faqs
 
-@router.post("/", dependencies=[Depends(get_current_superuser)])
+@router.post("/", dependencies=[Depends(require_admin)])
 async def create_faq(faq: FAQCreate)-> FAQ:
     """Create a new FAQ entry"""
     try:
@@ -44,7 +44,7 @@ async def create_faq(faq: FAQCreate)-> FAQ:
         raise
 
 
-@router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
+@router.patch("/{id}", dependencies=[Depends(require_admin)])
 async def update_faq(faq_update: FAQUpdate, id: int)-> FAQ:
     """Update a FAQ entry"""
     existing_faq = await db.faq.find_unique(where={"id": id})
@@ -72,7 +72,7 @@ async def update_faq(faq_update: FAQUpdate, id: int)-> FAQ:
             raise HTTPException(status_code=400, detail="A FAQ with this question already exists")
         raise
 
-@router.delete("/{id}", dependencies=[Depends(get_current_superuser)])
+@router.delete("/{id}", dependencies=[Depends(require_admin)])
 async def delete_faq(id: int)-> Message:
     """Delete a FAQ entry"""
     existing_faq = await db.faq.find_unique(where={"id": id})

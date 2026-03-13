@@ -4,13 +4,8 @@ import { deleteCookie, getCookies } from "@tanstack/react-start/server";
 
 const baseURL = process.env.API_URL || "http://localhost.dev";
 
-interface HeaderOptions {
-    cartId?: string | undefined;
-}
-
 type RequestOptions = RequestInit & {
     params?: Record<string, string | number | boolean | null | undefined>;
-    headers?: HeaderOptions;
 };
 
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
@@ -18,7 +13,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
     const { params, ...restOptions } = options;
     const { getToken } = await auth();
     const token = await getToken({ template: "default" });
-    // console.log("🚀 ~ file: api.server.ts:21 ~ token:", token)
+    console.log("🚀 ~ file: api.server.ts:16 ~ token:", token)
 
     const url = new URL(`/api${endpoint}`, baseURL);
 
@@ -33,13 +28,11 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         .map(([key, value]) => `${key}=${value}`)
         .join("; ");
 
-    // console.log("🚀 ~ file: api.server.ts:29 ~ cookieHeader:", cookieHeader)
-
     const headers = {
         "Content-Type": "application/json",
-        ...options.headers,
         Cookie: cookieHeader,
-        Authorization: token ? `Bearer ${token}` : "",
+        ...options.headers,
+        "X-Auth": token || "",
     };
 
     const response = await fetch(url, {
@@ -47,27 +40,17 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         headers,
     });
 
-    if (response.status === 403) {
-        throw redirect({
-            to: "/forbidden",
-        });
-    }
-
-    // if (response.status === 401) {
-    //     deleteCookie("__Secure-authjs.session-token", {
-    //         path: "/",
-    //         secure: true,
-    //         sameSite: "none",
-    //     });
-    //     deleteCookie("authjs.session-token");
-
+    // if (response.status === 403) {
     //     throw redirect({
-    //         to: "/auth/signin",
-    //         search: {
-    //             callbackUrl: "/",
-    //         },
+    //         to: "/forbidden",
     //     });
     // }
+
+    if (response.status === 401) {
+        throw redirect({
+            to: "/sign-in",
+        });
+    }
 
     if (response.ok) {
         return response.json();

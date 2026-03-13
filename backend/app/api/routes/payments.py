@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends, Response
 from app.core.config import settings
 from app.schemas.payment import PaymentInitialize, PaymentCreate
 from app.models.order import OrderCreate, Order
@@ -76,20 +76,20 @@ async def create_payment(
     return await initialize_payment(cart, current_user)
 
 @router.get("/verify/{reference}")
-async def verify_payment(reference: str, user: CurrentUser) -> Order:
+async def verify_payment(response: Response, reference: str, user: CurrentUser) -> Order:
     """Verify a payment"""
     async with httpx.AsyncClient() as client:
-        response = await client.get(
+        res = await client.get(
             f"{PAYSTACK_BASE_URL}/transaction/verify/{reference}",
             headers={
                 "Authorization": f"Bearer {PAYSTACK_SECRET_KEY}",
             }
         )
 
-        if response.status_code != 200:
+        if res.status_code != 200:
             raise HTTPException(status_code=400, detail="Failed to verify payment")
 
-        data = response.json()
+        data = res.json()
 
         order_in = OrderCreate(status=OrderStatus.PENDING, payment_status=PaymentStatus.SUCCESS)
 
@@ -111,6 +111,14 @@ async def verify_payment(reference: str, user: CurrentUser) -> Order:
                 "payment_method": PaymentMethod.PAYSTACK,
             }
             await publish_event(event=event)
+
+            response.delete_cookie(
+                key="_cart_id",
+                path="/",
+                httponly=True,
+                samesite="none",
+                secure=True,
+            )
 
             return order
         else:

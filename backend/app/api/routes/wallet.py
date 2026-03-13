@@ -3,10 +3,11 @@ from fastapi import APIRouter, Depends, Request, Query
 from pydantic import BaseModel
 from app.prisma_client import prisma as db
 from app.services.redis import cache_response
-from app.core.deps import get_current_superuser, CurrentUser
+from app.core.deps import  CurrentUser
 from app.models.user import User
 from datetime import datetime
 from prisma.enums import WalletTransactionType
+from app.core.permissions import require_admin
 
 class WalletTxn(BaseModel):
     id: str
@@ -25,7 +26,7 @@ class PaginatedWalletTxns(BaseModel):
 
 router = APIRouter()
 
-@router.get("/", dependencies=[Depends(get_current_superuser)])
+@router.get("/", dependencies=[Depends(require_admin)])
 @cache_response(key_prefix="wallet")
 async def index(
     request: Request,
