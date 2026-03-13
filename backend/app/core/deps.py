@@ -95,6 +95,28 @@ async def verify_clerk_token(request: Request):
     return payload
 
 
+async def verify_clerk_token2(request: Request):
+    auth = request.headers.get("Authorization")
+    if not auth:
+        return None
+
+    token = auth.split(" ")[1]
+    jwks = await get_jwks()
+
+    try:
+        payload = new_jwt.decode(
+            token,
+            jwks,
+            algorithms=["RS256"],
+            issuer=settings.CLERK_ISSUER_URL,
+            options={"verify_aud": False},
+        )
+    except Exception:
+        return None
+
+    return payload
+
+
 async def get_internal_service(
     credentials: HTTPAuthorizationCredentials | None = Depends(internal_bearer),
 ) -> ServicePrincipal | None:
@@ -135,20 +157,31 @@ async def get_user_token(access_token: TokenDep = None) -> TokenPayload | None:
 # TokenDep = Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]
 TokenUser = Annotated[TokenPayload, Depends(get_user_token)]
 
-async def get_user(token_data: TokenUser = None ) -> User | None:
-    if not token_data:
+# async def get_user(token_data: TokenUser = None ) -> User | None:
+async def get_user(payload=Depends(verify_clerk_token2)) -> User | None:
+    if not payload:
         return None
 
-    user = await prisma.user.find_unique(where={"email": token_data.sub})
+    clerk_id = payload["sub"]
+    user = await prisma.user.find_unique(
+        where={"clerk_id": clerk_id}
+    )
 
     if not user:
-        return None
+        user = await prisma.user.upsert(
+            where={"email": payload["email"]},
+            data={
+                "create": {"clerk_id": clerk_id, "email": payload["email"], "first_name": payload.get("firstName"), "last_name": payload.get("lastName"), "hashed_password": "dkkdkdkkdkdkd22h3s"},
+                "update": {"clerk_id": clerk_id},
+            },
+        )
     return user
 
 
 UserDep = Annotated[User | None, Depends(get_user)]
 
 async def get_current_user(payload=Depends(verify_clerk_token)) -> User:
+    print(payload)
     clerk_id = payload["sub"]
 
     user = await prisma.user.find_unique(
@@ -156,28 +189,15 @@ async def get_current_user(payload=Depends(verify_clerk_token)) -> User:
     )
 
     if not user:
-        user = await prisma.user.create(
+        user = await prisma.user.upsert(
+            where={"email": payload["email"]},
             data={
-                "clerk_id": clerk_id,
-                "email": payload["email"],
-                "first_name": payload.get("firstName"),
-                "last_name": payload.get("lastName"),
-            }
+                "create": {"clerk_id": clerk_id, "email": payload["email"], "first_name": payload.get("firstName"), "last_name": payload.get("lastName"), "hashed_password": "dkkdkdkkdkdkd22h3s"},
+                "update": {"clerk_id": clerk_id},
+            },
         )
 
     return user
-
-# async def get_current_user(token_data: TokenUser) -> User:
-#     if not token_data:
-#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
-
-#     user = await prisma.user.find_unique(where={"email": token_data.sub})
-
-#     if not user:
-#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
-#     if user.status == "inactive":
-#         raise HTTPException(status_code=400, detail="Inactive user")
-#     return user
 
 
 def get_current_active_user(

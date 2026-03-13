@@ -78,7 +78,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
     const handleUserInteraction = async (type: UserInteractionType, metadata?: Record<string, any>) => {
         if (session?.user && product?.id) {
             trackInteraction.mutate({
-                user_id: session.id,
                 product_id: product.id,
                 type,
                 metadata: { source: "product-view", ...metadata },

@@ -8,9 +8,8 @@ import { cn } from "@/utils";
 import type React from "react";
 import { CreditCard, Heart, Home, LayoutGrid, User2, User as UserIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import LocalizedClientLink from "@/components/ui/link";
-import { useInvalidateMe } from "@/hooks/useUser";
 import { ThemeToggle } from "../theme-toggle";
+import { SignInButton, UserButton } from "@clerk/tanstack-react-start";
 
 interface NavLinkProp {
     href: string;
@@ -33,12 +32,6 @@ const StoreMenuComp: React.FC = () => {
     const pathname = location.pathname;
     const state = useOverlayTriggerState({});
     const { session } = useRouteContext({ strict: false });
-    const invalidate = useInvalidateMe();
-
-    const handleLogout = async () => {
-        invalidate();
-        window.location.href = "/api/auth/signout";
-    };
 
     useEffect(() => {
         state.close();
@@ -78,18 +71,7 @@ const StoreMenuComp: React.FC = () => {
                         <ThemeToggle />
                     </div>
                     <div className="mt-4 mb-2 block md:hidden">
-                        {session ? (
-                            <div>
-                                <p className="font-semibold leading-6 text-primary-900">Logged in as {session.user?.first_name}</p>
-                                <button aria-label="log out" data-testid="logout-button" type="button" onClick={handleLogout}>
-                                    Log out
-                                </button>
-                            </div>
-                        ) : (
-                            <LocalizedClientLink className="font-semibold leading-6 text-primary-900" href={`/auth/signin?callbackUrl=${pathname}`}>
-                                Log In <span aria-hidden="true">&rarr;</span>
-                            </LocalizedClientLink>
-                        )}
+                        {session ? <UserButton /> : <SignInButton />}
                     </div>
                 </div>
             </DrawerContent>

@@ -10,10 +10,7 @@ import NotFound from "@/components/generic/not-found";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { WebSocketProvider } from "pulsews";
 import appCss from "@/styles.css?url";
-import { type AuthSession, getSession, type Session } from "start-authjs";
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
-import { authConfig } from "@/utils/auth";
 import { ThemeProvider } from "@/providers/theme-provider";
 import type { QueryClient } from "@tanstack/react-query";
 import { categoriesQuery } from "@/hooks/useCategories";
@@ -24,36 +21,54 @@ import { useEffect } from "react";
 import { initPulseMetrics } from "@/utils/pulsemetric";
 import PageTransitionLoader from "@/components/generic/page-transition-loader";
 import PWABadge from "@/PWAbadge";
-import { ClerkProvider, SignIn } from "@clerk/tanstack-react-start";
+import { ClerkProvider } from "@clerk/tanstack-react-start";
 import { auth } from "@clerk/tanstack-react-start/server";
 
+type SessionClaims = {
+    firstName?: string;
+    lastName?: string;
+    role?: string;
+    roles?: string[];
+};
+
+type AuthUser = {
+    firstName?: string;
+    lastName?: string;
+    role?: string;
+    roles?: string[];
+    isAdmin?: boolean;
+};
+
+type Session = {
+    id: string;
+    user: AuthUser;
+    accessToken: string;
+    impersonated: boolean;
+    impersonatedBy: string | null;
+};
+
+type AuthState = {
+    isAuthenticated: boolean;
+    userId: string | null;
+    sessionClaims: SessionClaims | null;
+};
+
 interface RouterContext {
-    session: AuthSession | null;
+    isAuthenticated: boolean;
+    userId: string | null;
+    session: Session | null;
     queryClient: QueryClient;
     config: any;
 }
 
-const fetchSession = createServerFn({ method: "GET" }).handler(async () => {
-    const request = getRequest();
-    const session = await getSession(request, authConfig);
-    return session;
-});
-
-const authStateFn = createServerFn().handler(async () => {
+export const authStateFn = createServerFn().handler(async (): Promise<AuthState> => {
     const { isAuthenticated, userId, sessionClaims } = await auth();
-    console.log("🚀 ~ file: __root.tsx:44 ~ userId:", userId);
-    console.log("🚀 ~ file: __root.tsx:44 ~ isAuthenticated:", isAuthenticated);
 
-    // if (!isAuthenticated) {
-    //     // This will error because you're redirecting to a path that doesn't exist yet
-    //     // You can create a sign-in route to handle this
-    //     // See https://clerk.com/docs/tanstack-react-start/guides/development/custom-sign-in-or-up-page
-    //     throw redirect({
-    //         to: "/sign-in",
-    //     });
-    // }
-
-    return { isAuthenticated, userId, sessionClaims };
+    return {
+        isAuthenticated,
+        userId,
+        sessionClaims: sessionClaims as SessionClaims | null,
+    };
 });
 
 export const Route = createRootRouteWithContext<RouterContext>()({
@@ -61,15 +76,24 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         if (process.env.MAINTENANCE_MODE === "true" && location.pathname !== "/maintenance") {
             throw redirect({ to: "/maintenance" });
         }
-        const session = (await fetchSession()) as unknown as Session;
         const { isAuthenticated, userId, sessionClaims } = await authStateFn();
         const user = {
-            firstName: (sessionClaims?.firstName as string) || "",
-            lastName: (sessionClaims?.lastName as string) || "",
-            role: (sessionClaims?.role as string) || "",
-            roles: (sessionClaims?.roles as string[]) || [],
+            firstName: sessionClaims?.firstName || "",
+            lastName: sessionClaims?.lastName || "",
+            role: sessionClaims?.role || "",
+            roles: sessionClaims?.roles || [],
+            isAdmin: sessionClaims?.roles?.includes("admin") || false,
         };
-        return { session, isAuthenticated, userId, user };
+
+        const session: Session | null = {
+            id: userId || "",
+            user,
+            accessToken: "",
+            impersonated: false,
+            impersonatedBy: null,
+        };
+
+        return { isAuthenticated, userId, session };
     },
     loader: async ({ context: { queryClient } }) => {
         const [categories, collections, config] = await Promise.all([
@@ -111,25 +135,13 @@ export const Route = createRootRouteWithContext<RouterContext>()({
             ],
         };
     },
-    errorComponent: ({ error }) => {
-        console.log("🚀 ~ file: __root.tsx:110 ~ error:", error);
-        if (error.message === "Not authenticated") {
-            return (
-                <div className="flex items-center justify-center p-12">
-                    <SignIn routing="hash" forceRedirectUrl={window.location.href} />
-                </div>
-            );
-        }
-
-        throw error;
+    errorComponent: (props) => {
+        return (
+            <RootDocument>
+                <DefaultCatchBoundary {...props} />
+            </RootDocument>
+        );
     },
-    // errorComponent: (props) => {
-    //     return (
-    //         <RootDocument>
-    //             <DefaultCatchBoundary {...props} />
-    //         </RootDocument>
-    //     );
-    // },
     notFoundComponent: () => <NotFound />,
     component: RootComponent,
 });

@@ -1,15 +1,16 @@
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from "@/components/navbar";
 import GetApp from "../get-app";
-import UserDropDown from "./user-dropdown";
 import { CartComponent } from "@/components/store/cart/cart-component";
 import LocalizedClientLink from "@/components/ui/link";
 import { SearchDialog } from "@/components/store/product-search";
 import { Heart, HeartOff, ShoppingBag } from "lucide-react";
 import { ThemeToggle } from "../theme-toggle";
-import type { Session } from "start-authjs";
 import { useConfig } from "@/providers/store-provider";
+import { SignInButton, UserButton } from "@clerk/tanstack-react-start";
+import { useRouteContext } from "@tanstack/react-router";
 
-const StoreNavbar = ({ session }: { session: Session | null }) => {
+const StoreNavbar = () => {
+    const { session } = useRouteContext({ strict: false });
     const { config } = useConfig();
 
     return (
@@ -48,15 +49,7 @@ const StoreNavbar = ({ session }: { session: Session | null }) => {
                         )}
                     </div>
                     <GetApp />
-                    <div className="hidden sm:flex">
-                        {session?.user ? (
-                            <UserDropDown user={session?.user} />
-                        ) : (
-                            <LocalizedClientLink className="text-sm font-semibold leading-6" href="/auth/signin">
-                                Log In <span aria-hidden="true">&rarr;</span>
-                            </LocalizedClientLink>
-                        )}
-                    </div>
+                    <div className="hidden sm:flex">{session?.user ? <UserButton /> : <SignInButton />}</div>
                 </NavbarItem>
             </NavbarContent>
         </NavigationBar>
