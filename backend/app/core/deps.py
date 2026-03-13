@@ -12,7 +12,7 @@ from app.models.generic import TokenPayload
 from app.services.notification import EmailChannel, NotificationService, SlackChannel, WhatsAppChannel
 from app.prisma_client import prisma
 from meilisearch import Client as MeilisearchClient
-from app.models.user import UserInternal as User, AuthUser
+from app.models.user import UserInternal as User
 from supabase import create_client, Client
 from app.services.redis import get_redis_dependency
 import redis.asyncio as redis
@@ -212,11 +212,11 @@ def get_current_active_user(
     return current_user
 
 
-CurrentUser = Annotated[AuthUser, Depends(get_current_user)]
+CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
-def get_current_superuser(current_user: CurrentUser) -> AuthUser:
-    if not current_user.role == "admin":
+def get_current_superuser(current_user: CurrentUser) -> User:
+    if not current_user.role == "ADMIN":
         raise HTTPException(
             status_code=403, detail="The user doesn't have enough privileges"
         )
