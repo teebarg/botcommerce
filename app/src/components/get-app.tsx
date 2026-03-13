@@ -151,7 +151,7 @@ const GetApp: React.FC = () => {
 
     return (
         <button
-            className="flex items-center hover:text-muted-foreground cursor-pointer bg-secondary transition-colors rounded-full md:px-2 py-1.5"
+            className="flex items-center hover:text-muted-foreground cursor-pointer bg-secondary transition-colors rounded-full p-1.5"
             onClick={handleInstallClick}
         >
             <RectangleVertical />

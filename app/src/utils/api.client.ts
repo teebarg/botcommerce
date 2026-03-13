@@ -11,7 +11,6 @@ async function clientRequest<T>(endpoint: string, options: ClientRequestOptions 
     const { params, ...rest } = options;
     const url = new URL(`/api${endpoint}`, baseURL);
     const token = await getToken({ template: "default" });
-    console.log("🚀 ~ file: api.client.ts:14 ~ token:", token)
 
     if (params) {
         for (const [key, value] of Object.entries(params)) {
@@ -26,7 +25,7 @@ async function clientRequest<T>(endpoint: string, options: ClientRequestOptions 
         headers: {
             "Content-Type": "application/json",
             ...rest.headers,
-            "X-Auth": token || "",
+            "X-Auth": token || "token",
         },
     });
 

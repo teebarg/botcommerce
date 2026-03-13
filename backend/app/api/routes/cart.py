@@ -168,43 +168,6 @@ async def add_item_to_cart(
     if cart is None:
         cart = await create_cart(user_id=user.id if user else None)
 
-    # variant = await db.productvariant.find_unique(
-    #     where={"id": item_in.variant_id},
-    #     include={"product": {"include": {"images": True}}}
-    # )
-
-    # if not variant:
-    #     raise HTTPException(status_code=400, detail="product does not exist")
-    # if variant.status != "IN_STOCK":
-    #     raise HTTPException(status_code=400, detail="product is out of stock")
-
-    # if item_in.quantity > variant.inventory:
-    #     available_quantity = variant.inventory - item_in.quantity
-    #     if available_quantity <= 0:
-    #         raise HTTPException(
-    #             status_code=400,
-    #             detail=f"Not enough inventory. Only {variant.inventory} items available in stock."
-    #         )
-    #     else:
-    #         raise HTTPException(
-    #             status_code=400,
-    #             detail=f"Not enough inventory. You can add {available_quantity} more items (only {variant.inventory} available in stock)."
-    #         )
-
-    # item = await db.cartitem.create(
-    #     data={
-    #         "cart_id": cart.id,
-    #         "cart_number": cart.cart_number,
-    #         "name": variant.product.name,
-    #         "slug": variant.product.slug,
-    #         "variant_id": item_in.variant_id,
-    #         "quantity": item_in.quantity,
-    #         "price": variant.price,
-    #         "image": variant.product.images[0].image if variant.product.images else variant.product.image
-    #     },
-    #     include={"variant": True}
-    # )
-
     item = await _handle_add_item(item_in, cart)
 
     background_tasks.add_task(calculate_cart_totals, cart=cart)
@@ -214,7 +177,6 @@ async def add_item_to_cart(
 
 
 @router.get("/")
-# @cache_response(key_prefix="cart", key=lambda request, response, user, _cart_id, **kwargs: user.id if user else _cart_id)
 async def get_cart_index(request: Request, response: Response, user: UserDep, _cart_id: Annotated[str | None, Cookie()] = None) -> Optional[Cart]:
     """Get a specific cart by ID"""
     include_query = {

@@ -1,6 +1,6 @@
 import { auth } from "@clerk/tanstack-react-start/server";
 import { redirect } from "@tanstack/react-router";
-import { deleteCookie, getCookies } from "@tanstack/react-start/server";
+import { getCookies } from "@tanstack/react-start/server";
 
 const baseURL = process.env.API_URL || "http://localhost.dev";
 
@@ -13,7 +13,6 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
     const { params, ...restOptions } = options;
     const { getToken } = await auth();
     const token = await getToken({ template: "default" });
-    console.log("🚀 ~ file: api.server.ts:16 ~ token:", token)
 
     const url = new URL(`/api${endpoint}`, baseURL);
 
@@ -32,7 +31,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         "Content-Type": "application/json",
         Cookie: cookieHeader,
         ...options.headers,
-        "X-Auth": token || "",
+        "X-Auth": token || "token",
     };
 
     const response = await fetch(url, {
@@ -40,11 +39,11 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         headers,
     });
 
-    // if (response.status === 403) {
-    //     throw redirect({
-    //         to: "/forbidden",
-    //     });
-    // }
+    if (response.status === 403) {
+        throw redirect({
+            to: "/forbidden",
+        });
+    }
 
     if (response.status === 401) {
         throw redirect({

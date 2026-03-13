@@ -10,12 +10,12 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { motion } from "framer-motion";
 import { BackButton } from "@/components/back";
 import { meQuery } from "@/queries/user.queries";
-import { redirect } from "@tanstack/react-router";
+import { SignIn } from "@clerk/tanstack-react-start";
 
 export const Route = createFileRoute("/checkout")({
-    beforeLoad: ({ context, location }) => {
-        if (!context.session) {
-            throw redirect({ to: "/auth/signin", search: { callbackUrl: location.href } });
+    beforeLoad: ({ context }) => {
+        if (!context.isAuthenticated) {
+            throw new Error("Not authenticated");
         }
     },
     loader: async ({ context: { queryClient } }) => {
@@ -32,6 +32,17 @@ export const Route = createFileRoute("/checkout")({
             },
         ],
     }),
+    errorComponent: ({ error }) => {
+        if (error.message === "Not authenticated") {
+            return (
+                <div className="flex items-center justify-center p-12">
+                    <SignIn routing="hash" forceRedirectUrl={window.location.href} />
+                </div>
+            );
+        }
+
+        throw error;
+    },
     component: RouteComponent,
 });
 

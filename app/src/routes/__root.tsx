@@ -27,7 +27,7 @@ import { auth } from "@clerk/tanstack-react-start/server";
 type SessionClaims = {
     firstName?: string;
     lastName?: string;
-    image?: string;
+    image_url?: string;
     email?: string;
     role?: string;
     roles?: string[];
@@ -84,7 +84,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         const user = {
             firstName: sessionClaims?.firstName || "",
             lastName: sessionClaims?.lastName || "",
-            image: sessionClaims?.image || "",
+            image: sessionClaims?.image_url || "",
             email: sessionClaims?.email || "",
             role: sessionClaims?.role || "",
             roles: sessionClaims?.roles || [],

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, BackgroundTasks, Cookie
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, BackgroundTasks, Cookie, Response
 from app.core.deps import CurrentUser, PrincipalDep
 from typing import Annotated, Optional
 from app.prisma_client import prisma as db
@@ -16,6 +16,7 @@ router = APIRouter()
 
 @router.post("/")
 async def create_order(
+    response: Response,
     order_in: OrderCreate,
     user: CurrentUser,
     _cart_id: Annotated[str | None, Cookie()] = None
@@ -24,6 +25,13 @@ async def create_order(
         order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=_cart_id)
         await invalidate_pattern("orders")
         await invalidate_pattern("cart")
+        response.delete_cookie(
+            key="_cart_id",
+            path="/",
+            httponly=True,
+            samesite="none",
+            secure=True,
+        )
         return order
     except Exception as e:
         logger.error(f"Failed to create order in create_order: {str(e)}")
