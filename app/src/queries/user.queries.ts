@@ -4,8 +4,6 @@ import { getMeFn, getMeTrxnFn } from "@/server/users.server";
 import { getOrderFn, getOrdersFn } from "@/server/order.server";
 import { getCollectionFn } from "@/server/collections.server";
 import { getReviewsFn } from "@/server/review.server";
-import { Wishlist } from "@/schemas";
-import { clientApi } from "@/utils/api.client";
 import { getCatalogFn, getUserAddressesFn } from "@/server/store.server";
 
 type FeedParams = {

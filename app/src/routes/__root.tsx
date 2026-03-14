@@ -73,11 +73,18 @@ const authStateFn = createServerFn().handler(async (): Promise<AuthState> => {
 });
 
 export const Route = createRootRouteWithContext<RouterContext>()({
-    beforeLoad: async ({ location }) => {
+    beforeLoad: async ({ context: { queryClient }, location }) => {
         if (process.env.MAINTENANCE_MODE === "true" && location.pathname !== "/maintenance") {
             throw redirect({ to: "/maintenance" });
         }
-        const { isAuthenticated, userId, sessionClaims } = await authStateFn();
+        const [{ isAuthenticated, userId, sessionClaims }, config] = await Promise.all([
+            authStateFn(),
+            queryClient.ensureQueryData({
+                queryKey: ["shop-settings"],
+                queryFn: () => getShopSettingsPublicFn(),
+                staleTime: 100000 * 60 * 5, // 5 minutes — settings rarely change
+            }),
+        ]);
         const user = {
             firstName: sessionClaims?.firstName || "",
             lastName: sessionClaims?.lastName || "",
@@ -95,7 +102,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
             impersonated: false,
             impersonatedBy: null,
         };
-        const config = await getShopSettingsPublicFn();
 
         return { isAuthenticated, userId, session, config };
     },
