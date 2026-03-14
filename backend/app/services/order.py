@@ -23,7 +23,6 @@ async def create_order_from_cart(order_in: OrderCreate, user_id: int, cart_numbe
     cart = await get_cart(cart_number=cart_number, user_id=user_id)
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
-    print("cart", cart)
 
     data = {
             "order_number": order_number,

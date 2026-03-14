@@ -47,7 +47,6 @@ interface IndexProducts {
 }
 
 export const getIndexProductsFn = createServerFn().handler(async () => await api.get<IndexProducts>("/product/index-products"));
-export const getIndexCategoriesProductsFn = createServerFn().handler(async () => await api.get<CategoriesWithProducts[]>("/category/home/products"));
 
 export const getProductsFeedFn = createServerFn()
     .inputValidator(FeedQuerySchema)

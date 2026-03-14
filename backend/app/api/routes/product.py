@@ -264,7 +264,6 @@ async def feed(
 
             if cursor:
                 c = decode_cursor(cursor)
-                print(c)
                 cursor_filter = (
                     f"(random_score > {c['r']} OR "
                     f"(random_score = {c['r']} AND freshness_score < {c['f']}) OR "

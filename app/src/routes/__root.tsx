@@ -13,8 +13,6 @@ import appCss from "@/styles.css?url";
 import { createServerFn } from "@tanstack/react-start";
 import { ThemeProvider } from "@/providers/theme-provider";
 import type { QueryClient } from "@tanstack/react-query";
-import { categoriesQuery } from "@/hooks/useCategories";
-import { collectionsQuery } from "@/hooks/useCollection";
 import { InvalidateProvider } from "@/providers/invalidate-provider";
 import { useEffect } from "react";
 import { initPulseMetrics } from "@/utils/pulsemetric";
@@ -65,9 +63,8 @@ interface RouterContext {
     config: any;
 }
 
-export const authStateFn = createServerFn().handler(async (): Promise<AuthState> => {
+const authStateFn = createServerFn().handler(async (): Promise<AuthState> => {
     const { isAuthenticated, userId, sessionClaims } = await auth();
-
     return {
         isAuthenticated,
         userId,
@@ -102,15 +99,8 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
         return { isAuthenticated, userId, session, config };
     },
-    loader: async ({ context: { queryClient, config } }) => {
-        const [categories, collections] = await Promise.all([
-            queryClient.ensureQueryData(categoriesQuery()),
-            queryClient.ensureQueryData(collectionsQuery())
-        ]);
-
+    loader: async ({ context: { config } }) => {
         return {
-            categories,
-            collections,
             config,
         };
     },

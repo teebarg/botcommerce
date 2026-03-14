@@ -14,7 +14,6 @@ router = APIRouter()
 
 @router.post("/batch")
 async def batch_user_interactions(user: UserDep, payload: List[UserInteractionCreate] = Body(...)) -> Message:
-    print(user)
     if not user:
         return Message(message="You are not logged in")
     for item in payload:

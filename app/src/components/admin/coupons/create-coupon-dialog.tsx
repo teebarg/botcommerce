@@ -72,7 +72,7 @@ export const CreateCouponDialog = () => {
 
     return (
         <SheetDrawer
-            drawerClassName="h-[85dvh]"
+            drawerClassName="h-[85svh]"
             open={state.isOpen}
             title="Create Coupon"
             trigger={

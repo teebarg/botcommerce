@@ -47,8 +47,6 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
     const [bgColor, setBgColor] = useState("rgb(20,20,20)");
     const [isBright, setIsBright] = useState(false);
 
-    console.log("inView:", inView, "imageLoaded:", imageLoaded);
-
     useEffect(() => {
         if (!inView || processedRef.current) return;
         if (!product.images?.[0]) return;

@@ -12,27 +12,26 @@ import NewsletterSection from "@/components/store/landing/newsletter-section";
 import CategoriesWithProductsSection from "@/components/store/home/categories-products";
 import { HERO_IMAGES } from "@/utils/constants";
 import InfiniteFeed from "@/components/store/collections/infinite-feed";
-import { indexCategoriesProductsQuery, indexProductQuery } from "@/queries/user.queries";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { getIndexProductsFn } from "@/server/product.server";
 
 export const Route = createFileRoute("/_mainLayout/")({
     component: Home,
-    loader: async ({ context: { queryClient } }) => {
-        await Promise.all([queryClient.ensureQueryData(indexProductQuery()), queryClient.ensureQueryData(indexCategoriesProductsQuery())]);
+    loader: async () => {
+        const homeProducts = await getIndexProductsFn();
         const image = HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)];
         return {
             heroImage: image,
+            homeProducts,
         };
     },
 });
 
 function Home() {
-    const { data } = useSuspenseQuery(indexProductQuery());
-    const loaderData = Route.useLoaderData();
+    const { heroImage, homeProducts: data } = Route.useLoaderData();
 
     return (
         <div>
-            <HeroSection image={loaderData.heroImage} />
+            <HeroSection image={heroImage} />
             <CategoriesSection />
             <SaleBanner />
             <SizesGrid />

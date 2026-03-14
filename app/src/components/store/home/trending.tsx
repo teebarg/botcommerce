@@ -4,6 +4,9 @@ import { TrendingUp } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 export default function Trending({ products }: { products: ProductSearch[] }) {
+    if (!products || products.length === 0) {
+        return null;
+    }
     return (
         <div className="max-w-8xl mx-auto">
             {products?.length && products?.length > 0 && (
