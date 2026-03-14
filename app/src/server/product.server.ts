@@ -1,11 +1,7 @@
 import { api } from "@/utils/api.server";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { Product, ProductSearch, ProductFeed } from "@/schemas";
-import { CategoriesWithProducts } from "./categories.server";
-
-const ProductIdSchema = z.number();
-const ProductLimitSchema = z.number().default(20);
+import type { Product, ProductSearch, ProductFeed, CategoriesWithProducts } from "@/schemas";
 
 export const SearchSchema = z.object({
     search: z.string().optional(),
@@ -65,16 +61,4 @@ export const getProductFn = createServerFn({ method: "GET" })
     .handler(async ({ data }) => {
         const res = await api.get<Product>(`/product/${data}`);
         return res;
-    });
-
-export const recommendedProductsFn = createServerFn({ method: "GET" })
-    .inputValidator(z.object({ limit: ProductLimitSchema }))
-    .handler(async ({ data: { limit } }) => {
-        return await api.get<{ recommended: ProductSearch[] }>("/product/recommend", { params: { limit } });
-    });
-
-export const similarProductsFn = createServerFn({ method: "GET" })
-    .inputValidator(z.object({ productId: ProductIdSchema, limit: ProductLimitSchema }))
-    .handler(async ({ data: { productId, limit } }) => {
-        return await api.get<{ similar: ProductSearch[] }>(`/product/${productId}/similar`, { params: { limit } });
     });

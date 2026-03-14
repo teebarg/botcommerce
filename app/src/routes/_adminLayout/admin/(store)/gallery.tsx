@@ -12,9 +12,14 @@ import type { PaginatedProductImages, ProductImage } from "@/schemas";
 import { useWebSocket } from "pulsews";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { clientApi } from "@/utils/api.client";
-import { galleryQuery } from "@/queries/admin.queries";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
+import { getProductImagesFn } from "@/server/gallery.server";
+
+const galleryQuery = () => ({
+    queryKey: ["gallery"],
+    queryFn: () => getProductImagesFn(),
+});
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/gallery")({
     loader: async ({ context: { queryClient } }) => {

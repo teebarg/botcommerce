@@ -4,13 +4,13 @@ import { useOverlayTriggerState } from "react-stately";
 import { Button } from "@/components/ui/button";
 import { FaqForm } from "@/components/admin/faq/faq-form";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { getFaqsFn } from "@/server/faq.server";
 import { Eye, EyeOff, Tag } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { FAQ } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
 import FaqActions from "@/components/admin/faq/faq-actions";
 import SheetDrawer from "@/components/sheet-drawer";
+import { getFaqsFn } from "@/server/store.server";
 
 const useFaqsQuery = () =>
     queryOptions({

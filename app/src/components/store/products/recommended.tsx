@@ -1,9 +1,10 @@
 import ProductCard from "@/components/store/products/product-card";
 import type { ProductSearch } from "@/schemas/product";
-import { useRecommendedProducts } from "@/hooks/useProduct";
 import ComponentLoader from "@/components/component-loader";
 import ServerError from "@/components/generic/server-error";
 import { useRouteContext } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { clientApi } from "@/utils/api.client";
 
 type RecommendedProductsProps = {
     exclude?: number[];
@@ -11,7 +12,11 @@ type RecommendedProductsProps = {
 
 export default function RecommendedProducts({ exclude = [] }: RecommendedProductsProps) {
     const { isAuthenticated } = useRouteContext({ strict: false });
-    const { data, isLoading, error } = useRecommendedProducts(12, isAuthenticated);
+    const { data, isLoading, error } = useQuery({
+        queryKey: ["products", "recommended"],
+        queryFn: () => clientApi.get<{ recommended: ProductSearch[] }>("/product/recommend", { params: { limit: 12 } }),
+        enabled: isAuthenticated,
+    });
 
     if (error) {
         return <ServerError error={error.message} scenario="recommended-products" stack={error.stack} />;

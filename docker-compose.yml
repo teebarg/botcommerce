@@ -27,31 +27,31 @@ services:
       - ./backend/:/app
       - /app/.venv
 
-  agent-api:
-    image: shop-agent:${TAG-latest}
-    build:
-      context: ./agent
-      dockerfile: Dockerfile.dev
-    networks:
-      - dev-net
-    labels:
-      - traefik.enable=true
-      - traefik.docker.network=dev-net
-      - traefik.http.services.agent-api.loadbalancer.server.port=8000
-      - traefik.http.routers.agent-api.rule=Host(`agent.lvh.me`)
-      - traefik.http.routers.agent-api.entrypoints=https
-      - traefik.http.routers.agent-api.tls=true
-      - traefik.http.routers.agent-api-http.rule=Host(`agent.lvh.me`)
-      - traefik.http.routers.agent-api-http.entrypoints=http
-      - traefik.http.routers.agent-api-http.middlewares=redirect-to-https
-      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
-    environment:
-      - FASTEMBED_CACHE_PATH=/app/models
-    platform: linux/amd64 # Patch for M1 Mac
-    volumes:
-      - ./agent:/app
-      - /app/.venv
-    command: fastapi run --reload app/main.py
+  # agent-api:
+  #   image: shop-agent:${TAG-latest}
+  #   build:
+  #     context: ./agent
+  #     dockerfile: Dockerfile.dev
+  #   networks:
+  #     - dev-net
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.docker.network=dev-net
+  #     - traefik.http.services.agent-api.loadbalancer.server.port=8000
+  #     - traefik.http.routers.agent-api.rule=Host(`agent.localhost`)
+  #     - traefik.http.routers.agent-api.entrypoints=https
+  #     - traefik.http.routers.agent-api.tls=true
+  #     - traefik.http.routers.agent-api-http.rule=Host(`agent.localhost`)
+  #     - traefik.http.routers.agent-api-http.entrypoints=http
+  #     - traefik.http.routers.agent-api-http.middlewares=redirect-to-https
+  #     - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+  #   environment:
+  #     - FASTEMBED_CACHE_PATH=/app/models
+  #   platform: linux/amd64 # Patch for M1 Mac
+  #   volumes:
+  #     - ./agent:/app
+  #     - /app/.venv
+  #   command: fastapi run --reload app/main.py
 
 networks:
   dev-net:

@@ -1,6 +1,5 @@
-import { CategoriesWithProducts } from "@/server/categories.server";
 import { ChevronRight } from "lucide-react";
-import { ProductSearch } from "@/schemas";
+import { CategoriesWithProducts, ProductSearch } from "@/schemas";
 import ProductCardLight from "../products/product-card-light";
 import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";

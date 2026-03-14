@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { Message, PaginatedProductSearch, ProductFeed, ProductVariant } from "@/schemas";
-import { recommendedProductsFn, similarProductsFn } from "@/server/product.server";
 import { useRef } from "react";
 import { clientApi } from "@/utils/api.client";
 
@@ -74,22 +73,6 @@ export const useProductFeed = (initialData: ProductFeed | null, search?: FeedPar
                   pageParams: [null],
               }
             : undefined,
-    });
-};
-
-export const useRecommendedProducts = (limit: number = 20, enabled: boolean = true) => {
-    return useQuery({
-        queryKey: ["products", "recommended", limit],
-        queryFn: () => recommendedProductsFn({ data: { limit } }),
-        enabled: enabled,
-    });
-};
-
-export const useSimilarProducts = (productId: number, limit: number = 20) => {
-    return useQuery({
-        queryKey: ["products", "similar", productId, limit],
-        queryFn: () => similarProductsFn({ data: { productId, limit } }),
-        enabled: !!productId,
     });
 };
 
