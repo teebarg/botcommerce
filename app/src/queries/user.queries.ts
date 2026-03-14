@@ -47,13 +47,7 @@ export const catalogFeedQuery = (params: CatalogFeedParams) =>
         queryKey: ["products", "catalog", JSON.stringify(params)],
         queryFn: () => getCatalogFn({ data: params }),
     });
-
-export const wishlistQuery = () =>
-    queryOptions({
-        queryKey: ["products", "wishlist"],
-        queryFn: () => clientApi.get<Wishlist>("/users/wishlist"),
-    });
-
+    
 export const productQuery = (slug: string) =>
     queryOptions({
         queryKey: ["products", "product", slug],

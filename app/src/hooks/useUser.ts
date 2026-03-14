@@ -62,11 +62,13 @@ export const useDeleteUser = () => {
     });
 };
 
+export const userWishlistQuery = () => ({
+  queryKey: ["products", "wishlist"],
+  queryFn: () => getWishlistListingFn(),
+});
+
 export const useUserWishlist = () => {
-    return useQuery({
-        queryKey: ["products", "wishlist"],
-        queryFn: () => getWishlistListingFn(),
-    });
+  return useQuery(userWishlistQuery());
 };
 
 export const useUserRecentlyViewed = (limit: number = 12, enabled: boolean = true) => {
