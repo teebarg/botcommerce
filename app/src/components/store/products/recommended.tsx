@@ -10,8 +10,8 @@ type RecommendedProductsProps = {
 };
 
 export default function RecommendedProducts({ exclude = [] }: RecommendedProductsProps) {
-    const { session } = useRouteContext({ strict: false });
-    const { data, isLoading, error } = useRecommendedProducts(12, Boolean(session?.user));
+    const { isAuthenticated } = useRouteContext({ strict: false });
+    const { data, isLoading, error } = useRecommendedProducts(12, isAuthenticated);
 
     if (error) {
         return <ServerError error={error.message} scenario="recommended-products" stack={error.stack} />;

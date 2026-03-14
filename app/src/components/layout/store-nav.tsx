@@ -10,7 +10,7 @@ import { SignInButton, UserButton } from "@clerk/tanstack-react-start";
 import { useRouteContext } from "@tanstack/react-router";
 
 const StoreNavbar = () => {
-    const { session } = useRouteContext({ strict: false });
+    const { isAuthenticated } = useRouteContext({ strict: false });
     const { config } = useConfig();
 
     return (
@@ -34,7 +34,7 @@ const StoreNavbar = () => {
                     <CartComponent />
                     <ThemeToggle />
                     <div className="hidden md:flex">
-                        {session ? (
+                        {isAuthenticated ? (
                             <LocalizedClientLink
                                 aria-label="go to wishlist"
                                 className="flex items-center justify-center rounded-md h-10 w-10 hover:bg-accent"
@@ -49,7 +49,7 @@ const StoreNavbar = () => {
                         )}
                     </div>
                     <GetApp />
-                    <div className="hidden sm:flex">{session?.user ? <UserButton /> : <SignInButton />}</div>
+                    <div className="hidden sm:flex">{isAuthenticated ? <UserButton /> : <SignInButton />}</div>
                 </NavbarItem>
             </NavbarContent>
         </NavigationBar>

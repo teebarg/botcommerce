@@ -53,11 +53,11 @@ const CustomerActions = ({ user }: CustomerActionsProps) => {
 
     return (
         <div className="flex">
-            {user.role !== "ADMIN" && (
+            {/* {user.role !== "ADMIN" && (
                 <Button size="icon" title="Impersonate" variant="ghost" onClick={handleImpersonate}>
                     <Eye className="h-5 w-5" />
                 </Button>
-            )}
+            )} */}
             <SheetDrawer
                 open={editState.isOpen}
                 title="Edit Customer"

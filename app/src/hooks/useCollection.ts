@@ -58,7 +58,7 @@ export const useCatalogs = (is_active?: boolean) => {
     return useQuery({
         queryKey: ["catalog", is_active],
         queryFn: () => clientApi.get<PaginatedCatalog>("/catalog/", { params: { is_active: is_active ?? null } }),
-        enabled: Boolean(session?.user?.isAdmin),
+        enabled: session?.user?.isAdmin,
     });
 };
 

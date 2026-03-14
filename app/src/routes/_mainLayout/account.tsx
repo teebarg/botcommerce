@@ -58,7 +58,7 @@ const navLinks = [
 ];
 
 function RouteComponent() {
-    const { session } = Route.useRouteContext();
+    const { isAuthenticated } = Route.useRouteContext();
     return (
         <div className="flex-1">
             <div className="bg-background/60 backdrop-blur-md md:hidden sticky top-16 z-20">
@@ -83,7 +83,7 @@ function RouteComponent() {
             </div>
             <div className="max-w-7xl mx-auto flex md:gap-4 pb-12 pt-8">
                 <div className="md:w-60 hidden md:block">
-                    <div className="md:sticky md:top-16">{session?.user && <AccountNav />}</div>
+                    <div className="md:sticky md:top-16">{isAuthenticated && <AccountNav />}</div>
                 </div>
                 <AnimatePresence mode="wait" custom={0}>
                     <motion.div

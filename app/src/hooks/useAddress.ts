@@ -6,12 +6,12 @@ import { clientApi } from "@/utils/api.client";
 import { Address, Message } from "@/schemas";
 
 export const useUserAddresses = () => {
-    const { session } = useRouteContext({ strict: false });
+    const { session, isAuthenticated } = useRouteContext({ strict: false });
 
     return useQuery({
         queryKey: ["addresses", session?.id?.toString()],
         queryFn: () => getUserAddressesFn(),
-        enabled: Boolean(session?.user),
+        enabled: isAuthenticated,
     });
 };
 
