@@ -11,6 +11,7 @@ from app.services.shop_settings import ShopSettingsService
 from prisma.enums import CartStatus
 from app.models.generic import Message
 from app.core.permissions import require_admin
+from fastapi.responses import JSONResponse
 
 logger = get_logger(__name__)
 
@@ -27,16 +28,6 @@ def _set_sso_cookie(response: Response, token: str) -> None:
         httponly=True,
         secure=True,
         samesite="none",
-    )
-
-def _clear_sso_cookie(response: Response) -> None:
-    """Clear access_token cookie (logout)."""
-    response.delete_cookie(
-        key="_cart_id",
-        path="/",
-        httponly=True,
-        samesite="none",
-        secure=True,
     )
 
 async def _handle_add_item(item_in: CartItemCreate, cart: Cart) -> CartItem:
@@ -647,7 +638,13 @@ async def apply_wallet(user: CurrentUser, _cart_id: Annotated[str | None, Cookie
     """
     cart = await get_cart(cart_number=_cart_id, user_id=user.id)
     if not cart:
-        raise HTTPException(status_code=404, detail="cart not found")
+        cart = await create_cart(user_id=user.id if user else None)
+        response = JSONResponse(
+            status_code=400,
+            content={"detail": "Your cart is empty, add some items first"}
+        )
+        set_sso_cookie(response, cart.cart_number)
+        return response
 
     if not user.wallet_balance or user.wallet_balance <= 0:
         raise HTTPException(status_code=400, detail="Wallet balance is empty")
@@ -699,7 +696,13 @@ async def remove_wallet(user: CurrentUser,  _cart_id: Annotated[str | None, Cook
     """
     cart = await get_cart(cart_number=_cart_id, user_id=user.id)
     if not cart:
-        raise HTTPException(status_code=404, detail="cart not found")
+        cart = await create_cart(user_id=user.id if user else None)
+        response = JSONResponse(
+            status_code=400,
+            content={"detail": "Your cart is empty, add some items to your cart"}
+        )
+        set_sso_cookie(response, cart.cart_number)
+        return response
 
     wallet_used = cart.wallet_used or 0
     if wallet_used <= 0:
