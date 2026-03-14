@@ -56,7 +56,7 @@ export const useTrackUserInteraction = () => {
 
     return {
         mutate: (payload: UserInteractionPayload) => {
-            if (import.meta.env.VITE_TRACKING_ENABLED !== "false") return;
+            if (import.meta.env.VITE_TRACKING_ENABLED !== "true") return;
             buffer.push(payload);
             scheduleFlush();
         },

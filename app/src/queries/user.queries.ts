@@ -45,7 +45,7 @@ export const catalogFeedQuery = (params: CatalogFeedParams) =>
         queryKey: ["products", "catalog", JSON.stringify(params)],
         queryFn: () => getCatalogFn({ data: params }),
     });
-    
+
 export const productQuery = (slug: string) =>
     queryOptions({
         queryKey: ["products", "product", slug],
@@ -62,6 +62,8 @@ export const ordersQuery = (params: { take?: number; status?: any; start_date?: 
     queryOptions({
         queryKey: ["orders", JSON.stringify(params)],
         queryFn: () => getOrdersFn({ data: params }),
+        staleTime: 1000 * 60 * 10,
+        refetchOnMount: false,
     });
 
 export const userAddressesQuery = () =>

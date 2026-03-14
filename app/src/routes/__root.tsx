@@ -82,7 +82,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
             queryClient.ensureQueryData({
                 queryKey: ["shop-settings"],
                 queryFn: () => getShopSettingsPublicFn(),
-                staleTime: 100000 * 60 * 5, // 5 minutes — settings rarely change
             }),
         ]);
         const user = {

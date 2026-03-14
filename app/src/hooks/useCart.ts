@@ -8,6 +8,8 @@ export const useMyCart = () => {
     return useQuery({
         queryKey: ["cart"],
         queryFn: () => clientApi.get<Cart>("/cart/"),
+        staleTime: 0,
+        refetchOnMount: false,
     });
 };
 
