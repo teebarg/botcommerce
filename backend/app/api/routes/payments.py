@@ -1,8 +1,8 @@
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends, Response
 from app.core.config import settings
 from app.schemas.payment import PaymentInitialize, PaymentCreate
 from app.models.order import OrderCreate, Order
-from app.core.deps import CurrentUser, Notification, get_current_user, get_current_superuser
+from app.core.deps import CurrentUser, Notification
 from app.models.user import User
 import httpx
 from datetime import datetime
@@ -13,6 +13,7 @@ from app.core.logging import get_logger
 from app.services.events import publish_event, publish_order_event
 from app.services.redis import invalidate_pattern, invalidate_key
 from app.models.cart import Cart
+from app.core.permissions import require_admin, require_user
 
 logger = get_logger(__name__)
 
@@ -75,20 +76,20 @@ async def create_payment(
     return await initialize_payment(cart, current_user)
 
 @router.get("/verify/{reference}")
-async def verify_payment(reference: str, user: CurrentUser) -> Order:
+async def verify_payment(response: Response, reference: str, user: CurrentUser) -> Order:
     """Verify a payment"""
     async with httpx.AsyncClient() as client:
-        response = await client.get(
+        res = await client.get(
             f"{PAYSTACK_BASE_URL}/transaction/verify/{reference}",
             headers={
                 "Authorization": f"Bearer {PAYSTACK_SECRET_KEY}",
             }
         )
 
-        if response.status_code != 200:
+        if res.status_code != 200:
             raise HTTPException(status_code=400, detail="Failed to verify payment")
 
-        data = response.json()
+        data = res.json()
 
         order_in = OrderCreate(status=OrderStatus.PENDING, payment_status=PaymentStatus.SUCCESS)
 
@@ -111,6 +112,14 @@ async def verify_payment(reference: str, user: CurrentUser) -> Order:
             }
             await publish_event(event=event)
 
+            response.delete_cookie(
+                key="_cart_id",
+                path="/",
+                httponly=True,
+                samesite="none",
+                secure=True,
+            )
+
             return order
         else:
             event = {
@@ -126,7 +135,7 @@ async def verify_payment(reference: str, user: CurrentUser) -> Order:
             raise HTTPException(status_code=500, detail="payment verification failed")
 
 
-@router.post("/", dependencies=[Depends(get_current_user)])
+@router.post("/", dependencies=[Depends(require_user)])
 async def create(*, create: PaymentCreate, notification: Notification, background_tasks: BackgroundTasks):
     """
     Create new payment.
@@ -153,7 +162,7 @@ async def create(*, create: PaymentCreate, notification: Notification, backgroun
     return payment
 
 
-@router.patch("/{id}/status", dependencies=[Depends(get_current_superuser)])
+@router.patch("/{id}/status", dependencies=[Depends(require_admin)])
 async def payment_status(id: int, status: PaymentStatus) -> Order:
     """Change payment status"""
     order = await db.order.find_unique(where={"id": id}, include={"order_items": {"include": {"variant": True}}})

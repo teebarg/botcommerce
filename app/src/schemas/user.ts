@@ -95,10 +95,3 @@ export type User = z.infer<typeof UserSchema>;
 export type PaginatedUsers = z.infer<typeof PaginatedUsersSchema>;
 export type Session = z.infer<typeof SessionSchema>;
 export type UserSession = z.infer<typeof UserSessionSchema>;
-
-import type { AuthSession as AuthjsSession } from "start-authjs";
-
-export type AuthSession = AuthjsSession & {
-    id: number;
-    accessToken: string;
-};

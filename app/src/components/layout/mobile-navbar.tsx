@@ -3,6 +3,7 @@ import { BackButton } from "@/components/back";
 import GetApp from "@/components/get-app";
 import { SearchDialog } from "@/components/store/product-search";
 import { ShoppingBag } from "lucide-react";
+import { UserButton, Show, SignInButton } from "@clerk/tanstack-react-start";
 
 const MobileHeader = () => {
     return (
@@ -17,6 +18,14 @@ const MobileHeader = () => {
             </div>
             <SearchDialog />
             <GetApp />
+            <div className="flex items-center">
+                <Show when="signed-in">
+                    <UserButton />
+                </Show>
+                <Show when="signed-out">
+                    <SignInButton />
+                </Show>
+            </div>
         </div>
     );
 };

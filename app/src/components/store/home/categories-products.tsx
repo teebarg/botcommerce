@@ -1,14 +1,16 @@
-import { CategoriesWithProducts } from "@/server/categories.server";
 import { ChevronRight } from "lucide-react";
-import { ProductSearch } from "@/schemas";
+import { CategoriesWithProducts, ProductSearch } from "@/schemas";
 import ProductCardLight from "../products/product-card-light";
 import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { indexCategoriesProductsQuery } from "@/queries/user.queries";
+import { useQuery } from "@tanstack/react-query";
+import { clientApi } from "@/utils/api.client";
 
 export default function CategoriesWithProductsSection() {
-    const { data: categoriesWithProducts } = useSuspenseQuery(indexCategoriesProductsQuery());
+    const { data: categoriesWithProducts } = useQuery({
+        queryKey: ["products", "home"],
+        queryFn: () => clientApi.get<CategoriesWithProducts[]>("/category/home/products"),
+    });
     return (
         <section className="max-w-8xl mx-auto px-4 py-6 space-y-8">
             <div>

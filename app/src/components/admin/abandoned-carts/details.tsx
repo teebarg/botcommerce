@@ -191,12 +191,12 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                 </div>
 
                 <div className="sheet-footer">
-                    {cart?.user?.email && (
+                    {/* {cart?.user?.email && (
                         <Button variant="contrast" onClick={handleImpersonation}>
                             <ExternalLink className="h-4 w-4" />
                             Impersonate
                         </Button>
-                    )}
+                    )} */}
                     <Button variant="outline" onClick={() => state.close()}>
                         Cancel
                     </Button>

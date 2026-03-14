@@ -242,6 +242,16 @@ export const ReviewStatusSchema = z.object({
     has_reviewed: z.boolean(),
 });
 
+export const CategoriesProductsSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    slug: z.string(),
+    products: z.array(ProductSearchSchema),
+    created_at: z.string(),
+});
+
+export type CategoriesWithProducts = z.infer<typeof CategoriesProductsSchema>;
+
 export type SearchCategory = z.infer<typeof SearchCategorySchema>;
 export type SearchCollection = z.infer<typeof SearchCollectionSchema>;
 export type SearchVariant = z.infer<typeof SearchVariantSchema>;

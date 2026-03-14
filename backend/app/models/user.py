@@ -71,3 +71,20 @@ class GuestUserCreate(BaseModel):
 class PasswordChange(BaseModel):
     old_password: str = Field(min_length=8, max_length=40)
     new_password: str = Field(min_length=8, max_length=40)
+
+
+from enum import Enum
+
+class UserRole(str, Enum):
+    USER = "user"
+    ADMIN = "admin"
+    SUPER_ADMIN = "super-admin"
+
+class AuthUser(BaseModel):
+    sub: str
+    email: EmailStr
+    firstName: str
+    lastName: str
+    image_url: HttpUrl | None = None
+    role: UserRole
+    roles: List[UserRole]

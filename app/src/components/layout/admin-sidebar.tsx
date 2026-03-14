@@ -219,7 +219,7 @@ export function AdminSidebar() {
                                     <div className="flex items-center gap-2">
                                         <UserAvatar />
                                         <div className="flex flex-col">
-                                            <p className="font-semibold">{session?.user?.first_name ?? "User"}</p>
+                                            <p className="font-semibold">{session?.user?.firstName ?? "User"}</p>
                                             <p className="text-xs text-muted-foreground">{session?.user?.email ?? "User"}</p>
                                         </div>
                                     </div>

@@ -1,16 +1,8 @@
-import { queryOptions, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { ContactFormValues } from "@/components/store/contact-form";
-import { getShopSettingsPublicFn } from "@/server/generic.server";
 import { Message, ShopSettings } from "@/schemas";
 import { clientApi } from "@/utils/api.client";
-
-export const siteConfigQueryOptions = () =>
-    queryOptions({
-        queryKey: ["shop-settings", "public"],
-        queryFn: () => getShopSettingsPublicFn(),
-        staleTime: 1000 * 60 * 60 * 24 * 7,
-    });
 
 export const useSyncShopDetails = () => {
     return useMutation({

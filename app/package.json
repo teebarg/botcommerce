@@ -24,6 +24,7 @@
     "dependencies": {
         "@auth/core": "0.41.1",
         "@auth/upstash-redis-adapter": "^2.10.0",
+        "@clerk/tanstack-react-start": "^1.0.4",
         "@fontsource-variable/lexend": "^5.2.11",
         "@fontsource-variable/outfit": "^5.2.8",
         "@hookform/resolvers": "4.1.3",
@@ -85,7 +86,6 @@
         "react-stately": "^3.42.0",
         "react-swipeable": "^7.0.2",
         "sonner": "^2.0.1",
-        "start-authjs": "^1.0.2",
         "tailwind-merge": "^3.0.2",
         "tailwindcss": "^4.0.6",
         "tw-animate-css": "^1.3.6",

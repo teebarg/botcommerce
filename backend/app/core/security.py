@@ -1,5 +1,6 @@
-from datetime import datetime, timedelta, timezone
 from typing import Union
+
+from datetime import datetime, timedelta, timezone
 import jwt
 from passlib.context import CryptContext
 

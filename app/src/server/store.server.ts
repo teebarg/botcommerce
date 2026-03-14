@@ -1,0 +1,31 @@
+import { createServerFn } from "@tanstack/react-start";
+import { api } from "@/utils/api.server";
+import type { Address, FAQ, SearchCatalog, Category } from "@/schemas";
+import { z } from "zod";
+
+export const CatalogSearchSchema = z.object({
+    slug: z.string(),
+    sort: z.string().optional(),
+    sizes: z.number().optional(),
+    colors: z.string().optional(),
+    cursor: z.number().optional(),
+});
+
+export const getCatalogFn = createServerFn()
+    .inputValidator((input: unknown) => CatalogSearchSchema.parse(input))
+    .handler(async ({ data }) => await api.get<SearchCatalog>(`/catalog/${data.slug}`, { params: { ...data } }));
+
+export const getFaqsFn = createServerFn({ method: "GET" }).handler(async () => {
+    return await api.get<FAQ[]>("/faq/");
+});
+
+export const getUserAddressesFn = createServerFn({ method: "GET" }).handler(async () => {
+    return await api.get<{ addresses: Address[] }>("/address/");
+});
+
+export const getCategoriesFn = createServerFn({ method: "GET" })
+    .inputValidator(z.string().optional())
+    .handler(async ({ data: query }) => {
+        return await api.get<Category[]>(`/category/`, { params: { query: query ?? "" } });
+    });
+

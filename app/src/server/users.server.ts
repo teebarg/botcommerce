@@ -30,7 +30,7 @@ export const getUsersFn = createServerFn({ method: "GET" })
 
 export const getWishlistListingFn = createServerFn().handler(async () => {
     return await api.get<Wishlist>("/users/wishlist");
-});
+    });
 
 export const getRecentlyViewedFn = createServerFn({ method: "GET" })
     .inputValidator(z.number().optional())

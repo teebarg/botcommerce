@@ -1,13 +1,12 @@
 import { queryOptions } from "@tanstack/react-query";
-import { getIndexCategoriesProductsFn, getIndexProductsFn, getProductFn, getProductsFeedFn } from "@/server/product.server";
-import { getCatalogFn } from "@/server/catalog.server";
+import { getProductFn, getProductsFeedFn } from "@/server/product.server";
 import { getMeFn, getMeTrxnFn } from "@/server/users.server";
 import { getOrderFn, getOrdersFn } from "@/server/order.server";
-import { getUserAddressesFn } from "@/server/address.server";
 import { getCollectionFn } from "@/server/collections.server";
 import { getReviewsFn } from "@/server/review.server";
 import { Wishlist } from "@/schemas";
 import { clientApi } from "@/utils/api.client";
+import { getCatalogFn, getUserAddressesFn } from "@/server/store.server";
 
 type FeedParams = {
     search?: string;
@@ -37,18 +36,6 @@ export const meTxnsQuery = () =>
         queryFn: () => getMeTrxnFn(),
     });
 
-export const indexProductQuery = () =>
-    queryOptions({
-        queryKey: ["products", "index"],
-        queryFn: () => getIndexProductsFn(),
-    });
-
-export const indexCategoriesProductsQuery = () =>
-    queryOptions({
-        queryKey: ["products", "home"],
-        queryFn: () => getIndexCategoriesProductsFn(),
-    });
-
 export const productFeedQuery = (params: FeedParams) =>
     queryOptions({
         queryKey: ["products", "feed", JSON.stringify(params)],
@@ -60,13 +47,7 @@ export const catalogFeedQuery = (params: CatalogFeedParams) =>
         queryKey: ["products", "catalog", JSON.stringify(params)],
         queryFn: () => getCatalogFn({ data: params }),
     });
-
-export const wishlistQuery = () =>
-    queryOptions({
-        queryKey: ["products", "wishlist"],
-        queryFn: () => clientApi.get<Wishlist>("/users/wishlist"),
-    });
-
+    
 export const productQuery = (slug: string) =>
     queryOptions({
         queryKey: ["products", "product", slug],

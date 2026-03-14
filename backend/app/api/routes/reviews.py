@@ -1,11 +1,12 @@
 from app.models.reviews import Review, Reviews, ReviewCreate, ReviewUpdate
 from fastapi import APIRouter, HTTPException, Depends, HTTPException, Query, BackgroundTasks
-from app.core.deps import CurrentUser, get_current_superuser
+from app.core.deps import CurrentUser
 from app.models.generic import Message
 from app.prisma_client import prisma as db
 from prisma.errors import PrismaError
 from math import ceil
 from app.services.product import reindex_product
+from app.core.permissions import require_admin
 
 router = APIRouter()
 
@@ -117,7 +118,7 @@ async def create(review: ReviewCreate, user: CurrentUser, background_tasks: Back
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
+@router.patch("/{id}", dependencies=[Depends(require_admin)])
 async def update(
     id: int,
     update_data: ReviewUpdate,
@@ -141,7 +142,7 @@ async def update(
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.delete("/{id}", dependencies=[Depends(get_current_superuser)])
+@router.delete("/{id}", dependencies=[Depends(require_admin)])
 async def delete(id: int) -> Message:
     existing = await db.review.find_unique(
         where={"id": id}

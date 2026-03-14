@@ -29,7 +29,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
     const isNew = useMemo(() => !!product?.is_new, [product]);
     const [selectedVariant, setSelectedVariant] = useState<ProductVariantLite | undefined>(product.variants?.[0]);
 
-    const { session } = useRouteContext({ strict: false });
+    const { session, isAuthenticated } = useRouteContext({ strict: false });
     const trackInteraction = useTrackUserInteraction();
     const updateVariant = useUpdateVariant(false);
 
@@ -76,9 +76,8 @@ const ProductView: React.FC<Props> = ({ product }) => {
     }, [session?.id, product?.id]);
 
     const handleUserInteraction = async (type: UserInteractionType, metadata?: Record<string, any>) => {
-        if (session?.user && product?.id) {
+        if (isAuthenticated && product?.id) {
             trackInteraction.mutate({
-                user_id: session.id,
                 product_id: product.id,
                 type,
                 metadata: { source: "product-view", ...metadata },
@@ -193,7 +192,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         </motion.div>
                     )}
 
-                    {session?.user?.isAdmin && product?.variants?.length ? (
+                    {isAuthenticated && session?.user?.isAdmin && product?.variants?.length ? (
                         <div className="flex flex-col gap-2 mt-4">
                             {product.variants?.map((v) => (
                                 <div key={v.id} className="flex lg:flex-row items-center justify-between text-sm gap-2 bg-secondary p-2">

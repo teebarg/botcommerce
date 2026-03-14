@@ -10,31 +10,66 @@ import NotFound from "@/components/generic/not-found";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { WebSocketProvider } from "pulsews";
 import appCss from "@/styles.css?url";
-import { type AuthSession, getSession, type Session } from "start-authjs";
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
-import { authConfig } from "@/utils/auth";
 import { ThemeProvider } from "@/providers/theme-provider";
 import type { QueryClient } from "@tanstack/react-query";
-import { categoriesQuery } from "@/hooks/useCategories";
-import { collectionsQuery } from "@/hooks/useCollection";
 import { InvalidateProvider } from "@/providers/invalidate-provider";
-import { siteConfigQueryOptions } from "@/hooks/useGeneric";
 import { useEffect } from "react";
 import { initPulseMetrics } from "@/utils/pulsemetric";
 import PageTransitionLoader from "@/components/generic/page-transition-loader";
 import PWABadge from "@/PWAbadge";
+import { ClerkProvider } from "@clerk/tanstack-react-start";
+import { auth } from "@clerk/tanstack-react-start/server";
+import { getShopSettingsPublicFn } from "@/server/generic.server";
+
+type SessionClaims = {
+    firstName?: string;
+    lastName?: string;
+    image_url?: string;
+    email?: string;
+    role?: string;
+    roles?: string[];
+};
+
+type AuthUser = {
+    firstName?: string;
+    lastName?: string;
+    image?: string;
+    email?: string;
+    role?: string;
+    roles?: string[];
+    isAdmin?: boolean;
+};
+
+type Session = {
+    id: string;
+    user: AuthUser;
+    accessToken: string;
+    impersonated: boolean;
+    impersonatedBy: string | null;
+};
+
+type AuthState = {
+    isAuthenticated: boolean;
+    userId: string | null;
+    sessionClaims: SessionClaims | null;
+};
 
 interface RouterContext {
-    session: AuthSession | null;
+    isAuthenticated: boolean;
+    userId: string | null;
+    session: Session | null;
     queryClient: QueryClient;
     config: any;
 }
 
-const fetchSession = createServerFn({ method: "GET" }).handler(async () => {
-    const request = getRequest();
-    const session = await getSession(request, authConfig);
-    return session;
+const authStateFn = createServerFn().handler(async (): Promise<AuthState> => {
+    const { isAuthenticated, userId, sessionClaims } = await auth();
+    return {
+        isAuthenticated,
+        userId,
+        sessionClaims: sessionClaims as SessionClaims | null,
+    };
 });
 
 export const Route = createRootRouteWithContext<RouterContext>()({
@@ -42,19 +77,30 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         if (process.env.MAINTENANCE_MODE === "true" && location.pathname !== "/maintenance") {
             throw redirect({ to: "/maintenance" });
         }
-        const session = (await fetchSession()) as unknown as Session;
-        return { session };
-    },
-    loader: async ({ context: { queryClient } }) => {
-        const [categories, collections, config] = await Promise.all([
-            queryClient.ensureQueryData(categoriesQuery()),
-            queryClient.ensureQueryData(collectionsQuery()),
-            queryClient.ensureQueryData(siteConfigQueryOptions()),
-        ]);
+        const { isAuthenticated, userId, sessionClaims } = await authStateFn();
+        const user = {
+            firstName: sessionClaims?.firstName || "",
+            lastName: sessionClaims?.lastName || "",
+            image: sessionClaims?.image_url || "",
+            email: sessionClaims?.email || "",
+            role: sessionClaims?.role || "",
+            roles: sessionClaims?.roles || [],
+            isAdmin: sessionClaims?.roles?.includes("admin") || false,
+        };
 
+        const session: Session | null = {
+            id: userId || "",
+            user,
+            accessToken: "",
+            impersonated: false,
+            impersonatedBy: null,
+        };
+        const config = await getShopSettingsPublicFn();
+
+        return { isAuthenticated, userId, session, config };
+    },
+    loader: async ({ context: { config } }) => {
         return {
-            categories,
-            collections,
             config,
         };
     },
@@ -135,29 +181,33 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 />
             </head>
             <body className="min-h-screen">
-                <ThemeProvider>
-                    <StoreProvider>
-                        <CartProvider>
-                            <div className="relative">
-                                <PushPermission />
-                                <WebSocketProvider
-                                    url={import.meta.env.VITE_WS + "/api/ws/"}
-                                    debug={true}
-                                    onOpen={() => console.log("WebSocket connected!")}
-                                    onClose={() => console.log("WebSocket disconnected!")}
-                                >
-                                    <InvalidateProvider>{children}</InvalidateProvider>
-                                    <ImpersonationBanner />
-                                </WebSocketProvider>
-                                {import.meta.env.MODE !== "production" && <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />}
-                            </div>
-                            {/* {import.meta.env.MODE !== "production" && <TanStackRouterDevtoolsPanel />} */}
-                            <Toaster closeButton richColors duration={5000} expand={false} position="top-right" />
-                            <PWABadge />
-                            <Scripts />
-                        </CartProvider>
-                    </StoreProvider>
-                </ThemeProvider>
+                <ClerkProvider>
+                    <ThemeProvider>
+                        <StoreProvider>
+                            <CartProvider>
+                                <div className="relative">
+                                    <PushPermission />
+                                    <WebSocketProvider
+                                        url={import.meta.env.VITE_WS + "/api/ws/"}
+                                        debug={true}
+                                        onOpen={() => console.log("WebSocket connected!")}
+                                        onClose={() => console.log("WebSocket disconnected!")}
+                                    >
+                                        <InvalidateProvider>{children}</InvalidateProvider>
+                                        <ImpersonationBanner />
+                                    </WebSocketProvider>
+                                    {import.meta.env.MODE !== "production" && (
+                                        <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
+                                    )}
+                                </div>
+                                {/* {import.meta.env.MODE !== "production" && <TanStackRouterDevtoolsPanel />} */}
+                                <Toaster closeButton richColors duration={5000} expand={false} position="top-right" />
+                                <PWABadge />
+                                <Scripts />
+                            </CartProvider>
+                        </StoreProvider>
+                    </ThemeProvider>
+                </ClerkProvider>
             </body>
         </html>
     );

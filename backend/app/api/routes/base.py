@@ -7,16 +7,17 @@ from fastapi import (
 )
 from app.prisma_client import prisma as db
 from prisma.enums import Role
-from app.core.deps import get_current_superuser, RedisClient
+from app.core.deps import RedisClient
 from typing import Literal, Optional
 from datetime import timedelta, datetime
 from app.services.redis import cache_response, invalidate_pattern
 from app.services.meilisearch import clear_index
 from app.core.config import settings
+from app.core.permissions import require_admin
 
 router = APIRouter()
 
-@router.get("/stats", dependencies=[Depends(get_current_superuser)])
+@router.get("/stats", dependencies=[Depends(require_admin)])
 async def admin_dashboard_stats():
     """Get admin dashboard stats"""
     orders_count = await db.order.count()
@@ -27,7 +28,7 @@ async def admin_dashboard_stats():
     products_count = await db.product.count()
 
     users = await db.user.find_many(where={"role": Role.CUSTOMER})
-    customers_count = len(users)
+    customers_count: int = len(users)
 
     return {
         "orders_count": orders_count,
@@ -36,7 +37,7 @@ async def admin_dashboard_stats():
         "customers_count": customers_count,
     }
 
-@router.get("/stats/trends", dependencies=[Depends(get_current_superuser)])
+@router.get("/stats/trends", dependencies=[Depends(require_admin)])
 @cache_response("stats-trends")
 async def stats_trends(
     request: Request,
@@ -115,7 +116,7 @@ async def stats_trends(
         "trends": trends
     }
 
-@router.post("/cache/bust", dependencies=[Depends(get_current_superuser)])
+@router.post("/cache/bust", dependencies=[Depends(require_admin)])
 async def bust_redis_cache(
     pattern: str = Body(..., embed=True, description="Key or pattern to delete from Redis cache"),
 ):
@@ -126,7 +127,7 @@ async def bust_redis_cache(
     except Exception as e:
         return {"success": False, "error": str(e), "pattern": pattern}
 
-@router.post("/cache/clear", dependencies=[Depends(get_current_superuser)])
+@router.post("/cache/clear", dependencies=[Depends(require_admin)])
 async def clear_redis_cache(redis: RedisClient):
     """Clear the entire Redis database"""
     try:

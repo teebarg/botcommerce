@@ -1,14 +1,12 @@
 from typing import Annotated, Literal, Optional
 
 import jwt
-from fastapi import Depends, HTTPException, status, Cookie
+from fastapi import Depends, HTTPException, status
 from fastapi.security import APIKeyHeader, OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
-from jwt.exceptions import InvalidTokenError
 from pydantic import BaseModel, ValidationError
 
 from app.core import security
 from app.core.config import settings
-from app.models.generic import TokenPayload
 from app.services.notification import EmailChannel, NotificationService, SlackChannel, WhatsAppChannel
 from app.prisma_client import prisma
 from meilisearch import Client as MeilisearchClient
@@ -18,6 +16,9 @@ from app.services.redis import get_redis_dependency
 import redis.asyncio as redis
 from app.services.shop_settings import ShopSettingsService
 from app.core.logging import get_logger
+import time
+import httpx
+from jose import jwt as jose_jwt
 
 logger = get_logger(__name__)
 
@@ -27,8 +28,6 @@ reusable_oauth2 = OAuth2PasswordBearer(
 
 meilisearch_client = MeilisearchClient(settings.MEILI_HOST, settings.MEILI_MASTER_KEY, timeout=1.5)
 supabase: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
-
-TokenDep = Annotated[str | None, Cookie(alias="authjs.session-token" if settings.ENVIRONMENT == "local" else "__Secure-authjs.session-token")]
 
 RedisClient = Annotated[redis.Redis, Depends(get_redis_dependency)]
 
@@ -45,6 +44,65 @@ class Principal(BaseModel):
     role: str
     type: Literal["user", "service"]
     user_id: Optional[int] = None
+
+
+CLERK_JWKS_URL: str = settings.CLERK_JWKS_URL
+
+JWKS_CACHE = None
+JWKS_CACHE_EXP = 0
+
+
+async def get_jwks():
+    global JWKS_CACHE, JWKS_CACHE_EXP
+
+    # refresh every hour
+    if JWKS_CACHE and time.time() < JWKS_CACHE_EXP:
+        return JWKS_CACHE
+
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(CLERK_JWKS_URL)
+        JWKS_CACHE = resp.json()
+        JWKS_CACHE_EXP = time.time() + 3600
+
+    return JWKS_CACHE
+
+
+async def verify_clerk_token(token: Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]):
+    if not token:
+        raise HTTPException(401, "Missing Authorization header")
+
+    jwks = await get_jwks()
+    try:
+        payload = jose_jwt.decode(
+            token,
+            jwks,
+            algorithms=["RS256"],
+            issuer=settings.CLERK_ISSUER_URL,
+            options={"verify_aud": False},
+        )
+    except Exception:
+        raise HTTPException(401, "Invalid or expired token")
+
+    return payload
+
+
+async def verify_clerk_token2(token: Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]):
+    if not token:
+        return None
+
+    jwks = await get_jwks()
+    try:
+        payload = jose_jwt.decode(
+            token,
+            jwks,
+            algorithms=["RS256"],
+            issuer=settings.CLERK_ISSUER_URL,
+            options={"verify_aud": False},
+        )
+    except Exception:
+        return None
+
+    return payload
 
 
 async def get_internal_service(
@@ -72,72 +130,46 @@ async def get_internal_service(
             detail="Invalid service token",
         )
 
-async def get_user_token(access_token: TokenDep = None) -> TokenPayload | None:
-    try:
-        payload = jwt.decode(
-            access_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
-        )
-        token_data = TokenPayload(sub=payload.get("email"))
-    except (InvalidTokenError, ValidationError) as e:
+async def get_user(payload=Depends(verify_clerk_token2)) -> User | None:
+    if not payload:
         return None
 
-    return token_data
-
-# SessionDep = Annotated[Session, Depends(get_db)]
-# TokenDep = Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]
-TokenUser = Annotated[TokenPayload, Depends(get_user_token)]
-
-async def get_user(token_data: TokenUser = None ) -> User | None:
-    if not token_data:
-        return None
-
-    user = await prisma.user.find_unique(where={"email": token_data.sub})
+    clerk_id = payload["sub"]
+    user = await prisma.user.find_unique(
+        where={"clerk_id": clerk_id}
+    )
 
     if not user:
-        return None
+        user = await prisma.user.upsert(
+            where={"email": payload["email"]},
+            data={
+                "create": {"clerk_id": clerk_id, "email": payload["email"], "first_name": payload.get("firstName"), "last_name": payload.get("lastName"), "hashed_password": "dkkdkdkkdkdkd22h3s"},
+                "update": {"clerk_id": clerk_id},
+            },
+        )
     return user
-
 
 UserDep = Annotated[User | None, Depends(get_user)]
 
+async def get_current_user(payload=Depends(verify_clerk_token)) -> User:
+    clerk_id = payload["sub"]
 
-async def get_current_user(token_data: TokenUser) -> User:
-    if not token_data:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
-
-    user = await prisma.user.find_unique(where={"email": token_data.sub})
+    user = await prisma.user.find_unique(
+        where={"clerk_id": clerk_id}
+    )
 
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
-    if user.status == "inactive":
-        raise HTTPException(status_code=400, detail="Inactive user")
+        user = await prisma.user.upsert(
+            where={"email": payload["email"]},
+            data={
+                "create": {"clerk_id": clerk_id, "email": payload["email"], "first_name": payload.get("firstName"), "last_name": payload.get("lastName"), "hashed_password": "dkkdkdkkdkdkd22h3s"},
+                "update": {"clerk_id": clerk_id},
+            },
+        )
+
     return user
 
-
-def get_current_active_user(
-    current_user: Annotated[User, Depends(get_current_user)]
-) -> User:
-    if not current_user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthenticated user"
-        )
-    if not current_user.is_active:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
-
-
 CurrentUser = Annotated[User, Depends(get_current_user)]
-
-
-def get_current_superuser(current_user: CurrentUser) -> User:
-    if not current_user.role == "ADMIN":
-        raise HTTPException(
-            status_code=403, detail="The user doesn't have enough privileges"
-        )
-    return current_user
-
-
-AdminUser = Annotated[User, Depends(get_current_superuser)]
 
 async def get_principal(
     service: ServicePrincipal | None = Depends(get_internal_service),

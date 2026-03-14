@@ -1,15 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from typing import List
 from app.models.delivery import DeliveryOption, DeliveryOptionCreate, DeliveryOptionUpdate
-from app.core.deps import get_current_superuser
 from app.prisma_client import prisma as db
 from app.models.generic import Message
 from app.services.redis import cache_response, invalidate_pattern
+from app.core.permissions import require_admin
+
 
 
 router = APIRouter()
 
-@router.get("/", response_model=List[DeliveryOption], dependencies=[Depends(get_current_superuser)])
+@router.get("/", response_model=List[DeliveryOption], dependencies=[Depends(require_admin)])
 @cache_response("delivery")
 async def get_delivery_options(request: Request):
     """Get all delivery options"""
@@ -24,7 +25,7 @@ async def get_available_delivery_options(request: Request):
         order={"created_at": "desc"}
     )
 
-@router.post("/", dependencies=[Depends(get_current_superuser)])
+@router.post("/", dependencies=[Depends(require_admin)])
 async def create_delivery_option(
     delivery_option: DeliveryOptionCreate
 ) -> DeliveryOption:
@@ -42,7 +43,7 @@ async def create_delivery_option(
 
     return await db.deliveryoption.create(data=delivery_option.model_dump())
 
-@router.patch("/{delivery_option_id}", dependencies=[Depends(get_current_superuser)])
+@router.patch("/{delivery_option_id}", dependencies=[Depends(require_admin)])
 async def update_delivery_option(
     delivery_option_id: int,
     delivery_option_update: DeliveryOptionUpdate,
@@ -68,7 +69,7 @@ async def update_delivery_option(
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@router.delete("/{delivery_option_id}", dependencies=[Depends(get_current_superuser)])
+@router.delete("/{delivery_option_id}", dependencies=[Depends(require_admin)])
 async def delete_delivery_option(
     delivery_option_id: int,
 ) -> Message:

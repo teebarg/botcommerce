@@ -1,17 +1,17 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { getUserAddressesFn } from "@/server/address.server";
+import { getUserAddressesFn } from "@/server/store.server";
 import { useRouteContext } from "@tanstack/react-router";
 import { clientApi } from "@/utils/api.client";
 import { Address, Message } from "@/schemas";
 
 export const useUserAddresses = () => {
-    const { session } = useRouteContext({ strict: false });
+    const { session, isAuthenticated } = useRouteContext({ strict: false });
 
     return useQuery({
         queryKey: ["addresses", session?.id?.toString()],
         queryFn: () => getUserAddressesFn(),
-        enabled: Boolean(session?.user),
+        enabled: isAuthenticated,
     });
 };
 

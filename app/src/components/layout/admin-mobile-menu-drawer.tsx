@@ -21,18 +21,18 @@ const MenuComp: React.FC = () => {
             <DrawerTrigger className="md:hidden">
                 <MenuIcon className="h-8 w-8" />
             </DrawerTrigger>
-            <DrawerContent aria-describedby={undefined} className="h-[calc(100vh-4rem)]">
+            <DrawerContent aria-describedby={undefined} className="h-[calc(100svh-4rem)]">
                 <DrawerHeader className="pb-0!">
                     <DrawerTitle>
                         <div className="flex items-center space-x-3 bg-primary -mx-4 -mt-4 p-4 overflow-hidden rounded-t-lg">
                             <Avatar>
                                 <AvatarImage src={session?.user?.image!} />
-                                <AvatarFallback className="bg-secondary">{session?.user?.first_name[0] || ""}</AvatarFallback>
+                                <AvatarFallback className="bg-secondary">{session?.user?.firstName?.[0] || ""}</AvatarFallback>
                             </Avatar>
 
                             <div>
                                 <div className="font-medium">
-                                    {session?.user?.first_name} {session?.user?.last_name}
+                                    {session?.user?.firstName} {session?.user?.lastName}
                                 </div>
                                 <div className="text-xs text-gray-300 text-left">{session?.user?.email}</div>
                             </div>

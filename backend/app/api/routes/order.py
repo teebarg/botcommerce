@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, BackgroundTasks, Cookie
-from app.core.deps import CurrentUser, get_current_superuser, PrincipalDep
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, BackgroundTasks, Cookie, Response
+from app.core.deps import CurrentUser, PrincipalDep
 from typing import Annotated, Optional
 from app.prisma_client import prisma as db
 from app.models.order import Order, OrderCreate, OrderTimelineEntry, PaginatedOrders, OrderNotesUpdate, ReturnItemPayload
@@ -8,6 +8,7 @@ from app.services.order import create_order_from_cart, retrieve_order, list_orde
 from app.services.redis import cache_response, invalidate_key, invalidate_pattern
 from app.core.logging import get_logger
 from app.models.generic import Message
+from app.core.permissions import require_admin
 
 logger = get_logger(__name__)
 
@@ -15,6 +16,7 @@ router = APIRouter()
 
 @router.post("/")
 async def create_order(
+    response: Response,
     order_in: OrderCreate,
     user: CurrentUser,
     _cart_id: Annotated[str | None, Cookie()] = None
@@ -23,6 +25,13 @@ async def create_order(
         order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=_cart_id)
         await invalidate_pattern("orders")
         await invalidate_pattern("cart")
+        response.delete_cookie(
+            key="_cart_id",
+            path="/",
+            httponly=True,
+            samesite="none",
+            secure=True,
+        )
         return order
     except Exception as e:
         logger.error(f"Failed to create order in create_order: {str(e)}")
@@ -69,7 +78,7 @@ async def get_orders(
     )
     return orders
 
-@router.delete("/{order_id}", dependencies=[Depends(get_current_superuser)])
+@router.delete("/{order_id}", dependencies=[Depends(require_admin)])
 async def delete_order(order_id: int):
     order = await db.order.find_unique(where={"id": order_id})
     if not order:
@@ -81,7 +90,7 @@ async def delete_order(order_id: int):
     return {"message": "order deleted successfully"}
 
 
-@router.patch("/{id}/status", dependencies=[Depends(get_current_superuser)])
+@router.patch("/{id}/status", dependencies=[Depends(require_admin)])
 async def order_status(id: int, status: OrderStatus) -> Order:
     """Change order status"""
     order = await db.order.find_unique(where={"id": id})
@@ -124,7 +133,7 @@ async def update_order_notes(order_id: int, notes_update: OrderNotesUpdate, user
     return updated_order
 
 
-@router.get("/{order_id}/timeline", dependencies=[Depends(get_current_superuser)], response_model=list[OrderTimelineEntry])
+@router.get("/{order_id}/timeline", dependencies=[Depends(require_admin)], response_model=list[OrderTimelineEntry])
 async def get_order_timeline(order_id: int):
     order = await db.order.find_unique(where={"id": order_id})
     if not order:
@@ -135,7 +144,7 @@ async def get_order_timeline(order_id: int):
     return entries
 
 
-@router.post("/{order_id}/return", dependencies=[Depends(get_current_superuser)], response_model=Message)
+@router.post("/{order_id}/return", dependencies=[Depends(require_admin)], response_model=Message)
 async def return_item(order_id: int, payload: ReturnItemPayload, background_tasks: BackgroundTasks):
     """Return an item from an order, update totals and inventory."""
     try:

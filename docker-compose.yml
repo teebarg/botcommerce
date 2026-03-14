@@ -5,10 +5,10 @@ services:
       - traefik.enable=true
       - traefik.docker.network=dev-net
       - traefik.http.services.shop-api.loadbalancer.server.port=8000
-      - traefik.http.routers.shop-api.rule=Host(`api.shop.lvh.me`)
+      - traefik.http.routers.shop-api.rule=Host(`api.shop.localhost`)
       - traefik.http.routers.shop-api.entrypoints=https
       - traefik.http.routers.shop-api.tls=true
-      - traefik.http.routers.shop-api-http.rule=Host(`api.shop.lvh.me`)
+      - traefik.http.routers.shop-api-http.rule=Host(`api.shop.localhost`)
       - traefik.http.routers.shop-api-http.entrypoints=http
       - traefik.http.routers.shop-api-http.middlewares=redirect-to-https
       - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
@@ -38,10 +38,10 @@ services:
       - traefik.enable=true
       - traefik.docker.network=dev-net
       - traefik.http.services.agent-api.loadbalancer.server.port=8000
-      - traefik.http.routers.agent-api.rule=Host(`agent.lvh.me`)
+      - traefik.http.routers.agent-api.rule=Host(`agent.localhost`)
       - traefik.http.routers.agent-api.entrypoints=https
       - traefik.http.routers.agent-api.tls=true
-      - traefik.http.routers.agent-api-http.rule=Host(`agent.lvh.me`)
+      - traefik.http.routers.agent-api-http.rule=Host(`agent.localhost`)
       - traefik.http.routers.agent-api-http.entrypoints=http
       - traefik.http.routers.agent-api-http.middlewares=redirect-to-https
       - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https

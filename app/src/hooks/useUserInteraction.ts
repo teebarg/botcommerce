@@ -5,7 +5,6 @@ import { Message } from "@/schemas";
 export type UserInteractionType = "VIEW" | "PURCHASE" | "CART_ADD" | "WISHLIST_ADD" | "WISHLIST_REMOVE";
 
 export interface UserInteractionPayload {
-    user_id: number;
     product_id: number;
     type: UserInteractionType;
     metadata?: Record<string, any>;
@@ -57,6 +56,7 @@ export const useTrackUserInteraction = () => {
 
     return {
         mutate: (payload: UserInteractionPayload) => {
+            if (import.meta.env.VITE_TRACKING_ENABLED !== "false") return;
             buffer.push(payload);
             scheduleFlush();
         },

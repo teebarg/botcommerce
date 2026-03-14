@@ -1,20 +1,18 @@
+import { auth } from "@clerk/tanstack-react-start/server";
 import { redirect } from "@tanstack/react-router";
-import { deleteCookie, getCookies } from "@tanstack/react-start/server";
+import { getCookies } from "@tanstack/react-start/server";
 
 const baseURL = process.env.API_URL || "http://localhost.dev";
 
-interface HeaderOptions {
-    cartId?: string | undefined;
-}
-
 type RequestOptions = RequestInit & {
     params?: Record<string, string | number | boolean | null | undefined>;
-    headers?: HeaderOptions;
 };
 
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
     const cookies = getCookies();
     const { params, ...restOptions } = options;
+    const { getToken } = await auth();
+    const token = await getToken({ template: "default" });
 
     const url = new URL(`/api${endpoint}`, baseURL);
 
@@ -31,8 +29,9 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
 
     const headers = {
         "Content-Type": "application/json",
-        ...options.headers,
         Cookie: cookieHeader,
+        ...options.headers,
+        "X-Auth": token || "token",
     };
 
     const response = await fetch(url, {
@@ -40,19 +39,15 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         headers,
     });
 
-    if (response.status === 401) {
-        deleteCookie("__Secure-authjs.session-token", {
-            path: "/",
-            secure: true,
-            sameSite: "none",
-        });
-        deleteCookie("authjs.session-token");
-
+    if (response.status === 403) {
         throw redirect({
-            to: "/auth/signin",
-            search: {
-                callbackUrl: "/",
-            },
+            to: "/forbidden",
+        });
+    }
+
+    if (response.status === 401) {
+        throw redirect({
+            to: "/sign-in",
         });
     }
 

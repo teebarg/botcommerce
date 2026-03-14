@@ -10,8 +10,9 @@ export const getShopSettingsFn = createServerFn({ method: "GET" }).handler(async
     return await api.get<ShopSettings[]>("/shop-settings/");
 });
 
-export const getShopSettingsPublicFn = createServerFn({ method: "GET" }).handler(async () => {
-    return await api.get<Record<string, string>>("/shop-settings/public");
+export const getShopSettingsPublicFn = createServerFn().handler(async () => {
+    const res = await api.get<any>("/shop-settings/public");
+    return res as Promise<any>
 });
 
 export const getChatsFn = createServerFn({ method: "GET" })

@@ -2,11 +2,10 @@ import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from 
 import ActivityTray from "@/components/generic/activities/activity-tray";
 import LocalizedClientLink from "@/components/ui/link";
 import MenuComp from "@/components/layout/admin-mobile-menu-drawer";
-import UserDropDown from "@/components/layout/user-dropdown";
 import { ThemeToggle } from "@/components/theme-toggle";
-import type { Session } from "start-authjs";
+import { UserButton } from "@clerk/tanstack-react-start";
 
-const AdminNavbar = ({ session }: { session: Session | null }) => {
+const AdminNavbar = () => {
     return (
         <NavigationBar className="h-16 bg-background sticky top-0 z-50">
             <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
@@ -28,13 +27,7 @@ const AdminNavbar = ({ session }: { session: Session | null }) => {
                     <ActivityTray />
                 </NavbarItem>
                 <NavbarItem className="flex">
-                    {session?.user ? (
-                        <UserDropDown user={session.user} />
-                    ) : (
-                        <LocalizedClientLink href="/auth/signin">
-                            Log In <span aria-hidden="true">&rarr;</span>
-                        </LocalizedClientLink>
-                    )}
+                    <UserButton />
                 </NavbarItem>
             </NavbarContent>
         </NavigationBar>

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from app.models.bank_details import BankDetails, BankDetailsCreate, BankDetailsUpdate
-from app.core.deps import get_current_superuser
+from app.core.permissions import require_admin
 from app.prisma_client import prisma as db
 from app.services.redis import cache_response, invalidate_pattern
 from app.core.logging import get_logger
@@ -15,7 +15,7 @@ async def list_bank_details(request: Request) -> list[BankDetails]:
     return await db.bankdetails.find_many()
 
 
-@router.post("/", dependencies=[Depends(get_current_superuser)])
+@router.post("/", dependencies=[Depends(require_admin)])
 async def create_bank_details(bank_details: BankDetailsCreate) -> BankDetails:
     try:
         bank_details = await db.bankdetails.create(data=bank_details.model_dump())
@@ -25,7 +25,7 @@ async def create_bank_details(bank_details: BankDetailsCreate) -> BankDetails:
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.put("/{id}", dependencies=[Depends(get_current_superuser)])
+@router.put("/{id}", dependencies=[Depends(require_admin)])
 async def update_bank_details(
     id: int,
     bank_details: BankDetailsUpdate,
@@ -40,7 +40,7 @@ async def update_bank_details(
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.delete("/{id}", dependencies=[Depends(get_current_superuser)])
+@router.delete("/{id}", dependencies=[Depends(require_admin)])
 async def delete_bank_details(id: int):
     try:
         await db.bankdetails.delete(where={"id": id})

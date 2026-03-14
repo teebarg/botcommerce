@@ -13,7 +13,7 @@ const ProductActions: React.FC<{
 }> = ({ product, actionColor = "gradient-primary" }) => {
     const { selectedVariant, handleAddToCart, handleWhatsAppPurchase, loading, outOfStock, isAdded } = useProductVariant(product);
 
-    const { session } = useRouteContext({ strict: false });
+    const { isAuthenticated } = useRouteContext({ strict: false });
     const trackInteraction = useTrackUserInteraction();
 
     const handleAddToCartAndTrack = (e: React.MouseEvent) => {
@@ -23,9 +23,8 @@ const ProductActions: React.FC<{
     };
 
     const handleUserInteraction = async (type: UserInteractionType, metadata?: Record<string, any>) => {
-        if (session?.user && product?.id) {
+        if (isAuthenticated && product?.id) {
             trackInteraction.mutate({
-                user_id: session.id,
                 product_id: product.id,
                 type,
                 metadata: { source: "product-card", ...metadata },

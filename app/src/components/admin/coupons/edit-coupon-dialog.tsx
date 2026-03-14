@@ -99,7 +99,7 @@ export const EditCouponDialog = ({ coupon }: EditCouponDialogProps) => {
 
     return (
         <SheetDrawer
-            drawerClassName="h-[85dvh]"
+            drawerClassName="h-[85svh]"
             open={state.isOpen}
             title="Edit Coupon"
             trigger={

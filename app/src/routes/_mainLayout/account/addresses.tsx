@@ -63,7 +63,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false, in
 
                 <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
                     <SheetDrawer
-                        drawerClassName="h-[90dvh]"
+                        drawerClassName="h-[90svh]"
                         open={editState.isOpen}
                         title="Edit address"
                         trigger={
@@ -117,7 +117,7 @@ function RouteComponent() {
                 <p className="text-muted-foreground">Manage your delivery addresses</p>
             </motion.div>
             <SheetDrawer
-                drawerClassName="h-[90dvh]"
+                drawerClassName="h-[90svh]"
                 open={addState.isOpen}
                 title="Add new address"
                 trigger={

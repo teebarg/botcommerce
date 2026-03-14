@@ -50,8 +50,8 @@ function RouteComponent() {
     const profileForm = useForm<ProfileFormValues>({
         resolver: zodResolver(profileSchema),
         defaultValues: {
-            first_name: session?.user?.first_name ?? "",
-            last_name: session?.user?.last_name ?? "",
+            first_name: session?.user?.firstName ?? "",
+            last_name: session?.user?.lastName ?? "",
         },
     });
 
@@ -137,8 +137,8 @@ function RouteComponent() {
                     <div className="w-24 h-24 rounded-full gradient-primary p-1">
                         <div className="w-full h-full rounded-full bg-secondary flex items-center justify-center overflow-hidden">
                             <span className="text-3xl font-bold text-foreground">
-                                {session?.user?.first_name[0]}
-                                {session?.user?.last_name?.[0]}
+                                {session?.user?.firstName?.[0]}
+                                {session?.user?.lastName?.[0]}
                             </span>
                         </div>
                     </div>
@@ -147,7 +147,7 @@ function RouteComponent() {
                     </button>
                 </div>
                 <p className="mt-3 font-semibold">
-                    {session?.user?.first_name} {session?.user?.last_name}
+                    {session?.user?.firstName} {session?.user?.lastName}
                 </p>
                 <p className="text-sm text-muted-foreground">{session?.user?.email}</p>
             </motion.div>

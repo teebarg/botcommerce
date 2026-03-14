@@ -2,20 +2,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { Cart, CartComplete, CartUpdate, Message, Order } from "@/schemas";
 import { useNavigate } from "@tanstack/react-router";
-import {
-    addToCartFn,
-    deleteCartItemFn,
-    getCartFn,
-    updateCartDetailsFn,
-    updateCartQuantityFn,
-} from "@/server/cart.server";
-import { analytics } from "@/utils/pulsemetric";
 import { clientApi } from "@/utils/api.client";
 
 export const useMyCart = () => {
     return useQuery({
         queryKey: ["cart"],
-        queryFn: () => getCartFn(),
+        queryFn: () => clientApi.get<Cart>("/cart/"),
     });
 };
 
@@ -24,7 +16,7 @@ export const useAddToCart = () => {
 
     return useMutation({
         mutationFn: async ({ variant_id, quantity }: { variant_id: number; quantity: number }) =>
-            await addToCartFn({ data: { variant_id, quantity } }),
+            await clientApi.post<Cart>("/cart/items", { variant_id, quantity }),
         onMutate: async ({ variant_id, quantity }) => {
             await queryClient.cancelQueries({ queryKey: ["cart"] });
 
@@ -74,7 +66,7 @@ export const useChangeCartQuantity = () => {
 
     return useMutation({
         mutationFn: async ({ item_id, quantity }: { item_id: number; quantity: number }) =>
-            await updateCartQuantityFn({ data: { item_id, quantity } }),
+            await clientApi.put<Cart>(`/cart/items/${item_id}?quantity=${quantity}`, {}),
         onMutate: async ({ item_id, quantity }) => {
             await queryClient.cancelQueries({ queryKey: ["cart"] });
 
@@ -112,7 +104,7 @@ export const useUpdateCartDetails = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (update: CartUpdate) => await updateCartDetailsFn({ data: update }),
+        mutationFn: async (update: CartUpdate) => await clientApi.put<Cart>("/cart/", update),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Cart details updated");
@@ -127,7 +119,7 @@ export const useDeleteCartItem = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (item_id: number) => await deleteCartItemFn({ data: item_id }),
+        mutationFn: async (item_id: number) => await clientApi.delete<Message>(`/cart/items/${item_id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Item removed from cart");
@@ -144,14 +136,14 @@ export const useCompleteCart = () => {
     return useMutation({
         mutationFn: async (complete: CartComplete) => await clientApi.post<Order>("/order/", complete),
         onSuccess: async (data) => {
-            navigate({ to: `/order/confirmed/${data?.order_number}` });
-            analytics.checkout({
-                cart_value: data?.total,
-                item_count: data?.order_items?.length,
-            });
-            toast.success("Order placed successfully");
+            navigate({ to: `/order/confirmed/${data?.order_number}`, replace: true });
+            // analytics.checkout({
+            //     cart_value: data?.total,
+            //     item_count: data?.order_items?.length,
+            // });
         },
         onError: (error: any) => {
+            navigate({ to: "/cart" }); // send them back
             toast.error(error.message || "Failed to place order");
         },
     });

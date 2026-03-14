@@ -1,15 +1,16 @@
 import { Navbar as NavigationBar, NavbarBrand, NavbarContent, NavbarItem } from "@/components/navbar";
 import GetApp from "../get-app";
-import UserDropDown from "./user-dropdown";
 import { CartComponent } from "@/components/store/cart/cart-component";
 import LocalizedClientLink from "@/components/ui/link";
 import { SearchDialog } from "@/components/store/product-search";
 import { Heart, HeartOff, ShoppingBag } from "lucide-react";
 import { ThemeToggle } from "../theme-toggle";
-import type { Session } from "start-authjs";
 import { useConfig } from "@/providers/store-provider";
+import { SignInButton, UserButton } from "@clerk/tanstack-react-start";
+import { useRouteContext } from "@tanstack/react-router";
 
-const StoreNavbar = ({ session }: { session: Session | null }) => {
+const StoreNavbar = () => {
+    const { isAuthenticated } = useRouteContext({ strict: false });
     const { config } = useConfig();
 
     return (
@@ -33,7 +34,7 @@ const StoreNavbar = ({ session }: { session: Session | null }) => {
                     <CartComponent />
                     <ThemeToggle />
                     <div className="hidden md:flex">
-                        {session ? (
+                        {isAuthenticated ? (
                             <LocalizedClientLink
                                 aria-label="go to wishlist"
                                 className="flex items-center justify-center rounded-md h-10 w-10 hover:bg-accent"
@@ -48,15 +49,7 @@ const StoreNavbar = ({ session }: { session: Session | null }) => {
                         )}
                     </div>
                     <GetApp />
-                    <div className="hidden sm:flex">
-                        {session?.user ? (
-                            <UserDropDown user={session?.user} />
-                        ) : (
-                            <LocalizedClientLink className="text-sm font-semibold leading-6" href="/auth/signin">
-                                Log In <span aria-hidden="true">&rarr;</span>
-                            </LocalizedClientLink>
-                        )}
-                    </div>
+                    <div className="hidden sm:flex">{isAuthenticated ? <UserButton /> : <SignInButton />}</div>
                 </NavbarItem>
             </NavbarContent>
         </NavigationBar>

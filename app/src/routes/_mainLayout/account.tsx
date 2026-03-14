@@ -1,13 +1,25 @@
 import AccountNav from "@/components/layout/account-nav";
-import { createFileRoute, Link, Outlet, redirect } from "@tanstack/react-router";
+import { SignIn } from "@clerk/tanstack-react-start";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { Box, Gift, MapPin, Package, User } from "lucide-react";
 
 export const Route = createFileRoute("/_mainLayout/account")({
-    beforeLoad: ({ context, location }) => {
-        if (!context.session) {
-            throw redirect({ to: "/auth/signin", search: { callbackUrl: location.href } });
+    beforeLoad: ({ context }) => {
+        if (!context.isAuthenticated) {
+            throw new Error("Not authenticated");
         }
+    },
+    errorComponent: ({ error }) => {
+        if (error.message === "Not authenticated") {
+            return (
+                <div className="flex items-center justify-center p-12">
+                    <SignIn routing="hash" forceRedirectUrl={window.location.href} />
+                </div>
+            );
+        }
+
+        throw error;
     },
     component: RouteComponent,
 });
@@ -46,7 +58,7 @@ const navLinks = [
 ];
 
 function RouteComponent() {
-    const { session } = Route.useRouteContext();
+    const { isAuthenticated } = Route.useRouteContext();
     return (
         <div className="flex-1">
             <div className="bg-background/60 backdrop-blur-md md:hidden sticky top-16 z-20">
@@ -71,7 +83,7 @@ function RouteComponent() {
             </div>
             <div className="max-w-7xl mx-auto flex md:gap-4 pb-12 pt-8">
                 <div className="md:w-60 hidden md:block">
-                    <div className="md:sticky md:top-16">{session?.user && <AccountNav />}</div>
+                    <div className="md:sticky md:top-16">{isAuthenticated && <AccountNav />}</div>
                 </div>
                 <AnimatePresence mode="wait" custom={0}>
                     <motion.div

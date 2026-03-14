@@ -2,9 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import WishlistItem from "@/components/store/wishlist";
 import type { WishItem } from "@/schemas";
 import { redirect } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { wishlistQuery } from "@/queries/user.queries";
 import { ZeroState } from "@/components/zero";
+import { userWishlistQuery, useUserWishlist } from "@/hooks/useUser";
 
 export const Route = createFileRoute("/_mainLayout/wishlist")({
     beforeLoad: ({ context, location }) => {
@@ -13,19 +12,19 @@ export const Route = createFileRoute("/_mainLayout/wishlist")({
         }
     },
     loader: async ({ context: { queryClient } }) => {
-        await queryClient.ensureQueryData(wishlistQuery());
+        await queryClient.ensureQueryData(userWishlistQuery());
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { data } = useSuspenseQuery(wishlistQuery());
+    const { data } = useUserWishlist();
 
     return (
         <div className="max-w-6xl mx-auto w-full mb-12 px-2 md:px-0 mt-18 md:mt-6">
             <div>
                 <h1 className="text-xl font-bold text-center mb-4">Your Wishlist</h1>
-                {data.wishlists.length > 0 ? (
+                {data?.wishlists && data.wishlists.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 lg:gap-8 mt-6 px-1">
                         {data.wishlists.map((item: WishItem, idx: number) => (
                             <WishlistItem key={idx} {...item.product} />

@@ -6,13 +6,14 @@ from app.models.chat import PaginatedChats, Chat, ChatRequest
 from app.models.generic import Message
 from app.services.websocket import manager
 from app.redis_client import redis_client
-from app.core.deps import get_current_superuser, AdminUser
+from app.core.deps import CurrentUser
 from datetime import datetime
 from app.services.chat import get_conversation
+from app.core.permissions import require_admin
 
 router = APIRouter()
 
-@router.post("/support", dependencies=[Depends(get_current_superuser)])
+@router.post("/support", dependencies=[Depends(require_admin)])
 async def admin_chat(payload: ChatRequest) -> Message:
     """
     Handle admin support chat messages
@@ -66,8 +67,8 @@ async def customer_chat(payload: ChatRequest) -> Message:
     return Message(message="message sent successfully")
 
 
-@router.post("/handoff")
-async def handoff(payload: ChatRequest, user: AdminUser) -> Message:
+@router.post("/handoff", dependencies=[Depends(require_admin)])
+async def handoff(payload: ChatRequest, user: CurrentUser) -> Message:
     conversation = await get_conversation(payload.conversation_uuid)
 
     if conversation.human_connected:
@@ -88,7 +89,7 @@ async def handoff(payload: ChatRequest, user: AdminUser) -> Message:
 
     return Message(message="Handoff request sent successfully")
 
-@router.get("/", dependencies=[Depends(get_current_superuser)])
+@router.get("/", dependencies=[Depends(require_admin)])
 async def index(
     uuid: Optional[str] = Query(None),
     status: Optional[ConversationStatus] = Query(None),
@@ -119,7 +120,7 @@ async def index(
     }
 
 
-@router.get("/{uid}", dependencies=[Depends(get_current_superuser)])
+@router.get("/{uid}", dependencies=[Depends(require_admin)])
 async def get_chat(uid: str) -> Chat:
     """Get a chat and all its messages"""
     chat = await db.conversation.find_unique(where={"conversation_uuid": uid}, include={"messages": True})
@@ -129,7 +130,7 @@ async def get_chat(uid: str) -> Chat:
     return chat
 
 
-@router.delete("/{id}", dependencies=[Depends(get_current_superuser)])
+@router.delete("/{id}", dependencies=[Depends(require_admin)])
 async def delete_chat(id: int) -> Message:
     """Delete a chat and all its messages"""
     existing_chat = await db.conversation.find_unique(where={"id": id})

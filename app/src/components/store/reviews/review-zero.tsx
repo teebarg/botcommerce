@@ -14,7 +14,7 @@ interface ProductReviewsZeroStateProps {
 }
 
 export const ProductReviewsZeroState = ({ productName, product_id }: ProductReviewsZeroStateProps) => {
-    const { session } = useRouteContext({ strict: false });
+    const { isAuthenticated } = useRouteContext({ strict: false });
     const state = useOverlayTriggerState({});
     const location = useLocation();
     const pathname = location.pathname;
@@ -70,7 +70,7 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
                     </div>
                 </div>
 
-                {session?.user ? (
+                {isAuthenticated ? (
                     <div className="space-y-3">
                         <SheetDrawer
                             open={state.isOpen}

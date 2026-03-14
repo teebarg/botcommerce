@@ -5,7 +5,7 @@ from app.services.catalog import CatalogService
 from math import ceil
 from app.services.redis import cache_response, invalidate_list, invalidate_pattern
 from app.services.product import reindex_catalog, reindex_catalogs
-from app.core.deps import get_current_superuser, UserDep
+from app.core.deps import UserDep
 from app.models.generic import Message
 
 from app.core.logging import get_logger
@@ -15,6 +15,7 @@ from app.core.config import settings
 from meilisearch.errors import MeilisearchApiError
 from app.services.websocket import manager
 from app.models.catalog import Catalog, Catalogs, CatalogView, CursorPaginatedCatalog, CatalogCreate, CatalogUpdate, CatalogBulkAdd
+from app.core.permissions import require_admin
 
 logger = get_logger(__name__)
 
@@ -35,7 +36,7 @@ async def list_catalogs_views() -> List[CatalogView]:
     return await db.sharedcollectionview.find_many()
 
 
-@router.get("/", dependencies=[Depends(get_current_superuser)])
+@router.get("/", dependencies=[Depends(require_admin)])
 @cache_response(key_prefix="catalog")
 async def list_catalogs(
     request: Request,
@@ -207,7 +208,7 @@ async def track_catalog_visit(
         "is_new_visit": is_new_visit,
     }
 
-@router.post("/", dependencies=[Depends(get_current_superuser)])
+@router.post("/", dependencies=[Depends(require_admin)])
 async def create_catalog(data: CatalogCreate) -> Catalog:
     create_data = data.model_dump(exclude_unset=True)
 
@@ -220,7 +221,7 @@ async def create_catalog(data: CatalogCreate) -> Catalog:
     await invalidate_catalog()
     return res
 
-@router.patch("/{id}", dependencies=[Depends(get_current_superuser)])
+@router.patch("/{id}", dependencies=[Depends(require_admin)])
 async def update_catalog(id: int, data: CatalogUpdate) -> Catalog:
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:
@@ -236,7 +237,7 @@ async def update_catalog(id: int, data: CatalogUpdate) -> Catalog:
 
     return res
 
-@router.delete("/{id}", dependencies=[Depends(get_current_superuser)])
+@router.delete("/{id}", dependencies=[Depends(require_admin)])
 async def delete_catalog(id: int) -> Message:
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:
@@ -246,7 +247,7 @@ async def delete_catalog(id: int) -> Message:
     await invalidate_catalog()
     return {"message": "Catalog deleted successfully"}
 
-@router.post("/{id}/add-product/{product_id}", dependencies=[Depends(get_current_superuser)])
+@router.post("/{id}/add-product/{product_id}", dependencies=[Depends(require_admin)])
 async def add_product_to_catalog(id: int, product_id: int, background_tasks: BackgroundTasks) -> Message:
     """Add a product to a catalog"""
     catalog = await db.sharedcollection.find_unique(where={"id": id})
@@ -266,7 +267,7 @@ async def add_product_to_catalog(id: int, product_id: int, background_tasks: Bac
 
     return {"message": "product added to catalog successfully"}
 
-@router.delete("/{id}/remove-product/{product_id}", dependencies=[Depends(get_current_superuser)])
+@router.delete("/{id}/remove-product/{product_id}", dependencies=[Depends(require_admin)])
 async def remove_product_from_catalog(id: int, product_id: int, background_tasks: BackgroundTasks) -> Message:
     """Remove a product from a catalog"""
     catalog = await db.sharedcollection.find_unique(where={"id": id})
@@ -287,7 +288,7 @@ async def remove_product_from_catalog(id: int, product_id: int, background_tasks
     return {"message": "product removed from collection successfully"}
 
 
-@router.post("/{id}/add-products", dependencies=[Depends(get_current_superuser)])
+@router.post("/{id}/add-products", dependencies=[Depends(require_admin)])
 async def bulk_add_products_to_catalog(id: int, data: CatalogBulkAdd, background_tasks: BackgroundTasks) -> Message:
     """Bulk add products to a catalog"""
     catalog = await db.sharedcollection.find_unique(where={"id": id})
@@ -313,7 +314,7 @@ async def bulk_add_products_to_catalog(id: int, data: CatalogBulkAdd, background
     return {"message": f"Added {len(data.product_ids)} product(s) to catalog"}
 
 
-@router.post("/{id}/remove-products", dependencies=[Depends(get_current_superuser)])
+@router.post("/{id}/remove-products", dependencies=[Depends(require_admin)])
 async def bulk_remove_products_from_catalog(id: int, data: CatalogBulkAdd, background_tasks: BackgroundTasks) -> Message:
     """Bulk remove products from a catalog"""
     catalog = await db.sharedcollection.find_unique(where={"id": id})

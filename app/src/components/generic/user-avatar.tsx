@@ -6,9 +6,9 @@ export function UserAvatar() {
 
     return (
         <Avatar className="h-8 w-8 cursor-pointer">
-            <AvatarImage alt={session?.user?.first_name} src={session?.user?.image ?? undefined} />
+            <AvatarImage alt={session?.user?.firstName} src={session?.user?.image ?? undefined} />
             <AvatarFallback className="bg-green-600 text-white text-xs">
-                {session?.user?.first_name
+                {session?.user?.firstName
                     ?.split(" ")
                     ?.map((n) => n[0])
                     .join("") ?? "ME"}

@@ -1,7 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import Optional
-
-from app.core.deps import get_current_superuser
 from app.models.carousel import (
     CarouselBanner,
     CarouselBannerCreate,
@@ -10,6 +8,7 @@ from app.models.carousel import (
 from app.prisma_client import prisma as db
 from app.core.storage import upload, delete_image
 from app.models.generic import ImageUpload, Message
+from app.core.permissions import require_admin
 
 router = APIRouter()
 
@@ -37,7 +36,7 @@ async def get_active_banners() -> list[CarouselBanner]:
         order={"order": "asc"}
     )
 
-@router.post("/", dependencies=[Depends(get_current_superuser)])
+@router.post("/", dependencies=[Depends(require_admin)])
 async def create_banner(banner: CarouselBannerCreate) -> CarouselBanner:
     """Create a new carousel banner"""
     try:
@@ -45,7 +44,7 @@ async def create_banner(banner: CarouselBannerCreate) -> CarouselBanner:
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.put("/{id}", dependencies=[Depends(get_current_superuser)])
+@router.put("/{id}", dependencies=[Depends(require_admin)])
 async def update_banner(id: int, banner: CarouselBannerUpdate) -> CarouselBanner:
     """Update a carousel banner"""
     try:
@@ -60,7 +59,7 @@ async def update_banner(id: int, banner: CarouselBannerUpdate) -> CarouselBanner
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.delete("/{id}", dependencies=[Depends(get_current_superuser)])
+@router.delete("/{id}", dependencies=[Depends(require_admin)])
 async def delete_banner(id: int) -> Message:
     """Delete a carousel banner"""
     try:
