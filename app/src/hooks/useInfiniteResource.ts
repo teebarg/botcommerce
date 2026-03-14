@@ -1,4 +1,4 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 interface InfiniteResourceOptions<TData, TItem> {
     queryKey: unknown[];
@@ -6,6 +6,7 @@ interface InfiniteResourceOptions<TData, TItem> {
     getItems: (data: TData) => TItem[];
     getNextCursor: (data: TData) => string | undefined | null;
     initialData?: TData;
+    staleTime?: number;
 }
 
 export function useInfiniteResource<TData, TItem>({
@@ -14,18 +15,22 @@ export function useInfiniteResource<TData, TItem>({
     getItems,
     getNextCursor,
     initialData,
+    staleTime = 1000 * 60 * 5,
 }: InfiniteResourceOptions<TData, TItem>) {
     const query = useInfiniteQuery<TData>({
         queryKey,
         queryFn: ({ pageParam }) => queryFn(pageParam as string | undefined),
         initialPageParam: undefined,
         getNextPageParam: (lastPage) => getNextCursor(lastPage) ?? undefined,
+        staleTime,
+        refetchOnMount: false,
         initialData: initialData
             ? {
                   pages: [initialData],
                   pageParams: [undefined],
               }
             : undefined,
+        initialDataUpdatedAt: initialData ? Date.now() : undefined,
     });
 
     const items = query.data?.pages.flatMap((page) => getItems(page)) ?? [];

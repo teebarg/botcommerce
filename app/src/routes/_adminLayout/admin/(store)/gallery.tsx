@@ -15,10 +15,13 @@ import { clientApi } from "@/utils/api.client";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { getProductImagesFn } from "@/server/gallery.server";
+import { queryOptions } from "@tanstack/react-query";
 
-const galleryQuery = () => ({
-    queryKey: ["gallery"],
-    queryFn: () => getProductImagesFn(),
+const galleryQuery = (params?: object) => queryOptions({
+    queryKey: ["gallery", params],
+    queryFn: () => getProductImagesFn(params),
+    staleTime: 1000 * 60 * 5,
+    refetchOnMount: false,
 });
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/gallery")({
@@ -30,7 +33,7 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/gallery")({
 
 function RouteComponent() {
     const params = Route.useSearch();
-    const { data } = useSuspenseQuery(galleryQuery());
+    const { data } = useSuspenseQuery(galleryQuery(params));
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
@@ -72,7 +75,7 @@ function RouteComponent() {
             setSelectedImages(new Set());
             setSelectionMode(false);
         }
-    }, [lastMessage?.percent, lastMessage?.status]);
+    }, [lastMessage, isLoading]);
 
     const handleSelectionChange = (imageId: number, selected: boolean) => {
         setSelectedImages((prev) => {
