@@ -31,7 +31,7 @@ function RouteComponent() {
                         ))}
                     </div>
                 ) : (
-                    <ZeroState title="Your wishlist is empty444" description="Start adding items to your wishlist to see them here." />
+                    <ZeroState title="Your wishlist is empty" description="Start adding items to your wishlist to see them here." />
                 )}
             </div>
         </div>

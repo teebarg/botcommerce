@@ -17,13 +17,13 @@ logger = get_logger(__name__)
 
 router = APIRouter()
 
-JWT_MAX_AGE_SECONDS = 15 * 60 * 60
+MAX_AGE_SECONDS = 365 * 24 * 60 * 60  # 1 year
 
-def _set_sso_cookie(response: Response, token: str) -> None:
+def _set_cart_cookie(response: Response, token: str) -> None:
     response.set_cookie(
         key="_cart_id",
         value=token,
-        max_age=JWT_MAX_AGE_SECONDS,
+        max_age=MAX_AGE_SECONDS,
         path="/",
         httponly=True,
         secure=True,
@@ -162,7 +162,7 @@ async def add_item_to_cart(
     item = await _handle_add_item(item_in, cart)
 
     background_tasks.add_task(calculate_cart_totals, cart=cart)
-    _set_sso_cookie(response, cart.cart_number)
+    _set_cart_cookie(response, cart.cart_number)
 
     return item
 
@@ -182,7 +182,7 @@ async def get_cart_index(request: Request, response: Response, user: UserDep, _c
             include=include_query
         )
         if cart:
-            _set_sso_cookie(response, cart.cart_number)
+            _set_cart_cookie(response, cart.cart_number)
             return cart
 
     if _cart_id:
@@ -191,7 +191,7 @@ async def get_cart_index(request: Request, response: Response, user: UserDep, _c
             return cart
 
     new_cart_id = generate_id()
-    _set_sso_cookie(response, new_cart_id)
+    _set_cart_cookie(response, new_cart_id)
     return await db.cart.create(
         data={"cart_number": new_cart_id, "user_id": user.id if user else None},
         include=include_query
@@ -204,7 +204,7 @@ async def get_cart_items(response: Response, user: UserDep, _cart_id: Annotated[
     cart = await get_cart(cart_number=_cart_id, user_id=user.id if user else None)
     if cart is None:
         cart = await create_cart(user_id=user.id if user else None)
-        _set_sso_cookie(response, cart.cart_number)
+        _set_cart_cookie(response, cart.cart_number)
         return []
     return await db.cartitem.find_many(where={"cart_number": cart.cart_number}, include={"variant": True})
 
@@ -215,7 +215,7 @@ async def update_cart(response: Response,cart_update: CartUpdate, user: UserDep,
     cart = await get_cart(cart_number=_cart_id, user_id=user.id if user else None)
     if cart is None:
         cart = await create_cart(user_id=user.id if user else None)
-        _set_sso_cookie(response, cart.cart_number)
+        _set_cart_cookie(response, cart.cart_number)
 
     async with db.tx() as tx:
         update_data = {}
@@ -289,7 +289,7 @@ async def delete_cart_item(response: Response, item_id: int, user: UserDep, _car
     cart = await get_cart(cart_number=_cart_id, user_id=user.id if user else None)
     if cart is None:
         cart = await create_cart(user_id=user.id if user else None)
-        _set_sso_cookie(response, cart.cart_number)
+        _set_cart_cookie(response, cart.cart_number)
         return {"message": "Item removed from cart successfully"}
 
     cart_item = await db.cartitem.find_unique(where={"id": item_id})
@@ -324,7 +324,7 @@ async def update_cart_item(response: Response, item_id: int, quantity: int, user
         item_in = CartItemCreate(variant_id=item_id, quantity=quantity)
         item = await _handle_add_item(item_in, cart)
         background_tasks.add_task(calculate_cart_totals, cart=cart)
-        _set_sso_cookie(response, cart.cart_number)
+        _set_cart_cookie(response, cart.cart_number)
         return {"message": "Item removed from cart successfully"}
 
     cart_item = await db.cartitem.find_unique(
