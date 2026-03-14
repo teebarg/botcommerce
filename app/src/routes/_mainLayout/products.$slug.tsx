@@ -8,7 +8,8 @@ import { BtnLink } from "@/components/ui/btnLink";
 import { Button } from "@/components/ui/button";
 import { LazyInView } from "@/components/LazyInView";
 import { productQuery } from "@/queries/user.queries";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import NotFound from "@/components/generic/not-found";
 
 export const Route = createFileRoute("/_mainLayout/products/$slug")({
     loader: async ({ context: { queryClient }, params: { slug } }) => {
@@ -66,16 +67,20 @@ export const Route = createFileRoute("/_mainLayout/products/$slug")({
 });
 
 function RouteComponent() {
-    const { data: product } = useSuspenseQuery(productQuery(Route.useParams().slug));
+    const { data: product } = useQuery(productQuery(Route.useParams().slug));
+
+    if (!product) {
+        return <NotFound />;
+    }
 
     return (
-        <main className="flex flex-col pt-16">
+        <main className="flex flex-col pt-18">
             <ProductView product={product} />
             <LazyInView>
                 <RelatedProducts productId={product.id} />
             </LazyInView>
             <LazyInView>
-                <ReviewsSection productName={product?.name} product_id={product?.id} />
+                <ReviewsSection productName={product.name} product_id={product.id} />
             </LazyInView>
         </main>
     );

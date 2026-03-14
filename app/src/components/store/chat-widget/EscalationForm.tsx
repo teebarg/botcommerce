@@ -138,9 +138,8 @@ const EscalationForm = ({ onSubmitForm, isLastMessage }: EscalationFormProps) =>
 
             <motion.button
                 type="submit"
-                whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-lg py-2 text-xs font-semibold transition-opacity hover:opacity-90"
+                className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-lg py-2 text-xs font-semibold transition-opacity hover:opacity-90 hover:scale-105 transition-transform"
             >
                 <Send className="w-3.5 h-3.5" />
                 Submit & Connect

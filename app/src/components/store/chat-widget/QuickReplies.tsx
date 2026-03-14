@@ -10,10 +10,9 @@ export const QuickReplies = ({ replies, onSelect }: QuickRepliesProps) => (
         {replies.map((reply) => (
             <motion.button
                 key={reply}
-                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => onSelect(reply)}
-                className="px-4 py-2 rounded-full border border-primary/40 text-sm text-primary hover:bg-primary/10 transition-colors"
+                className="px-4 py-2 rounded-full border border-primary/40 text-sm text-primary hover:bg-primary/10 transition-colors hover:scale-105 transition-transform"
             >
                 {reply}
             </motion.button>

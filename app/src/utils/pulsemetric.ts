@@ -40,7 +40,7 @@ let initialized = false;
 
 export function initPulseMetrics() {
     if (typeof window === "undefined") return;
-    if (import.meta.env.VITE_TRACKING_ENABLED === "false") return;
+    if (import.meta.env.VITE_TRACKING_ENABLED !== "false") return;
     if (!window.PulseMetrics) return;
     if (initialized) return;
 

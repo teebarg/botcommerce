@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { Cart, CartComplete, CartUpdate, Message, Order } from "@/schemas";
 import { useNavigate } from "@tanstack/react-router";
-import { analytics } from "@/utils/pulsemetric";
 import { clientApi } from "@/utils/api.client";
 
 export const useMyCart = () => {
@@ -137,14 +136,14 @@ export const useCompleteCart = () => {
     return useMutation({
         mutationFn: async (complete: CartComplete) => await clientApi.post<Order>("/order/", complete),
         onSuccess: async (data) => {
-            navigate({ to: `/order/confirmed/${data?.order_number}` });
-            analytics.checkout({
-                cart_value: data?.total,
-                item_count: data?.order_items?.length,
-            });
-            toast.success("Order placed successfully");
+            navigate({ to: `/order/confirmed/${data?.order_number}`, replace: true });
+            // analytics.checkout({
+            //     cart_value: data?.total,
+            //     item_count: data?.order_items?.length,
+            // });
         },
         onError: (error: any) => {
+            navigate({ to: "/cart" }); // send them back
             toast.error(error.message || "Failed to place order");
         },
     });

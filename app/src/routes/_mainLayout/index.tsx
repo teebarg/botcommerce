@@ -13,21 +13,28 @@ import CategoriesWithProductsSection from "@/components/store/home/categories-pr
 import { HERO_IMAGES } from "@/utils/constants";
 import InfiniteFeed from "@/components/store/collections/infinite-feed";
 import { getIndexProductsFn } from "@/server/product.server";
+import { queryOptions, useQuery } from "@tanstack/react-query";
+
+const indexProductQuery = () =>
+    queryOptions({
+        queryKey: ["products", "index"],
+        queryFn: () => getIndexProductsFn(),
+    });
 
 export const Route = createFileRoute("/_mainLayout/")({
     component: Home,
-    loader: async () => {
-        const homeProducts = await getIndexProductsFn();
+    loader: async ({ context: { queryClient } }) => {
+        await queryClient.ensureQueryData(indexProductQuery());
         const image = HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)];
         return {
             heroImage: image,
-            homeProducts,
         };
     },
 });
 
 function Home() {
-    const { heroImage, homeProducts: data } = Route.useLoaderData();
+    const { heroImage } = Route.useLoaderData();
+    const { data } = useQuery(indexProductQuery());
 
     return (
         <div>
