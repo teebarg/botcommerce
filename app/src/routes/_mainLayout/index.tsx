@@ -19,6 +19,7 @@ const indexProductQuery = () =>
     queryOptions({
         queryKey: ["products", "index"],
         queryFn: () => getIndexProductsFn(),
+        staleTime: 1000 * 60 * 30,
     });
 
 export const Route = createFileRoute("/_mainLayout/")({

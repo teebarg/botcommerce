@@ -2,7 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { getProductFn, getProductsFeedFn } from "@/server/product.server";
 import { getMeFn, getMeTrxnFn } from "@/server/users.server";
 import { getOrderFn, getOrdersFn } from "@/server/order.server";
-import { getCollectionFn } from "@/server/collections.server";
+import { getCollectionFn } from "@/server/store.server";
 import { getReviewsFn } from "@/server/review.server";
 import { getCatalogFn, getUserAddressesFn } from "@/server/store.server";
 

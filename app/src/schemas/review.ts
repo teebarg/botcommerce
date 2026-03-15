@@ -2,19 +2,12 @@ import { z } from "zod";
 
 import { UserSchema } from "./user";
 import { AuditSchema } from "./base";
+import { CursorSchema } from "./common";
 
 const RatingSchema = z.object({
     average: z.number().optional(),
     count: z.number(),
     breakdown: z.any(),
-});
-
-const PagSchema = z.object({
-    skip: z.number(),
-    limit: z.number(),
-    total_count: z.number(),
-    total_pages: z.number(),
-    ratings: RatingSchema,
 });
 
 export const ReviewSchema = z
@@ -30,8 +23,9 @@ export const ReviewSchema = z
     })
     .merge(AuditSchema);
 
-export const PaginatedReviewSchema = PagSchema.extend({
-    reviews: z.array(ReviewSchema),
+export const PaginatedReviewSchema = CursorSchema.extend({
+    items: z.array(ReviewSchema),
+    ratings: RatingSchema,
 });
 
 export type Review = z.infer<typeof ReviewSchema>;

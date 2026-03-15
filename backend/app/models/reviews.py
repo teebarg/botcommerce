@@ -35,9 +35,7 @@ class Ratings(BaseModel):
     breakdown: dict[int, int]
 
 class Reviews(BaseModel):
-    reviews: list[Review]
+    items: list[Review]
+    next_cursor: Optional[str]
     ratings: Ratings
-    skip: int
     limit: int
-    total_count: int
-    total_pages: int
