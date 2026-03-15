@@ -121,7 +121,6 @@ async def calculate_cart_totals(cart: Cart):
 
     await db.cart.update(where={"id": cart.id}, data=data)
     await invalidate_pattern("abandoned-carts")
-    await invalidate_pattern("cart")
 
 
 async def get_cart(cart_number: Optional[str], user_id: Optional[str]):
@@ -279,7 +278,6 @@ async def update_cart(response: Response,cart_update: CartUpdate, user: UserDep,
         if cart.user_id:
             await bust(f"cart:{cart.user_id}")
         await invalidate_pattern("abandoned-carts")
-        await invalidate_pattern("cart")
 
         return updated_cart
 
@@ -683,7 +681,6 @@ async def apply_wallet(user: CurrentUser, _cart_id: Annotated[str | None, Cookie
         logger.error(e)
         raise HTTPException(status_code=500, detail="Failed to update cart")
 
-    await invalidate_pattern("cart")
     await invalidate_pattern("user")
 
     return Message(message="Wallet applied")

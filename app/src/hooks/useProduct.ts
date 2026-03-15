@@ -50,7 +50,6 @@ export const useProductSearch = (params: SearchParams) => {
 };
 
 export const useProductFeed = (initialData: ProductFeed | null, search?: FeedParams) => {
-    const feedSeedRef = useRef<number | null>(initialData?.feed_seed ?? null);
     const [feedSeed, setFeedSeed] = useState<number | null>(initialData?.feed_seed ?? null);
     return useInfiniteQuery<ProductFeed, Error, InfiniteData<ProductFeed>, [string, string, string, FeedParams | {}], string | null>({
         queryKey: ["products", "feed", `${feedSeed}` || "", search ?? {}],

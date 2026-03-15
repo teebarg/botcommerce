@@ -157,7 +157,6 @@ async def apply_coupon(
 
     from app.services.redis import invalidate_pattern
     await invalidate_pattern("abandoned-carts")
-    await invalidate_pattern("cart")
     await invalidate_pattern("coupons")
 
     return Message(message="Coupon applied successfully")
@@ -184,7 +183,6 @@ async def remove_coupon(
 
     from app.services.redis import invalidate_pattern
     await invalidate_pattern("abandoned-carts")
-    await invalidate_pattern("cart")
     await invalidate_pattern("coupons")
 
     return {"message": "Coupon removed successfully"}
