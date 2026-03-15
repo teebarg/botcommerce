@@ -59,6 +59,10 @@ export function InfiniteList({
         }
     }, [isLoading]);
 
+    useEffect(() => {
+        lockRef.current = false;
+    }, [hasMore]);
+
     return (
         <div className={className}>
             {children}

@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { api } from "@/utils/api.server";
-import type { Address, FAQ, SearchCatalog, Category } from "@/schemas";
+import type { Address, FAQ, SearchCatalog, Category, Collection } from "@/schemas";
 import { z } from "zod";
 
 export const CatalogSearchSchema = z.object({
@@ -28,4 +28,12 @@ export const getCategoriesFn = createServerFn({ method: "GET" })
     .handler(async ({ data: query }) => {
         return await api.get<Category[]>(`/category/`, { params: { query: query ?? "" } });
     });
+
+export const getCollectionFn = createServerFn({ method: "GET" })
+    .inputValidator((d: string) => d)
+    .handler(async ({ data }) => {
+        const res = await api.get<Collection>(`/collection/${data}`);
+        return res;
+    });
+
 

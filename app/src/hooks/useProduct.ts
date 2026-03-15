@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { Message, PaginatedProductSearch, ProductFeed, ProductVariant } from "@/schemas";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { clientApi } from "@/utils/api.client";
 
 type SearchParams = {
@@ -45,34 +45,36 @@ export const useProductSearch = (params: SearchParams) => {
     return useQuery({
         queryKey: ["products", "search", params],
         queryFn: async () => await clientApi.get<PaginatedProductSearch>("/product/", { params }),
+        staleTime: 1000 * 60 * 30,
     });
 };
 
 export const useProductFeed = (initialData: ProductFeed | null, search?: FeedParams) => {
     const feedSeedRef = useRef<number | null>(initialData?.feed_seed ?? null);
+    const [feedSeed, setFeedSeed] = useState<number | null>(initialData?.feed_seed ?? null);
     return useInfiniteQuery<ProductFeed, Error, InfiniteData<ProductFeed>, [string, string, string, FeedParams | {}], string | null>({
-        queryKey: ["products", "feed", `${feedSeedRef.current}` || "", search ?? {}],
+        queryKey: ["products", "feed", `${feedSeed}` || "", search ?? {}],
         queryFn: async ({ pageParam }) => {
             const res = await clientApi.get<ProductFeed>("/product/feed", {
-                params: { cursor: pageParam ?? undefined, feed_seed: feedSeedRef.current ?? undefined, ...search },
+                params: { cursor: pageParam ?? undefined, feed_seed: feedSeed ?? undefined, ...search },
             });
             return res;
         },
         getNextPageParam: (lastPage) => {
-            if (!feedSeedRef.current) {
-                feedSeedRef.current = lastPage.feed_seed;
+            if (!feedSeed && lastPage.feed_seed) {
+                setFeedSeed(lastPage.feed_seed);
             }
             return lastPage.next_cursor ?? undefined;
         },
-
         initialPageParam: null,
-
+        staleTime: 1000 * 60 * 30,
         initialData: initialData
             ? {
                   pages: [initialData],
                   pageParams: [null],
               }
             : undefined,
+        initialDataUpdatedAt: initialData ? Date.now() : undefined,
     });
 };
 

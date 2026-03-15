@@ -4,85 +4,125 @@ from app.core.deps import CurrentUser
 from app.models.generic import Message
 from app.prisma_client import prisma as db
 from prisma.errors import PrismaError
-from math import ceil
 from app.services.product import reindex_product
 from app.core.permissions import require_admin
+from base64 import b64encode, b64decode
+import json
+import asyncio
 
 router = APIRouter()
 
 @router.get("/")
 async def index(
     product_id: int = None,
-    skip: int = Query(default=0, ge=0),
-    limit: int = Query(default=20, le=100),
+    cursor: str = Query(default=None, description="Pagination cursor from previous response"),
+    limit: int = Query(default=20, le=100, ge=1),
     sort: str = Query(default="newest")
 ) -> Reviews:
     """
-    Retrieve reviews with Redis caching.
+    Retrieve reviews with cursor-based pagination.
+    Cursor encodes the last seen record's sort field + id for stable pagination.
     """
-    where_clause = {"product_id": product_id} if product_id else {}
-    sort_map = {
-        "newest": {"created_at": "desc"},
-        "oldest": {"created_at": "asc"},
-        "highest": {"rating": "desc"},
-        "lowest": {"rating": "asc"},
+    SORT_MAP = {
+        "newest":  ("created_at", "desc"),
+        "oldest":  ("created_at", "asc"),
+        "highest": ("rating",     "desc"),
+        "lowest":  ("rating",     "asc"),
     }
-    order_by = sort_map.get(sort, {"created_at": "desc"})
+
+    sort_field, sort_dir = SORT_MAP.get(sort, ("created_at", "desc"))
+    where_clause = {"product_id": product_id} if product_id else {}
+    cursor_filter = {}
+    if cursor:
+        try:
+            payload = json.loads(b64decode(cursor).decode())
+            last_value = payload["value"]
+            last_id    = payload["id"]
+
+            gt_lt = "lt" if sort_dir == "desc" else "gt"
+
+            if sort_field == "created_at":
+                from datetime import datetime, timezone
+                last_value = datetime.fromisoformat(last_value)
+
+            cursor_filter = {
+                "OR": [
+                    {sort_field: {gt_lt: last_value}},
+                    {sort_field: {"equals": last_value}, "id": {gt_lt: last_id}},
+                ]
+            }
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid cursor")
+
+    combined_where = {**where_clause, **cursor_filter} if cursor_filter else where_clause
+
     reviews = await db.review.find_many(
-        where=where_clause,
-        skip=skip,
-        take=limit,
-        order=order_by,
+        where=combined_where,
+        take=limit + 1,
+        order=[{sort_field: sort_dir}, {"id": sort_dir}],
     )
-    total = await db.review.count(where=where_clause)
+
+    has_next = len(reviews) > limit
+    reviews  = reviews[:limit]
+
+    next_cursor = None
+    if has_next and reviews:
+        last = reviews[-1]
+        raw_value = getattr(last, sort_field)
+
+        if hasattr(raw_value, "isoformat"):
+            raw_value = raw_value.isoformat()
+
+        payload     = {"value": str(raw_value), "id": last.id}
+        next_cursor = b64encode(json.dumps(payload).encode()).decode()
 
     if product_id:
         stats_query = """
             SELECT
-                ROUND(AVG(rating)::numeric, 2) as average_rating,
-                COUNT(*) as ratings_count
-            FROM "reviews"
+                ROUND(AVG(rating)::numeric, 2) AS average_rating,
+                COUNT(*)                        AS ratings_count
+            FROM reviews
             WHERE product_id = $1
         """
         breakdown_query = """
-            SELECT rating, COUNT(*) as count
-            FROM "reviews"
+            SELECT rating, COUNT(*) AS count
+            FROM reviews
             WHERE product_id = $1
             GROUP BY rating
         """
-        stats_result = await db.query_raw(stats_query, product_id)
+        stats_result     = await db.query_raw(stats_query, product_id)
         breakdown_result = await db.query_raw(breakdown_query, product_id)
     else:
         stats_query = """
             SELECT
-                ROUND(AVG(rating)::numeric, 2) as average_rating,
-                COUNT(*) as ratings_count
-            FROM "reviews"
+                ROUND(AVG(rating)::numeric, 2) AS average_rating,
+                COUNT(*)                        AS ratings_count
+            FROM reviews
         """
         breakdown_query = """
-            SELECT rating, COUNT(*) as count
-            FROM "reviews"
+            SELECT rating, COUNT(*) AS count
+            FROM reviews
             GROUP BY rating
         """
-        stats_result = await db.query_raw(stats_query)
-        breakdown_result = await db.query_raw(breakdown_query)
+        stats_result, breakdown_result = await asyncio.gather(
+            db.query_raw(stats_query),
+            db.query_raw(breakdown_query),
+        )
 
-    average_rating = float(stats_result[0]["average_rating"] or 0)
-    ratings_count = stats_result[0]["ratings_count"]
-    rating_counts = {int(r["rating"]): r["count"] for r in breakdown_result}
+    average_rating   = float(stats_result[0]["average_rating"] or 0)
+    ratings_count    = stats_result[0]["ratings_count"]
+    rating_counts    = {int(r["rating"]): r["count"] for r in breakdown_result}
     rating_breakdown = {r: rating_counts.get(r, 0) for r in range(5, 0, -1)}
 
     return {
-        "reviews": reviews,
-        "skip": skip,
-        "limit": limit,
-        "total_pages": ceil(total / limit) if limit else 1,
-        "total_count": total,
+        "items":     reviews,
+        "next_cursor": next_cursor,
+        "limit":       limit,
         "ratings": {
-            "average": average_rating,
-            "count": ratings_count,
-            "breakdown": rating_breakdown
-        }
+            "average":   average_rating,
+            "count":     ratings_count,
+            "breakdown": rating_breakdown,
+        },
     }
 
 @router.post("/")
