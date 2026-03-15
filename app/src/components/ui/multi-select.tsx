@@ -23,12 +23,10 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
         const dropdownRef = useRef<HTMLDivElement | null>(null);
 
         useEffect(() => {
-            // Update internal state when value prop changes
             setSelectedItems(value);
         }, [value]);
 
         useEffect(() => {
-            // Handle clicks outside the dropdown to close it
             const handleClickOutside = (event: MouseEvent) => {
                 if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                     setIsOpen(false);
@@ -58,8 +56,6 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
             }
 
             setSelectedItems(newSelectedItems);
-
-            // Call onChange with the new array of selected items
             if (onChange) {
                 onChange(newSelectedItems);
             }

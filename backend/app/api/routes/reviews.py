@@ -15,7 +15,7 @@ router = APIRouter()
 @router.get("/")
 async def index(
     product_id: int = None,
-    cursor: str = Query(default=None, description="Pagination cursor from previous response"),
+    cursor: str = Query(default=None, description="cursor from previous response"),
     limit: int = Query(default=20, le=100, ge=1),
     sort: str = Query(default="newest")
 ) -> Reviews:
