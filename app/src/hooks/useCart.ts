@@ -134,11 +134,13 @@ export const useDeleteCartItem = () => {
 
 export const useCompleteCart = () => {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: async (complete: CartComplete) => await clientApi.post<Order>("/order/", complete),
         onSuccess: async (data) => {
             navigate({ to: `/order/confirmed/${data?.order_number}`, replace: true });
+            queryClient.invalidateQueries({ queryKey: ["cart"] });
             // analytics.checkout({
             //     cart_value: data?.total,
             //     item_count: data?.order_items?.length,

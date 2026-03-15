@@ -10,12 +10,6 @@ from app.main import app
 from app.models.user import User
 
 
-# @pytest.fixture
-# def db() -> Generator:
-#     with Session(engine) as session:
-#         yield session
-
-
 @pytest.fixture
 def client(current_user: User) -> Generator:
     with TestClient(app) as c:

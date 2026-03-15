@@ -24,7 +24,6 @@ async def create_order(
     try:
         order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=_cart_id)
         await invalidate_pattern("orders")
-        await invalidate_pattern("cart")
         response.delete_cookie(
             key="_cart_id",
             path="/",

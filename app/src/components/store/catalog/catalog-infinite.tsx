@@ -34,12 +34,15 @@ export default function CatalogInfinite({ slug, initialData }: Props) {
         },
         initialPageParam: undefined,
         getNextPageParam: (lastPage: SearchCatalog) => lastPage.next_cursor ?? undefined,
+        staleTime: 1000 * 60 * 30,
+        refetchOnMount: false,
         initialData: initialData
             ? {
                   pages: [initialData],
                   pageParams: [undefined],
               }
             : undefined,
+        initialDataUpdatedAt: initialData ? Date.now() : undefined,
     });
 
     const products = data?.pages.flatMap((p) => p.products) || [];

@@ -7,8 +7,8 @@ interface RecentlyViewedSectionProps {
 }
 
 export default function RecentlyViewedSection({ limit = 5 }: RecentlyViewedSectionProps) {
-    const { session } = useRouteContext({ strict: false });
-    const { data, isLoading } = useUserRecentlyViewed(limit, Boolean(session?.user));
+    const { isAuthenticated } = useRouteContext({ strict: false });
+    const { data, isLoading } = useUserRecentlyViewed(limit, isAuthenticated);
 
     if (!data || data.length === 0 || isLoading) return null;
     return <ProductSection title="Featured" products={data || []} href="/collections/featured" showGradient />;

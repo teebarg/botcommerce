@@ -80,7 +80,6 @@ export const collectionQuery = (slug: string) =>
 
 type ReviewsParams = {
     product_id?: number;
-    skip?: number;
     sort?: string;
 };
 
@@ -88,4 +87,5 @@ export const reviewsQuery = (params: ReviewsParams) =>
     queryOptions({
         queryKey: ["reviews", JSON.stringify(params)],
         queryFn: () => getReviewsFn({ data: params }),
+        staleTime: 1000 * 60 * 30,
     });

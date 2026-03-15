@@ -10,7 +10,6 @@ export const statsTrendsQuery = () =>
     queryOptions({
         queryKey: ["stats", "trends"],
         queryFn: () => getStatTrendsFn(),
-        staleTime: 50_000,
     });
 
 export interface UsersParams {

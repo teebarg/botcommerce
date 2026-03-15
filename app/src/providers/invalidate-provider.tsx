@@ -8,7 +8,7 @@ function parseEventKey(eventKey: string): string[] {
 }
 
 export function InvalidateProvider({ children }: { children: React.ReactNode }) {
-    const { session } = useRouteContext({ strict: false });
+    const { session, isAuthenticated } = useRouteContext({ strict: false });
     const queryClient = useQueryClient();
     const { lastMessage, send, isConnected } = useWebSocket();
     const userInitSentRef = useRef<boolean>(false);
@@ -24,7 +24,7 @@ export function InvalidateProvider({ children }: { children: React.ReactNode }) 
     }, [lastMessage, queryClient]);
 
     useEffect(() => {
-        if (session && isConnected && !userInitSentRef.current) {
+        if (isAuthenticated && isConnected && !userInitSentRef.current) {
             send(
                 JSON.stringify({
                     type: "init",
@@ -35,6 +35,6 @@ export function InvalidateProvider({ children }: { children: React.ReactNode }) 
 
             userInitSentRef.current = true;
         }
-    }, [session, isConnected]);
+    }, [isAuthenticated, isConnected]);
     return <div>{children}</div>;
 }
