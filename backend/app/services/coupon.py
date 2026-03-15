@@ -33,7 +33,7 @@ class CouponService:
 
         if any(user.id == user_id for user in coupon.users):
             raise HTTPException(
-                status_code=403,
+                status_code=400,
                 detail="Self-referral not allowed"
             )
 
@@ -63,13 +63,6 @@ class CouponService:
                         status_code=400,
                         detail="You have reached the maximum usage limit for this coupon."
                     )
-
-        # if coupon.scope == CouponScope.SPECIFIC_USERS:
-        #     if not user_id:
-        #         raise HTTPException(status_code=400, detail="Coupon is only available for specific users. Please log in.")
-
-        #     if not any(user.id == user_id for user in coupon.users):
-        #         raise HTTPException(status_code=403, detail="This coupon is not available for your account")
 
         # Validate cart requirements
         if cart:

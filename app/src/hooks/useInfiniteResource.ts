@@ -15,7 +15,7 @@ export function useInfiniteResource<TData, TItem>({
     getItems,
     getNextCursor,
     initialData,
-    staleTime = 1000 * 60 * 5,
+    staleTime = 1000 * 60 * 30,
 }: InfiniteResourceOptions<TData, TItem>) {
     const query = useInfiniteQuery<TData>({
         queryKey,

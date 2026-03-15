@@ -68,7 +68,7 @@ async def create_payment(
     cart = await db.cart.find_unique(where={"cart_number": cart_number})
 
     if cart.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to pay for this cart")
+        raise HTTPException(status_code=400, detail="Not authorized to pay for this cart")
 
     # if order.status in ["CANCELLED", "REFUNDED"]:
     #     raise HTTPException(status_code=400, detail="Cannot pay for cancelled or refunded order")

@@ -1,15 +1,7 @@
 import { Gift, MapPin, Package, User } from "lucide-react";
 import LocalizedClientLink from "@/components/ui/link";
-import { useInvalidateMe } from "@/hooks/useUser";
 
 const AccountNav = () => {
-    const invalidate = useInvalidateMe();
-
-    const handleLogout = async () => {
-        window.location.href = "/api/auth/signout";
-        invalidate();
-    };
-
     const navLinks = [
         {
             href: "/account",
@@ -57,11 +49,6 @@ const AccountNav = () => {
                             </AccountNavLink>
                         </li>
                     ))}
-                    <li className="text-grey-700">
-                        <button aria-label="log out" data-testid="logout-button" type="button" onClick={handleLogout}>
-                            Log out
-                        </button>
-                    </li>
                 </ul>
             </div>
         </div>

@@ -5,7 +5,7 @@ import { AdminSidebar } from "@/components/layout/admin-sidebar";
 import { SignIn } from "@clerk/tanstack-react-start";
 
 export const Route = createFileRoute("/_adminLayout")({
-    beforeLoad: ({ context, location }) => {
+    beforeLoad: ({ context }) => {
         if (!context.isAuthenticated) {
             throw new Error("Not authenticated");
         }

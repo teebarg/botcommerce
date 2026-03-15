@@ -1,18 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
 import WishlistItem from "@/components/store/wishlist";
 import type { WishItem } from "@/schemas";
-import { redirect } from "@tanstack/react-router";
 import { ZeroState } from "@/components/zero";
 import { userWishlistQuery, useUserWishlist } from "@/hooks/useUser";
+import { SignIn } from "@clerk/tanstack-react-start";
 
 export const Route = createFileRoute("/_mainLayout/wishlist")({
-    beforeLoad: ({ context, location }) => {
-        if (!context.session) {
-            throw redirect({ to: "/auth/signin", search: { callbackUrl: location.href } });
+    beforeLoad: ({ context }) => {
+        if (!context.isAuthenticated) {
+            throw new Error("Not authenticated");
         }
     },
     loader: async ({ context: { queryClient } }) => {
         await queryClient.ensureQueryData(userWishlistQuery());
+    },
+    errorComponent: ({ error }) => {
+        if (error.message === "Not authenticated") {
+            return (
+                <div className="flex items-center justify-center p-12">
+                    <SignIn routing="hash" forceRedirectUrl={window.location.href} />
+                </div>
+            );
+        }
+
+        throw error;
     },
     component: RouteComponent,
 });

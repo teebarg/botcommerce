@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { BtnLink } from "@/components/ui/btnLink";
 import { useLocation, useRouteContext } from "@tanstack/react-router";
 import SheetDrawer from "@/components/sheet-drawer";
+import { SignInButton } from "@clerk/tanstack-react-start";
 
 interface ProductReviewsZeroStateProps {
     onWriteReview?: () => void;
@@ -84,11 +85,7 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
                         <p className="text-xs text-muted-foreground">Takes less than 2 minutes</p>
                     </div>
                 ) : (
-                    <div className="space-y-3">
-                        <BtnLink className="w-full md:w-auto px-8" href={`/auth/signin?callbackUrl=${pathname}`} size="lg">
-                            Login to Write a Review
-                        </BtnLink>
-                    </div>
+                    <SignInButton />
                 )}
             </div>
         </Card>

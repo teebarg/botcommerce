@@ -13,7 +13,6 @@ import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 export const Route = createFileRoute("/_adminLayout/admin/(store)/reviews")({
     validateSearch: z.object({
         product_id: z.number().optional(),
-        skip: z.number().optional(),
         sort: z.string().optional(),
     }),
     loaderDeps: ({ search }) => search,
@@ -27,8 +26,8 @@ function RouteComponent() {
     const params = Route.useSearch();
     const { data: initialData } = useSuspenseQuery(reviewsQuery(params));
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteResource<PaginatedReview, Review>({
-        queryKey: ["reviews", JSON.stringify(params)],
-        queryFn: (cursor) => clientApi.get<PaginatedReview>("/order/", { params: { cursor, ...params } }),
+        queryKey: ["reviews", "infinite", JSON.stringify(params)],
+        queryFn: (cursor) => clientApi.get<PaginatedReview>("/reviews/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
         initialData: initialData,
@@ -46,7 +45,7 @@ function RouteComponent() {
                 </div>
             </div>
             <div className="mt-4">
-                {!isLoading && items.length > 0 && (
+                {!isLoading && items?.length > 0 && (
                     <InfiniteResourceList
                         items={items}
                         onLoadMore={fetchNextPage}
@@ -55,7 +54,7 @@ function RouteComponent() {
                         renderItem={(item: Review) => <ReviewItem key={item.id} review={item} />}
                     />
                 )}
-                {!isLoading && items.length === 0 && (
+                {!isLoading && items?.length === 0 && (
                     <div className="text-center py-8">
                         <p className="text-muted-foreground">No reviews found</p>
                     </div>

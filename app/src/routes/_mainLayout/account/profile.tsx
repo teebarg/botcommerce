@@ -116,10 +116,6 @@ function RouteComponent() {
         passwordForm.reset();
     };
 
-    if (!session) {
-        return <ServerError error="Failed to get session" scenario="profile" stack="Invalid session" />;
-    }
-
     return (
         <div className="space-y-6 pt-12 md:pt-6">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">

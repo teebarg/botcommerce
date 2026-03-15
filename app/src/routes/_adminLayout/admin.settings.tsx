@@ -9,7 +9,7 @@ import { getShopSettingsFn } from "@/server/generic.server";
 
 const useShopSettingsQuery = () =>
     queryOptions({
-        queryKey: ["shop-settings"],
+        queryKey: ["shop-settings", "list"],
         queryFn: () => getShopSettingsFn(),
     });
 

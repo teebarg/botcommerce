@@ -4,43 +4,19 @@ import DeliveryStep from "./delivery-step";
 import AddressStep from "./address-step";
 import PaymentStep from "./payment-step";
 import CheckoutStepIndicator from "./checkout-step-indicator";
-import CheckoutLoginPrompt from "@/components/generic/auth/checkout-auth-prompt";
 import type { Cart } from "@/schemas";
-import { useRouteContext } from "@tanstack/react-router";
 
-export type CheckoutStep = "auth" | "delivery" | "address" | "payment";
+export type CheckoutStep = "delivery" | "address" | "payment";
 
 interface CheckoutFlowProps {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
 }
 
 const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ cart }) => {
-    const { session } = useRouteContext({ strict: false });
-    const [currentStep, setCurrentStep] = useState<CheckoutStep>("auth");
-
-    const getStep = () => {
-        if (!session) {
-            return "auth";
-        }
-        if (!cart.shipping_method) {
-            return "delivery";
-        }
-        if (cart.shipping_method === "PICKUP") {
-            return "payment";
-        }
-        if (!cart.shipping_address) {
-            return "address";
-        }
-
-        return "payment";
-    };
+    const [currentStep, setCurrentStep] = useState<CheckoutStep>("delivery");
 
     const getCompletedSteps = (): CheckoutStep[] => {
         const completed: CheckoutStep[] = [];
-
-        if (session) {
-            completed.push("auth");
-        }
 
         if (cart.shipping_method) {
             completed.push("delivery");
@@ -62,11 +38,9 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ cart }) => {
     };
 
     const renderStep = () => {
-        const stepToRender = currentStep === "auth" ? getStep() : currentStep;
+        const stepToRender = currentStep;
 
         switch (stepToRender) {
-            case "auth":
-                return <CheckoutLoginPrompt />;
             case "delivery":
                 return (
                     <DeliveryStep
@@ -101,11 +75,11 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ cart }) => {
     };
 
     const completedSteps = getCompletedSteps();
-    const activeStep = currentStep === "auth" ? getStep() : currentStep;
+    const activeStep = currentStep;
 
     return (
         <div className="w-full flex-1 flex flex-col overflow-hidden">
-            {session && <CheckoutStepIndicator completedSteps={completedSteps} currentStep={activeStep} onStepClick={handleStepChange} />}
+            <CheckoutStepIndicator completedSteps={completedSteps} currentStep={activeStep} onStepClick={handleStepChange} />
             {renderStep()}
         </div>
     );

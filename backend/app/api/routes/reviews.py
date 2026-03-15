@@ -142,7 +142,7 @@ async def create(review: ReviewCreate, user: CurrentUser, background_tasks: Back
         for order in user_orders
     )
     if not has_purchased:
-        raise HTTPException(status_code=403, detail="You can only review products you have purchased.")
+        raise HTTPException(status_code=400, detail="You can only review products you have purchased.")
 
     try:
         review = await db.review.create(

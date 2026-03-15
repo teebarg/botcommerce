@@ -12,6 +12,7 @@ import SheetDrawer from "@/components/sheet-drawer";
 import { Filter, Star } from "lucide-react";
 import { ReviewForm } from "../store/reviews/review-form";
 import { useState } from "react";
+import { reviewsQuery } from "@/queries/user.queries";
 
 interface Prop {
     product_id: number;
@@ -21,16 +22,13 @@ interface Prop {
 const ReviewsSection: React.FC<Prop> = ({ product_id, productName }) => {
     const state = useOverlayTriggerState({});
     const [sort, setSort] = useState<SortBy>("newest");
-    const { data: reviewsData, isLoading } = useQuery({
-        queryKey: ["reviews", product_id, sort],
-        queryFn: async () => await clientApi.get<PaginatedReview>("/reviews/", { params: { product_id, sort } }),
-    });
+    const { data: reviewsData, isLoading } = useQuery(reviewsQuery({ product_id, sort }));
     const { data } = useQuery({
         queryKey: ["products", product_id, sort],
         queryFn: async () => await clientApi.get<ReviewStatus>(`/product/${product_id}/review-status`),
     });
 
-    const { reviews, ratings } = reviewsData || {};
+    const { items, ratings } = reviewsData || {};
     const getPercentage = (count: number) => (count / (ratings?.count || 0)) * 100;
 
     const onSortChange = (sort: string) => {
@@ -41,17 +39,13 @@ const ReviewsSection: React.FC<Prop> = ({ product_id, productName }) => {
         return <div>Loading</div>;
     }
 
-    if (reviewsData?.reviews?.length === 0) {
+    if (items?.length === 0) {
         return (
             <div className="max-w-7xl mx-auto px-4 py-12">
                 <p className="mt-2 mb-6 text-center font-semibold">Customer Reviews & Ratings</p>
                 <ProductReviewsZeroState productName={productName} product_id={product_id} />
             </div>
         );
-    }
-
-    if (!reviewsData) {
-        return null;
     }
 
     return (
@@ -97,7 +91,6 @@ const ReviewsSection: React.FC<Prop> = ({ product_id, productName }) => {
 
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h2 className="text-xl font-semibold text-foreground">Customer Reviews ({ratings?.count})</h2>
-
                 <div className="flex items-center space-x-3">
                     <Select defaultValue={sort} onValueChange={onSortChange}>
                         <SelectTrigger className="w-40">
@@ -124,7 +117,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id, productName }) => {
                 </div>
             </div>
             <div className="space-y-4">
-                {reviews?.map((review: Review, idx: number) => (
+                {items?.map((review: Review, idx: number) => (
                     <ReviewCard key={idx} review={review} />
                 ))}
             </div>

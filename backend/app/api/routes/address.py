@@ -95,7 +95,7 @@ async def update(
 
     if user.role != "ADMIN" and user.id != existing.user_id:
         raise HTTPException(
-            status_code=403,
+            status_code=400,
             detail="Unauthorized to access this address."
         )
 

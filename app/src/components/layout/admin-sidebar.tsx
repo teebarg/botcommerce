@@ -4,7 +4,6 @@ import {
     Users,
     Menu,
     ChevronUp,
-    LogOut,
     PanelLeftIcon,
     User,
     Star,
@@ -234,10 +233,6 @@ export function AdminSidebar() {
                                     <LocalizedClientLink href="/admin/settings" active="bg-primary/20 text-primary">
                                         Settings
                                     </LocalizedClientLink>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem className="text-red-600 cursor-pointer">
-                                    <LogOut className="h-4 w-4 mr-2" />
-                                    <LocalizedClientLink href="/api/auth/signout">Sign out</LocalizedClientLink>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
