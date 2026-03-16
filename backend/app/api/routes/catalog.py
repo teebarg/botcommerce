@@ -4,7 +4,7 @@ from app.prisma_client import prisma as db
 from app.services.catalog import CatalogService
 from math import ceil
 from app.services.redis import cache_response, invalidate_list, invalidate_pattern
-from app.services.product import reindex_catalog, reindex_catalogs
+from app.services.product import index_product, index_products
 from app.core.deps import UserDep
 from app.models.generic import Message
 
@@ -263,7 +263,8 @@ async def add_product_to_catalog(id: int, product_id: int, background_tasks: Bac
         data={"products": {"connect": {"id": product_id}}}
     )
 
-    background_tasks.add_task(reindex_catalog, product_id=product_id)
+    background_tasks.add_task(index_product, product_id=product_id)
+    await invalidate_pattern("gallery")
 
     return {"message": "product added to catalog successfully"}
 
@@ -283,9 +284,10 @@ async def remove_product_from_catalog(id: int, product_id: int, background_tasks
         }
     )
 
-    background_tasks.add_task(reindex_catalog, product_id=product_id)
+    background_tasks.add_task(index_product, product_id=product_id)
+    await invalidate_pattern("gallery")
 
-    return {"message": "product removed from collection successfully"}
+    return {"message": "product removed from catalog successfully"}
 
 
 @router.post("/{id}/add-products", dependencies=[Depends(require_admin)])
@@ -309,7 +311,7 @@ async def bulk_add_products_to_catalog(id: int, data: CatalogBulkAdd, background
         message_type="bulk_action",
     )
 
-    background_tasks.add_task(reindex_catalogs, product_ids=data.product_ids)
+    background_tasks.add_task(index_products, product_ids=data.product_ids)
 
     return {"message": f"Added {len(data.product_ids)} product(s) to catalog"}
 
@@ -335,6 +337,6 @@ async def bulk_remove_products_from_catalog(id: int, data: CatalogBulkAdd, backg
         message_type="bulk_action",
     )
 
-    background_tasks.add_task(reindex_catalogs, product_ids=data.product_ids)
+    background_tasks.add_task(index_products, product_ids=data.product_ids)
 
     return {"message": f"Removed {len(data.product_ids)} product(s) from catalog"}

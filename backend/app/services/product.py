@@ -1,9 +1,10 @@
-from typing import Union, List
+import asyncio
+from typing import Union, List, Optional, Any
 from app.prisma_client import prisma as db
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.services.meilisearch import add_documents_to_index, update_document, clear_index, delete_document
-from app.models.product import Product, ProductImage
+from app.models.product import Product
 from app.services.prisma import with_prisma_connection
 from app.services.redis import invalidate_pattern, invalidate_key
 import random
@@ -13,73 +14,33 @@ logger = get_logger(__name__)
 
 
 @with_prisma_connection
-async def delete_image_index(images: Union[ProductImage, List[ProductImage]]):
-    has_product = False
-    if isinstance(images, ProductImage):
-        images = [images]  # normalize to list
+async def delete_product_index(product_ids: List[int]) -> None:
     try:
-        for image in images:
-            if image.product is not None:
-                has_product = True
-                await delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(image.product.id))
-                await invalidate_key(f"product:{image.product.slug}")
+        await asyncio.gather(*[
+            delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(pid))
+            for pid in product_ids
+        ])
+        await asyncio.gather(*[
+            invalidate_pattern(f"product:similar:{pid}:*")
+            for pid in product_ids
+        ])
+        await invalidate_product_cache()
     except Exception as e:
-        logger.debug(f"Error re-indexing image {image.id}: {e}")
-
-    if has_product:
-        await invalidate_pattern("products")
+        logger.error(f"Error deleting products {product_ids} from index: {e}")
 
 
 @with_prisma_connection
-async def reindex_catalog(product_id: int):
+async def index_product(product_id: int):
     try:
-        await invalidate_pattern(f"gallery")
         product = await db.product.find_unique(
             where={"id": product_id},
-            include={"images": True}
-        )
-
-        if not product:
-            logger.warning(f"product with id {product_id} not found for re-indexing.")
-            return
-
-        await reindex_image(image_ids=[image.id for image in product.images])
-        await invalidate_pattern("product:catalog")
-        await invalidate_pattern("catalog")
-    except Exception as e:
-        logger.error(f"Error re-indexing reindex_catalog {product_id}: {e}")
-
-
-@with_prisma_connection
-async def reindex_catalogs(product_ids: list[int]):
-    try:
-        products = await db.product.find_many(
-            where={"id": {"in": product_ids}},
             include={
+                "categories": True,
+                "collections": True,
+                "variants": True,
                 "images": True,
+                "shared_collections": True,
             }
-        )
-
-        if not products:
-            logger.warning(f"products with ids {product_ids} not found for re-indexing.")
-            return
-
-        image_ids = list(set([image.id for product in products for image in product.images]))
-
-        await reindex_image(image_ids=image_ids)
-        await invalidate_pattern("product:catalog")
-        await invalidate_pattern("catalog")
-
-    except Exception as e:
-        logger.error(f"Error re-indexing products {product_ids}: {e}")
-
-
-@with_prisma_connection
-async def reindex_product(product_id: int):
-    try:
-        product = await db.product.find_unique(
-            where={"id": product_id},
-            include={"images": True}
         )
 
         if not product:
@@ -88,8 +49,9 @@ async def reindex_product(product_id: int):
             return
 
         try:
-            await reindex_image(image_ids=[image.id for image in product.images])
-            logger.info(f"Successfully reindexed product {product_id}")
+            product_data = prepare_product_data_for_indexing(product)
+            await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
+            await invalidate_product_cache(product_id=product.id, product_slug=product.slug)
         except Exception as e:
             logger.debug(f"Error re-indexing product {product_id}: {e}")
 
@@ -98,101 +60,43 @@ async def reindex_product(product_id: int):
 
 
 @with_prisma_connection
-async def index_products():
+async def index_products(product_ids: Optional[List[int]] = None):
     """
     Re-index all products in the database to Meilisearch.
     """
     try:
         logger.info("Starting re-indexing..........")
         products = await db.product.find_many(
-            include={"images": True}
-        )
-
-        image_ids = list(set([image.id for product in products for image in product.images]))
-
-        try:
-            await reindex_image(image_ids=image_ids)
-            logger.info(f"Successfully reindexed products images")
-        except Exception as e:
-            logger.debug(f"Error re-indexing products images: {e}")
-    except Exception as e:
-        logger.error(f"Error during product re-indexing: {e}")
-
-
-@with_prisma_connection
-async def index_images():
-    """
-    Re-index all products in the database to Meilisearch.
-    """
-    try:
-        logger.info("Starting re-indexing..........")
-        images = await db.productimage.find_many(
-            where={"order": 0, "product_id": {"not": None}},
-            order={"id": "desc"},
+            where={"id": {"in": product_ids}} if product_ids else None,
             include={
-                "product": {
-                    "include": {
-                        "categories": True,
-                        "collections": True,
-                        "variants": True,
-                        "shared_collections": True,
-                        "images": True,
-                    }
-                }
-            },
+                "categories": True,
+                "collections": True,
+                "variants": True,
+                "images": True,
+                "shared_collections": True,
+            }
         )
 
-        documents = []
-        for image in images:
-            if image.product:
-                product_dict = prepare_product_data_for_indexing(image.product)
-                documents.append(product_dict)
-
-        if len(documents) == 0:
-            logger.info("No products to re-index.")
+        if not products:
+            logger.warning(f"products with ids {product_ids} not found for re-indexing.")
             return
 
-        await clear_index(settings.MEILI_PRODUCTS_INDEX)
-        await add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
+        async def _index_single(product):
+            try:
+                product_data = prepare_product_data_for_indexing(product)
+                await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
+                if product.slug:
+                    await invalidate_key(f"product:slug:{product.slug}")
+                if product.id:
+                    await invalidate_pattern(f"product:similar:{product.id}:*")
+            except Exception as e:
+                logger.debug(f"Error indexing product {product.id}: {e}")
 
-        logger.info(f"Reindexed {len(documents)} products successfully.")
-
-        await invalidate_pattern("products")
-        await invalidate_pattern("product")
+        await asyncio.gather(*[_index_single(p) for p in products])
+        await invalidate_product_cache()
+        logger.info(f"Successfully indexed {len(products)} products")
     except Exception as e:
         logger.error(f"Error during product re-indexing: {e}")
-
-
-@with_prisma_connection
-async def reindex_image(image_ids: Union[str, List[str]]):
-    if isinstance(image_ids, str):
-        image_ids = [image_ids]
-
-    images = await db.productimage.find_many(
-        where={"id": {"in": image_ids}},
-        include={
-                "product": {
-                    "include": {
-                        "categories": True,
-                        "collections": True,
-                        "variants": True,
-                        "images": True,
-                        "shared_collections": True,
-                    }
-                }
-            },
-    )
-    for image in images:
-        try:
-            if image.product:
-                product_data = prepare_product_data_for_indexing(image.product)
-                await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
-                await invalidate_key(f"product:{image.product.slug}")
-        except Exception as e:
-            logger.debug(f"Error re-indexing product image {image.id}: {e}")
-
-    await invalidate_pattern("products")
-    await invalidate_pattern("product:catalog")
 
 
 def prepare_product_data_for_indexing(product: Product) -> dict:
@@ -206,6 +110,7 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     else:
         freshness_score = 0
 
+    rng = random.Random(product.id)
     product_dict: dict[str, bool | int | str | Unknown | None] = {
         "id": product.id,
         "name": product.name,
@@ -214,7 +119,7 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
         "sku": product.sku,
         "active": product.active,
         "is_new": getattr(product, "is_new", False),
-        "random_score": random.random(),
+        "random_score": rng.random(),
         "freshness_score": freshness_score,
     }
 
@@ -262,10 +167,23 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     return product_dict
 
 
-async def invalidate_product_cache(product_slug: str = None):
-    await invalidate_pattern("product:list:*")
-    await invalidate_pattern("product:search:*")
-    await invalidate_pattern("product:catalog:*")
+async def invalidate_product_cache(product_slug: str = None, product_id: int = None):
+    print("invalidating all products caches")
+    await asyncio.gather(
+        invalidate_pattern("product:list"),
+        invalidate_pattern("product:search"),
+        invalidate_pattern("product:catalog"),
+        invalidate_pattern("product:recommendation"),
+        invalidate_key("product:collection"),
+    )
 
+    tasks = []
     if product_slug:
-        await invalidate_key(f"product:slug:{product_slug}")
+        tasks.append(invalidate_key(f"product:slug:{product_slug}"))
+    if product_id:
+        tasks.append(invalidate_pattern(f"product:similar:{product_id}:*"))
+    
+    if tasks:
+        await asyncio.gather(*tasks)
+
+    print("🚀 ~ file: product.py:181 ~ tasks:", tasks)

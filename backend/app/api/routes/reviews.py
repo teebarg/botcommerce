@@ -4,7 +4,7 @@ from app.core.deps import CurrentUser
 from app.models.generic import Message
 from app.prisma_client import prisma as db
 from prisma.errors import PrismaError
-from app.services.product import reindex_product
+from app.services.product import index_product
 from app.core.permissions import require_admin
 from base64 import b64encode, b64decode
 import json
@@ -151,7 +151,7 @@ async def create(review: ReviewCreate, user: CurrentUser, background_tasks: Back
                 "user_id": user.id
             }
         )
-        background_tasks.add_task(reindex_product, product_id=review.product_id)
+        background_tasks.add_task(index_product, product_id=review.product_id)
 
         return review
     except PrismaError as e:
