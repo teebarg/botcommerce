@@ -183,7 +183,7 @@ async def get_recommendations(request: Request, user: CurrentUser, limit: int = 
 #     return products
 
 @router.get("/feed")
-@cache_response("products")
+@cache_response("product:list")
 async def feed(
     request: Request,
     search: str = "",
@@ -382,7 +382,7 @@ async def feed(
 
 
 @router.get("/index-products")
-@cache_response("products")
+# @cache_response("products")
 async def index_products(request: Request) -> IndexProducts:
     """
     Retrieve index products using Meilisearch.

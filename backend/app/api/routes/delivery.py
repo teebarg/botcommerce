@@ -7,7 +7,6 @@ from app.services.redis import cache_response, invalidate_pattern
 from app.core.permissions import require_admin
 
 
-
 router = APIRouter()
 
 @router.get("/", response_model=List[DeliveryOption], dependencies=[Depends(require_admin)])

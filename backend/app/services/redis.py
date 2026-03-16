@@ -101,6 +101,18 @@ def cache_response(key_prefix: str, key: Union[str, Callable[..., str], None] = 
         return wrapper
     return decorator
 
+@handle_redis_errors(default=None)
+async def invalidate_keys(pattern: str) -> None:
+    """
+    Delete all Redis keys matching pattern.
+    """
+    try:
+        keys = await redis_client.keys(f"{pattern}*")
+        if keys:
+            await redis_client.delete(*keys)
+    except Exception as e:
+        logger.error(f"Error invalidating list {pattern}: {e}")
+
 
 @handle_redis_errors(default=None)
 async def invalidate_pattern(pattern: str) -> None:

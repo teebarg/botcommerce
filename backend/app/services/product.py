@@ -260,3 +260,12 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     product_dict["catalogs"] = [sc.slug for sc in (product.shared_collections or [])]
 
     return product_dict
+
+
+async def invalidate_product_cache(product_slug: str = None):
+    await invalidate_pattern("product:list:*")
+    await invalidate_pattern("product:search:*")
+    await invalidate_pattern("product:catalog:*")
+
+    if product_slug:
+        await invalidate_key(f"product:slug:{product_slug}")
