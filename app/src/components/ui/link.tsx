@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import type React from "react";
 
 interface TransitionLinkProps {
@@ -10,20 +10,8 @@ interface TransitionLinkProps {
 }
 
 const LocalizedClientLink: React.FC<TransitionLinkProps> = ({ children, href, className, active, ...props }) => {
-    const navigate = useNavigate();
-
     return (
-        <Link
-            {...props}
-            className={className}
-            activeProps={{ className: active }}
-            activeOptions={{ exact: true }}
-            to={href}
-            onClick={(e) => {
-                e.preventDefault();
-                navigate({ to: href.toString() });
-            }}
-        >
+        <Link {...props} className={className} activeProps={{ className: active }} activeOptions={{ exact: true }} to={href}>
             {children}
         </Link>
     );

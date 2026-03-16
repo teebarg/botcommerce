@@ -60,6 +60,7 @@ const AdminMobileMenu: React.FC = () => {
                     {menuItems.map((item, idx: number) => (
                         <LocalizedClientLink
                             key={idx}
+                            preload={false}
                             className="flex items-center justify-between w-full p-3 text-left transition-colors"
                             href={item.href}
                             active="bg-primary/20 text-primary"

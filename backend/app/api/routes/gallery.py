@@ -144,7 +144,7 @@ async def image_gallery(
     limit: int = Query(default=36, ge=1, le=100),
 ) -> PaginatedProductImages:
     """
-    Gallery endpoint using cursor-based pagination.
+    Image gallery endpoint using cursor-based pagination.
     """
     try:
         images = await db.productimage.find_many(

@@ -5,7 +5,7 @@ import { useOverlayTriggerState } from "react-stately";
 import DeliveryOptionForm from "./delivery-option-form";
 import { Button } from "@/components/ui/button";
 import type { DeliveryOption, Message } from "@/schemas";
-import { useAdminDeliveryOptions } from "@/hooks/useApi";
+import { useDeliveryOptions } from "@/hooks/useApi";
 import { useInvalidate } from "@/hooks/useApi";
 import { Badge } from "@/components/ui/badge";
 import { currency } from "@/utils";
@@ -113,7 +113,7 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
 const DeliveryOverview: React.FC = () => {
     const addState = useOverlayTriggerState({});
 
-    const { data: deliveryOptions, isLoading, error } = useAdminDeliveryOptions(); 
+    const { data: deliveryOptions, isLoading, error } = useDeliveryOptions(); 
 
     if (error) {
         return <ServerError error={error.message} scenario="delivery" stack={error.stack} />;

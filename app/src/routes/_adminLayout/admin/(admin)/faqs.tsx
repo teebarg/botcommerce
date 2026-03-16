@@ -3,30 +3,31 @@ import { Plus } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { Button } from "@/components/ui/button";
 import { FaqForm } from "@/components/admin/faq/faq-form";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import { Eye, EyeOff, Tag } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { FAQ } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
 import FaqActions from "@/components/admin/faq/faq-actions";
 import SheetDrawer from "@/components/sheet-drawer";
-import { getFaqsFn } from "@/server/store.server";
+import { clientApi } from "@/utils/api.client";
 
-const useFaqsQuery = () =>
+const faqsQuery = () =>
     queryOptions({
         queryKey: ["faqs"],
-        queryFn: () => getFaqsFn(),
+        queryFn: () => clientApi.get<FAQ[]>("/faq/"),
+        staleTime: Infinity,
     });
 
 export const Route = createFileRoute("/_adminLayout/admin/(admin)/faqs")({
     loader: async ({ context }) => {
-        await context.queryClient.ensureQueryData(useFaqsQuery());
+        await context.queryClient.ensureQueryData(faqsQuery());
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { data: faqs } = useSuspenseQuery(useFaqsQuery());
+    const { data: faqs = [] } = useQuery(faqsQuery());
     const state = useOverlayTriggerState({});
 
     return (
@@ -67,11 +68,9 @@ function RouteComponent() {
                                         </Badge>
                                     </div>
                                 </div>
-
                                 <FaqActions faq={faq} />
                             </div>
                         </CardHeader>
-
                         <CardContent>
                             <div className="prose prose-sm max-w-none">
                                 <p className="text-muted-foreground leading-relaxed m-0">{faq.answer}</p>

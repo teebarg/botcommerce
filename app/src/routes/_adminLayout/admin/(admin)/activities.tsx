@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ActivityItem } from "@/components/generic/activities/ActivityItem";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import type { Activity, PaginatedActivities } from "@/schemas";
 import { ActivityIcon } from "lucide-react";
 import { activitiesQuery } from "@/queries/admin.queries";
@@ -16,8 +16,8 @@ export const Route = createFileRoute("/_adminLayout/admin/(admin)/activities")({
 });
 
 function RouteComponent() {
-    const { data } = useSuspenseQuery(activitiesQuery());
-    const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteResource<PaginatedActivities, Activity>({
+    const { data } = useQuery(activitiesQuery());
+    const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedActivities, Activity>({
         queryKey: ["activities", "infinite"],
         queryFn: (cursor) => clientApi.get<PaginatedActivities>("/activities/", { params: { cursor } }),
         getItems: (page) => page.items,
@@ -29,7 +29,7 @@ function RouteComponent() {
         <div className="px-2 md:px-10 py-8">
             <h1 className="text-2xl font-bold mb-6">Activities History</h1>
             <div className="max-w-6xl mx-auto py-4 px-1 md:px-6">
-                {!isLoading && items.length > 0 && (
+                {items.length > 0 && (
                     <InfiniteResourceList
                         items={items}
                         onLoadMore={fetchNextPage}
@@ -38,7 +38,7 @@ function RouteComponent() {
                         renderItem={(item: Activity) => <ActivityItem key={item.id} activity={item} />}
                     />
                 )}
-                {!isLoading && items?.length === 0 && (
+                {items?.length === 0 && (
                     <div className="text-center py-12 bg-secondary">
                         <div className="w-16 h-16 mx-auto mb-4 bg-contrast/10 rounded-full flex items-center justify-center">
                             <ActivityIcon className="w-8 h-8 text-contrast" />

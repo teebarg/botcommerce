@@ -5,9 +5,10 @@ import SuccessConfirmation from "@/components/store/orders/order-success";
 import PendingPayment from "@/components/store/orders/order-pending";
 import FailedPayment from "@/components/store/orders/order-failed";
 import { orderQuery } from "@/queries/user.queries";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_mainLayout/order/confirmed/$id")({
+    ssr: false,
     loader: async ({ params: { id }, context: { queryClient } }) => {
         try {
             await queryClient.ensureQueryData(orderQuery(id));
@@ -35,7 +36,7 @@ function RouteComponent() {
     useOneTimeConfetti(id, "firework");
 
     const navigate = useNavigate();
-    const { data: order } = useSuspenseQuery(orderQuery(id));
+    const { data: order } = useQuery({ ...orderQuery(id), staleTime: 0 });
 
     const onContinueShopping = () => {
         navigate({ to: "/collections" });

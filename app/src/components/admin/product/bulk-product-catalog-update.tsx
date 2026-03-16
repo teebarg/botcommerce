@@ -44,16 +44,18 @@ const CatalogItem: React.FC<{ catalog: Catalog; selectedProductIds: number[] }> 
 };
 
 export const CatalogBulkProductUpdate = ({ selectedProductIds = [], onClose }: CatalogBulkProductUpdateProps) => {
-    const { data } = useCatalogs(true);
+    const { data } = useCatalogs();
 
     return (
         <div className="flex-1 overflow-hidden flex flex-col">
             <p className="text-sm text-muted-foreground mb-3 mx-2">Select a catalog to add {selectedProductIds.length} product(s).</p>
             <ScrollArea className="flex-1 px-2">
                 <div className="space-y-2">
-                    {data?.catalogs?.map((collection: any) => (
-                        <CatalogItem key={collection.id} catalog={collection} selectedProductIds={selectedProductIds} />
-                    ))}
+                    {data?.catalogs
+                        ?.filter((catalog) => catalog.is_active)
+                        .map((collection: any) => (
+                            <CatalogItem key={collection.id} catalog={collection} selectedProductIds={selectedProductIds} />
+                        ))}
                 </div>
             </ScrollArea>
             <div className="sheet-footer">

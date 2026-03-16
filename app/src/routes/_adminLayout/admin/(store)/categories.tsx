@@ -1,17 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
-
 import ServerError from "@/components/generic/server-error";
-import { useCategories } from "@/hooks/useCategories";
+import { categoriesQuery } from "@/hooks/useCategories";
 import CategoryTree from "@/components/admin/categories/tree";
 import type { Category } from "@/schemas/product";
-import ComponentLoader from "@/components/component-loader";
+import { useQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/categories")({
+    loader: async ({ context: { queryClient } }) => {
+        await queryClient.ensureQueryData(categoriesQuery());
+    },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { data, isLoading, error } = useCategories();
+    const { data, error } = useQuery(categoriesQuery());
 
     if (error) {
         return <ServerError />;
@@ -21,7 +23,7 @@ function RouteComponent() {
 
     return (
         <div className="max-w-7xl w-full mx-auto">
-            {isLoading ? <ComponentLoader className="h-[80vh]" /> : <CategoryTree data={categories} />}
+            <CategoryTree data={categories} />
         </div>
     );
 }

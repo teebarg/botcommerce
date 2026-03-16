@@ -1,10 +1,10 @@
 import { queryOptions } from "@tanstack/react-query";
 import { getProductFn, getProductsFeedFn } from "@/server/product.server";
 import { getMeFn, getMeTrxnFn } from "@/server/users.server";
-import { getOrderFn, getOrdersFn } from "@/server/order.server";
 import { getCollectionFn } from "@/server/store.server";
-import { getReviewsFn } from "@/server/review.server";
 import { getCatalogFn, getUserAddressesFn } from "@/server/store.server";
+import { clientApi } from "@/utils/api.client";
+import { Order, PaginatedOrders, PaginatedReview } from "@/schemas";
 
 type FeedParams = {
     search?: string;
@@ -55,14 +55,14 @@ export const productQuery = (slug: string) =>
 export const orderQuery = (orderNumber: string) =>
     queryOptions({
         queryKey: ["order", orderNumber],
-        queryFn: () => getOrderFn({ data: orderNumber }),
+        queryFn: () => clientApi.get<Order>(`/order/${orderNumber}`),
     });
 
 export const ordersQuery = (params: { take?: number; status?: any; start_date?: string; end_date?: string }) =>
     queryOptions({
         queryKey: ["orders", JSON.stringify(params)],
-        queryFn: () => getOrdersFn({ data: params }),
-        staleTime: 1000 * 60 * 10,
+        queryFn: () => clientApi.get<PaginatedOrders>("/order/", { params }),
+        staleTime: 1000 * 60 * 60 * 24,
         refetchOnMount: false,
     });
 
@@ -78,14 +78,9 @@ export const collectionQuery = (slug: string) =>
         queryFn: () => getCollectionFn({ data: slug }),
     });
 
-type ReviewsParams = {
-    product_id?: number;
-    sort?: string;
-};
-
-export const reviewsQuery = (params: ReviewsParams) =>
+export const reviewsQuery = (params?: { search?: string; product_id?: number; sort?: string }) =>
     queryOptions({
-        queryKey: ["reviews", JSON.stringify(params)],
-        queryFn: () => getReviewsFn({ data: params }),
-        staleTime: 1000 * 60 * 30,
+        queryKey: ["reviews", params],
+        queryFn: () => clientApi.get<PaginatedReview>("/reviews/", { params }),
+        staleTime: 1000 * 60 * 60 * 24,
     });

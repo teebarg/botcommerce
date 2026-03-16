@@ -4,13 +4,14 @@ import { ShopDetails } from "@/components/admin/settings/shop-details";
 import { FeatureToggles } from "@/components/admin/settings/feature-toggles";
 import { ShopPayments } from "@/components/admin/settings/shop-payments";
 import DeliveryOverview from "@/components/admin/delivery/delivery-overview";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { getShopSettingsFn } from "@/server/generic.server";
+import { queryOptions, useQuery } from "@tanstack/react-query";
+import { clientApi } from "@/utils/api.client";
+import { ShopSettings } from "@/schemas";
 
 const useShopSettingsQuery = () =>
     queryOptions({
         queryKey: ["shop-settings", "list"],
-        queryFn: () => getShopSettingsFn(),
+        queryFn: () => clientApi.get<ShopSettings[]>("/shop-settings/"),
     });
 
 export const Route = createFileRoute("/_adminLayout/admin/settings")({
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/_adminLayout/admin/settings")({
 });
 
 function RouteComponent() {
-    const { data: settings } = useSuspenseQuery(useShopSettingsQuery());
+    const { data: settings } = useQuery(useShopSettingsQuery());
 
     return (
         <div className="py-8 px-2 md:px-8">

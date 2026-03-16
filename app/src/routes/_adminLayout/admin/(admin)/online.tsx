@@ -1,11 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Users, UserCheck, Eye, TrendingUp } from "lucide-react";
-
 import UserCounter from "@/components/admin/online/UserCounter";
 import UserAvatar from "@/components/admin/online/UserAvatar";
 import ActivityIndicator from "@/components/admin/online/ActivityIndicator";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useWebSocket } from "pulsews";
 

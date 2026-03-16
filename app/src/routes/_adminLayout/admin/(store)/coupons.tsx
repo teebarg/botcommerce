@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import LocalizedClientLink from "@/components/ui/link";
 import AnalyticsStats from "@/components/admin/coupons/analytics-stats";
 import z from "zod";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { useDeleteCoupon, useToggleCouponStatus } from "@/hooks/useCoupon";
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/coupons")({
 
 function RouteComponent() {
     const params = Route.useSearch();
-    const { data: initialCoupons } = useSuspenseQuery(couponsQuery(params));
+    const { data: initialCoupons } = useQuery(couponsQuery(params));
     const toggleMutation = useToggleCouponStatus();
     const deleteMutation = useDeleteCoupon();
 

@@ -6,23 +6,13 @@ from app.models.generic import Message
 from app.services.redis import cache_response, invalidate_pattern
 from app.core.permissions import require_admin
 
-
 router = APIRouter()
 
-@router.get("/", response_model=List[DeliveryOption], dependencies=[Depends(require_admin)])
+@router.get("/", response_model=List[DeliveryOption])
 @cache_response("delivery")
 async def get_delivery_options(request: Request):
     """Get all delivery options"""
     return await db.deliveryoption.find_many(order={"created_at": "desc"})
-
-@router.get("/available", response_model=List[DeliveryOption])
-@cache_response("delivery")
-async def get_available_delivery_options(request: Request):
-    """Get all active delivery options"""
-    return await db.deliveryoption.find_many(
-        where={"is_active": True},
-        order={"created_at": "desc"}
-    )
 
 @router.post("/", dependencies=[Depends(require_admin)])
 async def create_delivery_option(

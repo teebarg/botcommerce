@@ -10,30 +10,35 @@ import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
 import type { PaginatedProductImages, ProductImage } from "@/schemas";
 import { useWebSocket } from "pulsews";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { clientApi } from "@/utils/api.client";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
-import { getProductImagesFn } from "@/server/gallery.server";
 import { queryOptions } from "@tanstack/react-query";
+import { z } from "zod";
 
-const galleryQuery = (params?: object) => queryOptions({
-    queryKey: ["gallery", params],
-    queryFn: () => getProductImagesFn(params),
-    staleTime: 1000 * 60 * 5,
-    refetchOnMount: false,
-});
+const galleryQuery = (params?: object) =>
+    queryOptions({
+        queryKey: ["gallery", params],
+        queryFn: () => clientApi.get<PaginatedProductImages>("/gallery/"),
+        staleTime: 1000 * 60 * 60 * 24, // 24 hours
+        refetchOnMount: false,
+    });
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/gallery")({
-    loader: async ({ context: { queryClient } }) => {
-        await queryClient.ensureQueryData(galleryQuery());
+    validateSearch: z.object({
+        cursor: z.string().optional(),
+    }),
+    loaderDeps: ({ search }) => search,
+    loader: async ({ context: { queryClient }, deps }) => {
+        await queryClient.ensureQueryData(galleryQuery(deps));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
     const params = Route.useSearch();
-    const { data } = useSuspenseQuery(galleryQuery(params));
+    const { data } = useQuery(galleryQuery(params));
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
@@ -99,7 +104,7 @@ function RouteComponent() {
         } catch (error) {
             toast.error("Failed to delete images", { description: "Failed to delete images, contact support" });
         } finally {
-            setSelectedImages(new Set())
+            setSelectedImages(new Set());
         }
     };
 

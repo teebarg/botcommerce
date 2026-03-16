@@ -1,9 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { getAdminDeliveryOptionsFn, getDeliveryOptionsFn } from "@/server/generic.server";
 import { useRouteContext } from "@tanstack/react-router";
 import { clientApi } from "@/utils/api.client";
-import { BankDetails, Message } from "@/schemas";
+import { BankDetails, DeliveryOption, Message } from "@/schemas";
 
 export const useBankDetails = () => {
     return useQuery({
@@ -49,15 +48,9 @@ export const useDeleteChat = () => {
 
 export const useDeliveryOptions = () => {
     return useQuery({
-        queryKey: ["delivery", "available"],
-        queryFn: () => getDeliveryOptionsFn(),
-    });
-};
-
-export const useAdminDeliveryOptions = () => {
-    return useQuery({
         queryKey: ["delivery"],
-        queryFn: () => getAdminDeliveryOptionsFn(),
+        queryFn: () => clientApi.get<DeliveryOption[]>("/delivery/"),
+        staleTime: Infinity,
     });
 };
 

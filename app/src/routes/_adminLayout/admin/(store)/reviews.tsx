@@ -4,14 +4,16 @@ import type { PaginatedReview, Review } from "@/schemas";
 import { Input } from "@/components/ui/input";
 import ReviewItem from "@/components/admin/reviews/review-item";
 import z from "zod";
-import { reviewsQuery } from "@/queries/user.queries";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { clientApi } from "@/utils/api.client";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
+import { useUpdateQuery } from "@/hooks/useUpdateQuery";
+import { reviewsQuery } from "@/queries/user.queries";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/reviews")({
     validateSearch: z.object({
+        search: z.string().optional(),
         product_id: z.number().optional(),
         sort: z.string().optional(),
     }),
@@ -24,9 +26,11 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/reviews")({
 
 function RouteComponent() {
     const params = Route.useSearch();
-    const { data: initialData } = useSuspenseQuery(reviewsQuery(params));
-    const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteResource<PaginatedReview, Review>({
-        queryKey: ["reviews", "infinite", JSON.stringify(params)],
+    const { updateQuery } = useUpdateQuery(200);
+    const { data: initialData } = useQuery(reviewsQuery(params));
+
+    const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedReview, Review>({
+        queryKey: ["reviews", "infinite", params],
         queryFn: (cursor) => clientApi.get<PaginatedReview>("/reviews/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
@@ -41,11 +45,19 @@ function RouteComponent() {
                     <p className="text-muted-foreground text-sm">Manage your product reviews</p>
                 </div>
                 <div className="flex w-full items-center gap-2 md:w-auto mb-4">
-                    <Input className="bg-card" placeholder="Search reviews..." startContent={<Search />} type="search" wrapperClass="flex-1" />
+                    <Input
+                        className="bg-card"
+                        placeholder="Search reviews..."
+                        startContent={<Search />}
+                        type="search"
+                        wrapperClass="flex-1"
+                        value={params.search ?? ""}
+                        onChange={(e) => updateQuery([{ key: "search", value: e.target.value }])}
+                    />
                 </div>
             </div>
             <div className="mt-4">
-                {!isLoading && items?.length > 0 && (
+                {items.length > 0 && (
                     <InfiniteResourceList
                         items={items}
                         onLoadMore={fetchNextPage}
@@ -54,7 +66,7 @@ function RouteComponent() {
                         renderItem={(item: Review) => <ReviewItem key={item.id} review={item} />}
                     />
                 )}
-                {!isLoading && items?.length === 0 && (
+                {items.length === 0 && (
                     <div className="text-center py-8">
                         <p className="text-muted-foreground">No reviews found</p>
                     </div>
