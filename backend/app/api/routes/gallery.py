@@ -20,7 +20,6 @@ from app.models.product import (
     ProductImage
 )
 from app.prisma_client import prisma as db
-from prisma.errors import UniqueViolationError
 from app.services.product import index_products, delete_product_index, index_product
 from app.services.redis import cache_response
 from app.services.recently_viewed import RecentlyViewedService
@@ -108,9 +107,9 @@ async def reindex_images(background_tasks: BackgroundTasks) -> Message:
     Re-index all images in the db to Meilisearch.
     """
     try:
-        await invalidate_pattern("gallery")
+        # await invalidate_pattern("gallery")
         background_tasks.add_task(index_products)
-        return Message(message="Re-indexing task enqueued.")
+        return Message(message="Re-indexing task enqueued...........")
     except Exception as e:
         logger.error(e)
         raise HTTPException(

@@ -14,7 +14,7 @@ export function AdminPendingComponent() {
             {/* main content skeleton */}
             <div className="flex flex-1 flex-col overflow-hidden">
                 {/* navbar skeleton */}
-                <nav className="flex h-14 items-center justify-between border-b border-border px-5">
+                <nav className="flex header-safe items-center justify-between border-b border-border px-5">
                     <div className="skeleton h-5 w-40" />
                     <div className="flex gap-2">
                         <div className="skeleton h-8 w-8 rounded-full" />

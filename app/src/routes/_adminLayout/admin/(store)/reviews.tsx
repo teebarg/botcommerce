@@ -38,7 +38,7 @@ function RouteComponent() {
     });
 
     return (
-        <div className="px-3 md:px-12 py-8">
+        <div className="px-3 md:px-12 py-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 className="text-2xl font-semibold">Reviews</h1>

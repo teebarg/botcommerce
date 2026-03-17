@@ -32,7 +32,7 @@ function RouteComponent() {
     });
 
     return (
-        <div className="px-2 md:px-10 py-8">
+        <div className="px-2.5 md:px-10 py-6">
             <h3 className="text-2xl font-medium">Chats view</h3>
             <p className="text-muted-foreground text-sm mb-4">Manage your chats.</p>
             {items.length > 0 && (

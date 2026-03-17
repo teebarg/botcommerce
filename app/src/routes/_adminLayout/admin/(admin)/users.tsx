@@ -5,13 +5,13 @@ import CustomerCreateGuest from "@/components/admin/customers/customer-create-gu
 import CustomerFilter from "@/components/admin/customers/customer-filter";
 import CustomerCard from "@/components/admin/customers/customer-card";
 import z from "zod";
-import { useQuery } from "@tanstack/react-query"; // ← no longer suspense
+import { useQuery } from "@tanstack/react-query";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { usersQuery } from "@/queries/admin.queries";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { clientApi } from "@/utils/api.client";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
-import { useUpdateQuery } from "@/hooks/useUpdateQuery"; // ← for search
+import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import { useState } from "react";
 
 export const Route = createFileRoute("/_adminLayout/admin/(admin)/users")({
@@ -44,7 +44,7 @@ function RouteComponent() {
     });
 
     return (
-        <div className="px-3 md:px-10 py-8">
+        <div className="px-3 md:px-10 py-4">
             <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
                     <h3 className="text-xl font-semibold">Customers view</h3>

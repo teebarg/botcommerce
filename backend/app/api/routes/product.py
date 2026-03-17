@@ -30,7 +30,7 @@ from app.prisma_client import prisma as db
 from app.core.storage import upload
 from app.core.config import settings
 from prisma.errors import UniqueViolationError
-from app.services.product import index_product, index_products, delete_product_index
+from app.services.product import index_product, delete_product_index
 from app.services.redis import cache_response, invalidate_pattern
 from meilisearch.errors import MeilisearchApiError
 from app.services.recently_viewed import RecentlyViewedService
@@ -141,7 +141,7 @@ async def recommend(request: Request, id: int, limit: int = Query(default=20, le
 
 
 @router.get("/recommend")
-@cache_response("product:recommendation")
+@cache_response("products:recommendation")
 async def get_recommendations(request: Request, user: CurrentUser, limit: int = Query(default=20, le=100)):
     redis = request.app.state.redis
     index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
@@ -183,7 +183,7 @@ async def get_recommendations(request: Request, user: CurrentUser, limit: int = 
 #     return products
 
 @router.get("/feed")
-@cache_response("product:list")
+@cache_response("products:list")
 async def feed(
     request: Request,
     search: str = "",
@@ -382,8 +382,8 @@ async def feed(
 
 
 @router.get("/index-products")
-@cache_response("product:collection")
-async def index_products(request: Request) -> IndexProducts:
+@cache_response("products:collection")
+async def get_index_products(request: Request) -> IndexProducts:
     """
     Retrieve index products using Meilisearch.
     """
@@ -427,7 +427,7 @@ async def index_products(request: Request) -> IndexProducts:
     return result
 
 @router.get("/")
-@cache_response("product:search")
+@cache_response("products:search")
 async def search(
     request: Request,
     search: str = "",
@@ -677,22 +677,6 @@ async def create_product_bundle(
         except Exception as e:
             logger.error(e)
             raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.post("/reindex", response_model=Message)
-async def reindex_products(background_tasks: BackgroundTasks):
-    """
-    Re-index all products in the db to Meilisearch.
-    """
-    try:
-        background_tasks.add_task(index_products)
-        return Message(message="Re-indexing task enqueued.")
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(
-            status_code=500,
-            detail=str(e),
-        )
 
 
 @router.get("/{slug}")

@@ -36,7 +36,7 @@ function RouteComponent() {
     const guests = total - loggedIn;
     const active = sessions.filter((s) => s.last_seen <= 60).length;
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-6">
             <div className="text-center mb-8">
                 <h1 className="text-3xl font-bold">Online Users</h1>
                 <p className="text-muted-foreground">Real-time user activity monitoring</p>

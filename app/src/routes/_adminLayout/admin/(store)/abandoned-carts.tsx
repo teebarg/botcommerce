@@ -39,7 +39,7 @@ function RouteComponent() {
     const { data } = useQuery(abandonedCartsQuery({ hours_threshold: params.time || "24" }));
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedAbandonedCarts, Cart>({
-        queryKey: ["abandoned-carts", "infinite", params], // ← include params in key
+        queryKey: ["abandoned-carts", "infinite", params],
         queryFn: (cursor) => clientApi.get<PaginatedAbandonedCarts>("/cart/abandoned-carts", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
@@ -60,13 +60,13 @@ function RouteComponent() {
                             <Input
                                 className="pl-10 bg-card"
                                 placeholder="Search by customer name or email..."
-                                value={params.search ?? ""} // ← fallback to empty string
+                                value={params.search ?? ""}
                                 onChange={(e) => updateQuery([{ key: "search", value: e.target.value }])}
                             />
                         </div>
                         <div className="flex items-center gap-2">
                             <Select
-                                value={params.time || "24"} // ← driven by URL, not local state
+                                value={params.time || "24"}
                                 onValueChange={(value) => updateQuery([{ key: "time", value }])}
                             >
                                 <SelectTrigger className="w-full md:w-[180px]">

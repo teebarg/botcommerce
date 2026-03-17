@@ -64,7 +64,7 @@ function RouteComponent() {
         } catch (error) {}
     };
     return (
-        <div className="mx-auto max-w-5xl py-8 px-4">
+        <div className="mx-auto max-w-5xl w-full py-6 px-2.5">
             <div className="flex md:flex-row flex-col md:items-center md:justify-between mb-6 gap-2">
                 <div>
                     <h1 className="text-2xl font-bold">Coupon Management</h1>

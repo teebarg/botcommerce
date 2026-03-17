@@ -18,7 +18,7 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 @router.get("/home/products")
-@cache_response(key_prefix="products", key="home")
+@cache_response(key_prefix="products:home", key="home")
 async def get_home_categories_products(request: Request) -> list[CategoryWithProducts]:
     categories = await db.category.find_many(
         where={"is_active": True, "parent_id": None},

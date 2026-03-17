@@ -12,14 +12,14 @@ const StatComponent = ({ summary }: { summary?: any }) => {
 
     if (!summary) {
         return (
-            <div className="px-2 md:px-10 py-8 text-center">
+            <div className="px-2 md:px-10 py-6 text-center">
                 <p>Stats not found</p>
             </div>
         );
     }
 
     return (
-        <div className="px-4 md:px-10 py-8">
+        <div className="px-4 md:px-10 py-6">
             <h2 className="text-lg font-medium mb-3">Store Overview</h2>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

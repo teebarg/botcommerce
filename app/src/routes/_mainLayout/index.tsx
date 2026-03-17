@@ -17,7 +17,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 
 const indexProductQuery = () =>
     queryOptions({
-        queryKey: ["products", "index"],
+        queryKey: ["products", "collections"],
         queryFn: () => getIndexProductsFn(),
         staleTime: 1000 * 60 * 30,
     });

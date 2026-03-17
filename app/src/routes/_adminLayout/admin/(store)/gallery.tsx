@@ -109,7 +109,7 @@ function RouteComponent() {
     };
 
     return (
-        <div className="px-2">
+        <div className="px-2 py-4">
             <div className="mb-8">
                 <h3 className="text-lg font-semibold">Image Gallery</h3>
                 <p className="text-sm text-muted-foreground">Manage your product images.</p>
@@ -120,7 +120,7 @@ function RouteComponent() {
                 <div className="text-center">No images found</div>
             ) : (
                 <div>
-                    <div className="lg:hidden mb-4 sticky top-16 z-40 bg-background -mx-4 px-4 py-4 flex gap-2">
+                    <div className="lg:hidden mb-4 sticky top-16 z-40 bg-background -mx-2 px-4 py-4 flex gap-2">
                         <div className="rounded-full p-1 flex items-center gap-2 bg-secondary w-1/2">
                             <div className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "grid" && "bg-background")}>
                                 <Button

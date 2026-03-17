@@ -52,7 +52,7 @@ export const useProductSearch = (params: SearchParams) => {
 export const useProductFeed = (initialData: ProductFeed | null, search?: FeedParams) => {
     const [feedSeed, setFeedSeed] = useState<number | null>(initialData?.feed_seed ?? null);
     return useInfiniteQuery<ProductFeed, Error, InfiniteData<ProductFeed>, [string, string, string, FeedParams | {}], string | null>({
-        queryKey: ["products", "feed", `${feedSeed}` || "", search ?? {}],
+        queryKey: ["products", "list", `${feedSeed}` || "", search ?? {}],
         queryFn: async ({ pageParam }) => {
             const res = await clientApi.get<ProductFeed>("/product/feed", {
                 params: { cursor: pageParam ?? undefined, feed_seed: feedSeed ?? undefined, ...search },
@@ -88,18 +88,6 @@ export const useUpdateVariant = (showToast = true) => {
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to update variant");
-        },
-    });
-};
-
-export const useReIndexProducts = () => {
-    return useMutation({
-        mutationFn: async () => await clientApi.post<Message>("/product/reindex"),
-        onSuccess: () => {
-            toast.success("Products re-indexed successfully");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to re-index products");
         },
     });
 };

@@ -145,3 +145,14 @@ async def invalidate_key(key: str) -> None:
         )
     except Exception as e:
         logger.error(f"Error invalidating key {key}: {e}")
+
+
+@handle_redis_errors(default=None)
+async def invalidate_key_only(key: str) -> None:
+    """
+    Delete a specific Redis key and notify websocket clients.
+    """
+    try:
+        await redis_client.delete(key)
+    except Exception as e:
+        logger.error(f"Error invalidating key {key}: {e}")
