@@ -108,7 +108,8 @@ export const useUpdateCartDetails = () => {
     return useMutation({
         mutationFn: async (update: CartUpdate) => await clientApi.put<Cart>("/cart/", update),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["cart"] });
+            queryClient.invalidateQueries({ queryKey: ["addresses"] })
+            queryClient.invalidateQueries({ queryKey: ["cart"] })
             toast.success("Cart details updated");
         },
         onError: (error: any) => {

@@ -181,11 +181,7 @@ async def invalidate_product_cache(keys: List[str] = None):
         invalidate_keys("products:home"),
         invalidate_keys("products:collection"),
     )
-    await manager.broadcast_to_all(
-            data={"key": "products"},
-            message_type="invalidate",
-        )
-
+    await manager.broadcast_to_all(data={"key": "products"}, message_type="invalidate")
     if keys:
         tasks = []
         for key in keys:

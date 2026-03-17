@@ -14,7 +14,7 @@ from app.models.generic import Message
 from app.prisma_client import prisma as db
 from prisma.errors import PrismaError
 from app.core.logging import get_logger
-from app.services.redis import cache_response, invalidate_key
+from app.services.redis import cache_response, invalidate_key_only
 
 logger = get_logger(__name__)
 
@@ -52,7 +52,7 @@ async def create(
             }
         )
 
-        await invalidate_key(f"addresses:{user.id}")
+        await invalidate_key_only(f"addresses:{user.id}")
         return address
 
     except PrismaError as e:
@@ -99,7 +99,7 @@ async def update(
             where={"id": id},
             data=update_payload
         )
-        await invalidate_key(f"address:{id}")
+        await invalidate_key_only(f"addresses:{user.id}")
         return updated
 
     except PrismaError as e:
@@ -137,7 +137,7 @@ async def delete(id: int, user: CurrentUser) -> Message:
 
             await tx.address.delete(where={"id": id})
 
-        await invalidate_key(f"addresses:{user.id}")
+        await invalidate_key_only(f"addresses:{user.id}")
 
         return Message(message="Address deleted successfully")
     except PrismaError as e:

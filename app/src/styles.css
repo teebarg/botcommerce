@@ -573,7 +573,7 @@
         padding-bottom: env(safe-area-inset-bottom);
     }
     .header-safe {
-        padding-top: calc(env(safe-area-inset-top) + 8px);
+        padding-top: calc(env(safe-area-inset-top) + 10px);
         /* height: calc(env(safe-area-inset-top) + 64px); */
     }
     .h-safe-content {
