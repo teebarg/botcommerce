@@ -18,7 +18,7 @@ const MobileFilter: React.FC<MobileFilterProps> = ({ facets }) => {
     const filterState = useOverlayTriggerState({});
     const sidebarRef = useRef<FilterSidebarRef>(null);
 
-    const filterRoutes = ["/collections", "/search", "/catalog"];
+    const filterRoutes = ["/collections", "/search"];
 
     const showFilter = filterRoutes.some((route) => location.pathname.startsWith(route));
 

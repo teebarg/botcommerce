@@ -49,8 +49,8 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
                         </div>
                     )}
                 </div>
-                <Link to="/products/$slug" className="block px-1" params={{ slug: product.slug }}>
-                    <h3 className="line-clamp-1 text-sm">{product.name}</h3>
+                <Link to="/products/$slug" className="block px-1 py-2" params={{ slug: product.slug }}>
+                    <h3 className="line-clamp-1 text-xs">{product.name}</h3>
                     <PriceLabel priceInfo={priceInfo} />
                 </Link>
 

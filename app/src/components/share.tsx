@@ -6,7 +6,7 @@ import { useRouterState } from "@tanstack/react-router";
 
 export default function ShareButton() {
     const { location } = useRouterState();
-    const filterRoutes = ["/collections", "/search", "/catalog"];
+    const filterRoutes = ["/collections", "/search"];
 
     const show = filterRoutes.some((route) => location.pathname.startsWith(route));
 
