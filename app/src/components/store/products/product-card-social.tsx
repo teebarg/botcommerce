@@ -105,7 +105,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
     };
 
     return (
-        <div ref={ref} className="relative h-svh w-full snap-start overflow-hidden flex flex-col">
+        <div ref={ref} className="relative h-safe-store-content w-full snap-start overflow-hidden flex flex-col">
             <div
                 className="absolute inset-0 bg-[length:200%_200%] z-0 animate-ambient-move"
                 style={{
@@ -120,7 +120,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
             />
             {isBright && <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none" />}
             <div className="absolute top-0 left-0 right-0 h-48 bg-linear-to-b from-black/90 to-transparent z-30 pointer-events-none" />
-            <div className="relative w-full flex-1 flex items-start justify-center pt-16">
+            <div className="relative w-full flex-1 flex items-start justify-center">
                 {!imageLoaded && <div className="absolute inset-0 bg-[#2a2a2a] animate-pulse" />}
                 <img
                     src={product.images?.[0]}

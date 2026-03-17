@@ -17,7 +17,7 @@ function MainLayoutComponent() {
         <div className="flex flex-col min-h-screen">
             <StoreNavbar />
             <MobileHeader />
-            <main className="flex-1 flex flex-col pt-safe-header md:pt-2 pb-safe-nav md:pb-2">
+            <main className="flex-1 flex flex-col py-safe-mobile md:py-2!">
                 <Outlet />
             </main>
             <Footer />

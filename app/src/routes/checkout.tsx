@@ -53,11 +53,11 @@ function RouteComponent() {
         return <ServerError error={error.message} scenario="checkout" stack={error.stack} />;
     }
     return (
-        <div className="max-w-7xl mx-auto w-full h-svh flex flex-col overflow-hidden">
+        <div className="max-w-7xl mx-auto w-full flex flex-col overflow-hidden">
             <motion.header
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl flex justify-between items-center border-b border-border h-16 px-2.5 shrink-0"
+                className="sticky header-safe top-0 z-50 bg-background/80 backdrop-blur-xl flex justify-between items-center border-b border-border px-2.5 shrink-0"
             >
                 <div className="flex items-center gap-2">
                     <BackButton />
@@ -80,7 +80,7 @@ function RouteComponent() {
             ) : !cart ? (
                 <EmptyCartMessage />
             ) : (
-                <main className="flex-1 flex md:gap-8 overflow-hidden">
+                <main className="flex md:gap-8 overflow-hidden h-safe-content">
                     <CheckoutFlow cart={cart} />
                     <div className="mb-24 md:mb-0 hidden md:block">
                         <CheckoutSummary />

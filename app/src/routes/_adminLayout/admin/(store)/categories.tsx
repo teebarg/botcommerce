@@ -22,7 +22,7 @@ function RouteComponent() {
     const categories = data?.filter((cat: Category) => !cat.parent_id);
 
     return (
-        <div className="max-w-7xl w-full mx-auto">
+        <div className="max-w-7xl w-full mx-auto py-4">
             <CategoryTree data={categories} />
         </div>
     );

@@ -20,7 +20,7 @@ function RouteComponent() {
     const { data } = useCatalogs();
 
     return (
-        <div className="p-4">
+        <div className="py-8 px-3">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Catalogs</h1>
                 <SheetDrawer

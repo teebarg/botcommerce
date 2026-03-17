@@ -51,7 +51,7 @@ const ConfirmDrawer: React.FC<Props> = ({
         return (
             <Drawer open={open} onOpenChange={onOpenChange}>
                 <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-                <DrawerContent aria-describedby={undefined}>
+                <DrawerContent aria-describedby={undefined} className="drawer-safe">
                     <DrawerHeader className="pb-4">
                         <DrawerTitle>{title || "Confirm?"}</DrawerTitle>
                         {description && <DrawerDescription>{description ?? "This action cannot be undone."}</DrawerDescription>}

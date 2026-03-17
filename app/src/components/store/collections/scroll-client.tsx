@@ -102,7 +102,7 @@ export default function InfiniteScrollClient({ initialData, collection_slug, sea
                                 <p className="text-sm font-medium text-muted-foreground">Loading more products...</p>
                             </div>
                         }
-                        className="h-svh w-full overflow-y-auto snap-y snap-mandatory hide-scrollbar scroll-smooth"
+                        className="h-safe-store-content margin-safe w-full overflow-y-auto snap-y snap-mandatory hide-scrollbar scroll-smooth"
                     >
                         {products?.map((product: ProductSearch, idx: number) => (
                             <ProductCardSocial key={product.id + product.slug + idx} product={product} facets={facets} scrollRef={scrollRef} />

@@ -47,7 +47,7 @@ const StoreMenuComp: React.FC = () => {
                     <p className="text-xs">Menu</p>
                 </div>
             </DrawerTrigger>
-            <DrawerContent aria-describedby={undefined}>
+            <DrawerContent aria-describedby={undefined} className="drawer-safe">
                 <DrawerHeader className="sr-only">
                     <DrawerTitle>Menu</DrawerTitle>
                 </DrawerHeader>

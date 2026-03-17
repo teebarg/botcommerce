@@ -74,8 +74,8 @@ export const ChatBubble = () => {
                         exit={{ scale: 0 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={() => setIsOpen(true)}
-                        className="fixed bottom-20 right-5 z-50 w-14 h-14 rounded-full gradient-primary shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
-                        style={{ boxShadow: "0 0 30px hsl(350 89% 60% / 0.4)" }}
+                        className="fixed right-5 z-50 w-14 h-14 rounded-full gradient-primary shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
+                        style={{ boxShadow: "0 0 30px hsl(350 89% 60% / 0.4)", bottom: "calc(100px + var(--sab))" }}
                     >
                         <MessageCircle className="w-6 h-6 text-primary-foreground" />
                         <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-green-400 border-2 border-background" />
