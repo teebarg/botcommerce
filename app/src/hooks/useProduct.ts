@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { Message, PaginatedProductSearch, ProductFeed, ProductVariant } from "@/schemas";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { clientApi } from "@/utils/api.client";
 
 type SearchParams = {

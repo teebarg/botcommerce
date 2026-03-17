@@ -4,6 +4,8 @@ import GetApp from "@/components/get-app";
 import { SearchDialog } from "@/components/store/product-search";
 import { ShoppingBag } from "lucide-react";
 import { UserButton, Show, SignInButton } from "@clerk/tanstack-react-start";
+import MobileFilter from "@/components/store/mobile-filter";
+import ShareButton from "../share";
 
 const MobileHeader = () => {
     return (
@@ -21,7 +23,9 @@ const MobileHeader = () => {
                         <ShoppingBag className="w-5 h-5 text-white" />
                     </div>
                 </Link>
+                <MobileFilter />
             </div>
+            <ShareButton />
             <SearchDialog />
             <GetApp />
             <div className="flex items-center">

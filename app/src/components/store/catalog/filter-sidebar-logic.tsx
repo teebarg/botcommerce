@@ -7,11 +7,13 @@ import { Label } from "@/components/ui/label";
 import { COLOR_OPTIONS, SIZE_OPTIONS, AGE_OPTIONS, ColorOption } from "@/utils/constants";
 import { currency } from "@/utils";
 import type { Facet } from "@/schemas/product";
-import { useSearch } from "@tanstack/react-router";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { motion } from "framer-motion";
+import { useCollections } from "@/hooks/useCollection";
+import { Badge } from "@/components/ui/badge";
 
 export interface FilterSidebarRef {
     apply: () => void;
@@ -60,6 +62,8 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
     const [draft, setDraft] = useState(filters);
     const { updateQuery } = useUpdateQuery();
     const { data: categories } = useCategories();
+    const { data: collections } = useCollections();
+    const navigate = useNavigate();
 
     const [openSections, setOpenSections] = useState({
         categories: true,
@@ -136,6 +140,19 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
 
     return (
         <div className="space-y-6">
+            <div className="flex flex-wrap gap-2">
+                {collections?.map((collection) => (
+                    <Badge
+                        key={collection.id}
+                        className="cursor-pointer py-1 text-sm"
+                        onClick={() => {
+                            (navigate({ to: `/collections/${collection.slug}` }), onClose?.());
+                        }}
+                    >
+                        {collection.name}
+                    </Badge>
+                ))}
+            </div>
             <Collapsible open={openSections.categories} onOpenChange={() => toggleSection("categories")}>
                 <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
                     <span className="font-medium">Categories</span>

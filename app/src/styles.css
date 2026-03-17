@@ -507,7 +507,7 @@
     }
 
     .action-button {
-        @apply w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300;
+        @apply w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300;
         @apply bg-white/20 backdrop-blur-lg hover:bg-white/20 active:scale-90;
     }
 

@@ -2,8 +2,14 @@ import { toast } from "sonner";
 import { Share2, Copy, Smartphone, Twitter, Facebook } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import { useRouterState } from "@tanstack/react-router";
 
 export default function ShareButton() {
+    const { location } = useRouterState();
+    const filterRoutes = ["/collections", "/search", "/catalog"];
+
+    const show = filterRoutes.some((route) => location.pathname.startsWith(route));
+
     const handleCopyUrl = async () => {
         try {
             await navigator.clipboard.writeText(window.location.href);
@@ -56,19 +62,22 @@ export default function ShareButton() {
         }
     };
 
+    if (!show) {
+        return null;
+    }
+
     return (
         <Popover>
             <PopoverTrigger asChild>
-                <button className="z-50">
+                <button className="z-30">
                     <span className="hidden md:inline-flex items-center gap-1 px-3 py-2 rounded-md bg-contrast text-contrast-foreground cursor-pointer">
                         <Share2 className="h-4 w-4" />
                         Share
                     </span>
-                    <span className="md:hidden flex flex-col items-center gap-1 text-white/80">
+                    <span className="md:hidden flex flex-col items-center text-white/80">
                         <div className="action-button">
-                            <Share2 className="w-6 h-6" fill="currentColor" />
+                            <Share2 className="w-5 h-5" fill="currentColor" />
                         </div>
-                        <span className="text-xs font-semibold">Share</span>
                     </span>
                 </button>
             </PopoverTrigger>

@@ -1,10 +1,10 @@
 import { ChevronRight } from "lucide-react";
 import { CategoriesWithProducts, ProductSearch } from "@/schemas";
-import ProductCardLight from "../products/product-card-light";
 import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { clientApi } from "@/utils/api.client";
+import ProductCardPLP from "../products/product-card-plp";
 
 export default function CategoriesWithProductsSection() {
     const { data: categoriesWithProducts } = useQuery({
@@ -34,7 +34,7 @@ export default function CategoriesWithProductsSection() {
                             <h3 className="font-display text-lg font-medium">{category.name}</h3>
                             <Link
                                 to="/collections"
-                                search={(prev) => ({ ...prev, cat_ids: category.slug })}
+                                search={{ cat_ids: category.slug }}
                                 className="flex items-center gap-1 text-sm text-primary font-medium"
                             >
                                 View All
@@ -44,7 +44,7 @@ export default function CategoriesWithProductsSection() {
 
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                             {category.products.map((product: ProductSearch, index: number) => (
-                                <ProductCardLight key={product.id} product={product} index={index} />
+                                <ProductCardPLP key={product.id} product={product} index={index} />
                             ))}
                         </div>
                     </motion.div>

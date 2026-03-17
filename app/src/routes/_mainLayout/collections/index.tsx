@@ -14,7 +14,7 @@ const FeedQuerySchema = z.object({
     ages: z.string().optional(),
 });
 
-export const Route = createFileRoute("/_mainLayout/collections")({
+export const Route = createFileRoute("/_mainLayout/collections/")({
     validateSearch: FeedQuerySchema,
     component: RouteComponent,
     beforeLoad: ({ search }) => {
