@@ -30,7 +30,7 @@ from app.prisma_client import prisma as db
 from app.core.storage import upload
 from app.core.config import settings
 from prisma.errors import UniqueViolationError
-from app.services.product import reindex_product, index_images, delete_image_index
+from app.services.product import index_product, delete_product_index
 from app.services.redis import cache_response, invalidate_pattern
 from meilisearch.errors import MeilisearchApiError
 from app.services.recently_viewed import RecentlyViewedService
@@ -77,7 +77,7 @@ def build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any
 router = APIRouter()
 
 @router.get("/{product_id}/review-status")
-@cache_response("products")
+@cache_response("review-status")
 async def get_review_status(
     request: Request,
     product_id: int,
@@ -122,7 +122,7 @@ async def get_review_status(
     )
 
 @router.get("/{id}/similar")
-@cache_response("products")
+@cache_response(key_prefix="product:similar", key=lambda request, id, limit: f"{id}:{limit}")
 async def recommend(request: Request, id: int, limit: int = Query(default=20, le=100)):
     key: str = f"product:{id}:similar"
     ids = await redis_client.lrange(key, 0, -1)
@@ -141,7 +141,7 @@ async def recommend(request: Request, id: int, limit: int = Query(default=20, le
 
 
 @router.get("/recommend")
-@cache_response("products")
+@cache_response("products:recommendation")
 async def get_recommendations(request: Request, user: CurrentUser, limit: int = Query(default=20, le=100)):
     redis = request.app.state.redis
     index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
@@ -183,7 +183,7 @@ async def get_recommendations(request: Request, user: CurrentUser, limit: int = 
 #     return products
 
 @router.get("/feed")
-@cache_response("products")
+@cache_response("products:list")
 async def feed(
     request: Request,
     search: str = "",
@@ -382,8 +382,8 @@ async def feed(
 
 
 @router.get("/index-products")
-@cache_response("products")
-async def index_products(request: Request) -> IndexProducts:
+@cache_response("products:collection")
+async def get_index_products(request: Request) -> IndexProducts:
     """
     Retrieve index products using Meilisearch.
     """
@@ -427,7 +427,7 @@ async def index_products(request: Request) -> IndexProducts:
     return result
 
 @router.get("/")
-@cache_response("products")
+@cache_response("products:search")
 async def search(
     request: Request,
     search: str = "",
@@ -581,7 +581,7 @@ async def create_product(product: ProductCreate, background_tasks: BackgroundTas
             status_code=400, detail="Product with this name already exists")
 
     await invalidate_pattern("gallery")
-    background_tasks.add_task(reindex_product, product_id=created_product.id)
+    background_tasks.add_task(index_product, product_id=created_product.id)
 
     return created_product
 
@@ -661,7 +661,7 @@ async def create_product_bundle(
                             status_code=400, detail=f"Failed to create variant: {str(e)}")
 
             await invalidate_pattern("gallery")
-            background_tasks.add_task(reindex_product, product_id=product.id)
+            background_tasks.add_task(index_product, product_id=product.id)
 
             full = await tx.product.find_unique(
                 where={"id": product.id},
@@ -679,24 +679,8 @@ async def create_product_bundle(
             raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/reindex", response_model=Message)
-async def reindex_products(background_tasks: BackgroundTasks):
-    """
-    Re-index all products in the db to Meilisearch.
-    """
-    try:
-        background_tasks.add_task(index_images)
-        return Message(message="Re-indexing task enqueued.")
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(
-            status_code=500,
-            detail=str(e),
-        )
-
-
 @router.get("/{slug}")
-@cache_response("product", key=lambda request, slug, **kwargs: slug)
+@cache_response("product:slug", key=lambda request, slug, **kwargs: slug)
 async def read(request: Request, slug: str):
     """Get a specific product by slug with Redis caching."""
     product = await db.product.find_unique(
@@ -762,7 +746,7 @@ async def update_product(id: int, product: ProductUpdate, background_tasks: Back
         raise HTTPException(status_code=400, detail=str(e))
 
     await invalidate_pattern("gallery")
-    background_tasks.add_task(reindex_product, product_id=id)
+    background_tasks.add_task(index_product, product_id=id)
 
     return updated_product
 
@@ -794,7 +778,7 @@ async def delete_product(id: int) -> Message:
 
         service = RecentlyViewedService()
         await service.remove_product_from_all(product_id=id)
-        await delete_image_index(images=product.images)
+        await delete_product_index(product_ids=[id])
         await invalidate_pattern("gallery")
         return Message(message="Product deleted successfully")
 
@@ -829,7 +813,7 @@ async def create_variant(id: int, variant: VariantWithStatus, background_tasks: 
         raise HTTPException(status_code=400, detail=str(e))
 
     await invalidate_pattern("gallery")
-    background_tasks.add_task(reindex_product, product_id=id)
+    background_tasks.add_task(index_product, product_id=id)
 
     return created_variant
 
@@ -871,7 +855,7 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
         )
         await invalidate_pattern("gallery")
         background_tasks.add_task(
-            reindex_product, product_id=existing_variant.product_id)
+            index_product, product_id=existing_variant.product_id)
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=400, detail=str(e))
@@ -885,7 +869,7 @@ async def delete_variant(variant_id: int, background_tasks: BackgroundTasks):
         variant = await db.productvariant.delete(where={"id": variant_id})
 
         background_tasks.add_task(
-            reindex_product, product_id=variant.product_id)
+            index_product, product_id=variant.product_id)
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=400, detail=str(e))
@@ -911,7 +895,7 @@ async def add_image(id: int, image_data: ImageUpload, background_tasks: Backgrou
         )
 
         await invalidate_pattern("gallery")
-        background_tasks.add_task(reindex_product, product_id=id)
+        background_tasks.add_task(index_product, product_id=id)
 
         return updated_product
 
@@ -944,7 +928,7 @@ async def upload_images(id: int, image_data: ImageUpload, background_tasks: Back
         )
 
         await invalidate_pattern("gallery")
-        background_tasks.add_task(reindex_product, product_id=id)
+        background_tasks.add_task(index_product, product_id=id)
 
         return image
     except Exception as e:
@@ -981,7 +965,7 @@ async def delete_product_image(id: int, image_id: int, background_tasks: Backgro
             )
 
         await invalidate_pattern("gallery")
-        background_tasks.add_task(reindex_product, product_id=id)
+        background_tasks.add_task(index_product, product_id=id)
 
         return {"success": True}
 
@@ -1060,5 +1044,5 @@ async def reorder_images(id: int, image_ids: list[int]) -> Message:
             logger.error(e)
             raise HTTPException(status_code=400, detail=str(e))
 
-    await reindex_product(product_id=id)
+    await index_product(product_id=id)
     return Message(message="Image re-ordered successfully.")

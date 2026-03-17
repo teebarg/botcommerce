@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { getOrderTimelineFn } from "@/server/order.server";
 import type { Order, OrderStatus, PaymentStatus } from "@/schemas";
 import { clientApi } from "@/utils/api.client";
 
@@ -34,7 +33,7 @@ export const useChangePaymentStatus = () => {
     });
 };
 
-export interface OrderTimelineEntry {
+interface OrderTimelineEntry {
     id: number;
     order_id: number;
     from_status?: string | null;
@@ -47,7 +46,7 @@ export const useOrderTimeline = (orderId?: number) => {
     return useQuery({
         queryKey: ["order-timeline", orderId?.toString()],
         enabled: !!orderId,
-        queryFn: () => getOrderTimelineFn({ data: orderId! }),
+        queryFn: () => clientApi.get<OrderTimelineEntry[]>(`/order/${orderId}/timeline`),
     });
 };
 

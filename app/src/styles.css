@@ -553,4 +553,27 @@
         transform: translateZ(0);
         backface-visibility: hidden;
     }
+
+    .pt-safe-header {
+        padding-top: calc(env(safe-area-inset-top) + 64px);
+    }
+    .h-safe-header {
+        height: calc(env(safe-area-inset-top) + 56px);
+    }
+    .h-below-header {
+        height: calc(100svh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 56px - 64px);
+    }
+    .pb-safe-nav {
+        padding-bottom: calc(env(safe-area-inset-bottom) + 64px);
+    }
+    .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    .header-safe {
+        padding-top: env(safe-area-inset-top);
+        height: calc(env(safe-area-inset-top) + 64px);
+    }
+    .h-safe-content {
+        height: calc(100svh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 64px);
+    }
 }

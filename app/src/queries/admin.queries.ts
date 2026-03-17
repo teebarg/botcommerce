@@ -1,15 +1,13 @@
 import { queryOptions } from "@tanstack/react-query";
 import { getUsersFn } from "@/server/users.server";
-import { getCouponsFn } from "@/server/coupon.server";
-import { getActivitiesFn } from "@/server/activities.server";
-import { getAbandonedCartsFn, getAbandonedCartStatsFn } from "@/server/admin.server";
-import { getChatsFn, getStatTrendsFn } from "@/server/generic.server";
-import { ConversationStatus } from "@/schemas";
+import { ConversationStatus, PaginatedAbandonedCarts, PaginatedActivities, PaginatedChats, PaginatedCoupons } from "@/schemas";
+import { clientApi } from "@/utils/api.client";
+import { StatsTrends } from "@/types/models";
 
 export const statsTrendsQuery = () =>
     queryOptions({
         queryKey: ["stats", "trends"],
-        queryFn: () => getStatTrendsFn(),
+        queryFn: () => clientApi.get<StatsTrends>("/stats/trends"),
     });
 
 export interface UsersParams {
@@ -30,28 +28,42 @@ export interface CouponParams {
     isActive?: boolean;
 }
 
-export const couponsQuery = (params: UsersParams) => ({
+export const couponsQuery = (params: CouponParams) => ({
     queryKey: ["coupons", params],
-    queryFn: () => getCouponsFn({ data: params }),
+    queryFn: () =>
+        clientApi.get<PaginatedCoupons>("/coupon/", {
+            params: {
+                query: params?.query || "",
+                is_active: params?.isActive,
+            },
+        }),
 });
 
 export const activitiesQuery = () => ({
     queryKey: ["activities"],
-    queryFn: () => getActivitiesFn(),
+    queryFn: () => clientApi.get<PaginatedActivities>("/activities/"),
 });
+
+interface AbandonedCartStats {
+    active_count: number;
+    abandoned_count: number;
+    converted_count: number;
+    potential_revenue: number;
+}
 
 export const abandonedCartStatsQuery = (hours_threshold: string) => ({
     queryKey: ["abandoned-carts", "stats", JSON.stringify({ hours_threshold })],
-    queryFn: () => getAbandonedCartStatsFn({ data: hours_threshold }),
+    queryFn: () => clientApi.get<AbandonedCartStats>(`/cart/abandoned-carts/stats?hours_threshold=${hours_threshold}`),
 });
 
 export const abandonedCartsQuery = (params: { search?: string; hours_threshold?: string }) => ({
     queryKey: ["abandoned-carts", JSON.stringify(params)],
-    queryFn: () => getAbandonedCartsFn({ data: params }),
+    queryFn: () => clientApi.get<PaginatedAbandonedCarts>("/cart/abandoned-carts", { params }),
 });
 
 export const chatsQuery = (params: { user_id?: number; status?: ConversationStatus }) =>
     queryOptions({
         queryKey: ["chats", JSON.stringify(params)],
-        queryFn: () => getChatsFn({ data: params }),
+        queryFn: () => clientApi.get<PaginatedChats>("/chat/", { params }),
+        staleTime: 1000 * 60 * 60 * 24, // 1 hour
     });

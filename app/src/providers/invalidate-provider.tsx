@@ -4,7 +4,16 @@ import { useWebSocket } from "pulsews";
 import { useEffect, useRef } from "react";
 
 function parseEventKey(eventKey: string): string[] {
-    return eventKey.split(":");
+    try {
+        return eventKey.split(":");
+    } catch (error) {
+        console.error("Error parsing event key:", error);
+        return [];
+    }
+}
+
+function parseEventKeys(eventKeys: string[]): string[][] {
+    return eventKeys.map(parseEventKey);
 }
 
 export function InvalidateProvider({ children }: { children: React.ReactNode }) {
@@ -17,9 +26,16 @@ export function InvalidateProvider({ children }: { children: React.ReactNode }) 
         if (!lastMessage) return;
 
         if (lastMessage.type === "invalidate") {
-            const keys = parseEventKey(lastMessage.key);
-
-            queryClient.invalidateQueries({ queryKey: keys });
+            if (lastMessage.key) {
+                const keys = parseEventKey(lastMessage.key);
+                queryClient.invalidateQueries({ queryKey: keys });
+            }
+            if (lastMessage.keys) {
+                const keys = parseEventKeys(lastMessage.keys);
+                keys.forEach((key) => {
+                    queryClient.invalidateQueries({ queryKey: key });
+                });
+            }
         }
     }, [lastMessage, queryClient]);
 
@@ -28,8 +44,8 @@ export function InvalidateProvider({ children }: { children: React.ReactNode }) 
             send(
                 JSON.stringify({
                     type: "init",
-                    id: session.id,
-                    email: session.user.email,
+                    id: session?.id,
+                    email: session?.user.email,
                 })
             );
 

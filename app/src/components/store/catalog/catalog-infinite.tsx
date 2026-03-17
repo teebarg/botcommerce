@@ -27,7 +27,7 @@ export default function CatalogInfinite({ slug, initialData }: Props) {
     });
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery<SearchCatalog>({
-        queryKey: ["product", "catalog", slug, JSON.stringify(search)],
+        queryKey: ["products", "catalog", slug, JSON.stringify(search)],
         queryFn: async ({ pageParam }) => {
             const res = await clientApi.get<SearchCatalog>(`/catalog/${slug}`, { params: { slug, ...search, cursor: pageParam ?? undefined } });
             return res;

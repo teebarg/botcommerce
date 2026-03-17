@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, BackgroundTasks, Request, Header, Cookie
+from fastapi import APIRouter, HTTPException, status, BackgroundTasks, Request, Cookie
 from pydantic import EmailStr, BaseModel, Field
 from app.core import security
 from app.core.config import settings

@@ -8,7 +8,7 @@ from app.core.logging import logger
 from app.services.invoice import invoice_service
 from datetime import datetime
 from app.core.deps import supabase, Notification
-from app.services.product import reindex_product
+from app.services.product import index_product
 from app.core.config import settings
 from app.services.events import publish_order_event
 from app.services.redis import invalidate_key, invalidate_pattern
@@ -307,7 +307,7 @@ async def decrement_variant_inventory_for_order(order, notification=None) -> Non
                 update_data["status"] = "OUT_OF_STOCK"
                 out_of_stock = True
             await db.productvariant.update(where={"id": variant_id}, data=update_data)
-            await reindex_product(product_id=variant.product_id)
+            await index_product(product_id=variant.product_id)
             if out_of_stock:
                 out_of_stock_variants.append(variant)
             logger.info(f"Decrementing inventory for variant {variant_id} in order {order.id}")
@@ -469,7 +469,7 @@ async def return_order_item(order_id: int, item_id: int, background_tasks: Backg
             await invalidate_key(f"order-timeline:{order_id}")
             await invalidate_pattern("gallery")
             if order_item.variant and order_item.variant.product_id:
-                await reindex_product(product_id=order_item.variant.product_id)
+                await index_product(product_id=order_item.variant.product_id)
         except Exception as e:
             logger.error(f"Failed to invalidate caches/reindex after return: {e}")
 

@@ -6,7 +6,7 @@ import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import OrderFilters from "@/components/admin/orders/order-filters";
 import z from "zod";
 import { ordersQuery } from "@/queries/user.queries";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { clientApi } from "@/utils/api.client";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
@@ -27,11 +27,11 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/orders")({
 
 function RouteComponent() {
     const params = Route.useSearch();
-    const { data: initialData } = useSuspenseQuery(ordersQuery(params));
+    const { data: initialData } = useQuery(ordersQuery(params));
     const { updateQuery } = useUpdateQuery(200);
 
-    const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteResource<PaginatedOrders, Order>({
-        queryKey: ["coupons", "infinite", params],
+    const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedOrders, Order>({
+        queryKey: ["orders", "infinite", params],
         queryFn: (cursor) => clientApi.get<PaginatedOrders>("/order/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
@@ -39,7 +39,7 @@ function RouteComponent() {
     });
 
     return (
-        <div className="px-4 md:px-10 py-8">
+        <div className="px-4 md:px-10 py-4">
             <div className="mb-6 flex flex-col">
                 <h1 className="text-2xl font-medium">Order view</h1>
                 <p className="text-muted-foreground text-sm">Manage your orders.</p>
@@ -59,7 +59,7 @@ function RouteComponent() {
                 </div>
                 <OrderFilters />
                 <div className="mt-4">
-                    {!isLoading && items.length > 0 && (
+                    {items.length > 0 && (
                         <InfiniteResourceList
                             items={items}
                             onLoadMore={fetchNextPage}
@@ -68,7 +68,7 @@ function RouteComponent() {
                             renderItem={(item: Order) => <OrderCard key={item.id} order={item} />}
                         />
                     )}
-                    {!isLoading && items.length === 0 && (
+                    {items.length === 0 && (
                         <div className="text-center py-8">
                             <p className="text-muted-foreground">No orders found</p>
                         </div>

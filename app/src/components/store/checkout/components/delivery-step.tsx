@@ -17,7 +17,8 @@ interface DeliveryStepProps {
 
 const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
     const { config } = useConfig();
-    const { data: deliveryOptions, isPending } = useDeliveryOptions();
+    const { data, isPending } = useDeliveryOptions();
+    const deliveryOptions = data?.filter((item: DeliveryOption) => item.is_active);
     const updateCartDetails = useUpdateCartDetails();
     const [selectedDeliveryMethod, setSelectedDeliveryMethod] = React.useState<DeliveryOption | null>(null);
 

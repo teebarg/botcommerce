@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { getCouponsAnalyticsFn } from "@/server/coupon.server";
 import { clientApi } from "@/utils/api.client";
 import { Coupon } from "@/schemas";
 
@@ -127,9 +126,21 @@ export const useAssignCoupon = () => {
     });
 };
 
+interface CouponAnalytics {
+    total_coupons: number;
+    used_coupons: number;
+    total_redemptions: number;
+    active_coupons: number;
+    avg_redemption_rate: number;
+    date_range: {
+        start_date: string;
+        end_date: string;
+    };
+}
+
 export const useCouponsAnalytics = () => {
     return useQuery({
         queryKey: ["coupons"],
-        queryFn: async () => getCouponsAnalyticsFn(),
+        queryFn: async () => clientApi.get<CouponAnalytics>("/coupon/analytics"),
     });
 };

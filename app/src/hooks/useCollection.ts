@@ -1,15 +1,21 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { CollectionFormValues } from "@/components/admin/collections/collection-form";
 import type { CatalogFormValues } from "@/components/admin/catalogs/catalog-form";
-import { useRouteContext } from "@tanstack/react-router";
 import { clientApi } from "@/utils/api.client";
 import { Catalog, Collection, Message, PaginatedCatalog } from "@/schemas";
 
-export const useCollections = (query?: string) => {
+export const collectionsQuery = (params?: { search?: string }) =>
+    queryOptions({
+        queryKey: ["collections", params?.search],
+        queryFn: () => clientApi.get<Collection[]>("/collection/", { params }),
+        staleTime: Infinity,
+    });
+
+export const useCollections = () => {
     return useQuery({
-        queryKey: ["collections", query],
-        queryFn: () => clientApi.get<Collection[]>(`/collection/`, { params: { query: query ?? "" } }),
+        queryKey: ["collections"],
+        queryFn: () => clientApi.get<Collection[]>(`/collection/`),
     });
 };
 
@@ -49,14 +55,15 @@ export const useDeleteCollection = () => {
     });
 };
 
-export const useCatalogs = (is_active?: boolean) => {
-    const { session } = useRouteContext({ strict: false });
-
-    return useQuery({
-        queryKey: ["catalog", is_active],
-        queryFn: () => clientApi.get<PaginatedCatalog>("/catalog/", { params: { is_active: is_active ?? null } }),
-        enabled: session?.user?.isAdmin,
+export const catalogsQuery = () =>
+    queryOptions({
+        queryKey: ["catalogs"],
+        queryFn: () => clientApi.get<PaginatedCatalog>("/catalog/"),
+        staleTime: Infinity,
     });
+
+export const useCatalogs = () => {
+    return useQuery(catalogsQuery());
 };
 
 export const useCreateCatalog = () => {

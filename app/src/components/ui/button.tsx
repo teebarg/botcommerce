@@ -64,7 +64,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 {isLoading ? (
                     <>
                         <Loader className="h-4 w-4 animate-spin" />
-                        {size === "icon" ? "" : "Loading..."}
+                        {size === "icon" ? "" : "Pending..."}
                     </>
                 ) : (
                     <>

@@ -1,11 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Users, UserCheck, Eye, TrendingUp } from "lucide-react";
-
 import UserCounter from "@/components/admin/online/UserCounter";
 import UserAvatar from "@/components/admin/online/UserAvatar";
 import ActivityIndicator from "@/components/admin/online/ActivityIndicator";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useWebSocket } from "pulsews";
 
@@ -38,7 +36,7 @@ function RouteComponent() {
     const guests = total - loggedIn;
     const active = sessions.filter((s) => s.last_seen <= 60).length;
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-6">
             <div className="text-center mb-8">
                 <h1 className="text-3xl font-bold">Online Users</h1>
                 <p className="text-muted-foreground">Real-time user activity monitoring</p>

@@ -3,6 +3,7 @@ import AdminNavbar from "@/components/admin/layouts/admin-navbar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/layout/admin-sidebar";
 import { SignIn } from "@clerk/tanstack-react-start";
+import { AdminPendingComponent } from "@/components/admin/layouts/admin-pending";
 
 export const Route = createFileRoute("/_adminLayout")({
     beforeLoad: ({ context }) => {
@@ -24,6 +25,10 @@ export const Route = createFileRoute("/_adminLayout")({
 
         throw error;
     },
+    ssr: false,
+    pendingComponent: () => <AdminPendingComponent />,
+    pendingMs: 100,        // only show pending if takes longer than 100ms
+    pendingMinMs: 300,     // keep showing for at least 300ms to avoid flash
     component: RouteComponent,
 });
 

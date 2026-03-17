@@ -7,7 +7,13 @@ import { UserButton, Show, SignInButton } from "@clerk/tanstack-react-start";
 
 const MobileHeader = () => {
     return (
-        <div className="fixed md:hidden top-0 inset-x-0 z-40 bg-background/60 backdrop-blur-md px-3 py-3 flex items-center gap-2">
+        <div
+            className="fixed md:hidden top-0 inset-x-0 z-40 bg-background/60 backdrop-blur-md px-3 flex items-center gap-2"
+            style={{
+                paddingTop: `calc(env(safe-area-inset-top) + 12px)`,
+                paddingBottom: `12px`,
+            }}
+        >
             <div className="flex gap-2 items-center flex-1">
                 <BackButton />
                 <Link to="/">

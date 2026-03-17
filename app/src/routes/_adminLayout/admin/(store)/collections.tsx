@@ -5,27 +5,28 @@ import type { Collection } from "@/schemas/product";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { useCollections } from "@/hooks/useCollection";
+import { collectionsQuery } from "@/hooks/useCollection";
 import ServerError from "@/components/generic/server-error";
-import ComponentLoader from "@/components/component-loader";
 import { CreateCollection } from "@/components/admin/collections/create-collection";
 import { CollectionActions } from "@/components/admin/collections/collection-actions";
 import CollectionItem from "@/components/admin/collections/collection-items";
+import { z } from "zod";
+import { useQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/collections")({
+    validateSearch: z.object({
+        search: z.string().optional(),
+    }),
+    loaderDeps: ({ search }) => search,
+    loader: async ({ context: { queryClient }, deps }) => {
+        await queryClient.ensureQueryData(collectionsQuery(deps));
+    },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { data: collections, error, isLoading } = useCollections();
-
-    if (isLoading) {
-        return (
-            <div className="px-3 md:px-10 py-8">
-                <ComponentLoader className="h-192" />
-            </div>
-        );
-    }
+    const params = Route.useSearch();
+    const { data: collections, error } = useQuery(collectionsQuery(params));
 
     if (error) {
         return <ServerError />;
