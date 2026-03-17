@@ -585,4 +585,7 @@
     .sheet-safe-bottom {
         padding-bottom: calc(env(safe-area-inset-bottom) + 24px);
     }
+    .close-safe-top {
+        top: calc(env(safe-area-inset-bottom) + 16px);
+    }
 }
