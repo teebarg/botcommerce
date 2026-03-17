@@ -573,10 +573,16 @@
         padding-bottom: env(safe-area-inset-bottom);
     }
     .header-safe {
-        padding-top: env(safe-area-inset-top);
-        height: calc(env(safe-area-inset-top) + 64px);
+        padding-top: calc(env(safe-area-inset-top) + 8px);
+        /* height: calc(env(safe-area-inset-top) + 64px); */
     }
     .h-safe-content {
         height: calc(100svh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 64px);
+    }
+    .sheet-safe-top {
+        padding-top: calc(env(safe-area-inset-top) + 24px);
+    }
+    .sheet-safe-bottom {
+        padding-bottom: calc(env(safe-area-inset-bottom) + 24px);
     }
 }

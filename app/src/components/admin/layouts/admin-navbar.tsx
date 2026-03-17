@@ -7,7 +7,7 @@ import { UserButton } from "@clerk/tanstack-react-start";
 
 const AdminNavbar = () => {
     return (
-        <NavigationBar className="header-safe bg-background sticky top-0 z-50">
+        <NavigationBar className="header-safe pb-2 bg-background sticky top-0 z-50">
             <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
                 <NavbarBrand className="gap-3 max-w-fit hidden sm:block">
                     <LocalizedClientLink href="/admin">
