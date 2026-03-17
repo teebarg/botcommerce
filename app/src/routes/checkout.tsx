@@ -53,7 +53,7 @@ function RouteComponent() {
         return <ServerError error={error.message} scenario="checkout" stack={error.stack} />;
     }
     return (
-        <div className="max-w-7xl mx-auto w-full h-screen flex flex-col overflow-hidden">
+        <div className="max-w-7xl mx-auto w-full h-svh flex flex-col overflow-hidden">
             <motion.header
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
