@@ -61,7 +61,10 @@ function RouteComponent() {
     const { isAuthenticated } = Route.useRouteContext();
     return (
         <div className="flex-1">
-            <div className="bg-background/60 backdrop-blur-md md:hidden sticky top-16 z-20">
+            <div className="bg-background/60 backdrop-blur-md md:hidden sticky z-20"
+            style={{
+                top: "calc(var(--sat) + 64px)"
+            }}>
                 <motion.ul initial={{ y: 100 }} animate={{ y: 0 }} className="grid grid-cols-5 px-2">
                     {navLinks.map((link, idx: number) => (
                         <li key={idx}>
@@ -81,7 +84,7 @@ function RouteComponent() {
                     ))}
                 </motion.ul>
             </div>
-            <div className="max-w-7xl mx-auto flex md:gap-4 pb-12 pt-8">
+            <div className="max-w-7xl mx-auto flex md:gap-4 pb-4 md:pt-6">
                 <div className="md:w-60 hidden md:block">
                     <div className="md:sticky md:top-16">{isAuthenticated && <AccountNav />}</div>
                 </div>

@@ -25,7 +25,7 @@ function RouteComponent() {
     const { data: settings } = useQuery(useShopSettingsQuery());
 
     return (
-        <div className="py-6 px-2.5 md:px-8">
+        <div className="py-4 px-2.5 md:px-8">
             <h1 className="text-2xl font-semibold mb-4">Store Settings</h1>
             <Tabs defaultValue="shop-details">
                 <TabsList className="mb-4">

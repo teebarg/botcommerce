@@ -31,7 +31,12 @@ const ButtonNav = () => {
     ];
 
     return (
-        <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/60 backdrop-blur-md shadow-xl flex items-center justify-between px-8 pt-3 pb-[calc(env(safe-area-inset-bottom)+12px)] text-xs">
+        <nav
+            className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/60 backdrop-blur-md shadow-xl flex items-center justify-between px-8 pt-3 text-xs"
+            style={{
+                paddingBottom: `calc(var(--sab) + 12px)`,
+            }}
+        >
             {nav.map((item: NavLink, idx: number) => (
                 <motion.div whileTap={{ scale: 0.9 }} key={idx} className="flex flex-col items-center">
                     <LocalizedClientLink active="gradient-primary text-white rounded-xl" className="p-1.5" href={item.href}>

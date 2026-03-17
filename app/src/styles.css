@@ -383,10 +383,12 @@
 
     --radius: 0.5rem;
 
-    --safe-top: env(safe-area-inset-top);
-    --safe-bottom: env(safe-area-inset-bottom);
-    --safe-left: env(safe-area-inset-left);
-    --safe-right: env(safe-area-inset-right);
+    --sat: env(safe-area-inset-top, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    --sal: env(safe-area-inset-left, 0px);
+    --sar: env(safe-area-inset-right, 0px);
+    /* --sat: 44px;
+    --sab: 34px; */
 
     --sidebar: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -554,38 +556,35 @@
         backface-visibility: hidden;
     }
 
-    .pt-safe-header {
-        padding-top: calc(env(safe-area-inset-top) + 64px);
+    .py-safe-mobile {
+        padding-top: calc(var(--sat) + 64px);
+        padding-bottom: calc(var(--sab) + 32px + 4px);
     }
-    .h-safe-header {
-        height: calc(env(safe-area-inset-top) + 56px);
-    }
-    .h-below-header {
-        height: calc(100svh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 56px - 64px);
-    }
-    .pb-safe-nav {
-        padding-bottom: calc(env(safe-area-inset-bottom) + 64px);
-    }
-    .pt-safe {
-        padding-top: env(safe-area-inset-top);
-    }
-    .pb-safe {
-        padding-bottom: env(safe-area-inset-bottom);
-    }
-    .header-safe {
-        padding-top: calc(env(safe-area-inset-top) + 10px);
-        /* height: calc(env(safe-area-inset-top) + 64px); */
+    .py-admin-safe-mobile {
+        padding-top: "4px";
+        padding-bottom: calc(var(--sab) + 4px);
     }
     .h-safe-content {
-        height: calc(100svh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 64px);
+        height: calc(100svh - var(--sab) - var(--sat) - 64px);
     }
-    .sheet-safe-top {
-        padding-top: calc(env(safe-area-inset-top) + 24px);
+    .h-safe-store-content {
+        height: calc(100svh - var(--sab) - var(--sat) - 64px - 34px);
     }
-    .sheet-safe-bottom {
-        padding-bottom: calc(env(safe-area-inset-bottom) + 24px);
+    .header-safe {
+        padding-top: var(--sat);
+        height: calc(var(--sat) + 64px);
+    }
+    .drawer-safe {
+        padding-bottom: var(--sab);
+    }
+    .sheet-safe {
+        padding-top: var(--sat);
+        padding-bottom: var(--sab);
     }
     .close-safe-top {
-        top: calc(env(safe-area-inset-bottom) + 16px);
+        top: calc(var(--sat) + 16px);
+    }
+    .margin-safe {
+        margin-top: calc(var(--sat) + 64px);
     }
 }

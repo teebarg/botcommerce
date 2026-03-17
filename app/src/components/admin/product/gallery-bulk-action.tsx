@@ -31,7 +31,12 @@ export const ProductBulkActions = ({
     if (selectedCount === 0) return null;
 
     return (
-        <div className="animate-slide-up fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-card border border-border rounded-full px-6 py-3 flex items-center gap-2 transition-all duration-300 max-w-90vw w-auto">
+        <div
+            className="animate-slide-up fixed left-1/2 transform -translate-x-1/2 bg-card border border-border rounded-full px-6 py-3 flex items-center gap-2 transition-all duration-300 max-w-90vw w-auto"
+            style={{
+                bottom: `calc(var(--sab) + 1rem)`,
+            }}
+        >
             <Badge className="mr-2 text-sm whitespace-nowrap" variant="indigo">
                 {selectedCount} selected
             </Badge>

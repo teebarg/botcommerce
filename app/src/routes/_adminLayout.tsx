@@ -38,7 +38,9 @@ function RouteComponent() {
             <AdminSidebar />
             <main className="flex-1 flex flex-col">
                 <AdminNavbar />
-                <Outlet />
+                <div className="flex-1 flex flex-col py-admin-safe-mobile md:py-3!">
+                    <Outlet />
+                </div>
             </main>
         </SidebarProvider>
     );

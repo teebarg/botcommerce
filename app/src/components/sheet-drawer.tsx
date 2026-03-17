@@ -32,7 +32,7 @@ const SheetDrawer: React.FC<OverlayProps> = ({
         return (
             <Drawer open={open} onOpenChange={onOpenChange}>
                 <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-                <DrawerContent aria-describedby={undefined} className={cn("data-[vaul-drawer-direction=bottom]:max-h-[95vh]", drawerClassName)}>
+                <DrawerContent aria-describedby={undefined} className={cn("data-[vaul-drawer-direction=bottom]:max-h-[95vh] drawer-safe", drawerClassName)}>
                     <DrawerHeader>
                         <DrawerTitle>{title}</DrawerTitle>
                     </DrawerHeader>

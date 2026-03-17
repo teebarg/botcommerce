@@ -207,8 +207,20 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                     )}
                                 </div>
                                 {/* {import.meta.env.MODE !== "production" && <TanStackRouterDevtoolsPanel />} */}
-                                <Toaster closeButton richColors duration={5000} expand={false} position="top-right" />
+                                <Toaster
+                                    closeButton
+                                    richColors
+                                    duration={5000}
+                                    expand={false}
+                                    position="top-right"
+                                    toastOptions={{
+                                        style: {
+                                            marginTop: `calc(var(--sat) + 16px)`,
+                                        },
+                                    }}
+                                />
                                 <PWABadge />
+                                {/* <SafeAreaDebug /> */}
                                 <Scripts />
                             </CartProvider>
                         </StoreProvider>

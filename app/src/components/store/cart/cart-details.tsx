@@ -19,9 +19,9 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
     const routerState = useRouterState();
     const path = routerState.location.pathname;
     return (
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden py-2">
             {cart?.items && cart?.items?.length > 0 && (
-                <p className="bg-card text-card-foreground p-2 rounded flex gap-2 mx-4 mt-4" data-testid="urgentMessage-read">
+                <p className="bg-card text-card-foreground p-2 rounded flex gap-2 mx-4" data-testid="urgentMessage-read">
                     <Info />
                     <span className="text-sm">
                         <span className="font-semibold">{`Your items aren’t reserved`}</span>, {`checkout quickly to make sure you don’t miss out.`}
