@@ -90,9 +90,6 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                             <p className="text-muted-foreground text-lg">Organize and manage your product catalog with ease</p>
                             <div className="flex items-center gap-4 mt-4 text-sm">
                                 <span className="bg-white/20 px-3 py-1 rounded-full">{categories?.length || 0} Categories</span>
-                                <span className="bg-white/20 px-3 py-1 rounded-full">
-                                    {categories?.reduce((acc, cat) => acc + (cat.subcategories?.length || 0), 0)} Subcategories
-                                </span>
                             </div>
                         </div>
                         <SheetDrawer
@@ -145,26 +142,10 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                                                         <Badge variant={category.is_active ? "emerald" : "destructive"}>
                                                             {category.is_active ? "Active" : "Inactive"}
                                                         </Badge>
-                                                        {category?.subcategories && category?.subcategories?.length > 0 && (
-                                                            <Badge variant="default">{category.subcategories.length} subcategories</Badge>
-                                                        )}
                                                     </div>
                                                 </div>
 
                                                 <div className="flex items-center gap-2 shrink-0">
-                                                    {category?.subcategories && category?.subcategories?.length > 0 && (
-                                                        <button
-                                                            aria-label={expandedCategories.includes(category.id) ? "Collapse" : "Expand"}
-                                                            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                                                            onClick={() => toggleCategory(category.id)}
-                                                        >
-                                                            <ChevronDown
-                                                                className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
-                                                                    expandedCategories.includes(category.id) ? "rotate-180" : ""
-                                                                }`}
-                                                            />
-                                                        </button>
-                                                    )}
                                                     <CategoryAction
                                                         categoriesLength={categories?.length}
                                                         category={category}
@@ -176,40 +157,6 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                                         </div>
                                     </div>
                                 </div>
-
-                                {category?.subcategories && category?.subcategories?.length > 0 && expandedCategories.includes(category.id) && (
-                                    <div className="border-t border-input bg-card">
-                                        <div className="p-6 space-y-4">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                                {category?.subcategories?.map((subcategory, idx: number) => (
-                                                    <div
-                                                        key={idx}
-                                                        className="bg-card rounded-xl p-4 border border-input hover:shadow-sm transition-shadow group"
-                                                    >
-                                                        <div className="flex items-center gap-3">
-                                                            <CategoryImage categoryId={subcategory.id} image={subcategory.image} />
-
-                                                            <div className="flex-1 min-w-0">
-                                                                <h4 className="font-medium truncate mb-1">{subcategory.name}</h4>
-                                                                <Badge variant={subcategory.is_active ? "emerald" : "destructive"} />
-                                                            </div>
-                                                            <CategoryAction
-                                                                categoriesLength={category?.subcategories?.length}
-                                                                category={subcategory}
-                                                                index={idx}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-
-                                            <Button className="w-full md:w-auto">
-                                                <Plus className="w-5 h-5" />
-                                                Add Subcategory
-                                            </Button>
-                                        </div>
-                                    </div>
-                                )}
                             </div>
                         </div>
                     ))}
@@ -218,7 +165,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                 {(!categories || categories.length === 0) && (
                     <ZeroState
                         title="No categories yet"
-                        description="Start organizing your products by creating your first category. You can add images and subcategories to make navigation easier."
+                        description="Start organizing your products by creating your first category. You can add images to make navigation easier."
                         icon={<FileImage className="w-8 h-8 text-gray-400" />}
                     />
                 )}

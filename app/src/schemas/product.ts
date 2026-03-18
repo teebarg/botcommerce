@@ -24,10 +24,6 @@ export const CategorySchema = z
         image: z.string().optional(),
         is_active: z.boolean(),
         display_order: z.number().default(0),
-        parent_id: z.number().nullable(),
-        parent: z.null(),
-        subcategories: z.array(z.any()).optional(),
-        products: z.null(),
     })
     .merge(AuditSchema);
 
@@ -37,7 +33,6 @@ export const CollectionSchema = z
         name: z.string(),
         slug: z.string(),
         is_active: z.boolean(),
-        products: z.null(),
     })
     .merge(AuditSchema);
 
@@ -65,8 +60,6 @@ export const ProductLiteSchema = z.object({
     categories: z.array(CategorySchema),
     collections: z.array(CollectionSchema),
     active: z.boolean(),
-    product_id: z.number().optional(),
-    status: ProductStatusSchema,
     is_new: z.boolean().optional(),
 });
 
@@ -80,7 +73,6 @@ export const ProductImageSchema = z.object({
 
 export const ProductVariantSchema = z.object({
     id: z.number(),
-    product_id: z.number(),
     sku: z.string(),
     status: ProductStatusSchema,
     price: z.number(),
@@ -90,9 +82,6 @@ export const ProductVariantSchema = z.object({
     color: z.string().nullable().optional(),
     measurement: z.number().nullable().optional(),
     age: z.string().nullable().optional(),
-    order_items: z.null(),
-    cart_items: z.null(),
-    product: ProductLiteSchema.optional(),
 });
 
 export const ProductSchema = z

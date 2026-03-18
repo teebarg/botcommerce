@@ -58,9 +58,6 @@ export const useDeleteGalleryImage = () => {
 export const useBulkDeleteGalleryImages = () => {
     return useMutation({
         mutationFn: async ({ imageIds }: { imageIds: number[] }) => await clientApi.post<Message>(`/gallery/bulk-delete`, { files: imageIds }),
-        onSuccess: () => {
-            toast.success("Bulk delete successfully");
-        },
         onError: (error: any) => {
             toast.error(error.message || "Failed to start bulk delete");
         },

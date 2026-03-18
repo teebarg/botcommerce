@@ -78,7 +78,7 @@ const BankDetailComponent: React.FC<BankDetailsProps> = ({ bank }) => {
                 onClose={deleteState.close}
                 onConfirm={() => handleDeleteBankDetails(bank.id)}
                 title="Delete details"
-                description="This action cannot be undone. This will permanently delete the category and all its subcategories."
+                description="This action cannot be undone. This will permanently delete your bank details."
                 isLoading={deleteMutation.isPending}
             />
         </div>
@@ -152,7 +152,3 @@ export function ShopPayments({ settings }: ShopPaymentsProps) {
         </div>
     );
 }
-function mutationFn(variables: number, context: MutationFunctionContext): Promise<Message> {
-    throw new Error("Function not implemented.");
-}
-

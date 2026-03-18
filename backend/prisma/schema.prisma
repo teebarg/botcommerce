@@ -132,6 +132,8 @@ model ActivityLog {
 
   @@index([user_id])
   @@index([created_at])
+  @@index([user_id, created_at(sort: Desc)])
+  @@index([created_at(sort: Desc), id(sort: Desc)])
   @@map("activity_logs")
 }
 
@@ -298,6 +300,8 @@ model Review {
   @@index([user_id])
   @@index([rating])
   @@index([created_at])
+  @@index([product_id, id(sort: Desc)])
+  @@index([created_at(sort: Desc), id(sort: Desc)])
   @@map("reviews")
 }
 
@@ -365,6 +369,10 @@ model Order {
   @@index([status])
   @@index([created_at])
   @@index([payment_status])
+  @@index([user_id, created_at(sort: Desc)])
+  @@index([status, created_at(sort: Desc)])
+  @@index([payment_status, created_at(sort: Desc)])
+  @@index([user_id, status])
   @@map("orders")
 }
 
@@ -493,6 +501,7 @@ model Cart {
   updated_at DateTime? @updatedAt // Used to detect abandoned carts
 
   @@index([cart_number])
+  @@index([user_id, status])
   @@map("carts")
 }
 
@@ -569,6 +578,7 @@ model Favorite {
   @@unique([user_id, product_id])
   @@index([user_id])
   @@index([created_at])
+  @@index([user_id, created_at(sort: Desc)])
   @@map("favorites")
 }
 
@@ -611,6 +621,8 @@ model Conversation {
 
   @@index([user_id, status])
   @@index([conversation_uuid])
+  @@index([status, last_active(sort: Desc)])
+  @@index([user_id, last_active(sort: Desc)])
   @@map("conversations")
 }
 
@@ -624,6 +636,7 @@ model Message {
   metadata        Json?
 
   @@index([conversation_id, timestamp])
+  @@index([conversation_id, id(sort: Desc)])
   @@map("messages")
 }
 
@@ -687,6 +700,8 @@ model UserInteraction {
   @@index([user_id, type])
   @@index([product_id, type])
   @@index([timestamp])
+  @@index([user_id, type, timestamp(sort: Desc)])
+  @@index([product_id, type, timestamp(sort: Desc)])
   @@map("user_interactions")
 }
 
@@ -763,5 +778,6 @@ model WalletTransaction {
 
   @@index([user_id])
   @@index([type])
+  @@index([user_id, created_at(sort: Desc)])
   @@map("wallet_transactions")
 }

@@ -42,13 +42,7 @@ const CategoryAction: React.FC<Props> = ({ category, index, categoriesLength, on
                 }
                 onOpenChange={editState.setOpen}
             >
-                <CategoryForm
-                    current={category}
-                    hasParent={!!category?.parent_id}
-                    parent_id={category?.parent_id}
-                    type="update"
-                    onClose={editState.close}
-                />
+                <CategoryForm current={category} type="update" onClose={editState.close} />
             </SheetDrawer>
             <Button
                 className={cn("", index === 0 ? "opacity-50 cursor-not-allowed" : "")}
@@ -81,7 +75,7 @@ const CategoryAction: React.FC<Props> = ({ category, index, categoriesLength, on
                 onClose={deleteState.close}
                 onConfirm={onConfirmDelete}
                 title={`Delete ${category.name}`}
-                description="This action cannot be undone. This will permanently delete the category and all its subcategories."
+                description="This action cannot be undone. This will permanently delete the category."
                 isLoading={deleteMutation.isPending}
             />
         </div>
