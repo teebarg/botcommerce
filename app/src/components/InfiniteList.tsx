@@ -5,10 +5,6 @@ interface InfiniteListProps {
     onLoadMore: () => void;
     hasMore: boolean;
     isLoading: boolean;
-    /**
-     * Distance (px) before reaching the bottom
-     * that triggers prefetch
-     */
     preloadOffset?: number;
     loader?: React.ReactNode;
     endMessage?: React.ReactNode;
@@ -20,7 +16,7 @@ export function InfiniteList({
     onLoadMore,
     hasMore,
     isLoading,
-    preloadOffset = 800,
+    preloadOffset = 1200,
     loader = <div className="py-10 text-center text-muted-foreground">Loading…</div>,
     endMessage = null,
     className = "",

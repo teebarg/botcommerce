@@ -107,7 +107,7 @@ async def reindex_images(background_tasks: BackgroundTasks) -> Message:
     Re-index all images in the db to Meilisearch.
     """
     try:
-        # await invalidate_pattern("gallery")
+        await invalidate_pattern("gallery")
         background_tasks.add_task(index_products)
         return Message(message="Re-indexing task enqueued...........")
     except Exception as e:

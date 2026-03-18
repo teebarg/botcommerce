@@ -76,6 +76,10 @@ function RouteComponent() {
             setIsLoading(true);
         }
 
+        if (lastMessage?.type === "bulk_action" && lastMessage?.status === "processing" && !isLoading) {
+            setIsLoading(true);
+        }
+
         if (lastMessage?.type === "bulk_action" && lastMessage?.status === "completed") {
             setSelectedImages(new Set());
             setSelectionMode(false);
