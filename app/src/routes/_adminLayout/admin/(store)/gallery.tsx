@@ -10,7 +10,7 @@ import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
 import type { PaginatedProductImages, ProductImage } from "@/schemas";
 import { useWebSocket } from "pulsews";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { clientApi } from "@/utils/api.client";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
@@ -37,6 +37,7 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/gallery")({
 });
 
 function RouteComponent() {
+    const queryClient = useQueryClient();
     const params = Route.useSearch();
     const { data } = useQuery(galleryQuery(params));
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -81,8 +82,10 @@ function RouteComponent() {
         }
 
         if (lastMessage?.type === "bulk_action" && lastMessage?.status === "completed") {
+            queryClient.invalidateQueries({ queryKey: ["gallery"] });
             setSelectedImages(new Set());
             setSelectionMode(false);
+            setIsLoading(false);
         }
     }, [lastMessage, isLoading]);
 
@@ -108,7 +111,7 @@ function RouteComponent() {
         } catch (error) {
             toast.error("Failed to delete images", { description: "Failed to delete images, contact support" });
         } finally {
-            setSelectedImages(new Set());
+            // setSelectedImages(new Set());
         }
     };
 

@@ -14,8 +14,6 @@ class ProductImage(BaseModel):
 
 class ProductVariant(BaseModel):
     id: int
-    sku: str
-    product_id: int
     status: ProductStatus
     price: float
     old_price: Optional[float] = 0.0
@@ -70,7 +68,7 @@ class ProductLite(BaseModel):
     description: Optional[str] = None
     # image: Optional[str] = None
     variants: Optional[List[ProductVariant]] = None
-    ratings: float
+    # ratings: float
     categories: Optional[List[Category]] = []
     collections: Optional[List[Collection]] = []
     active: Optional[bool] = True

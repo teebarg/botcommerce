@@ -25,7 +25,7 @@ from app.services.redis import cache_response
 from app.services.recently_viewed import RecentlyViewedService
 from app.services.websocket import manager
 from app.services.generic import remove_image_from_storage
-from app.services.redis import invalidate_pattern
+from app.services.redis import invalidate_pattern, invalidate_keys
 from app.models.gallery import PaginatedProductImages
 from app.core.permissions import require_admin
 
@@ -74,31 +74,112 @@ async def image_gallery(
     Image gallery endpoint using cursor-based pagination.
     """
     try:
-        images = await db.productimage.find_many(
-            where={"order": 0},
-            take=limit + 1,
-            skip=1 if cursor else 0,
-            cursor={"id": cursor} if cursor else None,
-            order={"id": "desc"},
-            include={
-                "product": {
-                    "include": {
-                        "categories": True,
-                        "collections": True,
-                        "variants": True,
-                    }
-                }
-            },
+        images = await db.query_raw(
+            """
+            SELECT 
+                pi.id,
+                pi.image,
+                pi."order",
+                pi.product_id,
+                p.id          AS p_id,
+                p.name        AS p_name,
+                p.slug        AS p_slug,
+                p.active      AS p_active,
+                p.is_new      AS p_is_new,
+                -- variants as json array
+                COALESCE(
+                    JSON_AGG(
+                        DISTINCT JSONB_BUILD_OBJECT(
+                            'id', pv.id,
+                            'product_id', pv.product_id,
+                            'price', pv.price,
+                            'old_price', pv.old_price,
+                            'inventory', pv.inventory,
+                            'status', pv.status,
+                            'size', pv.size,
+                            'color', pv.color,
+                            'measurement', pv.measurement,
+                            'age', pv.age
+                        )
+                    ) FILTER (WHERE pv.id IS NOT NULL),
+                    '[]'
+                ) AS variants,
+                -- categories as json array
+                COALESCE(
+                    JSON_AGG(
+                        DISTINCT JSONB_BUILD_OBJECT(
+                            'id', pc.id,
+                            'name', pc.name,
+                            'slug', pc.slug
+                        )
+                    ) FILTER (WHERE pc.id IS NOT NULL),
+                    '[]'
+                ) AS categories,
+                -- collections as json array
+                COALESCE(
+                    JSON_AGG(
+                        DISTINCT JSONB_BUILD_OBJECT(
+                            'id', col.id,
+                            'name', col.name,
+                            'slug', col.slug
+                        )
+                    ) FILTER (WHERE col.id IS NOT NULL),
+                    '[]'
+                ) AS collections
+            FROM "product_images" pi
+            LEFT JOIN "products" p 
+                ON p.id = pi.product_id
+            LEFT JOIN "product_variants" pv 
+                ON pv.product_id = p.id
+            LEFT JOIN "_ProductCategories" cp 
+                ON cp."B" = p.id
+            LEFT JOIN "categories" pc 
+                ON pc.id = cp."A"
+            LEFT JOIN "_ProductCollections" clp 
+                ON clp."B" = p.id
+            LEFT JOIN "collections" col 
+                ON col.id = clp."A"
+            WHERE pi."order" = 0
+            AND pi.id < $1
+            GROUP BY pi.id, p.id
+            ORDER BY pi.id DESC
+            LIMIT $2
+            """,
+            cursor or 2147483647,
+            limit + 1,
         )
-        items = images[:limit]
-        return {
-            "items": items,
-            "next_cursor": items[-1].id if len(images) > limit and items else None,
-            "limit": limit
-        }
 
+        has_more: bool = len(images) > limit
+        items = images[:limit]
+
+        shaped = [
+            {
+                "id": img["id"],
+                "image": img["image"],
+                "order": img["order"],
+                "product_id": img["product_id"],
+                "product": {
+                    "id": img["p_id"],
+                    "name": img["p_name"],
+                    "slug": img["p_slug"],
+                    "active": img["p_active"],
+                    "is_new": img["p_is_new"],
+                    "categories": img["categories"],
+                    "collections": img["collections"],
+                    "variants": img["variants"],
+                } if img["p_id"] else None,
+            }
+            for img in items
+        ]
+
+        result = {
+            "items": shaped,
+            "next_cursor": items[-1]["id"] if has_more and items else None,
+            "limit": limit,
+        }
+        return result
     except Exception as e:
-        logger.error(e)
+        logger.error(f"Gallery fetch error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/reindex", dependencies=[Depends(require_admin)])
@@ -227,7 +308,7 @@ async def bulk_delete_gallery_images(
                 where={"id": {"in": [img.id for img in images]}}
             )
 
-            await invalidate_pattern("gallery")
+            await invalidate_keys("gallery")
             await manager.broadcast_to_all(
                 data={"status": "completed"},
                 message_type="bulk_action"

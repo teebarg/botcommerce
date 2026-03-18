@@ -21,7 +21,7 @@ router = APIRouter()
 @cache_response(key_prefix="products:home", key="home")
 async def get_home_categories_products(request: Request) -> list[CategoryWithProducts]:
     categories = await db.category.find_many(
-        where={"is_active": True, "parent_id": None},
+        where={"is_active": True},
         order={"display_order": "asc"},
         include={"products": {"include": {"variants": True, "images": True}, "take": 6, "orderBy": {"id": "desc"}}},
         take=4
@@ -41,7 +41,7 @@ async def index(
     """
     Retrieve all categories.
     """
-    where_clause = {"parent_id": None}
+    where_clause = {}
     if query:
         where_clause = {
             "OR": [

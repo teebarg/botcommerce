@@ -12,7 +12,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 const CategoryFormSchema = z.object({
     name: z.string().min(1, "Name is required"),
     is_active: z.boolean().default(true),
-    parent_id: z.number().nullable().optional(),
 });
 
 export type CategoryFormValues = z.infer<typeof CategoryFormSchema>;
@@ -21,21 +20,18 @@ interface Props {
     current?: Category;
     type?: "create" | "update";
     onClose?: () => void;
-    hasParent?: boolean;
-    parent_id?: number | null;
 }
 
 type ChildRef = {};
 
-const CategoryForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, current, hasParent = false, parent_id = null }, ref) => {
+const CategoryForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, current }, ref) => {
     const isCreate = type === "create";
     const defaultValues = React.useMemo<CategoryFormValues>(
         () => ({
             name: current?.name || "",
             is_active: current?.is_active ?? true,
-            parent_id: hasParent && parent_id ? parent_id : (current?.parent_id ?? null),
         }),
-        [current, parent_id, hasParent]
+        [current]
     );
 
     const form = useForm<CategoryFormValues>({
@@ -99,7 +95,6 @@ const CategoryForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
                             </FormItem>
                         )}
                     />
-                    {/* {hasParent && parent_id && <input type="hidden" {...form.register("parent_id", { value: parent_id })} />} */}
                 </div>
                 <div className="sheet-footer">
                     <Button aria-label="cancel" className="min-w-32" disabled={isPending} type="button" variant="destructive" onClick={onClose}>

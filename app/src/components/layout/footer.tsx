@@ -50,7 +50,7 @@ export default function Footer() {
     const { data: collections } = useCollections();
 
     const { data: cat } = useCategories();
-    const categories = cat?.filter((cat: Category) => !cat.parent_id).slice(0, 6);
+    const categories = cat?.slice(0, 6);
 
     return (
         <footer className="flex w-full flex-col pb-12 border-t border-border/50">
@@ -131,21 +131,6 @@ export default function Footer() {
                                                 >
                                                     {c.name}
                                                 </LocalizedClientLink>
-                                                {c.subcategories && c.subcategories?.length > 0 && (
-                                                    <ul className="ml-4 space-y-2">
-                                                        {c.subcategories?.map((child: Category) => (
-                                                            <li key={child.id}>
-                                                                <LocalizedClientLink
-                                                                    className="text-sm hover:text-primary transition-colors"
-                                                                    data-testid="category-link"
-                                                                    href={`/collections?cat_ids=${child.slug}`}
-                                                                >
-                                                                    {child.name}
-                                                                </LocalizedClientLink>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                )}
                                             </li>
                                         );
                                     })}

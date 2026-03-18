@@ -103,6 +103,20 @@ activate-env-windows:
 activate-env:
 	source .venv/bin/activate
 
+# prisma helpers
+.PHONY: dpf
+dpf:
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) prisma format
+
+.PHONY: dpg
+dpg:
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) prisma generate
+
+.PHONY: dpm
+dpm:
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) prisma migrate dev
+
+
 .PHONY: help
 help:
 	@echo "Available commands:"
