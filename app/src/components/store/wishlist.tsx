@@ -20,17 +20,13 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, slug, name, images }) =
     };
 
     return (
-        <div className="relative flex max-w-full flex-none flex-col gap-3 rounded-1xl md:bg-card w-full snap-start h-full" id={id.toString()}>
-            <div className="relative flex max-h-full w-full flex-col items-center overflow-hidden rounded-xl h-64 md:h-80 justify-between">
-                <div className="relative md:rounded-1xl z-0 h-full w-full overflow-visible">
-                    {images?.[0] && <ImageDisplay alt={name} url={images?.[0].image} />}
-                </div>
+        <div id={id.toString()} className="relative group md:bg-card">
+            <div className="relative aspect-[3/4] overflow-hidden bg-secondary" style={{ boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.05)" }}>
+                {images?.[0] && <ImageDisplay alt={name} url={images?.[0].image} />}
             </div>
-            <div className="space-y-1 px-1">
-                <Link className="font-medium line-clamp-1 text-lg" to="/products/$slug" params={{ slug }}>
-                    {name}
-                </Link>
-            </div>
+            <Link className="font-medium line-clamp-1 text-sm mt-1" to="/products/$slug" params={{ slug }}>
+                {name}
+            </Link>
             <button aria-label="remove from wishlist" className="absolute top-2 right-2 cursor-pointer" onClick={onRemove}>
                 <Heart className="w-10 h-10 fill-primary text-transparent" />
             </button>

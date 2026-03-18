@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { LayoutDashboard, RectangleVertical } from "lucide-react";
 import { GalleryCard } from "@/components/admin/product/gallery-card";
@@ -38,6 +38,7 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/gallery")({
 
 function RouteComponent() {
     const queryClient = useQueryClient();
+    const toastId = useRef<string | number | undefined>(undefined);
     const params = Route.useSearch();
     const { data } = useQuery(galleryQuery(params));
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -77,13 +78,13 @@ function RouteComponent() {
             setIsLoading(true);
         }
 
-        if (lastMessage?.type === "bulk_action" && lastMessage?.status === "processing" && !isLoading) {
-            setIsLoading(true);
+        if (lastMessage?.type === "bulk_action" && lastMessage?.status === "processing") {
+            toastId.current = toast.loading("Processing...");
         }
 
         if (lastMessage?.type === "bulk_action" && lastMessage?.status === "completed") {
             queryClient.invalidateQueries({ queryKey: ["gallery"] });
-            setSelectedImages(new Set());
+            toast.success("Done!", { id: toastId.current });
             setSelectionMode(false);
             setIsLoading(false);
         }
@@ -111,7 +112,7 @@ function RouteComponent() {
         } catch (error) {
             toast.error("Failed to delete images", { description: "Failed to delete images, contact support" });
         } finally {
-            // setSelectedImages(new Set());
+            setSelectedImages(new Set());
         }
     };
 
@@ -179,6 +180,7 @@ function RouteComponent() {
                             renderItem={(item: ProductImage, idx: number) => (
                                 <GalleryCard
                                     key={idx}
+                                    index={idx}
                                     image={item}
                                     isSelected={selectedImages.has(item?.id)}
                                     selectionMode={selectionMode}

@@ -1,52 +1,66 @@
 import { GalleryCardActions } from "./gallery-card-actions";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { cn, currency } from "@/utils";
 import type { Collection, ProductImage, ProductVariantLite } from "@/schemas";
 import MediaDisplay from "@/components/media-display";
 import { IsNew } from "@/components/products/product-badges";
+import { useState } from "react";
+import { motion } from "framer-motion";
+import ImageLightbox from "@/components/ImageLightbox";
 
 interface GalleryCardProps {
     image: ProductImage;
-    onClick?: () => void;
     isSelected?: boolean;
     onSelectionChange?: (imageId: number, selected: boolean) => void;
     selectionMode?: boolean;
+    index?: number;
 }
 
-export function GalleryCard({ image, onClick, isSelected = false, onSelectionChange, selectionMode = false }: GalleryCardProps) {
+export function GalleryCard({ image, isSelected = false, onSelectionChange, selectionMode = false, index = 0 }: GalleryCardProps) {
+    const [lightboxOpen, setLightboxOpen] = useState<boolean>(false);
+
+    const isProductInactive =
+        !image.product?.active || image.product?.variants?.length == 0 || image.product?.variants?.every((v) => v.inventory <= 0);
+
     if (!image) return;
-    
+
     const handleSelectionChange = (checked: boolean) => {
+        if (!selectionMode) {
+            setLightboxOpen(true);
+            return;
+        }
         onSelectionChange?.(image.id, checked);
     };
 
     return (
-        <Card
-            className={cn(
-                "group relative overflow-hidden border-0 bg-linear-to-br from-card to-muted/20 backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer",
-                image.product?.active ? "opacity-100" : "opacity-50 ring-2 ring-red-500",
-                isSelected && "ring-2 ring-primary/40 ring-offset-2"
-            )}
-            onClick={selectionMode ? undefined : onClick}
-        >
-            <CardContent className="p-0 md:p-0">
-                <div className="relative overflow-hidden aspect-gallery">
+        <>
+            <motion.div
+                className={cn(
+                    "relative group overflow-hidden bg-background",
+                    isProductInactive ? "ring-2 ring-red-500 opacity-50" : "",
+                    isSelected && "ring-2 ring-indigo-900 ring-offset-2"
+                )}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05, duration: 0.3 }}
+                viewport={{ once: true }}
+            >
+                <div
+                    className="relative aspect-[3/4] overflow-hidden bg-secondary"
+                    style={{ boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.05)" }}
+                    onClick={() => handleSelectionChange(!isSelected)}
+                >
                     <MediaDisplay url={image.image} alt={image.product?.name || ""} />
-                    <div
-                        className={cn(
-                            "absolute top-2 left-2 z-10 opacity-0 lg:opacity-100 transition-opacity duration-300",
-                            selectionMode ? "opacity-100" : ""
-                        )}
-                    >
-                        <Checkbox checked={isSelected} onCheckedChange={handleSelectionChange} />
-                    </div>
-
+                    {image.product && (
+                        <div className="absolute top-2 left-1/2 -translate-x-1/2">
+                            <Badge variant="indigo" className="text-base font-bold">
+                                {currency(image.product.variants?.[0]?.price || 0)}
+                            </Badge>
+                        </div>
+                    )}
                     <div className="absolute inset-0 bg-black/20 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                         {!selectionMode && <GalleryCardActions image={image} />}
                     </div>
-
                     <div className="absolute top-2 left-2 flex flex-wrap gap-1">
                         {image.product?.collections?.slice(0, 2).map((item: Collection, idx: number) => (
                             <Badge key={idx} variant="warning">
@@ -61,7 +75,6 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
                             </Badge>
                         ))}
                     </div>
-
                     {image.product?.variants?.[0]?.age && (
                         <div className="absolute top-2 right-2 flex flex-wrap gap-1">
                             {image.product?.variants?.map((item: ProductVariantLite, idx: number) => (
@@ -71,23 +84,10 @@ export function GalleryCard({ image, onClick, isSelected = false, onSelectionCha
                             ))}
                         </div>
                     )}
-
                     {image.product?.is_new && <IsNew className="bottom-0 right-1 top-auto left-auto" />}
-
-                    <div className="absolute bottom-2 left-2 flex flex-wrap gap-1">
-                        {image.product?.variants?.length == 0 ||
-                            (image.product?.variants?.every((v) => v.inventory <= 0) && <Badge variant="destructive">Out of stock</Badge>)}
-                    </div>
-
-                    {image.product && (
-                        <div className="absolute top-2 left-1/2 -translate-x-1/2">
-                            <Badge variant="indigo" className="text-base font-bold">
-                                {currency(image.product.variants?.[0]?.price || 0)}
-                            </Badge>
-                        </div>
-                    )}
                 </div>
-            </CardContent>
-        </Card>
+            </motion.div>
+            <ImageLightbox image={lightboxOpen ? image.image : null} onClose={() => setLightboxOpen(false)} />
+        </>
     );
 }

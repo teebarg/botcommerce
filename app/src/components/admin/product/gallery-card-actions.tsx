@@ -4,30 +4,21 @@ import { ProductSheetForm } from "./product-form-sheet";
 import { Button } from "@/components/ui/button";
 import type { ProductImage } from "@/schemas";
 import Overlay from "@/components/overlay";
-import { useDeleteGalleryImage } from "@/hooks/useGallery";
 
 interface GalleryCardActionProps {
     image: ProductImage;
 }
 
 export function GalleryCardActions({ image }: GalleryCardActionProps) {
-    const { mutateAsync: deleteImage } = useDeleteGalleryImage();
     const editState = useOverlayTriggerState({});
-    const deleteState = useOverlayTriggerState({});
-
-    const handleDelete = async () => {
-        deleteImage({ id: image.id }).finally(() => {
-            deleteState.close();
-        });
-    };
 
     return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
             <Overlay
                 open={editState.isOpen}
-                title="Create Metadata"
+                title="Update Metadata"
                 trigger={
-                    <Button className="bg-white/90 text-black hover:bg-white p-2" size="icon" onClick={editState.open}>
+                    <Button className="bg-white/90 text-black hover:bg-white p-2" size="icon">
                         <Edit2 className="h-4 w-4" />
                     </Button>
                 }
