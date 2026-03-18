@@ -67,9 +67,7 @@ class ProductLite(BaseModel):
     sku: Optional[str] = None
     slug: str
     description: Optional[str] = None
-    # image: Optional[str] = None
     variants: Optional[List[ProductVariant]] = None
-    # ratings: float
     categories: Optional[List[Category]] = []
     collections: Optional[List[Collection]] = []
     active: Optional[bool] = True

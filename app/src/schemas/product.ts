@@ -60,8 +60,6 @@ export const ProductLiteSchema = z.object({
     categories: z.array(CategorySchema),
     collections: z.array(CollectionSchema),
     active: z.boolean(),
-    product_id: z.number().optional(),
-    status: ProductStatusSchema,
     is_new: z.boolean().optional(),
 });
 
