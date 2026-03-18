@@ -183,10 +183,11 @@ async def invalidate_product_cache(keys: List[str] = None):
     )
     await manager.broadcast_to_all(data={"key": "products"}, message_type="invalidate")
     if keys:
-        tasks = []
+        # tasks = []
         for key in keys:
-            tasks.append(invalidate_key_only(key))
-        await asyncio.gather(*tasks)
+            # tasks.append(invalidate_key_only(key))
+            await invalidate_key_only(key)
+        # await asyncio.gather(*tasks)
         await manager.broadcast_to_all(
             data={"keys": keys},
             message_type="invalidate",
