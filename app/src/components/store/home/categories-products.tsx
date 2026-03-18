@@ -43,8 +43,8 @@ export default function CategoriesWithProductsSection() {
                         </div>
 
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                            {category.products.map((product: ProductSearch, index: number) => (
-                                <ProductCardPLP key={product.id} product={product} index={index} />
+                            {category.products.map((product: ProductSearch) => (
+                                <ProductCardPLP key={product.id} product={product} />
                             ))}
                         </div>
                     </motion.div>

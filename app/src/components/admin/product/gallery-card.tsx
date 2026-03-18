@@ -13,10 +13,9 @@ interface GalleryCardProps {
     isSelected?: boolean;
     onSelectionChange?: (imageId: number, selected: boolean) => void;
     selectionMode?: boolean;
-    index?: number;
 }
 
-export function GalleryCard({ image, isSelected = false, onSelectionChange, selectionMode = false, index = 0 }: GalleryCardProps) {
+export function GalleryCard({ image, isSelected = false, onSelectionChange, selectionMode = false }: GalleryCardProps) {
     const [lightboxOpen, setLightboxOpen] = useState<boolean>(false);
 
     const isProductInactive =
@@ -42,7 +41,7 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
                 )}
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05, duration: 0.3 }}
+                transition={{ delay: 0.05, duration: 0.3 }}
                 viewport={{ once: true }}
             >
                 <div

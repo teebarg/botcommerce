@@ -10,10 +10,9 @@ import ImageLightbox from "@/components/ImageLightbox";
 
 interface ProductCardProps {
     product: ProductSearch;
-    index?: number;
 }
 
-const ProductCardPLP: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
+const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
     const [lightboxOpen, setLightboxOpen] = useState<boolean>(false);
     const { priceInfo, outOfStock } = useProductVariant(product);
 
@@ -23,7 +22,7 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
                 className="relative group overflow-hidden bg-background"
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05, duration: 0.3 }}
+                transition={{ delay: 0.1, duration: 0.3 }}
                 viewport={{ once: true }}
             >
                 {Boolean(priceInfo.maxDiscountPercent) && (
