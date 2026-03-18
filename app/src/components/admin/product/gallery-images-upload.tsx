@@ -86,9 +86,9 @@ export function GalleryImagesUpload() {
                     {isPending ? "Saving..." : "Complete"}
                 </Button>
             )}
-            <Button className="min-w-32" disabled={isReIndexing} isLoading={isReIndexing} variant="emerald" onClick={() => reIndexGallery()}>
+            {/* <Button className="min-w-32" disabled={isReIndexing} isLoading={isReIndexing} variant="emerald" onClick={() => reIndexGallery()}>
                 Re-index
-            </Button>
+            </Button> */}
         </div>
     );
 }
