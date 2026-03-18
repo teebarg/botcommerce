@@ -41,7 +41,7 @@ const OrderDetails = ({ order }: OrderDetailsProps) => {
                                     <div key={idx}>
                                         <div className="flex items-center gap-4">
                                             <div className="h-36 w-36 relative group-hover:scale-105 transition-transform duration-200 rounded-lg overflow-hidden">
-                                                {item.image && <ImageDisplay alt={item.variant?.product?.name || item.image} url={item.image} />}
+                                                {item.image && <ImageDisplay alt={item.image} url={item.image} />}
                                             </div>
                                             <div className="flex-1">
                                                 <h4 className="font-medium">{item.name}</h4>

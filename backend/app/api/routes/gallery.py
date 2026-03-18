@@ -91,6 +91,7 @@ async def image_gallery(
                     JSON_AGG(
                         DISTINCT JSONB_BUILD_OBJECT(
                             'id', pv.id,
+                            'sku', pv.sku,
                             'product_id', pv.product_id,
                             'price', pv.price,
                             'old_price', pv.old_price,

@@ -14,6 +14,7 @@ class ProductImage(BaseModel):
 
 class ProductVariant(BaseModel):
     id: int
+    sku: str
     status: ProductStatus
     price: float
     old_price: Optional[float] = 0.0

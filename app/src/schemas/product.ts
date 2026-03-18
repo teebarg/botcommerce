@@ -75,8 +75,7 @@ export const ProductImageSchema = z.object({
 
 export const ProductVariantSchema = z.object({
     id: z.number(),
-    // product_id: z.number(),
-    // sku: z.string(),
+    sku: z.string(),
     status: ProductStatusSchema,
     price: z.number(),
     old_price: z.number(),
@@ -85,9 +84,6 @@ export const ProductVariantSchema = z.object({
     color: z.string().nullable().optional(),
     measurement: z.number().nullable().optional(),
     age: z.string().nullable().optional(),
-    // order_items: z.null(),
-    // cart_items: z.null(),
-    // product: ProductLiteSchema.optional(),
 });
 
 export const ProductSchema = z

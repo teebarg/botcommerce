@@ -369,9 +369,9 @@ model Order {
   @@index([status])
   @@index([created_at])
   @@index([payment_status])
-  @@index([user_id, created_at(sort: Desc)]) // user orders list, sorted by date
-  @@index([status, created_at(sort: Desc)]) // admin orders filtered by status
-  @@index([payment_status, created_at(sort: Desc)]) // payment status filter
+  @@index([user_id, created_at(sort: Desc)])
+  @@index([status, created_at(sort: Desc)])
+  @@index([payment_status, created_at(sort: Desc)])
   @@index([user_id, status])
   @@map("orders")
 }
