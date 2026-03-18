@@ -22,7 +22,7 @@ export default function InfiniteScrollClient({ initialData, collection_slug, sea
     });
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useProductFeed(initialData, {
         ...search,
-        show_facets: true,
+        // show_facets: true,
         collections: collection_slug,
         search: searchTerm,
     });

@@ -182,7 +182,7 @@ export function FilterSidebar({ facets, onApplyComplete }: Props) {
                         defaultValue={[Number(search.min_price ?? 1000), Number(search.max_price ?? 50000)]}
                         label="Price Range"
                         max={100000}
-                        min={0}
+                        min={1}
                         step={500}
                         onChange={onPriceChange}
                     />

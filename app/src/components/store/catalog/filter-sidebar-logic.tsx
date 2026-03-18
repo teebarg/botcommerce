@@ -36,7 +36,7 @@ type DraftFilters = {
 };
 
 const DEFAULT_DRAFT = {
-    sort: "created_at:desc",
+    sort: "id:desc",
     sizes: new Set<string>(),
     colors: new Set<string>(),
     ages: new Set<string>(),
@@ -49,12 +49,12 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
     const search = useSearch({ strict: false });
     const filters = useMemo(() => {
         return {
-            sort: search.sort ?? "created_at:desc",
+            sort: search.sort ?? "id:desc",
             sizes: new Set(search.sizes?.toString()?.split(",").filter(Boolean)),
             colors: new Set(search.colors?.split(",").filter(Boolean)),
             ages: new Set(search.ages?.split(",").filter(Boolean)),
             categories: new Set(search.cat_ids?.split(",").filter(Boolean)),
-            minPrice: search.min_price?.toString() ?? "0",
+            minPrice: search.min_price?.toString() ?? "1",
             maxPrice: search.max_price?.toString() ?? "50000",
         };
     }, [search]);
@@ -74,7 +74,7 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
         age: true,
     });
 
-    const [sort, setSort] = useState(() => search?.sort || "created_at:desc");
+    const [sort, setSort] = useState(() => search?.sort || "id:desc");
 
     const toggleSection = (section: keyof typeof openSections) => {
         setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
