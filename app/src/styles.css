@@ -587,4 +587,9 @@
     .margin-safe {
         margin-top: calc(var(--sat) + 64px);
     }
+    iframe[data-test="uw-iframe"] {
+        top: var(--sat) !important;
+        bottom: var(--sab) !important;
+        height: calc(100% - var(--sat) - var(--sab)) !important;
+    }
 }
