@@ -179,8 +179,8 @@ class ImageMetadata(BaseModel):
     inventory: Optional[int] = None
     active: Optional[bool] = None
     is_new: Optional[bool] = None
-    price: Optional[float] = 0
-    old_price: Optional[float] = 0
+    price: Optional[float] = None
+    old_price: Optional[float] = None
 
 class ImagesBulkUpdate(BaseModel):
     image_ids: List[int]
