@@ -37,7 +37,7 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
                     onClick={() => setLightboxOpen(true)}
                 >
                     <img
-                        src={product.images?.[0] || "/placeholder.jpg"}
+                        src={product.image || "/placeholder.jpg"}
                         className="object-cover w-full h-full transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:scale-105"
                         alt={product.name}
                         loading="lazy"
@@ -55,7 +55,7 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
 
                 <ProductCardActions product={product} actionColor="bg-gradient-action" />
             </motion.div>
-            <ImageLightbox image={lightboxOpen ? product.images?.[0] : null} onClose={() => setLightboxOpen(false)} />
+            <ImageLightbox image={lightboxOpen ? product.image : null} onClose={() => setLightboxOpen(false)} />
         </>
     );
 };

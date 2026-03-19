@@ -26,7 +26,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale" }) 
         <>
             <div className="shrink-0 cursor-pointer group w-60 md:w-72">
                 <div onClick={() => setLightboxOpen(true)} className="relative rounded-2xl overflow-hidden shadow-card h-80 md:h-96">
-                    <MediaDisplay url={product.images?.[0]} alt={product.name} className="transition-transform duration-500 group-hover:scale-110" />
+                    <MediaDisplay url={product.image} alt={product.name} className="transition-transform duration-500 group-hover:scale-110" />
                     <DiscountBadge
                         discount={priceInfo.maxDiscountPercent}
                         isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice}
@@ -70,7 +70,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale" }) 
 
                 <ProductCardActions product={product} actionColor="bg-gradient-action" />
             </div>
-            <ImageLightbox image={lightboxOpen ? product.images?.[0] : null} onClose={() => setLightboxOpen(false)} />
+            <ImageLightbox image={lightboxOpen ? product.image : null} onClose={() => setLightboxOpen(false)} />
         </>
     );
 };
