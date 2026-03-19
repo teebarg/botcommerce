@@ -427,14 +427,6 @@ async def logout(request: Request, response: Response):
 
 @router.post("/exchange")
 async def exchange_token(response: Response, payload=Depends(verify_clerk_token)):
-    # auth_header = request.headers.get("Authorization")
-
-    # if not auth_header:
-    #     raise HTTPException(401, "Missing token")
-
-    # token = auth_header.split(" ")[1]
-    # payload = verify_clerk_token(token)
-
     session_id = str(uuid.uuid4())
 
     clerk_id = payload["sub"]

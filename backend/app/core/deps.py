@@ -1,7 +1,7 @@
 from typing import Annotated, Literal, Optional
 
 import jwt
-from fastapi import Depends, HTTPException, status, Request, Cookie
+from fastapi import Depends, HTTPException, status, Cookie
 from fastapi.security import APIKeyHeader, OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, ValidationError
 
@@ -86,25 +86,6 @@ async def verify_clerk_token(token: Annotated[str | None, Depends(APIKeyHeader(n
     return payload
 
 
-async def verify_clerk_token2(token: Annotated[str | None, Depends(APIKeyHeader(name="X-Auth"))]):
-    if not token:
-        return None
-
-    jwks = await get_jwks()
-    try:
-        payload = jose_jwt.decode(
-            token,
-            jwks,
-            algorithms=["RS256"],
-            issuer=settings.CLERK_ISSUER_URL,
-            options={"verify_aud": False},
-        )
-    except Exception:
-        return None
-
-    return payload
-
-
 async def get_internal_service(
     credentials: HTTPAuthorizationCredentials | None = Depends(internal_bearer),
 ) -> ServicePrincipal | None:
@@ -130,51 +111,22 @@ async def get_internal_service(
             detail="Invalid service token",
         )
 
-# async def get_user(payload=Depends(verify_clerk_token2)) -> User | None:
-#     if not payload:
-#         return None
-
-#     clerk_id = payload["sub"]
-#     user = await prisma.user.find_unique(
-#         where={"clerk_id": clerk_id}
-#     )
-
-#     if not user:
-#         user = await prisma.user.upsert(
-#             where={"email": payload["email"]},
-#             data={
-#                 "create": {"clerk_id": clerk_id, "email": payload["email"], "first_name": payload.get("firstName"), "last_name": payload.get("lastName"), "hashed_password": "dkkdkdkkdkdkd22h3s"},
-#                 "update": {"clerk_id": clerk_id},
-#             },
-#         )
-#     return user
-
 
 async def verify_session(session_id: Annotated[str | None, Cookie()] = None) -> User | None:
-    # session_id = request.cookies.get("session_id")
-    print("🚀 ~ session_id: get_user", session_id)
-
     if not session_id:
         raise HTTPException(401, "Missing session cookie")
 
     session = await get_session(session_id)
-    print("🚀 ~ session: get_user", session)
-
     if not session:
         raise HTTPException(401, "Invalid session")
 
     return session
 
 async def get_user(session_id: Annotated[str | None, Cookie()] = None) -> User | None:
-    # session_id = request.cookies.get("session_id")
-    print("🚀 ~ session_id: get_user", session_id)
-
     if not session_id:
         return None
 
     session = await get_session(session_id)
-    print("🚀 ~ session: get_user", session)
-
     if not session:
         return None
 
@@ -186,40 +138,13 @@ async def get_user(session_id: Annotated[str | None, Cookie()] = None) -> User |
 
 UserDep = Annotated[User | None, Depends(get_user)]
 
-# async def get_current_user(payload=Depends(verify_clerk_token)) -> User:
-#     clerk_id = payload["sub"]
-
-#     user = await prisma.user.find_unique(
-#         where={"clerk_id": clerk_id}
-#     )
-
-#     if not user:
-#         user = await prisma.user.upsert(
-#             where={"email": payload["email"]},
-#             data={
-#                 "create": {"clerk_id": clerk_id, "email": payload["email"], "first_name": payload.get("firstName"), "last_name": payload.get("lastName"), "hashed_password": "dkkdkdkkdkdkd22h3s"},
-#                 "update": {"clerk_id": clerk_id},
-#             },
-#         )
-
-#     return user
-
-async def get_current_user(session_id: Annotated[str | None, Cookie()] = None):
-    # session_id = request.cookies.get("session_id")
-    print("🚀 ~ session_id: get_current_user", session_id)
-
-    if not session_id:
-        raise HTTPException(401)
-
-    session = await get_session(session_id)
-    print("🚀 ~ session:", session)
-
-    if not session:
-        raise HTTPException(401)
-
+async def get_current_user(session=Depends(verify_session)) -> User:
     user = await prisma.user.find_unique(
         where={"id": session.get("id")}
     )
+
+    if not user:
+        raise HTTPException(401, "User not found")
 
     return user
 

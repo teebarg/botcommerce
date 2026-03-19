@@ -62,7 +62,7 @@ const config = defineConfig({
                 ],
             },
             devOptions: {
-                enabled: false,
+                enabled: true,
                 type: "module",
             },
         }),

@@ -19,6 +19,6 @@ export type SessionUser = {
 
 export function useAppSession() {
     return useSession<SessionUser>({
-        password: 'ChangeThisBeforeShippingToProdOrYouWillBeFired',
+        password: import.meta.env.VITE_SESSION_PASSWORD,
     })
 }
