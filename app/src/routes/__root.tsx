@@ -62,15 +62,6 @@ interface RouterContext {
     config: any;
 }
 
-// const authStateFn = createServerFn().handler(async (): Promise<AuthState> => {
-//     const { isAuthenticated, userId, sessionClaims } = await auth();
-//     return {
-//         isAuthenticated,
-//         userId,
-//         sessionClaims: sessionClaims as SessionClaims | null,
-//     };
-// });
-
 const fetchUser = createServerFn().handler(async (): Promise<AuthState> => {
     const session = await useAppSession();
 

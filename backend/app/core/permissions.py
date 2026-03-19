@@ -6,33 +6,19 @@ async def require_user(session=Depends(verify_session)):
     return session
 
 
-def _get_roles(user):
-    roles = user.get("roles", [])
-
-    if roles is None:
-        return []
-
-    if not isinstance(roles, list):
-        return [roles]
-
-    return roles
-
-
 async def require_admin(session=Depends(verify_session)):
-    user = session.get("user")
-    roles = _get_roles(user)
+    roles = session.get("roles")
     if not any(role in ["admin"] for role in roles):
         raise HTTPException(
             status_code=403,
             detail="The user doesn't have enough privileges"
         )
 
-    return user
+    return session
 
 
 async def require_super_admin(session=Depends(verify_session)):
-    user = session.get("user")
-    roles = _get_roles(user)
+    roles = session.get("roles")
 
     if "super-admin" not in roles:
         raise HTTPException(
@@ -40,4 +26,4 @@ async def require_super_admin(session=Depends(verify_session)):
             detail="Super admin required"
         )
 
-    return user
+    return session
