@@ -1,10 +1,19 @@
 import { SignIn } from "@clerk/tanstack-react-start";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/sign-in")({
+    validateSearch: (search) => ({
+        redirect: (search.redirect as string) || "/",
+    }),
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    return <SignIn />;
+    const { redirect } = useSearch({ from: "/sign-in" });
+    console.log("🚀 ~ RouteComponent ~ redirect:", redirect)
+    return (
+        <div className="flex justify-center p-6">
+            <SignIn routing="hash" forceRedirectUrl={`/auth/callback?redirect=${redirect || "/"}`} />
+        </div>
+    );
 }

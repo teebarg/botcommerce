@@ -19,7 +19,7 @@ import {
 import { useLocation } from "@tanstack/react-router";
 import LocalizedClientLink from "@/components/ui/link";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { UserButton } from "@clerk/tanstack-react-start";
+import { UserDropdown } from "@/components/user-button";
 
 const AdminMobileMenu: React.FC = () => {
     const location = useLocation();
@@ -75,7 +75,7 @@ const AdminMobileMenu: React.FC = () => {
                 </div>
             </ScrollArea>
             <div className="p-4 border-t">
-                <UserButton />
+                <UserDropdown />
             </div>
         </div>
     );

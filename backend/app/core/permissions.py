@@ -1,9 +1,9 @@
 from fastapi import Depends, HTTPException
-from app.core.deps import verify_clerk_token
+from app.core.deps import verify_session
 
 
-async def require_user(user=Depends(verify_clerk_token)):
-    return user
+async def require_user(session=Depends(verify_session)):
+    return session
 
 
 def _get_roles(user):
@@ -18,7 +18,8 @@ def _get_roles(user):
     return roles
 
 
-async def require_admin(user=Depends(verify_clerk_token)):
+async def require_admin(session=Depends(verify_session)):
+    user = session.get("user")
     roles = _get_roles(user)
     if not any(role in ["admin"] for role in roles):
         raise HTTPException(
@@ -29,7 +30,8 @@ async def require_admin(user=Depends(verify_clerk_token)):
     return user
 
 
-async def require_super_admin(user=Depends(verify_clerk_token)):
+async def require_super_admin(session=Depends(verify_session)):
+    user = session.get("user")
     roles = _get_roles(user)
 
     if "super-admin" not in roles:

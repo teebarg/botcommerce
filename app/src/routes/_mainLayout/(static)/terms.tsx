@@ -1,8 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { BtnLink } from "@/components/ui/btnLink";
 import { useConfig } from "@/providers/store-provider";
+import { SignIn } from "@clerk/tanstack-react-start";
 
 export const Route = createFileRoute("/_mainLayout/(static)/terms")({
+    beforeLoad: ({ context }) => {
+        console.log("🚀 ~ Route ~ context:", context);
+        if (!context.isAuthenticated) {
+            throw new Error("Not authenticated");
+        }
+    },
+    errorComponent: ({ error }) => {
+        if (error.message === "Not authenticated") {
+            return (
+                <div className="flex items-center justify-center p-12">
+                    <SignIn routing="hash" forceRedirectUrl={`/auth/callback?redirect=${window.location.pathname}`} />
+                </div>
+            );
+        }
+
+        throw error;
+    },
     head: () => ({
         meta: [
             {
@@ -18,10 +36,10 @@ export const Route = createFileRoute("/_mainLayout/(static)/terms")({
 });
 
 function RouteComponent() {
-    const { config } = useConfig();;
+    const { config } = useConfig();
 
     return (
-        <div className="max-w-5xl mx-auto px-4 py-18">
+        <div className="max-w-5xl mx-auto px-4 py-6">
             <h1 className="text-3xl font-bold mb-8 text-center text-foreground">Terms and Conditions</h1>
 
             <div className="bg-card rounded-lg shadow-lg px-4 py-8 mb-8">
@@ -35,8 +53,8 @@ function RouteComponent() {
                 <p className="mb-4 text-foreground">
                     Unless otherwise stated, {config?.shop_name} Stores and/or its licensors own the intellectual property rights for all material on
                     {config?.shop_name} Stores. All intellectual property rights are reserved. You may view and/or print pages from{" "}
-                    <span className="underline">{import.meta.env.VITE_BASE_URL}</span> for your own personal use subject to restrictions set in these terms and
-                    conditions.
+                    <span className="underline">{import.meta.env.VITE_BASE_URL}</span> for your own personal use subject to restrictions set in these
+                    terms and conditions.
                 </p>
                 <h2 className="text-xl font-semibold mb-4 text-foreground">2. User Comments</h2>
                 <p className="mb-4 text-foreground">

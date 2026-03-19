@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_mainLayout/wishlist")({
         if (error.message === "Not authenticated") {
             return (
                 <div className="flex items-center justify-center p-12">
-                    <SignIn routing="hash" forceRedirectUrl={window.location.href} />
+                    <SignIn routing="hash" forceRedirectUrl={`/auth/callback?redirect=${window.location.pathname}`} />
                 </div>
             );
         }

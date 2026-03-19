@@ -1,7 +1,7 @@
 from typing import Annotated, Literal, Optional
 
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import APIKeyHeader, OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, ValidationError
 
@@ -12,7 +12,7 @@ from app.prisma_client import prisma
 from meilisearch import Client as MeilisearchClient
 from app.models.user import UserInternal as User
 from supabase import create_client, Client
-from app.services.redis import get_redis_dependency
+from app.services.redis import get_redis_dependency, get_session
 import redis.asyncio as redis
 from app.services.shop_settings import ShopSettingsService
 from app.core.logging import get_logger
@@ -130,42 +130,96 @@ async def get_internal_service(
             detail="Invalid service token",
         )
 
-async def get_user(payload=Depends(verify_clerk_token2)) -> User | None:
-    if not payload:
+# async def get_user(payload=Depends(verify_clerk_token2)) -> User | None:
+#     if not payload:
+#         return None
+
+#     clerk_id = payload["sub"]
+#     user = await prisma.user.find_unique(
+#         where={"clerk_id": clerk_id}
+#     )
+
+#     if not user:
+#         user = await prisma.user.upsert(
+#             where={"email": payload["email"]},
+#             data={
+#                 "create": {"clerk_id": clerk_id, "email": payload["email"], "first_name": payload.get("firstName"), "last_name": payload.get("lastName"), "hashed_password": "dkkdkdkkdkdkd22h3s"},
+#                 "update": {"clerk_id": clerk_id},
+#             },
+#         )
+#     return user
+
+
+async def verify_session(request: Request) -> User | None:
+    session_id = request.cookies.get("session_id")
+    print("🚀 ~ session_id: get_user", session_id)
+
+    if not session_id:
+        raise HTTPException(401, "Missing session cookie")
+
+    session = await get_session(session_id)
+    print("🚀 ~ session: get_user", session)
+
+    if not session:
+        raise HTTPException(401, "Invalid session")
+
+    return session
+
+async def get_user(request: Request) -> User | None:
+    session_id = request.cookies.get("session_id")
+    print("🚀 ~ session_id: get_user", session_id)
+
+    if not session_id:
         return None
 
-    clerk_id = payload["sub"]
+    session = await get_session(session_id)
+    print("🚀 ~ session: get_user", session)
+
+    if not session:
+        return None
+
     user = await prisma.user.find_unique(
-        where={"clerk_id": clerk_id}
+        where={"id": session.get("id")}
     )
 
-    if not user:
-        user = await prisma.user.upsert(
-            where={"email": payload["email"]},
-            data={
-                "create": {"clerk_id": clerk_id, "email": payload["email"], "first_name": payload.get("firstName"), "last_name": payload.get("lastName"), "hashed_password": "dkkdkdkkdkdkd22h3s"},
-                "update": {"clerk_id": clerk_id},
-            },
-        )
     return user
 
 UserDep = Annotated[User | None, Depends(get_user)]
 
-async def get_current_user(payload=Depends(verify_clerk_token)) -> User:
-    clerk_id = payload["sub"]
+# async def get_current_user(payload=Depends(verify_clerk_token)) -> User:
+#     clerk_id = payload["sub"]
+
+#     user = await prisma.user.find_unique(
+#         where={"clerk_id": clerk_id}
+#     )
+
+#     if not user:
+#         user = await prisma.user.upsert(
+#             where={"email": payload["email"]},
+#             data={
+#                 "create": {"clerk_id": clerk_id, "email": payload["email"], "first_name": payload.get("firstName"), "last_name": payload.get("lastName"), "hashed_password": "dkkdkdkkdkdkd22h3s"},
+#                 "update": {"clerk_id": clerk_id},
+#             },
+#         )
+
+#     return user
+
+async def get_current_user(request: Request):
+    session_id = request.cookies.get("session_id")
+    print("🚀 ~ session_id:", session_id)
+
+    if not session_id:
+        raise HTTPException(401)
+
+    session = await get_session(session_id)
+    print("🚀 ~ session:", session)
+
+    if not session:
+        raise HTTPException(401)
 
     user = await prisma.user.find_unique(
-        where={"clerk_id": clerk_id}
+        where={"id": session.get("id")}
     )
-
-    if not user:
-        user = await prisma.user.upsert(
-            where={"email": payload["email"]},
-            data={
-                "create": {"clerk_id": clerk_id, "email": payload["email"], "first_name": payload.get("firstName"), "last_name": payload.get("lastName"), "hashed_password": "dkkdkdkkdkdkd22h3s"},
-                "update": {"clerk_id": clerk_id},
-            },
-        )
 
     return user
 

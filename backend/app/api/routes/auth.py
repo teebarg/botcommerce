@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, BackgroundTasks, Request, Cookie
+from fastapi import APIRouter, HTTPException, status, BackgroundTasks, Request, Cookie, Response, Depends
 from pydantic import EmailStr, BaseModel, Field
 from app.core import security
 from app.core.config import settings
@@ -8,11 +8,13 @@ from app.services.events import publish_user_registered
 from datetime import datetime, timedelta
 from app.models.generic import Token, Message
 from app.prisma_client import prisma as db
-
+import uuid
 import httpx
 from typing import Annotated, Optional
 from app.core.logging import get_logger
 from app.core.decorators import limit
+from app.services.redis import set_session, delete_session
+from app.core.deps import verify_clerk_token
 
 logger = get_logger(__name__)
 
@@ -294,11 +296,6 @@ async def google(request: Request, payload: GooglePayload) -> Token:
     return Token(access_token=access_token)
 
 
-@router.post("/logout")
-async def logout():
-    return Message(message="Logout successful")
-
-
 @router.post("/send-magic-link")
 @limit("3/minute")
 async def send_magic_link(
@@ -414,6 +411,72 @@ async def merge_cart(user_id: str, cart_number: str | None = None):
         where={"cart_number": cart_number},
         data={"user_id": user_id},
     )
+
+
+@router.post("/logout")
+async def logout(request: Request, response: Response):
+    session_id = request.cookies.get("session_id")
+
+    if session_id:
+        await delete_session(session_id)
+
+    response.delete_cookie("session_id")
+
+    return {"ok": True}
+
+
+@router.post("/exchange")
+async def exchange_token(response: Response, payload=Depends(verify_clerk_token)):
+    # auth_header = request.headers.get("Authorization")
+
+    # if not auth_header:
+    #     raise HTTPException(401, "Missing token")
+
+    # token = auth_header.split(" ")[1]
+    # payload = verify_clerk_token(token)
+
+    session_id = str(uuid.uuid4())
+
+    clerk_id = payload["sub"]
+
+    user = await db.user.find_unique(
+        where={"clerk_id": clerk_id}
+    )
+
+    if not user:
+        user = await db.user.upsert(
+            where={"email": payload["email"]},
+            data={
+                "create": {"clerk_id": clerk_id, "email": payload["email"], "first_name": payload.get("firstName"), "last_name": payload.get("lastName"), "image": payload.get("image_url"), "hashed_password": "dkkdkdkkdkdkd22h3s"},
+                "update": {"clerk_id": clerk_id},
+            },
+        )
+
+    session_data = {
+        "id": user.id,
+        "firstName": user.first_name,
+        "lastName": user.last_name,
+        "sub": payload["sub"],
+        "email": payload.get("email"),
+        "image": payload.get("image_url"),
+        "role": payload.get("role"),
+        "roles": payload.get("roles", []),
+    }
+
+    await set_session(session_id, session_data)
+
+    response.set_cookie(
+        key="session_id",
+        path="/",
+        value=session_id,
+        httponly=True,
+        secure=True,
+        samesite="none",
+        # domain="shop.localhost",
+        max_age=60 * 60 * 24 * 7,
+    )
+
+    return session_data
 
 # @router.post("/test-job")
 # async def test(request: Request, id: int):

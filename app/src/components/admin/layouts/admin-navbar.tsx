@@ -3,7 +3,7 @@ import ActivityTray from "@/components/generic/activities/activity-tray";
 import LocalizedClientLink from "@/components/ui/link";
 import MenuComp from "@/components/layout/admin-mobile-menu-drawer";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { UserButton } from "@clerk/tanstack-react-start";
+import { UserDropdown } from "@/components/user-button";
 
 const AdminNavbar = () => {
     return (
@@ -27,7 +27,7 @@ const AdminNavbar = () => {
                     <ActivityTray />
                 </NavbarItem>
                 <NavbarItem className="flex">
-                    <UserButton />
+                    <UserDropdown />
                 </NavbarItem>
             </NavbarContent>
         </NavigationBar>

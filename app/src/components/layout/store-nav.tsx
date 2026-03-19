@@ -6,8 +6,8 @@ import { SearchDialog } from "@/components/store/product-search";
 import { Heart, HeartOff, ShoppingBag } from "lucide-react";
 import { ThemeToggle } from "../theme-toggle";
 import { useConfig } from "@/providers/store-provider";
-import { SignInButton, UserButton } from "@clerk/tanstack-react-start";
 import { useRouteContext } from "@tanstack/react-router";
+import { UserDropdown } from "../user-button";
 
 const StoreNavbar = () => {
     const { isAuthenticated } = useRouteContext({ strict: false });
@@ -49,7 +49,9 @@ const StoreNavbar = () => {
                         )}
                     </div>
                     <GetApp />
-                    <div className="hidden sm:flex">{isAuthenticated ? <UserButton /> : <SignInButton />}</div>
+                    <div className="hidden sm:block">
+                        <UserDropdown />
+                    </div>
                 </NavbarItem>
             </NavbarContent>
         </NavigationBar>
