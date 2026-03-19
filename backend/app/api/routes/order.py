@@ -33,7 +33,6 @@ async def create_order(
             secure=True,
             domain=settings.COOKIE_DOMAIN,
         )
-        # response.delete_cookie("_cart_id")
         return order
     except Exception as e:
         logger.error(f"Failed to create order in create_order: {str(e)}")

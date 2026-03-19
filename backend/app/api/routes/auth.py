@@ -475,26 +475,18 @@ async def exchange_token(response: Response, payload=Depends(verify_clerk_token)
 #     """
 #     Test job
 #     """
-#     print(dir(request))
-#     print(list(request.headers.keys()))
-#     print(request.headers.get("x-forwarded-host"))
-#     print(dir(request.client))
-#     client_host = request.client.host
-#     print(f"Client host: {client_host}")
-#     # user = await db.user.find_first(
-#     #     where={
-#     #         "id": id,
-#     #     }
-#     # )
+#     user = await db.user.find_first(
+#         where={
+#             "id": id,
+#         }
+#     )
 
-#     # try:
-#     #     await publish_user_registered(
-#     #         user=user,
-#     #         source="email_password",
-#     #         created_at=user.created_at,
-#     #     )
-#     # except Exception as e:
-#     #     logger.error(f"Failed to publish USER_REGISTERED event: {e}")
-#     #     pass
-
-#     return {"message": "User registered successfully"}
+#     try:
+#         await publish_user_registered(
+#             user=user,
+#             source="email_password",
+#             created_at=user.created_at,
+#         )
+#     except Exception as e:
+#         logger.error(f"Failed to publish USER_REGISTERED event: {e}")
+#         pass
