@@ -118,12 +118,7 @@ class SearchProduct(BaseModel):
     slug: str
     description: Optional[str] = None
     image: Optional[str] = None
-    categories: Optional[List[SearchCategory]] = []
-    collections: Optional[List[SearchCollection]] = []
-    images: Optional[List[str]] = []
     variants: Optional[List[SearchVariant]] = []
-    average_rating: Optional[float] = None
-    review_count: Optional[int] = None
     max_variant_price: Optional[float] = None
     min_variant_price: Optional[float] = None
     active: Optional[bool] = True

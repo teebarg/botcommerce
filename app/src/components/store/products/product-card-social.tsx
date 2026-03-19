@@ -49,11 +49,11 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
 
     useEffect(() => {
         if (!inView || processedRef.current) return;
-        if (!product.images?.[0]) return;
+        if (!product.image) return;
 
         const img = new Image();
         img.crossOrigin = "anonymous";
-        img.src = product.images[0];
+        img.src = product.image;
 
         img.onload = () => {
             const canvas = document.createElement("canvas");
@@ -94,7 +94,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
 
             setBgColor(`rgb(${Math.floor(r)}, ${Math.floor(g)}, ${Math.floor(b)})`);
         };
-    }, [inView, product.images]);
+    }, [inView, product.image]);
 
     const addWishlist = async () => {
         createWishlist(product.id);
@@ -114,7 +114,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
                 }}
             />
             <img
-                src={product.images?.[0]}
+                src={product.image}
                 className="absolute inset-0 w-full h-full object-cover scale-105 blur-2xl opacity-25 z-0 pointer-events-none"
                 alt=""
             />
@@ -123,7 +123,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
             <div className="relative w-full flex-1 flex items-start justify-center">
                 {!imageLoaded && <div className="absolute inset-0 bg-[#2a2a2a] animate-pulse" />}
                 <img
-                    src={product.images?.[0]}
+                    src={product.image}
                     alt={product.name}
                     onLoad={() => setImageLoaded(true)}
                     className="max-h-[65svh] w-full object-contain transition-all duration-500 ease-out opacity-0 data-[loaded=true]:opacity-100"

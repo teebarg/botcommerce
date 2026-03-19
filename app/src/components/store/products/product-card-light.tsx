@@ -30,7 +30,7 @@ const ProductCardLight: React.FC<ProductCardProps> = ({ product, variant = "sale
         >
             <div className="relative rounded-2xl overflow-hidden shadow-card h-60 md:h-80">
                 <img
-                    src={product.images?.[0] || "/placeholder.jpg"}
+                    src={product.image || "/placeholder.jpg"}
                     alt={product.name}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />

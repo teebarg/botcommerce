@@ -115,7 +115,6 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     else:
         freshness_score = 0
 
-    rng = random.Random(product.id)
     product_dict: dict[str, bool | int | str | Unknown | None] = {
         "id": product.id,
         "name": product.name,
@@ -124,49 +123,55 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
         "sku": product.sku,
         "active": product.active,
         "is_new": getattr(product, "is_new", False),
-        "random_score": rng.random(),
+        "random_score": random.random(),
         "freshness_score": freshness_score,
     }
 
     product_dict["collection_slugs"] = [c.slug for c in (product.collections or [])]
-    product_dict["collections"] = [{"id": c.id, "slug": c.slug, "name": c.name}
-                                   for c in (product.collections or [])]
     product_dict["category_slugs"] = [c.slug for c in (product.categories or [])]
-    product_dict["categories"] = [{"id": c.id, "slug": c.slug, "name": c.name}
-                                    for c in (product.categories or [])]
-    product_dict["images"] = [img.image for img in sorted((product.images or []), key=lambda img: img.order)]
-    product_dict["image"] = product_dict["images"][0] if product_dict["images"] else None
 
-    variants = [{"id": v.id, "price": v.price, "old_price": v.old_price, "inventory": v.inventory, "size": v.size, "color": v.color, "measurement": v.measurement, "age": v.age, "status": v.status} for v in (product.variants or [])]
+    # Images
+    images = [img.image for img in sorted((product.images or []), key=lambda img: img.order)]
+    product_dict["image"] = images[0] if images else None
+
+    # Variants
+    variants = [
+        {
+            "id": v.id,
+            "price": v.price,
+            "old_price": v.old_price,
+            "inventory": v.inventory,
+            "size": v.size,
+            "color": v.color,
+            "measurement": v.measurement,
+            "age": v.age,
+            "status": v.status,
+        }
+        for v in (product.variants or [])
+    ]
     product_dict["variants"] = variants
 
-    variant_prices = [v["price"]
-                      for v in variants if v.get("price") is not None]
-    product_dict["variant_prices"] = variant_prices
-    product_dict["min_variant_price"] = min(
-        variant_prices) if variant_prices else 0
-    product_dict["max_variant_price"] = max(
-        variant_prices) if variant_prices else 0
+    sizes, colors, ages, measurements = [], [], [], []
+    for v in variants:
+        if v.get("size"):        sizes.append(v["size"])
+        if v.get("color"):       colors.append(v["color"])
+        if v.get("age"):         ages.append(v["age"])
+        if v.get("measurement"): measurements.append(v["measurement"])
 
-    reviews = [r.dict() for r in (product.reviews or [])]
+    product_dict["sizes"] = sizes
+    product_dict["colors"] = colors
+    product_dict["ages"] = ages
+    product_dict["measurements"] = measurements
 
-    ratings = [r["rating"] for r in reviews if r.get("rating") is not None]
-    product_dict["review_count"] = len(ratings)
-    product_dict["average_rating"] = round(
-        sum(ratings) / len(ratings), 2) if ratings else 0
+    # Prices
+    variant_prices = [v["price"] for v in variants if v.get("price") is not None]
+    product_dict["min_variant_price"] = min(variant_prices) if variant_prices else 0
+    product_dict["max_variant_price"] = max(variant_prices) if variant_prices else 0
 
-    if any(v["inventory"] > 0 for v in variants):
-        product_dict["status"] = "IN STOCK"
-    else:
-        product_dict["status"] = "OUT OF STOCK"
-    product_dict["sizes"] = [v["size"]
-                             for v in variants if v.get("size") is not None]
-    product_dict["colors"] = [v["color"]
-                              for v in variants if v.get("color") is not None]
-    product_dict["ages"] = [v["age"]
-                           for v in variants if v.get("age") is not None]
-    product_dict["measurements"] = [v["measurement"]
-                                    for v in variants if v.get("measurement") is not None]
+    # Stock status
+    product_dict["status"] = (
+        "IN STOCK" if any(v["inventory"] > 0 for v in variants) else "OUT OF STOCK"
+    )
     product_dict["catalogs"] = [sc.slug for sc in (product.shared_collections or [])]
 
     return product_dict

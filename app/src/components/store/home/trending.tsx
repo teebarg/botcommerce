@@ -24,7 +24,7 @@ export default function Trending({ products }: { products: ProductSearch[] }) {
                         {products?.map((product: ProductSearch) => (
                             <Link key={product.id} to="/collections/$slug" params={{ slug: "trending" }} className="w-full h-full">
                                 <img
-                                    src={product.images?.[0] || "/placeholder.jpg"}
+                                    src={product.image || "/placeholder.jpg"}
                                     alt={product.name}
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                 />
