@@ -117,6 +117,7 @@ async def verify_payment(response: Response, reference: str, user: CurrentUser) 
                 httponly=True,
                 samesite="none",
                 secure=True,
+                domain=settings.COOKIE_DOMAIN,
             )
 
             return order

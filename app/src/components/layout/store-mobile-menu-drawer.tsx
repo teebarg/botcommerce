@@ -9,7 +9,7 @@ import type React from "react";
 import { CreditCard, Heart, Home, LayoutGrid, User2, User as UserIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "../theme-toggle";
-import { SignInButton, UserButton } from "@clerk/tanstack-react-start";
+import { UserDropdown } from "../user-button";
 
 interface NavLinkProp {
     href: string;
@@ -71,7 +71,7 @@ const StoreMenuComp: React.FC = () => {
                         <ThemeToggle />
                     </div>
                     <div className="mt-4 mb-2 block md:hidden">
-                        {isAuthenticated ? <UserButton /> : <SignInButton />}
+                        <UserDropdown />
                     </div>
                 </div>
             </DrawerContent>

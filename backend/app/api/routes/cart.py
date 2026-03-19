@@ -12,6 +12,7 @@ from prisma.enums import CartStatus
 from app.models.generic import Message
 from app.core.permissions import require_admin
 from fastapi.responses import JSONResponse
+from app.core.config import settings
 
 logger = get_logger(__name__)
 
@@ -28,6 +29,7 @@ def _set_cart_cookie(response: Response, token: str) -> None:
         httponly=True,
         secure=True,
         samesite="none",
+        domain=settings.COOKIE_DOMAIN,
     )
 
 async def _handle_add_item(item_in: CartItemCreate, cart: Cart) -> CartItem:

@@ -2,6 +2,7 @@ import { api } from "@/utils/api.server";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { PaginatedUsers, PaginatedWalletTxns, ProductSearch, User, Wishlist } from "@/schemas";
+import { AuthUser, useAppSession } from "@/utils/session";
 
 export const UserSearchSchema = z.object({
     query: z.string().optional(),
@@ -30,7 +31,7 @@ export const getUsersFn = createServerFn({ method: "GET" })
 
 export const getWishlistListingFn = createServerFn().handler(async () => {
     return await api.get<Wishlist>("/users/wishlist");
-    });
+});
 
 export const getRecentlyViewedFn = createServerFn({ method: "GET" })
     .inputValidator(z.number().optional())
@@ -43,3 +44,21 @@ export const getRecentlyViewedFn = createServerFn({ method: "GET" })
 export const getMeTrxnFn = createServerFn().handler(async () => {
     return await api.get<PaginatedWalletTxns>("/wallet/me");
 });
+
+export const logoutFn = createServerFn().handler(async () => {
+    const session = await useAppSession();
+
+    session.clear();
+});
+
+export const loginFn = createServerFn({ method: "POST" })
+    .inputValidator((d: { sessionUser: any }) => d)
+    .handler(async ({ data }) => {
+        const session = await useAppSession();
+        await session.update({
+            id: data?.sessionUser?.id,
+            user: {
+                ...(data?.sessionUser as AuthUser),
+            },
+        });
+    });

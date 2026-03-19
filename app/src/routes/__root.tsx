@@ -19,8 +19,8 @@ import { initPulseMetrics } from "@/utils/pulsemetric";
 import PageTransitionLoader from "@/components/generic/page-transition-loader";
 import PWABadge from "@/PWAbadge";
 import { ClerkProvider } from "@clerk/tanstack-react-start";
-import { auth } from "@clerk/tanstack-react-start/server";
 import { getShopSettingsPublicFn } from "@/server/generic.server";
+import { useAppSession } from "@/utils/session";
 
 type SessionClaims = {
     firstName?: string;
@@ -44,7 +44,6 @@ type AuthUser = {
 type Session = {
     id: string;
     user: AuthUser;
-    accessToken: string;
     impersonated: boolean;
     impersonatedBy: string | null;
 };
@@ -63,12 +62,29 @@ interface RouterContext {
     config: any;
 }
 
-const authStateFn = createServerFn().handler(async (): Promise<AuthState> => {
-    const { isAuthenticated, userId, sessionClaims } = await auth();
+// const authStateFn = createServerFn().handler(async (): Promise<AuthState> => {
+//     const { isAuthenticated, userId, sessionClaims } = await auth();
+//     return {
+//         isAuthenticated,
+//         userId,
+//         sessionClaims: sessionClaims as SessionClaims | null,
+//     };
+// });
+
+const fetchUser = createServerFn().handler(async (): Promise<AuthState> => {
+    const session = await useAppSession();
+
     return {
-        isAuthenticated,
-        userId,
-        sessionClaims: sessionClaims as SessionClaims | null,
+        isAuthenticated: Boolean(session.data.id),
+        userId: session.id || null,
+        sessionClaims: {
+            firstName: session.data.user?.firstName,
+            lastName: session.data.user?.lastName,
+            image_url: session.data.user?.image,
+            email: session.data.user?.email,
+            role: session.data.user?.role,
+            roles: session.data.user?.roles,
+        },
     };
 });
 
@@ -78,7 +94,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
             throw redirect({ to: "/maintenance" });
         }
         const [{ isAuthenticated, userId, sessionClaims }, config] = await Promise.all([
-            authStateFn(),
+            fetchUser(),
             queryClient.ensureQueryData({
                 queryKey: ["shop-settings"],
                 queryFn: () => getShopSettingsPublicFn(),
@@ -98,7 +114,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         const session: Session | null = {
             id: userId || "",
             user,
-            accessToken: "",
             impersonated: false,
             impersonatedBy: null,
         };

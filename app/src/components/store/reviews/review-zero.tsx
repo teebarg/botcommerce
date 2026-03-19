@@ -3,10 +3,9 @@ import { useOverlayTriggerState } from "react-stately";
 import { ReviewForm } from "./review-form";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { BtnLink } from "@/components/ui/btnLink";
-import { useLocation, useRouteContext } from "@tanstack/react-router";
+import { useRouteContext } from "@tanstack/react-router";
 import SheetDrawer from "@/components/sheet-drawer";
-import { SignInButton } from "@clerk/tanstack-react-start";
+import { UserDropdown } from "@/components/user-button";
 
 interface ProductReviewsZeroStateProps {
     onWriteReview?: () => void;
@@ -17,8 +16,6 @@ interface ProductReviewsZeroStateProps {
 export const ProductReviewsZeroState = ({ productName, product_id }: ProductReviewsZeroStateProps) => {
     const { isAuthenticated } = useRouteContext({ strict: false });
     const state = useOverlayTriggerState({});
-    const location = useLocation();
-    const pathname = location.pathname;
 
     return (
         <Card className="w-full max-w-6xl mx-auto text-center border-dashed border-2">
@@ -85,7 +82,7 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
                         <p className="text-xs text-muted-foreground">Takes less than 2 minutes</p>
                     </div>
                 ) : (
-                    <SignInButton />
+                    <UserDropdown />
                 )}
             </div>
         </Card>

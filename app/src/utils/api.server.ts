@@ -1,6 +1,5 @@
-import { auth } from "@clerk/tanstack-react-start/server";
 import { redirect } from "@tanstack/react-router";
-import { getCookies } from "@tanstack/react-start/server";
+import { getRequest } from "@tanstack/react-start/server";
 
 const baseURL = process.env.API_URL || "http://localhost.dev";
 
@@ -9,10 +8,9 @@ type RequestOptions = RequestInit & {
 };
 
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-    const cookies = getCookies();
+    const request = getRequest();
+    const cookieHeader = request.headers.get("Cookie") || "";
     const { params, ...restOptions } = options;
-    const { getToken } = await auth();
-    const token = await getToken({ template: "default" });
 
     const url = new URL(`/api${endpoint}`, baseURL);
 
@@ -23,15 +21,10 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         });
     }
 
-    const cookieHeader = Object.entries(cookies)
-        .map(([key, value]) => `${key}=${value}`)
-        .join("; ");
-
     const headers = {
         "Content-Type": "application/json",
         Cookie: cookieHeader,
         ...options.headers,
-        "X-Auth": token || "token",
     };
 
     const response = await fetch(url, {
@@ -48,6 +41,9 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
     if (response.status === 401) {
         throw redirect({
             to: "/sign-in",
+            search: {
+                redirect: "/",
+            },
         });
     }
 

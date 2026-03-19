@@ -156,3 +156,14 @@ async def invalidate_key_only(key: str) -> None:
         await redis_client.delete(key)
     except Exception as e:
         logger.error(f"Error invalidating key {key}: {e}")
+
+
+async def set_session(session_id: str, data: dict, ttl=60 * 60 * 24 * 7):
+    await redis_client.setex(f"session:{session_id}", ttl, json.dumps(data))
+
+async def get_session(session_id: str):
+    data = await redis_client.get(f"session:{session_id}")
+    return json.loads(data) if data else None
+
+async def delete_session(session_id: str):
+    await redis_client.delete(f"session:{session_id}")
