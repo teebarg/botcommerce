@@ -1,19 +1,19 @@
-import { useState, forwardRef, useImperativeHandle, useMemo } from "react";
-import { ChevronDown } from "lucide-react";
-import { useUpdateQuery } from "@/hooks/useUpdateQuery";
-import { useCategories } from "@/hooks/useCategories";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { COLOR_OPTIONS, SIZE_OPTIONS, AGE_OPTIONS, ColorOption } from "@/utils/constants";
-import { currency } from "@/utils";
-import type { Facet } from "@/schemas/product";
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Slider } from "@/components/ui/slider";
 import { motion } from "framer-motion";
-import { useCollections } from "@/hooks/useCollection";
+import { ChevronDown } from "lucide-react";
+import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useCategories } from "@/hooks/useCategories";
+import { useCollections } from "@/hooks/useCollection";
+import { useUpdateQuery } from "@/hooks/useUpdateQuery";
+import type { Facet } from "@/schemas/product";
+import { currency, debounce } from "@/utils";
+import { AGE_OPTIONS, COLOR_OPTIONS, type ColorOption, SIZE_OPTIONS } from "@/utils/constants";
 
 export interface FilterSidebarRef {
     apply: () => void;
@@ -43,6 +43,36 @@ const DEFAULT_DRAFT = {
     categories: new Set<string>(),
     minPrice: "1000",
     maxPrice: "50000",
+};
+
+const PRICE_MIN_BOUND = 1;
+const PRICE_MAX_BOUND = 1_000_000;
+
+const normalizePriceValues = (minStr: string, maxStr: string) => {
+    const parse = (v: string): number | null => {
+        if (!v) return null;
+        const parsed = Number(v);
+        if (!Number.isFinite(parsed)) return null;
+        return Math.trunc(parsed);
+    };
+
+    const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max);
+
+    const minParsed = parse(minStr);
+    const maxParsed = parse(maxStr);
+
+    const minNormalized = minParsed == null ? "" : clamp(minParsed, PRICE_MIN_BOUND, PRICE_MAX_BOUND).toString();
+    const maxNormalized = maxParsed == null ? "" : clamp(maxParsed, PRICE_MIN_BOUND, PRICE_MAX_BOUND).toString();
+
+    if (minNormalized !== "" && maxNormalized !== "") {
+        const minNum = Number(minNormalized);
+        let maxNum = Number(maxNormalized);
+        if (maxNum < minNum) maxNum = minNum; // enforce max >= min
+
+        return { minPrice: minNum.toString(), maxPrice: maxNum.toString() };
+    }
+
+    return { minPrice: minNormalized, maxPrice: maxNormalized };
 };
 
 export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets, onClose }, ref) => {
@@ -76,6 +106,20 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
 
     const [sort, setSort] = useState(() => search?.sort || "id:desc");
 
+    const [priceMinInput, setPriceMinInput] = useState<string>(filters.minPrice);
+    const [priceMaxInput, setPriceMaxInput] = useState<string>(filters.maxPrice);
+
+    const priceLowId = useId();
+    const priceHighId = useId();
+    const priceNewestId = useId();
+
+    useEffect(() => {
+        // Keep the input fields in sync if the underlying search params change
+        setPriceMinInput(filters.minPrice);
+        setPriceMaxInput(filters.maxPrice);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filters.minPrice, filters.maxPrice]);
+
     const toggleSection = (section: keyof typeof openSections) => {
         setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
     };
@@ -98,25 +142,39 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
     const onToggleAge = toggleDraftSet("ages");
     const onToggleCategory = toggleDraftSet("categories");
 
-    const onPriceChange = (values: number[]) => {
-        const [minPrice, maxPrice] = values;
+    const debouncedNormalizeRef = useMemo(
+        () =>
+            debounce((minStr: string, maxStr: string) => {
+                const { minPrice, maxPrice } = normalizePriceValues(minStr, maxStr);
+                setDraft((prev) => ({ ...prev, minPrice, maxPrice }));
+                setPriceMinInput(minPrice);
+                setPriceMaxInput(maxPrice);
+            }, 300),
+        []
+    );
 
-        setDraft((prev) => ({
-            ...prev,
-            minPrice: minPrice.toString(),
-            maxPrice: maxPrice.toString(),
-        }));
+    const handlePriceMinChange = (next: string) => {
+        const cleaned = next === "" ? "" : next.replace(/[^\d]/g, "");
+        setPriceMinInput(cleaned);
+        debouncedNormalizeRef(cleaned, priceMaxInput);
+    };
+
+    const handlePriceMaxChange = (next: string) => {
+        const cleaned = next === "" ? "" : next.replace(/[^\d]/g, "");
+        setPriceMaxInput(cleaned);
+        debouncedNormalizeRef(priceMinInput, cleaned);
     };
 
     const apply = () => {
+        const { minPrice, maxPrice } = normalizePriceValues(priceMinInput, priceMaxInput);
         updateQuery([
             { key: "sort", value: draft.sort },
             { key: "sizes", value: [...draft.sizes].join(",") },
             { key: "colors", value: [...draft.colors].join(",") },
             { key: "ages", value: [...draft.ages].join(",") },
             { key: "cat_ids", value: [...draft.categories].join(",") },
-            { key: "min_price", value: draft.minPrice },
-            { key: "max_price", value: draft.maxPrice },
+            { key: "min_price", value: minPrice },
+            { key: "max_price", value: maxPrice },
         ]);
         onClose?.();
     };
@@ -131,6 +189,8 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
             minPrice: DEFAULT_DRAFT.minPrice,
             maxPrice: DEFAULT_DRAFT.maxPrice,
         });
+        setPriceMinInput(DEFAULT_DRAFT.minPrice);
+        setPriceMaxInput(DEFAULT_DRAFT.maxPrice);
     };
 
     useImperativeHandle(ref, () => ({
@@ -146,7 +206,8 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
                         key={collection.id}
                         className="cursor-pointer py-1 text-sm"
                         onClick={() => {
-                            (navigate({ to: `/collections/${collection.slug}` }), onClose?.());
+                            navigate({ to: `/collections/${collection.slug}` });
+                            onClose?.();
                         }}
                     >
                         {collection.name}
@@ -184,17 +245,45 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <div className="pt-4 px-1">
-                        <Slider
-                            value={[Number(draft.minPrice ?? 1000), Number(draft.maxPrice ?? 50000)]}
-                            min={0}
-                            max={50000}
-                            step={500}
-                            onValueChange={(value) => onPriceChange(value as [number, number])}
-                            className="mb-4 mx-auto w-full max-w-sm"
-                        />
-                        <div className="flex justify-between text-sm text-muted-foreground">
-                            <span>{currency(Number(draft.minPrice))}</span>
-                            <span>{currency(Number(draft.maxPrice))}</span>
+                        <div className="space-y-3">
+                            <div className="flex items-start gap-3">
+                                <div className="flex-1">
+                                    <Input
+                                        label="Min"
+                                        inputMode="numeric"
+                                        placeholder="1"
+                                        min={PRICE_MIN_BOUND}
+                                        max={PRICE_MAX_BOUND}
+                                        step={1}
+                                        type="text"
+                                        value={priceMinInput}
+                                        onChange={(e) => handlePriceMinChange(e.target.value)}
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <Input
+                                        label="Max"
+                                        inputMode="numeric"
+                                        placeholder={`${PRICE_MAX_BOUND.toLocaleString()}`}
+                                        min={PRICE_MIN_BOUND}
+                                        max={PRICE_MAX_BOUND}
+                                        step={1}
+                                        type="text"
+                                        value={priceMaxInput}
+                                        onChange={(e) => handlePriceMaxChange(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex justify-between text-sm text-muted-foreground">
+                                <span>{draft.minPrice ? currency(Number(draft.minPrice)) : "Any"}</span>
+                                <span>{draft.maxPrice ? currency(Number(draft.maxPrice)) : "Any"}</span>
+                            </div>
+
+                            <p className="text-xs text-muted-foreground">
+                                Min must be at least {PRICE_MIN_BOUND}. Max must be at most {PRICE_MAX_BOUND.toLocaleString()}. Max must be greater
+                                than or equal to Min.
+                            </p>
                         </div>
                     </div>
                 </CollapsibleContent>
@@ -209,20 +298,20 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
                     <div className="pt-2">
                         <RadioGroup value={sort} onValueChange={setSort} className="gap-1">
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem id="price-low" value="min_variant_price:asc" />
-                                <Label className="text-sm" htmlFor="price-low">
+                                <RadioGroupItem id={priceLowId} value="min_variant_price:asc" />
+                                <Label className="text-sm" htmlFor={priceLowId}>
                                     Price: Low to High
                                 </Label>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem id="price-high" value="min_variant_price:desc" />
-                                <Label className="text-sm" htmlFor="price-high">
+                                <RadioGroupItem id={priceHighId} value="min_variant_price:desc" />
+                                <Label className="text-sm" htmlFor={priceHighId}>
                                     Price: High to Low
                                 </Label>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem id="newest" value="id:desc" />
-                                <Label className="text-sm" htmlFor="newest">
+                                <RadioGroupItem id={priceNewestId} value="id:desc" />
+                                <Label className="text-sm" htmlFor={priceNewestId}>
                                     Newest
                                 </Label>
                             </div>
