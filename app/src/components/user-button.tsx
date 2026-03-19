@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -9,8 +8,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, LogOut, Settings, Gift, CreditCard, CircleHelp as HelpCircle } from "lucide-react";
-import { useNavigate, useRouteContext, useRouter } from "@tanstack/react-router";
+import { User, LogOut, Gift, LayoutDashboard, Heart } from "lucide-react";
+import { useNavigate, useRouteContext } from "@tanstack/react-router";
 import { tryCatch } from "@/utils/try-catch";
 import { clientApi } from "@/utils/api.client";
 import { logoutFn } from "@/server/users.server";
@@ -19,10 +18,7 @@ import { useAuth } from "@clerk/tanstack-react-start";
 import { getInitials } from "@/utils";
 
 export function UserDropdown() {
-    const router = useRouter();
     const { isAuthenticated, session } = useRouteContext({ strict: false });
-    console.log("🚀 ~ UserDropdown ~ isAuthenticated:", isAuthenticated);
-    console.log("🚀 ~ UserDropdown ~ session:", session);
     const navigate = useNavigate();
     const { signOut } = useAuth();
 
@@ -35,13 +31,12 @@ export function UserDropdown() {
         await signOut({ sessionId: session?.id });
         await logoutFn();
         sessionStorage.clear();
-        // await router.invalidate();
         navigate({ to: "/" });
     };
 
     if (!isAuthenticated) {
         return (
-            <Button onClick={() => navigate({ to: "/sign-in", search: { redirect: location.pathname } })} size="sm">
+            <Button onClick={() => navigate({ to: "/sign-in", search: { redirect: location.pathname } })} size="xs">
                 Sign In
             </Button>
         );
@@ -70,25 +65,23 @@ export function UserDropdown() {
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer">
+                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate({ to: "/account" })}>
                     <User className="mr-2 h-4 w-4" />
                     <span>Account</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer">
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    <span>Billing</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer">
+                {session?.user?.isAdmin && (
+                    <DropdownMenuItem className="cursor-pointer" onClick={() => navigate({ to: "/admin" })}>
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        <span>Admin Panel</span>
+                    </DropdownMenuItem>
+                )}
+                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate({ to: "/account/referrals" })}>
                     <Gift className="mr-2 h-4 w-4" />
                     <span>Referrals</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer">
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer">
-                    <HelpCircle className="mr-2 h-4 w-4" />
-                    <span>Support</span>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate({ to: "/wishlist" })}>
+                    <Heart className="mr-2 h-4 w-4" />
+                    <span>Favorites</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive" onClick={handleSignOut}>

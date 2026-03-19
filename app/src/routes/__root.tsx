@@ -44,7 +44,6 @@ type AuthUser = {
 type Session = {
     id: string;
     user: AuthUser;
-    accessToken: string;
     impersonated: boolean;
     impersonatedBy: string | null;
 };
@@ -115,7 +114,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         const session: Session | null = {
             id: userId || "",
             user,
-            accessToken: "",
             impersonated: false,
             impersonatedBy: null,
         };
@@ -236,7 +234,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                         },
                                     }}
                                 />
-                                {/* <PWABadge /> */}
+                                <PWABadge />
                                 {/* <SafeAreaDebug /> */}
                                 <Scripts />
                             </CartProvider>

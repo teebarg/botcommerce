@@ -9,6 +9,7 @@ from app.services.redis import cache_response, invalidate_key, invalidate_patter
 from app.core.logging import get_logger
 from app.models.generic import Message
 from app.core.permissions import require_admin
+from app.core.config import settings
 
 logger = get_logger(__name__)
 
@@ -30,7 +31,9 @@ async def create_order(
             httponly=True,
             samesite="none",
             secure=True,
+            domain=settings.COOKIE_DOMAIN,
         )
+        # response.delete_cookie("_cart_id")
         return order
     except Exception as e:
         logger.error(f"Failed to create order in create_order: {str(e)}")

@@ -33,7 +33,7 @@ export function WalletTxnCard({ txn, index }: Props) {
             <div className="flex-1 min-w-0">
                 <p className="font-medium text-sm">{txn.type}</p>
                 <p className="text-xs text-muted-foreground truncate">{txn.reference_code}</p>
-                {txn.reference_id && <p className="text-xs text-muted-foreground truncate">({txn.reference_id})</p>}
+                {/* {txn.reference_id && <p className="text-xs text-muted-foreground truncate">({txn.reference_id})</p>} */}
             </div>
 
             <div className="text-right shrink-0">

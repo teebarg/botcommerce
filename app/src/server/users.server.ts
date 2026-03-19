@@ -54,13 +54,11 @@ export const logoutFn = createServerFn().handler(async () => {
 export const loginFn = createServerFn({ method: "POST" })
     .inputValidator((d: { sessionUser: any }) => d)
     .handler(async ({ data }) => {
-        console.log("🚀 ~ .handler ~ data:", data);
         const session = await useAppSession();
         await session.update({
             id: data?.sessionUser?.id,
             user: {
                 ...(data?.sessionUser as AuthUser),
-                image: data?.sessionUser?.image_url || "",
             },
         });
     });

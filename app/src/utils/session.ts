@@ -13,7 +13,6 @@ export type AuthUser = {
 export type SessionUser = {
     id: string | null;
     user: AuthUser;
-    accessToken: string;
     impersonated: boolean;
     impersonatedBy: string | null;
 };

@@ -1,4 +1,3 @@
-// import { getToken } from "@clerk/tanstack-react-start";
 import { redirect } from "@tanstack/react-router";
 
 const baseURL = import.meta.env.VITE_API_URL ?? "https://api.yourdomain.com";
@@ -10,7 +9,6 @@ type ClientRequestOptions = RequestInit & {
 async function clientRequest<T>(endpoint: string, options: ClientRequestOptions = {}): Promise<T> {
     const { params, ...rest } = options;
     const url = new URL(`/api${endpoint}`, baseURL);
-    // const token = await getToken({ template: "default" });
 
     if (params) {
         for (const [key, value] of Object.entries(params)) {
@@ -24,23 +22,24 @@ async function clientRequest<T>(endpoint: string, options: ClientRequestOptions 
         credentials: "include",
         headers: {
             "Content-Type": "application/json",
-            "accept": "application/json",
             ...rest.headers,
-            // "X-Auth": token || "token",
         },
     });
 
-    // if (response.status === 403) {
-    //     throw redirect({
-    //         to: "/forbidden",
-    //     });
-    // }
+    if (response.status === 403) {
+        throw redirect({
+            to: "/forbidden",
+        });
+    }
 
-    // if (response.status === 401) {
-    //     throw redirect({
-    //         to: "/sign-in",
-    //     });
-    // }
+    if (response.status === 401) {
+        throw redirect({
+            to: "/sign-in",
+            search: {
+                redirect: location.pathname || "/",
+            },
+        });
+    }
 
     if (!response.ok) {
         let message = "Request failed";

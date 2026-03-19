@@ -1,7 +1,7 @@
 from typing import Annotated, Literal, Optional
 
 import jwt
-from fastapi import Depends, HTTPException, status, Request
+from fastapi import Depends, HTTPException, status, Request, Cookie
 from fastapi.security import APIKeyHeader, OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, ValidationError
 
@@ -150,8 +150,8 @@ async def get_internal_service(
 #     return user
 
 
-async def verify_session(request: Request) -> User | None:
-    session_id = request.cookies.get("session_id")
+async def verify_session(session_id: Annotated[str | None, Cookie()] = None) -> User | None:
+    # session_id = request.cookies.get("session_id")
     print("🚀 ~ session_id: get_user", session_id)
 
     if not session_id:
@@ -165,8 +165,8 @@ async def verify_session(request: Request) -> User | None:
 
     return session
 
-async def get_user(request: Request) -> User | None:
-    session_id = request.cookies.get("session_id")
+async def get_user(session_id: Annotated[str | None, Cookie()] = None) -> User | None:
+    # session_id = request.cookies.get("session_id")
     print("🚀 ~ session_id: get_user", session_id)
 
     if not session_id:
@@ -204,9 +204,9 @@ UserDep = Annotated[User | None, Depends(get_user)]
 
 #     return user
 
-async def get_current_user(request: Request):
-    session_id = request.cookies.get("session_id")
-    print("🚀 ~ session_id:", session_id)
+async def get_current_user(session_id: Annotated[str | None, Cookie()] = None):
+    # session_id = request.cookies.get("session_id")
+    print("🚀 ~ session_id: get_current_user", session_id)
 
     if not session_id:
         raise HTTPException(401)

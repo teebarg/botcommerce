@@ -10,7 +10,6 @@ export const Route = createFileRoute("/sign-in")({
 
 function RouteComponent() {
     const { redirect } = useSearch({ from: "/sign-in" });
-    console.log("🚀 ~ RouteComponent ~ redirect:", redirect)
     return (
         <div className="flex justify-center p-6">
             <SignIn routing="hash" forceRedirectUrl={`/auth/callback?redirect=${redirect || "/"}`} />

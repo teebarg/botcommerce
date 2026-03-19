@@ -1,9 +1,5 @@
-// import { auth } from "@clerk/tanstack-react-start/server";
 import { redirect } from "@tanstack/react-router";
-import { getCookies, getCookie } from "@tanstack/react-start/server";
-// import { getWebRequest } from '@tanstack/start/server'
 import { getRequest } from "@tanstack/react-start/server";
-
 
 const baseURL = process.env.API_URL || "http://localhost.dev";
 
@@ -12,22 +8,12 @@ type RequestOptions = RequestInit & {
 };
 
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-    // const cookies = getCookies();
     const request = getRequest();
-    const cookieHeader2 = request.headers.get("Cookie") || "";
-    console.log(endpoint)
-    console.log("🚀 ~ cookieHeader222222222:", cookieHeader2)
-
-    // console.log("🚀 ~ cookies:", cookies)
-    // const sessionId = getCookie("session_id");
-    // console.log("🚀 ~ sessionId:", sessionId)
+    const cookieHeader = request.headers.get("Cookie") || "";
     const { params, ...restOptions } = options;
-    // const { getToken } = await auth();
-    // const token = await getToken({ template: "default" });
 
     const url = new URL(`/api${endpoint}`, baseURL);
 
-    console.log("🚀 ~ url:", url)
     if (params) {
         Object.entries(params).forEach(([key, value]) => {
             if (!value || value === undefined) return;
@@ -35,38 +21,30 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         });
     }
 
-    // const cookieHeader = Object.entries(cookies)
-    //     .map(([key, value]) => `${key}=${value}`)
-    //     .join("; ");
-
-    // console.log("🚀 ~ cookieHeader:.............", cookieHeader)
-
     const headers = {
         "Content-Type": "application/json",
-        "accept": "application/json",
-        Cookie: cookieHeader2,
+        Cookie: cookieHeader,
         ...options.headers,
-        // "X-Auth": "token",
     };
-
-    console.log("🚀 ~ headers:", headers)
 
     const response = await fetch(url, {
         ...restOptions,
         headers,
     });
 
-    // if (response.status === 403) {
-    //     throw redirect({
-    //         to: "/forbidden",
-    //     });
-    // }
+    if (response.status === 403) {
+        throw redirect({
+            to: "/forbidden",
+        });
+    }
 
     if (response.status === 401) {
-        console.log("401 response", response)
-        // throw redirect({
-        //     to: "/sign-in",
-        // });
+        throw redirect({
+            to: "/sign-in",
+            search: {
+                redirect: "/",
+            },
+        });
     }
 
     if (response.ok) {

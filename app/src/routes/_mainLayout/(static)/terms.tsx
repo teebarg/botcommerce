@@ -1,26 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { BtnLink } from "@/components/ui/btnLink";
 import { useConfig } from "@/providers/store-provider";
-import { SignIn } from "@clerk/tanstack-react-start";
 
 export const Route = createFileRoute("/_mainLayout/(static)/terms")({
-    beforeLoad: ({ context }) => {
-        console.log("🚀 ~ Route ~ context:", context);
-        if (!context.isAuthenticated) {
-            throw new Error("Not authenticated");
-        }
-    },
-    errorComponent: ({ error }) => {
-        if (error.message === "Not authenticated") {
-            return (
-                <div className="flex items-center justify-center p-12">
-                    <SignIn routing="hash" forceRedirectUrl={`/auth/callback?redirect=${window.location.pathname}`} />
-                </div>
-            );
-        }
-
-        throw error;
-    },
     head: () => ({
         meta: [
             {
