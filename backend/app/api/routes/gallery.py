@@ -82,7 +82,9 @@ async def image_gallery(
                 pi."order",
                 pi.product_id,
                 p.id          AS p_id,
+                p.sku         AS p_sku,
                 p.name        AS p_name,
+                p.description AS p_description,
                 p.slug        AS p_slug,
                 p.active      AS p_active,
                 p.is_new      AS p_is_new,
@@ -161,7 +163,9 @@ async def image_gallery(
                 "product_id": img["product_id"],
                 "product": {
                     "id": img["p_id"],
+                    "sku": img["p_sku"],
                     "name": img["p_name"],
+                    "description": img["p_description"],
                     "slug": img["p_slug"],
                     "active": img["p_active"],
                     "is_new": img["p_is_new"],
@@ -349,6 +353,7 @@ async def create_image_metadata(
                 "description": payload.description,
                 "active": True,
                 "is_new": payload.is_new if payload.is_new is not None else False,
+                "image": existing_image.image
             }
 
             if payload.category_ids:
@@ -461,6 +466,7 @@ async def update_image_metadata(
                             **variant_data,
                             "product_id": existing_image.product_id,
                             "sku": generate_sku(),
+                            "image": existing_image.image
                         })
                 except Exception as e:
                     logger.error(f"Variant upsert failed: {e}")

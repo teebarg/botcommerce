@@ -1,14 +1,13 @@
-from app.models.product import ProductLite
+from app.models.product import Product
 from pydantic import BaseModel
 from typing import Optional
-from datetime import datetime
 
 class ProductImage(BaseModel):
     id: int
     image: Optional[str] = None
     order: int
     product_id: Optional[int] = None
-    product: Optional[ProductLite] = None
+    product: Optional[Product] = None
 
 class PaginatedProductImages(BaseModel):
     items: list[ProductImage]

@@ -1,6 +1,6 @@
 import { Trash2, Edit3, X, Boxes } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
-import { BulkProductSheetForm } from "./bulk-product-form-sheet";
+import { BulkImageSheetForm } from "./bulk-image-form-sheet";
 import { CatalogBulkProductUpdate } from "./bulk-product-catalog-update";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -53,7 +53,7 @@ export const ProductBulkActions = ({
                     }
                     onOpenChange={editState.setOpen}
                 >
-                    <BulkProductSheetForm imageIds={selectedImageIds} onClose={editState.close} />
+                    <BulkImageSheetForm imageIds={selectedImageIds} onClose={editState.close} />
                 </Overlay>
 
                 <Overlay

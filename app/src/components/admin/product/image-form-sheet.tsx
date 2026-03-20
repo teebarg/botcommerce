@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useCollections } from "@/hooks/useCollection";
 import { useCategories } from "@/hooks/useCategories";
 import MultiSelect, { type SelectOption } from "@/components/ui/multi-select";
-import type { ProductLite, Product, ProductVariantLite } from "@/schemas";
+import type { Product, ProductVariantLite } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useCreateImageMetadata, useUpdateImageMetadata } from "@/hooks/useGallery";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,10 +24,10 @@ type FormProduct = Omit<Partial<Product>, "images" | "variants" | "categories" |
 interface ProductSheetFormProps {
     imageId: number;
     onClose: () => void;
-    currentProduct?: ProductLite;
+    currentProduct?: Product;
 }
 
-export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSheetFormProps) {
+export function ImageSheetForm({ onClose, imageId, currentProduct }: ProductSheetFormProps) {
     const { mutateAsync: createImageMetadata, isPending: createPending } = useCreateImageMetadata();
     const { mutateAsync: updateImageMetadata, isPending: updatePending } = useUpdateImageMetadata();
 
@@ -183,7 +183,10 @@ export function ProductSheetForm({ onClose, imageId, currentProduct }: ProductSh
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label className="text-sm">Size</Label>
-                            <Select value={newVariant?.size?.toString()} onValueChange={(value) => setNewVariant((prev) => ({ ...prev, size: value }))}>
+                            <Select
+                                value={newVariant?.size?.toString()}
+                                onValueChange={(value) => setNewVariant((prev) => ({ ...prev, size: value }))}
+                            >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select Size" />
                                 </SelectTrigger>

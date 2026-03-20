@@ -67,9 +67,8 @@ class ProductLite(BaseModel):
     sku: Optional[str] = None
     slug: str
     description: Optional[str] = None
+    images: Optional[List[ProductImage]] = []
     variants: Optional[List[ProductVariant]] = None
-    categories: Optional[List[Category]] = []
-    collections: Optional[List[Collection]] = []
     active: Optional[bool] = True
     is_new: Optional[bool] = False
 
@@ -80,14 +79,9 @@ class Product(BaseModel):
     sku: Optional[str] = None
     slug: str
     description: Optional[str] = None
-    image: Optional[str] = None
     variants: Optional[List[ProductVariant]] = None
-    ratings: float
     categories: Optional[List[Category]] = []
     collections: Optional[List[Collection]] = []
-    # brand: Optional[Brand] = None
-    images: Optional[List[ProductImage]] = []
-    reviews: Optional[List[Review]] = []
     active: Optional[bool] = True
     is_new: Optional[bool] = False
 

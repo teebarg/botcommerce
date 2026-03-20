@@ -50,25 +50,22 @@ export const ProductVariantLiteSchema = z.object({
     age: z.string().nullable().optional(),
 });
 
+export const ProductImageLiteSchema = z.object({
+    id: z.number(),
+    image: z.string(),
+    order: z.number()
+});
+
 export const ProductLiteSchema = z.object({
     id: z.number(),
     name: z.string(),
     slug: z.string(),
     sku: z.string(),
     description: z.string(),
+    images: z.array(ProductImageLiteSchema),
     variants: z.array(ProductVariantLiteSchema).optional(),
-    categories: z.array(CategorySchema),
-    collections: z.array(CollectionSchema),
     active: z.boolean(),
     is_new: z.boolean().optional(),
-});
-
-export const ProductImageSchema = z.object({
-    id: z.number(),
-    image: z.string(),
-    product: ProductLiteSchema.optional(),
-    product_id: z.number().optional(),
-    created_at: z.string().optional(),
 });
 
 export const ProductVariantSchema = z.object({
@@ -91,17 +88,21 @@ export const ProductSchema = z
         slug: z.string(),
         sku: z.string(),
         description: z.string(),
-        image: z.string(),
         variants: z.array(ProductVariantLiteSchema).optional(),
-        ratings: z.number(),
         categories: z.array(CategorySchema),
         collections: z.array(CollectionSchema),
-        images: z.array(ProductImageSchema),
-        reviews: z.array(ReviewSchema),
         active: z.boolean(),
         is_new: z.boolean(),
     })
     .merge(AuditSchema);
+
+export const ProductImageSchema = z.object({
+    id: z.number(),
+    image: z.string(),
+    product: ProductSchema.optional(),
+    product_id: z.number().optional(),
+    created_at: z.string().optional(),
+});
 
 export const SearchVariantSchema = z.object({
     id: z.number(),

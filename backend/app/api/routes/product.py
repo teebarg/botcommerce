@@ -12,11 +12,12 @@ from app.core.logging import get_logger
 from app.core.utils import slugify, url_to_list, generate_sku
 from app.models.generic import Message, ImageUpload
 from app.models.product import (
+    ProductLite,
     ProductCreate,
     ProductUpdate,
     VariantWithStatus,
-    Product, SearchProducts, FeedProducts,
-    ProductCreateBundle, IndexProducts, ReviewStatus
+    SearchProducts, FeedProducts,
+    IndexProducts, ReviewStatus
 )
 from app.services.meilisearch import (
     clear_index,
@@ -586,102 +587,9 @@ async def create_product(product: ProductCreate, background_tasks: BackgroundTas
     return created_product
 
 
-@router.post("/create-bundle", dependencies=[Depends(require_admin)])
-async def create_product_bundle(
-    payload: ProductCreateBundle,
-    background_tasks: BackgroundTasks,
-):
-    """
-    Create a product, images and variants.
-    - Creates the product with provided relations
-    - Uploads additional images to Supabase (if provided)
-    - Creates variants (if provided)
-    """
-    async with db.tx() as tx:
-        try:
-            slugified_name = slugify(payload.name)
-
-            data: dict[str, Any] = {
-                "name": payload.name,
-                "slug": slugified_name,
-                "sku": generate_sku(),
-                "description": payload.description,
-                "active": True,
-                "is_new": payload.is_new if payload.is_new is not None else False,
-            }
-
-            if payload.category_ids:
-                data["categories"] = {"connect": [{"id": id}
-                                                  for id in payload.category_ids]}
-
-            if payload.collection_ids:
-                data["collections"] = {"connect": [{"id": id}
-                                                   for id in payload.collection_ids]}
-
-            product = await tx.product.create(data=data)
-
-            if payload.images:
-                created_images = []
-                for index, img in enumerate(payload.images):
-                    try:
-                        image_url = upload(bucket="product-images", data=img)
-                        created_images.append({
-                            "image": image_url,
-                            "product_id": product.id,
-                            "order": index,
-                        })
-                    except Exception as e:
-                        logger.error(e)
-                        raise HTTPException(
-                            status_code=400, detail=f"Failed to upload image {index + 1}: {str(e)}")
-
-                if created_images:
-                    await tx.productimage.create_many(data=created_images)
-
-            if payload.variants:
-                for variant in payload.variants:
-                    try:
-                        await tx.productvariant.create(
-                            data={
-                                "sku": generate_sku(),
-                                "price": variant.price,
-                                "old_price": variant.old_price,
-                                "inventory": variant.inventory,
-                                "product_id": product.id,
-                                "status": variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
-                                "size": variant.size,
-                                "color": variant.color,
-                                "measurement": variant.measurement,
-                                "age": variant.age,
-                            }
-                        )
-                    except Exception as e:
-                        logger.error(e)
-                        raise HTTPException(
-                            status_code=400, detail=f"Failed to create variant: {str(e)}")
-
-            await invalidate_pattern("gallery")
-            background_tasks.add_task(index_product, product_id=product.id)
-
-            full = await tx.product.find_unique(
-                where={"id": product.id},
-                include={"variants": True, "images": True}
-            )
-
-            return full
-        except UniqueViolationError:
-            raise HTTPException(
-                status_code=400, detail="Product with this name already exists")
-        except HTTPException:
-            raise
-        except Exception as e:
-            logger.error(e)
-            raise HTTPException(status_code=500, detail=str(e))
-
-
 @router.get("/{slug}")
 @cache_response("product:slug", key=lambda request, slug, **kwargs: slug)
-async def read(request: Request, slug: str):
+async def read(request: Request, slug: str) -> ProductLite:
     """Get a specific product by slug with Redis caching."""
     product = await db.product.find_unique(
         where={"slug": slug},
@@ -693,10 +601,7 @@ async def read(request: Request, slug: str):
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    product_dict = product.dict()
-    product_dict["is_new"] = getattr(product, "is_new", False)
-
-    return product_dict
+    return product
 
 
 @router.put("/{id}", dependencies=[Depends(require_admin)])
@@ -783,41 +688,6 @@ async def delete_product(id: int) -> Message:
         return Message(message="Product deleted successfully")
 
 
-@router.post("/{id}/variants", dependencies=[Depends(require_admin)])
-async def create_variant(id: int, variant: VariantWithStatus, background_tasks: BackgroundTasks):
-    product = await db.product.find_unique(where={"id": id})
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-
-    try:
-        created_variant = await db.productvariant.create(
-            data={
-                "sku": generate_sku(),
-                "price": variant.price,
-                "old_price": variant.old_price,
-                "inventory": variant.inventory,
-                "product_id": id,
-                "status": variant.inventory > 0 and "IN_STOCK" or "OUT_OF_STOCK",
-                "size": variant.size,
-                "color": variant.color,
-                "measurement": variant.measurement,
-                "age": variant.age
-            }
-        )
-    except UniqueViolationError as e:
-        logger.error(e)
-        raise HTTPException(
-            status_code=400, detail="Variant with this details already exists")
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=400, detail=str(e))
-
-    await invalidate_pattern("gallery")
-    background_tasks.add_task(index_product, product_id=id)
-
-    return created_variant
-
-
 @router.put("/variants/{variant_id}", dependencies=[Depends(require_admin)])
 async def update_variant(variant_id: int, variant: VariantWithStatus, background_tasks: BackgroundTasks):
     existing_variant = await db.productvariant.find_unique(where={"id": variant_id})
@@ -862,51 +732,6 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
 
     return updated_variant
 
-
-@router.delete("/variants/{variant_id}", dependencies=[Depends(require_admin)])
-async def delete_variant(variant_id: int, background_tasks: BackgroundTasks):
-    try:
-        variant = await db.productvariant.delete(where={"id": variant_id})
-
-        background_tasks.add_task(
-            index_product, product_id=variant.product_id)
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=400, detail=str(e))
-
-    return {"success": True}
-
-
-@router.patch("/{id}/image", dependencies=[Depends(require_admin)])
-async def add_image(id: int, image_data: ImageUpload, background_tasks: BackgroundTasks) -> Product:
-    """
-    Add an image to a product.
-    """
-    product = await db.product.find_unique(where={"id": id})
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-
-    try:
-        image_url = upload(bucket="product-images", data=image_data)
-
-        updated_product = await db.product.update(
-            where={"id": id},
-            data={"image": image_url}
-        )
-
-        await invalidate_pattern("gallery")
-        background_tasks.add_task(index_product, product_id=id)
-
-        return updated_product
-
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(
-            status_code=400,
-            detail=str(e)
-        )
-
-
 @router.post("/{id}/images", dependencies=[Depends(require_admin)])
 async def upload_images(id: int, image_data: ImageUpload, background_tasks: BackgroundTasks):
     """
@@ -917,7 +742,7 @@ async def upload_images(id: int, image_data: ImageUpload, background_tasks: Back
         raise HTTPException(status_code=404, detail="Product not found")
 
     try:
-        image_url = upload(bucket="product-images", data=image_data)
+        image_url: str = upload(bucket="product-images", data=image_data)
 
         image = await db.productimage.create(
             data={

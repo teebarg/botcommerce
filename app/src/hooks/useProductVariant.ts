@@ -3,13 +3,13 @@ import { useEffect, useMemo, useState } from "react";
 import { useAddToCart, useChangeCartQuantity } from "./useCart";
 import { currency } from "@/utils";
 import { useConfig } from "@/providers/store-provider";
-import type { Product, ProductSearch, ProductVariantLite } from "@/schemas/product";
+import type { ProductLite, ProductSearch, ProductVariantLite } from "@/schemas/product";
 import { useCart } from "@/providers/cart-provider";
 import { isFirstWhatsAppMessage, markFirstWhatsAppMessageSent } from "@/utils/whatsapp-message-state";
 import { analytics } from "@/utils/pulsemetric";
 import { CartItem } from "@/schemas";
 
-export const useProductVariant = (product: Product | ProductSearch) => {
+export const useProductVariant = (product: ProductLite | ProductSearch) => {
     const { cart } = useCart();
     const { config } = useConfig();
     const { mutateAsync: addToCart, isPending: creating } = useAddToCart();

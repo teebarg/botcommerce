@@ -1,7 +1,7 @@
 import { api } from "@/utils/api.server";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { Product, ProductSearch, ProductFeed, CategoriesWithProducts } from "@/schemas";
+import type { ProductSearch, ProductFeed, ProductLite } from "@/schemas";
 
 export const SearchSchema = z.object({
     search: z.string().optional(),
@@ -58,6 +58,6 @@ export const getProductsFeedFn = createServerFn()
 export const getProductFn = createServerFn({ method: "GET" })
     .inputValidator((d: string) => d)
     .handler(async ({ data }) => {
-        const res = await api.get<Product>(`/product/${data}`);
+        const res = await api.get<ProductLite>(`/product/${data}`);
         return res;
     });

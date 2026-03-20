@@ -1,6 +1,6 @@
 import { Edit2 } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
-import { ProductSheetForm } from "./product-form-sheet";
+import { ImageSheetForm } from "./image-form-sheet";
 import { Button } from "@/components/ui/button";
 import type { ProductImage } from "@/schemas";
 import Overlay from "@/components/overlay";
@@ -24,7 +24,7 @@ export function GalleryCardActions({ image }: GalleryCardActionProps) {
                 }
                 onOpenChange={editState.setOpen}
             >
-                <ProductSheetForm currentProduct={image.product} imageId={image.id} onClose={editState.close} />
+                <ImageSheetForm currentProduct={image.product} imageId={image.id} onClose={editState.close} />
             </Overlay>
         </div>
     );
