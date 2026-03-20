@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Literal
 from pydantic import BaseModel, Field
 from app.models.generic import ImageUpload
 from app.models.base import BM
@@ -116,15 +116,14 @@ class SearchProduct(BaseModel):
     name: Optional[str] = None
     sku: Optional[str] = None
     slug: str
-    description: Optional[str] = None
     image: Optional[str] = None
+    status: Literal["IN STOCK", "OUT OF STOCK"] = "IN STOCK"
     variants: Optional[List[SearchVariant]] = []
-    max_variant_price: Optional[float] = None
-    min_variant_price: Optional[float] = None
     active: Optional[bool] = True
     sizes: Optional[List[str]] = None
+    ages: Optional[List[str]] = None
     colors: Optional[List[str]] = None
-    catalogs: Optional[List[str]] = None
+    measurements: Optional[List[int]] = None
     is_new: Optional[bool] = False
 
 class Facets(BaseModel):

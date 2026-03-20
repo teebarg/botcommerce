@@ -42,7 +42,7 @@ function PWABadge() {
                     {needRefresh && (
                         <button
                             onClick={() => updateServiceWorker(true)}
-                            className="px-3 py-1 text-xs font-medium rounded-md bg-primary text-white hover:opacity-90"
+                            className="px-3 py-1 text-xs font-medium rounded-md bg-primary text-white hover:opacity-90 cursor-pointer"
                         >
                             Update
                         </button>

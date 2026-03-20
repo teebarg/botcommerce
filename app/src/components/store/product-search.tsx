@@ -10,7 +10,7 @@ import { useProductSearch } from "@/hooks/useProduct";
 import { Separator } from "@/components/ui/separator";
 import LocalizedClientLink from "@/components/ui/link";
 import { useNavigate } from "@tanstack/react-router";
-import ProductCardLight from "@/components/store/products/product-card-light";
+import ProductCardPLP from "./products/product-card-plp";
 
 interface SearchDialogProps {
     initialQuery?: string;
@@ -123,7 +123,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                                         <h3 className="font-semibold text-sm tracking-wider mb-4">PRODUCTS</h3>
                                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                                             {data?.products?.map((product: ProductSearch) => (
-                                                <ProductCardLight key={product.id} product={product} />
+                                                <ProductCardPLP key={product.id} product={product} />
                                             ))}
                                         </div>
                                     </div>
@@ -169,7 +169,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                                     <h3 className="font-semibold text-sm tracking-wider mb-4">TRENDING PRODUCTS</h3>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                         {trendingData?.products?.map((product: ProductSearch) => (
-                                            <ProductCardLight key={product.id} product={product} />
+                                            <ProductCardPLP key={product.id} product={product} />
                                         ))}
                                     </div>
                                 </div>
