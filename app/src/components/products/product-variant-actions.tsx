@@ -1,13 +1,13 @@
 import type React from "react";
 import { Heart, ShoppingCart } from "lucide-react";
 import { useProductVariant } from "@/hooks/useProductVariant";
-import type { Product } from "@/schemas/product";
+import type { ProductLite } from "@/schemas/product";
 import { motion } from "framer-motion";
 import { useUserCreateWishlist, useUserDeleteWishlist } from "@/hooks/useUser";
 import { Button } from "@/components/ui/button";
 
 interface VariantSelectionProps {
-    product: Product;
+    product: ProductLite;
     inWishlist: boolean;
 }
 

@@ -4,11 +4,11 @@ import { Minus, Plus } from "lucide-react";
 import { cn, currency } from "@/utils";
 import { Badge } from "@/components/ui/badge";
 import { useProductVariant } from "@/hooks/useProductVariant";
-import type { Product, ProductVariantLite } from "@/schemas/product";
+import type { ProductLite, ProductVariantLite } from "@/schemas/product";
 import { motion } from "framer-motion";
 
 interface VariantSelectionProps {
-    product: Product;
+    product: ProductLite;
     selectedVariant?: ProductVariantLite;
     onVariantChange: (variant: ProductVariantLite | undefined) => void;
 }

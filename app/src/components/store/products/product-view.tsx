@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { currency } from "@/utils";
 import { ProductVariantSelection } from "@/components/products/product-variant-selection";
-import type { Product, ProductVariantLite } from "@/schemas";
+import type { ProductLite, ProductVariantLite } from "@/schemas";
 import { type UserInteractionType, useTrackUserInteraction } from "@/hooks/useUserInteraction";
 import { Button } from "@/components/ui/button";
 import { useUpdateVariant } from "@/hooks/useProduct";
@@ -17,7 +17,7 @@ import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { useOverlayTriggerState } from "react-stately";
 
 interface Props {
-    product: Product;
+    product: ProductLite;
 }
 
 const ProductView: React.FC<Props> = ({ product }) => {
