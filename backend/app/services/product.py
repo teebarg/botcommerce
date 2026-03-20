@@ -62,47 +62,6 @@ async def index_product(product_id: int):
     except Exception as e:
         logger.error(f"Error re-indexing product {product_id}: {e}")
 
-
-@with_prisma_connection
-async def index_products222(product_ids: Optional[List[int]] = None):
-    """
-    Re-index all products in the database to Meilisearch.
-    """
-    try:
-        logger.info("Starting re-indexing..........")
-        products = await db.product.find_many(
-            where={"id": {"in": product_ids}} if product_ids else None,
-            include={
-                "categories": True,
-                "collections": True,
-                "variants": True,
-                "images": True,
-                "shared_collections": True,
-            }
-        )
-
-        if not products:
-            logger.warning(f"products with ids {product_ids} not found for re-indexing.")
-            return
-
-        keys = []
-        async def _index_single(product):
-            try:
-                product_data = prepare_product_data_for_indexing(product)
-                await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
-                if product.slug:
-                    keys.append(f"product:slug:{product.slug}")
-                if product.id:
-                    keys.append(f"product:similar:{product.id}")
-            except Exception as e:
-                logger.debug(f"Error indexing product {product.id}: {e}")
-
-        await asyncio.gather(*[_index_single(p) for p in products])
-        await invalidate_product_cache(keys=keys)
-        logger.info(f"Successfully indexed {len(products)} products")
-    except Exception as e:
-        logger.error(f"Error during product re-indexing: {e}")
-
 @with_prisma_connection
 async def index_products(product_ids: Optional[List[int]] = None):
     try:
