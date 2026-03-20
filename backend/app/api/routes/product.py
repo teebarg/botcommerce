@@ -12,6 +12,7 @@ from app.core.logging import get_logger
 from app.core.utils import slugify, url_to_list, generate_sku
 from app.models.generic import Message, ImageUpload
 from app.models.product import (
+    ProductLite,
     ProductCreate,
     ProductUpdate,
     VariantWithStatus,
@@ -681,7 +682,7 @@ async def create_product_bundle(
 
 @router.get("/{slug}")
 @cache_response("product:slug", key=lambda request, slug, **kwargs: slug)
-async def read(request: Request, slug: str):
+async def read(request: Request, slug: str) -> ProductLite:
     """Get a specific product by slug with Redis caching."""
     product = await db.product.find_unique(
         where={"slug": slug},
@@ -693,10 +694,7 @@ async def read(request: Request, slug: str):
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    product_dict = product.dict()
-    product_dict["is_new"] = getattr(product, "is_new", False)
-
-    return product_dict
+    return product
 
 
 @router.put("/{id}", dependencies=[Depends(require_admin)])
