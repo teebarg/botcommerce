@@ -45,12 +45,12 @@ const FIELD_CONFIG = {
     inventory: { label: "Inventory", type: "number" },
 } as const;
 
-interface BulkProductSheetFormProps {
+interface BulkImageSheetFormProps {
     imageIds: number[];
     onClose: () => void;
 }
 
-export function BulkProductSheetForm({ onClose, imageIds }: BulkProductSheetFormProps) {
+export function BulkImageSheetForm({ onClose, imageIds }: BulkImageSheetFormProps) {
     const { mutateAsync: bulkProductUpdate, isPending } = useBulkProductUpdate();
 
     const [errors, setErrors] = useState<Partial<FormProduct>>({});
