@@ -30,7 +30,7 @@ from app.prisma_client import prisma as db
 from app.core.storage import upload
 from app.core.config import settings
 from prisma.errors import UniqueViolationError
-from app.services.product import index_product, delete_product_index
+from app.services.product import index_product, delete_product_index, index_products
 from app.services.redis import cache_response, invalidate_pattern
 from meilisearch.errors import MeilisearchApiError
 from app.services.recently_viewed import RecentlyViewedService
@@ -1046,3 +1046,18 @@ async def reorder_images(id: int, image_ids: list[int]) -> Message:
 
     await index_product(product_id=id)
     return Message(message="Image re-ordered successfully.")
+
+@router.post("/reindex")
+async def reindex_products(background_tasks: BackgroundTasks) -> Message:
+    """
+    Re-index all products in the db to Meilisearch.
+    """
+    try:
+        background_tasks.add_task(index_products)
+        return Message(message="Re-indexing task enqueued...........")
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(
+            status_code=500,
+            detail=str(e),
+        )
