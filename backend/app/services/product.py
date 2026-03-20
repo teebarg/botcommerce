@@ -3,7 +3,7 @@ from typing import List, Optional, Any
 from app.prisma_client import prisma as db
 from app.core.config import settings
 from app.core.logging import get_logger
-from app.services.meilisearch import update_document, delete_document
+from app.services.meilisearch import update_document, delete_document, add_documents_to_index
 from app.models.product import Product
 from app.services.prisma import with_prisma_connection
 from app.services.redis import invalidate_keys, invalidate_key_only
@@ -64,7 +64,7 @@ async def index_product(product_id: int):
 
 
 @with_prisma_connection
-async def index_products(product_ids: Optional[List[int]] = None):
+async def index_products222(product_ids: Optional[List[int]] = None):
     """
     Re-index all products in the database to Meilisearch.
     """
@@ -100,6 +100,52 @@ async def index_products(product_ids: Optional[List[int]] = None):
         await asyncio.gather(*[_index_single(p) for p in products])
         await invalidate_product_cache(keys=keys)
         logger.info(f"Successfully indexed {len(products)} products")
+    except Exception as e:
+        logger.error(f"Error during product re-indexing: {e}")
+
+@with_prisma_connection
+async def index_products(product_ids: Optional[List[int]] = None):
+    try:
+        logger.info("Starting re-indexing..........")
+        products = await db.product.find_many(
+            where={"id": {"in": product_ids}} if product_ids else None,
+            include={
+                "categories": True,
+                "collections": True,
+                "variants": True,
+                "images": True,
+                "shared_collections": True,
+            }
+        )
+
+        if not products:
+            logger.warning(f"Products with ids {product_ids} not found for re-indexing.")
+            return
+
+        documents = []
+        cache_keys = []
+        for product in products:
+            try:
+                product_data = prepare_product_data_for_indexing(product)
+                documents.append(product_data)
+                if product.slug:
+                    cache_keys.append(f"product:slug:{product.slug}")
+                if product.id:
+                    cache_keys.append(f"product:similar:{product.id}")
+            except Exception as e:
+                logger.debug(f"Error preparing product {product.id}: {e}")
+
+        # Batch into chunks of 500 (Meili handles this well)
+        BATCH_SIZE = 500
+        # index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
+        for i in range(0, len(documents), BATCH_SIZE):
+            batch = documents[i:i + BATCH_SIZE]
+            # index.add_documents(batch)
+            await add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=batch)
+            logger.info(f"Indexed batch {i // BATCH_SIZE + 1} ({len(batch)} products)")
+
+        await invalidate_product_cache(keys=cache_keys)
+        logger.info(f"Successfully indexed {len(documents)} products")
     except Exception as e:
         logger.error(f"Error during product re-indexing: {e}")
 
