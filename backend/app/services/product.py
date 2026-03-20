@@ -82,7 +82,7 @@ async def index_products(product_ids: Optional[List[int]] = None):
             return
 
         documents = []
-        cache_keys = []
+        cache_keys: list[str] = []
         for product in products:
             try:
                 product_data = prepare_product_data_for_indexing(product)
@@ -94,12 +94,9 @@ async def index_products(product_ids: Optional[List[int]] = None):
             except Exception as e:
                 logger.debug(f"Error preparing product {product.id}: {e}")
 
-        # Batch into chunks of 500 (Meili handles this well)
         BATCH_SIZE = 500
-        # index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
         for i in range(0, len(documents), BATCH_SIZE):
             batch = documents[i:i + BATCH_SIZE]
-            # index.add_documents(batch)
             await add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=batch)
             logger.info(f"Indexed batch {i // BATCH_SIZE + 1} ({len(batch)} products)")
 
