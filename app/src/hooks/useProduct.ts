@@ -127,3 +127,15 @@ export const useReorderImages = () => {
         },
     });
 };
+
+export const useReIndexProducts = () => {
+    return useMutation({
+        mutationFn: async () => await clientApi.post<Message>("/product/reindex"),
+        onSuccess: () => {
+            toast.success("Products re-indexing queued");
+        },
+        onError: (error: any) => {
+            toast.error(error.message || "Failed to re-index products");
+        },
+    });
+};
