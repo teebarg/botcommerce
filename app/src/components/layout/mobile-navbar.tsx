@@ -28,9 +28,7 @@ const MobileHeader = () => {
             <ShareButton />
             <SearchDialog />
             <GetApp />
-            <div className="sm:hidden">
-                <UserDropdown />
-            </div>
+            <UserDropdown />
         </div>
     );
 };

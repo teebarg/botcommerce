@@ -46,6 +46,9 @@ from app.core.permissions import require_admin
 
 logger = get_logger(__name__)
 
+DEFAULT_MAX_PRICE = 50000
+DEFAULT_MIN_PRICE = 1
+
 
 def build_variant_data(payload) -> dict[str, Any]:
     data = {}
@@ -183,6 +186,28 @@ async def get_recommendations(request: Request, user: CurrentUser, limit: int = 
 #     products = await service.get_popular_products(limit)
 #     return products
 
+
+def has_active_filters(
+    search: str,
+    cat_ids: str,
+    collections: str,
+    max_price: int,
+    min_price: int,
+    sizes: str,
+    colors: str,
+    ages: str,
+) -> bool:
+    return any([
+        search,
+        cat_ids,
+        collections,
+        sizes,
+        colors,
+        ages,
+        min_price != DEFAULT_MIN_PRICE,
+        max_price != DEFAULT_MAX_PRICE,
+    ])
+
 @router.get("/feed")
 @cache_response("products:list")
 async def feed(
@@ -191,8 +216,8 @@ async def feed(
     sort: str = "id:desc",
     cat_ids: str = Query(default=""),
     collections: str = Query(default=""),
-    max_price: int = Query(default=1000000, gt=0),
-    min_price: int = Query(default=1, gt=0),
+    max_price: int = Query(default=DEFAULT_MAX_PRICE, gt=0),
+    min_price: int = Query(default=DEFAULT_MIN_PRICE, gt=0),
     sizes: str = Query(default=""),
     colors: str = Query(default=""),
     ages: str = Query(default=""),
@@ -206,8 +231,6 @@ async def feed(
     """
     Cursor-based discovery feed using Meilisearch-compatible pagination.
     """
-    use_search = search != ""
-
     import random, json, base64
 
     def encode_cursor(hit: dict) -> str:
@@ -254,13 +277,13 @@ async def feed(
         feed_seed = random.random()
 
     index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
-    use_search: bool = True if any([search, cat_ids, collections, sizes, colors, ages]) else False
+    disable_random_feed: bool = has_active_filters(search, cat_ids, collections, max_price, min_price, sizes, colors, ages)
 
     try:
         hits: list[dict] = []
         total_count = 0
 
-        if not use_search:
+        if not disable_random_feed:
             cursor_filter = ""
 
             if cursor:
@@ -435,8 +458,8 @@ async def search(
     sort: str = "id:desc",
     cat_ids: str = Query(default=""),
     collections: str = Query(default=""),
-    max_price: int = Query(default=1000000, gt=0),
-    min_price: int = Query(default=1, gt=0),
+    max_price: int = Query(default=DEFAULT_MAX_PRICE, gt=0),
+    min_price: int = Query(default=DEFAULT_MIN_PRICE, gt=0),
     sizes: str = Query(default=""),
     colors: str = Query(default=""),
     ages: str = Query(default=""),

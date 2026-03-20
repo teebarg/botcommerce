@@ -49,7 +49,7 @@ const StoreNavbar = () => {
                         )}
                     </div>
                     <GetApp />
-                    <div className="hidden sm:block">
+                    <div className="hidden sm:flex items-center">
                         <UserDropdown />
                     </div>
                 </NavbarItem>

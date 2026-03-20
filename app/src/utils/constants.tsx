@@ -72,3 +72,6 @@ export const HERO_IMAGES = [
     "https://res.cloudinary.com/dj7ubhgys/image/upload/v1769793694/h2_tfzcyr.jpg",
     "https://res.cloudinary.com/dj7ubhgys/image/upload/v1769793694/h1_zaixjo.jpg",
 ];
+
+export const DEFAULT_MAX_PRICE = 50000
+export const DEFAULT_MIN_PRICE = 1

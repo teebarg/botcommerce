@@ -76,7 +76,7 @@ export default function ShareButton() {
                     </span>
                     <span className="md:hidden flex flex-col items-center text-white/80">
                         <div className="action-button">
-                            <Share2 className="w-5 h-5" fill="currentColor" />
+                            <Share2 className="w-4 h-4" fill="currentColor" />
                         </div>
                     </span>
                 </button>

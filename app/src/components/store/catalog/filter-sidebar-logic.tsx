@@ -13,7 +13,7 @@ import { useCollections } from "@/hooks/useCollection";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import type { Facet } from "@/schemas/product";
 import { currency, debounce } from "@/utils";
-import { AGE_OPTIONS, COLOR_OPTIONS, type ColorOption, SIZE_OPTIONS } from "@/utils/constants";
+import { AGE_OPTIONS, COLOR_OPTIONS, type ColorOption, DEFAULT_MAX_PRICE, DEFAULT_MIN_PRICE, SIZE_OPTIONS } from "@/utils/constants";
 
 export interface FilterSidebarRef {
     apply: () => void;
@@ -41,12 +41,12 @@ const DEFAULT_DRAFT = {
     colors: new Set<string>(),
     ages: new Set<string>(),
     categories: new Set<string>(),
-    minPrice: "1000",
-    maxPrice: "50000",
+    minPrice: DEFAULT_MIN_PRICE,
+    maxPrice: DEFAULT_MAX_PRICE,
 };
 
-const PRICE_MIN_BOUND = 1;
-const PRICE_MAX_BOUND = 1_000_000;
+const PRICE_MIN_BOUND = DEFAULT_MIN_PRICE;
+const PRICE_MAX_BOUND = DEFAULT_MAX_PRICE;
 
 const normalizePriceValues = (minStr: string, maxStr: string) => {
     const parse = (v: string): number | null => {
@@ -84,8 +84,8 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
             colors: new Set(search.colors?.split(",").filter(Boolean)),
             ages: new Set(search.ages?.split(",").filter(Boolean)),
             categories: new Set(search.cat_ids?.split(",").filter(Boolean)),
-            minPrice: search.min_price?.toString() ?? "1",
-            maxPrice: search.max_price?.toString() ?? "50000",
+            minPrice: search.min_price?.toString() ?? `${DEFAULT_MIN_PRICE}`,
+            maxPrice: search.max_price?.toString() ?? `${DEFAULT_MAX_PRICE}`,
         };
     }, [search]);
 
@@ -186,11 +186,11 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
             colors: new Set(),
             ages: new Set(),
             categories: new Set(),
-            minPrice: DEFAULT_DRAFT.minPrice,
-            maxPrice: DEFAULT_DRAFT.maxPrice,
+            minPrice: DEFAULT_DRAFT.minPrice.toString(),
+            maxPrice: DEFAULT_DRAFT.maxPrice.toString(),
         });
-        setPriceMinInput(DEFAULT_DRAFT.minPrice);
-        setPriceMaxInput(DEFAULT_DRAFT.maxPrice);
+        setPriceMinInput(DEFAULT_DRAFT.minPrice.toString());
+        setPriceMaxInput(DEFAULT_DRAFT.maxPrice.toString());
     };
 
     useImperativeHandle(ref, () => ({
