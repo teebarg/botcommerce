@@ -183,22 +183,6 @@ async def image_gallery(
         logger.error(f"Gallery fetch error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/reindex", dependencies=[Depends(require_admin)])
-async def reindex_images(background_tasks: BackgroundTasks) -> Message:
-    """
-    Re-index all images in the db to Meilisearch.
-    """
-    try:
-        await invalidate_pattern("gallery")
-        background_tasks.add_task(index_products)
-        return Message(message="Re-indexing task enqueued...........")
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(
-            status_code=500,
-            detail=str(e),
-        )
-
 
 @router.delete("/{image_id}", dependencies=[Depends(require_admin)])
 async def delete_gallery_image(image_id: int, background_tasks: BackgroundTasks) -> Message:

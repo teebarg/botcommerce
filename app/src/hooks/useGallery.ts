@@ -31,18 +31,6 @@ export const useUpdateImageMetadata = () => {
     });
 };
 
-export const useReIndexGallery = () => {
-    return useMutation({
-        mutationFn: async () => await clientApi.post<Message>("/gallery/reindex"),
-        onSuccess: () => {
-            toast.success("Gallery re-indexed successfully");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to re-index gallery");
-        },
-    });
-};
-
 export const useDeleteGalleryImage = () => {
     return useMutation({
         mutationFn: async ({ id }: { id: number }) => await clientApi.delete<Message>(`/gallery/${id}`),

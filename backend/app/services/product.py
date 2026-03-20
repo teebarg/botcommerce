@@ -3,7 +3,7 @@ from typing import List, Optional, Any
 from app.prisma_client import prisma as db
 from app.core.config import settings
 from app.core.logging import get_logger
-from app.services.meilisearch import update_document, delete_document
+from app.services.meilisearch import update_document, delete_document, add_documents_to_index
 from app.models.product import Product
 from app.services.prisma import with_prisma_connection
 from app.services.redis import invalidate_keys, invalidate_key_only
@@ -62,12 +62,8 @@ async def index_product(product_id: int):
     except Exception as e:
         logger.error(f"Error re-indexing product {product_id}: {e}")
 
-
 @with_prisma_connection
 async def index_products(product_ids: Optional[List[int]] = None):
-    """
-    Re-index all products in the database to Meilisearch.
-    """
     try:
         logger.info("Starting re-indexing..........")
         products = await db.product.find_many(
@@ -82,24 +78,30 @@ async def index_products(product_ids: Optional[List[int]] = None):
         )
 
         if not products:
-            logger.warning(f"products with ids {product_ids} not found for re-indexing.")
+            logger.warning(f"Products with ids {product_ids} not found for re-indexing.")
             return
 
-        keys = []
-        async def _index_single(product):
+        documents = []
+        cache_keys: list[str] = []
+        for product in products:
             try:
                 product_data = prepare_product_data_for_indexing(product)
-                await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
+                documents.append(product_data)
                 if product.slug:
-                    keys.append(f"product:slug:{product.slug}")
+                    cache_keys.append(f"product:slug:{product.slug}")
                 if product.id:
-                    keys.append(f"product:similar:{product.id}")
+                    cache_keys.append(f"product:similar:{product.id}")
             except Exception as e:
-                logger.debug(f"Error indexing product {product.id}: {e}")
+                logger.debug(f"Error preparing product {product.id}: {e}")
 
-        await asyncio.gather(*[_index_single(p) for p in products])
-        await invalidate_product_cache(keys=keys)
-        logger.info(f"Successfully indexed {len(products)} products")
+        BATCH_SIZE = 500
+        for i in range(0, len(documents), BATCH_SIZE):
+            batch = documents[i:i + BATCH_SIZE]
+            await add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=batch)
+            logger.info(f"Indexed batch {i // BATCH_SIZE + 1} ({len(batch)} products)")
+
+        await invalidate_product_cache(keys=cache_keys)
+        logger.info(f"Successfully indexed {len(documents)} products")
     except Exception as e:
         logger.error(f"Error during product re-indexing: {e}")
 

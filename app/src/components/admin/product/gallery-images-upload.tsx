@@ -9,7 +9,7 @@ declare global {
 }
 
 export function GalleryImagesUpload() {
-    // const { mutateAsync: reIndexGallery, isPending: isReIndexing } = useReIndexGallery();
+    // const { mutateAsync: rendexProducts, isPending: isReIndexing } = useReIndexProducts();
     const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [isCloudinaryLoaded, setIsCloudinaryLoaded] = useState(false);
 
@@ -86,7 +86,7 @@ export function GalleryImagesUpload() {
                     {isPending ? "Saving..." : "Complete"}
                 </Button>
             )}
-            {/* <Button className="min-w-32" disabled={isReIndexing} isLoading={isReIndexing} variant="emerald" onClick={() => reIndexGallery()}>
+            {/* <Button className="min-w-32" disabled={isReIndexing} isLoading={isReIndexing} variant="emerald" onClick={() => rendexProducts()}>
                 Re-index
             </Button> */}
         </div>
