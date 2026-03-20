@@ -88,13 +88,9 @@ export const ProductSchema = z
         slug: z.string(),
         sku: z.string(),
         description: z.string(),
-        image: z.string(),
         variants: z.array(ProductVariantLiteSchema).optional(),
-        ratings: z.number(),
         categories: z.array(CategorySchema),
         collections: z.array(CollectionSchema),
-        // images: z.array(ProductImageSchema),
-        reviews: z.array(ReviewSchema),
         active: z.boolean(),
         is_new: z.boolean(),
     })

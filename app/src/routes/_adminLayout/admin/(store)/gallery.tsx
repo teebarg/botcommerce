@@ -86,6 +86,7 @@ function RouteComponent() {
             queryClient.invalidateQueries({ queryKey: ["gallery"] });
             toast.success("Done!", { id: toastId.current });
             setSelectionMode(false);
+            setSelectedImages(new Set());
             setIsLoading(false);
         }
     }, [lastMessage, isLoading]);

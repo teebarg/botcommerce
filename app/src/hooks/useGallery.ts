@@ -56,9 +56,6 @@ export const useBulkProductUpdate = () => {
     return useMutation({
         mutationFn: async ({ imageIds, input }: BulkUpdateInput) =>
             await clientApi.patch<Message>("/gallery/bulk-update", { image_ids: imageIds, data: input }),
-        onSuccess: () => {
-            toast.success("Bulk metadata updated successfully");
-        },
         onError: (error: any) => {
             toast.error(error.message || "Failed to start bulk metadata");
         },
