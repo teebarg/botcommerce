@@ -135,50 +135,6 @@ function RouteComponent() {
                 <div className="text-center">No images found</div>
             ) : (
                 <div>
-                    {/* <div className="flex items-center gap-2">
-                        <Select
-                            value={params.active === true ? "true" : params.active === false ? "false" : "all"}
-                            onValueChange={(value) => {
-                                const newActive = value === "all" ? undefined : value === "true";
-                                navigate({ to: ".", search: (prev) => ({ ...prev, active: newActive, cursor: undefined }) });
-                            }}
-                        >
-                            <SelectTrigger className="w-32">
-                                <SelectValue placeholder="Active" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All</SelectItem>
-                                <SelectItem value="true">Active</SelectItem>
-                                <SelectItem value="false">Inactive</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Select
-                            value={params.sort}
-                            onValueChange={(value) => {
-                                navigate({ to: ".", search: (prev) => ({ ...prev, sort: value as "newest" | "oldest", cursor: undefined }) });
-                            }}
-                        >
-                            <SelectTrigger className="w-32">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="newest">Newest</SelectItem>
-                                <SelectItem value="oldest">Oldest</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div> */}
-                    {/* <SheetDrawer
-                        open={filterState.isOpen}
-                        title="Filter Gallery"
-                        trigger={
-                            <Button className="bg-contrast/10" variant="ghost">
-                                <Share2 className="h-5 w-5 text-contrast" />
-                            </Button>
-                        }
-                        onOpenChange={filterState.setOpen}
-                    >
-                        <GalleryFilters onClose={filterState.close} />
-                    </SheetDrawer> */}
                     <div className="mb-4 sticky top-16 z-40 bg-background -mx-2 px-4 py-4 flex gap-2 justify-between">
                         <div className="rounded-full p-1 flex items-center gap-2 bg-secondary w-1/2">
                             <div className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "grid" && "bg-background")}>

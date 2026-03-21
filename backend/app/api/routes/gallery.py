@@ -64,7 +64,7 @@ def build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any
 router = APIRouter()
 
 @router.get("/")
-# @cache_response("gallery")
+@cache_response("gallery")
 async def image_gallery(
     request: Request,
     cursor: Optional[int] = Query(default=None),
@@ -94,7 +94,7 @@ async def image_gallery(
             )
         """)
 
-    extra_filters_sql = "\n".join(extra_filters)
+    extra_filters_sql: str = "\n".join(extra_filters)
 
     try:
         images = await db.query_raw(
@@ -204,155 +204,6 @@ async def image_gallery(
             "limit": limit,
         }
 
-    except Exception as e:
-        logger.error(f"Gallery fetch error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@router.get("/gallery22222")
-@cache_response("gallery2")
-async def image_gallery2(
-    request: Request,
-    cursor: Optional[int] = Query(default=None),
-    limit: int = Query(default=36, ge=1, le=100),
-    active: Optional[bool] = Query(default=None),
-    sort: str = Query(default="newest", regex="^(newest|oldest)$"),
-) -> PaginatedProductImages:
-    """
-    Image gallery endpoint using cursor-based pagination.
-    """
-    try:
-        # Build cursor default
-        default_cursor = 2147483647 if sort == "newest" else 0
-        cursor_value = cursor if cursor is not None else default_cursor
-
-        # Build WHERE clauses
-        where_clauses = ["pi.\"order\" = 0"]
-        params = [cursor_value, limit + 1]
-        param_index = 3
-
-        if active is not None:
-            where_clauses.append("p.active = $3")
-            params.insert(2, active)
-            param_index = 4
-
-        where_sql = " AND ".join(where_clauses)
-
-        # Build ORDER BY
-        if sort == "newest":
-            order_sql = "ORDER BY pi.id DESC"
-            cursor_condition = "pi.id < $1"
-        else:  # oldest
-            order_sql = "ORDER BY pi.id ASC"
-            cursor_condition = "pi.id > $1"
-
-        images = await db.query_raw(
-            f"""
-            SELECT 
-                pi.id,
-                pi.image,
-                pi."order",
-                pi.product_id,
-                p.id          AS p_id,
-                p.sku         AS p_sku,
-                p.name        AS p_name,
-                p.description AS p_description,
-                p.slug        AS p_slug,
-                p.active      AS p_active,
-                p.is_new      AS p_is_new,
-                -- variants as json array
-                COALESCE(
-                    JSON_AGG(
-                        DISTINCT JSONB_BUILD_OBJECT(
-                            'id', pv.id,
-                            'sku', pv.sku,
-                            'product_id', pv.product_id,
-                            'price', pv.price,
-                            'old_price', pv.old_price,
-                            'inventory', pv.inventory,
-                            'status', pv.status,
-                            'size', pv.size,
-                            'color', pv.color,
-                            'measurement', pv.measurement,
-                            'age', pv.age
-                        )
-                    ) FILTER (WHERE pv.id IS NOT NULL),
-                    '[]'
-                ) AS variants,
-                -- categories as json array
-                COALESCE(
-                    JSON_AGG(
-                        DISTINCT JSONB_BUILD_OBJECT(
-                            'id', pc.id,
-                            'name', pc.name,
-                            'slug', pc.slug
-                        )
-                    ) FILTER (WHERE pc.id IS NOT NULL),
-                    '[]'
-                ) AS categories,
-                -- collections as json array
-                COALESCE(
-                    JSON_AGG(
-                        DISTINCT JSONB_BUILD_OBJECT(
-                            'id', col.id,
-                            'name', col.name,
-                            'slug', col.slug
-                        )
-                    ) FILTER (WHERE col.id IS NOT NULL),
-                    '[]'
-                ) AS collections
-            FROM "product_images" pi
-            LEFT JOIN "products" p 
-                ON p.id = pi.product_id
-            LEFT JOIN "product_variants" pv 
-                ON pv.product_id = p.id
-            LEFT JOIN "_ProductCategories" cp 
-                ON cp."B" = p.id
-            LEFT JOIN "categories" pc 
-                ON pc.id = cp."A"
-            LEFT JOIN "_ProductCollections" clp 
-                ON clp."B" = p.id
-            LEFT JOIN "collections" col 
-                ON col.id = clp."A"
-            WHERE {where_sql}
-            AND {cursor_condition}
-            GROUP BY pi.id, p.id
-            {order_sql}
-            LIMIT $2
-            """,
-            *params,
-        )
-
-        has_more: bool = len(images) > limit
-        items = images[:limit]
-
-        shaped = [
-            {
-                "id": img["id"],
-                "image": img["image"],
-                "order": img["order"],
-                "product_id": img["product_id"],
-                "product": {
-                    "id": img["p_id"],
-                    "sku": img["p_sku"],
-                    "name": img["p_name"],
-                    "description": img["p_description"],
-                    "slug": img["p_slug"],
-                    "active": img["p_active"],
-                    "is_new": img["p_is_new"],
-                    "categories": img["categories"],
-                    "collections": img["collections"],
-                    "variants": img["variants"],
-                } if img["p_id"] else None,
-            }
-            for img in items
-        ]
-
-        result = {
-            "items": shaped,
-            "next_cursor": items[-1]["id"] if has_more and items else None,
-            "limit": limit,
-        }
-        return result
     except Exception as e:
         logger.error(f"Gallery fetch error: {e}")
         raise HTTPException(status_code=500, detail=str(e))

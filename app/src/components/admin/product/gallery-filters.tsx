@@ -25,10 +25,9 @@ const DEFAULTS: Filters = {
 };
 
 function parseFilters(search: Record<string, unknown>): Filters {
-    console.log("🚀 ~ parseFilters ~ search:", search)
     return {
         sort: search.sort === "oldest" ? "oldest" : "newest",
-        active: search.active === "true" ? "true" : search.active === "false" ? "false" : "all",
+        active: search.active == true ? "true" : search.active == false ? "false" : "all",
         out_of_stock: search.out_of_stock ? true : false,
     };
 }
@@ -44,22 +43,13 @@ function countActiveFilters(filters: Filters): number {
 export function GalleryFilters() {
     const { updateQuery } = useUpdateQuery();
     const search = useSearch({ strict: false }) as Record<string, unknown>;
-    console.log("🚀 ~ GalleryFilters ~ search:", search)
     const [open, setOpen] = useState(false);
     const [draft, setDraft] = useState<Filters>(() => parseFilters(search));
-    console.log("🚀 ~ GalleryFilters ~ draft:", draft)
     const show = location.pathname.startsWith("/admin/gallery");
-
-    useEffect(() => {
-        console.log("🚀 ~ GalleryFilters ~ useEffect on loading ~ search:", search)
-        setDraft(parseFilters(search));
-        console.log("🚀 ~ GalleryFilters ~ useEffect on loading ~ draft:", draft)
-    }, []);
 
     // Sync draft when URL changes externally
     useEffect(() => {
         setDraft(parseFilters(search));
-        console.log("🚀 ~ GalleryFilters ~ useEffect ~ draft111:", draft)
     }, [search.sort, search.active, search.out_of_stock]);
 
     function handleApply() {
