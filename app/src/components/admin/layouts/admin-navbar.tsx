@@ -4,6 +4,7 @@ import LocalizedClientLink from "@/components/ui/link";
 import MenuComp from "@/components/layout/admin-mobile-menu-drawer";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UserDropdown } from "@/components/user-button";
+import { GalleryFilters } from "../product/gallery-filters";
 
 const AdminNavbar = () => {
     return (
@@ -23,6 +24,7 @@ const AdminNavbar = () => {
                 </NavbarItem>
                 <NavbarItem className="flex items-center gap-2.5">
                     {/* <Notification /> */}
+                    <GalleryFilters />
                     <ThemeToggle />
                     <ActivityTray />
                 </NavbarItem>

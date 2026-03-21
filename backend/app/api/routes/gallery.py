@@ -69,13 +69,36 @@ async def image_gallery(
     request: Request,
     cursor: Optional[int] = Query(default=None),
     limit: int = Query(default=36, ge=1, le=100),
+    sort: str = Query(default="newest", pattern="^(newest|oldest)$"),
+    active: Optional[bool] = Query(default=None),
+    out_of_stock: bool = Query(default=False),
 ) -> PaginatedProductImages:
     """
     Image gallery endpoint using cursor-based pagination.
     """
+    order_dir = "ASC" if sort == "oldest" else "DESC"
+    cursor_op = ">" if sort == "oldest" else "<"
+    cursor_default = 0 if sort == "oldest" else 2147483647
+
+    extra_filters = []
+
+    if active is not None:
+        extra_filters.append(f"AND p.active = {str(active).lower()}")
+
+    if out_of_stock:
+        extra_filters.append("""
+            AND NOT EXISTS (
+                SELECT 1 FROM "product_variants" pv2
+                WHERE pv2.product_id = p.id
+                AND pv2.inventory > 0
+            )
+        """)
+
+    extra_filters_sql: str = "\n".join(extra_filters)
+
     try:
         images = await db.query_raw(
-            """
+            f"""
             SELECT 
                 pi.id,
                 pi.image,
@@ -88,7 +111,6 @@ async def image_gallery(
                 p.slug        AS p_slug,
                 p.active      AS p_active,
                 p.is_new      AS p_is_new,
-                -- variants as json array
                 COALESCE(
                     JSON_AGG(
                         DISTINCT JSONB_BUILD_OBJECT(
@@ -107,7 +129,6 @@ async def image_gallery(
                     ) FILTER (WHERE pv.id IS NOT NULL),
                     '[]'
                 ) AS variants,
-                -- categories as json array
                 COALESCE(
                     JSON_AGG(
                         DISTINCT JSONB_BUILD_OBJECT(
@@ -118,7 +139,6 @@ async def image_gallery(
                     ) FILTER (WHERE pc.id IS NOT NULL),
                     '[]'
                 ) AS categories,
-                -- collections as json array
                 COALESCE(
                     JSON_AGG(
                         DISTINCT JSONB_BUILD_OBJECT(
@@ -143,12 +163,13 @@ async def image_gallery(
             LEFT JOIN "collections" col 
                 ON col.id = clp."A"
             WHERE pi."order" = 0
-            AND pi.id < $1
+            AND pi.id {cursor_op} $1
+            {extra_filters_sql}
             GROUP BY pi.id, p.id
-            ORDER BY pi.id DESC
+            ORDER BY pi.id {order_dir}
             LIMIT $2
             """,
-            cursor or 2147483647,
+            cursor or cursor_default,
             limit + 1,
         )
 
@@ -177,12 +198,12 @@ async def image_gallery(
             for img in items
         ]
 
-        result = {
+        return {
             "items": shaped,
             "next_cursor": items[-1]["id"] if has_more and items else None,
             "limit": limit,
         }
-        return result
+
     except Exception as e:
         logger.error(f"Gallery fetch error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
