@@ -1,20 +1,20 @@
+from typing import Annotated, Optional
 from fastapi import APIRouter, HTTPException, status, BackgroundTasks, Request, Cookie, Response, Depends
 from pydantic import EmailStr, BaseModel, Field
 from app.core import security
 from app.core.config import settings
-from app.core.utils import generate_magic_link_email, send_email, generate_verification_email
-from app.models.user import User, EmailData, SyncUserPayload, GooglePayload
+from app.core.utils import send_email, generate_verification_email
+from app.models.user import User, GooglePayload
 from app.services.events import publish_user_registered
 from datetime import datetime, timedelta
-from app.models.generic import Token, Message
+from app.models.generic import Token
 from app.prisma_client import prisma as db
 import uuid
 import httpx
-from typing import Annotated, Optional
 from app.core.logging import get_logger
-from app.core.decorators import limit
 from app.services.redis import set_session, delete_session
 from app.core.deps import verify_clerk_token
+from app.services.cart import merge_cart
 
 logger = get_logger(__name__)
 
@@ -296,121 +296,19 @@ async def google(request: Request, payload: GooglePayload) -> Token:
     return Token(access_token=access_token)
 
 
-@router.post("/send-magic-link")
-@limit("3/minute")
-async def send_magic_link(
-    request: Request,
-    payload: EmailData,
-    _cart_id: Annotated[str | None, Cookie()] = None
-) -> Message:
-    """
-    Request a magic link for passwordless authentication.
-    A user will only be created if:
-      - Email is valid
-      - Magic link email is successfully sent
-    """
-
-    email: str = payload.email
-    url: str = payload.url
-
-    user = await db.user.find_first(
-        where={"email": email}
-    )
-
-    is_new_user = False
-
-    if not user:
-        is_new_user = True
-        user_data = {
-            "email": email,
-            "first_name": "",
-            "last_name": "",
-            "image": "",
-            "status": "PENDING",
-            "role": "CUSTOMER",
-            "hashed_password": "password"
-        }
-    else:
-        user_data = None
-
-    try:
-        email_data = await generate_magic_link_email(
-            email_to=email,
-            magic_link=url,
-            first_name=user.first_name if user else ""
-        )
-
-        await send_email(
-            email_to=email,
-            subject=email_data.subject,
-            html_content=email_data.html_content,
-        )
-
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Unable to send magic link at this time."
-        )
-
-    if is_new_user:
-        user = await db.user.create(data=user_data)
-
-        try:
-            await publish_user_registered(
-                user=user,
-                source="magic_link_auto_create",
-                created_at=user.created_at,
-            )
-        except Exception:
-            pass
-
-    if _cart_id:
-        await merge_cart(user_id=user.id, cart_number=_cart_id)
-
-    return {
-        "message": "If an account exists with this email, you will receive a magic link"
-    }
-
-
-@router.post("/sync-user")
-async def sync_user(request: Request, payload: SyncUserPayload, _cart_id: Annotated[str | None, Cookie()] = None) -> Message:
-    user = await db.user.find_first(
-        where={
-            "email": payload.email,
-        }
-    )
-    if not user:
-        user = await db.user.create(
-            data={
-                "email": payload.email,
-                "first_name": payload.first_name,
-                "last_name": payload.last_name,
-                "image": payload.image,
-                "status": "ACTIVE",
-                "role": "CUSTOMER",
-                "hashed_password": "password"
-            }
-        )
-        try:
-            await publish_user_registered(
-                user=user,
-                source="sync_user",
-                created_at=user.created_at,
-            )
-        except Exception as e:
-            logger.error(f"Failed to publish USER_REGISTERED event: {e}")
-
-    await merge_cart(user_id=user.id, cart_number=_cart_id)
-    return {"message": "User synced successfully"}
-
-
-async def merge_cart(user_id: str, cart_number: str | None = None):
-    if not cart_number:
-        return
-    await db.cart.update(
-        where={"cart_number": cart_number},
-        data={"user_id": user_id},
-    )
+# async def merge_cart(user_id: str, cart_number: str | None = None) -> None:
+#     cart = await db.cart.find_first(
+#         where={"user_id": user_id, "status": "ACTIVE"},
+#         order={"created_at": "desc"}
+#     )
+#     if cart:
+#         return
+#     if not cart_number:
+#         return
+#     await db.cart.update(
+#         where={"cart_number": cart_number},
+#         data={"user_id": user_id},
+#     )
 
 
 @router.post("/logout")
@@ -465,7 +363,7 @@ async def exchange_token(response: Response, payload=Depends(verify_clerk_token)
         secure=True,
         samesite="none",
         domain=settings.COOKIE_DOMAIN,
-        max_age=60 * 60 * 24 * 7,
+        max_age=60 * 60 * 24 * 30,
     )
 
     return session_data

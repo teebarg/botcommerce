@@ -434,8 +434,6 @@ async def get_index_products(request: Request) -> IndexProducts:
                 except Exception:
                     logger.error(f"Meilisearch retry failed: {e}")
                     raise HTTPException(status_code=502, detail="Search service unavailable")
-                return
-
             logger.error(f"Meilisearch error: {e}")
             raise HTTPException(
                 status_code=502, detail="Search service temporarily unavailable")

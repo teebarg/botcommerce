@@ -158,7 +158,7 @@ async def invalidate_key_only(key: str) -> None:
         logger.error(f"Error invalidating key {key}: {e}")
 
 
-async def set_session(session_id: str, data: dict, ttl=60 * 60 * 24 * 7):
+async def set_session(session_id: str, data: dict, ttl=60 * 60 * 24 * 30):
     await redis_client.setex(f"session:{session_id}", ttl, json.dumps(data))
 
 async def get_session(session_id: str):
