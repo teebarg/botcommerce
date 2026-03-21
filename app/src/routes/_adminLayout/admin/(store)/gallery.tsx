@@ -8,7 +8,6 @@ import { GalleryImagesUpload } from "@/components/admin/product/gallery-images-u
 import { useBulkDeleteGalleryImages } from "@/hooks/useGallery";
 import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { PaginatedProductImages, ProductImage } from "@/schemas";
 import { useWebSocket } from "pulsews";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -18,6 +17,7 @@ import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { queryOptions } from "@tanstack/react-query";
 import { z } from "zod";
 import { useNavigate } from "@tanstack/react-router";
+import { useOverlayTriggerState } from "react-stately";
 
 const galleryQuery = (params?: object) =>
     queryOptions({
@@ -41,6 +41,7 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/gallery")({
 });
 
 function RouteComponent() {
+    const filterState = useOverlayTriggerState({});
     const queryClient = useQueryClient();
     const navigate = useNavigate();
     const toastId = useRef<string | number | undefined>(undefined);
@@ -134,7 +135,7 @@ function RouteComponent() {
                 <div className="text-center">No images found</div>
             ) : (
                 <div>
-                    <div className="flex items-center gap-2">
+                    {/* <div className="flex items-center gap-2">
                         <Select
                             value={params.active === true ? "true" : params.active === false ? "false" : "all"}
                             onValueChange={(value) => {
@@ -165,7 +166,19 @@ function RouteComponent() {
                                 <SelectItem value="oldest">Oldest</SelectItem>
                             </SelectContent>
                         </Select>
-                    </div>
+                    </div> */}
+                    {/* <SheetDrawer
+                        open={filterState.isOpen}
+                        title="Filter Gallery"
+                        trigger={
+                            <Button className="bg-contrast/10" variant="ghost">
+                                <Share2 className="h-5 w-5 text-contrast" />
+                            </Button>
+                        }
+                        onOpenChange={filterState.setOpen}
+                    >
+                        <GalleryFilters onClose={filterState.close} />
+                    </SheetDrawer> */}
                     <div className="mb-4 sticky top-16 z-40 bg-background -mx-2 px-4 py-4 flex gap-2 justify-between">
                         <div className="rounded-full p-1 flex items-center gap-2 bg-secondary w-1/2">
                             <div className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "grid" && "bg-background")}>

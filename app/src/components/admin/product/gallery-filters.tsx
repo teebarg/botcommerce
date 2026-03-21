@@ -12,7 +12,6 @@ import { Switch } from "@/components/ui/switch";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 
-
 type Filters = {
     sort: "newest" | "oldest";
     active: "true" | "false" | "all";
@@ -26,10 +25,11 @@ const DEFAULTS: Filters = {
 };
 
 function parseFilters(search: Record<string, unknown>): Filters {
+    console.log("🚀 ~ parseFilters ~ search:", search)
     return {
         sort: search.sort === "oldest" ? "oldest" : "newest",
         active: search.active === "true" ? "true" : search.active === "false" ? "false" : "all",
-        out_of_stock: search.out_of_stock === "true",
+        out_of_stock: search.out_of_stock ? true : false,
     };
 }
 
@@ -44,12 +44,22 @@ function countActiveFilters(filters: Filters): number {
 export function GalleryFilters() {
     const { updateQuery } = useUpdateQuery();
     const search = useSearch({ strict: false }) as Record<string, unknown>;
+    console.log("🚀 ~ GalleryFilters ~ search:", search)
     const [open, setOpen] = useState(false);
     const [draft, setDraft] = useState<Filters>(() => parseFilters(search));
+    console.log("🚀 ~ GalleryFilters ~ draft:", draft)
+    const show = location.pathname.startsWith("/admin/gallery");
+
+    useEffect(() => {
+        console.log("🚀 ~ GalleryFilters ~ useEffect on loading ~ search:", search)
+        setDraft(parseFilters(search));
+        console.log("🚀 ~ GalleryFilters ~ useEffect on loading ~ draft:", draft)
+    }, []);
 
     // Sync draft when URL changes externally
     useEffect(() => {
         setDraft(parseFilters(search));
+        console.log("🚀 ~ GalleryFilters ~ useEffect ~ draft111:", draft)
     }, [search.sort, search.active, search.out_of_stock]);
 
     function handleApply() {
@@ -76,6 +86,8 @@ export function GalleryFilters() {
         draft.sort !== parseFilters(search).sort ||
         draft.active !== parseFilters(search).active ||
         draft.out_of_stock !== parseFilters(search).out_of_stock;
+
+    if (!show) return null;
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -109,7 +121,6 @@ export function GalleryFilters() {
                 <Separator />
 
                 <div className="space-y-5 px-4 py-4">
-                    {/* Sort */}
                     <div className="space-y-2">
                         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Sort by</Label>
                         <ToggleGroup
@@ -127,7 +138,6 @@ export function GalleryFilters() {
                         </ToggleGroup>
                     </div>
 
-                    {/* Active status */}
                     <div className="space-y-2">
                         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Status</Label>
                         <ToggleGroup
@@ -148,7 +158,6 @@ export function GalleryFilters() {
                         </ToggleGroup>
                     </div>
 
-                    {/* Out of stock */}
                     <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
                             <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Out of stock</Label>
@@ -160,7 +169,6 @@ export function GalleryFilters() {
 
                 <Separator />
 
-                {/* Footer */}
                 <div className="flex gap-2 px-4 py-3">
                     <Button
                         variant="outline"
