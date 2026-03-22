@@ -324,7 +324,7 @@ async def logout(request: Request, response: Response):
 
 
 @router.post("/exchange")
-async def exchange_token(response: Response, payload=Depends(verify_clerk_token)):
+async def exchange_token(response: Response, background_tasks: BackgroundTasks, payload=Depends(verify_clerk_token)):
     session_id = str(uuid.uuid4())
 
     clerk_id = payload["sub"]
@@ -365,6 +365,8 @@ async def exchange_token(response: Response, payload=Depends(verify_clerk_token)
         domain=settings.COOKIE_DOMAIN,
         max_age=60 * 60 * 24 * 30,
     )
+
+    background_tasks.add_task(merge_cart, user_id=user.id, cart_number=_cart_id)
 
     return session_data
 
