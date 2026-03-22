@@ -307,7 +307,7 @@ async def logout(request: Request, response: Response):
 
 
 @router.post("/exchange")
-async def exchange_token(response: Response, background_tasks: BackgroundTasks, payload=Depends(verify_clerk_token), _cart_id: Annotated[str | None, Cookie()] = None):
+async def exchange_token(response: Response, payload=Depends(verify_clerk_token), _cart_id: Annotated[str | None, Cookie()] = None):
     session_id = str(uuid.uuid4())
 
     clerk_id = payload["sub"]
@@ -348,29 +348,28 @@ async def exchange_token(response: Response, background_tasks: BackgroundTasks, 
         domain=settings.COOKIE_DOMAIN,
         max_age=60 * 60 * 24 * 30,
     )
-
-    background_tasks.add_task(merge_cart, user_id=user.id, cart_number=_cart_id)
+    await merge_cart(user_id=1, cart_number=id)
 
     return session_data
 
-@router.post("/test-job")
-async def test(request: Request, background_tasks: BackgroundTasks) -> None:
-    """
-    Test job
-    """
-    # user = await db.user.find_first(
-    #     where={
-    #         "id": id,
-    #     }
-    # )
+# @router.post("/test-job")
+# async def test(request: Request, id: str) -> None:
+#     """
+#     Test job
+#     """
+#     # user = await db.user.find_first(
+#     #     where={
+#     #         "id": id,
+#     #     }
+#     # )
 
-    try:
-        # await publish_user_registered(
-        #     user=user,
-        #     source="email_password",
-        #     created_at=user.created_at,
-        # )
-        background_tasks.add_task(merge_cart, user_id="1", cart_number="cart_LSXYKLG4FAXU90XRHE6GGTO7I")
-    except Exception as e:
-        logger.error(f"Failed to merge cart: {e}")
-        pass
+#     try:
+#         # await publish_user_registered(
+#         #     user=user,
+#         #     source="email_password",
+#         #     created_at=user.created_at,
+#         # )
+#         await merge_cart(user_id=1, cart_number=id)
+#     except Exception as e:
+#         logger.error(f"Failed to merge cart: {e}")
+#         pass

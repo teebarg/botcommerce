@@ -3,6 +3,7 @@ import { clientApi } from "@/utils/api.client";
 import { SessionUser } from "@/utils/session";
 import { tryCatch } from "@/utils/try-catch";
 import { useAuth, useUser } from "@clerk/tanstack-react-start";
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate, useRouteContext } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
@@ -18,6 +19,7 @@ export const Route = createFileRoute("/auth/callback")({
 });
 
 function RouteComponent() {
+    const queryClient = useQueryClient();
     const navigate = useNavigate();
     const { isLoaded, isSignedIn } = useUser();
     const { isAuthenticated } = useRouteContext({ strict: false });
@@ -54,6 +56,7 @@ function RouteComponent() {
             await loginFn({ data: { sessionUser } });
 
             sessionStorage.setItem("auth_exchanged", "true");
+            queryClient.invalidateQueries({ queryKey: ["cart"] });
             navigate({ to: search.redirect || "/" });
         };
 
