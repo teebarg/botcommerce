@@ -125,7 +125,7 @@ async def calculate_cart_totals(cart: Cart):
     await invalidate_pattern("abandoned-carts")
 
 
-async def get_cart(cart_number: Optional[str], user_id: Optional[str]):
+async def get_cart(cart_number: Optional[str], user_id: Optional[int]):
     """Retrieve an existing cart"""
     if user_id:
         cart = await db.cart.find_first(
@@ -322,7 +322,7 @@ async def update_cart_item(response: Response, item_id: int, quantity: int, user
     if cart is None:
         cart = await create_cart(user_id=user.id if user else None)
         item_in = CartItemCreate(variant_id=item_id, quantity=quantity)
-        item = await _handle_add_item(item_in, cart)
+        await _handle_add_item(item_in, cart)
         background_tasks.add_task(calculate_cart_totals, cart=cart)
         _set_cart_cookie(response, cart.cart_number)
         return {"message": "Item removed from cart successfully"}

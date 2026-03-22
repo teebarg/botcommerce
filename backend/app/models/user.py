@@ -21,12 +21,6 @@ class EmailData(BaseModel):
     email: EmailStr
     url: HttpUrl
 
-class SyncUserPayload(BaseModel):
-    email: EmailStr
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    image: Optional[str] = None
-
 class GooglePayload(BaseModel):
     email: EmailStr
     first_name: str

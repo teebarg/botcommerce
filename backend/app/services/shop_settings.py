@@ -5,7 +5,7 @@ from typing import Any
 
 class ShopSettingsService:
     CACHE_PREFIX = "shop-settings:"
-    CACHE_EXPIRATION = 3600 * 24 * 7 # 1 week
+    CACHE_EXPIRATION = 3600 * 24 * 30 # 1 week
 
     def __init__(self):
         self.redis = redis_client
