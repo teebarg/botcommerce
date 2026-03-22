@@ -152,8 +152,6 @@ async def verify_email(payload: VerifyEmailPayload, _cart_id: Annotated[str | No
         }
     )
 
-    await merge_cart(user_id=user.id, cart_number=_cart_id)
-
     try:
         await publish_user_registered(
             user=user,
@@ -296,21 +294,6 @@ async def google(request: Request, payload: GooglePayload) -> Token:
     return Token(access_token=access_token)
 
 
-# async def merge_cart(user_id: str, cart_number: str | None = None) -> None:
-#     cart = await db.cart.find_first(
-#         where={"user_id": user_id, "status": "ACTIVE"},
-#         order={"created_at": "desc"}
-#     )
-#     if cart:
-#         return
-#     if not cart_number:
-#         return
-#     await db.cart.update(
-#         where={"cart_number": cart_number},
-#         data={"user_id": user_id},
-#     )
-
-
 @router.post("/logout")
 async def logout(request: Request, response: Response):
     session_id = request.cookies.get("session_id")
@@ -324,7 +307,7 @@ async def logout(request: Request, response: Response):
 
 
 @router.post("/exchange")
-async def exchange_token(response: Response, background_tasks: BackgroundTasks, payload=Depends(verify_clerk_token)):
+async def exchange_token(response: Response, background_tasks: BackgroundTasks, payload=Depends(verify_clerk_token), _cart_id: Annotated[str | None, Cookie()] = None):
     session_id = str(uuid.uuid4())
 
     clerk_id = payload["sub"]
@@ -370,23 +353,24 @@ async def exchange_token(response: Response, background_tasks: BackgroundTasks, 
 
     return session_data
 
-# @router.post("/test-job")
-# async def test(request: Request, id: int):
-#     """
-#     Test job
-#     """
-#     user = await db.user.find_first(
-#         where={
-#             "id": id,
-#         }
-#     )
+@router.post("/test-job")
+async def test(request: Request, background_tasks: BackgroundTasks) -> None:
+    """
+    Test job
+    """
+    # user = await db.user.find_first(
+    #     where={
+    #         "id": id,
+    #     }
+    # )
 
-#     try:
-#         await publish_user_registered(
-#             user=user,
-#             source="email_password",
-#             created_at=user.created_at,
-#         )
-#     except Exception as e:
-#         logger.error(f"Failed to publish USER_REGISTERED event: {e}")
-#         pass
+    try:
+        # await publish_user_registered(
+        #     user=user,
+        #     source="email_password",
+        #     created_at=user.created_at,
+        # )
+        background_tasks.add_task(merge_cart, user_id="1", cart_number="cart_LSXYKLG4FAXU90XRHE6GGTO7I")
+    except Exception as e:
+        logger.error(f"Failed to merge cart: {e}")
+        pass

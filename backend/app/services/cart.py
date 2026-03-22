@@ -1,9 +1,12 @@
 from typing import Optional
+import logging
 from app.prisma_client import prisma as db
 from prisma.enums import CartStatus
 from app.models.cart import Cart
 from app.services.redis import invalidate_pattern
 from app.services.shop_settings import ShopSettingsService
+
+logger = logging.getLogger(__name__)
 
 
 async def get_cart(cart_number: Optional[str], user_id: Optional[str]) -> Cart | None:
@@ -26,6 +29,7 @@ async def get_cart(cart_number: Optional[str], user_id: Optional[str]) -> Cart |
 
 async def calculate_cart_totals(cart: Cart):
     """Helper function to calculate cart totals"""
+    logger.info(f"Calculating cart totals for cart {cart.id}")
     from app.services.coupon import CouponService
     service = ShopSettingsService()
 
@@ -79,6 +83,7 @@ async def calculate_cart_totals(cart: Cart):
 
 
 async def merge_cart(user_id: int, cart_number: Optional[str] = None) -> None:
+    logger.info(f"Merging cart for user {user_id} with cart number {cart_number}")
     async with db.tx() as tx:
         user_cart = await tx.cart.find_first(
             where={"user_id": user_id, "status": "ACTIVE"},
@@ -97,6 +102,8 @@ async def merge_cart(user_id: int, cart_number: Optional[str] = None) -> None:
             )
 
         if user_cart and guest_cart:
+            logger.info(f"User cart found: {user_cart}")
+            logger.info(f"Guest cart found: {guest_cart}")
             # Map user items for O(1) lookup
             user_items_map = {
                 (item.product_id, item.variant_id): item
@@ -156,6 +163,7 @@ async def merge_cart(user_id: int, cart_number: Optional[str] = None) -> None:
         # CASE 2: ONLY guest cart
         # -------------------------------
         if not user_cart and guest_cart:
+            logger.info(f"Only guest cart found, updating user_id")
             updated = await tx.cart.update(
                 where={"id": guest_cart.id},
                 data={"user_id": user_id},
@@ -168,8 +176,8 @@ async def merge_cart(user_id: int, cart_number: Optional[str] = None) -> None:
         # -------------------------------
         # CASE 3: ONLY user cart
         # -------------------------------
-        if user_cart:
-            return
+        # if user_cart:
+        #     return
 
         # -------------------------------
         # CASE 4: NO cart → create
