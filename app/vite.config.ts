@@ -22,9 +22,9 @@ const config = defineConfig({
             externals: {
                 inline: ["@auth/core"],
             },
-            // routeRules: {
-            //     "/sw.js": { headers: { "Cache-Control": "no-cache, no-store, must-revalidate" } },
-            // },
+            routeRules: {
+                "/sw.js": { headers: { "Cache-Control": "no-cache, no-store, must-revalidate" } },
+            },
         }),
         viteTsConfigPaths({
             projects: ["./tsconfig.json"],
