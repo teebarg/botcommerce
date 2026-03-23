@@ -100,10 +100,12 @@ registerRoute(
 
 // PUSH NOTIFICATIONS
 self.addEventListener("push", (event) => {
+    console.log("🚀 ~ file: sw.js:103 ~ event:", event);
     if (!event.data) return;
     let data;
     try {
         data = event.data.json();
+        console.log("🚀 ~ file: sw.js:108 ~ data:", data);
     } catch (err) {
         return;
     }
@@ -126,6 +128,7 @@ self.addEventListener("push", (event) => {
             receivedAt: Date.now(),
         },
     };
+    console.log("🚀 ~ file: sw.js:114 ~ options:", options);
 
     event.waitUntil(
         Promise.all([
