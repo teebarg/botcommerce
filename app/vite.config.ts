@@ -40,7 +40,8 @@ const config = defineConfig({
             srcDir: "src",
             filename: "sw.js",
             registerType: "prompt",
-            outDir: ".output/public",
+            // outDir: ".output/public",
+            outDir: "public",
             injectRegister: "auto",
             includeAssets: ["robots.txt", "favicon.ico", "favicon-32x32.png", "favicon-16x16.png", "icon.png", "placeholder.jpg", "pr-logo.png"],
             manifest: {
@@ -59,6 +60,7 @@ const config = defineConfig({
             injectManifest: {
                 globDirectory: ".output/public",
                 globPatterns: ["**/*.{js,css,html,png,svg,ico,woff2}", "assets/*.css", "_server/assets/*.css"],
+                dontCacheBustURLsMatching: /\.[0-9a-f]{8}\./,
             },
             devOptions: {
                 enabled: true,
