@@ -63,7 +63,9 @@ cleanupOutdatedCaches();
 
 // IMAGE CACHING
 registerRoute(
-    ({ request, url }) => request.destination === "image" || url.origin.includes("supabase.co") || url.href.includes("cdn"),
+    ({ request, url }) =>
+        (request.destination === "image" || url.origin.includes("supabase.co") || url.href.includes("cdn")) &&
+        request.destination !== "serviceworker",
     new StaleWhileRevalidate({
         cacheName: "image-cache",
         plugins: [
@@ -109,7 +111,7 @@ self.addEventListener("push", (event) => {
     const options = {
         body: data.body,
         icon: "/pr-logo.png",
-        image: data.imageUrl ?? "/promo-banner.webp",
+        // image: data.imageUrl ?? "/promo-banner.webp",
         badge: "/pr-logo.png",
         vibrate: [200, 100, 200],
         requireInteraction: true,
@@ -126,8 +128,9 @@ self.addEventListener("push", (event) => {
     };
 
     event.waitUntil(
-        self.registration.showNotification(data.title, options).then(() => {
-            return fetch(`${API_BASE}/api/push-event`, {
+        Promise.all([
+            self.registration.showNotification(data.title, options),
+            fetch(`${API_BASE}/api/push-event`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -137,10 +140,8 @@ self.addEventListener("push", (event) => {
                     deliveredAt: new Date().toISOString(),
                     timestamp: new Date().toISOString(),
                 }),
-            }).catch((err) => {
-                console.error("Failed to send push event:", err);
-            });
-        })
+            }).catch((err) => console.error("Failed to send push event:", err)),
+        ])
     );
 });
 
