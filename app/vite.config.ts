@@ -13,14 +13,17 @@ const config = defineConfig({
         port: 5173,
         allowedHosts: true,
         watch: {
-            ignored: ["**/routeTree.gen.ts"]
-        }
+            ignored: ["**/routeTree.gen.ts"],
+        },
     },
     plugins: [
         devtools(),
         nitro({
             externals: {
                 inline: ["@auth/core"],
+            },
+            routeRules: {
+                "/sw.js": { headers: { "Cache-Control": "no-cache, no-store, must-revalidate" } },
             },
         }),
         viteTsConfigPaths({
@@ -55,11 +58,7 @@ const config = defineConfig({
             },
             injectManifest: {
                 globDirectory: ".output/public",
-                globPatterns: [
-                    "**/*.{js,css,html,png,svg,ico,woff2}",
-                    "assets/*.css",
-                    "_server/assets/*.css",
-                ],
+                globPatterns: ["**/*.{js,css,html,png,svg,ico,woff2}", "assets/*.css", "_server/assets/*.css"],
             },
             devOptions: {
                 enabled: true,
