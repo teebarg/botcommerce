@@ -3,7 +3,7 @@ from typing import List, Optional, Any
 from app.prisma_client import prisma as db
 from app.core.config import settings
 from app.core.logging import get_logger
-from app.services.meilisearch import update_document, delete_document, add_documents_to_index
+from app.services.meilisearch import update_document, delete_document, add_documents_to_index, clear_index
 from app.models.product import Product
 from app.services.prisma import with_prisma_connection
 from app.services.redis import invalidate_keys, invalidate_key_only
@@ -80,6 +80,10 @@ async def index_products(product_ids: Optional[List[int]] = None):
         if not products:
             logger.warning(f"Products with ids {product_ids} not found for re-indexing.")
             return
+
+        if product_ids is None or len(product_ids) < 1:
+            logger.info("Clearing index...")
+            await clear_index(index_name=settings.MEILI_PRODUCTS_INDEX)
 
         documents = []
         cache_keys: list[str] = []
