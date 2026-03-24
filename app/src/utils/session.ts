@@ -1,4 +1,4 @@
-import { useSession } from '@tanstack/react-start/server'
+import { useSession } from "@tanstack/react-start/server";
 
 export type AuthUser = {
     firstName?: string;
@@ -19,6 +19,12 @@ export type SessionUser = {
 
 export function useAppSession() {
     return useSession<SessionUser>({
-        password: import.meta.env.VITE_SESSION_PASSWORD,
-    })
+        password: process.env.SESSION_PASSWORD!,
+        cookie: {
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            httpOnly: true,
+            maxAge: 30 * 24 * 60 * 60,
+        },
+    });
 }
