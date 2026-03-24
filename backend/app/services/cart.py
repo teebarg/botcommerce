@@ -158,4 +158,4 @@ async def merge_cart(user_id: int, cart_number: Optional[str] = None) -> None:
         await calculate_cart_totals(cart_id=target_cart_id)
 
     except Exception as e:
-        logger.error(f"Error merging cart: {e}")
+        logger.error(f"Error merging cart: {e}", exc_info=True)
