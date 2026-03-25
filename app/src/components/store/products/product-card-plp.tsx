@@ -5,9 +5,10 @@ import type { ProductSearch } from "@/schemas/product";
 import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import ProductCardActions from "./product-card-actions";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import ImageLightbox from "@/components/ImageLightbox";
 import ProductTag from "./product-tag";
+import { IsNew } from "@/components/products/product-badges";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -16,6 +17,7 @@ interface ProductCardProps {
 const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
     const [lightboxOpen, setLightboxOpen] = useState<boolean>(false);
     const { priceInfo, outOfStock } = useProductVariant(product);
+    const isNew = useMemo(() => !!product?.is_new, [product]);
 
     return (
         <>
@@ -43,6 +45,7 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
                         alt={product.name}
                         loading="lazy"
                     />
+                    {isNew && <IsNew className="bottom-2 top-auto" />}
                     {outOfStock && (
                         <div className="absolute inset-0 flex items-center justify-center">
                             <span className="bg-foreground text-background px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em]">Sold Out</span>
