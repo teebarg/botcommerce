@@ -18,7 +18,7 @@ export interface DiscountBadgeProps extends React.HTMLAttributes<HTMLDivElement>
 }
 
 const discountBadgeVariants = cva(
-    "absolute top-3 right-3 z-10 font-bold text-white transition-all duration-300 flex items-center gap-1.5 overflow-hidden",
+    "absolute top-3 left-3 z-10 font-bold text-white transition-all duration-300 flex items-center gap-1.5 overflow-hidden",
     {
         variants: {
             variant: {
