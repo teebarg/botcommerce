@@ -95,9 +95,6 @@ class Settings(BaseSettings):
     WHATSAPP_TOKEN: str | None = None
     WHATSAPP_PHONE_NUMBER_ID: str | None = None
 
-    GOOGLE_CLIENT_ID: str = ""
-    GOOGLE_CLIENT_SECRET: str = ""
-
     GEMINI_API_KEY: str = ""
     GEMINI_MODEL: str = "gemini-2.5-flash"
 
