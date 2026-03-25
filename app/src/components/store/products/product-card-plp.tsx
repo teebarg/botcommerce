@@ -7,6 +7,7 @@ import { Link } from "@tanstack/react-router";
 import ProductCardActions from "./product-card-actions";
 import { useState } from "react";
 import ImageLightbox from "@/components/ImageLightbox";
+import ProductTag from "./product-tag";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -19,7 +20,7 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
     return (
         <>
             <motion.div
-                className="relative group overflow-hidden bg-background"
+                className="relative group cursor-pointer"
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1, duration: 0.3 }}
@@ -32,7 +33,7 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
                 )}
 
                 <div
-                    className="relative aspect-[3/4] overflow-hidden bg-secondary"
+                    className="relative aspect-[3/4] overflow-visible"
                     style={{ boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.05)" }}
                     onClick={() => setLightboxOpen(true)}
                 >
@@ -47,6 +48,7 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
                             <span className="bg-foreground text-background px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em]">Sold Out</span>
                         </div>
                     )}
+                    <ProductTag product={product} />
                 </div>
                 <Link to="/products/$slug" className="block px-1 py-2" params={{ slug: product.slug }}>
                     <h3 className="line-clamp-1 text-xs">{product.name}</h3>
