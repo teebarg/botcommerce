@@ -172,40 +172,20 @@ export function BulkImageSheetForm({ onClose, imageIds }: BulkImageSheetFormProp
                             </Button>
                         </div>
                     </div>
-
-                    {/* <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {Object.entries(FIELD_CONFIG).map(([field, config]) => (
-                            <div key={field} className="flex items-center space-x-2">
-                                <Checkbox
-                                    checked={selectedFields.has(field as FieldKey)}
-                                    id={field}
-                                    onCheckedChange={() => toggleFieldSelection(field as FieldKey)}
-                                />
-                                <Label className="text-sm" htmlFor={field}>
-                                    {config.label}
-                                </Label>
-                            </div>
-                        ))}
-                    </div> */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {Object.entries(FIELD_CONFIG).map(([field, config]) => {
-                            const val = product[field as FieldKey];
-                            // const isActive = activeCategory === key;
                             const isActive = selectedFields.has(field as FieldKey);
                             return (
                                 <button
                                     key={field}
                                     onClick={() => toggleFieldSelection(field as FieldKey)}
-                                    className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium transition-all active:scale-95 ${
+                                    className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium cursor-pointer transition-all active:scale-95 ${
                                         isActive
-                                            ? "bg-primary text-primary-foreground shadow-md"
-                                            : val
-                                              ? "bg-primary/15 text-primary border border-primary/30"
-                                              : "bg-secondary text-secondary-foreground"
+                                            ? "bg-primary/15 text-primary border border-primary/30 shadow-md"
+                                            : "bg-secondary text-secondary-foreground"
                                     }`}
                                 >
                                     {config.label}
-                                    {/* {val && !isActive && <span className="text-xs opacity-70">: {val}</span>} */}
                                 </button>
                             );
                         })}

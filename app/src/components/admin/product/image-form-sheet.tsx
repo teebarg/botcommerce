@@ -28,15 +28,6 @@ interface ProductSheetFormProps {
     currentProduct?: Product;
 }
 
-type Attribute = "size" | "age" | "color" | "width" | "length";
-const ATTRIBUTES: { key: Attribute; label: string }[] = [
-    // { key: "size", label: "Size" },
-    { key: "age", label: "Age" },
-    // { key: "color", label: "Color" },
-    // { key: "width", label: "Width" },
-    // { key: "length", label: "Length" },
-];
-
 export function ImageSheetForm({ onClose, imageId, currentProduct }: ProductSheetFormProps) {
     const { mutateAsync: createImageMetadata, isPending: createPending } = useCreateImageMetadata();
     const { mutateAsync: updateImageMetadata, isPending: updatePending } = useUpdateImageMetadata();
@@ -78,15 +69,6 @@ export function ImageSheetForm({ onClose, imageId, currentProduct }: ProductShee
     });
 
     const isDisabled = (newVariant?.price || 0) < 2;
-    const [activeCategory, setActiveCategory] = useState<Attribute | null>(null);
-
-    const values: Record<Attribute, string> = {
-        size: newVariant.size || "",
-        age: newVariant.age || "",
-        color: newVariant.color || "",
-        width: newVariant.width?.toString() || "",
-        length: newVariant.length?.toString() || "",
-    };
 
     const handleSubmit = () => {
         const input: any = {
@@ -259,41 +241,12 @@ export function ImageSheetForm({ onClose, imageId, currentProduct }: ProductShee
                             />
                         </div>
 
-                        <div className="flex flex-wrap gap-2 col-span-2">
-                            {ATTRIBUTES.map(({ key, label }) => {
-                                const val = values[key];
-                                const isActive = activeCategory === key;
-                                return (
-                                    <button
-                                        key={key}
-                                        onClick={() => setActiveCategory(isActive ? null : key)}
-                                        className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium transition-all active:scale-95 ${
-                                            isActive
-                                                ? "bg-primary text-primary-foreground shadow-md"
-                                                : val
-                                                  ? "bg-primary/15 text-primary border border-primary/30"
-                                                  : "bg-secondary text-secondary-foreground"
-                                        }`}
-                                    >
-                                        {label}
-                                        {val && !isActive && (
-                                            <span className="text-xs opacity-70">
-                                                : {key === "width" ? `${val}cm` : key === "length" ? `${val}cm` : val}
-                                            </span>
-                                        )}
-                                    </button>
-                                );
-                            })}
+                        <div className="col-span-2">
+                            <AgeRangeSelector
+                                selectedRange={newVariant.age || ""}
+                                onChange={(range) => setNewVariant((prev) => ({ ...prev, age: range }))}
+                            />
                         </div>
-
-                        {activeCategory === "age" && (
-                            <div className="col-span-2">
-                                <AgeRangeSelector
-                                    selectedRange={newVariant.age || ""}
-                                    onChange={(range) => setNewVariant((prev) => ({ ...prev, age: range }))}
-                                />
-                            </div>
-                        )}
 
                         <Separator className="col-span-2" />
 
