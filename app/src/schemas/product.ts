@@ -46,7 +46,8 @@ export const ProductVariantLiteSchema = z.object({
     inventory: z.number(),
     size: z.string().nullable().optional(),
     color: z.string().nullable().optional(),
-    measurement: z.number().nullable().optional(),
+    width: z.number().nullable().optional(),
+    length: z.number().nullable().optional(),
     age: z.string().nullable().optional(),
 });
 
@@ -77,7 +78,8 @@ export const ProductVariantSchema = z.object({
     inventory: z.number(),
     size: z.string().nullable().optional(),
     color: z.string().nullable().optional(),
-    measurement: z.number().nullable().optional(),
+    width: z.number().nullable().optional(),
+    length: z.number().nullable().optional(),
     age: z.string().nullable().optional(),
 });
 
@@ -114,7 +116,8 @@ export const SearchVariantSchema = z.object({
     inventory: z.number(),
     size: z.string().nullable().optional(),
     color: z.string().nullable().optional(),
-    measurement: z.number().nullable().optional(),
+    width: z.number().nullable().optional(),
+    length: z.number().nullable().optional(),
     age: z.string().nullable().optional(),
     is_new: z.boolean().optional(),
 });
@@ -143,7 +146,8 @@ export const ProductSearchSchema = z.object({
     sizes: z.array(z.string()),
     colors: z.array(z.string()),
     ages: z.array(z.string()),
-    measurements: z.array(z.number()),
+    widths: z.array(z.number()),
+    lengths: z.array(z.number()),
     is_new: z.boolean().optional(),
 });
 

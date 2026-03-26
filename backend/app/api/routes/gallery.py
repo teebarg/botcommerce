@@ -38,8 +38,10 @@ def build_variant_data(payload) -> dict[str, Any]:
         data["size"] = payload.size
     if payload.color is not None:
         data["color"] = payload.color
-    if payload.measurement is not None:
-        data["measurement"] = payload.measurement
+    if payload.width is not None:
+        data["width"] = payload.width
+    if payload.length is not None:
+        data["length"] = payload.length
     if payload.age is not None:
         data["age"] = payload.age
     if payload.inventory is not None:
@@ -123,7 +125,8 @@ async def image_gallery(
                             'status', pv.status,
                             'size', pv.size,
                             'color', pv.color,
-                            'measurement', pv.measurement,
+                            'width', pv.width,
+                            'length', pv.length,
                             'age', pv.age
                         )
                     ) FILTER (WHERE pv.id IS NOT NULL),
@@ -401,7 +404,8 @@ async def create_image_metadata(
                             "status": "IN_STOCK" if variant.inventory > 0 else "OUT_OF_STOCK",
                             "size": variant.size,
                             "color": variant.color,
-                            "measurement": variant.measurement,
+                            "width": variant.width,
+                            "length": variant.length,
                             "age": variant.age,
                         }
                     )
@@ -468,6 +472,7 @@ async def update_image_metadata(
                 )
 
             async def _upsert_variant(variant):
+                print("🚀 ~ file: gallery.py:475 ~ variant:", variant)
                 status = "IN_STOCK" if variant.inventory > 0 else "OUT_OF_STOCK"
                 variant_data = {
                     "price": variant.price,
@@ -476,7 +481,8 @@ async def update_image_metadata(
                     "status": status,
                     "size": variant.size,
                     "color": variant.color,
-                    "measurement": variant.measurement,
+                    "width": variant.width,
+                    "length": variant.length,
                     "age": variant.age,
                 }
                 try:

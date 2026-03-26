@@ -22,7 +22,8 @@ class ProductVariant(BaseModel):
     age: Optional[str]
     size: Optional[str]
     color: Optional[str]
-    measurement: Optional[int]
+    width: Optional[int]
+    length: Optional[int]
 
 class VariantWithStatus(BaseModel):
     id: Optional[int] = None
@@ -31,7 +32,8 @@ class VariantWithStatus(BaseModel):
     inventory: int = Field(..., ge=0)
     size: Optional[str] = None
     color: Optional[str] = None
-    measurement: Optional[int] = None
+    width: Optional[int] = None
+    length: Optional[int] = None
     age: Optional[str] = None
 
 class ProductCreate(BaseModel):
@@ -102,7 +104,8 @@ class SearchVariant(BaseModel):
     inventory: int = 0
     size: Optional[str] = None
     color: Optional[str] = None
-    measurement: Optional[int] = None
+    width: Optional[int] = None
+    length: Optional[int] = None
     age: Optional[str] = None
 
 class SearchProduct(BaseModel):
@@ -117,7 +120,8 @@ class SearchProduct(BaseModel):
     sizes: Optional[List[str]] = None
     ages: Optional[List[str]] = None
     colors: Optional[List[str]] = None
-    measurements: Optional[List[int]] = None
+    widths: Optional[List[int]] = None
+    lengths: Optional[List[int]] = None
     is_new: Optional[bool] = False
 
 class Facets(BaseModel):
@@ -162,7 +166,8 @@ class ImageMetadata(BaseModel):
     tag_ids: Optional[List[int]] = None
     size: Optional[str] = None
     color: Optional[str] = None
-    measurement: Optional[int] = None
+    width: Optional[int] = None
+    length: Optional[int] = None
     age: Optional[str] = None
     inventory: Optional[int] = None
     active: Optional[bool] = None

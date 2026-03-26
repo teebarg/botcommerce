@@ -7,6 +7,14 @@ interface ProductTagProps {
 const ProductTag = ({ product }: ProductTagProps) => {
     const accentColor = product.colors[0] ?? "transparent";
     const content = (() => {
+        if (product.widths?.length > 0 || product.lengths?.length > 0) {
+            return (
+                <div className="text-[0.85rem]">
+                    {product.widths?.length > 0 && <div>W-{product.widths[0]}</div>}
+                    {product.lengths?.length > 0 && <div>L-{product.lengths[0]}</div>}
+                </div>
+            );
+        }
         if (product.ages.length > 0) {
             return <div>{product.ages[0]}</div>;
         }

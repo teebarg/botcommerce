@@ -45,7 +45,7 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
                         alt={product.name}
                         loading="lazy"
                     />
-                    {isNew && <IsNew className="bottom-2 top-auto" />}
+                    {isNew && <IsNew />}
                     {outOfStock && (
                         <div className="absolute inset-0 flex items-center justify-center">
                             <span className="bg-foreground text-background px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em]">Sold Out</span>

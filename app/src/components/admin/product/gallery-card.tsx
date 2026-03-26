@@ -83,7 +83,7 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
                             ))}
                         </div>
                     )}
-                    {image.product?.is_new && <IsNew className="bottom-0 right-1 top-auto left-auto" />}
+                    {image.product?.is_new && <IsNew className="right-1 top-auto left-auto" />}
                 </div>
             </motion.div>
             <ImageLightbox image={lightboxOpen ? image.image : null} onClose={() => setLightboxOpen(false)} />

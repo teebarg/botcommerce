@@ -56,8 +56,10 @@ def build_variant_data(payload) -> dict[str, Any]:
         data["size"] = payload.size
     if payload.color is not None:
         data["color"] = payload.color
-    if payload.measurement is not None:
-        data["measurement"] = payload.measurement
+    if payload.width is not None:
+        data["width"] = payload.width
+    if payload.length is not None:
+        data["length"] = payload.length
     if payload.age is not None:
         data["age"] = payload.age
     if payload.inventory is not None:
@@ -733,8 +735,11 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
     if variant.color is not None:
         update_data["color"] = variant.color
 
-    if variant.measurement is not None:
-        update_data["measurement"] = variant.measurement
+    if variant.width is not None:
+        update_data["width"] = variant.width
+
+    if variant.length is not None:
+        update_data["length"] = variant.length
 
     if variant.age is not None:
         update_data["age"] = variant.age

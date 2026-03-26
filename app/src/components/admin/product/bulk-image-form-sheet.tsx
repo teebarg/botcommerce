@@ -23,7 +23,8 @@ type FormProduct = {
     size: string;
     color: string;
     age: string;
-    measurement: number;
+    length: number;
+    width: number;
     price: number;
     old_price: number;
     inventory: number;
@@ -39,9 +40,10 @@ const FIELD_CONFIG = {
     size: { label: "Size", type: "select" },
     color: { label: "Color", type: "select" },
     age: { label: "Age Range", type: "select" },
-    measurement: { label: "Measurement", type: "number" },
-    price: { label: "Price", type: "number" },
-    old_price: { label: "Old Price", type: "number" },
+    length: { label: "Length", type: "number" },
+    width: { label: "Waist", type: "number" },
+    price: { label: "Price(₦)", type: "number" },
+    old_price: { label: "Old Price(₦)", type: "number" },
     inventory: { label: "Inventory", type: "number" },
 } as const;
 
@@ -64,7 +66,8 @@ export function BulkImageSheetForm({ onClose, imageIds }: BulkImageSheetFormProp
         is_new: false,
         size: "",
         color: "",
-        measurement: 0,
+        length: 0,
+        width: 0,
         age: "",
         price: 0,
         old_price: 0,
@@ -127,8 +130,11 @@ export function BulkImageSheetForm({ onClose, imageIds }: BulkImageSheetFormProp
         if (selectedFields.has("age")) {
             input.age = product.age;
         }
-        if (selectedFields.has("measurement")) {
-            input.measurement = product.measurement;
+        if (selectedFields.has("length")) {
+            input.length = product.length;
+        }
+        if (selectedFields.has("width")) {
+            input.width = product.width;
         }
         if (selectedFields.has("price")) {
             input.price = product.price;
@@ -167,7 +173,7 @@ export function BulkImageSheetForm({ onClose, imageIds }: BulkImageSheetFormProp
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {/* <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {Object.entries(FIELD_CONFIG).map(([field, config]) => (
                             <div key={field} className="flex items-center space-x-2">
                                 <Checkbox
@@ -180,6 +186,29 @@ export function BulkImageSheetForm({ onClose, imageIds }: BulkImageSheetFormProp
                                 </Label>
                             </div>
                         ))}
+                    </div> */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {Object.entries(FIELD_CONFIG).map(([field, config]) => {
+                            const val = product[field as FieldKey];
+                            // const isActive = activeCategory === key;
+                            const isActive = selectedFields.has(field as FieldKey);
+                            return (
+                                <button
+                                    key={field}
+                                    onClick={() => toggleFieldSelection(field as FieldKey)}
+                                    className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium transition-all active:scale-95 ${
+                                        isActive
+                                            ? "bg-primary text-primary-foreground shadow-md"
+                                            : val
+                                              ? "bg-primary/15 text-primary border border-primary/30"
+                                              : "bg-secondary text-secondary-foreground"
+                                    }`}
+                                >
+                                    {config.label}
+                                    {/* {val && !isActive && <span className="text-xs opacity-70">: {val}</span>} */}
+                                </button>
+                            );
+                        })}
                     </div>
                 </Card>
 
@@ -250,7 +279,8 @@ export function BulkImageSheetForm({ onClose, imageIds }: BulkImageSheetFormProp
                 {(selectedFields.has("size") ||
                     selectedFields.has("color") ||
                     selectedFields.has("age") ||
-                    selectedFields.has("measurement") ||
+                    selectedFields.has("length") ||
+                    selectedFields.has("width") ||
                     selectedFields.has("price") ||
                     selectedFields.has("old_price") ||
                     selectedFields.has("inventory")) && (
@@ -292,28 +322,40 @@ export function BulkImageSheetForm({ onClose, imageIds }: BulkImageSheetFormProp
                                 </div>
                             )}
 
+                            {selectedFields.has("width") && (
+                                <div className="space-y-2">
+                                    <Label className="text-sm">Width</Label>
+                                    <Input
+                                        placeholder="41"
+                                        type="number"
+                                        value={product.width || ""}
+                                        onChange={(e) => updateField("width", parseFloat(e.target.value) || 0)}
+                                    />
+                                </div>
+                            )}
+
+                            {selectedFields.has("length") && (
+                                <div className="space-y-2">
+                                    <Label className="text-sm">Length</Label>
+                                    <Input
+                                        placeholder="43"
+                                        type="number"
+                                        value={product.length || ""}
+                                        onChange={(e) => updateField("length", parseFloat(e.target.value) || 0)}
+                                    />
+                                </div>
+                            )}
+
                             {selectedFields.has("age") && (
                                 <div className="col-span-2">
                                     <AgeRangeSelector selectedRange={product.age} onChange={(range) => updateField("age", range)} />
                                 </div>
                             )}
 
-                            {selectedFields.has("measurement") && (
-                                <div className="space-y-2">
-                                    <Label className="text-sm">Measurement</Label>
-                                    <Input
-                                        placeholder="Example: 41,42,43"
-                                        type="number"
-                                        value={product.measurement || ""}
-                                        onChange={(e) => updateField("measurement", parseFloat(e.target.value) || 0)}
-                                    />
-                                </div>
-                            )}
-
                             {selectedFields.has("price") && (
                                 <div className="space-y-2">
                                     <Label className="text-sm" htmlFor="price">
-                                        Price
+                                        Price(₦)
                                     </Label>
                                     <Input
                                         id="price"
@@ -329,7 +371,7 @@ export function BulkImageSheetForm({ onClose, imageIds }: BulkImageSheetFormProp
                             {selectedFields.has("old_price") && (
                                 <div className="space-y-2">
                                     <Label className="text-sm" htmlFor="old_price">
-                                        Old Price
+                                        Old Price(₦)
                                     </Label>
                                     <Input
                                         id="old_price"

@@ -34,7 +34,8 @@ type UpdateVariantInput = {
     status?: "IN_STOCK" | "OUT_OF_STOCK";
     size?: string;
     color?: string;
-    measurement?: number;
+    width?: number;
+    length?: number;
     age?: string;
 };
 type UploadImageInput = { id: number; data: any };
