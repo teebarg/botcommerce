@@ -12,6 +12,8 @@ const productSearchSchema = z.object({
     sizes: z.number().optional(),
     colors: z.string().optional(),
     ages: z.string().optional(),
+    width: z.number().optional(),
+    length: z.number().optional(),
 });
 
 export const Route = createFileRoute("/_mainLayout/search/$query")({

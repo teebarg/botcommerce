@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { api } from "@/utils/api.server";
-import type { Address, SearchCatalog, Category, Collection } from "@/schemas";
+import type { Address, SearchCatalog, Collection } from "@/schemas";
 import { z } from "zod";
 
 export const CatalogSearchSchema = z.object({
@@ -8,6 +8,8 @@ export const CatalogSearchSchema = z.object({
     sort: z.string().optional(),
     sizes: z.number().optional(),
     colors: z.string().optional(),
+    width: z.number().optional(),
+    length: z.number().optional(),
     cursor: z.number().optional(),
 });
 

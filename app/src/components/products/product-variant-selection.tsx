@@ -17,7 +17,8 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
     const {
         selectedColor,
         selectedSize,
-        selectedMeasurement,
+        selectedWidth,
+        selectedLength,
         selectedAge,
         quantity,
         selectedVariant,
@@ -30,7 +31,8 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
         isOptionAvailable,
         toggleSizeSelect,
         toggleColorSelect,
-        toggleMeasurementSelect,
+        toggleWidthSelect,
+        toggleLengthSelect,
         toggleAgeSelect,
     } = useProductVariant(product);
     const safeColors = colors.filter((c): c is string => typeof c === "string");
@@ -113,14 +115,14 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
 
             {widths?.length > 0 && (
                 <div className="space-y-3">
-                    <h3 className="text-sm font-medium">Measurement</h3>
+                    <h3 className="text-sm font-medium">Widths</h3>
                     <div className="flex flex-wrap gap-2">
                         {widths?.map((width) => {
                             if (!width) {
                                 return null;
                             }
                             const available = isOptionAvailable("width", width!);
-                            const isSelected = selectedMeasurement === width;
+                            const isSelected = selectedWidth === width;
 
                             return (
                                 <button
@@ -134,7 +136,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                                               : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
                                     )}
                                     disabled={!available}
-                                    onClick={() => available && toggleMeasurementSelect(width)}
+                                    onClick={() => available && toggleWidthSelect(width)}
                                 >
                                     {width}
                                 </button>
@@ -146,14 +148,14 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
 
             {lengths?.length > 0 && (
                 <div className="space-y-3">
-                    <h3 className="text-sm font-medium">Measurement</h3>
+                    <h3 className="text-sm font-medium">Lengths</h3>
                     <div className="flex flex-wrap gap-2">
                         {lengths?.map((length) => {
                             if (!length) {
                                 return null;
                             }
                             const available = isOptionAvailable("length", length!);
-                            const isSelected = selectedMeasurement === length;
+                            const isSelected = selectedLength === length;
 
                             return (
                                 <button
@@ -167,7 +169,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                                               : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
                                     )}
                                     disabled={!available}
-                                    onClick={() => available && toggleMeasurementSelect(length)}
+                                    onClick={() => available && toggleLengthSelect(length)}
                                 >
                                     {length}
                                 </button>

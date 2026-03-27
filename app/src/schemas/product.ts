@@ -173,6 +173,8 @@ export const FacetSchema = z.object({
     sizes: z.record(z.string(), z.string()).optional(),
     colors: z.record(z.string(), z.string()).optional(),
     ages: z.record(z.string(), z.string()).optional(),
+    widths: z.record(z.string(), z.string()).optional(),
+    lengths: z.record(z.string(), z.string()).optional(),
 });
 
 export const PaginatedProductSearchSchema = PagSchema.extend({

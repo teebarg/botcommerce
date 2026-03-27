@@ -198,6 +198,8 @@ def has_active_filters(
     sizes: str,
     colors: str,
     ages: str,
+    width: str,
+    length: str,
 ) -> bool:
     return any([
         search,
@@ -206,6 +208,8 @@ def has_active_filters(
         sizes,
         colors,
         ages,
+        width,
+        length,
         min_price != DEFAULT_MIN_PRICE,
         max_price != DEFAULT_MAX_PRICE,
     ])
@@ -223,6 +227,8 @@ async def feed(
     sizes: str = Query(default=""),
     colors: str = Query(default=""),
     ages: str = Query(default=""),
+    width: str = Query(default=""),
+    length: str = Query(default=""),
     limit: int = Query(default=20, le=100),
     active: bool = Query(default=True),
     show_suggestions: bool = Query(default=False),
@@ -275,11 +281,17 @@ async def feed(
         age_values: str = ", ".join([f'"{age}"' for age in [ages]])
         base_filters.append(f"ages IN [{age_values}]")
 
+    if width:
+        base_filters.append(f"widths IN [{width}]")
+
+    if length:
+        base_filters.append(f"lengths IN [{length}]")
+
     if feed_seed is None:
         feed_seed = random.random()
 
     index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
-    disable_random_feed: bool = has_active_filters(search, cat_ids, collections, max_price, min_price, sizes, colors, ages)
+    disable_random_feed: bool = has_active_filters(search, cat_ids, collections, max_price, min_price, sizes, colors, ages, width, length)
 
     try:
         hits: list[dict] = []
@@ -363,6 +375,8 @@ async def feed(
                     "sizes",
                     "colors",
                     "ages",
+                    "widths",
+                    "lengths",
                 ]
 
             res = index.search(search, search_params)
@@ -463,6 +477,8 @@ async def search(
     sizes: str = Query(default=""),
     colors: str = Query(default=""),
     ages: str = Query(default=""),
+    width: str = Query(default=""),
+    length: str = Query(default=""),
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
     active: bool = Query(default=True),
@@ -488,6 +504,10 @@ async def search(
     if ages:
         age_values: str = ", ".join([f'"{age}"' for age in [ages]])
         filters.append(f"ages IN [{age_values}]")
+    if width:
+        filters.append(f"widths IN [{width}]")
+    if length:
+        filters.append(f"lengths IN [{length}]")
 
     search_params = {
         "limit": limit,
@@ -496,7 +516,7 @@ async def search(
     }
 
     if show_facets:
-        search_params["facets"] = ["category_slugs", "sizes", "colors", "ages"]
+        search_params["facets"] = ["category_slugs", "sizes", "colors", "ages", "widths", "lengths"]
 
     if filters:
         search_params["filter"] = " AND ".join(filters)
@@ -575,41 +595,6 @@ async def search(
     }
 
 
-@router.post("/", dependencies=[Depends(require_admin)])
-async def create_product(product: ProductCreate, background_tasks: BackgroundTasks):
-    slugified_name = slugify(product.name)
-
-    data = {
-        "name": product.name,
-        "slug": slugified_name,
-        "sku": generate_sku(),
-        "description": product.description,
-        # "brand": {"connect": {"id": product.brand_id}},
-        "active": product.active,
-        "is_new": product.is_new if product.is_new is not None else False,
-    }
-
-    if product.category_ids:
-        category_connect = [{"id": id} for id in product.category_ids]
-        data["categories"] = {"connect": category_connect}
-
-    if product.collection_ids:
-        collection_connect = [{"id": id} for id in product.collection_ids]
-        data["collections"] = {"connect": collection_connect}
-
-    try:
-        created_product = await db.product.create(data=data)
-    except UniqueViolationError as e:
-        logger.error(e)
-        raise HTTPException(
-            status_code=400, detail="Product with this name already exists")
-
-    await invalidate_pattern("gallery")
-    background_tasks.add_task(index_product, product_id=created_product.id)
-
-    return created_product
-
-
 @router.get("/{slug}")
 @cache_response("product:slug", key=lambda request, slug, **kwargs: slug)
 async def read(request: Request, slug: str) -> ProductLite:
@@ -627,88 +612,36 @@ async def read(request: Request, slug: str) -> ProductLite:
     return product
 
 
-@router.put("/{id}", dependencies=[Depends(require_admin)])
-async def update_product(id: int, product: ProductUpdate, background_tasks: BackgroundTasks):
-    existing_product = await db.product.find_unique(where={"id": id})
-    if not existing_product:
-        raise HTTPException(status_code=404, detail="Product not found")
+# @router.delete("/{id}", dependencies=[Depends(require_admin)])
+# async def delete_product(id: int) -> Message:
+#     """
+#     Delete a product.
+#     """
+#     product = await db.product.find_unique(
+#         where={"id": id},
+#         include={
+#             "images": True,
+#         }
+#     )
+#     if not product:
+#         raise HTTPException(status_code=404, detail="Product not found")
+#     async with db.tx() as tx:
+#         try:
+#             await remove_image_from_storage(images=[img.image for img in product.images])
 
-    update_data = {}
+#             await tx.productimage.delete_many(where={"product_id": id})
+#             await tx.review.delete_many(where={"product_id": id})
+#             await tx.productvariant.delete_many(where={"product_id": id})
 
-    if product.name is not None:
-        update_data["name"] = product.name
-        update_data["slug"] = slugify(product.name)
-        update_data["sku"] = f"SK{slugify(product.name)}"
+#             await tx.product.delete(where={"id": id})
+#         except Exception as e:
+#             logger.error(e)
 
-    if product.sku is not None:
-        update_data["sku"] = product.sku
-
-    if product.description is not None:
-        update_data["description"] = product.description
-
-    if product.category_ids is not None:
-        category_ids = [{"id": id} for id in product.category_ids]
-        update_data["categories"] = {"set": category_ids}
-
-    if product.collection_ids is not None:
-        collection_ids = [{"id": id} for id in product.collection_ids]
-        update_data["collections"] = {"set": collection_ids}
-    # if product.brand_id is not None:
-    #     update_data["brand"] = {"connect": {"id": product.brand_id}}
-    if product.active is not None:
-        update_data["active"] = product.active
-    if product.is_new is not None:
-        update_data["is_new"] = product.is_new
-
-    try:
-        updated_product = await db.product.update(
-            where={"id": id},
-            data=update_data,
-        )
-    except UniqueViolationError as e:
-        logger.error(e)
-        raise HTTPException(
-            status_code=400, detail="Product with this name already exists")
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=400, detail=str(e))
-
-    await invalidate_pattern("gallery")
-    background_tasks.add_task(index_product, product_id=id)
-
-    return updated_product
-
-
-@router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete_product(id: int) -> Message:
-    """
-    Delete a product.
-    """
-    product = await db.product.find_unique(
-        where={"id": id},
-        include={
-            "images": True,
-        }
-    )
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    async with db.tx() as tx:
-        try:
-            await remove_image_from_storage(images=[img.image for img in product.images])
-
-            await tx.productimage.delete_many(where={"product_id": id})
-            await tx.review.delete_many(where={"product_id": id})
-            await tx.productvariant.delete_many(where={"product_id": id})
-
-            await tx.product.delete(where={"id": id})
-        except Exception as e:
-            logger.error(e)
-
-        service = RecentlyViewedService()
-        await service.remove_product_from_all(product_id=id)
-        await delete_product_index(product_ids=[id])
-        await invalidate_pattern("gallery")
-        return Message(message="Product deleted successfully")
+#         service = RecentlyViewedService()
+#         await service.remove_product_from_all(product_id=id)
+#         await delete_product_index(product_ids=[id])
+#         await invalidate_pattern("gallery")
+#         return Message(message="Product deleted successfully")
 
 
 @router.put("/variants/{variant_id}", dependencies=[Depends(require_admin)])
