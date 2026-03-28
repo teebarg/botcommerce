@@ -1,3 +1,4 @@
+import asyncio
 from typing import Any
 from fastapi import (
     APIRouter,
@@ -9,12 +10,10 @@ from fastapi import (
 )
 from app.core.deps import CurrentUser, UserDep
 from app.core.logging import get_logger
-from app.core.utils import slugify, url_to_list, generate_sku
+from app.core.utils import url_to_list
 from app.models.generic import Message, ImageUpload
 from app.models.product import (
     ProductLite,
-    ProductCreate,
-    ProductUpdate,
     VariantWithStatus,
     SearchProducts, FeedProducts,
     IndexProducts, ReviewStatus
@@ -30,17 +29,14 @@ from app.services.meilisearch import (
 from app.prisma_client import prisma as db
 from app.core.storage import upload
 from app.core.config import settings
-from prisma.errors import UniqueViolationError
-from app.services.product import index_product, delete_product_index, index_products
+from app.services.product import index_product, index_products
 from app.services.redis import cache_response, invalidate_pattern
 from meilisearch.errors import MeilisearchApiError
-from app.services.recently_viewed import RecentlyViewedService
 from app.core.storage import upload
 from app.services.generic import remove_image_from_storage
 from app.services.redis import invalidate_pattern
 from app.redis_client import redis_client
 from collections import Counter
-import asyncio
 from prisma.enums import PaymentStatus
 from app.core.permissions import require_admin
 
@@ -610,38 +606,6 @@ async def read(request: Request, slug: str) -> ProductLite:
         raise HTTPException(status_code=404, detail="Product not found")
 
     return product
-
-
-# @router.delete("/{id}", dependencies=[Depends(require_admin)])
-# async def delete_product(id: int) -> Message:
-#     """
-#     Delete a product.
-#     """
-#     product = await db.product.find_unique(
-#         where={"id": id},
-#         include={
-#             "images": True,
-#         }
-#     )
-#     if not product:
-#         raise HTTPException(status_code=404, detail="Product not found")
-#     async with db.tx() as tx:
-#         try:
-#             await remove_image_from_storage(images=[img.image for img in product.images])
-
-#             await tx.productimage.delete_many(where={"product_id": id})
-#             await tx.review.delete_many(where={"product_id": id})
-#             await tx.productvariant.delete_many(where={"product_id": id})
-
-#             await tx.product.delete(where={"id": id})
-#         except Exception as e:
-#             logger.error(e)
-
-#         service = RecentlyViewedService()
-#         await service.remove_product_from_all(product_id=id)
-#         await delete_product_index(product_ids=[id])
-#         await invalidate_pattern("gallery")
-#         return Message(message="Product deleted successfully")
 
 
 @router.put("/variants/{variant_id}", dependencies=[Depends(require_admin)])

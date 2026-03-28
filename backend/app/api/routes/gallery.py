@@ -472,7 +472,6 @@ async def update_image_metadata(
                 )
 
             async def _upsert_variant(variant):
-                print("🚀 ~ file: gallery.py:475 ~ variant:", variant)
                 status = "IN_STOCK" if variant.inventory > 0 else "OUT_OF_STOCK"
                 variant_data = {
                     "price": variant.price,

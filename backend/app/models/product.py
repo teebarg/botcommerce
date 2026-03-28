@@ -1,9 +1,6 @@
 from typing import List, Optional, Literal
 from pydantic import BaseModel, Field
-from app.models.generic import ImageUpload
-from app.models.base import BM
 from prisma.enums import ProductStatus
-from app.models.reviews import Review
 from app.models.collection import Collection
 from app.models.category import Category
 
@@ -45,17 +42,6 @@ class ProductCreate(BaseModel):
     tags_ids: Optional[List[int]] = None
     active: Optional[bool] = True
     is_new: Optional[bool] = False
-
-class ProductUpdate(BaseModel):
-    name: Optional[str] = Field(None, min_length=1)
-    description: Optional[str] = None
-    sku: Optional[str] = None
-    brand_id: Optional[int] = None
-    category_ids: Optional[List[int]] = None
-    collection_ids: Optional[List[int]] = None
-    tags_ids: Optional[List[int]] = None
-    active: Optional[bool] = True
-    is_new: Optional[bool] = None
 
 class ReviewCreate(BaseModel):
     product_id: int = Field(..., gt=0)
@@ -117,11 +103,6 @@ class ProductSearch(BaseModel):
     status: Literal["IN STOCK", "OUT OF STOCK"] = "IN STOCK"
     variants: Optional[List[SearchVariant]] = []
     active: Optional[bool] = True
-    # sizes: Optional[List[str]] = None
-    # ages: Optional[List[str]] = None
-    # colors: Optional[List[str]] = None
-    # widths: Optional[List[int]] = None
-    # lengths: Optional[List[int]] = None
     is_new: Optional[bool] = False
 
 class Facets(BaseModel):
@@ -152,10 +133,6 @@ class IndexProducts(BaseModel):
     featured: List[ProductSearch]
     arrival: List[ProductSearch]
     trending: List[ProductSearch]
-
-class ProductCreateBundle(ProductCreate):
-    images: Optional[List[ImageUpload]] = None
-    variants: Optional[List[VariantWithStatus]] = None
 
 class ProductImageMetadata(ProductCreate):
     variants: Optional[List[VariantWithStatus]] = None
