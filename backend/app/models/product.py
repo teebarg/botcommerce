@@ -108,7 +108,7 @@ class SearchVariant(BaseModel):
     length: Optional[int] = None
     age: Optional[str] = None
 
-class SearchProduct(BaseModel):
+class ProductSearch(BaseModel):
     id: int
     name: Optional[str] = None
     sku: Optional[str] = None
@@ -117,11 +117,11 @@ class SearchProduct(BaseModel):
     status: Literal["IN STOCK", "OUT OF STOCK"] = "IN STOCK"
     variants: Optional[List[SearchVariant]] = []
     active: Optional[bool] = True
-    sizes: Optional[List[str]] = None
-    ages: Optional[List[str]] = None
-    colors: Optional[List[str]] = None
-    widths: Optional[List[int]] = None
-    lengths: Optional[List[int]] = None
+    # sizes: Optional[List[str]] = None
+    # ages: Optional[List[str]] = None
+    # colors: Optional[List[str]] = None
+    # widths: Optional[List[int]] = None
+    # lengths: Optional[List[int]] = None
     is_new: Optional[bool] = False
 
 class Facets(BaseModel):
@@ -131,7 +131,7 @@ class Facets(BaseModel):
     ages: Optional[dict[str, int]] = None
 
 class FeedProducts(BaseModel):
-    products: List[SearchProduct]
+    products: List[ProductSearch]
     facets: Facets
     total_count: int
     suggestions: List[str]
@@ -140,7 +140,7 @@ class FeedProducts(BaseModel):
     next_cursor: str | None
 
 class SearchProducts(BaseModel):
-    products: List[SearchProduct]
+    products: List[ProductSearch]
     facets: Facets
     suggestions: List[str]
     skip: int
@@ -149,9 +149,9 @@ class SearchProducts(BaseModel):
     total_pages: int
 
 class IndexProducts(BaseModel):
-    featured: List[SearchProduct]
-    arrival: List[SearchProduct]
-    trending: List[SearchProduct]
+    featured: List[ProductSearch]
+    arrival: List[ProductSearch]
+    trending: List[ProductSearch]
 
 class ProductCreateBundle(ProductCreate):
     images: Optional[List[ImageUpload]] = None
@@ -190,4 +190,4 @@ class CategoryWithProducts(BaseModel):
     id: int
     name: Optional[str] = None
     slug: str = Field(..., min_length=1)
-    products: Optional[List[SearchProduct]] = None
+    products: Optional[List[ProductSearch]] = None

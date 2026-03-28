@@ -143,11 +143,11 @@ export const ProductSearchSchema = z.object({
     status: ProductStatusSchema,
     variants: z.array(SearchVariantSchema).nullable(),
     active: z.boolean(),
-    sizes: z.array(z.string()),
-    colors: z.array(z.string()),
-    ages: z.array(z.string()),
-    widths: z.array(z.number()),
-    lengths: z.array(z.number()),
+    // sizes: z.array(z.string()),
+    // colors: z.array(z.string()),
+    // ages: z.array(z.string()),
+    // widths: z.array(z.number()),
+    // lengths: z.array(z.number()),
     is_new: z.boolean().optional(),
 });
 

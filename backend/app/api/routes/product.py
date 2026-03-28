@@ -182,7 +182,7 @@ async def get_recommendations(request: Request, user: CurrentUser, limit: int = 
 # @router.get("/popular")
 # async def get_popular_products(
 #     limit: int = Query(default=10, le=20)
-# ) -> list[SearchProduct]:
+# ) -> list[ProductSearch]:
 #     """Get popular products."""
 #     service = PopularProductsService()
 #     products = await service.get_popular_products(limit)
