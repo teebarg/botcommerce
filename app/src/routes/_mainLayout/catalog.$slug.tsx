@@ -7,7 +7,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import CatalogInfinite from "@/components/store/catalog/catalog-infinite";
 
 export const CatalogSearchSchema = z.object({
-    sizes: z.number().optional(),
+    sizes: z.string().optional(),
     colors: z.string().optional(),
     width: z.number().optional(),
     length: z.number().optional(),

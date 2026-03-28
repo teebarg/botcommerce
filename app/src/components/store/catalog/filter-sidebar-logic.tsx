@@ -340,7 +340,7 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
                     <div className="flex gap-2 pt-2">
                         <div className="flex-1">
                             <Input
-                                label="Width"
+                                label="Waist"
                                 inputMode="numeric"
                                 placeholder="35"
                                 step={1}

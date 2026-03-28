@@ -47,7 +47,6 @@ export function GalleryFilters() {
     const [draft, setDraft] = useState<Filters>(() => parseFilters(search));
     const show = location.pathname.startsWith("/admin/gallery");
 
-    // Sync draft when URL changes externally
     useEffect(() => {
         setDraft(parseFilters(search));
     }, [search.sort, search.active, search.out_of_stock]);

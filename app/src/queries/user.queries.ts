@@ -20,7 +20,7 @@ type FeedParams = {
 
 type CatalogFeedParams = {
     slug: string;
-    sizes?: number;
+    sizes?: string;
     colors?: string;
     width?: number;
     length?: number;

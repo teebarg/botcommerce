@@ -6,7 +6,7 @@ import { z } from "zod";
 export const CatalogSearchSchema = z.object({
     slug: z.string(),
     sort: z.string().optional(),
-    sizes: z.number().optional(),
+    sizes: z.string().optional(),
     colors: z.string().optional(),
     width: z.number().optional(),
     length: z.number().optional(),

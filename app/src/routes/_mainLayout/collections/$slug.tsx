@@ -10,7 +10,7 @@ const FeedQuerySchema = z.object({
     max_price: z.number().optional(),
     min_price: z.number().optional(),
     cat_ids: z.string().optional(),
-    sizes: z.number().optional(),
+    sizes: z.string().optional(),
     colors: z.string().optional(),
     ages: z.string().optional(),
     width: z.number().optional(),

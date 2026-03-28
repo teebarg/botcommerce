@@ -23,11 +23,11 @@ type FormProduct = {
     size: string;
     color: string;
     age: string;
-    length: number;
     width: number;
+    length: number;
+    inventory: number;
     price: number;
     old_price: number;
-    inventory: number;
 };
 
 type FieldKey = keyof FormProduct;
@@ -40,11 +40,11 @@ const FIELD_CONFIG = {
     size: { label: "Size", type: "select" },
     color: { label: "Color", type: "select" },
     age: { label: "Age Range", type: "select" },
-    length: { label: "Length", type: "number" },
     width: { label: "Waist", type: "number" },
+    length: { label: "Length", type: "number" },
+    inventory: { label: "Inventory", type: "number" },
     price: { label: "Price(₦)", type: "number" },
     old_price: { label: "Old Price(₦)", type: "number" },
-    inventory: { label: "Inventory", type: "number" },
 } as const;
 
 interface BulkImageSheetFormProps {
