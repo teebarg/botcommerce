@@ -69,7 +69,7 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
         variants_summary: str = " | ".join(filter(None, [
             f"Sizes: {r['sizes']}"          if r["sizes"]  else None,
             f"Colors: {r['colors']}"        if r["colors"] else None,
-            f"Widths: {r['widths']}"        if r["widths"] else None,
+            f"Waist: {r['widths']}"        if r["widths"] else None,
             f"Lengths: {r['lengths']}"      if r["lengths"] else None,
             f"Price: {price}"         if price else None,
             f"{r['in_stock_variants']}/{r['total_variants']} variants in stock"
