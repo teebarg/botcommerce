@@ -46,7 +46,8 @@ export const ProductVariantLiteSchema = z.object({
     inventory: z.number(),
     size: z.string().nullable().optional(),
     color: z.string().nullable().optional(),
-    measurement: z.number().nullable().optional(),
+    width: z.number().nullable().optional(),
+    length: z.number().nullable().optional(),
     age: z.string().nullable().optional(),
 });
 
@@ -77,7 +78,8 @@ export const ProductVariantSchema = z.object({
     inventory: z.number(),
     size: z.string().nullable().optional(),
     color: z.string().nullable().optional(),
-    measurement: z.number().nullable().optional(),
+    width: z.number().nullable().optional(),
+    length: z.number().nullable().optional(),
     age: z.string().nullable().optional(),
 });
 
@@ -114,7 +116,8 @@ export const SearchVariantSchema = z.object({
     inventory: z.number(),
     size: z.string().nullable().optional(),
     color: z.string().nullable().optional(),
-    measurement: z.number().nullable().optional(),
+    width: z.number().nullable().optional(),
+    length: z.number().nullable().optional(),
     age: z.string().nullable().optional(),
     is_new: z.boolean().optional(),
 });
@@ -140,10 +143,6 @@ export const ProductSearchSchema = z.object({
     status: ProductStatusSchema,
     variants: z.array(SearchVariantSchema).nullable(),
     active: z.boolean(),
-    sizes: z.array(z.string()),
-    colors: z.array(z.string()),
-    ages: z.array(z.string()),
-    measurements: z.array(z.number()),
     is_new: z.boolean().optional(),
 });
 
@@ -169,6 +168,8 @@ export const FacetSchema = z.object({
     sizes: z.record(z.string(), z.string()).optional(),
     colors: z.record(z.string(), z.string()).optional(),
     ages: z.record(z.string(), z.string()).optional(),
+    widths: z.record(z.string(), z.string()).optional(),
+    lengths: z.record(z.string(), z.string()).optional(),
 });
 
 export const PaginatedProductSearchSchema = PagSchema.extend({

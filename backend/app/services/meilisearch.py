@@ -12,7 +12,7 @@ from anyio import to_thread
 
 client = Client(settings.MEILI_HOST, settings.MEILI_MASTER_KEY)
 
-REQUIRED_FILTERABLES: list[str] = ["id", "catalogs", "category_slugs", "collection_slugs", "name", "max_variant_price", "min_variant_price", "active", "sizes", "colors", "ages", "random_score", "freshness_score"]
+REQUIRED_FILTERABLES: list[str] = ["id", "catalogs", "category_slugs", "collection_slugs", "name", "max_variant_price", "min_variant_price", "active", "sizes", "colors", "ages", "widths", "lengths", "random_score", "freshness_score"]
 REQUIRED_SORTABLES: list[str] = ["id", "created_at", "max_variant_price", "min_variant_price", "random_score", "freshness_score"]
 
 

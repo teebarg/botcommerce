@@ -1,3 +1,4 @@
+import asyncio
 from typing import Any
 from fastapi import (
     APIRouter,
@@ -9,12 +10,10 @@ from fastapi import (
 )
 from app.core.deps import CurrentUser, UserDep
 from app.core.logging import get_logger
-from app.core.utils import slugify, url_to_list, generate_sku
+from app.core.utils import url_to_list
 from app.models.generic import Message, ImageUpload
 from app.models.product import (
     ProductLite,
-    ProductCreate,
-    ProductUpdate,
     VariantWithStatus,
     SearchProducts, FeedProducts,
     IndexProducts, ReviewStatus
@@ -30,17 +29,14 @@ from app.services.meilisearch import (
 from app.prisma_client import prisma as db
 from app.core.storage import upload
 from app.core.config import settings
-from prisma.errors import UniqueViolationError
-from app.services.product import index_product, delete_product_index, index_products
+from app.services.product import index_product, index_products
 from app.services.redis import cache_response, invalidate_pattern
 from meilisearch.errors import MeilisearchApiError
-from app.services.recently_viewed import RecentlyViewedService
 from app.core.storage import upload
 from app.services.generic import remove_image_from_storage
 from app.services.redis import invalidate_pattern
 from app.redis_client import redis_client
 from collections import Counter
-import asyncio
 from prisma.enums import PaymentStatus
 from app.core.permissions import require_admin
 
@@ -56,8 +52,10 @@ def build_variant_data(payload) -> dict[str, Any]:
         data["size"] = payload.size
     if payload.color is not None:
         data["color"] = payload.color
-    if payload.measurement is not None:
-        data["measurement"] = payload.measurement
+    if payload.width is not None:
+        data["width"] = payload.width
+    if payload.length is not None:
+        data["length"] = payload.length
     if payload.age is not None:
         data["age"] = payload.age
     if payload.inventory is not None:
@@ -180,7 +178,7 @@ async def get_recommendations(request: Request, user: CurrentUser, limit: int = 
 # @router.get("/popular")
 # async def get_popular_products(
 #     limit: int = Query(default=10, le=20)
-# ) -> list[SearchProduct]:
+# ) -> list[ProductSearch]:
 #     """Get popular products."""
 #     service = PopularProductsService()
 #     products = await service.get_popular_products(limit)
@@ -196,6 +194,8 @@ def has_active_filters(
     sizes: str,
     colors: str,
     ages: str,
+    width: str,
+    length: str,
 ) -> bool:
     return any([
         search,
@@ -204,6 +204,8 @@ def has_active_filters(
         sizes,
         colors,
         ages,
+        width,
+        length,
         min_price != DEFAULT_MIN_PRICE,
         max_price != DEFAULT_MAX_PRICE,
     ])
@@ -221,6 +223,8 @@ async def feed(
     sizes: str = Query(default=""),
     colors: str = Query(default=""),
     ages: str = Query(default=""),
+    width: str = Query(default=""),
+    length: str = Query(default=""),
     limit: int = Query(default=20, le=100),
     active: bool = Query(default=True),
     show_suggestions: bool = Query(default=False),
@@ -273,11 +277,17 @@ async def feed(
         age_values: str = ", ".join([f'"{age}"' for age in [ages]])
         base_filters.append(f"ages IN [{age_values}]")
 
+    if width:
+        base_filters.append(f"widths IN [{width}]")
+
+    if length:
+        base_filters.append(f"lengths IN [{length}]")
+
     if feed_seed is None:
         feed_seed = random.random()
 
     index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
-    disable_random_feed: bool = has_active_filters(search, cat_ids, collections, max_price, min_price, sizes, colors, ages)
+    disable_random_feed: bool = has_active_filters(search, cat_ids, collections, max_price, min_price, sizes, colors, ages, width, length)
 
     try:
         hits: list[dict] = []
@@ -361,6 +371,8 @@ async def feed(
                     "sizes",
                     "colors",
                     "ages",
+                    "widths",
+                    "lengths",
                 ]
 
             res = index.search(search, search_params)
@@ -461,6 +473,8 @@ async def search(
     sizes: str = Query(default=""),
     colors: str = Query(default=""),
     ages: str = Query(default=""),
+    width: str = Query(default=""),
+    length: str = Query(default=""),
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
     active: bool = Query(default=True),
@@ -486,6 +500,10 @@ async def search(
     if ages:
         age_values: str = ", ".join([f'"{age}"' for age in [ages]])
         filters.append(f"ages IN [{age_values}]")
+    if width:
+        filters.append(f"widths IN [{width}]")
+    if length:
+        filters.append(f"lengths IN [{length}]")
 
     search_params = {
         "limit": limit,
@@ -494,7 +512,7 @@ async def search(
     }
 
     if show_facets:
-        search_params["facets"] = ["category_slugs", "sizes", "colors", "ages"]
+        search_params["facets"] = ["category_slugs", "sizes", "colors", "ages", "widths", "lengths"]
 
     if filters:
         search_params["filter"] = " AND ".join(filters)
@@ -573,41 +591,6 @@ async def search(
     }
 
 
-@router.post("/", dependencies=[Depends(require_admin)])
-async def create_product(product: ProductCreate, background_tasks: BackgroundTasks):
-    slugified_name = slugify(product.name)
-
-    data = {
-        "name": product.name,
-        "slug": slugified_name,
-        "sku": generate_sku(),
-        "description": product.description,
-        # "brand": {"connect": {"id": product.brand_id}},
-        "active": product.active,
-        "is_new": product.is_new if product.is_new is not None else False,
-    }
-
-    if product.category_ids:
-        category_connect = [{"id": id} for id in product.category_ids]
-        data["categories"] = {"connect": category_connect}
-
-    if product.collection_ids:
-        collection_connect = [{"id": id} for id in product.collection_ids]
-        data["collections"] = {"connect": collection_connect}
-
-    try:
-        created_product = await db.product.create(data=data)
-    except UniqueViolationError as e:
-        logger.error(e)
-        raise HTTPException(
-            status_code=400, detail="Product with this name already exists")
-
-    await invalidate_pattern("gallery")
-    background_tasks.add_task(index_product, product_id=created_product.id)
-
-    return created_product
-
-
 @router.get("/{slug}")
 @cache_response("product:slug", key=lambda request, slug, **kwargs: slug)
 async def read(request: Request, slug: str) -> ProductLite:
@@ -623,90 +606,6 @@ async def read(request: Request, slug: str) -> ProductLite:
         raise HTTPException(status_code=404, detail="Product not found")
 
     return product
-
-
-@router.put("/{id}", dependencies=[Depends(require_admin)])
-async def update_product(id: int, product: ProductUpdate, background_tasks: BackgroundTasks):
-    existing_product = await db.product.find_unique(where={"id": id})
-    if not existing_product:
-        raise HTTPException(status_code=404, detail="Product not found")
-
-    update_data = {}
-
-    if product.name is not None:
-        update_data["name"] = product.name
-        update_data["slug"] = slugify(product.name)
-        update_data["sku"] = f"SK{slugify(product.name)}"
-
-    if product.sku is not None:
-        update_data["sku"] = product.sku
-
-    if product.description is not None:
-        update_data["description"] = product.description
-
-    if product.category_ids is not None:
-        category_ids = [{"id": id} for id in product.category_ids]
-        update_data["categories"] = {"set": category_ids}
-
-    if product.collection_ids is not None:
-        collection_ids = [{"id": id} for id in product.collection_ids]
-        update_data["collections"] = {"set": collection_ids}
-    # if product.brand_id is not None:
-    #     update_data["brand"] = {"connect": {"id": product.brand_id}}
-    if product.active is not None:
-        update_data["active"] = product.active
-    if product.is_new is not None:
-        update_data["is_new"] = product.is_new
-
-    try:
-        updated_product = await db.product.update(
-            where={"id": id},
-            data=update_data,
-        )
-    except UniqueViolationError as e:
-        logger.error(e)
-        raise HTTPException(
-            status_code=400, detail="Product with this name already exists")
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=400, detail=str(e))
-
-    await invalidate_pattern("gallery")
-    background_tasks.add_task(index_product, product_id=id)
-
-    return updated_product
-
-
-@router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete_product(id: int) -> Message:
-    """
-    Delete a product.
-    """
-    product = await db.product.find_unique(
-        where={"id": id},
-        include={
-            "images": True,
-        }
-    )
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    async with db.tx() as tx:
-        try:
-            await remove_image_from_storage(images=[img.image for img in product.images])
-
-            await tx.productimage.delete_many(where={"product_id": id})
-            await tx.review.delete_many(where={"product_id": id})
-            await tx.productvariant.delete_many(where={"product_id": id})
-
-            await tx.product.delete(where={"id": id})
-        except Exception as e:
-            logger.error(e)
-
-        service = RecentlyViewedService()
-        await service.remove_product_from_all(product_id=id)
-        await delete_product_index(product_ids=[id])
-        await invalidate_pattern("gallery")
-        return Message(message="Product deleted successfully")
 
 
 @router.put("/variants/{variant_id}", dependencies=[Depends(require_admin)])
@@ -733,8 +632,11 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
     if variant.color is not None:
         update_data["color"] = variant.color
 
-    if variant.measurement is not None:
-        update_data["measurement"] = variant.measurement
+    if variant.width is not None:
+        update_data["width"] = variant.width
+
+    if variant.length is not None:
+        update_data["length"] = variant.length
 
     if variant.age is not None:
         update_data["age"] = variant.age

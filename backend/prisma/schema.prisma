@@ -254,6 +254,8 @@ model ProductVariant {
   size        String?
   color       String?
   measurement Int?
+  width       Int?
+  length      Int?
   age         String?
   order_items OrderItem[]
   cart_items  CartItem[] // Added relation to CartItem

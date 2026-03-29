@@ -32,7 +32,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale" }) 
                         isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice}
                         variant={variant}
                     />
-                    {isNew && <IsNew className="bottom-2 top-auto" />}
+                    {isNew && <IsNew />}
                     {outOfStock && (
                         <div className="absolute inset-0 bg-black/35 flex items-center justify-center">
                             <Badge className="text-sm backdrop-blur-sm" variant="contrast">

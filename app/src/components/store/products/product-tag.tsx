@@ -5,15 +5,24 @@ interface ProductTagProps {
 }
 
 const ProductTag = ({ product }: ProductTagProps) => {
-    const accentColor = product.colors[0] ?? "transparent";
+    const variant = product.variants?.[0];
+    const accentColor = variant?.color ?? "transparent";
     const content = (() => {
-        if (product.ages.length > 0) {
-            return <div>{product.ages[0]}</div>;
+        if (variant?.width || variant?.length) {
+            return (
+                <div className="text-[0.85rem]">
+                    {variant.width && <div>W-{variant.width}</div>}
+                    {variant.length && <div>L-{variant.length}</div>}
+                </div>
+            );
         }
-        if (product.sizes.length > 0) {
+        if (variant?.age) {
+            return <div>{variant?.age}</div>;
+        }
+        if (variant?.size) {
             return (
                 <div>
-                    uk<span className="text-lg">{product.sizes[0]}</span>
+                    uk<span className="text-lg">{variant.size}</span>
                 </div>
             );
         }
@@ -24,7 +33,6 @@ const ProductTag = ({ product }: ProductTagProps) => {
 
     return (
         <div className="absolute -right-1 top-6 z-10 origin-top-right transition-transform duration-300 group-hover:rotate-3">
-            {/* String/thread */}
             <div className="absolute -top-4 right-4 w-px h-4 bg-foreground" />
             <div className="absolute -top-5 right-3 w-3 h-3 rounded-full border border-foreground bg-background" />
             <div

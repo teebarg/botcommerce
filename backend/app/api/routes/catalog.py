@@ -103,6 +103,8 @@ async def search(
     min_price: int = Query(default=1, gt=0),
     sizes: str = Query(default=""),
     colors: str = Query(default=""),
+    width: str = Query(default=""),
+    length: str = Query(default=""),
     limit: int = Query(default=20, le=100),
     cursor: int | None = Query(default=None),
 ) -> CursorPaginatedCatalog:
@@ -135,6 +137,12 @@ async def search(
 
     if colors:
         filters.append(f"colors IN [{colors}]")
+
+    if width:
+        filters.append(f"widths IN [{width}]")
+
+    if length:
+        filters.append(f"lengths IN [{length}]")
 
     if cursor is not None:
         filters.append(f"id < {cursor}")

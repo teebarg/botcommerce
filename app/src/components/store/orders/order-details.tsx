@@ -46,7 +46,7 @@ const OrderDetails = ({ order }: OrderDetailsProps) => {
                                             <div className="flex-1">
                                                 <h4 className="font-medium">{item.name}</h4>
                                                 <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
-                                                {item.variant && (item.variant.size || item.variant.color || item.variant.measurement) && (
+                                                {item.variant && (item.variant.size || item.variant.color || item.variant.width || item.variant.length) && (
                                                     <div className="flex flex-wrap gap-1.5 mb-2 mt-4">
                                                         {item.variant.color && (
                                                             <div className="flex items-center gap-1">
@@ -64,11 +64,19 @@ const OrderDetails = ({ order }: OrderDetailsProps) => {
                                                                 </Badge>
                                                             </div>
                                                         )}
-                                                        {item.variant.measurement && (
+                                                        {item.variant.width && (
                                                             <div className="flex items-center gap-1">
-                                                                <span className="text-xs text-muted-foreground">Measurement:</span>
+                                                                <span className="text-xs text-muted-foreground">Width:</span>
                                                                 <Badge className="text-sm px-2 py-0.5" variant="contrast">
-                                                                    {item.variant.measurement}
+                                                                    {item.variant.width}
+                                                                </Badge>
+                                                            </div>
+                                                        )}
+                                                        {item.variant.length && (
+                                                            <div className="flex items-center gap-1">
+                                                                <span className="text-xs text-muted-foreground">Length:</span>
+                                                                <Badge className="text-sm px-2 py-0.5" variant="contrast">
+                                                                    {item.variant.length}
                                                                 </Badge>
                                                             </div>
                                                         )}

@@ -20,7 +20,8 @@ export const useProductVariant = (product: ProductLite | ProductSearch) => {
 
     const [selectedColor, setSelectedColor] = useState<string | null>(product?.variants?.[0]?.color || null);
     const [selectedSize, setSelectedSize] = useState<string | null>(product?.variants?.[0]?.size || null);
-    const [selectedMeasurement, setSelectedMeasurement] = useState<number | null>(product?.variants?.[0]?.measurement || null);
+    const [selectedWidth, setSelectedWidth] = useState<number | null>(product?.variants?.[0]?.width || null);
+    const [selectedLength, setSelectedLength] = useState<number | null>(product?.variants?.[0]?.length || null);
     const [selectedAge, setSelectedAge] = useState<string | null>(product?.variants?.[0]?.age || null);
     const [quantity, setQuantity] = useState<number>(1);
     const [selectedVariant, setSelectedVariant] = useState<ProductVariantLite | undefined>();
@@ -33,8 +34,12 @@ export const useProductVariant = (product: ProductLite | ProductSearch) => {
         return [...new Set(product?.variants?.filter((v) => v.color).map((v) => v.color))];
     }, [product?.variants]);
 
-    const measurements = useMemo(() => {
-        return [...new Set(product?.variants?.filter((v) => v.measurement).map((v) => v.measurement))];
+    const widths = useMemo(() => {
+        return [...new Set(product?.variants?.filter((v) => v.width).map((v) => v.width))];
+    }, [product?.variants]);
+
+    const lengths = useMemo(() => {
+        return [...new Set(product?.variants?.filter((v) => v.length).map((v) => v.length))];
     }, [product?.variants]);
 
     const ages = useMemo(() => {
@@ -70,19 +75,19 @@ export const useProductVariant = (product: ProductLite | ProductSearch) => {
         return cart?.items?.find((item: CartItem) => item.variant_id == selectedVariant?.id);
     }, [cart, selectedVariant]);
 
-    const findMatchingVariant = (size: string | null, color: string | null, measurement: number | null, age: string | null) => {
+    const findMatchingVariant = (size: string | null, color: string | null, width: number | null, length: number | null, age: string | null) => {
         if (product?.variants?.length == 0) {
             return undefined;
         }
         if (product?.variants?.length == 1) {
             return product?.variants[0];
         }
-        if (!size && !color && !measurement && !age) {
+        if (!size && !color && !width && !length && !age) {
             return product?.variants?.find((variant) => variant.inventory > 0);
         }
 
         return product?.variants?.find(
-            (variant) => variant.size === size && variant.color === color && variant.measurement === measurement && variant.age === age
+            (variant) => variant.size === size && variant.color === color && variant.width === width && variant.length === length && variant.age === age
         );
     };
 
@@ -91,18 +96,19 @@ export const useProductVariant = (product: ProductLite | ProductSearch) => {
     }, []);
 
     useEffect(() => {
-        const matchingVariant = findMatchingVariant(selectedSize, selectedColor, selectedMeasurement, selectedAge);
+        const matchingVariant = findMatchingVariant(selectedSize, selectedColor, selectedWidth, selectedLength, selectedAge);
 
         setSelectedVariant(matchingVariant ?? undefined);
-    }, [selectedSize, selectedColor, selectedMeasurement, selectedAge]);
+    }, [selectedSize, selectedColor, selectedWidth, selectedLength, selectedAge]);
 
-    const isOptionAvailable = (type: "size" | "color" | "measurement" | "age", value: string | number) => {
+    const isOptionAvailable = (type: "size" | "color" | "width" | "length" | "age", value: string | number) => {
         if (type === "size") {
             return product?.variants?.some(
                 (v) =>
                     v.size === value &&
                     (!selectedColor || v.color === selectedColor) &&
-                    (!selectedMeasurement || v.measurement === selectedMeasurement) &&
+                    (!selectedWidth || v.width === selectedWidth) &&
+                    (!selectedLength || v.length === selectedLength) &&
                     (!selectedAge || v.age === selectedAge) &&
                     v.inventory > 0
             );
@@ -111,15 +117,26 @@ export const useProductVariant = (product: ProductLite | ProductSearch) => {
                 (v) =>
                     v.color === value &&
                     (!selectedSize || v.size === selectedSize) &&
-                    (!selectedMeasurement || v.measurement === selectedMeasurement) &&
+                    (!selectedWidth || v.width === selectedWidth) &&
+                    (!selectedLength || v.length === selectedLength) &&
                     (!selectedAge || v.age === selectedAge) &&
                     v.inventory > 0
             );
-        } else if (type === "measurement") {
+        } else if (type === "width") {
             return product?.variants?.some(
                 (v) =>
                     (!selectedSize || v.size === selectedSize) &&
                     (!selectedColor || v.color === selectedColor) &&
+                    (!selectedLength || v.length === selectedLength) &&
+                    (!selectedAge || v.age === selectedAge) &&
+                    v.inventory > 0
+            );
+        } else if (type === "length") {
+            return product?.variants?.some(
+                (v) =>
+                    (!selectedSize || v.size === selectedSize) &&
+                    (!selectedColor || v.color === selectedColor) &&
+                    (!selectedWidth || v.width === selectedWidth) &&
                     (!selectedAge || v.age === selectedAge) &&
                     v.inventory > 0
             );
@@ -129,7 +146,8 @@ export const useProductVariant = (product: ProductLite | ProductSearch) => {
                     v.age === value &&
                     (!selectedSize || v.size === selectedSize) &&
                     (!selectedColor || v.color === selectedColor) &&
-                    (!selectedMeasurement || v.measurement === selectedMeasurement) &&
+                    (!selectedWidth || v.width === selectedWidth) &&
+                    (!selectedLength || v.length === selectedLength) &&
                     v.inventory > 0
             );
         }
@@ -145,8 +163,12 @@ export const useProductVariant = (product: ProductLite | ProductSearch) => {
         setSelectedColor((prev) => (prev === color ? null : color));
     };
 
-    const toggleMeasurementSelect = (measurement: number) => {
-        setSelectedMeasurement((prev) => (prev === measurement ? null : measurement));
+    const toggleWidthSelect = (width: number) => {
+        setSelectedWidth((prev) => (prev === width ? null : width));
+    };
+
+    const toggleLengthSelect = (length: number) => {
+        setSelectedLength((prev) => (prev === length ? null : length));
     };
 
     const toggleAgeSelect = (age: string) => {
@@ -192,7 +214,8 @@ export const useProductVariant = (product: ProductLite | ProductSearch) => {
             ? [
                   selectedVariant.size && `Size: ${selectedVariant.size}`,
                   selectedVariant.color && `Color: ${selectedVariant.color}`,
-                  selectedVariant.measurement && `Measurement: ${selectedVariant.measurement}`,
+                  selectedVariant.width && `Width: ${selectedVariant.width}`,
+                  selectedVariant.length && `Length: ${selectedVariant.length}`,
                   selectedVariant.age && `Age: ${selectedVariant.age}`,
                   `Price: ${currency(selectedVariant.price)}`,
               ]
@@ -225,8 +248,10 @@ export const useProductVariant = (product: ProductLite | ProductSearch) => {
         setSelectedColor,
         selectedSize,
         setSelectedSize,
-        selectedMeasurement,
-        setSelectedMeasurement,
+        selectedWidth,
+        setSelectedWidth,
+        selectedLength,
+        setSelectedLength,
         selectedAge,
         setSelectedAge,
         quantity,
@@ -234,12 +259,14 @@ export const useProductVariant = (product: ProductLite | ProductSearch) => {
         selectedVariant,
         sizes,
         colors,
-        measurements,
+        widths,
+        lengths,
         ages,
         isOptionAvailable,
         toggleSizeSelect,
         toggleColorSelect,
-        toggleMeasurementSelect,
+        toggleWidthSelect,
+        toggleLengthSelect,
         toggleAgeSelect,
         handleAddToCart,
         handleWhatsAppPurchase,

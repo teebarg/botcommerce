@@ -12,14 +12,18 @@ type FeedParams = {
     collections?: string;
     min_price?: number;
     max_price?: number;
+    width?: number;
+    length?: number;
     sort?: string;
     show_facets?: boolean;
 };
 
 type CatalogFeedParams = {
     slug: string;
-    sizes?: number;
+    sizes?: string;
     colors?: string;
+    width?: number;
+    length?: number;
 };
 
 export const meQuery = () =>

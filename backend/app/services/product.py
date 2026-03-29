@@ -149,25 +149,28 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
             "inventory": v.inventory,
             "size": v.size,
             "color": v.color,
-            "measurement": v.measurement,
             "age": v.age,
+            "width": v.width,
+            "length": v.length,
             "status": v.status,
         }
         for v in (product.variants or [])
     ]
     product_dict["variants"] = variants
 
-    sizes, colors, ages, measurements = [], [], [], []
+    sizes, colors, ages, widths, lengths = [], [], [], [], []
     for v in variants:
         if v.get("size"):        sizes.append(v["size"])
         if v.get("color"):       colors.append(v["color"])
         if v.get("age"):         ages.append(v["age"])
-        if v.get("measurement"): measurements.append(v["measurement"])
+        if v.get("width"):       widths.append(v["width"])
+        if v.get("length"):      lengths.append(v["length"])
 
     product_dict["sizes"] = sizes
     product_dict["colors"] = colors
     product_dict["ages"] = ages
-    product_dict["measurements"] = measurements
+    product_dict["widths"] = widths
+    product_dict["lengths"] = lengths
 
     # Prices
     variant_prices = [v["price"] for v in variants if v.get("price") is not None]

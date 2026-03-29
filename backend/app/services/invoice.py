@@ -214,10 +214,12 @@ class InvoiceService:
                     variant_parts.append(f"Size: {item.variant['size']}")
                 if item.variant.get('color'):
                     variant_parts.append(f"Color: {item.variant['color']}")
-                if item.variant.get('measurement'):
-                    variant_parts.append(f"Measurement: {item.variant['measurement']}")
                 if item.variant.get('age'):
                     variant_parts.append(f"Age: {item.variant['age']}")
+                if item.variant.get('width'):
+                    variant_parts.append(f"Width: {item.variant['width']}")
+                if item.variant.get('length'):
+                    variant_parts.append(f"Length: {item.variant['length']}")
                 if variant_parts:
                     item_name += f" ({', '.join(variant_parts)})"
 

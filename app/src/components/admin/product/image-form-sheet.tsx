@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { COLOR_OPTIONS, ColorOption, SIZE_OPTIONS } from "@/utils/constants";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AgeRangeSelector } from "@/components/ui/age-selector";
+import { Separator } from "@/components/ui/separator";
 
 type FormProduct = Omit<Partial<Product>, "images" | "variants" | "categories" | "collections"> & {
     categories: { value: number; label: string }[];
@@ -59,7 +60,8 @@ export function ImageSheetForm({ onClose, imageId, currentProduct }: ProductShee
         id: currentProduct?.variants?.[0]?.id ?? undefined,
         size: currentProduct?.variants?.[0]?.size ?? "",
         color: currentProduct?.variants?.[0]?.color ?? "",
-        measurement: currentProduct?.variants?.[0]?.measurement ?? undefined,
+        width: currentProduct?.variants?.[0]?.width ?? undefined,
+        length: currentProduct?.variants?.[0]?.length ?? undefined,
         age: currentProduct?.variants?.[0]?.age ?? "",
         price: currentProduct?.variants?.[0]?.price ?? 0,
         old_price: currentProduct?.variants?.[0]?.old_price ?? 0,
@@ -131,7 +133,7 @@ export function ImageSheetForm({ onClose, imageId, currentProduct }: ProductShee
                         </div>
                     </Card>
 
-                    <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-2">
                         <div className="flex items-center gap-2">
                             <Checkbox checked={product.active} id="active" onCheckedChange={(checked) => updateField("active", checked)} />
                             <Label className="text-sm font-medium" htmlFor="active">
@@ -220,12 +222,22 @@ export function ImageSheetForm({ onClose, imageId, currentProduct }: ProductShee
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-sm">Measurement</Label>
+                            <Label className="text-sm">Waist</Label>
                             <Input
-                                placeholder="Example: 41,42,43"
+                                placeholder="41"
                                 type="number"
-                                value={newVariant.measurement || ""}
-                                onChange={(e) => setNewVariant((prev) => ({ ...prev, measurement: parseFloat(e.target.value) || undefined }))}
+                                value={newVariant.width || ""}
+                                onChange={(e) => setNewVariant((prev) => ({ ...prev, width: parseFloat(e.target.value) || undefined }))}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label className="text-sm">Length</Label>
+                            <Input
+                                placeholder="43"
+                                type="number"
+                                value={newVariant.length || ""}
+                                onChange={(e) => setNewVariant((prev) => ({ ...prev, length: parseFloat(e.target.value) || undefined }))}
                             />
                         </div>
 
@@ -236,9 +248,11 @@ export function ImageSheetForm({ onClose, imageId, currentProduct }: ProductShee
                             />
                         </div>
 
+                        <Separator className="col-span-2" />
+
                         <div className="space-y-2">
                             <Label className="text-sm" htmlFor="price">
-                                Price
+                                Price(₦)
                             </Label>
                             <Input
                                 id="price"
@@ -252,11 +266,11 @@ export function ImageSheetForm({ onClose, imageId, currentProduct }: ProductShee
 
                         <div className="space-y-2">
                             <Label className="text-sm" htmlFor="old_price">
-                                Old Price
+                                Old Price(₦)
                             </Label>
                             <Input
                                 id="old_price"
-                                placeholder="0"
+                                placeholder="Optional"
                                 step="1"
                                 type="number"
                                 value={newVariant.old_price || ""}

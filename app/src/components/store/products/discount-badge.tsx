@@ -49,7 +49,7 @@ const discountBadgeVariants = cva(
         },
         defaultVariants: {
             variant: "sale",
-            size: "md",
+            size: "sm",
         },
     }
 );

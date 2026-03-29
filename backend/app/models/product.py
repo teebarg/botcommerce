@@ -1,9 +1,6 @@
 from typing import List, Optional, Literal
 from pydantic import BaseModel, Field
-from app.models.generic import ImageUpload
-from app.models.base import BM
 from prisma.enums import ProductStatus
-from app.models.reviews import Review
 from app.models.collection import Collection
 from app.models.category import Category
 
@@ -22,7 +19,8 @@ class ProductVariant(BaseModel):
     age: Optional[str]
     size: Optional[str]
     color: Optional[str]
-    measurement: Optional[int]
+    width: Optional[int]
+    length: Optional[int]
 
 class VariantWithStatus(BaseModel):
     id: Optional[int] = None
@@ -31,7 +29,8 @@ class VariantWithStatus(BaseModel):
     inventory: int = Field(..., ge=0)
     size: Optional[str] = None
     color: Optional[str] = None
-    measurement: Optional[int] = None
+    width: Optional[int] = None
+    length: Optional[int] = None
     age: Optional[str] = None
 
 class ProductCreate(BaseModel):
@@ -43,17 +42,6 @@ class ProductCreate(BaseModel):
     tags_ids: Optional[List[int]] = None
     active: Optional[bool] = True
     is_new: Optional[bool] = False
-
-class ProductUpdate(BaseModel):
-    name: Optional[str] = Field(None, min_length=1)
-    description: Optional[str] = None
-    sku: Optional[str] = None
-    brand_id: Optional[int] = None
-    category_ids: Optional[List[int]] = None
-    collection_ids: Optional[List[int]] = None
-    tags_ids: Optional[List[int]] = None
-    active: Optional[bool] = True
-    is_new: Optional[bool] = None
 
 class ReviewCreate(BaseModel):
     product_id: int = Field(..., gt=0)
@@ -102,10 +90,11 @@ class SearchVariant(BaseModel):
     inventory: int = 0
     size: Optional[str] = None
     color: Optional[str] = None
-    measurement: Optional[int] = None
+    width: Optional[int] = None
+    length: Optional[int] = None
     age: Optional[str] = None
 
-class SearchProduct(BaseModel):
+class ProductSearch(BaseModel):
     id: int
     name: Optional[str] = None
     sku: Optional[str] = None
@@ -114,10 +103,6 @@ class SearchProduct(BaseModel):
     status: Literal["IN STOCK", "OUT OF STOCK"] = "IN STOCK"
     variants: Optional[List[SearchVariant]] = []
     active: Optional[bool] = True
-    sizes: Optional[List[str]] = None
-    ages: Optional[List[str]] = None
-    colors: Optional[List[str]] = None
-    measurements: Optional[List[int]] = None
     is_new: Optional[bool] = False
 
 class Facets(BaseModel):
@@ -127,7 +112,7 @@ class Facets(BaseModel):
     ages: Optional[dict[str, int]] = None
 
 class FeedProducts(BaseModel):
-    products: List[SearchProduct]
+    products: List[ProductSearch]
     facets: Facets
     total_count: int
     suggestions: List[str]
@@ -136,7 +121,7 @@ class FeedProducts(BaseModel):
     next_cursor: str | None
 
 class SearchProducts(BaseModel):
-    products: List[SearchProduct]
+    products: List[ProductSearch]
     facets: Facets
     suggestions: List[str]
     skip: int
@@ -145,13 +130,9 @@ class SearchProducts(BaseModel):
     total_pages: int
 
 class IndexProducts(BaseModel):
-    featured: List[SearchProduct]
-    arrival: List[SearchProduct]
-    trending: List[SearchProduct]
-
-class ProductCreateBundle(ProductCreate):
-    images: Optional[List[ImageUpload]] = None
-    variants: Optional[List[VariantWithStatus]] = None
+    featured: List[ProductSearch]
+    arrival: List[ProductSearch]
+    trending: List[ProductSearch]
 
 class ProductImageMetadata(ProductCreate):
     variants: Optional[List[VariantWithStatus]] = None
@@ -162,7 +143,8 @@ class ImageMetadata(BaseModel):
     tag_ids: Optional[List[int]] = None
     size: Optional[str] = None
     color: Optional[str] = None
-    measurement: Optional[int] = None
+    width: Optional[int] = None
+    length: Optional[int] = None
     age: Optional[str] = None
     inventory: Optional[int] = None
     active: Optional[bool] = None
@@ -185,4 +167,4 @@ class CategoryWithProducts(BaseModel):
     id: int
     name: Optional[str] = None
     slug: str = Field(..., min_length=1)
-    products: Optional[List[SearchProduct]] = None
+    products: Optional[List[ProductSearch]] = None

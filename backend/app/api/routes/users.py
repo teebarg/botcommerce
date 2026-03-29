@@ -9,7 +9,7 @@ from prisma.enums import Role, Status
 from app.models.user import User, UserSelf, UserAdmin, UserUpdateMe, UserUpdate, PaginatedUsers, GuestUserCreate, PasswordChange
 from app.core.security import verify_password, get_password_hash
 from app.services.recently_viewed import RecentlyViewedService
-from app.models.product import SearchProduct
+from app.models.product import ProductSearch
 from app.services.redis import cache_response, bust
 from app.core.permissions import require_admin
 
@@ -280,7 +280,7 @@ async def get_recently_viewed(
     request: Request,
     current_user: CurrentUser,
     limit: int = Query(default=10, le=20)
-) -> list[SearchProduct]:
+) -> list[ProductSearch]:
     """Get current user's recently viewed products."""
     service = RecentlyViewedService()
     products = await service.get_recently_viewed(current_user.id, limit)

@@ -33,6 +33,8 @@ type DraftFilters = {
     sort: string;
     minPrice: string;
     maxPrice: string;
+    width: string;
+    length: string;
 };
 
 const DEFAULT_DRAFT = {
@@ -43,6 +45,8 @@ const DEFAULT_DRAFT = {
     categories: new Set<string>(),
     minPrice: DEFAULT_MIN_PRICE,
     maxPrice: DEFAULT_MAX_PRICE,
+    width: "",
+    length: "",
 };
 
 const PRICE_MIN_BOUND = DEFAULT_MIN_PRICE;
@@ -77,6 +81,8 @@ const normalizePriceValues = (minStr: string, maxStr: string) => {
 
 export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets, onClose }, ref) => {
     const search = useSearch({ strict: false });
+    const navigate = useNavigate();
+    const { updateQuery } = useUpdateQuery();
     const filters = useMemo(() => {
         return {
             sort: search.sort ?? "id:desc",
@@ -86,14 +92,14 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
             categories: new Set(search.cat_ids?.split(",").filter(Boolean)),
             minPrice: search.min_price?.toString() ?? `${DEFAULT_MIN_PRICE}`,
             maxPrice: search.max_price?.toString() ?? `${DEFAULT_MAX_PRICE}`,
+            width: search.width?.toString() ?? "",
+            length: search.length?.toString() ?? "",
         };
     }, [search]);
 
     const [draft, setDraft] = useState(filters);
-    const { updateQuery } = useUpdateQuery();
     const { data: categories } = useCategories();
     const { data: collections } = useCollections();
-    const navigate = useNavigate();
 
     const [openSections, setOpenSections] = useState({
         categories: true,
@@ -102,6 +108,7 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
         size: true,
         color: true,
         age: true,
+        waistLength: true,
     });
 
     const [sort, setSort] = useState(() => search?.sort || "id:desc");
@@ -175,6 +182,8 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
             { key: "cat_ids", value: [...draft.categories].join(",") },
             { key: "min_price", value: minPrice },
             { key: "max_price", value: maxPrice },
+            { key: "width", value: draft.width },
+            { key: "length", value: draft.length },
         ]);
         onClose?.();
     };
@@ -188,6 +197,8 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
             categories: new Set(),
             minPrice: DEFAULT_DRAFT.minPrice.toString(),
             maxPrice: DEFAULT_DRAFT.maxPrice.toString(),
+            width: "",
+            length: "",
         });
         setPriceMinInput(DEFAULT_DRAFT.minPrice.toString());
         setPriceMaxInput(DEFAULT_DRAFT.maxPrice.toString());
@@ -316,6 +327,39 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
                                 </Label>
                             </div>
                         </RadioGroup>
+                    </div>
+                </CollapsibleContent>
+            </Collapsible>
+
+            <Collapsible open={openSections.waistLength} onOpenChange={() => toggleSection("waistLength")}>
+                <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
+                    <span className="font-medium">Waist * Length</span>
+                    <ChevronDown className={`h-4 w-4 transition-transform ${openSections.waistLength ? "rotate-180" : ""}`} />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <div className="flex gap-2 pt-2">
+                        <div className="flex-1">
+                            <Input
+                                label="Waist"
+                                inputMode="numeric"
+                                placeholder="35"
+                                step={1}
+                                type="text"
+                                value={draft.width}
+                                onChange={(e) => setDraft({ ...draft, width: e.target.value })}
+                            />
+                        </div>
+                        <div className="flex-1">
+                            <Input
+                                label="Length"
+                                inputMode="numeric"
+                                placeholder="42"
+                                step={1}
+                                type="text"
+                                value={draft.length}
+                                onChange={(e) => setDraft({ ...draft, length: e.target.value })}
+                            />
+                        </div>
                     </div>
                 </CollapsibleContent>
             </Collapsible>

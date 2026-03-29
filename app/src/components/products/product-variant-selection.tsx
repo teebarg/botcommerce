@@ -17,19 +17,22 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
     const {
         selectedColor,
         selectedSize,
-        selectedMeasurement,
+        selectedWidth,
+        selectedLength,
         selectedAge,
         quantity,
         selectedVariant,
         setQuantity,
         sizes,
         colors,
-        measurements,
+        widths,
+        lengths,
         ages,
         isOptionAvailable,
         toggleSizeSelect,
         toggleColorSelect,
-        toggleMeasurementSelect,
+        toggleWidthSelect,
+        toggleLengthSelect,
         toggleAgeSelect,
     } = useProductVariant(product);
     const safeColors = colors.filter((c): c is string => typeof c === "string");
@@ -110,20 +113,20 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                 </div>
             )}
 
-            {measurements?.length > 0 && (
+            {widths?.length > 0 && (
                 <div className="space-y-3">
-                    <h3 className="text-sm font-medium">Measurement</h3>
+                    <h3 className="text-sm font-medium">Widths</h3>
                     <div className="flex flex-wrap gap-2">
-                        {measurements?.map((measurement) => {
-                            if (!measurement) {
+                        {widths?.map((width) => {
+                            if (!width) {
                                 return null;
                             }
-                            const available = isOptionAvailable("measurement", measurement!);
-                            const isSelected = selectedMeasurement === measurement;
+                            const available = isOptionAvailable("width", width!);
+                            const isSelected = selectedWidth === width;
 
                             return (
                                 <button
-                                    key={measurement}
+                                    key={width}
                                     className={cn(
                                         "px-6 py-2 text-sm font-medium border border-border rounded-md transition-all duration-200",
                                         isSelected
@@ -133,9 +136,42 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                                               : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
                                     )}
                                     disabled={!available}
-                                    onClick={() => available && toggleMeasurementSelect(measurement)}
+                                    onClick={() => available && toggleWidthSelect(width)}
                                 >
-                                    {measurement}
+                                    {width}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {lengths?.length > 0 && (
+                <div className="space-y-3">
+                    <h3 className="text-sm font-medium">Lengths</h3>
+                    <div className="flex flex-wrap gap-2">
+                        {lengths?.map((length) => {
+                            if (!length) {
+                                return null;
+                            }
+                            const available = isOptionAvailable("length", length!);
+                            const isSelected = selectedLength === length;
+
+                            return (
+                                <button
+                                    key={length}
+                                    className={cn(
+                                        "px-6 py-2 text-sm font-medium border border-border rounded-md transition-all duration-200",
+                                        isSelected
+                                            ? "bg-contrast text-contrast-foreground"
+                                            : available
+                                              ? "bg-card"
+                                              : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
+                                    )}
+                                    disabled={!available}
+                                    onClick={() => available && toggleLengthSelect(length)}
+                                >
+                                    {length}
                                 </button>
                             );
                         })}

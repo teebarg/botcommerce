@@ -1,7 +1,7 @@
 from typing import Optional, List
 from datetime import datetime
 from pydantic import BaseModel, Field
-from app.models.product import SearchProduct
+from app.models.product import ProductSearch
 
 class CatalogView(BaseModel):
     id: int
@@ -18,12 +18,12 @@ class CatalogBase(BaseModel):
     created_at: Optional[datetime] = None
 
 class Catalog(CatalogBase):
-    products: Optional[List[SearchProduct]] = []
+    products: Optional[List[ProductSearch]] = []
     view_count: int = 0
     products_count: int = 0
 
 class CursorPaginatedCatalog(BaseModel):
-    products: list[SearchProduct]
+    products: list[ProductSearch]
     view_count: int = 0
     limit: int
     next_cursor: int | None = None

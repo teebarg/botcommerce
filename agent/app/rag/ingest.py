@@ -35,6 +35,8 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
             MIN(pv.old_price)                           AS old_price,
             STRING_AGG(DISTINCT pv.size, ', ')          AS sizes,
             STRING_AGG(DISTINCT pv.color, ', ')         AS colors,
+            STRING_AGG(DISTINCT pv.width, ', ')         AS widths,
+            STRING_AGG(DISTINCT pv.length, ', ')        AS lengths,
             COUNT(pv.id)                                AS total_variants,
             COUNT(pv.id) FILTER (
                 WHERE pv.status = 'IN_STOCK'
@@ -67,6 +69,8 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
         variants_summary: str = " | ".join(filter(None, [
             f"Sizes: {r['sizes']}"          if r["sizes"]  else None,
             f"Colors: {r['colors']}"        if r["colors"] else None,
+            f"Waist: {r['widths']}"        if r["widths"] else None,
+            f"Lengths: {r['lengths']}"      if r["lengths"] else None,
             f"Price: {price}"         if price else None,
             f"{r['in_stock_variants']}/{r['total_variants']} variants in stock"
                                             if r["total_variants"] else None,
