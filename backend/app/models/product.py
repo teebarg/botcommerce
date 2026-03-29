@@ -16,11 +16,11 @@ class ProductVariant(BaseModel):
     price: float
     old_price: Optional[float] = 0.0
     inventory: int
-    age: Optional[str]
-    size: Optional[str]
-    color: Optional[str]
-    width: Optional[int]
-    length: Optional[int]
+    age: Optional[str] = None
+    size: Optional[str] = None
+    color: Optional[str] = None
+    width: Optional[int] = None
+    length: Optional[int] = None
 
 class VariantWithStatus(BaseModel):
     id: Optional[int] = None
