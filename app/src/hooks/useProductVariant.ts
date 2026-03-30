@@ -6,8 +6,8 @@ import { useConfig } from "@/providers/store-provider";
 import type { ProductLite, ProductSearch, ProductVariantLite } from "@/schemas/product";
 import { useCart } from "@/providers/cart-provider";
 import { isFirstWhatsAppMessage, markFirstWhatsAppMessageSent } from "@/utils/whatsapp-message-state";
-import { analytics } from "@/utils/pulsemetric";
 import { CartItem } from "@/schemas";
+import { gtag } from "@/utils/gtag";
 
 export const useProductVariant = (product: ProductLite | ProductSearch) => {
     const { cart } = useCart();
@@ -181,7 +181,7 @@ export const useProductVariant = (product: ProductLite | ProductSearch) => {
         if (variantInCart) {
             updateQuantity({ item_id: variantInCart.id, quantity: variantInCart.quantity + quantity }).then(() => {
                 setIsAdded(true);
-                analytics.addToCart({
+                gtag.addToCart({
                     product_id: product.id.toString(),
                     product_name: product.name,
                     quantity,
@@ -197,7 +197,7 @@ export const useProductVariant = (product: ProductLite | ProductSearch) => {
             quantity,
         }).then(() => {
             setIsAdded(true);
-            analytics.addToCart({
+            gtag.addToCart({
                 product_id: product.id.toString(),
                 product_name: product.name,
                 quantity,
