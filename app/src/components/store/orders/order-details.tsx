@@ -66,7 +66,7 @@ const OrderDetails = ({ order }: OrderDetailsProps) => {
                                                         )}
                                                         {item.variant.width && (
                                                             <div className="flex items-center gap-1">
-                                                                <span className="text-xs text-muted-foreground">Width:</span>
+                                                                <span className="text-xs text-muted-foreground">Waist:</span>
                                                                 <Badge className="text-sm px-2 py-0.5" variant="contrast">
                                                                     {item.variant.width}
                                                                 </Badge>

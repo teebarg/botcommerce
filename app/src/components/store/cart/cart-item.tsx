@@ -30,7 +30,7 @@ const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
                                 {item.variant.color}
                             </Badge>
                         )}
-                        {item.variant.width && <Badge variant="contrast">Width: {item.variant.width}</Badge>}
+                        {item.variant.width && <Badge variant="contrast">Waist: {item.variant.width}</Badge>}
                         {item.variant.length && <Badge variant="contrast">Length: {item.variant.length}</Badge>}
                         {item.variant.age && <Badge variant="contrast">Age: {item.variant.age}</Badge>}
                     </div>

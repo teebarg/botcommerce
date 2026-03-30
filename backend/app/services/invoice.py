@@ -217,7 +217,7 @@ class InvoiceService:
                 if item.variant.get('age'):
                     variant_parts.append(f"Age: {item.variant['age']}")
                 if item.variant.get('width'):
-                    variant_parts.append(f"Width: {item.variant['width']}")
+                    variant_parts.append(f"Waist: {item.variant['width']}")
                 if item.variant.get('length'):
                     variant_parts.append(f"Length: {item.variant['length']}")
                 if variant_parts:

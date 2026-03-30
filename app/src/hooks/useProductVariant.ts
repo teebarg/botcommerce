@@ -214,7 +214,7 @@ export const useProductVariant = (product: ProductLite | ProductSearch) => {
             ? [
                   selectedVariant.size && `Size: ${selectedVariant.size}`,
                   selectedVariant.color && `Color: ${selectedVariant.color}`,
-                  selectedVariant.width && `Width: ${selectedVariant.width}`,
+                  selectedVariant.width && `Waist: ${selectedVariant.width}`,
                   selectedVariant.length && `Length: ${selectedVariant.length}`,
                   selectedVariant.age && `Age: ${selectedVariant.age}`,
                   `Price: ${currency(selectedVariant.price)}`,
