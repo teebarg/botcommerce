@@ -142,10 +142,6 @@ export const useCompleteCart = () => {
         onSuccess: async (data) => {
             navigate({ to: `/order/confirmed/${data?.order_number}`, replace: true });
             queryClient.invalidateQueries({ queryKey: ["cart"] });
-            // analytics.checkout({
-            //     cart_value: data?.total,
-            //     item_count: data?.order_items?.length,
-            // });
         },
         onError: (error: any) => {
             navigate({ to: "/cart" }); // send them back

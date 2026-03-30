@@ -191,6 +191,19 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                         `,
                     }}
                 />
+                {/* GA Script */}
+                <script async src="https://www.googletagmanager.com/gtag/js?id=G-9CL81BV3RX"></script>
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            window.dataLayer = window.dataLayer || [];
+                            function gtag(){dataLayer.push(arguments);}
+                            window.gtag = gtag;
+                            gtag('js', new Date());
+                            gtag('config', 'G-9CL81BV3RX');
+                        `,
+                    }}
+                />
             </head>
             <body className="min-h-screen">
                 <ClerkProvider>
