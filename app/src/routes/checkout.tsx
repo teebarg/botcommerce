@@ -54,8 +54,8 @@ function RouteComponent() {
     useEffect(() => {
         if (cart) {
             gtag.beginCheckout({
-                id: cart.cart_number,
-                total: cart.total,
+                cart_id: cart.cart_number,
+                value: cart.total,
                 items: cart.items.map((item) => ({
                     id: item.id,
                     name: item.name,
@@ -63,7 +63,6 @@ function RouteComponent() {
                     quantity: item.quantity,
                 })),
             });
-            console.log("Checkout page loaded.........................");
         }
     }, [cart]);
 

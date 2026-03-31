@@ -45,10 +45,13 @@ function RouteComponent() {
     };
 
     useEffect(() => {
+        const done = localStorage.getItem(`gtag:${id}`);
+        if (done) return;
+        
         if (order) {
             gtag.purchase({
-                id: order.order_number,
-                total: order.total,
+                order_id: order.order_number,
+                value: order.total,
                 items: order.order_items.map((item) => ({
                     id: item.id,
                     name: item.name,
@@ -56,7 +59,7 @@ function RouteComponent() {
                     quantity: item.quantity,
                 })),
             });
-            console.log("Order page loaded.........................");
+            localStorage.setItem(`gtag:${id}`, "1");
         }
     }, [order]);
 

@@ -19,26 +19,17 @@ import PWABadge from "@/PWAbadge";
 import { ClerkProvider } from "@clerk/tanstack-react-start";
 import { getShopSettingsPublicFn } from "@/server/generic.server";
 import { useAppSession } from "@/utils/session";
-
 import { useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { gtag } from "@/utils/gtag";
 
 function RouteChangeTracker() {
     const location = useRouterState({ select: (s) => s.location });
-    console.log("🚀 ~ file: __root.tsx:27 ~ location:", location);
-
     useEffect(() => {
-        // const isProduction = process.env.NODE_ENV === "local";
-        // const isProduction = import.meta.env.MODE === "development";
-        // console.log(process.env)
-        // console.log(import.meta.env)
-        // console.log("🚀 ~ file: __root.tsx:30 ~ isProduction:", isProduction);
-        if (!(window as any).gtag || import.meta.env.PROD) return;
-
-        (window as any).gtag("config", import.meta.env.VITE_GA_ID, {
-            page_path: location.pathname + location.search,
+        gtag.pageView({
+            page_path: location.href,
         });
-    }, [location.pathname, location.search]);
+    }, [location.href]);
 
     return null;
 }
@@ -186,12 +177,7 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-    const GA_ID = process.env.VITE_GA_ID;
-    console.log(".................................................................");
-    console.log("🚀 ~ file: __root.tsx:168 ~ GA_ID:", GA_ID);
-    // console.log(process.env);
-    // console.log(import.meta.env);
-    console.log(".................................................................");
+    const GA_ID = import.meta.env.VITE_GA_ID;
     return (
         <html suppressHydrationWarning>
             <head>
