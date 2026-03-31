@@ -14,13 +14,25 @@ import { createServerFn } from "@tanstack/react-start";
 import { ThemeProvider } from "@/providers/theme-provider";
 import type { QueryClient } from "@tanstack/react-query";
 import { InvalidateProvider } from "@/providers/invalidate-provider";
-import { useEffect } from "react";
-import { initPulseMetrics } from "@/utils/pulsemetric";
 import PageTransitionLoader from "@/components/generic/page-transition-loader";
 import PWABadge from "@/PWAbadge";
 import { ClerkProvider } from "@clerk/tanstack-react-start";
 import { getShopSettingsPublicFn } from "@/server/generic.server";
 import { useAppSession } from "@/utils/session";
+import { useRouterState } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { gtag } from "@/utils/gtag";
+
+function RouteChangeTracker() {
+    const location = useRouterState({ select: (s) => s.location });
+    useEffect(() => {
+        gtag.pageView({
+            page_path: location.href,
+        });
+    }, [location.href]);
+
+    return null;
+}
 
 type SessionClaims = {
     firstName?: string;
@@ -158,15 +170,14 @@ function RootComponent() {
     return (
         <RootDocument>
             <PageTransitionLoader />
+            <RouteChangeTracker />
             <Outlet />
         </RootDocument>
     );
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-    useEffect(() => {
-        initPulseMetrics();
-    }, []);
+    const GA_ID = import.meta.env.VITE_GA_ID;
     return (
         <html suppressHydrationWarning>
             <head>
@@ -178,7 +189,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=false, viewport-fit=cover" />
                 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-                <script src="https://pub-f4e5ec522d104f0c94def43905ff791e.r2.dev/sdk.js" onError={(e) => console.error("Failed to load SDK:", e)} />
                 <script
                     dangerouslySetInnerHTML={{
                         __html: `
@@ -192,7 +202,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                     }}
                 />
                 {/* GA Script */}
-                <script async src="https://www.googletagmanager.com/gtag/js?id=G-9CL81BV3RX"></script>
+                <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
                 <script
                     dangerouslySetInnerHTML={{
                         __html: `
@@ -200,7 +210,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                             function gtag(){dataLayer.push(arguments);}
                             window.gtag = gtag;
                             gtag('js', new Date());
-                            gtag('config', 'G-9CL81BV3RX');
+                            gtag('config', '${GA_ID}');
                         `,
                     }}
                 />

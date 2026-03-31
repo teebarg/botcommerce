@@ -6,6 +6,8 @@ import PendingPayment from "@/components/store/orders/order-pending";
 import FailedPayment from "@/components/store/orders/order-failed";
 import { orderQuery } from "@/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { gtag } from "@/utils/gtag";
 
 export const Route = createFileRoute("/_mainLayout/order/confirmed/$id")({
     ssr: false,
@@ -41,6 +43,23 @@ function RouteComponent() {
     const onContinueShopping = () => {
         navigate({ to: "/collections" });
     };
+
+    useEffect(() => {
+        const done = localStorage.getItem(`gtag:${id}`);
+        if (done || !order) return;
+
+        gtag.purchase({
+            order_id: order.order_number,
+            value: order.total,
+            items: order.order_items.map((item) => ({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+            })),
+        });
+        localStorage.setItem(`gtag:${id}`, "1");
+    }, [order]);
 
     if (!order) {
         return <div className="flex items-center justify-center py-12 px-2 bg-secondary">Order not found</div>;

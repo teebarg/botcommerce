@@ -15,6 +15,7 @@ import { ProductVariantActions } from "@/components/products/product-variant-act
 import ShareButton from "@/components/share";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { useOverlayTriggerState } from "react-stately";
+import { gtag } from "@/utils/gtag";
 
 interface Props {
     product: ProductLite;
@@ -63,6 +64,10 @@ const ProductView: React.FC<Props> = ({ product }) => {
                 confirmState.close();
             });
     };
+
+    useEffect(() => {
+        gtag.viewItem({ id: product.id, name: product.name, price: selectedVariant?.price! });
+    }, [product.id]);
 
     useEffect(() => {
         const startTime = Date.now();

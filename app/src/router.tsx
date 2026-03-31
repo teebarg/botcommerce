@@ -10,13 +10,34 @@ import NotFound from "@/components/generic/not-found";
 // Create a new router instance
 export const getRouter = () => {
     const rqContext = TanstackQuery.getContext();
-    const session = null;
+    const session = {
+        isAuthenticated: false,
+        userId: null,
+        impersonated: false,
+        impersonatedBy: null,
+        id: "",
+        user: {
+            firstName: "",
+            lastName: "",
+            image: "",
+            email: "",
+            role: "",
+            roles: [],
+            isAdmin: false,
+        },
+    };
     const config = {};
 
     const router = createRouter({
         routeTree,
         scrollRestoration: true,
-        context: { ...rqContext, session, config },
+        context: {
+            ...rqContext,
+            session,
+            config,
+            isAuthenticated: false,
+            userId: null,
+        },
         defaultPreload: "intent",
         defaultErrorComponent: DefaultCatchBoundary,
         defaultNotFoundComponent: () => <NotFound />,
@@ -26,14 +47,6 @@ export const getRouter = () => {
     });
 
     setupRouterSsrQueryIntegration({ router, queryClient: rqContext.queryClient });
-
-    router.subscribe("onLoad", ({ toLocation }) => {
-        if (!(window as any).gtag) return;
-
-        (window as any).gtag("config", "G-9CL81BV3RX", {
-            page_path: toLocation.pathname + toLocation.search,
-        });
-    });
 
     return router;
 };
