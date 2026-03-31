@@ -46,21 +46,19 @@ function RouteComponent() {
 
     useEffect(() => {
         const done = localStorage.getItem(`gtag:${id}`);
-        if (done) return;
-        
-        if (order) {
-            gtag.purchase({
-                order_id: order.order_number,
-                value: order.total,
-                items: order.order_items.map((item) => ({
-                    id: item.id,
-                    name: item.name,
-                    price: item.price,
-                    quantity: item.quantity,
-                })),
-            });
-            localStorage.setItem(`gtag:${id}`, "1");
-        }
+        if (done || !order) return;
+
+        gtag.purchase({
+            order_id: order.order_number,
+            value: order.total,
+            items: order.order_items.map((item) => ({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+            })),
+        });
+        localStorage.setItem(`gtag:${id}`, "1");
     }, [order]);
 
     if (!order) {

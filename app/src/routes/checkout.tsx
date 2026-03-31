@@ -52,18 +52,18 @@ function RouteComponent() {
     const { cart, error, isLoading } = useCart();
 
     useEffect(() => {
-        if (cart) {
-            gtag.beginCheckout({
-                cart_id: cart.cart_number,
-                value: cart.total,
-                items: cart.items.map((item) => ({
-                    id: item.id,
-                    name: item.name,
-                    price: item.price,
-                    quantity: item.quantity,
-                })),
-            });
-        }
+        if (!cart) return;
+
+        gtag.beginCheckout({
+            cart_id: cart.cart_number,
+            value: cart.total,
+            items: cart.items.map((item) => ({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+            })),
+        });
     }, [cart]);
 
     if (error) {
