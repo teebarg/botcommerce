@@ -9,7 +9,7 @@ from app.agent.agent_graph import run_agent
 from app.agent.memory import clear_session
 from app.config import get_settings
 from app.utils import _notify_slack_escalation
-from app.agent.db import is_human_connected, save_message_db
+from app.agent.db import is_human_connected, save_message_db, mark_escalated
 from app.redis_client import redis_client
 
 logging.basicConfig(
@@ -92,6 +92,16 @@ async def chat(request: ChatRequest, background_tasks: BackgroundTasks) -> ChatR
                 session_id=request.session_id,
                 customer_id=request.customer_id,
                 reason=reason,
+            )
+
+            await mark_escalated(conversation_uuid=request.session_id)
+
+            background_tasks.add_task(
+                persist_turn_to_db,
+                session_id=request.session_id,
+                user_msg=reason,
+                ai_msg="Escalation request received",
+                metadata={"sources": []}
             )
 
             return ChatResponse(
