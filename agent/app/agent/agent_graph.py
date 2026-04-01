@@ -67,6 +67,7 @@ SYSTEM_PROMPT = (
     "Do not add extra text."
     "Never escalate just because a product was not found — tell the customer politely instead. "
     "Keep replies concise and warm."
+    "Always display currency in Nigerian Naira (₦). Never use dollars ($). Do not infer currency — use only the provided format."
 )
 
 CONVERSATIONAL_PATTERNS = re.compile(

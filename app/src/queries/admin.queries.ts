@@ -65,5 +65,5 @@ export const chatsQuery = (params: { user_id?: number; status?: ConversationStat
     queryOptions({
         queryKey: ["chats", JSON.stringify(params)],
         queryFn: () => clientApi.get<PaginatedChats>("/chat/", { params }),
-        staleTime: 1000 * 60 * 60 * 24, // 1 hour
+        staleTime: 1000 * 60 * 60,
     });

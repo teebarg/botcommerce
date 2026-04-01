@@ -4,6 +4,7 @@ import { Bot, User, AlertTriangle, Check, X } from "lucide-react";
 import { formatTime } from "@/utils";
 import { useState } from "react";
 import { ChatMessage } from "@/schemas";
+import { Button } from "@/components/ui/button";
 
 const EscalationCard = () => (
     <div className="mt-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 flex items-center gap-3">
@@ -54,14 +55,27 @@ function renderText(text: string): React.ReactNode {
 }
 
 interface ChatMessageProps {
-    onSend: (message: string, file?: File) => void;
+    onSend?: (message: string, file?: File) => void;
     message: ChatMessage;
     index: number;
     isLastUserMessage: boolean;
     isLastMessage: boolean;
+    humanConnected: boolean;
+    takeOverPending: boolean;
+    onHandleTakeOver: () => void;
 }
 
-const AdminChatMessage = ({ message, index, onSend, isLastUserMessage, isLastMessage }: ChatMessageProps) => {
+const AdminChatMessage = ({
+    message,
+    index,
+    onSend,
+    isLastUserMessage,
+    isLastMessage,
+    humanConnected,
+    takeOverPending,
+    onHandleTakeOver,
+}: ChatMessageProps) => {
+    console.log("message.................", message);
     const isAgent = message.sender === "BOT";
     const [isEditing, setIsEditing] = useState(false);
     const [editValue, setEditValue] = useState(message.content);
@@ -82,87 +96,101 @@ const AdminChatMessage = ({ message, index, onSend, isLastUserMessage, isLastMes
     }
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 12, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: index * 0.05, type: "spring", stiffness: 500, damping: 30 }}
-            className={`flex gap-2 px-2.5 ${isAgent ? "justify-start" : "justify-end"}`}
-        >
-            {isAgent && (
-                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
-                    <Bot className="w-4 h-4 text-primary" />
-                </div>
-            )}
-
-            <div className={`max-w-[80%] space-y-1.5 ${isAgent ? "" : "order-first"}`}>
-                {isEditing ? (
-                    <div className="space-y-2">
-                        <textarea
-                            value={editValue}
-                            onChange={(e) => setEditValue(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter" && !e.shiftKey) {
-                                    e.preventDefault();
-                                    handleSaveEdit();
-                                }
-                                if (e.key === "Escape") handleCancelEdit();
-                            }}
-                            className="w-full bg-secondary rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30 resize-none min-h-[60px]"
-                            autoFocus
-                        />
-                        <div className="flex items-center gap-1.5 justify-end">
-                            <button onClick={handleCancelEdit} className="p-1.5 rounded-lg hover:bg-secondary transition-colors">
-                                <X className="w-3.5 h-3.5 text-muted-foreground" />
-                            </button>
-                            <button
-                                onClick={handleSaveEdit}
-                                disabled={!editValue.trim()}
-                                className="p-1.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-40"
-                            >
-                                <Check className="w-3.5 h-3.5" />
-                            </button>
-                        </div>
+        <>
+            <motion.div
+                initial={{ opacity: 0, y: 12, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ delay: index * 0.05, type: "spring", stiffness: 500, damping: 30 }}
+                className={`flex gap-2 px-2.5 ${isAgent ? "justify-start" : "justify-end"}`}
+            >
+                {isAgent && (
+                    <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                        <Bot className="w-4 h-4 text-primary" />
                     </div>
-                ) : (
-                    <>
-                        {message.content && (
-                            <div
-                                className={`rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
-                                    isAgent
-                                        ? "bg-card text-card-foreground rounded-tl-md border border-border"
-                                        : "bg-primary text-primary-foreground rounded-tr-md"
-                                }`}
-                            >
-                                {renderText(message.content)}
-                            </div>
-                        )}
-
-                        {/* {message.escalated && <EscalationCard />} */}
-                        {/* {message.order && <OrderCard order={message.order} />} */}
-                        {/* {message.form?.type === "escalation_details" && <EscalationForm onSubmitForm={onSubmitForm} isLastMessage={isLastMessage} />} */}
-                        {/* {message.form?.type === "complaint" && <ComplaintForm onSubmitForm={onSubmitForm} form={message.form} />} */}
-                        {/* {!!message.products?.length && <ProductRecommendationCard products={message.products || []} />} */}
-                        {/* {isAgent && <SourceBadges sources={message.sources ?? []} />} */}
-                        <div className={`flex items-center gap-1.5 mt-1 ${isAgent ? "justify-start" : "justify-end"}`}>
-                            <p className="text-[10px] text-muted-foreground">{formatTime(new Date(message.timestamp))}</p>
-                            {!isAgent && isLastUserMessage && (
-                                <button
-                                    onClick={() => setIsEditing(true)}
-                                    className="text-[10px] text-muted-foreground hover:text-foreground transition-colors underline"
-                                >
-                                    Edit
-                                </button>
-                            )}
-                        </div>
-                    </>
                 )}
-            </div>
-            {!isAgent && (
-                <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 mt-1">
-                    <User className="w-4 h-4 text-secondary-foreground" />
+
+                <div className={`max-w-[80%] space-y-1.5 ${isAgent ? "" : "order-first"}`}>
+                    {isEditing ? (
+                        <div className="space-y-2">
+                            <textarea
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter" && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleSaveEdit();
+                                    }
+                                    if (e.key === "Escape") handleCancelEdit();
+                                }}
+                                className="w-full bg-secondary rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30 resize-none min-h-[60px]"
+                                autoFocus
+                            />
+                            <div className="flex items-center gap-1.5 justify-end">
+                                <button onClick={handleCancelEdit} className="p-1.5 rounded-lg hover:bg-secondary transition-colors">
+                                    <X className="w-3.5 h-3.5 text-muted-foreground" />
+                                </button>
+                                <button
+                                    onClick={handleSaveEdit}
+                                    disabled={!editValue.trim()}
+                                    className="p-1.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-40"
+                                >
+                                    <Check className="w-3.5 h-3.5" />
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            {message.content && (
+                                <div
+                                    className={`rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
+                                        isAgent
+                                            ? "bg-card text-card-foreground rounded-tl-md border border-border"
+                                            : "bg-primary text-primary-foreground rounded-tr-md"
+                                    }`}
+                                >
+                                    {renderText(message.content)}
+                                </div>
+                            )}
+
+                            {/* {message.escalated && <EscalationCard />} */}
+                            {/* {message.order && <OrderCard order={message.order} />} */}
+                            {/* {message.form?.type === "escalation_details" && <EscalationForm onSubmitForm={onSubmitForm} isLastMessage={isLastMessage} />} */}
+                            {/* {message.form?.type === "complaint" && <ComplaintForm onSubmitForm={onSubmitForm} form={message.form} />} */}
+                            {/* {!!message.products?.length && <ProductRecommendationCard products={message.products || []} />} */}
+                            {/* {isAgent && <SourceBadges sources={message.sources ?? []} />} */}
+                            <div className={`flex items-center gap-1.5 mt-1 ${isAgent ? "justify-start" : "justify-end"}`}>
+                                <p className="text-[10px] text-muted-foreground">{formatTime(new Date(message.timestamp))}</p>
+                                {!isAgent && isLastUserMessage && (
+                                    <button
+                                        onClick={() => setIsEditing(true)}
+                                        className="text-[10px] text-muted-foreground hover:text-foreground transition-colors underline"
+                                    >
+                                        Edit
+                                    </button>
+                                )}
+                            </div>
+                        </>
+                    )}
+                </div>
+                {!isAgent && (
+                    <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 mt-1">
+                        <User className="w-4 h-4 text-secondary-foreground" />
+                    </div>
+                )}
+            </motion.div>
+            {message.metadata?.escalated && (
+                <div className="px-4">
+                    <div className="px-4 py-2 bg-amber-50 rounded-md space-y-1">
+                        <p className="text-xs text-amber-800">Escalated to Human</p>
+                        {!humanConnected && (
+                            <Button size="xs" variant="warning" onClick={onHandleTakeOver} isLoading={takeOverPending} disabled={takeOverPending}>
+                                Take over
+                            </Button>
+                        )}
+                    </div>
                 </div>
             )}
-        </motion.div>
+        </>
     );
 };
 

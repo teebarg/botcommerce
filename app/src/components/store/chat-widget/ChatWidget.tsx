@@ -49,8 +49,8 @@ export const ChatWidget = () => {
 
                 {isTyping && <TypingIndicator />}
 
-                {!isTyping && messages.at(-1)?.quick_replies && (
-                    <QuickReplies replies={messages.at(-1)!.quick_replies || []} onSelect={(r) => sendMessage(r)} />
+                {!isTyping && messages.at(-1)?.metadata?.quick_replies && (
+                    <QuickReplies replies={messages.at(-1)?.metadata?.quick_replies || []} onSelect={(r) => sendMessage(r)} />
                 )}
             </div>
 

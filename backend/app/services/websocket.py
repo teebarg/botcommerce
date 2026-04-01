@@ -42,6 +42,7 @@ class InMemoryWebSocketManager:
 
     async def send_to_user(self, user_id: str, data: dict, message_type: str = "general") -> bool:
         if user_id not in self.connections:
+            logger.warning(f"⚠️ User {user_id} not connected.")
             return False
 
         message = {
@@ -52,6 +53,7 @@ class InMemoryWebSocketManager:
 
         try:
             await self.connections[user_id].send_json(message)
+            logger.info(f"✅ WS Message sent to user {user_id}.")
             return True
         except WebSocketDisconnect:
             await self.disconnect(user_id)

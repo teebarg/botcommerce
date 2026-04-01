@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useRouteContext } from "@tanstack/react-router";
 import { clientApi } from "@/utils/api.client";
-import { BankDetails, DeliveryOption, Message } from "@/schemas";
+import { BankDetails, Chat, DeliveryOption, Message } from "@/schemas";
 
 export const useBankDetails = () => {
     return useQuery({
@@ -11,22 +11,66 @@ export const useBankDetails = () => {
     });
 };
 
+export const useChat = (uid: string) => {
+    return useQuery({
+        queryKey: ["chats", uid],
+        queryFn: () => clientApi.get<Chat>(`/chat/${uid}`),
+        staleTime: 1000 * 60 * 5,
+    });
+};
+
 export const useChatMutation = () => {
     const { session } = useRouteContext({ strict: false });
-
     return useMutation({
         mutationFn: async (message: string) => {
             const conversationId = sessionStorage.getItem("chatbotConversationId");
             const body = {
                 user_id: session?.id,
                 conversation_uuid: conversationId!,
-                user_message: message,
+                message: message,
             };
 
             return await clientApi.post<{ reply: string; conversation_uuid: string }>("/chat/", body);
         },
         onError: (error) => {
             toast.error("Failed to chat" + error);
+        },
+    });
+};
+
+export const useAdminMessageMutation = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ conversationUuid, message }: { conversationUuid: string; message: string }) => {
+            return await clientApi.post<{ reply: string; conversation_uuid: string }>("/chat/support", {
+                conversation_uuid: conversationUuid,
+                message: message,
+            });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["chats"] });
+            toast.success("Successfull!")
+        },
+        onError: (error) => {
+            toast.error("Failed to chat" + error);
+        },
+    });
+};
+
+export const useChatHandOff = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ conversationUuid }: { conversationUuid: string }) => {
+            return await clientApi.post<Message>("/chat/handoff", {
+                conversation_uuid: conversationUuid,
+            });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["chats"] });
+            toast.success("Chat handed off successfully");
+        },
+        onError: (error) => {
+            toast.error("Failed to handoff chat" + error);
         },
     });
 };

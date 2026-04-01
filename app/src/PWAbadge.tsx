@@ -32,11 +32,11 @@ function PWABadge() {
     if (!offlineReady && !needRefresh) return null;
 
     return (
-        <div className="fixed bottom-4 right-4 z-50">
+        <div className="fixed bottom-4 right-4 z-50 pb-[var(--sat)]">
             <div className="flex items-center gap-3 rounded-xl bg-background border shadow-lg px-4 py-3 min-w-[260px]">
                 <div className="text-primary">{offlineReady ? <WifiOff size={18} /> : <RefreshCw size={18} />}</div>
 
-                <div className="flex-1 text-sm">{offlineReady ? <span>POS ready for offline use</span> : <span>System update available</span>}</div>
+                <div className="flex-1 text-sm">{offlineReady ? <span>App ready for offline use</span> : <span>System update available</span>}</div>
 
                 <div className="flex items-center gap-2">
                     {needRefresh && (

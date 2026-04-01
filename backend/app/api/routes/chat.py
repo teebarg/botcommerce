@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Query, Depends
 from app.prisma_client import prisma as db
 from typing import Optional
 from prisma.enums import ConversationStatus
-from app.models.chat import PaginatedChats, Chat, ChatRequest
+from app.models.chat import PaginatedChats, Chat, ChatRequest, ChatHandoffRequest
 from app.models.generic import Message
 from app.services.websocket import manager
 from app.redis_client import redis_client
@@ -20,7 +20,7 @@ async def admin_chat(payload: ChatRequest) -> Message:
     """
     conversation = await get_conversation(payload.conversation_uuid)
 
-    customer = redis_client.get(f"chat_user:{payload.conversation_uuid}")
+    customer = await redis_client.get(f"chat_user:{payload.conversation_uuid}")
     if not customer:
         raise HTTPException(status_code=400, detail="Customer not connected")
 
@@ -29,14 +29,14 @@ async def admin_chat(payload: ChatRequest) -> Message:
     await db.message.create(
         data={
             "conversation_id": conversation.id,
-            "content": payload.user_message,
+            "content": payload.message,
             "sender": "SYSTEM",
         }
     )
 
     await manager.send_to_user(
         user_id=customer,
-        data={"message": payload.user_message},
+        data={"message": payload.message},
         message_type="chat",
     )
 
@@ -53,14 +53,14 @@ async def customer_chat(payload: ChatRequest) -> Message:
     await db.message.create(
         data={
             "conversation_id": conversation.id,
-            "content": payload.user_message,
+            "content": payload.message,
             "sender": "USER",
         }
     )
 
     await manager.send_to_user(
         user_id=conversation.support_id,
-        data={"message": payload.user_message},
+        data={"message": payload.message},
         message_type="chat",
     )
 
@@ -68,13 +68,13 @@ async def customer_chat(payload: ChatRequest) -> Message:
 
 
 @router.post("/handoff", dependencies=[Depends(require_admin)])
-async def handoff(payload: ChatRequest, user: CurrentUser) -> Message:
+async def handoff(payload: ChatHandoffRequest, user: CurrentUser) -> Message:
     conversation = await get_conversation(payload.conversation_uuid)
 
     if conversation.human_connected:
         raise HTTPException(status_code=400, detail="conversation already connected to human")
 
-    customer = redis_client.get(f"chat_user:{payload.conversation_uuid}")
+    customer = await redis_client.get(f"chat_user:{payload.conversation_uuid}")
 
     await db.conversation.update(
         where={"id": conversation.id},
@@ -120,7 +120,7 @@ async def index(
     }
 
 
-@router.get("/{uid}", dependencies=[Depends(require_admin)])
+@router.get("/{uid}")
 async def get_chat(uid: str) -> Chat:
     """Get a chat and all its messages"""
     chat = await db.conversation.find_unique(where={"conversation_uuid": uid}, include={"messages": True})

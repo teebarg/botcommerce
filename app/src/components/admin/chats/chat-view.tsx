@@ -2,11 +2,11 @@ import type React from "react";
 import { Bot, User, MoreVertical, ArrowLeft, Mail, UserX, Eye, Send } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import type { Chat, ChatMessage, ConversationStatus } from "@/schemas";
-import { formatDate } from "@/utils";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import AdminChatMessage from "./chat-message";
+import { useAdminMessageMutation, useChatHandOff } from "@/hooks/useApi";
+import { useEffect, useRef, useState } from "react";
 
 const StatusBadge = ({ status }: { status: ConversationStatus }) => {
     const labels = {
@@ -32,8 +32,27 @@ function cleanMarkdown(md: string) {
 }
 
 const ChatViewer: React.FC<{ chat: Chat; onClose: () => void }> = ({ chat, onClose }) => {
-    const sendMessage = () => {};
-    const handleTakeOver = () => {};
+    const [input, setInput] = useState("");
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const handOff = useChatHandOff();
+    const send = useAdminMessageMutation();
+
+    useEffect(() => {
+        scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+    }, [chat.messages]);
+
+    const handleTakeOver = () => {
+        handOff.mutate({ conversationUuid: chat.conversation_uuid });
+    };
+    const handleSend = () => {
+        if (!input.trim()) return;
+        send.mutateAsync({
+            conversationUuid: chat.conversation_uuid,
+            message: input.trim(),
+        }).then(() => {
+            setInput("");
+        });
+    };
     return (
         <div className="flex-1 flex flex-col overflow-hidden">
             <div className="flex items-center justify-between bg-background border-b border-border py-4 px-1 md:px-4">
@@ -93,7 +112,7 @@ const ChatViewer: React.FC<{ chat: Chat; onClose: () => void }> = ({ chat, onClo
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
                 {/* {chat.messages.map((message: ChatMessage, idx: number) => (
                     <div key={idx} className={`flex ${message.role === "agent" ? "justify-start" : "justify-end"}`}>
                         <div
@@ -138,7 +157,10 @@ const ChatViewer: React.FC<{ chat: Chat; onClose: () => void }> = ({ chat, onClo
                             index={index}
                             isLastUserMessage={index === lastUserIdx}
                             isLastMessage={index === chat.messages.length - 1}
-                            onSend={sendMessage}
+                            humanConnected={chat.human_connected || false}
+                            takeOverPending={handOff.isPending}
+                            onHandleTakeOver={handleTakeOver}
+                            // onSend={sendMessage}
                             // onSubmitForm={sendFormSubmission}
                         />
                     );
@@ -148,21 +170,30 @@ const ChatViewer: React.FC<{ chat: Chat; onClose: () => void }> = ({ chat, onClo
                         <p className="text-gray-500">No messages</p>
                     </div>
                 )}
-                {chat.is_escalated && (
-                    <div className="px-4 py-2 bg-amber-400">
-                        <button onClick={handleTakeOver}>Take over</button>
-                    </div>
-                )}
             </div>
-            {/* send Message */}
-            <div className="bg-background border-t border-border p-4">
-                <div className="flex items-center space-x-2">
-                    <Input placeholder="Type a message..." wrapperClass="flex-1" />
-                    <Button>
+            {chat.human_connected && (
+                <div className="flex items-center space-x-2 bg-background border-t border-border p-4">
+                    <div className="flex-1 relative">
+                        <textarea
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleSend();
+                                }
+                            }}
+                            placeholder="Type your message..."
+                            rows={1}
+                            className="w-full resize-none bg-muted/50 border border-border rounded-2xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50 max-h-24"
+                            disabled={send.isPending}
+                        />
+                    </div>
+                    <Button onClick={handleSend} disabled={send.isPending || !input.trim()}>
                         <Send size={20} />
                     </Button>
                 </div>
-            </div>
+            )}
         </div>
     );
 };

@@ -8,7 +8,7 @@ export const ChatMessageSchema = z.object({
     content: z.string(),
     sender: MessageSenderSchema,
     metadata: z.record(z.any()).optional(),
-    timestamp: z.string(),
+    timestamp: z.date(),
 });
 
 export const ChatSchema = z.object({

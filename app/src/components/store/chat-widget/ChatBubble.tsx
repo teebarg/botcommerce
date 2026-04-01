@@ -7,7 +7,7 @@ import { useConfig } from "@/providers/store-provider";
 
 const ChatHeader = ({ onClose }: { onClose: () => void }) => {
     return (
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card/50 backdrop-blur-sm shrink-0 rounded-t-2xl">
+        <div className="flex items-center gap-3 px-4 pb-3 pt-[calc(var(--sat)+12px)] border-b border-border bg-card/50 backdrop-blur-sm shrink-0 rounded-t-2xl">
             <div className="relative">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                     <Sparkles className="w-5 h-5 text-primary" />
