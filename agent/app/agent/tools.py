@@ -131,7 +131,6 @@ def check_order_status(order_number: str) -> str:
             "image": item.get("image"),
             "quantity": item.get("quantity", 1),
             "price": item.get("price"),
-            "subtotal": item.get("subtotal"),
         })
 
     order_payload = {
@@ -155,7 +154,7 @@ def check_order_status(order_number: str) -> str:
     human_summary: str = (
         f"Order #{order_number} is currently **{status.replace('_', ' ')}**.\n"
         f"Payment Status: **{payment_status.replace('_', ' ')}**\n"
-        f"Total Paid: {result.get('total')}\n"
+        f"Order value: {result.get('total')}\n"
         f"Placed On: {result.get('created_at')}"
     )
 
@@ -219,7 +218,7 @@ def request_refund(order_id: str, reason: str) -> str:
 @tool
 def escalate_to_human(reason: str) -> str:
     """
-    Escalate the conversation to a human support agent.
+    Escalate the conversation to a human agent.
     Use when:
     - The customer is angry or upset
     - The issue is too complex to resolve with available tools

@@ -1,12 +1,13 @@
 import { motion } from "framer-motion";
-import { Bot, User, AlertTriangle, Check, X } from "lucide-react";
-import { ChatMessage as ChatMessageType } from "./types";
+import { Bot, User, AlertTriangle, Check, X, ShieldCheck } from "lucide-react";
+import { ChatMessage as ChatMessageType } from "@/schemas";
 import { ProductRecommendationCard } from "./ProductRecommendationCard";
 import { formatTime } from "@/utils";
 import EscalationForm from "./EscalationForm";
 import { useState } from "react";
 import { OrderCard } from "./OrderCard";
 import ComplaintForm from "./ComplaintForm";
+import { useRouteContext } from "@tanstack/react-router";
 
 const EscalationCard = () => (
     <div className="mt-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 flex items-center gap-3">
@@ -66,9 +67,11 @@ interface ChatMessageProps {
 }
 
 const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage, isLastMessage }: ChatMessageProps) => {
-    const isAgent = message.role === "agent";
-    const [isEditing, setIsEditing] = useState(false);
-    const [editValue, setEditValue] = useState(message.text);
+    const { session } = useRouteContext({ strict: false });
+    const isAgent = message.sender === "BOT";
+    const isAssistant = ["SYSTEM", "BOT"].includes(message.sender);
+    const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [editValue, setEditValue] = useState<string>(message.content);
 
     const handleSaveEdit = () => {
         const trimmed = editValue.trim();
@@ -79,9 +82,9 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage, 
 
     const handleCancelEdit = () => {
         setIsEditing(false);
-        setEditValue(message.text);
+        setEditValue(message.content);
     };
-    if (message.text !== undefined && message.text !== null && message.text.trim() === "") {
+    if (message.content !== undefined && message.content !== null && message.content.trim() === "") {
         return null;
     }
 
@@ -90,15 +93,15 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage, 
             initial={{ opacity: 0, y: 12, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: index * 0.05, type: "spring", stiffness: 500, damping: 30 }}
-            className={`flex gap-2 px-2.5 ${isAgent ? "justify-start" : "justify-end"}`}
+            className={`flex gap-2 px-2.5 ${isAssistant ? "justify-start" : "justify-end"}`}
         >
-            {isAgent && (
-                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
-                    <Bot className="w-4 h-4 text-primary" />
+            {isAssistant && (
+                <div className="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center shrink-0 mt-1">
+                    {!isAgent ? <ShieldCheck className="w-4 h-4 text-orange-700" /> : <Bot className="w-4 h-4 text-orange-800" />}
                 </div>
             )}
 
-            <div className={`max-w-[80%] space-y-1.5 ${isAgent ? "" : "order-first"}`}>
+            <div className={`max-w-[80%] space-y-1.5 ${isAssistant ? "" : "order-first"}`}>
                 {isEditing ? (
                     <div className="space-y-2">
                         <textarea
@@ -129,27 +132,29 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage, 
                     </div>
                 ) : (
                     <>
-                        {message.text && (
+                        {message.content && (
                             <div
                                 className={`rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
-                                    isAgent
+                                    isAssistant
                                         ? "bg-card text-card-foreground rounded-tl-md border border-border"
                                         : "bg-primary text-primary-foreground rounded-tr-md"
                                 }`}
                             >
-                                {renderText(message.text)}
+                                {renderText(message.content)}
                             </div>
                         )}
 
-                        {message.escalated && <EscalationCard />}
-                        {message.order && <OrderCard order={message.order} />}
-                        {message.form?.type === "escalation_details" && <EscalationForm onSubmitForm={onSubmitForm} isLastMessage={isLastMessage} />}
-                        {message.form?.type === "complaint" && <ComplaintForm onSubmitForm={onSubmitForm} form={message.form} />}
-                        {!!message.products?.length && <ProductRecommendationCard products={message.products || []} />}
-                        {isAgent && <SourceBadges sources={message.sources ?? []} />}
-                        <div className={`flex items-center gap-1.5 mt-1 ${isAgent ? "justify-start" : "justify-end"}`}>
+                        {message.metadata?.escalated && <EscalationCard />}
+                        {message.metadata?.order && <OrderCard order={message.metadata.order} />}
+                        {message.metadata?.form?.type === "escalation_details" && (
+                            <EscalationForm onSubmitForm={onSubmitForm} isLastMessage={isLastMessage} />
+                        )}
+                        {message.metadata?.form?.type === "complaint" && <ComplaintForm onSubmitForm={onSubmitForm} form={message.metadata.form} />}
+                        {!!message.metadata?.products?.length && <ProductRecommendationCard products={message.metadata.products || []} />}
+                        {isAgent && <SourceBadges sources={message.metadata?.sources ?? []} />}
+                        <div className={`flex items-center gap-1.5 mt-1 ${isAssistant ? "justify-start" : "justify-end"}`}>
                             <p className="text-[10px] text-muted-foreground">{formatTime(message.timestamp)}</p>
-                            {!isAgent && isLastUserMessage && (
+                            {!isAssistant && isLastUserMessage && (
                                 <button
                                     onClick={() => setIsEditing(true)}
                                     className="text-[10px] text-muted-foreground hover:text-foreground transition-colors underline"
@@ -161,9 +166,13 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage, 
                     </>
                 )}
             </div>
-            {!isAgent && (
-                <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 mt-1">
-                    <User className="w-4 h-4 text-secondary-foreground" />
+            {!isAssistant && (
+                <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 mt-1 overflow-hidden">
+                    {!session?.user?.image ? (
+                        <User className="w-4 h-4 text-primary" />
+                    ) : (
+                        <img alt={session?.user?.image} className="w-full h-full object-contain" src={session?.user?.image ?? "/placeholder.jpg"} />
+                    )}
                 </div>
             )}
         </motion.div>

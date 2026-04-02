@@ -37,16 +37,16 @@ class ChatRequest(BaseModel):
         default=None,
         description="Session ID for conversation continuity. Auto-generated if not provided."
     )
-    customer_id: Optional[str] = Field(
+    customer_id: Optional[int] = Field(
         default=None,
-        description="Customer ID from shop, if the user is logged in."
+        description="Customer ID if the user is logged in."
     )
 
     model_config = {"json_schema_extra": {"example": {
         "type": "message",
         "message": "Where is my order #12345?",
         "session_id": "abc-123",
-        "customer_id": "cust-456"
+        "customer_id": 123
     }}}
 
 class ChatResponse(BaseModel):

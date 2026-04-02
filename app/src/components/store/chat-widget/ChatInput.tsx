@@ -20,7 +20,7 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
     };
 
     return (
-        <div className="p-3 border-t border-border bg-background/80 backdrop-blur-xl">
+        <div className="px-3 pt-3 pb-[calc(var(--sab)+4px)] border-t border-border bg-background/80 backdrop-blur-xl">
             <AnimatePresence>
                 {file && (
                     <motion.div

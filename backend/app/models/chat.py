@@ -31,8 +31,8 @@ class PaginatedChats(BaseModel):
     limit: int
 
 class ChatRequest(BaseModel):
-    user_message: str
-    user_id: Optional[int] = None
+    message: str
     conversation_uuid: str
-    session_id: Optional[str] = None
-    customer_id: Optional[str] = None
+
+class ChatHandoffRequest(BaseModel):
+    conversation_uuid: str
