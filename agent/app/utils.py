@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 async def _notify_slack_escalation(
     session_id: str | None,
-    customer_id: str | None,
+    customer_id: int | None,
     reason: str,
 ) -> None:
     """
@@ -33,7 +33,7 @@ async def _notify_slack_escalation(
                 "type": "section",
                 "fields": [
                     {"type": "mrkdwn", "text": "*Session ID:*\n`" + (session_id or "unknown") + "`"},
-                    {"type": "mrkdwn", "text": "*Customer ID:*\n`" + (customer_id or "guest") + "`"},
+                    {"type": "mrkdwn", "text": "*Customer ID:*\n`" + (str(customer_id) or "guest") + "`"},
                     {"type": "mrkdwn", "text": "*Time:*\n" + timestamp},
                     {"type": "mrkdwn", "text": "*Reason:*\n" + reason_clean},
                 ],

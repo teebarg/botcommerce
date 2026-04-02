@@ -23,52 +23,33 @@ async def get_connection() -> asyncpg.Connection:
     return await asyncpg.connect(url)
 
 async def ensure_conversation_exists(
-    session_id: str,
-    customer_id: Optional[str] = None,
+    conversation_uuid: str,
+    customer_id: Optional[int] = None,
 ) -> int:
     """
-    Ensures a row exists.
+    Ensures a conversation row exists.
     Returns conversation.id
     """
-    conn = await get_connection()
+    conn = None
     try:
+        conn = await get_connection()
         row = await conn.fetchrow(
             """
-            SELECT id
-            FROM conversations
-            WHERE conversation_uuid = $1
-            """,
-            session_id,
-        )
-
-        if row:
-            return row["id"]
-
-        logger.info(f"[DB] Creating new conversation {session_id}")
-
-        row = await conn.fetchrow(
-            """
-            INSERT INTO conversations (
-                conversation_uuid,
-                user_id,
-                last_active
-            )
+            INSERT INTO conversations (conversation_uuid, user_id, last_active)
             VALUES ($1, $2, NOW())
+            ON CONFLICT (conversation_uuid) DO UPDATE SET last_active = NOW()
             RETURNING id
             """,
-            session_id,
+            conversation_uuid,
             customer_id,
         )
-
         return row["id"]
-
+    except Exception:
+        logger.exception(f"[DB] Failed to ensure conversation exists uuid={conversation_uuid}")
+        raise
     finally:
-        await conn.close()
-
-
-# ─────────────────────────────────────────────────────────────
-# Human Handoff Check
-# ─────────────────────────────────────────────────────────────
+        if conn:
+            await conn.close()
 
 async def is_human_connected(session_id: str) -> bool:
     """
@@ -93,10 +74,6 @@ async def is_human_connected(session_id: str) -> bool:
     finally:
         await conn.close()
 
-
-# ─────────────────────────────────────────────────────────────
-# Escalation
-# ─────────────────────────────────────────────────────────────
 async def mark_escalated(conversation_uuid: str):
     conn = None
     try:
@@ -113,36 +90,12 @@ async def mark_escalated(conversation_uuid: str):
             conversation_uuid,
         )
         logger.info(f"[DB] Conversation {conversation_uuid} escalated")
-
     except Exception:
         logger.exception(f"[DB] Failed to escalate conversation uuid={conversation_uuid}")
         raise
-
     finally:
         if conn:
             await conn.close()
-
-
-async def mark_human_active(session_id: str):
-    conn = await get_connection()
-    try:
-        await conn.execute(
-            """
-            UPDATE conversations
-            SET status = 'HUMAN_ACTIVE'
-            WHERE conversation_uuid = $1
-            """,
-            session_id,
-        )
-        logger.info(f"[DB] Human connected to {session_id}")
-
-    finally:
-        await conn.close()
-
-
-# ─────────────────────────────────────────────────────────────
-# Message Persistence
-# ─────────────────────────────────────────────────────────────
 
 async def save_message_db(
     session_id: str,

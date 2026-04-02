@@ -35,7 +35,7 @@ async def websocket(ws: WebSocket):
         None
     """
     ip = ws.client.host
-    session_key = f"session:{ip}"
+    session_key: str = f"session:{ip}"
     user_id = None
 
     session_store.set(session_key, {
@@ -70,7 +70,7 @@ async def websocket(ws: WebSocket):
                             "location": "Unknown",
                             "path": "/",
                             "updated_at": str(int(time.time()))
-                        })
+                    })
 
                         if await manager.promote_connection(ip, user_id, metadata={
                             "ip": ip,

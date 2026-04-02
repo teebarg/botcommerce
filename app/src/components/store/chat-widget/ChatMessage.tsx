@@ -7,6 +7,7 @@ import EscalationForm from "./EscalationForm";
 import { useState } from "react";
 import { OrderCard } from "./OrderCard";
 import ComplaintForm from "./ComplaintForm";
+import { useRouteContext } from "@tanstack/react-router";
 
 const EscalationCard = () => (
     <div className="mt-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 flex items-center gap-3">
@@ -66,9 +67,9 @@ interface ChatMessageProps {
 }
 
 const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage, isLastMessage }: ChatMessageProps) => {
+    const { session } = useRouteContext({ strict: false });
     const isAgent = message.sender === "BOT";
-    // const isSupport = message.role === "support";
-    const isAssistant = ["SUPPORT", "BOT"].includes(message.sender);
+    const isAssistant = ["SYSTEM", "BOT"].includes(message.sender);
     const [isEditing, setIsEditing] = useState(false);
     const [editValue, setEditValue] = useState(message.content);
 
@@ -95,8 +96,8 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage, 
             className={`flex gap-2 px-2.5 ${isAssistant ? "justify-start" : "justify-end"}`}
         >
             {isAssistant && (
-                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
-                    {!isAgent ? <ShieldCheck  className="w-4 h-4 text-primary" /> : <Bot className="w-4 h-4 text-primary" />}
+                <div className="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center shrink-0 mt-1">
+                    {!isAgent ? <ShieldCheck className="w-4 h-4 text-orange-700" /> : <Bot className="w-4 h-4 text-orange-800" />}
                 </div>
             )}
 
@@ -145,7 +146,9 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage, 
 
                         {message.metadata?.escalated && <EscalationCard />}
                         {message.metadata?.order && <OrderCard order={message.metadata.order} />}
-                        {message.metadata?.form?.type === "escalation_details" && <EscalationForm onSubmitForm={onSubmitForm} isLastMessage={isLastMessage} />}
+                        {message.metadata?.form?.type === "escalation_details" && (
+                            <EscalationForm onSubmitForm={onSubmitForm} isLastMessage={isLastMessage} />
+                        )}
                         {message.metadata?.form?.type === "complaint" && <ComplaintForm onSubmitForm={onSubmitForm} form={message.metadata.form} />}
                         {!!message.metadata?.products?.length && <ProductRecommendationCard products={message.metadata.products || []} />}
                         {isAgent && <SourceBadges sources={message.metadata?.sources ?? []} />}
@@ -164,8 +167,12 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage, 
                 )}
             </div>
             {!isAssistant && (
-                <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 mt-1">
-                    <User className="w-4 h-4 text-secondary-foreground" />
+                <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 mt-1 overflow-hidden">
+                    {!session?.user?.image ? (
+                        <User className="w-4 h-4 text-primary" />
+                    ) : (
+                        <img alt={session?.user?.image} className="w-full h-full object-contain" src={session?.user?.image ?? "/placeholder.jpg"} />
+                    )}
                 </div>
             )}
         </motion.div>

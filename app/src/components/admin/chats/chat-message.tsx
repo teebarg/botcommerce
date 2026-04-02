@@ -1,41 +1,9 @@
 import { motion } from "framer-motion";
-import { Bot, User, AlertTriangle, Check, X } from "lucide-react";
-// import { ProductRecommendationCard } from "./ProductRecommendationCard";
+import { Bot, User, AlertTriangle, Check, X, ShieldCheck } from "lucide-react";
 import { formatTime } from "@/utils";
 import { useState } from "react";
 import { ChatMessage } from "@/schemas";
 import { Button } from "@/components/ui/button";
-
-const EscalationCard = () => (
-    <div className="mt-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 flex items-center gap-3">
-        <AlertTriangle className="w-5 h-5 text-destructive flex-shrink-0" />
-        <div>
-            <p className="text-xs font-semibold text-foreground">Escalated to Human Agent</p>
-            <p className="text-[10px] text-muted-foreground">Average wait time: ~2 minutes</p>
-        </div>
-    </div>
-);
-
-function SourceBadges({ sources }: { sources: string[] }) {
-    if (!sources?.length) return null;
-    const icons: Record<string, string> = {
-        Products: "🛍️",
-        Faqs: "❓",
-        Policies: "📋",
-    };
-    return (
-        <div className="flex gap-1.5 flex-wrap mt-2">
-            {sources.map((s) => (
-                <span
-                    key={s}
-                    className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200 font-medium tracking-wide"
-                >
-                    {icons[s] ?? "📄"} {s}
-                </span>
-            ))}
-        </div>
-    );
-}
 
 function renderText(text: string): React.ReactNode {
     return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) => {
@@ -63,22 +31,14 @@ interface ChatMessageProps {
     humanConnected: boolean;
     takeOverPending: boolean;
     onHandleTakeOver: () => void;
+    image?: string;
 }
 
-const AdminChatMessage = ({
-    message,
-    index,
-    onSend,
-    isLastUserMessage,
-    isLastMessage,
-    humanConnected,
-    takeOverPending,
-    onHandleTakeOver,
-}: ChatMessageProps) => {
-    console.log("message.................", message);
+const AdminChatMessage = ({ message, index, onSend, humanConnected, takeOverPending, onHandleTakeOver, image }: ChatMessageProps) => {
     const isAgent = message.sender === "BOT";
-    const [isEditing, setIsEditing] = useState(false);
-    const [editValue, setEditValue] = useState(message.content);
+    const isAssistant = ["SYSTEM", "BOT"].includes(message.sender);
+    const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [editValue, setEditValue] = useState<string>(message.content);
 
     const handleSaveEdit = () => {
         const trimmed = editValue.trim();
@@ -101,15 +61,19 @@ const AdminChatMessage = ({
                 initial={{ opacity: 0, y: 12, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ delay: index * 0.05, type: "spring", stiffness: 500, damping: 30 }}
-                className={`flex gap-2 px-2.5 ${isAgent ? "justify-start" : "justify-end"}`}
+                className={`flex gap-2 px-2.5 ${isAssistant ? "justify-end" : "justify-start"}`}
             >
-                {isAgent && (
-                    <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
-                        <Bot className="w-4 h-4 text-primary" />
+                {!isAssistant && (
+                    <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1 overflow-hidden">
+                        {!image ? (
+                            <User className="w-4 h-4 text-primary" />
+                        ) : (
+                            <img alt={image} className="w-full h-full object-contain" src={image ?? "/placeholder.jpg"} />
+                        )}
                     </div>
                 )}
 
-                <div className={`max-w-[80%] space-y-1.5 ${isAgent ? "" : "order-first"}`}>
+                <div className={`max-w-[80%] space-y-1.5 ${!isAssistant ? "" : "order-first"}`}>
                     {isEditing ? (
                         <div className="space-y-2">
                             <textarea
@@ -143,50 +107,39 @@ const AdminChatMessage = ({
                             {message.content && (
                                 <div
                                     className={`rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
-                                        isAgent
-                                            ? "bg-card text-card-foreground rounded-tl-md border border-border"
-                                            : "bg-primary text-primary-foreground rounded-tr-md"
+                                        isAssistant
+                                            ? "bg-card text-card-foreground rounded-tr-md border border-border"
+                                            : "bg-primary text-primary-foreground rounded-tl-md"
                                     }`}
                                 >
                                     {renderText(message.content)}
                                 </div>
                             )}
-
-                            {/* {message.escalated && <EscalationCard />} */}
-                            {/* {message.order && <OrderCard order={message.order} />} */}
-                            {/* {message.form?.type === "escalation_details" && <EscalationForm onSubmitForm={onSubmitForm} isLastMessage={isLastMessage} />} */}
-                            {/* {message.form?.type === "complaint" && <ComplaintForm onSubmitForm={onSubmitForm} form={message.form} />} */}
-                            {/* {!!message.products?.length && <ProductRecommendationCard products={message.products || []} />} */}
-                            {/* {isAgent && <SourceBadges sources={message.sources ?? []} />} */}
-                            <div className={`flex items-center gap-1.5 mt-1 ${isAgent ? "justify-start" : "justify-end"}`}>
-                                <p className="text-[10px] text-muted-foreground">{formatTime(new Date(message.timestamp))}</p>
-                                {!isAgent && isLastUserMessage && (
-                                    <button
-                                        onClick={() => setIsEditing(true)}
-                                        className="text-[10px] text-muted-foreground hover:text-foreground transition-colors underline"
-                                    >
-                                        Edit
-                                    </button>
-                                )}
+                            <div className={`flex mt-1 ${!isAssistant ? "justify-start" : "justify-end"}`}>
+                                <p className="text-[10px] text-muted-foreground">{formatTime(message.timestamp)}</p>
                             </div>
                         </>
                     )}
                 </div>
-                {!isAgent && (
-                    <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 mt-1">
-                        <User className="w-4 h-4 text-secondary-foreground" />
+                {isAssistant && (
+                    <div className="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0 mt-1">
+                        {!isAgent ? <ShieldCheck className="w-4 h-4 text-orange-700" /> : <Bot className="w-4 h-4 text-orange-800" />}
                     </div>
                 )}
             </motion.div>
             {message.metadata?.escalated && (
                 <div className="px-4">
-                    <div className="px-4 py-2 bg-amber-50 rounded-md space-y-1">
-                        <p className="text-xs text-amber-800">Escalated to Human</p>
-                        {!humanConnected && (
-                            <Button size="xs" variant="warning" onClick={onHandleTakeOver} isLoading={takeOverPending} disabled={takeOverPending}>
-                                Take over
-                            </Button>
-                        )}
+                    <div className="mt-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 flex items-start gap-3">
+                        <AlertTriangle className="w-5 h-5 text-destructive flex-shrink-0" />
+                        <div>
+                            <p className="text-xs font-semibold text-foreground">Escalated to Human Agent</p>
+                            <p className="text-[10px] text-muted-foreground mb-2">Average wait time: ~2 minutes</p>
+                            {!humanConnected && (
+                                <Button size="xs" variant="warning" onClick={onHandleTakeOver} isLoading={takeOverPending} disabled={takeOverPending}>
+                                    Take over
+                                </Button>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}

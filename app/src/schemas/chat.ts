@@ -20,8 +20,8 @@ export const ChatSchema = z.object({
     support_name: z.string().optional(),
     status: ConversationStatusSchema,
     messages: z.array(ChatMessageSchema),
-    is_escalated: z.boolean().optional(),
-    human_connected: z.boolean().optional(),
+    is_escalated: z.boolean().default(false),
+    human_connected: z.boolean().default(false),
     started_at: z.string(),
     last_active: z.string(),
 });

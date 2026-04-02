@@ -92,8 +92,8 @@ class InMemoryWebSocketManager:
         if old_id not in self.connections:
             return False
 
-        self.connections[new_id] = self.connections.pop(old_id)
-        self.heartbeats[new_id] = self.heartbeats.pop(old_id, datetime.now(timezone.utc))
+        self.connections[str(new_id)] = self.connections.pop(old_id)
+        self.heartbeats[str(new_id)] = self.heartbeats.pop(old_id, datetime.now(timezone.utc))
         logger.info(f"🔁 Promoted connection from {old_id} → {new_id}")
         return True
 

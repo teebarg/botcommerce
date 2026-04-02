@@ -9,7 +9,7 @@ from app.agent.agent_graph import run_agent
 from app.agent.memory import clear_session
 from app.config import get_settings
 from app.utils import _notify_slack_escalation
-from app.agent.db import is_human_connected, save_message_db, mark_escalated
+from app.agent.db import is_human_connected, save_message_db, mark_escalated, ensure_conversation_exists
 from app.redis_client import redis_client
 
 logging.basicConfig(
@@ -74,10 +74,13 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
     - Returns whether the conversation was escalated to a human
     """
     connection_key = payload.customer_id or request.client.host
-    await redis_client.set(f"chat_user:{payload.session_id}", connection_key, ex=86400)
+    await redis_client.set(f"chat_user:{payload.session_id}", str(connection_key), ex=86400)
 
     if payload.customer_id is None:
         await redis_client.set(f"chat_session:{connection_key}", payload.session_id, ex=86400)
+
+    # Ensure customer conversation exists
+    await ensure_conversation_exists(conversation_uuid=payload.session_id, customer_id=payload.customer_id)
 
     if payload.type == "form_submission":
         if payload.form_type == "escalation_details":

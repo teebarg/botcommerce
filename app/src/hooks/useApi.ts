@@ -20,17 +20,13 @@ export const useChat = (uid: string) => {
 };
 
 export const useChatMutation = () => {
-    const { session } = useRouteContext({ strict: false });
     return useMutation({
         mutationFn: async (message: string) => {
-            const conversationId = sessionStorage.getItem("chatbotConversationId");
-            const body = {
-                user_id: session?.id,
-                conversation_uuid: conversationId!,
+            const conversationUuid = sessionStorage.getItem("chat_session_id");
+            return await clientApi.post<{ reply: string; conversation_uuid: string }>("/chat/", {
+                conversation_uuid: conversationUuid!,
                 message: message,
-            };
-
-            return await clientApi.post<{ reply: string; conversation_uuid: string }>("/chat/", body);
+            });
         },
         onError: (error) => {
             toast.error("Failed to chat" + error);
@@ -49,7 +45,7 @@ export const useAdminMessageMutation = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["chats"] });
-            toast.success("Successfull!")
+            toast.success("Successfull!");
         },
         onError: (error) => {
             toast.error("Failed to chat" + error);

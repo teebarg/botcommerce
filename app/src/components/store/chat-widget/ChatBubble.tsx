@@ -8,11 +8,8 @@ import { useConfig } from "@/providers/store-provider";
 const ChatHeader = ({ onClose }: { onClose: () => void }) => {
     return (
         <div className="flex items-center gap-3 px-4 pb-3 pt-[calc(var(--sat)+12px)] border-b border-border bg-card/50 backdrop-blur-sm shrink-0 rounded-t-2xl">
-            <div className="relative">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-primary" />
-                </div>
-                <span className="absolute bottom-0 right-0 w-3 h-3 bg-success rounded-full border-2 border-background" />
+            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-orange-800" />
             </div>
             <div className="flex-1">
                 <h3 className="text-sm font-semibold text-foreground">Support Agent</h3>

@@ -35,7 +35,7 @@ async def admin_chat(payload: ChatRequest) -> Message:
     )
 
     await manager.send_to_user(
-        user_id=customer,
+        user_id=str(customer),
         data={"message": payload.message},
         message_type="chat",
     )
@@ -59,7 +59,7 @@ async def customer_chat(payload: ChatRequest) -> Message:
     )
 
     await manager.send_to_user(
-        user_id=conversation.support_id,
+        user_id=str(conversation.support_id),
         data={"message": payload.message},
         message_type="chat",
     )

@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 class AgentState(TypedDict):
     messages: Annotated[list[BaseMessage], add_messages]
-    customer_id: str | None
+    customer_id: int | None
     session_id: str | None
     escalated: bool
     sources: list[str]
@@ -299,8 +299,8 @@ def build_graph():
         _log_observations(state)
 
         # Update sources and escalated — only scan the current batch
-        sources = list(state.get("sources", []))
-        escalated = state.get("escalated", False)
+        sources: list[str] = list(state.get("sources", []))
+        escalated: bool = state.get("escalated", False)
         for msg in reversed(state["messages"]):
             if not isinstance(msg, ToolMessage):
                 break
@@ -554,7 +554,7 @@ def _classify_intent(message: str) -> str:
 async def run_agent(
     message: str,
     session_id: str | None = None,
-    customer_id: str | None = None,
+    customer_id: int | None = None,
 ) -> dict:
 
     if not session_id:
@@ -650,7 +650,7 @@ async def run_agent(
 
             if high_risk:
                 await escalate_to_human({"reason": reason})
-                await _notify_slack_escalation(session_id, customer_id, reason)
+                await _notify_slack_escalation(session_id=session_id, customer_id=customer_id, reason=reason)
 
                 return {
                     "reply": "A human specialist has been alerted and will assist you shortly.",
