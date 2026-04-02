@@ -70,8 +70,8 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage, 
     const { session } = useRouteContext({ strict: false });
     const isAgent = message.sender === "BOT";
     const isAssistant = ["SYSTEM", "BOT"].includes(message.sender);
-    const [isEditing, setIsEditing] = useState(false);
-    const [editValue, setEditValue] = useState(message.content);
+    const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [editValue, setEditValue] = useState<string>(message.content);
 
     const handleSaveEdit = () => {
         const trimmed = editValue.trim();
@@ -152,9 +152,9 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage, 
                         {message.metadata?.form?.type === "complaint" && <ComplaintForm onSubmitForm={onSubmitForm} form={message.metadata.form} />}
                         {!!message.metadata?.products?.length && <ProductRecommendationCard products={message.metadata.products || []} />}
                         {isAgent && <SourceBadges sources={message.metadata?.sources ?? []} />}
-                        <div className={`flex items-center gap-1.5 mt-1 ${isAgent ? "justify-start" : "justify-end"}`}>
+                        <div className={`flex items-center gap-1.5 mt-1 ${isAssistant ? "justify-start" : "justify-end"}`}>
                             <p className="text-[10px] text-muted-foreground">{formatTime(message.timestamp)}</p>
-                            {!isAgent && isLastUserMessage && (
+                            {!isAssistant && isLastUserMessage && (
                                 <button
                                     onClick={() => setIsEditing(true)}
                                     className="text-[10px] text-muted-foreground hover:text-foreground transition-colors underline"

@@ -32,10 +32,7 @@ class PaginatedChats(BaseModel):
 
 class ChatRequest(BaseModel):
     message: str
-    # user_id: Optional[int] = None
     conversation_uuid: str
-    # session_id: Optional[str] = None
-    # customer_id: Optional[str] = None
 
 class ChatHandoffRequest(BaseModel):
     conversation_uuid: str

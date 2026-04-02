@@ -61,7 +61,6 @@ function getSessionId(): string {
 export const useSupportChat = () => {
     const { session, isAuthenticated } = useRouteContext({ strict: false });
     const { lastMessage } = useWebSocket();
-    console.log("🚀 ~ file: useSupportChat.ts:64 ~ lastMessage:", lastMessage);
     const [messages, setMessages] = useState<ChatMessage[]>(loadLocalHistory);
     const [loading, setLoading] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -77,14 +76,12 @@ export const useSupportChat = () => {
         if (historyLoading) return;
 
         if (dbHistory) {
-            console.log("🚀 ~ file: useSupportChat.ts:78 ~ dbHistory:", dbHistory);
             const messagesToSet = dbHistory.messages.length > 0 ? [...WELCOME_MESSAGES, ...dbHistory.messages] : WELCOME_MESSAGES;
             setMessages(messagesToSet);
             saveHistory(messagesToSet);
             setHumanConnected(dbHistory.human_connected);
             return;
         }
-        console.log("loading from local.....");
         setMessages(loadLocalHistory());
     }, [historyLoading, dbHistory]);
 

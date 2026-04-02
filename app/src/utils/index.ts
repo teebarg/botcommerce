@@ -204,7 +204,6 @@ export const formatTime = (input: Date | string): string => {
             minute: "2-digit",
         });
     } catch (error) {
-        console.log("🚀 ~ formatTime error:", error);
         return "";
     }
 };
