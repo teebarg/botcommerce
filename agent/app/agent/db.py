@@ -171,7 +171,6 @@ async def update_conversation_db(
 
         conversation_id = conversation["id"]
 
-        # Build dynamic update (future-proof if you add more fields)
         updates = []
         values = []
         idx = 1
@@ -181,11 +180,10 @@ async def update_conversation_db(
             values.append(is_escalated)
             idx += 1
 
-        # Always update last_active
         updates.append(f"last_active = NOW()")
 
         if updates:
-            query = f"""
+            query: str = f"""
                 UPDATE conversations
                 SET {', '.join(updates)}
                 WHERE id = ${idx}

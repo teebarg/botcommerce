@@ -79,7 +79,6 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
     if payload.customer_id is None:
         await redis_client.set(f"chat_session:{connection_key}", payload.session_id, ex=86400)
 
-    # Ensure customer conversation exists
     await ensure_conversation_exists(conversation_uuid=payload.session_id, customer_id=payload.customer_id)
 
     if payload.type == "form_submission":
