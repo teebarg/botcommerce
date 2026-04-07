@@ -44,28 +44,13 @@ export interface Product {
     image_url: string | null;
 }
 
-export interface ChatMessage {
-    id: string;
-    role: "agent" | "user";
-    text: string;
-    timestamp: Date;
-    sources?: string[];
-    escalated?: boolean;
-    products?: Product[];
-    order?: OrderPayload;
-    quick_replies?: string[];
-    form?: any;
-    reaction?: "thumbs-up" | "thumbs-down" | null;
-    replies_used?: boolean; // true once a quick reply is clicked — hides buttons
-}
-
 export interface ChatResponse {
     reply: string;
     session_id: string;
     sources: string[];
     escalated: boolean;
     products: Product[];
-    order?: any;
+    order?: OrderPayload;
     quick_replies?: string[];
     form?: any;
     reaction?: "thumbs-up" | "thumbs-down" | null;

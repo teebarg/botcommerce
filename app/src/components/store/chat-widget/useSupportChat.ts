@@ -1,32 +1,37 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { ChatMessage, ChatResponse } from "./types";
+import { ChatResponse } from "./types";
 import { useWebSocket } from "pulsews";
+import { useRouteContext } from "@tanstack/react-router";
+import { useChat, useChatMutation } from "@/hooks/useApi";
+import { ChatMessage } from "@/schemas";
 
-const generateId = () => Math.random().toString(36).slice(2, 10);
+const generateId = () => Math.random();
 const STORAGE_KEY = "support-chat-history";
+const now = () => new Date();
 
 const WELCOME_MESSAGES: ChatMessage[] = [
     {
         id: generateId(),
-        role: "agent",
-        text: "Hi! I'm Alex from support 👋 How can I help you today?",
-        timestamp: new Date(),
+        sender: "BOT",
+        content: "Hi! I'm Alex from support 👋 How can I help you today?",
+        timestamp: now(),
     },
     {
         id: generateId(),
-        role: "agent",
-        text: "",
-        timestamp: new Date(),
-        quick_replies: ["Track my order", "Product recommendations", "Return an item", "Talk to a human"],
+        sender: "BOT",
+        content: "",
+        timestamp: now(),
+        metadata: {
+            quick_replies: ["Track my order", "Product recommendations", "Return an item", "Talk to a human"],
+        },
     },
 ];
 
-const loadHistory = (): ChatMessage[] => {
+const loadLocalHistory = (): ChatMessage[] => {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return WELCOME_MESSAGES;
         const parsed = JSON.parse(raw) as ChatMessage[];
-        // Rehydrate Date objects
         return parsed.map((m) => ({ ...m, timestamp: new Date(m.timestamp) }));
     } catch {
         return WELCOME_MESSAGES;
@@ -54,19 +59,42 @@ function getSessionId(): string {
 }
 
 export const useSupportChat = () => {
+    const { session, isAuthenticated } = useRouteContext({ strict: false });
     const { lastMessage } = useWebSocket();
-    console.debug("🚀 ~ file: useSupportChat.ts:58 ~ lastMessage:", lastMessage)
-    const [messages, setMessages] = useState<ChatMessage[]>(loadHistory);
+    const [messages, setMessages] = useState<ChatMessage[]>(loadLocalHistory);
     const [loading, setLoading] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);
+    const [humanConnected, setHumanConnected] = useState<boolean>(false);
+    const { data: dbHistory, isLoading: historyLoading } = useChat(getSessionId());
+    const userSendChat = useChatMutation();
 
     const isDisabled = useMemo(() => {
-        return loading || isTyping || messages.at(-1)?.escalated;
+        return loading || isTyping || (messages.at(-1)?.metadata?.escalated && messages.at(-1)?.sender == "BOT");
     }, [loading, isTyping]);
 
     useEffect(() => {
-        saveHistory(messages);
-    }, [messages]);
+        if (historyLoading) return;
+
+        if (dbHistory) {
+            const messagesToSet = dbHistory.messages.length > 0 ? [...WELCOME_MESSAGES, ...dbHistory.messages] : WELCOME_MESSAGES;
+            setMessages(messagesToSet);
+            saveHistory(messagesToSet);
+            setHumanConnected(dbHistory.human_connected);
+            return;
+        }
+        setMessages(loadLocalHistory());
+    }, [historyLoading, dbHistory]);
+
+    useEffect(() => {
+        const agentMsg: ChatMessage = {
+            id: Date.now() + 1,
+            sender: "SYSTEM",
+            content: lastMessage.message || "",
+            timestamp: now(),
+        };
+
+        setMessages((prev) => [...prev, agentMsg]);
+    }, [lastMessage]);
 
     const addMessage = useCallback((msg: ChatMessage) => {
         setMessages((prev) => [...prev, msg]);
@@ -77,13 +105,35 @@ export const useSupportChat = () => {
         setMessages(WELCOME_MESSAGES);
     }, []);
 
+    const handleSendMessage = async (text: string, _file?: File) => {
+        if (humanConnected) {
+            sendHumanMessage(text, _file);
+        } else {
+            sendMessage(text, _file);
+        }
+    };
+
+    const sendHumanMessage = useCallback(
+        async (text: string, _file?: File) => {
+            const userMsg: ChatMessage = {
+                id: Date.now(),
+                sender: "USER",
+                content: text,
+                timestamp: now(),
+            };
+            addMessage(userMsg);
+            userSendChat.mutate(text);
+        },
+        [addMessage]
+    );
+
     const sendMessage = useCallback(
         async (text: string, _file?: File) => {
             const userMsg: ChatMessage = {
-                id: Date.now().toString(),
-                role: "user",
-                text,
-                timestamp: new Date(),
+                id: Date.now(),
+                sender: "USER",
+                content: text,
+                timestamp: now(),
             };
             addMessage(userMsg);
             setIsTyping(true);
@@ -96,7 +146,7 @@ export const useSupportChat = () => {
                         type: "message",
                         message: text,
                         session_id: getSessionId(),
-                        customer_id: "Beaf",
+                        customer_id: isAuthenticated ? session?.id : null,
                     }),
                 });
 
@@ -105,15 +155,18 @@ export const useSupportChat = () => {
                 const data: ChatResponse = await res.json();
 
                 const agentMsg: ChatMessage = {
-                    id: (Date.now() + 1).toString(),
-                    role: "agent",
-                    text: data?.reply || "",
-                    timestamp: new Date(),
-                    sources: data?.sources || [],
-                    escalated: data?.escalated || false,
-                    products: data?.products || [],
-                    order: data?.order || null,
-                    form: data?.form || null,
+                    id: Date.now() + 1,
+                    sender: "BOT",
+                    content: data?.reply || "",
+                    timestamp: now(),
+                    metadata: {
+                        sources: data?.sources || [],
+                        escalated: data?.escalated || false,
+                        products: data?.products || [],
+                        order: data?.order || null,
+                        form: data?.form || null,
+                        quick_replies: data?.quick_replies || [],
+                    },
                 };
 
                 setMessages((prev) => [...prev, agentMsg]);
@@ -121,13 +174,10 @@ export const useSupportChat = () => {
                 setMessages((prev) => [
                     ...prev,
                     {
-                        id: Date.now().toString(),
-                        role: "agent",
-                        text: "Sorry, I couldn't connect. Please try again.",
-                        timestamp: new Date(),
-                        sources: [],
-                        escalated: false,
-                        products: [],
+                        id: Date.now(),
+                        sender: "BOT",
+                        content: "Sorry, I couldn't connect. Please try again.",
+                        timestamp: now(),
                     },
                 ]);
             } finally {
@@ -138,58 +188,51 @@ export const useSupportChat = () => {
         [addMessage]
     );
 
-    const sendFormSubmission = useCallback(
-        async (formType: string, formData: any) => {
-            try {
-                const res = await fetch(`${import.meta.env.VITE_AGENT_API}/chat`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        type: "form_submission",
-                        form_type: formType,
-                        data: formData,
-                        session_id: getSessionId(),
-                        customer_id: "Beaf",
-                    }),
-                });
+    const sendFormSubmission = useCallback(async (formType: string, formData: any) => {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_AGENT_API}/chat`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    type: "form_submission",
+                    form_type: formType,
+                    data: formData,
+                    session_id: getSessionId(),
+                    customer_id: isAuthenticated ? session?.id : null,
+                }),
+            });
 
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-                const data: ChatResponse = await res.json();
-                const agentMsg: ChatMessage = {
-                    id: (Date.now() + 1).toString(),
-                    role: "agent",
-                    text: data?.reply || "",
-                    timestamp: new Date(),
+            const data: ChatResponse = await res.json();
+            const agentMsg: ChatMessage = {
+                id: Date.now() + 1,
+                sender: "BOT",
+                content: data?.reply || "",
+                timestamp: now(),
+                metadata: {
                     sources: data?.sources || [],
                     escalated: data?.escalated || false,
                     products: data?.products || [],
                     form: data?.form || null,
-                };
-                setMessages((prev) => [...prev, agentMsg]);
-            } catch {
-                setMessages((prev) => [
-                    ...prev,
-                    {
-                        id: Date.now().toString(),
-                        role: "agent",
-                        text: "Sorry, I couldn't connect. Please try again.",
-                        timestamp: new Date(),
-                        sources: [],
-                        escalated: false,
-                        products: [],
-                    },
-                ]);
-            } finally {
-                setLoading(false);
-            }
-        },
-        []
-    );
-
-    const reactToMessage = useCallback((id: string, reaction: "thumbs-up" | "thumbs-down") => {
-        setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, reaction: m.reaction === reaction ? null : reaction } : m)));
+                    quick_replies: data?.quick_replies || [],
+                },
+            };
+            setMessages((prev) => [...prev, agentMsg]);
+        } catch {
+            setMessages((prev) => [
+                ...prev,
+                {
+                    id: Date.now(),
+                    sender: "BOT",
+                    content: "Sorry, I couldn't connect. Please try again.",
+                    timestamp: now(),
+                },
+            ]);
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
-    return { messages, isTyping, loading, sendMessage, sendFormSubmission, reactToMessage, clearHistory, lastMessage: messages.at(-1), isDisabled };
+    return { messages, isTyping, loading, handleSendMessage, sendFormSubmission, clearHistory, lastMessage: messages.at(-1), isDisabled };
 };

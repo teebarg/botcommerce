@@ -8,7 +8,7 @@ import TypingIndicator from "./TypingIndicator";
 import ChatMessage from "./ChatMessage";
 
 export const ChatWidget = () => {
-    const { messages, isTyping, sendMessage, sendFormSubmission, clearHistory, isDisabled } = useSupportChat();
+    const { messages, isTyping, handleSendMessage, sendFormSubmission, clearHistory, isDisabled } = useSupportChat();
     const scrollRef = useRef<HTMLDivElement>(null);
     const hasHistory = messages.length > 2;
 
@@ -32,7 +32,7 @@ export const ChatWidget = () => {
             <div ref={scrollRef} className="flex-1 overflow-y-auto hide-scrollbar py-4 space-y-3">
                 <AnimatePresence mode="popLayout">
                     {messages.map((msg, index) => {
-                        const lastUserIdx = messages.reduce((acc, m, idx) => (m.role === "user" ? idx : acc), -1);
+                        const lastUserIdx = messages.reduce((acc, m, idx) => (m.sender === "USER" ? idx : acc), -1);
                         return (
                             <ChatMessage
                                 key={msg.id}
@@ -40,7 +40,7 @@ export const ChatWidget = () => {
                                 index={index}
                                 isLastUserMessage={index === lastUserIdx}
                                 isLastMessage={index === messages.length - 1}
-                                onSend={sendMessage}
+                                onSend={handleSendMessage}
                                 onSubmitForm={sendFormSubmission}
                             />
                         );
@@ -49,12 +49,12 @@ export const ChatWidget = () => {
 
                 {isTyping && <TypingIndicator />}
 
-                {!isTyping && messages.at(-1)?.quick_replies && (
-                    <QuickReplies replies={messages.at(-1)!.quick_replies || []} onSelect={(r) => sendMessage(r)} />
+                {!isTyping && messages.at(-1)?.metadata?.quick_replies && (
+                    <QuickReplies replies={messages.at(-1)?.metadata?.quick_replies || []} onSelect={(r) => handleSendMessage(r)} />
                 )}
             </div>
 
-            <ChatInput onSend={sendMessage} disabled={isTyping || isDisabled} />
+            <ChatInput onSend={handleSendMessage} disabled={isTyping || isDisabled} />
         </>
     );
 };

@@ -16,7 +16,7 @@ const CartControl: React.FC<Props> = ({ item }) => {
     const onUpdateQuantity = async (id: number, quantity: number) => {
         await updateQuantity.mutateAsync({ item_id: id, quantity });
         gtag.addToCart({
-            product_id: item.variant.product_id.toString(),
+            product_id: item.variant.product_id,
             product_name: item.name,
             quantity,
             price: item.variant.price,

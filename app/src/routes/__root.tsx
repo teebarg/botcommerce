@@ -22,6 +22,7 @@ import { useAppSession } from "@/utils/session";
 import { useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { gtag } from "@/utils/gtag";
+// import { SafeAreaDebug } from "@/components/safe-area-debug";
 
 function RouteChangeTracker() {
     const location = useRouterState({ select: (s) => s.location });
@@ -79,7 +80,7 @@ const fetchUser = createServerFn().handler(async (): Promise<AuthState> => {
 
     return {
         isAuthenticated: Boolean(session.data.id),
-        userId: session.id || null,
+        userId: session.data.id || null,
         sessionClaims: {
             firstName: session.data.user?.firstName,
             lastName: session.data.user?.lastName,

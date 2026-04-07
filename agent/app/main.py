@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
@@ -9,7 +9,7 @@ from app.agent.agent_graph import run_agent
 from app.agent.memory import clear_session
 from app.config import get_settings
 from app.utils import _notify_slack_escalation
-from app.agent.db import is_human_connected, save_message_db
+from app.agent.db import is_human_connected, save_message_db, mark_escalated, ensure_conversation_exists
 from app.redis_client import redis_client
 
 logging.basicConfig(
@@ -65,7 +65,7 @@ async def persist_turn_to_db(session_id: str, user_msg: str, ai_msg: str, metada
 
 
 @app.post("/chat", tags=["Chat"])
-async def chat(request: ChatRequest, background_tasks: BackgroundTasks) -> ChatResponse:
+async def chat(request: Request, payload: ChatRequest, background_tasks: BackgroundTasks) -> ChatResponse:
     """
     Main chat endpoint.
 
@@ -73,30 +73,42 @@ async def chat(request: ChatRequest, background_tasks: BackgroundTasks) -> ChatR
     - Automatically routes to RAG or API tools
     - Returns whether the conversation was escalated to a human
     """
-    connection_key = request.customer_id or request.client_ip
-    await redis_client.set(f"chat_user:{request.session_id}", connection_key, ex=86400)
+    connection_key = payload.customer_id or request.client.host
+    await redis_client.set(f"chat_user:{payload.session_id}", str(connection_key), ex=86400)
 
-    if not request.customer_id:
-        await redis_client.set(f"chat_session:{connection_key}", request.session_id, ex=86400)
+    if payload.customer_id is None:
+        await redis_client.set(f"chat_session:{connection_key}", payload.session_id, ex=86400)
 
-    if request.type == "form_submission":
-        if request.form_type == "escalation_details":
+    await ensure_conversation_exists(conversation_uuid=payload.session_id, customer_id=payload.customer_id)
+
+    if payload.type == "form_submission":
+        if payload.form_type == "escalation_details":
             reason: str = (
                 f"Escalation request:\n"
-                f"Name: {request.data.get('name')}\n"
-                f"Phone: {request.data.get('phone')}\n"
-                f"Summary: {request.data.get('summary')}"
+                f"Name: {payload.data.get('name')}\n"
+                f"Phone: {payload.data.get('phone')}\n"
+                f"Summary: {payload.data.get('summary')}"
             )
 
             await _notify_slack_escalation(
-                session_id=request.session_id,
-                customer_id=request.customer_id,
+                session_id=payload.session_id,
+                customer_id=payload.customer_id,
                 reason=reason,
+            )
+
+            await mark_escalated(conversation_uuid=payload.session_id)
+
+            background_tasks.add_task(
+                persist_turn_to_db,
+                session_id=payload.session_id,
+                user_msg=reason,
+                ai_msg="Escalation request received",
+                metadata={"sources": [], "products": [],"escalated": True, "quick_replies": [], "form": None}
             )
 
             return ChatResponse(
                 reply="Thank you. A human support agent will contact you shortly.",
-                session_id=request.session_id,
+                session_id=payload.session_id,
                 sources=[],
                 products=[],
                 escalated=True,
@@ -104,12 +116,12 @@ async def chat(request: ChatRequest, background_tasks: BackgroundTasks) -> ChatR
                 form=None,
             )
 
-    if await is_human_connected(request.session_id):
+    if await is_human_connected(payload.session_id):
         # AI is silent — save the user message and tell them to wait
-        await save_message_db(session_id=request.session_id, content=request.message or "", role="USER")
+        await save_message_db(session_id=payload.session_id, content=payload.message or "", role="USER")
         return ChatResponse(
             reply="You're connected with a support agent. They'll respond shortly.",
-            session_id=request.session_id,
+            session_id=payload.session_id,
             sources=[],
             products=[],
             escalated=True,
@@ -118,35 +130,41 @@ async def chat(request: ChatRequest, background_tasks: BackgroundTasks) -> ChatR
         )
 
     result = await run_agent(
-        message=request.message or "",
-        session_id=request.session_id,
-        customer_id=request.customer_id,
+        message=payload.message or "",
+        session_id=payload.session_id,
+        customer_id=payload.customer_id,
     )
 
     background_tasks.add_task(
         persist_turn_to_db,
-        session_id=request.session_id,
-        user_msg=request.message or "",
+        session_id=payload.session_id,
+        user_msg=payload.message or "",
         ai_msg=result.get("reply", ""),
-        metadata={"sources": result.get("sources")}
+        metadata={
+            "sources": result.get("sources"),
+            "products": result.get("products"),
+            "escalated": result.get("escalated"),
+            "quick_replies": result.get("quick_replies"),
+            "form": result.get("form"),
+        },
     )
 
     return ChatResponse(**result)
 
 
 @app.post("/ingest", tags=["Admin"])
-async def ingest_data(request: IngestRequest, background_tasks: BackgroundTasks):
+async def ingest_data(payload: IngestRequest, background_tasks: BackgroundTasks):
     """
     Trigger data ingestion into Qdrant.
     Runs in the background so it doesn't block the response.
     """
     from app.rag.ingest import ingest
 
-    background_tasks.add_task(ingest, request.collection)
+    background_tasks.add_task(ingest, payload.collection)
 
     return {
         "status": "started",
-        "message": f"Ingesting '{request.collection}' in the background. Check server logs for progress.",
+        "message": f"Ingesting '{payload.collection}' in the background. Check server logs for progress.",
     }
 
 

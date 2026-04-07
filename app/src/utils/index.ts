@@ -182,9 +182,30 @@ export const getAvatarColor = (name: string) => {
     return colors[index];
 };
 
+export const formatTime = (input: Date | string): string => {
+    try {
+        let d: Date;
 
-export const formatTime = (date: Date): string => {
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        if (typeof input === "string") {
+            // Normalize DB format → ISO
+            const normalized = input.includes("T") ? input : input.replace(" ", "T");
+
+            d = new Date(normalized);
+        } else {
+            d = input;
+        }
+
+        if (isNaN(d.getTime())) {
+            throw new Error("Invalid date");
+        }
+
+        return d.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    } catch (error) {
+        return "";
+    }
 };
 
 export { handleError, capitalize, currency, buildUrl, debounce, isEqual, omit, generateId, timeAgo, formatDate };
