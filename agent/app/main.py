@@ -171,8 +171,7 @@ async def ingest_data(payload: IngestRequest, background_tasks: BackgroundTasks)
 @app.get("/health", tags=["System"])
 async def health_check() -> HealthResponse:
     """
-    Health check endpoint. Render uses this to verify the service is running.
-    Checks connectivity to Qdrant and Redis.
+    Health check endpoint.
     """
     settings = get_settings()
 
@@ -186,8 +185,8 @@ async def health_check() -> HealthResponse:
 
     redis_status = "ok"
     try:
-        from app.agent.memory import get_redis
-        r = get_redis()
+        from app.agent.memory import _get_redis
+        r = _get_redis()
         r.ping()
     except Exception as e:
         redis_status: str = f"error: {str(e)[:50]}"

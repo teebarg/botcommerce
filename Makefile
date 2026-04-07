@@ -1,5 +1,4 @@
 PROJECT_SLUG = shop
-APP_NAME = $(PROJECT_SLUG)-backend
 DOCKER_HUB = beafdocker
 DOCKER_COMPOSE = docker compose
 
@@ -19,15 +18,13 @@ update:
 stop:
 	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) down
 
-
 .PHONY: logs
 logs:
-	$(DOCKER_COMPOSE) logs -f $(service)
+	$(DOCKER_COMPOSE) logs -f $(s)
 
 .PHONY: bash
 bash:
-	$(DOCKER_COMPOSE) exec $(SERVICE) /bin/bash
-
+	$(DOCKER_COMPOSE) exec $(s) /bin/bash
 
 .PHONY: install
 install:
@@ -37,63 +34,49 @@ install:
 clean:
 	$(DOCKER_COMPOSE) down -v --remove-orphans
 
-
 .PHONY: lint-backend
 lint-backend:
-	@cd backend && ./scripts/lint.sh
+	$(DOCKER_COMPOSE) exec $(s) ./scripts/lint.sh
 
 .PHONY: test-backend
 test-backend:
-	@cd backend && ./scripts/test.sh
+	$(DOCKER_COMPOSE) exec $(s) ./scripts/test.sh
 
 .PHONY: prep
 prep:
-	@cd backend && ./scripts/prestart.sh
+	$(DOCKER_COMPOSE) exec shop-api ./scripts/prestart.sh
 
-.PHONY: prep-docker
-prep-docker:
-	docker exec shop-backend ./scripts/prestart.sh
-
-.PHONY: serve-agent
-serve-agent:
-	@cd agent; uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload --workers 4
-
-.PHONY: serve-backend
-serve-backend:
-	@cd backend; uvicorn app.main:app --host 0.0.0.0 --reload --workers 4
-
+# Frontend
 .PHONY: fe-dev
 fe-dev:
 	@cd app && pnpm dev
 
-.PHONY: sync
-sync:
-	@cd backend; uv sync && source .venv/bin/activate
+.PHONY: ss
+ss: docker-build docker-push
+	@$(MAKE) -s dbs dps
 
-.PHONY: dev
-dev:
-	make -j 3 serve-backend fe-dev serve-agent
+.PHONY: dbs
+dbs:
+	@cd backend && docker buildx build --platform linux/amd64 -t $(DOCKER_HUB)/$(PROJECT_SLUG)-backend:latest -t $(DOCKER_HUB)/$(PROJECT_SLUG)-backend:$(shell git rev-parse HEAD) . --push
 
-.PHONY: deploy
-deploy:
-	vercel deploy --prod
+.PHONY: dps
+dps:
+	@docker push $(DOCKER_HUB)/$(PROJECT_SLUG)-backend:latest
+	@docker push $(DOCKER_HUB)/$(PROJECT_SLUG)-backend:$(shell git rev-parse HEAD)
 
-.PHONY: scaffold
-scaffold:
-	@cd scripts && python scaffold.py run -n $(name)
+.PHONY: sa
+sa: docker-build docker-push
+	@$(MAKE) -s dbs dps
 
-.PHONY: stage
-stage: docker-build docker-push
-	@$(MAKE) -s docker-build docker-push
+.PHONY: dba
+dba:
+	@cd agent && docker buildx build --platform linux/amd64 -t $(DOCKER_HUB)/$(PROJECT_SLUG)-agent:latest -t $(DOCKER_HUB)/$(PROJECT_SLUG)-agent:$(shell git rev-parse HEAD) . --push
 
-.PHONY: docker-build
-docker-build:
-	@cd backend && docker buildx build --platform linux/amd64 -t $(DOCKER_HUB)/$(APP_NAME):latest -t $(DOCKER_HUB)/$(APP_NAME):$(shell git rev-parse HEAD) . --push
+.PHONY: dpa
+dpa:
+	@docker push $(DOCKER_HUB)/$(PROJECT_SLUG)-agent:latest
+	@docker push $(DOCKER_HUB)/$(PROJECT_SLUG)-agent:$(shell git rev-parse HEAD)
 
-.PHONY: docker-push
-docker-push:
-	@docker push $(DOCKER_HUB)/$(APP_NAME):latest
-	@docker push $(DOCKER_HUB)/$(APP_NAME):$(shell git rev-parse HEAD)
 
 .PHONY: activate-env-windows
 activate-env-windows:
@@ -120,13 +103,38 @@ dpm:
 .PHONY: help
 help:
 	@echo "Available commands:"
-	@echo "  make dev         - Run the development server"
-	@echo "  make build       - Build the production application"
-	@echo "  make start       - Start the production server"
-	@echo "  make lint        - Run linter"
-	@echo "  make test        - Run e2e tests"
-	@echo "  make prettier    - Run prettier"
-	@echo "  make docker-dev  - Run the development server in Docker"
-	@echo "  make docker-build - Build Docker image"
-	@echo "  make docker-up   - Start Docker containers"
-	@echo "  make docker-down - Stop Docker containers"
+	@echo ""
+	@echo "  -- Docker / Compose --"
+	@echo "  make build              - Build all Docker containers"
+	@echo "  make up                 - Build and start all containers"
+	@echo "  make update s=<service> - Force recreate a specific service"
+	@echo "  make stop               - Stop and remove containers"
+	@echo "  make clean              - Stop containers, remove volumes and orphans"
+	@echo ""
+	@echo "  -- Development --"
+	@echo "  make logs s=<service>   - Tail logs (omit s= for all services)"
+	@echo "  make bash s=<service>   - Open bash shell in a service"
+	@echo "  make install s=<svc> package=<pkg> - Install a uv package in a service"
+	@echo "  make prep               - Run prestart script in shop-api"
+	@echo "  make fe-dev             - Run frontend dev server (pnpm)"
+	@echo ""
+	@echo "  -- Testing & Linting --"
+	@echo "  make lint-backend s=<service>  - Run lint script in a service"
+	@echo "  make test-backend s=<service>  - Run test script in a service"
+	@echo ""
+	@echo "  -- Prisma --"
+	@echo "  make dpf s=<service>    - Format Prisma schema"
+	@echo "  make dpg s=<service>    - Generate Prisma client"
+	@echo "  make dpm s=<service>    - Run Prisma migrations (dev)"
+	@echo ""
+	@echo "  -- Deploy / Push --"
+	@echo "  make ss                 - Build and push backend image (shop-backend)"
+	@echo "  make dbs                - Build backend Docker image for linux/amd64"
+	@echo "  make dps                - Push backend image to Docker Hub"
+	@echo "  make sa                 - Build and push agent image (shop-agent)"
+	@echo "  make dba                - Build agent Docker image for linux/amd64"
+	@echo "  make dpa                - Push agent image to Docker Hub"
+	@echo ""
+	@echo "  -- Environment --"
+	@echo "  make activate-env               - Activate venv (Linux/macOS)"
+	@echo "  make activate-env-windows       - Activate venv (Windows PowerShell)"
