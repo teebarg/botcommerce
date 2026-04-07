@@ -22,7 +22,7 @@ import { useAppSession } from "@/utils/session";
 import { useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { gtag } from "@/utils/gtag";
-import { SafeAreaDebug } from "@/components/safe-area-debug";
+// import { SafeAreaDebug } from "@/components/safe-area-debug";
 
 function RouteChangeTracker() {
     const location = useRouterState({ select: (s) => s.location });
@@ -250,7 +250,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                     }}
                                 />
                                 <PWABadge />
-                                <SafeAreaDebug />
+                                {/* <SafeAreaDebug /> */}
                                 <Scripts />
                             </CartProvider>
                         </StoreProvider>

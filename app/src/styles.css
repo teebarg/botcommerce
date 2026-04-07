@@ -383,12 +383,12 @@
 
     --radius: 0.5rem;
 
-    /* --sat: env(safe-area-inset-top, 0px);
-    --sab: env(safe-area-inset-bottom, 0px); */
+    --sat: env(safe-area-inset-top, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
     --sal: env(safe-area-inset-left, 0px);
     --sar: env(safe-area-inset-right, 0px);
-    --sat: 44px;
-    --sab: 34px;
+    /* --sat: 44px;
+    --sab: 34px; */
 
     --sidebar: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;

@@ -96,10 +96,6 @@ export const useSupportChat = () => {
         setMessages((prev) => [...prev, agentMsg]);
     }, [lastMessage]);
 
-    // useEffect(() => {
-    //     saveHistory(messages);
-    // }, [messages]);
-
     const addMessage = useCallback((msg: ChatMessage) => {
         setMessages((prev) => [...prev, msg]);
     }, []);
@@ -238,9 +234,5 @@ export const useSupportChat = () => {
         }
     }, []);
 
-    // const reactToMessage = useCallback((id: string, reaction: "thumbs-up" | "thumbs-down") => {
-    //     setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, reaction: m.reaction === reaction ? null : reaction } : m)));
-    // }, []);
-
-    return { messages, isTyping, loading, handleSendMessage, sendMessage, sendFormSubmission, clearHistory, lastMessage: messages.at(-1), isDisabled };
+    return { messages, isTyping, loading, handleSendMessage, sendFormSubmission, clearHistory, lastMessage: messages.at(-1), isDisabled };
 };
