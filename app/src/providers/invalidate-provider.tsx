@@ -20,7 +20,7 @@ export function InvalidateProvider({ children }: { children: React.ReactNode }) 
     const { session, isAuthenticated } = useRouteContext({ strict: false });
     const queryClient = useQueryClient();
     const { lastMessage, send, isConnected } = useWebSocket();
-    const userInitSentRef = useRef<boolean>(false);
+    const prevConnectedRef = useRef<boolean>(false);
 
     useEffect(() => {
         if (!lastMessage) return;
@@ -40,7 +40,7 @@ export function InvalidateProvider({ children }: { children: React.ReactNode }) 
     }, [lastMessage, queryClient]);
 
     useEffect(() => {
-        if (isAuthenticated && isConnected && !userInitSentRef.current) {
+        if (isAuthenticated && isConnected && !prevConnectedRef.current) {
             send(
                 JSON.stringify({
                     type: "init",
@@ -48,9 +48,8 @@ export function InvalidateProvider({ children }: { children: React.ReactNode }) 
                     email: session?.user.email,
                 })
             );
-
-            userInitSentRef.current = true;
         }
+        prevConnectedRef.current = isConnected;
     }, [isAuthenticated, isConnected]);
     return <div>{children}</div>;
 }
