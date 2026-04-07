@@ -85,6 +85,7 @@ export interface ChatResponse {
     session_id: string;
     sources: string[];
     escalated: boolean;
+    complaint_sent: boolean;
     products: Product[];
     order?: any;
     quick_replies?: string[];

@@ -54,6 +54,7 @@ class ChatResponse(BaseModel):
     session_id: str
     sources: list[str] = []
     escalated: bool = False
+    complaint_sent: bool = False
     products: list[dict] = []
     order: OrderPayload | None = None
     quick_replies: list[str] = []

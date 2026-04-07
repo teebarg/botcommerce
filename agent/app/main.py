@@ -11,6 +11,8 @@ from app.config import get_settings
 from app.utils import _notify_slack_escalation
 from app.agent.db import is_human_connected, save_message_db, mark_escalated, ensure_conversation_exists
 from app.redis_client import redis_client
+from app.agent.memory import save_messages_to_redis, load_messages_from_redis
+from langchain_core.messages import (ToolMessage, BaseMessage, HumanMessage, AIMessage)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -73,6 +75,7 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
     - Automatically routes to RAG or API tools
     - Returns whether the conversation was escalated to a human
     """
+    history: list[BaseMessage] = load_messages_from_redis(payload.session_id)
     connection_key = payload.customer_id or request.client.host
     await redis_client.set(f"chat_user:{payload.session_id}", str(connection_key), ex=86400)
 
@@ -86,8 +89,9 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
             reason: str = (
                 f"Escalation request:\n"
                 f"Name: {payload.data.get('name')}\n"
-                f"Phone: {payload.data.get('phone')}\n"
-                f"Summary: {payload.data.get('summary')}"
+                f"Category: {payload.data.get('phone')}\n"
+                f"Summary: {payload.data.get('summary')}\n"
+                f"Order Number: {payload.data.get('order_number')}"
             )
 
             await _notify_slack_escalation(
@@ -103,7 +107,7 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
                 session_id=payload.session_id,
                 user_msg=reason,
                 ai_msg="Escalation request received",
-                metadata={"sources": [], "products": [],"escalated": True, "quick_replies": [], "form": None}
+                metadata={"sources": [], "products": [],"escalated": True, "complaint_sent": False, "quick_replies": [], "form": None}
             )
 
             return ChatResponse(
@@ -112,19 +116,68 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
                 sources=[],
                 products=[],
                 escalated=True,
+                complaint_sent=False,
+                quick_replies=[],
+                form=None,
+            )
+
+        if payload.form_type == "complaint_details":
+            reason: str = (
+                f"Complaint request:\n"
+                f"Name: {payload.data.get('name')}\n"
+                f"Email: {payload.data.get('email')}\n"
+                f"Category: {payload.data.get('phone')}\n"
+                f"Description: {payload.data.get('description')}\n"
+                f"Order Number: {payload.data.get('order_number')}"
+            )
+
+            await _notify_slack_escalation(
+                session_id=payload.session_id,
+                customer_id=payload.customer_id,
+                reason=reason,
+            )
+
+            await mark_escalated(conversation_uuid=payload.session_id)
+
+            user_msg = "User submitted a complaint form"
+            ai_msg = "Complaint request received and sent to support team"
+
+            save_messages_to_redis(
+                session_id=payload.session_id,
+                messages=history + [HumanMessage(content=user_msg), AIMessage(content=ai_msg)],
+            )
+
+            background_tasks.add_task(
+                persist_turn_to_db,
+                session_id=payload.session_id,
+                user_msg=user_msg,
+                ai_msg=ai_msg,
+                metadata={"sources": [], "products": [],"escalated": False, "complaint_sent": True, "quick_replies": [], "form": None}
+            )
+
+            return ChatResponse(
+                reply=(
+                    "Thanks, I've sent your request to our support team. "
+                    "They’ll get back to you within 24 hours. "
+                    "If you'd like, I can still help with anything else in the meantime."
+                ),
+                session_id=payload.session_id,
+                sources=[],
+                products=[],
+                complaint_sent=True,
+                escalated=False,
                 quick_replies=[],
                 form=None,
             )
 
     if await is_human_connected(payload.session_id):
-        # AI is silent — save the user message and tell them to wait
         await save_message_db(session_id=payload.session_id, content=payload.message or "", role="USER")
         return ChatResponse(
             reply="You're connected with a support agent. They'll respond shortly.",
             session_id=payload.session_id,
             sources=[],
             products=[],
-            escalated=True,
+            escalated=False,
             quick_replies=[],
             form=None,
         )
@@ -144,6 +197,7 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
             "sources": result.get("sources"),
             "products": result.get("products"),
             "escalated": result.get("escalated"),
+            "complaint_sent": result.get("complaint_sent"),
             "quick_replies": result.get("quick_replies"),
             "form": result.get("form"),
         },
@@ -156,7 +210,6 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
 async def ingest_data(payload: IngestRequest, background_tasks: BackgroundTasks):
     """
     Trigger data ingestion into Qdrant.
-    Runs in the background so it doesn't block the response.
     """
     from app.rag.ingest import ingest
 

@@ -22,7 +22,7 @@ const WELCOME_MESSAGES: ChatMessage[] = [
         content: "",
         timestamp: now(),
         metadata: {
-            quick_replies: ["Track my order", "Product recommendations", "Return an item", "Talk to a human"],
+            quick_replies: ["Track my order", "Product recommendations", "Make a complaint", "Talk to a human"],
         },
     },
 ];
@@ -40,7 +40,6 @@ const loadLocalHistory = (): ChatMessage[] => {
 
 const saveHistory = (messages: ChatMessage[]) => {
     try {
-        // Keep last 100 messages to avoid bloating storage
         const toSave = messages.slice(-100);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
     } catch {
@@ -60,7 +59,7 @@ function getSessionId(): string {
 
 export const useSupportChat = () => {
     const { session, isAuthenticated } = useRouteContext({ strict: false });
-    const { lastMessage } = useWebSocket();
+    const { lastMessage: lastWsMessage } = useWebSocket();
     const [messages, setMessages] = useState<ChatMessage[]>(loadLocalHistory);
     const [loading, setLoading] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -70,7 +69,7 @@ export const useSupportChat = () => {
 
     const isDisabled = useMemo(() => {
         return loading || isTyping || (messages.at(-1)?.metadata?.escalated && messages.at(-1)?.sender == "BOT");
-    }, [loading, isTyping]);
+    }, [loading, isTyping, messages]);
 
     useEffect(() => {
         if (historyLoading) return;
@@ -86,15 +85,17 @@ export const useSupportChat = () => {
     }, [historyLoading, dbHistory]);
 
     useEffect(() => {
+        if (lastWsMessage.type != "chat") return;
+
         const agentMsg: ChatMessage = {
             id: Date.now() + 1,
             sender: "SYSTEM",
-            content: lastMessage.message || "",
+            content: lastWsMessage.message || "",
             timestamp: now(),
         };
 
         setMessages((prev) => [...prev, agentMsg]);
-    }, [lastMessage]);
+    }, [lastWsMessage]);
 
     const addMessage = useCallback((msg: ChatMessage) => {
         setMessages((prev) => [...prev, msg]);
@@ -162,6 +163,7 @@ export const useSupportChat = () => {
                     metadata: {
                         sources: data?.sources || [],
                         escalated: data?.escalated || false,
+                        complaint_sent: data?.complaint_sent || false,
                         products: data?.products || [],
                         order: data?.order || null,
                         form: data?.form || null,
@@ -189,6 +191,13 @@ export const useSupportChat = () => {
     );
 
     const sendFormSubmission = useCallback(async (formType: string, formData: any) => {
+        const userMsg: ChatMessage = {
+            id: Date.now(),
+            sender: "USER",
+            content: "User submitted a complaint form",
+            timestamp: now(),
+        };
+        addMessage(userMsg);
         try {
             const res = await fetch(`${import.meta.env.VITE_AGENT_API}/chat`, {
                 method: "POST",
@@ -213,6 +222,7 @@ export const useSupportChat = () => {
                 metadata: {
                     sources: data?.sources || [],
                     escalated: data?.escalated || false,
+                    complaint_sent: data?.complaint_sent || false,
                     products: data?.products || [],
                     form: data?.form || null,
                     quick_replies: data?.quick_replies || [],

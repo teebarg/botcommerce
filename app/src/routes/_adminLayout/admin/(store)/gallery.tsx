@@ -16,8 +16,6 @@ import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { queryOptions } from "@tanstack/react-query";
 import { z } from "zod";
-import { useNavigate } from "@tanstack/react-router";
-import { useOverlayTriggerState } from "react-stately";
 
 const galleryQuery = (params?: object) =>
     queryOptions({
@@ -41,9 +39,7 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/gallery")({
 });
 
 function RouteComponent() {
-    const filterState = useOverlayTriggerState({});
     const queryClient = useQueryClient();
-    const navigate = useNavigate();
     const toastId = useRef<string | number | undefined>(undefined);
     const params = Route.useSearch();
     const { data } = useQuery(galleryQuery(params));

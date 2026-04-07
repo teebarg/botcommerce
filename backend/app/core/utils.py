@@ -454,9 +454,9 @@ async def generate_magic_link_email(email_to: str, magic_link: str, first_name: 
 
 async def generate_welcome_email(email_to: str, first_name: str, coupon: Coupon) -> EmailData:
     service = ShopSettingsService()
-    shop_name = await service.get("shop_name")
+    shop_name: str | None = await service.get("shop_name")
 
-    html_content = render_email_template(
+    html_content: str = render_email_template(
         template_name="welcome.html",
         context={
             "first_name": first_name,

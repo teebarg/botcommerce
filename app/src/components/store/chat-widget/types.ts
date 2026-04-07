@@ -49,6 +49,7 @@ export interface ChatResponse {
     session_id: string;
     sources: string[];
     escalated: boolean;
+    complaint_sent: boolean;
     products: Product[];
     order?: OrderPayload;
     quick_replies?: string[];

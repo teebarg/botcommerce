@@ -1,17 +1,26 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Send, User, Mail, FileText, CheckCircle } from "lucide-react";
+import { Send, User, Mail, FileText, Hash, CheckCircle } from "lucide-react";
 
 interface EscalationFormProps {
     onSubmitForm: (formType: string, formData: any) => void;
     isLastMessage: boolean;
 }
 
+const ISSUE_CATEGORIES = [
+    { value: "billing", label: "Billing" },
+    { value: "delivery", label: "Delivery" },
+    { value: "technical", label: "Technical" },
+    { value: "account", label: "Account" },
+    { value: "other", label: "Other" },
+];
+
 const EscalationForm = ({ onSubmitForm, isLastMessage }: EscalationFormProps) => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [summary, setSummary] = useState("");
     const [orderId, setOrderId] = useState("");
+    const [category, setCategory] = useState("");
     const [submitted, setSubmitted] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -20,6 +29,7 @@ const EscalationForm = ({ onSubmitForm, isLastMessage }: EscalationFormProps) =>
         if (!name.trim()) errs.name = "Name is required";
         if (!email.trim()) errs.email = "Email is required";
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) errs.email = "Invalid email";
+        if (!category) errs.category = "Please select a category";
         if (!summary.trim()) errs.summary = "Please describe your issue";
         return errs;
     };
@@ -32,7 +42,13 @@ const EscalationForm = ({ onSubmitForm, isLastMessage }: EscalationFormProps) =>
             return;
         }
         setSubmitted(true);
-        onSubmitForm("escalation_details", { name: name.trim(), email: email.trim(), summary: summary.trim(), order_number: orderId.trim() });
+        onSubmitForm("escalation_details", {
+            name: name.trim(),
+            email: email.trim(),
+            category,
+            summary: summary.trim(),
+            order_number: orderId.trim(),
+        });
     };
 
     if (!isLastMessage || submitted) {
@@ -99,6 +115,27 @@ const EscalationForm = ({ onSubmitForm, isLastMessage }: EscalationFormProps) =>
                 {errors.email && <p className="text-[10px] text-destructive pl-1">{errors.email}</p>}
             </div>
 
+            <div className="space-y-1">
+                <select
+                    value={category}
+                    onChange={(e) => {
+                        setCategory(e.target.value);
+                        setErrors((p) => ({ ...p, category: "" }));
+                    }}
+                    className="w-full bg-secondary rounded-lg px-3 py-2 text-xs text-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-shadow appearance-none cursor-pointer"
+                >
+                    <option value="" disabled>
+                        Select issue category
+                    </option>
+                    {ISSUE_CATEGORIES.map((c) => (
+                        <option key={c.value} value={c.value}>
+                            {c.label}
+                        </option>
+                    ))}
+                </select>
+                {errors.category && <p className="text-[10px] text-destructive pl-1">{errors.category}</p>}
+            </div>
+
             {/* Summary */}
             <div className="space-y-1">
                 <div className="relative">
@@ -120,26 +157,21 @@ const EscalationForm = ({ onSubmitForm, isLastMessage }: EscalationFormProps) =>
 
             <div className="space-y-1">
                 <div className="relative">
-                    <FileText className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-muted-foreground" />
-                    <textarea
+                    <Hash className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                    <input
                         value={orderId}
-                        onChange={(e) => {
-                            setOrderId(e.target.value);
-                            setErrors((p) => ({ ...p, orderId: "" }));
-                        }}
+                        onChange={(e) => setOrderId(e.target.value)}
                         placeholder="Order ID (optional)"
-                        rows={2}
-                        maxLength={500}
-                        className="w-full bg-secondary rounded-lg pl-8 pr-3 py-2 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-shadow resize-none"
+                        maxLength={100}
+                        className="w-full bg-secondary rounded-lg pl-8 pr-3 py-2 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
                     />
                 </div>
-                {errors.orderId && <p className="text-[10px] text-destructive pl-1">{errors.orderId}</p>}
             </div>
 
             <motion.button
                 type="submit"
                 whileTap={{ scale: 0.98 }}
-                className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-lg py-2 text-xs font-semibold transition-opacity hover:opacity-90 hover:scale-105 transition-transform"
+                className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-lg py-2 text-xs font-semibold hover:opacity-90 hover:scale-105 transition-transform cursor-pointer"
             >
                 <Send className="w-3.5 h-3.5" />
                 Submit & Connect

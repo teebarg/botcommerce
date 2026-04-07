@@ -37,6 +37,7 @@ class AgentState(TypedDict):
     customer_id: int | None
     session_id: str | None
     escalated: bool
+    complaint_sent: bool
     sources: list[str]
     iterations: int
 
@@ -51,7 +52,9 @@ SYSTEM_PROMPT = (
     "Never reveal you are an AI or mention any AI company. "
     "Never make up product details, prices, or order information — always use tools. "
     "Tool usage rules: "
-    "(1) For product questions: call search_products once with the customer query. "
+    "(1) For product questions: call search_products once with a specific customer query. "
+    "NEVER call search_products with an empty query or for general 'what do you sell' questions — "
+    "instead, briefly describe that you offer a range of products and ask what they're looking for. "
     "When search_products returns results, do NOT list the products in your reply — "
     "they are displayed as visual cards in the UI automatically. "
     "Instead, just tell the customer how many options you found and invite them to ask for details. "
@@ -75,7 +78,9 @@ CONVERSATIONAL_PATTERNS = re.compile(
     r"who are you|what are you|are you (a |an )?(bot|ai|robot|human|person|agent)|"
     r"what('?s| is) your name|tell me about yourself|"
     r"thanks?|thank you|cheers|ok(ay)?|great|awesome|bye|goodbye|"
-    r"help|what can you do|how can you help)\s*[?!.]*\s*$",
+    r"help|what can you do|how can you help|"
+    r"(good[,.]?\s+)?(what (do you sell|can you help|do you (have|carry|offer)))|"  # ← add this
+    r"what('?s| is) (in stock|available|on (sale|offer)))\s*[?!.]*\s*$",
     re.IGNORECASE,
 )
 
@@ -265,6 +270,7 @@ def build_graph():
         return {
             "messages": [response],
             "escalated": state.get("escalated", False),
+            "complaint_sent": state.get("complaint_sent", False),
             "sources": list(state.get("sources", [])),
             "iterations": new_iterations,
         }
@@ -420,32 +426,29 @@ _COMPLEX_SIGNALS = re.compile(
 )
 
 def _rule_based_quick_replies(message: str, sources: list[str], escalated: bool) -> list[str]:
-    """Fast, zero-cost quick replies based on message content and tool sources used."""
-    msg = message.lower()
+    msg: str = message.lower()
 
     if escalated:
-        return ["Check order status", "Browse products", "Return policy"]
+        return []
 
     if "order" in msg or "track" in msg or "status" in msg:
-        return ["Track another order", "Request refund", "Speak to human"]
+        return ["Track another order", "Browse products", "Return policy"]
 
     if "refund" in msg or "return" in msg or "exchange" in msg:
-        return ["Start a return", "Track my order", "Speak to human"]
+        return ["Return policy", "Track my order", "Contact support"]
 
-    if "stock" in msg or "available" in msg or "availab" in msg:
-        return ["Browse products", "Notify when available", "See alternatives"]
+    if "stock" in msg or "availab" in msg:
+        return ["See alternatives", "Browse products", "Contact support"]
 
     if "pay" in msg or "payment" in msg or "checkout" in msg:
-        return ["Browse products", "Track my order", "Return policy"]
+        return ["Track my order", "Return policy", "Contact support"]
 
     if "Products" in sources:
-        return ["Check stock", "How to order", "See more products", "Return policy"]
+        return ["Check stock", "How to order", "See more products"]
 
     if "Faqs" in sources or "Policies" in sources:
-        return ["Track my order", "Browse products", "Speak to human"]
-
-    # Default / greeting / unrecognised
-    return ["Track my order", "Browse products", "Return policy", "Speak to human"]
+        return ["Track my order", "Browse products", "Contact support"]
+    return ["Track my order", "Browse products", "Contact support"]
 
 
 async def _llm_quick_replies(
@@ -488,10 +491,11 @@ async def _get_quick_replies(
 ) -> list[str]:
     """
     Combined strategy:
-    - Simple / greeting messages → rule-based (instant, no cost)
+    - Simple / greeting messages → rule-based
     - Complex messages (orders, refunds, complaints) → LLM-generated with rule-based fallback
     """
     is_complex = bool(_COMPLEX_SIGNALS.search(user_message))
+    print("🚀 ~ file: agent_graph.py:496 ~ is_complex:", is_complex)
 
     if not is_complex:
         return _rule_based_quick_replies(user_message, sources, escalated)
@@ -578,10 +582,10 @@ async def run_agent(
             session_id,
             history + [HumanMessage(content=message), AIMessage(content=reply)],
         )
-        quick_replies = await _get_quick_replies(message, reply, [], False, llm)
+        quick_replies: list[str] = await _get_quick_replies(message, reply, [], False, llm)
         return {"reply": reply, "session_id": session_id, "sources": [], "escalated": False, "quick_replies": quick_replies}
 
-    intent = _classify_intent(message)
+    intent: str = _classify_intent(message)
 
     if intent == Intent.ESCALATION_REQUEST:
         return {

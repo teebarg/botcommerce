@@ -39,6 +39,9 @@ def search_products(query: str) -> str:
     Search the product catalog for products.
     Returns compact product summaries for agent reasoning.
     """
+    if not query or not query.strip():
+        return "No query provided. Ask the customer what they're looking for."
+        
     results = search_collection("products", query, top_k=3, score_threshold=0.45)
     if not results:
         return "No matching products found."
