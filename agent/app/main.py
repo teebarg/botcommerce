@@ -280,9 +280,10 @@ async def clear_collection():
 @app.get("/test-micro", tags=["System"])
 async def test_micro():
     # from app.agent.tools import _shop_request
-    from app.rag.qdrant_client import search_collection
+    from app.rag.qdrant_client import search_collection  
     # result = _shop_request("GET", "/api/order/ORD-C0B7CD56")
-    result = search_collection("faqs", "How do I place an order", top_k=3, score_threshold=0.45)
+    # result = search_collection("faqs", "How do I place an order", top_k=3, score_threshold=0.45)
+    result = search_collection("products", "pin downs", top_k=3, score_threshold=0.45)
     return {
         "result": result,
         "status": "ok"

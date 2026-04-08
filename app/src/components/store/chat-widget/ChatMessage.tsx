@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Bot, User, AlertTriangle, Check, X, ShieldCheck, CheckCircle } from "lucide-react";
 import { ChatMessage as ChatMessageType } from "@/schemas";
-import { ProductRecommendationCard } from "./ProductRecommendationCard";
+import { ProductRecommendation } from "./ProductRecommendation";
 import { formatTime } from "@/utils";
 import EscalationForm from "./EscalationForm";
 import { useState } from "react";
@@ -161,7 +161,7 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage, 
                             <EscalationForm onSubmitForm={onSubmitForm} isLastMessage={isLastMessage} />
                         )}
                         {message.metadata?.form?.type === "complaint" && <ComplaintForm onSubmitForm={onSubmitForm} isLastMessage={isLastMessage} />}
-                        {!!message.metadata?.products?.length && <ProductRecommendationCard products={message.metadata.products || []} />}
+                        {!!message.metadata?.products?.length && <ProductRecommendation products={message.metadata.products || []} />}
                         {isAgent && <SourceBadges sources={message.metadata?.sources ?? []} />}
                         <div className={`flex items-center gap-1.5 mt-1 ${isAssistant ? "justify-start" : "justify-end"}`}>
                             <p className="text-[10px] text-muted-foreground">{formatTime(message.timestamp)}</p>

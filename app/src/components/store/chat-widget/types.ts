@@ -37,9 +37,11 @@ export interface OrderInfo {
 }
 
 export interface Product {
+    id: number;
+    variant_id: number;
     name: string;
     sku: string;
-    price: string;
+    price: number;
     description: string;
     image_url: string | null;
 }

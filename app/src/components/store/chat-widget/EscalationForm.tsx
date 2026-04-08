@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Send, User, Mail, FileText, Hash, CheckCircle } from "lucide-react";
+import { Send, User, Mail, FileText, Hash } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface EscalationFormProps {
     onSubmitForm: (formType: string, formData: any) => void;
@@ -52,30 +52,11 @@ const EscalationForm = ({ onSubmitForm, isLastMessage }: EscalationFormProps) =>
     };
 
     if (!isLastMessage || submitted) {
-        return (
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="mt-2 rounded-xl border border-border bg-card p-4 flex items-center gap-3"
-            >
-                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                    <p className="text-xs font-semibold text-foreground">Details submitted</p>
-                    <p className="text-[11px] text-muted-foreground">A human agent will reach out to you shortly.</p>
-                </div>
-            </motion.div>
-        );
+        return null;
     }
 
     return (
-        <motion.form
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            onSubmit={handleSubmit}
-            className="mt-2 rounded-xl border border-border bg-card p-3 space-y-2.5"
-        >
+        <form onSubmit={handleSubmit} className="mt-2 rounded-xl border border-border bg-card p-3 space-y-2.5">
             <p className="text-xs font-semibold text-foreground">Please share your details so our team can follow up:</p>
 
             {/* Name */}
@@ -168,15 +149,11 @@ const EscalationForm = ({ onSubmitForm, isLastMessage }: EscalationFormProps) =>
                 </div>
             </div>
 
-            <motion.button
-                type="submit"
-                whileTap={{ scale: 0.98 }}
-                className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-lg py-2 text-xs font-semibold hover:opacity-90 hover:scale-105 transition-transform cursor-pointer"
-            >
+            <Button type="submit" variant="gradient" size="sm" className="w-full">
                 <Send className="w-3.5 h-3.5" />
                 Submit & Connect
-            </motion.button>
-        </motion.form>
+            </Button>
+        </form>
     );
 };
 

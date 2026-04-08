@@ -63,12 +63,14 @@ SYSTEM_PROMPT = (
     "(3) For stock questions: call check_stock only when the customer explicitly asks if something is in stock. "
     "(4) For policy or how-to questions: call search_faqs or search_policies. "
     "(5) For refunds: confirm order ID and reason before calling request_refund. "
-    "If you believe this issue requires human support (fraud, legal threat, abuse, complex billing issue),"
-    "respond ONLY with:"
-    "ESCALATION_REQUIRED: <short reason>"
-    "Do not call any tools in this case."
-    "Do not add extra text."
-    "Never escalate just because a product was not found — tell the customer politely instead. "
+    "ESCALATION rules — ONLY use ESCALATION_REQUIRED for: fraud, legal threats, "
+    "lawsuits, chargebacks, abuse, or complex billing disputes a bot cannot resolve. "
+    "NEVER EVER use ESCALATION_REQUIRED when: a product is not found, an item is unavailable, "
+    "a search returns no results, or a customer simply asks about a product you don't carry. "
+    "For those cases, reply politely: e.g. 'I couldn't find that item — could you describe it "
+    "differently or check the spelling?' "
+    "If and ONLY IF it is a genuine high-risk case, respond ONLY with: "
+    "ESCALATION_REQUIRED: <short reason> — no tools, no extra text. "
     "Keep replies concise and warm."
     "Always display currency in Nigerian Naira (₦). Never use dollars ($). Do not infer currency — use only the provided format."
 )
@@ -289,8 +291,8 @@ def build_graph():
                 and "<!-- UI_CARDS -->" not in str(msg.content)
                 and "No matching products" not in str(msg.content)
             ):
-                count = str(msg.content).count("(SKU:")
-                note = (
+                count: int = str(msg.content).count("(SKU:")
+                note: str = (
                     f"\n\n<!-- UI_CARDS: {count} product card(s) will be shown in the UI automatically. "
                     "Do NOT list them in your text reply. Just acknowledge the count warmly and invite questions. -->"
                 )
@@ -647,42 +649,51 @@ async def run_agent(
         if reply.startswith("ESCALATION_REQUIRED:"):
             reason: str = reply.replace("ESCALATION_REQUIRED:", "").strip()
 
-            high_risk: bool = any(
-                word in reason.lower()
-                for word in ["fraud", "legal", "lawsuit", "chargeback", "threat"]
-            )
+            NON_ESCALATION_KEYWORDS: list[str] = [
+                "not found", "no results", "couldn't find", "don't carry",
+                "unavailable", "out of stock", "no matching", "pin down",
+            ]
 
-            if high_risk:
-                await escalate_to_human({"reason": reason})
-                await _notify_slack_escalation(session_id=session_id, customer_id=customer_id, reason=reason)
+            if any(kw in reason.lower() for kw in NON_ESCALATION_KEYWORDS):
+                # Model mis-escalated — treat as a normal "not found" reply
+                reply = "I couldn't find that item in our catalog. Could you describe it differently or check the name?"
+            else:
+                high_risk: bool = any(
+                    word in reason.lower()
+                    for word in ["fraud", "legal", "lawsuit", "chargeback", "threat"]
+                )
+
+                if high_risk:
+                    await escalate_to_human({"reason": reason})
+                    await _notify_slack_escalation(session_id=session_id, customer_id=customer_id, reason=reason)
+
+                    return {
+                        "reply": "A human specialist has been alerted and will assist you shortly.",
+                        "session_id": session_id,
+                        "sources": [],
+                        "products": [],
+                        "escalated": True,
+                        "quick_replies": [],
+                        "form": None,
+                    }
 
                 return {
-                    "reply": "A human specialist has been alerted and will assist you shortly.",
+                    "reply": "I'm going to connect you with a support agent. Please provide a few details.",
                     "session_id": session_id,
                     "sources": [],
                     "products": [],
-                    "escalated": True,
+                    "escalated": False,
                     "quick_replies": [],
-                    "form": None,
+                    "form": FORMS["escalation_details"],
                 }
 
-            return {
-                "reply": "I’m going to connect you with a support agent. Please provide a few details.",
-                "session_id": session_id,
-                "sources": [],
-                "products": [],
-                "escalated": False,
-                "quick_replies": [],
-                "form": FORMS["escalation_details"],
-            }
-
-        last_human_idx = max(
+        last_human_idx: int = max(
             (i for i, m in enumerate(final_state["messages"]) if isinstance(m, HumanMessage)),
             default=0,
         )
 
         current_turn_msgs = final_state["messages"][last_human_idx:]
-        called_search = any(
+        called_search: bool = any(
             isinstance(m, ToolMessage) and m.name == "search_products"
             for m in current_turn_msgs
         )

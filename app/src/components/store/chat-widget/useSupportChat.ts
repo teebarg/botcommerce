@@ -103,6 +103,7 @@ export const useSupportChat = () => {
 
     const clearHistory = useCallback(() => {
         localStorage.removeItem(STORAGE_KEY);
+        sessionStorage.removeItem("chat_session_id")
         setMessages(WELCOME_MESSAGES);
     }, []);
 

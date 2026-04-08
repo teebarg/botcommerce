@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { Send, User, Mail, FileText, AlertCircle, Package } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface ComplaintFormProps {
     onSubmitForm: (formType: string, formData: any) => void;
@@ -53,16 +53,11 @@ const ComplaintForm = ({ onSubmitForm, isLastMessage }: ComplaintFormProps) => {
     };
 
     if (!isLastMessage || submitted) {
-        return null
+        return null;
     }
 
     return (
-        <motion.form
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            onSubmit={handleSubmit}
-            className="mt-2 rounded-xl border border-border bg-card p-3 space-y-2.5"
-        >
+        <form onSubmit={handleSubmit} className="mt-2 rounded-xl border border-border bg-card p-3 space-y-2.5">
             <div className="flex items-center gap-2">
                 <AlertCircle className="w-3.5 h-3.5 text-destructive flex-shrink-0" />
                 <p className="text-xs font-semibold text-foreground">We're sorry to hear that. Please share the details:</p>
@@ -160,15 +155,11 @@ const ComplaintForm = ({ onSubmitForm, isLastMessage }: ComplaintFormProps) => {
                 </div>
             </div>
 
-            <motion.button
-                type="submit"
-                whileTap={{ scale: 0.98 }}
-                className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-lg py-2 text-xs font-semibold hover:opacity-90 hover:scale-105 transition-transform cursor-pointer"
-            >
+            <Button type="submit" variant="gradient" className="w-full hover:scale-105">
                 <Send className="w-3.5 h-3.5" />
                 Submit Complaint
-            </motion.button>
-        </motion.form>
+            </Button>
+        </form>
     );
 };
 

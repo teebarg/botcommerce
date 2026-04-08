@@ -46,7 +46,7 @@ def search_products(query: str) -> str:
     if not results:
         return "No matching products found."
 
-    summary_lines = []
+    summary_lines: list[str] = []
     structured = []
 
     for r in results:
@@ -55,6 +55,8 @@ def search_products(query: str) -> str:
         )
 
         structured.append({
+            "id": r.get("product_id", 0),
+            "variant_id": r.get("variant_id", 0),
             "name": r["name"],
             "sku": r.get("sku", ""),
             "price": str(r["price"]),
@@ -188,10 +190,7 @@ def check_stock(product_slug: str) -> str:
     if result.get("active"):
         return f"✅ Slug '{product_slug}' is **in stock** (1 unit available)."
 
-    msg: str = f"❌ Slug '{product_slug}' is currently **out of stock**."
-    if result.get("restock_date"):
-        msg += f" Expected restock: {result['restock_date']}."
-    return msg
+    return f"❌ Slug '{product_slug}' is currently **out of stock**."
 
 
 @tool

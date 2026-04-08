@@ -123,7 +123,7 @@ async def index(
 @router.get("/{uid}")
 async def get_chat(uid: str) -> Chat:
     """Get a chat and all its messages"""
-    chat = await db.conversation.find_unique(where={"conversation_uuid": uid}, include={"messages": True})
+    chat = await db.conversation.find_unique(where={"conversation_uuid": uid}, include={"messages": {"orderBy": {"id": "asc"}}})
     if not chat:
         raise HTTPException(status_code=404, detail="conversation not found")
 

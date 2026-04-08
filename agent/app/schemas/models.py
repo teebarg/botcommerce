@@ -49,13 +49,24 @@ class ChatRequest(BaseModel):
         "customer_id": 123
     }}}
 
+class Product(BaseModel):
+    """
+    Product model for chat responses
+    """
+    id: int
+    variant_id: int
+    name: str
+    sku: str
+    price: str
+    image_url: Optional[str] = None
+
 class ChatResponse(BaseModel):
     reply: str
     session_id: str
     sources: list[str] = []
     escalated: bool = False
     complaint_sent: bool = False
-    products: list[dict] = []
+    products: list[Product] = []
     order: OrderPayload | None = None
     quick_replies: list[str] = []
     form: dict | None = None
