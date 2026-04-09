@@ -81,7 +81,7 @@ CONVERSATIONAL_PATTERNS = re.compile(
     r"what('?s| is) your name|tell me about yourself|"
     r"thanks?|thank you|cheers|ok(ay)?|great|awesome|bye|goodbye|"
     r"help|what can you do|how can you help|"
-    r"(good[,.]?\s+)?(what (do you sell|can you help|do you (have|carry|offer)))|"  # ← add this
+    r"(good[,.]?\s+)?(what (do you sell|can you help|do you (have|carry|offer)))|"
     r"what('?s| is) (in stock|available|on (sale|offer)))\s*[?!.]*\s*$",
     re.IGNORECASE,
 )
@@ -497,13 +497,11 @@ async def _get_quick_replies(
     - Complex messages (orders, refunds, complaints) → LLM-generated with rule-based fallback
     """
     is_complex = bool(_COMPLEX_SIGNALS.search(user_message))
-    print("🚀 ~ file: agent_graph.py:496 ~ is_complex:", is_complex)
-
     if not is_complex:
         return _rule_based_quick_replies(user_message, sources, escalated)
 
     # Try LLM first for complex cases
-    llm_replies = await _llm_quick_replies(user_message, agent_reply, llm)
+    llm_replies: list[str] = await _llm_quick_replies(user_message, agent_reply, llm)
     if llm_replies:
         return llm_replies
 

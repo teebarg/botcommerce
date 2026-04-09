@@ -12,7 +12,7 @@ from app.utils import _notify_slack_escalation
 from app.agent.db import is_human_connected, save_message_db, mark_escalated, ensure_conversation_exists
 from app.redis_client import redis_client
 from app.agent.memory import save_messages_to_redis, load_messages_from_redis
-from langchain_core.messages import (ToolMessage, BaseMessage, HumanMessage, AIMessage)
+from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 
 logging.basicConfig(
     level=logging.INFO,
@@ -75,7 +75,6 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
     - Automatically routes to RAG or API tools
     - Returns whether the conversation was escalated to a human
     """
-    history: list[BaseMessage] = load_messages_from_redis(payload.session_id)
     connection_key = payload.customer_id or request.client.host
     await redis_client.set(f"chat_user:{payload.session_id}", str(connection_key), ex=86400)
 
@@ -142,6 +141,7 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
             user_msg = "User submitted a complaint form"
             ai_msg = "Complaint request received and sent to support team"
 
+            history: list[BaseMessage] = load_messages_from_redis(payload.session_id)
             save_messages_to_redis(
                 session_id=payload.session_id,
                 messages=history + [HumanMessage(content=user_msg), AIMessage(content=ai_msg)],
