@@ -73,10 +73,11 @@ export interface OrderInfo {
 }
 
 export interface Product {
+    id: number;
+    variant_id: number;
     name: string;
     sku: string;
     price: string;
-    description: string;
     image_url: string | null;
 }
 
@@ -85,6 +86,7 @@ export interface ChatResponse {
     session_id: string;
     sources: string[];
     escalated: boolean;
+    complaint_sent: boolean;
     products: Product[];
     order?: any;
     quick_replies?: string[];

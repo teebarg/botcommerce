@@ -22,9 +22,11 @@ const buttonVariants = cva(
                 accent: "bg-accent text-accent-foreground transform hover:scale-105 font-semibold",
                 contrast: "bg-contrast text-contrast-foreground",
                 reward: "bg-gradient-to-r from-[hsl(45,90%,50%)] via-[hsl(45,95%,70%)] to-[hsl(45,90%,50%)] text-foreground font-bold shadow-[0_0_60px_hsl(45,90%,50%,0.4)] hover:shadow-[0_0_80px_hsl(45,90%,50%,0.5)] hover:-translate-y-1 animate-pulse",
+                gradient: "gradient-primary text-primary-foreground"
             },
             size: {
                 default: "h-10 px-4 py-2",
+                xxs: "rounded-lg py-1.5 text-xs",
                 xs: "h-7 rounded-md px-2",
                 sm: "h-9 rounded-md px-3",
                 lg: "h-11 rounded-md px-8",

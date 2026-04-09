@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
-import { Bot, User, AlertTriangle, Check, X, ShieldCheck } from "lucide-react";
+import { Bot, User, AlertTriangle, Check, X, ShieldCheck, CheckCircle } from "lucide-react";
 import { ChatMessage as ChatMessageType } from "@/schemas";
-import { ProductRecommendationCard } from "./ProductRecommendationCard";
+import { ProductRecommendation } from "./ProductRecommendation";
 import { formatTime } from "@/utils";
 import EscalationForm from "./EscalationForm";
 import { useState } from "react";
@@ -15,6 +15,16 @@ const EscalationCard = () => (
         <div>
             <p className="text-xs font-semibold text-foreground">Escalated to Human Agent</p>
             <p className="text-[10px] text-muted-foreground">Average wait time: ~2 minutes</p>
+        </div>
+    </div>
+);
+
+const ComplaintCard = () => (
+    <div className="mt-2 rounded-lg border border-orange-500/30 bg-orange-500/5 p-3 flex items-start gap-3">
+        <CheckCircle className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
+        <div>
+            <p className="text-xs font-semibold text-foreground">Complaint Submitted</p>
+            <p className="text-[10px] text-muted-foreground">Our support team will review your complaint and get back to you within 24 hours.</p>
         </div>
     </div>
 );
@@ -145,12 +155,13 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage, 
                         )}
 
                         {message.metadata?.escalated && <EscalationCard />}
+                        {message.metadata?.complaint_sent && <ComplaintCard />}
                         {message.metadata?.order && <OrderCard order={message.metadata.order} />}
                         {message.metadata?.form?.type === "escalation_details" && (
                             <EscalationForm onSubmitForm={onSubmitForm} isLastMessage={isLastMessage} />
                         )}
-                        {message.metadata?.form?.type === "complaint" && <ComplaintForm onSubmitForm={onSubmitForm} form={message.metadata.form} />}
-                        {!!message.metadata?.products?.length && <ProductRecommendationCard products={message.metadata.products || []} />}
+                        {message.metadata?.form?.type === "complaint" && <ComplaintForm onSubmitForm={onSubmitForm} isLastMessage={isLastMessage} />}
+                        {!!message.metadata?.products?.length && <ProductRecommendation products={message.metadata.products || []} />}
                         {isAgent && <SourceBadges sources={message.metadata?.sources ?? []} />}
                         <div className={`flex items-center gap-1.5 mt-1 ${isAssistant ? "justify-start" : "justify-end"}`}>
                             <p className="text-[10px] text-muted-foreground">{formatTime(message.timestamp)}</p>

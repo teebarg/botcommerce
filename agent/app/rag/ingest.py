@@ -29,6 +29,7 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
             p.description,
             p.is_new,
             img.image                                   AS image,
+            first_variant.id                            AS variant_id,
             STRING_AGG(DISTINCT c.name, ', ')           AS categories,
             MIN(pv.price)                               AS min_price,
             MAX(pv.price)                               AS max_price,
@@ -49,11 +50,19 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
             ORDER BY pi.order ASC
             LIMIT 1
         ) img ON TRUE
+        LEFT JOIN LATERAL (
+            SELECT pv2.id
+            FROM product_variants pv2
+            WHERE pv2.product_id = p.id
+            ORDER BY pv2.id ASC
+            LIMIT 1
+        ) first_variant ON TRUE
         LEFT JOIN "_ProductCategories" pc ON pc."A" = p.id
-        LEFT JOIN categories c       ON c.id = pc."B"
-        LEFT JOIN product_variants pv ON pv.product_id = p.id
+        LEFT JOIN categories c            ON c.id = pc."B"
+        LEFT JOIN product_variants pv     ON pv.product_id = p.id
         WHERE p.active = true
-        GROUP BY p.id, p.name, p.sku, p.description, p.is_new, img.image
+        GROUP BY p.id, p.name, p.sku, p.description, p.is_new, img.image, first_variant.id
+        HAVING SUM(pv.inventory) > 0
         ORDER BY p.id
     """)
 
@@ -67,6 +76,7 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
                 price: str = f"₦{r['min_price']:.2f} – ₦{r['max_price']:.2f}"
 
         variants_summary: str = " | ".join(filter(None, [
+            f"Variant_id: {r['variant_id']}"     if r["variant_id"]  else None,
             f"Sizes: {r['sizes']}"          if r["sizes"]  else None,
             f"Colors: {r['colors']}"        if r["colors"] else None,
             f"Waists: {r['widths']}"        if r["widths"] else None,
@@ -78,6 +88,8 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
 
         text: str = " ".join(filter(None, [
             f"Product: {r['name']}.",
+            f"Product ID: {r['id']}.",
+            f"Variant ID: {r['variant_id']}.",
             f"Image: {r['image']}.",
             f"Category: {r['categories']}." if r["categories"] else None,
             f"Description: {r['description']}." if r["description"] else None,
@@ -89,6 +101,7 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
         documents.append({
             "text": text,
             "product_id": r["id"],
+            "variant_id": r["variant_id"],
             "name": r["name"],
             "sku": r["sku"],
             "image": r["image"],

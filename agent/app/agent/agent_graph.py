@@ -37,6 +37,7 @@ class AgentState(TypedDict):
     customer_id: int | None
     session_id: str | None
     escalated: bool
+    complaint_sent: bool
     sources: list[str]
     iterations: int
 
@@ -51,7 +52,9 @@ SYSTEM_PROMPT = (
     "Never reveal you are an AI or mention any AI company. "
     "Never make up product details, prices, or order information — always use tools. "
     "Tool usage rules: "
-    "(1) For product questions: call search_products once with the customer query. "
+    "(1) For product questions: call search_products once with a specific customer query. "
+    "NEVER call search_products with an empty query or for general 'what do you sell' questions — "
+    "instead, briefly describe that you offer a range of products and ask what they're looking for. "
     "When search_products returns results, do NOT list the products in your reply — "
     "they are displayed as visual cards in the UI automatically. "
     "Instead, just tell the customer how many options you found and invite them to ask for details. "
@@ -60,12 +63,14 @@ SYSTEM_PROMPT = (
     "(3) For stock questions: call check_stock only when the customer explicitly asks if something is in stock. "
     "(4) For policy or how-to questions: call search_faqs or search_policies. "
     "(5) For refunds: confirm order ID and reason before calling request_refund. "
-    "If you believe this issue requires human support (fraud, legal threat, abuse, complex billing issue),"
-    "respond ONLY with:"
-    "ESCALATION_REQUIRED: <short reason>"
-    "Do not call any tools in this case."
-    "Do not add extra text."
-    "Never escalate just because a product was not found — tell the customer politely instead. "
+    "ESCALATION rules — ONLY use ESCALATION_REQUIRED for: fraud, legal threats, "
+    "lawsuits, chargebacks, abuse, or complex billing disputes a bot cannot resolve. "
+    "NEVER EVER use ESCALATION_REQUIRED when: a product is not found, an item is unavailable, "
+    "a search returns no results, or a customer simply asks about a product you don't carry. "
+    "For those cases, reply politely: e.g. 'I couldn't find that item — could you describe it "
+    "differently or check the spelling?' "
+    "If and ONLY IF it is a genuine high-risk case, respond ONLY with: "
+    "ESCALATION_REQUIRED: <short reason> — no tools, no extra text. "
     "Keep replies concise and warm."
     "Always display currency in Nigerian Naira (₦). Never use dollars ($). Do not infer currency — use only the provided format."
 )
@@ -75,7 +80,9 @@ CONVERSATIONAL_PATTERNS = re.compile(
     r"who are you|what are you|are you (a |an )?(bot|ai|robot|human|person|agent)|"
     r"what('?s| is) your name|tell me about yourself|"
     r"thanks?|thank you|cheers|ok(ay)?|great|awesome|bye|goodbye|"
-    r"help|what can you do|how can you help)\s*[?!.]*\s*$",
+    r"help|what can you do|how can you help|"
+    r"(good[,.]?\s+)?(what (do you sell|can you help|do you (have|carry|offer)))|"
+    r"what('?s| is) (in stock|available|on (sale|offer)))\s*[?!.]*\s*$",
     re.IGNORECASE,
 )
 
@@ -265,6 +272,7 @@ def build_graph():
         return {
             "messages": [response],
             "escalated": state.get("escalated", False),
+            "complaint_sent": state.get("complaint_sent", False),
             "sources": list(state.get("sources", [])),
             "iterations": new_iterations,
         }
@@ -283,8 +291,8 @@ def build_graph():
                 and "<!-- UI_CARDS -->" not in str(msg.content)
                 and "No matching products" not in str(msg.content)
             ):
-                count = str(msg.content).count("(SKU:")
-                note = (
+                count: int = str(msg.content).count("(SKU:")
+                note: str = (
                     f"\n\n<!-- UI_CARDS: {count} product card(s) will be shown in the UI automatically. "
                     "Do NOT list them in your text reply. Just acknowledge the count warmly and invite questions. -->"
                 )
@@ -420,32 +428,29 @@ _COMPLEX_SIGNALS = re.compile(
 )
 
 def _rule_based_quick_replies(message: str, sources: list[str], escalated: bool) -> list[str]:
-    """Fast, zero-cost quick replies based on message content and tool sources used."""
-    msg = message.lower()
+    msg: str = message.lower()
 
     if escalated:
-        return ["Check order status", "Browse products", "Return policy"]
+        return []
 
     if "order" in msg or "track" in msg or "status" in msg:
-        return ["Track another order", "Request refund", "Speak to human"]
+        return ["Track another order", "Browse products", "Return policy"]
 
     if "refund" in msg or "return" in msg or "exchange" in msg:
-        return ["Start a return", "Track my order", "Speak to human"]
+        return ["Return policy", "Track my order", "Contact support"]
 
-    if "stock" in msg or "available" in msg or "availab" in msg:
-        return ["Browse products", "Notify when available", "See alternatives"]
+    if "stock" in msg or "availab" in msg:
+        return ["See alternatives", "Browse products", "Contact support"]
 
     if "pay" in msg or "payment" in msg or "checkout" in msg:
-        return ["Browse products", "Track my order", "Return policy"]
+        return ["Track my order", "Return policy", "Contact support"]
 
     if "Products" in sources:
-        return ["Check stock", "How to order", "See more products", "Return policy"]
+        return ["Check stock", "How to order", "See more products"]
 
     if "Faqs" in sources or "Policies" in sources:
-        return ["Track my order", "Browse products", "Speak to human"]
-
-    # Default / greeting / unrecognised
-    return ["Track my order", "Browse products", "Return policy", "Speak to human"]
+        return ["Track my order", "Browse products", "Contact support"]
+    return ["Track my order", "Browse products", "Contact support"]
 
 
 async def _llm_quick_replies(
@@ -488,16 +493,15 @@ async def _get_quick_replies(
 ) -> list[str]:
     """
     Combined strategy:
-    - Simple / greeting messages → rule-based (instant, no cost)
+    - Simple / greeting messages → rule-based
     - Complex messages (orders, refunds, complaints) → LLM-generated with rule-based fallback
     """
     is_complex = bool(_COMPLEX_SIGNALS.search(user_message))
-
     if not is_complex:
         return _rule_based_quick_replies(user_message, sources, escalated)
 
     # Try LLM first for complex cases
-    llm_replies = await _llm_quick_replies(user_message, agent_reply, llm)
+    llm_replies: list[str] = await _llm_quick_replies(user_message, agent_reply, llm)
     if llm_replies:
         return llm_replies
 
@@ -578,10 +582,10 @@ async def run_agent(
             session_id,
             history + [HumanMessage(content=message), AIMessage(content=reply)],
         )
-        quick_replies = await _get_quick_replies(message, reply, [], False, llm)
+        quick_replies: list[str] = await _get_quick_replies(message, reply, [], False, llm)
         return {"reply": reply, "session_id": session_id, "sources": [], "escalated": False, "quick_replies": quick_replies}
 
-    intent = _classify_intent(message)
+    intent: str = _classify_intent(message)
 
     if intent == Intent.ESCALATION_REQUEST:
         return {
@@ -643,42 +647,51 @@ async def run_agent(
         if reply.startswith("ESCALATION_REQUIRED:"):
             reason: str = reply.replace("ESCALATION_REQUIRED:", "").strip()
 
-            high_risk: bool = any(
-                word in reason.lower()
-                for word in ["fraud", "legal", "lawsuit", "chargeback", "threat"]
-            )
+            NON_ESCALATION_KEYWORDS: list[str] = [
+                "not found", "no results", "couldn't find", "don't carry",
+                "unavailable", "out of stock", "no matching", "pin down",
+            ]
 
-            if high_risk:
-                await escalate_to_human({"reason": reason})
-                await _notify_slack_escalation(session_id=session_id, customer_id=customer_id, reason=reason)
+            if any(kw in reason.lower() for kw in NON_ESCALATION_KEYWORDS):
+                # Model mis-escalated — treat as a normal "not found" reply
+                reply = "I couldn't find that item in our catalog. Could you describe it differently or check the name?"
+            else:
+                high_risk: bool = any(
+                    word in reason.lower()
+                    for word in ["fraud", "legal", "lawsuit", "chargeback", "threat"]
+                )
+
+                if high_risk:
+                    await escalate_to_human({"reason": reason})
+                    await _notify_slack_escalation(session_id=session_id, customer_id=customer_id, reason=reason)
+
+                    return {
+                        "reply": "A human specialist has been alerted and will assist you shortly.",
+                        "session_id": session_id,
+                        "sources": [],
+                        "products": [],
+                        "escalated": True,
+                        "quick_replies": [],
+                        "form": None,
+                    }
 
                 return {
-                    "reply": "A human specialist has been alerted and will assist you shortly.",
+                    "reply": "I'm going to connect you with a support agent. Please provide a few details.",
                     "session_id": session_id,
                     "sources": [],
                     "products": [],
-                    "escalated": True,
+                    "escalated": False,
                     "quick_replies": [],
-                    "form": None,
+                    "form": FORMS["escalation_details"],
                 }
 
-            return {
-                "reply": "I’m going to connect you with a support agent. Please provide a few details.",
-                "session_id": session_id,
-                "sources": [],
-                "products": [],
-                "escalated": False,
-                "quick_replies": [],
-                "form": FORMS["escalation_details"],
-            }
-
-        last_human_idx = max(
+        last_human_idx: int = max(
             (i for i, m in enumerate(final_state["messages"]) if isinstance(m, HumanMessage)),
             default=0,
         )
 
         current_turn_msgs = final_state["messages"][last_human_idx:]
-        called_search = any(
+        called_search: bool = any(
             isinstance(m, ToolMessage) and m.name == "search_products"
             for m in current_turn_msgs
         )
