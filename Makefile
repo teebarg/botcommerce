@@ -52,7 +52,7 @@ fe-dev:
 	@cd app && pnpm dev
 
 .PHONY: ss
-ss: docker-build docker-push
+ss: dbs dps
 	@$(MAKE) -s dbs dps
 
 .PHONY: dbs
@@ -65,8 +65,8 @@ dps:
 	@docker push $(DOCKER_HUB)/$(PROJECT_SLUG)-backend:$(shell git rev-parse HEAD)
 
 .PHONY: sa
-sa: docker-build docker-push
-	@$(MAKE) -s dbs dps
+sa: dba dpa
+	@$(MAKE) -s dba dpa
 
 .PHONY: dba
 dba:
