@@ -1,9 +1,8 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { ChatResponse } from "./types";
 import { useWebSocket } from "pulsews";
 import { useRouteContext } from "@tanstack/react-router";
 import { useChat, useChatMutation } from "@/hooks/useApi";
-import { ChatMessage } from "@/schemas";
+import { ChatMessage, ChatResponse } from "@/schemas";
 
 const generateId = () => Math.random();
 const STORAGE_KEY = "support-chat-history";

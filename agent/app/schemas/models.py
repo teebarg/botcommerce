@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import Optional, Literal, Dict, Any, List
 
-class OrderItem(BaseModel):
+class ChatOrderItem(BaseModel):
     product_id: Optional[int] = None
     name: str
     image: Optional[str]
@@ -18,14 +18,14 @@ class OrderFinancials(BaseModel):
     shipping_fee: float
     total: float
 
-class OrderPayload(BaseModel):
+class ChatOrder(BaseModel):
     order_number: str
     status: str
     payment_status: str
     payment_method: Optional[str]
     shipping_method: Optional[str]
     financials: OrderFinancials
-    items: List[OrderItem]
+    items: List[ChatOrderItem]
     created_at: str
 
 class ChatRequest(BaseModel):
@@ -49,7 +49,7 @@ class ChatRequest(BaseModel):
         "customer_id": 123
     }}}
 
-class Product(BaseModel):
+class ChatProduct(BaseModel):
     """
     Product model for chat responses
     """
@@ -66,8 +66,8 @@ class ChatResponse(BaseModel):
     sources: list[str] = []
     escalated: bool = False
     complaint_sent: bool = False
-    products: list[Product] = []
-    order: OrderPayload | None = None
+    products: list[ChatProduct] = []
+    order: ChatOrder | None = None
     quick_replies: list[str] = []
     form: dict | None = None
     timestamp: datetime = Field(default_factory=datetime.utcnow)

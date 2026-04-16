@@ -65,9 +65,6 @@
     --background-image-gradient-action: var(--gradient-action);
     --background-image-gradient-card: var(--gradient-card);
 
-    --shadow-glow: 0 0 40px hsla(340, 82%, 52%, 0.3);
-    --shadow-card: 0 8px 32px hsla(0, 0%, 0%, 0.4);
-
     --aspect-product: 4 / 5;
     --aspect-gallery: 4 / 6;
 
@@ -361,19 +358,16 @@
 
     --discount-sale-glow: 0 100% 70%;
 
-    --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.1);
     --shadow-discount: 0 4px 20px -2px;
     --shadow-intense: 0 8px 32px -4px;
     --shadow-soft: 0 4px 24px -4px hsl(222 47% 11% / 0.08);
-    --shadow-glow: 0 0 40px hsl(35 92% 55% / 0.2);
+    --shadow-glow: 0 0 40px hsl(340, 82%, 52%, 0.3);
 
     --gradient-sale: linear-gradient(135deg, hsl(0 85% 60%) 0%, hsl(14 100% 57%) 100%);
     --gradient-success: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(152 50% 45%) 100%);
     --gradient-gold: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(45 95% 70%) 50%, hsl(var(--gold)) 100%);
     --gradient-action: linear-gradient(135deg, hsl(340, 82%, 52%) 0%, hsl(15, 90%, 60%) 100%);
     --gradient-card: linear-gradient(180deg, hsl(0, 0%, 10%) 0%, hsl(0, 0%, 6%) 100%);
-    --shadow-glow: 0 0 40px hsla(340, 82%, 52%, 0.3);
-    --shadow-card: 0 8px 32px hsla(0, 0%, 0%, 0.4);
 
     --warning: #f59e0b;
     --warning-foreground: #ffffff;
@@ -383,12 +377,12 @@
 
     --radius: 0.5rem;
 
-    --sat: env(safe-area-inset-top, 0px);
-    --sab: env(safe-area-inset-bottom, 0px);
+    /* --sat: env(safe-area-inset-top, 0px);
+    --sab: env(safe-area-inset-bottom, 0px); */
     --sal: env(safe-area-inset-left, 0px);
     --sar: env(safe-area-inset-right, 0px);
-    /* --sat: 44px;
-    --sab: 34px; */
+    --sat: 44px;
+    --sab: 34px;
 
     --sidebar: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -451,10 +445,6 @@
 
     body {
         @apply bg-background text-foreground font-sans antialiased;
-        padding-top: env(safe-area-inset-top);
-        padding-left: env(safe-area-inset-left);
-        padding-right: env(safe-area-inset-right);
-        padding-bottom: env(safe-area-inset-bottom);
     }
 
     /* Hide scrollbar for immersive experience */
@@ -495,10 +485,6 @@
         box-shadow: var(--shadow-glow);
     }
 
-    .shadow-card {
-        box-shadow: var(--shadow-card);
-    }
-
     .text-gradient {
         background: var(--gradient-primary);
         -webkit-background-clip: text;
@@ -518,31 +504,12 @@
         background-clip: text;
     }
 
-    .chatbot-message li a {
-        @apply text-blue-500 hover:text-blue-600;
-    }
-
     .carousel-nav-link {
         @apply rounded-full bg-card-foreground hover:bg-foreground text-card shadow-md backdrop-blur disabled:opacity-40 disabled:pointer-events-none;
     }
 
-    .fade-to-black {
-        mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0) 100%);
-        -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0) 100%);
-    }
-
-    .bg-blur {
-        @apply bg-background/80 backdrop-blur-2xl;
-    }
-
     .sheet-footer {
         @apply bg-background/80 backdrop-blur-2xl flex gap-2 justify-end p-4 border-t border-border;
-    }
-
-    /* Hardware acceleration for smoother scrolling */
-    .snap-y {
-        scroll-behavior: smooth;
-        -webkit-overflow-scrolling: touch;
     }
 
     /* Optimization for list items */
@@ -580,12 +547,6 @@
     .sheet-safe {
         padding-top: var(--sat);
         padding-bottom: var(--sab);
-    }
-    .close-safe-top {
-        top: calc(var(--sat) + 16px);
-    }
-    .margin-safe {
-        margin-top: calc(var(--sat) + 64px);
     }
     iframe[data-test="uw-iframe"] {
         top: var(--sat) !important;

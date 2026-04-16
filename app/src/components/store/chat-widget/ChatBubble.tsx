@@ -2,8 +2,8 @@ import { useState } from "react";
 import { MessageCircle, Sparkles, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChatWidget } from "./ChatWidget";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { useConfig } from "@/providers/store-provider";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 const ChatHeader = ({ onClose }: { onClose: () => void }) => {
     return (
@@ -24,7 +24,7 @@ const ChatHeader = ({ onClose }: { onClose: () => void }) => {
 
 export const ChatBubble = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
-    const isMobile = useIsMobile();
+    const { isMobile } = useMediaQuery()
 
     const { config } = useConfig();
     if (config?.feature_chatbot != "true") {

@@ -27,8 +27,8 @@ export const Route = createFileRoute("/_adminLayout")({
     },
     ssr: false,
     pendingComponent: () => <AdminPendingComponent />,
-    pendingMs: 100,        // only show pending if takes longer than 100ms
-    pendingMinMs: 300,     // keep showing for at least 300ms to avoid flash
+    pendingMs: 100,
+    pendingMinMs: 300,
     component: RouteComponent,
 });
 

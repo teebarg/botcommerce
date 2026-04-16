@@ -1,7 +1,5 @@
 import { z } from "zod";
-
 import { AuditSchema } from "./base";
-import { PagSchema } from "./common";
 
 export const CarouselBannerSchema = z
     .object({
@@ -17,9 +15,4 @@ export const CarouselBannerSchema = z
     })
     .merge(AuditSchema);
 
-export const PaginatedCarouselBannerSchema = PagSchema.extend({
-    banners: z.array(CarouselBannerSchema),
-});
-
 export type CarouselBanner = z.infer<typeof CarouselBannerSchema>;
-export type PaginatedCarouselBanner = z.infer<typeof PaginatedCarouselBannerSchema>;

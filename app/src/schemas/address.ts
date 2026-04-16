@@ -1,7 +1,5 @@
 import { z } from "zod";
-
 import { AddressTypeSchema } from "./enums";
-import { PagSchema } from "./common";
 
 export const AddressSchema = z.object({
     id: z.number(),
@@ -19,9 +17,4 @@ export const AddressSchema = z.object({
     updated_at: z.string().optional(),
 });
 
-export const PaginatedAddressSchema = PagSchema.extend({
-    addresses: z.array(AddressSchema),
-});
-
 export type Address = z.infer<typeof AddressSchema>;
-export type PaginatedAddress = z.infer<typeof PaginatedAddressSchema>;

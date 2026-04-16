@@ -12,13 +12,6 @@ export const CursorSchema = z.object({
     limit: z.number(),
 });
 
-export const PagSchema = z.object({
-    skip: z.number(),
-    limit: z.number(),
-    total_count: z.number(),
-    total_pages: z.number(),
-});
-
 export const MessageSchema = z.object({
     message: z.string(),
     error: z.boolean().default(false),
@@ -121,7 +114,6 @@ export type PaginatedCoupons = z.infer<typeof PaginatedCouponsSchema>
 export type CouponUsage = z.infer<typeof CouponUsageSchema>;
 
 export type Token = z.infer<typeof TokenSchema>;
-export type Pag = z.infer<typeof PagSchema>;
 export type Message = z.infer<typeof MessageSchema>;
 export type ShopSettings = z.infer<typeof ShopSettingsSchema>;
 export type BankDetails = z.infer<typeof BankDetailsSchema>;

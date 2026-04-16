@@ -2,8 +2,8 @@ import type React from "react";
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/utils";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 interface Props {
     content?: string | React.ReactNode;
@@ -36,7 +36,7 @@ const ConfirmDrawer: React.FC<Props> = ({
     isLoading = false,
     hideActionBtn = false,
 }) => {
-    const isMobile = useIsMobile();
+    const { isMobile } = useMediaQuery()
 
     const handleConfirm = async () => {
         onConfirm?.();

@@ -17,12 +17,12 @@ import { InvalidateProvider } from "@/providers/invalidate-provider";
 import PageTransitionLoader from "@/components/generic/page-transition-loader";
 import PWABadge from "@/PWAbadge";
 import { ClerkProvider } from "@clerk/tanstack-react-start";
-import { getShopSettingsPublicFn } from "@/server/generic.server";
 import { useAppSession } from "@/utils/session";
 import { useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { gtag } from "@/utils/gtag";
-// import { SafeAreaDebug } from "@/components/safe-area-debug";
+import { SafeAreaDebug } from "@/components/safe-area-debug";
+import { getShopSettingsPublicFn } from "@/server/store.server";
 
 function RouteChangeTracker() {
     const location = useRouterState({ select: (s) => s.location });
@@ -250,7 +250,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                     }}
                                 />
                                 <PWABadge />
-                                {/* <SafeAreaDebug /> */}
+                                <SafeAreaDebug />
                                 <Scripts />
                             </CartProvider>
                         </StoreProvider>
