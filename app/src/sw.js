@@ -98,7 +98,7 @@ registerRoute(
     })
 );
 
-// PUSH NOTIFICATIONS
+
 self.addEventListener("push", (event) => {
     if (!event.data) return;
     let data;

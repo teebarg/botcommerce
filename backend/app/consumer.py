@@ -262,7 +262,7 @@ class RedisStreamConsumer:
                 "valid_until": datetime.now() + timedelta(weeks=500),
                 "users": {"connect": [{"id": int(event["id"])}]}
             })
-            # update user table
+
             await db.user.update(where={"id": int(event["id"])}, data={"referral_code": code})
             welcome_email = await generate_welcome_email(
                 email_to=event["email"],

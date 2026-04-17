@@ -1,8 +1,11 @@
-from abc import ABC, abstractmethod
+import json
 import requests
 
+from abc import ABC, abstractmethod
 from app.core.logging import logger
 from app.core.utils import send_email
+from pywebpush import webpush, WebPushException
+from app.core.config import settings
 
 class NotificationChannel(ABC):
     @abstractmethod
@@ -88,6 +91,14 @@ class SMSChannel(NotificationChannel):
             logger.error(f"SMS sending failed: {str(e)}")
             return False
 
+class PushChannel(NotificationChannel):
+    async def send(self, recipient: str, message: str, **kwargs) -> bool:
+        try:
+            send_notifications_to_subscribers(subscriptions=kwargs.get("subscriptions", []), notification=kwargs.get("notification", {}))
+        except Exception as e:
+            logger.error(f"Push notification sending failed: {str(e)}")
+            return False
+
 
 class NotificationService:
     def __init__(self):
@@ -137,3 +148,47 @@ notification_service.send_notification(
     "Hello from the notification service!"
 )
 """
+
+
+def send_notifications_to_subscribers(subscriptions, notification):
+    failed_subscriptions = []
+    sent_subscriptions = []
+
+    vapid_claims: dict[str, str] = {"sub": f"mailto:{settings.ADMIN_EMAIL}"}
+    vapid_private_key: str = settings.VAPID_PRIVATE_KEY
+
+    for subscriber in subscriptions:
+        subscription_info = {
+            "endpoint": subscriber["endpoint"],
+            "keys": {
+                "p256dh": subscriber["p256dh"],
+                "auth": subscriber["auth"],
+            },
+        }
+
+        payload: str = json.dumps({
+            "title": notification["title"],
+            "body": notification["body"],
+            "path": notification.get("path", "/collections"),
+            "data": notification.get("data"),
+            "imageUrl": notification.get("image"),
+            "subscriberId": subscriber.get("id"),
+        })
+
+        try:
+            webpush(
+                subscription_info=subscription_info,
+                data=payload,
+                vapid_private_key=vapid_private_key,
+                vapid_claims=vapid_claims,
+            )
+            sent_subscriptions.append(subscriber.get("id"))
+        except WebPushException as ex:
+            logger.error(f"WebPush Error: {ex}")
+            failed_subscriptions.append(subscriber.get("id"))
+
+    if failed_subscriptions:
+        logger.error(f"Failed to send notifications to: {json.dumps(failed_subscriptions)}")
+    logger.info(f"Sent notifications to: {json.dumps(sent_subscriptions)}")
+
+    return {"sentSubscriptions": sent_subscriptions, "failedSubscriptions": failed_subscriptions}

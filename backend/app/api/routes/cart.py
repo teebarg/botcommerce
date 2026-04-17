@@ -1,10 +1,10 @@
 from typing import Optional, Annotated
 from datetime import datetime, timedelta, timezone
-from app.core.utils import generate_id, generate_abandoned_cart_email, send_email
+from app.core.utils import generate_id, generate_abandoned_cart_email
 from app.models.cart import CartUpdate, CartItemCreate, CartItem, Cart, CartLite, SendAbandonedCartReminders, PaginatedAbandonedCarts
 from fastapi import APIRouter, HTTPException, Request, BackgroundTasks, Depends, Cookie, Response
 from app.prisma_client import prisma as db
-from app.core.deps import UserDep, CurrentUser
+from app.core.deps import UserDep, CurrentUser, Notification
 from app.services.redis import cache_response, invalidate_key, bust, invalidate_pattern
 from app.core.logging import get_logger
 from app.services.shop_settings import ShopSettingsService
@@ -351,7 +351,7 @@ async def update_cart_item(response: Response, item_id: int, quantity: int, user
     return updated_item
 
 
-async def send_abandoned_cart_reminder(cart_id: int):
+async def send_abandoned_cart_reminder(cart_id: int, notification: Notification):
     """Background task to send abandoned cart reminder email"""
     try:
         cart = await db.cart.find_unique(
@@ -402,7 +402,6 @@ async def send_abandoned_cart_reminder(cart_id: int):
                 }
                 for item in cart.items
             ],
-            "created_at": cart.created_at,
             "updated_at": cart.updated_at
         }
 
@@ -412,10 +411,20 @@ async def send_abandoned_cart_reminder(cart_id: int):
             user_name=cart.user.first_name or cart.user.username
         )
 
-        await send_email(
-            email_to=cart.email or cart.user.email,
+        await notification.send_notification(
+            channel_name="email",
+            recipient=cart.email or cart.user.email,
             subject=email_data.subject,
-            html_content=email_data.html_content
+            message=email_data.html_content
+        )
+
+        subscription = await db.pushsubscription.find_unique(
+            where={"userId": cart.user_id}
+        )
+        await notification.send_notification(
+            channel_name="push",
+            subscriptions=[subscription.model_dump()], 
+            notification={"title": "Your cart is waiting 🛒", "body": "Complete checkout before your items sell out."}
         )
 
         logger.info(f"Abandoned cart reminder sent to {cart.email or cart.user.email} for cart {cart.cart_number}")
@@ -427,6 +436,7 @@ async def send_abandoned_cart_reminder(cart_id: int):
 @router.post("/abandoned-carts/send-reminders")
 async def send_abandoned_cart_reminders(
     background_tasks: BackgroundTasks,
+    notification: Notification,
     data: SendAbandonedCartReminders
 ):
     """
@@ -456,7 +466,7 @@ async def send_abandoned_cart_reminders(
             }
 
         for cart in abandoned_carts:
-            background_tasks.add_task(send_abandoned_cart_reminder, cart.id)
+            background_tasks.add_task(send_abandoned_cart_reminder, cart_id=cart.id, notification=notification)
 
         logger.info(f"Queued {len(abandoned_carts)} abandoned cart reminders")
 
@@ -545,7 +555,8 @@ async def get_admin_abandoned_carts(
 @router.post("/abandoned-carts/{cart_id}/send-reminder", dependencies=[Depends(require_admin)])
 async def send_cart_reminder(
     cart_id: int,
-    background_tasks: BackgroundTasks
+    background_tasks: BackgroundTasks,
+    notification: Notification,
 ):
     """
     Send a recovery email reminder for a specific abandoned cart.
@@ -558,7 +569,7 @@ async def send_cart_reminder(
         if not cart:
             raise HTTPException(status_code=404, detail="cart not found")
 
-        background_tasks.add_task(send_abandoned_cart_reminder, cart.id)
+        background_tasks.add_task(send_abandoned_cart_reminder, cart_id=cart.id, notification=notification)
 
         return {
             "message": "Recovery email queued successfully",
@@ -643,7 +654,7 @@ async def apply_wallet(user: CurrentUser, _cart_id: Annotated[str | None, Cookie
             status_code=400,
             content={"detail": "Your cart is empty, add some items first"}
         )
-        set_sso_cookie(response, cart.cart_number)
+        _set_cart_cookie(response, cart.cart_number)
         return response
 
     if not user.wallet_balance or user.wallet_balance <= 0:
@@ -700,7 +711,7 @@ async def remove_wallet(user: CurrentUser,  _cart_id: Annotated[str | None, Cook
             status_code=400,
             content={"detail": "Your cart is empty, add some items to your cart"}
         )
-        set_sso_cookie(response, cart.cart_number)
+        _set_cart_cookie(response, cart.cart_number)
         return response
 
     wallet_used = cart.wallet_used or 0

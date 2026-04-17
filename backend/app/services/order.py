@@ -318,23 +318,6 @@ async def decrement_variant_inventory_for_order(order, notification=None) -> Non
 
     if out_of_stock_variants and notification:
         logger.info(f"Out of stock variants found for order {order.id}: {out_of_stock_variants}")
-        # subject = f"Product Variants OUT OF STOCK in Order {order.id}"
-        # message_lines = [
-        #     f"The following product variants are now OUT OF STOCK due to order {order_id}:"
-        # ]
-        # for v in out_of_stock_variants:
-        #     message_lines.append(f"- SKU: {v.sku}, Product ID: {v.product_id}")
-        # message = "\n".join(message_lines)
-        # service = ShopSettingsService()
-        # try:
-        #     await notification.send_notification(
-        #         channel_name="email",
-        #         recipient=await service.get("shop_email"),
-        #         subject=subject,
-        #         message=message
-        #     )
-        # except Exception as e:
-        #     logger.error(f"Failed to send out-of-stock email: {e}")
         try:
             slack_text: str = f"🚨 *OUT OF STOCK* 🚨\nOrder ID: {order.id}\n" + "\n".join([
                 f"• SKU: {v.sku}, Product ID: {v.product_id}" for v in out_of_stock_variants

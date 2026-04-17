@@ -116,13 +116,16 @@ export default function PushPermission() {
                 const registration = await navigator.serviceWorker.ready;
                 const sub = await registration.pushManager.getSubscription();
 
-                if (!sub) return;
-
-                if (hasSubscriptionChanged(sub)) {
-                    await syncSubscriptionToBackend(sub);
-                } else {
-                    setSubscription(sub);
+                if (!sub) {
+                    subscribeToPush();
+                    return;
                 }
+                // if (hasSubscriptionChanged(sub)) {
+                //     console.log("Subscription changed, syncing to backend");
+                //     await syncSubscriptionToBackend(sub);
+                // } else {
+                //     setSubscription(sub);
+                // }
             } catch (err) {
                 console.error("Subscription check failed", err);
             }
