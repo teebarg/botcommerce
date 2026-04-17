@@ -200,7 +200,7 @@ export default function PushPermission() {
                     transition={{ type: "spring", damping: 25, stiffness: 300 }}
                     className={cn(
                         "relative w-full md:max-w-sm shadow-2xl border border-border/50",
-                        "bg-card rounded-t-[28px] md:rounded-3xl overflow-hidden"
+                        "bg-card rounded-t-[28px] md:rounded-3xl overflow-hidden pb-[var(--sab)]"
                     )}
                 >
                     <div key="permission">

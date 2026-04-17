@@ -44,7 +44,6 @@ export const useAdminMessageMutation = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["chats"] });
-            toast.success("Successfull!");
         },
         onError: (error) => {
             toast.error("Failed to chat" + error);
