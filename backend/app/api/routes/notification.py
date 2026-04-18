@@ -1,5 +1,5 @@
 from app.services.notification import send_notifications_to_subscribers
-from fastapi import APIRouter
+from fastapi import APIRouter, BackgroundTasks
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 
@@ -69,12 +69,13 @@ async def push_fcm(data: FCMIn, user: UserDep):
 
 
 @router.post("/push")
-async def send_push_notification(data: PushMessageSchema):
+async def send_push_notification(data: PushMessageSchema, background_tasks: BackgroundTasks):
     try:
         subscriptions = await db.pushsubscription.find_many()
         logger.info(f"Found {len(subscriptions)} subscriptions")
-        res = send_notifications_to_subscribers(subscriptions=[subscription.model_dump() for subscription in subscriptions], notification=data.model_dump())
-        return res
+        
+        background_tasks.add_task(send_notifications_to_subscribers, subscriptions=[subscription.model_dump() for subscription in subscriptions], notification=data.model_dump())
+        return {"message": "success"}
     except Exception as e:
         logger.error(f"Failed to send push notifications: {str(e)}")
         return {"message": "failed"}

@@ -84,6 +84,24 @@ export const useDeleteChat = () => {
     });
 };
 
+export const useSendPushNotification = () => {
+    return useMutation({
+        mutationFn: async ({ title, body, image, path }: { title: string; body: string; image?: string; path?: string }) =>
+            await clientApi.post<Message>("/notification/push", {
+                title,
+                body,
+                image,
+                path,
+            }),
+        onSuccess: () => {
+            toast.success("Push notification sent successfully");
+        },
+        onError: (error) => {
+            toast.error("Failed to send push notification" + error);
+        },
+    });
+};
+
 export const useDeliveryOptions = () => {
     return useQuery({
         queryKey: ["delivery"],
