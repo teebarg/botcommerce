@@ -16,7 +16,7 @@ export default function NotFound() {
     };
 
     return (
-        <div className="min-h-screen bg-background flex items-center justify-center p-4 relative">
+        <div className="h-vhc bg-background flex items-center justify-center p-4 relative">
             <div className="max-w-md w-full text-center animate-fade-in">
                 <div className="relative mb-8">
                     <div className="w-32 h-32 mx-auto relative animate-float">

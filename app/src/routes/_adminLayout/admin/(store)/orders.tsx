@@ -39,12 +39,12 @@ function RouteComponent() {
     });
 
     return (
-        <div className="px-4 md:px-10 py-4">
+        <div className="px-4 md:px-10 py-2">
             <div className="mb-6 flex flex-col">
                 <h1 className="text-2xl font-medium">Order view</h1>
                 <p className="text-muted-foreground text-sm">Manage your orders.</p>
             </div>
-            <div className="pb-4">
+            <div>
                 <div className="relative mb-4">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <Search className="text-gray-400" size={18} />

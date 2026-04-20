@@ -8,7 +8,7 @@ import { GalleryFilters } from "../product/gallery-filters";
 
 const AdminNavbar = () => {
     return (
-        <NavigationBar className="header-safe bg-background sticky top-0 z-50 flex items-center">
+        <NavigationBar className="bg-background sticky top-[var(--sat)] z-50 flex items-center h-16">
             <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
                 <NavbarBrand className="gap-3 max-w-fit hidden sm:block">
                     <LocalizedClientLink href="/admin">

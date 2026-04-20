@@ -215,7 +215,7 @@ export default function PushPermission() {
                                 <div className="relative flex justify-center">
                                     <div className="relative">
                                         <div className="absolute inset-0 bg-gold/30 rounded-2xl blur-xl animate-pulse-glow" />
-                                        <div className="relative bg-card p-5 rounded-2xl shadow-glow animate-gift-open">
+                                        <div className="relative bg-card p-5 rounded-2xl shadow-glow">
                                             <Gift className="w-12 h-12 text-primary" strokeWidth={2} />
                                         </div>
                                         <div className="absolute -top-2 -left-2 animate-sparkle-burst" style={{ animationDelay: "0s" }}>

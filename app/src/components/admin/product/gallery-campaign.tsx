@@ -3,7 +3,7 @@ import { useOverlayTriggerState } from "react-stately";
 import { Button } from "@/components/ui/button";
 import SheetDrawer from "@/components/sheet-drawer";
 import { useState } from "react";
-import { Edit, Send } from "lucide-react";
+import { Radio, Send } from "lucide-react";
 import { toast } from "sonner";
 import { MobilePreview } from "./mobile-preview";
 import { useSendPushNotification } from "@/hooks/useApi";
@@ -22,9 +22,9 @@ interface Props {
 const GalleryCampaign: React.FC<Props> = ({ image }) => {
     const state = useOverlayTriggerState({});
     const confirmState = useOverlayTriggerState({});
-    const [title, setTitle] = useState("");
-    const [body, setBody] = useState("");
-    const [destination, setDestination] = useState("");
+    const [title, setTitle] = useState<string>("");
+    const [body, setBody] = useState<string>("");
+    const [destination, setDestination] = useState<string>("/collections");
     const { mutateAsync: sendPushNotification, isPending: isSending } = useSendPushNotification();
 
     const handleDispatch = () => {
@@ -48,14 +48,14 @@ const GalleryCampaign: React.FC<Props> = ({ image }) => {
             open={state.isOpen}
             title={
                 <header>
-                    <h1 className="text-2xl tracking-tight">Curate Dispatch</h1>
+                    <h1 className="text-xl">Curate Dispatch</h1>
                     <p className="text-muted-foreground mt-1 max-w-md">Configure the messaging and targeting for your next campaign.</p>
                 </header>
             }
             trigger={
-                <Button className="bg-contrast/10" variant="ghost">
-                    <Send className="h-5 w-5 text-contrast" />
-                </Button>
+                <div className="p-2 bg-amber-500">
+                    <Radio className="h-5 w-5 text-white" />
+                </div>
             }
             onOpenChange={state.setOpen}
         >
@@ -72,7 +72,7 @@ const GalleryCampaign: React.FC<Props> = ({ image }) => {
                             value={title}
                             maxLength={TITLE_LIMIT}
                             onChange={(e) => setTitle(e.target.value)}
-                            placeholder="e.g., The Autumn Cashmere Edit"
+                            placeholder="e.g., The Autumn Cashmere"
                         />
                     </div>
 
@@ -92,43 +92,37 @@ const GalleryCampaign: React.FC<Props> = ({ image }) => {
                         />
                     </div>
 
-                    {/* Media + Destination */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
-                        <div>
-                            <Label>Visual asset</Label>
-                            <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-border group">
-                                <img src={image} alt={image ?? "Selected visual asset"} className="w-full h-full object-cover" />
-                            </div>
+                        <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-border group">
+                            <img src={image} alt={image ?? "Selected visual asset"} className="w-full h-full object-cover" />
                         </div>
                         <div>
                             <Label>Destination URL</Label>
-                            <Input value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="aura.co/…" />
+                            <Input value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="/…" />
                         </div>
                     </div>
 
-                    <div>
-                        <ConfirmDrawer
-                            open={confirmState.isOpen}
-                            onOpenChange={confirmState.setOpen}
-                            trigger={
-                                <button className="bg-foreground text-background px-8 py-4 text-sm tracking-wide hover:bg-foreground/90 transition-colors min-w-full sm:min-w-[220px] flex items-center justify-center gap-2 rounded-md">
-                                    <Send className="size-4" />
-                                    Dispatch Now
-                                </button>
-                            }
-                            onClose={confirmState.close}
-                            onConfirm={handleDispatch}
-                            title="Confirm Dispatch"
-                            description="Are you sure you want to dispatch this campaign?"
-                            isLoading={isSending}
-                            variant="destructive"
-                        />
-                    </div>
+                    <ConfirmDrawer
+                        open={confirmState.isOpen}
+                        onOpenChange={confirmState.setOpen}
+                        trigger={
+                            <Button className="w-full" variant="default">
+                                <Send className="size-4" />
+                                Dispatch Now
+                            </Button>
+                        }
+                        onClose={confirmState.close}
+                        onConfirm={handleDispatch}
+                        title="Confirm Dispatch"
+                        description="Are you sure you want to dispatch this campaign?"
+                        isLoading={isSending}
+                        variant="destructive"
+                    />
                 </div>
 
                 <aside className="lg:col-span-5">
                     <div className="lg:sticky lg:top-12 flex flex-col items-center">
-                        <MobilePreview title={title} body={body} appName="Aura" imageUrl={image ?? undefined} />
+                        <MobilePreview title={title} body={body} imageUrl={image ?? undefined} />
                         <p className="text-xs text-muted-foreground mt-6 text-center max-w-[280px] leading-relaxed">
                             Live preview reflects what your users will see on their device.
                         </p>

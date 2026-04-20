@@ -19,8 +19,8 @@ const StatComponent = ({ summary }: { summary?: any }) => {
     }
 
     return (
-        <div className="px-4 md:px-10 py-6">
-            <h2 className="text-lg font-medium mb-3">Store Overview</h2>
+        <div className="px-4 md:px-10">
+            <h2 className="text-lg font-medium">Store Overview</h2>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 <StatCard

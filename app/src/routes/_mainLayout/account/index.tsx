@@ -67,8 +67,8 @@ function RouteComponent() {
     const { data } = useSuspenseQuery(ordersQuery({}));
 
     return (
-        <div className="px-2 md:px-0 space-y-4">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center pt-12 md:pt-6 pb-6">
+        <div className="px-2 md:px-0 pt-6 space-y-6">
+            <div className="text-center">
                 <div className="w-20 h-20 mx-auto rounded-full gradient-primary mb-4">
                     <div className="w-full h-full rounded-full bg-background flex items-center justify-center overflow-hidden">
                         <img src={session?.user?.image} className="object-contain" />
@@ -76,7 +76,7 @@ function RouteComponent() {
                 </div>
                 <h2 className="text-xl font-bold">Welcome back, {session?.user?.firstName}!</h2>
                 <p className="text-muted-foreground text-sm">Member since January 2024</p>
-            </motion.div>
+            </div>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="grid grid-cols-3 gap-3">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
@@ -116,7 +116,7 @@ function RouteComponent() {
                 </motion.div>
             </motion.div>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-2">
                     <h3 className="font-semibold">Recent Orders</h3>
                     <Link to="/account/orders" className="text-sm text-primary flex items-center gap-1">
                         View All

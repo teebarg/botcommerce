@@ -19,7 +19,7 @@ function RouteComponent() {
     }
 
     return (
-        <div className="max-w-7xl w-full mx-auto py-4">
+        <div className="max-w-7xl w-full mx-auto py-2">
             <CategoryTree data={data} />
         </div>
     );

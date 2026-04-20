@@ -105,7 +105,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
     };
 
     return (
-        <div ref={ref} className="relative h-safe-store-content w-full snap-start overflow-hidden flex flex-col">
+        <div ref={ref} className="relative w-full snap-start overflow-hidden flex flex-col">
             <div
                 className="absolute inset-0 bg-[length:200%_200%] z-0 animate-ambient-move"
                 style={{
@@ -228,7 +228,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
                 <div className="flex items-center gap-2 mt-4">
                     <Music className="w-3 h-3 text-muted-foreground" />
                     <div className="flex-1 h-4 overflow-hidden relative">
-                        <div className="whitespace-nowrap animate-marquee text-xs text-white/70">
+                        <div className="whitespace-nowrap text-xs text-white/70">
                             🎵 Trending Styles • Shop the look • Limited Edition Drop
                         </div>
                     </div>

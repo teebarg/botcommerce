@@ -245,7 +245,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                     position="top-right"
                                     toastOptions={{
                                         style: {
-                                            marginTop: `calc(var(--sat) + 16px)`,
+                                            marginTop: "var(--sat)",
                                         },
                                     }}
                                 />

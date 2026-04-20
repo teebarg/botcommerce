@@ -74,7 +74,7 @@ function RouteComponent() {
             <motion.header
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                className="sticky header-safe top-0 z-50 bg-background/80 backdrop-blur-xl flex justify-between items-center border-b border-border px-2.5 shrink-0"
+                className="sticky h-16 top-0 z-50 bg-background/80 backdrop-blur-xl flex justify-between items-center border-b border-border px-2.5 shrink-0"
             >
                 <div className="flex items-center gap-2">
                     <BackButton />
@@ -97,7 +97,7 @@ function RouteComponent() {
             ) : !cart ? (
                 <EmptyCartMessage />
             ) : (
-                <main className="flex md:gap-8 overflow-hidden h-safe-content">
+                <main className="flex md:gap-8 overflow-hidden h-sc">
                     <CheckoutFlow cart={cart} />
                     <div className="mb-24 md:mb-0 hidden md:block">
                         <CheckoutSummary />

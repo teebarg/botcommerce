@@ -62,7 +62,7 @@ function RouteComponent() {
     };
 
     return (
-        <div className="space-y-6 px-2 pt-12 md:pt-6">
+        <div className="space-y-6 px-2 pt-6">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

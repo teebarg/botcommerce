@@ -135,7 +135,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ image }) => {
                     </div>
                 </div>
             </div>
-            <section className="md:hidden relative h-safe-store-content w-full overflow-hidden">
+            <section className="md:hidden relative h-sc w-full overflow-hidden">
                 <img src={image} alt="image" className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-linear-to-t from-black via-black/50 to-transparent" />
                 <div className="absolute bottom-32 left-0 right-0 px-6 space-y-4">

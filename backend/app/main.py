@@ -358,12 +358,3 @@ async def process_stream_id(stream_id: str, request: Request):
         raise HTTPException(status_code=500, detail=f"Error processing event: {str(e)}")
 
     return {"status": "processed", "id": msg_id}
-
-
-# @app.post("/api/test-push")
-# async def test_push():
-#     subscription = await db.pushsubscription.find_unique(
-#         where={"userId": 1}
-#     )
-#     print("🚀 ~ file: main.py:366 ~ subscription:", subscription)
-#     return {"message": "success"}

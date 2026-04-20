@@ -84,8 +84,8 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
                             ))}
                         </div>
                     )}
-                    {image.product?.is_new && <IsNew className="right-1 top-auto left-auto" />}
-                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2" onClick={(e) => e.stopPropagation()}>
+                    {image.product?.is_new && <IsNew className="right-0 bottom-0 top-auto left-auto" />}
+                    <div className="absolute bottom-0 left-0" onClick={(e) => e.stopPropagation()}>
                         <GalleryCampaign image={image.image} />
                     </div>
                 </div>
