@@ -758,12 +758,13 @@ model PushSubscription {
   p256dh   String @db.Text
   auth     String @db.Text
 
-  userId Int?  @unique
+  userId Int?
   user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   created_at DateTime? @default(now())
   updated_at DateTime? @updatedAt
 
+  @@index([userId])
   @@map("push_subscriptions")
 }
 

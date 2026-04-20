@@ -418,12 +418,12 @@ async def send_abandoned_cart_reminder(cart_id: int, notification: Notification)
             message=email_data.html_content
         )
 
-        subscription = await db.pushsubscription.find_unique(
+        subscriptions = await db.pushsubscription.find_many(
             where={"userId": cart.user_id}
         )
         await notification.send_notification(
             channel_name="push",
-            subscriptions=[subscription.model_dump()], 
+            subscriptions=[subscription.model_dump() for subscription in subscriptions], 
             notification={"title": "Your cart is waiting 🛒", "body": "Complete checkout before your items sell out."}
         )
 

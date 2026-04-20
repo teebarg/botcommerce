@@ -43,14 +43,11 @@ async def create_push_event(data: PushEventSchema) -> Message:
 @router.post("/push-fcm")
 async def push_fcm(data: FCMIn, user: UserDep) -> Message:
     await redis_client.xadd("FCM", jsonable_encoder(data, exclude_none=True))
-    where={
-        'endpoint': data.endpoint
-    }
-    if user is not None:
-        where['userId'] = user.id
     try:
         await db.pushsubscription.upsert(
-            where=where,
+            where={
+                'endpoint': data.endpoint
+            },
             data={
                 "create": {
                     'p256dh': data.p256dh,
