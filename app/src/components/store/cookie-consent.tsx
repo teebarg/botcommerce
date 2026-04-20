@@ -6,14 +6,14 @@ import { useLocalStorageFlag } from "@/hooks/useLocalStorage";
 export type CookieProps = {};
 
 const Cookie: FC<CookieProps> = () => {
-    const { enabled, enable, hydrated } = useLocalStorageFlag("tbo_cookie");
+    const { enabled, enable, hydrated, disable } = useLocalStorageFlag("tbo_cookie");
 
     if (!hydrated || enabled) {
         return null;
     }
 
     return (
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 px-6 pb-6 z-50">
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 p-6 z-50">
             <div className="pointer-events-auto ml-auto max-w-sm rounded-1xl border border-input bg-background/95 p-6 shadow-sm backdrop-blur">
                 <p className="text-sm font-normal">
                     {`We use cookies on our website to give you the most relevant experience by remembering your preferences and repeat visits. By`}
@@ -38,7 +38,7 @@ const Cookie: FC<CookieProps> = () => {
                     >
                         Accept All
                     </Button>
-                    <Button aria-label="reject" className="border-2 w-full bg-transparent border-border font-medium">
+                    <Button onClick={disable} aria-label="reject" className="border-2 w-full bg-transparent border-border font-medium">
                         Reject All
                     </Button>
                 </div>

@@ -21,7 +21,6 @@ import { useAppSession } from "@/utils/session";
 import { useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { gtag } from "@/utils/gtag";
-import { SafeAreaDebug } from "@/components/safe-area-debug";
 import { getShopSettingsPublicFn } from "@/server/store.server";
 
 function RouteChangeTracker() {
@@ -250,7 +249,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                     }}
                                 />
                                 <PWABadge />
-                                <SafeAreaDebug />
+                                {/* <SafeAreaDebug /> */}
                                 <Scripts />
                             </CartProvider>
                         </StoreProvider>
