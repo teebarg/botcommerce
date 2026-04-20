@@ -1,10 +1,15 @@
-import type { ProductImage } from "./product-creator";
 import { useState, useRef } from "react";
 import { Upload, X, Image as ImageIcon, Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils";
 import ImageDisplay from "@/components/image-display";
+
+interface ProductImage {
+    id: string;
+    file: File;
+    url: string;
+}
 
 interface ImageUploadProps {
     images: ProductImage[];
@@ -137,7 +142,7 @@ export function ImageUpload({ images, onImagesChange, isLoading = false, showUpl
                             ))}
 
                             <Card
-                                className="relative group overflow-hidden bg-gradient-card shadow-sm border-2 border-dashed border-border hover:border-primary/50 transition-colors duration-smooth cursor-pointer"
+                                className="relative group overflow-hidden bg-card shadow-sm border-2 border-dashed border-border hover:border-primary/50 transition-colors duration-smooth cursor-pointer"
                                 onClick={openFileDialog}
                             >
                                 <div className="aspect-square flex items-center justify-center">

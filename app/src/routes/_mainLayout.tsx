@@ -17,7 +17,7 @@ function MainLayoutComponent() {
         <div className="flex flex-col min-h-screen">
             <StoreNavbar />
             <MobileHeader />
-            <main className="flex-1 flex flex-col pt-16 pb-8">
+            <main className="flex-1 flex flex-col pt-16 md:pt-0 pb-8">
                 <Outlet />
             </main>
             <Footer />
