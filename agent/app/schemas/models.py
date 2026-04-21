@@ -63,7 +63,7 @@ class ChatProduct(BaseModel):
 class ChatResponse(BaseModel):
     reply: str
     session_id: str
-    sources: list[str] = []
+    sources: Optional[list[str]] = []
     escalated: bool = False
     complaint_sent: bool = False
     products: list[ChatProduct] = []

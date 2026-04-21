@@ -4,7 +4,7 @@ import { MenuIcon } from "lucide-react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import AdminMobileMenu from "@/components/admin/layouts/admin-mobile-menu";
 import { useLocation, useRouteContext } from "@tanstack/react-router";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/generic/user-avatar";
 
 const MenuComp: React.FC = () => {
     const location = useLocation();
@@ -25,10 +25,7 @@ const MenuComp: React.FC = () => {
                 <DrawerHeader className="pb-0!">
                     <DrawerTitle>
                         <div className="flex items-center space-x-3 bg-primary -mx-4 -mt-4 p-4 overflow-hidden rounded-t-lg">
-                            <Avatar>
-                                <AvatarImage src={session?.user?.image!} />
-                                <AvatarFallback className="bg-secondary">{session?.user?.firstName?.[0] || ""}</AvatarFallback>
-                            </Avatar>
+                            <UserAvatar />
                             <div>
                                 <div>
                                     {session?.user?.firstName} {session?.user?.lastName}

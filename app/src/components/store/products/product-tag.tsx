@@ -17,12 +17,12 @@ const ProductTag = ({ product }: ProductTagProps) => {
             );
         }
         if (variant?.age) {
-            return <div className="py-1">{variant?.age}</div>;
+            return <div className="py-1 text-xs">{variant?.age}</div>;
         }
         if (variant?.size) {
             return (
-                <div>
-                    uk<span className="text-lg">{variant.size}</span>
+                <div className="text-[10px]">
+                    uk<span className="text-base">{variant.size}</span>
                 </div>
             );
         }
@@ -49,7 +49,7 @@ const ProductTag = ({ product }: ProductTagProps) => {
     return (
         <div className="absolute right-0 top-0">
             <div
-                className="relative bg-amber-500 text-white border-border border-l-[3px] px-2 font-semibold text-xs uppercase"
+                className="relative bg-amber-500 text-white border-border border-l-[3px] px-2 font-semibold uppercase"
                 style={{ borderLeftColor: accentColor }}
             >
                 {content}

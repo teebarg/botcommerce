@@ -1,5 +1,4 @@
 import { ShoppingBag } from "lucide-react";
-import { motion } from "framer-motion";
 import { gtag } from "@/utils/gtag";
 import { useMemo } from "react";
 import { useCart } from "@/providers/cart-provider";
@@ -45,13 +44,7 @@ export const ProductCard = ({ product }: { product: ChatProduct }) => {
         });
     };
     return (
-        <motion.div
-            key={product.sku}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-            className="glass rounded-2xl overflow-hidden min-w-[160px] max-w-[160px] shrink-0"
-        >
+        <div key={product.sku} className="glass rounded-2xl overflow-hidden min-w-[160px] max-w-[160px] shrink-0">
             <div className="relative h-28 overflow-hidden">
                 <img src={product.image_url || "/placeholder.jpg"} alt={product.name} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -64,6 +57,6 @@ export const ProductCard = ({ product }: { product: ChatProduct }) => {
                     Add
                 </Button>
             </div>
-        </motion.div>
+        </div>
     );
 };

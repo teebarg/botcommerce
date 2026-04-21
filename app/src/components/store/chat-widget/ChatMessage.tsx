@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Bot, User, AlertTriangle, Check, X, ShieldCheck, CheckCircle } from "lucide-react";
+import { Bot, AlertTriangle, Check, X, ShieldCheck, CheckCircle } from "lucide-react";
 import { ChatMessage as ChatMessageType } from "@/schemas";
 import { ProductRecommendation } from "./ProductRecommendation";
 import { formatTime } from "@/utils";
@@ -8,6 +8,7 @@ import { useState } from "react";
 import { OrderCard } from "./OrderCard";
 import ComplaintForm from "./ComplaintForm";
 import { useRouteContext } from "@tanstack/react-router";
+import { chatAvatar, renderText } from "@/utils/reuseable";
 
 const EscalationCard = () => (
     <div className="mt-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 flex items-center gap-3">
@@ -50,33 +51,16 @@ function SourceBadges({ sources }: { sources: string[] }) {
     );
 }
 
-function renderText(text: string): React.ReactNode {
-    return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) => {
-        if (part.startsWith("**") && part.endsWith("**"))
-            return (
-                <strong key={i} className="font-semibold">
-                    {part.slice(2, -2)}
-                </strong>
-            );
-        return part.split("\n").map((line, j, arr) => (
-            <span key={`${i}-${j}`}>
-                {line}
-                {j < arr.length - 1 && <br />}
-            </span>
-        ));
-    });
-}
-
 interface ChatMessageProps {
     onSend: (message: string, file?: File) => void;
     onSubmitForm: (formType: string, formData: any) => void;
     message: ChatMessageType;
     index: number;
-    isLastUserMessage: boolean;
     isLastMessage: boolean;
+    isEditable?: boolean;
 }
 
-const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage, isLastMessage }: ChatMessageProps) => {
+const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastMessage, isEditable }: ChatMessageProps) => {
     const { session } = useRouteContext({ strict: false });
     const isAgent = message.sender === "BOT";
     const isAssistant = ["SYSTEM", "BOT"].includes(message.sender);
@@ -146,8 +130,8 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage, 
                             <div
                                 className={`rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
                                     isAssistant
-                                        ? "bg-card text-card-foreground rounded-tl-md border border-border"
-                                        : "bg-primary text-primary-foreground rounded-tr-md"
+                                        ? "bg-card text-card-foreground rounded-tl-none border border-border"
+                                        : "bg-primary text-primary-foreground rounded-tr-none"
                                 }`}
                             >
                                 {renderText(message.content)}
@@ -165,7 +149,7 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage, 
                         {isAgent && <SourceBadges sources={message.metadata?.sources ?? []} />}
                         <div className={`flex items-center gap-1.5 mt-1 ${isAssistant ? "justify-start" : "justify-end"}`}>
                             <p className="text-[10px] text-muted-foreground">{formatTime(message.timestamp)}</p>
-                            {!isAssistant && isLastUserMessage && (
+                            {isEditable && (
                                 <button
                                     onClick={() => setIsEditing(true)}
                                     className="text-[10px] text-muted-foreground hover:text-foreground transition-colors underline"
@@ -177,15 +161,7 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastUserMessage, 
                     </>
                 )}
             </div>
-            {!isAssistant && (
-                <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 mt-1 overflow-hidden">
-                    {!session?.user?.image ? (
-                        <User className="w-4 h-4 text-primary" />
-                    ) : (
-                        <img alt={session?.user?.image} className="w-full h-full object-contain" src={session?.user?.image ?? "/placeholder.jpg"} />
-                    )}
-                </div>
-            )}
+            {!isAssistant && chatAvatar(session?.user?.image)}
         </motion.div>
     );
 };

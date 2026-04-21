@@ -56,11 +56,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-async def persist_turn_to_db(session_id: str, user_msg: str, ai_msg: str, metadata: dict) -> None:
+async def persist_turn_to_db(session_id: str, user_msg: str, ai_msg: str, user_metadata: dict, ai_metadata: dict) -> None:
     """Saves both messages using the UPSERT-safe function."""
     try:
-        await save_message_db(session_id=session_id, role="USER", content=user_msg)
-        await save_message_db(session_id=session_id, role="BOT", content=ai_msg, metadata=metadata)
+        await save_message_db(session_id=session_id, role="USER", content=user_msg, metadata=user_metadata)
+        await save_message_db(session_id=session_id, role="BOT", content=ai_msg, metadata=ai_metadata)
         logger.info(f"💾 Persisted turn for session {session_id} to DB")
     except Exception as e:
         logger.error(f"❌ Background DB Persistence Error: {e}")
@@ -101,23 +101,22 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
 
             await mark_escalated(conversation_uuid=payload.session_id)
 
+            user_msg = "User provided response"
+            reply="Thank you. A human support agent will contact you shortly."
+
             background_tasks.add_task(
                 persist_turn_to_db,
                 session_id=payload.session_id,
-                user_msg=reason,
-                ai_msg="Escalation request received",
-                metadata={"sources": [], "products": [],"escalated": True, "complaint_sent": False, "quick_replies": [], "form": None}
+                user_msg=user_msg,
+                ai_msg=reply,
+                ai_metadata={"escalated": True},
+                user_metadata={"reason": reason}
             )
 
             return ChatResponse(
-                reply="Thank you. A human support agent will contact you shortly.",
+                reply=reply,
                 session_id=payload.session_id,
-                sources=[],
-                products=[],
                 escalated=True,
-                complaint_sent=False,
-                quick_replies=[],
-                form=None,
             )
 
         if payload.form_type == "complaint_details":
@@ -136,38 +135,34 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
                 reason=reason,
             )
 
-            await mark_escalated(conversation_uuid=payload.session_id)
+            # await mark_escalated(conversation_uuid=payload.session_id)
 
-            user_msg = "User submitted a complaint form"
-            ai_msg = "Complaint request received and sent to support team"
+            user_msg = "User provided response"
+            reply=(
+                "Thanks, I've sent your request to our support team. "
+                "They’ll get back to you within 24 hours. "
+                "If you'd like, I can still help with anything else in the meantime."
+            )
 
             history: list[BaseMessage] = load_messages_from_redis(payload.session_id)
             save_messages_to_redis(
                 session_id=payload.session_id,
-                messages=history + [HumanMessage(content=user_msg), AIMessage(content=ai_msg)],
+                messages=history + [HumanMessage(content=user_msg), AIMessage(content="Complaint request received and sent to support team")],
             )
 
             background_tasks.add_task(
                 persist_turn_to_db,
                 session_id=payload.session_id,
                 user_msg=user_msg,
-                ai_msg=ai_msg,
-                metadata={"sources": [], "products": [],"escalated": False, "complaint_sent": True, "quick_replies": [], "form": None}
+                ai_msg=reply,
+                ai_metadata={"complaint_sent": True},
+                user_metadata={"reason": reason}
             )
 
             return ChatResponse(
-                reply=(
-                    "Thanks, I've sent your request to our support team. "
-                    "They’ll get back to you within 24 hours. "
-                    "If you'd like, I can still help with anything else in the meantime."
-                ),
+                reply=reply,
                 session_id=payload.session_id,
-                sources=[],
-                products=[],
                 complaint_sent=True,
-                escalated=False,
-                quick_replies=[],
-                form=None,
             )
 
     if await is_human_connected(payload.session_id):
@@ -193,7 +188,7 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
         session_id=payload.session_id,
         user_msg=payload.message or "",
         ai_msg=result.get("reply", ""),
-        metadata={
+        ai_metadata={
             "sources": result.get("sources"),
             "products": result.get("products"),
             "escalated": result.get("escalated"),
@@ -201,6 +196,7 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
             "quick_replies": result.get("quick_replies"),
             "form": result.get("form"),
         },
+        user_metadata={}
     )
 
     return ChatResponse(**result)

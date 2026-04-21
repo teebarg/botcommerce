@@ -101,6 +101,10 @@ export const useSupportChat = () => {
         setMessages((prev) => [...prev, agentMsg]);
     }, [lastWsMessage]);
 
+    const lastUserMessage = useMemo(() => {
+        return messages.findLast((msg) => msg.sender === "USER");
+    }, [messages]);
+
     const addMessage = useCallback((msg: ChatMessage) => {
         setMessages((prev) => [...prev, msg]);
     }, []);
@@ -199,7 +203,7 @@ export const useSupportChat = () => {
         const userMsg: ChatMessage = {
             id: Date.now(),
             sender: "USER",
-            content: "User submitted a complaint form",
+            content: "User provided response",
             timestamp: now(),
         };
         addMessage(userMsg);
@@ -249,5 +253,16 @@ export const useSupportChat = () => {
         }
     }, []);
 
-    return { messages, isTyping, loading, handleSendMessage, sendFormSubmission, clearHistory, lastMessage: messages.at(-1), isDisabled };
+    return {
+        messages,
+        isTyping,
+        loading,
+        handleSendMessage,
+        sendFormSubmission,
+        clearHistory,
+        lastMessage: messages.at(-1),
+        isDisabled,
+        lastUserMessage,
+        editAble: true,
+    };
 };

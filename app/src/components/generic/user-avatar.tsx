@@ -1,16 +1,17 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/utils";
 import { useRouteContext } from "@tanstack/react-router";
 
-export function UserAvatar() {
+export function UserAvatar({ className }: { className?: string }) {
     const { session } = useRouteContext({ strict: false });
 
     return (
-        <Avatar className="h-8 w-8 cursor-pointer">
+        <Avatar className={cn("h-8 w-8 cursor-pointer", className)}>
             <AvatarImage alt={session?.user?.firstName} src={session?.user?.image ?? undefined} />
             <AvatarFallback className="bg-green-600 text-white text-xs">
                 {session?.user?.firstName
                     ?.split(" ")
-                    ?.map((n) => n[0])
+                    ?.map((n: string) => n[0])
                     .join("") ?? "ME"}
             </AvatarFallback>
         </Avatar>
