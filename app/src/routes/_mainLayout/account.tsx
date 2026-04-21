@@ -61,10 +61,7 @@ function RouteComponent() {
     const { isAuthenticated } = Route.useRouteContext();
     return (
         <div className="flex-1">
-            <div className="bg-background/60 backdrop-blur-md md:hidden sticky z-20"
-            style={{
-                top: "calc(var(--sat) + 64px)"
-            }}>
+            <div className="bg-background/60 backdrop-blur-md md:hidden sticky z-20 top-[calc(var(--sat)+64px)]">
                 <motion.ul initial={{ y: 100 }} animate={{ y: 0 }} className="grid grid-cols-5 px-2">
                     {navLinks.map((link, idx: number) => (
                         <li key={idx}>

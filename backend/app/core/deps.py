@@ -7,7 +7,7 @@ from pydantic import BaseModel, ValidationError
 
 from app.core import security
 from app.core.config import settings
-from app.services.notification import EmailChannel, NotificationService, SlackChannel, WhatsAppChannel
+from app.services.notification import EmailChannel, NotificationService, SlackChannel, WhatsAppChannel, PushChannel
 from app.prisma_client import prisma
 from meilisearch import Client as MeilisearchClient
 from app.models.user import UserInternal as User
@@ -195,6 +195,11 @@ def get_notification_service() -> NotificationService:
             phone_number_id=settings.WHATSAPP_PHONE_NUMBER_ID,
         )
         notification_service.register_channel("whatsapp", whatsapp_channel)
+
+    # Configure Push channel
+    if getattr(settings, "VAPID_PRIVATE_KEY", None):
+        push_channel = PushChannel()
+        notification_service.register_channel("push", push_channel)
 
     return notification_service
 

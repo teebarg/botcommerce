@@ -11,8 +11,8 @@ def upload(bucket: str, data: ImageUpload) -> str:
     try:
         file_bytes = base64.b64decode(data.file)
 
-        file_extension = data.file_name.split('.')[-1]
-        unique_filename = f"{uuid.uuid4()}.{file_extension}"
+        file_extension: str = data.file_name.split('.')[-1]
+        unique_filename: str = f"{uuid.uuid4()}.{file_extension}"
 
         result = supabase.storage.from_(bucket).upload(
             unique_filename,

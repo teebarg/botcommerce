@@ -116,9 +116,12 @@ export default function PushPermission() {
                 const registration = await navigator.serviceWorker.ready;
                 const sub = await registration.pushManager.getSubscription();
 
-                if (!sub) return;
-
+                if (!sub) {
+                    subscribeToPush();
+                    return;
+                }
                 if (hasSubscriptionChanged(sub)) {
+                    console.log("Subscription changed, syncing to backend");
                     await syncSubscriptionToBackend(sub);
                 } else {
                     setSubscription(sub);
@@ -200,19 +203,19 @@ export default function PushPermission() {
                     transition={{ type: "spring", damping: 25, stiffness: 300 }}
                     className={cn(
                         "relative w-full md:max-w-sm shadow-2xl border border-border/50",
-                        "bg-card rounded-t-[28px] md:rounded-3xl overflow-hidden"
+                        "bg-card rounded-t-[28px] md:rounded-3xl overflow-hidden pb-[var(--sab)]"
                     )}
                 >
                     <div key="permission">
                         <div className="pt-8 pb-4 px-6 text-center">
-                            <div className="relative gradient-success py-8 px-6">
+                            <div className="relative py-8 px-6">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary-foreground/10 rounded-full -translate-y-1/2 translate-x-1/2" />
                                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary-foreground/10 rounded-full translate-y-1/2 -translate-x-1/2" />
 
                                 <div className="relative flex justify-center">
                                     <div className="relative">
                                         <div className="absolute inset-0 bg-gold/30 rounded-2xl blur-xl animate-pulse-glow" />
-                                        <div className="relative bg-card p-5 rounded-2xl shadow-glow animate-gift-open">
+                                        <div className="relative bg-card p-5 rounded-2xl shadow-glow">
                                             <Gift className="w-12 h-12 text-primary" strokeWidth={2} />
                                         </div>
                                         <div className="absolute -top-2 -left-2 animate-sparkle-burst" style={{ animationDelay: "0s" }}>
@@ -251,7 +254,7 @@ export default function PushPermission() {
                             <div className="relative bg-muted rounded-2xl p-6 border-2 border-gold/30 text-center mb-6 mx-6">
                                 <p className="text-sm text-muted-foreground mb-2">Your gift is worth</p>
                                 <div className="flex items-center justify-center gap-2">
-                                    <span className="text-5xl font-extrabold text-gradient-gold">{currency(50000)}</span>
+                                    <span className="text-5xl font-extrabold text-gold">{currency(50000)}</span>
                                 </div>
                                 <p className="text-sm font-medium text-primary mt-2">Shopping Credits</p>
                             </div>
@@ -259,13 +262,13 @@ export default function PushPermission() {
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="border-t border-border">
                             <button
                                 onClick={handleDismiss}
-                                className="w-full py-4 text-center font-medium text-muted-foreground hover:bg-secondary/50 active:bg-secondary transition-colors border-b border-border"
+                                className="w-full py-4 text-center font-medium text-muted-foreground hover:bg-secondary/50 active:bg-secondary transition-colors border-b border-border cursor-pointer"
                             >
                                 Maybe later
                             </button>
                             <button
                                 onClick={handleOptIn}
-                                className="w-full py-4 text-center font-semibold text-primary hover:bg-primary/5 active:bg-primary/10 transition-colors"
+                                className="w-full py-4 text-center font-semibold text-primary hover:bg-primary/5 active:bg-primary/10 transition-colors cursor-pointer"
                             >
                                 Claim My Gift!
                             </button>

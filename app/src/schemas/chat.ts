@@ -34,7 +34,7 @@ export type ChatMessage = z.infer<typeof ChatMessageSchema>;
 export type Chat = z.infer<typeof ChatSchema>;
 export type PaginatedChats = z.infer<typeof PaginatedChatsSchema>;
 
-export interface OrderItem {
+export interface ChatOrderItem {
     product_id: number;
     name: string;
     image?: string;
@@ -52,14 +52,14 @@ export interface OrderFinancials {
     total: number;
 }
 
-export interface OrderPayload {
+export interface ChatOrder {
     order_number: string;
     status: string;
     payment_status: string;
     payment_method?: string;
     shipping_method?: string;
     financials: OrderFinancials;
-    items: OrderItem[];
+    items: ChatOrderItem[];
     created_at: string; // ISO string
 }
 
@@ -72,7 +72,7 @@ export interface OrderInfo {
     trackingUrl?: string;
 }
 
-export interface Product {
+export interface ChatProduct {
     id: number;
     variant_id: number;
     name: string;
@@ -87,8 +87,8 @@ export interface ChatResponse {
     sources: string[];
     escalated: boolean;
     complaint_sent: boolean;
-    products: Product[];
-    order?: any;
+    products: ChatProduct[];
+    order?: ChatOrder;
     quick_replies?: string[];
     form?: any;
     reaction?: "thumbs-up" | "thumbs-down" | null;

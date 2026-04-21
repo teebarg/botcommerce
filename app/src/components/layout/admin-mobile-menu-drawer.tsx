@@ -29,9 +29,8 @@ const MenuComp: React.FC = () => {
                                 <AvatarImage src={session?.user?.image!} />
                                 <AvatarFallback className="bg-secondary">{session?.user?.firstName?.[0] || ""}</AvatarFallback>
                             </Avatar>
-
                             <div>
-                                <div className="font-medium">
+                                <div>
                                     {session?.user?.firstName} {session?.user?.lastName}
                                 </div>
                                 <div className="text-xs text-gray-300 text-left">{session?.user?.email}</div>

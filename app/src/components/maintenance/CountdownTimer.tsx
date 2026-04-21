@@ -43,21 +43,21 @@ const CountdownTimer = ({ targetDate }: CountdownTimerProps) => {
 
     return (
         <div className="flex items-center justify-center lg:justify-start gap-3 md:gap-4">
-            <div className="flex flex-col items-center p-3 md:p-4 rounded-xl bg-card border border-border shadow-soft min-w-[70px] md:min-w-[80px]">
+            <div className="flex flex-col items-center p-3 md:p-4 rounded-xl bg-card border border-border shadow-glow min-w-[70px] md:min-w-[80px]">
                 <span className="text-2xl md:text-3xl font-heading font-bold text-foreground tabular-nums">{formatNumber(timeLeft.hours)}</span>
                 <span className="text-xs text-muted-foreground uppercase tracking-wide">Hours</span>
             </div>
 
             <span className="text-2xl font-bold text-muted-foreground animate-pulse-slow">:</span>
 
-            <div className="flex flex-col items-center p-3 md:p-4 rounded-xl bg-card border border-border shadow-soft min-w-[70px] md:min-w-[80px]">
+            <div className="flex flex-col items-center p-3 md:p-4 rounded-xl bg-card border border-border shadow-glow min-w-[70px] md:min-w-[80px]">
                 <span className="text-2xl md:text-3xl font-heading font-bold text-foreground tabular-nums">{formatNumber(timeLeft.minutes)}</span>
                 <span className="text-xs text-muted-foreground uppercase tracking-wide">Minutes</span>
             </div>
 
             <span className="text-2xl font-bold text-muted-foreground animate-pulse-slow">:</span>
 
-            <div className="flex flex-col items-center p-3 md:p-4 rounded-xl bg-card border border-border shadow-soft min-w-[70px] md:min-w-[80px]">
+            <div className="flex flex-col items-center p-3 md:p-4 rounded-xl bg-card border border-border shadow-glow min-w-[70px] md:min-w-[80px]">
                 <span className="text-2xl md:text-3xl font-heading font-bold text-contrast tabular-nums">{formatNumber(timeLeft.seconds)}</span>
                 <span className="text-xs text-muted-foreground uppercase tracking-wide">Seconds</span>
             </div>

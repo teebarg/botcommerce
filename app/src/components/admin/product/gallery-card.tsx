@@ -7,6 +7,7 @@ import { IsNew } from "@/components/products/product-badges";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import ImageLightbox from "@/components/ImageLightbox";
+import { GalleryCampaign } from "./gallery-campaign";
 
 interface GalleryCardProps {
     image: ProductImage;
@@ -83,7 +84,10 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
                             ))}
                         </div>
                     )}
-                    {image.product?.is_new && <IsNew className="right-1 top-auto left-auto" />}
+                    {image.product?.is_new && <IsNew className="right-0 bottom-0 top-auto left-auto" />}
+                    <div className="absolute bottom-0 left-0" onClick={(e) => e.stopPropagation()}>
+                        <GalleryCampaign image={image.image} />
+                    </div>
                 </div>
             </motion.div>
             <ImageLightbox image={lightboxOpen ? image.image : null} onClose={() => setLightboxOpen(false)} />

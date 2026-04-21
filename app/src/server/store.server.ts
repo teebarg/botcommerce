@@ -28,4 +28,8 @@ export const getCollectionFn = createServerFn({ method: "GET" })
         return res;
     });
 
+export const getShopSettingsPublicFn = createServerFn().handler(async () => {
+    const res = await api.get<any>("/shop-settings/public");
+    return res as Promise<any>
+});
 

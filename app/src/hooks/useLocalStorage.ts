@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
 export function useLocalStorageFlag(key: string) {
-    const [enabled, setEnabled] = useState(false);
-    const [hydrated, setHydrated] = useState(false);
+    const [enabled, setEnabled] = useState<boolean>(false);
+    const [hydrated, setHydrated] = useState<boolean>(false);
 
     useEffect(() => {
         const stored = localStorage.getItem(key);
@@ -15,5 +15,10 @@ export function useLocalStorageFlag(key: string) {
         setEnabled(true);
     };
 
-    return { enabled, enable, hydrated };
+    const disable = () => {
+        localStorage.removeItem(key);
+        setEnabled(false);
+    };
+
+    return { enabled, enable, disable, hydrated };
 }

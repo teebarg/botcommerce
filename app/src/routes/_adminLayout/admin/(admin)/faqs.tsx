@@ -31,7 +31,7 @@ function RouteComponent() {
     const state = useOverlayTriggerState({});
 
     return (
-        <div className="px-2.5 md:px-10 py-6">
+        <div className="px-2.5 md:px-10 py-4">
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-2xl font-bold">Manage FAQs</h1>
                 <SheetDrawer

@@ -20,7 +20,7 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
                         <div className="absolute inset-0 flex items-center justify-center">
                             <div className="relative">
                                 <ShoppingCart className="w-20 h-20 text-muted-foreground/40" strokeWidth={1.5} />
-                                <div className="absolute -top-1 -right-1 bg-error rounded-full p-1.5 animate-bounce-gentle">
+                                <div className="absolute -top-1 -right-1 bg-destructive rounded-full p-1.5 animate-bounce-gentle">
                                     <AlertCircle className="w-5 h-5 text-primary-foreground" />
                                 </div>
                             </div>
@@ -70,10 +70,10 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
                         </Button>
                     )}
                 </div>
-                <div className="bg-error-light border border-error-border rounded-lg overflow-hidden transition-all duration-300">
+                <div className="bg-warning/20 border border-warning rounded-lg overflow-hidden transition-all duration-300">
                     <button
                         onClick={() => setShowDetails(!showDetails)}
-                        className="w-full px-4 py-3 flex items-center justify-between text-sm font-medium text-error hover:bg-error/5 transition-colors"
+                        className="w-full px-4 py-3 flex items-center justify-between text-sm font-medium text-warning hover:bg-warning/5 transition-colors"
                     >
                         <span className="flex items-center gap-2">
                             <AlertCircle className="w-4 h-4" />
@@ -84,7 +84,7 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
 
                     <div className={`overflow-hidden transition-all duration-300 ${showDetails ? "max-h-40" : "max-h-0"}`}>
                         <div className="px-4 pb-4">
-                            <code className="block text-left text-sm bg-muted rounded-md p-3 text-error font-mono break-all border border-error-border/50">
+                            <code className="block text-left text-sm bg-muted rounded-md p-3 text-destructive font-mono break-all border border-warning/50">
                                 <ErrorComponent error={error} />
                             </code>
                         </div>

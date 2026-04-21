@@ -1,14 +1,13 @@
 import { ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
-import { Product } from "./types";
 import { gtag } from "@/utils/gtag";
 import { useMemo } from "react";
 import { useCart } from "@/providers/cart-provider";
-import { CartItem } from "@/schemas";
+import { CartItem, ChatProduct } from "@/schemas";
 import { useAddToCart, useChangeCartQuantity } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
 
-export const ProductCard = ({ product }: { product: Product }) => {
+export const ProductCard = ({ product }: { product: ChatProduct }) => {
     const { cart } = useCart();
     const { mutateAsync: addToCart, isPending: creating } = useAddToCart();
     const { mutateAsync: updateQuantity, isPending: updating } = useChangeCartQuantity();
@@ -28,7 +27,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
                     product_id: product.id,
                     product_name: product.name,
                     quantity: variantInCart.quantity + 1,
-                    price: product.price,
+                    price: Number(product.price),
                 });
             });
             return;
@@ -41,7 +40,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
                 product_id: product.id,
                 product_name: product.name,
                 quantity: 1,
-                price: product.price,
+                price: Number(product.price),
             });
         });
     };

@@ -33,7 +33,7 @@ function RouteComponent() {
     }
 
     return (
-        <div className="px-3 md:px-10 py-4">
+        <div className="px-3 md:px-10 py-2">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
                 <div>
                     <h1 className="text-2xl font-medium">Collections</h1>

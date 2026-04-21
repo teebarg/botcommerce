@@ -1,9 +1,8 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { ChatResponse } from "./types";
 import { useWebSocket } from "pulsews";
 import { useRouteContext } from "@tanstack/react-router";
 import { useChat, useChatMutation } from "@/hooks/useApi";
-import { ChatMessage } from "@/schemas";
+import { ChatMessage, ChatResponse } from "@/schemas";
 
 const generateId = () => Math.random();
 const STORAGE_KEY = "support-chat-history";
@@ -87,6 +86,11 @@ export const useSupportChat = () => {
     useEffect(() => {
         if (lastWsMessage.type != "chat") return;
 
+        if (lastWsMessage.message == "human-connected") {
+            setHumanConnected(true);
+            return;
+        }
+
         const agentMsg: ChatMessage = {
             id: Date.now() + 1,
             sender: "SYSTEM",
@@ -103,7 +107,7 @@ export const useSupportChat = () => {
 
     const clearHistory = useCallback(() => {
         localStorage.removeItem(STORAGE_KEY);
-        sessionStorage.removeItem("chat_session_id")
+        sessionStorage.removeItem("chat_session_id");
         setMessages(WELCOME_MESSAGES);
     }, []);
 

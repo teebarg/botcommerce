@@ -20,31 +20,31 @@ stop:
 
 .PHONY: logs
 logs:
-	$(DOCKER_COMPOSE) logs -f $(s)
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) logs -f $(s)
 
 .PHONY: bash
 bash:
-	$(DOCKER_COMPOSE) exec $(s) /bin/bash
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) /bin/bash
 
 .PHONY: install
 install:
-	$(DOCKER_COMPOSE) exec $(s) uv pip install $(package)
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) uv pip install $(package)
 
 .PHONY: clean
 clean:
-	$(DOCKER_COMPOSE) down -v --remove-orphans
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) down -v --remove-orphans
 
 .PHONY: lint-backend
 lint-backend:
-	$(DOCKER_COMPOSE) exec $(s) ./scripts/lint.sh
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) ./scripts/lint.sh
 
 .PHONY: test-backend
 test-backend:
-	$(DOCKER_COMPOSE) exec $(s) ./scripts/test.sh
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) ./scripts/test.sh
 
 .PHONY: prep
 prep:
-	$(DOCKER_COMPOSE) exec shop-api ./scripts/prestart.sh
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec shop-api ./scripts/prestart.sh
 
 # Frontend
 .PHONY: fe-dev

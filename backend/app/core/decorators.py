@@ -47,7 +47,7 @@ def limit(rate_string: str):
 
             redis = request.app.state.redis
             client_ip = request.client.host
-            key = f"rate_limit:{client_ip}:{func.__name__}"
+            key: str = f"rate_limit:{client_ip}:{func.__name__}"
 
             current_count = await redis.incr(key)
 

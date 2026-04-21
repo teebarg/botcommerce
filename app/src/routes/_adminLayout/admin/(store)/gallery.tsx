@@ -131,7 +131,7 @@ function RouteComponent() {
                 <div className="text-center">No images found</div>
             ) : (
                 <div>
-                    <div className="mb-4 sticky top-16 z-40 bg-background -mx-2 px-4 py-4 flex gap-2 justify-between">
+                    <div className="mb-4 sticky top-[calc(var(--sat)+4rem)] z-40 bg-background -mx-2 px-4 py-4 flex gap-2 justify-between">
                         <div className="rounded-full p-1 flex items-center gap-2 bg-secondary w-1/2">
                             <div className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "grid" && "bg-background")}>
                                 <Button

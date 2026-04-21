@@ -49,10 +49,8 @@ class Settings(BaseSettings):
             return f"http://{self.DOMAIN}"
         return f"https://{self.DOMAIN}"
 
-    FIRST_SUPERUSER_FIRSTNAME: str = "admin"
-    FIRST_SUPERUSER_LASTNAME: str = "admin"
-    FIRST_SUPERUSER: EmailStr = "admin@email.com"
-    FIRST_SUPERUSER_PASSWORD: str = "password"
+    ADMIN_EMAIL: str = "teebarg01@gmail.com"
+    VAPID_PRIVATE_KEY: str = ""
 
     REDIS_URL: str = "redis://localhost:6379/0"
     SENTRY_DSN: HttpUrl | None = None

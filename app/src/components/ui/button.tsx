@@ -21,7 +21,6 @@ const buttonVariants = cva(
                 emerald: "bg-emerald-700 text-white hover:bg-emerald-800",
                 accent: "bg-accent text-accent-foreground transform hover:scale-105 font-semibold",
                 contrast: "bg-contrast text-contrast-foreground",
-                reward: "bg-gradient-to-r from-[hsl(45,90%,50%)] via-[hsl(45,95%,70%)] to-[hsl(45,90%,50%)] text-foreground font-bold shadow-[0_0_60px_hsl(45,90%,50%,0.4)] hover:shadow-[0_0_80px_hsl(45,90%,50%,0.5)] hover:-translate-y-1 animate-pulse",
                 gradient: "gradient-primary text-primary-foreground"
             },
             size: {

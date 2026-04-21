@@ -46,10 +46,6 @@
 
     --color-gold: hsl(var(--gold));
 
-    --color-error: hsl(var(--error));
-    --color-error-light: hsl(var(--error-light));
-    --color-error-border: hsl(var(--error-border));
-
     --color-sidebar: hsl(var(--sidebar));
     --color-sidebar-foreground: hsl(var(--sidebar-foreground));
     --color-sidebar-primary: hsl(var(--sidebar-primary));
@@ -60,24 +56,16 @@
     --color-sidebar-ring: hsl(var(--sidebar-ring));
 
     --background-image-gradient-primary: var(--gradient-primary);
-    --background-image-gradient-sale: var(--gradient-sale);
-    --background-image-gradient-gold: var(--gradient-gold);
     --background-image-gradient-action: var(--gradient-action);
-    --background-image-gradient-card: var(--gradient-card);
-
-    --shadow-glow: 0 0 40px hsla(340, 82%, 52%, 0.3);
-    --shadow-card: 0 8px 32px hsla(0, 0%, 0%, 0.4);
 
     --aspect-product: 4 / 5;
     --aspect-gallery: 4 / 6;
 
     --container-8xl: 88rem;
-    --container-9xl: 96rem;
 
     --radius-1xl: 0.875rem;
 
     --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
-    --animate-pulse-scale: pulse-scale 2s ease-in-out infinite;
     --animate-bounce: bounce 1s infinite;
     --animate-shimmer: shimmer 2s infinite;
     --animate-float: float 6s ease-in-out infinite;
@@ -85,64 +73,9 @@
     --animate-slide-up: slide-up 0.8s ease-out;
     --animate-scale-in: scale-in 0.4s ease-out;
     --animate-sparkle-burst: sparkle-burst 1.5s ease-in-out 0s infinite normal none running;
-    --animate-gift-open: gift-open 2s ease-in-out 0s infinite normal none running;
     --animate-fade-in: slide-up 0.5s ease-out 0.2s both;
-    --animate-fade-right: fade-right 0.5s ease-out 0.2s both;
-    --animate-marquee: marquee 10s linear infinite;
-    --animate-orbit: orbit 3s ease-in-out infinite;
     --animate-wave: wave 1.5s ease-in-out infinite;
-    --animate-expandFade: expandFade 2s ease-in-out infinite;
-    --animate-rotateMorphReverse: rotateMorphReverse 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-    --animate-ambient-move: ambientMove 10s ease-in-out infinite;
     --animate-progress-bar: progress-bar 2s ease-out forwards;
-
-    @keyframes ambientMove {
-        0% {
-            background-position: 30% 30%;
-        }
-        50% {
-            background-position: 70% 60%;
-        }
-        100% {
-            background-position: 30% 30%;
-        }
-    }
-
-    @keyframes marquee {
-        0% {
-            transform: translateX(0);
-        }
-
-        100% {
-            transform: translateX(-50%);
-        }
-    }
-
-    @keyframes expandFade {
-        0% {
-            transform: scale(0.5);
-            opacity: 0.5;
-        }
-        50% {
-            opacity: 0.2;
-        }
-        100% {
-            transform: scale(2);
-            opacity: 0;
-        }
-    }
-
-    @keyframes fade-right {
-        0% {
-            opacity: 0;
-            transform: translateX(20px);
-        }
-
-        100% {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
 
     @keyframes float {
         0%,
@@ -164,29 +97,6 @@
         100% {
             opacity: 1;
             transform: translateY(0%);
-        }
-    }
-
-    @keyframes float {
-        0%,
-        100% {
-            transform: translateY(0px);
-        }
-
-        50% {
-            transform: translateY(-10px);
-        }
-    }
-
-    @keyframes pulse-scale {
-        0%,
-        100% {
-            transform: scale(0.8);
-            opacity: 0.8;
-        }
-        50% {
-            transform: scale(1);
-            opacity: 1;
         }
     }
 
@@ -223,55 +133,6 @@
         }
     }
 
-    @keyframes gift-open {
-        0% {
-            transform: scale(1) rotate(0deg);
-        }
-
-        15% {
-            transform: scale(1.1) rotate(-5deg);
-        }
-
-        30% {
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        45% {
-            transform: scale(1.15) rotate(-3deg);
-        }
-
-        60% {
-            transform: scale(1.2) rotate(0deg);
-        }
-
-        75% {
-            transform: scale(1.15) rotate(3deg);
-        }
-
-        85% {
-            transform: scale(1.1) rotate(-2deg);
-        }
-
-        100% {
-            transform: scale(1) rotate(0deg);
-        }
-    }
-
-    @keyframes rotateMorphReverse {
-        0% {
-            transform: rotate(0deg) scale(1);
-        }
-        33% {
-            transform: rotate(-120deg) scale(0.9);
-        }
-        66% {
-            transform: rotate(-240deg) scale(1.1);
-        }
-        100% {
-            transform: rotate(-360deg) scale(1);
-        }
-    }
-
     @keyframes sparkle-burst {
         0% {
             opacity: 0;
@@ -288,23 +149,7 @@
             transform: scale(0);
         }
     }
-    @keyframes orbit {
-        0% {
-            transform: translate(0, -20px);
-        }
-        25% {
-            transform: translate(20px, 0);
-        }
-        50% {
-            transform: translate(0, 20px);
-        }
-        75% {
-            transform: translate(-20px, 0);
-        }
-        100% {
-            transform: translate(0, -20px);
-        }
-    }
+
     @keyframes wave {
         0%,
         100% {
@@ -352,28 +197,16 @@
     --input: 0 0% 90%;
     --ring: 219 100% 53%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(219 100% 53%), hsl(219 100% 48%));
-
     --gold: 45 90% 50%;
-    --error: 15 90% 60%;
-    --error-light: 15 100% 97%;
-    --error-border: 15 80% 85%;
 
     --discount-sale-glow: 0 100% 70%;
 
-    --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.1);
     --shadow-discount: 0 4px 20px -2px;
     --shadow-intense: 0 8px 32px -4px;
-    --shadow-soft: 0 4px 24px -4px hsl(222 47% 11% / 0.08);
-    --shadow-glow: 0 0 40px hsl(35 92% 55% / 0.2);
+    --shadow-glow: 0 0 40px hsl(340, 82%, 52%, 0.3);
 
-    --gradient-sale: linear-gradient(135deg, hsl(0 85% 60%) 0%, hsl(14 100% 57%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(152 50% 45%) 100%);
-    --gradient-gold: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(45 95% 70%) 50%, hsl(var(--gold)) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(219 100% 53%), hsl(219 100% 48%));
     --gradient-action: linear-gradient(135deg, hsl(340, 82%, 52%) 0%, hsl(15, 90%, 60%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0, 0%, 10%) 0%, hsl(0, 0%, 6%) 100%);
-    --shadow-glow: 0 0 40px hsla(340, 82%, 52%, 0.3);
-    --shadow-card: 0 8px 32px hsla(0, 0%, 0%, 0.4);
 
     --warning: #f59e0b;
     --warning-foreground: #ffffff;
@@ -422,14 +255,9 @@
     --input: 0 0% 22%;
     --ring: 219 100% 53%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(219 100% 53%), hsl(219 100% 48%));
 
-    --error: 15 85% 55%;
-    --error-light: 15 40% 15%;
-    --error-border: 15 50% 30%;
-
-    --shadow-soft: 0 4px 24px -4px hsl(0 0% 0% / 0.3);
     --shadow-glow: 0 0 40px hsl(35 92% 55% / 0.15);
+    --gradient-primary: linear-gradient(135deg, hsl(219 100% 53%), hsl(219 100% 48%));
 
     --contrast: 43 74% 66%;
     --contrast-foreground: 20 14.3% 4.1%;
@@ -450,11 +278,7 @@
     }
 
     body {
-        @apply bg-background text-foreground font-sans antialiased;
-        padding-top: env(safe-area-inset-top);
-        padding-left: env(safe-area-inset-left);
-        padding-right: env(safe-area-inset-right);
-        padding-bottom: env(safe-area-inset-bottom);
+        @apply bg-background text-foreground font-sans antialiased pt-[var(--sat)] pb-[var(--sab)];
     }
 
     /* Hide scrollbar for immersive experience */
@@ -495,54 +319,17 @@
         box-shadow: var(--shadow-glow);
     }
 
-    .shadow-card {
-        box-shadow: var(--shadow-card);
-    }
-
-    .text-gradient {
-        background: var(--gradient-primary);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-
     .action-button {
         @apply w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300;
         @apply bg-white/20 backdrop-blur-lg hover:bg-white/20 active:scale-90;
-    }
-
-    .text-gradient-gold {
-        background: var(--gradient-gold);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-
-    .chatbot-message li a {
-        @apply text-blue-500 hover:text-blue-600;
     }
 
     .carousel-nav-link {
         @apply rounded-full bg-card-foreground hover:bg-foreground text-card shadow-md backdrop-blur disabled:opacity-40 disabled:pointer-events-none;
     }
 
-    .fade-to-black {
-        mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0) 100%);
-        -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0) 100%);
-    }
-
-    .bg-blur {
-        @apply bg-background/80 backdrop-blur-2xl;
-    }
-
     .sheet-footer {
         @apply bg-background/80 backdrop-blur-2xl flex gap-2 justify-end p-4 border-t border-border;
-    }
-
-    /* Hardware acceleration for smoother scrolling */
-    .snap-y {
-        scroll-behavior: smooth;
-        -webkit-overflow-scrolling: touch;
     }
 
     /* Optimization for list items */
@@ -556,36 +343,20 @@
         backface-visibility: hidden;
     }
 
-    .py-safe-mobile {
-        padding-top: calc(var(--sat) + 64px);
-        padding-bottom: calc(var(--sab) + 32px + 4px);
-    }
-    .py-admin-safe-mobile {
-        padding-top: "4px";
-        padding-bottom: calc(var(--sab) + 4px);
-    }
-    .h-safe-content {
+    .h-sc {
         height: calc(100svh - var(--sab) - var(--sat) - 64px);
     }
-    .h-safe-store-content {
-        height: calc(100svh - var(--sab) - var(--sat) - 64px - 34px);
+
+    .h-vhc {
+        height: calc(100svh - var(--sab) - var(--sat));
     }
-    .header-safe {
-        padding-top: var(--sat);
-        height: calc(var(--sat) + 64px);
-    }
+
     .drawer-safe {
         padding-bottom: var(--sab);
     }
     .sheet-safe {
         padding-top: var(--sat);
         padding-bottom: var(--sab);
-    }
-    .close-safe-top {
-        top: calc(var(--sat) + 16px);
-    }
-    .margin-safe {
-        margin-top: calc(var(--sat) + 64px);
     }
     iframe[data-test="uw-iframe"] {
         top: var(--sat) !important;

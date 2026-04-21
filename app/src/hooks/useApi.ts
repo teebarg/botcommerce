@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useRouteContext } from "@tanstack/react-router";
 import { clientApi } from "@/utils/api.client";
 import { BankDetails, Chat, DeliveryOption, Message } from "@/schemas";
 
@@ -45,7 +44,6 @@ export const useAdminMessageMutation = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["chats"] });
-            toast.success("Successfull!");
         },
         onError: (error) => {
             toast.error("Failed to chat" + error);
@@ -82,6 +80,24 @@ export const useDeleteChat = () => {
         },
         onError: (error) => {
             toast.error("Failed to delete chat" + error);
+        },
+    });
+};
+
+export const useSendPushNotification = () => {
+    return useMutation({
+        mutationFn: async ({ title, body, image, path }: { title: string; body: string; image?: string; path?: string }) =>
+            await clientApi.post<Message>("/notification/push", {
+                title,
+                body,
+                image,
+                path,
+            }),
+        onSuccess: () => {
+            toast.success("Push notification sent successfully");
+        },
+        onError: (error) => {
+            toast.error("Failed to send push notification" + error);
         },
     });
 };

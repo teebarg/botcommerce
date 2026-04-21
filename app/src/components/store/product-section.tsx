@@ -121,20 +121,18 @@ const ProductSection = ({ title, subtitle, products, href, showGradient = false 
             >
                 <ChevronRight className="h-5 w-5" strokeWidth={2} />
             </Button>
-            <div className="px-4 mb-4">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h2 className={`font-display text-xl font-semibold ${showGradient ? "text-gradient" : ""}`}>{title}</h2>
-                        {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
-                    </div>
-                    <Link to={href} className="flex items-center gap-1 text-sm text-primary font-medium">
-                        See All
-                        <ChevronRight className="w-4 h-4" />
-                    </Link>
+            <div className="flex items-center justify-between mb-2 px-2">
+                <div>
+                    <h2 className={`font-display text-xl font-semibold ${showGradient ? "text-primary" : ""}`}>{title}</h2>
+                    {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
                 </div>
+                <Link to={href} className="flex items-center gap-1 text-sm text-primary font-medium">
+                    See All
+                    <ChevronRight className="w-4 h-4" />
+                </Link>
             </div>
 
-            <ul ref={listRef} className="flex gap-4 overflow-x-auto hide-scrollbar px-2 md:px-0 pb-2">
+            <ul ref={listRef} className="flex gap-4 overflow-x-auto hide-scrollbar px-2 md:px-0">
                 {products.map((product) => (
                     <li key={product.id} data-card>
                         <ProductCard product={product} />

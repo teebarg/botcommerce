@@ -11,9 +11,9 @@ from app.core.config import settings
 from app.core.logging import logger
 from app.models.order import Order
 from app.models.user import User
+from app.models.coupon import Coupon
 from jinja2 import Environment, FileSystemLoader, Template
 from app.services.shop_settings import ShopSettingsService
-from app.models.coupon import Coupon
 
 
 @dataclass
@@ -64,20 +64,18 @@ def format_discount(coupon: Coupon) -> str:
 def slugify(text) -> str:
     """
     Convert a string into a URL-friendly slug.
-
     Args:
         text (str): The input string to convert
-
     Returns:
         str: The slugified string
     """
     if not text:
         return ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
     text = text.lower().replace(' ', '-')
-    slug = ''.join(char for char in text if char.isalnum() or char == '-')
+    slug: str = ''.join(char for char in text if char.isalnum() or char == '-')
     while '--' in slug:
         slug = slug.replace('--', '-')
-    slug = slug.strip('-')
+    slug: str = slug.strip('-')
 
     return slug
 
@@ -116,7 +114,7 @@ def render_email_template(*, template_name: str, context: dict[str, Any]) -> str
 
 
 def render_email_template2(*, template_name: str, context: dict[str, Any]) -> str:
-    template_str = (
+    template_str: str = (
         Path(__file__).parent.parent / "email-templates" / "build" / template_name
     ).read_text()
     html_content = Template(template_str).render(context)
@@ -283,14 +281,6 @@ async def send_email(
         raise Exception(f"Email sending failed: {str(e)}")
 
 
-def generate_test_email(email_to: str) -> EmailData:
-    html_content = render_email_template(
-        template_name="test.html",
-        context={"email": email_to, **merge_metadata({})},
-    )
-    return EmailData(html_content=html_content, subject="Test email")
-
-
 async def generate_invoice_email(order: Order, user: User) -> EmailData:
     service = ShopSettingsService()
     header_title = "Your order has been processed successfully"
@@ -432,8 +422,12 @@ def generate_sku(prefix: str = "PRD") -> str:
     return f"{prefix}-{date_part}-{random_part}"
 
 
-
 def generate_id(prefix="cart_", length=25):
+    """
+    Generate a unique ID.
+    Format: {prefix}-{RANDOM}
+    Example: cart_7G9X2
+    """
     chars = string.ascii_uppercase + string.digits
     unique_part = "".join(random.choice(chars) for _ in range(length))
     return prefix + unique_part

@@ -34,8 +34,8 @@ const OfflinePage = () => {
                                 <WifiOff className="w-20 h-20 text-muted-foreground/40 animate-pulse" strokeWidth={1.5} />
                                 <div className="absolute -top-2 -right-2">
                                     <div className="relative">
-                                        <div className="w-3 h-3 rounded-full bg-error animate-ping absolute" />
-                                        <div className="w-3 h-3 rounded-full bg-error" />
+                                        <div className="w-3 h-3 rounded-full bg-destructive animate-ping absolute" />
+                                        <div className="w-3 h-3 rounded-full bg-destructive" />
                                     </div>
                                 </div>
                             </div>
@@ -48,8 +48,8 @@ const OfflinePage = () => {
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-52 h-52 rounded-full border border-muted-foreground/5" />
                 </div>
 
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-error-light border border-error-border text-error text-sm font-medium mb-4">
-                    <span className="w-2 h-2 rounded-full bg-error animate-pulse" />
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-warning/20 border border-warning text-warning text-sm font-medium mb-4">
+                    <span className="w-2 h-2 rounded-full bg-warning animate-pulse" />
                     No Connection
                 </div>
 

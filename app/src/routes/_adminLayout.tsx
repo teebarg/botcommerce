@@ -3,7 +3,6 @@ import AdminNavbar from "@/components/admin/layouts/admin-navbar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/layout/admin-sidebar";
 import { SignIn } from "@clerk/tanstack-react-start";
-import { AdminPendingComponent } from "@/components/admin/layouts/admin-pending";
 
 export const Route = createFileRoute("/_adminLayout")({
     beforeLoad: ({ context }) => {
@@ -26,9 +25,8 @@ export const Route = createFileRoute("/_adminLayout")({
         throw error;
     },
     ssr: false,
-    pendingComponent: () => <AdminPendingComponent />,
-    pendingMs: 100,        // only show pending if takes longer than 100ms
-    pendingMinMs: 300,     // keep showing for at least 300ms to avoid flash
+    pendingMs: 100,
+    pendingMinMs: 300,
     component: RouteComponent,
 });
 
@@ -38,7 +36,7 @@ function RouteComponent() {
             <AdminSidebar />
             <main className="flex-1 flex flex-col">
                 <AdminNavbar />
-                <div className="flex-1 flex flex-col py-admin-safe-mobile md:py-3!">
+                <div className="flex-1 flex flex-col">
                     <Outlet />
                 </div>
             </main>

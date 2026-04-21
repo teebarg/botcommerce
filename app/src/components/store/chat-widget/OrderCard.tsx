@@ -1,7 +1,7 @@
-import { Package, Truck, CheckCircle2, RotateCcw, ExternalLink } from "lucide-react";
-import { OrderPayload } from "./types";
+import { Package, Truck, CheckCircle2, RotateCcw } from "lucide-react";
 import { motion } from "framer-motion";
 import { currency } from "@/utils";
+import { ChatOrder } from "@/schemas";
 
 const statusConfig = {
     PENDING: { icon: Package, label: "Pending", color: "text-orange-400", bg: "bg-orange-400/10", progress: 15 },
@@ -12,7 +12,7 @@ const statusConfig = {
     RETURNED: { icon: RotateCcw, label: "Returned", color: "text-red-400", bg: "bg-red-400/10", progress: 100 },
 };
 
-export const OrderCard = ({ order }: { order: OrderPayload | null }) => {
+export const OrderCard = ({ order }: { order: ChatOrder | null }) => {
     if (!order) return null;
 
     const config = statusConfig[order.status as keyof typeof statusConfig];

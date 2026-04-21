@@ -74,7 +74,7 @@ function RouteComponent() {
     }
 
     return (
-        <div className="px-2 pb-8">
+        <div className="px-2 pb-2">
             {order?.payment_status === "SUCCESS" && <SuccessConfirmation onContinueShopping={onContinueShopping} order={order} />}
             {order?.payment_status === "PENDING" && <PendingPayment onContinueShopping={onContinueShopping} order={order} />}
             {order?.payment_status === "FAILED" && <FailedPayment onContinueShopping={onContinueShopping} order={order} />}

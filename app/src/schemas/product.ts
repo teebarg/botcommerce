@@ -1,9 +1,15 @@
 import { z } from "zod";
 
 import { ProductStatusSchema } from "./enums";
-import { ReviewSchema } from "./review";
 import { AuditSchema } from "./base";
-import { CursorSchema, PagSchema } from "./common";
+import { CursorSchema } from "./common";
+
+const PagSchema = z.object({
+    skip: z.number(),
+    limit: z.number(),
+    total_count: z.number(),
+    total_pages: z.number(),
+});
 
 export const DBCatalogSchema = z.object({
     id: z.number(),

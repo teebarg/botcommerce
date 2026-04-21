@@ -83,7 +83,7 @@ async def handoff(payload: ChatHandoffRequest, user: CurrentUser) -> Message:
 
     await manager.send_to_user(
         user_id=customer,
-        data={"message": "Human agent will assist you shortly"},
+        data={"message": "human-connected"},
         message_type="chat",
     )
 

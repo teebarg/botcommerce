@@ -764,6 +764,7 @@ model PushSubscription {
   created_at DateTime? @default(now())
   updated_at DateTime? @updatedAt
 
+  @@index([userId])
   @@map("push_subscriptions")
 }
 

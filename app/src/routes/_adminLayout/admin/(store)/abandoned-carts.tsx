@@ -91,7 +91,7 @@ function RouteComponent() {
                     </div>
                 </div>
             </div>
-            <div className="container mx-auto px-6 py-8">
+            <div className="container mx-auto px-4 py-2">
                 {stats && <AbandonedCartStats stat={stats} />}
                 <div className="mt-4 space-y-4">
                     {items.length > 0 && (

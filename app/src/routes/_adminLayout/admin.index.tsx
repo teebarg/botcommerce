@@ -17,7 +17,7 @@ function RouteComponent() {
     const { data: statsTrends } = useQuery(statsTrendsQuery());
 
     return (
-        <div>
+        <div className="py-2.5 space-y-3">
             <StatComponent summary={statsTrends?.summary} />
             <RecentOrdersList orders={paginatedOrders?.items || []} />
         </div>
