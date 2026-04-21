@@ -17,7 +17,7 @@ const ProductTag = ({ product }: ProductTagProps) => {
             );
         }
         if (variant?.age) {
-            return <div>{variant?.age}</div>;
+            return <div className="py-1">{variant?.age}</div>;
         }
         if (variant?.size) {
             return (
@@ -31,15 +31,27 @@ const ProductTag = ({ product }: ProductTagProps) => {
 
     if (!content) return null;
 
+    if (variant?.width || variant?.length) {
+        return (
+            <div className="absolute -right-1 top-6 z-10 origin-top-right transition-transform duration-300 group-hover:rotate-3">
+                <div className="absolute -top-4 right-4 w-px h-4 bg-foreground" />
+                <div className="absolute -top-5 right-3 w-3 h-3 rounded-full border border-foreground bg-background" />
+                <div
+                    className="relative bg-background text-foreground border-border border-l-[3px] px-2 py-1 font-display text-xs uppercase"
+                    style={{ borderLeftColor: accentColor }}
+                >
+                    {content}
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="absolute -right-1 top-6 z-10 origin-top-right transition-transform duration-300 group-hover:rotate-3">
-            <div className="absolute -top-4 right-4 w-px h-4 bg-foreground" />
-            <div className="absolute -top-5 right-3 w-3 h-3 rounded-full border border-foreground bg-background" />
+        <div className="absolute right-0 top-0">
             <div
-                className="relative bg-background text-foreground border-border border-l-[3px] px-2 py-1 font-display text-xs uppercase"
+                className="relative bg-amber-500 text-white border-border border-l-[3px] px-2 font-semibold text-xs uppercase"
                 style={{ borderLeftColor: accentColor }}
             >
-                <div className="border-t border-dashed border-border w-full" />
                 {content}
             </div>
         </div>

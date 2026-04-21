@@ -116,7 +116,7 @@ const GalleryCampaign: React.FC<Props> = ({ image }) => {
                         title="Confirm Dispatch"
                         description="Are you sure you want to dispatch this campaign?"
                         isLoading={isSending}
-                        variant="destructive"
+                        variant="default"
                     />
                 </div>
 

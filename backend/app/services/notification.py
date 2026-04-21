@@ -189,6 +189,6 @@ def send_notifications_to_subscribers(subscriptions, notification):
 
     if failed_subscriptions:
         logger.error(f"Failed to send notifications to: {json.dumps(failed_subscriptions)}")
-    logger.info(f"Sent notifications to: {json.dumps(sent_subscriptions)}")
+    logger.debug(f"Sent notifications to: {json.dumps(sent_subscriptions)}")
 
     return {"sentSubscriptions": sent_subscriptions, "failedSubscriptions": failed_subscriptions}

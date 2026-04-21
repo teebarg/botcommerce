@@ -26,7 +26,7 @@ export default function Trending({ products }: { products: ProductSearch[] }) {
                                 <img
                                     src={product.image || "/placeholder.jpg"}
                                     alt={product.name}
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    className="w-full h-full max-h-80 object-cover transition-transform duration-500 group-hover:scale-110"
                                 />
                             </Link>
                         ))}
