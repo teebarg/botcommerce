@@ -25,6 +25,7 @@ dependencies = [
     "sentry-sdk[fastapi]<3.0.0,>=1.40.6",
     "cloudinary==1.44.1",
     "python-jose[cryptography]==3.3.0",
+    "pywebpush==2.3.0",
 ]
 
 [dependency-groups]
