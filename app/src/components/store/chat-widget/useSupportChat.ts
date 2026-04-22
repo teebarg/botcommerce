@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useMemo } from "react";
 import { useWebSocket } from "pulsews";
 import { useRouteContext } from "@tanstack/react-router";
 import { useChat, useChatMutation } from "@/hooks/useApi";
-import { ChatMessage, ChatResponse } from "@/schemas";
+import { ChatMessage, ChatResponse, MessageSender } from "@/schemas";
 
 const generateId = () => Math.random();
 const STORAGE_KEY = "support-chat-history";
@@ -93,7 +93,7 @@ export const useSupportChat = () => {
 
         const agentMsg: ChatMessage = {
             id: Date.now() + 1,
-            sender: "SYSTEM",
+            sender: MessageSender.SYSTEM,
             content: lastWsMessage.message || "",
             timestamp: now(),
         };

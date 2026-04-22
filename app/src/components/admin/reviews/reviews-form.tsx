@@ -76,10 +76,10 @@ const UpdateReviewForm: React.FC<Props> = ({ onClose, review }) => {
                     />
                 </div>
                 <div className="sheet-footer">
-                    <Button aria-label="cancel" className="min-w-32" type="button" variant="destructive" onClick={onClose}>
+                    <Button aria-label="cancel" variant="destructive" onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button aria-label="update" className="min-w-32" isLoading={isPending} type="submit">
+                    <Button aria-label="update" isLoading={isPending} type="submit">
                         Update
                     </Button>
                 </div>

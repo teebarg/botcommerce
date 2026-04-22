@@ -63,15 +63,6 @@ export interface ChatOrder {
     created_at: string; // ISO string
 }
 
-export interface OrderInfo {
-    orderId: string;
-    status: "processing" | "shipped" | "delivered" | "returned";
-    items: string[];
-    total: number;
-    estimatedDelivery?: string;
-    trackingUrl?: string;
-}
-
 export interface ChatProduct {
     id: number;
     variant_id: number;

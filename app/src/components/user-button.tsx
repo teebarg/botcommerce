@@ -48,6 +48,7 @@ export function UserDropdown() {
                 <Button
                     variant="ghost"
                     className="relative h-8 w-8 rounded-full ring-offset-background transition-all hover:ring-2 hover:ring-ring hover:ring-offset-2"
+                    size="icon"
                 >
                     <UserAvatar />
                 </Button>

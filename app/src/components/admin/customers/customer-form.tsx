@@ -55,7 +55,7 @@ export default function CustomerForm({ user, onClose }: ReviewFormProps) {
     return (
         <Form {...form}>
             <form className="space-y-6 h-full flex-1 flex flex-col overflow-hidden" onSubmit={form.handleSubmit(onSubmit)}>
-                <div className="flex-1 overflow-auto space-y-4 px-4 py-4">
+                <div className="flex-1 overflow-auto space-y-4 px-2.5 py-4">
                     <FormField
                         control={form.control}
                         name="first_name"
@@ -134,10 +134,10 @@ export default function CustomerForm({ user, onClose }: ReviewFormProps) {
                     </FormItem>
                 </div>
                 <div className="flex gap-2 justify-end p-4 border-t border-border">
-                    <Button className="min-w-32" type="button" variant="destructive" onClick={() => onClose?.()}>
+                    <Button variant="destructive" onClick={() => onClose?.()}>
                         Close
                     </Button>
-                    <Button className="min-w-32" disabled={loading} isLoading={loading} type="submit">
+                    <Button disabled={loading} isLoading={loading} type="submit">
                         {user?.id ? "Update" : "Create"}
                     </Button>
                 </div>

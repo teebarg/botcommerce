@@ -97,10 +97,10 @@ const CategoryForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, cu
                     />
                 </div>
                 <div className="sheet-footer">
-                    <Button aria-label="cancel" className="min-w-32" disabled={isPending} type="button" variant="destructive" onClick={onClose}>
+                    <Button aria-label="cancel" disabled={isPending} type="button" variant="destructive" onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button aria-label="submit" className="min-w-32" isLoading={isPending} type="submit">
+                    <Button aria-label="submit" isLoading={isPending} type="submit">
                         {isCreate ? "Submit" : "Update"}
                     </Button>
                 </div>

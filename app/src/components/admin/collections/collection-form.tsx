@@ -72,7 +72,7 @@ const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
     return (
         <Form {...form}>
             <form className="flex-1 flex flex-col overflow-hidden" onSubmit={handleSubmit(onSubmit)}>
-                <div className="space-y-6 flex-1 overflow-y-auto px-2 pb-4">
+                <div className="space-y-6 flex-1 overflow-y-auto px-2.5 pb-4">
                     <div>
                         <Input label="Name" placeholder="Ex. Gown" {...register("name")} required disabled={isPending} error={errors.name?.message} />
                         {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>}
@@ -93,10 +93,10 @@ const CollectionForm = forwardRef<ChildRef, Props>(({ type = "create", onClose, 
                     />
                 </div>
                 <div className="sheet-footer">
-                    <Button aria-label="cancel" className="min-w-32" disabled={isPending} type="button" variant="destructive" onClick={onClose}>
+                    <Button aria-label="cancel" disabled={isPending} type="button" variant="destructive" onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button aria-label={isCreate ? "submit" : "update"} className="min-w-32" disabled={isPending} isLoading={isPending} type="submit">
+                    <Button aria-label={isCreate ? "submit" : "update"} disabled={isPending} isLoading={isPending} type="submit">
                         {isCreate ? "Submit" : "Update"}
                     </Button>
                 </div>
