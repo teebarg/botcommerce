@@ -48,8 +48,8 @@ const GalleryCampaign: React.FC<Props> = ({ image }) => {
             open={state.isOpen}
             title={
                 <header>
-                    <h1 className="text-xl">Curate Dispatch</h1>
-                    <p className="text-muted-foreground mt-1 max-w-md">Configure the messaging and targeting for your next campaign.</p>
+                    <h1>Curate Dispatch</h1>
+                    <p className="text-muted-foreground mt-1 max-w-md text-sm">Configure the messaging and targeting for your next campaign.</p>
                 </header>
             }
             trigger={
@@ -117,6 +117,7 @@ const GalleryCampaign: React.FC<Props> = ({ image }) => {
                         description="Are you sure you want to dispatch this campaign?"
                         isLoading={isSending}
                         variant="default"
+                        confirmText="Send"
                     />
                 </div>
 

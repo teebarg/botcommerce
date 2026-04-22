@@ -71,7 +71,7 @@ export function BulkImageSheetForm({ onClose, imageIds }: BulkImageSheetFormProp
         age: "",
         price: 0,
         old_price: 0,
-        inventory: 0,
+        inventory: 1,
     });
 
     const updateField = (field: keyof FormProduct, value: string | number | SelectOption[] | boolean) => {
