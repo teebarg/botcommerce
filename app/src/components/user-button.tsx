@@ -14,11 +14,12 @@ import { clientApi } from "@/utils/api.client";
 import { logoutFn } from "@/server/users.server";
 import { Message } from "@/schemas";
 import { useAuth } from "@clerk/tanstack-react-start";
-import { getInitials } from "@/utils";
 import { UserAvatar } from "./generic/user-avatar";
+import { useLocation } from "@tanstack/react-router";
 
 export function UserDropdown() {
     const { isAuthenticated, session } = useRouteContext({ strict: false });
+    const location = useLocation();
     const navigate = useNavigate();
     const { signOut } = useAuth();
 

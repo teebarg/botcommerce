@@ -1,19 +1,21 @@
 import { toast } from "sonner";
 import { Share2 } from "lucide-react";
 import { ShareUI } from "@/utils/reuseable";
+import { useLocation } from "@tanstack/react-router";
 
 interface ShareButtonProps {
     text?: string;
 }
 
 export default function ShareButton({ text = "Check out these products in our catalog" }: ShareButtonProps) {
+    const location = useLocation();
     const handleNativeShare = async () => {
         if (navigator.share) {
             try {
                 await navigator.share({
                     title: "Product Catalog",
                     text: "Check out these products in our catalog",
-                    url: window.location.href,
+                    url: location.href,
                 });
             } catch (error: any) {
                 if (error.name !== "AbortError") {
@@ -28,7 +30,7 @@ export default function ShareButton({ text = "Check out these products in our ca
     return (
         <ShareUI
             handleNativeShare={handleNativeShare}
-            targetUrl={window.location.href}
+            targetUrl={location.href}
             text={text}
             trigger={
                 <button className="z-30">

@@ -168,11 +168,11 @@ export const onlyUnique = (value: unknown, index: number, self: unknown[]) => se
 
 export const getInitials = (name: string) => {
     return name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2);
+        ?.split(" ")
+        ?.map((n: string) => n[0])
+        ?.join("")
+        ?.toUpperCase()
+        ?.slice(0, 2);
 };
 
 export const getAvatarColor = (name: string) => {

@@ -14,7 +14,6 @@ export function usePersistentState<T>(key: string, initialValue: T, options?: Op
 
     const [state, setState] = useState<T>(initialValue);
 
-    // 🔥 Hydrate from localStorage (client only)
     useEffect(() => {
         if (typeof window === "undefined") return;
 
@@ -30,7 +29,6 @@ export function usePersistentState<T>(key: string, initialValue: T, options?: Op
         }
     }, [key, deserialize]);
 
-    // 🔥 Persist changes (only after hydration)
     useEffect(() => {
         if (!isHydrated.current) return;
 

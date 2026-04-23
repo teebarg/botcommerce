@@ -3,7 +3,7 @@ import WishlistItem from "@/components/store/wishlist";
 import type { WishItem } from "@/schemas";
 import { ZeroState } from "@/components/zero";
 import { userWishlistQuery, useUserWishlist } from "@/hooks/useUser";
-import { SignIn } from "@clerk/tanstack-react-start";
+import { SignInRedirect } from "@/utils/reuseable";
 
 export const Route = createFileRoute("/_mainLayout/wishlist")({
     beforeLoad: ({ context }) => {
@@ -16,11 +16,7 @@ export const Route = createFileRoute("/_mainLayout/wishlist")({
     },
     errorComponent: ({ error }) => {
         if (error.message === "Not authenticated") {
-            return (
-                <div className="flex items-center justify-center p-12">
-                    <SignIn routing="hash" forceRedirectUrl={`/auth/callback?redirect=${window.location.pathname}`} />
-                </div>
-            );
+            return <SignInRedirect />;
         }
 
         throw error;

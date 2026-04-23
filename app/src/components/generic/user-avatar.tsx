@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/utils";
+import { cn, getInitials } from "@/utils";
 import { useRouteContext } from "@tanstack/react-router";
 
 export function UserAvatar({ className }: { className?: string }) {
@@ -8,12 +8,7 @@ export function UserAvatar({ className }: { className?: string }) {
     return (
         <Avatar className={cn("h-8 w-8 cursor-pointer", className)}>
             <AvatarImage alt={session?.user?.firstName} src={session?.user?.image ?? undefined} />
-            <AvatarFallback className="bg-green-600 text-white text-xs">
-                {session?.user?.firstName
-                    ?.split(" ")
-                    ?.map((n: string) => n[0])
-                    .join("") ?? "ME"}
-            </AvatarFallback>
+            <AvatarFallback className="bg-green-600 text-white text-xs">{getInitials(session?.user?.firstName ?? "")}</AvatarFallback>
         </Avatar>
     );
 }

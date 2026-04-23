@@ -10,9 +10,9 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { motion } from "framer-motion";
 import { BackButton } from "@/components/back";
 import { meQuery } from "@/queries/user.queries";
-import { SignIn } from "@clerk/tanstack-react-start";
 import { useEffect } from "react";
 import { gtag } from "@/utils/gtag";
+import { SignInRedirect } from "@/utils/reuseable";
 
 export const Route = createFileRoute("/checkout")({
     beforeLoad: ({ context }) => {
@@ -36,11 +36,7 @@ export const Route = createFileRoute("/checkout")({
     }),
     errorComponent: ({ error }) => {
         if (error.message === "Not authenticated") {
-            return (
-                <div className="flex items-center justify-center p-12">
-                    <SignIn routing="hash" forceRedirectUrl={`/auth/callback?redirect=${window.location.pathname}`} />
-                </div>
-            );
+            return <SignInRedirect />;
         }
 
         throw error;

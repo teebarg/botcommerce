@@ -13,6 +13,7 @@ export const ShopSettingsTypeSchema = z.enum(["FEATURE", "SHOP_DETAIL", "CUSTOM"
 export const ConversationStatusSchema = z.enum(["ACTIVE", "COMPLETED", "ABANDONED"]);
 export const MessageSenderSchema = z.enum(["USER", "BOT", "SYSTEM"]);
 export const SortBySchema = z.enum(["newest", "oldest", "highest", "lowest"]);
+export const InteractionTypeSchema = z.enum(["VIEW", "PURCHASE", "CART_ADD", "WISHLIST_ADD", "WISHLIST_REMOVE"]);
 
 export type OrderStatus = z.infer<typeof OrderStatusSchema>;
 export type DiscountType = z.infer<typeof DiscountTypeSchema>;

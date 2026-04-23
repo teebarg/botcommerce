@@ -34,6 +34,7 @@ const GalleryCampaign: React.FC<Props> = ({ image }) => {
         }
 
         sendPushNotification({
+            notificationId: crypto.randomUUID(),
             title,
             body,
             image,

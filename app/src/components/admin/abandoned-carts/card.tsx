@@ -99,17 +99,9 @@ export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
                             )}
                         </div>
 
-                        <div className="flex flex-wrap gap-4 text-sm">
-                            <div className="flex items-center gap-1.5 text-muted-foreground">
-                                <Clock className="h-4 w-4" />
-                                <span>Abandoned {formatDistanceToNow(new Date(cart.created_at), { addSuffix: true })}</span>
-                            </div>
-                            {/* {cart.lastEmailSent && (
-                                <div className="flex items-center gap-1.5 text-muted-foreground">
-                                    <TrendingUp className="h-4 w-4" />
-                                    <span>Last email {formatDistanceToNow(new Date(cart.lastEmailSent), { addSuffix: true })}</span>
-                                </div>
-                            )} */}
+                        <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
+                            <Clock className="h-4 w-4" />
+                            <span>Abandoned {formatDistanceToNow(new Date(cart.created_at), { addSuffix: true })}</span>
                         </div>
                     </div>
 

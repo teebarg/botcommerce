@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearch } from "@tanstack/react-router";
+import { useLocation, useSearch } from "@tanstack/react-router";
 import { SlidersHorizontal, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -45,6 +45,7 @@ export function GalleryFilters() {
     const search = useSearch({ strict: false }) as Record<string, unknown>;
     const [open, setOpen] = useState(false);
     const [draft, setDraft] = useState<Filters>(() => parseFilters(search));
+    const location = useLocation();
     const show = location.pathname.startsWith("/admin/gallery");
 
     useEffect(() => {

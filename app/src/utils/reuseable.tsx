@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { useRouterState } from "@tanstack/react-router";
+import { SignIn } from "@clerk/tanstack-react-start";
 
 export function renderText(text: string): React.ReactNode {
     return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) => {
@@ -114,7 +115,7 @@ interface ShareUIProps {
     text?: string;
 }
 
-export function ShareUI({ trigger, handleNativeShare, targetUrl = window.location.href, text = "Check out these products in our catalog" }: ShareUIProps) {
+export function ShareUI({ trigger, handleNativeShare, targetUrl = "", text = "Check out these products in our catalog" }: ShareUIProps) {
     const { location } = useRouterState();
     const filterRoutes = ["/collections", "/search", "/admin/catalog", "/products"];
 
@@ -241,5 +242,13 @@ export function ShareUI({ trigger, handleNativeShare, targetUrl = window.locatio
                 </div>
             </PopoverContent>
         </Popover>
+    );
+}
+
+export function SignInRedirect(): React.ReactNode {
+    return (
+        <div className="flex items-center justify-center p-12">
+            <SignIn routing="hash" forceRedirectUrl={`/auth/callback?redirect=${typeof window !== "undefined" ? window.location.pathname : ""}`} />
+        </div>
     );
 }

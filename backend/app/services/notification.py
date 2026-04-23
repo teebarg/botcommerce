@@ -172,6 +172,7 @@ def send_notifications_to_subscribers(subscriptions, notification):
             "path": notification.get("path", "/collections"),
             "data": notification.get("data"),
             "imageUrl": notification.get("image"),
+            "notificationId": notification.get("notificationId"),
             "subscriberId": subscriber.get("id"),
         })
 

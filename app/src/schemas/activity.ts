@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import { CursorSchema } from "./common";
 import { UserLiteSchema, UserSchema } from "./user";
 import { ProductSchema } from "./product";

@@ -7,9 +7,6 @@ export const Route = createFileRoute("/api/push-event")({
         handlers: {
             POST: async ({ request }) => {
                 const data = await request.json();
-                if (!data.subscriberId || !data.notificationId) {
-                    return Response.json({ message: "Missing required fields: subscriberId, notificationId" }, { status: 400 });
-                }
                 const result = await api.post<Message>("/notification/push-event", data);
                 return Response.json(result);
             },
