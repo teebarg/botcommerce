@@ -217,15 +217,18 @@ def request_refund(order_id: str, reason: str) -> str:
         f"A confirmation email will be sent to the customer shortly."
     )
 
+
 @tool
 def escalate_to_human(reason: str) -> str:
     """
     Escalate the conversation to a human agent.
-    Use when:
-    - The customer is angry or upset
-    - The issue is too complex to resolve with available tools
-    - The customer explicitly asks to speak to a human
-    - The issue involves fraud, legal matters, or account security
+    Use ONLY for high-risk cases:
+    - Fraud or suspected fraudulent activity
+    - Legal threats or lawsuits
+    - Chargebacks or billing disputes that cannot be resolved
+    - Account security issues
+    - Abusive or threatening behaviour
+    Do NOT use when the customer simply asks to speak to a human — that is handled separately.
     Input: a brief summary of why escalation is needed.
     """
     logger.warning(f"[ESCALATION] {reason}")
@@ -282,10 +285,7 @@ def shop_guide(topic: str) -> str:
     """
     key = topic.strip().lower()
 
-    for name, content in _GUIDE_CONTENT.items():
-        if key.startswith(name):
-            return content
-
+    # Handle fraud first so it always logs before anything else
     if key.startswith("fraud"):
         detail = key[5:].lstrip(": ").strip() or topic
         logger.warning(f"[FRAUD REPORT] {detail}")
@@ -294,10 +294,18 @@ def shop_guide(topic: str) -> str:
             "Our fraud team will review your case and contact you shortly."
         )
 
-    detail = topic.lstrip("other:").strip() or topic
+    for name, content in _GUIDE_CONTENT.items():
+        if key.startswith(name):
+            return content
+
+    # Log unmatched topics for visibility
+    logger.info(f"[shop_guide] Unmatched topic: '{topic}'")
+
+    detail = topic.removeprefix("other:").removeprefix("other").strip() or topic
     return (
-        f"I've noted your question about '{detail}' and passed it to our support team. "
-        "Someone will follow up with you shortly."
+        f"I don't have specific information about '{detail}', but I'm here to help. "
+        "Could you provide more details so I can assist you better, "
+        "or would you like me to connect you with our support team?"
     )
 
 def get_all_tools() -> list:

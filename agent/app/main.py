@@ -76,10 +76,10 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
     - Returns whether the conversation was escalated to a human
     """
     connection_key = payload.customer_id or request.client.host
-    await redis_client.set(f"chat_user:{payload.session_id}", str(connection_key), ex=86400)
+    await redis_client.set(f"chat_user:{payload.session_id}", str(connection_key))
 
     if payload.customer_id is None:
-        await redis_client.set(f"chat_session:{connection_key}", payload.session_id, ex=86400)
+        await redis_client.set(f"chat_session:{connection_key}", payload.session_id)
 
     await ensure_conversation_exists(conversation_uuid=payload.session_id, customer_id=payload.customer_id)
 

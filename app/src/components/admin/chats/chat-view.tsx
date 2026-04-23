@@ -1,5 +1,5 @@
 import type React from "react";
-import { ArrowLeft, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import type { Chat, ChatMessage, ConversationStatus } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
 import AdminChatMessage from "./chat-message";
@@ -68,14 +68,9 @@ const ChatViewer: React.FC<{ chat: Chat; onClose: () => void }> = ({ chat, onClo
     };
     return (
         <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="flex items-center justify-between bg-background border-b border-border py-4 px-1 md:px-4">
+            <div className="flex items-center justify-between bg-background border-b border-border py-4 px-2.5">
                 <div className="flex items-center gap-2">
-                    <button className="lg:hidden p-2 text-muted-foreground hover:bg-muted/20 rounded-lg" onClick={onClose}>
-                        <ArrowLeft size={20} />
-                    </button>
-
                     {chatAvatar(chat.user?.image, "w-10 h-10")}
-
                     <div>
                         <h2 className="font-medium flex items-center text-sm">{chat.user?.first_name ?? "Anonymous"}</h2>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -84,7 +79,7 @@ const ChatViewer: React.FC<{ chat: Chat; onClose: () => void }> = ({ chat, onClo
                         </div>
                     </div>
                 </div>
-                <div className="pr-8">
+                <div className="pr-12">
                     <StatusBadge status={chat.status} />
                 </div>
             </div>

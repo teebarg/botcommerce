@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     GOOGLE_API_KEY: str = Field(default="")
 
     GROQ_API_KEY: str = Field(default="", alias="GROQ_API_KEY")
-    GROQ_MODEL: str = Field(default="llama-3.3-70b-versatile", alias="GROQ_MODEL")
+    GROQ_MODEL: str = Field(default="openai/gpt-oss-120b", alias="GROQ_MODEL")
 
     QDRANT_URL: str = Field(alias="QDRANT_URL")
     QDRANT_API_KEY: str = Field(alias="QDRANT_API_KEY")
