@@ -3,7 +3,7 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
 from prisma.enums import PaymentMethod, ShippingMethod, OrderStatus, PaymentStatus
-from app.models.user import User
+from app.models.user import MiniUser
 from app.models.address import Address
 
 class OrderItemLite(BaseModel):
@@ -30,8 +30,8 @@ class Order(BaseModel):
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
     order_number: str
-    user_id: int
-    user: Optional[User]
+    # user_id: int
+    user: Optional[MiniUser]
     shipping_address: Optional[Address]
     total: float
     subtotal: float

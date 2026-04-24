@@ -2,7 +2,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Request, Depends
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
-from app.services.redis import cache_response, invalidate_pattern
+from app.services.redis import cache_response, refresh_data
 from app.services.shop_settings import ShopSettingsService
 from pydantic import BaseModel
 from datetime import datetime
@@ -55,7 +55,7 @@ async def sync_shop_details(form_data: dict[str, Any]):
             if not value:
                 continue
             await service.set(key, str(value), type_="SHOP_DETAIL")
-        await invalidate_pattern("shop-settings")
+        await refresh_data(patterns="shop-settings")
         return {"message": "Shop details synced successfully"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

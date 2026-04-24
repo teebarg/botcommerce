@@ -11,7 +11,7 @@ from app.models.coupon import (
 from app.services.coupon import CouponService
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
-from app.services.redis import cache_response, invalidate_pattern
+from app.services.redis import cache_response, refresh_data
 from prisma.errors import PrismaError
 from datetime import datetime, date
 from app.services.cart import get_cart
@@ -74,7 +74,7 @@ async def create_coupon(coupon_data: CouponCreate) -> Coupon:
         data["code"] = code
         coupon = await db.coupon.create(data=data)
 
-        await invalidate_pattern("coupons")
+        await refresh_data(patterns=["coupons"])
         return coupon
     except PrismaError as e:
         logger.error(f"Error creating coupon: {str(e)}")
@@ -106,7 +106,7 @@ async def update_coupon(id: int, coupon_data: CouponUpdate) -> Coupon:
             data=data
         )
 
-        await invalidate_pattern("coupons")
+        await refresh_data(patterns=["coupons"])
         return updated_coupon
     except HTTPException:
         raise
@@ -126,7 +126,7 @@ async def delete_coupon(id: int):
 
     try:
         await db.coupon.delete(where={"id": id})
-        await invalidate_pattern("coupons")
+        await refresh_data(patterns=["coupons"])
         return {"message": "Coupon deleted successfully"}
     except PrismaError as e:
         logger.error(f"Error deleting coupon: {str(e)}")
@@ -154,11 +154,7 @@ async def apply_coupon(
     )
 
     await service.apply_coupon_to_cart(coupon, cart)
-
-    from app.services.redis import invalidate_pattern
-    await invalidate_pattern("abandoned-carts")
-    await invalidate_pattern("coupons")
-
+    await refresh_data(patterns=["abandoned-carts", "coupons"])
     return Message(message="Coupon applied successfully")
 
 
@@ -181,9 +177,7 @@ async def remove_coupon(
 
     await service.remove_coupon_from_cart(cart)
 
-    from app.services.redis import invalidate_pattern
-    await invalidate_pattern("abandoned-carts")
-    await invalidate_pattern("coupons")
+    await refresh_data(patterns=["abandoned-carts", "coupons"])
 
     return {"message": "Coupon removed successfully"}
 
@@ -204,7 +198,7 @@ async def assign_coupon(id: int, user_ids: List[int]):
             update_data["scope"] = CouponScope.SPECIFIC_USERS
         await db.coupon.update(where={"id": id}, data=update_data)
 
-        await invalidate_pattern("coupons")
+        await refresh_data(patterns=["coupons"])
         return {"message": f"Coupon shared with {len(user_ids)} user(s) successfully"}
     except PrismaError as e:
         logger.error(f"Error sharing coupon: {str(e)}")
@@ -226,7 +220,7 @@ async def toggle_coupon_status(id: int) -> Coupon:
             data={"is_active": not coupon.is_active}
         )
 
-        await invalidate_pattern("coupons")
+        await refresh_data(patterns=["coupons"])
         return updated_coupon
     except PrismaError as e:
         logger.error(f"Error toggling coupon status: {str(e)}")

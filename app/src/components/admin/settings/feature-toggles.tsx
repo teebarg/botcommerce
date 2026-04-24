@@ -25,13 +25,8 @@ const defaultFeatures = [
     },
     {
         key: "feature_chatbot",
-        label: "Chatbot",
-        description: "Enable chatbot functionality for customers",
-    },
-    {
-        key: "feature_whatsapp",
-        label: "WhatsApp",
-        description: "Enable WhatsApp functionality for customers",
+        label: "AI Support Agent",
+        description: "Enable AI support agent for customers",
     },
 ];
 

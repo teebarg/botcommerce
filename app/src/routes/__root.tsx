@@ -231,9 +231,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                         <InvalidateProvider>{children}</InvalidateProvider>
                                         <ImpersonationBanner />
                                     </WebSocketProvider>
-                                    {/* {import.meta.env.MODE !== "production" && (
+                                    {import.meta.env.MODE !== "production" && (
                                         <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
-                                    )} */}
+                                    )}
                                 </div>
                                 {/* {import.meta.env.MODE !== "production" && <TanStackRouterDevtoolsPanel />} */}
                                 <Toaster

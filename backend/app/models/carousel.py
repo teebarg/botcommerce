@@ -1,6 +1,5 @@
-from typing import Optional, List
+from typing import Optional
 from pydantic import BaseModel
-from datetime import datetime
 
 class CarouselBannerBase(BaseModel):
     title: str
@@ -20,4 +19,3 @@ class CarouselBannerUpdate(CarouselBannerBase):
 class CarouselBanner(CarouselBannerBase):
     id: int
     image: Optional[str] = None
-    created_at: datetime

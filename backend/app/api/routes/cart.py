@@ -5,7 +5,7 @@ from app.models.cart import CartUpdate, CartItemCreate, CartItem, Cart, CartLite
 from fastapi import APIRouter, HTTPException, Request, BackgroundTasks, Depends, Cookie, Response
 from app.prisma_client import prisma as db
 from app.core.deps import UserDep, CurrentUser, Notification
-from app.services.redis import cache_response, invalidate_key, bust, invalidate_pattern
+from app.services.redis import cache_response, refresh_data
 from app.core.logging import get_logger
 from app.services.shop_settings import ShopSettingsService
 from prisma.enums import CartStatus
@@ -122,7 +122,7 @@ async def calculate_cart_totals(cart: Cart):
         data["payment_method"] = "WALLET"
 
     await db.cart.update(where={"id": cart.id}, data=data)
-    await invalidate_pattern("abandoned-carts")
+    await refresh_data(patterns=["abandoned-carts"])
 
 
 async def get_cart(cart_number: Optional[str], user_id: Optional[int]):
@@ -245,9 +245,7 @@ async def update_cart(response: Response,cart_update: CartUpdate, user: UserDep,
 
             update_data["shipping_address"] = {"connect": {"id": address.id}}
             update_data["billing_address"] = {"connect": {"id": address.id}}
-            await invalidate_key(f"addresses:{user.id}")
-            await invalidate_key(f"address:{address.id}")
-
+            await refresh_data(keys=[f"addresses:{user.id}", f"address:{address.id}"])
 
         if cart_update.status is not None:
             update_data["status"] = cart_update.status
@@ -276,11 +274,10 @@ async def update_cart(response: Response,cart_update: CartUpdate, user: UserDep,
             data=update_data,
         )
 
-        await bust(f"cart:{cart.cart_number}")
+        keys: list[str] = [f"cart:{cart.cart_number}"]
         if cart.user_id:
-            await bust(f"cart:{cart.user_id}")
-        await invalidate_pattern("abandoned-carts")
-
+            keys.append(f"cart:{cart.user_id}")
+        await refresh_data(patterns=["abandoned-carts"], keys=keys)
         return updated_cart
 
 
@@ -309,10 +306,10 @@ async def delete_cart_item(response: Response, item_id: int, user: UserDep, _car
             data={"subtotal": subtotal, "tax": tax, "total": total},
         )
 
-    await bust(f"cart:{cart.cart_number}")
+    keys: list[str] = [f"cart:{cart.cart_number}"]
     if cart.user_id:
-        await bust(f"cart:{cart.user_id}")
-    await invalidate_pattern("abandoned-carts")
+        keys.append(f"cart:{cart.user_id}")
+    await refresh_data(patterns=["abandoned-carts"], keys=keys)
     return {"message": "Item removed from cart successfully"}
 
 
@@ -694,7 +691,7 @@ async def apply_wallet(user: CurrentUser, _cart_id: Annotated[str | None, Cookie
         logger.error(e)
         raise HTTPException(status_code=500, detail="Failed to update cart")
 
-    await invalidate_pattern("user")
+    await refresh_data(patterns=["user"])
 
     return Message(message="Wallet applied")
 
@@ -738,6 +735,6 @@ async def remove_wallet(user: CurrentUser,  _cart_id: Annotated[str | None, Cook
         raise HTTPException(status_code=500, detail=f"Failed to remove wallet: {e}")
 
     await calculate_cart_totals(cart)
-    await invalidate_pattern("user")
+    await refresh_data(patterns=["user"])
 
     return Message(message="Wallet removed successfully")

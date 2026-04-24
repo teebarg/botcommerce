@@ -3,7 +3,6 @@ import { OrderStatusSchema, ShippingMethodSchema, PaymentMethodSchema, PaymentSt
 import { UserSchema } from "./user";
 import { AddressSchema } from "./address";
 import { ProductVariantLiteSchema } from "./product";
-import { AuditSchema } from "./base";
 import { CursorSchema } from "./common";
 
 export const OrderItemSchema = z
@@ -16,8 +15,7 @@ export const OrderItemSchema = z
         image: z.string().optional(),
         quantity: z.number(),
         price: z.number(),
-    })
-    .merge(AuditSchema);
+    });
 
 export const OrderSchema = z
     .object({
@@ -28,7 +26,7 @@ export const OrderSchema = z
         phone: z.string().optional(),
         cart_id: z.string(),
         cart_number: z.string(),
-        user_id: z.number(),
+        // user_id: z.number(),
         user: UserSchema,
         order_items: z.array(OrderItemSchema),
         subtotal: z.number(),
@@ -44,8 +42,8 @@ export const OrderSchema = z
         payment_status: PaymentStatusSchema,
         invoice_url: z.string().optional(),
         order_notes: z.string().optional(),
-    })
-    .merge(AuditSchema);
+        created_at: z.string(),
+    });
 
 export const PaginatedOrdersSchema = CursorSchema.extend({
     items: z.array(OrderSchema),

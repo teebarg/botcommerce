@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import { ProductStatusSchema } from "./enums";
-import { AuditSchema } from "./base";
 import { CursorSchema } from "./common";
 
 const PagSchema = z.object({
@@ -30,8 +29,7 @@ export const CategorySchema = z
         image: z.string().optional(),
         is_active: z.boolean(),
         display_order: z.number().default(0),
-    })
-    .merge(AuditSchema);
+    });
 
 export const CollectionSchema = z
     .object({
@@ -39,8 +37,8 @@ export const CollectionSchema = z
         name: z.string(),
         slug: z.string(),
         is_active: z.boolean(),
-    })
-    .merge(AuditSchema);
+        created_at: z.string().optional()
+    });
 
 export const ProductVariantLiteSchema = z.object({
     id: z.number(),
@@ -101,15 +99,14 @@ export const ProductSchema = z
         collections: z.array(CollectionSchema),
         active: z.boolean(),
         is_new: z.boolean(),
-    })
-    .merge(AuditSchema);
+    });
 
 export const ProductImageSchema = z.object({
     id: z.number(),
     image: z.string(),
     product: ProductSchema.optional(),
     product_id: z.number().optional(),
-    created_at: z.string().optional(),
+    // created_at: z.string().optional(),
 });
 
 export const SearchVariantSchema = z.object({
@@ -162,8 +159,8 @@ export const CatalogSchema = z
         products_count: z.number(),
         view_count: z.number(),
         is_active: z.boolean(),
-    })
-    .merge(AuditSchema);
+        created_at: z.string(),
+    });
 
 export const PaginatedCatalogSchema = PagSchema.extend({
     catalogs: z.array(CatalogSchema),
@@ -196,13 +193,9 @@ export const ProductFeedSchema = z.object({
 
 export const WishItemSchema = z.object({
     id: z.number(),
-    name: z.string(),
-    description: z.string().optional(),
-    user_id: z.number().optional(),
-    product_id: z.number().optional(),
-    product: ProductSchema,
-    image: z.string(),
-    created_at: z.string().optional(),
+    // user_id: z.number(),
+    product_id: z.number(),
+    product: ProductLiteSchema,
 });
 
 export const WishlistSchema = z.object({
@@ -234,7 +227,6 @@ export const CategoriesProductsSchema = z.object({
     name: z.string(),
     slug: z.string(),
     products: z.array(ProductSearchSchema),
-    created_at: z.string(),
 });
 
 export type CategoriesWithProducts = z.infer<typeof CategoriesProductsSchema>;

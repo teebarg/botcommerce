@@ -17,8 +17,6 @@ export const ShopSettingsSchema = z.object({
     key: z.string(),
     value: z.string().nullable(),
     type: ShopSettingsTypeSchema,
-    created_at: z.string(),
-    updated_at: z.string(),
 });
 
 export const BankDetailsSchema = z.object({
@@ -27,8 +25,6 @@ export const BankDetailsSchema = z.object({
     account_name: z.string(),
     account_number: z.string(),
     is_active: z.boolean(),
-    created_at: z.string(),
-    updated_at: z.string(),
 });
 
 export const FAQSchema = z.object({
@@ -37,8 +33,6 @@ export const FAQSchema = z.object({
     answer: z.string(),
     category: z.string().optional(),
     is_active: z.boolean(),
-    created_at: z.string(),
-    updated_at: z.string(),
 });
 
 export const DeliveryOptionSchema = z.object({

@@ -1,5 +1,4 @@
 from typing import Optional
-from datetime import datetime
 from pydantic import BaseModel, Field
 
 class FAQBase(BaseModel):
@@ -10,7 +9,6 @@ class FAQ(FAQBase):
     question: str
     answer: str
     is_active: bool
-    created_at: datetime
 
 class FAQCreate(FAQBase):
     question: str = Field(..., min_length=1, max_length=50)

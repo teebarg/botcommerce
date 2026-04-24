@@ -5,7 +5,7 @@ from app.prisma_client import prisma as db
 from app.models.order import Order, OrderCreate, OrderTimelineEntry, PaginatedOrders, OrderNotesUpdate, ReturnItemPayload
 from prisma.enums import OrderStatus
 from app.services.order import create_order_from_cart, retrieve_order, list_orders, return_order_item
-from app.services.redis import cache_response, invalidate_key, invalidate_pattern
+from app.services.redis import cache_response, refresh_data
 from app.core.logging import get_logger
 from app.models.generic import Message
 from app.core.permissions import require_admin
@@ -24,7 +24,7 @@ async def create_order(
 ) -> Order:
     try:
         order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=_cart_id)
-        await invalidate_pattern("orders")
+        await refresh_data(patterns="orders")
         response.delete_cookie(
             key="_cart_id",
             path="/",
@@ -86,8 +86,7 @@ async def delete_order(order_id: int):
         raise HTTPException(status_code=404, detail="order not found")
 
     await db.order.delete(where={"id": order_id})
-    await invalidate_pattern("orders")
-    await invalidate_key(f"order:{order_id}")
+    await refresh_data(patterns=["orders", f"order:{order.order_number}"])
     return {"message": "order deleted successfully"}
 
 
@@ -115,9 +114,11 @@ async def order_status(id: int, status: OrderStatus) -> Order:
         except Exception as e:
             logger.error(f"Failed to create order timeline: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-        await invalidate_pattern("orders")
-        await invalidate_key(f"order:{id}")
-        await invalidate_key(f"order-timeline:{id}")
+
+        await refresh_data(
+            patterns=["orders", f"order:{order.order_number}"],
+            keys=[f"order-timeline:{id}"],
+        )
         return updated_order
 
 @router.patch("/{order_id}/notes")
@@ -129,8 +130,7 @@ async def update_order_notes(order_id: int, notes_update: OrderNotesUpdate, user
         where={"id": order_id},
         data={"order_notes": notes_update.notes}
     )
-    await invalidate_pattern("orders")
-    await invalidate_key(f"order:{order.order_number}")
+    await refresh_data(patterns=["orders", f"order:{order.order_number}"])
     return updated_order
 
 

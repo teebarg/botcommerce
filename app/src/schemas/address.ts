@@ -14,7 +14,6 @@ export const AddressSchema = z.object({
     phone: z.string(),
     is_billing: z.boolean().optional(),
     created_at: z.string().optional(),
-    updated_at: z.string().optional(),
 });
 
 export type Address = z.infer<typeof AddressSchema>;

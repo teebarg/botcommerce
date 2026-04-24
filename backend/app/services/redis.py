@@ -1,8 +1,9 @@
+from typing import List, Any, Callable, Union
 from datetime import datetime, timedelta
 from functools import wraps
-from typing import Any, Callable, Union
 
 import json
+import asyncio
 import inspect
 from fastapi import Request
 from app.redis_client import redis_client
@@ -115,39 +116,6 @@ async def invalidate_keys(pattern: str) -> None:
 
 
 @handle_redis_errors(default=None)
-async def invalidate_pattern(pattern: str) -> None:
-    """
-    Delete all Redis keys matching pattern and notify websocket clients.
-    """
-    try:
-        keys = await redis_client.keys(f"{pattern}*")
-        if keys:
-            await redis_client.delete(*keys)
-
-        await manager.broadcast_to_all(
-            data={"key": pattern},
-            message_type="invalidate",
-        )
-    except Exception as e:
-        logger.error(f"Error invalidating pattern {pattern}: {e}")
-
-
-@handle_redis_errors(default=None)
-async def invalidate_key(key: str) -> None:
-    """
-    Delete a specific Redis key and notify websocket clients.
-    """
-    try:
-        await redis_client.delete(key)
-        await manager.broadcast_to_all(
-            data={"key": key},
-            message_type="invalidate",
-        )
-    except Exception as e:
-        logger.error(f"Error invalidating key {key}: {e}")
-
-
-@handle_redis_errors(default=None)
 async def invalidate_key_only(key: str) -> None:
     """
     Delete a specific Redis key and notify websocket clients.
@@ -167,3 +135,40 @@ async def get_session(session_id: str):
 
 async def delete_session(session_id: str):
     await redis_client.delete(f"session:{session_id}")
+
+
+async def refresh_data(*, keys=None, patterns=None) -> None:
+    """
+    Invalidate redis keys/patterns and broadcast affected frontend keys.
+
+    Example:
+        await refresh_data(
+            keys=[f"order:{id}", f"order-timeline:{id}"],
+            patterns="orders",
+        )
+    """
+    def normalize(value):
+        if value is None:
+            return []
+        if isinstance(value, str):
+            return [value]
+        return list(value)
+
+    key_list = normalize(keys)
+    pattern_list = normalize(patterns)
+
+    tasks = []
+
+    for key in key_list:
+        tasks.append(invalidate_key_only(key=key))
+
+    for pattern in pattern_list:
+        tasks.append(invalidate_keys(pattern=pattern))
+
+    if tasks:
+        await asyncio.gather(*tasks)
+
+    await manager.broadcast_to_all(
+        data={"keys": pattern_list + key_list},
+        message_type="invalidate",
+    )

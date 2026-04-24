@@ -12,8 +12,7 @@ import {
 } from "./enums";
 import { ProductVariantLiteSchema } from "./product";
 import { type Address, AddressSchema } from "./address";
-import { AuditSchema } from "./base";
-import { UserSchema } from "./user";
+import { UserMiniSchema, UserSchema } from "./user";
 import { CursorSchema } from "./common";
 
 export const CartItemSchema = z
@@ -26,15 +25,14 @@ export const CartItemSchema = z
         image: z.string().optional(),
         quantity: z.number(),
         price: z.number(),
-    })
-    .merge(AuditSchema);
+    });
 
 export const CartSchema = z
     .object({
         id: z.number(),
         cart_number: z.string(),
         user_id: z.number().optional(),
-        user: UserSchema.optional(),
+        user: UserMiniSchema.optional(),
         email: z.string().email().optional(),
         phone: z
             .string()
@@ -55,8 +53,8 @@ export const CartSchema = z
         shipping_address: AddressSchema.optional(),
         shipping_method: ShippingMethodSchema.optional(),
         payment_method: PaymentMethodSchema.optional(),
-    })
-    .merge(AuditSchema);
+        created_at: z.string(),
+    });
 
 export const PaginatedAbandonedCartsSchema = CursorSchema.extend({
     items: z.array(CartSchema),

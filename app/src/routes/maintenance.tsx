@@ -4,8 +4,7 @@ import MaintenanceProgress from "@/components/maintenance/MaintenanceProgress";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useConfig } from "@/providers/store-provider";
 import { createFileRoute } from "@tanstack/react-router";
-import { Instagram, Twitter, Facebook } from "lucide-react";
-import { ShoppingBag } from "lucide-react";
+import { Instagram, Twitter, Facebook, ShoppingBag } from "lucide-react";
 import { useMemo } from "react";
 import { redirect } from "@tanstack/react-router";
 

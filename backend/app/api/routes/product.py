@@ -30,11 +30,10 @@ from app.prisma_client import prisma as db
 from app.core.storage import upload
 from app.core.config import settings
 from app.services.product import index_product, index_products
-from app.services.redis import cache_response, invalidate_pattern
+from app.services.redis import cache_response, refresh_data
 from meilisearch.errors import MeilisearchApiError
 from app.core.storage import upload
 from app.services.generic import remove_image_from_storage
-from app.services.redis import invalidate_pattern
 from app.redis_client import redis_client
 from collections import Counter
 from prisma.enums import PaymentStatus
@@ -646,7 +645,7 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
             where={"id": variant_id},
             data=update_data,
         )
-        await invalidate_pattern("gallery")
+        await refresh_data(patterns="gallery")
         background_tasks.add_task(
             index_product, product_id=existing_variant.product_id)
     except Exception as e:
@@ -675,7 +674,7 @@ async def upload_images(id: int, image_data: ImageUpload, background_tasks: Back
             }
         )
 
-        await invalidate_pattern("gallery")
+        await refresh_data(patterns="gallery")
         background_tasks.add_task(index_product, product_id=id)
 
         return image
@@ -712,7 +711,7 @@ async def delete_product_image(id: int, image_id: int, background_tasks: Backgro
                 data={"order": index}
             )
 
-        await invalidate_pattern("gallery")
+        await refresh_data(patterns="gallery")
         background_tasks.add_task(index_product, product_id=id)
 
         return {"success": True}

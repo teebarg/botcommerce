@@ -3,7 +3,7 @@ from typing import List
 from app.prisma_client import prisma as db
 from app.services.catalog import CatalogService
 from math import ceil
-from app.services.redis import cache_response, invalidate_list, invalidate_pattern
+from app.services.redis import cache_response, invalidate_list, refresh_data
 from app.services.product import index_product, index_products
 from app.core.deps import UserDep
 from app.models.generic import Message
@@ -272,7 +272,8 @@ async def add_product_to_catalog(id: int, product_id: int, background_tasks: Bac
     )
 
     background_tasks.add_task(index_product, product_id=product_id)
-    await invalidate_pattern("gallery")
+    await refresh_data(patterns=["gallery"])
+    
 
     return {"message": "product added to catalog successfully"}
 
@@ -293,8 +294,7 @@ async def remove_product_from_catalog(id: int, product_id: int, background_tasks
     )
 
     background_tasks.add_task(index_product, product_id=product_id)
-    await invalidate_pattern("gallery")
-
+    await refresh_data(patterns=["gallery"])
     return {"message": "product removed from catalog successfully"}
 
 
@@ -313,7 +313,7 @@ async def bulk_add_products_to_catalog(id: int, data: CatalogBulkAdd, background
         data={"products": {"connect": [{"id": pid} for pid in data.product_ids]}}
     )
 
-    await invalidate_pattern(f"gallery")
+    await refresh_data(patterns=["gallery"])
     await manager.broadcast_to_all(
         data={"status": "completed"},
         message_type="bulk_action",
@@ -339,7 +339,7 @@ async def bulk_remove_products_from_catalog(id: int, data: CatalogBulkAdd, backg
         data={"products": {"disconnect": [{"id": pid} for pid in data.product_ids]}}
     )
 
-    await invalidate_pattern(f"gallery")
+    await refresh_data(patterns=["gallery"])
     await manager.broadcast_to_all(
         data={"status": "completed"},
         message_type="bulk_action",

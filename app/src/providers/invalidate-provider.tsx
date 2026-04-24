@@ -26,6 +26,7 @@ export function InvalidateProvider({ children }: { children: React.ReactNode }) 
         if (!lastMessage) return;
 
         if (lastMessage.type === "invalidate") {
+            console.log("Invalidating keys:", lastMessage);
             if (lastMessage.key) {
                 const keys = parseEventKey(lastMessage.key);
                 queryClient.invalidateQueries({ queryKey: keys });

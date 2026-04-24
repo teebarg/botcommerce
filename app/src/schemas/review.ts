@@ -1,7 +1,5 @@
 import { z } from "zod";
-
 import { UserSchema } from "./user";
-import { AuditSchema } from "./base";
 import { CursorSchema } from "./common";
 
 const RatingSchema = z.object({
@@ -20,8 +18,8 @@ export const ReviewSchema = z
         verified: z.boolean().optional(),
         product_id: z.number(),
         user: UserSchema,
-    })
-    .merge(AuditSchema);
+        created_at: z.string(),
+    });
 
 export const PaginatedReviewSchema = CursorSchema.extend({
     items: z.array(ReviewSchema),

@@ -1,8 +1,6 @@
 import { z } from "zod";
 import { CursorSchema } from "./common";
-import { UserLiteSchema, UserSchema } from "./user";
-import { ProductSchema } from "./product";
-import { InteractionTypeSchema } from "./enums";
+import { UserLiteSchema } from "./user";
 
 export const ActivitySchema = z.object({
     id: z.number(),
@@ -19,19 +17,5 @@ export const PaginatedActivitiesSchema = CursorSchema.extend({
     items: z.array(ActivitySchema),
 });
 
-export const UserInteractionSchema = z.object({
-    id: z.number(),
-    user_id: z.number(),
-    user: UserSchema,
-    product_id: z.number(),
-    product: ProductSchema,
-    type: InteractionTypeSchema,
-    metadata: z.any().nullable().optional(),
-    timestamp: z.date().nullable().optional(),
-    created_at: z.string(),
-    updated_at: z.string(),
-});
-
 export type Activity = z.infer<typeof ActivitySchema>;
 export type PaginatedActivities = z.infer<typeof PaginatedActivitiesSchema>;
-export type UserInteraction = z.infer<typeof UserInteractionSchema>;

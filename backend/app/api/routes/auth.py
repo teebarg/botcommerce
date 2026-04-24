@@ -70,24 +70,3 @@ async def exchange_token(response: Response, payload=Depends(verify_clerk_token)
     await merge_cart(user_id=user.id, cart_number=_cart_id)
 
     return session_data
-
-# @router.post("/test-job")
-# async def test(request: Request, id: str) -> None:
-#     """
-#     Test job
-#     """
-#     # user = await db.user.find_first(
-#     #     where={
-#     #         "id": id,
-#     #     }
-#     # )
-
-#     try:
-#         # await publish_user_registered(
-#         #     user=user,
-#         #     source="email_password",
-#         #     created_at=user.created_at,
-#         # )
-#     except Exception as e:
-#         logger.error(f"Failed to merge cart: {e}")
-#         pass

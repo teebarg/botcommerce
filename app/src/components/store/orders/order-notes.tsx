@@ -2,7 +2,6 @@ import type React from "react";
 import { useState } from "react";
 import { Save } from "lucide-react";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,7 +17,6 @@ interface OrderNotesProp {
 const OrderNotes: React.FC<OrderNotesProp> = ({ order }) => {
     const [notes, setNotes] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const queryClient = useQueryClient();
 
     const handleSaveNote = async () => {
         if (!notes.trim()) return;
@@ -33,8 +31,6 @@ const OrderNotes: React.FC<OrderNotesProp> = ({ order }) => {
 
             return;
         }
-        queryClient.invalidateQueries({ queryKey: ["order", order.order_number] });
-        queryClient.invalidateQueries({ queryKey: ["orders"] });
         setNotes("");
 
         toast.success("Note saved successfully!", {

@@ -10,7 +10,7 @@ from app.services.popular_products import PopularProductsService
 from prisma import Json
 from datetime import datetime
 from app.core.utils import generate_welcome_email
-from app.services.redis import invalidate_pattern
+from app.services.redis import refresh_data
 from datetime import timedelta
 
 logger = get_logger(__name__)
@@ -184,7 +184,9 @@ class RedisStreamConsumer:
             raise Exception(f"Database error: {str(e)}")
 
         await send_notification(id=int(event["order_id"]), user_id=int(event["user_id"]), notification=self.get_notification())
-        await invalidate_pattern("users")
+        await refresh_data(
+            patterns=["users"],
+        )
 
     async def handle_payment_success(self, event):
         try:
@@ -275,8 +277,9 @@ class RedisStreamConsumer:
                 subject=welcome_email.subject,
                 message=welcome_email.html_content
             )
-            await invalidate_pattern("coupons")
-            await invalidate_pattern("users")
+            await refresh_data(
+                patterns=["coupons", "users"],
+            )
         except Exception as e:
             logger.error(f"Failed to send welcome email: {str(e)}")
             raise Exception(f"Email error: {str(e)}")
