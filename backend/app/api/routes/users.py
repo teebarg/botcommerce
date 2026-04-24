@@ -10,7 +10,7 @@ from app.models.user import User, UserSelf, UserAdmin, UserUpdateMe, UserUpdate,
 from app.core.security import verify_password, get_password_hash
 from app.services.recently_viewed import RecentlyViewedService
 from app.models.product import ProductSearch
-from app.services.redis import cache_response, bust
+from app.services.redis import cache_response, refresh_data
 from app.core.permissions import require_admin
 
 router = APIRouter()
@@ -213,7 +213,7 @@ async def create_user_wishlist_item(item: WishlistCreate, user: CurrentUser) -> 
                 "user_id": user.id
             }
         )
-        await bust(f"products:wishlist:{user.id}")
+        await refresh_data(keys=f"products:wishlist:{user.id}")
         return Message(message="Product added to wishlist")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -244,7 +244,7 @@ async def remove_wishlist_item(
                 }
             }
         )
-        await bust(f"products:wishlist:{user.id}")
+        await refresh_data(keys=f"products:wishlist:{user.id}")
         return Message(message="Product deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

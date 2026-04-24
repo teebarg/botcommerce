@@ -6,7 +6,7 @@ from app.core.logging import get_logger
 from app.services.meilisearch import update_document, delete_document, add_documents_to_index, clear_index
 from app.models.product import Product
 from app.services.prisma import with_prisma_connection
-from app.services.redis import invalidate_keys, invalidate_key_only
+from app.services.redis import refresh_data, invalidate_key_only
 import random
 from datetime import datetime, timezone
 from app.services.websocket import manager
@@ -186,21 +186,25 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     return product_dict
 
 
-async def invalidate_product_cache(keys: List[str] = None):
-    await asyncio.gather(
-        invalidate_keys("products:list"),
-        invalidate_keys("products:search"),
-        invalidate_keys("products:catalog"),
-        invalidate_keys("products:recommendation"),
-        invalidate_keys("products:home"),
-        invalidate_keys("products:collection"),
+async def invalidate_product_cache(keys: List[str] = None) -> None:
+    await refresh_data(
+        patterns=["gallery", "products:list", "products:search", "products:catalog", "products:recommendation", "products:home", "products:collection"],
+        keys=keys
     )
-    await manager.broadcast_to_all(data={"key": "products"}, message_type="invalidate")
-    if keys:
-        for key in keys:
-            await invalidate_key_only(key)
-        await manager.broadcast_to_all(
-            data={"keys": keys},
-            message_type="invalidate",
-        )
-        return
+    # await asyncio.gather(
+    #     invalidate_keys("products:list"),
+    #     invalidate_keys("products:search"),
+    #     invalidate_keys("products:catalog"),
+    #     invalidate_keys("products:recommendation"),
+    #     invalidate_keys("products:home"),
+    #     invalidate_keys("products:collection"),
+    # )
+    # await manager.broadcast_to_all(data={"key": "products"}, message_type="invalidate")
+    # if keys:
+    #     for key in keys:
+    #         await invalidate_key_only(key)
+    #     await manager.broadcast_to_all(
+    #         data={"keys": keys},
+    #         message_type="invalidate",
+    #     )
+    #     return

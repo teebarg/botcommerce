@@ -135,8 +135,6 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
                 reason=reason,
             )
 
-            # await mark_escalated(conversation_uuid=payload.session_id)
-
             user_msg = "User provided response"
             reply=(
                 "Thanks, I've sent your request to our support team. "

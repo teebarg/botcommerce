@@ -23,7 +23,6 @@ export const WalletTxnLiteSchema = z.object({
 
 export const WalletTxnSchema = z.object({
     id: z.string(),
-    // user_id: z.number(),
     user: UserLiteSchema,
     amount: z.number(),
     type: z.enum(["CASHBACK", "WITHDRAWAL", "ADJUSTMENT", "REVERSAL"]),

@@ -106,7 +106,6 @@ export const ProductImageSchema = z.object({
     image: z.string(),
     product: ProductSchema.optional(),
     product_id: z.number().optional(),
-    // created_at: z.string().optional(),
 });
 
 export const SearchVariantSchema = z.object({
@@ -193,7 +192,6 @@ export const ProductFeedSchema = z.object({
 
 export const WishItemSchema = z.object({
     id: z.number(),
-    // user_id: z.number(),
     product_id: z.number(),
     product: ProductLiteSchema,
 });

@@ -253,7 +253,7 @@ async def delete_gallery_image(image_id: int, background_tasks: BackgroundTasks)
 
 
 @router.post("/bulk-upload", dependencies=[Depends(require_admin)])
-async def bulk_save_image_urls(payload: ProductImageBulkUrls, background_tasks: BackgroundTasks):
+async def bulk_save_image_urls(payload: ProductImageBulkUrls):
     """
     Save many image URLs into the gallery.
     """
@@ -321,7 +321,7 @@ async def bulk_delete_gallery_images(
                 where={"id": {"in": [img.id for img in images]}}
             )
 
-            await refresh_data(patterns=["gallery"])
+            # await refresh_data(patterns=["gallery"])
             await manager.broadcast_to_all(
                 data={"status": "completed"},
                 message_type="bulk_action"
@@ -422,7 +422,7 @@ async def create_image_metadata(
         logger.error(f"Error creating product for image {image_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-    await refresh_data(patterns=["gallery"])
+    # await refresh_data(patterns=["gallery"])
     background_tasks.add_task(index_product, product_id=product.id)
 
     return {"success": True}
@@ -507,7 +507,7 @@ async def update_image_metadata(
         logger.error(f"Error updating image metadata {image_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-    await refresh_data(patterns=["gallery"])
+    # await refresh_data(patterns=["gallery"])
     background_tasks.add_task(index_product, product_id=existing_image.product_id)
 
     return {"success": True}
@@ -589,7 +589,7 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images) -> None
 
     await asyncio.gather(*[_process_with_tx(img) for img in images], return_exceptions=True)
 
-    await refresh_data(patterns=["gallery"])
+    # await refresh_data(patterns=["gallery"])
     await index_products(product_ids=created_product_ids)
 
     status = "completed" if not failed_ids else "partial"

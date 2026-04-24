@@ -30,7 +30,6 @@ class Order(BaseModel):
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
     order_number: str
-    # user_id: int
     user: Optional[MiniUser]
     shipping_address: Optional[Address]
     total: float

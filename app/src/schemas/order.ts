@@ -26,7 +26,6 @@ export const OrderSchema = z
         phone: z.string().optional(),
         cart_id: z.string(),
         cart_number: z.string(),
-        // user_id: z.number(),
         user: UserSchema,
         order_items: z.array(OrderItemSchema),
         subtotal: z.number(),

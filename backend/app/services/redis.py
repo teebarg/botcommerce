@@ -61,11 +61,6 @@ async def invalidate_list(entity: str):
         if cursor == 0:
             break
 
-@handle_redis_errors(default=False)
-async def bust(key: str) -> bool:
-    """Delete a specific Redis key"""
-    return await redis_client.delete(key) > 0
-
 async def get_redis_dependency(request: Request):
     return request.app.state.redis
 
@@ -156,6 +151,7 @@ async def refresh_data(*, keys=None, patterns=None) -> None:
 
     key_list = normalize(keys)
     pattern_list = normalize(patterns)
+    print("🚀 ~ file: redis.py:154 ~ pattern_list + key_list:", pattern_list + key_list)
 
     tasks = []
 
