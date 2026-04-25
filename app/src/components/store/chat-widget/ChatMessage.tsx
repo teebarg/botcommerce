@@ -150,12 +150,14 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastMessage, isEd
                         <div className={`flex items-center gap-1.5 mt-1 ${isAssistant ? "justify-start" : "justify-end"}`}>
                             <p className="text-[10px] text-muted-foreground">{formatTime(message.timestamp)}</p>
                             {isEditable && (
-                                <button
-                                    onClick={() => setIsEditing(true)}
-                                    className="text-[10px] text-muted-foreground hover:text-foreground transition-colors underline"
-                                >
-                                    Edit
-                                </button>
+                                <>
+                                    {/* <button
+                                        onClick={() => setIsEditing(true)}
+                                        className="text-[10px] text-muted-foreground hover:text-foreground transition-colors underline"
+                                    >
+                                        Edit
+                                    </button> */}
+                                </>
                             )}
                         </div>
                     </>

@@ -24,7 +24,7 @@ async def broadcast_sessions(session_store: SessionStore):
     await manager.broadcast_to_all({"users": sessions}, "online-users")
 
 @router.websocket("/")
-async def websocket(ws: WebSocket):
+async def websocket(ws: WebSocket) -> None:
     """
     Handles the WebSocket endpoint with RedisConnectionManager.
 
@@ -34,7 +34,7 @@ async def websocket(ws: WebSocket):
     Returns:
         None
     """
-    ip = ws.client.host
+    ip: str = ws.query_params.get("session_id")
     session_key: str = f"session:{ip}"
     user_id = None
 
@@ -72,19 +72,15 @@ async def websocket(ws: WebSocket):
                             "updated_at": str(int(time.time()))
                     })
 
-                        if await manager.promote_connection(ip, user_id, metadata={
-                            "ip": ip,
-                            "email": email,
-                            "location": "Unknown"
-                        }):
-                            logger.info(f"Promoted connection from {ip} to {user_id}")
+                        if await manager.promote_connection(old_id=ip, new_id=user_id):
                             session_id = await redis_client.get(f"chat_session:{ip}")
                             if session_id:
                                 await redis_client.set(f"chat_user:{session_id}", user_id)
                                 await redis_client.delete(f"chat_session:{ip}")
                                 logger.info(f"Updated chat mapping {session_id} → {user_id}")
                         else:
-                            logger.debug(f"Failed to promote connection from {ip} to {user_id}")
+                            await manager.register(user_id=user_id, websocket=ws)
+                            logger.debug(f"Promotion failed, registered {user_id} directly")
                             continue
 
                 elif message_type == "ping":

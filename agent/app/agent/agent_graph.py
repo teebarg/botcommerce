@@ -77,6 +77,9 @@ SYSTEM_PROMPT = (
     "(e.g. personal advice, general knowledge, jokes), politely decline and redirect them. "
     "Example: 'I'm only able to help with shop-related questions — is there anything I can assist you with today?' "
     "Do NOT call any tool for off-topic messages. "
+    "If the customer says 'contact support', 'contact us', or similar, "
+    "respond ONLY with: ESCALATION_REQUIRED: customer wants to contact support. "
+    "Do NOT call any tool. "
 )
 
 CONVERSATIONAL_PATTERNS = re.compile(
@@ -543,12 +546,12 @@ class Intent:
     CONTACT_UPDATE = "contact_update"
     NORMAL = "normal"
 
-
 _ESCALATION_RE = re.compile(
     r"(speak (to|with) (a )?human|talk (to|with) (a )?human|human agent|call me"
     r"|need (a |to speak with )?(human|agent)|connect me"
     r"|(speak|talk|chat|connect).{0,20}(human|agent|person|someone|representative)"
-    r"|(need|want).{0,20}(human|agent|real person))",
+    r"|(need|want).{0,20}(human|agent|real person)"
+    r"|contact support|contact (an? )?(agent|team|us)|reach (out|support)|get (help|support))",
     re.IGNORECASE,
 )
 _COMPLAINT_RE = re.compile(
@@ -571,7 +574,7 @@ async def _classify_intent(message: str) -> str:
         return Intent.CONTACT_UPDATE
 
     _AMBIGUOUS_SIGNALS = re.compile(
-        r"(human|agent|person|representative|complain|unhappy|frustrated|update|change|help me)",
+        r"(human|agent|person|representative|complain|unhappy|frustrated|update|change|help me|contact|support|reach)",
         re.IGNORECASE,
     )
     if not _AMBIGUOUS_SIGNALS.search(msg):

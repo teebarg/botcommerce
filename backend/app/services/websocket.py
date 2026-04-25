@@ -5,7 +5,7 @@ from app.core.logging import logger
 from typing import Dict, Optional
 
 class InMemoryWebSocketManager:
-    def __init__(self, idle_timeout_seconds: int = 60 * 5):
+    def __init__(self, idle_timeout_seconds: int = 60 * 5) -> None:
         self.connections: Dict[str, WebSocket] = {}
         self.heartbeats: Dict[str, datetime] = {}
         self.idle_timeout = timedelta(seconds=idle_timeout_seconds)
@@ -15,6 +15,10 @@ class InMemoryWebSocketManager:
         """Start background tasks (like idle cleanup)."""
         if not self.cleanup_task:
             self.cleanup_task = asyncio.create_task(self._idle_cleanup_loop())
+
+    async def register(self, user_id: str, websocket: WebSocket) -> None:
+        """Register an already-accepted WebSocket under a new ID."""
+        self.connections[str(user_id)] = websocket
 
     async def connect(self, user_id: str, websocket: WebSocket, metadata: Optional[dict] = None) -> bool:
         try:
@@ -88,7 +92,7 @@ class InMemoryWebSocketManager:
         if user_id in self.heartbeats:
             self.heartbeats[user_id] = datetime.now(timezone.utc)
 
-    async def promote_connection(self, old_id: str, new_id: str, metadata: Optional[dict] = None) -> bool:
+    async def promote_connection(self, old_id: str, new_id: str) -> bool:
         if old_id not in self.connections:
             return False
 
@@ -99,8 +103,8 @@ class InMemoryWebSocketManager:
 
     async def _idle_cleanup_loop(self):
         while True:
-            now = datetime.now(timezone.utc)
-            to_disconnect = [
+            now: datetime = datetime.now(timezone.utc)
+            to_disconnect: list[str] = [
                 user_id for user_id, last_seen in self.heartbeats.items()
                 if now - last_seen > self.idle_timeout
             ]
