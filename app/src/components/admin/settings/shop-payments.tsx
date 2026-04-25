@@ -71,7 +71,7 @@ const BankDetailComponent: React.FC<BankDetailsProps> = ({ bank }) => {
                 open={deleteState.isOpen}
                 onOpenChange={deleteState.setOpen}
                 trigger={
-                    <Button aria-label="delete" className="min-w-32" variant="destructive">
+                    <Button aria-label="delete" variant="destructive">
                         Delete
                     </Button>
                 }

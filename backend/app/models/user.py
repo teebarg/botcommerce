@@ -66,6 +66,10 @@ class PasswordChange(BaseModel):
     old_password: str = Field(min_length=8, max_length=40)
     new_password: str = Field(min_length=8, max_length=40)
 
+class MiniUser(BaseModel):
+    email: EmailStr
+    first_name: str
+    last_name: str
 
 from enum import Enum
 

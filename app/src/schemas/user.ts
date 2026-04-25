@@ -1,8 +1,5 @@
 import { z } from "zod";
-
 import { AddressSchema } from "./address";
-import { AuditSchema } from "./base";
-
 import { CursorSchema } from "./index";
 
 export const UserLiteSchema = z.object({
@@ -26,7 +23,6 @@ export const WalletTxnLiteSchema = z.object({
 
 export const WalletTxnSchema = z.object({
     id: z.string(),
-    user_id: z.number(),
     user: UserLiteSchema,
     amount: z.number(),
     type: z.enum(["CASHBACK", "WITHDRAWAL", "ADJUSTMENT", "REVERSAL"]),
@@ -52,8 +48,8 @@ export const UserSchema = z
         role: z.enum(["ADMIN", "CUSTOMER"]),
         referral_code: z.string().optional(),
         wallet_balance: z.number(),
-    })
-    .merge(AuditSchema);
+        created_at: z.string(),
+    });
 
 export const PaginatedUsersSchema = CursorSchema.extend({
     items: z.array(UserSchema),
@@ -72,6 +68,14 @@ export const SessionSchema = z.object({
     addresses: z.array(AddressSchema).optional(),
     impersonated: z.boolean().optional(),
     impersonatedBy: z.string().optional(),
+});
+
+export const UserMiniSchema = z.object({
+    id: z.number(),
+    first_name: z.string(),
+    last_name: z.string().optional(),
+    email: z.string(),
+    addresses: z.array(AddressSchema).optional(),
 });
 
 export const UserSessionSchema = z.object({

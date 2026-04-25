@@ -11,7 +11,7 @@ from app.core.deps import supabase, Notification
 from app.services.product import index_product
 from app.core.config import settings
 from app.services.events import publish_order_event
-from app.services.redis import invalidate_key, invalidate_pattern
+from app.services.redis import refresh_data
 from app.services.shop_settings import ShopSettingsService
 from app.services.cart import get_cart
 
@@ -276,8 +276,7 @@ async def create_invoice(order_id: int) -> str:
 
         await db.order.update(where={"id": order_id}, data={"invoice_url": public_url})
 
-        await invalidate_pattern("orders")
-        await invalidate_key(f"order:{order_id}")
+        await refresh_data(patterns=["orders"], keys=[f"order:{order_id}"])
 
         return public_url
     except Exception as e:
@@ -311,7 +310,7 @@ async def decrement_variant_inventory_for_order(order, notification=None) -> Non
             if out_of_stock:
                 out_of_stock_variants.append(variant)
             logger.info(f"Decrementing inventory for variant {variant_id} in order {order.id}")
-        await invalidate_pattern("gallery")
+        await refresh_data(patterns=["gallery"])
     except Exception as e:
         logger.error(f"Failed to decrement variant inventory for order {order.id}: {e}")
         raise Exception("Failed to decrement variant inventory for order")
@@ -326,7 +325,7 @@ async def decrement_variant_inventory_for_order(order, notification=None) -> Non
                 channel_name="slack",
                 slack_message={"text": slack_text}
             )
-            await invalidate_pattern("orders")
+            await refresh_data(patterns=["orders"])
         except Exception as e:
             logger.error(f"Failed to send out-of-stock slack: {e}")
 
@@ -447,10 +446,7 @@ async def return_order_item(order_id: int, item_id: int, background_tasks: Backg
 
     async def invalidate_caches() -> None:
         try:
-            await invalidate_pattern("orders")
-            await invalidate_key(f"order:{order_id}")
-            await invalidate_key(f"order-timeline:{order_id}")
-            await invalidate_pattern("gallery")
+            await refresh_data(patterns=["orders"], keys=[f"order:{order_id}", f"order-timeline:{order_id}"])
             if order_item.variant and order_item.variant.product_id:
                 await index_product(product_id=order_item.variant.product_id)
         except Exception as e:

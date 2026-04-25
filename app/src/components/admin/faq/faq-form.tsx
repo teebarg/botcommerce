@@ -60,7 +60,7 @@ export function FaqForm({ faq, onCancel }: FaqFormProps) {
     return (
         <Form {...form}>
             <form className="space-y-4 flex-1 flex flex-col overflow-hidden" onSubmit={form.handleSubmit(onSubmit)}>
-                <div className="flex-1 overflow-y-auto space-y-4 px-4">
+                <div className="flex-1 overflow-y-auto space-y-4 px-2.5">
                     <FormField
                         control={form.control}
                         name="question"
@@ -128,7 +128,7 @@ export function FaqForm({ faq, onCancel }: FaqFormProps) {
                     />
                 </div>
                 <div className="sheet-footer">
-                    <Button className="min-w-32" type="button" variant="destructive" onClick={onCancel}>
+                    <Button variant="destructive" onClick={onCancel}>
                         Cancel
                     </Button>
                     <Button disabled={loading} isLoading={loading} type="submit">

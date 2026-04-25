@@ -90,7 +90,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
     };
 
     return (
-        <div className="max-w-6xl mx-auto md:py-8 md:px-4 md:grid md:grid-cols-2 md:gap-8 md:items-start">
+        <div className="max-w-6xl mx-auto w-full md:py-8 md:px-4 md:grid md:grid-cols-2 md:gap-8 md:items-start">
             <div className="relative aspect-square md:aspect-product md:rounded-3xl md:overflow-hidden md:sticky md:top-16">
                 <img
                     key={currentImageIndex}
@@ -137,7 +137,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
                         <span className="text-sm font-bold text-white">R</span>
                     </div>
-                    <ShareButton />
+                    <ShareButton text="Check out this product!" />
                 </div>
 
                 <h1 className="text-2xl md:text-3xl font-bold text-foreground">{product.name}</h1>

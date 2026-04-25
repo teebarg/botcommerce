@@ -3,7 +3,7 @@ import logging
 from app.prisma_client import prisma as db
 from prisma.enums import CartStatus
 from app.models.cart import Cart
-from app.services.redis import invalidate_pattern
+from app.services.redis import refresh_data
 from app.services.shop_settings import ShopSettingsService
 
 logger = logging.getLogger(__name__)
@@ -82,8 +82,7 @@ async def calculate_cart_totals(cart_id: int):
             data["payment_method"] = "WALLET"
 
         await db.cart.update(where={"id": cart.id}, data=data)
-        await invalidate_pattern("abandoned-carts")
-        await invalidate_pattern("carts")
+        await refresh_data(patterns=["carts", "abandoned-carts"])
     except Exception as e:
         logger.error(f"Error calculating cart totals: {e}")
 

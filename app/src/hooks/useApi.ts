@@ -21,7 +21,7 @@ export const useChat = (uid: string) => {
 export const useChatMutation = () => {
     return useMutation({
         mutationFn: async (message: string) => {
-            const conversationUuid = sessionStorage.getItem("chat_session_id");
+            const conversationUuid = localStorage.getItem("chat_session_id");
             return await clientApi.post<{ reply: string; conversation_uuid: string }>("/chat/", {
                 conversation_uuid: conversationUuid!,
                 message: message,
@@ -86,8 +86,21 @@ export const useDeleteChat = () => {
 
 export const useSendPushNotification = () => {
     return useMutation({
-        mutationFn: async ({ title, body, image, path }: { title: string; body: string; image?: string; path?: string }) =>
+        mutationFn: async ({
+            title,
+            body,
+            image,
+            path,
+            notificationId,
+        }: {
+            title: string;
+            body: string;
+            image?: string;
+            path?: string;
+            notificationId: string;
+        }) =>
             await clientApi.post<Message>("/notification/push", {
+                notificationId,
                 title,
                 body,
                 image,

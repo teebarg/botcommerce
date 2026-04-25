@@ -46,7 +46,7 @@ export const ProductBulkActions = ({
                     open={editState.isOpen}
                     title="Bulk Products Update"
                     trigger={
-                        <Button className="h-8 px-2 sm:px-3" size="sm" variant="ghost" onClick={editState.open}>
+                        <Button className="h-8 px-2 sm:px-3 min-w-0" size="sm" variant="ghost" onClick={editState.open}>
                             <Edit3 className="h-5 w-5 sm:mr-1" />
                             <span className="hidden sm:inline">Edit</span>
                         </Button>
@@ -60,7 +60,7 @@ export const ProductBulkActions = ({
                     open={addToSharedState.isOpen}
                     title="Update Catalog"
                     trigger={
-                        <Button className="h-8 px-2 sm:px-3" disabled={isLoading} size="sm" variant="ghost" onClick={addToSharedState.open}>
+                        <Button className="h-8 px-2 sm:px-3 min-w-0" disabled={isLoading} size="sm" variant="ghost" onClick={addToSharedState.open}>
                             <Boxes className="h-5 w-5 sm:mr-1" />
                             <span className="hidden sm:inline">Catalog</span>
                         </Button>
@@ -80,7 +80,7 @@ export const ProductBulkActions = ({
                     onOpenChange={deleteState.setOpen}
                     trigger={
                         <Button
-                            className="h-8 px-2 sm:px-3 text-destructive hover:text-destructive-foreground"
+                            className="h-8 px-2 sm:px-3 text-destructive hover:text-destructive-foreground min-w-0"
                             disabled={isLoading}
                             size="sm"
                             variant="ghost"

@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field
 from typing import Optional
-from datetime import datetime
 from prisma.enums import ShippingMethod
 
 class DeliveryOptionBase(BaseModel):
@@ -24,8 +23,6 @@ class DeliveryOptionUpdate(BaseModel):
 
 class DeliveryOption(DeliveryOptionBase):
     id: int
-    created_at: datetime
-    updated_at: datetime
 
     class Config:
         from_attributes = True

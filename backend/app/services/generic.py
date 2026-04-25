@@ -5,7 +5,6 @@ import urllib.parse
 import re
 import cloudinary
 import cloudinary.uploader
-import cloudinary.api
 from app.core.config import settings
 
 cloudinary.config(
@@ -46,6 +45,13 @@ async def remove_image_from_storage(images: Union[str, List[str]]):
             except Exception as e:
                 logger.error(f"Failed to parse Firebase URL {img}: {e}")
 
+        elif "storage.googleapis.com" in img:
+            try:
+                parts = img.split("/o/")[-1].split("?")[0]
+                firebase_paths.append(urllib.parse.unquote(parts))
+            except Exception as e:
+                logger.error(f"Failed to parse Google Storage URL {img}: {e}")
+
         elif "res.cloudinary.com" in img:
             try:
                 # Extract public_id from Cloudinary URL
@@ -69,15 +75,7 @@ async def remove_image_from_storage(images: Union[str, List[str]]):
             logger.error(f"Error deleting Supabase images: {e}")
 
     if firebase_paths:
-        logger.info(f"Delete Firebase images: {firebase_paths}")
-        # bucket = fb_storage.bucket()
-        # for path in firebase_paths:
-        #     try:
-        #         blob = bucket.blob(path)
-        #         blob.delete()
-        #         logger.info(f"Deleted Firebase image: {path}")
-        #     except Exception as e:
-        #         logger.error(f"Error deleting Firebase image {path}: {e}")
+        logger.debug(f"Delete Firebase images: {firebase_paths}")
 
     if cloudinary_ids:
         for public_id in cloudinary_ids:

@@ -18,7 +18,6 @@ const ConfigTypeSchema = z.object({
     whatsapp: z.string().optional(),
     tax_rate: z.string().optional(),
     feature_reviews: z.string().optional(),
-    feature_whatsapp: z.string().optional(),
     feature_chatbot: z.string().optional(),
     feature_wishlist: z.string().optional(),
     payment_bank: z.string().optional(),

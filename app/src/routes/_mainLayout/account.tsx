@@ -1,5 +1,5 @@
 import AccountNav from "@/components/layout/account-nav";
-import { SignIn } from "@clerk/tanstack-react-start";
+import { SignInRedirect } from "@/utils/reuseable";
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { Box, Gift, MapPin, Package, User } from "lucide-react";
@@ -12,11 +12,7 @@ export const Route = createFileRoute("/_mainLayout/account")({
     },
     errorComponent: ({ error }) => {
         if (error.message === "Not authenticated") {
-            return (
-                <div className="flex items-center justify-center p-12">
-                    <SignIn routing="hash" forceRedirectUrl={`/auth/callback?redirect=${window.location.pathname}`} />
-                </div>
-            );
+            return <SignInRedirect />;
         }
 
         throw error;

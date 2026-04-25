@@ -10,6 +10,9 @@ from app.core.deps import CurrentUser
 from datetime import datetime
 from app.services.chat import get_conversation
 from app.core.permissions import require_admin
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 
@@ -20,19 +23,24 @@ async def admin_chat(payload: ChatRequest) -> Message:
     """
     conversation = await get_conversation(payload.conversation_uuid)
 
+    try:
+        await db.message.create(
+            data={
+                "conversation_id": conversation.id,
+                "content": payload.message,
+                "sender": "SYSTEM",
+            }
+        )
+    except Exception as e:
+        logger.error(f"Failed to send message: {e}")
+        raise HTTPException(status_code=400, detail="Failed to send message")
+
     customer = await redis_client.get(f"chat_user:{payload.conversation_uuid}")
     if not customer:
-        raise HTTPException(status_code=400, detail="Customer not connected")
+        logger.info(f"No customer connected for conversation {payload.conversation_uuid}")
+        return Message(message="message sent successfully")
 
     customer = customer.decode() if isinstance(customer, bytes) else customer
-
-    await db.message.create(
-        data={
-            "conversation_id": conversation.id,
-            "content": payload.message,
-            "sender": "SYSTEM",
-        }
-    )
 
     await manager.send_to_user(
         user_id=str(customer),

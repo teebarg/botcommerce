@@ -73,6 +73,10 @@ SYSTEM_PROMPT = (
     "ESCALATION_REQUIRED: <short reason> — no tools, no extra text. "
     "Keep replies concise and warm."
     "Always display currency in Nigerian Naira (₦). Never use dollars ($). Do not infer currency — use only the provided format."
+    "If the customer asks something completely unrelated to the shop, products, orders, or support "
+    "(e.g. personal advice, general knowledge, jokes), politely decline and redirect them. "
+    "Example: 'I'm only able to help with shop-related questions — is there anything I can assist you with today?' "
+    "Do NOT call any tool for off-topic messages. "
 )
 
 CONVERSATIONAL_PATTERNS = re.compile(
@@ -91,11 +95,14 @@ def _trim_persistent_history(messages: list[BaseMessage]) -> list[BaseMessage]:
     Trim history before saving to Redis.
     Removes old tool messages and keeps only recent turns.
     """
-    filtered = [m for m in messages if not isinstance(m, ToolMessage)]
+    filtered = [
+        m for m in messages
+        if not isinstance(m, ToolMessage)
+        and not (isinstance(m, AIMessage) and m.tool_calls)
+    ]
     MAX_KEEP = 10
     if len(filtered) > MAX_KEEP:
         filtered = filtered[-MAX_KEEP:]
-
     return filtered
 
 
@@ -537,20 +544,56 @@ class Intent:
     NORMAL = "normal"
 
 
-def _classify_intent(message: str) -> str:
-    msg = message.strip().lower()
+_ESCALATION_RE = re.compile(
+    r"(speak (to|with) (a )?human|talk (to|with) (a )?human|human agent|call me"
+    r"|need (a |to speak with )?(human|agent)|connect me"
+    r"|(speak|talk|chat|connect).{0,20}(human|agent|person|someone|representative)"
+    r"|(need|want).{0,20}(human|agent|real person))",
+    re.IGNORECASE,
+)
+_COMPLAINT_RE = re.compile(
+    r"(complain|bad experience|wrong item|damaged|overcharged|poor service|unsatisfied)",
+    re.IGNORECASE,
+)
+_CONTACT_UPDATE_RE = re.compile(
+    r"(update.{0,15}(contact|address|email|phone)|change.{0,15}(address|email|phone|details))",
+    re.IGNORECASE,
+)
 
-    # Escalation request
-    if re.search(r"(speak to (a )?human|talk to (a )?human|human agent|call me)", msg):
+async def _classify_intent(message: str) -> str:
+    msg: str = message.strip()
+
+    if _ESCALATION_RE.search(msg):
         return Intent.ESCALATION_REQUEST
-
-    # Complaint
-    if re.search(r"(complain|bad experience|wrong item|damaged|overcharged|poor service|unsatisfied)", msg):
+    if _COMPLAINT_RE.search(msg):
         return Intent.COMPLAINT
-
-    # Contact update
-    if re.search(r"(update.{0,15}(contact|address|email|phone)|change.{0,15}(address|email|phone|details))", msg):
+    if _CONTACT_UPDATE_RE.search(msg):
         return Intent.CONTACT_UPDATE
+
+    _AMBIGUOUS_SIGNALS = re.compile(
+        r"(human|agent|person|representative|complain|unhappy|frustrated|update|change|help me)",
+        re.IGNORECASE,
+    )
+    if not _AMBIGUOUS_SIGNALS.search(msg):
+        return Intent.NORMAL
+
+    try:
+        llm = get_llm()
+        prompt: str = (
+            "Classify the customer message into exactly one of these intents:\n"
+            "- escalation_request: customer wants to speak to a human agent\n"
+            "- complaint: customer is complaining or had a bad experience\n"
+            "- contact_update: customer wants to update their contact details\n"
+            "- normal: anything else\n\n"
+            f"Customer message: \"{message}\"\n\n"
+            "Reply with ONLY the intent label, nothing else."
+        )
+        resp = await llm.ainvoke([HumanMessage(content=prompt)])
+        result = resp.content.strip().lower()
+        if result in ("escalation_request", "complaint", "contact_update", "normal"):
+            return result
+    except Exception:
+        pass
 
     return Intent.NORMAL
 
@@ -585,7 +628,7 @@ async def run_agent(
         quick_replies: list[str] = await _get_quick_replies(message, reply, [], False, llm)
         return {"reply": reply, "session_id": session_id, "sources": [], "escalated": False, "quick_replies": quick_replies}
 
-    intent: str = _classify_intent(message)
+    intent: str = await  _classify_intent(message)
 
     if intent == Intent.ESCALATION_REQUEST:
         return {
@@ -653,7 +696,6 @@ async def run_agent(
             ]
 
             if any(kw in reason.lower() for kw in NON_ESCALATION_KEYWORDS):
-                # Model mis-escalated — treat as a normal "not found" reply
                 reply = "I couldn't find that item in our catalog. Could you describe it differently or check the name?"
             else:
                 high_risk: bool = any(
@@ -664,24 +706,15 @@ async def run_agent(
                 if high_risk:
                     await escalate_to_human({"reason": reason})
                     await _notify_slack_escalation(session_id=session_id, customer_id=customer_id, reason=reason)
-
                     return {
                         "reply": "A human specialist has been alerted and will assist you shortly.",
                         "session_id": session_id,
-                        "sources": [],
-                        "products": [],
                         "escalated": True,
-                        "quick_replies": [],
-                        "form": None,
                     }
 
                 return {
-                    "reply": "I'm going to connect you with a support agent. Please provide a few details.",
+                    "reply": "Sure — I'll connect you with a support agent. First, please provide a few details.",
                     "session_id": session_id,
-                    "sources": [],
-                    "products": [],
-                    "escalated": False,
-                    "quick_replies": [],
                     "form": FORMS["escalation_details"],
                 }
 

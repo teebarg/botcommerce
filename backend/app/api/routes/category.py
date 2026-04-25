@@ -8,7 +8,7 @@ from app.core.utils import slugify
 from app.core.storage import upload, delete_image
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
-from app.services.redis import cache_response, invalidate_pattern
+from app.services.redis import cache_response, refresh_data
 from app.core.logging import get_logger
 from app.services.product import prepare_product_data_for_indexing
 from app.core.permissions import require_admin
@@ -63,7 +63,7 @@ async def create(*, data: CategoryCreate) -> Category:
         category = await db.category.create(
             data={**data.model_dump(), "slug": slugify(data.name)}
         )
-        await invalidate_pattern("categories")
+        await refresh_data(patterns=["categories"])
         return category
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -82,7 +82,7 @@ async def reorder_categories(data: BulkOrderUpdate) -> Message:
                         data={"display_order": category_update.display_order}
                     )
 
-            await invalidate_pattern("categories")
+            await refresh_data(patterns=["categories"])
             return {"message": "categories reordered successfully"}
         except Exception as e:
             logger.error(f"Failed to reorder categories: {str(e)}")
@@ -109,7 +109,7 @@ async def update(
             where={"id": id},
             data=update_data.model_dump(exclude_unset=True)
         )
-        await invalidate_pattern("categories")
+        await refresh_data(patterns=["categories"])
         return update
     except PrismaError as e:
         logger.error(f"Failed to update category: {str(e)}")
@@ -131,7 +131,7 @@ async def delete(id: int) -> Message:
         await db.category.delete(
             where={"id": id}
         )
-        await invalidate_pattern("categories")
+        await refresh_data(patterns=["categories"])
         return Message(message="Category deleted successfully")
     except PrismaError as e:
         logger.error(f"Failed to delete category: {str(e)}")
@@ -156,7 +156,7 @@ async def add_image(id: int, image_data: ImageUpload) -> Category:
             where={"id": id},
             data={"image": image_url}
         )
-        await invalidate_pattern("categories")
+        await refresh_data(patterns=["categories"])
         return updated_category
 
     except Exception as e:
@@ -189,7 +189,7 @@ async def delete_image(id: int) -> Message:
             where={"id": id},
             data={"image": None}
         )
-        await invalidate_pattern("categories")
+        await refresh_data(patterns=["categories"])
         return Message(message="Category image deleted successfully")
 
     except Exception as e:

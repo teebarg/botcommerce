@@ -3,7 +3,6 @@ from datetime import datetime
 
 class Activity(BaseModel):
     id: int
-    user_id: int
     action_download_url: str | None = None
     activity_type: str
     description: str | None = None

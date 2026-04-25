@@ -14,12 +14,15 @@ from datetime import datetime
 
 class PushEventSchema(BaseModel):
     notificationId: str
-    subscriberId: str
+    subscriberId: Optional[str] = None
     eventType: Literal["DELIVERED", "OPENED", "CLICKED", "DISMISSED"]
     userAgent: Optional[str] = None
     deliveredAt: Optional[datetime] = None
+    title: Optional[str] = None
+    body: Optional[str] = None
 
 class PushMessageSchema(BaseModel):
+    notificationId: str
     title: str
     body: str
     image: Optional[str] = None
@@ -36,9 +39,11 @@ router = APIRouter()
 
 @router.post("/push-event")
 async def create_push_event(data: PushEventSchema) -> Message:
-    await redis_client.xadd("PUSH_EVENT", jsonable_encoder(data, exclude_none=True))
+    try:
+        await redis_client.xadd("PUSH_EVENT", jsonable_encoder(data, exclude_none=True))
+    except Exception as e:
+        logger.error(f"Error creating push event: {e}")
     return Message(message="success")
-
 
 @router.post("/push-fcm")
 async def push_fcm(data: FCMIn, user: UserDep) -> Message:

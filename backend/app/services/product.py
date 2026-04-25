@@ -6,7 +6,7 @@ from app.core.logging import get_logger
 from app.services.meilisearch import update_document, delete_document, add_documents_to_index, clear_index
 from app.models.product import Product
 from app.services.prisma import with_prisma_connection
-from app.services.redis import invalidate_keys, invalidate_key_only
+from app.services.redis import refresh_data, invalidate_key_only
 import random
 from datetime import datetime, timezone
 from app.services.websocket import manager
@@ -31,7 +31,7 @@ async def delete_product_index(product_ids: List[int]) -> None:
 
 
 @with_prisma_connection
-async def index_product(product_id: int):
+async def index_product(product_id: int) -> None:
     try:
         product = await db.product.find_unique(
             where={"id": product_id},
@@ -49,16 +49,12 @@ async def index_product(product_id: int):
                 f"product with id {product_id} not found for re-indexing.")
             return
 
-        try:
-            product_data = prepare_product_data_for_indexing(product)
-            await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
-            await invalidate_product_cache(keys=[
-                f"product:slug:{product.slug}",
-                f"product:similar:{product.id}",
-            ])
-        except Exception as e:
-            logger.debug(f"Error re-indexing product {product_id}: {e}")
-
+        product_data = prepare_product_data_for_indexing(product)
+        await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
+        await invalidate_product_cache(keys=[
+            f"product:slug:{product.slug}",
+            f"product:similar:{product.id}",
+        ])
     except Exception as e:
         logger.error(f"Error re-indexing product {product_id}: {e}")
 
@@ -186,24 +182,8 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     return product_dict
 
 
-async def invalidate_product_cache(keys: List[str] = None):
-    await asyncio.gather(
-        invalidate_keys("products:list"),
-        invalidate_keys("products:search"),
-        invalidate_keys("products:catalog"),
-        invalidate_keys("products:recommendation"),
-        invalidate_keys("products:home"),
-        invalidate_keys("products:collection"),
+async def invalidate_product_cache(keys: List[str] = None) -> None:
+    await refresh_data(
+        patterns=["gallery", "products:list", "products:search", "products:catalog", "products:recommendation", "products:home", "products:collection"],
+        keys=keys
     )
-    await manager.broadcast_to_all(data={"key": "products"}, message_type="invalidate")
-    if keys:
-        # tasks = []
-        for key in keys:
-            # tasks.append(invalidate_key_only(key))
-            await invalidate_key_only(key)
-        # await asyncio.gather(*tasks)
-        await manager.broadcast_to_all(
-            data={"keys": keys},
-            message_type="invalidate",
-        )
-        return

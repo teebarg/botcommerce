@@ -36,13 +36,13 @@ function PWABadge() {
             <div className="flex items-center gap-3 rounded-xl bg-background border shadow-lg px-4 py-3 min-w-[260px]">
                 <div className="text-primary">{offlineReady ? <WifiOff size={18} /> : <RefreshCw size={18} />}</div>
 
-                <div className="flex-1 text-sm">{offlineReady ? <span>App ready for offline use</span> : <span>System update available</span>}</div>
+                <div className="flex-1 text-sm">{offlineReady ? <span>App ready for offline use</span> : <span>Updates available</span>}</div>
 
                 <div className="flex items-center gap-2">
                     {needRefresh && (
                         <button
                             onClick={() => updateServiceWorker(true)}
-                            className="px-3 py-1 text-xs font-medium rounded-md bg-primary text-white hover:opacity-90 cursor-pointer"
+                            className="px-3 py-1 text-xs font-medium rounded-md bg-amber-600 text-white cursor-pointer"
                         >
                             Update
                         </button>

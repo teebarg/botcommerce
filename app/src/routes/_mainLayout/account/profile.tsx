@@ -10,12 +10,12 @@ import { Button } from "@/components/ui/button";
 import type { Message } from "@/schemas";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useInvalidate } from "@/hooks/useApi";
-import ServerError from "@/components/generic/server-error";
 import { tryCatch } from "@/utils/try-catch";
 import { Separator } from "@/components/ui/separator";
 import { updateAuthSession } from "@/utils/auth-client";
 import { motion } from "framer-motion";
 import { clientApi } from "@/utils/api.client";
+import { getInitials } from "@/utils";
 
 const profileSchema = z.object({
     first_name: z.string().min(1, "First name is required").max(255, "First name is too long"),
@@ -133,8 +133,7 @@ function RouteComponent() {
                     <div className="w-24 h-24 rounded-full gradient-primary p-1">
                         <div className="w-full h-full rounded-full bg-secondary flex items-center justify-center overflow-hidden">
                             <span className="text-3xl font-bold text-foreground">
-                                {session?.user?.firstName?.[0]}
-                                {session?.user?.lastName?.[0]}
+                                {getInitials(session?.user?.firstName ?? "")}
                             </span>
                         </div>
                     </div>

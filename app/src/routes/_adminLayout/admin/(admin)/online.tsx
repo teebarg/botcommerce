@@ -2,10 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Users, UserCheck, Eye, TrendingUp } from "lucide-react";
 import UserCounter from "@/components/admin/online/UserCounter";
-import UserAvatar from "@/components/admin/online/UserAvatar";
 import ActivityIndicator from "@/components/admin/online/ActivityIndicator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useWebSocket } from "pulsews";
+import OnlineAvatar from "@/components/admin/online/OnlineAvatar";
 
 interface Session {
     id: string;
@@ -61,7 +61,7 @@ function RouteComponent() {
                             {sessions.map((user: Session, idx: number) => (
                                 <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-secondary">
                                     <div className="flex items-center gap-3">
-                                        <UserAvatar user={user} />
+                                        <OnlineAvatar email={user.email} />
                                         <div>
                                             <div className="font-medium">{user.email !== "Unknown" ? user.email : "Anonymous Visitor"}</div>
                                             <div className="text-sm text-muted-foreground">Viewing: {user.path}</div>

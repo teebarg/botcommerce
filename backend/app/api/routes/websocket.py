@@ -80,7 +80,7 @@ async def websocket(ws: WebSocket):
                             logger.info(f"Promoted connection from {ip} to {user_id}")
                             session_id = await redis_client.get(f"chat_session:{ip}")
                             if session_id:
-                                await redis_client.set(f"chat_user:{session_id}", user_id, ex=86400)
+                                await redis_client.set(f"chat_user:{session_id}", user_id)
                                 await redis_client.delete(f"chat_session:{ip}")
                                 logger.info(f"Updated chat mapping {session_id} → {user_id}")
                         else:

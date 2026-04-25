@@ -98,7 +98,6 @@ registerRoute(
     })
 );
 
-
 self.addEventListener("push", (event) => {
     if (!event.data) return;
     let data;
@@ -123,6 +122,8 @@ self.addEventListener("push", (event) => {
             url: data?.data?.actionUrl ?? data?.path ?? "/",
             subscriberId: data.subscriberId,
             notificationId: data.notificationId,
+            title: data.title,
+            body: data.body,
             receivedAt: Date.now(),
         },
     };
@@ -137,6 +138,8 @@ self.addEventListener("push", (event) => {
                     subscriberId: data.subscriberId,
                     notificationId: data.notificationId,
                     eventType: "DELIVERED",
+                    title: data.title,
+                    body: data.body,
                     deliveredAt: new Date().toISOString(),
                     timestamp: new Date().toISOString(),
                 }),
@@ -158,6 +161,8 @@ self.addEventListener("notificationclick", (event) => {
                 subscriberId: info.subscriberId,
                 notificationId: info.notificationId,
                 eventType,
+                title: info.title,
+                body: info.body,
                 timestamp: new Date().toISOString(),
             }),
         }).catch(() => {})
@@ -173,13 +178,15 @@ self.addEventListener("notificationclose", (event) => {
     const info = event.notification.data;
     if (!info) return;
     event.waitUntil(
-        fetch("/api/push-event", {
+        fetch(`${API_BASE}/api/push-event`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 subscriberId: info.subscriberId,
                 notificationId: info.notificationId,
-                eventType: "DISMISSED",
+                eventType: "CLICKED",
+                title: info.title,
+                body: info.body,
                 timestamp: new Date().toISOString(),
             }),
         }).catch(() => {})

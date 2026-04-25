@@ -71,7 +71,6 @@ class CartItemBase(BaseModel):
 class CartItem(CartItemBase):
     id: int
     variant: Optional[ProductVariant]
-    created_at: datetime
 
 class Cart(BaseModel):
     id: int

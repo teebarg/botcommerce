@@ -39,19 +39,17 @@ export default function CatalogInfinite({ slug, initialData }: Props) {
     const hasProducts = products.length > 0;
 
     return (
-        <div className="max-w-8xl mx-auto w-full px-2">
-            <main className="w-full">
-                {!hasProducts && <NoProductsFound />}
-                {hasProducts && (
-                    <InfiniteList hasMore={!!hasNextPage} isLoading={isFetchingNextPage} onLoadMore={fetchNextPage}>
-                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 md:gap-4 gap-2">
-                            {products?.map((product: ProductSearch, idx: number) => (
-                                <ProductCardPLP key={product.id + product.slug + idx} product={product} />
-                            ))}
-                        </div>
-                    </InfiniteList>
-                )}
-            </main>
-        </div>
+        <main className="max-w-8xl mx-auto w-full px-2 py-4">
+            {!hasProducts && <NoProductsFound />}
+            {hasProducts && (
+                <InfiniteList hasMore={!!hasNextPage} isLoading={isFetchingNextPage} onLoadMore={fetchNextPage}>
+                    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 md:gap-4 gap-2">
+                        {products?.map((product: ProductSearch, idx: number) => (
+                            <ProductCardPLP key={product.id + product.slug + idx} product={product} />
+                        ))}
+                    </div>
+                </InfiniteList>
+            )}
+        </main>
     );
 }

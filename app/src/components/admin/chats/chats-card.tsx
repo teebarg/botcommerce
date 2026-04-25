@@ -20,18 +20,17 @@ const getStatusBadge = (status?: ConversationStatus) => {
 
 const ChatsCard = ({ chat }: CustomerCardProps) => {
     return (
-        <Card className="mb-3 overflow-hidden hover:shadow-md transition-shadow">
-            <div key={chat.id} className="bg-secondary rounded-lg overflow-hidden shadow-md p-4">
-                <div className="flex justify-between items-center mb-4">
-                    <h3 className="m-0 text-lg">#{chat.id}</h3>
+        <Card className="mb-3">
+            <div key={chat.id} className="bg-card rounded-lg overflow-hidden shadow-md p-4">
+                <div className="flex justify-between items-start mb-4">
+                    <div className="space-y-0.5">
+                        <p>ID: {chat.conversation_uuid}</p>
+                        <p>User: {chat.user_id || "Anonymous"}</p>
+                        <p>Messages: {chat.messages?.length}</p>
+                        <p>Started: {formatDate(chat.started_at)}</p>
+                        <p>Last Active: {formatDate(chat.last_active)}</p>
+                    </div>
                     {getStatusBadge(chat.status)}
-                </div>
-                <div className="space-y-1">
-                    <p>ID: {chat.conversation_uuid}</p>
-                    <p>User: {chat.user_id || "Anonymous"}</p>
-                    <p>Messages: {chat.messages?.length}</p>
-                    <p>Started: {formatDate(chat.started_at)}</p>
-                    <p>Last Active: {formatDate(chat.last_active)}</p>
                 </div>
                 <ChatsActions chat={chat} />
             </div>

@@ -27,7 +27,6 @@ function RouteComponent() {
     const search = Route.useSearch();
 
     useEffect(() => {
-        // Wait until Clerk has finished loading
         if (!isLoaded) return;
 
         const run = async () => {

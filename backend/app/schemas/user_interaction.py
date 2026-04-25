@@ -9,7 +9,6 @@ class UserInteractionCreate(BaseModel):
 
 class UserInteractionResponse(BaseModel):
     id: int
-    user_id: int
     product_id: int
     type: Literal["VIEW", "PURCHASE", "CART_ADD"]
     timestamp: datetime

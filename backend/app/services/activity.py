@@ -2,7 +2,7 @@ from typing import Optional
 from app.prisma_client import prisma as db
 from app.services.websocket import manager
 from app.core.logging import logger
-from app.services.redis import invalidate_pattern
+from app.services.redis import refresh_data
 from app.models.activities import Activity
 
 async def log_activity(
@@ -26,7 +26,7 @@ async def log_activity(
             }
         )
 
-        await invalidate_pattern("activities")
+        await refresh_data(patterns="activities")
         await manager.send_to_user(
             user_id=user_id,
             data={"key": f"activity:{user_id}"},

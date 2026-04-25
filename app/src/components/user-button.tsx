@@ -7,7 +7,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, LogOut, Gift, LayoutDashboard, Heart } from "lucide-react";
 import { useNavigate, useRouteContext } from "@tanstack/react-router";
 import { tryCatch } from "@/utils/try-catch";
@@ -15,10 +14,12 @@ import { clientApi } from "@/utils/api.client";
 import { logoutFn } from "@/server/users.server";
 import { Message } from "@/schemas";
 import { useAuth } from "@clerk/tanstack-react-start";
-import { getInitials } from "@/utils";
+import { UserAvatar } from "./generic/user-avatar";
+import { useLocation } from "@tanstack/react-router";
 
 export function UserDropdown() {
     const { isAuthenticated, session } = useRouteContext({ strict: false });
+    const location = useLocation();
     const navigate = useNavigate();
     const { signOut } = useAuth();
 
@@ -48,13 +49,9 @@ export function UserDropdown() {
                 <Button
                     variant="ghost"
                     className="relative h-8 w-8 rounded-full ring-offset-background transition-all hover:ring-2 hover:ring-ring hover:ring-offset-2"
+                    size="icon"
                 >
-                    <Avatar className="h-8 w-8">
-                        <AvatarImage src={session?.user?.image} alt={session?.user?.email || "User"} />
-                        <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
-                            {getInitials(session?.user?.firstName || "")}
-                        </AvatarFallback>
-                    </Avatar>
+                    <UserAvatar />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>

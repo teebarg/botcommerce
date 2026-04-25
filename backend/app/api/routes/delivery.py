@@ -1,9 +1,10 @@
+from prisma.errors import PrismaError
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from typing import List
 from app.models.delivery import DeliveryOption, DeliveryOptionCreate, DeliveryOptionUpdate
 from app.prisma_client import prisma as db
 from app.models.generic import Message
-from app.services.redis import cache_response, invalidate_pattern
+from app.services.redis import cache_response, refresh_data
 from app.core.permissions import require_admin
 
 router = APIRouter()
@@ -28,7 +29,7 @@ async def create_delivery_option(
             detail=f"Delivery option with method {delivery_option.method} already exists"
         )
 
-    await invalidate_pattern("delivery")
+    await refresh_data(patterns=["delivery"])
 
     return await db.deliveryoption.create(data=delivery_option.model_dump())
 
@@ -52,7 +53,7 @@ async def update_delivery_option(
             where={"id": delivery_option_id},
             data=delivery_option_update.model_dump(exclude_unset=True)
         )
-        await invalidate_pattern("delivery")
+        await refresh_data(patterns=["delivery"])
         return res
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -76,6 +77,6 @@ async def delete_delivery_option(
         where={"id": delivery_option_id}
     )
 
-    await invalidate_pattern("delivery")
+    await refresh_data(patterns=["delivery"])
 
     return {"message": "Delivery option deleted successfully"}

@@ -2,10 +2,11 @@ import { useState, useCallback, useEffect, useMemo } from "react";
 import { useWebSocket } from "pulsews";
 import { useRouteContext } from "@tanstack/react-router";
 import { useChat, useChatMutation } from "@/hooks/useApi";
-import { ChatMessage, ChatResponse } from "@/schemas";
+import { ChatMessage, ChatResponse, MessageSender } from "@/schemas";
 
 const generateId = () => Math.random();
 const STORAGE_KEY = "support-chat-history";
+const CHAT_SESSION_KEY = "chat_session_id";
 const now = () => new Date();
 
 const WELCOME_MESSAGES: ChatMessage[] = [
@@ -48,10 +49,10 @@ const saveHistory = (messages: ChatMessage[]) => {
 
 function getSessionId(): string {
     if (typeof window === "undefined") return crypto.randomUUID();
-    let id = sessionStorage.getItem("chat_session_id");
+    let id = localStorage.getItem(CHAT_SESSION_KEY);
     if (!id) {
         id = crypto.randomUUID();
-        sessionStorage.setItem("chat_session_id", id);
+        localStorage.setItem(CHAT_SESSION_KEY, id);
     }
     return id;
 }
@@ -81,7 +82,7 @@ export const useSupportChat = () => {
             return;
         }
         setMessages(loadLocalHistory());
-    }, [historyLoading, dbHistory]);
+    }, [historyLoading]);
 
     useEffect(() => {
         if (lastWsMessage.type != "chat") return;
@@ -93,7 +94,7 @@ export const useSupportChat = () => {
 
         const agentMsg: ChatMessage = {
             id: Date.now() + 1,
-            sender: "SYSTEM",
+            sender: MessageSender.SYSTEM,
             content: lastWsMessage.message || "",
             timestamp: now(),
         };
@@ -101,13 +102,17 @@ export const useSupportChat = () => {
         setMessages((prev) => [...prev, agentMsg]);
     }, [lastWsMessage]);
 
+    const lastUserMessage = useMemo(() => {
+        return messages.findLast((msg) => msg.sender === "USER");
+    }, [messages]);
+
     const addMessage = useCallback((msg: ChatMessage) => {
         setMessages((prev) => [...prev, msg]);
     }, []);
 
     const clearHistory = useCallback(() => {
         localStorage.removeItem(STORAGE_KEY);
-        sessionStorage.removeItem("chat_session_id");
+        localStorage.removeItem(CHAT_SESSION_KEY);
         setMessages(WELCOME_MESSAGES);
     }, []);
 
@@ -199,7 +204,7 @@ export const useSupportChat = () => {
         const userMsg: ChatMessage = {
             id: Date.now(),
             sender: "USER",
-            content: "User submitted a complaint form",
+            content: "User provided response",
             timestamp: now(),
         };
         addMessage(userMsg);
@@ -249,5 +254,16 @@ export const useSupportChat = () => {
         }
     }, []);
 
-    return { messages, isTyping, loading, handleSendMessage, sendFormSubmission, clearHistory, lastMessage: messages.at(-1), isDisabled };
+    return {
+        messages,
+        isTyping,
+        loading,
+        handleSendMessage,
+        sendFormSubmission,
+        clearHistory,
+        lastMessage: messages.at(-1),
+        isDisabled,
+        lastUserMessage,
+        editAble: true,
+    };
 };

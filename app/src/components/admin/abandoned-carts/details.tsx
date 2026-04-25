@@ -175,17 +175,6 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                                 <p className="font-medium">{formatDistanceToNow(new Date(cart.created_at), { addSuffix: true })}</p>
                                 <p className="text-xs text-muted-foreground mt-1">{new Date(cart.created_at).toLocaleString()}</p>
                             </div>
-
-                            {/* <div className="p-4 rounded-lg border bg-card">
-                                    <div className="flex items-center gap-2 mb-2 text-muted-foreground">
-                                        <Mail className="h-4 w-4" />
-                                        <span className="text-sm">Recovery Attempts</span>
-                                    </div>
-                                    <p className="font-medium text-2xl">{cart.recoveryAttempts}</p>
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                        {cart.recoveryAttempts === 0 ? "No emails sent yet" : "emails sent"}
-                                    </p>
-                                </div> */}
                         </div>
                     </div>
                 </div>

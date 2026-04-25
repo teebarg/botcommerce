@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import AdminNavbar from "@/components/admin/layouts/admin-navbar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/layout/admin-sidebar";
-import { SignIn } from "@clerk/tanstack-react-start";
+import { SignInRedirect } from "@/utils/reuseable";
 
 export const Route = createFileRoute("/_adminLayout")({
     beforeLoad: ({ context }) => {
@@ -15,11 +15,7 @@ export const Route = createFileRoute("/_adminLayout")({
     },
     errorComponent: ({ error }) => {
         if (error.message === "Not authenticated") {
-            return (
-                <div className="flex items-center justify-center p-12">
-                    <SignIn routing="hash" forceRedirectUrl={`/auth/callback?redirect=${window.location.pathname}`} />
-                </div>
-            );
+            return <SignInRedirect />;
         }
 
         throw error;

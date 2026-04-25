@@ -1,5 +1,4 @@
 import { ShoppingCart, DollarSign, TrendingUp, BarChart3 } from "lucide-react";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { currency } from "@/utils";
 
@@ -49,7 +48,7 @@ export const AbandonedCartStats = ({ stat }: AbandonedCartStatsProps) => {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {stats.map((stat, index) => (
-                <Card key={index} className="hover:shadow-lg transition-all duration-300 border-t-4 border-t-primary/50">
+                <Card key={index} className="border-t-4 border-t-primary/50">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">{stat.title}</CardTitle>
                         <stat.icon className={`h-5 w-5 ${stat.color}`} />

@@ -25,7 +25,7 @@ from app.services.redis import cache_response
 from app.services.recently_viewed import RecentlyViewedService
 from app.services.websocket import manager
 from app.services.generic import remove_image_from_storage
-from app.services.redis import invalidate_pattern, invalidate_keys
+from app.services.redis import refresh_data
 from app.models.gallery import PaginatedProductImages
 from app.core.permissions import require_admin
 
@@ -220,7 +220,7 @@ async def delete_gallery_image(image_id: int, background_tasks: BackgroundTasks)
 
     if not image.product_id:
         await db.productimage.delete(where={"id": image_id})
-        await invalidate_pattern("gallery")
+        await refresh_data(patterns=["gallery"])
         background_tasks.add_task(remove_image_from_storage, image.image)
         return Message(message="Image deleted successfully")
 
@@ -241,10 +241,7 @@ async def delete_gallery_image(image_id: int, background_tasks: BackgroundTasks)
         logger.error(f"Error deleting product {product_id}: {e}")
         raise HTTPException(status_code=500, detail="Failed to delete product")
 
-    await asyncio.gather(
-        invalidate_pattern("gallery"),
-        RecentlyViewedService().remove_product_from_all(product_id=product_id),
-    )
+    await RecentlyViewedService().remove_product_from_all(product_id=product_id)
 
     background_tasks.add_task(delete_product_index, product_ids=[product_id])
     background_tasks.add_task(remove_image_from_storage, image_urls)
@@ -253,7 +250,7 @@ async def delete_gallery_image(image_id: int, background_tasks: BackgroundTasks)
 
 
 @router.post("/bulk-upload", dependencies=[Depends(require_admin)])
-async def bulk_save_image_urls(payload: ProductImageBulkUrls, background_tasks: BackgroundTasks):
+async def bulk_save_image_urls(payload: ProductImageBulkUrls):
     """
     Save many image URLs into the gallery.
     """
@@ -273,7 +270,7 @@ async def bulk_save_image_urls(payload: ProductImageBulkUrls, background_tasks: 
                 status_code=400, detail="No valid images to save")
 
         await db.productimage.create_many(data=create_rows)
-        await invalidate_pattern("gallery")
+        await refresh_data(patterns=["gallery"])
 
         return {"success": True, "count": len(create_rows)}
     except HTTPException:
@@ -307,6 +304,10 @@ async def bulk_delete_gallery_images(
     async def _delete_task(images: list[ProductImage]) -> None:
         try:
             product_ids = list({img.product_id for img in images if img.product_id})
+            await db.productimage.delete_many(
+                where={"id": {"in": [img.id for img in images]}}
+            )
+
             results = await asyncio.gather(
                 remove_image_from_storage([img.image for img in images]),
                 delete_product_index(product_ids),
@@ -317,18 +318,12 @@ async def bulk_delete_gallery_images(
             if errors:
                 logger.error(f"Some delete tasks failed: {errors}")
 
-            await db.productimage.delete_many(
-                where={"id": {"in": [img.id for img in images]}}
-            )
-
-            await invalidate_keys("gallery")
             await manager.broadcast_to_all(
                 data={"status": "completed"},
                 message_type="bulk_action"
             )
 
             logger.info(f"Bulk delete completed for {len(images)} images")
-
         except Exception as e:
             logger.error(f"Error processing bulk delete: {str(e)}")
             await manager.broadcast_to_all(
@@ -422,7 +417,6 @@ async def create_image_metadata(
         logger.error(f"Error creating product for image {image_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-    await invalidate_pattern("gallery")
     background_tasks.add_task(index_product, product_id=product.id)
 
     return {"success": True}
@@ -507,7 +501,6 @@ async def update_image_metadata(
         logger.error(f"Error updating image metadata {image_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-    await invalidate_pattern("gallery")
     background_tasks.add_task(index_product, product_id=existing_image.product_id)
 
     return {"success": True}
@@ -588,8 +581,6 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images) -> None
             failed_ids.append(image.id)
 
     await asyncio.gather(*[_process_with_tx(img) for img in images], return_exceptions=True)
-
-    await invalidate_pattern("gallery")
     await index_products(product_ids=created_product_ids)
 
     status = "completed" if not failed_ids else "partial"

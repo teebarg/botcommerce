@@ -8,7 +8,6 @@ export * from "./order";
 export * from "./review";
 export * from "./activity";
 export * from "./chat";
-export * from "./carousel";
 
 export interface DeliveryOption {
     id: number;
@@ -18,6 +17,4 @@ export interface DeliveryOption {
     amount: number;
     duration: string;
     is_active: boolean;
-    created_at: string;
-    updated_at: string;
 }

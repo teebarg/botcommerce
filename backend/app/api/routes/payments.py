@@ -11,7 +11,7 @@ from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
 from app.services.order import create_order_from_cart, process_order_payment
 from app.core.logging import get_logger
 from app.services.events import publish_event, publish_order_event
-from app.services.redis import invalidate_pattern, invalidate_key
+from app.services.redis import refresh_data
 from app.models.cart import Cart
 from app.core.permissions import require_admin, require_user
 
@@ -98,7 +98,7 @@ async def verify_payment(response: Response, reference: str, user: CurrentUser) 
 
             order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cart_number)
 
-            await invalidate_pattern("orders")
+            await refresh_data(patterns=["orders"])
 
             event = {
                 "type": "PAYMENT_SUCCESS",
@@ -177,8 +177,7 @@ async def payment_status(id: int, status: PaymentStatus) -> Order:
 
     async with db.tx() as tx:
         updated_order = await tx.order.update(where={"id": id}, data=data)
-        await invalidate_pattern("orders")
-        await invalidate_key(f"order:{id}")
+        keys: list[str] = [f"order:{id}"]
 
         if status == PaymentStatus.SUCCESS:
             await publish_order_event(order=updated_order, type="ORDER_PAID")
@@ -191,8 +190,9 @@ async def payment_status(id: int, status: PaymentStatus) -> Order:
                         "message": "Payment successful",
                     }
                 )
-                await invalidate_key(f"order-timeline:{id}")
+                keys.append(f"order-timeline:{id}")
             except Exception as e:
                 logger.error(f"Failed to create order timeline when updating payment status: {str(e)}")
                 raise HTTPException(status_code=400, detail=f"Database error: {str(e)}")
+        await refresh_data(patterns=["orders"], keys=keys)
         return updated_order

@@ -121,7 +121,7 @@ export default function PushPermission() {
                     return;
                 }
                 if (hasSubscriptionChanged(sub)) {
-                    console.log("Subscription changed, syncing to backend");
+                    console.debug("Subscription changed, syncing to backend");
                     await syncSubscriptionToBackend(sub);
                 } else {
                     setSubscription(sub);

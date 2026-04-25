@@ -5,7 +5,7 @@ from app.core.deps import CurrentUser
 from app.models.generic import Message
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
-from app.services.redis import cache_response, invalidate_keys
+from app.services.redis import cache_response, refresh_data
 from app.models.activities import PaginatedActivities, Activity
 from app.core.permissions import require_admin
 
@@ -61,8 +61,7 @@ async def delete_activity(id: int, user: CurrentUser) -> Message:
             whereQuery.update({"user_id" : user.id})
 
         await db.activitylog.delete(where=whereQuery)
-        await invalidate_key(f"activity:{user.id}")
-        await invalidate_keys("activities")
+        await refresh_data(patterns=["activities"], keys=[f"activity:{user.id}"])
         return Message(message="Activity deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

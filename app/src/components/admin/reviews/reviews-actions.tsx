@@ -57,25 +57,11 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
                 isLoading={deletePending}
             />
             {review.verified ? (
-                <Button
-                    aria-label="unpublish"
-                    className="min-w-32"
-                    disabled={isPending}
-                    isLoading={isPending}
-                    variant="emerald"
-                    onClick={() => handlePublish(false)}
-                >
+                <Button aria-label="unpublish" disabled={isPending} isLoading={isPending} variant="emerald" onClick={() => handlePublish(false)}>
                     Un-publish
                 </Button>
             ) : (
-                <Button
-                    aria-label="publish"
-                    className="min-w-32"
-                    disabled={isPending}
-                    isLoading={isPending}
-                    variant="outline"
-                    onClick={() => handlePublish(true)}
-                >
+                <Button aria-label="publish" disabled={isPending} isLoading={isPending} variant="outline" onClick={() => handlePublish(true)}>
                     Publish
                 </Button>
             )}
