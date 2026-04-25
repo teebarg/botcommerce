@@ -151,7 +151,6 @@ async def refresh_data(*, keys=None, patterns=None) -> None:
 
     key_list = normalize(keys)
     pattern_list = normalize(patterns)
-    print("🚀 ~ file: redis.py:154 ~ pattern_list + key_list:", pattern_list + key_list)
 
     tasks = []
 

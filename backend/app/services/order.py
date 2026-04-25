@@ -446,7 +446,7 @@ async def return_order_item(order_id: int, item_id: int, background_tasks: Backg
 
     async def invalidate_caches() -> None:
         try:
-            await refresh_data(patterns=["orders", "gallery"], keys=[f"order:{order_id}", f"order-timeline:{order_id}"])
+            await refresh_data(patterns=["orders"], keys=[f"order:{order_id}", f"order-timeline:{order_id}"])
             if order_item.variant and order_item.variant.product_id:
                 await index_product(product_id=order_item.variant.product_id)
         except Exception as e:
