@@ -22,6 +22,7 @@ import { useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { gtag } from "@/utils/gtag";
 import { getShopSettingsPublicFn } from "@/server/store.server";
+import { getSessionId } from "@/utils";
 
 function RouteChangeTracker() {
     const location = useRouterState({ select: (s) => s.location });
@@ -178,6 +179,7 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
     const GA_ID = import.meta.env.VITE_GA_ID;
+    const localSessionId = getSessionId();
     return (
         <html suppressHydrationWarning>
             <head>
@@ -223,7 +225,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                 <div className="relative">
                                     <PushPermission />
                                     <WebSocketProvider
-                                        url={import.meta.env.VITE_WS + "/api/ws/"}
+                                        url={`${import.meta.env.VITE_WS}/api/ws/?session_id=${localSessionId}`}
                                         debug={true}
                                         onOpen={() => console.log("WebSocket connected!")}
                                         onClose={() => console.log("WebSocket disconnected!")}

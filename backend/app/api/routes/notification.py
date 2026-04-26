@@ -58,12 +58,12 @@ async def push_fcm(data: FCMIn, user: UserDep) -> Message:
                     'p256dh': data.p256dh,
                     'auth': data.auth,
                     'endpoint': data.endpoint,
-                    'userId': user.id
+                    'userId': user.id if user else None
                 },
                 "update": {
                     'p256dh': data.p256dh,
                     'auth': data.auth,
-                    'userId': user.id
+                    'userId': user.id if user else None
                 }
             }
         )
@@ -78,7 +78,7 @@ async def send_push_notification(data: PushMessageSchema, background_tasks: Back
     try:
         subscriptions = await db.pushsubscription.find_many()
         logger.info(f"Found {len(subscriptions)} subscriptions")
-        
+
         background_tasks.add_task(send_notifications_to_subscribers, subscriptions=[subscription.model_dump() for subscription in subscriptions], notification=data.model_dump())
         return Message(message="success")
     except Exception as e:

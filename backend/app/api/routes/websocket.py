@@ -24,7 +24,7 @@ async def broadcast_sessions(session_store: SessionStore):
     await manager.broadcast_to_all({"users": sessions}, "online-users")
 
 @router.websocket("/")
-async def websocket(ws: WebSocket):
+async def websocket(ws: WebSocket) -> None:
     """
     Handles the WebSocket endpoint with RedisConnectionManager.
 
@@ -34,8 +34,9 @@ async def websocket(ws: WebSocket):
     Returns:
         None
     """
-    ip = ws.client.host
-    session_key: str = f"session:{ip}"
+    ip: str = ws.client.host
+    app_session_id: str = ws.query_params.get("session_id")
+    session_key: str = f"session:{app_session_id}"
     user_id = None
 
     session_store.set(session_key, {
@@ -45,8 +46,8 @@ async def websocket(ws: WebSocket):
         "updated_at": str(int(time.time()))
     })
 
-    if not await manager.connect(ip, ws, metadata={"ip": ip, "location": "Unknown"}):
-        logger.error(f"Failed to establish WebSocket connection for IP {ip}")
+    if not await manager.connect(app_session_id, ws, metadata={"ip": ip, "location": "Unknown"}):
+        logger.error(f"Failed to establish WebSocket connection for {app_session_id}")
         return
 
     await broadcast_sessions(session_store)
@@ -72,32 +73,28 @@ async def websocket(ws: WebSocket):
                             "updated_at": str(int(time.time()))
                     })
 
-                        if await manager.promote_connection(ip, user_id, metadata={
-                            "ip": ip,
-                            "email": email,
-                            "location": "Unknown"
-                        }):
-                            logger.info(f"Promoted connection from {ip} to {user_id}")
-                            session_id = await redis_client.get(f"chat_session:{ip}")
+                        if await manager.promote_connection(old_id=app_session_id, new_id=user_id):
+                            session_id = await redis_client.get(f"chat_session:{app_session_id}")
                             if session_id:
                                 await redis_client.set(f"chat_user:{session_id}", user_id)
-                                await redis_client.delete(f"chat_session:{ip}")
+                                await redis_client.delete(f"chat_session:{app_session_id}")
                                 logger.info(f"Updated chat mapping {session_id} → {user_id}")
                         else:
-                            logger.debug(f"Failed to promote connection from {ip} to {user_id}")
+                            await manager.register(user_id=user_id, websocket=ws)
+                            logger.debug(f"Promotion failed, registered {user_id} directly")
                             continue
 
                 elif message_type == "ping":
-                    await manager.handle_heartbeat(user_id if user_id else ip)
+                    await manager.handle_heartbeat(user_id if user_id else app_session_id)
 
                 elif message_type == "path":
                     path = payload.get("path", "/")
                     session_store.update_field(
-                        f"session:{user_id or ip}", "path", path
+                        f"session:{user_id or app_session_id}", "path", path
                     )
 
                 session_store.update_field(
-                    f"session:{user_id or ip}", "updated_at", str(int(time.time()))
+                    f"session:{user_id or app_session_id}", "updated_at", str(int(time.time()))
                 )
 
                 await broadcast_sessions(session_store)
@@ -110,11 +107,11 @@ async def websocket(ws: WebSocket):
                 continue
 
     except WebSocketDisconnect:
-        logger.info(f"WebSocket disconnected for user {user_id or ip}")
+        logger.info(f"WebSocket disconnected for user {user_id or app_session_id}")
     except Exception as e:
         logger.error(f"Unexpected error in websocket handler: {e}")
     finally:
-        final_key = f"session:{user_id or ip}"
-        await manager.disconnect(user_id or ip)
+        final_key = f"session:{user_id or app_session_id}"
+        await manager.disconnect(user_id or app_session_id)
         session_store.delete(final_key)
         await broadcast_sessions(session_store)
