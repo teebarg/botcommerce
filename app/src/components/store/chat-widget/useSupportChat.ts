@@ -3,6 +3,7 @@ import { useWebSocket } from "pulsews";
 import { useRouteContext } from "@tanstack/react-router";
 import { useChat, useChatMutation } from "@/hooks/useApi";
 import { ChatMessage, ChatResponse, MessageSender } from "@/schemas";
+import { getSessionId } from "@/utils";
 
 const generateId = () => Math.random();
 const STORAGE_KEY = "support-chat-history";
@@ -47,7 +48,7 @@ const saveHistory = (messages: ChatMessage[]) => {
     }
 };
 
-function getSessionId(): string {
+function getChatSessionId(): string {
     if (typeof window === "undefined") return crypto.randomUUID();
     let id = localStorage.getItem(CHAT_SESSION_KEY);
     if (!id) {
@@ -64,7 +65,7 @@ export const useSupportChat = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);
     const [humanConnected, setHumanConnected] = useState<boolean>(false);
-    const { data: dbHistory, isLoading: historyLoading } = useChat(getSessionId());
+    const { data: dbHistory, isLoading: historyLoading } = useChat(getChatSessionId());
     const userSendChat = useChatMutation();
 
     const isDisabled = useMemo(() => {
@@ -156,8 +157,9 @@ export const useSupportChat = () => {
                     body: JSON.stringify({
                         type: "message",
                         message: text,
-                        session_id: getSessionId(),
+                        session_id: getChatSessionId(),
                         customer_id: isAuthenticated ? session?.id : null,
+                        app_session_id: getSessionId(),
                     }),
                 });
 
@@ -216,8 +218,9 @@ export const useSupportChat = () => {
                     type: "form_submission",
                     form_type: formType,
                     data: formData,
-                    session_id: getSessionId(),
+                    session_id: getChatSessionId(),
                     customer_id: isAuthenticated ? session?.id : null,
+                    app_session_id: getSessionId(),
                 }),
             });
 

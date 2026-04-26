@@ -41,6 +41,7 @@ class ChatRequest(BaseModel):
         default=None,
         description="Customer ID if the user is logged in."
     )
+    app_session_id: str
 
     model_config = {"json_schema_extra": {"example": {
         "type": "message",
