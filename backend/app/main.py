@@ -51,9 +51,12 @@ async def lifespan(app: FastAPI):
     consumer = RedisStreamConsumer(redis_client, STREAM_NAME, GROUP_NAME, CONSUMER_NAME)
     app.state.consumer = consumer
     await consumer.start()
+    await manager.start()
 
     yield
-
+    
+    if manager.cleanup_task:
+        manager.cleanup_task.cancel()
     await consumer.stop()
     await db.disconnect()
     await redis_client.close()

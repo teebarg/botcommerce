@@ -3,25 +3,9 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from app.core.logging import logger
 import json, time
 from app.services.websocket import manager
-from app.services.session_store import session_store, SessionStore
 from app.redis_client import redis_client
 
 router = APIRouter()
-
-async def broadcast_sessions(session_store: SessionStore):
-    sessions = []
-    all_sessions = session_store.get_all_with_prefix("session:")
-    for key, data in all_sessions.items():
-        sessions.append({
-            "id": key.replace("session:", ""),
-            "type": data.get("type", "guest"),
-            "email": data.get("email", "Unknown"),
-            "location": data.get("location", "Unknown"),
-            "path": data.get("path", "/"),
-            "last_seen": int(time.time()) - int(data.get("updated_at", 0))
-        })
-
-    await manager.broadcast_to_all({"users": sessions}, "online-users")
 
 @router.websocket("/")
 async def websocket(ws: WebSocket) -> None:
@@ -34,23 +18,19 @@ async def websocket(ws: WebSocket) -> None:
     Returns:
         None
     """
-    ip: str = ws.client.host
     app_session_id: str = ws.query_params.get("session_id")
-    session_key: str = f"session:{app_session_id}"
     user_id = None
 
-    session_store.set(session_key, {
+    if not await manager.connect(app_session_id, ws, metadata={
+        "ip": ws.client.host,
         "type": "guest",
-        "path": "/",
         "location": "Unknown",
+        "path": "/",
         "updated_at": str(int(time.time()))
-    })
-
-    if not await manager.connect(app_session_id, ws, metadata={"ip": ip, "location": "Unknown"}):
-        logger.error(f"Failed to establish WebSocket connection for {app_session_id}")
+    }):
         return
 
-    await broadcast_sessions(session_store)
+    await manager.broadcast_sessions()
 
     try:
         while True:
@@ -64,16 +44,13 @@ async def websocket(ws: WebSocket) -> None:
                     email = payload.get("email")
 
                     if user_id:
-                        user_session_key: str = f"session:{user_id}"
-                        session_store.set(user_session_key, {
+                        if await manager.promote_connection(old_id=app_session_id, new_id=user_id, metadata={
                             "type": "user",
                             "email": email or "Unknown",
                             "location": "Unknown",
                             "path": "/",
                             "updated_at": str(int(time.time()))
-                    })
-
-                        if await manager.promote_connection(old_id=app_session_id, new_id=user_id):
+                        }):
                             session_id = await redis_client.get(f"chat_session:{app_session_id}")
                             if session_id:
                                 await redis_client.set(f"chat_user:{session_id}", user_id)
@@ -85,19 +62,12 @@ async def websocket(ws: WebSocket) -> None:
                             continue
 
                 elif message_type == "ping":
-                    await manager.handle_heartbeat(user_id if user_id else app_session_id)
+                    await manager.handle_heartbeat_field(user_id=user_id or app_session_id, field="updated_at", value=str(int(time.time())))
 
                 elif message_type == "path":
-                    path = payload.get("path", "/")
-                    session_store.update_field(
-                        f"session:{user_id or app_session_id}", "path", path
-                    )
+                    await manager.handle_heartbeat_field(user_id=user_id or app_session_id, field="path", value=payload.get("path", "/"))
 
-                session_store.update_field(
-                    f"session:{user_id or app_session_id}", "updated_at", str(int(time.time()))
-                )
-
-                await broadcast_sessions(session_store)
+                await manager.broadcast_sessions()
 
             except json.JSONDecodeError:
                 logger.error(f"Invalid JSON received: {msg}")
@@ -111,7 +81,5 @@ async def websocket(ws: WebSocket) -> None:
     except Exception as e:
         logger.error(f"Unexpected error in websocket handler: {e}")
     finally:
-        final_key = f"session:{user_id or app_session_id}"
         await manager.disconnect(user_id or app_session_id)
-        session_store.delete(final_key)
-        await broadcast_sessions(session_store)
+        await manager.broadcast_sessions()

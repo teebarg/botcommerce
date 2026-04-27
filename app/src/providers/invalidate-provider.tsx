@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useRouteContext } from "@tanstack/react-router";
+import { useLocation, useRouteContext } from "@tanstack/react-router";
 import { useWebSocket } from "pulsews";
 import { useEffect, useRef } from "react";
 
@@ -17,6 +17,8 @@ function parseEventKeys(eventKeys: string[]): string[][] {
 }
 
 export function InvalidateProvider({ children }: { children: React.ReactNode }) {
+    const location = useLocation();
+    const pathname = location.pathname;
     const { session, isAuthenticated } = useRouteContext({ strict: false });
     const queryClient = useQueryClient();
     const { lastMessage, send, isConnected } = useWebSocket();
@@ -51,5 +53,14 @@ export function InvalidateProvider({ children }: { children: React.ReactNode }) 
         }
         prevConnectedRef.current = isConnected;
     }, [isAuthenticated, isConnected]);
+
+    useEffect(() => {
+        send(
+            JSON.stringify({
+                type: "path",
+                path: pathname,
+            })
+        );
+    }, [pathname]);
     return <div>{children}</div>;
 }

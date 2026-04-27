@@ -1,4 +1,4 @@
-import asyncio
+import asyncio, time
 from fastapi import WebSocket, WebSocketDisconnect
 from datetime import datetime, timezone, timedelta
 from app.core.logging import logger
@@ -7,11 +7,11 @@ from typing import Dict, Optional
 class InMemoryWebSocketManager:
     def __init__(self, idle_timeout_seconds: int = 60 * 5) -> None:
         self.connections: Dict[str, WebSocket] = {}
-        self.heartbeats: Dict[str, datetime] = {}
+        self.heartbeats: Dict[str, Dict] = {}
         self.idle_timeout = timedelta(seconds=idle_timeout_seconds)
         self.cleanup_task = None
 
-    async def start(self):
+    async def start(self) -> None:
         """Start background tasks (like idle cleanup)."""
         if not self.cleanup_task:
             self.cleanup_task = asyncio.create_task(self._idle_cleanup_loop())
@@ -23,23 +23,23 @@ class InMemoryWebSocketManager:
     async def connect(self, user_id: str, websocket: WebSocket, metadata: Optional[dict] = None) -> bool:
         try:
             await websocket.accept()
-            self.connections[user_id] = websocket
-            self.heartbeats[user_id] = datetime.now(timezone.utc)
+            self.connections[str(user_id)] = websocket
+            self.heartbeats[str(user_id)] = metadata
             logger.info(f"✅ User {user_id} connected.")
             return True
         except Exception as e:
-            logger.error(f"❌ Failed to connect user {user_id}: {e}")
+            logger.error(f"❌ Failed to establish WebSocket connection for {user_id}: {e}")
             return False
 
     async def disconnect(self, user_id: str) -> None:
         if user_id in self.connections:
             try:
-                await self.connections[user_id].close()
+                await self.connections[str(user_id)].close()
             except:
                 pass
             try:
-                del self.connections[user_id]
-                self.heartbeats.pop(user_id, None)
+                del self.connections[str(user_id)]
+                self.heartbeats.pop(str(user_id), None)
             except Exception as e:
                 logger.error(f"❌ Failed to disconnect user {user_id}: {e}")
             logger.info(f"👋 User {user_id} disconnected.")
@@ -87,33 +87,59 @@ class InMemoryWebSocketManager:
     def get_connection_count(self) -> int:
         return len(self.connections)
 
-    async def handle_heartbeat(self, user_id: str) -> None:
+    async def handle_heartbeat(self, user_id: str, metadata: Dict) -> None:
         """Update the last seen heartbeat timestamp."""
         if user_id in self.heartbeats:
-            self.heartbeats[user_id] = datetime.now(timezone.utc)
+            self.heartbeats[user_id] = metadata
 
-    async def promote_connection(self, old_id: str, new_id: str) -> bool:
+    async def handle_heartbeat_field(self, user_id: str, field: str, value: str) -> None:
+        """Update the heartbeat field."""
+        if str(user_id) in self.heartbeats:
+            try:
+                self.heartbeats[str(user_id)][field] = value
+            except Exception as e:
+                logger.error(f"Failed to update heartbeat field {field} for user {user_id}: {e}")
+
+
+    async def broadcast_sessions(self):
+        sessions = []
+        for key, data in self.heartbeats.items():
+            sessions.append({
+                "id": key,
+                "type": data.get("type", "guest"),
+                "email": data.get("email", "Unknown"),
+                "location": data.get("location", "Unknown"),
+                "path": data.get("path", "/"),
+                "last_seen": int(time.time()) - int(data.get("updated_at", 0))
+            })
+
+        await manager.broadcast_to_all({"users": sessions}, "online-users")
+
+    async def promote_connection(self, old_id: str, new_id: str, metadata: Dict) -> bool:
         if old_id not in self.connections:
             return False
 
         self.connections[str(new_id)] = self.connections.pop(old_id)
-        self.heartbeats[str(new_id)] = self.heartbeats.pop(old_id, datetime.now(timezone.utc))
+        old_metadata = self.heartbeats.pop(old_id, {})
+        self.heartbeats[str(new_id)] = {**old_metadata, **metadata}
+
         logger.info(f"🔁 Promoted connection from {old_id} → {new_id}")
         return True
 
     async def _idle_cleanup_loop(self):
         while True:
-            now: datetime = datetime.now(timezone.utc)
-            to_disconnect: list[str] = [
-                user_id for user_id, last_seen in self.heartbeats.items()
-                if now - last_seen > self.idle_timeout
+            now = int(time.time())
+            to_disconnect = [
+                user_id for user_id, data in self.heartbeats.items()
+                if isinstance(data, dict) and
+                (now - int(data.get("updated_at", now))) > self.idle_timeout.seconds
             ]
 
             for user_id in to_disconnect:
                 logger.info(f"⏳ Disconnecting idle user {user_id}")
                 await self.disconnect(user_id)
 
-            await asyncio.sleep(10)
+            await asyncio.sleep(60)
 
 
 manager = InMemoryWebSocketManager()
