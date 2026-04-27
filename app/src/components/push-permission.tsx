@@ -8,7 +8,6 @@ import { clientApi } from "@/utils/api.client";
 import { Message } from "@/schemas";
 
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000;
-const CHECK_INTERVAL = 60 * 60 * 1000;
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -68,6 +67,8 @@ export default function PushPermission() {
     const [permission, setPermission] = useState<NotificationPermission>("default");
     const [subscription, setSubscription] = useState<PushSubscription | null>(null);
     const [isDismissed, setIsDismissed] = useState<boolean>(false);
+    const [isChecking, setIsChecking] = useState<boolean>(false);
+    const [isSyncing, setIsSyncing] = useState<boolean>(false);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -89,6 +90,8 @@ export default function PushPermission() {
     }, []);
 
     const syncSubscriptionToBackend = useCallback(async (sub: PushSubscription) => {
+        if (isSyncing) return;
+        setIsSyncing(true);
         const subscriptionData = {
             endpoint: sub.endpoint,
             p256dh: sub.toJSON().keys?.p256dh || "",
@@ -99,44 +102,64 @@ export default function PushPermission() {
 
         if (error) {
             toast.error(error);
+            setIsSyncing(false);
             return false;
         }
 
         storeSubscriptionKeys(sub);
         setSubscription(sub);
         localStorage.setItem("push_synced", "true");
+        setIsSyncing(false);
         return true;
     }, []);
 
+    const checkSubscription = async () => {
+        if (isChecking) return;
+        setIsChecking(true);
+        try {
+            const registration = await navigator.serviceWorker.ready;
+            const sub = await registration.pushManager.getSubscription();
+
+            if (!sub) {
+                subscribeToPush();
+                return;
+            }
+            if (hasSubscriptionChanged(sub) || !localStorage.getItem("push_synced")) {
+                console.debug("Subscription changed, syncing to backend");
+                await syncSubscriptionToBackend(sub);
+            } else {
+                setSubscription(sub);
+            }
+        } catch (err) {
+            console.error("Subscription check failed", err);
+        } finally {
+            setIsChecking(false);
+        }
+    };
+
     useEffect(() => {
-        if (permission !== "granted") return;
-
-        const checkSubscription = async () => {
-            try {
-                const registration = await navigator.serviceWorker.ready;
-                const sub = await registration.pushManager.getSubscription();
-
-                if (!sub) {
-                    subscribeToPush();
-                    return;
-                }
-                if (hasSubscriptionChanged(sub)) {
-                    console.debug("Subscription changed, syncing to backend");
-                    await syncSubscriptionToBackend(sub);
-                } else {
-                    setSubscription(sub);
-                }
-            } catch (err) {
-                console.error("Subscription check failed", err);
+        if (permission !== "granted") {
+            void (async () => {
+                await subscribeToPush();
+            })();
+        }
+        const onVisible = () => {
+            if (document.visibilityState === "visible") {
+                checkSubscription();
             }
         };
 
-        checkSubscription();
+        const onPushSubscriptionChange = () => {
+            checkSubscription();
+        };
 
-        const interval = setInterval(checkSubscription, CHECK_INTERVAL);
-
-        return () => clearInterval(interval);
-    }, [permission, syncSubscriptionToBackend]);
+        document.addEventListener("visibilitychange", onVisible);
+        document.addEventListener("pushsubscriptionchange", onPushSubscriptionChange);
+        return () => {
+            document.removeEventListener("visibilitychange", onVisible);
+            document.removeEventListener("pushsubscriptionchange", onPushSubscriptionChange);
+        };
+    }, []);
 
     async function subscribeToPush() {
         const perm = await Notification.requestPermission();
