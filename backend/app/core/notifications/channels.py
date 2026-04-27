@@ -1,15 +1,17 @@
-import json
 import httpx
 from abc import ABC, abstractmethod
+from dataclasses import asdict
+
 from app.core.logging import logger
 from app.core.utils import send_email
+import json
 from pywebpush import webpush, WebPushException
 from app.core.config import settings
+
 
 class NotificationChannel(ABC):
     @abstractmethod
     async def send(self, recipient: str, message: str, **kwargs) -> bool:
-        """Send notification through the channel."""
         pass
 
 
@@ -21,11 +23,11 @@ class EmailChannel(NotificationChannel):
         self.password = password
 
 
-    async def send(self, recipient: str, message: str, subject: str = "Notification", cc_list: list[str] = [], **kwargs) -> bool:
+    async def send(self, recipient: str, message: str, cc_list: list[str] = [], **kwargs) -> bool:
         try:
             await send_email(
                 email_to=recipient,
-                subject=subject,
+                subject=kwargs.get("subject", "Notification"),
                 html_content=message,
                 cc_list=cc_list,
             )
@@ -39,13 +41,13 @@ class SlackChannel(NotificationChannel):
     def __init__(self, webhook_url: str):
         self.webhook_url = webhook_url
 
-    async def send(self, recipient: str, message: str, slack_message: dict, **kwargs) -> bool:
+    async def send(self, recipient: str, message: str, **kwargs) -> bool:
         try:
             async with httpx.AsyncClient() as client:
-                response = await client.post(self.webhook_url, json=slack_message)
+                response = await client.post(self.webhook_url, json=kwargs.get("slack_message", {}), timeout=10)
             return response.status_code == 200
         except Exception as e:
-            logger.error(f"Slack notification failed: {str(e)}")
+            logger.error("slack.send_failed", extra={"error": str(e)})
             return False
 
 
@@ -55,9 +57,9 @@ class WhatsAppChannel(NotificationChannel):
         self.phone_number_id = phone_number_id
 
     async def send(self, recipient: str, message: str, **kwargs) -> bool:
+        if not recipient:
+            return False
         try:
-            if not recipient:
-                return False
             url = f"https://graph.facebook.com/v17.0/{self.phone_number_id}/messages"
             headers = {
                 "Authorization": f"Bearer {self.token}",
@@ -71,14 +73,10 @@ class WhatsAppChannel(NotificationChannel):
             }
             async with httpx.AsyncClient() as client:
                 response = await client.post(url, json=payload, headers=headers, timeout=10)
-            if response.status_code == 200:
-                return True
-            else:
-                logger.error(f"WhatsApp notification failed: {response.status_code} - {response.text}")
-                return False
+            return 200 <= response.status_code < 300
         except Exception as e:
-            logger.error(f"WhatsApp notification failed: {str(e)}")
-            raise Exception(f"WhatsApp notification failed: {str(e)}")
+            logger.error("whatsapp.send_failed", extra={"error": str(e)})
+            return False
 
 
 class SMSChannel(NotificationChannel):
@@ -88,12 +86,9 @@ class SMSChannel(NotificationChannel):
         self.from_number = from_number
 
     async def send(self, recipient: str, message: str, **kwargs) -> bool:
-        # TODO: Implementation would depend on your SMS provider (e.g., Twilio, MessageBird)
-        try:
-            return True
-        except Exception as e:
-            logger.error(f"SMS sending failed: {str(e)}")
-            return False
+        # plug in Twilio / MessageBird here
+        raise NotImplementedError("SMSChannel.send not implemented")
+
 
 class PushChannel(NotificationChannel):
     async def send(self, recipient: str, message: str, **kwargs) -> bool:
@@ -102,56 +97,6 @@ class PushChannel(NotificationChannel):
         except Exception as e:
             logger.error(f"Push notification sending failed: {str(e)}")
             return False
-
-
-class NotificationService:
-    def __init__(self):
-        self.channels: dict[str, NotificationChannel] = {}
-
-    def register_channel(self, channel_name: str, channel: NotificationChannel):
-        """Register a new notification channel."""
-        self.channels[channel_name] = channel
-
-    async def send_notification(self, channel_name: str, recipient: str = "", message: str = "", **kwargs) -> bool:
-        """Send notification through specified channel."""
-        channel = self.channels.get(channel_name)
-        if not channel:
-            raise ValueError(f"Channel {channel_name} not found")
-        return await channel.send(recipient, message, **kwargs)
-
-
-# Usage example:
-"""
-# Initialize the notification service
-notification_service = NotificationService()
-
-# Configure and register email channel
-email_channel = EmailChannel(
-    smtp_host="smtp.gmail.com",
-    smtp_port=587,
-    username="your-email@gmail.com",
-    password="your-password"
-)
-notification_service.register_channel("email", email_channel)
-
-# Configure and register Slack channel
-slack_channel = SlackChannel(webhook_url="https://hooks.slack.com/services/YOUR/WEBHOOK/URL")
-notification_service.register_channel("slack", slack_channel)
-
-# Send notifications
-notification_service.send_notification(
-    "email",
-    "recipient@example.com",
-    "Hello from the notification service!",
-    subject="Test Notification"
-)
-
-notification_service.send_notification(
-    "slack",
-    "#general",
-    "Hello from the notification service!"
-)
-"""
 
 
 def send_notifications_to_subscribers(subscriptions, notification):

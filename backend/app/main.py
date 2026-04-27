@@ -1,5 +1,6 @@
 import asyncio
 from app.services.redis import invalidate_list
+from app.core.notifications.setup import init_notification_service
 import sentry_sdk
 import time
 from contextlib import asynccontextmanager
@@ -52,6 +53,7 @@ async def lifespan(app: FastAPI):
     app.state.consumer = consumer
     await consumer.start()
     await manager.start()
+    init_notification_service()
 
     yield
     
