@@ -69,6 +69,7 @@ class TemplateEngine:
         return email_data.html_content, dict_data
 
     def _send_push_notification(self, ctx: dict) -> tuple[str, dict]:
+        print("ctx.......", ctx)
         dict_data = {
             "subject": "",
             "recipient": "",

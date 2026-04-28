@@ -53,6 +53,9 @@ class NotificationService:
         Looks up the registry, renders templates, and sends through all
         configured channels. Returns a result map e.g. {"email": True, "slack": False}.
         """
+        logger.info("Sending notifications........................")
+        # logger.info(event)
+        logger.info("")
         event_type = type(event)
         handler_config = self._registry.get(event_type)
 
@@ -62,12 +65,23 @@ class NotificationService:
 
         # Convert event to a plain dict for template rendering
         context = dataclasses.asdict(event)
-        print(context)
+        print("context........", context)
         event_name = _event_to_template_name(event_type)
+        print("event_name........", event_name)
+        if event_name is None:
+            return
 
         try:
             message, send_kwargs = self.templates.render(handler_config["template"], event_name, context)
-        except NotImplementedError:
+            logger.info("message......", message)
+            logger.info("send_kwargs......", send_kwargs)
+        except NotImplementedError as e:
+            logger.info("NotImplementedError......")
+            logger.info(e)
+            return {}
+        except Exception as e:
+            logger.info("Exception......")
+            logger.info(e)
             return {}
 
         tasks = []
@@ -126,11 +140,15 @@ class NotificationService:
 # Helpers
 # ------------------------------------------------------------------ #
 
-def _event_to_template_name(event_type: type) -> str:
+def _event_to_template_name(event_type: type) -> str | None:
     """OrderConfirmedEvent → 'order_confirmed'"""
-    name = event_type.__name__
-    if name.endswith("Event"):
-        name = name[:-5]
-    # CamelCase → snake_case
-    import re
-    return re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
+    try:
+        name = event_type.__name__
+        if name.endswith("Event"):
+            name = name[:-5]
+        # CamelCase → snake_case
+        import re
+        return re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
+    except Exception as e:
+        logger.error(e)
+        return None

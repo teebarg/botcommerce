@@ -104,7 +104,7 @@ function RouteComponent() {
                         />
                     )}
                     {items.length === 0 && (
-                        <div className="text-center py-12 bg-secondary">
+                        <div className="text-center py-12 px-2 bg-secondary">
                             <p className="text-muted-foreground">No abandoned carts found, adjust the time range or search query</p>
                         </div>
                     )}
