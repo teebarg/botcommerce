@@ -97,17 +97,36 @@ def cache_response(key_prefix: str, key: Union[str, Callable[..., str], None] = 
         return wrapper
     return decorator
 
+# @handle_redis_errors(default=None)
+# async def invalidate_keys(pattern: str) -> None:
+#     """
+#     Delete all Redis keys matching pattern.
+#     """
+#     try:
+#         keys = await redis_client.keys(f"{pattern}*")
+#         if keys:
+#             await redis_client.delete(*keys)
+#     except Exception as e:
+#         # logger.error(f"Error invalidating list {pattern}: {e}")
+#         print(f"Error invalidating list {pattern}: {e}")
+
+
 @handle_redis_errors(default=None)
 async def invalidate_keys(pattern: str) -> None:
     """
-    Delete all Redis keys matching pattern.
+    Delete all Redis keys matching pattern using SCAN (non-blocking).
     """
     try:
-        keys = await redis_client.keys(f"{pattern}*")
-        if keys:
-            await redis_client.delete(*keys)
+        cursor = 0
+        while True:
+            cursor, keys = await redis_client.scan(cursor, match=f"{pattern}*", count=100)
+            if keys:
+                await redis_client.delete(*keys)
+            if cursor == 0:
+                break
     except Exception as e:
-        logger.error(f"Error invalidating list {pattern}: {e}")
+        # logger.error(f"Error invalidating pattern {pattern}: {e}")
+        print(f"Error invalidating list {pattern}: {e}")
 
 
 @handle_redis_errors(default=None)
@@ -133,16 +152,44 @@ async def delete_session(session_id: str):
     await redis_client.delete(f"session:{session_id}")
 
 
-async def refresh_data(*, keys=None, patterns=None) -> None:
-    """
-    Invalidate redis keys/patterns and broadcast affected frontend keys.
+# async def refresh_data(*, keys=None, patterns=None) -> None:
+#     """
+#     Invalidate redis keys/patterns and broadcast affected frontend keys.
 
-    Example:
-        await refresh_data(
-            keys=[f"order:{id}", f"order-timeline:{id}"],
-            patterns="orders",
-        )
-    """
+#     Example:
+#         await refresh_data(
+#             keys=[f"order:{id}", f"order-timeline:{id}"],
+#             patterns="orders",
+#         )
+#     """
+#     def normalize(value):
+#         if value is None:
+#             return []
+#         if isinstance(value, str):
+#             return [value]
+#         return list(value)
+
+#     key_list = normalize(keys)
+#     pattern_list = normalize(patterns)
+
+#     tasks = []
+
+#     for key in key_list:
+#         tasks.append(invalidate_key_only(key=key))
+
+#     for pattern in pattern_list:
+#         tasks.append(invalidate_keys(pattern=pattern))
+
+#     if tasks:
+#         await asyncio.gather(*tasks)
+
+#     await manager.broadcast_to_all(
+#         data={"keys": pattern_list + key_list},
+#         message_type="invalidate",
+#     )
+
+
+async def refresh_data(*, keys=None, patterns=None) -> None:
     def normalize(value):
         if value is None:
             return []
@@ -153,16 +200,18 @@ async def refresh_data(*, keys=None, patterns=None) -> None:
     key_list = normalize(keys)
     pattern_list = normalize(patterns)
 
-    tasks = []
+    if key_list:
+        try:
+            async with redis_client.pipeline(transaction=False) as pipe:
+                for key in key_list:
+                    pipe.delete(key)
+                await pipe.execute()
+        except Exception as e:
+            logger.error(f"Pipeline key invalidation failed: {e}")
 
-    for key in key_list:
-        tasks.append(invalidate_key_only(key=key))
-
+    # Pattern scans must be sequential — each one holds a connection during SCAN loop
     for pattern in pattern_list:
-        tasks.append(invalidate_keys(pattern=pattern))
-
-    if tasks:
-        await asyncio.gather(*tasks)
+        await invalidate_keys(pattern=pattern)
 
     await manager.broadcast_to_all(
         data={"keys": pattern_list + key_list},
