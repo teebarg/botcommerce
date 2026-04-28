@@ -10,6 +10,7 @@ from app.services.redis import refresh_data, invalidate_key_only
 import random
 from datetime import datetime, timezone
 from app.services.websocket import manager
+from app.redis_client import redis_client
 
 logger = get_logger(__name__)
 
@@ -21,14 +22,21 @@ async def delete_product_index(product_ids: List[int]) -> None:
             delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(pid))
             for pid in product_ids
         ])
-        await asyncio.gather(*[
-            invalidate_key_only(f"product:similar:{pid}")
-            for pid in product_ids
-        ])
+        await _batch_invalidate_pipeline(product_ids=product_ids)
         await invalidate_product_cache()
     except Exception as e:
         logger.error(f"Error deleting products {product_ids} from index: {e}")
 
+
+async def _batch_invalidate_pipeline(product_ids: List[int]) -> None:
+    keys = [f"product:similar:{pid}" for pid in product_ids]
+    try:
+        async with redis_client.pipeline(transaction=False) as pipe:
+            for key in keys:
+                pipe.delete(key)
+            await pipe.execute()
+    except Exception as e:
+        logger.error(f"Error batch invalidating keys: {e}")
 
 @with_prisma_connection
 async def index_product(product_id: int) -> None:
