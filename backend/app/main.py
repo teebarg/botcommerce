@@ -1,5 +1,6 @@
 import asyncio
 from app.services.redis import invalidate_list
+from app.core.notifications.setup import init_notification_service
 import sentry_sdk
 import time
 from contextlib import asynccontextmanager
@@ -41,7 +42,7 @@ async def lifespan(app: FastAPI):
     app.state.redis = redis_client
 
     # try:
-    #     logger.info("Creating Redis stream and group")
+    #     logger.debug("Creating Redis stream and group")
     #     await redis_client.xgroup_create(STREAM_NAME, GROUP_NAME, id="$", mkstream=True)
     # except Exception as e:
     #     logger.error(f"Failed to create Redis stream and group: {e}")
@@ -52,6 +53,7 @@ async def lifespan(app: FastAPI):
     app.state.consumer = consumer
     await consumer.start()
     await manager.start()
+    init_notification_service()
 
     yield
     
@@ -103,7 +105,7 @@ class TimingMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         duration = time.time() - start_time
         duration_ms = round(duration * 1000, 2)
-        logger.info(f"{request.method} {request.url.path} - {duration_ms}ms")
+        logger.debug(f"{request.method} {request.url.path} - {duration_ms}ms")
 
         return response
 
@@ -353,7 +355,7 @@ async def process_stream_id(stream_id: str, request: Request):
         raise HTTPException(status_code=404, detail="Message not found")
 
     msg_id, data = msgs[0]
-    logger.info(f"📦 Received message: {msg_id} -> {data}")
+    logger.debug(f"📦 Received message: {msg_id} -> {data}")
 
     try:
        await consumer.process_stream(msg_id=msg_id, data=data)

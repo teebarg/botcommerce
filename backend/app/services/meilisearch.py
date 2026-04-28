@@ -82,7 +82,7 @@ async def add_documents_to_index(index_name: str, documents: list) -> None:
         return task
 
     task = await to_thread.run_sync(_add)
-    logger.info(f"Added {len(documents)} documents to index {index_name}, task: {task.task_uid}")
+    logger.debug(f"Added {len(documents)} documents to index {index_name}, task: {task.task_uid}")
 
 
 async def update_document(index_name: str, document: dict) -> None:
@@ -97,7 +97,7 @@ async def update_document(index_name: str, document: dict) -> None:
         return task
 
     task = await to_thread.run_sync(_update)
-    logger.info(f"Updated document {document['id']} in index {index_name}, task: {task.task_uid}")
+    logger.debug(f"Updated document {document['id']} in index {index_name}, task: {task.task_uid}")
 
 
 async def delete_document(index_name: str, document_id: str) -> None:
@@ -112,7 +112,7 @@ async def delete_document(index_name: str, document_id: str) -> None:
         return task
 
     task = await to_thread.run_sync(_delete)
-    logger.info(f"Deleted document {document_id} from index {index_name}, task: {task.task_uid}")
+    logger.debug(f"Deleted document {document_id} from index {index_name}, task: {task.task_uid}")
 
 
 async def clear_index(index_name: str) -> None:
@@ -127,7 +127,7 @@ async def clear_index(index_name: str) -> None:
         return task
 
     task = await to_thread.run_sync(_clear)
-    logger.info(f"Cleared index {index_name}, task: {task.task_uid}")
+    logger.debug(f"Cleared index {index_name}, task: {task.task_uid}")
 
 
 def delete_index(index_name: str) -> None:
@@ -135,4 +135,4 @@ def delete_index(index_name: str) -> None:
     Clear index from a Meilisearch.
     """
     client.delete_index(index_name)
-    logger.info(f"Deleted index {index_name}")
+    logger.debug(f"Deleted index {index_name}")

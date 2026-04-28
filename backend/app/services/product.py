@@ -61,7 +61,7 @@ async def index_product(product_id: int) -> None:
 @with_prisma_connection
 async def index_products(product_ids: Optional[List[int]] = None):
     try:
-        logger.info("Starting re-indexing..........")
+        logger.debug("Starting re-indexing..........")
         products = await db.product.find_many(
             where={"id": {"in": product_ids}} if product_ids else None,
             include={
@@ -78,7 +78,7 @@ async def index_products(product_ids: Optional[List[int]] = None):
             return
 
         if product_ids is None or len(product_ids) < 1:
-            logger.info("Clearing index...")
+            logger.debug("Clearing index...")
             await clear_index(index_name=settings.MEILI_PRODUCTS_INDEX)
 
         documents = []
@@ -98,10 +98,10 @@ async def index_products(product_ids: Optional[List[int]] = None):
         for i in range(0, len(documents), BATCH_SIZE):
             batch = documents[i:i + BATCH_SIZE]
             await add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=batch)
-            logger.info(f"Indexed batch {i // BATCH_SIZE + 1} ({len(batch)} products)")
+            logger.debug(f"Indexed batch {i // BATCH_SIZE + 1} ({len(batch)} products)")
 
         await invalidate_product_cache(keys=cache_keys)
-        logger.info(f"Successfully indexed {len(documents)} products")
+        logger.debug(f"Successfully indexed {len(documents)} products")
     except Exception as e:
         logger.error(f"Error during product re-indexing: {e}")
 

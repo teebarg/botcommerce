@@ -323,7 +323,7 @@ async def bulk_delete_gallery_images(
                 message_type="bulk_action"
             )
 
-            logger.info(f"Bulk delete completed for {len(images)} images")
+            logger.debug(f"Bulk delete completed for {len(images)} images")
         except Exception as e:
             logger.error(f"Error processing bulk delete: {str(e)}")
             await manager.broadcast_to_all(
@@ -596,7 +596,7 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images) -> None
     if failed_ids:
         logger.warning(f"Bulk update partial failure — failed image ids: {failed_ids}")
     else:
-        logger.info(f"Bulk update completed for {len(images)} images")
+        logger.debug(f"Bulk update completed for {len(images)} images")
 
 
 @router.patch("/bulk-update", dependencies=[Depends(require_admin)])

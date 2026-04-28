@@ -1,4 +1,4 @@
-from app.services.notification import send_notifications_to_subscribers
+from app.core.notifications.events import SendPushNotificationEvent
 from fastapi import APIRouter, BackgroundTasks
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
@@ -7,7 +7,7 @@ from app.models.generic import Message
 from app.core.logging import get_logger
 from app.services.redis import redis_client
 from app.prisma_client import prisma as db
-from app.core.deps import UserDep
+from app.core.deps import Notification, UserDep
 
 from typing import Optional, Literal
 from datetime import datetime
@@ -74,12 +74,10 @@ async def push_fcm(data: FCMIn, user: UserDep) -> Message:
 
 
 @router.post("/push")
-async def send_push_notification(data: PushMessageSchema, background_tasks: BackgroundTasks) -> Message:
+async def send_push_notification(data: PushMessageSchema, background_tasks: BackgroundTasks, notification: Notification) -> Message:
     try:
         subscriptions = await db.pushsubscription.find_many()
-        logger.info(f"Found {len(subscriptions)} subscriptions")
-
-        background_tasks.add_task(send_notifications_to_subscribers, subscriptions=[subscription.model_dump() for subscription in subscriptions], notification=data.model_dump())
+        background_tasks.add_task(notification.dispatch, SendPushNotificationEvent(subscriptions=[subscription.model_dump() for subscription in subscriptions], notification=data.model_dump()))
         return Message(message="success")
     except Exception as e:
         logger.error(f"Failed to send push notifications: {str(e)}")

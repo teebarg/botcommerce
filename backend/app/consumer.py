@@ -2,8 +2,8 @@ import asyncio
 from app.core.logging import get_logger
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
-from app.core.deps import get_notification_service
 from app.services.order import send_notification, process_order_payment
+from app.core.notifications.setup import get_notification_service
 from prisma.enums import OrderStatus, PaymentStatus, PaymentMethod, CartStatus
 from app.services.recently_viewed import RecentlyViewedService
 from app.services.popular_products import PopularProductsService
@@ -32,15 +32,15 @@ class RedisStreamConsumer:
             """Run a task, restart on unexpected failure until shutdown."""
             while not self.shutdown_event.is_set():
                 try:
-                    logger.info(f"Starting task: {name}")
+                    logger.debug(f"Starting task: {name}")
                     await coro()
                 except asyncio.CancelledError:
-                    logger.info(f"Task cancelled: {name}")
+                    logger.error(f"Task cancelled: {name}")
                     raise
                 except Exception as e:
-                    logger.exception(f"Task {name} crashed with error: {e}, restarting...")
+                    logger.critical(f"Task {name} crashed with error: {e}, restarting...")
                     await asyncio.sleep(1)
-            logger.info(f"Task stopped: {name}")
+            logger.debug(f"Task stopped: {name}")
 
         self.consume_task = asyncio.create_task(
             supervise(self.consume, "redis-consume"), name="redis-consume-supervisor"
@@ -49,7 +49,7 @@ class RedisStreamConsumer:
         #     supervise(self.claim_stale_messages, "redis-claim-stale"), name="redis-claim-stale-supervisor"
         # )
 
-        logger.info("Redis consumer started with supervision...")
+        logger.debug("Redis consumer started with supervision...")
 
     async def stop(self):
         """Stop consumer loops gracefully"""
@@ -58,7 +58,7 @@ class RedisStreamConsumer:
         tasks = [t for t in [self.consume_task] if t]
 
         for task in tasks:
-            logger.info(f"Cancelling task: {task.get_name()}")
+            logger.debug(f"Cancelling task: {task.get_name()}")
             task.cancel()
 
         if tasks:
@@ -70,7 +70,7 @@ class RedisStreamConsumer:
             except asyncio.TimeoutError:
                 logger.warning("Some consumer tasks didn’t stop gracefully")
 
-        logger.info("Redis consumer stopped.")
+        logger.debug("Redis consumer stopped.")
 
     async def consume(self):
         try:
@@ -109,7 +109,7 @@ class RedisStreamConsumer:
                 "0-0",
                 count=10
             )
-            logger.info(f"Claimed {len(claimed[1])} stale messages")
+            logger.debug(f"Claimed {len(claimed[1])} stale messages")
             for msg_id, data in claimed[1]:
                 await self._process(msg_id, data)
         except Exception as e:

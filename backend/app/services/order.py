@@ -1,5 +1,6 @@
 from typing import Optional
 import uuid
+from app.core.notifications.events import InvoiceEvent, OrderConfirmedEvent
 from fastapi import HTTPException, BackgroundTasks
 from app.prisma_client import prisma as db
 from app.models.order import Order, OrderCreate
@@ -7,7 +8,7 @@ from app.core.utils import generate_invoice_email, generate_payment_receipt, gen
 from app.core.logging import logger
 from app.services.invoice import invoice_service
 from datetime import datetime
-from app.core.deps import supabase, Notification
+from app.core.deps import Notification, supabase
 from app.services.product import index_product
 from app.core.config import settings
 from app.services.events import publish_order_event
@@ -157,7 +158,7 @@ async def list_orders(
     }
 
 
-async def send_notification(id: int, user_id: int, notification):
+async def send_notification(id: int, user_id: int, notification: Notification):
     try:
         user = await db.user.find_unique(where={"id": user_id})
         if not user:
@@ -177,71 +178,22 @@ async def send_notification(id: int, user_id: int, notification):
             }
         )
 
-        try:
-            email_data = await generate_invoice_email(order=order, user=user)
-            service = ShopSettingsService()
-            shop_email = await service.get("shop_email")
-            cc_list = [shop_email] if shop_email else []
-            await notification.send_notification(
-                channel_name="email",
-                recipient=user.email,
-                subject=email_data.subject,
-                message=email_data.html_content,
-                cc_list=cc_list,
-            )
-            logger.info(f"Invoice email sent to user: {user_id}")
-        except Exception as e:
-            logger.error(f"Failed to generate invoice email: {e}")
-            return
+        service = ShopSettingsService()
+        shop_email = await service.get("shop_email")
+        cc_list = [shop_email] if shop_email else []
 
         order_link: str = f"{settings.FRONTEND_HOST}/order/confirmed/{order.order_number}"
         items_overview: str = "\n".join(
             [f"• {it.name} x{it.quantity} - {it.price}" for it in (order.order_items or [])]
         ) or "No items found"
 
-        slack_message = {
-            "text": (
-                f"🛍️ *New Order Created* 🛍️\n"
-                f"*Order:* <{order_link}|{order.order_number}>\n"
-                f"*Customer:* {user.first_name} {user.last_name}\n"
-                f"*Email:* {user.email}\n"
-                f"*Amount:* {order.total}\n"
-                f"*Payment Status:* {order.payment_status}\n"
-                f"*Items:*\n{items_overview}\n"
-            )
-        }
-
-        await notification.send_notification(
-            channel_name="slack",
-            slack_message=slack_message
-        )
-        logger.info(f"Slack notification sent to user: {user_id}")
-
-        try:
-            service = ShopSettingsService()
-            contact = await service.get("whatsapp")
-            whatsapp_available = hasattr(notification, "channels") and "whatsapp" in getattr(notification, "channels", {})
-            if contact and whatsapp_available:
-                normalized = contact.value.replace(" ", "").replace("+", "")
-                whatsapp_text = (
-                    f"New order: {order.order_number}\n"
-                    f"Customer: {user.first_name} {user.last_name}\n"
-                    f"Email: {user.email}\n"
-                    f"Amount: {order.total}\n"
-                    f"Payment: {order.payment_status}\n"
-                    f"Items:\n{items_overview}\n\n"
-                    f"View order: {order_link}\n"
-                )
-                await notification.send_notification(
-                    channel_name="whatsapp",
-                    recipient=normalized,
-                    message=whatsapp_text,
-                )
-                logger.info("WhatsApp notification sent to shop contact")
-            else:
-                logger.info("WhatsApp not configured or shop contact missing. Skipping WhatsApp notification.")
-        except Exception as e:
-            logger.error(f"Failed to send WhatsApp notification: {e}")
+        await notification.dispatch(OrderConfirmedEvent(
+            order=order,
+            user=user,
+            order_link=order_link,
+            items_overview=items_overview,
+            cc_list=cc_list
+        ))
     except Exception as e:
         logger.error(f"Failed to send notification: {e}")
 
@@ -284,7 +236,7 @@ async def create_invoice(order_id: int) -> str:
         raise Exception("An unexpected error occurred while generating the invoice")
 
 
-async def decrement_variant_inventory_for_order(order, notification=None) -> None:
+async def decrement_variant_inventory_for_order(order, notification: Notification) -> None:
     """
     Decrement inventory for each variant in the order.
     If inventory reaches 0, set status to OUT_OF_STOCK and send notification.
@@ -297,7 +249,7 @@ async def decrement_variant_inventory_for_order(order, notification=None) -> Non
             quantity = item.quantity
             variant = await db.productvariant.find_unique(where={"id": variant_id})
             if not variant:
-                logger.info(f"Variant {variant_id} not found for order {order.id}")
+                logger.warning(f"Variant {variant_id} not found for order {order.id}")
                 continue
             new_inventory = max(0, variant.inventory - quantity)
             update_data = {"inventory": new_inventory}
@@ -309,14 +261,14 @@ async def decrement_variant_inventory_for_order(order, notification=None) -> Non
             await index_product(product_id=variant.product_id)
             if out_of_stock:
                 out_of_stock_variants.append(variant)
-            logger.info(f"Decrementing inventory for variant {variant_id} in order {order.id}")
+            logger.debug(f"Decrementing inventory for variant {variant_id} in order {order.id}")
         await refresh_data(patterns=["gallery"])
     except Exception as e:
         logger.error(f"Failed to decrement variant inventory for order {order.id}: {e}")
         raise Exception("Failed to decrement variant inventory for order")
 
     if out_of_stock_variants and notification:
-        logger.info(f"Out of stock variants found for order {order.id}: {out_of_stock_variants}")
+        logger.debug(f"Out of stock variants found for order {order.id}: {out_of_stock_variants}")
         try:
             slack_text: str = f"🚨 *OUT OF STOCK* 🚨\nOrder ID: {order.id}\n" + "\n".join([
                 f"• SKU: {v.sku}, Product ID: {v.product_id}" for v in out_of_stock_variants
@@ -332,18 +284,15 @@ async def decrement_variant_inventory_for_order(order, notification=None) -> Non
 
 async def send_payment_receipt(order, notification: Notification) -> None:
     try:
-        email_data = await generate_payment_receipt(order=order, user=order.user)
         service = ShopSettingsService()
         shop_email: str | None = await service.get("shop_email")
-        cc_list: list[str] | list[Unknown] = [shop_email] if shop_email else []
-        await notification.send_notification(
-            channel_name="email",
-            recipient=order.user.email,
-            subject=email_data.subject,
-            message=email_data.html_content,
-            cc_list=cc_list,
-        )
-        logger.info(f"Invoice email sent to user: {order.user_id}")
+        cc_list = [shop_email] if shop_email else []
+
+        await notification.dispatch(InvoiceEvent(
+            order=order,
+            cc_list=cc_list
+        ))
+        logger.debug(f"Invoice email sent to user: {order.user_id}")
     except Exception as e:
         logger.error(f"Failed to generate invoice email: {e}")
 
@@ -396,7 +345,7 @@ async def return_order_item(order_id: int, item_id: int, background_tasks: Backg
         if variant_id is not None:
             variant = await tx.productvariant.find_unique(where={"id": variant_id})
             if variant and order_item.order.payment_status == "SUCCESS":
-                logger.info(f"Incrementing inventory for variant {variant_id} in order {order_id}")
+                logger.debug(f"Incrementing inventory for variant {variant_id} in order {order_id}")
                 new_inventory = (variant.inventory or 0) + quantity
                 update_data = {
                     "inventory": new_inventory,
@@ -456,7 +405,7 @@ async def return_order_item(order_id: int, item_id: int, background_tasks: Backg
 
     return {"message": "Item returned successfully"}
 
-async def process_referral(order, notification=None) -> None:
+async def process_referral(order, notification: Notification) -> None:
     coupon_owner = await db.user.find_unique(where={"referral_code": order.coupon_code})
     async with db.tx() as tx:
         await tx.wallettransaction.create(
@@ -482,7 +431,7 @@ async def process_referral(order, notification=None) -> None:
             message=email_data.html_content,
             cc_list=cc_list,
         )
-        logger.info(f"Referral cashback email sent to user: {coupon_owner.id}")
+        logger.debug(f"Referral cashback email sent to user: {coupon_owner.id}")
     except Exception as e:
         logger.error(f"Failed to generate referral cashback email: {e}")
         return

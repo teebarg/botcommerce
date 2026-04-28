@@ -55,7 +55,7 @@ async def websocket(ws: WebSocket) -> None:
                             if session_id:
                                 await redis_client.set(f"chat_user:{session_id}", user_id)
                                 await redis_client.delete(f"chat_session:{app_session_id}")
-                                logger.info(f"Updated chat mapping {session_id} → {user_id}")
+                                logger.debug(f"Updated chat mapping {session_id} → {user_id}")
                         else:
                             await manager.register(user_id=user_id, websocket=ws)
                             logger.debug(f"Promotion failed, registered {user_id} directly")
@@ -77,7 +77,7 @@ async def websocket(ws: WebSocket) -> None:
                 continue
 
     except WebSocketDisconnect:
-        logger.info(f"WebSocket disconnected for user {user_id or app_session_id}")
+        logger.debug(f"WebSocket disconnected for user {user_id or app_session_id}")
     except Exception as e:
         logger.error(f"Unexpected error in websocket handler: {e}")
     finally:

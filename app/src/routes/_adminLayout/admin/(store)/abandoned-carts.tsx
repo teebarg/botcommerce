@@ -49,7 +49,7 @@ function RouteComponent() {
     return (
         <div className="bg-background">
             <div className="border-b bg-background sticky top-16 z-10">
-                <div className="container mx-auto px-6 py-4">
+                <div className="container mx-auto px-4 py-4">
                     <div className="mb-4">
                         <h1 className="text-3xl font-bold">Abandoned Carts</h1>
                         <p className="text-muted-foreground">Monitor and recover lost sales opportunities</p>
@@ -64,7 +64,7 @@ function RouteComponent() {
                                 onChange={(e) => updateQuery([{ key: "search", value: e.target.value }])}
                             />
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-col md:flex-row items-center gap-2">
                             <Select
                                 value={params.time || "24"}
                                 onValueChange={(value) => updateQuery([{ key: "time", value }])}
@@ -84,6 +84,7 @@ function RouteComponent() {
                                 disabled={sendRemindersLoading}
                                 isLoading={sendRemindersLoading}
                                 onClick={() => sendReminders({ hours_threshold: parseInt(params.time || "24") })}
+                                className="w-full"
                             >
                                 Send Reminders
                             </Button>
@@ -104,7 +105,7 @@ function RouteComponent() {
                         />
                     )}
                     {items.length === 0 && (
-                        <div className="text-center py-12 bg-secondary">
+                        <div className="text-center py-12 px-2 bg-secondary">
                             <p className="text-muted-foreground">No abandoned carts found, adjust the time range or search query</p>
                         </div>
                     )}

@@ -354,7 +354,7 @@ async def feed(
                 hits.extend(wrap_res["hits"])
                 total_count += wrap_res["estimatedTotalHits"]
         else:
-            print("in normal search")
+            logger.debug("in normal search")
             search_params = {
                 "limit": limit,
                 "sort": [sort],
@@ -724,7 +724,7 @@ async def configure_filterable_attributes(
         index.update_sortable_attributes(REQUIRED_SORTABLES)
         # index.update_non_separator_tokens(["-"])
 
-        logger.info(f"Updated filterable attributes: {attributes}")
+        logger.debug(f"Updated filterable attributes: {attributes}")
         return Message(
             message=f"Filterable attributes updated successfully: {attributes}"
         )
