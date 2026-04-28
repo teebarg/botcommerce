@@ -1,5 +1,7 @@
 from typing import Annotated, Literal, Optional
 
+from app.core.notifications.service import NotificationService
+from app.core.notifications.setup import get_notification_service
 import jwt
 from fastapi import Depends, HTTPException, status, Cookie
 from fastapi.security import APIKeyHeader, OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
@@ -7,7 +9,6 @@ from pydantic import BaseModel, ValidationError
 
 from app.core import security
 from app.core.config import settings
-from app.services.notification import EmailChannel, NotificationService, SlackChannel, WhatsAppChannel, PushChannel
 from app.prisma_client import prisma
 from meilisearch import Client as MeilisearchClient
 from app.models.user import UserInternal as User
@@ -171,37 +172,6 @@ async def get_principal(
     )
 
 PrincipalDep = Annotated[Principal, Depends(get_principal)]
-
-def get_notification_service() -> NotificationService:
-    notification_service = NotificationService()
-
-    # Configure email channel
-    email_channel = EmailChannel(
-        smtp_host=settings.SMTP_HOST,
-        smtp_port=settings.SMTP_PORT,
-        username=settings.SMTP_USER,
-        password=settings.SMTP_PASSWORD
-    )
-    notification_service.register_channel("email", email_channel)
-
-    # Configure slack channel
-    slack_channel = SlackChannel(webhook_url=settings.SLACK_ALERTS)
-    notification_service.register_channel("slack", slack_channel)
-
-    # Configure WhatsApp channel
-    if getattr(settings, "WHATSAPP_TOKEN", None) and getattr(settings, "WHATSAPP_PHONE_NUMBER_ID", None):
-        whatsapp_channel = WhatsAppChannel(
-            token=settings.WHATSAPP_TOKEN,
-            phone_number_id=settings.WHATSAPP_PHONE_NUMBER_ID,
-        )
-        notification_service.register_channel("whatsapp", whatsapp_channel)
-
-    # Configure Push channel
-    if getattr(settings, "VAPID_PRIVATE_KEY", None):
-        push_channel = PushChannel()
-        notification_service.register_channel("push", push_channel)
-
-    return notification_service
 
 Notification = Annotated[NotificationService, Depends(get_notification_service)]
 

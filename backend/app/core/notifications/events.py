@@ -10,27 +10,11 @@ class BaseNotificationEvent:
 
 @dataclass
 class OrderConfirmedEvent(BaseNotificationEvent):
-    order_id: int
-    user_email: str
-    user_phone: Optional[str] = None
-    user_name: Optional[str] = None
-    order_total: Optional[float] = None
-
-
-@dataclass
-class OrderShippedEvent(BaseNotificationEvent):
-    order_id: int
-    user_email: str
-    user_phone: Optional[str] = None
-    tracking_number: Optional[str] = None
-
-
-@dataclass
-class PasswordResetEvent(BaseNotificationEvent):
-    user_email: str
-    reset_link: str
-    user_name: Optional[str] = None
-
+    order: Dict
+    user: Dict
+    order_link: str
+    items_overview: str
+    cc_list: List[str]
 
 @dataclass
 class SendAbandonedCartEvent(BaseNotificationEvent):
@@ -44,3 +28,8 @@ class SendAbandonedCartEvent(BaseNotificationEvent):
 class SendPushNotificationEvent(BaseNotificationEvent):
     subscriptions: List[Dict]
     notification: Dict
+
+@dataclass
+class InvoiceEvent(BaseNotificationEvent):
+    order: Dict
+    cc_list: List[str]

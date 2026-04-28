@@ -131,7 +131,7 @@ async def send_email_smtp(
     if not settings.EMAILS_ENABLED:
         return
     if email_to.lower().endswith("@guest.com"):
-        logger.info("Skipping email send to guest.com address: %s", email_to)
+        logger.debug("Skipping email send to guest.com address: %s", email_to)
         return
 
     try:
@@ -159,7 +159,7 @@ async def send_email_smtp(
         if settings.SMTP_PASSWORD:
             smtp_options["password"] = settings.SMTP_PASSWORD
         response = message.send(to=email_to, smtp=smtp_options)
-        logger.info(f"send email result: {response}")
+        logger.debug(f"send email result: {response}")
         if not response.status_code or response.status_code != 250:
             raise Exception("Email sending failed")
     except Exception as e:
@@ -184,11 +184,11 @@ async def send_email_brevo(
     """
 
     if not settings.EMAILS_ENABLED:
-        logger.info("Emails disabled via EMAILS_ENABLED setting")
+        logger.warning("Emails disabled via EMAILS_ENABLED setting")
         return
 
     if email_to.lower().endswith("@guest.com"):
-        logger.info("Skipping email send to guest.com address: %s", email_to)
+        logger.debug("Skipping email send to guest.com address: %s", email_to)
         return
 
     if not hasattr(settings, 'BREVO_API_KEY') or not settings.BREVO_API_KEY:
@@ -222,7 +222,7 @@ async def send_email_brevo(
         "api-key": settings.BREVO_API_KEY
     }
 
-    logger.info(f"Sending email via Brevo to: {email_to}")
+    logger.debug(f"Sending email via Brevo to: {email_to}")
 
     try:
         async with httpx.AsyncClient() as client:
@@ -236,10 +236,10 @@ async def send_email_brevo(
         if response.status_code == 201:
             response_data = response.json()
             message_id = response_data.get("messageId", "unknown")
-            logger.info(f"Email sent successfully via Brevo. Message ID: {message_id}")
+            logger.debug(f"Email sent successfully via Brevo. Message ID: {message_id}")
         else:
             error_text = response.text
-            logger.error(f"Brevo API error: {response.status_code} - {error_text}")
+            logger.critical(f"Brevo API error: {response.status_code} - {error_text}")
 
             raise Exception(f"Brevo API error: {response.status_code} - {error_text}")
 

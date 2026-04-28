@@ -37,7 +37,7 @@ async def admin_chat(payload: ChatRequest) -> Message:
 
     customer = await redis_client.get(f"chat_user:{payload.conversation_uuid}")
     if not customer:
-        logger.info(f"No customer connected for conversation {payload.conversation_uuid}")
+        logger.warning(f"No customer connected for conversation {payload.conversation_uuid}")
         return Message(message="message sent successfully")
 
     customer = customer.decode() if isinstance(customer, bytes) else customer

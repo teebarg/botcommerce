@@ -1,6 +1,8 @@
 import asyncio
+import json
 from celery_app import celery_app
 from services.image_enrichment import get_enrichment
+from db import database
 
 @celery_app.task(name="tasks.enrich_products.run")
 def enrich_products(limit: int = 10):

@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("🚀connecting to dbs......:")
+    logger.debug("🚀connecting to dbs......:")
     await database.connect()
-    logger.info("✅ ~ connected to pyscopg......:")
+    logger.debug("✅ ~ connected to pyscopg......:")
     yield
     await database.disconnect()
 

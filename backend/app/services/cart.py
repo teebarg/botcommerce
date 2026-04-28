@@ -29,7 +29,7 @@ async def get_cart(cart_number: Optional[str], user_id: Optional[str]) -> Cart |
 
 async def calculate_cart_totals(cart_id: int):
     """Helper function to calculate cart totals"""
-    logger.info(f"Calculating cart totals for cart {cart_id}")
+    logger.debug(f"Calculating cart totals for cart {cart_id}")
     try:
         from app.services.coupon import CouponService
         service = ShopSettingsService()
@@ -88,7 +88,7 @@ async def calculate_cart_totals(cart_id: int):
 
 
 async def merge_cart(user_id: int, cart_number: Optional[str] = None) -> None:
-    logger.info(f"Merging cart for user {user_id} with cart number {cart_number}")
+    logger.debug(f"Merging cart for user {user_id} with cart number {cart_number}")
     try:
         async with db.tx() as tx:
             user_cart = await tx.cart.find_first(
@@ -111,7 +111,7 @@ async def merge_cart(user_id: int, cart_number: Optional[str] = None) -> None:
             # CASE 1: Both carts exist — merge items
             # ----------------------------------------
             if user_cart and guest_cart:
-                logger.info(
+                logger.debug(
                     f"Merging guest cart {guest_cart.cart_number} "
                     f"into user cart {user_cart.cart_number}"
                 )
@@ -141,7 +141,7 @@ async def merge_cart(user_id: int, cart_number: Optional[str] = None) -> None:
             # CASE 2: Only guest cart exists — claim it
             # ----------------------------------------
             elif guest_cart and not user_cart:
-                logger.info(
+                logger.debug(
                     f"Claiming guest cart {guest_cart.cart_number} for user {user_id}"
                 )
                 await tx.cart.update(

@@ -70,7 +70,7 @@ async def remove_image_from_storage(images: Union[str, List[str]]):
     if supabase_paths and supabase:
         try:
             supabase.storage.from_("product-images").remove(supabase_paths)
-            logger.info(f"Deleted {len(supabase_paths)} Supabase images")
+            logger.debug(f"Deleted {len(supabase_paths)} Supabase images")
         except Exception as e:
             logger.error(f"Error deleting Supabase images: {e}")
 
@@ -81,6 +81,6 @@ async def remove_image_from_storage(images: Union[str, List[str]]):
         for public_id in cloudinary_ids:
             try:
                 cloudinary.uploader.destroy(public_id)
-                logger.info(f"Deleted Cloudinary image: {public_id}")
+                logger.debug(f"Deleted Cloudinary image: {public_id}")
             except Exception as e:
                 logger.error(f"Error deleting Cloudinary image {public_id}: {e}")

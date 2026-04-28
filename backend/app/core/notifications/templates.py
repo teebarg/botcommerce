@@ -1,66 +1,61 @@
 from typing import Any
-from app.core.utils import generate_abandoned_cart_email
+from app.core.utils import generate_abandoned_cart_email, generate_invoice_email, generate_payment_receipt
 
 
 class TemplateEngine:
-    """
-    Minimal template engine.
-    Swap this out for Jinja2 if your templates grow complex.
-    """
-
-    def render(self, channel: str, event_name: str, context: dict[str, Any]) -> Any:
+    async def render(self, channel: str, event_name: str, context: dict[str, Any]) -> Any:
         method = f"_{event_name}"
         if not hasattr(self, method):
             raise NotImplementedError(
                 f"No template defined for channel='{channel}' event='{event_name}'"
             )
-        return getattr(self, method)(context)
+        return await getattr(self, method)(context)
 
-    # ------------------------------------------------------------------ #
-    # Email templates
-    # ------------------------------------------------------------------ #
 
-    def _email_order_confirmed(self, ctx: dict) -> str:
-        name = ctx.get("user_name") or "there"
-        order_id = ctx.get("order_id")
-        total = ctx.get("order_total")
-        total_line = f"<p><strong>Order total:</strong> ${total:.2f}</p>" if total else ""
-        return f"""
-        <h2>Hey {name}, your order is confirmed! 🎉</h2>
-        <p>Order <strong>#{order_id}</strong> has been received and is being processed.</p>
-        {total_line}
-        <p>We'll notify you once it ships.</p>
-        """
+    async def _order_confirmed(self, ctx: dict) -> tuple[str, dict]:
+        order = ctx.get("order")
+        user = ctx.get("user")
+        email = user.email
+        email_data = await generate_invoice_email(order=order, user=user)
+        dict_data = {
+            "subject": email_data.subject,
+            "recipient": email,
+            "cc_list": ctx.get("cc_list"),
+            "slack_message": {
+                "text": (
+                    f"🛍️ *New Order Created* 🛍️\n"
+                    f"*Order:* <{ctx.get('order_link')}|{order.order_number}>\n"
+                    f"*Customer:* {user.first_name} {user.last_name}\n"
+                    f"*Email:* {email}\n"
+                    f"*Amount:* {order.total}\n"
+                    f"*Payment Status:* {order.payment_status}\n"
+                    f"*Items:*\n{ctx.get('items_overview')}\n"
+                ),
+            }
+        }
+        return email_data.html_content, dict_data
 
-    def _email_order_shipped(self, ctx: dict) -> str:
-        order_id = ctx.get("order_id")
-        tracking = ctx.get("tracking_number")
-        tracking_line = f"<p><strong>Tracking number:</strong> {tracking}</p>" if tracking else ""
-        return f"""
-        <h2>Your order is on its way! 🚚</h2>
-        <p>Order <strong>#{order_id}</strong> has been shipped.</p>
-        {tracking_line}
-        """
-
-    def _send_abandoned_cart(self, ctx: dict) -> tuple[str, dict]:
-        email_data = generate_abandoned_cart_email(
-            cart_data=ctx.cart,
-            user_email=ctx.email or ctx.user.email,
-            user_name=ctx.user.first_name or ctx.user.username
+    async def _send_abandoned_cart(self, ctx: dict) -> tuple[str, dict]:
+        cart = ctx.get("cart", {})
+        email = ctx.get("user_email")
+        email_data = await generate_abandoned_cart_email(
+            cart_data=cart,
+            user_email=email,
+            user_name=ctx.get("user_name")
         )
         dict_data = {
             "subject": email_data.subject,
-            "recipient": ctx.email or ctx.user.email,
-            "subscriptions": ctx.subscriptions,
+            "recipient": email,
+            "subscriptions": ctx.get("subscriptions"),
             "notification": {"title": "Your cart is waiting 🛒", "body": "Complete checkout before your items sell out."},
             "slack_message": {
-                "text": f"✅ *Abandoned cart reminder sent to {ctx.user_email}*\nCart: {ctx.cart.cart_number}",
+                "text": f"✅ *Abandoned cart reminder sent to {email}*\nCart: {cart.get('cart_number')}",
                 "blocks": [
                     {
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": f"✅ *Abandoned cart reminder sent to {ctx.user_email}*\nCart: {ctx.cart.cart_number}"
+                            "text": f"✅ *Abandoned cart reminder sent to {email}*\nCart: {cart.get('cart_number')}"
                         }
                     }
                 ]
@@ -68,8 +63,17 @@ class TemplateEngine:
         }
         return email_data.html_content, dict_data
 
-    def _send_push_notification(self, ctx: dict) -> tuple[str, dict]:
-        print("ctx......._send_push_notification.............", ctx)
+    async def _send_invoice(self, ctx: dict) -> tuple[str, dict]:
+        order = ctx.get("order")
+        email_data = generate_payment_receipt(order=order, user=order.get("user"))
+        dict_data = {
+            "subject": email_data.subject,
+            "recipient": order.get("user", {}).get("email"),
+            "cc_list": ctx.get("cc_list")
+        }
+        return email_data.html_content, dict_data
+
+    async def _send_push_notification(self, ctx: dict) -> tuple[str, dict]:
         dict_data = {
             "subject": "",
             "recipient": "",
@@ -77,35 +81,3 @@ class TemplateEngine:
             "notification": ctx.get("notification"),
         }
         return "", dict_data
-
-    # ------------------------------------------------------------------ #
-    # WhatsApp templates (plain text only)
-    # ------------------------------------------------------------------ #
-
-    def _whatsapp_order_confirmed(self, ctx: dict) -> str:
-        name = ctx.get("user_name") or "there"
-        order_id = ctx.get("order_id")
-        return f"Hey {name}! Your order #{order_id} is confirmed ✅. We'll update you when it ships."
-
-    def _whatsapp_order_shipped(self, ctx: dict) -> str:
-        order_id = ctx.get("order_id")
-        tracking = ctx.get("tracking_number", "N/A")
-        return f"Great news! Order #{order_id} is on its way 🚚. Tracking: {tracking}"
-
-    # ------------------------------------------------------------------ #
-    # Slack templates (block kit dicts)
-    # ------------------------------------------------------------------ #
-
-    def _slack_order_confirmed(self, ctx: dict) -> dict:
-        return {
-            "text": f"New order confirmed: #{ctx.get('order_id')}",
-            "blocks": [
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": f"✅ *Order #{ctx.get('order_id')} confirmed*\nCustomer: {ctx.get('user_email')}",
-                    },
-                }
-            ],
-        }

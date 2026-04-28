@@ -41,10 +41,10 @@ class SlackChannel(NotificationChannel):
     def __init__(self, webhook_url: str):
         self.webhook_url = webhook_url
 
-    async def send(self, recipient: str, message: str, **kwargs) -> bool:
+    async def send(self, recipient: str, message: str, slack_message: dict, **kwargs) -> bool:
         try:
             async with httpx.AsyncClient() as client:
-                response = await client.post(self.webhook_url, json=kwargs.get("slack_message", {}), timeout=10)
+                response = await client.post(self.webhook_url, json=slack_message, timeout=10)
             return response.status_code == 200
         except Exception as e:
             logger.error("slack.send_failed", extra={"error": str(e)})
@@ -77,17 +77,6 @@ class WhatsAppChannel(NotificationChannel):
         except Exception as e:
             logger.error("whatsapp.send_failed", extra={"error": str(e)})
             return False
-
-
-class SMSChannel(NotificationChannel):
-    def __init__(self, api_key: str, api_secret: str, from_number: str):
-        self.api_key = api_key
-        self.api_secret = api_secret
-        self.from_number = from_number
-
-    async def send(self, recipient: str, message: str, **kwargs) -> bool:
-        # plug in Twilio / MessageBird here
-        raise NotImplementedError("SMSChannel.send not implemented")
 
 
 class PushChannel(NotificationChannel):
@@ -134,11 +123,11 @@ def send_notifications_to_subscribers(subscriptions, notification):
             )
             sent_subscriptions.append(subscriber.get("id"))
         except WebPushException as ex:
-            logger.error(f"WebPush Error: {ex}")
             failed_subscriptions.append(subscriber.get("id"))
+            logger.error(f"WebPush Error: {ex}")
 
     if failed_subscriptions:
-        logger.error(f"Failed to send notifications to: {json.dumps(failed_subscriptions)}")
-    logger.debug(f"Sent notifications to: {json.dumps(sent_subscriptions)}")
+        logger.info(f"Failed to send notifications to: {json.dumps(failed_subscriptions)}")
+    logger.info(f"Sent notifications to: {json.dumps(sent_subscriptions)}")
 
     return {"sentSubscriptions": sent_subscriptions, "failedSubscriptions": failed_subscriptions}

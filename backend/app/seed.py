@@ -20,7 +20,7 @@ async def seed():
     await db.connect()
     await db.bankdetails.delete_many()
 
-    logger.info("Seeding users...")
+    logger.debug("Seeding users...")
     async def upsert_user(email, role="CUSTOMER"):
         hashed_password = bcrypt.hashpw("password123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         return await db.user.upsert(
@@ -39,7 +39,7 @@ async def seed():
             }
         )
 
-    logger.info("Seeding brands...")
+    logger.debug("Seeding brands...")
     brands = [
         {"name": "Nike", "slug": "nike"},
         {"name": "Adidas", "slug": "adidas"},
@@ -58,7 +58,7 @@ async def seed():
             }
         )
 
-    logger.info("Seeding categories...")
+    logger.debug("Seeding categories...")
     categories = [
         {"name": "Shoes", "slug": "shoes"},
         {"name": "Clothing", "slug": "clothing"},
@@ -77,7 +77,7 @@ async def seed():
             }
         )
 
-    logger.info("Seeding collections...")
+    logger.debug("Seeding collections...")
     collections = [
         {"name": "Summer Sale", "slug": "summer-sale"},
         {"name": "New Arrivals", "slug": "new-arrivals"},
@@ -96,7 +96,7 @@ async def seed():
             }
         )
 
-    logger.info("Seeding settings...")
+    logger.debug("Seeding settings...")
     for setting in [
         {"key": "shop_name", "value": "The Bot Store", "type": "SHOP_DETAIL"},
         {"key": "address", "value": "123 Main St", "type": "SHOP_DETAIL"},
@@ -120,7 +120,7 @@ async def seed():
         )
 
 
-    logger.info("Seeding delivery options...")
+    logger.debug("Seeding delivery options...")
     delivery_options = [
         {"name": "Standard Shipping", "description": "Your order will be delivered within 5-7 days", "amount": 3000, "method": "STANDARD", "duration": "5-7 business days"},
         {"name": "Express Shipping", "description": "Your order will be delivered within 2-3 days", "amount": 5000, "method": "EXPRESS", "duration": "2-3 business days"},
@@ -143,14 +143,14 @@ async def seed():
         )
 
 
-    logger.info("Seeding bank details...")
+    logger.debug("Seeding bank details...")
     await db.bankdetails.create({
         "bank_name": "Citi Bank",
         "account_name": "John Doe",
         "account_number": "0123456789",
     })
 
-    logger.info("Seeding catalogs...")
+    logger.debug("Seeding catalogs...")
     shared_collections = [
         {"title": "Summer Sale", "slug": "summer-sale", "description": "Summer Sale", "is_active": True},
         {"title": "New Arrivals", "slug": "new-arrivals", "description": "New Arrivals", "is_active": True},

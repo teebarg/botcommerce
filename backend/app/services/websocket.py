@@ -25,7 +25,7 @@ class InMemoryWebSocketManager:
             await websocket.accept()
             self.connections[str(user_id)] = websocket
             self.heartbeats[str(user_id)] = metadata
-            logger.info(f"✅ User {user_id} connected.")
+            logger.debug(f"✅ User {user_id} connected.")
             return True
         except Exception as e:
             logger.error(f"❌ Failed to establish WebSocket connection for {user_id}: {e}")
@@ -42,7 +42,7 @@ class InMemoryWebSocketManager:
                 self.heartbeats.pop(str(user_id), None)
             except Exception as e:
                 logger.error(f"❌ Failed to disconnect user {user_id}: {e}")
-            logger.info(f"👋 User {user_id} disconnected.")
+            logger.debug(f"👋 User {user_id} disconnected.")
 
     async def send_to_user(self, user_id: str, data: dict, message_type: str = "general") -> bool:
         if user_id not in self.connections:
@@ -57,7 +57,6 @@ class InMemoryWebSocketManager:
 
         try:
             await self.connections[user_id].send_json(message)
-            logger.info(f"✅ WS Message sent to user {user_id}.")
             return True
         except WebSocketDisconnect:
             await self.disconnect(user_id)
@@ -123,7 +122,7 @@ class InMemoryWebSocketManager:
         old_metadata = self.heartbeats.pop(old_id, {})
         self.heartbeats[str(new_id)] = {**old_metadata, **metadata}
 
-        logger.info(f"🔁 Promoted connection from {old_id} → {new_id}")
+        logger.debug(f"🔁 Promoted connection from {old_id} → {new_id}")
         return True
 
     async def _idle_cleanup_loop(self):
@@ -136,7 +135,7 @@ class InMemoryWebSocketManager:
             ]
 
             for user_id in to_disconnect:
-                logger.info(f"⏳ Disconnecting idle user {user_id}")
+                logger.debug(f"⏳ Disconnecting idle user {user_id}")
                 await self.disconnect(user_id)
 
             await asyncio.sleep(60)

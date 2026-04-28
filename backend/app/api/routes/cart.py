@@ -1,10 +1,11 @@
 from typing import Optional, Annotated
 from datetime import datetime, timedelta, timezone
-from app.core.utils import generate_id, generate_abandoned_cart_email
+from app.core.utils import generate_id
 from app.models.cart import CartUpdate, CartItemCreate, CartItem, Cart, CartLite, SendAbandonedCartReminders, PaginatedAbandonedCarts
+from app.core.notifications.events import SendAbandonedCartEvent
 from fastapi import APIRouter, HTTPException, Request, BackgroundTasks, Depends, Cookie, Response
 from app.prisma_client import prisma as db
-from app.core.deps import UserDep, CurrentUser, Notification
+from app.core.deps import Notification, UserDep, CurrentUser
 from app.services.redis import cache_response, refresh_data
 from app.core.logging import get_logger
 from app.services.shop_settings import ShopSettingsService
@@ -374,11 +375,11 @@ async def send_abandoned_cart_reminder(cart_id: int, notification: Notification)
             return
 
         if not cart.user:
-            logger.warning(f"cart {cart_id} has no associated user, skipping email")
+            logger.warning(f"cart {cart_id} has no associated user, skipping notification")
             return
 
         if not cart.email and not cart.user.email:
-            logger.warning(f"cart {cart_id} has no email address, skipping email")
+            logger.warning(f"cart {cart_id} has no email address, skipping notification")
             return
 
         cart_data = {
@@ -402,29 +403,18 @@ async def send_abandoned_cart_reminder(cart_id: int, notification: Notification)
             "updated_at": cart.updated_at
         }
 
-        email_data = await generate_abandoned_cart_email(
-            cart_data=cart_data,
-            user_email=cart.email or cart.user.email,
-            user_name=cart.user.first_name or cart.user.username
-        )
-
-        await notification.send_notification(
-            channel_name="email",
-            recipient=cart.email or cart.user.email,
-            subject=email_data.subject,
-            message=email_data.html_content
-        )
-
         subscriptions = await db.pushsubscription.find_many(
             where={"userId": cart.user_id}
         )
-        await notification.send_notification(
-            channel_name="push",
-            subscriptions=[subscription.model_dump() for subscription in subscriptions], 
-            notification={"title": "Your cart is waiting 🛒", "body": "Complete checkout before your items sell out."}
-        )
 
-        logger.info(f"Abandoned cart reminder sent to {cart.email or cart.user.email} for cart {cart.cart_number}")
+        await notification.dispatch(SendAbandonedCartEvent(
+            cart=cart_data,
+            user_email=cart.email or cart.user.email,
+            user_name=cart.user.first_name or cart.user.username,
+            subscriptions=[subscription.model_dump() for subscription in subscriptions]
+        ))
+
+        logger.debug(f"Abandoned cart reminder sent to {cart.email or cart.user.email} for cart {cart.cart_number}")
 
     except Exception as e:
         logger.error(f"Failed to send abandoned cart reminder for cart {cart_id}: {str(e)}")
@@ -465,7 +455,7 @@ async def send_abandoned_cart_reminders(
         for cart in abandoned_carts:
             background_tasks.add_task(send_abandoned_cart_reminder, cart_id=cart.id, notification=notification)
 
-        logger.info(f"Queued {len(abandoned_carts)} abandoned cart reminders")
+        logger.debug(f"Queued {len(abandoned_carts)} abandoned cart reminders")
 
         return {
             "message": f"Abandoned cart reminders queued successfully",
