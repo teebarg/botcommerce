@@ -122,7 +122,7 @@ async def get_review_status(
     )
 
 @router.get("/{id}/similar")
-@cache_response(key_prefix="product:similar", key=lambda request, id, limit: f"{id}:{limit}")
+@cache_response(key_prefix="product:similar", key=lambda request, id, limit: f"{id}:{limit}", tags=["products", "product:{id}"])
 async def recommend(request: Request, id: int, limit: int = Query(default=20, le=100)):
     key: str = f"product:{id}:similar"
     ids = await redis_client.lrange(key, 0, -1)
@@ -141,7 +141,7 @@ async def recommend(request: Request, id: int, limit: int = Query(default=20, le
 
 
 @router.get("/recommend")
-@cache_response("products:recommendation")
+@cache_response("products:recommendation", tags=["products"])
 async def get_recommendations(request: Request, user: CurrentUser, limit: int = Query(default=20, le=100)):
     redis = request.app.state.redis
     index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
@@ -209,7 +209,7 @@ def has_active_filters(
     ])
 
 @router.get("/feed")
-@cache_response("products:list")
+@cache_response("products:list", tags=["products"])
 async def feed(
     request: Request,
     search: str = "",
@@ -416,7 +416,7 @@ async def feed(
 
 
 @router.get("/index-products")
-@cache_response("products:collection")
+@cache_response("products:collection", tags=["products"])
 async def get_index_products(request: Request) -> IndexProducts:
     """
     Retrieve index products using Meilisearch.
@@ -459,7 +459,7 @@ async def get_index_products(request: Request) -> IndexProducts:
     return result
 
 @router.get("/")
-@cache_response("products:search")
+@cache_response("products:search", tags=["products"])
 async def search(
     request: Request,
     search: str = "",
@@ -590,7 +590,7 @@ async def search(
 
 
 @router.get("/{slug}")
-@cache_response("product:slug", key=lambda request, slug, **kwargs: slug)
+@cache_response("product:slug", key=lambda request, slug, **kwargs: slug, tags=["products"])
 async def read(request: Request, slug: str) -> ProductLite:
     """Get a specific product by slug with Redis caching."""
     product = await db.product.find_unique(

@@ -6,7 +6,7 @@ from app.core.logging import get_logger
 from app.services.meilisearch import update_document, delete_document, add_documents_to_index, clear_index
 from app.models.product import Product
 from app.services.prisma import with_prisma_connection
-from app.services.redis import refresh_data, invalidate_key_only
+from app.services.redis import cache_invalidate_tag, refresh_data, invalidate_key_only
 import random
 from datetime import datetime, timezone
 from app.services.websocket import manager
@@ -14,22 +14,34 @@ from app.redis_client import redis_client
 
 logger = get_logger(__name__)
 
+async def invalidate_product_cache(product_id: int = None) -> None:
+    tags = ["products"]
+    if product_id:
+        tags.append(f"product:{product_id}")
 
-@with_prisma_connection
-async def delete_product_index(product_ids: List[int]) -> None:
-    try:
-        await asyncio.gather(*[
-            delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(pid))
-            for pid in product_ids
-        ])
-        await _batch_invalidate_pipeline(product_ids=product_ids)
-        await invalidate_product_cache()
-    except Exception as e:
-        logger.error(f"Error deleting products {product_ids} from index: {e}")
+    for tag in tags:
+        await cache_invalidate_tag(tag)
 
+    await manager.broadcast_to_all(
+        data={"keys": tags},
+        message_type="invalidate",
+    )
+
+
+# async def _batch_invalidate_pipeline(product_ids: List[int]) -> None:
+#     keys = [f"product:similar:{pid}" for pid in product_ids]
+#     try:
+#         async with redis_client.pipeline(transaction=False) as pipe:
+#             for key in keys:
+#                 pipe.delete(key)
+#             await pipe.execute()
+#     except Exception as e:
+#         logger.error(f"Error batch invalidating keys: {e}")
 
 async def _batch_invalidate_pipeline(product_ids: List[int]) -> None:
+    """Invalidate similar/slug keys for deleted products — not in tag system since they were never cached via cache_response."""
     keys = [f"product:similar:{pid}" for pid in product_ids]
+    keys += [f"product:slug:{pid}" for pid in product_ids]
     try:
         async with redis_client.pipeline(transaction=False) as pipe:
             for key in keys:
@@ -59,10 +71,11 @@ async def index_product(product_id: int) -> None:
 
         product_data = prepare_product_data_for_indexing(product)
         await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
-        await invalidate_product_cache(keys=[
-            f"product:slug:{product.slug}",
-            f"product:similar:{product.id}",
-        ])
+        # await invalidate_product_cache(keys=[
+        #     f"product:slug:{product.slug}",
+        #     f"product:similar:{product.id}",
+        # ])
+        await invalidate_product_cache(product_id=product_id)
     except Exception as e:
         logger.error(f"Error re-indexing product {product_id}: {e}")
 
@@ -90,15 +103,15 @@ async def index_products(product_ids: Optional[List[int]] = None):
             await clear_index(index_name=settings.MEILI_PRODUCTS_INDEX)
 
         documents = []
-        cache_keys: list[str] = []
+        # cache_keys: list[str] = []
         for product in products:
             try:
                 product_data = prepare_product_data_for_indexing(product)
                 documents.append(product_data)
-                if product.slug:
-                    cache_keys.append(f"product:slug:{product.slug}")
-                if product.id:
-                    cache_keys.append(f"product:similar:{product.id}")
+                # if product.slug:
+                #     cache_keys.append(f"product:slug:{product.slug}")
+                # if product.id:
+                #     cache_keys.append(f"product:similar:{product.id}")
             except Exception as e:
                 logger.debug(f"Error preparing product {product.id}: {e}")
 
@@ -108,10 +121,32 @@ async def index_products(product_ids: Optional[List[int]] = None):
             await add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=batch)
             logger.debug(f"Indexed batch {i // BATCH_SIZE + 1} ({len(batch)} products)")
 
-        await invalidate_product_cache(keys=cache_keys)
+        if product_ids:
+            # Partial update — invalidate only the affected products + listings
+            for pid in product_ids:
+                await cache_invalidate_tag(f"product:{pid}")
+            await cache_invalidate_tag("products")  # listings still need to refresh
+        else:
+            # Full reindex — wipe everything
+            await invalidate_product_cache()
+
+        # await invalidate_product_cache(keys=cache_keys)
         logger.debug(f"Successfully indexed {len(documents)} products")
     except Exception as e:
         logger.error(f"Error during product re-indexing: {e}")
+
+
+@with_prisma_connection
+async def delete_product_index(product_ids: List[int]) -> None:
+    try:
+        await asyncio.gather(*[
+            delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(pid))
+            for pid in product_ids
+        ])
+        await _batch_invalidate_pipeline(product_ids=product_ids)
+        await invalidate_product_cache()
+    except Exception as e:
+        logger.error(f"Error deleting products {product_ids} from index: {e}")
 
 
 def prepare_product_data_for_indexing(product: Product) -> dict:
@@ -190,8 +225,8 @@ def prepare_product_data_for_indexing(product: Product) -> dict:
     return product_dict
 
 
-async def invalidate_product_cache(keys: List[str] = None) -> None:
-    await refresh_data(
-        patterns=["gallery", "products:list", "products:search", "products:catalog", "products:recommendation", "products:home", "products:collection"],
-        keys=keys
-    )
+# async def invalidate_product_cache(keys: List[str] = None) -> None:
+#     await refresh_data(
+#         patterns=["gallery", "products:list", "products:search", "products:catalog", "products:recommendation", "products:home", "products:collection"],
+#         keys=keys
+#     )

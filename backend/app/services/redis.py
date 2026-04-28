@@ -64,7 +64,12 @@ async def invalidate_list(entity: str):
 async def get_redis_dependency(request: Request):
     return request.app.state.redis
 
-def cache_response(key_prefix: str, key: Union[str, Callable[..., str], None] = None, expire: int = DEFAULT_EXPIRATION):
+def cache_response(
+    key_prefix: str,
+    key: Union[str, Callable[..., str], None] = None,
+    expire: int = DEFAULT_EXPIRATION,
+    tags: List[str] = None,
+):
     def decorator(func: Callable):
         @wraps(func)
         async def wrapper(*args, **kwargs):
@@ -75,24 +80,28 @@ def cache_response(key_prefix: str, key: Union[str, Callable[..., str], None] = 
             redis = request.app.state.redis
 
             if isinstance(key, str):
-                raw_key: str = f"{key_prefix}:{key}"
+                raw_key = f"{key_prefix}:{key}"
             elif callable(key):
                 sig = inspect.signature(key)
                 allowed_params = sig.parameters.keys()
-                filtered_kwargs = {
-                    k: v for k, v in kwargs.items() if k in allowed_params
-                }
-                dynamic_key: str = key(**filtered_kwargs)
-                raw_key: str = f"{key_prefix}:{dynamic_key}"
+                filtered_kwargs = {k: v for k, v in kwargs.items() if k in allowed_params}
+                raw_key = f"{key_prefix}:{key(**filtered_kwargs)}"
             else:
-                raw_key: str = f"{key_prefix}:{request.url.path}?{request.url.query}"
+                raw_key = f"{key_prefix}:{request.url.path}?{request.url.query}"
 
             cached = await redis.get(raw_key)
             if cached is not None:
                 return json.loads(cached)
 
             result = await func(*args, **kwargs)
-            await redis.setex(raw_key, expire, json.dumps(result, cls=EnhancedJSONEncoder))
+
+            async with redis.pipeline(transaction=False) as pipe:
+                pipe.setex(raw_key, expire, json.dumps(result, cls=EnhancedJSONEncoder))
+                for tag in (tags or []):
+                    pipe.sadd(f"tag:{tag}", raw_key)
+                    pipe.expire(f"tag:{tag}", expire)
+                await pipe.execute()
+
             return result
         return wrapper
     return decorator
@@ -217,3 +226,15 @@ async def refresh_data(*, keys=None, patterns=None) -> None:
         data={"keys": pattern_list + key_list},
         message_type="invalidate",
     )
+
+
+async def cache_invalidate_tag(tag: str) -> None:
+    tag_key = f"tag:{tag}"
+    keys = await redis_client.smembers(tag_key)
+    if not keys:
+        return
+    async with redis_client.pipeline(transaction=False) as pipe:
+        for key in keys:
+            pipe.delete(key)
+        pipe.delete(tag_key)
+        await pipe.execute()
