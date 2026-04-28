@@ -47,7 +47,7 @@ class SlackChannel(NotificationChannel):
                 response = await client.post(self.webhook_url, json=slack_message, timeout=10)
             return response.status_code == 200
         except Exception as e:
-            logger.error("slack.send_failed", extra={"error": str(e)})
+            logger.error(f"slack.send_failed: {str(e)}")
             return False
 
 
@@ -75,7 +75,7 @@ class WhatsAppChannel(NotificationChannel):
                 response = await client.post(url, json=payload, headers=headers, timeout=10)
             return 200 <= response.status_code < 300
         except Exception as e:
-            logger.error("whatsapp.send_failed", extra={"error": str(e)})
+            logger.error(f"whatsapp.send_failed: {str(e)}")
             return False
 
 

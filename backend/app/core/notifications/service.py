@@ -48,8 +48,7 @@ class NotificationService:
     async def dispatch(self, event: BaseNotificationEvent) -> dict[str, bool]:
         """
         Dispatch a notification event.
-        Looks up the registry, renders templates, and sends through all
-        configured channels. Returns a result map e.g. {"email": True, "slack": False}.
+        Returns a result map e.g. {"email": True, "slack": False}.
         """
         event_type = type(event)
         handler_config = self._registry.get(event_type)

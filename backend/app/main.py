@@ -282,15 +282,6 @@ async def generate_sitemap(request: Request):
     return Response(content=sitemap, media_type="application/xml")
 
 
-@app.get("/api/test")
-async def test():
-    logger.critical("CRITICAL")
-    logger.warning("WARNING")
-    logger.error("ERROR")
-    logger.exception("ERROR")
-    return "test"
-
-
 # @app.post("/api/test-notification")
 # async def update_order():
 #     connection = await aio_pika.connect_robust(settings.RABBITMQ_HOST)
