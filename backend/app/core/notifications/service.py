@@ -73,8 +73,8 @@ class NotificationService:
 
         try:
             message, send_kwargs = self.templates.render(handler_config["template"], event_name, context)
-            logger.info("message......", message)
-            logger.info("send_kwargs......", send_kwargs)
+            logger.info(message)
+            logger.info(send_kwargs)
         except NotImplementedError as e:
             logger.info("NotImplementedError......")
             logger.info(e)
@@ -87,7 +87,7 @@ class NotificationService:
         tasks = []
         for channel in handler_config["channels"]:
             tasks.append(self._dispatch_single(event, channel, message, send_kwargs))
-        
+
         results_list = await asyncio.gather(*tasks, return_exceptions=False)
         return dict[str, bool](results_list)
 

@@ -4,7 +4,7 @@ from app.core.utils import generate_abandoned_cart_email
 
 class TemplateEngine:
     """
-    Minimal template engine. 
+    Minimal template engine.
     Swap this out for Jinja2 if your templates grow complex.
     """
 
@@ -69,12 +69,12 @@ class TemplateEngine:
         return email_data.html_content, dict_data
 
     def _send_push_notification(self, ctx: dict) -> tuple[str, dict]:
-        print("ctx.......", ctx)
+        print("ctx......._send_push_notification.............", ctx)
         dict_data = {
             "subject": "",
             "recipient": "",
-            "subscriptions": ctx.subscriptions,
-            "notification": ctx.notification,
+            "subscriptions": ctx.get("subscriptions"),
+            "notification": ctx.get("notification"),
         }
         return "", dict_data
 
