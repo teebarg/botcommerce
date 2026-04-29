@@ -184,9 +184,7 @@ class RedisStreamConsumer:
             raise Exception(f"Database error: {str(e)}")
 
         await send_notification(id=int(event["order_id"]), user_id=int(event["user_id"]), notification=self.get_notification())
-        await refresh_data(
-            patterns=["users"],
-        )
+        await refresh_data(patterns=["users"])
 
     async def handle_payment_success(self, event):
         try:
@@ -277,9 +275,7 @@ class RedisStreamConsumer:
                 subject=welcome_email.subject,
                 message=welcome_email.html_content
             )
-            await refresh_data(
-                patterns=["coupons", "users"],
-            )
+            await refresh_data(patterns=["coupons", "users"])
         except Exception as e:
             logger.error(f"Failed to send welcome email: {str(e)}")
             raise Exception(f"Email error: {str(e)}")

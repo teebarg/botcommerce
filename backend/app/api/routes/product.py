@@ -1,4 +1,5 @@
 import asyncio
+import json
 from typing import Any
 from fastapi import (
     APIRouter,
@@ -30,7 +31,7 @@ from app.prisma_client import prisma as db
 from app.core.storage import upload
 from app.core.config import settings
 from app.services.product import index_product, index_products
-from app.services.redis import cache_response
+from app.services.redis import DEFAULT_EXPIRATION, EnhancedJSONEncoder, cache_response
 from meilisearch.errors import MeilisearchApiError
 from app.services.generic import remove_image_from_storage
 from app.redis_client import redis_client
@@ -122,7 +123,7 @@ async def get_review_status(
     )
 
 @router.get("/{id}/similar")
-@cache_response(key_prefix="product:similar", key=lambda request, id, limit: f"{id}:{limit}")
+@cache_response(key_prefix="product:similar", key=lambda request, id, limit: f"{id}:{limit}", tags=["products", "product:{id}"])
 async def recommend(request: Request, id: int, limit: int = Query(default=20, le=100)):
     key: str = f"product:{id}:similar"
     ids = await redis_client.lrange(key, 0, -1)
@@ -141,12 +142,12 @@ async def recommend(request: Request, id: int, limit: int = Query(default=20, le
 
 
 @router.get("/recommend")
-@cache_response("products:recommendation")
+@cache_response("products:recommendation", tags=["products"])
 async def get_recommendations(request: Request, user: CurrentUser, limit: int = Query(default=20, le=100)):
     redis = request.app.state.redis
     index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
 
-    product_ids = await redis.lrange(f"user:{user.id}:history", 0, 4)  # last 5 viewed
+    product_ids = await redis.lrange(f"user:{user.id}:history", 0, 4)
     if not product_ids:
         return {"recommended": []}
 
@@ -209,7 +210,7 @@ def has_active_filters(
     ])
 
 @router.get("/feed")
-@cache_response("products:list")
+@cache_response("products:list", tags=["products"])
 async def feed(
     request: Request,
     search: str = "",
@@ -416,7 +417,7 @@ async def feed(
 
 
 @router.get("/index-products")
-@cache_response("products:collection")
+@cache_response("products:collection", tags=["products"])
 async def get_index_products(request: Request) -> IndexProducts:
     """
     Retrieve index products using Meilisearch.
@@ -459,7 +460,7 @@ async def get_index_products(request: Request) -> IndexProducts:
     return result
 
 @router.get("/")
-@cache_response("products:search")
+@cache_response("products:search", tags=["products"])
 async def search(
     request: Request,
     search: str = "",
@@ -590,18 +591,26 @@ async def search(
 
 
 @router.get("/{slug}")
-@cache_response("product:slug", key=lambda request, slug, **kwargs: slug)
 async def read(request: Request, slug: str) -> ProductLite:
-    """Get a specific product by slug with Redis caching."""
+    redis = request.app.state.redis
+    
+    cache_key = f"product:slug:{slug}"
+    cached = await redis.get(cache_key)
+    if cached:
+        return json.loads(cached)
+
     product = await db.product.find_unique(
         where={"slug": slug},
-        include={
-            "variants": True,
-            "images": True,
-        }
+        include={"variants": True, "images": True}
     )
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
+
+    async with redis.pipeline(transaction=False) as pipe:
+        pipe.setex(cache_key, DEFAULT_EXPIRATION, json.dumps(product, cls=EnhancedJSONEncoder))
+        pipe.sadd(f"tag:product:{product.id}", cache_key)
+        pipe.expire(f"tag:product:{product.id}", DEFAULT_EXPIRATION)
+        await pipe.execute()
 
     return product
 

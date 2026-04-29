@@ -71,9 +71,9 @@ export const useUserWishlist = () => {
   return useQuery(userWishlistQuery());
 };
 
-export const useUserRecentlyViewed = (limit: number = 12, enabled: boolean = true) => {
+export const useUserRecentlyViewed = (limit: number = 12, enabled: boolean = true, user_id: number) => {
     return useQuery({
-        queryKey: ["products", "recently-viewed"],
+        queryKey: ["products", "recently-viewed", user_id],
         queryFn: () => getRecentlyViewedFn({ data: limit }),
         enabled: enabled,
     });

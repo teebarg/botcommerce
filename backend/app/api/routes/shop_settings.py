@@ -55,7 +55,7 @@ async def sync_shop_details(form_data: dict[str, Any]):
             if not value:
                 continue
             await service.set(key, str(value), type_="SHOP_DETAIL")
-        await refresh_data(patterns="shop-settings")
+        await refresh_data(patterns=["shop-settings"])
         return {"message": "Shop details synced successfully"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

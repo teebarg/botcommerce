@@ -21,7 +21,7 @@ from app.models.product import (
 )
 from app.prisma_client import prisma as db
 from app.services.product import index_products, delete_product_index, index_product
-from app.services.redis import cache_response
+from app.services.redis import cache_response, refresh_product
 from app.services.recently_viewed import RecentlyViewedService
 from app.services.websocket import manager
 from app.services.generic import remove_image_from_storage
@@ -59,14 +59,13 @@ def build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any
     if category_ids:
         data["categories"] = {"connect": [{"id": id} for id in category_ids]}
     if collection_ids:
-        data["collections"] = {"connect": [{"id": id}
-                                           for id in collection_ids]}
+        data["collections"] = {"connect": [{"id": id} for id in collection_ids]}
     return data
 
 router = APIRouter()
 
 @router.get("/")
-@cache_response("gallery")
+@cache_response("gallery", tags=["gallery"])
 async def image_gallery(
     request: Request,
     cursor: Optional[int] = Query(default=None),
@@ -220,7 +219,7 @@ async def delete_gallery_image(image_id: int, background_tasks: BackgroundTasks)
 
     if not image.product_id:
         await db.productimage.delete(where={"id": image_id})
-        await refresh_data(patterns=["gallery"])
+        await refresh_product(tags=["gallery"])
         background_tasks.add_task(remove_image_from_storage, image.image)
         return Message(message="Image deleted successfully")
 
@@ -270,7 +269,7 @@ async def bulk_save_image_urls(payload: ProductImageBulkUrls):
                 status_code=400, detail="No valid images to save")
 
         await db.productimage.create_many(data=create_rows)
-        await refresh_data(patterns=["gallery"])
+        await refresh_product(tags=["gallery"])
 
         return {"success": True, "count": len(create_rows)}
     except HTTPException:
