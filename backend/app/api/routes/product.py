@@ -608,7 +608,7 @@ async def read(request: Request, slug: str) -> ProductLite:
 
     async with redis.pipeline(transaction=False) as pipe:
         pipe.setex(cache_key, DEFAULT_EXPIRATION, json.dumps(product, cls=EnhancedJSONEncoder))
-        pipe.sadd(f"tag:product:{product.id}", cache_key)   # tag by id
+        pipe.sadd(f"tag:product:{product.id}", cache_key)
         pipe.expire(f"tag:product:{product.id}", DEFAULT_EXPIRATION)
         await pipe.execute()
 

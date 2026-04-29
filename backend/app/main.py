@@ -1,5 +1,4 @@
-import asyncio
-from app.services.redis import invalidate_list
+from app.services.redis import refresh_data
 from app.core.notifications.setup import init_notification_service
 import sentry_sdk
 import time
@@ -14,6 +13,8 @@ from app.core.utils import (generate_contact_form_email,
 from app.models.generic import ContactFormCreate, NewsletterCreate, BulkPurchaseCreate
 from app.prisma_client import prisma as db
 from fastapi import BackgroundTasks, FastAPI, Request, Response, HTTPException
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from app.services.websocket import manager
@@ -21,11 +22,9 @@ from app.services.meilisearch import get_or_create_index
 from app.redis_client import redis_client
 
 from app.core.logging import get_logger
-from fastapi.responses import JSONResponse
 from app.consumer import RedisStreamConsumer
 from app.core.deps import ShopSettingsServiceDep
 from pydantic import BaseModel
-from fastapi.exceptions import RequestValidationError
 
 STREAM_NAME = "EVENT_STREAMS"
 GROUP_NAME = "notifications"
@@ -322,20 +321,9 @@ async def start_websocket_manager():
     await manager.start()
 
 
-@app.post("/api/invalidate-react")
-async def invalidate_react(key: str):
-    await manager.broadcast_to_all(
-        data={
-            "key": key,
-        },
-        message_type="invalidate",
-    )
-    return {"message": "success"}
-
-
 @app.post("/api/invalidate-redis")
 async def invalidate_redis(key: str):
-    await invalidate_list(key)
+    await refresh_data(patterns=[key])
     return {"message": "success"}
 
 

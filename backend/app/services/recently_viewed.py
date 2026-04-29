@@ -5,7 +5,7 @@ from app.core.config import settings
 from app.services.websocket import manager
 from app.core.logging import get_logger
 from app.redis_client import redis_client
-from app.services.redis import invalidate_list
+from app.services.redis import refresh_data
 
 logger = get_logger(__name__)
 
@@ -26,13 +26,7 @@ class RecentlyViewedService:
 
         await redis_client.zremrangebyrank(key, 0, -(self.max_items + 1))
 
-        await invalidate_list(f"user_recently_viewed:{user_id}")
-
-        await manager.send_to_user(
-            user_id=user_id,
-            data={"key": "products:recently-viewed"},
-            message_type="invalidate",
-        )
+        await refresh_data(keys=[f"products:recently-viewed:{user_id}"])
 
     async def remove_product_from_all(self, product_id: int):
         """Remove a product from all users' recently viewed list"""
@@ -41,7 +35,7 @@ class RecentlyViewedService:
             for key in keys:
                 await redis_client.zrem(key, str(product_id))
 
-            await invalidate_list("user_recently_viewed")
+            await refresh_data(patterns=["products:recently-viewed"])
         except Exception as e:
             logger.error(f"Error removing product from recently viewed list: {str(e)}")
 

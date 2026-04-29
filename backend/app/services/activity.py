@@ -1,6 +1,5 @@
 from typing import Optional
 from app.prisma_client import prisma as db
-from app.services.websocket import manager
 from app.core.logging import logger
 from app.services.redis import refresh_data
 from app.models.activities import Activity
@@ -26,12 +25,7 @@ async def log_activity(
             }
         )
 
-        await refresh_data(patterns="activities")
-        await manager.send_to_user(
-            user_id=user_id,
-            data={"key": f"activity:{user_id}"},
-            message_type="invalidate",
-        )
+        await refresh_data(patterns=["activities"], keys=[f"activity:{user_id}"])
         return activity
     except Exception as exc:
         logger.error(f"Handled error in log_activity: {exc}", exc_info=True)

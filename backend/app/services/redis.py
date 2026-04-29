@@ -44,22 +44,6 @@ async def publish_event(event_name: str, payload: dict[str, Any]) -> bool:
     await redis_client.xadd(stream_key, data)
     return True
 
-
-@handle_redis_errors(default=False)
-async def invalidate_list(entity: str):
-    """
-    Invalidate all list/search redis entries for a given entity (e.g., "products:*").
-    """
-    pattern = f"{entity}:*"
-    cursor = 0
-
-    while True:
-        cursor, keys = await redis_client.scan(cursor=cursor, match=pattern, count=5000)
-        if keys:
-            await redis_client.delete(*keys)
-        if cursor == 0:
-            break
-
 async def get_redis_dependency(request: Request):
     return request.app.state.redis
 
@@ -179,10 +163,7 @@ async def refresh_data(keys: List[str] = None, patterns: List[str] = None) -> No
     Invalidate specific keys and/or patterns.
 
     Example:
-        await invalidate(
-            keys=[f"addresses:{user_id}", f"address:{address_id}"],
-            patterns=["addresses"]
-        )
+        await invalidate(keys=[f"addresses:{id}", patterns=["addresses"])
     """
     key_list = keys or []
     pattern_list = patterns or []
@@ -212,6 +193,11 @@ async def refresh_data(keys: List[str] = None, patterns: List[str] = None) -> No
                     break
         except Exception as e:
             logger.error(f"Error invalidating pattern {pattern}: {e}")
+
+    await manager.broadcast_to_all(
+        data={"keys": key_list + pattern_list},
+        message_type="invalidate",
+    )
 
 
 async def cache_invalidate_tag(tag: str) -> None:

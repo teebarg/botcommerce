@@ -3,7 +3,7 @@ from typing import List
 from app.prisma_client import prisma as db
 from app.services.catalog import CatalogService
 from math import ceil
-from app.services.redis import cache_response, invalidate_list, refresh_data
+from app.services.redis import cache_response, refresh_data
 from app.services.product import index_product, index_products
 from app.core.deps import UserDep
 from app.models.generic import Message
@@ -22,13 +22,7 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 async def invalidate_catalog() -> None:
-    await invalidate_list("catalog")
-    await manager.broadcast_to_all(
-            data={
-                "key": "catalog",
-            },
-            message_type="invalidate",
-        )
+    await refresh_data(patterns=["catalog"])
 
 
 @router.get("/views")

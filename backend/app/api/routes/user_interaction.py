@@ -5,7 +5,7 @@ from app.schemas.user_interaction import UserInteractionCreate, UserInteractionR
 from app.services.user_interaction import log_user_interaction
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
-from app.services.redis import cache_response, invalidate_list
+from app.services.redis import cache_response, refresh_data
 from app.models.generic import Message
 
 logger = get_logger(__name__)
@@ -23,7 +23,7 @@ async def batch_user_interactions(user: UserDep, payload: List[UserInteractionCr
             type=item.type,
             metadata=item.metadata,
         )
-    await invalidate_list("interactions")
+    await refresh_data(patterns=["interactions"])
     return Message(message="success")
 
 @router.get("/", response_model=List[UserInteractionResponse])
