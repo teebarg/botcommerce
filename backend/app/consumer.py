@@ -277,9 +277,7 @@ class RedisStreamConsumer:
                 subject=welcome_email.subject,
                 message=welcome_email.html_content
             )
-            await refresh_data(
-                patterns=["coupons", "users"],
-            )
+            await refresh_data(patterns=["coupons", "users"])
         except Exception as e:
             logger.error(f"Failed to send welcome email: {str(e)}")
             raise Exception(f"Email error: {str(e)}")
