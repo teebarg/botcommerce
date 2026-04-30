@@ -65,7 +65,7 @@ export function ImageSheetForm({ onClose, imageId, currentProduct }: ProductShee
         age: currentProduct?.variants?.[0]?.age ?? "",
         price: currentProduct?.variants?.[0]?.price ?? 0,
         old_price: currentProduct?.variants?.[0]?.old_price ?? 0,
-        inventory: currentProduct?.variants?.[0]?.inventory ?? 1,
+        inventory: currentProduct?.variants?.[0]?.inventory ?? 0,
     });
 
     const isDisabled = (newVariant?.price || 0) < 2;
