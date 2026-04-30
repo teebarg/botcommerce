@@ -17,6 +17,9 @@
     --font-display: "Outfit Variable", sans-serif;
     --font-sans: "Lexend Variable", sans-serif;
 
+    --text-xxs: 0.625rem;
+    --text-xxs--line-height: calc(1 / 0.625);
+
     --color-background: hsl(var(--background));
     --color-foreground: hsl(var(--foreground));
 

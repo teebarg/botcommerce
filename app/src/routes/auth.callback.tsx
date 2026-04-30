@@ -63,30 +63,70 @@ function RouteComponent() {
     }, [isLoaded, isSignedIn]);
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-background transition-colors px-4">
-            <div className="flex flex-col items-center gap-6">
-                <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                    className="text-2xl font-semibold tracking-tight text-foreground"
+        <div
+            className="min-h-screen flex items-center justify-center px-4"
+            style={{
+                background: "#0c0b09",
+                backgroundImage: "radial-gradient(ellipse 80% 60% at 50% 0%, #1c1810 0%, #0c0b09 70%)",
+            }}
+        >
+            {/* Corner accents */}
+            <span className="absolute top-5 left-5 w-4 h-4 border-t border-l border-[#c9a96e33]" />
+            <span className="absolute bottom-5 right-5 w-4 h-4 border-b border-r border-[#c9a96e33]" />
+
+            <div
+                className="flex flex-col items-center"
+            >
+                {/* Monogram ring */}
+                <div className="relative w-[72px] h-[72px] mb-8">
+                    <div className="absolute inset-0 rounded-full border border-[#c9a96e22]" />
+                    <motion.div
+                        className="absolute inset-0 rounded-full"
+                        style={{ border: "1px solid transparent", borderTopColor: "#c9a96e", borderRightColor: "#c9a96e88" }}
+                        animate={{ rotate: 360 }}
+                        transition={{ repeat: Infinity, duration: 1.4, ease: "linear" }}
+                    />
+                    <motion.span
+                        className="absolute inset-0 flex items-center justify-center text-[#c9a96e]"
+                        style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, fontWeight: 300, letterSpacing: "0.05em" }}
+                        animate={{ opacity: [0.7, 1, 0.7] }}
+                        transition={{ repeat: Infinity, duration: 2.8, ease: "easeInOut" }}
+                    >
+                        R
+                    </motion.span>
+                </div>
+
+                <h1
+                    style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                    className="text-2xl tracking-[0.12em] uppercase text-[#e8dfc8] m-0 font-light"
                 >
                     Signing you in
-                </motion.div>
-                <div className="relative">
-                    <div className="w-14 h-14 rounded-full border-4 border-border" />
-                    <motion.div
-                        className="absolute inset-0 rounded-full border-4 border-t-transparent border-primary"
-                        animate={{ rotate: 360 }}
-                        transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                    />
-                </div>
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="text-sm text-muted-foreground">
-                    Verifying your session and preparing your dashboard...
-                </motion.p>
-                <div className="mt-6 w-[280px] space-y-3">
-                    {[1, 2, 3].map((i) => (
-                        <div key={i} className="h-10 rounded-xl bg-card animate-pulse" />
+                </h1>
+
+                <div
+                    className="w-8 h-px my-3"
+                    style={{ background: "linear-gradient(90deg, transparent, #c9a96e, transparent)" }}
+                />
+
+                <p
+                    className="text-xxs tracking-[0.2em] uppercase text-[#8a7d65] m-0 mb-10"
+                    style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300 }}
+                >
+                    Verifying your session
+                </p>
+
+                <div
+                    className="w-[260px] flex flex-col gap-[10px]"
+                >
+                    {[100, 72, 88, 55].map((w, i) => (
+                        <div
+                            key={i}
+                            className="h-px rounded-sm overflow-hidden"
+                            style={{
+                                width: `${w}%`,
+                                background: "#1e1c16",
+                            }}
+                        />
                     ))}
                 </div>
             </div>

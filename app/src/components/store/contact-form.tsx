@@ -46,12 +46,12 @@ export default function ContactForm() {
 
     return (
         <div className="bg-card rounded-lg border border-input md:p-8 p-4">
-            <div className="mb-6">
-                <h3 className="text-xl font-semibold mb-2">Send us a Message</h3>
-                <p className="text-muted-foreground text-sm">{`Fill out the form below and we'll get back to you within 24 hours.`}</p>
+            <div>
+                <h3 className="text-xl font-semibold">Send us a Message</h3>
+                <p className="text-muted-foreground text-sm">Fill out the form below and we'll get back to you.</p>
             </div>
             <Form {...form}>
-                <form className="mt-10 space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+                <form className="mt-6 space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="grid sm:grid-cols-2 gap-4">
                         <FormField
                             control={form.control}

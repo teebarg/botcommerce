@@ -37,7 +37,7 @@ export function UserDropdown() {
 
     if (!isAuthenticated) {
         return (
-            <Button onClick={() => navigate({ to: "/sign-in", search: { redirect: location.pathname } })} size="xs">
+            <Button className="min-w-0 px-2" onClick={() => navigate({ to: "/sign-in", search: { redirect: location.pathname } })} size="xxs">
                 Sign In
             </Button>
         );

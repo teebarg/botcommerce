@@ -36,8 +36,8 @@ export default function NewsletterSection() {
                             <Mail className="h-4 w-4 text-primary" />
                             <span className="text-sm font-medium text-foreground">Newsletter</span>
                         </div>
-                        <h2 className="text-3xl font-bold mb-2">Stay in the Loop</h2>
-                        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                        <h2 className="text-2xl font-bold mb-2">Stay in the Loop</h2>
+                        <p className="text-muted-foreground max-w-2xl mx-auto">
                             Join over 5,000+ subscribers and get exclusive deals, product updates, and insider tips delivered straight to your inbox.
                         </p>
                     </div>

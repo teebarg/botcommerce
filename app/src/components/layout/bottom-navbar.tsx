@@ -32,23 +32,23 @@ const ButtonNav = () => {
 
     return (
         <nav
-            className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/60 backdrop-blur-md shadow-xl flex items-center justify-between px-8 pt-3 text-xs"
+            className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/60 backdrop-blur-md shadow-xl flex items-center justify-between px-8 pt-3 text-xxs"
             style={{
                 paddingBottom: `calc(var(--sab) + 12px)`,
             }}
         >
             {nav.map((item: NavLink, idx: number) => (
-                <motion.div whileTap={{ scale: 0.9 }} key={idx} className="flex flex-col items-center">
+                <div key={idx} className="flex flex-col items-center">
                     <LocalizedClientLink active="gradient-primary text-white rounded-xl" className="p-1.5" href={item.href}>
                         {item.icon}
                     </LocalizedClientLink>
                     {item.label}
-                </motion.div>
+                </div>
             ))}
-            <span className="flex flex-col items-center">
+            <div className="flex flex-col items-center">
                 <CartComponent />
                 Cart
-            </span>
+            </div>
 
             <StoreMenuComp />
         </nav>

@@ -9,7 +9,7 @@ import { UserDropdown } from "../user-button";
 
 const MobileHeader = () => {
     return (
-        <div className="fixed md:hidden top-0 inset-x-0 z-40 bg-background/60 backdrop-blur-md px-3 flex items-center gap-2 pb-3 pt-[calc(var(--sat)+12px)]">
+        <div className="fixed md:hidden top-0 inset-x-0 z-40 bg-background/60 backdrop-blur-md px-3 flex items-center gap-1 pb-3 pt-[calc(var(--sat)+12px)]">
             <div className="flex gap-2 items-center flex-1">
                 <BackButton />
                 <Link to="/">
