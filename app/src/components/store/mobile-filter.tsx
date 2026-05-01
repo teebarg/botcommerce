@@ -91,11 +91,11 @@ const MobileFilter: React.FC<MobileFilterProps> = ({ facets }) => {
             }
             trigger={
                 <div className="flex items-center justify-between px-4 py-3">
-                    <button className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-foreground transition-colors hover:text-muted-foreground">
+                    <button className="flex items-center gap-2 text-xxs font-bold uppercase tracking-widest text-foreground transition-colors hover:text-muted-foreground">
                         <SlidersHorizontal className="w-3.5 h-3.5" />
                         Filters
                         {activeCount > 0 && (
-                            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-[10px] font-medium text-background">
+                            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-xxs font-medium text-background">
                                 {activeCount}
                             </span>
                         )}

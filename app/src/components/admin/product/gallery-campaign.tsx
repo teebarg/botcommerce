@@ -63,7 +63,7 @@ const GalleryCampaign: React.FC<Props> = ({ image }) => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 flex-1 overflow-auto px-2.5 py-4">
                 <div className="lg:col-span-7 flex flex-col gap-12">
                     <div>
-                        <div className="flex justify-between items-end mb-2 text-[11px]">
+                        <div className="flex justify-between items-end mb-2 text-xxs">
                             <Label>Headline</Label>
                             <span className="text-muted-foreground tabular-nums">
                                 {title.length} / {TITLE_LIMIT}
@@ -78,7 +78,7 @@ const GalleryCampaign: React.FC<Props> = ({ image }) => {
                     </div>
 
                     <div>
-                        <div className="flex justify-between items-end mb-2 text-[11px]">
+                        <div className="flex justify-between items-end mb-2 text-xxs">
                             <Label>Narrative</Label>
                             <span className="text-muted-foreground tabular-nums">
                                 {body.length} / {BODY_LIMIT}

@@ -78,7 +78,7 @@ const ComplaintForm = ({ onSubmitForm, isLastMessage }: ComplaintFormProps) => {
                         className="w-full bg-secondary rounded-lg pl-8 pr-3 py-2 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
                     />
                 </div>
-                {errors.name && <p className="text-[10px] text-destructive pl-1">{errors.name}</p>}
+                {errors.name && <p className="text-xxs text-destructive pl-1">{errors.name}</p>}
             </div>
 
             {/* Email */}
@@ -97,7 +97,7 @@ const ComplaintForm = ({ onSubmitForm, isLastMessage }: ComplaintFormProps) => {
                         className="w-full bg-secondary rounded-lg pl-8 pr-3 py-2 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
                     />
                 </div>
-                {errors.email && <p className="text-[10px] text-destructive pl-1">{errors.email}</p>}
+                {errors.email && <p className="text-xxs text-destructive pl-1">{errors.email}</p>}
             </div>
 
             {/* Category */}
@@ -119,7 +119,7 @@ const ComplaintForm = ({ onSubmitForm, isLastMessage }: ComplaintFormProps) => {
                         </option>
                     ))}
                 </select>
-                {errors.category && <p className="text-[10px] text-destructive pl-1">{errors.category}</p>}
+                {errors.category && <p className="text-xxs text-destructive pl-1">{errors.category}</p>}
             </div>
 
             {/* Description */}
@@ -138,7 +138,7 @@ const ComplaintForm = ({ onSubmitForm, isLastMessage }: ComplaintFormProps) => {
                         className="w-full bg-secondary rounded-lg pl-8 pr-3 py-2 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-shadow resize-none"
                     />
                 </div>
-                {errors.description && <p className="text-[10px] text-destructive pl-1">{errors.description}</p>}
+                {errors.description && <p className="text-xxs text-destructive pl-1">{errors.description}</p>}
             </div>
 
             {/* Order ID */}

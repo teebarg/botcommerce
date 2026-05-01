@@ -74,7 +74,7 @@ const EscalationForm = ({ onSubmitForm, isLastMessage }: EscalationFormProps) =>
                         className="w-full bg-secondary rounded-lg pl-8 pr-3 py-2 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
                     />
                 </div>
-                {errors.name && <p className="text-[10px] text-destructive pl-1">{errors.name}</p>}
+                {errors.name && <p className="text-xxs text-destructive pl-1">{errors.name}</p>}
             </div>
 
             {/* Email */}
@@ -93,7 +93,7 @@ const EscalationForm = ({ onSubmitForm, isLastMessage }: EscalationFormProps) =>
                         className="w-full bg-secondary rounded-lg pl-8 pr-3 py-2 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
                     />
                 </div>
-                {errors.email && <p className="text-[10px] text-destructive pl-1">{errors.email}</p>}
+                {errors.email && <p className="text-xxs text-destructive pl-1">{errors.email}</p>}
             </div>
 
             <div className="space-y-1">
@@ -114,7 +114,7 @@ const EscalationForm = ({ onSubmitForm, isLastMessage }: EscalationFormProps) =>
                         </option>
                     ))}
                 </select>
-                {errors.category && <p className="text-[10px] text-destructive pl-1">{errors.category}</p>}
+                {errors.category && <p className="text-xxs text-destructive pl-1">{errors.category}</p>}
             </div>
 
             {/* Summary */}
@@ -133,7 +133,7 @@ const EscalationForm = ({ onSubmitForm, isLastMessage }: EscalationFormProps) =>
                         className="w-full bg-secondary rounded-lg pl-8 pr-3 py-2 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-shadow resize-none"
                     />
                 </div>
-                {errors.summary && <p className="text-[10px] text-destructive pl-1">{errors.summary}</p>}
+                {errors.summary && <p className="text-xxs text-destructive pl-1">{errors.summary}</p>}
             </div>
 
             <div className="space-y-1">

@@ -24,11 +24,13 @@ export default function InfiniteFeed() {
 
     return (
         <InfiniteList hasMore={!!hasNextPage} isLoading={isFetchingNextPage} onLoadMore={fetchNextPage}>
-            <div className="grid grid-cols-2 md:grid-cols-6 px-2 md:gap-4 gap-2">
+            <div className="px-2 md:px-0 columns-2 md:columns-4 lg:columns-6 gap-2 md:gap-4">
                 {products?.map((product: ProductSearch, idx: number) => (
-                    <ProductCardPLP key={product.id + product.slug + idx} product={product} />
+                    <div key={product.slug + idx} className="mb-2 md:mb-4 break-inside-avoid">
+                        <ProductCardPLP product={product} />
+                    </div>
                 ))}
             </div>
         </InfiniteList>
-    );
+    )
 }

@@ -13,7 +13,7 @@ const ChatHeader = ({ onClose }: { onClose: () => void }) => {
             </div>
             <div className="flex-1">
                 <h3 className="text-sm font-semibold text-foreground">Support Agent</h3>
-                <p className="text-[11px] text-muted-foreground">AI-powered • Always online</p>
+                <p className="text-xxs text-muted-foreground">AI-powered • Always online</p>
             </div>
             <button onClick={onClose} className="p-2 rounded-xl hover:bg-muted transition-colors">
                 <X className="w-5 h-5 text-foreground" />

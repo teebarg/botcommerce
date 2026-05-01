@@ -86,7 +86,7 @@ export function GalleryFilters() {
                     <SlidersHorizontal className="h-4 w-4" />
                     Filters
                     {activeCount > 0 && (
-                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-[10px] font-medium text-background">
+                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-xxs font-medium text-background">
                             {activeCount}
                         </span>
                     )}

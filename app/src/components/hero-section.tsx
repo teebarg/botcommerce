@@ -138,7 +138,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ image }) => {
             <section className="md:hidden relative h-sc w-full overflow-hidden">
                 <img src={image} alt="image" className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-linear-to-t from-black via-black/50 to-transparent" />
-                <div className="absolute bottom-32 left-0 right-0 px-6 space-y-4">
+                <div className="absolute bottom-32 left-0 right-0 px-6 space-y-2">
                     <div className="inline-block bg-white text-black text-xs font-semibold px-3 py-1 rounded-full mb-2">FEATURED</div>
                     <h1 className="text-4xl font-bold leading-tight text-gray-100">Premium Collection</h1>
                     <p className="text-lg text-gray-300">Premium look. Budget-friendly</p>
@@ -149,7 +149,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ image }) => {
                         </div>
                         <Link
                             to="/collections"
-                            className="flex-1 flex items-center justify-center bg-white text-black font-semibold py-4 rounded-full hover:bg-gray-100 transition-colors"
+                            className="flex-1 flex items-center justify-center bg-white text-black font-semibold py-4 rounded-full"
                         >
                             Shop Now
                         </Link>

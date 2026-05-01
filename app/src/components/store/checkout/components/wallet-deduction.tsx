@@ -67,7 +67,7 @@ const WalletDeduction: React.FC<{ cart: Cart }> = ({ cart }) => {
                             <span className="text-muted-foreground">Credit applied</span>
                             <span className="font-bold text-primary">-{currency(cart.wallet_used)}</span>
                         </div>
-                        <p className="text-[10px] text-muted-foreground mt-1">
+                        <p className="text-xxs text-muted-foreground mt-1">
                             Full wallet balance will be applied. Remaining amount charged to your payment method.
                         </p>
                     </motion.div>

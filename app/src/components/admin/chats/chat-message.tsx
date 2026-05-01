@@ -41,7 +41,7 @@ const AdminChatMessage = ({ message, humanConnected, takeOverPending, onHandleTa
                         <div className="mt-2 rounded-lg bg-card text-card-foreground italic p-3 text-sm">{renderText(message.metadata?.reason)}</div>
                     )}
                     <div className={`flex mt-1 ${!isAssistant ? "justify-start" : "justify-end"}`}>
-                        <p className="text-[10px] text-muted-foreground">{formatTime(message.timestamp)}</p>
+                        <p className="text-xxs text-muted-foreground">{formatTime(message.timestamp)}</p>
                     </div>
                 </div>
                 {isAssistant && (

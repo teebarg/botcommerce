@@ -21,11 +21,11 @@ export const MobilePreview = ({ title, body, imageUrl }: MobilePreviewProps) => 
                         <div className="flex justify-between items-center mb-2">
                             <div className="flex items-center gap-2 min-w-0">
                                 <div className="size-5 bg-foreground rounded-md flex items-center justify-center shrink-0">
-                                    <span className="text-[10px] text-background font-semibold">P</span>
+                                    <span className="text-xxs text-background font-semibold">P</span>
                                 </div>
                                 <span className="text-xs font-semibold text-foreground/80 tracking-tight uppercase truncate">Pixel</span>
                             </div>
-                            <span className="text-[11px] text-foreground/50 shrink-0 ml-2">now</span>
+                            <span className="text-xxs text-foreground/50 shrink-0 ml-2">now</span>
                         </div>
                         <h4 className="text-sm font-semibold text-foreground leading-tight mb-1 line-clamp-2">
                             {title || "Your headline appears here"}
