@@ -26,12 +26,9 @@ const WalletDeduction: React.FC<{ cart: Cart }> = ({ cart }) => {
         return null;
     }
     return (
-        <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.05 }}
+        <div
             className={cn(
-                "p-4 rounded-2xl border-2 transition-all duration-300",
+                "p-4 rounded-2xl border-2 transition-all animate-in fade-in slide-in-from-left-4 duration-300",
                 useWalletCredit ? "border-primary bg-primary/10 shadow-glow" : "border-border bg-card"
             )}
         >
@@ -73,7 +70,7 @@ const WalletDeduction: React.FC<{ cart: Cart }> = ({ cart }) => {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </motion.div>
+        </div>
     );
 };
 

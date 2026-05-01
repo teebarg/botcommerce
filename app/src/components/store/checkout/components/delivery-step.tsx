@@ -47,10 +47,10 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
     return (
         <>
             <div className="space-y-4 px-4 flex-1">
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
+                <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
                     <h2 className="text-2xl font-bold mb-2">Choose Delivery</h2>
                     <p className="text-muted-foreground">How would you like to receive your order?</p>
-                </motion.div>
+                </div>
 
                 <RadioGroup value={cart.shipping_method} variant="delivery" onValueChange={(value: string) => handleChange(value)}>
                     {deliveryOptions?.map((option, idx: number) => (
@@ -60,7 +60,10 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
                             value={option.method}
                             variant="delivery"
                         >
-                            <motion.div key={idx} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.1 }}>
+                            <div key={idx}
+                                className="animate-in fade-in slide-in-from-left-4 duration-300"
+                                style={{ animationDelay: `${idx * 100}ms` }}
+                            >
                                 <div className="flex items-center space-x-3 mb-2">
                                     {option.method === "PICKUP" ? (
                                         <Store className="h-6 w-6 text-primary" />
@@ -83,7 +86,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
                                         {option.amount === 0 ? <span>{config?.address}</span> : <span>Available nationwide</span>}
                                     </div>
                                 </div>
-                            </motion.div>
+                            </div>
                         </RadioGroupItem>
                     ))}
                 </RadioGroup>

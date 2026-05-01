@@ -1,6 +1,5 @@
 import type React from "react";
 import { ArrowLeft } from "lucide-react";
-import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 import { cn } from "@/utils";
@@ -43,15 +42,12 @@ const BackButton: React.FC<Props> = ({ onClick, className }) => {
     }
 
     return (
-        <motion.button
-            initial={false}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className={cn("p-2.5 rounded-full bg-background/80 backdrop-blur-sm shadow-lg border border-border", className)}
+        <button
+            className={cn("p-2.5 rounded-full bg-background/80 backdrop-blur-sm shadow-lg border border-border animate-in fade-in slide-in-from-left-2 duration-300 delay-200", className)}
             onClick={handleGoBack}
         >
             <ArrowLeft className="w-5 h-5 text-foreground" />
-        </motion.button>
+        </button>
     );
 };
 

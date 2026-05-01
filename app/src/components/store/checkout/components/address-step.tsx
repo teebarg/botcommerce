@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import type { Address } from "@/schemas";
 import ComponentLoader from "@/components/component-loader";
 import { useUserAddresses } from "@/hooks/useAddress";
-import { motion } from "framer-motion";
 import SheetDrawer from "@/components/sheet-drawer";
 import { useOverlayTriggerState } from "react-stately";
 import CheckoutAddressForm from "../checkout-address-form";
@@ -39,24 +38,19 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
     return (
         <>
             <div className="space-y-4 px-4 py-4 flex-1 overflow-y-auto">
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
+                <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
                     <h2 className="text-2xl font-bold mb-2">Delivery Address</h2>
                     <p className="text-muted-foreground">Where should we send your order?</p>
-                </motion.div>
+                </div>
 
                 <div className="space-y-3">
                     <div className="space-y-3">
                         <Label className="text-base font-medium block">Select Address</Label>
                         <RadioGroup value={selectedAddressId} onValueChange={setSelectedAddressId}>
                             {addresses.map((addr: Address, idx: number) => (
-                                <motion.div
-                                    key={addr.id}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: idx * 0.1 }}
-                                >
+                                <div key={addr.id}>
                                     <AddressCard key={idx} address={addr} addresses={addresses} selectedAddress={selectedAddress} />
-                                </motion.div>
+                                </div>
                             ))}
                         </RadioGroup>
                     </div>

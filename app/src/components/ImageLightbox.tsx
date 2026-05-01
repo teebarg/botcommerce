@@ -10,12 +10,8 @@ const ImageLightbox = ({ image, onClose }: ImageLightboxProps) => {
     return (
         <AnimatePresence>
             {image && (
-                <motion.div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/95 cursor-zoom-out"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/95 cursor-zoom-out animate-in fade-in duration-200"
                     onClick={onClose}
                 >
                     <button onClick={onClose} className="absolute top-4 right-4 z-10 text-background/70 hover:text-background transition-colors">
@@ -31,7 +27,7 @@ const ImageLightbox = ({ image, onClose }: ImageLightboxProps) => {
                         exit={{ scale: 0.9, opacity: 0 }}
                         transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
                     />
-                </motion.div>
+                </div>
             )}
         </AnimatePresence>
     );

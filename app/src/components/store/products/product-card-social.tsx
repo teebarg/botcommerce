@@ -4,7 +4,7 @@ import { useProductVariant } from "@/hooks/useProductVariant";
 import { PriceLabel } from "@/components/store/products/price-label";
 import { DiscountBadge } from "@/components/store/products/discount-badge";
 import { useUserCreateWishlist, useUserDeleteWishlist, useUserWishlist } from "@/hooks/useUser";
-import type { Facet, ProductSearch, SearchVariant } from "@/schemas/product";
+import type { ProductSearch, SearchVariant } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { IsNew } from "@/components/products/product-badges";
@@ -21,11 +21,10 @@ import { Link } from "@tanstack/react-router";
 
 interface ProductCardProps {
     product: ProductSearch;
-    facets?: Facet;
     scrollRef?: React.RefObject<HTMLElement | null>;
 }
 
-const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scrollRef }) => {
+const ProductCardSocial: React.FC<ProductCardProps> = ({ product, scrollRef }) => {
     const processedRef = useRef(false);
     const [ref, inView] = useInView({
         root: scrollRef?.current,
@@ -177,7 +176,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, facets, scroll
                 >
                     <div className="flex-1 flex flex-col overflow-hidden">
                         <ScrollArea className="flex-1 px-6">
-                            <FilterSidebarLogic ref={sidebarRef} facets={facets} onClose={filterState.close} />
+                            <FilterSidebarLogic ref={sidebarRef} onClose={filterState.close} />
                         </ScrollArea>
                         <div className="flex justify-center gap-2 p-4 border-t border-border">
                             <Button className="w-full rounded-full py-6" onClick={() => sidebarRef.current?.apply()}>

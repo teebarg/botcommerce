@@ -1,6 +1,5 @@
 import { ChevronRight } from "lucide-react";
 import { CategoriesWithProducts, ProductSearch } from "@/schemas";
-import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { clientApi } from "@/utils/api.client";
@@ -22,13 +21,10 @@ export default function CategoriesWithProductsSection() {
                 if (category.products.length === 0) return null;
 
                 return (
-                    <motion.div
+                    <div
                         key={category.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ delay: categoryIndex * 0.1 }}
-                        viewport={{ once: true }}
-                        className="space-y-4"
+                        className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300"
+                        style={{ animationDelay: `${categoryIndex * 100}ms` }}
                     >
                         <div className="flex items-center justify-between">
                             <h3 className="font-display text-lg font-medium">{category.name}</h3>
@@ -47,7 +43,7 @@ export default function CategoriesWithProductsSection() {
                                 <ProductCardPLP key={product.id} product={product} />
                             ))}
                         </div>
-                    </motion.div>
+                    </div>
                 );
             })}
         </section>

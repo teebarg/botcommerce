@@ -10,7 +10,6 @@ import { useConfig } from "@/providers/store-provider";
 import DiscountCode from "./discount-code";
 import CartContactForm from "../contact";
 import { ZeroPayment } from "../../payment/zero-payment";
-import { motion } from "framer-motion";
 import WalletDeduction from "./wallet-deduction";
 
 const payMethods: { id: string; provider_id: PaymentMethod }[] = [
@@ -38,10 +37,10 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
     return (
         <div className="flex-1 overflow-y-auto">
             <div className="space-y-6 px-4">
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
+                <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
                     <h2 className="text-2xl font-bold mb-2">Payment Details</h2>
                     <p className="text-muted-foreground">Complete your order</p>
-                </motion.div>
+                </div>
 
                 <DiscountCode />
 
@@ -50,7 +49,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                 <CartContactForm />
 
                 {cart?.phone && (
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
                         {cart?.total! < 1 ? (
                             <ZeroPayment />
                         ) : (
@@ -93,7 +92,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                                 })}
                             </RadioGroupWithLabel>
                         )}
-                    </motion.div>
+                    </div>
                 )}
             </div>
             {cart?.payment_method === "PAYSTACK" && <PaystackPayment amount={cart.total} cartNumber={cart.cart_number} canContinue={canContinue} />}

@@ -5,7 +5,6 @@ import { useOverlayTriggerState } from "react-stately";
 import type { Order } from "@/schemas";
 import Overlay from "@/components/overlay";
 import OrderDetails from "@/components/store/orders/order-details";
-import { motion } from "framer-motion";
 import { ordersQuery } from "@/queries/user.queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
@@ -16,12 +15,10 @@ const OrderItem: React.FC<{ order: Order; idx: number }> = ({ order, idx }) => {
         <Overlay
             open={state.isOpen}
             trigger={
-                <motion.div
+                <div
                     key={order.id + idx}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.25 + idx * 0.05 }}
-                    className="bg-card rounded-2xl p-4 border border-border flex items-center gap-4"
+                    className="bg-card rounded-2xl p-4 border border-border flex items-center gap-4 animate-in fade-in slide-in-from-left-4 duration-300"
+                    style={{ animationDelay: `${250 + idx * 50}ms` }}
                 >
                     <img src={order.order_items[0].image} alt="Order item" className="w-14 h-14 rounded-xl object-cover" />
                     <div className="flex-1 min-w-0">
@@ -43,7 +40,7 @@ const OrderItem: React.FC<{ order: Order; idx: number }> = ({ order, idx }) => {
                         </div>
                     </div>
                     <p className="font-semibold">{currency(order.total)}</p>
-                </motion.div>
+                </div>
             }
             onOpenChange={state.setOpen}
             showHeader={true}
@@ -77,45 +74,34 @@ function RouteComponent() {
                 <h2 className="text-xl font-bold">Welcome back, {session?.user?.firstName}!</h2>
                 <p className="text-muted-foreground text-sm">Member since January 2024</p>
             </div>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="grid grid-cols-3 gap-3">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.1 }}
-                    className="bg-card rounded-2xl p-4 text-center border border-border"
-                >
+            <div className="grid grid-cols-3 gap-3 animate-in fade-in slide-in-from-bottom-4 duration-100">
+                <div className="bg-card rounded-2xl p-4 text-center border border-border animate-in fade-in zoom-in-90 duration-300 delay-100">
                     <div className="w-10 h-10 mx-auto rounded-xl gradient-primary flex items-center justify-center mb-2">
                         <Heart className="w-5 h-5 text-white" />
                     </div>
                     <p className="text-2xl font-bold">{data?.items?.length}</p>
                     <p className="text-xs text-muted-foreground">Total Orders</p>
-                </motion.div>
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.15 }}
-                    className="bg-card rounded-2xl p-4 text-center border border-border"
+                </div>
+                <div
+                    className="bg-card rounded-2xl p-4 text-center border border-border animate-in fade-in zoom-in-90 duration-300 delay-150"
                 >
                     <div className="w-10 h-10 mx-auto rounded-xl gradient-primary flex items-center justify-center mb-2">
                         <MapPin className="w-5 h-5 text-white" />
                     </div>
                     <p className="text-2xl font-bold">0</p>
                     <p className="text-xs text-muted-foreground">Wishlist Items</p>
-                </motion.div>
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="bg-card rounded-2xl p-4 text-center border border-border"
+                </div>
+                <div
+                    className="bg-card rounded-2xl p-4 text-center border border-border animate-in fade-in zoom-in-90 duration-300 delay-200"
                 >
                     <div className="w-10 h-10 mx-auto rounded-xl gradient-primary flex items-center justify-center mb-2">
                         <Package className="w-5 h-5 text-white" />
                     </div>
                     <p className="text-2xl font-bold">1</p>
                     <p className="text-xs text-muted-foreground">Saved Addresses</p>
-                </motion.div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+                </div>
+            </div>
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-200">
                 <div className="flex items-center justify-between mb-2">
                     <h3 className="font-semibold">Recent Orders</h3>
                     <Link to="/account/orders" className="text-sm text-primary flex items-center gap-1">
@@ -129,17 +115,14 @@ function RouteComponent() {
                         <OrderItem key={idx} order={order} idx={idx} />
                     ))}
                     {data?.items?.length === 0 && (
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.25 }}
-                            className="bg-card rounded-2xl p-4 border border-border flex items-center gap-4"
+                        <div
+                            className="bg-card rounded-2xl p-4 border border-border flex items-center gap-4 animate-in fade-in slide-in-from-left-4 duration-300 delay-[250ms]"
                         >
                             No orders found
-                        </motion.div>
+                        </div>
                     )}
                 </div>
-            </motion.div>
+            </div>
         </div>
     );
 }

@@ -8,7 +8,6 @@ import type { Order, OrderItem } from "@/schemas";
 import { currency } from "@/utils";
 import { useConfig } from "@/providers/store-provider";
 import ImageDisplay from "@/components/image-display";
-import { motion } from "framer-motion";
 
 interface OrderDetailsProps {
     order: Order;
@@ -18,12 +17,8 @@ const OrderDetails = ({ order }: OrderDetailsProps) => {
     const { config } = useConfig();
 
     return (
-        <motion.div
-            key="orderDetails"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="flex-1 flex flex-col overflow-hidden"
+        <div
+            className="flex-1 flex flex-col overflow-hidden animate-in fade-in slide-in-from-right-4 duration-300"
         >
             <div className="grid gap-6 lg:grid-cols-3 overflow-y-auto px-2">
                 <div className="lg:col-span-2 space-y-6">
@@ -182,7 +177,7 @@ const OrderDetails = ({ order }: OrderDetailsProps) => {
                     </div>
                 </div>
             </div>
-        </motion.div>
+        </div>
     );
 };
 

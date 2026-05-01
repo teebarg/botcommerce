@@ -13,7 +13,6 @@ import { useInvalidate } from "@/hooks/useApi";
 import { tryCatch } from "@/utils/try-catch";
 import { Separator } from "@/components/ui/separator";
 import { updateAuthSession } from "@/utils/auth-client";
-import { motion } from "framer-motion";
 import { clientApi } from "@/utils/api.client";
 import { getInitials } from "@/utils";
 
@@ -118,16 +117,13 @@ function RouteComponent() {
 
     return (
         <div className="space-y-6 pt-6">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
+            <div className="text-center animate-in fade-in slide-in-from-bottom-4 duration-300">
                 <h2 className="text-2xl font-bold mb-2">Profile Details</h2>
                 <p className="text-muted-foreground">Manage your personal information</p>
-            </motion.div>
+            </div>
 
-            <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.1 }}
-                className="flex flex-col items-center"
+            <div
+                className="flex flex-col items-center animate-in fade-in zoom-in-90 duration-300 delay-100"
             >
                 <div className="relative">
                     <div className="w-24 h-24 rounded-full gradient-primary p-1">
@@ -145,7 +141,7 @@ function RouteComponent() {
                     {session?.user?.firstName} {session?.user?.lastName}
                 </p>
                 <p className="text-sm text-muted-foreground">{session?.user?.email}</p>
-            </motion.div>
+            </div>
 
             <div className="px-2 md:px-0">
                 <div className="bg-card rounded-xl shadow-sm border border-border mb-6 transition-colors duration-300">

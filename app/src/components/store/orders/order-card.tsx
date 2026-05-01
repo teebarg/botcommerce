@@ -7,7 +7,6 @@ import { currency, formatDate } from "@/utils";
 import Overlay from "@/components/overlay";
 import { OrderStatusBadge } from "@/components/admin/orders/order-status-badge";
 import ImageDisplay from "@/components/image-display";
-import { motion } from "framer-motion";
 
 const OrderCard = ({ order, idx }: { order: Order; idx: number }) => {
     const state = useOverlayTriggerState({});
@@ -19,12 +18,10 @@ const OrderCard = ({ order, idx }: { order: Order; idx: number }) => {
         <Overlay
             open={state.isOpen}
             trigger={
-                <motion.div
+                <div
                     key={order.id + idx}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.25 + idx * 0.05 }}
-                    className="bg-card rounded-2xl p-4 border border-border flex flex-col gap-2"
+                    className="bg-card rounded-2xl p-4 border border-border flex flex-col gap-2 animate-in fade-in slide-in-from-left-4 duration-300"
+                    style={{ animationDelay: `${250 + idx * 50}ms` }}
                 >
                     <div className="flex gap-2">
                         <p className="font-semibold">{order.order_number}</p>
@@ -59,7 +56,7 @@ const OrderCard = ({ order, idx }: { order: Order; idx: number }) => {
                             </div>
                         )}
                     </div>
-                </motion.div>
+                </div>
             }
             onOpenChange={state.setOpen}
             showHeader={true}

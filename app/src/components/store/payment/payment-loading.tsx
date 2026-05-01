@@ -1,5 +1,4 @@
 import type React from "react";
-import { motion } from "framer-motion";
 import { CheckCircle2, ShoppingBag } from "lucide-react";
 
 const PaymentLoading: React.FC = () => {
@@ -8,31 +7,11 @@ const PaymentLoading: React.FC = () => {
             <div className="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden">
                 <div className="p-8">
                     <div className="flex justify-center mb-8">
-                        <motion.div
-                            animate={{ scale: 1 }}
-                            className="relative"
-                            initial={{ scale: 0 }}
-                            transition={{
-                                type: "spring",
-                                stiffness: 260,
-                                damping: 20,
-                            }}
-                        >
-                            <motion.div
-                                animate={{
-                                    rotate: 360,
-                                }}
-                                className="w-24 h-24 rounded-full border-4 border-violet-200 border-t-violet-500"
-                                transition={{
-                                    duration: 2,
-                                    repeat: Infinity,
-                                    ease: "linear",
-                                }}
-                            />
-                            <ShoppingBag className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-violet-500 w-10 h-10" />
-                        </motion.div>
+                        <div className="relative animate-in zoom-in-0 duration-500">
+                            <div className="w-24 h-24 rounded-full border-4 border-violet-200 border-t-violet-500 animate-spin" />
+                            <ShoppingBag className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-violet-500 w-10 h-10" />
+                        </div>
                     </div>
-
                     <h2 className="text-2xl font-bold text-center text-gray-800 mb-2">Processing Your Order</h2>
 
                     <p className="text-gray-600 text-center mb-8">Please wait while we verify your payment</p>
@@ -72,30 +51,13 @@ function ProcessStep({ title, description, isCompleted, isActive = false }: Proc
         <div className="flex items-start space-x-4">
             <div className="shrink-0">
                 {isCompleted ? (
-                    <motion.div
-                        animate={{ scale: 1 }}
-                        initial={{ scale: 0 }}
-                        transition={{
-                            type: "spring",
-                            stiffness: 260,
-                            damping: 20,
-                        }}
-                    >
+                    <div className="animate-in zoom-in-0 duration-300">
                         <CheckCircle2 className="w-6 h-6 text-green-500" />
-                    </motion.div>
+                    </div>
                 ) : (
                     <div className={`w-6 h-6 rounded-full border-2 ${isActive ? "border-violet-500" : "border-gray-300"}`}>
                         {isActive && (
-                            <motion.div
-                                animate={{ scale: 1 }}
-                                className="w-full h-full rounded-full bg-violet-500"
-                                initial={{ scale: 0 }}
-                                transition={{
-                                    repeatType: "reverse",
-                                    repeat: Infinity,
-                                    duration: 1,
-                                }}
-                            />
+                            <div className="w-full h-full rounded-full bg-violet-500 animate-pulse" />
                         )}
                     </div>
                 )}

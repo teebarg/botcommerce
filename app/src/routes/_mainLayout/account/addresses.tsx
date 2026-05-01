@@ -6,7 +6,6 @@ import type { Address } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils";
 import { useDeleteAddress } from "@/hooks/useAddress";
-import { AnimatePresence, motion } from "framer-motion";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import SheetDrawer from "@/components/sheet-drawer";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -32,14 +31,9 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false, in
     };
 
     return (
-        <motion.div
-            key={address.id}
-            layout
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20, scale: 0.9 }}
-            transition={{ delay: index * 0.05 }}
-            className={cn("bg-card rounded-2xl border-2 overflow-hidden transition-all duration-300", isActive ? "border-primary" : "border-border")}
+        <div
+            className={cn("bg-card rounded-2xl border-2 overflow-hidden transition-all duration-300 animate-in fade-in slide-in-from-left-4", isActive ? "border-primary" : "border-border")}
+            style={{ animationDelay: `${index * 50}ms` }}
         >
             <div className="p-4">
                 <div className="flex items-start gap-4">
@@ -93,7 +87,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false, in
                     />
                 </div>
             </div>
-        </motion.div>
+        </div>
     );
 };
 
@@ -111,10 +105,10 @@ function RouteComponent() {
 
     return (
         <div className="w-full px-2 pt-6">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-4">
+            <div className="text-center mb-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
                 <h2 className="text-2xl font-bold mb-2">My Addresses</h2>
                 <p className="text-muted-foreground">Manage your delivery addresses</p>
-            </motion.div>
+            </div>
             <SheetDrawer
                 open={addState.isOpen}
                 title="Add new address"
@@ -130,11 +124,9 @@ function RouteComponent() {
                 <AddressForm mode="create" onClose={addState.close} />
             </SheetDrawer>
             <div className="space-y-3 mt-4">
-                <AnimatePresence mode="popLayout">
-                    {addresses?.map((address: Address, index: number) => {
-                        return <AddressItem key={index} index={index} address={address} />;
-                    })}
-                </AnimatePresence>
+                {addresses?.map((address: Address, index: number) => {
+                    return <AddressItem key={index} index={index} address={address} />;
+                })}
             </div>
         </div>
     );
