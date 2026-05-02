@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { useCart } from "@/providers/cart-provider";
 import { useUpdateCartDetails } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
 import { Label } from "@/components/ui/label";
 import { formatPhone, normalizePhone } from "@/lib/validation";
 
@@ -41,11 +40,8 @@ const CartContactForm = () => {
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="p-4 rounded-2xl bg-card border border-border"
+        <div
+            className="p-4 rounded-2xl bg-card border border-border animate-in fade-in slide-in-from-right-4 duration-200"
         >
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -86,7 +82,7 @@ const CartContactForm = () => {
                     />
                 </form>
             </Form>
-        </motion.div>
+        </div>
     );
 };
 

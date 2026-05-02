@@ -19,7 +19,7 @@ export const OrderCard = ({ order }: { order: ChatOrder | null }) => {
     const Icon = config.icon;
 
     return (
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass rounded-2xl p-4 space-y-3 max-w-xs">
+        <div className="glass rounded-2xl p-4 space-y-3 max-w-xs animate-in fade-in zoom-in-95 duration-300">
             <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground font-mono">#{order.order_number}</span>
                 <span className={`flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${config.bg} ${config.color}`}>
@@ -48,6 +48,6 @@ export const OrderCard = ({ order }: { order: ChatOrder | null }) => {
             <div className="flex items-center justify-between pt-2 border-t border-border">
                 <span className="text-sm font-semibold text-foreground">{currency(order.financials.total)}</span>
             </div>
-        </motion.div>
+        </div>
     );
 };

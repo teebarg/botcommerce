@@ -17,7 +17,7 @@ type SearchParams = {
     show_suggestions?: boolean;
 };
 
-type FeedParams = {
+export type FeedParams = {
     search?: string;
     categories?: string;
     collections?: string;

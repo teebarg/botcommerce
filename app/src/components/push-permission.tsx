@@ -206,16 +206,10 @@ export default function PushPermission() {
 
     return (
         <AnimatePresence>
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-end md:items-center justify-center"
+            <div
+                className="fixed inset-0 z-50 flex items-end md:items-center justify-center animate-in fade-in duration-300"
             >
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                <div
                     onClick={handleDismiss}
                     className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                 />
@@ -256,24 +250,14 @@ export default function PushPermission() {
                                     </div>
                                 </div>
                             </div>
-                            <motion.h2
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.15 }}
-                                className="text-lg font-semibold mb-2"
-                            >
+                            <h2 className="text-lg font-semibold mb-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
                                 You Have a Gift! 🎁
-                            </motion.h2>
-                            <motion.p
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2 }}
-                                className="text-sm text-muted-foreground leading-relaxed"
-                            >
+                            </h2>
+                            <p className="text-sm text-muted-foreground leading-relaxed animate-in fade-in slide-in-from-bottom-2 duration-200">
                                 We have something special waiting just for you
-                            </motion.p>
+                            </p>
                         </div>
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
                             <div className="relative bg-muted rounded-2xl p-6 border-2 border-gold/30 text-center mb-6 mx-6">
                                 <p className="text-sm text-muted-foreground mb-2">Your gift is worth</p>
                                 <div className="flex items-center justify-center gap-2">
@@ -281,8 +265,8 @@ export default function PushPermission() {
                                 </div>
                                 <p className="text-sm font-medium text-primary mt-2">Shopping Credits</p>
                             </div>
-                        </motion.div>
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="border-t border-border">
+                        </div>
+                        <div className="border-t border-border animate-in fade-in duration-300">
                             <button
                                 onClick={handleDismiss}
                                 className="w-full py-4 text-center font-medium text-muted-foreground hover:bg-secondary/50 active:bg-secondary transition-colors border-b border-border cursor-pointer"
@@ -295,10 +279,10 @@ export default function PushPermission() {
                             >
                                 Claim My Gift!
                             </button>
-                        </motion.div>
+                        </div>
                     </div>
                 </motion.div>
-            </motion.div>
+            </div>
         </AnimatePresence>
     );
 }

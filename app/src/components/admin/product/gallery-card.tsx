@@ -5,7 +5,6 @@ import type { Collection, ProductImage, ProductVariantLite } from "@/schemas";
 import MediaDisplay from "@/components/media-display";
 import { IsNew } from "@/components/products/product-badges";
 import { useState } from "react";
-import { motion } from "framer-motion";
 import ImageLightbox from "@/components/ImageLightbox";
 import { GalleryCampaign } from "./gallery-campaign";
 
@@ -34,16 +33,12 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
 
     return (
         <>
-            <motion.div
+            <div
                 className={cn(
-                    "relative group overflow-hidden bg-background",
+                    "relative group overflow-hidden bg-background animate-in fade-in duration-300",
                     isProductInactive ? "ring-2 ring-red-500 opacity-50" : "",
                     isSelected && "ring-2 ring-indigo-900 ring-offset-2"
                 )}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.05, duration: 0.3 }}
-                viewport={{ once: true }}
             >
                 <div
                     className="relative aspect-[3/4] overflow-hidden bg-secondary"
@@ -89,7 +84,7 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
                         <GalleryCampaign image={image.image} />
                     </div>
                 </div>
-            </motion.div>
+            </div>
             <ImageLightbox image={lightboxOpen ? image.image : null} onClose={() => setLightboxOpen(false)} />
         </>
     );

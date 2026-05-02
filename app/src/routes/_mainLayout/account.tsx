@@ -58,7 +58,7 @@ function RouteComponent() {
     return (
         <div className="flex-1">
             <div className="bg-background/60 backdrop-blur-md md:hidden sticky z-20 top-[calc(var(--sat)+64px)]">
-                <motion.ul initial={{ y: 100 }} animate={{ y: 0 }} className="grid grid-cols-5 px-2">
+                <ul className="grid grid-cols-5 px-2 animate-in slide-in-from-bottom-24 duration-300">
                     {navLinks.map((link, idx: number) => (
                         <li key={idx}>
                             <Link
@@ -75,7 +75,7 @@ function RouteComponent() {
                             </Link>
                         </li>
                     ))}
-                </motion.ul>
+                </ul>
             </div>
             <div className="max-w-7xl mx-auto flex md:gap-4 pb-4 md:pt-6">
                 <div className="md:w-60 hidden md:block">

@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Bot, AlertTriangle, Check, X, ShieldCheck, CheckCircle } from "lucide-react";
 import { ChatMessage as ChatMessageType } from "@/schemas";
 import { ProductRecommendation } from "./ProductRecommendation";
@@ -83,11 +82,9 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastMessage, isEd
     }
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 12, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: index * 0.05, type: "spring", stiffness: 500, damping: 30 }}
-            className={`flex gap-2 px-2.5 ${isAssistant ? "justify-start" : "justify-end"}`}
+        <div
+            className={`flex gap-2 px-2.5 animate-in fade-in slide-in-from-bottom-3 zoom-in-95 duration-300 ${isAssistant ? "justify-start" : "justify-end"}`}
+            style={{ animationDelay: `${index * 50}ms` }}
         >
             {isAssistant && (
                 <div className="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center shrink-0 mt-1">
@@ -164,7 +161,7 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastMessage, isEd
                 )}
             </div>
             {!isAssistant && chatAvatar(session?.user?.image)}
-        </motion.div>
+        </div>
     );
 };
 

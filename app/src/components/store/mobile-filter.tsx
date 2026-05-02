@@ -1,5 +1,4 @@
 import type React from "react";
-import type { Facet } from "@/schemas/product";
 import { useRef } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import Overlay from "@/components/overlay";
@@ -10,9 +9,7 @@ import { useRouterState } from "@tanstack/react-router";
 import { FilterSidebarLogic, FilterSidebarRef } from "./catalog/filter-sidebar-logic";
 import { useSearch } from "@tanstack/react-router";
 
-interface MobileFilterProps {
-    facets?: Facet;
-}
+interface MobileFilterProps {}
 
 type Filters = {
     ages: string;
@@ -66,7 +63,7 @@ function countActiveFilters(filters: Filters): number {
     return count;
 }
 
-const MobileFilter: React.FC<MobileFilterProps> = ({ facets }) => {
+const MobileFilter: React.FC<MobileFilterProps> = ({}) => {
     const { location } = useRouterState();
     const filterState = useOverlayTriggerState({});
     const sidebarRef = useRef<FilterSidebarRef>(null);
@@ -107,7 +104,7 @@ const MobileFilter: React.FC<MobileFilterProps> = ({ facets }) => {
         >
             <div className="flex-1 flex flex-col overflow-hidden">
                 <ScrollArea className="flex-1 px-6">
-                    <FilterSidebarLogic ref={sidebarRef} facets={facets} onClose={filterState.close} />
+                    <FilterSidebarLogic ref={sidebarRef} onClose={filterState.close} />
                 </ScrollArea>
                 <div className="flex justify-center gap-2 p-4 border-t border-border">
                     <Button className="w-full rounded-full py-6" onClick={() => sidebarRef.current?.apply()}>

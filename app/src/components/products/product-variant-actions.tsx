@@ -25,19 +25,17 @@ export const ProductVariantActions: React.FC<VariantSelectionProps> = ({ product
     };
 
     return (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }} className="flex items-center gap-3">
-            <motion.button
-                whileTap={{ scale: 0.95 }}
+        <div className="flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
+            <button
                 onClick={(e) => {
                     e.stopPropagation();
                     inWishlist ? removeWishlist() : addWishlist();
                 }}
-                className={`p-3 rounded-xl border transition-colors ${
-                    inWishlist ? "bg-primary/10 border-primary" : "bg-background border-border hover:border-primary"
-                }`}
+                className={`p-3 rounded-xl border transition-colors active:scale-95 ${inWishlist ? "bg-primary/10 border-primary" : "bg-background border-border hover:border-primary"
+                    }`}
             >
                 <Heart className={`w-6 h-6 ${inWishlist ? "fill-primary text-primary" : "text-foreground"}`} />
-            </motion.button>
+            </button>
 
             <Button
                 className="w-auto text-emerald-700 hover:text-emerald-600 hover:bg-transparent"
@@ -58,24 +56,23 @@ export const ProductVariantActions: React.FC<VariantSelectionProps> = ({ product
                 </svg>
             </Button>
 
-            <motion.button
+            <button
                 onClick={!outOfStock ? handleAddToCart : undefined}
                 disabled={outOfStock}
-                className={`flex-1 py-3 px-6 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all ${
-                    outOfStock
+                className={`flex-1 py-3 px-6 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all ${outOfStock
                         ? "bg-muted text-muted-foreground cursor-not-allowed"
                         : isAdded
-                          ? "bg-green-500 text-white"
-                          : "bg-primary text-primary-foreground hover:bg-primary/90"
-                }`}
+                            ? "bg-green-500 text-white"
+                            : "bg-primary text-primary-foreground hover:bg-primary/90"
+                    }`}
             >
                 {outOfStock ? (
                     "Out of Stock"
                 ) : isAdded ? (
                     <>
-                        <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                        <span className="animate-in zoom-in-0 duration-300">
                             ✓
-                        </motion.span>
+                        </span>
                         Added to Cart!
                     </>
                 ) : (
@@ -84,7 +81,7 @@ export const ProductVariantActions: React.FC<VariantSelectionProps> = ({ product
                         Add to Cart
                     </>
                 )}
-            </motion.button>
-        </motion.div>
+            </button>
+        </div>
     );
 };

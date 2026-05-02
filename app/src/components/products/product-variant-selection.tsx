@@ -44,7 +44,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
     return (
         <div className="space-y-6 mt-4">
             {sizes?.length > 0 && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}>
+                <div className="animate-in fade-in duration-300">
                     <p className="text-sm font-medium text-foreground mb-3">Select Size</p>
                     <div className="flex flex-wrap gap-2">
                         {sizes.map((size) => (
@@ -59,11 +59,11 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                             </button>
                         ))}
                     </div>
-                </motion.div>
+                </div>
             )}
 
             {safeColors.length > 0 && (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mb-6">
+                <div className="mb-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
                     <h3 className="text-sm font-medium text-foreground mb-3">Color: {selectedColor}</h3>
                     <div className="flex gap-3">
                         {safeColors.map((color: string, idx: number) => (
@@ -77,7 +77,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                             />
                         ))}
                     </div>
-                </motion.div>
+                </div>
             )}
 
             {ages?.length > 0 && (
@@ -202,7 +202,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                 </div>
             )}
 
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="flex items-center gap-4">
+            <div className="flex items-center gap-4 animate-in fade-in duration-300">
                 <p className="text-sm font-medium text-foreground">Quantity</p>
                 <div className="flex items-center gap-3 bg-muted rounded-lg p-1">
                     <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-2 rounded-md hover:bg-background transition-colors">
@@ -213,7 +213,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                         <Plus className="w-4 h-4" />
                     </button>
                 </div>
-            </motion.div>
+            </div>
         </div>
     );
 };

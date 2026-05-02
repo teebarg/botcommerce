@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { ArrowRightLeft, Headphones, Shield } from "lucide-react";
 
 interface HandoffBannerProps {
@@ -6,13 +5,9 @@ interface HandoffBannerProps {
 }
 
 const HandoffBanner = ({ agentName = "Sarah M." }: HandoffBannerProps) => (
-    <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ type: "spring", stiffness: 400, damping: 25 }}
-        className="my-4"
+    <div
+        className="my-4 animate-in fade-in zoom-in-90 duration-300"
     >
-        {/* Divider line */}
         <div className="flex items-center gap-3 mb-3">
             <div className="flex-1 h-px bg-border" />
             <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary border border-border">
@@ -22,12 +17,8 @@ const HandoffBanner = ({ agentName = "Sarah M." }: HandoffBannerProps) => (
             <div className="flex-1 h-px bg-border" />
         </div>
 
-        {/* Agent card */}
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="rounded-xl border border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10 p-3.5"
+        <div
+            className="rounded-xl border border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10 p-3.5 animate-in fade-in slide-in-from-bottom-2 duration-300 delay-200"
         >
             <div className="flex items-center gap-3">
                 {/* Agent avatar */}
@@ -53,8 +44,8 @@ const HandoffBanner = ({ agentName = "Sarah M." }: HandoffBannerProps) => (
                 </div>
                 <span className="text-xxs text-muted-foreground">Avg. response: &lt;1 min</span>
             </div>
-        </motion.div>
-    </motion.div>
+        </div>
+    </div>
 );
 
 export default HandoffBanner;

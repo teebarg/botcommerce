@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { ArrowDownLeft, ShoppingBag } from "lucide-react";
 import { cn, currency, formatDate } from "@/utils";
 import { WalletTxn } from "@/schemas";
@@ -14,12 +13,9 @@ export function WalletTxnCard({ txn, index }: Props) {
     const TxnIcon = isCredit ? ArrowDownLeft : ShoppingBag;
 
     return (
-        <motion.div
-            key={txn.id}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.25 + index * 0.04 }}
-            className="bg-card rounded-2xl p-4 border border-border flex items-center gap-3"
+        <div
+            className="bg-card rounded-2xl p-4 border border-border flex items-center gap-3 animate-in fade-in slide-in-from-left-4 duration-300"
+            style={{ animationDelay: `${250 + index * 40}ms` }}
         >
             <div
                 className={cn(
@@ -43,6 +39,6 @@ export function WalletTxnCard({ txn, index }: Props) {
                 </p>
                 <p className="text-xxs text-muted-foreground">{formatDate(txn.created_at)}</p>
             </div>
-        </motion.div>
+        </div>
     );
 }

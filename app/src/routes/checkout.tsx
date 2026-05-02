@@ -7,7 +7,6 @@ import { useCart } from "@/providers/cart-provider";
 import CheckoutFlow from "@/components/store/checkout/components/checkout-flow";
 import ComponentLoader from "@/components/component-loader";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { motion } from "framer-motion";
 import { BackButton } from "@/components/back";
 import { meQuery } from "@/queries/user.queries";
 import { useEffect } from "react";
@@ -67,10 +66,8 @@ function RouteComponent() {
     }
     return (
         <div className="max-w-7xl mx-auto w-full flex flex-col overflow-hidden">
-            <motion.header
-                initial={{ y: -20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                className="sticky h-16 top-0 z-50 bg-background/80 backdrop-blur-xl flex justify-between items-center border-b border-border px-2.5 shrink-0"
+            <header
+                className="sticky h-16 top-0 z-50 bg-background/80 backdrop-blur-xl flex justify-between items-center border-b border-border px-2.5 shrink-0 animate-in fade-in duration-300"
             >
                 <div className="flex items-center gap-2">
                     <BackButton />
@@ -82,7 +79,7 @@ function RouteComponent() {
                         <CartComponent />
                     </div>
                 </div>
-            </motion.header>{" "}
+            </header>{" "}
             {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-[1fr_360px] gap-x-8 px-2 pt-4">
                     <ComponentLoader className="rounded-md h-192 md:mt-8" />

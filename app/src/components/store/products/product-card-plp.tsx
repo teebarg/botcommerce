@@ -2,7 +2,6 @@ import type React from "react";
 import { useProductVariant } from "@/hooks/useProductVariant";
 import { PriceLabel } from "@/components/store/products/price-label";
 import type { ProductSearch } from "@/schemas/product";
-import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import ProductCardActions from "./product-card-actions";
 import { useMemo, useState } from "react";
@@ -21,13 +20,7 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
 
     return (
         <>
-            <motion.div
-                className="relative group cursor-pointer bg-background"
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.05, duration: 0.25 }}
-                viewport={{ once: true }}
-            >
+            <div className="relative group cursor-pointer bg-background animate-in fade-in duration-300">
                 {Boolean(priceInfo.maxDiscountPercent) && (
                     <div className="absolute top-2 left-2 z-10 bg-destructive text-destructive-foreground px-2 py-1 text-xxs font-bold">
                         -{priceInfo.maxDiscountPercent}%
@@ -40,10 +33,11 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
                     onClick={() => setLightboxOpen(true)}
                 >
                     <img
-                        src={product.image || "/placeholder.jpg"}
-                        alt={product.name}
+                        src={product?.image || "/placeholder.jpg"}
+                        alt={product?.name}
                         loading="lazy"
-                        className="w-full h-auto max-h-[500px] object-cover transition-transform duration-500 group-hover:scale-105"
+                        decoding="async"
+                        className="w-full h-auto max-h-[400px] object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     {isNew && <IsNew />}
                     {outOfStock && (
@@ -55,14 +49,14 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
                     )}
                     <ProductTag product={product} />
                 </div>
-                <Link to="/products/$slug" className="block px-1 py-2" params={{ slug: product.slug }}>
-                    <h3 className="line-clamp-1 text-xs">{product.name}</h3>
+                <Link to="/products/$slug" className="block px-1 py-2" params={{ slug: product?.slug }}>
+                    <h3 className="line-clamp-1 text-xs">{product?.name}</h3>
                     <PriceLabel priceInfo={priceInfo} />
                 </Link>
 
                 <ProductCardActions product={product} actionColor="bg-gradient-action" />
-            </motion.div>
-            <ImageLightbox image={lightboxOpen ? product.image : null} onClose={() => setLightboxOpen(false)} />
+            </div>
+            <ImageLightbox image={lightboxOpen ? product?.image : null} onClose={() => setLightboxOpen(false)} />
         </>
     );
 };

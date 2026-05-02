@@ -11,7 +11,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCategories } from "@/hooks/useCategories";
 import { useCollections } from "@/hooks/useCollection";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
-import type { Facet } from "@/schemas/product";
 import { currency, debounce } from "@/utils";
 import { AGE_OPTIONS, COLOR_OPTIONS, type ColorOption, DEFAULT_MAX_PRICE, DEFAULT_MIN_PRICE, SIZE_OPTIONS } from "@/utils/constants";
 
@@ -21,7 +20,6 @@ export interface FilterSidebarRef {
 }
 
 interface Props {
-    facets?: Facet;
     onClose?: () => void;
 }
 
@@ -79,7 +77,7 @@ const normalizePriceValues = (minStr: string, maxStr: string) => {
     return { minPrice: minNormalized, maxPrice: maxNormalized };
 };
 
-export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets, onClose }, ref) => {
+export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose }, ref) => {
     const search = useSearch({ strict: false });
     const navigate = useNavigate();
     const { updateQuery } = useUpdateQuery();
@@ -242,7 +240,6 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
                                 <Label htmlFor={`cat-${category.id}`} className="text-sm cursor-pointer flex-1">
                                     {category.name}
                                 </Label>
-                                <span className="text-xs text-muted-foreground">{facets?.category_slugs?.[category.slug] || 0}</span>
                             </div>
                         ))}
                     </div>
@@ -372,18 +369,16 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
                 <CollapsibleContent>
                     <div className="flex flex-wrap gap-2 pt-2">
                         {SIZE_OPTIONS.map((size) => (
-                            <motion.button
+                            <button
                                 key={size}
                                 onClick={() => onToggleSize(size)}
-                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                                    draft.sizes.has(size)
+                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors active:scale-95 ${draft.sizes.has(size)
                                         ? "bg-primary text-primary-foreground"
                                         : "bg-secondary text-secondary-foreground hover:bg-muted"
-                                }`}
-                                whileTap={{ scale: 0.95 }}
+                                    }`}
                             >
                                 {size}
-                            </motion.button>
+                            </button>
                         ))}
                     </div>
                 </CollapsibleContent>
@@ -397,20 +392,18 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ facets,
                 <CollapsibleContent>
                     <div className="flex flex-wrap gap-2 pt-2">
                         {COLOR_OPTIONS.map((color: ColorOption) => (
-                            <motion.button
+                            <button
                                 key={color.name}
                                 onClick={() => onToggleColor(color.name)}
-                                className={`relative w-8 h-8 rounded-full border-2 transition-all ${
-                                    draft.colors.has(color.name)
+                                className={`relative w-8 h-8 rounded-full border-2 transition-all active:scale-95 ${draft.colors.has(color.name)
                                         ? "border-primary ring-2 ring-primary ring-offset-2 ring-offset-background"
                                         : "border-border hover:border-muted-foreground"
-                                }`}
+                                    }`}
                                 style={{ backgroundColor: color.value }}
-                                whileTap={{ scale: 0.9 }}
                                 title={color.name}
                             >
                                 {color.name === "White" && <span className="absolute inset-0 rounded-full border border-border" />}
-                            </motion.button>
+                            </button>
                         ))}
                     </div>
                 </CollapsibleContent>

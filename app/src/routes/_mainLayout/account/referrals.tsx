@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { meQuery, meTxnsQuery } from "@/queries/user.queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { motion } from "framer-motion";
 import { Check, Copy, Gift, Loader, Share2, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -63,10 +62,8 @@ function RouteComponent() {
 
     return (
         <div className="space-y-6 px-2 pt-6">
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="relative overflow-hidden rounded-2xl gradient-primary p-6 text-white"
+            <div
+                className="relative overflow-hidden rounded-2xl gradient-primary p-6 text-white animate-in fade-in slide-in-from-bottom-4 duration-300"
             >
                 <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white/10 -translate-y-1/2 translate-x-1/2" />
                 <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-white/5 translate-y-1/2 -translate-x-1/2" />
@@ -81,43 +78,37 @@ function RouteComponent() {
                         <div className="flex-1 bg-white/20 backdrop-blur-sm rounded-xl px-4 py-3 font-mono text-2xl font-bold tracking-widest text-center">
                             {me?.referral_code}
                         </div>
-                        <motion.button
-                            whileTap={{ scale: 0.9 }}
+                        <button
                             onClick={handleCopy}
-                            className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center"
+                            className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center active:scale-95"
                         >
                             {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
-                        </motion.button>
+                        </button>
                     </div>
 
-                    <motion.button
-                        whileTap={{ scale: 0.97 }}
+                    <button
                         onClick={handleShare}
-                        className="w-full mt-4 py-3 rounded-xl bg-white/20 backdrop-blur-sm font-medium flex items-center justify-center gap-2 text-sm"
+                        className="w-full mt-4 py-3 rounded-xl bg-white/20 backdrop-blur-sm font-medium flex items-center justify-center gap-2 text-sm active:scale-95"
                     >
                         <Share2 className="w-4 h-4" />
                         Share with Friends
-                    </motion.button>
+                    </button>
 
                     <p className="text-xs opacity-70 mt-3 text-center">Earn cashback when friends make their first purchase</p>
                 </div>
-            </motion.div>
+            </div>
 
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="grid grid-cols-3 gap-3">
-                <motion.div
-                    key="Wallet Balance"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.1 + 0 * 0.05 }}
-                    className="bg-card rounded-2xl p-4 text-center border border-border"
+            <div className="grid grid-cols-3 gap-3 animate-in fade-in slide-in-from-bottom-4 duration-100">
+                <div
+                    className="bg-card rounded-2xl p-4 text-center border border-border animate-in fade-in zoom-in-90 duration-300 delay-100"
                 >
                     <div className="w-10 h-10 mx-auto rounded-xl bg-gradient-to-br flex items-center justify-center mb-2 from-primary to-accent">
                         <Wallet className="w-5 h-5 text-white" />
                     </div>
                     <p className="text-xl font-bold">{currency(me.wallet_balance)}</p>
                     <p className="text-xs text-muted-foreground">Wallet Balance</p>
-                </motion.div>
-            </motion.div>
+                </div>
+            </div>
 
             <div>
                 <div className="flex items-center justify-between mb-4">
@@ -141,11 +132,8 @@ function RouteComponent() {
                     />
                 )}
             </div>
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="bg-card rounded-2xl p-5 border border-border"
+            <div
+                className="bg-card rounded-2xl p-5 border border-border animate-in fade-in slide-in-from-bottom-4 duration-300"
             >
                 <h3 className="font-semibold mb-3">How It Works</h3>
                 <div className="space-y-3">
@@ -162,7 +150,7 @@ function RouteComponent() {
                         </div>
                     ))}
                 </div>
-            </motion.div>
+            </div>
         </div>
     );
 }
