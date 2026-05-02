@@ -9,9 +9,9 @@ interface CustomerCardProps {
 }
 
 const getStatusBadge = (status?: ConversationStatus) => {
-    const variants: Record<ConversationStatus, "destructive" | "emerald" | "warning"> = {
+    const variants: Record<ConversationStatus, "destructive" | "success-subtle" | "warning"> = {
         ["ABANDONED"]: "destructive",
-        ["ACTIVE"]: "emerald",
+        ["ACTIVE"]: "success-subtle",
         ["COMPLETED"]: "warning",
     };
 

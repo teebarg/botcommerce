@@ -18,7 +18,7 @@ const ProductActions: React.FC<{
 
     const handleAddToCartAndTrack = (e: React.MouseEvent) => {
         e.stopPropagation();
-        handleUserInteraction("CART_ADD");
+        // handleUserInteraction("CART_ADD");
         handleAddToCart();
     };
 
@@ -56,7 +56,7 @@ const ProductActions: React.FC<{
                 className="w-full h-12!"
                 disabled={loading || !selectedVariant || outOfStock}
                 size="sm"
-                variant="emerald"
+                variant="success-subtle"
                 onClick={handleWhatsAppPurchase}
             >
                 Buy

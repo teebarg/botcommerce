@@ -22,10 +22,10 @@ const ActivityTypeIcon = ({ type, isSuccess }: { type: string; isSuccess: boolea
 
 const StatusBadge = ({ isSuccess, activityType }: { isSuccess: boolean; activityType: string }) => {
     if (activityType === "PRODUCT_EXPORT") {
-        return <Badge variant={isSuccess ? "emerald" : "destructive"}>{isSuccess ? "Completed" : "Failed"}</Badge>;
+        return <Badge variant={isSuccess ? "success-subtle" : "destructive"}>{isSuccess ? "Completed" : "Failed"}</Badge>;
     }
 
-    return <Badge variant="blue">Success</Badge>;
+    return <Badge variant="success">Success</Badge>;
 };
 
 const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
@@ -78,7 +78,7 @@ const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
                                             </div>
                                             <Button
                                                 size="xs"
-                                                variant="emerald"
+                                                variant="success-subtle"
                                                 onClick={() => handleDownload(activity.action_download_url!, "products_export.xlsx")}
                                             >
                                                 <Download className="mr-1" size={14} />

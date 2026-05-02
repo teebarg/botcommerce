@@ -27,8 +27,8 @@ function RouteComponent() {
 
     return (
         <div className="px-2.5 md:px-10 py-4">
-            <h1 className="text-2xl font-bold mb-2.5">Activities History</h1>
-            <div className="max-w-6xl mx-auto py-4 px-1 md:px-6">
+            <h1 className="text-xl font-bold mb-2">Activities History</h1>
+            <div className="max-w-6xl mx-auto px-1 md:px-6">
                 {items.length > 0 && (
                     <InfiniteResourceList
                         items={items}

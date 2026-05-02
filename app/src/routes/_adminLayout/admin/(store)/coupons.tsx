@@ -67,8 +67,8 @@ function RouteComponent() {
         <div className="mx-auto max-w-5xl w-full py-4 px-2.5">
             <div className="flex md:flex-row flex-col md:items-center md:justify-between mb-6 gap-2">
                 <div>
-                    <h1 className="text-2xl font-bold">Coupon Management</h1>
-                    <p className="text-muted-foreground mt-1">Create, manage, and track your promotional coupons</p>
+                    <h1 className="text-xl font-bold">Coupon Management</h1>
+                    <p className="text-sm text-muted-foreground mt-1">Create, manage, and track your promotional coupons</p>
                 </div>
                 <div className="flex gap-2">
                     <LocalizedClientLink

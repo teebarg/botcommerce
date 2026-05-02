@@ -22,7 +22,7 @@ const CatalogItem: React.FC<{ catalog: Catalog; selectedProductIds: number[] }> 
                     <span>
                         {catalog.title} ({catalog.products_count})
                     </span>
-                    <Badge className="text-xs" variant={catalog.is_active ? "emerald" : "destructive"}>
+                    <Badge className="text-xs" variant={catalog.is_active ? "success" : "destructive"}>
                         {catalog.is_active ? "Active" : "Inactive"}
                     </Badge>
                 </CardTitle>
@@ -30,8 +30,6 @@ const CatalogItem: React.FC<{ catalog: Catalog; selectedProductIds: number[] }> 
             <CardContent className="pt-0 pb-3">
                 <Button
                     disabled={!catalog.is_active || isAdding || selectedProductIds.length === 0}
-                    isLoading={isAdding}
-                    size="sm"
                     onClick={async () => {
                         await bulkAddToCatalog({ catalogId: catalog.id, productIds: selectedProductIds });
                     }}

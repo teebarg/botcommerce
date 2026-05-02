@@ -17,7 +17,7 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
             label: string;
             nextStatus: OrderStatus | null;
             actionLabel: string;
-            variant: "default" | "destructive" | "outline" | "secondary" | "emerald" | "warning" | "contrast";
+            variant: "default" | "destructive" | "accent" | "accent-subtle" | "secondary" | "success" | "warning" |"warning-subtle" | "contrast";
         }
     > = {
         REFUNDED: {
@@ -36,25 +36,25 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
             label: "Processing",
             nextStatus: "SHIPPED" as const,
             actionLabel: "Order Packed",
-            variant: "contrast",
+            variant: "warning-subtle",
         },
         SHIPPED: {
             label: "Order Packed",
             nextStatus: "OUT_FOR_DELIVERY" as const,
             actionLabel: "Mark Out for Delivery",
-            variant: "outline",
+            variant: "accent-subtle",
         },
         OUT_FOR_DELIVERY: {
             label: "Out for Delivery",
             nextStatus: "DELIVERED" as const,
             actionLabel: "Mark Delivered",
-            variant: "secondary",
+            variant: "accent",
         },
         DELIVERED: {
             label: "Delivered",
             nextStatus: null,
             actionLabel: "",
-            variant: "emerald",
+            variant: "success",
         },
         CANCELED: {
             label: "Cancelled",
@@ -84,7 +84,7 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
                     open={paymentState.isOpen}
                     onOpenChange={paymentState.setOpen}
                     trigger={
-                        <Button className="flex-1 w-full" variant="emerald">
+                        <Button className="flex-1 w-full" variant="accent">
                             Update Payment
                         </Button>
                     }

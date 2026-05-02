@@ -10,9 +10,9 @@ const CustomerCard = ({ user }: CustomerCardProps) => {
     const fullName = `${user?.first_name} ${user?.last_name}`;
 
     const getStatusBadge = (status?: Status) => {
-        const variants: Record<Status, "destructive" | "emerald" | "warning"> = {
+        const variants: Record<Status, "destructive" | "success-subtle" | "warning"> = {
             ["PENDING"]: "warning",
-            ["ACTIVE"]: "emerald",
+            ["ACTIVE"]: "success-subtle",
             ["INACTIVE"]: "destructive",
         };
 

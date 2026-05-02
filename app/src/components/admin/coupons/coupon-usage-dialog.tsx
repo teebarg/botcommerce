@@ -24,7 +24,7 @@ export const CouponUsageDialog = ({ couponCode, usageHistory, couponType, assign
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="w-full sm:w-auto" size="sm" variant="outline">
+                <Button className="w-full sm:w-auto" size="sm" variant="accent-subtle">
                     <History className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Usage History ({usageHistory.length})</span>
                     <span className="sm:hidden">History ({usageHistory.length})</span>

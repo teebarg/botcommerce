@@ -57,12 +57,12 @@ function RouteComponent() {
                                     <h3 className="text-lg font-semibold leading-tight mb-2">{faq.question}</h3>
                                     <div className="flex items-center gap-3">
                                         {faq.category && (
-                                            <Badge variant="blue">
+                                            <Badge variant="accent">
                                                 <Tag className="w-3 h-3 mr-1" />
                                                 {faq.category}
                                             </Badge>
                                         )}
-                                        <Badge variant={faq.is_active ? "emerald" : "destructive"}>
+                                        <Badge variant={faq.is_active ? "success-subtle" : "destructive"}>
                                             {faq.is_active ? <Eye className="w-3 h-3 mr-1" /> : <EyeOff className="w-3 h-3 mr-1" />}
                                             {faq.is_active ? "Active" : "Inactive"}
                                         </Badge>

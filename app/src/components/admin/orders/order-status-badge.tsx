@@ -7,7 +7,7 @@ import type { OrderStatus } from "@/schemas";
 export const PaymentStatusBadge = ({ status }: { status: string }) => {
     const statusConfig: Record<
         string,
-        { icon: JSX.Element; label: string; variant: "destructive" | "default" | "secondary" | "emerald" | "warning" }
+        { icon: JSX.Element; label: string; variant: "destructive" | "default" | "success" | "warning" }
     > = {
         ["PENDING"]: {
             icon: <ShieldAlert className="mr-1" size={14} />,
@@ -22,7 +22,7 @@ export const PaymentStatusBadge = ({ status }: { status: string }) => {
         ["SUCCESS"]: {
             icon: <CheckCircle className="mr-1" size={14} />,
             label: "Payment Successful",
-            variant: "emerald",
+            variant: "success",
         },
         ["REFUNDED"]: {
             icon: <RotateCcw className="mr-1" size={14} />,
@@ -44,12 +44,12 @@ export const PaymentStatusBadge = ({ status }: { status: string }) => {
 export const OrderStatusBadge = ({ status }: { status: OrderStatus }) => {
     const statusConfig: Record<
         OrderStatus,
-        { icon: JSX.Element; label: string; variant: "destructive" | "default" | "secondary" | "emerald" | "yellow" | "blue" }
+        { icon: JSX.Element; label: string; variant: "destructive" | "default" | "accent-subtle" | "success" | "success-subtle" | "warning-subtle" | "accent" }
     > = {
         ["PENDING"]: {
             icon: <ShieldAlert className="mr-1" size={14} />,
             label: "Pending",
-            variant: "yellow",
+            variant: "warning-subtle",
         },
         ["PROCESSING"]: {
             icon: <RefreshCw className="mr-1" size={14} />,
@@ -59,17 +59,17 @@ export const OrderStatusBadge = ({ status }: { status: OrderStatus }) => {
         ["SHIPPED"]: {
             icon: <Package className="mr-1" size={14} />,
             label: "Order Packed",
-            variant: "secondary",
+            variant: "accent-subtle",
         },
         ["OUT_FOR_DELIVERY"]: {
             icon: <Truck className="mr-1" size={14} />,
             label: "Out for delivery",
-            variant: "blue",
+            variant: "accent",
         },
         ["DELIVERED"]: {
             icon: <PackageCheck className="mr-1" size={14} />,
             label: "Delivered",
-            variant: "emerald",
+            variant: "success",
         },
         ["CANCELED"]: {
             icon: <XCircle className="mr-1" size={14} />,
@@ -79,7 +79,7 @@ export const OrderStatusBadge = ({ status }: { status: OrderStatus }) => {
         ["REFUNDED"]: {
             icon: <RotateCcw className="mr-1" size={14} />,
             label: "Delivered",
-            variant: "emerald",
+            variant: "success-subtle",
         },
     };
 

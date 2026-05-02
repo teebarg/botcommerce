@@ -194,7 +194,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                         </div>
                     </div>
                     <div className="mt-2 flex justify-between items-center">
-                        <Badge variant={selectedVariant.status === "IN_STOCK" ? "emerald" : "destructive"}>
+                        <Badge variant={selectedVariant.status === "IN_STOCK" ? "success-subtle" : "destructive"}>
                             {selectedVariant.status === "IN_STOCK" ? "In Stock" : "Out of Stock"}
                         </Badge>
                         <span className="text-xs text-gray-400">{selectedVariant.inventory} available</span>
