@@ -30,19 +30,10 @@ export default function InfiniteFeed({ initialData, params }: Props) {
     }
 
     return (
-        <InfiniteList
-            hasMore={!!hasNextPage}
-            isLoading={isFetchingNextPage}
-            onLoadMore={fetchNextPage}
-        >
-            <div className="px-2 columns-2 md:columns-3 lg:columns-4 gap-4">
-                {products.map((product: ProductSearch, idx: number) => (
-                    <div
-                        key={product.slug + idx}
-                        style={{ breakInside: "avoid", marginBottom: "1rem" }}
-                    >
-                        <ProductCardPLP product={product} />
-                    </div>
+        <InfiniteList hasMore={!!hasNextPage} isLoading={isFetchingNextPage} onLoadMore={fetchNextPage}>
+            <div className="grid grid-cols-2 md:grid-cols-6 md:gap-4 gap-2">
+                {products?.map((product: ProductSearch, idx: number) => (
+                    <ProductCardPLP key={product.id + product.slug + idx} product={product} />
                 ))}
             </div>
         </InfiniteList>
