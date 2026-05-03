@@ -8,13 +8,14 @@ import { useMemo, useState } from "react";
 import ImageLightbox from "@/components/ImageLightbox";
 import ProductTag from "./product-tag";
 import { IsNew } from "@/components/products/product-badges";
-import ImageDisplay from "@/components/image-display";
+import { cn } from "@/utils";
 
 interface ProductCardProps {
     product: ProductSearch;
 }
 
 const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
+    const [mediaLoaded, setMediaLoaded] = useState<boolean>(false);
     const [lightboxOpen, setLightboxOpen] = useState<boolean>(false);
     const { priceInfo, outOfStock } = useProductVariant(product);
     const isNew = useMemo(() => !!product?.is_new, [product]);
@@ -33,13 +34,25 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
                     style={{ boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.05)" }}
                     onClick={() => setLightboxOpen(true)}
                 >
-                    <ImageDisplay src={product?.image} alt={product?.name} className="min-h-60 max-h-[400px]" />
+                    {!mediaLoaded && (
+                        <img src="/placeholder.jpg" alt="placeholder" className="absolute inset-0 w-full h-[400px] object-cover" />
+                    )}
+
+                    <img
+                        alt={product?.name}
+                        className={cn(
+                            "w-full h-full max-h-[400px] object-cover transition-opacity duration-500",
+                            mediaLoaded ? "opacity-100" : "opacity-0",
+                        )}
+                        src={product?.image ?? "/placeholder.jpg"}
+                        onLoad={() => setMediaLoaded(true)}
+                        loading="lazy"
+                        decoding="async"
+                    />
                     {isNew && <IsNew />}
                     {outOfStock && (
                         <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="bg-foreground text-background px-4 py-2 text-xxs font-bold uppercase tracking-[0.2em]">
-                                Sold Out
-                            </span>
+                            <span className="bg-foreground text-background px-4 py-2 text-xxs font-bold uppercase tracking-[0.2em]">Sold Out</span>
                         </div>
                     )}
                     <ProductTag product={product} />
