@@ -33,7 +33,7 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
                     style={{ boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.05)" }}
                     onClick={() => setLightboxOpen(true)}
                 >
-                    <ImageDisplay src={product?.image} alt={product?.name} className="h-auto max-h-[400px] group-hover:scale-105" />
+                    <ImageDisplay src={product?.image} alt={product?.name} className="min-h-60 max-h-[400px]" />
                     {isNew && <IsNew />}
                     {outOfStock && (
                         <div className="absolute inset-0 flex items-center justify-center">

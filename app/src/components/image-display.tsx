@@ -16,26 +16,20 @@ const ImageDisplay: React.FC<MediaDisplayProps> = ({ url, alt, className, ...pro
     const isVideo = /\.(mp4|webm|mov)$/i.test(mediaUrl);
     const displayUrl = isVideo ? mediaUrl.replace(".mp4", ".webp") : mediaUrl;
 
-    if (!mediaLoaded) {
-        return (
-            <img
-                src="/placeholder.jpg"
-                alt="placeholder"
-                className="w-full h-auto max-h-[400px] object-cover"
-            />
-        )
-    }
-
     return (
-        <img
-            alt={alt}
-            className={cn("w-full h-full object-cover transition-all duration-500", mediaLoaded ? "opacity-100" : "opacity-0", className)}
-            src={displayUrl}
-            onLoad={() => setMediaLoaded(true)}
-            loading="lazy"
-            decoding="async"
-            {...props}
-        />
+        <div className="relative w-full h-full">
+            {!mediaLoaded && <img src="/placeholder.jpg" alt="placeholder" className="absolute inset-0 w-full h-full max-h-[400px] object-cover" />}
+
+            <img
+                alt={alt}
+                className={cn("w-full h-full object-cover transition-opacity duration-500", mediaLoaded ? "opacity-100" : "opacity-0", className)}
+                src={displayUrl}
+                onLoad={() => setMediaLoaded(true)}
+                loading="lazy"
+                decoding="async"
+                {...props}
+            />
+        </div>
     );
 };
 
