@@ -19,7 +19,6 @@ const buttonVariants = cva(
                 link: "text-primary underline-offset-4 hover:underline",
                 accent: "bg-accent text-accent-foreground hover:bg-accent/90",
                 "accent-subtle": "bg-accent-subtle text-accent-subtle-foreground hover:bg-accent-subtle/90 border border-accent-subtle-foreground/20",
-                gradient: "gradient-primary text-primary-foreground",
                 success: "bg-success text-success-foreground hover:bg-success/90",
                 "success-subtle": "bg-success-subtle text-success-subtle-foreground hover:bg-success-subtle/90 border border-success-subtle-foreground/20",
                 warning: "bg-warning text-warning-foreground hover:bg-warning/90",

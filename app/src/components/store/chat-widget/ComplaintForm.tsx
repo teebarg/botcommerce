@@ -155,7 +155,7 @@ const ComplaintForm = ({ onSubmitForm, isLastMessage }: ComplaintFormProps) => {
                 </div>
             </div>
 
-            <Button type="submit" variant="gradient" className="w-full hover:scale-105">
+            <Button type="submit" className="w-full">
                 <Send className="w-3.5 h-3.5" />
                 Submit Complaint
             </Button>
