@@ -37,7 +37,7 @@ export const ProductBulkActions = ({
                 bottom: `calc(var(--sab) + 1rem)`,
             }}
         >
-            <Badge className="mr-2 text-sm whitespace-nowrap" variant="indigo">
+            <Badge className="mr-2 text-sm whitespace-nowrap" variant="accent">
                 {selectedCount} selected
             </Badge>
 

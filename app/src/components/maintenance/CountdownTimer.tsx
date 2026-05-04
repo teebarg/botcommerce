@@ -58,7 +58,7 @@ const CountdownTimer = ({ targetDate }: CountdownTimerProps) => {
             <span className="text-2xl font-bold text-muted-foreground animate-pulse-slow">:</span>
 
             <div className="flex flex-col items-center p-3 md:p-4 rounded-xl bg-card border border-border shadow-glow min-w-[70px] md:min-w-[80px]">
-                <span className="text-2xl md:text-3xl font-heading font-bold text-contrast tabular-nums">{formatNumber(timeLeft.seconds)}</span>
+                <span className="text-2xl md:text-3xl font-heading font-bold text-accent tabular-nums">{formatNumber(timeLeft.seconds)}</span>
                 <span className="text-xs text-muted-foreground uppercase tracking-wide">Seconds</span>
             </div>
         </div>

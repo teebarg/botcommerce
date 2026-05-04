@@ -86,11 +86,9 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                 <div className="bg-linear-to-r from-primary/20 via-secondary/20 to-accent/20 rounded-2xl p-8">
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                         <div>
-                            <h1 className="text-3xl font-bold mb-2">Product Categories</h1>
-                            <p className="text-muted-foreground text-lg">Organize and manage your product catalog with ease</p>
-                            <div className="flex items-center gap-4 mt-4 text-sm">
-                                <span className="bg-white/20 px-3 py-1 rounded-full">{categories?.length || 0} Categories</span>
-                            </div>
+                            <h1 className="text-2xl font-bold">Product Categories</h1>
+                            <p className="text-muted-foreground mb-2">Organize and manage your product catalog with ease</p>
+                            <Badge variant="accent">{categories?.length || 0} Categories</Badge>
                         </div>
                         <SheetDrawer
                             open={addState.isOpen}
@@ -111,8 +109,8 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                 <div className="space-y-4">
                     <div className="sticky top-16 z-10 bg-background space-y-2">
                         {hasChanges && (
-                            <div className="mt-4 p-3 bg-contrast/20 border border-contrast/20 rounded-md">
-                                <p className="text-sm text-contrast">
+                            <div className="mt-4 p-3 bg-accent/20 border border-accent/20 rounded-md">
+                                <p className="text-sm text-accent">
                                     {`You have unsaved changes. Click "Save Order" to apply the new category order.`}
                                 </p>
                             </div>
@@ -139,7 +137,7 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                                                 <div className="min-w-0 flex-1">
                                                     <h3 className="text-xl font-semibold mb-2 truncate line-clamp-1">{category.name}</h3>
                                                     <div className="flex flex-wrap items-center gap-3">
-                                                        <Badge variant={category.is_active ? "emerald" : "destructive"}>
+                                                        <Badge variant={category.is_active ? "success-subtle" : "destructive"}>
                                                             {category.is_active ? "Active" : "Inactive"}
                                                         </Badge>
                                                     </div>

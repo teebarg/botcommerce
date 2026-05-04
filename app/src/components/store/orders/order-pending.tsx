@@ -38,7 +38,7 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
             </FadeInComponent>
 
             <FadeInComponent delay="100ms">
-                <div className="bg-emerald-100/20 dark:bg-contrast/20 rounded-xl shadow-sm p-4 mb-6 mt-4">
+                <div className="bg-emerald-100/20 dark:bg-accent/20 rounded-xl shadow-sm p-4 mb-6 mt-4">
                     <h3 className="text-lg font-medium mb-4">Bank Transfer Details</h3>
                     <div className="space-y-1">
                         <div className="flex items-center justify-between">
@@ -63,9 +63,9 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
 
             {order?.payment_method === "BANK_TRANSFER" && (
                 <FadeInComponent delay="200ms">
-                    <div className="mb-8 p-4 bg-contrast/10 rounded-2xl">
+                    <div className="mb-8 p-4 bg-accent/10 rounded-2xl">
                         <div className="flex items-center justify-center gap-2 mb-4">
-                            <AlertCircle className="w-6 h-6 text-contrast" />
+                            <AlertCircle className="w-6 h-6 text-accent" />
                             <span className="font-semibold">Payment Pending</span>
                         </div>
                         <p className="text-sm text-muted-foreground mb-4">

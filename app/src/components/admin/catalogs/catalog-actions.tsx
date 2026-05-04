@@ -35,8 +35,8 @@ const CatalogActions: React.FC<Props> = ({ item }) => {
                 open={editState.isOpen}
                 title="Edit Catalog"
                 trigger={
-                    <Button className="bg-contrast/10" variant="ghost" size="icon">
-                        <Edit className="h-5 w-5 text-contrast" />
+                    <Button className="bg-accent/10" variant="ghost" size="icon">
+                        <Edit className="h-5 w-5 text-accent" />
                     </Button>
                 }
                 onOpenChange={editState.setOpen}

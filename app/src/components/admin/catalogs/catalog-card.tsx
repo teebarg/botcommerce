@@ -14,7 +14,7 @@ export const CatalogCard: React.FC<{ catalog: DBCatalog }> = ({ catalog }) => (
                     <CardTitle className="text-lg font-semibold text-foreground">{catalog.title}</CardTitle>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <span className="font-mono bg-muted px-2 py-1 rounded text-xs">/{catalog.slug}</span>
-                        <Badge className="text-xs" variant={catalog.is_active ? "emerald" : "destructive"}>
+                        <Badge className="text-xs" variant={catalog.is_active ? "success-subtle" : "destructive"}>
                             {catalog.is_active ? "Active" : "Inactive"}
                         </Badge>
                     </div>

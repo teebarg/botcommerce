@@ -86,7 +86,7 @@ export function GalleryImagesUpload() {
                     {isPending ? "Saving..." : "Complete"}
                 </Button>
             )}
-            {/* <Button disabled={isReIndexing} isLoading={isReIndexing} variant="emerald" onClick={() => rendexProducts()}>
+            {/* <Button disabled={isReIndexing} isLoading={isReIndexing} variant="success-subtle" onClick={() => rendexProducts()}>
                 Re-index
             </Button> */}
         </div>

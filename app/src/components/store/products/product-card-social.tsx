@@ -140,7 +140,7 @@ const ProductCardSocial: React.FC<ProductCardProps> = ({ product, scrollRef }) =
             {isNew && <IsNew className="top-4 left-4" />}
             {outOfStock && (
                 <div className="absolute inset-0 bg-black/35 flex items-center justify-center">
-                    <Badge className="text-sm backdrop-blur-sm" variant="contrast">
+                    <Badge className="text-sm backdrop-blur-sm" variant="accent-subtle">
                         Out of Stock
                     </Badge>
                 </div>

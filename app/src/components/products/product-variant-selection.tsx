@@ -97,7 +97,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                                     className={cn(
                                         "px-6 py-2 text-sm font-medium border border-border rounded-md transition-all duration-200",
                                         isSelected
-                                            ? "bg-contrast text-contrast-foreground"
+                                            ? "bg-accent text-accent-foreground"
                                             : available
                                               ? "bg-card"
                                               : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
@@ -130,7 +130,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                                     className={cn(
                                         "px-6 py-2 text-sm font-medium border border-border rounded-md transition-all duration-200",
                                         isSelected
-                                            ? "bg-contrast text-contrast-foreground"
+                                            ? "bg-accent text-accent-foreground"
                                             : available
                                               ? "bg-card"
                                               : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
@@ -163,7 +163,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                                     className={cn(
                                         "px-6 py-2 text-sm font-medium border border-border rounded-md transition-all duration-200",
                                         isSelected
-                                            ? "bg-contrast text-contrast-foreground"
+                                            ? "bg-accent text-accent-foreground"
                                             : available
                                               ? "bg-card"
                                               : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
@@ -194,7 +194,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                         </div>
                     </div>
                     <div className="mt-2 flex justify-between items-center">
-                        <Badge variant={selectedVariant.status === "IN_STOCK" ? "emerald" : "destructive"}>
+                        <Badge variant={selectedVariant.status === "IN_STOCK" ? "success-subtle" : "destructive"}>
                             {selectedVariant.status === "IN_STOCK" ? "In Stock" : "Out of Stock"}
                         </Badge>
                         <span className="text-xs text-gray-400">{selectedVariant.inventory} available</span>

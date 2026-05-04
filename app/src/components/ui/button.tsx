@@ -17,15 +17,16 @@ const buttonVariants = cva(
                 secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
                 ghost: "hover:bg-accent hover:text-accent-foreground",
                 link: "text-primary underline-offset-4 hover:underline",
-                warning: "bg-warning text-white hover:bg-warning/90",
-                emerald: "bg-emerald-700 text-white hover:bg-emerald-800",
-                accent: "bg-accent text-accent-foreground transform hover:scale-105 font-semibold",
-                contrast: "bg-contrast text-contrast-foreground",
-                gradient: "gradient-primary text-primary-foreground"
+                accent: "bg-accent text-accent-foreground hover:bg-accent/90",
+                "accent-subtle": "bg-accent-subtle text-accent-subtle-foreground hover:bg-accent-subtle/90 border border-accent-subtle-foreground/20",
+                success: "bg-success text-success-foreground hover:bg-success/90",
+                "success-subtle": "bg-success-subtle text-success-subtle-foreground hover:bg-success-subtle/90 border border-success-subtle-foreground/20",
+                warning: "bg-warning text-warning-foreground hover:bg-warning/90",
+                "warning-subtle": "bg-warning-subtle text-warning-subtle-foreground hover:bg-warning-subtle/90 border border-warning-subtle-foreground/20"
             },
             size: {
-                default: "h-10 px-4 py-2",
-                xxs: "rounded-lg py-1.5 text-xs",
+                default: "h-8 px-4 py-2",
+                xxs: "rounded-lg px-1.5 py-1.5 text-xs",
                 xs: "h-7 rounded-md px-2",
                 sm: "h-9 rounded-md px-3",
                 lg: "h-11 rounded-md px-8",
@@ -45,19 +46,20 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
     isLoading?: boolean;
     startContent?: React.ReactNode;
     endContent?: React.ReactNode;
+    loadingText?: string;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-    ({ className, variant, size, asChild = false, isLoading = false, children, startContent, endContent, ...props }, ref) => {
+    ({ className, variant, size, asChild = false, isLoading = false, children, startContent, endContent, loadingText, ...props }, ref) => {
         const Comp = asChild ? Slot : "button";
 
         return (
             <Comp
                 ref={ref}
                 className={cn(
+                    buttonVariants({ variant, size }),
                     "relative flex items-center justify-center",
-                    isLoading && "opacity-50 cursor-not-allowed",
-                    buttonVariants({ variant, size, className })
+                    isLoading && "opacity-50 cursor-not-allowed", className
                 )}
                 disabled={isLoading || props.disabled}
                 {...props}
@@ -65,7 +67,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 {isLoading ? (
                     <>
                         <Loader className="h-4 w-4 animate-spin" />
-                        {size === "icon" ? "" : "Pending..."}
+                        {size === "icon" ? "" : (loadingText ?? "Pending...")}
                     </>
                 ) : (
                     <>

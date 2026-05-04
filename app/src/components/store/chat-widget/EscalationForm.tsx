@@ -149,7 +149,7 @@ const EscalationForm = ({ onSubmitForm, isLastMessage }: EscalationFormProps) =>
                 </div>
             </div>
 
-            <Button type="submit" variant="gradient" size="sm" className="w-full">
+            <Button type="submit" size="sm" className="w-full">
                 <Send className="w-3.5 h-3.5" />
                 Submit & Connect
             </Button>

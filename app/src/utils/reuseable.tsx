@@ -99,7 +99,7 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
 
                 <button
                     disabled={disabled || (!input.trim() && !file)}
-                    className="p-2.5 rounded-xl gradient-primary text-primary-foreground disabled:opacity-40 shrink-0"
+                    className="p-2.5 rounded-xl bg-primary text-primary-foreground disabled:opacity-40 shrink-0"
                 >
                     <Send className="w-5 h-5" />
                 </button>
@@ -180,8 +180,8 @@ export function ShareUI({ trigger, handleNativeShare, targetUrl = "", text = "Ch
                     </div>
 
                     <div className="flex gap-3 p-3 rounded-lg group cursor-pointer" onClick={handleNativeShare}>
-                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-contrast/10">
-                            <Smartphone className="h-4 w-4 text-contrast" />
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/10">
+                            <Smartphone className="h-4 w-4 text-accent" />
                         </div>
                         <div className="flex flex-col">
                             <span className="text-sm font-medium text-foreground">More</span>

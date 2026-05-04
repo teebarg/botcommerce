@@ -126,14 +126,14 @@ function RouteComponent() {
                 className="flex flex-col items-center animate-in fade-in zoom-in-90 duration-300 delay-100"
             >
                 <div className="relative">
-                    <div className="w-24 h-24 rounded-full gradient-primary p-1">
+                    <div className="w-24 h-24 rounded-full bg-primary p-1">
                         <div className="w-full h-full rounded-full bg-secondary flex items-center justify-center overflow-hidden">
                             <span className="text-3xl font-bold text-foreground">
                                 {getInitials(session?.user?.firstName ?? "")}
                             </span>
                         </div>
                     </div>
-                    <button className="absolute bottom-0 right-0 w-8 h-8 rounded-full gradient-primary flex items-center justify-center shadow-lg">
+                    <button className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-lg">
                         <Camera className="w-4 h-4 text-white" />
                     </button>
                 </div>
@@ -213,7 +213,7 @@ function RouteComponent() {
                                         <Button disabled={isPending} isLoading={isPending} type="submit">
                                             Save Changes
                                         </Button>
-                                        <Button type="button" variant="outline" onClick={handleCancel}>
+                                        <Button variant="destructive" onClick={handleCancel}>
                                             Cancel
                                         </Button>
                                     </div>

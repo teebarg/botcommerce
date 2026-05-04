@@ -18,10 +18,10 @@ const ActivityTypeIcon = ({ type, isSuccess }: { type: string; isSuccess: boolea
 
 const StatusBadge = ({ isSuccess, activityType }: { isSuccess: boolean; activityType: string }) => {
     if (activityType === "PRODUCT_EXPORT") {
-        return <Badge variant={isSuccess ? "emerald" : "destructive"}>{isSuccess ? "Completed" : "Failed"}</Badge>;
+        return <Badge variant={isSuccess ? "success-subtle" : "destructive"}>{isSuccess ? "Completed" : "Failed"}</Badge>;
     }
 
-    return <Badge variant="blue">Success</Badge>;
+    return <Badge variant="success">Success</Badge>;
 };
 
 export const ActivityItem: React.FC<{ activity: Activity }> = ({ activity }) => {
@@ -63,7 +63,6 @@ export const ActivityItem: React.FC<{ activity: Activity }> = ({ activity }) => 
                         trigger={
                             <Button
                                 aria-label={`Remove ${activity.description}`}
-                                size="sm"
                                 startContent={<Trash2 className="w-4 h-4" />}
                                 variant="destructive"
                             >
@@ -79,7 +78,7 @@ export const ActivityItem: React.FC<{ activity: Activity }> = ({ activity }) => 
                     {activity.action_download_url && (
                         <a
                             download
-                            className="inline-flex items-center text-sm font-medium text-blue-500 hover:text-blue-700 transition-colors"
+                            className="inline-flex items-center text-sm font-medium text-blue-500 hover:text-blue-600 transition-colors"
                             href={activity.action_download_url}
                         >
                             <Download className="w-4 h-4 mr-2 group-hover/link:-translate-y-px transition-transform" />

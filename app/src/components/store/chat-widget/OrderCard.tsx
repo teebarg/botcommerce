@@ -33,7 +33,7 @@ export const OrderCard = ({ order }: { order: ChatOrder | null }) => {
                     initial={{ width: 0 }}
                     animate={{ width: `${config.progress}%` }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="h-full rounded-full gradient-primary"
+                    className="h-full rounded-full bg-gradient-primary"
                 />
             </div>
 

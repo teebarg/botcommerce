@@ -123,7 +123,7 @@ function RouteComponent() {
         <div className="min-h-screen bg-linear-to-br from-background via-background to-secondary/10">
             <section className="relative py-20 px-4">
                 <div className="max-w-6xl mx-auto text-center">
-                    <Badge className="mb-4" variant="contrast">
+                    <Badge className="mb-4" variant="accent-subtle">
                         Wholesale & Bulk Orders
                     </Badge>
                     <h1 className="text-4xl md:text-6xl font-bold bg-linear-to-r from-primary via-primary/80 to-accent bg-clip-text text-transparent mb-6">
@@ -162,18 +162,16 @@ function RouteComponent() {
                                 return (
                                     <Card
                                         key={idx}
-                                        className={`cursor-pointer transition-all duration-200 hover:shadow-lg border ${
-                                            isSelected ? "border-primary/40 bg-primary/5" : "border-border hover:border-primary/30"
-                                        } ${option.popular ? "ring-1 ring-accent/20" : ""}`}
+                                        className={`cursor-pointer transition-all duration-200 hover:shadow-lg border ${isSelected ? "border-primary/40 bg-primary/5" : "border-border hover:border-primary/30"
+                                            } ${option.popular ? "ring-1 ring-accent/20" : ""}`}
                                         onClick={() => handleBulkTypeSelect(option.id)}
                                     >
                                         <CardHeader className="pb-4">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-3">
                                                     <div
-                                                        className={`p-2 rounded-lg ${
-                                                            isSelected ? "bg-primary text-primary-foreground" : "bg-background"
-                                                        }`}
+                                                        className={`p-2 rounded-lg ${isSelected ? "bg-primary text-primary-foreground" : "bg-background"
+                                                            }`}
                                                     >
                                                         <IconComponent className="w-5 h-5" />
                                                     </div>
@@ -183,7 +181,7 @@ function RouteComponent() {
                                                     </div>
                                                 </div>
                                                 {option.popular && (
-                                                    <Badge className="bg-contrast text-contrast-foreground" variant="default">
+                                                    <Badge variant="accent">
                                                         Popular
                                                     </Badge>
                                                 )}
@@ -214,7 +212,7 @@ function RouteComponent() {
                                 <div className="grid gap-3">
                                     {benefits.map((benefit, index) => (
                                         <div key={index} className="flex items-center gap-3">
-                                            <Dot className="w-4 h-4 text-contrast shrink-0" />
+                                            <Dot className="w-4 h-4 text-accent shrink-0" />
                                             <span className="text-sm">{benefit}</span>
                                         </div>
                                     ))}
