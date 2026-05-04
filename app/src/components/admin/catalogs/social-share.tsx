@@ -30,8 +30,8 @@ export function SocialShare({ catalog }: SocialShareProps) {
             handleNativeShare={handleNativeShare}
             targetUrl={targetUrl}
             trigger={
-                <Button className="h-10 w-10 rounded-full bg-contrast/10 backdrop-blur-sm hover:bg-contrast/20" size="icon" variant="ghost">
-                    <Share className="h-5 w-5 text-contrast" />
+                <Button className="h-10 w-10 rounded-full bg-accent/10 backdrop-blur-sm hover:bg-accent/20" size="icon" variant="ghost">
+                    <Share className="h-5 w-5 text-accent" />
                 </Button>
             }
         />

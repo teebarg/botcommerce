@@ -81,7 +81,7 @@ function RouteComponent() {
                 <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
                     <p className="text-sm text-muted-foreground">
                         Questions? Contact us at{" "}
-                        <a href={`mailto:${config?.contact_email}`} className="text-contrast hover:underline">
+                        <a href={`mailto:${config?.contact_email}`} className="text-accent hover:underline">
                             {config?.contact_email}
                         </a>
                     </p>

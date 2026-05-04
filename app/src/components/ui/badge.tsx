@@ -7,16 +7,11 @@ const badgeVariants = cva("inline-flex items-center rounded-full border px-2.5 p
     variants: {
         variant: {
             default: "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
-            // warning: "border-transparent bg-warning text-warning-foreground hover:bg-warning/80",
             secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
             destructive: "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
             outline: "text-foreground",
             accent: "border-transparent bg-accent text-accent-foreground hover:bg-accent/80",
             "accent-subtle": "border-transparent bg-accent-subtle text-accent-subtle-foreground hover:bg-accent-subtle/90",
-            // blue: "border-transparent bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200",
-            // yellow: "border-transparent bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-            // gray: "border-transparent bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-800 hover:bg-gray-200 dark:hover:bg-gray-900",
-            contrast: "border-transparent bg-contrast text-contrast-foreground hover:bg-contrast/80",
             success: "border-transparent bg-success text-success-foreground hover:bg-success/80",
             "success-subtle": "border-transparent bg-success-subtle text-success-subtle-foreground hover:bg-success-subtle/90",
             warning: "border-transparent bg-warning text-warning-foreground hover:bg-warning/80",

@@ -109,8 +109,8 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                 <div className="space-y-4">
                     <div className="sticky top-16 z-10 bg-background space-y-2">
                         {hasChanges && (
-                            <div className="mt-4 p-3 bg-contrast/20 border border-contrast/20 rounded-md">
-                                <p className="text-sm text-contrast">
+                            <div className="mt-4 p-3 bg-accent/20 border border-accent/20 rounded-md">
+                                <p className="text-sm text-accent">
                                     {`You have unsaved changes. Click "Save Order" to apply the new category order.`}
                                 </p>
                             </div>

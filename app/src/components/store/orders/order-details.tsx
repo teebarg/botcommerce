@@ -46,7 +46,7 @@ const OrderDetails = ({ order }: OrderDetailsProps) => {
                                                         {item.variant.color && (
                                                             <div className="flex items-center gap-1">
                                                                 <span className="text-xs text-muted-foreground">Color:</span>
-                                                                <Badge className="text-sm px-2 py-0.5" variant="contrast">
+                                                                <Badge className="text-sm px-2 py-0.5" variant="accent-subtle">
                                                                     {item.variant.color}
                                                                 </Badge>
                                                             </div>
@@ -54,7 +54,7 @@ const OrderDetails = ({ order }: OrderDetailsProps) => {
                                                         {item.variant.size && (
                                                             <div className="flex items-center gap-1">
                                                                 <span className="text-xs text-muted-foreground">Size:</span>
-                                                                <Badge className="text-sm px-2 py-0.5" variant="contrast">
+                                                                <Badge className="text-sm px-2 py-0.5" variant="accent-subtle">
                                                                     {item.variant.size}
                                                                 </Badge>
                                                             </div>
@@ -62,7 +62,7 @@ const OrderDetails = ({ order }: OrderDetailsProps) => {
                                                         {item.variant.width && (
                                                             <div className="flex items-center gap-1">
                                                                 <span className="text-xs text-muted-foreground">Waist:</span>
-                                                                <Badge className="text-sm px-2 py-0.5" variant="contrast">
+                                                                <Badge className="text-sm px-2 py-0.5" variant="accent-subtle">
                                                                     {item.variant.width}
                                                                 </Badge>
                                                             </div>
@@ -70,7 +70,7 @@ const OrderDetails = ({ order }: OrderDetailsProps) => {
                                                         {item.variant.length && (
                                                             <div className="flex items-center gap-1">
                                                                 <span className="text-xs text-muted-foreground">Length:</span>
-                                                                <Badge className="text-sm px-2 py-0.5" variant="contrast">
+                                                                <Badge className="text-sm px-2 py-0.5" variant="accent-subtle">
                                                                     {item.variant.length}
                                                                 </Badge>
                                                             </div>
@@ -78,7 +78,7 @@ const OrderDetails = ({ order }: OrderDetailsProps) => {
                                                         {item.variant.age && (
                                                             <div className="flex items-center gap-1">
                                                                 <span className="text-xs text-muted-foreground">Age:</span>
-                                                                <Badge className="text-sm px-2 py-0.5" variant="contrast">
+                                                                <Badge className="text-sm px-2 py-0.5" variant="accent-subtle">
                                                                     {item.variant.age}
                                                                 </Badge>
                                                             </div>

@@ -34,7 +34,7 @@ export default function ShareButton({ text = "Check out these products in our ca
             text={text}
             trigger={
                 <button className="z-30">
-                    <span className="hidden md:inline-flex items-center gap-1 px-3 py-2 rounded-md bg-contrast text-contrast-foreground cursor-pointer">
+                    <span className="hidden md:inline-flex items-center gap-1 px-3 py-2 rounded-md bg-accent text-accent-foreground cursor-pointer">
                         <Share2 className="h-4 w-4" />
                         Share
                     </span>

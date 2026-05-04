@@ -10,7 +10,7 @@ import { useRouteContext } from "@tanstack/react-router";
 const ProductActions: React.FC<{
     product: ProductSearch;
     actionColor?: string;
-}> = ({ product, actionColor = "gradient-primary" }) => {
+}> = ({ product, actionColor = "bg-primary" }) => {
     const { selectedVariant, handleAddToCart, handleWhatsAppPurchase, loading, outOfStock, isAdded } = useProductVariant(product);
 
     const { isAuthenticated } = useRouteContext({ strict: false });

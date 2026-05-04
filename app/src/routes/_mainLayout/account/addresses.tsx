@@ -37,7 +37,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false, in
         >
             <div className="p-4">
                 <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 gradient-primary">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-primary">
                         <Home className="w-5 h-5 text-white" />
                     </div>
 

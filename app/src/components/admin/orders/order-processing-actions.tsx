@@ -17,7 +17,7 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
             label: string;
             nextStatus: OrderStatus | null;
             actionLabel: string;
-            variant: "default" | "destructive" | "accent" | "accent-subtle" | "secondary" | "success" | "warning" |"warning-subtle" | "contrast";
+            variant: "default" | "destructive" | "accent" | "accent-subtle" | "secondary" | "success" | "warning" |"warning-subtle";
         }
     > = {
         REFUNDED: {

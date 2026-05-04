@@ -1,4 +1,4 @@
-import type { Status, User } from "@/schemas";
+import type { User } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
 import CustomerActions from "./customer-actions";
 
@@ -9,8 +9,8 @@ interface CustomerCardProps {
 const CustomerCard = ({ user }: CustomerCardProps) => {
     const fullName = `${user?.first_name} ${user?.last_name}`;
 
-    const getStatusBadge = (status?: Status) => {
-        const variants: Record<Status, "destructive" | "success-subtle" | "warning"> = {
+    const getStatusBadge = (status?: any) => {
+        const variants: Record<any, "destructive" | "success-subtle" | "warning"> = {
             ["PENDING"]: "warning",
             ["ACTIVE"]: "success-subtle",
             ["INACTIVE"]: "destructive",
@@ -25,10 +25,10 @@ const CustomerCard = ({ user }: CustomerCardProps) => {
                 <p className="truncate">{fullName}</p>
                 <p className="truncate text-muted-foreground">{user.email}</p>
                 <div className="justify-self-start">
-                    {getStatusBadge(user.status as Status)}
+                    {getStatusBadge(user.status)}
                 </div>
                 <div className="justify-self-start">
-                    <Badge variant={user.role == "ADMIN" ? "contrast" : "default"}>{user.role}</Badge>
+                    <Badge variant={user.role == "ADMIN" ? "accent" : "default"}>{user.role}</Badge>
                 </div>
                 <div>
                     <CustomerActions user={user} />
@@ -43,8 +43,8 @@ const CustomerCard = ({ user }: CustomerCardProps) => {
                     <CustomerActions user={user} />
                 </div>
                 <div className="flex gap-2 mt-4">
-                    {getStatusBadge(user.status as Status)}
-                    <Badge variant={user.role == "ADMIN" ? "contrast" : "default"}>{user.role}</Badge>
+                    {getStatusBadge(user.status)}
+                    <Badge variant={user.role == "ADMIN" ? "accent" : "default"}>{user.role}</Badge>
                 </div>
             </div>
         </div>

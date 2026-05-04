@@ -40,8 +40,8 @@ function RouteComponent() {
                 )}
                 {items?.length === 0 && (
                     <div className="text-center py-12 bg-secondary">
-                        <div className="w-16 h-16 mx-auto mb-4 bg-contrast/10 rounded-full flex items-center justify-center">
-                            <ActivityIcon className="w-8 h-8 text-contrast" />
+                        <div className="w-16 h-16 mx-auto mb-4 bg-accent/10 rounded-full flex items-center justify-center">
+                            <ActivityIcon className="w-8 h-8 text-accent" />
                         </div>
                         <h3 className="text-xl font-medium">No activities yet</h3>
                         <p className="text-muted-foreground">Activities will appear here</p>

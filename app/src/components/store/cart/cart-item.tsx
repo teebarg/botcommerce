@@ -19,10 +19,10 @@ const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
 
                 {item.variant && (item.variant.size || item.variant.color || item.variant.width || item.variant.length || item.variant.age) && (
                     <div className="flex flex-wrap gap-1.5 mb-2">
-                        {item.variant.size && <Badge variant="contrast">Size: {item.variant.size}</Badge>}
+                        {item.variant.size && <Badge variant="accent-subtle">Size: {item.variant.size}</Badge>}
 
                         {item.variant.color && (
-                            <Badge variant="contrast">
+                            <Badge variant="accent-subtle">
                                 <div
                                     className="w-2.5 h-2.5 rounded-full border border-border mr-1"
                                     style={{ backgroundColor: item.variant.color.toLowerCase() }}
@@ -30,9 +30,9 @@ const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
                                 {item.variant.color}
                             </Badge>
                         )}
-                        {item.variant.width && <Badge variant="contrast">Waist: {item.variant.width}</Badge>}
-                        {item.variant.length && <Badge variant="contrast">Length: {item.variant.length}</Badge>}
-                        {item.variant.age && <Badge variant="contrast">Age: {item.variant.age}</Badge>}
+                        {item.variant.width && <Badge variant="accent-subtle">Waist: {item.variant.width}</Badge>}
+                        {item.variant.length && <Badge variant="accent-subtle">Length: {item.variant.length}</Badge>}
+                        {item.variant.age && <Badge variant="accent-subtle">Age: {item.variant.age}</Badge>}
                     </div>
                 )}
 

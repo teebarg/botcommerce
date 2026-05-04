@@ -59,7 +59,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
             sheetClassName="min-w-[30vw]"
             title={<div className="py-1.5">{cart.status !== "CONVERTED" && <ReminderButton id={cart.id} />}</div>}
             trigger={
-                <Button variant="contrast" onClick={state.open}>
+                <Button variant="accent" onClick={state.open}>
                     View Details
                 </Button>
             }
@@ -72,7 +72,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                             <User className="h-5 w-5" />
                             Customer Information
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg border bg-linear-to-br from-contrast/5 to-primary/5">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg border bg-linear-to-br from-accent/5 to-primary/5">
                             <div className="space-y-1">
                                 <p className="text-sm text-muted-foreground">Name</p>
                                 {cart?.user?.first_name ? (
@@ -181,7 +181,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
 
                 <div className="sheet-footer">
                     {/* {cart?.user?.email && (
-                        <Button variant="contrast" onClick={handleImpersonation}>
+                        <Button variant="accent" onClick={handleImpersonation}>
                             <ExternalLink className="h-4 w-4" />
                             Impersonate
                         </Button>

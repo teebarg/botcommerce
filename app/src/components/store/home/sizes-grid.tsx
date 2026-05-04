@@ -12,7 +12,7 @@ const SizesGrid = () => {
                 <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4">
                     {sizes?.map((item: string, idx: number) => (
                         <LocalizedClientLink key={idx} href={`/collections?sizes=${item}`}>
-                            <div className="w-18 md:w-20 h-18 md:h-20 rounded-full bg-linear-to-br from-primary to-foreground/80 dark:to-accent flex flex-col items-center justify-center text-white font-bold">
+                            <div className="w-18 md:w-20 h-18 md:h-20 rounded-full bg-gradient-primary flex flex-col items-center justify-center text-white font-bold">
                                 <span className="text-lg md:text-2xl leading-none">{item}</span>
                                 <span className="text-sm md:text-lg leading-none">UK</span>
                             </div>

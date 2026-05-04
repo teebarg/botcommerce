@@ -37,10 +37,10 @@ const WalletDeduction: React.FC<{ cart: Cart }> = ({ cart }) => {
                     <div
                         className={cn(
                             "w-10 h-10 rounded-xl flex items-center justify-center transition-colors",
-                            useWalletCredit ? "gradient-primary" : "bg-secondary"
+                            useWalletCredit ? "bg-accent" : "bg-secondary"
                         )}
                     >
-                        <Wallet className={cn("w-5 h-5", useWalletCredit ? "text-white" : "text-primary")} />
+                        <Wallet className={cn("w-5 h-5", useWalletCredit ? "text-accent-foreground" : "text-primary")} />
                     </div>
                     <div>
                         <Label className="font-semibold">Referral Credit</Label>

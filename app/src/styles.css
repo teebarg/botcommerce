@@ -46,9 +46,6 @@
     --color-card-foreground: hsl(var(--card-foreground));
     --color-card: hsl(var(--card));
 
-    --color-contrast: hsl(var(--contrast));
-    --color-contrast-foreground: hsl(var(--contrast-foreground));
-
     --color-success: hsl(var(--success));
     --color-success-subtle: hsl(var(--success-subtle));
     --color-success-foreground: hsl(var(--success-foreground));
@@ -58,9 +55,6 @@
     --color-warning-subtle: hsl(var(--warning-subtle));
     --color-warning-foreground: hsl(var(--warning-foreground));
     --color-warning-subtle-foreground: hsl(var(--warning-subtle-foreground));
-
-
-    --color-gold: hsl(var(--gold));
 
     --color-sidebar: hsl(var(--sidebar));
     --color-sidebar-foreground: hsl(var(--sidebar-foreground));
@@ -73,6 +67,9 @@
 
     --background-image-gradient-primary: var(--gradient-primary);
     --background-image-gradient-action: var(--gradient-action);
+    --background-image-gradient-accent: var(--gradient-accent);
+    --background-image-gradient-hero: var(--gradient-hero);
+    --background-image-gradient-subtle: var(--gradient-subtle);
 
     --aspect-product: 4 / 5;
     --aspect-gallery: 4 / 6;
@@ -119,11 +116,11 @@
     @keyframes pulse-glow {
         0%,
         100% {
-            box-shadow: 0 0 20px hsl(var(--gold) / 0.3);
+            box-shadow: 0 0 20px hsl(var(--accent) / 0.3);
         }
 
         50% {
-            box-shadow: 0 0 40px hsl(var(--gold) / 0.6);
+            box-shadow: 0 0 40px hsl(var(--accent) / 0.6);
         }
     }
 
@@ -202,8 +199,6 @@
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 96%;
     --secondary-foreground: 0 0% 9%;
-    /* --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 9%; */
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
     --destructive: 0 84.2% 60.2%;
@@ -213,19 +208,15 @@
     --input: 0 0% 90%;
     --ring: 219 100% 53%;
 
-    --gold: 45 90% 50%;
-
-    --discount-sale-glow: 0 100% 70%;
-
     --shadow-discount: 0 4px 20px -2px;
     --shadow-intense: 0 8px 32px -4px;
     --shadow-glow: 0 0 40px hsl(340, 82%, 52%, 0.3);
 
-    --gradient-primary: linear-gradient(135deg, hsl(219 100% 53%), hsl(219 100% 48%));
     --gradient-action: linear-gradient(135deg, hsl(340, 82%, 52%) 0%, hsl(15, 90%, 60%) 100%);
-
-    --contrast: 14 90% 58%;
-    --contrast-foreground: 0 0% 100%;
+    --gradient-primary: linear-gradient(135deg, hsl(219 100% 53%), hsl(38 92% 50%));
+    --gradient-accent:  linear-gradient(135deg, hsl(38 92% 50%), hsl(43 96% 56%));
+    --gradient-hero:    linear-gradient(135deg, hsl(219 100% 53%) 0%, hsl(38 92% 50%) 100%);
+    --gradient-subtle:  linear-gradient(135deg, hsl(38 92% 50% / 0.10), hsl(219 100% 53% / 0.07));
 
     --accent: 38 92% 50%;
     --accent-foreground: 20 14% 4%;
@@ -274,8 +265,6 @@
     --secondary-foreground: 0 0% 96%;
     --muted: 0 0% 22%;
     --muted-foreground: 0 0% 64%;
-    /* --accent: 0 0% 22%;
-    --accent-foreground: 0 0% 96%; */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 96%;
 
@@ -283,13 +272,7 @@
     --input: 0 0% 22%;
     --ring: 219 100% 53%;
 
-
     --shadow-glow: 0 0 40px hsl(35 92% 55% / 0.15);
-    --gradient-primary: linear-gradient(135deg, hsl(219 100% 53%), hsl(219 100% 48%));
-
-    --contrast: 43 74% 66%;
-    --contrast-foreground: 20 14.3% 4.1%;
-
 
     --accent: 43 96% 56%;
     --accent-foreground: 20 14% 4%;
@@ -352,9 +335,6 @@
 }
 
 @layer utilities {
-    .gradient-primary {
-        @apply bg-linear-to-br from-primary to-foreground/80 dark:to-accent text-white;
-    }
     .glass {
         @apply bg-white/8 backdrop-blur-xl border border-white/12;
     }

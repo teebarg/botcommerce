@@ -99,7 +99,7 @@ const CustomerFilter = ({ open, onOpenChange }: CustomerFilterProps) => {
             </div>
 
             <div className="flex justify-end gap-2 mt-4">
-                <Button variant="contrast" onClick={handleReset}>
+                <Button variant="accent" onClick={handleReset}>
                     Reset
                 </Button>
                 <Button onClick={handleApply}>Apply Filters</Button>

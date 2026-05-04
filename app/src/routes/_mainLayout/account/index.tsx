@@ -66,7 +66,7 @@ function RouteComponent() {
     return (
         <div className="px-2 md:px-0 pt-6 space-y-6">
             <div className="text-center">
-                <div className="w-20 h-20 mx-auto rounded-full gradient-primary mb-4">
+                <div className="w-20 h-20 mx-auto rounded-full bg-primary mb-4">
                     <div className="w-full h-full rounded-full bg-background flex items-center justify-center overflow-hidden">
                         <img src={session?.user?.image} className="object-contain" />
                     </div>
@@ -76,7 +76,7 @@ function RouteComponent() {
             </div>
             <div className="grid grid-cols-3 gap-3 animate-in fade-in slide-in-from-bottom-4 duration-100">
                 <div className="bg-card rounded-2xl p-4 text-center border border-border animate-in fade-in zoom-in-90 duration-300 delay-100">
-                    <div className="w-10 h-10 mx-auto rounded-xl gradient-primary flex items-center justify-center mb-2">
+                    <div className="w-10 h-10 mx-auto rounded-xl bg-primary flex items-center justify-center mb-2">
                         <Heart className="w-5 h-5 text-white" />
                     </div>
                     <p className="text-2xl font-bold">{data?.items?.length}</p>
@@ -85,7 +85,7 @@ function RouteComponent() {
                 <div
                     className="bg-card rounded-2xl p-4 text-center border border-border animate-in fade-in zoom-in-90 duration-300 delay-150"
                 >
-                    <div className="w-10 h-10 mx-auto rounded-xl gradient-primary flex items-center justify-center mb-2">
+                    <div className="w-10 h-10 mx-auto rounded-xl bg-primary flex items-center justify-center mb-2">
                         <MapPin className="w-5 h-5 text-white" />
                     </div>
                     <p className="text-2xl font-bold">0</p>
@@ -94,7 +94,7 @@ function RouteComponent() {
                 <div
                     className="bg-card rounded-2xl p-4 text-center border border-border animate-in fade-in zoom-in-90 duration-300 delay-200"
                 >
-                    <div className="w-10 h-10 mx-auto rounded-xl gradient-primary flex items-center justify-center mb-2">
+                    <div className="w-10 h-10 mx-auto rounded-xl bg-primary flex items-center justify-center mb-2">
                         <Package className="w-5 h-5 text-white" />
                     </div>
                     <p className="text-2xl font-bold">1</p>

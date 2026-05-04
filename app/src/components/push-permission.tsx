@@ -231,18 +231,18 @@ export default function PushPermission() {
 
                                 <div className="relative flex justify-center">
                                     <div className="relative">
-                                        <div className="absolute inset-0 bg-gold/30 rounded-2xl blur-xl animate-pulse-glow" />
+                                        <div className="absolute inset-0 bg-accent/30 rounded-2xl blur-xl animate-pulse-glow" />
                                         <div className="relative bg-card p-5 rounded-2xl shadow-glow">
                                             <Gift className="w-12 h-12 text-primary" strokeWidth={2} />
                                         </div>
                                         <div className="absolute -top-2 -left-2 animate-sparkle-burst" style={{ animationDelay: "0s" }}>
-                                            <Star className="w-4 h-4 text-gold fill-gold" />
+                                            <Star className="w-4 h-4 text-accent fill-accent" />
                                         </div>
                                         <div className="absolute -top-1 -right-2 animate-sparkle-burst" style={{ animationDelay: "0.5s" }}>
-                                            <Star className="w-3 h-3 text-gold fill-gold" />
+                                            <Star className="w-3 h-3 text-accent fill-accent" />
                                         </div>
                                         <div className="absolute -bottom-1 -left-1 animate-sparkle-burst" style={{ animationDelay: "1s" }}>
-                                            <Star className="w-3 h-3 text-gold fill-gold" />
+                                            <Star className="w-3 h-3 text-accent fill-accent" />
                                         </div>
                                         <div className="absolute -bottom-2 -right-1 animate-sparkle-burst" style={{ animationDelay: "0.75s" }}>
                                             <Sparkles className="w-4 h-4 text-accent" />
@@ -258,10 +258,10 @@ export default function PushPermission() {
                             </p>
                         </div>
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                            <div className="relative bg-muted rounded-2xl p-6 border-2 border-gold/30 text-center mb-6 mx-6">
+                            <div className="relative bg-muted rounded-2xl p-6 border-2 border-accent/30 text-center mb-6 mx-6">
                                 <p className="text-sm text-muted-foreground mb-2">Your gift is worth</p>
                                 <div className="flex items-center justify-center gap-2">
-                                    <span className="text-5xl font-extrabold text-gold">{currency(50000)}</span>
+                                    <span className="text-5xl font-extrabold text-accent">{currency(50000)}</span>
                                 </div>
                                 <p className="text-sm font-medium text-primary mt-2">Shopping Credits</p>
                             </div>
