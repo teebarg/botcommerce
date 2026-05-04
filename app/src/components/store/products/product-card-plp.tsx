@@ -29,17 +29,15 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
                 )}
 
                 <div
-                    className="relative overflow-hidden"
+                    className="relative aspect-[3/4] overflow-hidden"
                     style={{ boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.05)" }}
                     onClick={() => setLightboxOpen(true)}
                 >
-                    <ImageDisplay src={product?.image} alt={product?.name} className="h-auto max-h-[400px] group-hover:scale-105" />
+                    <ImageDisplay url={product.image} alt={product.name} className="h-full" />
                     {isNew && <IsNew />}
                     {outOfStock && (
                         <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="bg-foreground text-background px-4 py-2 text-xxs font-bold uppercase tracking-[0.2em]">
-                                Sold Out
-                            </span>
+                            <span className="bg-foreground text-background px-4 py-2 text-xxs font-bold uppercase tracking-[0.2em]">Sold Out</span>
                         </div>
                     )}
                     <ProductTag product={product} />
