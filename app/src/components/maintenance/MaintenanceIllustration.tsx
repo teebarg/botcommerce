@@ -2,7 +2,7 @@ const MaintenanceIllustration = () => {
     return (
         <div className="relative w-64 h-64 md:w-80 md:h-80">
             <svg
-                className="absolute top-4 left-4 w-32 h-32 text-contrast/60 animate-spin"
+                className="absolute top-4 left-4 w-32 h-32 text-accent/60 animate-spin"
                 style={{ animationDuration: "8s" }}
                 viewBox="0 0 100 100"
                 fill="currentColor"

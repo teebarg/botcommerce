@@ -14,7 +14,7 @@ const CollectionItem = ({ collection }: CollectionItemProps) => {
             <div className="p-3 flex-1">
                 <div className="flex items-center justify-between">
                     <h3 className="font-medium mb-1">{collection.name}</h3>
-                    <Badge variant={collection.is_active ? "emerald" : "destructive"}>{collection.is_active ? "Active" : "Inactive"}</Badge>
+                    <Badge variant={collection.is_active ? "success-subtle" : "destructive"}>{collection.is_active ? "Active" : "Inactive"}</Badge>
                 </div>
                 <span className="font-mono bg-muted px-2 py-1 rounded text-xs">/collections/{collection.slug}</span>
                 <div className="mt-6">

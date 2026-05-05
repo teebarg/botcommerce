@@ -76,7 +76,7 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                             <div className="flex flex-wrap items-center gap-2">
                                 <CardTitle className="text-lg md:text-xl font-semibold">{coupon.code}</CardTitle>
-                                <Badge variant={coupon.is_active ? "emerald" : "destructive"}>{coupon.is_active ? "Active" : "Inactive"}</Badge>
+                                <Badge variant={coupon.is_active ? "success-subtle" : "destructive"}>{coupon.is_active ? "Active" : "Inactive"}</Badge>
                             </div>
                             <div className="flex gap-2 self-start sm:self-auto">
                                 <Button className="h-9 w-9" size="icon" variant="ghost" onClick={() => onCopy(coupon.code)}>

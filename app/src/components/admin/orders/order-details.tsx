@@ -26,7 +26,7 @@ const orderStatusMap = {
     PROCESSING: {
         icon: <RefreshCw className="h-5 w-5 text-white" />,
         label: "Processing",
-        color: "bg-contrast",
+        color: "bg-accent",
     },
     SHIPPED: {
         icon: <Package className="h-5 w-5 text-secondary-foreground" />,

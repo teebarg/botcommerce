@@ -24,13 +24,13 @@ const MenuComp: React.FC = () => {
             <DrawerContent aria-describedby={undefined} className="h-[calc(100svh-4rem)] drawer-safe">
                 <DrawerHeader className="pb-0!">
                     <DrawerTitle>
-                        <div className="flex items-center space-x-3 bg-primary -mx-4 -mt-4 p-4 overflow-hidden rounded-t-lg">
+                        <div className="flex items-center space-x-3 bg-gradient-primary -mx-4 -mt-4 p-4 overflow-hidden rounded-t-lg">
                             <UserAvatar />
-                            <div>
+                            <div className="text-white">
                                 <div>
                                     {session?.user?.firstName} {session?.user?.lastName}
                                 </div>
-                                <div className="text-xs text-gray-300 text-left">{session?.user?.email}</div>
+                                <div className="text-xs text-left">{session?.user?.email}</div>
                             </div>
                         </div>
                     </DrawerTitle>

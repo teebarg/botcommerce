@@ -63,13 +63,13 @@ const AdminMobileMenu: React.FC = () => {
                             preload={false}
                             className="flex items-center justify-between w-full p-3 text-left transition-colors"
                             href={item.href}
-                            active="bg-primary/20 text-primary"
+                            active="bg-accent/20 text-accent"
                         >
                             <div className="flex items-center space-x-3">
-                                <span className={pathname === item.href ? "text-primary" : "text-muted-foreground"}>{item.icon}</span>
+                                <span className={pathname === item.href ? "text-accent" : "text-muted-foreground"}>{item.icon}</span>
                                 <span>{item.label}</span>
                             </div>
-                            <ChevronRight className={pathname === item.href ? "text-primary" : "text-muted-foreground"} size={16} />
+                            <ChevronRight className={pathname === item.href ? "text-accent" : "text-muted-foreground"} size={16} />
                         </LocalizedClientLink>
                     ))}
                 </div>

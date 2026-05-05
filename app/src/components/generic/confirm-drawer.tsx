@@ -105,7 +105,7 @@ const ConfirmDrawer: React.FC<Props> = ({
                             ${
                                 variant === "destructive"
                                     ? "bg-gradient-to-br from-[#f85032] to-[#e73827] shadow-[0_4px_6px_-1px_rgba(248,80,50,0.2)] hover:shadow-[0_6px_8px_-1px_rgba(248,80,50,0.3)] hover:-translate-y-px active:translate-y-0"
-                                    : "gradient-primary hover:-translate-y-px active:translate-y-0"
+                                    : "bg-gradient-primary hover:-translate-y-px active:translate-y-0"
                             }
                         `}
                         >

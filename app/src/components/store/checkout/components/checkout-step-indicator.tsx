@@ -25,7 +25,7 @@ const CheckoutStepIndicator: React.FC<CheckoutStepIndicatorProps> = ({ currentSt
                             className={cn(
                                 "h-1 flex-1 rounded-full transition-colors duration-300",
                                 isClickable ? "cursor-pointer" : "opacity-50 cursor-not-allowed",
-                                isCompleted ? "gradient-primary" : "bg-secondary"
+                                isCompleted ? "bg-accent" : "bg-secondary"
                             )}
                             initial={false}
                             animate={{

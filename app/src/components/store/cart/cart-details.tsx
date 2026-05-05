@@ -84,7 +84,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
                             {path !== "/checkout" && (
                                 <Button
                                     onClick={() => router.navigate({ to: "/checkout" })}
-                                    className="w-full h-14 rounded-2xl gradient-primary text-white font-semibold gap-2 shadow-background/30 shadow-xl"
+                                    className="w-full h-12 rounded-2xl bg-gradient-primary text-white font-semibold gap-2 shadow-background/30 shadow-xl"
                                 >
                                     Proceed to Checkout
                                     <ArrowRight className="w-5 h-5" />

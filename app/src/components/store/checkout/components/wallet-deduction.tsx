@@ -29,7 +29,7 @@ const WalletDeduction: React.FC<{ cart: Cart }> = ({ cart }) => {
         <div
             className={cn(
                 "p-4 rounded-2xl border-2 transition-all animate-in fade-in slide-in-from-left-4 duration-300",
-                useWalletCredit ? "border-primary bg-primary/10 shadow-glow" : "border-border bg-card"
+                useWalletCredit ? "border-primary bg-primary/10" : "border-border bg-card"
             )}
         >
             <div className="flex items-center justify-between">
@@ -37,10 +37,10 @@ const WalletDeduction: React.FC<{ cart: Cart }> = ({ cart }) => {
                     <div
                         className={cn(
                             "w-10 h-10 rounded-xl flex items-center justify-center transition-colors",
-                            useWalletCredit ? "gradient-primary" : "bg-secondary"
+                            useWalletCredit ? "bg-accent" : "bg-secondary"
                         )}
                     >
-                        <Wallet className={cn("w-5 h-5", useWalletCredit ? "text-white" : "text-primary")} />
+                        <Wallet className={cn("w-5 h-5", useWalletCredit ? "text-accent-foreground" : "text-primary")} />
                     </div>
                     <div>
                         <Label className="font-semibold">Referral Credit</Label>

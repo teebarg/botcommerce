@@ -23,7 +23,7 @@ const Pickup: React.FC<PickupProps> = ({ amount, canContinue }) => {
     return (
         <>
             <div className="space-y-4 px-4">
-                <div className="space-y-3 p-4 bg-contrast/5 rounded-lg">
+                <div className="space-y-3 p-4 bg-accent/5 rounded-lg">
                     <div className="flex items-start mb-3">
                         <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
                         <div className="ml-2">
@@ -49,7 +49,7 @@ const Pickup: React.FC<PickupProps> = ({ amount, canContinue }) => {
                     isLoading={completeCart.isPending}
                     size="lg"
                     onClick={onPaymentCompleted}
-                    className="bg-gradient-action shadow-glow hover:opacity-90 transition-opacity h-14 rounded-2xl text-base font-semibold w-full md:w-sm"
+                    className="bg-gradient-action hover:opacity-90 transition-opacity h-14 rounded-2xl text-base font-semibold w-full md:w-sm"
                 >
                     Confirm Order for Pickup
                 </Button>

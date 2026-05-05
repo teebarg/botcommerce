@@ -39,17 +39,16 @@ const ButtonNav = () => {
         >
             {nav.map((item: NavLink, idx: number) => (
                 <div key={idx} className="flex flex-col items-center">
-                    <LocalizedClientLink active="gradient-primary text-white rounded-xl" className="p-1.5" href={item.href}>
+                    <LocalizedClientLink active="bg-gradient-primary text-white rounded-xl" className="p-1.5" href={item.href}>
                         {item.icon}
                     </LocalizedClientLink>
                     {item.label}
                 </div>
             ))}
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center gap-1">
                 <CartComponent />
                 Cart
             </div>
-
             <StoreMenuComp />
         </nav>
     );

@@ -35,11 +35,11 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
     };
 
     return (
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto slide-in">
             <div className="space-y-6 px-4">
-                <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                    <h2 className="text-2xl font-bold mb-2">Payment Details</h2>
-                    <p className="text-muted-foreground">Complete your order</p>
+                <div className="text-center mb-8">
+                    <h2 className="text-2xl font-bold">Payment Details</h2>
+                    <p className="text-muted-foreground text-sm">Complete your order</p>
                 </div>
 
                 <DiscountCode />
@@ -49,7 +49,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                 <CartContactForm />
 
                 {cart?.phone && (
-                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div className="slide-in">
                         {cart?.total! < 1 ? (
                             <ZeroPayment />
                         ) : (

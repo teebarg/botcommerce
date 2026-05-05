@@ -39,9 +39,9 @@ export function PaystackPayment({ cartNumber, amount, canContinue }: PaystackPay
     return (
         <>
             <div className="px-4 mt-4">
-                <div className="p-4 bg-contrast/10 rounded-lg">
+                <div className="p-4 bg-accent/10 rounded-lg">
                     <h4 className="font-medium mb-3 flex items-center space-x-2">
-                        <Globe className="h-4 w-4 text-contrast" />
+                        <Globe className="h-4 w-4 text-accent" />
                         <span>Paystack Payment</span>
                     </h4>
                     <div className="space-y-3">
@@ -69,7 +69,7 @@ export function PaystackPayment({ cartNumber, amount, canContinue }: PaystackPay
                     isLoading={loading}
                     size="lg"
                     onClick={handlePayment}
-                    className="bg-gradient-action shadow-glow hover:opacity-90 transition-opacity h-14 rounded-2xl text-base font-semibold w-full md:w-sm"
+                    className="bg-gradient-action hover:opacity-90 transition-opacity h-14 rounded-2xl text-base font-semibold w-full md:w-sm"
                 >
                     Pay {currency(amount)} Now
                 </Button>

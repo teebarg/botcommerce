@@ -45,15 +45,15 @@ const MaintenanceProgress = ({ startDate, endDate }: MaintenanceProgressProps) =
               -45deg,
               transparent,
               transparent 8px,
-              hsl(var(--contrast) / 0.3) 8px,
-              hsl(var(--contrast) / 0.3) 16px
+              hsl(var(--accent) / 0.3) 8px,
+              hsl(var(--accent) / 0.3) 16px
             )`,
                         backgroundSize: "200% 100%",
                         animation: "stripes 20s linear infinite",
                     }}
                 />
                 <div
-                    className="h-full rounded-full bg-contrast transition-all duration-1000 ease-out relative overflow-hidden"
+                    className="h-full rounded-full bg-accent transition-all duration-1000 ease-out relative overflow-hidden"
                     style={{ width: `${progress}%` }}
                 >
                     <div

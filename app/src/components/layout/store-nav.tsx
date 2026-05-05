@@ -18,7 +18,7 @@ const StoreNavbar = () => {
             <NavbarContent className="flex flex-1 max-w-8xl mx-auto">
                 <NavbarBrand className="flex items-center font-semibold">
                     <LocalizedClientLink href="/" className="flex items-center gap-2">
-                        <div className="w-9 h-9 rounded-lg gradient-primary flex items-center justify-center">
+                        <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
                             <ShoppingBag className="w-5 h-5 text-white" />
                         </div>
                         <span className="font-display text-xl font-semibold text-foreground hidden sm:block">{config?.shop_name}</span>

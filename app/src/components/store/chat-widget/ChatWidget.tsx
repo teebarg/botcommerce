@@ -26,7 +26,7 @@ export const ChatWidget = () => {
                     </button>
                 </div>
             )}
-            <div ref={scrollRef} className="flex-1 overflow-y-auto hide-scrollbar py-4 space-y-3">
+            <div ref={scrollRef} className="flex-1 overflow-y-auto py-4 space-y-3">
                 <AnimatePresence mode="popLayout">
                     {messages.map((msg, index) => {
                         const isEditable = msg.content !== "User provided response" && msg.id === lastUserMessage?.id;

@@ -20,7 +20,7 @@ function RouteComponent() {
     const { data } = useCatalogs();
 
     return (
-        <div className="px-3 py-2">
+        <div className="px-3 py-2 slide-in">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Catalogs</h1>
                 <SheetDrawer

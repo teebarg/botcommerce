@@ -16,20 +16,20 @@ const HeroSection: React.FC<HeroSectionProps> = ({ image }) => {
                 </div>
 
                 <div className="absolute top-20 left-10 animate-float">
-                    <Sparkles className="w-6 h-6 text-contrast opacity-60" />
+                    <Sparkles className="w-6 h-6 text-accent opacity-60" />
                 </div>
                 <div className="absolute top-40 right-20 animate-float delay-200">
-                    <Star className="w-8 h-8 text-contrast opacity-50" />
+                    <Star className="w-8 h-8 text-accent opacity-50" />
                 </div>
                 <div className="absolute bottom-32 left-20 animate-float delay-400">
-                    <Sparkles className="w-5 h-5 text-contrast opacity-70" />
+                    <Sparkles className="w-5 h-5 text-accent opacity-70" />
                 </div>
 
                 <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         <div className="text-left space-y-2 lg:space-y-7 animate-fade-in">
-                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-contrast/10 border border-contrast/20 text-contrast backdrop-blur-sm">
-                                <Star className="w-4 h-4 text-contrast" />
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 text-accent backdrop-blur-sm">
+                                <Star className="w-4 h-4 text-accent" />
                                 <span className="text-sm font-medium">New Collection</span>
                             </div>
 
@@ -112,15 +112,15 @@ const HeroSection: React.FC<HeroSectionProps> = ({ image }) => {
                                     <h3 className="font-semibold text-card-foreground mb-3">Trending Now</h3>
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-3 h-3 rounded-full bg-contrast animate-pulse" />
+                                            <div className="w-3 h-3 rounded-full bg-accent animate-pulse" />
                                             <span className="text-sm text-muted-foreground">Oversized Blazers</span>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <div className="w-3 h-3 rounded-full bg-contrast animate-pulse delay-500" />
+                                            <div className="w-3 h-3 rounded-full bg-accent animate-pulse delay-500" />
                                             <span className="text-sm text-muted-foreground">Vintage Denim</span>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <div className="w-3 h-3 rounded-full bg-contrast animate-pulse delay-1000" />
+                                            <div className="w-3 h-3 rounded-full bg-accent animate-pulse delay-1000" />
                                             <span className="text-sm text-muted-foreground">Statement Accessories</span>
                                         </div>
                                     </div>

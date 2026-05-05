@@ -215,7 +215,7 @@ const AddressForm: React.FC<AddressFormProps> = ({ mode, address, onClose }) => 
                     <Button type="button" variant="destructive" onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button type="submit" disabled={isDisabled} isLoading={isLoading} className="gradient-primary">
+                    <Button type="submit" disabled={isDisabled} isLoading={isLoading}>
                         {mode === "create" ? "Save" : "Update"}
                     </Button>
                 </div>

@@ -79,7 +79,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = () => {
                         <Filter className="h-4 w-4" />
                         Apply Filters
                     </Button>
-                    <Button size="lg" variant="contrast" onClick={clearFilters}>
+                    <Button size="lg" variant="accent" onClick={clearFilters}>
                         <X className="h-4 w-4" />
                         Clear Filters
                     </Button>

@@ -59,7 +59,7 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
                         <div className="flex-1">
                             <div className="flex items-center gap-3">
                                 <h3 className="text-lg font-bold">{option.name}</h3>
-                                <Badge variant={option.is_active ? "emerald" : "destructive"}>{option.is_active ? "Active" : "Inactive"}</Badge>
+                                <Badge variant={option.is_active ? "success-subtle" : "destructive"}>{option.is_active ? "Active" : "Inactive"}</Badge>
                             </div>
 
                             <p className="text-muted-foreground mb-2">{option.description}</p>

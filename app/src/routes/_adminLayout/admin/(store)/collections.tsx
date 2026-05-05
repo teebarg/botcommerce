@@ -70,7 +70,7 @@ function RouteComponent() {
                                     <div className="font-bold truncate min-w-72">{collection?.name}</div>
                                 </TableCell>
                                 <TableCell>
-                                    <Badge variant={collection.is_active ? "emerald" : "destructive"}>
+                                    <Badge variant={collection.is_active ? "success-subtle" : "destructive"}>
                                         {collection.is_active ? "Active" : "Inactive"}
                                     </Badge>
                                 </TableCell>

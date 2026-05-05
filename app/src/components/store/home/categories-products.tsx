@@ -23,7 +23,7 @@ export default function CategoriesWithProductsSection() {
                 return (
                     <div
                         key={category.id}
-                        className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300"
+                        className="space-y-4"
                         style={{ animationDelay: `${categoryIndex * 100}ms` }}
                     >
                         <div className="flex items-center justify-between">
@@ -31,7 +31,7 @@ export default function CategoriesWithProductsSection() {
                             <Link
                                 to="/collections"
                                 search={{ cat_ids: category.slug }}
-                                className="flex items-center gap-1 text-sm text-primary font-medium"
+                                className="flex items-center gap-1 text-sm text-accent font-medium"
                             >
                                 View All
                                 <ChevronRight className="w-4 h-4" />

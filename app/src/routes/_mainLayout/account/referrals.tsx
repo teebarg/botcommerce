@@ -61,9 +61,9 @@ function RouteComponent() {
     };
 
     return (
-        <div className="space-y-6 px-2 pt-6">
+        <div className="space-y-6 px-2 pt-6 slide-in">
             <div
-                className="relative overflow-hidden rounded-2xl gradient-primary p-6 text-white animate-in fade-in slide-in-from-bottom-4 duration-300"
+                className="relative overflow-hidden rounded-2xl bg-gradient-primary p-6 text-white"
             >
                 <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white/10 -translate-y-1/2 translate-x-1/2" />
                 <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-white/5 translate-y-1/2 -translate-x-1/2" />
@@ -98,12 +98,12 @@ function RouteComponent() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3 animate-in fade-in slide-in-from-bottom-4 duration-100">
+            <div className="grid grid-cols-3 gap-3">
                 <div
-                    className="bg-card rounded-2xl p-4 text-center border border-border animate-in fade-in zoom-in-90 duration-300 delay-100"
+                    className="bg-card rounded-2xl p-4 text-center border border-border"
                 >
-                    <div className="w-10 h-10 mx-auto rounded-xl bg-gradient-to-br flex items-center justify-center mb-2 from-primary to-accent">
-                        <Wallet className="w-5 h-5 text-white" />
+                    <div className="w-10 h-10 mx-auto rounded-xl bg-accent-subtle flex items-center justify-center mb-2">
+                        <Wallet className="w-5 h-5 text-accent-subtle-foreground" />
                     </div>
                     <p className="text-xl font-bold">{currency(me.wallet_balance)}</p>
                     <p className="text-xs text-muted-foreground">Wallet Balance</p>
@@ -132,9 +132,7 @@ function RouteComponent() {
                     />
                 )}
             </div>
-            <div
-                className="bg-card rounded-2xl p-5 border border-border animate-in fade-in slide-in-from-bottom-4 duration-300"
-            >
+            <div className="bg-card rounded-2xl p-5 border border-border">
                 <h3 className="font-semibold mb-3">How It Works</h3>
                 <div className="space-y-3">
                     {[
@@ -143,7 +141,7 @@ function RouteComponent() {
                         { step: "3", text: "You earn cashback to your wallet" },
                     ].map((item) => (
                         <div key={item.step} className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                                 {item.step}
                             </div>
                             <p className="text-sm text-muted-foreground">{item.text}</p>

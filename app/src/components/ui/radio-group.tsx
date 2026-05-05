@@ -33,7 +33,7 @@ const radioVariants = {
     },
     delivery: {
         container: "grid gap-2",
-        item: "flex items-start space-x-4 p-6 rounded-lg border-2 cursor-pointer transition-all duration-300 hover:shadow-glow border-border hover:border-primary/20 data-[state=checked]:border-primary/30 data-[state=checked]:bg-primary/5 data-[state=checked]:shadow-primary group relative focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+        item: "flex items-start space-x-4 p-6 rounded-lg border-2 cursor-pointer transition-all duration-300 border-border hover:border-primary/20 data-[state=checked]:border-primary/30 data-[state=checked]:bg-primary/5 data-[state=checked]:shadow-primary group relative focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
         indicator: "flex items-center justify-center",
         icon: "size-4 opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
     },

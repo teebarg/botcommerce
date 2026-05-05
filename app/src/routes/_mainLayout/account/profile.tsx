@@ -116,25 +116,23 @@ function RouteComponent() {
     };
 
     return (
-        <div className="space-y-6 pt-6">
-            <div className="text-center animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <h2 className="text-2xl font-bold mb-2">Profile Details</h2>
-                <p className="text-muted-foreground">Manage your personal information</p>
+        <div className="space-y-6 pt-6 slide-in">
+            <div className="text-center">
+                <h2 className="text-2xl font-bold">Profile Details</h2>
+                <p className="text-muted-foreground text-sm">Manage your personal information</p>
             </div>
 
-            <div
-                className="flex flex-col items-center animate-in fade-in zoom-in-90 duration-300 delay-100"
-            >
+            <div className="flex flex-col items-center">
                 <div className="relative">
-                    <div className="w-24 h-24 rounded-full gradient-primary p-1">
+                    <div className="w-24 h-24 rounded-full bg-accent p-1">
                         <div className="w-full h-full rounded-full bg-secondary flex items-center justify-center overflow-hidden">
                             <span className="text-3xl font-bold text-foreground">
                                 {getInitials(session?.user?.firstName ?? "")}
                             </span>
                         </div>
                     </div>
-                    <button className="absolute bottom-0 right-0 w-8 h-8 rounded-full gradient-primary flex items-center justify-center shadow-lg">
-                        <Camera className="w-4 h-4 text-white" />
+                    <button className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-accent flex items-center justify-center shadow-lg">
+                        <Camera className="w-4 h-4 text-accent-foreground" />
                     </button>
                 </div>
                 <p className="mt-3 font-semibold">
@@ -144,7 +142,7 @@ function RouteComponent() {
             </div>
 
             <div className="px-2 md:px-0">
-                <div className="bg-card rounded-xl shadow-sm border border-border mb-6 transition-colors duration-300">
+                <div className="bg-card rounded-xl shadow-sm border border-border mb-6">
                     <div className="flex items-center justify-between p-6">
                         <div>
                             <h3 className="text-lg font-semibold">Profile Information</h3>
@@ -213,7 +211,7 @@ function RouteComponent() {
                                         <Button disabled={isPending} isLoading={isPending} type="submit">
                                             Save Changes
                                         </Button>
-                                        <Button type="button" variant="outline" onClick={handleCancel}>
+                                        <Button variant="destructive" onClick={handleCancel}>
                                             Cancel
                                         </Button>
                                     </div>
@@ -222,7 +220,7 @@ function RouteComponent() {
                         </Form>
                     </div>
                 </div>
-                <div className="bg-card rounded-xl shadow-sm border border-border transition-colors duration-300">
+                <div className="bg-card rounded-xl shadow-sm border border-border">
                     <div className="p-6 border-b border-border">
                         <div className="flex items-center justify-between">
                             <div>

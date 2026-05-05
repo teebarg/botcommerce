@@ -37,10 +37,10 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
 
     return (
         <>
-            <div className="space-y-4 px-4 py-4 flex-1 overflow-y-auto">
-                <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                    <h2 className="text-2xl font-bold mb-2">Delivery Address</h2>
-                    <p className="text-muted-foreground">Where should we send your order?</p>
+            <div className="space-y-4 px-4 py-4 flex-1 overflow-y-auto slide-in">
+                <div className="text-center mb-8">
+                    <h2 className="text-xl font-bold">Delivery Address</h2>
+                    <p className="text-muted-foreground text-sm">Where should we send your order?</p>
                 </div>
 
                 <div className="space-y-3">
@@ -62,7 +62,7 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
                                 variant="outline"
                                 className="w-full h-auto p-4 rounded-2xl border-2 border-dashed justify-start gap-4 border-primary bg-primary/5"
                             >
-                                <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center">
+                                <div className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center">
                                     <Plus className="w-5 h-5" />
                                 </div>
                                 <span className="font-medium">Add New Address</span>
@@ -79,7 +79,7 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
                     disabled={!Boolean(address)}
                     size="lg"
                     onClick={handleContinue}
-                    className="bg-gradient-action shadow-glow hover:opacity-90 transition-opacity h-14 rounded-2xl text-base font-semibold w-full md:w-sm"
+                    className="bg-gradient-action hover:opacity-90 transition-opacity h-14 rounded-2xl font-semibold w-full md:w-sm"
                 >
                     Continue
                     <ChevronRight className="h-5 w-5" />

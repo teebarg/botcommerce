@@ -141,7 +141,7 @@ export function ShopPayments({ settings }: ShopPaymentsProps) {
                         return <BankDetailComponent key={idx} bank={detail} />;
                     })}
                     {bankDetails?.length === 0 && (
-                        <div className="flex flex-col items-center justify-center md:col-span-2 bg-contrast/10 p-4 rounded-lg">
+                        <div className="flex flex-col items-center justify-center md:col-span-2 bg-accent/10 p-4 rounded-lg">
                             <ShieldAlert className="w-14 h-14 text-muted-foreground mb-2" />
                             <p className="font-semibold">No bank details found</p>
                             <p className="text-muted-foreground text-sm">Add bank details to enable bank transfer payments</p>

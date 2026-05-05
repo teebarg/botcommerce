@@ -37,7 +37,7 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
                 className={cn(
                     "relative group overflow-hidden bg-background animate-in fade-in duration-300",
                     isProductInactive ? "ring-2 ring-red-500 opacity-50" : "",
-                    isSelected && "ring-2 ring-indigo-900 ring-offset-2"
+                    isSelected && "ring-2 ring-green-600 ring-offset-2"
                 )}
             >
                 <div
@@ -48,7 +48,7 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
                     <MediaDisplay url={image.image} alt={image.product?.name || ""} />
                     {image.product && (
                         <div className="absolute top-2 left-1/2 -translate-x-1/2">
-                            <Badge variant="indigo" className="text-base font-bold">
+                            <Badge className="text-base font-bold">
                                 {currency(image.product.variants?.[0]?.price || 0)}
                             </Badge>
                         </div>
@@ -65,7 +65,7 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
                     </div>
                     <div className="absolute top-2 right-2 flex flex-wrap gap-1">
                         {image.product?.variants?.map((item: ProductVariantLite, idx: number) => (
-                            <Badge key={idx} className={cn(item.size ? "" : "hidden")} variant="emerald">
+                            <Badge key={idx} className={cn(item.size ? "" : "hidden")} variant="success-subtle">
                                 UK: {item.size}
                             </Badge>
                         ))}
@@ -73,7 +73,7 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
                     {image.product?.variants?.[0]?.age && (
                         <div className="absolute top-2 right-2 flex flex-wrap gap-1">
                             {image.product?.variants?.map((item: ProductVariantLite, idx: number) => (
-                                <Badge key={idx} variant="emerald">
+                                <Badge key={idx} variant="success">
                                     {item.age}
                                 </Badge>
                             ))}

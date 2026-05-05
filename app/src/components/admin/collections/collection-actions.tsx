@@ -24,13 +24,13 @@ const CollectionActions: React.FC<Props> = ({ collection }) => {
     };
 
     return (
-        <div className="relative flex items-center">
+        <div className="relative flex items-center gap-1.5">
             <SheetDrawer
                 open={editState.isOpen}
                 title="Edit Collection"
                 trigger={
-                    <Button size="icon" variant="ghost">
-                        <Pencil className="h-5 w-5" />
+                    <Button size="icon" variant="warning">
+                        <Pencil className="h-4 w-4" />
                     </Button>
                 }
                 onOpenChange={editState.setOpen}
@@ -41,8 +41,8 @@ const CollectionActions: React.FC<Props> = ({ collection }) => {
                 open={deleteState.isOpen}
                 onOpenChange={deleteState.setOpen}
                 trigger={
-                    <Button size="icon" variant="ghost">
-                        <Trash2 className="text-red-500 h-5 w-5 cursor-pointer" />
+                    <Button size="icon" variant="destructive">
+                        <Trash2 className="h-4 w-4" />
                     </Button>
                 }
                 onClose={deleteState.close}
