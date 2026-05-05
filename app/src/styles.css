@@ -68,7 +68,6 @@
     --background-image-gradient-primary: var(--gradient-primary);
     --background-image-gradient-action: var(--gradient-action);
     --background-image-gradient-accent: var(--gradient-accent);
-    --background-image-gradient-hero: var(--gradient-hero);
     --background-image-gradient-subtle: var(--gradient-subtle);
 
     --aspect-product: 4 / 5;
@@ -211,7 +210,6 @@
     --gradient-action: linear-gradient(135deg, hsl(340, 82%, 52%) 0%, hsl(15, 90%, 60%) 100%);
     --gradient-primary: linear-gradient(135deg, hsl(219 100% 53%), hsl(38 92% 50%));
     --gradient-accent:  linear-gradient(135deg, hsl(38 92% 50%), hsl(43 96% 56%));
-    --gradient-hero:    linear-gradient(135deg, hsl(219 100% 53%) 0%, hsl(38 92% 50%) 100%);
     --gradient-subtle:  linear-gradient(135deg, hsl(38 92% 50% / 0.10), hsl(219 100% 53% / 0.07));
 
     --accent: 38 92% 50%;
@@ -321,7 +319,7 @@
     }
 
     .carousel-nav-link {
-        @apply rounded-full bg-card-foreground hover:bg-foreground text-card shadow-md backdrop-blur disabled:opacity-40 disabled:pointer-events-none;
+        @apply h-12 w-12 z-10 absolute top-1/2 -translate-y-1/2 hidden md:flex rounded-full bg-card-foreground hover:bg-foreground text-card shadow-md backdrop-blur disabled:opacity-40 disabled:pointer-events-none;
     }
 
     .sheet-footer {

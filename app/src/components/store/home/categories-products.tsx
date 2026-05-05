@@ -31,7 +31,7 @@ export default function CategoriesWithProductsSection() {
                             <Link
                                 to="/collections"
                                 search={{ cat_ids: category.slug }}
-                                className="flex items-center gap-1 text-sm text-primary font-medium"
+                                className="flex items-center gap-1 text-sm text-accent font-medium"
                             >
                                 View All
                                 <ChevronRight className="w-4 h-4" />

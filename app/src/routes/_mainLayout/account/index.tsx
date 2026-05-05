@@ -104,7 +104,7 @@ function RouteComponent() {
             <div>
                 <div className="flex items-center justify-between mb-2">
                     <h3 className="font-semibold">Recent Orders</h3>
-                    <Link to="/account/orders" className="text-sm text-primary flex items-center gap-1">
+                    <Link to="/account/orders" className="text-sm text-accent flex items-center gap-1">
                         View All
                         <ChevronRight className="w-4 h-4" />
                     </Link>

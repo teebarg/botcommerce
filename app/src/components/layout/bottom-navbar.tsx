@@ -45,11 +45,10 @@ const ButtonNav = () => {
                     {item.label}
                 </div>
             ))}
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center gap-1">
                 <CartComponent />
                 Cart
             </div>
-
             <StoreMenuComp />
         </nav>
     );

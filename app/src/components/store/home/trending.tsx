@@ -16,7 +16,7 @@ export default function Trending({ products }: { products: ProductSearch[] }) {
                             <TrendingUp className="w-5 h-5 text-primary" />
                             <h2 className="text-lg md:text-xl font-bold text-foreground">Trending Now</h2>
                         </div>
-                        <LocalizedClientLink className="text-sm" href="/collections/trending">
+                        <LocalizedClientLink className="text-sm text-accent mr-1" href="/collections/trending">
                             View All
                         </LocalizedClientLink>
                     </div>

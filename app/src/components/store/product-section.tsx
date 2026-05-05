@@ -105,7 +105,7 @@ const ProductSection = ({ title, subtitle, products, href, showGradient = false 
         <section className="relative py-6 max-w-8xl mx-auto">
             <Button
                 aria-label="Scroll backward"
-                className="carousel-nav-link absolute top-1/2 -translate-y-1/2 z-10 h-12 w-12 -left-6 hidden md:flex"
+                className="carousel-nav-link -left-6"
                 size="icon"
                 onClick={() => scrollToIndex(scrollState.activeIndex - 1)}
                 disabled={scrollState.atStart}
@@ -114,7 +114,7 @@ const ProductSection = ({ title, subtitle, products, href, showGradient = false 
             </Button>
             <Button
                 aria-label="Scroll forward"
-                className="carousel-nav-link absolute top-1/2 -translate-y-1/2 z-10 h-12 w-12 -right-6 hidden md:flex"
+                className="carousel-nav-link -right-6"
                 size="icon"
                 onClick={() => scrollToIndex(scrollState.activeIndex + 1)}
                 disabled={scrollState.atEnd}
@@ -123,10 +123,10 @@ const ProductSection = ({ title, subtitle, products, href, showGradient = false 
             </Button>
             <div className="flex items-center justify-between mb-2 px-2">
                 <div>
-                    <h2 className={`font-display text-xl font-semibold ${showGradient ? "text-primary" : ""}`}>{title}</h2>
+                    <h2 className="font-display text-xl font-semibold">{title}</h2>
                     {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
                 </div>
-                <Link to={href} className="flex items-center gap-1 text-sm text-primary font-medium">
+                <Link to={href} className="flex items-center gap-1 text-sm text-accent font-medium">
                     See All
                     <ChevronRight className="w-4 h-4" />
                 </Link>
