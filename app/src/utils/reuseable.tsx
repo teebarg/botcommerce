@@ -96,10 +96,10 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
                         disabled={disabled}
                     />
                 </div>
-
                 <button
+                    onClick={handleSend}
                     disabled={disabled || (!input.trim() && !file)}
-                    className="p-2.5 rounded-xl bg-primary text-primary-foreground disabled:opacity-40 shrink-0"
+                    className="p-2.5 rounded-xl bg-primary text-primary-foreground disabled:opacity-40 shrink-0 cursor-pointer"
                 >
                     <Send className="w-5 h-5" />
                 </button>
