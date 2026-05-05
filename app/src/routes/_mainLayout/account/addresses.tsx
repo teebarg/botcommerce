@@ -32,7 +32,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false, in
 
     return (
         <div
-            className={cn("bg-card rounded-2xl border-2 overflow-hidden transition-all duration-300 animate-in fade-in slide-in-from-left-4", isActive ? "border-primary" : "border-border")}
+            className={cn("bg-card rounded-2xl border-2 overflow-hidden slide-in", isActive ? "border-primary" : "border-border")}
             style={{ animationDelay: `${index * 50}ms` }}
         >
             <div className="p-4">
@@ -60,7 +60,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false, in
                         open={editState.isOpen}
                         title="Edit address"
                         trigger={
-                            <Button variant="ghost" size="sm" className="text-xs">
+                            <Button variant="accent" size="sm" className="text-xs">
                                 <Edit3 className="w-3 h-3 mr-1" />
                                 Edit
                             </Button>
@@ -74,7 +74,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false, in
                         open={deleteState.isOpen}
                         onOpenChange={deleteState.setOpen}
                         trigger={
-                            <Button variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive">
+                            <Button variant="destructive" size="sm" className="text-xs">
                                 <Trash2 className="w-3 h-3 mr-1" />
                                 Delete
                             </Button>
@@ -104,16 +104,16 @@ function RouteComponent() {
     const addresses = data.addresses;
 
     return (
-        <div className="w-full px-2 pt-6">
-            <div className="text-center mb-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <h2 className="text-2xl font-bold mb-2">My Addresses</h2>
-                <p className="text-muted-foreground">Manage your delivery addresses</p>
+        <div className="w-full px-2 pt-6 slide-in">
+            <div className="text-center mb-4">
+                <h2 className="text-xl font-bold">My Addresses</h2>
+                <p className="text-muted-foreground text-sm">Manage your delivery addresses</p>
             </div>
             <SheetDrawer
                 open={addState.isOpen}
                 title="Add new address"
                 trigger={
-                    <Button onClick={addState.open}>
+                    <Button>
                         <Plus className="h-5 w-5" />
                         <span className="font-semibold">Add new address</span>
                     </Button>

@@ -29,7 +29,7 @@ const WalletDeduction: React.FC<{ cart: Cart }> = ({ cart }) => {
         <div
             className={cn(
                 "p-4 rounded-2xl border-2 transition-all animate-in fade-in slide-in-from-left-4 duration-300",
-                useWalletCredit ? "border-primary bg-primary/10 shadow-glow" : "border-border bg-card"
+                useWalletCredit ? "border-primary bg-primary/10" : "border-border bg-card"
             )}
         >
             <div className="flex items-center justify-between">

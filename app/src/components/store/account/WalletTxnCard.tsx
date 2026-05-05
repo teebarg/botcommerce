@@ -14,7 +14,7 @@ export function WalletTxnCard({ txn, index }: Props) {
 
     return (
         <div
-            className="bg-card rounded-2xl p-4 border border-border flex items-center gap-3 animate-in fade-in slide-in-from-left-4 duration-300"
+            className="bg-card rounded-2xl p-4 border border-border flex items-center gap-3"
             style={{ animationDelay: `${250 + index * 40}ms` }}
         >
             <div

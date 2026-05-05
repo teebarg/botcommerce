@@ -18,7 +18,7 @@ const CategoriesSection: React.FC = () => {
                         {(categories || []).map((category: Category, idx: number) => (
                             <Link
                                 key={idx}
-                                className="shrink-0 snap-start relative w-32 h-32 rounded-2xl overflow-hidden"
+                                className="shrink-0 relative w-32 h-32 rounded-2xl overflow-hidden"
                                 to="/collections"
                                 search={(prev) => ({ ...prev, cat_ids: category.slug })}
                             >

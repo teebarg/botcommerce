@@ -55,15 +55,13 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
 
     return (
         <div
-            className={`relative p-4 rounded-xl cursor-pointer transition-all duration-300 group overflow-hidden w-full ${
-                isSelected ? "ring-2 ring-primary/20 bg-primary/10" : "border border-input bg-secondary hover:border-primary/50 hover:shadow-md"
-            }`}
+            className={`relative p-4 rounded-xl cursor-pointer transition-all duration-300 group overflow-hidden w-full ${isSelected ? "ring-2 ring-primary/20 bg-primary/10" : "border border-input bg-card hover:border-primary/50 hover:shadow-md"
+                }`}
         >
             <div className="absolute top-3 right-3 flex items-center gap-2">
                 <div
-                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
-                        isSelected ? "border-primary bg-primary shadow-sm" : "border-input group-hover:border-primary/50"
-                    }`}
+                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${isSelected ? "border-primary bg-primary shadow-sm" : "border-input group-hover:border-primary/50"
+                        }`}
                 >
                     {isSelected && <Check className="w-4 h-4 text-white" />}
                 </div>
@@ -72,9 +70,8 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
             <div onClick={() => !isSelected && handleSelect(address.id)}>
                 <div className="flex items-start gap-3 mb-3">
                     <div
-                        className={`p-2.5 rounded-lg transition-colors ${
-                            isSelected ? "bg-primary text-white" : "bg-primary/10 text-muted-foreground group-hover:bg-primary/10"
-                        }`}
+                        className={`p-2.5 rounded-lg transition-colors ${isSelected ? "bg-primary text-white" : "bg-primary/10 text-muted-foreground group-hover:bg-primary/10"
+                            }`}
                     >
                         {getTypeIcon(address.address_type)}
                     </div>
@@ -99,9 +96,8 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                     title="Address"
                     trigger={
                         <Button
-                            className="text-muted-foreground hover:text-blue-600 hover:bg-blue-50"
                             size="icon"
-                            variant="ghost"
+                            variant="accent"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <Edit3 className="w-4 h-4" />

@@ -58,17 +58,17 @@ function RouteComponent() {
     return (
         <div className="flex-1">
             <div className="bg-background/60 backdrop-blur-md md:hidden sticky z-20 top-[calc(var(--sat)+64px)]">
-                <ul className="grid grid-cols-5 px-2 animate-in slide-in-from-bottom-24 duration-300">
+                <ul className="grid grid-cols-5 px-2">
                     {navLinks.map((link, idx: number) => (
                         <li key={idx}>
                             <Link
-                                activeProps={{ className: "bg-primary/20 text-primary" }}
+                                activeProps={{ className: "text-accent" }}
                                 activeOptions={{ exact: true }}
                                 className="text-xs font-semibold"
                                 data-testid={link.dataTestid}
                                 to={link.href}
                             >
-                                <div className="flex flex-col items-center p-4 gap-1">
+                                <div className="flex flex-col items-center py-2 gap-1">
                                     <div className="bg-secondary p-2 rounded-xl">{link.icon}</div>
                                     <span>{link.label}</span>
                                 </div>

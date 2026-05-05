@@ -46,10 +46,10 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
 
     return (
         <>
-            <div className="space-y-4 px-4 flex-1">
+            <div className="space-y-4 px-4 flex-1 slide-in">
                 <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                    <h2 className="text-2xl font-bold mb-2">Choose Delivery</h2>
-                    <p className="text-muted-foreground">How would you like to receive your order?</p>
+                    <h2 className="text-xl font-bold">Choose Delivery</h2>
+                    <p className="text-muted-foreground text-sm">How would you like to receive your order?</p>
                 </div>
 
                 <RadioGroup value={cart.shipping_method} variant="delivery" onValueChange={(value: string) => handleChange(value)}>
@@ -96,7 +96,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
                     size="lg"
                     onClick={handleContinue}
                     disabled={updateCartDetails.isPending || !canContinue}
-                    className="bg-gradient-action shadow-glow hover:opacity-90 transition-opacity h-14 rounded-2xl text-base font-semibold w-full md:w-sm"
+                    className="bg-gradient-action hover:opacity-90 transition-opacity h-14 rounded-2xl text-base font-semibold w-full md:w-sm"
                 >
                     Continue
                     <ChevronRight className="h-5 w-5" />

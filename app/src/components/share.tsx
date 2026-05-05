@@ -39,7 +39,7 @@ export default function ShareButton({ text = "Check out these products in our ca
                         Share
                     </span>
                     <span className="md:hidden flex flex-col items-center text-white/80">
-                        <div className="action-button">
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center bg-accent text-accent-foreground">
                             <Share2 className="w-4 h-4" fill="currentColor" />
                         </div>
                     </span>

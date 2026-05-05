@@ -38,7 +38,7 @@ function Home() {
     const { data } = useQuery(indexProductQuery());
 
     return (
-        <div>
+        <div className="animate-in fade-in-50 duration-300">
             <HeroSection image={heroImage} />
             <CategoriesSection />
             <SaleBanner />

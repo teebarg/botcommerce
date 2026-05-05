@@ -63,7 +63,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({ amount, canContinue }) => {
                     isLoading={completeCart.isPending}
                     onClick={onPaymentCompleted}
                     size="lg"
-                    className="bg-gradient-action shadow-glow hover:opacity-90 transition-opacity h-14 rounded-2xl text-base font-semibold w-full md:w-sm"
+                    className="bg-gradient-action hover:opacity-90 transition-opacity h-14 rounded-2xl text-base font-semibold w-full md:w-sm"
                 >
                     Pay {currency(amount)} via Bank Transfer
                 </Button>

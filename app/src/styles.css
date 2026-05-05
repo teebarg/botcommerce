@@ -208,10 +208,6 @@
     --input: 0 0% 90%;
     --ring: 219 100% 53%;
 
-    --shadow-discount: 0 4px 20px -2px;
-    --shadow-intense: 0 8px 32px -4px;
-    --shadow-glow: 0 0 40px hsl(340, 82%, 52%, 0.3);
-
     --gradient-action: linear-gradient(135deg, hsl(340, 82%, 52%) 0%, hsl(15, 90%, 60%) 100%);
     --gradient-primary: linear-gradient(135deg, hsl(219 100% 53%), hsl(38 92% 50%));
     --gradient-accent:  linear-gradient(135deg, hsl(38 92% 50%), hsl(43 96% 56%));
@@ -271,8 +267,6 @@
     --border: 0 0% 22%;
     --input: 0 0% 22%;
     --ring: 219 100% 53%;
-
-    --shadow-glow: 0 0 40px hsl(35 92% 55% / 0.15);
 
     --accent: 43 96% 56%;
     --accent-foreground: 20 14% 4%;
@@ -335,17 +329,11 @@
 }
 
 @layer utilities {
+    .slide-in {
+        @apply animate-in slide-in-from-left-50 duration-300
+    }
     .glass {
         @apply bg-white/8 backdrop-blur-xl border border-white/12;
-    }
-
-    .shadow-glow {
-        box-shadow: var(--shadow-glow);
-    }
-
-    .action-button {
-        @apply w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300;
-        @apply bg-white/20 backdrop-blur-lg hover:bg-white/20 active:scale-90;
     }
 
     .carousel-nav-link {
@@ -354,17 +342,6 @@
 
     .sheet-footer {
         @apply bg-background/80 backdrop-blur-2xl flex gap-2 justify-end p-4 border-t border-border;
-    }
-
-    /* Optimization for list items */
-    .snap-start {
-        /* Tells browser to optimize rendering for these properties */
-        will-change: transform;
-        /* Huge performance boost for long lists - renders items like they are off-screen until needed */
-        content-visibility: auto;
-        contain-intrinsic-size: 100vh; /* Approximate height of one card */
-        transform: translateZ(0);
-        backface-visibility: hidden;
     }
 
     .h-sc {

@@ -17,7 +17,7 @@ const OrderItem: React.FC<{ order: Order; idx: number }> = ({ order, idx }) => {
             trigger={
                 <div
                     key={order.id + idx}
-                    className="bg-card rounded-2xl p-4 border border-border flex items-center gap-4 animate-in fade-in slide-in-from-left-4 duration-300"
+                    className="bg-card rounded-2xl p-4 border border-border flex items-center gap-4"
                     style={{ animationDelay: `${250 + idx * 50}ms` }}
                 >
                     <img src={order.order_items[0].image} alt="Order item" className="w-14 h-14 rounded-xl object-cover" />
@@ -64,7 +64,7 @@ function RouteComponent() {
     const { data } = useSuspenseQuery(ordersQuery({}));
 
     return (
-        <div className="px-2 md:px-0 pt-6 space-y-6">
+        <div className="px-2 md:px-0 pt-6 space-y-6 slide-in">
             <div className="text-center">
                 <div className="w-20 h-20 mx-auto rounded-full bg-primary mb-4">
                     <div className="w-full h-full rounded-full bg-background flex items-center justify-center overflow-hidden">
@@ -74,8 +74,8 @@ function RouteComponent() {
                 <h2 className="text-xl font-bold">Welcome back, {session?.user?.firstName}!</h2>
                 <p className="text-muted-foreground text-sm">Member since January 2024</p>
             </div>
-            <div className="grid grid-cols-3 gap-3 animate-in fade-in slide-in-from-bottom-4 duration-100">
-                <div className="bg-card rounded-2xl p-4 text-center border border-border animate-in fade-in zoom-in-90 duration-300 delay-100">
+            <div className="grid grid-cols-3 gap-3">
+                <div className="bg-card rounded-2xl p-4 text-center border border-border">
                     <div className="w-10 h-10 mx-auto rounded-xl bg-primary flex items-center justify-center mb-2">
                         <Heart className="w-5 h-5 text-white" />
                     </div>
@@ -83,7 +83,7 @@ function RouteComponent() {
                     <p className="text-xs text-muted-foreground">Total Orders</p>
                 </div>
                 <div
-                    className="bg-card rounded-2xl p-4 text-center border border-border animate-in fade-in zoom-in-90 duration-300 delay-150"
+                    className="bg-card rounded-2xl p-4 text-center border border-border"
                 >
                     <div className="w-10 h-10 mx-auto rounded-xl bg-primary flex items-center justify-center mb-2">
                         <MapPin className="w-5 h-5 text-white" />
@@ -92,7 +92,7 @@ function RouteComponent() {
                     <p className="text-xs text-muted-foreground">Wishlist Items</p>
                 </div>
                 <div
-                    className="bg-card rounded-2xl p-4 text-center border border-border animate-in fade-in zoom-in-90 duration-300 delay-200"
+                    className="bg-card rounded-2xl p-4 text-center border border-border"
                 >
                     <div className="w-10 h-10 mx-auto rounded-xl bg-primary flex items-center justify-center mb-2">
                         <Package className="w-5 h-5 text-white" />
@@ -101,7 +101,7 @@ function RouteComponent() {
                     <p className="text-xs text-muted-foreground">Saved Addresses</p>
                 </div>
             </div>
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-200">
+            <div>
                 <div className="flex items-center justify-between mb-2">
                     <h3 className="font-semibold">Recent Orders</h3>
                     <Link to="/account/orders" className="text-sm text-primary flex items-center gap-1">

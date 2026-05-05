@@ -44,7 +44,7 @@ function RouteComponent() {
                     <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
                         <div className="flex-1 text-center lg:text-left space-y-6 animate-fade-in">
                             <div className="flex items-center justify-center lg:justify-start gap-3 mb-8">
-                                <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center shadow-glow">
+                                <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center shadow-md">
                                     <ShoppingBag className="w-6 h-6 text-accent-foreground" />
                                 </div>
                                 <span className="text-2xl font-display font-bold text-foreground">{config?.shop_name}</span>
