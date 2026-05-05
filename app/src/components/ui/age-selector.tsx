@@ -44,7 +44,7 @@ export const AgeRangeSelector = ({ selectedRange, onChange }: AgeRangeSelectorPr
                             key={range}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                                 selectedRange === range
-                                    ? "bg-primary text-primary-foreground shadow-md scale-105"
+                                    ? "bg-accent text-accent-foreground shadow-md"
                                     : "bg-muted text-muted-foreground hover:bg-border hover:scale-105"
                             }`}
                             type="button"

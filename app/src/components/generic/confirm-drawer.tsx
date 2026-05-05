@@ -62,15 +62,15 @@ const ConfirmDrawer: React.FC<Props> = ({
                             <button
                                 onClick={handleConfirm}
                                 className={cn(
-                                    "w-full py-4 text-center font-semibold text-primary hover:bg-primary/5 active:bg-primary/10 transition-colors border-b border-border",
-                                    variant === "destructive" && "text-destructive hover:bg-destructive/5 active:bg-destructive/10"
+                                    "w-full py-4 text-center font-semibold text-primary active:bg-primary/10 transition-colors border-b border-border",
+                                    variant === "destructive" && "text-destructive active:bg-destructive/10"
                                 )}
                             >
                                 {isLoading ? "Processing..." : confirmText}
                             </button>
                             <button
                                 onClick={onClose}
-                                className="w-full py-4 text-center font-medium text-muted-foreground hover:bg-secondary/50 active:bg-secondary transition-colors"
+                                className="w-full py-4 text-center font-medium text-muted-foreground active:bg-secondary transition-colors"
                             >
                                 {cancelText}
                             </button>
@@ -91,23 +91,17 @@ const ConfirmDrawer: React.FC<Props> = ({
                 </DialogHeader>
                 {content}
                 {!hideActionBtn && (
-                    <DialogFooter className="mt-6 gap-2 sm:gap-2">
+                    <DialogFooter className="mt-6 gap-2">
                         <Button
                             onClick={handleCancel}
-                            className="px-5 border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 active:bg-gray-100"
+                            variant="outline" className="text-muted-foreground border-muted"
                         >
                             {cancelText}
                         </Button>
                         <Button
                             isLoading={isLoading}
                             onClick={handleConfirm}
-                            className={`px-5 border-none text-white
-                            ${
-                                variant === "destructive"
-                                    ? "bg-gradient-to-br from-[#f85032] to-[#e73827] shadow-[0_4px_6px_-1px_rgba(248,80,50,0.2)] hover:shadow-[0_6px_8px_-1px_rgba(248,80,50,0.3)] hover:-translate-y-px active:translate-y-0"
-                                    : "bg-gradient-primary hover:-translate-y-px active:translate-y-0"
-                            }
-                        `}
+                            variant={variant === "destructive" ? "destructive" : "default"}
                         >
                             {confirmText}
                         </Button>

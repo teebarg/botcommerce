@@ -48,7 +48,7 @@ const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
     };
 
     return (
-        <div className="px-6 py-4">
+        <div className="px-4 py-4">
             <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-3 flex-1">
                     <div className="shrink-0 mt-0.5">
@@ -56,8 +56,8 @@ const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                            <p className="text-sm font-medium truncate max-w-[200px]">{activity.description}</p>
+                        <div className="flex items-center justify-between mb-1 gap-2">
+                            <p className="font-medium truncate max-w-[250px]">{activity.description}</p>
                             <StatusBadge activityType={activity.activity_type} isSuccess={activity.is_success} />
                         </div>
 
@@ -117,7 +117,7 @@ const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
 const ActivityView: React.FC<Props> = ({ activities }) => {
     return (
         <div className="bg-background rounded-lg shadow-sm border border-border">
-            <div className="px-6 py-4">
+            <div className="px-4 py-4">
                 <h2 className="text-xl font-semibold flex items-center gap-2">
                     <Clock className="text-muted-foreground" size={20} />
                     Recent Activity

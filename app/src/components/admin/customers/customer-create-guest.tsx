@@ -38,7 +38,7 @@ export default function CustomerCreateGuest() {
         <SheetDrawer
             title="Create Guest User"
             trigger={
-                <Button size="sm" variant="outline">
+                <Button size="sm">
                     Create Guest User
                 </Button>
             }

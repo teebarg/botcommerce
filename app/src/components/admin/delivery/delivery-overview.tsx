@@ -48,63 +48,59 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
     };
 
     return (
-        <div className="bg-card rounded-2xl shadow-lg border border-border overflow-hidden">
-            <div className="p-6">
-                <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-4 flex-1">
-                        <div className={`p-3 rounded-xl ${option.is_active ? "bg-blue-100" : "bg-gray-100"}`}>
-                            <div className={option.is_active ? "text-blue-600" : "text-gray-400"}>{getIcon(option.method)}</div>
-                        </div>
+        <div className="flex items-start justify-between p-4 bg-card rounded-2xl border border-border overflow-hidden">
+            <div className="flex items-start gap-4 flex-1">
+                <div className="p-3 rounded-xl bg-accent/10">
+                    <div className="text-accent">{getIcon(option.method)}</div>
+                </div>
 
-                        <div className="flex-1">
-                            <div className="flex items-center gap-3">
-                                <h3 className="text-lg font-bold">{option.name}</h3>
-                                <Badge variant={option.is_active ? "success-subtle" : "destructive"}>{option.is_active ? "Active" : "Inactive"}</Badge>
-                            </div>
-
-                            <p className="text-muted-foreground mb-2">{option.description}</p>
-
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="flex items-center gap-2 text-sm">
-                                    <span className="font-medium text-green-600">{currency(option.amount)}</span>
-                                </div>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <Clock className="w-4 h-4" />
-                                    <span className="font-medium">{option.duration}</span>
-                                </div>
-                            </div>
-                        </div>
+                <div className="flex-1">
+                    <div className="flex items-center gap-3">
+                        <h3 className="text-lg font-bold">{option.name}</h3>
+                        <Badge variant={option.is_active ? "success-subtle" : "destructive"}>{option.is_active ? "Active" : "Inactive"}</Badge>
                     </div>
 
-                    <div className="flex items-center ml-4">
-                        <SheetDrawer
-                            open={editState.isOpen}
-                            title="Edit Delivery Option"
-                            trigger={
-                                <Button size="icon" variant="ghost" onClick={editState.open}>
-                                    <Pencil className="h-5 w-5" />
-                                </Button>
-                            }
-                            onOpenChange={editState.setOpen}
-                        >
-                            <DeliveryOptionForm initialData={option} onClose={editState.close} />
-                        </SheetDrawer>
-                        <ConfirmDrawer
-                            open={deleteState.isOpen}
-                            onOpenChange={deleteState.setOpen}
-                            trigger={
-                                <Button className="p-2 text-red-600 bg-red-50 hover:bg-red-100" size="icon">
-                                    <Trash2 className="w-4 h-4" />
-                                </Button>
-                            }
-                            onClose={deleteState.close}
-                            onConfirm={handleDelete}
-                            title="Delete"
-                            description="This action cannot be undone. This will permanently delete the delivery option."
-                            isLoading={isPending}
-                        />
+                    <p className="text-sm text-muted-foreground mb-2">{option.description}</p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        <div className="font-semibold">
+                            {currency(option.amount)}
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Clock className="w-4 h-4" />
+                            <span className="font-medium">{option.duration}</span>
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            <div className="flex items-center ml-4">
+                <SheetDrawer
+                    open={editState.isOpen}
+                    title="Edit Delivery Option"
+                    trigger={
+                        <Button size="icon" variant="ghost" onClick={editState.open}>
+                            <Pencil className="h-5 w-5" />
+                        </Button>
+                    }
+                    onOpenChange={editState.setOpen}
+                >
+                    <DeliveryOptionForm initialData={option} onClose={editState.close} />
+                </SheetDrawer>
+                <ConfirmDrawer
+                    open={deleteState.isOpen}
+                    onOpenChange={deleteState.setOpen}
+                    trigger={
+                        <Button className="p-2 text-red-600 bg-red-50" size="icon">
+                            <Trash2 className="w-4 h-4" />
+                        </Button>
+                    }
+                    onClose={deleteState.close}
+                    onConfirm={handleDelete}
+                    title="Delete"
+                    description="This action cannot be undone. This will permanently delete the delivery option."
+                    isLoading={isPending}
+                />
             </div>
         </div>
     );
@@ -113,7 +109,7 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
 const DeliveryOverview: React.FC = () => {
     const addState = useOverlayTriggerState({});
 
-    const { data: deliveryOptions, isLoading, error } = useDeliveryOptions(); 
+    const { data: deliveryOptions, isLoading, error } = useDeliveryOptions();
 
     if (error) {
         return <ServerError error={error.message} scenario="delivery" stack={error.stack} />;

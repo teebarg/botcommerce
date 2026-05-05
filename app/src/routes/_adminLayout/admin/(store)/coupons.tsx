@@ -68,11 +68,11 @@ function RouteComponent() {
             <div className="flex md:flex-row flex-col md:items-center md:justify-between mb-6 gap-2">
                 <div>
                     <h1 className="text-xl font-bold">Coupon Management</h1>
-                    <p className="text-sm text-muted-foreground mt-1">Create, manage, and track your promotional coupons</p>
+                    <p className="text-sm text-muted-foreground">Create, manage, and track your promotional coupons</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 mt-2">
                     <LocalizedClientLink
-                        className="flex items-center gap-2 border border-input bg-background hover:bg-accent py-2 px-4 rounded-md"
+                        className="flex items-center gap-2 border border-input bg-background py-1 px-4 rounded-md"
                         href="/admin/coupons/analytics"
                     >
                         <BarChart3 className="mr-2 h-4 w-4" />
