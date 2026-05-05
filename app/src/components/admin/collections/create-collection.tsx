@@ -13,7 +13,7 @@ const CreateCollection: React.FC<Props> = () => {
         <SheetDrawer
             open={state.isOpen}
             title="Create Collection"
-            trigger={<Button onClick={state.open}>Create Collection</Button>}
+            trigger={<Button onClick={state.open}>Create</Button>}
             onOpenChange={state.setOpen}
         >
             <CollectionForm type="create" onClose={state.close} />

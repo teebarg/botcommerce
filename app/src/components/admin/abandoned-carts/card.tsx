@@ -32,7 +32,7 @@ export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
     };
 
     return (
-        <Card className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary/50">
+        <Card className="hover:shadow-lg border-l-4 border-l-primary/50">
             <CardContent className="p-6">
                 <div className="flex flex-col lg:flex-row gap-6">
                     <div className="flex-1 space-y-4">

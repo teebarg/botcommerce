@@ -51,8 +51,8 @@ function RouteComponent() {
             <div className="border-b bg-background sticky top-16 z-10">
                 <div className="container mx-auto px-4 py-4">
                     <div className="mb-4">
-                        <h1 className="text-3xl font-bold">Abandoned Carts</h1>
-                        <p className="text-muted-foreground">Monitor and recover lost sales opportunities</p>
+                        <h1 className="text-2xl font-bold">Abandoned Carts</h1>
+                        <p className="text-muted-foreground text-sm">Monitor and recover lost sales opportunities</p>
                     </div>
                     <div className="flex flex-col md:flex-row md:justify-between gap-3">
                         <div className="relative">

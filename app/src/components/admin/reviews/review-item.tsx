@@ -23,7 +23,7 @@ const ReviewItem = ({ review }: ReviewListProps) => {
                     </div>
                     <span
                         className={`text-xs px-2 py-1 rounded-full ${
-                            review?.verified ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                            review?.verified ? "bg-success-subtle text-success-subtle-foreground" : "bg-accent/20 text-accent"
                         }`}
                     >
                         {review?.verified ? "Verified" : "Un-verified"}

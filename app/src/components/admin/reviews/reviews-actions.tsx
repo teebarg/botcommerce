@@ -29,13 +29,13 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
     };
 
     return (
-        <div className="relative flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
             <SheetDrawer
                 open={editState.isOpen}
                 title="Edit Review"
                 trigger={
                     <Button size="icon" onClick={editState.open}>
-                        <Pencil className="h-5 w-5" />
+                        <Pencil className="h-3 w-3" />
                     </Button>
                 }
                 onOpenChange={editState.setOpen}
@@ -47,7 +47,7 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
                 onOpenChange={deleteState.setOpen}
                 trigger={
                     <Button size="icon" variant="destructive">
-                        <Trash2 className="h-5 w-5" />
+                        <Trash2 className="h-4 w-4" />
                     </Button>
                 }
                 onClose={deleteState.close}
@@ -57,7 +57,7 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
                 isLoading={deletePending}
             />
             {review.verified ? (
-                <Button aria-label="unpublish" disabled={isPending} isLoading={isPending} variant="success-subtle" onClick={() => handlePublish(false)}>
+                <Button aria-label="unpublish" disabled={isPending} isLoading={isPending} variant="success" onClick={() => handlePublish(false)}>
                     Un-publish
                 </Button>
             ) : (
