@@ -17,9 +17,7 @@ const OrderDetails = ({ order }: OrderDetailsProps) => {
     const { config } = useConfig();
 
     return (
-        <div
-            className="flex-1 flex flex-col overflow-hidden animate-in fade-in slide-in-from-right-4 duration-300"
-        >
+        <div className="flex-1 flex flex-col overflow-hidden">
             <div className="grid gap-6 lg:grid-cols-3 overflow-y-auto px-2">
                 <div className="lg:col-span-2 space-y-6">
                     <OrderOverview order={order} />
@@ -35,7 +33,7 @@ const OrderDetails = ({ order }: OrderDetailsProps) => {
                                 {order.order_items.map((item: OrderItem, idx: number) => (
                                     <div key={idx}>
                                         <div className="flex items-center gap-4">
-                                            <div className="h-36 w-36 relative group-hover:scale-105 transition-transform duration-200 rounded-lg overflow-hidden">
+                                            <div className="h-36 w-36 relative rounded-lg overflow-hidden">
                                                 {item.image && <ImageDisplay alt={item.image} url={item.image} />}
                                             </div>
                                             <div className="flex-1">

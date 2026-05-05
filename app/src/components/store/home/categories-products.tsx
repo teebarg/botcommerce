@@ -23,7 +23,7 @@ export default function CategoriesWithProductsSection() {
                 return (
                     <div
                         key={category.id}
-                        className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300"
+                        className="space-y-4"
                         style={{ animationDelay: `${categoryIndex * 100}ms` }}
                     >
                         <div className="flex items-center justify-between">

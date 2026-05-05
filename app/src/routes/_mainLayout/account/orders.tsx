@@ -26,7 +26,7 @@ function RouteComponent() {
                 {data?.items?.length ? (
                     <div className="flex flex-col gap-y-8 w-full">
                         {data?.items?.map((o: Order, idx: number) => (
-                            <OrderCard key={idx} order={o} idx={idx} />
+                            <OrderCard key={idx} order={o} />
                         ))}
                     </div>
                 ) : (

@@ -88,10 +88,10 @@ function RouteComponent() {
 
                     <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
                         <div className="flex items-start">
-                            <AlertCircle className="h-6 w-6 text-yellow-600 mt-1 mr-3" />
+                            <AlertCircle className="h-6 w-6 text-accent-subtle mt-1 mr-3" />
                             <div>
-                                <h3 className="text-lg font-semibold text-yellow-900 mb-2">Return Requirements</h3>
-                                <ul className="text-yellow-800 space-y-1">
+                                <h3 className="text-lg font-semibold text-accent mb-2">Return Requirements</h3>
+                                <ul className="text-accent/90 space-y-1">
                                     <li>• Items must be in original condition</li>
                                     <li>• Electronics must include all original accessories and packaging</li>
                                     <li>• Some items like personalized products are not returnable</li>

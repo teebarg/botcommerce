@@ -18,7 +18,7 @@ const HandoffBanner = ({ agentName = "Sarah M." }: HandoffBannerProps) => (
         </div>
 
         <div
-            className="rounded-xl border border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10 p-3.5 animate-in fade-in slide-in-from-bottom-2 duration-300 delay-200"
+            className="rounded-xl border border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10 p-3.5"
         >
             <div className="flex items-center gap-3">
                 {/* Agent avatar */}

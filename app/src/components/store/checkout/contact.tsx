@@ -40,9 +40,7 @@ const CartContactForm = () => {
     };
 
     return (
-        <div
-            className="p-4 rounded-2xl bg-card border border-border animate-in fade-in slide-in-from-right-4 duration-200"
-        >
+        <div className="p-4 rounded-2xl bg-card border border-border">
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="flex items-center gap-3 mb-3">

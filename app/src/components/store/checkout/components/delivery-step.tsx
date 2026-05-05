@@ -47,7 +47,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
     return (
         <>
             <div className="space-y-4 px-4 flex-1 slide-in">
-                <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <div className="text-center mb-8">
                     <h2 className="text-xl font-bold">Choose Delivery</h2>
                     <p className="text-muted-foreground text-sm">How would you like to receive your order?</p>
                 </div>
@@ -60,10 +60,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
                             value={option.method}
                             variant="delivery"
                         >
-                            <div key={idx}
-                                className="animate-in fade-in slide-in-from-left-4 duration-300"
-                                style={{ animationDelay: `${idx * 100}ms` }}
-                            >
+                            <div key={idx}>
                                 <div className="flex items-center space-x-3 mb-2">
                                     {option.method === "PICKUP" ? (
                                         <Store className="h-6 w-6 text-primary" />

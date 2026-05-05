@@ -116,7 +116,7 @@ function RouteComponent() {
                     ))}
                     {data?.items?.length === 0 && (
                         <div
-                            className="bg-card rounded-2xl p-4 border border-border flex items-center gap-4 animate-in fade-in slide-in-from-left-4 duration-300 delay-[250ms]"
+                            className="bg-card rounded-2xl p-4 border border-border flex items-center gap-4"
                         >
                             No orders found
                         </div>

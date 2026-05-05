@@ -2,7 +2,6 @@ import type React from "react";
 import { Heart, ShoppingCart } from "lucide-react";
 import { useProductVariant } from "@/hooks/useProductVariant";
 import type { ProductLite } from "@/schemas/product";
-import { motion } from "framer-motion";
 import { useUserCreateWishlist, useUserDeleteWishlist } from "@/hooks/useUser";
 import { Button } from "@/components/ui/button";
 
@@ -25,7 +24,7 @@ export const ProductVariantActions: React.FC<VariantSelectionProps> = ({ product
     };
 
     return (
-        <div className="flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <div className="flex items-center gap-3">
             <button
                 onClick={(e) => {
                     e.stopPropagation();

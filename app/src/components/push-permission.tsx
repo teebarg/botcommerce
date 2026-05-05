@@ -250,23 +250,21 @@ export default function PushPermission() {
                                     </div>
                                 </div>
                             </div>
-                            <h2 className="text-lg font-semibold mb-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                            <h2 className="text-lg font-semibold mb-2">
                                 You Have a Gift! 🎁
                             </h2>
-                            <p className="text-sm text-muted-foreground leading-relaxed animate-in fade-in slide-in-from-bottom-2 duration-200">
+                            <p className="text-sm text-muted-foreground leading-relaxed">
                                 We have something special waiting just for you
                             </p>
                         </div>
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                            <div className="relative bg-muted rounded-2xl p-6 border-2 border-accent/30 text-center mb-6 mx-6">
-                                <p className="text-sm text-muted-foreground mb-2">Your gift is worth</p>
-                                <div className="flex items-center justify-center gap-2">
-                                    <span className="text-5xl font-extrabold text-accent">{currency(50000)}</span>
-                                </div>
-                                <p className="text-sm font-medium text-primary mt-2">Shopping Credits</p>
+                        <div className="relative bg-muted rounded-2xl p-6 border-2 border-accent/30 text-center mb-6 mx-6">
+                            <p className="text-sm text-muted-foreground mb-2">Your gift is worth</p>
+                            <div className="flex items-center justify-center gap-2">
+                                <span className="text-5xl font-extrabold text-accent">{currency(50000)}</span>
                             </div>
+                            <p className="text-sm font-medium text-primary mt-2">Shopping Credits</p>
                         </div>
-                        <div className="border-t border-border animate-in fade-in duration-300">
+                        <div className="border-t border-border">
                             <button
                                 onClick={handleDismiss}
                                 className="w-full py-4 text-center font-medium text-muted-foreground hover:bg-secondary/50 active:bg-secondary transition-colors border-b border-border cursor-pointer"

@@ -132,7 +132,7 @@ const ProductSection = ({ title, subtitle, products, href, showGradient = false 
                 </Link>
             </div>
 
-            <ul ref={listRef} className="flex gap-4 overflow-x-auto hide-scrollbar px-2 md:px-0">
+            <ul ref={listRef} className="flex gap-4 overflow-x-auto px-2 md:px-0">
                 {products.map((product) => (
                     <li key={product.id} data-card>
                         <ProductCard product={product} />

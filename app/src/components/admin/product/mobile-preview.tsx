@@ -15,7 +15,7 @@ export const MobilePreview = ({ title, body, imageUrl }: MobilePreviewProps) => 
                         <p className="text-xs text-foreground/60 mt-2 font-medium">Wednesday, October 12</p>
                     </div>
                     <div
-                        className="bg-card backdrop-blur-xl rounded-2xl p-3.5 shadow-[0_8px_30px_hsl(var(--foreground)/0.06)] border border-background/60 animate-in fade-in slide-in-from-top-2 duration-500"
+                        className="bg-card backdrop-blur-xl rounded-2xl p-3.5 shadow-[0_8px_30px_hsl(var(--foreground)/0.06)] border border-background/60"
                         key={title + body}
                     >
                         <div className="flex justify-between items-center mb-2">

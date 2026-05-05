@@ -83,7 +83,7 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastMessage, isEd
 
     return (
         <div
-            className={`flex gap-2 px-2.5 animate-in fade-in slide-in-from-bottom-3 zoom-in-95 duration-300 ${isAssistant ? "justify-start" : "justify-end"}`}
+            className={`flex gap-2 px-2.5 ${isAssistant ? "justify-start" : "justify-end"}`}
             style={{ animationDelay: `${index * 50}ms` }}
         >
             {isAssistant && (
