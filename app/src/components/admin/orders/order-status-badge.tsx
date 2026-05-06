@@ -2,12 +2,12 @@ import { CheckCircle, Package, PackageCheck, RefreshCw, RotateCcw, ShieldAlert, 
 import type { JSX } from "react";
 
 import { Badge } from "@/components/ui/badge";
-import type { OrderStatus } from "@/schemas";
+import { BadgeVariant, OrderStatus } from "@/schemas";
 
 export const PaymentStatusBadge = ({ status }: { status: string }) => {
     const statusConfig: Record<
         string,
-        { icon: JSX.Element; label: string; variant: "destructive" | "default" | "success" | "warning" }
+        { icon: JSX.Element; label: string; variant: BadgeVariant }
     > = {
         ["PENDING"]: {
             icon: <ShieldAlert className="mr-1" size={14} />,
@@ -44,46 +44,46 @@ export const PaymentStatusBadge = ({ status }: { status: string }) => {
 export const OrderStatusBadge = ({ status }: { status: OrderStatus }) => {
     const statusConfig: Record<
         OrderStatus,
-        { icon: JSX.Element; label: string; variant: "destructive" | "default" | "accent-subtle" | "success" | "success-subtle" | "warning-subtle" | "accent" }
+        { icon: JSX.Element; label: string; variant: BadgeVariant }
     > = {
-        ["PENDING"]: {
+        [OrderStatus.PENDING]: {
             icon: <ShieldAlert className="mr-1" size={14} />,
             label: "Pending",
             variant: "warning-subtle",
         },
-        ["PROCESSING"]: {
+        [OrderStatus.PROCESSING]: {
             icon: <RefreshCw className="mr-1" size={14} />,
             label: "Processing",
             variant: "default",
         },
-        ["SHIPPED"]: {
+        [OrderStatus.SHIPPED]: {
             icon: <Package className="mr-1" size={14} />,
             label: "Order Packed",
             variant: "accent-subtle",
         },
-        ["OUT_FOR_DELIVERY"]: {
+        [OrderStatus.OUT_FOR_DELIVERY]: {
             icon: <Truck className="mr-1" size={14} />,
             label: "Out for delivery",
             variant: "accent",
         },
-        ["DELIVERED"]: {
+        [OrderStatus.DELIVERED]: {
             icon: <PackageCheck className="mr-1" size={14} />,
             label: "Delivered",
             variant: "success",
         },
-        ["CANCELED"]: {
+        [OrderStatus.CANCELED]: {
             icon: <XCircle className="mr-1" size={14} />,
-            label: "Delivered",
+            label: "Canceled",
             variant: "destructive",
         },
-        ["REFUNDED"]: {
+        [OrderStatus.REFUNDED]: {
             icon: <RotateCcw className="mr-1" size={14} />,
-            label: "Delivered",
+            label: "Refunded",
             variant: "success-subtle",
         },
     };
-
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
+    
+    const config = statusConfig[status] || statusConfig[OrderStatus.PENDING];
 
     return (
         <Badge variant={config.variant}>

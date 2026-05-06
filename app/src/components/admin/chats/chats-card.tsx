@@ -1,24 +1,24 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { formatDate } from "@/utils";
-import type { Chat, ConversationStatus } from "@/schemas";
+import { BadgeVariant, Chat, ConversationStatus } from "@/schemas";
 import ChatsActions from "./chats-actions";
 
-interface CustomerCardProps {
+interface ChatsCardProps {
     chat: Chat;
 }
 
 const getStatusBadge = (status?: ConversationStatus) => {
-    const variants: Record<ConversationStatus, "destructive" | "success-subtle" | "warning"> = {
-        ["ABANDONED"]: "destructive",
-        ["ACTIVE"]: "success-subtle",
-        ["COMPLETED"]: "warning",
+    const variants: Record<ConversationStatus, BadgeVariant> = {
+        [ConversationStatus.ABANDONED]: "destructive",
+        [ConversationStatus.ACTIVE]: "success-subtle",
+        [ConversationStatus.COMPLETED]: "accent",
     };
 
     return <Badge variant={variants[status ?? "ABANDONED"]}>{status}</Badge>;
 };
 
-const ChatsCard = ({ chat }: CustomerCardProps) => {
+const ChatsCard = ({ chat }: ChatsCardProps) => {
     return (
         <Card className="mb-3">
             <div key={chat.id} className="bg-card rounded-lg overflow-hidden shadow-md p-4">

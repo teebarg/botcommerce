@@ -1,3 +1,4 @@
+import { AddressTypeSchema } from "@/schemas";
 import { z } from "zod";
 
 export const normalizePhone = (value: string) => {
@@ -41,7 +42,7 @@ export const phoneSchema = z
 export const emailSchema = z.string().email("Enter a valid email address").toLowerCase();
 
 export const addressSchema = z.object({
-    address_type: z.enum(["HOME", "WORK", "BILLING", "SHIPPING", "OTHER"]),
+    address_type: AddressTypeSchema,
     first_name: z.string().min(1, "First name is required"),
     last_name: z.string().min(1, "Last name is required"),
     address_1: z.string().min(1, "Address is required"),

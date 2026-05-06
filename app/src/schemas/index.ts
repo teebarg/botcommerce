@@ -18,3 +18,10 @@ export interface DeliveryOption {
     duration: string;
     is_active: boolean;
 }
+
+import { badgeVariants } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
+import { type VariantProps } from "class-variance-authority";
+
+export type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>["variant"]>;
+export type ButtonVariant = NonNullable<VariantProps<typeof buttonVariants>["variant"]>;

@@ -4,51 +4,52 @@ import { useOverlayTriggerState } from "react-stately";
 import OrderProcessingAction from "./order-processing-actions";
 import { OrderStatusBadge } from "./order-status-badge";
 import { useOrderTimeline } from "@/hooks/useOrder";
-import type { Order, OrderItem } from "@/schemas";
+import { OrderStatus, type Order, type OrderItem } from "@/schemas";
 import { useReturnOrderItem } from "@/hooks/useOrder";
 import { currency, formatDate } from "@/utils";
 import { Badge } from "@/components/ui/badge";
 import ImageDisplay from "@/components/image-display";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { Button } from "@/components/ui/button";
+import { ReactElement } from "react";
 
 interface OrderDetailsProps {
     order: Order;
     onClose: () => void;
 }
 
-const orderStatusMap = {
-    PENDING: {
+const orderStatusMap: Record<OrderStatus, { icon: ReactElement; label: string; color: string }> = {
+    [OrderStatus.PENDING]: {
         icon: <ShieldAlert className="h-5 w-5 text-white" />,
         label: "Pending",
         color: "bg-warning",
     },
-    PROCESSING: {
+    [OrderStatus.PROCESSING]: {
         icon: <RefreshCw className="h-5 w-5 text-white" />,
         label: "Processing",
         color: "bg-accent",
     },
-    SHIPPED: {
+    [OrderStatus.SHIPPED]: {
         icon: <Package className="h-5 w-5 text-secondary-foreground" />,
         label: "Order Packed",
         color: "bg-secondary",
     },
-    OUT_FOR_DELIVERY: {
+    [OrderStatus.OUT_FOR_DELIVERY]: {
         icon: <Truck className="h-5 w-5 text-primary-foreground" />,
         label: "Out for Delivery",
         color: "bg-primary",
     },
-    DELIVERED: {
+    [OrderStatus.DELIVERED]: {
         icon: <PackageCheck className="h-5 w-5 text-white" />,
         label: "Delivered",
         color: "bg-emerald-700",
     },
-    CANCELED: {
+    [OrderStatus.CANCELED]: {
         icon: <XCircle className="h-5 w-5 text-destructive-foreground" />,
         label: "Cancelled",
         color: "bg-destructive",
     },
-    REFUNDED: {
+    [OrderStatus.REFUNDED]: {
         icon: <RotateCcw className="h-5 w-5 text-destructive-foreground" />,
         label: "Refunded",
         color: "bg-destructive",

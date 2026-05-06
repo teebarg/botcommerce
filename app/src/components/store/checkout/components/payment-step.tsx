@@ -1,7 +1,7 @@
 import React from "react";
 import { paymentInfoMap } from "@/utils/constants";
 import { RadioGroupItem, RadioGroupWithLabel } from "@/components/ui/radio-group";
-import type { Cart, PaymentMethod } from "@/schemas";
+import { Cart, PaymentMethod } from "@/schemas";
 import { useUpdateCartDetails } from "@/hooks/useCart";
 import { PaystackPayment } from "@/components/store/payment/paystack-payment";
 import BankTransfer from "@/components/store/payment/bank-transfer";
@@ -13,9 +13,9 @@ import { ZeroPayment } from "../../payment/zero-payment";
 import WalletDeduction from "./wallet-deduction";
 
 const payMethods: { id: string; provider_id: PaymentMethod }[] = [
-    { id: "pickup", provider_id: "CASH_ON_DELIVERY" },
-    { id: "manual", provider_id: "BANK_TRANSFER" },
-    { id: "paystack", provider_id: "PAYSTACK" },
+    { id: "pickup", provider_id: PaymentMethod.CASH_ON_DELIVERY },
+    { id: "manual", provider_id: PaymentMethod.BANK_TRANSFER },
+    { id: "paystack", provider_id: PaymentMethod.PAYSTACK },
 ];
 
 interface PaymentStepProps {
@@ -63,10 +63,10 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                             >
                                 {payMethods.map((item: { id: string; provider_id: PaymentMethod }, idx: number) => {
                                     if (
-                                        (item.provider_id === "CASH_ON_DELIVERY" && config?.payment_cash != "true") ||
-                                        (item.provider_id === "BANK_TRANSFER" && config?.payment_bank != "true") ||
-                                        (item.provider_id === "PAYSTACK" && config?.payment_paystack != "true") ||
-                                        (cart?.shipping_method !== "PICKUP" && item.provider_id === "CASH_ON_DELIVERY")
+                                        (item.provider_id === PaymentMethod.CASH_ON_DELIVERY && config?.payment_cash != "true") ||
+                                        (item.provider_id === PaymentMethod.BANK_TRANSFER && config?.payment_bank != "true") ||
+                                        (item.provider_id === PaymentMethod.PAYSTACK && config?.payment_paystack != "true") ||
+                                        (cart?.shipping_method !== "PICKUP" && item.provider_id === PaymentMethod.CASH_ON_DELIVERY)
                                     ) {
                                         return null;
                                     }
@@ -95,9 +95,9 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                     </div>
                 )}
             </div>
-            {cart?.payment_method === "PAYSTACK" && <PaystackPayment amount={cart.total} cartNumber={cart.cart_number} canContinue={canContinue} />}
-            {cart?.payment_method === "BANK_TRANSFER" && <BankTransfer amount={cart.total} canContinue={canContinue} />}
-            {cart?.payment_method === "CASH_ON_DELIVERY" && <Pickup amount={cart.total} canContinue={canContinue} />}
+            {cart?.payment_method === PaymentMethod.PAYSTACK && <PaystackPayment amount={cart.total} cartNumber={cart.cart_number} canContinue={canContinue} />}
+            {cart?.payment_method === PaymentMethod.BANK_TRANSFER && <BankTransfer amount={cart.total} canContinue={canContinue} />}
+            {cart?.payment_method === PaymentMethod.CASH_ON_DELIVERY && <Pickup amount={cart.total} canContinue={canContinue} />}
         </div>
     );
 };

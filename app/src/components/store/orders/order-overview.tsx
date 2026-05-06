@@ -1,51 +1,22 @@
 import { CheckCircle, Package, Calendar, Clock, RefreshCw, X, Truck } from "lucide-react";
-
-import type { Order, OrderStatus } from "@/schemas";
+import { Order, OrderStatus } from "@/schemas";
 import { cn, formatDate } from "@/utils";
+import { ReactElement } from "react";
 
 const OrderOverview = ({ order }: { order: Order }) => {
     const isPending = order.payment_status === "PENDING";
-    const getOrderStatusIcon = (status: OrderStatus) => {
-        switch (status) {
-            case "PENDING":
-                return <Clock className="h-4 w-4 text-orange-600" />;
-            case "PROCESSING":
-                return <RefreshCw className="h-4 w-4 text-blue-600" />;
-            case "SHIPPED":
-                return <Package className="h-4 w-4 text-purple-600" />;
-            case "OUT_FOR_DELIVERY":
-                return <Truck className="h-4 w-4 text-indigo-600" />;
-            case "DELIVERED":
-                return <CheckCircle className="h-4 w-4 text-green-600" />;
-            case "CANCELED":
-                return <X className="h-4 w-4 text-red-600" />;
-            case "REFUNDED":
-                return <RefreshCw className="h-4 w-4 text-gray-600" />;
-            default:
-                return <Clock className="h-4 w-4 text-orange-600" />;
-        }
+
+    const orderStatusConfig: Record<OrderStatus, { icon: ReactElement; color: string }> = {
+        [OrderStatus.PENDING]: { icon: <Clock className="h-4 w-4" />, color: "text-orange-600" },
+        [OrderStatus.PROCESSING]: { icon: <RefreshCw className="h-4 w-4" />, color: "text-blue-600" },
+        [OrderStatus.SHIPPED]: { icon: <Package className="h-4 w-4" />, color: "text-purple-600" },
+        [OrderStatus.OUT_FOR_DELIVERY]: { icon: <Truck className="h-4 w-4" />, color: "text-indigo-600" },
+        [OrderStatus.DELIVERED]: { icon: <CheckCircle className="h-4 w-4" />, color: "text-green-600" },
+        [OrderStatus.CANCELED]: { icon: <X className="h-4 w-4" />, color: "text-red-600" },
+        [OrderStatus.REFUNDED]: { icon: <RefreshCw className="h-4 w-4" />, color: "text-gray-600" },
     };
 
-    const getOrderStatusColor = (status: OrderStatus) => {
-        switch (status) {
-            case "PENDING":
-                return "text-orange-600";
-            case "PROCESSING":
-                return "text-blue-600";
-            case "SHIPPED":
-                return "text-purple-600";
-            case "OUT_FOR_DELIVERY":
-                return "text-indigo-600";
-            case "DELIVERED":
-                return "text-green-600";
-            case "CANCELED":
-                return "text-red-600";
-            case "REFUNDED":
-                return "text-gray-600";
-            default:
-                return "text-orange-600";
-        }
-    };
+    const { icon, color } = orderStatusConfig[order.status] ?? orderStatusConfig[OrderStatus.PENDING];
 
     const formatOrderStatus = (status: OrderStatus) => {
         return status
@@ -76,9 +47,9 @@ const OrderOverview = ({ order }: { order: Order }) => {
 
             <div className="mt-4 pt-4 border-t">
                 <div className="flex items-center space-x-2">
-                    {getOrderStatusIcon(order.status)}
+                    {icon}
                     <span className="font-medium">Order Status:</span>
-                    <span className={`text-sm font-medium ${getOrderStatusColor(order.status)}`}>{formatOrderStatus(order.status)}</span>
+                    <span className={`text-sm font-medium ${color}`}>{formatOrderStatus(order.status)}</span>
                 </div>
             </div>
 

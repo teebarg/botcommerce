@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { clientApi } from "@/utils/api.client";
-import { BankDetails, Chat, DeliveryOption, Message } from "@/schemas";
+import { BankDetails, Chat, ConversationStatus, DeliveryOption, Message } from "@/schemas";
 
 export const useBankDetails = () => {
     return useQuery({
@@ -12,7 +12,7 @@ export const useBankDetails = () => {
 
 export const useChat = (uid: string) => {
     return useQuery({
-        queryKey: ["chats", uid],
+        queryKey: ["chat", uid],
         queryFn: () => clientApi.get<Chat>(`/chat/${uid}`),
         staleTime: 1000 * 60 * 5,
     });
@@ -33,17 +33,28 @@ export const useChatMutation = () => {
     });
 };
 
+
+export const useChatStatusMutation = () => {
+    return useMutation({
+        mutationFn: async ({ conversationUuid, status }: { conversationUuid: string; status: ConversationStatus }) => {
+            return await clientApi.post<Message>("/chat/status", {
+                conversation_uuid: conversationUuid,
+                status,
+            });
+        },
+        onError: (error) => {
+            toast.error("Failed to chat" + error);
+        },
+    });
+};
+
 export const useAdminMessageMutation = () => {
-    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ conversationUuid, message }: { conversationUuid: string; message: string }) => {
-            return await clientApi.post<{ reply: string; conversation_uuid: string }>("/chat/support", {
+            return await clientApi.post<Message>("/chat/support", {
                 conversation_uuid: conversationUuid,
                 message: message,
             });
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["chats"] });
         },
         onError: (error) => {
             toast.error("Failed to chat" + error);

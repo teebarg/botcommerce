@@ -3,10 +3,11 @@ import type * as React from "react";
 import { cn } from "@/utils";
 import LocalizedClientLink from "@/components/ui/link";
 import { buttonVariants } from "@/components/ui/button";
+import { ButtonVariant } from "@/schemas";
 
 interface BtnLinkProps {
     children: React.ReactNode;
-    variant?: "secondary" | "default" | "destructive" | "warning" | "success" | "success-subtle" | "outline";
+    variant?: ButtonVariant;
     size?: "sm" | "lg" | "icon";
     className?: string;
     href: string;

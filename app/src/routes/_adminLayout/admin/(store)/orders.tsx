@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Search } from "lucide-react";
-import type { Order, PaginatedOrders } from "@/schemas";
+import { OrderStatusSchema, type Order, type PaginatedOrders } from "@/schemas";
 import OrderCard from "@/components/admin/orders/order-card";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import OrderFilters from "@/components/admin/orders/order-filters";
@@ -14,7 +14,7 @@ import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 export const Route = createFileRoute("/_adminLayout/admin/(store)/orders")({
     validateSearch: z.object({
         search: z.string().optional(),
-        status: z.enum(["ACTIVE", "COMPLETED", "ABANDONED", "DELIVERED"]).optional(),
+        status: OrderStatusSchema.optional(),
         start_date: z.string().optional(),
         end_date: z.string().optional(),
     }),

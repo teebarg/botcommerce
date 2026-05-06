@@ -1,12 +1,15 @@
 import type React from "react";
 import { Mail } from "lucide-react";
-import type { Chat, ChatMessage, ConversationStatus } from "@/schemas";
+import { BadgeVariant, Chat, ChatMessage, ConversationStatus } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
 import AdminChatMessage from "./chat-message";
-import { useAdminMessageMutation, useChatHandOff } from "@/hooks/useApi";
+import { useAdminMessageMutation, useChatHandOff, useChatStatusMutation } from "@/hooks/useApi";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useWebSocket } from "pulsews";
 import { chatAvatar, ChatInput } from "@/utils/reuseable";
+import { Button } from "@/components/ui/button";
+import { useOverlayTriggerState } from "react-stately";
+import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 
 const StatusBadge = ({ status }: { status: ConversationStatus }) => {
     const labels = {
@@ -15,7 +18,7 @@ const StatusBadge = ({ status }: { status: ConversationStatus }) => {
         ["COMPLETED"]: "Completed",
     };
 
-    const variants: Record<ConversationStatus, "destructive" | "success-subtle" | "warning"> = {
+    const variants: Record<ConversationStatus, BadgeVariant> = {
         ["ABANDONED"]: "destructive",
         ["ACTIVE"]: "success-subtle",
         ["COMPLETED"]: "warning",
@@ -25,10 +28,12 @@ const StatusBadge = ({ status }: { status: ConversationStatus }) => {
 };
 
 const ChatViewer: React.FC<{ chat: Chat; onClose: () => void }> = ({ chat, onClose }) => {
+    const state = useOverlayTriggerState({});
     const [messages, setMessages] = useState<ChatMessage[]>(chat.messages);
     const scrollRef = useRef<HTMLDivElement>(null);
     const handOff = useChatHandOff();
     const send = useAdminMessageMutation();
+    const closeChat = useChatStatusMutation();
     const { lastMessage } = useWebSocket();
 
     useEffect(() => {
@@ -66,6 +71,9 @@ const ChatViewer: React.FC<{ chat: Chat; onClose: () => void }> = ({ chat, onClo
             message: message,
         });
     };
+    const onConfirmClose = () => {
+        closeChat.mutateAsync({ conversationUuid: chat.conversation_uuid, status: ConversationStatus.COMPLETED });
+    };
     return (
         <div className="flex-1 flex flex-col overflow-hidden">
             <div className="flex items-center justify-between bg-background border-b border-border py-4 px-2.5">
@@ -79,11 +87,24 @@ const ChatViewer: React.FC<{ chat: Chat; onClose: () => void }> = ({ chat, onClo
                         </div>
                     </div>
                 </div>
-                <div className="pr-12">
+                <div className="pr-12 flex items-center gap-2">
+                    {chat.status == ConversationStatus.ACTIVE && (
+                        <ConfirmDrawer
+                            open={state.isOpen}
+                            onOpenChange={state.setOpen}
+                            onClose={state.close}
+                            onConfirm={onConfirmClose}
+                            trigger={
+                                <Button size="xxs" variant="accent">Close</Button>
+                            }
+                            title="Complete Chat"
+                            description="This action cannot be undone. This will permanently close the chat."
+                            isLoading={closeChat.isPending}
+                        />
+                    )}
                     <StatusBadge status={chat.status} />
                 </div>
             </div>
-
             <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.map((msg) => {
                     return (

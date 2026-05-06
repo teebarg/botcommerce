@@ -31,61 +31,55 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false, in
     };
 
     return (
-        <div
-            className={cn("bg-card rounded-2xl border-2 overflow-hidden slide-in", isActive ? "border-primary" : "border-border")}
-            style={{ animationDelay: `${index * 50}ms` }}
-        >
-            <div className="p-4">
-                <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-primary">
-                        <Home className="w-5 h-5 text-white" />
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold">
-                                {address?.first_name} {address?.last_name}
-                            </h3>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                            {address.address_1}
-                            {address.address_2 && <span>, {address.address_2}</span>}
-                        </p>
-                        <p className="text-sm text-muted-foreground">{address.state}</p>
-                    </div>
+        <div className={cn("bg-card rounded-2xl border-2 overflow-hidden p-4", isActive ? "border-primary" : "border-border")}>
+            <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-primary">
+                    <Home className="w-5 h-5 text-white" />
                 </div>
 
-                <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
-                    <SheetDrawer
-                        open={editState.isOpen}
-                        title="Edit address"
-                        trigger={
-                            <Button variant="accent" size="sm" className="text-xs">
-                                <Edit3 className="w-3 h-3 mr-1" />
-                                Edit
-                            </Button>
-                        }
-                        onOpenChange={editState.setOpen}
-                        showHeader={true}
-                    >
-                        <AddressForm mode="edit" address={address} onClose={editState.close} />
-                    </SheetDrawer>
-                    <ConfirmDrawer
-                        open={deleteState.isOpen}
-                        onOpenChange={deleteState.setOpen}
-                        trigger={
-                            <Button variant="destructive" size="sm" className="text-xs">
-                                <Trash2 className="w-3 h-3 mr-1" />
-                                Delete
-                            </Button>
-                        }
-                        onClose={deleteState.close}
-                        onConfirm={onConfirmDelete}
-                        title={`Delete ${address.first_name}`}
-                        description="Are you sure you want to delete this address? This action cannot be undone."
-                        isLoading={deleteAddress.isPending}
-                    />
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-semibold">
+                            {address?.first_name} {address?.last_name}
+                        </h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                        {address.address_1}
+                        {address.address_2 && <span>, {address.address_2}</span>}
+                    </p>
+                    <p className="text-sm text-muted-foreground">{address.state}</p>
                 </div>
+            </div>
+            <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
+                <SheetDrawer
+                    open={editState.isOpen}
+                    title="Edit address"
+                    trigger={
+                        <Button variant="accent" size="sm" className="text-xs">
+                            <Edit3 className="w-3 h-3 mr-1" />
+                            Edit
+                        </Button>
+                    }
+                    onOpenChange={editState.setOpen}
+                    showHeader={true}
+                >
+                    <AddressForm mode="edit" address={address} onClose={editState.close} />
+                </SheetDrawer>
+                <ConfirmDrawer
+                    open={deleteState.isOpen}
+                    onOpenChange={deleteState.setOpen}
+                    trigger={
+                        <Button variant="destructive" size="sm" className="text-xs">
+                            <Trash2 className="w-3 h-3 mr-1" />
+                            Delete
+                        </Button>
+                    }
+                    onClose={deleteState.close}
+                    onConfirm={onConfirmDelete}
+                    title={`Delete ${address.first_name}`}
+                    description="Are you sure you want to delete this address? This action cannot be undone."
+                    isLoading={deleteAddress.isPending}
+                />
             </div>
         </div>
     );

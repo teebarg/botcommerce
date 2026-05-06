@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MessageCircle, Sparkles, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChatWidget } from "./ChatWidget";
 import { useConfig } from "@/providers/store-provider";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { useLocation } from "@tanstack/react-router";
 
 const ChatHeader = ({ onClose }: { onClose: () => void }) => {
     return (
@@ -25,8 +26,18 @@ const ChatHeader = ({ onClose }: { onClose: () => void }) => {
 export const ChatBubble = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const { isMobile } = useMediaQuery()
-
     const { config } = useConfig();
+    const location = useLocation();
+    const isFirstRender = useRef(true);
+
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+        setIsOpen(false);
+    }, [location.pathname]);
+
     if (config?.feature_chatbot != "true") {
         return null;
     }
@@ -75,7 +86,7 @@ export const ChatBubble = () => {
                         style={{ boxShadow: "0 0 30px hsl(350 89% 60% / 0.4)", bottom: "calc(100px + var(--sab))" }}
                     >
                         <MessageCircle className="w-6 h-6 text-primary-foreground" />
-                        <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-green-400 border-2 border-background" />
+                        <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-success" />
                     </motion.button>
                 )}
             </AnimatePresence>

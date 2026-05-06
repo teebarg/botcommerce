@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useWebSocket } from "pulsews";
 import { useRouteContext } from "@tanstack/react-router";
-import { useChat, useChatMutation } from "@/hooks/useApi";
-import { ChatMessage, ChatResponse, MessageSender } from "@/schemas";
+import { useChat, useChatMutation, useChatStatusMutation } from "@/hooks/useApi";
+import { ChatMessage, ChatResponse, ConversationStatus, MessageSender } from "@/schemas";
 import { getSessionId } from "@/utils";
 
 const generateId = () => Math.random();
@@ -14,7 +14,7 @@ const WELCOME_MESSAGES: ChatMessage[] = [
     {
         id: generateId(),
         sender: "BOT",
-        content: "Hi! I'm Alex from support 👋 How can I help you today?",
+        content: "Hi! I'm Seun from support 👋 How can I help you today?",
         timestamp: now(),
     },
     {
@@ -67,6 +67,7 @@ export const useSupportChat = () => {
     const [humanConnected, setHumanConnected] = useState<boolean>(false);
     const { data: dbHistory, isLoading: historyLoading } = useChat(getChatSessionId());
     const userSendChat = useChatMutation();
+    const closeChat = useChatStatusMutation();
 
     const isDisabled = useMemo(() => {
         return loading || isTyping || (messages.at(-1)?.metadata?.escalated && messages.at(-1)?.sender == "BOT");
@@ -76,6 +77,12 @@ export const useSupportChat = () => {
         if (historyLoading) return;
 
         if (dbHistory) {
+            if (dbHistory.status != ConversationStatus.ACTIVE) {
+                localStorage.removeItem(STORAGE_KEY);
+                localStorage.removeItem(CHAT_SESSION_KEY);
+                setMessages(WELCOME_MESSAGES);
+                return;
+            }
             const messagesToSet = dbHistory.messages.length > 0 ? [...WELCOME_MESSAGES, ...dbHistory.messages] : WELCOME_MESSAGES;
             setMessages(messagesToSet);
             saveHistory(messagesToSet);
@@ -112,9 +119,13 @@ export const useSupportChat = () => {
     }, []);
 
     const clearHistory = useCallback(() => {
-        localStorage.removeItem(STORAGE_KEY);
-        localStorage.removeItem(CHAT_SESSION_KEY);
-        setMessages(WELCOME_MESSAGES);
+        const conversationUuid = localStorage.getItem("chat_session_id");
+        if (!conversationUuid) return
+        closeChat.mutateAsync({conversationUuid, status: ConversationStatus.ABANDONED}).then(() => {
+            localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(CHAT_SESSION_KEY);
+            setMessages(WELCOME_MESSAGES);
+        })
     }, []);
 
     const handleSendMessage = async (text: string, _file?: File) => {

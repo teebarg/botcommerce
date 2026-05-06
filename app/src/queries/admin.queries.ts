@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { getUsersFn } from "@/server/users.server";
-import { ConversationStatus, PaginatedAbandonedCarts, PaginatedActivities, PaginatedChats, PaginatedCoupons } from "@/schemas";
+import { CartStatus, PaginatedAbandonedCarts, PaginatedActivities, PaginatedChats, PaginatedCoupons } from "@/schemas";
 import { clientApi } from "@/utils/api.client";
 import { StatsTrends } from "@/types/models";
 
@@ -61,7 +61,7 @@ export const abandonedCartsQuery = (params: { search?: string; hours_threshold?:
     queryFn: () => clientApi.get<PaginatedAbandonedCarts>("/cart/abandoned-carts", { params }),
 });
 
-export const chatsQuery = (params: { user_id?: number; status?: ConversationStatus }) =>
+export const chatsQuery = (params: { user_id?: number; status?: CartStatus }) =>
     queryOptions({
         queryKey: ["chats", JSON.stringify(params)],
         queryFn: () => clientApi.get<PaginatedChats>("/chat/", { params }),

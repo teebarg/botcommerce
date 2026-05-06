@@ -2,7 +2,7 @@ import type React from "react";
 import { useOverlayTriggerState } from "react-stately";
 import PaymentStatusManager from "./order-payment-status";
 import { Button } from "@/components/ui/button";
-import type { Order, OrderStatus } from "@/schemas";
+import { ButtonVariant, Order, OrderStatus } from "@/schemas";
 import { useChangeOrderStatus } from "@/hooks/useOrder";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 
@@ -11,52 +11,53 @@ interface OrderProcessingActionProps {
 }
 
 const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) => {
+
     const statusConfig: Record<
-        "PENDING" | "PROCESSING" | "SHIPPED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELED" | "REFUNDED",
+        OrderStatus,
         {
             label: string;
             nextStatus: OrderStatus | null;
             actionLabel: string;
-            variant: "default" | "destructive" | "accent" | "accent-subtle" | "secondary" | "success" | "warning" |"warning-subtle";
+            variant: ButtonVariant;
         }
     > = {
-        REFUNDED: {
+        [OrderStatus.REFUNDED]: {
             label: "Refunded",
             nextStatus: null,
             actionLabel: "",
             variant: "destructive",
         },
-        PENDING: {
+        [OrderStatus.PENDING]: {
             label: "Pending",
-            nextStatus: "PROCESSING" as const,
+            nextStatus: OrderStatus.PROCESSING,
             actionLabel: "Mark as Processing",
             variant: "warning",
         },
-        PROCESSING: {
+        [OrderStatus.PROCESSING]: {
             label: "Processing",
-            nextStatus: "SHIPPED" as const,
+            nextStatus: OrderStatus.SHIPPED,
             actionLabel: "Order Packed",
             variant: "warning-subtle",
         },
-        SHIPPED: {
+        [OrderStatus.SHIPPED]: {
             label: "Order Packed",
-            nextStatus: "OUT_FOR_DELIVERY" as const,
+            nextStatus: OrderStatus.OUT_FOR_DELIVERY,
             actionLabel: "Mark Out for Delivery",
             variant: "accent-subtle",
         },
-        OUT_FOR_DELIVERY: {
+        [OrderStatus.OUT_FOR_DELIVERY]: {
             label: "Out for Delivery",
-            nextStatus: "DELIVERED" as const,
+            nextStatus: OrderStatus.DELIVERED,
             actionLabel: "Mark Delivered",
             variant: "accent",
         },
-        DELIVERED: {
+        [OrderStatus.DELIVERED]: {
             label: "Delivered",
             nextStatus: null,
             actionLabel: "",
             variant: "success",
         },
-        CANCELED: {
+        [OrderStatus.CANCELED]: {
             label: "Cancelled",
             nextStatus: null,
             actionLabel: "",

@@ -12,7 +12,7 @@ import {
 } from "./enums";
 import { ProductVariantLiteSchema } from "./product";
 import { type Address, AddressSchema } from "./address";
-import { UserMiniSchema, UserSchema } from "./user";
+import { UserMiniSchema } from "./user";
 import { CursorSchema } from "./common";
 
 export const CartItemSchema = z

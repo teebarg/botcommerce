@@ -1,6 +1,6 @@
 import type React from "react";
 import { ProductReviewsZeroState } from "../store/reviews/review-zero";
-import type { PaginatedReview, Review, ReviewStatus, SortBy } from "@/schemas";
+import type { Review, ReviewStatus, SortBy } from "@/schemas";
 import { useQuery } from "@tanstack/react-query";
 import { clientApi } from "@/utils/api.client";
 import { Card } from "@/components/ui/card";

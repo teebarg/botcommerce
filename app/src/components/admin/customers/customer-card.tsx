@@ -1,4 +1,4 @@
-import type { User } from "@/schemas";
+import type { BadgeVariant, User } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
 import CustomerActions from "./customer-actions";
 
@@ -10,7 +10,7 @@ const CustomerCard = ({ user }: CustomerCardProps) => {
     const fullName = `${user?.first_name} ${user?.last_name}`;
 
     const getStatusBadge = (status?: any) => {
-        const variants: Record<any, "destructive" | "success-subtle" | "warning"> = {
+        const variants: Record<any, BadgeVariant> = {
             ["PENDING"]: "warning",
             ["ACTIVE"]: "success-subtle",
             ["INACTIVE"]: "destructive",

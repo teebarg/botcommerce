@@ -3,7 +3,7 @@ import { useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { Filter, Search, X } from "lucide-react";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
-import type { OrderStatus } from "@/schemas";
+import { OrderStatus } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -67,7 +67,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = () => {
                         </SelectTrigger>
                         <SelectContent>
                             {/* <SelectItem value="">All Status</SelectItem> */}
-                            {["PENDING", "PROCESSING", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELED", "REFUNDED"].map((status) => (
+                            {Object.values(OrderStatus).map((status) => (
                                 <SelectItem key={status} value={status}>
                                     {status}
                                 </SelectItem>
@@ -87,9 +87,8 @@ const OrderFilters: React.FC<OrderFiltersProps> = () => {
             </div>
             <div className="flex flex-wrap md:hidden gap-2 overflow-x-auto pb-2 mb-4">
                 <button
-                    className={`px-3 py-1.5 text-sm rounded-full whitespace-nowrap ${
-                        !search.status ? "bg-primary text-white" : "bg-gray-100 text-gray-700"
-                    }`}
+                    className={`px-3 py-1.5 text-sm rounded-full whitespace-nowrap ${!search.status ? "bg-primary text-white" : "bg-gray-100 text-gray-700"
+                        }`}
                     onClick={() => updateStatusQuery()}
                 >
                     All
@@ -103,9 +102,8 @@ const OrderFilters: React.FC<OrderFiltersProps> = () => {
                 ].map((item: { status: string; label: string; color: string }, idx: number) => (
                     <button
                         key={idx}
-                        className={`px-3 py-1.5 text-sm rounded-full whitespace-nowrap ${
-                            search.status === item.status ? item.color + " text-white" : "bg-gray-200 text-gray-700"
-                        }`}
+                        className={`px-3 py-1.5 text-sm rounded-full whitespace-nowrap ${search.status === item.status ? item.color + " text-white" : "bg-gray-200 text-gray-700"
+                            }`}
                         onClick={() => updateStatusQuery(item.status as OrderStatus)}
                     >
                         {item.label}

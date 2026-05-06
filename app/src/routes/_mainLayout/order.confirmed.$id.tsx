@@ -8,6 +8,7 @@ import { orderQuery } from "@/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { gtag } from "@/utils/gtag";
+import { PaymentMethod } from "@/schemas";
 
 export const Route = createFileRoute("/_mainLayout/order/confirmed/$id")({
     ssr: false,
@@ -65,7 +66,7 @@ function RouteComponent() {
         return <div className="flex items-center justify-center py-12 px-2 bg-secondary">Order not found</div>;
     }
 
-    if (order?.payment_method === "CASH_ON_DELIVERY") {
+    if (order?.payment_method === PaymentMethod.CASH_ON_DELIVERY) {
         return (
             <div className="px-2 pb-8">
                 <OrderPickup onContinueShopping={onContinueShopping} order={order} />
