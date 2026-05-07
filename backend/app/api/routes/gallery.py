@@ -505,7 +505,6 @@ async def update_image_metadata(
     return {"success": True}
 
 async def _process_single_image(
-    tx,
     image,
     payload: ImagesBulkUpdate,
     created_product_ids: list,
@@ -513,35 +512,37 @@ async def _process_single_image(
     if image.product_id is None:
         name: str = f"{random.choice(['Classic', 'Premium', 'Superior', 'Deluxe', 'Luxury'])} {random.randint(10000, 99999)}"
         slug: str = slugify(name)
+        sku_product: str = generate_sku()
+        sku_variant: str = generate_sku()
 
-        existing = await tx.product.find_first(where={"slug": slug})
+        existing = await db.product.find_first(where={"slug": slug})
         if existing:
             slug = f"{slug}-{generate_sku().lower()}"
 
         product_data: dict[str, Any] = {
             "name": name,
             "slug": slug,
-            "sku": generate_sku(),
+            "sku": sku_product,
             "active": payload.data.active if payload.data.active is not None else True,
             "is_new": payload.data.is_new or False,
             **build_relation_data(payload.data.category_ids, payload.data.collection_ids),
         }
-        product = await tx.product.create(data=product_data)
-        created_product_ids.append(product.id)
-
-        await tx.productimage.update(
-            where={"id": image.id},
-            data={"product": {"connect": {"id": product.id}}},
-        )
-
         variant_data = {
-            "sku": generate_sku(),
-            "product_id": product.id,
+            "sku": sku_variant,
             "price": payload.data.price or 1,
             "inventory": payload.data.inventory or 0,
             **build_variant_data(payload.data),
         }
-        await tx.productvariant.create(data=variant_data)
+
+        async with db.tx() as tx:
+            product = await tx.product.create(data=product_data)
+            await tx.productimage.update(
+                where={"id": image.id},
+                data={"product": {"connect": {"id": product.id}}},
+            )
+            await tx.productvariant.create(data={**variant_data, "product_id": product.id})
+
+        created_product_ids.append(product.id)
 
     else:
         created_product_ids.append(image.product_id)
@@ -556,15 +557,21 @@ async def _process_single_image(
         if payload.data.active is not None:
             relation_updates["active"] = payload.data.active
 
-        if relation_updates:
-            await tx.product.update(where={"id": image.product_id}, data=relation_updates)
-
         variant_data = build_variant_data(payload.data)
-        if variant_data and image.product and image.product.variants:
-            await tx.productvariant.update(
-                where={"id": image.product.variants[0].id},
-                data=variant_data,
-            )
+        first_variant_id = (
+            image.product.variants[0].id
+            if variant_data and image.product and image.product.variants
+            else None
+        )
+
+        async with db.tx() as tx:
+            if relation_updates:
+                await tx.product.update(where={"id": image.product_id}, data=relation_updates)
+            if variant_data and first_variant_id:
+                await tx.productvariant.update(
+                    where={"id": first_variant_id},
+                    data=variant_data,
+                )
 
 
 async def handle_bulk_update_products(payload: ImagesBulkUpdate, images) -> None:
@@ -573,8 +580,7 @@ async def handle_bulk_update_products(payload: ImagesBulkUpdate, images) -> None
 
     async def _process_with_tx(image):
         try:
-            async with db.tx() as tx:
-                await _process_single_image(tx, image, payload, created_product_ids)
+            await _process_single_image(image=image, payload=payload, created_product_ids=created_product_ids)
         except Exception as e:
             logger.error(f"Error processing image {image.id}: {e}")
             failed_ids.append(image.id)
