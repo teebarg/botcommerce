@@ -36,3 +36,7 @@ class ChatRequest(BaseModel):
 
 class ChatHandoffRequest(BaseModel):
     conversation_uuid: str
+
+class ChatCloseRequest(BaseModel):
+    conversation_uuid: str
+    status: ConversationStatus

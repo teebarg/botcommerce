@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from app.prisma_client import prisma as db
 
 async def get_conversation(uuid: str):

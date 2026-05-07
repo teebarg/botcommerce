@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException, Query, Depends
+from app.services.redis import cache_response, refresh_data
+from fastapi import APIRouter, HTTPException, Query, Depends, Request
 from app.prisma_client import prisma as db
 from app.models.faq import FAQ, FAQCreate, FAQUpdate
 from typing import Optional, List
@@ -8,7 +9,9 @@ from app.core.permissions import require_admin
 router = APIRouter()
 
 @router.get("/")
+@cache_response(key_prefix="faqs")
 async def list_faqs(
+    request: Request,
     query: Optional[str] = Query(None, min_length=1, description="Search query for FAQ questions"),
     category: Optional[str] = Query(None, description="Filter by category"),
     is_active: Optional[bool] = Query(None, description="Filter by active status")
@@ -37,6 +40,7 @@ async def create_faq(faq: FAQCreate)-> FAQ:
                 "is_active": faq.is_active
             }
         )
+        await refresh_data(patterns=["faqs"])
         return new_faq
     except Exception as e:
         if "unique constraint" in str(e).lower():
@@ -66,6 +70,7 @@ async def update_faq(faq_update: FAQUpdate, id: int)-> FAQ:
             where={"id": id},
             data=update_data
         )
+        await refresh_data(patterns=["faqs"])
         return updated_faq
     except Exception as e:
         if "unique constraint" in str(e).lower():
@@ -80,4 +85,5 @@ async def delete_faq(id: int)-> Message:
         raise HTTPException(status_code=404, detail="FAQ not found")
 
     await db.faq.delete(where={"id": id})
-    return Message(detail="FAQ deleted successfully")
+    await refresh_data(patterns=["faqs"])
+    return Message(message="FAQ deleted successfully")

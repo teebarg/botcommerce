@@ -1,8 +1,9 @@
+from app.services.redis import refresh_data
 from fastapi import APIRouter, HTTPException, Query, Depends
 from app.prisma_client import prisma as db
 from typing import Optional
 from prisma.enums import ConversationStatus
-from app.models.chat import PaginatedChats, Chat, ChatRequest, ChatHandoffRequest
+from app.models.chat import ChatCloseRequest, PaginatedChats, Chat, ChatRequest, ChatHandoffRequest
 from app.models.generic import Message
 from app.services.websocket import manager
 from app.redis_client import redis_client
@@ -31,6 +32,7 @@ async def admin_chat(payload: ChatRequest) -> Message:
                 "sender": "SYSTEM",
             }
         )
+        await refresh_data(patterns=["chats", f"chat:{payload.conversation_uuid}"])
     except Exception as e:
         logger.error(f"Failed to send message: {e}")
         raise HTTPException(status_code=400, detail="Failed to send message")
@@ -65,6 +67,7 @@ async def customer_chat(payload: ChatRequest) -> Message:
             "sender": "USER",
         }
     )
+    await refresh_data(patterns=["chats", f"chat:{payload.conversation_uuid}"])
 
     await manager.send_to_user(
         user_id=str(conversation.support_id),
@@ -88,6 +91,8 @@ async def handoff(payload: ChatHandoffRequest, user: CurrentUser) -> Message:
         where={"id": conversation.id},
         data={"support_id": user.id, "support_name": f"{user.first_name} {user.last_name}" ,"human_connected": True, "last_active": datetime.utcnow() },
     )
+
+    await refresh_data(patterns=["chats", f"chat:{payload.conversation_uuid}"])
 
     await manager.send_to_user(
         user_id=customer,
@@ -149,3 +154,17 @@ async def delete_chat(id: int) -> Message:
         await tx.message.delete_many(where={"conversation_id": id})
         await tx.conversation.delete(where={"id": id})
         return {"message": "conversation deleted successfully"}
+
+
+@router.post("/status")
+async def status(payload: ChatCloseRequest) -> Message:
+    conversation = await get_conversation(payload.conversation_uuid)
+
+    await db.conversation.update(
+        where={"id": conversation.id},
+        data={"status": payload.status },
+    )
+
+    await refresh_data(patterns=["chats", f"chat:{payload.conversation_uuid}"])
+
+    return Message(message="Chat status updated successfully")

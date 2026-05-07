@@ -78,5 +78,4 @@ async def delete_delivery_option(
     )
 
     await refresh_data(patterns=["delivery"])
-
-    return {"message": "Delivery option deleted successfully"}
+    return Message(message="Delivery option deleted successfully")
