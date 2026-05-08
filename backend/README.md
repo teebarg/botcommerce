@@ -1,67 +1,136 @@
-# Python Service
+# 🛒 Revoque E-commerce Backend API
 
-[![Python Version](https://img.shields.io/badge/python-3.11-blue.svg)](https://python.org)
+A comprehensive, modern e-commerce backend built with **FastAPI**, **Prisma**, and **PostgreSQL**. Features complete store management, user authentication, payment processing, and real-time notifications.
 
-## Introduction
+[![Python Version](https://img.shields.io/badge/python-3.10+-blue.svg)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.114+-green.svg)](https://fastapi.tiangolo.com)
+[![Prisma](https://img.shields.io/badge/Prisma-ORM-purple.svg)](https://prisma.io)
 
-This is a FastAPI project built with Python 3.11. FastAPI is a modern, fast, web framework for building APIs with Python based on standard Python type hints. This project serves as a starting point for building scalable and high-performance APIs.
+---
 
-## Features
+## 🚀 Features
 
-- FastAPI-based API with automatic validation, serialization, and documentation
-- Python 3.11 with type hinting for enhanced code readability and maintainability
-- Asynchronous support to handle high-concurrency scenarios
-- Built-in Swagger UI and ReDoc for API documentation
-- JWT authentication (Optional, if your project needs authentication)
-- Dockerized setup for easy deployment (Optional)
+### Core E-commerce
+- **Product Management**: Catalog, categories, brands, collections, variants
+- **Order Processing**: Cart management, checkout, order tracking, status updates
+- **User Management**: Authentication, profiles, addresses, wallet system
+- **Payment Integration**: Multiple payment gateways, transaction processing
+- **Reviews & Ratings**: Customer feedback, product reviews
 
-## Requirements
+### Advanced Features
+- **Real-time Notifications**: WebSockets, push notifications, email alerts
+- **Search & Discovery**: MeiliSearch integration, advanced filtering
+- **Content Management**: CMS, galleries, carousels, FAQs
+- **Analytics & Insights**: User interactions, activity tracking
+- **Multi-vendor Support**: Brand management, store settings
+- **Coupon System**: Discount codes, promotions, loyalty programs
 
-- Python 3.11
-- Pip (package manager)
+### Technical Features
+- **FastAPI**: Modern async API with automatic validation & documentation
+- **Prisma ORM**: Type-safe database operations with PostgreSQL
+- **JWT Authentication**: Secure user authentication & authorization
+- **Redis**: Caching, session management, and pub/sub
+- **File Storage**: Cloudinary integration for media assets
+- **WebSocket Support**: Real-time communication
+- **Docker Ready**: Containerized deployment setup
 
-## Installation
+## 🛠️ Technology Stack
 
-1. Clone the repository:
+- **Backend**: FastAPI, Python 3.10+
+- **Database**: PostgreSQL with Prisma ORM
+- **Cache**: Redis for caching and sessions
+- **Search**: MeiliSearch for product search
+- **Storage**: Cloudinary for media files
+- **Authentication**: JWT with bcrypt password hashing
+- **Notifications**: Email, push notifications, WebSockets
+- **File Processing**: PDF generation with ReportLab
+- **Monitoring**: Sentry for error tracking
+- **Package Manager**: UV for fast dependency management
 
+## ⚡ Quick Start
+
+### Prerequisites
+- Python 3.10+
+- PostgreSQL database
+- Redis server
+- UV (recommended package manager)
+
+### 1. Clone & Install
 ```bash
 git clone https://github.com/teebarg/botcommerce
-cd botcommerce
+cd backend
+uv sync
 ```
 
-2. Create a virtual environment (optional but recommended):
-
+### 2. Set Up Environment
 ```bash
-python3.11 -m venv venv
-source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+cp .env.example .env
+# Edit .env with your database URLs and API keys
 ```
 
-3. Install the dependencies:
-
+### 3. Database Setup
 ```bash
-pip install -r requirements.txt
+# Generate Prisma client
+uv run prisma generate
 
+# Run database migrations
+uv run prisma migrate dev
+
+# Seed database (optional)
+uv run prisma db seed
 ```
 
-## Configuration
-
-The project includes a config.py file where you can configure various settings, such as database connection, JWT secret key, etc.
-
-## Run the Application
-To run the FastAPI application, use the following command:
-
+### 4. Start the Application
 ```bash
-uvicorn main:app --reload
+# Development mode with hot reload
+uv run uvicorn app.api.main:app --reload --host 0.0.0.0 --port 4030
 
+# Production mode
+uv run uvicorn app.api.main:app --host 0.0.0.0 --port 4030
 ```
 
-main is the name of the main module (e.g., the filename without the .py extension).
-app is the name of the FastAPI application instance.
-The API will be available at <http://localhost:8000>.
+The API will be available at **http://localhost:4030**
 
-## API Documentation
+## 📚 API Documentation
 
-Swagger UI: <http://localhost:4030/docs>
-ReDoc: <http://localhost:4030/redoc>
+- **Swagger UI**: http://localhost:4030/docs
+- **ReDoc**: http://localhost:4030/redoc
+- **OpenAPI Schema**: http://localhost:4030/openapi.json
 
- sudo lsof -t -i tcp:8000 | xargs kill -9
+---
+
+## 🏗️ Project Structure
+
+```
+backend/
+├── app/
+│   ├── api/
+│   │   ├── main.py              # FastAPI app and router setup
+│   │   └── routes/              # API endpoint modules
+│   │       ├── auth.py          # Authentication endpoints
+│   │       ├── users.py         # User management
+│   │       ├── product.py       # Product operations
+│   │       ├── cart.py          # Shopping cart
+│   │       ├── order.py         # Order management
+│   │       ├── payment.py       # Payment processing
+│   │       ├── reviews.py       # Product reviews
+│   │       ├── notification.py  # Notification system
+│   │       ├── websocket.py     # WebSocket handlers
+│   │       └── ...              # 25+ route modules
+│   ├── core/
+│   │   ├── config.py            # Application configuration
+│   │   ├── security.py          # Security utilities
+│   │   ├── deps.py              # Dependency injection
+│   │   └── notifications/       # Notification system
+│   ├── models/                  # Pydantic models
+│   ├── services/                # Business logic
+│   └── utils/                   # Utility functions
+├── prisma/
+│   ├── schema.prisma           # Database schema
+│   ├── migrations/             # Database migrations
+│   └── seed.py                 # Database seeding
+├── scripts/                    # Utility scripts
+├── pyproject.toml              # UV configuration
+├── Dockerfile                  # Docker configuration
+└── .env.example               # Environment template
+```

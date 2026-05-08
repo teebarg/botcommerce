@@ -1,7 +1,8 @@
-# 🤖 Customer Support Agent
+# 🤖 Revoque Customer Support Agent
 
-An agentic AI customer support system built with **LangChain**, **Qdrant**, **RAG**, and **FastAPI**.
-Runs on Groq — deployable on 500MB free tier servers.
+An advanced agentic AI customer support system built with **LangGraph**, **LangChain**, **Qdrant**, **RAG**, and **FastAPI**.
+Features intelligent conversation flows, forms, quick replies, and comprehensive observability.
+Runs on multiple LLM providers — deployable on 500MB free tier servers.
 
 ---
 
@@ -14,17 +15,21 @@ Your App
 ┌─────────────────────────────┐
 │   FastAPI (Render 500MB)    │
 │                             │
-│   LangChain ReAct Agent     │
+│   LangGraph Agent           │
 │   ├── search_products       │──► Qdrant (free cloud)
 │   ├── search_faqs           │──► Qdrant (free cloud)
 │   ├── search_policies       │──► Qdrant (free cloud)
 │   ├── check_order_status    │──► shop API
 │   ├── check_stock           │──► shop API
 │   ├── request_refund        │──► shop API
-│   └── escalate_to_human     │──► Human Helpdesk
+│   ├── escalate_to_human     │──► Human Helpdesk
+│   ├── intent classification │──► LLM
+│   ├── form generation       │──► Dynamic UI
+│   └── quick replies         │──► Contextual
 │                             │
-│   LLM: Groq (prod)          │
+│   LLM: Groq/Claude/Others   │
 │   Memory: Redis (session)   │
+│   Observability: Langfuse   │
 └─────────────────────────────┘
 ```
 
@@ -35,12 +40,13 @@ Your App
 ### Prerequisites
 - Python 3.11+
 - Docker (optional, for Redis)
+- UV (recommended package manager)
 
 ### 1. Clone & Install
 ```bash
-git clone <your-repo>
-cd customer-support-agent
-pip install -r requirements.txt
+git clone https://github.com/teebarg/botcommerce
+cd agent
+uv sync
 ```
 
 ### 2. Set Up Environment
@@ -93,16 +99,22 @@ Set these in your Render service settings:
 |---|---|
 | `ENV` | `production` |
 | `GROQ_API_KEY` | From console.groq.com |
+| `ANTHROPIC_API_KEY` | From console.anthropic.com |
+| `GOOGLE_API_KEY` | From Google AI Studio |
 | `QDRANT_URL` | From cloud.qdrant.io |
 | `QDRANT_API_KEY` | From cloud.qdrant.io |
 | `REDIS_URL` | From Render Redis service |
 | `API_BASE_URL` | Your shop API URL |
+| `LANGFUSE_SECRET_KEY` | From Langfuse dashboard |
+| `LANGFUSE_PUBLIC_KEY` | From Langfuse dashboard |
+| `LANGFUSE_HOST` | Your Langfuse instance URL |
+| `SLACK_WEBHOOK_URL` | For escalation notifications |
 
 ### Deploy Steps
 1. Push your code to GitHub
 2. Create a new **Web Service** on Render → connect your repo
-3. Set **Build Command**: `pip install -r requirements.txt`
-4. Set **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port 8000`
+3. Set **Build Command**: `uv sync`
+4. Set **Start Command**: `uv run uvicorn app.main:app --host 0.0.0.0 --port 8000`
 5. Add all environment variables
 6. Deploy!
 
@@ -117,32 +129,87 @@ curl -X POST https://your-render-app.onrender.com/ingest \
 
 ## 📁 Project Structure
 
-```
-customer-support-agent/
+````
+agent/
 ├── app/
 │   ├── main.py              # FastAPI entry point & endpoints
-│   ├── config.py            # Settings & LLM factory (Groq)
+│   ├── config.py            # Settings & LLM factory (multiple providers)
 │   ├── agent/
-│   │   ├── agent.py         # LangChain ReAct agent loop
+│   │   ├── agent_graph.py   # LangGraph agent with state management
+│   │   ├── agent.py         # Legacy ReAct agent (fallback)
 │   │   ├── tools.py         # All agent tools (RAG + shop API)
-│   │   └── memory.py        # Redis-backed conversation memory
+│   │   ├── memory.py        # Redis-backed conversation memory
+│   │   └── db.py            # Database operations for conversations
 │   ├── rag/
 │   │   ├── qdrant_client.py # Qdrant connection & search
 │   │   └── ingest.py        # Data ingestion pipeline
-│   └── schemas/
-│       └── models.py        # Pydantic v2 request/response models
-├── data/
-│   ├── products.json        # Your product catalog
-│   ├── faqs.json            # Frequently asked questions
-│   └── policies.txt         # Store policies
+│   ├── schemas/
+│   │   └── models.py        # Pydantic v2 request/response models
+│   ├── observability/       # Monitoring & evaluation
+│   │   ├── tracing.py       # Langfuse integration
+│   │   ├── eval_runner.py   # Automated evaluation pipeline
+│   │   ├── evaluators.py    # Custom evaluation metrics
+│   │   ├── db.py           # Evaluation database
+│   │   └── langfuse_client.py # Langfuse client setup
+│   ├── utils.py             # Utility functions (Slack, etc.)
+│   └── redis_client.py      # Redis connection management
+├── models/                   # Local embedding models
+├── scripts/                  # Utility scripts
+├── pyproject.toml           # UV-based dependency management
 ├── Dockerfile               # Optimized for Render 500MB
-├── requirements.txt
-└── .env.example
+├── .env.example
+└── README.md
 ```
 
 ---
 
-## 🔌 Integrating with Your Shop
+## � Advanced Features
+
+### 🎯 Smart Intent Classification
+The agent automatically classifies customer intents and responds appropriately:
+- **Normal queries** → LangGraph agent with full tool access
+- **Escalation requests** → Human agent form collection
+- **Complaints** → Structured complaint form
+- **Contact updates** → Customer detail update form
+
+### 📝 Dynamic Forms
+Interactive forms that appear contextually:
+```json
+{
+  "type": "escalation_details",
+  "title": "Before we connect you with an agent",
+  "fields": [
+    {"name": "name", "label": "Your name", "type": "text", "required": true},
+    {"name": "phone", "label": "Phone number", "type": "tel", "required": false},
+    {"name": "summary", "label": "Describe the issue", "type": "textarea", "required": true}
+  ]
+}
+```
+
+### ⚡ Contextual Quick Replies
+AI-generated quick reply buttons that adapt to conversation context:
+- Rule-based for simple queries (greetings, basic questions)
+- LLM-generated for complex scenarios (orders, refunds, complaints)
+- Always relevant and action-oriented
+
+### 📊 Comprehensive Observability
+Built-in monitoring and evaluation with Langfuse:
+- **Tracing**: Full conversation flow tracking
+- **Evaluation**: Automated quality assessment
+- **Metrics**: Response time, tool usage, escalation rates
+- **Analytics**: Customer satisfaction and conversation patterns
+
+### 🔄 Multi-LLM Support
+Flexible LLM provider switching:
+- **Groq**: Fast, cost-effective production
+- **Claude**: High-quality reasoning
+- **Google Gemini**: Advanced capabilities
+- **Local models**: Ollama integration
+- **Cerebras**: High-performance inference
+
+---
+
+## �� Integrating with Your Shop
 
 Send a POST request to `/chat` for every customer message:
 
@@ -159,9 +226,13 @@ const response = await fetch('https://api.agent.com/chat', {
 });
 
 const data = await response.json();
-// data.reply        → show this to the customer
-// data.session_id   → save this for the next message
-// data.escalated    → if true, notify a human agent
+// data.reply           → show this to the customer
+// data.session_id      → save this for the next message
+// data.escalated      → if true, notify a human agent
+// data.products       → product cards for UI display
+// data.quick_replies  → array of button labels
+// data.form           → dynamic form object (if needed)
+// data.sources        → ['Products', 'Faqs', 'Policies']
 ```
 
 ---
@@ -175,19 +246,3 @@ Whenever you add new products, FAQs, or update policies:
 curl -X POST https://your-agent.onrender.com/ingest \
   -d '{"collection": "products"}'
 ```
-
----
-
-## 📊 CV Skills This Project Demonstrates
-
-- **LangChain** — ReAct agents, tool calling, memory management
-- **RAG** (Retrieval-Augmented Generation) — semantic search over knowledge base
-- **Qdrant** — vector database, embedding storage, semantic search
-- **Sentence Transformers** — local embeddings, `all-MiniLM-L6-v2`
-- **FastAPI** — async REST API, background tasks, middleware
-- **Pydantic v2** — data validation and settings management
-- **Redis** — distributed session state and conversation memory
-- **Docker** — containerization, multi-stage builds, health checks
-- **Prompt Engineering** — ReAct format, agent behavior control
-- **Model-agnostic design** — Claude / Groq switching
-- **Groq API** — LLM inference, open-source model deployment
