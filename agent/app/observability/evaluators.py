@@ -1,0 +1,176 @@
+"""
+app/observability/evaluators.py
+
+Four async evaluators, each returning a score (0.0–1.0) + a short note.
+All evaluators are best-effort: they never raise.
+"""
+from __future__ import annotations
+
+import logging
+import re
+import time
+from typing import Any
+
+logger = logging.getLogger(__name__)
+
+
+# ── 1. Response quality (LLM-as-judge) ───────────────────────────────────────
+
+_QUALITY_SYSTEM = (
+    "You are an impartial QA evaluator for a customer support chatbot called Seun. "
+    "Given a customer message and the agent's reply, score the reply on two dimensions:\n"
+    "1. Correctness (0-5): Is the information accurate, relevant, and complete?\n"
+    "2. Tone (0-5): Is the reply warm, professional, and appropriately concise?\n\n"
+    "Reply in EXACTLY this format (no other text):\n"
+    "CORRECTNESS: <integer 0-5>\n"
+    "TONE: <integer 0-5>\n"
+    "NOTES: <one sentence>"
+)
+
+
+async def evaluate_response_quality(
+    user_message: str,
+    agent_reply: str,
+    llm: Any,
+) -> tuple[float, str]:
+    """
+    Use the LLM to judge response quality.
+    Returns (score 0-1, short note).
+    """
+    from langchain_core.messages import HumanMessage, SystemMessage
+    prompt = f"Customer: {user_message}\n\nAgent: {agent_reply}"
+    try:
+        resp = await llm.ainvoke([
+            SystemMessage(content=_QUALITY_SYSTEM),
+            HumanMessage(content=prompt),
+        ])
+        text: str = resp.content.strip()
+
+        corr_match = re.search(r"CORRECTNESS:\s*(\d)", text)
+        tone_match = re.search(r"TONE:\s*(\d)", text)
+        note_match = re.search(r"NOTES:\s*(.+)", text)
+
+        correctness = int(corr_match.group(1)) if corr_match else 3
+        tone = int(tone_match.group(1)) if tone_match else 3
+        note = note_match.group(1).strip() if note_match else "No note"
+
+        # Average, normalized to 0-1
+        score = round(((correctness + tone) / 10.0), 2)
+        return score, note
+    except Exception as exc:
+        logger.debug(f"[Eval] response_quality error: {exc}")
+        return 0.5, "Eval failed"
+
+
+# ── 2. Tool call accuracy (rule-based) ───────────────────────────────────────
+
+# Maps intent keywords → expected tools
+_TOOL_EXPECTATIONS: list[tuple[re.Pattern, str]] = [
+    (re.compile(r"order|track|status|delivery", re.I),   "check_order_status"),
+    (re.compile(r"refund|return|exchange",       re.I),   "request_refund"),
+    (re.compile(r"in stock|available|stock",     re.I),   "check_stock"),
+    (re.compile(r"policy|return policy|shipping policy", re.I), "search_policies"),
+    (re.compile(r"how do I|faq|help with",       re.I),   "search_faqs"),
+]
+
+_FORBIDDEN_ESCALATION_PATTERNS = re.compile(
+    r"not found|no results|couldn't find|don't carry|unavailable|out of stock",
+    re.I,
+)
+
+
+async def evaluate_tool_accuracy(
+    user_message: str,
+    tools_called: list[dict],
+    agent_reply: str,
+) -> tuple[float, str]:
+    """
+    Heuristic check: did the agent call the right tool(s) for this message?
+    Returns (score 0-1, note).
+    """
+    tool_names = {t["name"] for t in tools_called}
+
+    # Check for expected tool
+    for pattern, expected_tool in _TOOL_EXPECTATIONS:
+        if pattern.search(user_message):
+            if expected_tool in tool_names:
+                return 1.0, f"Correctly called {expected_tool}"
+            else:
+                # Might have answered from cache/memory — partial credit
+                return 0.5, f"Expected {expected_tool} but not called"
+
+    # Check escalation wasn't triggered for trivial reasons
+    if "escalate_to_human" in tool_names:
+        if _FORBIDDEN_ESCALATION_PATTERNS.search(agent_reply):
+            return 0.0, "Escalated for a non-critical reason (item not found)"
+        return 1.0, "Escalation tool called for a plausible reason"
+
+    # No expectation matched — neutral
+    return 0.8, "No specific tool expectation for this message"
+
+
+# ── 3. Escalation decision accuracy ──────────────────────────────────────────
+
+_HIGH_RISK_PATTERNS = re.compile(
+    r"fraud|lawsuit|legal action|chargeback|threatening|report you|solicitor",
+    re.I,
+)
+_ROUTINE_PATTERNS = re.compile(
+    r"not found|no results|unavailable|don't have|what products|do you sell",
+    re.I,
+)
+
+
+async def evaluate_escalation_accuracy(
+    user_message: str,
+    agent_reply: str,
+    escalated: bool,
+    tools_called: list[dict],
+) -> tuple[float, str]:
+    """
+    Was the escalation decision correct?
+    High-risk message + escalated   → 1.0
+    High-risk message + not escalated → 0.2
+    Routine message + escalated     → 0.0
+    Routine message + not escalated → 1.0
+    Ambiguous                        → 0.7
+    """
+    is_high_risk = bool(_HIGH_RISK_PATTERNS.search(user_message))
+    is_routine = bool(_ROUTINE_PATTERNS.search(user_message))
+
+    if is_high_risk and escalated:
+        return 1.0, "Correct: high-risk message escalated"
+    if is_high_risk and not escalated:
+        return 0.2, "Missed escalation on high-risk message"
+    if is_routine and escalated:
+        return 0.0, "Incorrect: routine message escalated"
+    if is_routine and not escalated:
+        return 1.0, "Correct: routine message not escalated"
+
+    # Ambiguous — check whether escalate_to_human was called
+    if "escalate_to_human" in {t["name"] for t in tools_called}:
+        return 0.8, "Escalation tool called — plausible but not confirmed high-risk"
+    return 0.7, "Escalation decision ambiguous"
+
+
+# ── 4. Latency score ──────────────────────────────────────────────────────────
+
+# Thresholds (ms)
+_LATENCY_EXCELLENT = 1_500   # ≤ 1.5s → 1.0
+_LATENCY_GOOD      = 3_000   # ≤ 3s   → 0.75
+_LATENCY_FAIR      = 6_000   # ≤ 6s   → 0.5
+_LATENCY_POOR      = 10_000  # ≤ 10s  → 0.25
+                              # > 10s  → 0.0
+
+
+def evaluate_latency(latency_ms: float) -> tuple[float, str]:
+    if latency_ms <= _LATENCY_EXCELLENT:
+        return 1.0, f"Excellent latency: {latency_ms:.0f}ms"
+    elif latency_ms <= _LATENCY_GOOD:
+        return 0.75, f"Good latency: {latency_ms:.0f}ms"
+    elif latency_ms <= _LATENCY_FAIR:
+        return 0.5, f"Fair latency: {latency_ms:.0f}ms"
+    elif latency_ms <= _LATENCY_POOR:
+        return 0.25, f"Poor latency: {latency_ms:.0f}ms"
+    else:
+        return 0.0, f"Unacceptable latency: {latency_ms:.0f}ms"

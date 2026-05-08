@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     agent_max_iterations: int = Field(default=6, alias="AGENT_MAX_ITERATIONS")
     agent_verbose: bool = Field(default=True, alias="AGENT_VERBOSE")
 
+    LANGFUSE_SECRET_KEY: str = ""
+    LANGFUSE_PUBLIC_KEY: str = ""
+    LANGFUSE_BASE_URL: str = ""
+
     SLACK_WEBHOOK_URL: str | None = ""
 
     class Config:

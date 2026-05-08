@@ -19,7 +19,8 @@
         "format": "biome format",
         "lint": "biome lint",
         "check": "biome check",
-        "start": "node .output/server/index.mjs"
+        "start": "node .output/server/index.mjs",
+        "generate:api": "powershell -Command \"$env:NODE_TLS_REJECT_UNAUTHORIZED='0'; npx openapi-zod-client 'https://api.shop.localhost/api/openapi.json' -o types2.ts\""
     },
     "dependencies": {
         "@auth/core": "0.41.1",

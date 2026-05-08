@@ -13,6 +13,12 @@ from app.agent.db import is_human_connected, save_message_db, mark_escalated, en
 from app.redis_client import redis_client
 from app.agent.memory import save_messages_to_redis, load_messages_from_redis
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
+import time
+from app.observability.tracing import start_turn_trace, end_turn_trace
+from app.observability.eval_runner import run_eval_pipeline
+from app.observability.db import ensure_eval_table
+from app.observability.langfuse_client import flush_langfuse
+from app.config import get_llm
 
 logging.basicConfig(
     level=logging.INFO,
@@ -32,11 +38,13 @@ async def lifespan(app: FastAPI):
     try:
         from app.rag.qdrant_client import get_embedding_model
         get_embedding_model()  # loads and caches the model
+        await ensure_eval_table()
         logger.info("✅ Embedding model loaded")
     except Exception as e:
         logger.error(f"⚠️  Could not pre-load embedding model....: {e}")
 
     yield
+    flush_langfuse()
 
     logger.info("Shutting down...")
 
@@ -175,10 +183,28 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
             form=None,
         )
 
+    _t_start = time.monotonic()
+    trace, turn_span = start_turn_trace(
+        session_id=payload.session_id,
+        customer_id=payload.customer_id,
+        message=payload.message or "",
+    )
+
     result = await run_agent(
         message=payload.message or "",
         session_id=payload.session_id,
         customer_id=payload.customer_id,
+    )
+
+    _latency_ms = (time.monotonic() - _t_start) * 1000
+
+    end_turn_trace(
+        span=turn_span,
+        trace=trace,
+        reply=result.get("reply", ""),
+        escalated=result.get("escalated", False),
+        sources=result.get("sources", []),
+        latency_ms=_latency_ms,
     )
 
     background_tasks.add_task(
@@ -195,6 +221,22 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
             "form": result.get("form"),
         },
         user_metadata={}
+    )
+
+    background_tasks.add_task(
+        run_eval_pipeline,
+        session_id=payload.session_id,
+        customer_id=payload.customer_id,
+        langfuse_trace_id=trace.id,
+        user_message=payload.message or "",
+        agent_reply=result.get("reply", ""),
+        escalated=result.get("escalated", False),
+        sources=result.get("sources", []),
+        tools_called=[],   # populated via tracing.py spans; expand if needed
+        latency_ms=_latency_ms,
+        prompt_tokens=result.get("_prompt_tokens", 0),
+        completion_tokens=result.get("_completion_tokens", 0),
+        llm=get_llm(),
     )
 
     return ChatResponse(**result)

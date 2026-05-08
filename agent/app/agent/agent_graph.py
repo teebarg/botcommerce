@@ -1,6 +1,8 @@
 """
 LangGraph customer support agent.
 """
+import time as _time
+from app.observability.tracing import record_llm_generation
 import json
 import logging
 import re
@@ -26,6 +28,7 @@ from app.agent.tools import get_all_tools
 from app.config import get_llm
 from app.utils import _notify_slack_escalation
 from app.agent.tools import escalate_to_human
+from app.observability.tracing import record_tool_span
 
 logger = logging.getLogger(__name__)
 
@@ -251,7 +254,32 @@ def build_graph():
         prompt = _sanitize_prompt([SystemMessage(content=system)] + trimmed)
 
         try:
+            # response = await llm_with_tools.ainvoke(prompt)
+            _t0 = _time.monotonic()
             response = await llm_with_tools.ainvoke(prompt)
+            _llm_ms = (_time.monotonic() - _t0) * 1000
+
+            # record_llm_generation(
+            #     model=llm.model_name,
+            #     prompt_tokens=prompt_tokens,
+            #     completion_tokens=completion_tokens,
+            #     latency_ms=_llm_ms,
+            #     input_messages=prompt,
+            #     output_text=response.content,
+            #     iteration=state.get("iterations", 0),
+            # )
+            # response = response.content
+
+            _usage = getattr(response, "usage_metadata", None) or {}
+            record_llm_generation(
+                model=getattr(llm_with_tools, "model_name", "unknown"),
+                prompt_tokens=_usage.get("input_tokens", 0),
+                completion_tokens=_usage.get("output_tokens", 0),
+                latency_ms=_llm_ms,
+                input_messages=[str(m.content)[:200] for m in prompt],
+                output_text=str(response.content)[:500],
+                iteration=state.get("iterations", 0),
+            )
 
         except Exception as exc:
             err = str(exc)
