@@ -1,3 +1,4 @@
+from app.agent.eval_config import SUPPORT_EVAL_CONFIG
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -16,7 +17,6 @@ from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 import time
 from app.observability.tracing import start_turn_trace, end_turn_trace
 from app.observability.eval_runner import run_eval_pipeline
-from app.observability.db import ensure_eval_table
 from app.observability.langfuse_client import flush_langfuse
 from app.config import get_llm
 
@@ -38,7 +38,6 @@ async def lifespan(app: FastAPI):
     try:
         from app.rag.qdrant_client import get_embedding_model
         get_embedding_model()  # loads and caches the model
-        await ensure_eval_table()
         logger.info("✅ Embedding model loaded")
     except Exception as e:
         logger.error(f"⚠️  Could not pre-load embedding model....: {e}")
@@ -232,11 +231,14 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
         agent_reply=result.get("reply", ""),
         escalated=result.get("escalated", False),
         sources=result.get("sources", []),
-        tools_called=[],   # populated via tracing.py spans; expand if needed
+        tools_called=result.get("_tools_called", []),
         latency_ms=_latency_ms,
         prompt_tokens=result.get("_prompt_tokens", 0),
         completion_tokens=result.get("_completion_tokens", 0),
         llm=get_llm(),
+        config=SUPPORT_EVAL_CONFIG,
+        error=None,
+        stacktrace=None,
     )
 
     return ChatResponse(**result)

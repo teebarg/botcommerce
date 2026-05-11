@@ -6,9 +6,8 @@ observability credentials are missing.
 from __future__ import annotations
 import logging
 from functools import lru_cache
-from typing import Any
 from langfuse import Langfuse
-from app.config import get_settings
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -16,10 +15,9 @@ logger = logging.getLogger(__name__)
 @lru_cache(maxsize=1)
 def get_langfuse() -> Langfuse | None:
     """Return shared Langfuse client, or None if creds are missing."""
-    settings = get_settings()
-    pk  = getattr(settings, "langfuse_public_key", "") or ""
-    sk  = getattr(settings, "langfuse_secret_key", "") or ""
-    host = getattr(settings, "langfuse_host", "https://cloud.langfuse.com") or "https://cloud.langfuse.com"
+    pk  = settings.LANGFUSE_PUBLIC_KEY
+    sk  = settings.LANGFUSE_SECRET_KEY
+    host = settings.LANGFUSE_BASE_URL
     if not pk or not sk:
         logger.warning("[Langfuse] Credentials missing — observability disabled.")
         return None

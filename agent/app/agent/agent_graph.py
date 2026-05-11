@@ -37,19 +37,20 @@ logger = logging.getLogger(__name__)
 
 class AgentState(TypedDict):
     messages: Annotated[list[BaseMessage], add_messages]
-    customer_id: int | None
-    session_id: str | None
-    escalated: bool
-    complaint_sent: bool
-    sources: list[str]
-    iterations: int
+    customer_id: int | None = None
+    session_id: str | None = None
+    escalated: bool = False
+    complaint_sent: bool = False
+    sources: list[str] = []
+    iterations: int = 0
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
 
 
 MAX_ITERATIONS = 6
 
 
 # ── System prompt ─────────────────────────────────────────────────────────────
-
 SYSTEM_PROMPT = (
     "You are Seun, a friendly customer support agent for Thriftbyoba, an online shop. "
     "If users ask where they are or if they are at Thriftbyoba, warmly confirm that they are. "
@@ -96,6 +97,17 @@ CONVERSATIONAL_PATTERNS = re.compile(
     r"what('?s| is) (in stock|available|on (sale|offer)))\s*[?!.]*\s*$",
     re.IGNORECASE,
 )
+
+def _extract_tools_called(messages: list) -> list[dict]:
+    """Extract tool calls made this turn as [{name, args, result_preview}]."""
+    tools = []
+    for msg in messages:
+        if isinstance(msg, ToolMessage):
+            tools.append({
+                "name": msg.name or "unknown",
+                "result_preview": str(msg.content)[:200],
+            })
+    return tools
 
 def _trim_persistent_history(messages: list[BaseMessage]) -> list[BaseMessage]:
     """
@@ -252,23 +264,25 @@ def build_graph():
         )
 
         prompt = _sanitize_prompt([SystemMessage(content=system)] + trimmed)
+        _prompt_tokens = 0
+        _completion_tokens = 0
 
         try:
             # response = await llm_with_tools.ainvoke(prompt)
             _t0 = _time.monotonic()
             response = await llm_with_tools.ainvoke(prompt)
+            # response = await llm.ainvoke(prompt)
+            # Temporarily in call_model(), right after response:
+            logger.debug(f"[Tracing] usage raw: {getattr(response, 'usage_metadata', None)} | {getattr(response, 'response_metadata', {})}")
             _llm_ms = (_time.monotonic() - _t0) * 1000
 
-            # record_llm_generation(
-            #     model=llm.model_name,
-            #     prompt_tokens=prompt_tokens,
-            #     completion_tokens=completion_tokens,
-            #     latency_ms=_llm_ms,
-            #     input_messages=prompt,
-            #     output_text=response.content,
-            #     iteration=state.get("iterations", 0),
-            # )
-            # response = response.content
+            usage = (
+                getattr(response, "usage_metadata", None)      # LangChain standard
+                or getattr(response, "response_metadata", {}).get("token_usage", {})  # Groq fallback
+                or {}
+            )
+            _prompt_tokens     = usage.get("input_tokens") or usage.get("prompt_tokens") or 0
+            _completion_tokens = usage.get("output_tokens") or usage.get("completion_tokens") or 0
 
             _usage = getattr(response, "usage_metadata", None) or {}
             record_llm_generation(
@@ -312,8 +326,10 @@ def build_graph():
             "messages": [response],
             "escalated": state.get("escalated", False),
             "complaint_sent": state.get("complaint_sent", False),
-            "sources": list(state.get("sources", [])),
+            "sources": list[str](state.get("sources", [])),
             "iterations": new_iterations,
+            "prompt_tokens":     state.get("prompt_tokens", 0)     + _prompt_tokens,
+            "completion_tokens": state.get("completion_tokens", 0) + _completion_tokens,
         }
 
     tool_node = ToolNode(tools)
@@ -346,6 +362,7 @@ def build_graph():
         _log_observations(state)
 
         # Update sources and escalated — only scan the current batch
+        batch: list[ToolMessage] = []
         sources: list[str] = list(state.get("sources", []))
         escalated: bool = state.get("escalated", False)
         for msg in reversed(state["messages"]):
@@ -362,6 +379,16 @@ def build_graph():
                     customer_id=state.get("customer_id"),
                     reason=str(msg.content),
                 )
+            batch.append(msg)
+
+        for msg in batch:
+            record_tool_span(
+                tool_name=msg.name or "unknown",
+                tool_args={},
+                tool_result=str(msg.content)[:300],
+                latency_ms=0,
+            )
+
         # Only return patched tool messages for this turn
         new_tool_msgs = [
             m for m in patched
@@ -702,6 +729,8 @@ async def run_agent(
         "escalated": False,
         "sources": [],
         "iterations": 0,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
     }
 
     try:
@@ -760,6 +789,7 @@ async def run_agent(
             isinstance(m, ToolMessage) and m.name == "search_products"
             for m in current_turn_msgs
         )
+        tools_called: list[dict] = _extract_tools_called(current_turn_msgs)
 
         called_check_order_status: bool = any(
             isinstance(m, ToolMessage) and m.name == "check_order_status"
@@ -789,7 +819,21 @@ async def run_agent(
             "quick_replies": quick_replies,
             "form": None,
             "order": extracted_order,
+            "_prompt_tokens": final_state.get("prompt_tokens", 0),
+            "_completion_tokens": final_state.get("completion_tokens", 0),
+            "_tools_called": tools_called,
         }
+
+        # return {
+        #     "reply": reply,
+        #     "session_id": session_id,
+        #     "sources": sources,
+        #     "products": products,
+        #     "escalated": escalated,
+        #     "quick_replies": quick_replies,
+        #     "form": None,
+        #     "order": extracted_order,
+        # }
 
     except Exception as e:
         logger.error(f"[Agent] Error: {e}", exc_info=True)

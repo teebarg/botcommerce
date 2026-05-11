@@ -561,8 +561,9 @@ model User {
   PushSubscription     PushSubscription[]
   walletTxns           WalletTransaction[]
 
-  created_at DateTime? @default(now())
-  updated_at DateTime? @updatedAt
+  created_at DateTime?    @default(now())
+  updated_at DateTime?    @updatedAt
+  EvalResult EvalResult[]
 
   @@index([first_name, last_name, email])
   @@map("users")
@@ -783,4 +784,62 @@ model WalletTransaction {
   @@index([type])
   @@index([user_id, created_at(sort: Desc)])
   @@map("wallet_transactions")
+}
+
+model EvalResult {
+  id          BigInt @id @default(autoincrement())
+  session_id  String
+  customer_id Int?
+
+  // Agent metadata
+  agent_name    String?
+  agent_version String?
+  model_name    String?
+
+  // Tracing / observability
+  langfuse_trace_id String?
+  trace_metadata    Json?
+
+  // Input / output snapshot
+  user_message String? @db.Text
+  agent_reply  String? @db.Text
+  escalated    Boolean @default(false)
+  sources      Json? // list[string]
+  tools_called Json? // [{name,args,result_preview,duration_ms}]
+
+  // Performance metrics
+  latency_ms        Float?
+  prompt_tokens     Int?
+  completion_tokens Int?
+  total_tokens      Int?
+
+  // Evaluation scores (0.0 - 1.0)
+  score_response_quality    Float?
+  score_tool_accuracy       Float?
+  score_escalation_accuracy Float?
+  score_latency             Float?
+  score_groundedness        Float? // hallucination / factual grounding
+  score_context_relevance   Float? // retrieval relevance
+
+  // Evaluation reasoning / notes
+  eval_notes Json?
+
+  // Failure/debugging
+  error      String? @db.Text
+  stacktrace String? @db.Text
+
+  created_at DateTime @default(now())
+
+  // Relations
+  user User? @relation(fields: [customer_id], references: [id], onDelete: SetNull)
+
+  // Indexes
+  @@index([session_id])
+  @@index([customer_id])
+  @@index([created_at(sort: Desc)])
+  @@index([agent_name])
+  @@index([agent_version])
+  @@index([model_name])
+  @@index([agent_name, created_at(sort: Desc)])
+  @@map("eval_results")
 }
