@@ -89,7 +89,7 @@ async def mark_escalated(conversation_uuid: str):
             """,
             conversation_uuid,
         )
-        logger.info(f"[DB] Conversation {conversation_uuid} escalated")
+        logger.debug(f"[DB] Conversation {conversation_uuid} escalated")
     except Exception:
         logger.exception(f"[DB] Failed to escalate conversation uuid={conversation_uuid}")
         raise

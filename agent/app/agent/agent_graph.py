@@ -2,10 +2,12 @@
 LangGraph customer support agent.
 """
 import time as _time
+from app.logging import get_logger
 from app.observability.tracing import record_llm_generation
 import json
 import logging
 import re
+import re as _re
 import uuid
 from typing import Annotated, Literal
 
@@ -30,7 +32,8 @@ from app.utils import _notify_slack_escalation
 from app.agent.tools import escalate_to_human
 from app.observability.tracing import record_tool_span
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 # ── State ─────────────────────────────────────────────────────────────────────
@@ -49,8 +52,6 @@ class AgentState(TypedDict):
 
 MAX_ITERATIONS = 6
 
-
-# ── System prompt ─────────────────────────────────────────────────────────────
 SYSTEM_PROMPT = (
     "You are Seun, a friendly customer support agent for Thriftbyoba, an online shop. "
     "If users ask where they are or if they are at Thriftbyoba, warmly confirm that they are. "
@@ -64,6 +65,14 @@ SYSTEM_PROMPT = (
     "they are displayed as visual cards in the UI automatically. "
     "Instead, just tell the customer how many options you found and invite them to ask for details. "
     "Example: 'I found 3 options for you! Let me know if you'd like more details on any of them.' "
+    "When search_products returns results that do not match what the customer asked for "
+    "(e.g. customer asked for diapers but results show clothing), you MUST: "
+    "1. Tell the customer you don't carry that specific item. "
+    "2. Call search_products AGAIN with a related fashion/clothing query to find actual alternatives. "
+    "3. Present the alternatives warmly. "
+    "Do NOT say 'I found some options' without first calling the tool. "
+    "Example: customer asks for 'baby diapers' → say we don't carry diapers → "
+    "call search_products('baby clothing') → 'Here are some baby clothing options instead!' "
     "(2) For order questions: call check_order_status with the order ID. "
     "(3) For stock questions: call check_stock only when the customer explicitly asks if something is in stock. "
     "(4) For policy or how-to questions: call search_faqs or search_policies. "
@@ -97,6 +106,63 @@ CONVERSATIONAL_PATTERNS = re.compile(
     r"what('?s| is) (in stock|available|on (sale|offer)))\s*[?!.]*\s*$",
     re.IGNORECASE,
 )
+
+from app.rag.qdrant_client import get_embedding_model
+
+def _is_results_mismatch_semantic(query: str, results: str) -> bool:
+    """
+    Compute cosine similarity between the query and the top results.
+    If similarity is below threshold, it's a mismatch.
+    """
+    import numpy as np
+    logger.debug("_is_results_mismatch_semantic")
+
+    try:
+        model = get_embedding_model()
+        
+        # Extract just product names from results for a cleaner signal
+        product_names = _re.findall(r'^- (.+?) \(SKU:', results, _re.MULTILINE)
+        if not product_names:
+            return False
+        
+        results_text = " ".join(product_names[:3])  # top 3 names
+        
+        # query_emb   = model.encode(query,        normalize_embeddings=True)
+        # results_emb = model.encode(results_text, normalize_embeddings=True)
+
+        query_emb   = next(model.embed([query]))
+        results_emb = next(model.embed([results_text]))
+        
+        similarity = float(np.dot(query_emb, results_emb))
+        logger.debug(f"[Mismatch] query='{query}' similarity={similarity:.3f}")
+        
+        return similarity < 0.3  # tunable threshold
+        
+    except Exception as exc:
+        logger.error(f"[Mismatch] Semantic check failed: {exc}")
+        return False
+
+
+def _is_results_mismatch(query: str, results: str) -> bool:
+    """
+    Heuristic: did the search return results unrelated to the query?
+    Checks if any meaningful query word appears in the results.
+    """
+    stopwords = {"do", "you", "have", "sell", "i", "a", "the", "any", "some", "for"}
+    query_words = {
+        w.lower() for w in _re.findall(r'\w+', query)
+        if w.lower() not in stopwords and len(w) > 2
+    }
+    logger.debug(f"[Mismatch] query_words={query_words}")
+    if not query_words:
+        return False
+    results_lower = results.lower()
+    matched = [w for w in query_words if w in results_lower]
+    logger.debug(f"[Mismatch] query_words={query_words} matched={matched}")
+    # If NONE of the meaningful query words appear in results, it's a mismatch
+    # return not any(word in results_lower for word in query_words)
+    specific_words = sorted(query_words, key=len, reverse=True)
+    return not any(word in results_lower for word in specific_words[:2])
 
 def _extract_tools_called(messages: list) -> list[dict]:
     """Extract tool calls made this turn as [{name, args, result_preview}]."""
@@ -150,12 +216,12 @@ def _log_thought(state: AgentState) -> None:
     last = state["messages"][-1]
     if isinstance(last, AIMessage):
         if last.tool_calls:
-            logger.info(f"[Thought] (iter {state.get('iterations', '?')}) "
+            logger.debug(f"[Thought] (iter {state.get('iterations', '?')}) "
                         f"Calling {len(last.tool_calls)} tool(s):")
             for tc in last.tool_calls:
-                logger.info(f"  → {tc['name']}  args={tc['args']}")
+                logger.debug(f"  → {tc['name']}  args={tc['args']}")
         else:
-            logger.info(f"[Final Answer] {str(last.content)[:200]}")
+            logger.debug(f"[Final Answer] {str(last.content)[:200]}")
 
 
 def _log_observations(state: AgentState) -> None:
@@ -169,7 +235,7 @@ def _log_observations(state: AgentState) -> None:
         preview = str(msg.content)[:300]
         if len(str(msg.content)) > 300:
             preview += "..."
-        logger.info(f"[Observation] ({msg.name}) {preview}")
+        logger.debug(f"[Observation] ({msg.name}) {preview}")
 
 
 # ── Form definitions ──────────────────────────────────────────────────────────
@@ -243,9 +309,9 @@ def build_graph():
                 (m for m in reversed(state["messages"]) if isinstance(m, HumanMessage)), None
             )
             if first_human:
-                logger.info(f"\n{'='*60}")
-                logger.info(f"[User] {first_human.content}")
-                logger.info(f"{'='*60}")
+                logger.debug(f"\n{'='*60}")
+                logger.debug(f"[User] {first_human.content}")
+                logger.debug(f"{'='*60}")
 
         system = SYSTEM_PROMPT
         if state.get("customer_id"):
@@ -268,11 +334,8 @@ def build_graph():
         _completion_tokens = 0
 
         try:
-            # response = await llm_with_tools.ainvoke(prompt)
             _t0 = _time.monotonic()
             response = await llm_with_tools.ainvoke(prompt)
-            # response = await llm.ainvoke(prompt)
-            # Temporarily in call_model(), right after response:
             logger.debug(f"[Tracing] usage raw: {getattr(response, 'usage_metadata', None)} | {getattr(response, 'response_metadata', {})}")
             _llm_ms = (_time.monotonic() - _t0) * 1000
 
@@ -307,11 +370,11 @@ def build_graph():
                 minimal_prompt = [SystemMessage(content=system)]
                 if last_human:
                     minimal_prompt.append(last_human)
-                logger.warning("[Agent] Retrying with minimal prompt")
                 try:
                     response = await llm_with_tools.ainvoke(minimal_prompt)
-                except Exception as exc2:
-                    logger.error(f"[Agent] Minimal retry failed: {exc2}")
+                    logger.debug("[Agent] Retry with tools succeeded")
+                except Exception:
+                    logger.warning("[Agent] Retrying without tools")
                     response = await llm.ainvoke(minimal_prompt)
             else:
                 raise
@@ -351,6 +414,32 @@ def build_graph():
                     f"\n\n<!-- UI_CARDS: {count} product card(s) will be shown in the UI automatically. "
                     "Do NOT list them in your text reply. Just acknowledge the count warmly and invite questions. -->"
                 )
+
+                # ── Mismatch detection ──────────────────────────────────────────
+                # Extract the original query from the AI message that triggered this tool
+                original_query = ""
+                for m in reversed(messages):
+                    if isinstance(m, AIMessage) and m.tool_calls:
+                        for tc in m.tool_calls:
+                            if tc["name"] == "search_products":
+                                original_query = tc["args"].get("query", "")
+                        break
+
+                logger.debug(f"original_query................{original_query}")
+
+                # if original_query and _is_results_mismatch(original_query, str(msg.content)):
+                if original_query and _is_results_mismatch_semantic(original_query, str(msg.content)):
+                    logger.debug(f"[Mismatch] Query='{original_query}' — injecting warning")
+                    note += (
+                        f"\n\n<!-- MISMATCH WARNING: The customer asked for '{original_query}' "
+                        "but the results do not appear to contain that item. "
+                        "You MUST tell the customer you don't carry that specific item "
+                        "before mentioning the results. Do NOT say 'I found X options' as if they match. -->"
+                    )
+                else:
+                    logger.debug(f"[Mismatch] Query='{original_query}' — no mismatch detected")
+                # ── End mismatch detection ──────────────────────────────────────
+
                 msg = ToolMessage(
                     content=str(msg.content) + note,
                     tool_call_id=msg.tool_call_id,
@@ -431,7 +520,7 @@ _graph = build_graph()
 # ── Product extractor ─────────────────────────────────────────────────────────
 
 def _extract_products(messages: list) -> list[dict]:
-    import re as _re, json as _json
+    import json as _json
     pattern = _re.compile(r"<!-- PRODUCTS_JSON:(.+?) -->", _re.DOTALL)
 
     for msg in reversed(messages):
@@ -462,12 +551,17 @@ def _strip_product_listing(reply: str, has_products: bool) -> str:
     if not has_products:
         return reply
 
-    import re as _re
-
     # Remove lead-in phrases like "Here are some examples:"
     reply = _re.sub(
         r"(Here are some (examples|options|products)[^:\n]*:\s*\n)",
         "",
+        reply,
+        flags=_re.IGNORECASE,
+    )
+
+    reply = _re.sub(
+        r"(Here are some [^!]+instead!)\s*\1",  # catch exact duplicates
+        r"\1",
         reply,
         flags=_re.IGNORECASE,
     )
@@ -539,6 +633,7 @@ async def _llm_quick_replies(
         "Example: [\"Track my order\", \"Request refund\", \"Speak to human\"]"
     )
     try:
+        logger.debug(f"[quick_replies] - Calling Model for Quick Replies")
         resp = await llm.ainvoke([HumanMessage(content=prompt)])
         match = re.search(r"\[.*?\]", resp.content, re.DOTALL)
         if match:
@@ -546,7 +641,7 @@ async def _llm_quick_replies(
             # Sanitise: keep only short strings
             return [str(r).strip() for r in parsed if len(str(r)) <= 40][:4]
     except Exception as exc:
-        logger.debug(f"[quick_replies] LLM fallback failed: {exc}")
+        logger.error(f"[quick_replies] LLM fallback failed: {exc}")
     return []
 
 
@@ -647,11 +742,13 @@ async def _classify_intent(message: str) -> str:
             f"Customer message: \"{message}\"\n\n"
             "Reply with ONLY the intent label, nothing else."
         )
+        logger.debug(f"[INTENT] - Calling model to classify intent")
         resp = await llm.ainvoke([HumanMessage(content=prompt)])
         result = resp.content.strip().lower()
         if result in ("escalation_request", "complaint", "contact_update", "normal"):
             return result
-    except Exception:
+    except Exception as e:
+        logger.debug(f"[INTENT] - Classify Intent Error {e}")
         pass
 
     return Intent.NORMAL
@@ -666,14 +763,14 @@ async def run_agent(
     if not session_id:
         session_id = str(uuid.uuid4())
 
-    logger.info(
+    logger.debug(
         f"[Agent] Session: {session_id} | Customer: {customer_id} | Message: {message[:80] if len(message) > 80 else message}"
     )
 
     history: list[BaseMessage] = load_messages_from_redis(session_id)
 
     if CONVERSATIONAL_PATTERNS.match(message.strip()):
-        logger.info("[Agent] Conversational shortcut")
+        logger.debug("[Agent] Conversational shortcut")
         llm = get_llm()
         resp = await llm.ainvoke(
             [SystemMessage(content=SYSTEM_PROMPT), *history, HumanMessage(content=message)]
@@ -824,27 +921,17 @@ async def run_agent(
             "_tools_called": tools_called,
         }
 
-        # return {
-        #     "reply": reply,
-        #     "session_id": session_id,
-        #     "sources": sources,
-        #     "products": products,
-        #     "escalated": escalated,
-        #     "quick_replies": quick_replies,
-        #     "form": None,
-        #     "order": extracted_order,
-        # }
-
     except Exception as e:
         logger.error(f"[Agent] Error: {e}", exc_info=True)
+        raise
 
-        return {
-            "reply": "Something went wrong on my end. Please try again.",
-            "session_id": session_id,
-            "sources": [],
-            "products": [],
-            "escalated": False,
-            "quick_replies": [],
-            "form": None,
-            "order": None,
-        }
+        # return {
+        #     "reply": "Something went wrong on my end. Please try again.",
+        #     "session_id": session_id,
+        #     "sources": [],
+        #     "products": [],
+        #     "escalated": False,
+        #     "quick_replies": [],
+        #     "form": None,
+        #     "order": None,
+        # }

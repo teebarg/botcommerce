@@ -121,11 +121,11 @@ async def run_agent(
     if not session_id:
         session_id = str(uuid.uuid4())
 
-    logger.info(f"[Agent] Session: {session_id} | Customer: {customer_id} | Message: {message[:80]}")
+    logger.debug(f"[Agent] Session: {session_id} | Customer: {customer_id} | Message: {message[:80]}")
 
     # Conversational
     if CONVERSATIONAL_PATTERNS.match(message.strip()):
-        logger.info("[Agent] Conversational message — skipping ReAct loop")
+        logger.debug("[Agent] Conversational message — skipping ReAct loop")
         llm = get_llm()
         reply = await _handle_conversational(message, customer_id, llm)
 

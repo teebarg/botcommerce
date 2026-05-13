@@ -64,13 +64,13 @@ async def save_eval_result(
             scores.get("tool_accuracy"),
             scores.get("escalation_accuracy"),
             scores.get("latency"),
-            scores.get("groundedness"),        # new
-            scores.get("context_relevance"),   # new
+            scores.get("groundedness"),
+            scores.get("context_relevance"),
             json.dumps(eval_notes),
             error,
             stacktrace,
         )
-        logger.info(f"[EvalDB] Saved eval for session {session_id}")
+        logger.debug(f"[EvalDB] Saved eval for session {session_id}")
     except Exception as exc:
         logger.error(f"[EvalDB] save_eval_result error: {exc}")
     finally:

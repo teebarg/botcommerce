@@ -113,7 +113,7 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
             "type": "product",
         })
 
-    logger.info(f"Loaded {len(documents)} active products")
+    logger.debug(f"Loaded {len(documents)} active products")
     return documents
 
 
@@ -137,7 +137,7 @@ async def load_faqs(conn: asyncpg.Connection) -> list[dict]:
             "type": "faq",
         })
 
-    logger.info(f"Loaded {len(documents)} active FAQs")
+    logger.debug(f"Loaded {len(documents)} active FAQs")
     return documents
 
 
@@ -193,7 +193,7 @@ async def load_policies(conn: asyncpg.Connection) -> list[dict]:
             "policy_type": "shop_setting",
         })
 
-    logger.info(f"Loaded {len(documents)} policy documents")
+    logger.debug(f"Loaded {len(documents)} policy documents")
     return documents
 
 LOADERS = {
@@ -208,13 +208,13 @@ async def ingest(collection: str) -> None:
     try:
         targets: list[str] = list(LOADERS.keys()) if collection == "all" else [collection]
         for name in targets:
-            logger.info(f"\n{'='*40}\nIngesting: {name}\n{'='*40}")
+            logger.debug(f"\n{'='*40}\nIngesting: {name}\n{'='*40}")
             docs = await LOADERS[name](conn)
             if not docs:
                 logger.warning(f"No documents found for '{name}' — skipping.")
                 continue
             count: int = upsert_documents(name, docs)
-            logger.info(f"✅ {name}: {count} documents upsert into Qdrant")
+            logger.debug(f"✅ {name}: {count} documents upsert into Qdrant")
     finally:
         await conn.close()
 

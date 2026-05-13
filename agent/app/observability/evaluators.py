@@ -16,14 +16,17 @@ logger = logging.getLogger(__name__)
 
 # ── 1. Response quality (LLM-as-judge) ───────────────────────────────────────
 _QUALITY_SYSTEM = (
-    "You are an impartial QA evaluator for a customer support chatbot called Seun. "
-    "Given a customer message, the agent's reply, and the list of tools called, "
+    "You are an impartial QA evaluator for a customer support chatbot called Seun "
+    "for Thriftbyoba, a fashion and clothing store.\n"
+    "Given a customer message, the tool results, and the agent's reply, "
     "score the reply on two dimensions:\n"
-    "1. Correctness (0-5): Is the information accurate and grounded in tool results? "
-    "If the agent lists specific products, prices, or order details WITHOUT a tool being called, "
-    "score Correctness 0 — this is hallucination.\n"
-    "2. Tone (0-5): Is the reply warm, professional, and appropriately concise?\n\n"
-    "Reply in EXACTLY this format (no other text):\n"
+    "1. Correctness (0-5): Is the reply accurate and appropriate?\n"
+    "   - If the store does not carry what the customer asked for and the agent "
+    "correctly says so while redirecting to relevant alternatives, score 5.\n"
+    "   - If the agent presents unrelated results as if they match the query, score 0.\n"
+    "   - If the agent used tool results accurately, score 4-5.\n"
+    "2. Tone (0-5): Is the reply warm, professional, and concise?\n\n"
+    "Reply in EXACTLY this format:\n"
     "CORRECTNESS: <integer 0-5>\n"
     "TONE: <integer 0-5>\n"
     "NOTES: <one sentence>"
@@ -46,7 +49,20 @@ async def evaluate_response_quality(
         ", ".join(t["name"] for t in tools_called)
         if tools_called else "none"
     )
-    prompt = f"Customer: {user_message}\n\nAgent: {agent_reply}\n\nTools called: {tools_summary}"
+    tool_results_detail = (
+        "\n".join(
+            f"- {t['name']}: {t['result_preview'][:150]}"
+            for t in tools_called
+        )
+        if tools_called else "none"
+    )
+
+    prompt = (
+        f"Customer asked: {user_message}\n\n"
+        f"Tools called: {tools_summary}\n"
+        f"Tool results:\n{tool_results_detail}\n\n"
+        f"Agent reply: {agent_reply}"
+    )
     try:
         resp = await llm.ainvoke([
             SystemMessage(content=_QUALITY_SYSTEM),
@@ -66,7 +82,7 @@ async def evaluate_response_quality(
         score = round(((correctness + tone) / 10.0), 2)
         return score, note
     except Exception as exc:
-        logger.debug(f"[Eval] response_quality error: {exc}")
+        logger.error(f"[Eval] response_quality error: {exc}")
         return 0.5, "Eval failed"
 
 
@@ -150,8 +166,9 @@ async def evaluate_escalation_accuracy(
     """
     high_risk_re = re.compile(high_risk_patterns, re.I) if high_risk_patterns else _HIGH_RISK_PATTERNS
     routine_re   = re.compile(routine_patterns,   re.I) if routine_patterns   else _ROUTINE_PATTERNS
-    is_high_risk = bool(_HIGH_RISK_PATTERNS.search(user_message))
-    is_routine = bool(_ROUTINE_PATTERNS.search(user_message))
+
+    is_high_risk = bool(high_risk_re.search(user_message))
+    is_routine   = bool(routine_re.search(user_message))
 
     if is_high_risk and escalated:
         return 1.0, "Correct: high-risk message escalated"
@@ -190,9 +207,6 @@ def evaluate_latency(latency_ms: float) -> tuple[float, str]:
     else:
         return 0.0, f"Unacceptable latency: {latency_ms:.0f}ms"
 
-
-# ── 5. Groundedness (did the reply stay grounded in tool results?) ─────────────
-
 _GROUNDEDNESS_SYSTEM = (
     "You are evaluating whether a customer support agent's reply is grounded in the "
     "tool results provided, or whether it contains hallucinated details.\n"
@@ -210,6 +224,8 @@ async def evaluate_groundedness(
     tools_called: list[dict],
     llm: Any,
 ) -> tuple[float, str]:
+    """Groundedness (did the reply stay grounded in tool results?)"""
+    return 0.0, "[Eval] groundedness: Awaiting Implementation"
     from langchain_core.messages import HumanMessage, SystemMessage
 
     if not tools_called:
@@ -237,17 +253,17 @@ async def evaluate_groundedness(
         note  = note_match.group(1).strip() if note_match else "No note"
         return round(score, 2), note
     except Exception as exc:
-        logger.debug(f"[Eval] groundedness error: {exc}")
+        logger.error(f"[Eval] groundedness error: {exc}")
         return 0.5, "Eval failed"
 
-
-# ── 6. Context relevance (did retrieval return relevant results?) ──────────────
 
 async def evaluate_context_relevance(
     user_message: str,
     tools_called: list[dict],
     llm: Any,
 ) -> tuple[float, str]:
+    """Context relevance (did retrieval return relevant results?)"""
+    return 0.0, "[Eval] context_relevance: Awaiting Implementation"
     from langchain_core.messages import HumanMessage, SystemMessage
 
     # Only meaningful when a search tool was called
@@ -284,5 +300,5 @@ async def evaluate_context_relevance(
         note  = note_match.group(1).strip() if note_match else "No note"
         return round(score, 2), note
     except Exception as exc:
-        logger.debug(f"[Eval] context_relevance error: {exc}")
+        logger.error(f"[Eval] context_relevance error: {exc}")
         return 0.5, "Eval failed"

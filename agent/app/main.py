@@ -1,3 +1,4 @@
+import dataclasses
 from app.agent.eval_config import SUPPORT_EVAL_CONFIG
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,7 +9,7 @@ import sys
 from app.schemas.models import ChatRequest, ChatResponse, IngestRequest, HealthResponse
 from app.agent.agent_graph import run_agent
 from app.agent.memory import clear_session
-from app.config import get_settings
+from app.config import get_model_name, get_settings
 from app.utils import _notify_slack_escalation
 from app.agent.db import is_human_connected, save_message_db, mark_escalated, ensure_conversation_exists
 from app.redis_client import redis_client
@@ -33,19 +34,19 @@ async def lifespan(app: FastAPI):
     """
     Runs on startup: pre-load the embedding model so the first request isn't slow.
     """
-    logger.info("🚀 Pre-loading embedding model...")
+    logger.debug("🚀 Pre-loading embedding model...")
 
     try:
         from app.rag.qdrant_client import get_embedding_model
         get_embedding_model()  # loads and caches the model
-        logger.info("✅ Embedding model loaded")
+        logger.debug("✅ Embedding model loaded")
     except Exception as e:
         logger.error(f"⚠️  Could not pre-load embedding model....: {e}")
 
     yield
     flush_langfuse()
 
-    logger.info("Shutting down...")
+    logger.debug("Shutting down...")
 
 
 app = FastAPI(
@@ -68,7 +69,7 @@ async def persist_turn_to_db(session_id: str, user_msg: str, ai_msg: str, user_m
     try:
         await save_message_db(session_id=session_id, role="USER", content=user_msg, metadata=user_metadata)
         await save_message_db(session_id=session_id, role="BOT", content=ai_msg, metadata=ai_metadata)
-        logger.info(f"💾 Persisted turn for session {session_id} to DB")
+        logger.debug(f"💾 Persisted turn for session {session_id} to DB")
     except Exception as e:
         logger.error(f"❌ Background DB Persistence Error: {e}")
 
@@ -189,13 +190,24 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
         message=payload.message or "",
     )
 
-    result = await run_agent(
-        message=payload.message or "",
-        session_id=payload.session_id,
-        customer_id=payload.customer_id,
-    )
+    try:
+        result = await run_agent(
+            message=payload.message or "",
+            session_id=payload.session_id,
+            customer_id=payload.customer_id,
+        )
+    except Exception:
+        return ChatResponse(reply="Something went wrong on my end. Please try again.", session_id=payload.session_id)
+
 
     _latency_ms = (time.monotonic() - _t_start) * 1000
+
+    trace.update(metadata={
+        "latency_ms": round(_latency_ms, 1),
+        "iterations": result.get("_iterations", 0),
+        "intent": result.get("_intent", "normal"),
+        "had_tools": bool(result.get("_tools_called")),
+    })
 
     end_turn_trace(
         span=turn_span,
@@ -236,7 +248,7 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
         prompt_tokens=result.get("_prompt_tokens", 0),
         completion_tokens=result.get("_completion_tokens", 0),
         llm=get_llm(),
-        config=SUPPORT_EVAL_CONFIG,
+        config=dataclasses.replace(SUPPORT_EVAL_CONFIG, model_name=get_model_name()),
         error=None,
         stacktrace=None,
     )

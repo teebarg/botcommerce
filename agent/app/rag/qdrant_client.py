@@ -45,7 +45,7 @@ COLLECTIONS = {
 
 @lru_cache()
 def get_embedding_model() -> TextEmbedding:
-    logger.info(f"Loading FastEmbed model: {MODEL_NAME} (ONNX, no PyTorch)")
+    logger.debug(f"Loading FastEmbed model: {MODEL_NAME} (ONNX, no PyTorch)")
     return TextEmbedding(
         model_name=MODEL_NAME,
         cache_dir=MODEL_CACHE_DIR,
@@ -56,7 +56,7 @@ def get_embedding_model() -> TextEmbedding:
 def get_qdrant_client() -> QdrantClient:
     from app.config import get_settings
     settings = get_settings()
-    logger.info(f"Connecting to Qdrant: {settings.QDRANT_URL}")
+    logger.debug(f"Connecting to Qdrant: {settings.QDRANT_URL}")
     return QdrantClient(
         url=settings.QDRANT_URL,
         api_key=settings.QDRANT_API_KEY,
@@ -73,9 +73,9 @@ def ensure_collection(collection_name: str) -> None:
             collection_name=collection_name,
             vectors_config=VectorParams(size=EMBEDDING_DIM, distance=Distance.COSINE),
         )
-        logger.info(f"Created Qdrant collection: {collection_name}")
+        logger.debug(f"Created Qdrant collection: {collection_name}")
     else:
-        logger.info(f"Collection already exists: {collection_name}")
+        logger.debug(f"Collection already exists: {collection_name}")
 
 
 def upsert_documents(collection_key: str, documents: list[dict]) -> int:
@@ -108,7 +108,7 @@ def upsert_documents(collection_key: str, documents: list[dict]) -> int:
     ]
 
     client.upsert(collection_name=collection_name, points=points, wait=False)
-    logger.info(f"Upserted {len(points)} docs into '{collection_name}'")
+    logger.debug(f"Upserted {len(points)} docs into '{collection_name}'")
     return len(points)
 
 
@@ -168,7 +168,7 @@ def clear_collection(collection_key: str) -> None:
         wait=True,
     )
 
-    logger.info(f"Cleared all points from '{collection_name}'")
+    logger.debug(f"Cleared all points from '{collection_name}'")
 
 
 def delete_collection(collection_key: str) -> None:
@@ -179,4 +179,4 @@ def delete_collection(collection_key: str) -> None:
     client = get_qdrant_client()
 
     client.delete_collection(collection_name)
-    logger.info(f"Deleted collection '{collection_name}'")
+    logger.debug(f"Deleted collection '{collection_name}'")

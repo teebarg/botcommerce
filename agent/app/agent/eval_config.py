@@ -5,7 +5,6 @@ from app.observability.eval_runner import AgentEvalConfig
 SUPPORT_EVAL_CONFIG = AgentEvalConfig(
     agent_name="customer_support",
     agent_version="1.0.0",
-    model_name="llama-3.3-70b-versatile",
     retrieval_tools=["search_products", "search_faqs", "search_policies"],
     tool_expectations=[
         (re.compile(r"do you have|looking for|show me|find me|got any", re.I), "search_products"),
@@ -28,7 +27,6 @@ SUPPORT_EVAL_CONFIG = AgentEvalConfig(
 MARKETING_EVAL_CONFIG = AgentEvalConfig(
     agent_name="marketing",
     agent_version="1.0.0",
-    model_name="llama-3.3-70b-versatile",
     retrieval_tools=["search_campaigns", "search_products"],
     tool_expectations=[
         (re.compile(r"discount|promo|offer|sale|coupon", re.I), "search_campaigns"),

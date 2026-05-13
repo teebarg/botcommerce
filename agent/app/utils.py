@@ -52,7 +52,7 @@ async def _notify_slack_escalation(
         async with httpx.AsyncClient(timeout=5.0) as client:
             resp = await client.post(webhook_url, json=payload)
             if resp.status_code == 200:
-                logger.info(f"[Escalation] Slack notified for session {session_id}")
+                logger.debug(f"[Escalation] Slack notified for session {session_id}")
             else:
                 logger.warning(f"[Escalation] Slack returned {resp.status_code}: {resp.text}")
     except Exception as exc:

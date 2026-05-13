@@ -194,6 +194,6 @@ def clear_session(session_id: str) -> None:
     try:
         r = _get_redis()
         r.delete(f"chat:{session_id}:messages")
-        logger.info(f"[Memory] Cleared session {session_id}")
+        logger.debug(f"[Memory] Cleared session {session_id}")
     except Exception as e:
         logger.warning(f"[Memory] Could not clear session {session_id}: {e}")

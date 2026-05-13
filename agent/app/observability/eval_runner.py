@@ -23,7 +23,7 @@ from app.observability.db import save_eval_result
 from app.observability.tracing import score_trace
 from dataclasses import dataclass, field
 from typing import Callable, Awaitable
-from app.config import settings
+from app.config import get_llm, settings
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 class AgentEvalConfig:
     agent_name: str
     agent_version: str
-    model_name: str
+    model_name: str = ""
 
     # Optional custom evaluators — each returns (score, note)
     # If not provided, falls back to the generic ones
@@ -69,7 +69,7 @@ async def run_eval_pipeline(
     prompt_tokens: int,
     completion_tokens: int,
     llm: Any,
-    config: AgentEvalConfig,          # <-- replaces agent_name/version/model_name args
+    config: AgentEvalConfig,
     error: str | None = None,
     stacktrace: str | None = None,
 ) -> None:
@@ -109,10 +109,7 @@ async def run_eval_pipeline(
         # ── 4. Latency ────────────────────────────────────────────────────────
         lat_score, lat_note = evaluate_latency(latency_ms)
         gr_score,  gr_note  = await evaluate_groundedness(agent_reply, tools_called, llm)
-        cr_score,  cr_note  = await evaluate_context_relevance(
-            user_message, tools_called, llm,
-            retrieval_tools=config.retrieval_tools,
-        )
+        cr_score,  cr_note  = await evaluate_context_relevance(user_message=user_message, tools_called=tools_called, llm=llm)
 
         scores = {
             "response_quality":    rq_score,
@@ -131,7 +128,7 @@ async def run_eval_pipeline(
             "context_relevance":   cr_note,
         }
 
-        logger.info(
+        logger.debug(
             f"[Eval] session={session_id} "
             f"quality={rq_score:.2f} tool={ta_score:.2f} "
             f"escalation={ea_score:.2f} latency={lat_score:.2f}"
