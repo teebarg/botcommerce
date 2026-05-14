@@ -31,7 +31,7 @@ export default function InfiniteFeed({ initialData, params }: Props) {
 
     return (
         <InfiniteList hasMore={!!hasNextPage} isLoading={isFetchingNextPage} onLoadMore={fetchNextPage}>
-            <div className="grid grid-cols-2 md:grid-cols-6 md:gap-4 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 md:gap-4 gap-2">
                 {products?.map((product: ProductSearch, idx: number) => (
                     <ProductCardPLP key={product.id + product.slug + idx} product={product} />
                 ))}

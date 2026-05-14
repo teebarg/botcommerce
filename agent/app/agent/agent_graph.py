@@ -5,7 +5,6 @@ import time as _time
 from app.logging import get_logger
 from app.observability.tracing import record_llm_generation
 import json
-import logging
 import re
 import re as _re
 import uuid
@@ -32,7 +31,6 @@ from app.utils import _notify_slack_escalation
 from app.agent.tools import escalate_to_human
 from app.observability.tracing import record_tool_span
 
-# logger = logging.getLogger(__name__)
 logger = get_logger(__name__)
 
 
@@ -58,8 +56,10 @@ SYSTEM_PROMPT = (
     "Never reveal you are an AI or mention any AI company. "
     "Never make up product details, prices, or order information — always use tools. "
     "Tool usage rules: "
-    "(1) For product questions: call search_products once with a specific customer query. "
-    "NEVER call search_products with an empty query or for general 'what do you sell' questions — "
+    "(1) For product questions: ALWAYS call search_products first, no matter what. "
+    "Even if you think the item is not fashion-related, call search_products anyway. "
+    "Let the results determine whether we carry it — never assume without searching. "
+    "NEVER call search_products with an empty query..."
     "instead, briefly describe that you offer a range of products and ask what they're looking for. "
     "When search_products returns results, do NOT list the products in your reply — "
     "they are displayed as visual cards in the UI automatically. "
@@ -73,6 +73,9 @@ SYSTEM_PROMPT = (
     "Do NOT say 'I found some options' without first calling the tool. "
     "Example: customer asks for 'baby diapers' → say we don't carry diapers → "
     "call search_products('baby clothing') → 'Here are some baby clothing options instead!' "
+    "When you tell a customer we don't carry something and show alternatives, "
+    "use only ONE introductory sentence before the cards appear. "
+    "Do not repeat or rephrase the same sentence. "
     "(2) For order questions: call check_order_status with the order ID. "
     "(3) For stock questions: call check_stock only when the customer explicitly asks if something is in stock. "
     "(4) For policy or how-to questions: call search_faqs or search_policies. "
@@ -115,13 +118,14 @@ def _is_results_mismatch_semantic(query: str, results: str) -> bool:
     If similarity is below threshold, it's a mismatch.
     """
     import numpy as np
-    logger.debug("_is_results_mismatch_semantic")
+    logger.debug("in _is_results_mismatch_semantic")
 
     try:
         model = get_embedding_model()
         
         # Extract just product names from results for a cleaner signal
         product_names = _re.findall(r'^- (.+?) \(SKU:', results, _re.MULTILINE)
+        logger.debug(f"[Mismatch] Semantic product_names: {product_names}")
         if not product_names:
             return False
         
@@ -134,6 +138,7 @@ def _is_results_mismatch_semantic(query: str, results: str) -> bool:
         results_emb = next(model.embed([results_text]))
         
         similarity = float(np.dot(query_emb, results_emb))
+        logger.debug(f"[Mismatch] Semantic similarity: {similarity}")
         logger.debug(f"[Mismatch] query='{query}' similarity={similarity:.3f}")
         
         return similarity < 0.3  # tunable threshold
@@ -375,7 +380,8 @@ def build_graph():
                     logger.debug("[Agent] Retry with tools succeeded")
                 except Exception:
                     logger.warning("[Agent] Retrying without tools")
-                    response = await llm.ainvoke(minimal_prompt)
+                    # response = await llm.ainvoke(minimal_prompt)
+                    raise
             else:
                 raise
 
@@ -573,9 +579,19 @@ def _strip_product_listing(reply: str, has_products: bool) -> str:
         reply,
         flags=_re.DOTALL,
     )
+    reply = _re.sub(r'(.+?[.!?])\s+\1', r'\1', reply, flags=_re.IGNORECASE)
+
+     # Deduplicate: "X instead! Here are some Y instead!" → keep only first sentence
+    reply = _re.sub(
+        r"((?:I found|Here are|We have)[^!]+instead!)\s+(?:I found|Here are|We have)[^!]+instead!",
+        r"\1",
+        reply,
+        flags=_re.IGNORECASE,
+    )
 
     # Collapse excess blank lines
     reply = _re.sub(r"\n{3,}", "\n\n", reply)
+    reply = _re.sub(r'([^.!?]+[!?])\s+\1', r'\1', reply, flags=_re.IGNORECASE)
 
     return reply.strip()
 
