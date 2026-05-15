@@ -3,13 +3,13 @@ app/observability/langfuse_client.py
 Langfuse v4 — context-manager / OTel based SDK.
 """
 from __future__ import annotations
-import logging
 from functools import lru_cache
-from langfuse import Langfuse, get_client, propagate_attributes
+from app.logging import get_logger
+from langfuse import Langfuse
 
 from app.config import settings
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 @lru_cache(maxsize=1)
@@ -132,11 +132,9 @@ class _SpanAdapter:
 
     def end(self, output=None, metadata=None, level=None, **__) -> None:
         try:
-            kwargs = {}
-            if output is not None:  kwargs["output"]   = output
-            if metadata is not None: kwargs["metadata"] = metadata
-            if level is not None:   kwargs["level"]    = level
-            self._obs.end(**kwargs)
+            if output is not None or metadata is not None:
+                self._obs.update(output=output, metadata=metadata)
+            self._obs.end()
         except Exception as exc:
             logger.debug(f"[Langfuse] span.end error: {exc}")
 

@@ -7,12 +7,10 @@ Uses the same DB connection pattern already in app/agent/db.py.
 from __future__ import annotations
 
 import json
-import logging
-from datetime import datetime, timezone
-
+from app.logging import get_logger
 from app.agent.db import get_connection
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 async def save_eval_result(

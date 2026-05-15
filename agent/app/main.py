@@ -4,8 +4,6 @@ from app.agent.eval_config import SUPPORT_EVAL_CONFIG
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-# import logging
-# import sys
 
 from app.schemas.models import ChatRequest, ChatResponse, IngestRequest, HealthResponse
 from app.agent.agent_graph import run_agent
@@ -22,12 +20,6 @@ from app.observability.eval_runner import run_eval_pipeline
 from app.observability.langfuse_client import flush_langfuse
 from app.config import get_llm
 
-# logging.basicConfig(
-#     level=logging.INFO,
-#     format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
-#     handlers=[logging.StreamHandler(sys.stdout)],
-# )
-# logger = logging.getLogger(__name__)
 logger = get_logger(__name__)
 
 

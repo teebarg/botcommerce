@@ -1,13 +1,13 @@
 import json
+from app.logging import get_logger
 import jwt
 import time
 import httpx
-import logging
 from langchain_classic.tools import tool
 from app.rag.qdrant_client import search_collection
 from app.config import get_settings
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 def _shop_request(method: str, path: str, **kwargs) -> dict:
@@ -42,7 +42,7 @@ def search_products(query: str) -> str:
     if not query or not query.strip():
         return "No query provided. Ask the customer what they're looking for."
         
-    results = search_collection("products", query, top_k=3, score_threshold=0.45)
+    results = search_collection("products", query, top_k=4, score_threshold=0.45)
     if not results:
         return "No matching products found."
 

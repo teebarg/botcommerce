@@ -1,5 +1,5 @@
 import json
-import logging
+from app.logging import get_logger
 import asyncpg
 from typing import Optional
 from datetime import datetime
@@ -7,8 +7,7 @@ from app.config import get_settings
 
 settings = get_settings()
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 # ─────────────────────────────────────────────────────────────
@@ -45,7 +44,7 @@ async def ensure_conversation_exists(
         )
         return row["id"]
     except Exception:
-        logger.exception(f"[DB] Failed to ensure conversation exists uuid={conversation_uuid}")
+        logger.error(f"[DB] Failed to ensure conversation exists uuid={conversation_uuid}")
         raise
     finally:
         if conn:
@@ -91,7 +90,7 @@ async def mark_escalated(conversation_uuid: str):
         )
         logger.debug(f"[DB] Conversation {conversation_uuid} escalated")
     except Exception:
-        logger.exception(f"[DB] Failed to escalate conversation uuid={conversation_uuid}")
+        logger.error(f"[DB] Failed to escalate conversation uuid={conversation_uuid}")
         raise
     finally:
         if conn:

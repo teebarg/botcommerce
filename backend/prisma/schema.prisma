@@ -791,7 +791,6 @@ model EvalResult {
   session_id  String
   customer_id Int?
 
-  // Agent metadata
   agent_name    String?
   agent_version String?
   model_name    String?
@@ -800,14 +799,12 @@ model EvalResult {
   langfuse_trace_id String?
   trace_metadata    Json?
 
-  // Input / output snapshot
   user_message String? @db.Text
   agent_reply  String? @db.Text
   escalated    Boolean @default(false)
   sources      Json? // list[string]
   tools_called Json? // [{name,args,result_preview,duration_ms}]
 
-  // Performance metrics
   latency_ms        Float?
   prompt_tokens     Int?
   completion_tokens Int?
@@ -824,16 +821,13 @@ model EvalResult {
   // Evaluation reasoning / notes
   eval_notes Json?
 
-  // Failure/debugging
   error      String? @db.Text
   stacktrace String? @db.Text
 
   created_at DateTime @default(now())
 
-  // Relations
   user User? @relation(fields: [customer_id], references: [id], onDelete: SetNull)
 
-  // Indexes
   @@index([session_id])
   @@index([customer_id])
   @@index([created_at(sort: Desc)])

@@ -1,9 +1,9 @@
-import logging
 from datetime import datetime, timezone
+from app.logging import get_logger
 import httpx
 from app.config import settings
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 async def _notify_slack_escalation(
     session_id: str | None,

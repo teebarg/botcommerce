@@ -25,7 +25,6 @@ from app.services.redis import cache_response, refresh_product
 from app.services.recently_viewed import RecentlyViewedService
 from app.services.websocket import manager
 from app.services.generic import remove_image_from_storage
-from app.services.redis import refresh_data
 from app.models.gallery import PaginatedProductImages
 from app.core.permissions import require_admin
 
@@ -534,7 +533,7 @@ async def _process_single_image(
             **build_variant_data(payload.data),
         }
 
-        async with db.tx() as tx:
+        async with db.tx(timeout=15000) as tx:
             product = await tx.product.create(data=product_data)
             await tx.productimage.update(
                 where={"id": image.id},
@@ -564,28 +563,29 @@ async def _process_single_image(
             else None
         )
 
-        async with db.tx() as tx:
-            if relation_updates:
-                await tx.product.update(where={"id": image.product_id}, data=relation_updates)
-            if variant_data and first_variant_id:
-                await tx.productvariant.update(
-                    where={"id": first_variant_id},
-                    data=variant_data,
-                )
+        if relation_updates or (variant_data and first_variant_id):
+            async with db.tx(timeout=15000) as tx:
+                if relation_updates:
+                    await tx.product.update(
+                        where={"id": image.product_id}, data=relation_updates
+                    )
+                if variant_data and first_variant_id:
+                    await tx.productvariant.update(
+                        where={"id": first_variant_id},
+                        data=variant_data,
+                    )
 
 
 async def handle_bulk_update_products(payload: ImagesBulkUpdate, images) -> None:
     failed_ids = []
     created_product_ids = []
 
-    async def _process_with_tx(image):
+    for image in images:
         try:
             await _process_single_image(image=image, payload=payload, created_product_ids=created_product_ids)
         except Exception as e:
             logger.error(f"Error processing image {image.id}: {e}")
             failed_ids.append(image.id)
-
-    await asyncio.gather(*[_process_with_tx(img) for img in images], return_exceptions=True)
     await index_products(product_ids=created_product_ids)
 
     status = "completed" if not failed_ids else "partial"

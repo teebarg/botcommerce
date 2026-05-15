@@ -1,14 +1,13 @@
 import asyncio
 import argparse
-import logging
+from app.logging import get_logger
 import asyncpg
 from app.rag.qdrant_client import upsert_documents
 from app.config import get_settings
 
 settings = get_settings()
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 async def get_connection() -> asyncpg.Connection:
@@ -87,15 +86,9 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
         ]))
 
         text: str = " ".join(filter(None, [
-            f"Product: {r['name']}.",
-            f"Product ID: {r['id']}.",
-            f"Variant ID: {r['variant_id']}.",
-            f"Image: {r['image']}.",
-            f"Category: {r['categories']}." if r["categories"] else None,
-            f"Description: {r['description']}." if r["description"] else None,
-            f"SKU: {r['sku']}.",
-            "Is New."                  if r["is_new"]     else "Thrift",
-            variants_summary,
+            r['name'],
+            r['categories'] if r["categories"] else None,
+            r['description'] if r["description"] else None,
         ]))
 
         documents.append({

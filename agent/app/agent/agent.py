@@ -1,8 +1,8 @@
+from app.logging import get_logger
 from langchain.agents import AgentExecutor, create_react_agent
 from langchain.prompts import PromptTemplate
 from langchain_core.runnables import RunnableConfig
 from langchain_core.messages import HumanMessage, SystemMessage
-import logging
 import uuid
 import re
 
@@ -10,7 +10,7 @@ from app.config import get_llm, get_settings
 from app.agent.tools import get_all_tools
 from app.agent.memory import load_memory_from_redis, save_memory_to_redis
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 # Messages that match these patterns never enter the ReAct loop.
 CONVERSATIONAL_PATTERNS = re.compile(

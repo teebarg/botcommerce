@@ -246,6 +246,12 @@ async def feed(
             json.dumps(payload).encode()
         ).decode()
 
+    def encode_offset_cursor(offset: int) -> str:
+        payload = {"offset": offset}
+        return base64.urlsafe_b64encode(
+            json.dumps(payload).encode()
+        ).decode()
+
     def decode_cursor(cursor: str) -> dict:
         return json.loads(
             base64.urlsafe_b64decode(cursor.encode()).decode()
@@ -286,23 +292,28 @@ async def feed(
         feed_seed = random.random()
 
     index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
-    disable_random_feed: bool = has_active_filters(search, cat_ids, collections, max_price, min_price, sizes, colors, ages, width, length)
+    disable_random_feed: bool = has_active_filters(
+        search, cat_ids, collections, max_price, min_price, sizes, colors, ages, width, length
+    )
+
+    offset = 0
+    cursor_filter = ""
+    if cursor:
+        c = decode_cursor(cursor)
+        if disable_random_feed:
+            offset = c.get("offset", 0)
+        else:
+            cursor_filter = (
+                f"(random_score > {c['r']} OR "
+                f"(random_score = {c['r']} AND freshness_score < {c['f']}) OR "
+                f"(random_score = {c['r']} AND freshness_score = {c['f']} AND id > {c['id']}))"
+            )
 
     try:
         hits: list[dict] = []
         total_count = 0
 
         if not disable_random_feed:
-            cursor_filter = ""
-
-            if cursor:
-                c = decode_cursor(cursor)
-                cursor_filter = (
-                    f"(random_score > {c['r']} OR "
-                    f"(random_score = {c['r']} AND freshness_score < {c['f']}) OR "
-                    f"(random_score = {c['r']} AND freshness_score = {c['f']} AND id > {c['id']}))"
-                )
-
             seed_filter: str = f"random_score >= {feed_seed}"
 
             filters = " AND ".join(
@@ -358,6 +369,7 @@ async def feed(
             logger.debug("in normal search")
             search_params = {
                 "limit": limit,
+                "offset": offset,
                 "sort": [sort],
             }
 
@@ -399,11 +411,12 @@ async def feed(
             detail="Search service temporarily unavailable",
         )
 
-    next_cursor: str | None = (
-        encode_cursor(hits[-1])
-        if hits and total_count > limit
-        else None
-    )
+    next_cursor: str | None = None
+    if hits and total_count > (offset + limit):
+        if not disable_random_feed:
+            next_cursor = encode_cursor(hits[-1])
+        else:
+            next_cursor = encode_offset_cursor(offset + limit)
 
     return {
         "products": hits,

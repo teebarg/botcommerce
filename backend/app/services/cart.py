@@ -1,12 +1,12 @@
 from typing import Optional
-import logging
 from app.prisma_client import prisma as db
+from app.core.logging import get_logger
 from prisma.enums import CartStatus
 from app.models.cart import Cart
 from app.services.redis import refresh_data
 from app.services.shop_settings import ShopSettingsService
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 async def get_cart(cart_number: Optional[str], user_id: Optional[str]) -> Cart | None:

@@ -7,10 +7,9 @@ Called as a FastAPI background task — never blocks the response.
 """
 from __future__ import annotations
 
-import logging
-import time
 from typing import Any
 
+from app.logging import get_logger
 from app.observability.evaluators import (
     evaluate_context_relevance,
     evaluate_escalation_accuracy,
@@ -22,10 +21,9 @@ from app.observability.evaluators import (
 from app.observability.db import save_eval_result
 from app.observability.tracing import score_trace
 from dataclasses import dataclass, field
-from typing import Callable, Awaitable
-from app.config import get_llm, settings
+from typing import Callable
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 @dataclass

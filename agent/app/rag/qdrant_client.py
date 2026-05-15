@@ -1,3 +1,4 @@
+from app.logging import get_logger
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
     Distance, VectorParams, PointStruct, Filter,
@@ -7,12 +8,11 @@ from qdrant_client.models import (
 from functools import lru_cache
 from typing import Optional
 import uuid
-import logging
 from pathlib import Path
 from fastembed import TextEmbedding
 import os
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 # MODEL_NAME = "all-MiniLM-L6-v2"

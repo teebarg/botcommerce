@@ -46,58 +46,44 @@ class AgentState(TypedDict):
     iterations: int = 0
     prompt_tokens: int = 0
     completion_tokens: int = 0
+    query_intent: str = "ambiguous"
 
 
 MAX_ITERATIONS = 6
 
-SYSTEM_PROMPT = (
-    "You are Seun, a friendly customer support agent for Thriftbyoba, an online shop. "
-    "If users ask where they are or if they are at Thriftbyoba, warmly confirm that they are. "
-    "Never reveal you are an AI or mention any AI company. "
-    "Never make up product details, prices, or order information — always use tools. "
-    "Tool usage rules: "
-    "(1) For product questions: ALWAYS call search_products first, no matter what. "
-    "Even if you think the item is not fashion-related, call search_products anyway. "
-    "Let the results determine whether we carry it — never assume without searching. "
-    "NEVER call search_products with an empty query..."
-    "instead, briefly describe that you offer a range of products and ask what they're looking for. "
-    "When search_products returns results, do NOT list the products in your reply — "
-    "they are displayed as visual cards in the UI automatically. "
-    "Instead, just tell the customer how many options you found and invite them to ask for details. "
-    "Example: 'I found 3 options for you! Let me know if you'd like more details on any of them.' "
-    "When search_products returns results that do not match what the customer asked for "
-    "(e.g. customer asked for diapers but results show clothing), you MUST: "
-    "1. Tell the customer you don't carry that specific item. "
-    "2. Call search_products AGAIN with a related fashion/clothing query to find actual alternatives. "
-    "3. Present the alternatives warmly. "
-    "Do NOT say 'I found some options' without first calling the tool. "
-    "Example: customer asks for 'baby diapers' → say we don't carry diapers → "
-    "call search_products('baby clothing') → 'Here are some baby clothing options instead!' "
-    "When you tell a customer we don't carry something and show alternatives, "
-    "use only ONE introductory sentence before the cards appear. "
-    "Do not repeat or rephrase the same sentence. "
-    "(2) For order questions: call check_order_status with the order ID. "
-    "(3) For stock questions: call check_stock only when the customer explicitly asks if something is in stock. "
-    "(4) For policy or how-to questions: call search_faqs or search_policies. "
-    "(5) For refunds: confirm order ID and reason before calling request_refund. "
-    "ESCALATION rules — ONLY use ESCALATION_REQUIRED for: fraud, legal threats, "
-    "lawsuits, chargebacks, abuse, or complex billing disputes a bot cannot resolve. "
-    "NEVER EVER use ESCALATION_REQUIRED when: a product is not found, an item is unavailable, "
-    "a search returns no results, or a customer simply asks about a product you don't carry. "
-    "For those cases, reply politely: e.g. 'I couldn't find that item — could you describe it "
-    "differently or check the spelling?' "
-    "If and ONLY IF it is a genuine high-risk case, respond ONLY with: "
-    "ESCALATION_REQUIRED: <short reason> — no tools, no extra text. "
-    "Keep replies concise and warm."
-    "Always display currency in Nigerian Naira (₦). Never use dollars ($). Do not infer currency — use only the provided format."
-    "If the customer asks something completely unrelated to Thriftbyoba, products, orders, or support..."
-    "(e.g. personal advice, general knowledge, jokes), politely decline and redirect them. "
-    "Example: 'I'm only able to help with shop-related questions — is there anything I can assist you with today?' "
-    "Do NOT call any tool for off-topic messages. "
-    "If the customer says 'contact support', 'contact us', or similar, "
-    "respond ONLY with: ESCALATION_REQUIRED: customer wants to contact support. "
-    "Do NOT call any tool. "
-)
+SYSTEM_PROMPT = """You are Seun, a warm and helpful customer support agent for Thriftbyoba, a Nigerian online fashion store selling clothing and accessories for all ages.
+
+## Identity
+- Never reveal you are an AI or mention any AI company.
+- If asked where the customer is, confirm they are at Thriftbyoba.
+- Always use Nigerian Naira (₦) for prices. Never use dollars ($).
+- Keep replies concise, friendly, and professional.
+
+## Product Search
+- ALWAYS call search_products before answering any product question. Never assume what we carry.
+- NEVER call search_products with an empty query. If the question is too vague, ask the customer to be more specific.
+- When results are returned, DO NOT list products in your reply. They display as cards in the UI automatically. Simply say how many you found, e.g. "I found 3 options for you! Let me know if you'd like more details."
+- If the results clearly do not match what the customer asked for (e.g. they asked for baby diapers but results show clothing), you MUST:
+  1. Tell the customer we don't carry that specific item.
+  2. Call search_products again with a related clothing/fashion query.
+  3. Introduce the alternatives warmly in ONE sentence only.
+- If the customer asks for something completely unrelated to fashion (e.g. electronics, food, furniture), do NOT search. Simply say we are a fashion store and ask if you can help with clothing instead.
+
+## Orders, Stock & Policies
+- Order status: call check_order_status with the order ID.
+- Stock availability: call check_stock only when the customer explicitly asks.
+- Policy or how-to questions: call search_faqs or search_policies.
+- Refunds: confirm the order ID and reason before calling request_refund.
+
+## Escalation
+Only respond with `ESCALATION_REQUIRED: <reason>` for: fraud, legal threats, lawsuits, chargebacks, abuse, or complex billing disputes.
+Do NOT escalate for: missing products, unavailable items, or anything a search can resolve.
+If the customer asks to contact support or speak to a human, respond ONLY with: `ESCALATION_REQUIRED: customer wants to contact support.`
+Do not call any tool when escalating.
+
+## Off-topic
+If the customer asks about anything unrelated to Thriftbyoba, products, orders, or support (e.g. personal advice, general knowledge, jokes), politely decline and redirect. Do not call any tool.
+"""
 
 CONVERSATIONAL_PATTERNS = re.compile(
     r"^\s*(hi+|hey+|hello+|howdy|good\s*(morning|afternoon|evening)|"
@@ -110,64 +96,39 @@ CONVERSATIONAL_PATTERNS = re.compile(
     re.IGNORECASE,
 )
 
-from app.rag.qdrant_client import get_embedding_model
 
-def _is_results_mismatch_semantic(query: str, results: str) -> bool:
-    """
-    Compute cosine similarity between the query and the top results.
-    If similarity is below threshold, it's a mismatch.
-    """
-    import numpy as np
-    logger.debug("in _is_results_mismatch_semantic")
+from enum import Enum
 
+class QueryIntent(str, Enum):
+    FASHION = "fashion"        # carry it, search normally
+    OUT_OF_SCOPE = "out_of_scope"  # don't carry it, politely redirect
+    AMBIGUOUS = "ambiguous"    # search and let results decide
+
+_QUERY_ROUTER_PROMPT = """You are a query router for Thriftbyoba, a Nigerian online fashion store.
+Classify the customer's product query into exactly one category:
+
+- fashion: clothing, footwear, bags, accessories, or anything wearable for any age or gender
+- out_of_scope: food, electronics, furniture, real estate, medicine, cosmetics, groceries, or anything clearly not fashion
+- ambiguous: unclear, could be fashion-related (e.g. "baby items", "gift")
+
+Reply with ONLY one word: fashion, out_of_scope, or ambiguous.
+
+Query: {query}"""
+
+async def classify_query_intent(query: str) -> QueryIntent:
+    """Classify whether a product query is fashion-related before searching."""
     try:
-        model = get_embedding_model()
-        
-        # Extract just product names from results for a cleaner signal
-        product_names = _re.findall(r'^- (.+?) \(SKU:', results, _re.MULTILINE)
-        logger.debug(f"[Mismatch] Semantic product_names: {product_names}")
-        if not product_names:
-            return False
-        
-        results_text = " ".join(product_names[:3])  # top 3 names
-        
-        # query_emb   = model.encode(query,        normalize_embeddings=True)
-        # results_emb = model.encode(results_text, normalize_embeddings=True)
+        llm = get_llm()
+        resp = await llm.ainvoke([
+            HumanMessage(content=_QUERY_ROUTER_PROMPT.format(query=query))
+        ])
+        result = _extract_text_content(resp.content).strip().lower()
+        if result in QueryIntent.__members__.values():
+            return QueryIntent(result)
+    except Exception as e:
+        logger.error(f"[QueryRouter] Classification failed: {e}")
+    return QueryIntent.AMBIGUOUS  # safe fallback — let search decide
 
-        query_emb   = next(model.embed([query]))
-        results_emb = next(model.embed([results_text]))
-        
-        similarity = float(np.dot(query_emb, results_emb))
-        logger.debug(f"[Mismatch] Semantic similarity: {similarity}")
-        logger.debug(f"[Mismatch] query='{query}' similarity={similarity:.3f}")
-        
-        return similarity < 0.3  # tunable threshold
-        
-    except Exception as exc:
-        logger.error(f"[Mismatch] Semantic check failed: {exc}")
-        return False
-
-
-def _is_results_mismatch(query: str, results: str) -> bool:
-    """
-    Heuristic: did the search return results unrelated to the query?
-    Checks if any meaningful query word appears in the results.
-    """
-    stopwords = {"do", "you", "have", "sell", "i", "a", "the", "any", "some", "for"}
-    query_words = {
-        w.lower() for w in _re.findall(r'\w+', query)
-        if w.lower() not in stopwords and len(w) > 2
-    }
-    logger.debug(f"[Mismatch] query_words={query_words}")
-    if not query_words:
-        return False
-    results_lower = results.lower()
-    matched = [w for w in query_words if w in results_lower]
-    logger.debug(f"[Mismatch] query_words={query_words} matched={matched}")
-    # If NONE of the meaningful query words appear in results, it's a mismatch
-    # return not any(word in results_lower for word in query_words)
-    specific_words = sorted(query_words, key=len, reverse=True)
-    return not any(word in results_lower for word in specific_words[:2])
 
 def _extract_tools_called(messages: list) -> list[dict]:
     """Extract tool calls made this turn as [{name, args, result_preview}]."""
@@ -299,6 +260,58 @@ _FORM_DETECTION_PROMPT = (
     "Reply with ONLY one of: escalation_details, complaint, contact_update, null."
 )
 
+# Tool Call Repair
+_TOOL_JSON_RE = re.compile(
+    r'\{\s*"name"\s*:\s*"(?P<name>[^"]+)"\s*,\s*"arguments"\s*:\s*(?P<args>\{.*\})\s*\}',
+    re.DOTALL,
+)
+
+def _repair_tool_call(response: AIMessage) -> AIMessage:
+    """
+    Convert malformed JSON tool-call text into proper LangChain tool_calls.
+    """
+    if getattr(response, "tool_calls", None):
+        return response
+
+    content = str(response.content).strip()
+
+    match = _TOOL_JSON_RE.search(content)
+    if not match:
+        return response
+
+    try:
+        tool_name = match.group("name")
+        tool_args = json.loads(match.group("args"))
+
+        logger.warning(
+            f"[Repair] Converted malformed tool JSON into tool_call: {tool_name}"
+        )
+
+        return AIMessage(
+            content="",
+            tool_calls=[
+                {
+                    "id": str(uuid.uuid4()),
+                    "name": tool_name,
+                    "args": tool_args,
+                    "type": "tool_call",
+                }
+            ],
+        )
+
+    except Exception as e:
+        logger.error(f"[Repair] Failed to repair tool call: {e}")
+        return response
+
+
+def _sanitize_loaded_history(messages: list[BaseMessage]) -> list[BaseMessage]:
+    """Drop any ToolMessages or AIMessage tool-calls that survived serialisation."""
+    return [
+        m for m in messages
+        if not isinstance(m, ToolMessage)
+        and not (isinstance(m, AIMessage) and m.tool_calls)
+    ]
+
 
 # ── Graph ─────────────────────────────────────────────────────────────────────
 
@@ -314,13 +327,29 @@ def build_graph():
                 (m for m in reversed(state["messages"]) if isinstance(m, HumanMessage)), None
             )
             if first_human:
-                logger.debug(f"\n{'='*60}")
-                logger.debug(f"[User] {first_human.content}")
-                logger.debug(f"{'='*60}")
+                logger.debug(f"[Human Message] {first_human.content}")
+                intent = await classify_query_intent(str(first_human.content))
+                logger.debug(f"[QueryRouter] intent={intent} for query='{first_human.content[:60]}'")
+            else:
+                intent = QueryIntent.AMBIGUOUS
+        else:
+            intent = QueryIntent.AMBIGUOUS
 
         system = SYSTEM_PROMPT
         if state.get("customer_id"):
             system += f" The customer ID is {state['customer_id']}."
+
+        if intent == QueryIntent.OUT_OF_SCOPE:
+            system += (
+                "\n\nROUTER DECISION: This query is out of scope for a fashion store. "
+                "Do NOT call any tool. Tell the customer we only sell fashion items "
+                "and ask what clothing you can help them find."
+            )
+        elif intent == QueryIntent.FASHION:
+            system += (
+                "\n\nROUTER DECISION: This is a valid fashion query. "
+                "Call search_products and present results normally."
+            )
 
         def _count_tokens(msgs: list[BaseMessage]) -> int:
             return sum(len(str(m.content)) for m in msgs) // 4
@@ -341,7 +370,8 @@ def build_graph():
         try:
             _t0 = _time.monotonic()
             response = await llm_with_tools.ainvoke(prompt)
-            logger.debug(f"[Tracing] usage raw: {getattr(response, 'usage_metadata', None)} | {getattr(response, 'response_metadata', {})}")
+            response = _repair_tool_call(response)
+            # logger.debug(f"[Tracing] usage raw: {getattr(response, 'usage_metadata', None)} | {getattr(response, 'response_metadata', {})}")
             _llm_ms = (_time.monotonic() - _t0) * 1000
 
             usage = (
@@ -386,8 +416,6 @@ def build_graph():
                 raise
 
         new_iterations = state.get("iterations", 0) + 1
-
-        # Log the model's decision now that we have the response
         updated_state = {**state, "messages": state["messages"] + [response], "iterations": new_iterations}
         _log_thought(updated_state)
 
@@ -404,6 +432,82 @@ def build_graph():
     tool_node = ToolNode(tools)
 
     async def process_tool_results(state: AgentState) -> dict:
+        messages = list(state["messages"])
+        patched: list[BaseMessage] = []
+        
+        # Find the last AIMessage with tool_calls — only patch ToolMessages from that batch
+        last_ai_tool_call_ids: set[str] = set()
+        for msg in reversed(messages):
+            if isinstance(msg, AIMessage) and msg.tool_calls:
+                last_ai_tool_call_ids = {tc["id"] for tc in msg.tool_calls}
+                break
+
+        for msg in messages:
+            if (
+                isinstance(msg, ToolMessage)
+                and msg.name == "search_products"
+                and msg.tool_call_id in last_ai_tool_call_ids  # only current batch
+                and "<!-- UI_CARDS -->" not in str(msg.content)
+                and "No matching products" not in str(msg.content)
+            ):
+                count: int = str(msg.content).count("(SKU:")
+                note: str = (
+                    f"\n\n<!-- UI_CARDS: {count} product card(s) will be shown in the UI automatically. "
+                    "Do NOT list them in your text reply. "
+                    "Do NOT repeat the product names or SKUs. "
+                    "Just acknowledge the count warmly and invite questions. -->"
+                )
+                msg = ToolMessage(
+                    content=str(msg.content) + note,
+                    tool_call_id=msg.tool_call_id,
+                    name=msg.name,
+                )
+            patched.append(msg)
+
+        _log_observations(state)
+
+        sources: list[str] = list(state.get("sources", []))
+        escalated: bool = state.get("escalated", False)
+
+        for msg in reversed(state["messages"]):
+            if not isinstance(msg, ToolMessage):
+                break
+            if msg.tool_call_id not in last_ai_tool_call_ids:
+                break  # stop at previous turn's messages
+            if msg.name in ("search_products", "search_faqs", "search_policies"):
+                label = msg.name.replace("search_", "").replace("_", " ").title()
+                if label not in sources:
+                    sources.append(label)
+            if msg.name == "escalate_to_human":
+                escalated = True
+                await _notify_slack_escalation(
+                    session_id=state.get("session_id"),
+                    customer_id=state.get("customer_id"),
+                    reason=str(msg.content),
+                )
+
+        for msg in state["messages"]:
+            if isinstance(msg, ToolMessage) and msg.tool_call_id in last_ai_tool_call_ids:
+                record_tool_span(
+                    tool_name=msg.name or "unknown",
+                    tool_args={},
+                    tool_result=str(msg.content)[:300],
+                    latency_ms=0,
+                )
+
+        # Return only the patched versions of the current batch's tool messages
+        new_tool_msgs = [
+            m for m in patched
+            if isinstance(m, ToolMessage) and m.tool_call_id in last_ai_tool_call_ids
+        ]
+
+        return {
+            "messages": new_tool_msgs,
+            "sources": sources,
+            "escalated": escalated,
+        }
+
+    async def process_tool_results2(state: AgentState) -> dict:
         # For search_products results, append a UI note so the model doesn't
         # re-list products in its text reply (they render as cards in the UI)
         messages = list(state["messages"])
@@ -418,33 +522,10 @@ def build_graph():
                 count: int = str(msg.content).count("(SKU:")
                 note: str = (
                     f"\n\n<!-- UI_CARDS: {count} product card(s) will be shown in the UI automatically. "
-                    "Do NOT list them in your text reply. Just acknowledge the count warmly and invite questions. -->"
+                    "Do NOT list them in your text reply. "
+                    "Do NOT repeat the product names or SKUs. "
+                    "Just acknowledge the count warmly and invite questions. -->"
                 )
-
-                # ── Mismatch detection ──────────────────────────────────────────
-                # Extract the original query from the AI message that triggered this tool
-                original_query = ""
-                for m in reversed(messages):
-                    if isinstance(m, AIMessage) and m.tool_calls:
-                        for tc in m.tool_calls:
-                            if tc["name"] == "search_products":
-                                original_query = tc["args"].get("query", "")
-                        break
-
-                logger.debug(f"original_query................{original_query}")
-
-                # if original_query and _is_results_mismatch(original_query, str(msg.content)):
-                if original_query and _is_results_mismatch_semantic(original_query, str(msg.content)):
-                    logger.debug(f"[Mismatch] Query='{original_query}' — injecting warning")
-                    note += (
-                        f"\n\n<!-- MISMATCH WARNING: The customer asked for '{original_query}' "
-                        "but the results do not appear to contain that item. "
-                        "You MUST tell the customer you don't carry that specific item "
-                        "before mentioning the results. Do NOT say 'I found X options' as if they match. -->"
-                    )
-                else:
-                    logger.debug(f"[Mismatch] Query='{original_query}' — no mismatch detected")
-                # ── End mismatch detection ──────────────────────────────────────
 
                 msg = ToolMessage(
                     content=str(msg.content) + note,
@@ -520,11 +601,7 @@ def build_graph():
 
 _graph = build_graph()
 
-
-# ── Public API ────────────────────────────────────────────────────────────────
-
 # ── Product extractor ─────────────────────────────────────────────────────────
-
 def _extract_products(messages: list) -> list[dict]:
     import json as _json
     pattern = _re.compile(r"<!-- PRODUCTS_JSON:(.+?) -->", _re.DOTALL)
@@ -565,13 +642,6 @@ def _strip_product_listing(reply: str, has_products: bool) -> str:
         flags=_re.IGNORECASE,
     )
 
-    reply = _re.sub(
-        r"(Here are some [^!]+instead!)\s*\1",  # catch exact duplicates
-        r"\1",
-        reply,
-        flags=_re.IGNORECASE,
-    )
-
     # Remove numbered product blocks: "1. **Name** ..." up to next item or end
     reply = _re.sub(
         r"\n?\d+\.\s+\*\*[^*]+\*\*.*?(?=\n\d+\.\s+\*\*|\Z)",
@@ -579,19 +649,9 @@ def _strip_product_listing(reply: str, has_products: bool) -> str:
         reply,
         flags=_re.DOTALL,
     )
-    reply = _re.sub(r'(.+?[.!?])\s+\1', r'\1', reply, flags=_re.IGNORECASE)
-
-     # Deduplicate: "X instead! Here are some Y instead!" → keep only first sentence
-    reply = _re.sub(
-        r"((?:I found|Here are|We have)[^!]+instead!)\s+(?:I found|Here are|We have)[^!]+instead!",
-        r"\1",
-        reply,
-        flags=_re.IGNORECASE,
-    )
 
     # Collapse excess blank lines
     reply = _re.sub(r"\n{3,}", "\n\n", reply)
-    reply = _re.sub(r'([^.!?]+[!?])\s+\1', r'\1', reply, flags=_re.IGNORECASE)
 
     return reply.strip()
 
@@ -682,7 +742,6 @@ async def _get_quick_replies(
     if llm_replies:
         return llm_replies
 
-    # LLM failed — fall back to rules
     return _rule_based_quick_replies(user_message, sources, escalated)
 
 
@@ -784,6 +843,7 @@ async def run_agent(
     )
 
     history: list[BaseMessage] = load_messages_from_redis(session_id)
+    history = _sanitize_loaded_history(history)
 
     if CONVERSATIONAL_PATTERNS.match(message.strip()):
         logger.debug("[Agent] Conversational shortcut")
@@ -792,7 +852,7 @@ async def run_agent(
             [SystemMessage(content=SYSTEM_PROMPT), *history, HumanMessage(content=message)]
         )
 
-        reply = _extract_text_content(resp.content).strip()
+        reply: str = _extract_text_content(resp.content).strip()
         save_messages_to_redis(
             session_id,
             history + [HumanMessage(content=message), AIMessage(content=reply)],

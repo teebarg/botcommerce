@@ -6,12 +6,11 @@ All evaluators are best-effort: they never raise.
 """
 from __future__ import annotations
 
-import logging
 import re
-import time
 from typing import Any
+from app.logging import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 # ── 1. Response quality (LLM-as-judge) ───────────────────────────────────────
