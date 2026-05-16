@@ -1,9 +1,3 @@
-"""
-app/observability/evaluators.py
-
-Four async evaluators, each returning a score (0.0–1.0) + a short note.
-All evaluators are best-effort: they never raise.
-"""
 from __future__ import annotations
 
 import re
@@ -13,7 +7,7 @@ from app.logging import get_logger
 logger = get_logger(__name__)
 
 
-# ── 1. Response quality (LLM-as-judge) ───────────────────────────────────────
+#1. Response quality (LLM-as-judge)
 _QUALITY_SYSTEM = (
     "You are an impartial QA evaluator for a customer support chatbot called Seun "
     "for Thriftbyoba, a fashion and clothing store.\n"
@@ -85,7 +79,7 @@ async def evaluate_response_quality(
         return 0.5, "Eval failed"
 
 
-# ── 2. Tool call accuracy (rule-based) ───────────────────────────────────────
+#2. Tool call accuracy (rule-based)
 
 # Maps intent keywords → expected tools
 _TOOL_EXPECTATIONS: list[tuple[re.Pattern, str]] = [
@@ -116,26 +110,22 @@ async def evaluate_tool_accuracy(
     expectations = tool_expectations or _TOOL_EXPECTATIONS
     tool_names = {t["name"] for t in tools_called}
 
-    # Check for expected tool
     for pattern, expected_tool in expectations:
         if pattern.search(user_message):
             if expected_tool in tool_names:
                 return 1.0, f"Correctly called {expected_tool}"
             else:
-                # Might have answered from cache/memory — partial credit
                 return 0.5, f"Expected {expected_tool} but not called"
 
-    # Check escalation wasn't triggered for trivial reasons
     if "escalate_to_human" in tool_names:
         if _FORBIDDEN_ESCALATION_PATTERNS.search(agent_reply):
             return 0.0, "Escalated for a non-critical reason (item not found)"
         return 1.0, "Escalation tool called for a plausible reason"
 
-    # No expectation matched — neutral
     return 0.8, "No specific tool expectation for this message"
 
 
-# ── 3. Escalation decision accuracy ──────────────────────────────────────────
+#3. Escalation decision accuracy
 _HIGH_RISK_PATTERNS = re.compile(
     r"fraud|lawsuit|legal action|chargeback|threatening|report you|solicitor",
     re.I,
@@ -184,7 +174,7 @@ async def evaluate_escalation_accuracy(
     return 0.7, "Escalation decision ambiguous"
 
 
-# ── 4. Latency score ──────────────────────────────────────────────────────────
+#4. Latency score
 
 # Thresholds (ms)
 _LATENCY_EXCELLENT = 1_500   # ≤ 1.5s → 1.0
@@ -205,55 +195,6 @@ def evaluate_latency(latency_ms: float) -> tuple[float, str]:
         return 0.25, f"Poor latency: {latency_ms:.0f}ms"
     else:
         return 0.0, f"Unacceptable latency: {latency_ms:.0f}ms"
-
-_GROUNDEDNESS_SYSTEM = (
-    "You are evaluating whether a customer support agent's reply is grounded in the "
-    "tool results provided, or whether it contains hallucinated details.\n"
-    "Given the tool results and the agent reply, score Groundedness (0-5):\n"
-    "5 = reply only uses information from tool results\n"
-    "3 = reply mostly grounded but adds minor assumptions\n"
-    "0 = reply contains product names, prices, or facts not in tool results\n\n"
-    "Reply in EXACTLY this format:\n"
-    "GROUNDEDNESS: <integer 0-5>\n"
-    "NOTES: <one sentence>"
-)
-
-async def evaluate_groundedness(
-    agent_reply: str,
-    tools_called: list[dict],
-    llm: Any,
-) -> tuple[float, str]:
-    """Groundedness (did the reply stay grounded in tool results?)"""
-    return 0.0, "[Eval] groundedness: Awaiting Implementation"
-    from langchain_core.messages import HumanMessage, SystemMessage
-
-    if not tools_called:
-        # No tools called — if reply mentions specific items it's hallucination
-        has_price = bool(re.search(r"₦[\d,]+", agent_reply))
-        has_sku   = bool(re.search(r"SKU|PRD-|TBH", agent_reply, re.I))
-        if has_price or has_sku:
-            return 0.0, "Specific product details in reply but no tools were called"
-        return 1.0, "No tools called and no fabricated details detected"
-
-    tool_results = "\n\n".join(
-        f"Tool: {t['name']}\nResult: {t['result_preview']}"
-        for t in tools_called
-    )
-    prompt = f"Tool results:\n{tool_results}\n\nAgent reply: {agent_reply}"
-    try:
-        resp = await llm.ainvoke([
-            SystemMessage(content=_GROUNDEDNESS_SYSTEM),
-            HumanMessage(content=prompt),
-        ])
-        text = resp.content.strip()
-        g_match   = re.search(r"GROUNDEDNESS:\s*(\d)", text)
-        note_match = re.search(r"NOTES:\s*(.+)", text)
-        score = int(g_match.group(1)) / 5.0 if g_match else 0.5
-        note  = note_match.group(1).strip() if note_match else "No note"
-        return round(score, 2), note
-    except Exception as exc:
-        logger.error(f"[Eval] groundedness error: {exc}")
-        return 0.5, "Eval failed"
 
 
 async def evaluate_context_relevance(

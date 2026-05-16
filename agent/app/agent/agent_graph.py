@@ -34,8 +34,7 @@ from app.observability.tracing import record_tool_span
 logger = get_logger(__name__)
 
 
-# ── State ─────────────────────────────────────────────────────────────────────
-
+# State
 class AgentState(TypedDict):
     messages: Annotated[list[BaseMessage], add_messages]
     customer_id: int | None = None
@@ -62,7 +61,10 @@ SYSTEM_PROMPT = """You are Seun, a warm and helpful customer support agent for T
 ## Product Search
 - ALWAYS call search_products before answering any product question. Never assume what we carry.
 - NEVER call search_products with an empty query. If the question is too vague, ask the customer to be more specific.
-- When results are returned, DO NOT list products in your reply. They display as cards in the UI automatically. Simply say how many you found, e.g. "I found 3 options for you! Let me know if you'd like more details."
+- When results are returned, DO NOT list products in your reply — they display as cards in the UI automatically.
+  Acknowledge the results naturally and conversationally. Vary your phrasing every time.
+  Never repeat the same sentence twice across a conversation.
+  You can comment on the selection, ask what they're looking for, or invite them to browse — keep it warm and human.
 - If the results clearly do not match what the customer asked for (e.g. they asked for baby diapers but results show clothing), you MUST:
   1. Tell the customer we don't carry that specific item.
   2. Call search_products again with a related clothing/fashion query.
@@ -74,6 +76,30 @@ SYSTEM_PROMPT = """You are Seun, a warm and helpful customer support agent for T
 - Stock availability: call check_stock only when the customer explicitly asks.
 - Policy or how-to questions: call search_faqs or search_policies.
 - Refunds: confirm the order ID and reason before calling request_refund.
+
+## Order Tracking
+- NEVER assume or guess an order number.
+- If the customer says "track my order" or "where is my order" without providing an order number,
+  ask: "Could you please share your order number? It usually starts with ORD."
+- Only call check_order_status once you have the order number from the customer.
+- Never call check_order_status more than once for the same order number in a single turn.
+- When presenting order results, ALWAYS include these fields in your reply:
+  1. The order number (so the customer knows you found the right one)
+  2. Current status in plain English
+  3. Order value formatted as ₦X,XXX
+  4. Payment method and status
+  5. Date placed, formatted as "April 28, 2026"
+  6. A helpful next step or reassurance based on the status
+- Use natural language, never dump raw field values
+- Format the date as human-readable e.g. "April 28, 2026" not "2026-04-28T13:48:32.415000Z"
+- Format the price with ₦ and commas e.g. "₦5,375" not "5375.0"
+- Use friendly status explanations:
+  - PENDING → "Your order is being processed"
+  - SHIPPED → "Your order is on its way"
+  - DELIVERED → "Your order has been delivered"
+  - CANCELLED → "Your order was cancelled"
+- For CASH_ON_DELIVERY, reassure: "Payment will be collected when your order arrives"
+- Always end with an offer to help further
 
 ## Escalation
 Only respond with `ESCALATION_REQUIRED: <reason>` for: fraud, legal threats, lawsuits, chargebacks, abuse, or complex billing disputes.
@@ -127,7 +153,7 @@ async def classify_query_intent(query: str) -> QueryIntent:
             return QueryIntent(result)
     except Exception as e:
         logger.error(f"[QueryRouter] Classification failed: {e}")
-    return QueryIntent.AMBIGUOUS  # safe fallback — let search decide
+    return QueryIntent.AMBIGUOUS
 
 
 def _extract_tools_called(messages: list) -> list[dict]:
@@ -141,24 +167,33 @@ def _extract_tools_called(messages: list) -> list[dict]:
             })
     return tools
 
-def _trim_persistent_history(messages: list[BaseMessage]) -> list[BaseMessage]:
+MAX_TURNS = 5
+
+def _build_persistable_history(
+    prev_history: list[BaseMessage],
+    current_human_msg: str,
+    final_reply: str,
+    called_search: bool,
+) -> list[BaseMessage]:
     """
-    Trim history before saving to Redis.
-    Removes old tool messages and keeps only recent turns.
+    Product search turns are stateless — never persisted.
+    All other turns (orders, policies, general chat) are kept up to MAX_TURNS.
     """
-    filtered = [
-        m for m in messages
-        if not isinstance(m, ToolMessage)
-        and not (isinstance(m, AIMessage) and m.tool_calls)
+    if called_search:
+        return prev_history
+
+    updated = prev_history + [
+        HumanMessage(content=current_human_msg),
+        AIMessage(content=final_reply),
     ]
-    MAX_KEEP = 10
-    if len(filtered) > MAX_KEEP:
-        filtered = filtered[-MAX_KEEP:]
-    return filtered
 
+    max_messages = MAX_TURNS * 2
+    if len(updated) > max_messages:
+        updated = updated[-max_messages:]
 
-# ── Prompt sanitizer ──────────────────────────────────────────────────────────
+    return updated
 
+# Prompt sanitizer
 _REACT_RE = re.compile(
     r"^(Thought:|Action:|Action Input:|Observation:|Final Answer:)",
     re.MULTILINE,
@@ -175,8 +210,7 @@ def _sanitize_prompt(messages: list) -> list:
     return clean
 
 
-# ── Verbose logger ────────────────────────────────────────────────────────────
-
+# Verbose logger
 def _log_thought(state: AgentState) -> None:
     """Log the model's decision AFTER it responds (AIMessage is now in state)."""
     last = state["messages"][-1]
@@ -204,8 +238,7 @@ def _log_observations(state: AgentState) -> None:
         logger.debug(f"[Observation] ({msg.name}) {preview}")
 
 
-# ── Form definitions ──────────────────────────────────────────────────────────
-
+# Form definitions
 FORMS: dict[str, dict] = {
     "escalation_details": {
         "type": "escalation_details",
@@ -283,7 +316,7 @@ def _repair_tool_call(response: AIMessage) -> AIMessage:
         tool_name = match.group("name")
         tool_args = json.loads(match.group("args"))
 
-        logger.warning(
+        logger.debug(
             f"[Repair] Converted malformed tool JSON into tool_call: {tool_name}"
         )
 
@@ -313,22 +346,28 @@ def _sanitize_loaded_history(messages: list[BaseMessage]) -> list[BaseMessage]:
     ]
 
 
-# ── Graph ─────────────────────────────────────────────────────────────────────
-
+# Graph
 def build_graph():
     llm = get_llm()
     tools = get_all_tools()
     llm_with_tools = llm.bind_tools(tools)
 
     async def call_model(state: AgentState) -> dict:
-        # Log the incoming human message on first iteration only
         if state.get("iterations", 0) == 0:
             first_human = next(
                 (m for m in reversed(state["messages"]) if isinstance(m, HumanMessage)), None
             )
             if first_human:
                 logger.debug(f"[Human Message] {first_human.content}")
-                intent = await classify_query_intent(str(first_human.content))
+                # intent = await classify_query_intent(str(first_human.content))
+                _PRODUCT_QUERY_SIGNALS = re.compile(
+                    r"(do you (sell|have|carry)|looking for|find me|search|show me|any .+in stock|what .+(have|carry|sell))",
+                    re.IGNORECASE,
+                )
+                if _PRODUCT_QUERY_SIGNALS.search(str(first_human.content)):
+                    intent = await classify_query_intent(str(first_human.content))
+                else:
+                    intent = QueryIntent.AMBIGUOUS  # let the LLM handle it normally
                 logger.debug(f"[QueryRouter] intent={intent} for query='{first_human.content[:60]}'")
             else:
                 intent = QueryIntent.AMBIGUOUS
@@ -371,7 +410,6 @@ def build_graph():
             _t0 = _time.monotonic()
             response = await llm_with_tools.ainvoke(prompt)
             response = _repair_tool_call(response)
-            # logger.debug(f"[Tracing] usage raw: {getattr(response, 'usage_metadata', None)} | {getattr(response, 'response_metadata', {})}")
             _llm_ms = (_time.monotonic() - _t0) * 1000
 
             usage = (
@@ -453,9 +491,14 @@ def build_graph():
                 count: int = str(msg.content).count("(SKU:")
                 note: str = (
                     f"\n\n<!-- UI_CARDS: {count} product card(s) will be shown in the UI automatically. "
-                    "Do NOT list them in your text reply. "
-                    "Do NOT repeat the product names or SKUs. "
-                    "Just acknowledge the count warmly and invite questions. -->"
+                    "Do NOT list product names, SKUs, or prices in your text reply — the cards handle that. "
+                    "Respond naturally and conversationally, varying your phrasing each time. "
+                    "Examples of good replies (do not copy verbatim): "
+                    "'Sure! Here are some options that might work 😊', "
+                    "'I pulled up a few things that could be a great fit!', "
+                    "'Found some nice ones — take a look!', "
+                    "'Here you go! Let me know if any catch your eye or if you want something different.' "
+                    "Match the customer's energy — casual if they're casual, warm if they seem uncertain. -->"
                 )
                 msg = ToolMessage(
                     content=str(msg.content) + note,
@@ -507,78 +550,7 @@ def build_graph():
             "escalated": escalated,
         }
 
-    async def process_tool_results2(state: AgentState) -> dict:
-        # For search_products results, append a UI note so the model doesn't
-        # re-list products in its text reply (they render as cards in the UI)
-        messages = list(state["messages"])
-        patched: list[BaseMessage] = []
-        for msg in messages:
-            if (
-                isinstance(msg, ToolMessage)
-                and msg.name == "search_products"
-                and "<!-- UI_CARDS -->" not in str(msg.content)
-                and "No matching products" not in str(msg.content)
-            ):
-                count: int = str(msg.content).count("(SKU:")
-                note: str = (
-                    f"\n\n<!-- UI_CARDS: {count} product card(s) will be shown in the UI automatically. "
-                    "Do NOT list them in your text reply. "
-                    "Do NOT repeat the product names or SKUs. "
-                    "Just acknowledge the count warmly and invite questions. -->"
-                )
-
-                msg = ToolMessage(
-                    content=str(msg.content) + note,
-                    tool_call_id=msg.tool_call_id,
-                    name=msg.name,
-                )
-            patched.append(msg)
-
-        # Log current batch observations
-        _log_observations(state)
-
-        # Update sources and escalated — only scan the current batch
-        batch: list[ToolMessage] = []
-        sources: list[str] = list(state.get("sources", []))
-        escalated: bool = state.get("escalated", False)
-        for msg in reversed(state["messages"]):
-            if not isinstance(msg, ToolMessage):
-                break
-            if msg.name in ("search_products", "search_faqs", "search_policies"):
-                label = msg.name.replace("search_", "").replace("_", " ").title()
-                if label not in sources:
-                    sources.append(label)
-            if msg.name == "escalate_to_human":
-                escalated = True
-                await _notify_slack_escalation(
-                    session_id=state.get("session_id"),
-                    customer_id=state.get("customer_id"),
-                    reason=str(msg.content),
-                )
-            batch.append(msg)
-
-        for msg in batch:
-            record_tool_span(
-                tool_name=msg.name or "unknown",
-                tool_args={},
-                tool_result=str(msg.content)[:300],
-                latency_ms=0,
-            )
-
-        # Only return patched tool messages for this turn
-        new_tool_msgs = [
-            m for m in patched
-            if isinstance(m, ToolMessage)
-            and m.tool_call_id in {tm.tool_call_id for tm in state["messages"] if isinstance(tm, ToolMessage)}
-        ]
-
-        return {
-            "messages": new_tool_msgs,
-            "sources": sources,
-            "escalated": escalated,
-        }
-
-    def should_continue(state: AgentState) -> Literal["tools", "end"]:
+    def should_continue2(state: AgentState) -> Literal["tools", "end"]:
         if state.get("iterations", 0) >= MAX_ITERATIONS:
             logger.warning(f"[Agent] Hit MAX_ITERATIONS ({MAX_ITERATIONS}) — forcing end.")
             return "end"
@@ -586,6 +558,41 @@ def build_graph():
         if isinstance(last, AIMessage) and last.tool_calls:
             return "tools"
         return "end"
+
+    def should_continue(state: AgentState) -> Literal["tools", "end"]:
+        if state.get("iterations", 0) >= MAX_ITERATIONS:
+            logger.warning(f"[Agent] Hit MAX_ITERATIONS ({MAX_ITERATIONS}) — forcing end.")
+            return "end"
+
+        last = state["messages"][-1]
+        if not (isinstance(last, AIMessage) and last.tool_calls):
+            return "end"
+
+        # Prevent calling the same tool with identical args twice in one session
+        last_tool_name = last.tool_calls[0]["name"]
+        last_tool_args = last.tool_calls[0]["args"]
+
+        previous_tool_calls = [
+            m for m in state["messages"][:-1]
+            if isinstance(m, ToolMessage) and m.name == last_tool_name
+        ]
+        for prev in previous_tool_calls:
+            # If this exact tool+args combo was already called, stop
+            parent_ai = next(
+                (m for m in state["messages"]
+                if isinstance(m, AIMessage)
+                and any(tc["id"] == prev.tool_call_id for tc in getattr(m, "tool_calls", []))),
+                None,
+            )
+            if parent_ai and any(
+                tc["args"] == last_tool_args for tc in getattr(parent_ai, "tool_calls", [])
+            ):
+                logger.warning(
+                    f"[Agent] Duplicate tool call detected: {last_tool_name}({last_tool_args}) — forcing end."
+                )
+                return "end"
+
+        return "tools"
 
     graph = StateGraph(AgentState)
     graph.add_node("model", call_model)
@@ -601,7 +608,7 @@ def build_graph():
 
 _graph = build_graph()
 
-# ── Product extractor ─────────────────────────────────────────────────────────
+# Product extractor
 def _extract_products(messages: list) -> list[dict]:
     import json as _json
     pattern = _re.compile(r"<!-- PRODUCTS_JSON:(.+?) -->", _re.DOTALL)
@@ -624,125 +631,65 @@ def _extract_orders(messages):
             return json.loads(raw.strip())
     return None
 
-# ── Reply cleaner ─────────────────────────────────────────────────────────────
+# Quick replies
+_QUICK_REPLIES: dict[str, list[str]] = {
+    "awaiting_input":       [],
+    "product_search":       ["Check stock", "See other options", "How to order", "Contact support"],
+    "order_status":         ["Track another order", "Request refund", "Contact support"],
+    "refund":               ["Check refund status", "Track my order", "Contact support"],
+    "policy":               ["Track my order", "Browse products", "Contact support"],
+    "escalated":            [],
+    "complaint_sent":       [],
+    "greeting":             ["Track my order", "Browse products", "View policies"],
+    "default":              ["Track my order", "Browse products", "Contact support"],
+}
 
-def _strip_product_listing(reply: str, has_products: bool) -> str:
-    """
-    When structured product cards are returned, strip any duplicate product
-    listing the model included in the reply text.
-    """
-    if not has_products:
-        return reply
-
-    # Remove lead-in phrases like "Here are some examples:"
-    reply = _re.sub(
-        r"(Here are some (examples|options|products)[^:\n]*:\s*\n)",
-        "",
-        reply,
-        flags=_re.IGNORECASE,
-    )
-
-    # Remove numbered product blocks: "1. **Name** ..." up to next item or end
-    reply = _re.sub(
-        r"\n?\d+\.\s+\*\*[^*]+\*\*.*?(?=\n\d+\.\s+\*\*|\Z)",
-        "",
-        reply,
-        flags=_re.DOTALL,
-    )
-
-    # Collapse excess blank lines
-    reply = _re.sub(r"\n{3,}", "\n\n", reply)
-
-    return reply.strip()
-
-# ── Quick replies ─────────────────────────────────────────────────────────────
-
-# Complexity signals — if any match, we use the LLM to generate smart replies
-_COMPLEX_SIGNALS = re.compile(
-    r"(order|refund|return|payment|track|ship|stock|availab|broken|wrong|missing|complaint|issue|problem|help|human|agent)",
+_AWAITING_INPUT_PATTERNS = re.compile(
+    r"(could you (please )?(share|provide|give)|"
+    r"please (share|provide|send|give)|"
+    r"what (is|was) your order|"
+    r"can you (share|provide|confirm)|"
+    r"please (confirm|clarify)|"
+    r"could you (tell|let) me)",
     re.IGNORECASE,
 )
 
-def _rule_based_quick_replies(message: str, sources: list[str], escalated: bool) -> list[str]:
-    msg: str = message.lower()
-
-    if escalated:
-        return []
-
-    if "order" in msg or "track" in msg or "status" in msg:
-        return ["Track another order", "Browse products", "Return policy"]
-
-    if "refund" in msg or "return" in msg or "exchange" in msg:
-        return ["Return policy", "Track my order", "Contact support"]
-
-    if "stock" in msg or "availab" in msg:
-        return ["See alternatives", "Browse products", "Contact support"]
-
-    if "pay" in msg or "payment" in msg or "checkout" in msg:
-        return ["Track my order", "Return policy", "Contact support"]
-
-    if "Products" in sources:
-        return ["Check stock", "How to order", "See more products"]
-
-    if "Faqs" in sources or "Policies" in sources:
-        return ["Track my order", "Browse products", "Contact support"]
-    return ["Track my order", "Browse products", "Contact support"]
-
-
-async def _llm_quick_replies(
-    user_message: str,
-    agent_reply: str,
-    llm,
-) -> list[str]:
-    """
-    Ask the LLM to generate context-aware quick replies.
-    Returns 2-4 short button labels. Falls back to [] on any error.
-    """
-    import json as _json
-
-    prompt = (
-        f"Customer said: \"{user_message}\"\n"
-        f"Agent replied: \"{agent_reply[:300]}\"\n\n"
-        "Suggest 2-4 quick reply button labels the customer might click next. "
-        "Rules: max 5 words each, action-oriented, relevant to the conversation. "
-        "Return ONLY a valid JSON array of strings, nothing else.\n"
-        "Example: [\"Track my order\", \"Request refund\", \"Speak to human\"]"
-    )
-    try:
-        logger.debug(f"[quick_replies] - Calling Model for Quick Replies")
-        resp = await llm.ainvoke([HumanMessage(content=prompt)])
-        match = re.search(r"\[.*?\]", resp.content, re.DOTALL)
-        if match:
-            parsed = _json.loads(match.group())
-            # Sanitise: keep only short strings
-            return [str(r).strip() for r in parsed if len(str(r)) <= 40][:4]
-    except Exception as exc:
-        logger.error(f"[quick_replies] LLM fallback failed: {exc}")
-    return []
-
-
-async def _get_quick_replies(
+def _get_quick_replies(
     user_message: str,
     agent_reply: str,
     sources: list[str],
     escalated: bool,
-    llm,
+    called_search: bool,
+    called_order: bool,
+    complaint_sent: bool,
 ) -> list[str]:
-    """
-    Combined strategy:
-    - Simple / greeting messages → rule-based
-    - Complex messages (orders, refunds, complaints) → LLM-generated with rule-based fallback
-    """
-    is_complex = bool(_COMPLEX_SIGNALS.search(user_message))
-    if not is_complex:
-        return _rule_based_quick_replies(user_message, sources, escalated)
+    if _AWAITING_INPUT_PATTERNS.search(agent_reply):
+        return _QUICK_REPLIES["awaiting_input"]
 
-    # Try LLM first for complex cases
-    llm_replies: list[str] = await _llm_quick_replies(user_message, agent_reply, llm)
-    if llm_replies:
-        return llm_replies
+    if escalated or complaint_sent:
+        return _QUICK_REPLIES["escalated"]
 
-    return _rule_based_quick_replies(user_message, sources, escalated)
+    if called_search:
+        return _QUICK_REPLIES["product_search"]
+
+    if called_order:
+        return _QUICK_REPLIES["order_status"]
+
+    msg = user_message.lower()
+
+    if any(w in msg for w in ("refund", "return", "exchange")):
+        return _QUICK_REPLIES["refund"]
+
+    if any(w in msg for w in ("policy", "policies", "faq", "how do i", "how to")):
+        return _QUICK_REPLIES["policy"]
+
+    if "Faqs" in sources or "Policies" in sources:
+        return _QUICK_REPLIES["policy"]
+
+    if any(w in msg for w in ("hi", "hello", "hey", "good morning", "good afternoon")):
+        return _QUICK_REPLIES["greeting"]
+
+    return _QUICK_REPLIES["default"]
 
 
 def _extract_text_content(content) -> str:
@@ -764,8 +711,7 @@ def _extract_text_content(content) -> str:
 
     return str(content)
 
-# ── Intent Router ───────────────────────────────────────────────────────────
-
+# Intent Router
 class Intent:
     ESCALATION_REQUEST = "escalation_request"
     COMPLAINT = "complaint"
@@ -857,7 +803,16 @@ async def run_agent(
             session_id,
             history + [HumanMessage(content=message), AIMessage(content=reply)],
         )
-        quick_replies: list[str] = await _get_quick_replies(message, reply, [], False, llm)
+        # quick_replies: list[str] = await _get_quick_replies(message, reply, [], False, llm)
+        quick_replies: list[str] = _get_quick_replies(
+            user_message=message,
+            agent_reply=reply,
+            sources=[],
+            escalated=False,
+            called_search=False,
+            called_order=False,
+            complaint_sent=False,
+        )
         return {"reply": reply, "session_id": session_id, "sources": [], "escalated": False, "quick_replies": quick_replies}
 
     intent: str = await  _classify_intent(message)
@@ -866,10 +821,6 @@ async def run_agent(
         return {
             "reply": "Sure — I’ll connect you with a support agent. First, please provide a few details.",
             "session_id": session_id,
-            "sources": [],
-            "products": [],
-            "escalated": False,
-            "quick_replies": [],
             "form": FORMS["escalation_details"],
         }
 
@@ -877,10 +828,6 @@ async def run_agent(
         return {
             "reply": "I'm sorry about your experience. Please provide more details so we can investigate.",
             "session_id": session_id,
-            "sources": [],
-            "products": [],
-            "escalated": False,
-            "quick_replies": [],
             "form": FORMS["complaint"],
         }
 
@@ -888,10 +835,6 @@ async def run_agent(
         return {
             "reply": "Sure — please provide the updated details below.",
             "session_id": session_id,
-            "sources": [],
-            "products": [],
-            "escalated": False,
-            "quick_replies": [],
             "form": FORMS["contact_update"],
         }
 
@@ -972,16 +915,28 @@ async def run_agent(
         products = _extract_products(final_state["messages"]) if called_search else []
         extracted_order = _extract_orders(final_state["messages"]) if called_check_order_status else None
 
-        reply = _strip_product_listing(reply, has_products=bool(products))
-
-        clean_history = _trim_persistent_history(final_state["messages"])
+        clean_history = _build_persistable_history(
+            prev_history=history,
+            current_human_msg=message,
+            final_reply=reply,
+            called_search=called_search,
+        )
         save_messages_to_redis(session_id, clean_history)
 
         sources = final_state.get("sources", [])
         escalated = final_state.get("escalated", False)
 
         llm = get_llm()
-        quick_replies = await _get_quick_replies(message, reply, sources, escalated, llm)
+        # quick_replies = await _get_quick_replies(message, reply, sources, escalated, llm)
+        quick_replies = _get_quick_replies(
+            user_message=message,
+            agent_reply=reply,
+            sources=sources,
+            escalated=escalated,
+            called_search=called_search,
+            called_order=called_check_order_status,
+            complaint_sent=final_state.get("complaint_sent", False),
+        )
 
         return {
             "reply": reply,
@@ -1000,14 +955,3 @@ async def run_agent(
     except Exception as e:
         logger.error(f"[Agent] Error: {e}", exc_info=True)
         raise
-
-        # return {
-        #     "reply": "Something went wrong on my end. Please try again.",
-        #     "session_id": session_id,
-        #     "sources": [],
-        #     "products": [],
-        #     "escalated": False,
-        #     "quick_replies": [],
-        #     "form": None,
-        #     "order": None,
-        # }

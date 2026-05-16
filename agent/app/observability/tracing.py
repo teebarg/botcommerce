@@ -1,10 +1,3 @@
-"""
-app/observability/tracing.py
-
-Context-var based tracing helpers.
-The active trace for the current async task is stored in a ContextVar so
-agent_graph.py can attach spans without passing objects through the call stack.
-"""
 from __future__ import annotations
 
 from contextvars import ContextVar

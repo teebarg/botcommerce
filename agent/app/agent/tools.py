@@ -118,6 +118,7 @@ def check_order_status(order_number: str) -> str:
 
     Input: the order number (e.g. 'ORDFCC4E3EB').
     """
+    from datetime import datetime
 
     order_number = order_number.strip().lstrip("#").strip().upper()
     result = _shop_request("GET", f"/api/order/{order_number}")
@@ -127,22 +128,51 @@ def check_order_status(order_number: str) -> str:
 
     status = (result.get("status") or "PENDING").upper()
     payment_status = (result.get("payment_status") or "PENDING").upper()
+    payment_method = (result.get("payment_method") or "").upper()
+    total = result.get("total") or 0
+    created_at = result.get("created_at") or ""
 
-    items_payload = []
-    for item in result.get("order_items", []):
-        items_payload.append({
+    status_map = {
+        "PENDING": "being processed",
+        "SHIPPED": "on its way",
+        "DELIVERED": "delivered",
+        "CANCELLED": "cancelled",
+    }
+    status_text = status_map.get(status, status.replace("_", " ").lower())
+
+    try:
+        dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+        formatted_date = dt.strftime("%B %d, %Y")
+    except Exception:
+        formatted_date = created_at
+
+    formatted_total = f"₦{float(total):,.0f}"
+
+    if payment_method == "CASH_ON_DELIVERY":
+        payment_note = "Payment will be collected when you pickup at our store."
+    elif payment_status == "SUCCESS":
+        payment_note = "Payment confirmed ✓"
+    elif payment_status == "PENDING":
+        payment_note = "Payment is still pending."
+    else:
+        payment_note = payment_status.replace("_", " ").title()
+
+    items_payload = [
+        {
             "product_id": item.get("product_id"),
             "name": item.get("name"),
             "image": item.get("image"),
             "quantity": item.get("quantity", 1),
             "price": item.get("price"),
-        })
+        }
+        for item in result.get("order_items", [])
+    ]
 
     order_payload = {
         "order_number": order_number,
         "status": status,
         "payment_status": payment_status,
-        "payment_method": result.get("payment_method"),
+        "payment_method": payment_method,
         "shipping_method": result.get("shipping_method"),
         "financials": {
             "subtotal": result.get("subtotal"),
@@ -150,17 +180,18 @@ def check_order_status(order_number: str) -> str:
             "discount": result.get("discount_amount"),
             "wallet_used": result.get("wallet_used"),
             "shipping_fee": result.get("shipping_fee"),
-            "total": result.get("total"),
+            "total": total,
         },
         "items": items_payload,
-        "created_at": result.get("created_at"),
+        "created_at": created_at,
     }
 
-    human_summary: str = (
-        f"Order #{order_number} is currently **{status.replace('_', ' ')}**.\n"
-        f"Payment Status: **{payment_status.replace('_', ' ')}**\n"
-        f"Order value: {result.get('total')}\n"
-        f"Placed On: {result.get('created_at')}"
+    human_summary = (
+        f"Order #{order_number} is currently {status_text}.\n"
+        f"Order value: {formatted_total}\n"
+        f"Payment: {payment_note}\n"
+        f"Date placed: {formatted_date}\n\n"
+        f"Use ALL of the above fields in your reply. Do not omit any."
     )
 
     return (

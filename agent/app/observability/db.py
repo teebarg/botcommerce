@@ -1,9 +1,3 @@
-"""
-app/observability/db.py
-
-Postgres schema + async helpers for storing eval results.
-Uses the same DB connection pattern already in app/agent/db.py.
-"""
 from __future__ import annotations
 
 import json

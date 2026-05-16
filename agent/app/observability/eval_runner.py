@@ -1,10 +1,3 @@
-"""
-app/observability/eval_runner.py
-
-Orchestrates all four evaluators for a single chat turn,
-writes scores to Postgres, and pushes them to Langfuse.
-Called as a FastAPI background task — never blocks the response.
-"""
 from __future__ import annotations
 
 from typing import Any
@@ -13,7 +6,6 @@ from app.logging import get_logger
 from app.observability.evaluators import (
     evaluate_context_relevance,
     evaluate_escalation_accuracy,
-    evaluate_groundedness,
     evaluate_latency,
     evaluate_response_quality,
     evaluate_tool_accuracy,
@@ -73,15 +65,14 @@ async def run_eval_pipeline(
 ) -> None:
     """
     Run all evaluators, persist to Postgres, push scores to Langfuse.
-    Safe to call in a background task — never raises.
     """
     try:
-        # ── 1. Response quality (LLM judge) ──────────────────────────────────
+        #1. Response quality (LLM judge)
         rq_score, rq_note = await evaluate_response_quality(
             user_message, agent_reply, llm, tools_called
         )
 
-        # ── 2. Tool accuracy (rule-based) ─────────────────────────────────────
+        #2. Tool accuracy (rule-based)
         if config.tool_accuracy_fn:
             ta_score, ta_note = await config.tool_accuracy_fn(
                 user_message, tools_called, agent_reply
@@ -92,7 +83,7 @@ async def run_eval_pipeline(
                 tool_expectations=config.tool_expectations,
             )
 
-        # ── 3. Escalation accuracy ────────────────────────────────────────────
+        #3. Escalation accuracy
         if config.escalation_accuracy_fn:
             ea_score, ea_note = await config.escalation_accuracy_fn(
                 user_message, agent_reply, escalated, tools_called
@@ -104,9 +95,9 @@ async def run_eval_pipeline(
                 high_risk_patterns=config.high_risk_patterns,
             )
 
-        # ── 4. Latency ────────────────────────────────────────────────────────
+        #4. Latency
         lat_score, lat_note = evaluate_latency(latency_ms)
-        gr_score,  gr_note  = await evaluate_groundedness(agent_reply, tools_called, llm)
+        gr_score,  gr_note  = 0.0, "[Eval] groundedness: Awaiting Implementation"
         cr_score,  cr_note  = await evaluate_context_relevance(user_message=user_message, tools_called=tools_called, llm=llm)
 
         scores = {
@@ -132,7 +123,7 @@ async def run_eval_pipeline(
             f"escalation={ea_score:.2f} latency={lat_score:.2f}"
         )
 
-        # ── Push scores to Langfuse ───────────────────────────────────────────
+        # Push scores to Langfuse
         # score_trace reads the ContextVar — still valid in background tasks
         # spawned in the same async context.
         for name, value in scores.items():

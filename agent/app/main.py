@@ -171,11 +171,6 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
         return ChatResponse(
             reply="You're connected with a support agent. They'll respond shortly.",
             session_id=payload.session_id,
-            sources=[],
-            products=[],
-            escalated=False,
-            quick_replies=[],
-            form=None,
         )
 
     _t_start = time.monotonic()
