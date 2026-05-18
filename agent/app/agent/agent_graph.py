@@ -6,9 +6,9 @@ from app.logging import get_logger
 from app.observability.tracing import record_llm_generation
 import json
 import re
-import re as _re
 import uuid
 from typing import Annotated, Literal
+from enum import Enum
 
 from langchain_core.messages import (
     AIMessage,
@@ -123,37 +123,76 @@ CONVERSATIONAL_PATTERNS = re.compile(
 )
 
 
-from enum import Enum
+class MessageIntent(str, Enum):
+    ESCALATION_REQUEST = "escalation_request"
+    COMPLAINT = "complaint"
+    CONTACT_UPDATE = "contact_update"
+    OUT_OF_SCOPE = "out_of_scope"
+    FASHION = "fashion"
+    NORMAL = "normal"
 
-class QueryIntent(str, Enum):
-    FASHION = "fashion"        # carry it, search normally
-    OUT_OF_SCOPE = "out_of_scope"  # don't carry it, politely redirect
-    AMBIGUOUS = "ambiguous"    # search and let results decide
+_UNIFIED_ROUTER_PROMPT = """Classify this customer message into exactly one category:
 
-_QUERY_ROUTER_PROMPT = """You are a query router for Thriftbyoba, a Nigerian online fashion store.
-Classify the customer's product query into exactly one category:
+- escalation_request: wants to speak to a human agent
+- complaint: complaining or had a bad experience
+- contact_update: wants to update contact details
+- out_of_scope: asking about non-fashion items (electronics, food, furniture)
+- fashion: clear fashion/clothing product query
+- normal: everything else (greetings, order tracking, policy questions)
 
-- fashion: clothing, footwear, bags, accessories, or anything wearable for any age or gender
-- out_of_scope: food, electronics, furniture, real estate, medicine, cosmetics, groceries, or anything clearly not fashion
-- ambiguous: unclear, could be fashion-related (e.g. "baby items", "gift")
+Message: {message}
 
-Reply with ONLY one word: fashion, out_of_scope, or ambiguous.
+Reply with ONLY the category label, nothing else."""
 
-Query: {query}"""
+# Keep these regex shortcuts — they avoid the LLM call entirely for clear-cut cases
+_ESCALATION_RE = re.compile(
+    r"(speak (to|with) (a )?human|talk (to|with) (a )?human|human agent|call me"
+    r"|need (a |to speak with )?(human|agent)|connect me"
+    r"|(speak|talk|chat|connect).{0,20}(human|agent|person|someone|representative)"
+    r"|(need|want).{0,20}(human|agent|real person)"
+    r"|contact support|contact (an? )?(agent|team|us)|reach (out|support)|get (help|support))",
+    re.IGNORECASE,
+)
+_COMPLAINT_RE = re.compile(
+    r"(complain|bad experience|wrong item|damaged|overcharged|poor service|unsatisfied)",
+    re.IGNORECASE,
+)
+_CONTACT_UPDATE_RE = re.compile(
+    r"(update.{0,15}(contact|address|email|phone)|change.{0,15}(address|email|phone|details))",
+    re.IGNORECASE,
+)
+_PRODUCT_QUERY_SIGNALS = re.compile(
+    r"(do you (sell|have|carry)|looking for|find me|search|show me|any .+in stock|what .+(have|carry|sell))",
+    re.IGNORECASE,
+)
 
-async def classify_query_intent(query: str) -> QueryIntent:
-    """Classify whether a product query is fashion-related before searching."""
+async def _classify_message(message: str) -> MessageIntent:
+    """
+    Regex handles obvious cases first to avoid the LLM call entirely.
+    """
+    msg = message.strip()
+
+    if _ESCALATION_RE.search(msg):
+        return MessageIntent.ESCALATION_REQUEST
+    if _COMPLAINT_RE.search(msg):
+        return MessageIntent.COMPLAINT
+    if _CONTACT_UPDATE_RE.search(msg):
+        return MessageIntent.CONTACT_UPDATE
+    if _PRODUCT_QUERY_SIGNALS.search(msg):
+        return MessageIntent.FASHION
+
     try:
         llm = get_llm()
         resp = await llm.ainvoke([
-            HumanMessage(content=_QUERY_ROUTER_PROMPT.format(query=query))
+            HumanMessage(content=_UNIFIED_ROUTER_PROMPT.format(message=msg))
         ])
         result = _extract_text_content(resp.content).strip().lower()
-        if result in QueryIntent.__members__.values():
-            return QueryIntent(result)
+        if result in MessageIntent.__members__.values():
+            return MessageIntent(result)
     except Exception as e:
-        logger.error(f"[QueryRouter] Classification failed: {e}")
-    return QueryIntent.AMBIGUOUS
+        logger.error(f"[Router] Classification failed: {e}")
+
+    return MessageIntent.NORMAL
 
 
 def _extract_tools_called(messages: list) -> list[dict]:
@@ -274,25 +313,6 @@ FORMS: dict[str, dict] = {
     },
 }
 
-_FORM_TRIGGER_RULES = re.compile(
-    r"(?P<escalation>escalat|speak to (a )?human|talk to (a )?human|human agent|call me)"
-    r"|(?P<complaint>complain|feedback|bad experience|wrong item|damaged|overcharged|poor service|unsatisfied)"
-    r"|(?P<contact_update>update.{0,15}(contact|address|email|phone|number)|change.{0,15}(address|email|phone|number|details))",
-    re.IGNORECASE,
-)
-
-_FORM_DETECTION_PROMPT = (
-    "You are deciding whether a customer message needs a data-collection form. "
-    "Available forms: "
-    "escalation_details (customer wants human agent), "
-    "complaint (complaint or negative feedback), "
-    "contact_update (wants to update address/email/phone), "
-    "null (no form needed). "
-    "Customer message: {message} "
-    "Agent reply: {reply} "
-    "Reply with ONLY one of: escalation_details, complaint, contact_update, null."
-)
-
 # Tool Call Repair
 _TOOL_JSON_RE = re.compile(
     r'\{\s*"name"\s*:\s*"(?P<name>[^"]+)"\s*,\s*"arguments"\s*:\s*(?P<args>\{.*\})\s*\}',
@@ -359,32 +379,26 @@ def build_graph():
             )
             if first_human:
                 logger.debug(f"[Human Message] {first_human.content}")
-                # intent = await classify_query_intent(str(first_human.content))
-                _PRODUCT_QUERY_SIGNALS = re.compile(
-                    r"(do you (sell|have|carry)|looking for|find me|search|show me|any .+in stock|what .+(have|carry|sell))",
-                    re.IGNORECASE,
-                )
-                if _PRODUCT_QUERY_SIGNALS.search(str(first_human.content)):
-                    intent = await classify_query_intent(str(first_human.content))
-                else:
-                    intent = QueryIntent.AMBIGUOUS  # let the LLM handle it normally
-                logger.debug(f"[QueryRouter] intent={intent} for query='{first_human.content[:60]}'")
-            else:
-                intent = QueryIntent.AMBIGUOUS
+
+            intent_str = state.get("query_intent", "normal")
+            try:
+                intent = MessageIntent(intent_str)
+            except ValueError:
+                intent = MessageIntent.NORMAL
         else:
-            intent = QueryIntent.AMBIGUOUS
+            intent = MessageIntent.NORMAL
 
         system = SYSTEM_PROMPT
         if state.get("customer_id"):
             system += f" The customer ID is {state['customer_id']}."
 
-        if intent == QueryIntent.OUT_OF_SCOPE:
+        if intent == MessageIntent.OUT_OF_SCOPE:
             system += (
                 "\n\nROUTER DECISION: This query is out of scope for a fashion store. "
                 "Do NOT call any tool. Tell the customer we only sell fashion items "
                 "and ask what clothing you can help them find."
             )
-        elif intent == QueryIntent.FASHION:
+        elif intent == MessageIntent.FASHION:
             system += (
                 "\n\nROUTER DECISION: This is a valid fashion query. "
                 "Call search_products and present results normally."
@@ -448,7 +462,6 @@ def build_graph():
                     logger.debug("[Agent] Retry with tools succeeded")
                 except Exception:
                     logger.warning("[Agent] Retrying without tools")
-                    # response = await llm.ainvoke(minimal_prompt)
                     raise
             else:
                 raise
@@ -550,15 +563,6 @@ def build_graph():
             "escalated": escalated,
         }
 
-    def should_continue2(state: AgentState) -> Literal["tools", "end"]:
-        if state.get("iterations", 0) >= MAX_ITERATIONS:
-            logger.warning(f"[Agent] Hit MAX_ITERATIONS ({MAX_ITERATIONS}) — forcing end.")
-            return "end"
-        last = state["messages"][-1]
-        if isinstance(last, AIMessage) and last.tool_calls:
-            return "tools"
-        return "end"
-
     def should_continue(state: AgentState) -> Literal["tools", "end"]:
         if state.get("iterations", 0) >= MAX_ITERATIONS:
             logger.warning(f"[Agent] Hit MAX_ITERATIONS ({MAX_ITERATIONS}) — forcing end.")
@@ -610,8 +614,7 @@ _graph = build_graph()
 
 # Product extractor
 def _extract_products(messages: list) -> list[dict]:
-    import json as _json
-    pattern = _re.compile(r"<!-- PRODUCTS_JSON:(.+?) -->", _re.DOTALL)
+    pattern = re.compile(r"<!-- PRODUCTS_JSON:(.+?) -->", re.DOTALL)
 
     for msg in reversed(messages):
         if not isinstance(msg, ToolMessage) or msg.name != "search_products":
@@ -619,7 +622,7 @@ def _extract_products(messages: list) -> list[dict]:
         m = pattern.search(str(msg.content))
         if m:
             try:
-                return _json.loads(m.group(1))
+                return json.loads(m.group(1))
             except Exception:
                 pass
     return []
@@ -711,13 +714,6 @@ def _extract_text_content(content) -> str:
 
     return str(content)
 
-# Intent Router
-class Intent:
-    ESCALATION_REQUEST = "escalation_request"
-    COMPLAINT = "complaint"
-    CONTACT_UPDATE = "contact_update"
-    NORMAL = "normal"
-
 _ESCALATION_RE = re.compile(
     r"(speak (to|with) (a )?human|talk (to|with) (a )?human|human agent|call me"
     r"|need (a |to speak with )?(human|agent)|connect me"
@@ -734,45 +730,6 @@ _CONTACT_UPDATE_RE = re.compile(
     r"(update.{0,15}(contact|address|email|phone)|change.{0,15}(address|email|phone|details))",
     re.IGNORECASE,
 )
-
-async def _classify_intent(message: str) -> str:
-    msg: str = message.strip()
-
-    if _ESCALATION_RE.search(msg):
-        return Intent.ESCALATION_REQUEST
-    if _COMPLAINT_RE.search(msg):
-        return Intent.COMPLAINT
-    if _CONTACT_UPDATE_RE.search(msg):
-        return Intent.CONTACT_UPDATE
-
-    _AMBIGUOUS_SIGNALS = re.compile(
-        r"(human|agent|person|representative|complain|unhappy|frustrated|update|change|help me|contact|support|reach)",
-        re.IGNORECASE,
-    )
-    if not _AMBIGUOUS_SIGNALS.search(msg):
-        return Intent.NORMAL
-
-    try:
-        llm = get_llm()
-        prompt: str = (
-            "Classify the customer message into exactly one of these intents:\n"
-            "- escalation_request: customer wants to speak to a human agent\n"
-            "- complaint: customer is complaining or had a bad experience\n"
-            "- contact_update: customer wants to update their contact details\n"
-            "- normal: anything else\n\n"
-            f"Customer message: \"{message}\"\n\n"
-            "Reply with ONLY the intent label, nothing else."
-        )
-        logger.debug(f"[INTENT] - Calling model to classify intent")
-        resp = await llm.ainvoke([HumanMessage(content=prompt)])
-        result = resp.content.strip().lower()
-        if result in ("escalation_request", "complaint", "contact_update", "normal"):
-            return result
-    except Exception as e:
-        logger.debug(f"[INTENT] - Classify Intent Error {e}")
-        pass
-
-    return Intent.NORMAL
 
 
 async def run_agent(
@@ -803,7 +760,6 @@ async def run_agent(
             session_id,
             history + [HumanMessage(content=message), AIMessage(content=reply)],
         )
-        # quick_replies: list[str] = await _get_quick_replies(message, reply, [], False, llm)
         quick_replies: list[str] = _get_quick_replies(
             user_message=message,
             agent_reply=reply,
@@ -815,23 +771,24 @@ async def run_agent(
         )
         return {"reply": reply, "session_id": session_id, "sources": [], "escalated": False, "quick_replies": quick_replies}
 
-    intent: str = await  _classify_intent(message)
+    intent: str = await _classify_message(message)
+    logger.debug(f"[Router] intent={intent} for message='{message[:60]}'")
 
-    if intent == Intent.ESCALATION_REQUEST:
+    if intent == MessageIntent.ESCALATION_REQUEST:
         return {
             "reply": "Sure — I’ll connect you with a support agent. First, please provide a few details.",
             "session_id": session_id,
             "form": FORMS["escalation_details"],
         }
 
-    if intent == Intent.COMPLAINT:
+    if intent == MessageIntent.COMPLAINT:
         return {
             "reply": "I'm sorry about your experience. Please provide more details so we can investigate.",
             "session_id": session_id,
             "form": FORMS["complaint"],
         }
 
-    if intent == Intent.CONTACT_UPDATE:
+    if intent == MessageIntent.CONTACT_UPDATE:
         return {
             "reply": "Sure — please provide the updated details below.",
             "session_id": session_id,
@@ -847,6 +804,7 @@ async def run_agent(
         "iterations": 0,
         "prompt_tokens": 0,
         "completion_tokens": 0,
+        "query_intent": intent.value,
     }
 
     try:
