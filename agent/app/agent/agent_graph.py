@@ -914,6 +914,13 @@ async def run_agent(
 
         products = _extract_products(final_state["messages"]) if called_search else []
         extracted_order = _extract_orders(final_state["messages"]) if called_check_order_status else None
+        if extracted_order:
+            formatted_reply = extracted_order.pop("_formatted_reply", None)
+            if formatted_reply:
+                logger.debug("[Order] Using pre-formatted reply from tool payload")
+                reply = formatted_reply
+            else:
+                logger.warning("[Order] _formatted_reply missing from payload — using LLM reply")
 
         clean_history = _build_persistable_history(
             prev_history=history,

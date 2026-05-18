@@ -43,7 +43,6 @@ def create_trace(name, session_id=None, user_id=None, metadata=None, tags=None, 
     if not client:
         return _NoOpTrace()
     try:
-        # v4: start_observation() with as_type= (not type=)
         # propagate_attributes sets session_id/user_id/tags on the OTel context
         obs = client.start_observation(
             name=name,
@@ -66,8 +65,6 @@ def create_trace(name, session_id=None, user_id=None, metadata=None, tags=None, 
 
 
 class _TraceAdapter:
-    """Wraps a v4 root observation to expose the v2-style trace interface."""
-
     def __init__(self, client: Langfuse, obs, session_id=None, user_id=None, tags=None):
         self._client     = client
         self._obs        = obs

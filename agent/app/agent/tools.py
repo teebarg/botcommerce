@@ -42,7 +42,7 @@ def search_products(query: str) -> str:
     if not query or not query.strip():
         return "No query provided. Ask the customer what they're looking for."
         
-    results = search_collection("products", query, top_k=4, score_threshold=0.45)
+    results = search_collection("products", query, top_k=5, score_threshold=0.55)
     if not results:
         return "No matching products found."
 
@@ -187,19 +187,45 @@ def check_order_status(order_number: str) -> str:
     }
 
     human_summary = (
-        f"Order #{order_number} is currently {status_text}.\n"
-        f"Order value: {formatted_total}\n"
-        f"Payment: {payment_note}\n"
-        f"Date placed: {formatted_date}\n\n"
-        f"Use ALL of the above fields in your reply. Do not omit any."
+        f"Here's the update for order **#{order_number}** 😊\n\n"
+        f"**Status:** Your order is currently {status_text}\n"
+        f"**Order value:** {formatted_total}\n"
+        f"**Payment:** {payment_note}\n"
+        f"**Placed on:** {formatted_date}\n\n"
+        f"Is there anything else I can help you with?"
     )
 
+    # In check_order_status tool, change human_summary to a terse agent note:
+    agent_note = (
+        f"Order {order_number} found. Status: {status_text}. "
+        f"Value: {formatted_total}. Payment: {payment_note}. "
+        f"Placed: {formatted_date}. "
+        f"The formatted customer reply is in ORDERS_JSON block — extract and return it as-is."
+    )
+
+    formatted_reply = (
+        f"Here's the update for order **#{order_number}** 😊\n\n"
+        f"**Status:** Your order is currently {status_text}\n"
+        f"**Order value:** {formatted_total}\n"
+        f"**Payment:** {payment_note}\n"
+        f"**Placed on:** {formatted_date}\n\n"
+        f"Is there anything else I can help you with?"
+    )
+
+    order_payload["_formatted_reply"] = formatted_reply
+
     return (
-        human_summary
-        + "\n\n<!-- ORDERS_JSON: "
+        "\n\n<!-- ORDERS_JSON: "
         + json.dumps(order_payload)
         + " -->"
     )
+
+    # return (
+    #     human_summary
+    #     + "\n\n<!-- ORDERS_JSON: "
+    #     + json.dumps(order_payload)
+    #     + " -->"
+    # )
 
 
 @tool

@@ -124,8 +124,7 @@ async def run_eval_pipeline(
         )
 
         # Push scores to Langfuse
-        # score_trace reads the ContextVar — still valid in background tasks
-        # spawned in the same async context.
+        # score_trace reads the ContextVar — still valid in background tasks spawned in the same async context.
         for name, value in scores.items():
             if value is not None:
                 score_trace(name=name, value=value, comment=notes[name])

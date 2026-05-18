@@ -1,4 +1,3 @@
-# app/agents/customer_support/eval_config.py
 import re
 from app.observability.eval_runner import AgentEvalConfig
 

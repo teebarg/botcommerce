@@ -85,6 +85,6 @@ def get_model_name() -> str:
     return (
         getattr(llm, "model",       None) or  # Groq, Cerebras, Ollama
         getattr(llm, "model_name",  None) or  # Gemini, older LangChain
-        getattr(llm, "model_id",    None) or  # some HuggingFace wrappers
-        settings.LLM_PROVIDER                 # fallback: at least know the provider
+        getattr(llm, "model_id",    None) or
+        settings.LLM_PROVIDER
     )
