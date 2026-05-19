@@ -111,21 +111,11 @@ Do not call any tool when escalating.
 If the customer asks about anything unrelated to Thriftbyoba, products, orders, or support (e.g. personal advice, general knowledge, jokes), politely decline and redirect. Do not call any tool.
 """
 
-CONVERSATIONAL_PATTERNS = re.compile(
-    r"^\s*(hi+|hey+|hello+|howdy|good\s*(morning|afternoon|evening)|"
-    r"who are you|what are you|are you (a |an )?(bot|ai|robot|human|person|agent)|"
-    r"what('?s| is) your name|tell me about yourself|"
-    r"thanks?|thank you|cheers|ok(ay)?|great|awesome|bye|goodbye|"
-    r"help|what can you do|how can you help|"
-    r"(good[,.]?\s+)?(what (do you sell|can you help|do you (have|carry|offer)))|"
-    r"what('?s| is) (in stock|available|on (sale|offer)))\s*[?!.]*\s*$",
-    re.IGNORECASE,
-)
-
 
 class MessageIntent(str, Enum):
     ESCALATION_REQUEST = "escalation_request"
     COMPLAINT = "complaint"
+    CONVERSATION = "conversation"
     CONTACT_UPDATE = "contact_update"
     OUT_OF_SCOPE = "out_of_scope"
     FASHION = "fashion"
@@ -135,6 +125,7 @@ _UNIFIED_ROUTER_PROMPT = """Classify this customer message into exactly one cate
 
 - escalation_request: wants to speak to a human agent
 - complaint: complaining or had a bad experience
+- conversation: general conversation(hi, hello)
 - contact_update: wants to update contact details
 - out_of_scope: asking about non-fashion items (electronics, food, furniture)
 - fashion: clear fashion/clothing product query
@@ -144,7 +135,16 @@ Message: {message}
 
 Reply with ONLY the category label, nothing else."""
 
-# Keep these regex shortcuts — they avoid the LLM call entirely for clear-cut cases
+_CONVERSATIONAL_PATTERNS = re.compile(
+    r"^\s*(hi+|hey+|hello+|howdy|good\s*(morning|afternoon|evening)|"
+    r"who are you|what are you|are you (a |an )?(bot|ai|robot|human|person|agent)|"
+    r"what('?s| is) your name|tell me about yourself|"
+    r"thanks?|thank you|cheers|ok(ay)?|great|awesome|bye|goodbye|"
+    r"help|what can you do|how can you help|"
+    r"(good[,.]?\s+)?(what (do you sell|can you help|do you (have|carry|offer)))|"
+    r"what('?s| is) (in stock|available|on (sale|offer)))\s*[?!.]*\s*$",
+    re.IGNORECASE,
+)
 _ESCALATION_RE = re.compile(
     r"(speak (to|with) (a )?human|talk (to|with) (a )?human|human agent|call me"
     r"|need (a |to speak with )?(human|agent)|connect me"
@@ -180,12 +180,13 @@ async def _classify_message(message: str) -> MessageIntent:
         return MessageIntent.CONTACT_UPDATE
     if _PRODUCT_QUERY_SIGNALS.search(msg):
         return MessageIntent.FASHION
+    if _CONVERSATIONAL_PATTERNS.search(msg):
+        return MessageIntent.CONVERSATION
 
     try:
+        logger.debug(f"[Classify Message] Calling LLM to classify intent")
         llm = get_llm()
-        resp = await llm.ainvoke([
-            HumanMessage(content=_UNIFIED_ROUTER_PROMPT.format(message=msg))
-        ])
+        resp = await llm.ainvoke([ HumanMessage(content=_UNIFIED_ROUTER_PROMPT.format(message=msg)) ])
         result = _extract_text_content(resp.content).strip().lower()
         if result in MessageIntent.__members__.values():
             return MessageIntent(result)
@@ -714,23 +715,6 @@ def _extract_text_content(content) -> str:
 
     return str(content)
 
-_ESCALATION_RE = re.compile(
-    r"(speak (to|with) (a )?human|talk (to|with) (a )?human|human agent|call me"
-    r"|need (a |to speak with )?(human|agent)|connect me"
-    r"|(speak|talk|chat|connect).{0,20}(human|agent|person|someone|representative)"
-    r"|(need|want).{0,20}(human|agent|real person)"
-    r"|contact support|contact (an? )?(agent|team|us)|reach (out|support)|get (help|support))",
-    re.IGNORECASE,
-)
-_COMPLAINT_RE = re.compile(
-    r"(complain|bad experience|wrong item|damaged|overcharged|poor service|unsatisfied)",
-    re.IGNORECASE,
-)
-_CONTACT_UPDATE_RE = re.compile(
-    r"(update.{0,15}(contact|address|email|phone)|change.{0,15}(address|email|phone|details))",
-    re.IGNORECASE,
-)
-
 
 async def run_agent(
     message: str,
@@ -748,7 +732,10 @@ async def run_agent(
     history: list[BaseMessage] = load_messages_from_redis(session_id)
     history = _sanitize_loaded_history(history)
 
-    if CONVERSATIONAL_PATTERNS.match(message.strip()):
+    intent: str = await _classify_message(message)
+    logger.debug(f"[Router] intent={intent} for message='{message[:60]}'")
+
+    if intent == MessageIntent.CONVERSATION:
         logger.debug("[Agent] Conversational shortcut")
         llm = get_llm()
         resp = await llm.ainvoke(
@@ -769,10 +756,7 @@ async def run_agent(
             called_order=False,
             complaint_sent=False,
         )
-        return {"reply": reply, "session_id": session_id, "sources": [], "escalated": False, "quick_replies": quick_replies}
-
-    intent: str = await _classify_message(message)
-    logger.debug(f"[Router] intent={intent} for message='{message[:60]}'")
+        return {"reply": reply, "session_id": session_id, "quick_replies": quick_replies}
 
     if intent == MessageIntent.ESCALATION_REQUEST:
         return {
@@ -892,7 +876,6 @@ async def run_agent(
         escalated = final_state.get("escalated", False)
 
         llm = get_llm()
-        # quick_replies = await _get_quick_replies(message, reply, sources, escalated, llm)
         quick_replies = _get_quick_replies(
             user_message=message,
             agent_reply=reply,
