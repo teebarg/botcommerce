@@ -31,6 +31,8 @@ class Settings(BaseSettings):
 
     SLACK_WEBHOOK_URL: str | None = ""
 
+    OBSERVABILITY_ENABLED: bool = False
+
     class Config:
         env_file = ".env"
         populate_by_name = True

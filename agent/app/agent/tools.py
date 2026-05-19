@@ -195,7 +195,6 @@ def check_order_status(order_number: str) -> str:
         f"Is there anything else I can help you with?"
     )
 
-    # In check_order_status tool, change human_summary to a terse agent note:
     agent_note = (
         f"Order {order_number} found. Status: {status_text}. "
         f"Value: {formatted_total}. Payment: {payment_note}. "
@@ -215,17 +214,11 @@ def check_order_status(order_number: str) -> str:
     order_payload["_formatted_reply"] = formatted_reply
 
     return (
-        "\n\n<!-- ORDERS_JSON: "
+        agent_note
+        + "\n\n<!-- ORDERS_JSON: "
         + json.dumps(order_payload)
         + " -->"
     )
-
-    # return (
-    #     human_summary
-    #     + "\n\n<!-- ORDERS_JSON: "
-    #     + json.dumps(order_payload)
-    #     + " -->"
-    # )
 
 
 @tool

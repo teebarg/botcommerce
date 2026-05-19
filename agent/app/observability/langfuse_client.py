@@ -17,6 +17,9 @@ def get_langfuse() -> Langfuse | None:
     pk   = settings.LANGFUSE_PUBLIC_KEY
     sk   = settings.LANGFUSE_SECRET_KEY
     host = settings.LANGFUSE_BASE_URL
+    if not settings.OBSERVABILITY_ENABLED:
+        logger.debug("[Langfuse] Observability disabled")
+        return None
     if not pk or not sk:
         logger.warning("[Langfuse] Credentials missing — observability disabled.")
         return None

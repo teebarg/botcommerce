@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 from app.schemas.models import ChatRequest, ChatResponse, IngestRequest, HealthResponse
 from app.agent.agent_graph import run_agent
 from app.agent.memory import clear_session
-from app.config import get_model_name, get_settings
+from app.config import get_model_name, get_settings, settings
 from app.utils import _notify_slack_escalation
 from app.agent.db import is_human_connected, save_message_db, mark_escalated, ensure_conversation_exists
 from app.redis_client import redis_client
@@ -224,24 +224,25 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
         user_metadata={}
     )
 
-    background_tasks.add_task(
-        run_eval_pipeline,
-        session_id=payload.session_id,
-        customer_id=payload.customer_id,
-        langfuse_trace_id=trace.id,
-        user_message=payload.message or "",
-        agent_reply=result.get("reply", ""),
-        escalated=result.get("escalated", False),
-        sources=result.get("sources", []),
-        tools_called=result.get("_tools_called", []),
-        latency_ms=_latency_ms,
-        prompt_tokens=result.get("_prompt_tokens", 0),
-        completion_tokens=result.get("_completion_tokens", 0),
-        llm=get_llm(),
-        config=dataclasses.replace(SUPPORT_EVAL_CONFIG, model_name=get_model_name()),
-        error=None,
-        stacktrace=None,
-    )
+    if settings.OBSERVABILITY_ENABLED:
+        background_tasks.add_task(
+            run_eval_pipeline,
+            session_id=payload.session_id,
+            customer_id=payload.customer_id,
+            langfuse_trace_id=trace.id,
+            user_message=payload.message or "",
+            agent_reply=result.get("reply", ""),
+            escalated=result.get("escalated", False),
+            sources=result.get("sources", []),
+            tools_called=result.get("_tools_called", []),
+            latency_ms=_latency_ms,
+            prompt_tokens=result.get("_prompt_tokens", 0),
+            completion_tokens=result.get("_completion_tokens", 0),
+            llm=get_llm(),
+            config=dataclasses.replace(SUPPORT_EVAL_CONFIG, model_name=get_model_name()),
+            error=None,
+            stacktrace=None,
+        )
 
     return ChatResponse(**result)
 

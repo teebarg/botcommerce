@@ -184,7 +184,7 @@ async def _classify_message(message: str) -> MessageIntent:
         return MessageIntent.CONVERSATION
 
     try:
-        logger.debug(f"[Classify Message] Calling LLM to classify intent")
+        logger.debug(f"[Classify Message] Calling LLM to classify intent..............................")
         llm = get_llm()
         resp = await llm.ainvoke([ HumanMessage(content=_UNIFIED_ROUTER_PROMPT.format(message=msg)) ])
         result = _extract_text_content(resp.content).strip().lower()
