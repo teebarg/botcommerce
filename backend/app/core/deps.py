@@ -81,7 +81,8 @@ async def verify_clerk_token(token: Annotated[str | None, Depends(APIKeyHeader(n
             issuer=settings.CLERK_ISSUER_URL,
             options={"verify_aud": False},
         )
-    except Exception:
+    except Exception as e:
+        logger.error(f"[Verify Clerk Token] Error occurred verifying clerk token: {e}")
         raise HTTPException(401, "Invalid or expired token")
 
     return payload

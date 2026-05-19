@@ -5,14 +5,13 @@ import time
 import httpx
 from langchain_classic.tools import tool
 from app.rag.qdrant_client import search_collection
-from app.config import get_settings
+from app.config import settings
 
 logger = get_logger(__name__)
 
 
 def _shop_request(method: str, path: str, **kwargs) -> dict:
     """Internal helper for calling the shop API with a short-lived JWT."""
-    settings = get_settings()
     token = jwt.encode(
         {"sub": "agent", "role": "ADMIN", "exp": int(time.time()) + 300},
         settings.SECRET_KEY,

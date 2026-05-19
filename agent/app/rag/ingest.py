@@ -3,9 +3,7 @@ import argparse
 from app.logging import get_logger
 import asyncpg
 from app.rag.qdrant_client import upsert_documents
-from app.config import get_settings
-
-settings = get_settings()
+from app.config import settings
 
 logger = get_logger(__name__)
 

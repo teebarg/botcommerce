@@ -1,3 +1,4 @@
+from functools import lru_cache
 import json
 from app.logging import get_logger
 import redis
@@ -9,7 +10,7 @@ from langchain_core.messages import (
     ToolMessage,
 )
 
-from app.config import get_settings
+from app.config import settings
 
 logger = get_logger(__name__)
 
@@ -21,10 +22,9 @@ _MESSAGE_TYPES = {
     "tool": ToolMessage,
 }
 
-
+@lru_cache(maxsize=1)
 def _get_redis() -> redis.Redis:
-    settings = get_settings()
-    return redis.from_url(settings.REDIS_URL, decode_responses=True)
+    return redis.from_url(settings.REDIS_URL, decode_responses=True, max_connections=20)
 
 
 def _normalise_content(content) -> str:

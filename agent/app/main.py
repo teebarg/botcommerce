@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 from app.schemas.models import ChatRequest, ChatResponse, IngestRequest, HealthResponse
 from app.agent.agent_graph import run_agent
 from app.agent.memory import clear_session
-from app.config import get_model_name, get_settings, settings
+from app.config import get_model_name, settings
 from app.utils import _notify_slack_escalation
 from app.agent.db import is_human_connected, save_message_db, mark_escalated, ensure_conversation_exists
 from app.redis_client import redis_client
@@ -78,6 +78,11 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
     - Returns whether the conversation was escalated to a human
     """
     logger.debug("Starting agent chat...................................................................................")
+    MAX_MESSAGE_LENGTH = 1000
+
+    if payload.message and len(payload.message) > MAX_MESSAGE_LENGTH:
+        return ChatResponse(reply="Your message is too long. Please keep it under 1000 characters.", session_id=payload.session_id)
+
     connection_key = payload.customer_id or payload.app_session_id
     await redis_client.set(f"chat_user:{payload.session_id}", str(connection_key))
 
@@ -180,13 +185,20 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
         message=payload.message or "",
     )
 
+    # rate limiting:
+    turn_count = await redis_client.incr(f"rate:{payload.session_id}")
+    await redis_client.expire(f"rate:{payload.session_id}", 60)
+    if turn_count > 10:  # 10 messages per minute per session
+        return ChatResponse(reply="Please slow down — try again in a moment.", session_id=payload.session_id)
+
     try:
         result = await run_agent(
             message=payload.message or "",
             session_id=payload.session_id,
             customer_id=payload.customer_id,
         )
-    except Exception:
+    except Exception as e:
+        logger.error(f"[Chat] Unhandled error for session {payload.session_id}: {e}", exc_info=True)
         return ChatResponse(reply="Something went wrong on my end. Please try again.", session_id=payload.session_id)
 
 
@@ -267,31 +279,28 @@ async def health_check() -> HealthResponse:
     """
     Health check endpoint.
     """
-    settings = get_settings()
+    checks = {}
 
-    qdrant_status = "ok"
     try:
         from app.rag.qdrant_client import get_qdrant_client
         client = get_qdrant_client()
         client.get_collections()
+        checks["qdrant"] = "ok"
     except Exception as e:
-        qdrant_status: str = f"error: {str(e)[:50]}"
+        checks["qdrant"] = "error"
+        logger.error(f"error: {str(e)[:50]}")
 
-    redis_status = "ok"
     try:
         from app.agent.memory import _get_redis
         r = _get_redis()
         r.ping()
+        checks["redis"] = "ok"
     except Exception as e:
-        redis_status: str = f"error: {str(e)[:50]}"
+        checks["redis"] = "error"
+        logger.error(f"error: {str(e)[:50]}")
 
-    return HealthResponse(
-        status="healthy",
-        llm="groq",
-        qdrant=qdrant_status,
-        redis=redis_status,
-        environment=settings.env,
-    )
+    healthy = all(v == "ok" for v in checks.values())
+    return HealthResponse(status="ok" if healthy else "degraded", checks=checks)
 
 
 @app.delete("/session/{session_id}", tags=["Admin"])

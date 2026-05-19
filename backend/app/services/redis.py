@@ -6,8 +6,10 @@ import json
 import inspect
 from fastapi import Request
 from app.redis_client import redis_client
-from app.core.logging import logger
+from app.core.logging import get_logger
 from app.services.websocket import manager
+
+logger = get_logger(__name__)
 
 DEFAULT_EXPIRATION = int(timedelta(days=7).total_seconds())
 
@@ -18,7 +20,7 @@ def handle_redis_errors(default: Any = None):
             try:
                 return await func(*args, **kwargs)
             except Exception as e:
-                logger.error(f"Redis error in {func.__name__}: {str(e)}")
+                logger.error(f"[Redis] error in {func.__name__}: {str(e)}")
                 return default
         return wrapper
     return decorator
@@ -29,7 +31,8 @@ class EnhancedJSONEncoder(json.JSONEncoder):
             return o.isoformat()
         try:
             return o.__dict__
-        except Exception:
+        except Exception as e:
+            logger.error(f"[JSONEncoder] JSONEncoder Failed: {e}")
             return str(o)
 
 

@@ -54,8 +54,7 @@ def get_embedding_model() -> TextEmbedding:
 
 @lru_cache()
 def get_qdrant_client() -> QdrantClient:
-    from app.config import get_settings
-    settings = get_settings()
+    from app.config import settings
     logger.debug(f"Connecting to Qdrant: {settings.QDRANT_URL}")
     return QdrantClient(
         url=settings.QDRANT_URL,

@@ -455,8 +455,8 @@ async def get_index_products(request: Request) -> IndexProducts:
                 ensure_index_ready(index)
                 try:
                     search_results = index.search("", search_params)
-                except Exception:
-                    logger.error(f"Meilisearch retry failed: {e}")
+                except Exception as err:
+                    logger.error(f"Meilisearch retry failed: {err}")
                     raise HTTPException(status_code=502, detail="Search service unavailable")
             logger.error(f"Meilisearch error: {e}")
             raise HTTPException(

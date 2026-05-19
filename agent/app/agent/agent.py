@@ -6,7 +6,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 import uuid
 import re
 
-from app.config import get_llm, get_settings
+from app.config import get_llm, settings
 from app.agent.tools import get_all_tools
 from app.agent.memory import load_memory_from_redis, save_memory_to_redis
 
@@ -84,7 +84,6 @@ Thought: {agent_scratchpad}"""
 
 
 def _create_executor(session_id: str) -> tuple[AgentExecutor, object]:
-    settings = get_settings()
     llm = get_llm()
     tools = get_all_tools()
     memory = load_memory_from_redis(session_id)
