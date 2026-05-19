@@ -2,12 +2,38 @@ import json
 from app.logging import get_logger
 import jwt
 import time
-import httpx
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from langchain_classic.tools import tool
 from app.rag.qdrant_client import search_collection
 from app.config import settings
 
 logger = get_logger(__name__)
+
+
+def _make_http_session() -> requests.Session:
+    session = requests.Session()
+    
+    retry_strategy = Retry(
+        total=3,                        # retry 3 times
+        backoff_factor=0.5,             # wait 0.5s, 1s, 2s between retries
+        status_forcelist=[429, 500, 502, 503, 504],  # retry on these status codes
+        allowed_methods=["GET", "POST"],
+    )
+    
+    adapter = HTTPAdapter(
+        max_retries=retry_strategy,
+        pool_connections=10,
+        pool_maxsize=20,
+    )
+    
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    
+    return session
+
+_http_session = _make_http_session()
 
 
 def _shop_request(method: str, path: str, **kwargs) -> dict:
@@ -20,16 +46,27 @@ def _shop_request(method: str, path: str, **kwargs) -> dict:
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     url: str = f"{settings.API_BASE_URL}{path}"
     try:
-        with httpx.Client(timeout=10.0) as client:
-            response = client.request(method, url, headers=headers, **kwargs)
-            response.raise_for_status()
-            return response.json()
-    except httpx.HTTPStatusError as e:
-        logger.error(f"API error: {e.response.status_code} — {e.response.text}")
-        return {"error": f"API error {e.response.status_code}: {e.response.text}"}
-    except httpx.RequestError as e:
-        logger.error(f"API connection error: {e}")
-        return {"error": "Could not connect to the API. Please try again."}
+        response = _http_session.request(
+            method=method,
+            url=url,
+            headers=headers,
+            timeout=(3.0, 10.0),  # (connect_timeout, read_timeout)
+            **kwargs,
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.Timeout:
+        logger.warning(f"[ShopAPI] Timeout: {method} {path}")
+        return {"error": "Request timed out"}
+    except requests.ConnectionError:
+        logger.error(f"[ShopAPI] Connection error: {method} {path}")
+        return {"error": "Service unavailable"}
+    except requests.HTTPError as e:
+        logger.error(f"[ShopAPI] HTTP {e.response.status_code}: {method} {path}")
+        return {"error": f"HTTP {e.response.status_code}"}
+    except Exception as e:
+        logger.error(f"[ShopAPI] Unexpected error: {e}")
+        return {"error": str(e)}
 
 
 @tool
@@ -43,7 +80,7 @@ def search_products(query: str) -> str:
         
     results = search_collection("products", query, top_k=5, score_threshold=0.55)
     if not results:
-        return "No matching products found."
+        return "No matching products found. Tell the customer we don't sell that item and offer to help with something else."
 
     summary_lines: list[str] = []
     structured = []
@@ -52,7 +89,6 @@ def search_products(query: str) -> str:
         summary_lines.append(
             f"- {r['name']} (SKU: {r.get('sku','N/A')}) | Price: {r['price']} | Category: {r['category']}"
         )
-
         structured.append({
             "id": r.get("product_id", 0),
             "variant_id": r.get("variant_id", 0),
@@ -64,7 +100,16 @@ def search_products(query: str) -> str:
 
     output = "Top matching products:\n"
     output += "\n".join(summary_lines)
-
+    output += (
+        f"\n\n<!-- AGENT_INSTRUCTION: {len(structured)} product card(s) for '{query}' are displayed in the UI automatically. "
+        "Do NOT repeat product names, SKUs, or prices in your reply. "
+        "Do NOT call search_products again. "
+        "Do NOT ask what the customer is looking for — they already told you. "
+        "Acknowledge specifically what was found, for example: "
+        "'Yes, we carry {query}! Here are some options I found for you 😊 Let me know if anything catches your eye.' "
+        "or 'Found some options for you! Let me know if any catch your eye.' "
+        "Keep it to one or two sentences. -->"
+    )
     output += f"\n\n<!-- PRODUCTS_JSON:{json.dumps(structured, separators=(',', ':'))} -->"
     return output
 

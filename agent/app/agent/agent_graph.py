@@ -59,14 +59,14 @@ SYSTEM_PROMPT = """You are Seun, a warm and helpful customer support agent for T
 - Keep replies concise, friendly, and professional.
 
 ## Product Search
-- ALWAYS call search_products before answering any product question. Never assume what we carry.
+- ALWAYS call search_products before answering any product question. Never assume what we sell.
 - NEVER call search_products with an empty query. If the question is too vague, ask the customer to be more specific.
 - When results are returned, DO NOT list products in your reply — they display as cards in the UI automatically.
   Acknowledge the results naturally and conversationally. Vary your phrasing every time.
   Never repeat the same sentence twice across a conversation.
   You can comment on the selection, ask what they're looking for, or invite them to browse — keep it warm and human.
 - If the results clearly do not match what the customer asked for (e.g. they asked for baby diapers but results show clothing), you MUST:
-  1. Tell the customer we don't carry that specific item.
+  1. Tell the customer we don't sell that specific item.
   2. Call search_products again with a related clothing/fashion query.
   3. Introduce the alternatives warmly in ONE sentence only.
 - If the customer asks for something completely unrelated to fashion (e.g. electronics, food, furniture), do NOT search. Simply say we are a fashion store and ask if you can help with clothing instead.
@@ -141,7 +141,7 @@ _CONVERSATIONAL_PATTERNS = re.compile(
     r"what('?s| is) your name|tell me about yourself|"
     r"thanks?|thank you|cheers|ok(ay)?|great|awesome|bye|goodbye|"
     r"help|what can you do|how can you help|"
-    r"(good[,.]?\s+)?(what (do you sell|can you help|do you (have|carry|offer)))|"
+    r"(good[,.]?\s+)?(what (do you sell|can you help|do you (have|carry|offer|sell)))|"
     r"what('?s| is) (in stock|available|on (sale|offer)))\s*[?!.]*\s*$",
     re.IGNORECASE,
 )
@@ -162,7 +162,8 @@ _CONTACT_UPDATE_RE = re.compile(
     re.IGNORECASE,
 )
 _PRODUCT_QUERY_SIGNALS = re.compile(
-    r"(do you (sell|have|carry)|looking for|find me|search|show me|any .+in stock|what .+(have|carry|sell))",
+    r"(do you (sell|have|carry)|looking for|find me|search|show me|any .+in stock"
+    r"|what .+(have|carry|sell)|what about|got any|any .+available)",
     re.IGNORECASE,
 )
 
@@ -316,7 +317,7 @@ FORMS: dict[str, dict] = {
 
 # Tool Call Repair
 _TOOL_JSON_RE = re.compile(
-    r'\{\s*"name"\s*:\s*"(?P<name>[^"]+)"\s*,\s*"arguments"\s*:\s*(?P<args>\{.*\})\s*\}',
+    r'\{\s*"(?:type"\s*:\s*"function"\s*,\s*)?"name"\s*:\s*"(?P<name>[^"]+)"\s*,\s*"(?:arguments|parameters)"\s*:\s*(?P<args>\{.*\})\s*\}',
     re.DOTALL,
 )
 
@@ -337,10 +338,7 @@ def _repair_tool_call(response: AIMessage) -> AIMessage:
         tool_name = match.group("name")
         tool_args = json.loads(match.group("args"))
 
-        logger.debug(
-            f"[Repair] Converted malformed tool JSON into tool_call: {tool_name}"
-        )
-
+        logger.debug(f"[Repair] Converted malformed tool JSON into tool_call: {tool_name}")
         return AIMessage(
             content="",
             tool_calls=[
@@ -352,7 +350,6 @@ def _repair_tool_call(response: AIMessage) -> AIMessage:
                 }
             ],
         )
-
     except Exception as e:
         logger.error(f"[Repair] Failed to repair tool call: {e}")
         return response
@@ -485,52 +482,25 @@ def build_graph():
 
     async def process_tool_results(state: AgentState) -> dict:
         messages = list(state["messages"])
-        patched: list[BaseMessage] = []
         
-        # Find the last AIMessage with tool_calls — only patch ToolMessages from that batch
         last_ai_tool_call_ids: set[str] = set()
         for msg in reversed(messages):
             if isinstance(msg, AIMessage) and msg.tool_calls:
                 last_ai_tool_call_ids = {tc["id"] for tc in msg.tool_calls}
                 break
 
-        for msg in messages:
-            if (
-                isinstance(msg, ToolMessage)
-                and msg.name == "search_products"
-                and msg.tool_call_id in last_ai_tool_call_ids  # only current batch
-                and "<!-- UI_CARDS -->" not in str(msg.content)
-                and "No matching products" not in str(msg.content)
-            ):
-                count: int = str(msg.content).count("(SKU:")
-                note: str = (
-                    f"\n\n<!-- UI_CARDS: {count} product card(s) will be shown in the UI automatically. "
-                    "Do NOT list product names, SKUs, or prices in your text reply — the cards handle that. "
-                    "Respond naturally and conversationally, varying your phrasing each time. "
-                    "Examples of good replies (do not copy verbatim): "
-                    "'Sure! Here are some options that might work 😊', "
-                    "'I pulled up a few things that could be a great fit!', "
-                    "'Found some nice ones — take a look!', "
-                    "'Here you go! Let me know if any catch your eye or if you want something different.' "
-                    "Match the customer's energy — casual if they're casual, warm if they seem uncertain. -->"
-                )
-                msg = ToolMessage(
-                    content=str(msg.content) + note,
-                    tool_call_id=msg.tool_call_id,
-                    name=msg.name,
-                )
-            patched.append(msg)
+        current_batch = [
+            m for m in messages
+            if isinstance(m, ToolMessage)
+            and m.tool_call_id in last_ai_tool_call_ids
+        ]
 
         _log_observations(state)
 
         sources: list[str] = list(state.get("sources", []))
         escalated: bool = state.get("escalated", False)
 
-        for msg in reversed(state["messages"]):
-            if not isinstance(msg, ToolMessage):
-                break
-            if msg.tool_call_id not in last_ai_tool_call_ids:
-                break  # stop at previous turn's messages
+        for msg in current_batch:
             if msg.name in ("search_products", "search_faqs", "search_policies"):
                 label = msg.name.replace("search_", "").replace("_", " ").title()
                 if label not in sources:
@@ -542,27 +512,26 @@ def build_graph():
                     customer_id=state.get("customer_id"),
                     reason=str(msg.content),
                 )
-
-        for msg in state["messages"]:
-            if isinstance(msg, ToolMessage) and msg.tool_call_id in last_ai_tool_call_ids:
-                record_tool_span(
-                    tool_name=msg.name or "unknown",
-                    tool_args={},
-                    tool_result=str(msg.content)[:300],
-                    latency_ms=0,
-                )
-
-        # Return only the patched versions of the current batch's tool messages
-        new_tool_msgs = [
-            m for m in patched
-            if isinstance(m, ToolMessage) and m.tool_call_id in last_ai_tool_call_ids
-        ]
+            record_tool_span(
+                tool_name=msg.name or "unknown",
+                tool_args={},
+                tool_result=str(msg.content)[:300],
+                latency_ms=0,
+            )
 
         return {
-            "messages": new_tool_msgs,
+            "messages": current_batch,
             "sources": sources,
             "escalated": escalated,
         }
+
+
+    MAX_CALLS_PER_TURN = {
+        "search_products":    1,  # tool instructs model not to retry
+        "check_order_status": 1,  # either found or not
+        "check_stock":        1,  # either in stock or not
+        "request_refund":     1,  # never retry a write operation
+    }
 
     def should_continue(state: AgentState) -> Literal["tools", "end"]:
         if state.get("iterations", 0) >= MAX_ITERATIONS:
@@ -573,29 +542,26 @@ def build_graph():
         if not (isinstance(last, AIMessage) and last.tool_calls):
             return "end"
 
-        # Prevent calling the same tool with identical args twice in one session
         last_tool_name = last.tool_calls[0]["name"]
-        last_tool_args = last.tool_calls[0]["args"]
 
-        previous_tool_calls = [
-            m for m in state["messages"][:-1]
+        # Scope to current turn only
+        last_human_idx = max(
+            (i for i, m in enumerate(state["messages"]) if isinstance(m, HumanMessage)),
+            default=0,
+        )
+        current_turn_msgs = state["messages"][last_human_idx:]
+
+        times_called = sum(
+            1 for m in current_turn_msgs
             if isinstance(m, ToolMessage) and m.name == last_tool_name
-        ]
-        for prev in previous_tool_calls:
-            # If this exact tool+args combo was already called, stop
-            parent_ai = next(
-                (m for m in state["messages"]
-                if isinstance(m, AIMessage)
-                and any(tc["id"] == prev.tool_call_id for tc in getattr(m, "tool_calls", []))),
-                None,
+        )
+
+        max_allowed = MAX_CALLS_PER_TURN.get(last_tool_name, 2)
+        if times_called >= max_allowed:
+            logger.warning(
+                f"[Agent] {last_tool_name} called {times_called}/{max_allowed} times this turn — forcing end."
             )
-            if parent_ai and any(
-                tc["args"] == last_tool_args for tc in getattr(parent_ai, "tool_calls", [])
-            ):
-                logger.warning(
-                    f"[Agent] Duplicate tool call detected: {last_tool_name}({last_tool_args}) — forcing end."
-                )
-                return "end"
+            return "end"
 
         return "tools"
 
@@ -810,7 +776,7 @@ async def run_agent(
             reason: str = reply.replace("ESCALATION_REQUIRED:", "").strip()
 
             NON_ESCALATION_KEYWORDS: list[str] = [
-                "not found", "no results", "couldn't find", "don't carry",
+                "not found", "no results", "couldn't find", "don't sell",
                 "unavailable", "out of stock", "no matching", "pin down",
             ]
 

@@ -198,7 +198,7 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
             customer_id=payload.customer_id,
         )
     except Exception as e:
-        logger.error(f"[Chat] Unhandled error for session {payload.session_id}: {e}", exc_info=True)
+        logger.error(f"[Chat Api] Unhandled error for session {payload.session_id}: {e}", exc_info=True)
         return ChatResponse(reply="Something went wrong on my end. Please try again.", session_id=payload.session_id)
 
 

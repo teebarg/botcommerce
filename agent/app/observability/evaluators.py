@@ -14,7 +14,7 @@ _QUALITY_SYSTEM = (
     "Given a customer message, the tool results, and the agent's reply, "
     "score the reply on two dimensions:\n"
     "1. Correctness (0-5): Is the reply accurate and appropriate?\n"
-    "   - If the store does not carry what the customer asked for and the agent "
+    "   - If the store does not sell what the customer asked for and the agent "
     "correctly says so while redirecting to relevant alternatives, score 5.\n"
     "   - If the agent presents unrelated results as if they match the query, score 0.\n"
     "   - If the agent used tool results accurately, score 4-5.\n"
@@ -92,7 +92,7 @@ _TOOL_EXPECTATIONS: list[tuple[re.Pattern, str]] = [
 ]
 
 _FORBIDDEN_ESCALATION_PATTERNS = re.compile(
-    r"not found|no results|couldn't find|don't carry|unavailable|out of stock",
+    r"not found|no results|couldn't find|don't sell|unavailable|out of stock",
     re.I,
 )
 
