@@ -1,7 +1,5 @@
 import httpx
 from abc import ABC, abstractmethod
-from dataclasses import asdict
-
 from app.core.logging import logger
 from app.core.utils import send_email
 import json

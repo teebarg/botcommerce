@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from app.logging import get_logger
-from app.agent.db import get_connection
+from app.db import get_connection
 
 logger = get_logger(__name__)
 

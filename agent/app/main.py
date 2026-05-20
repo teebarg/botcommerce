@@ -1,4 +1,5 @@
 import dataclasses
+import time
 from app.logging import get_logger
 from app.agent.eval_config import SUPPORT_EVAL_CONFIG
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, Request
@@ -7,18 +8,16 @@ from contextlib import asynccontextmanager
 
 from app.schemas.models import ChatRequest, ChatResponse, IngestRequest, HealthResponse
 from app.agent.agent_graph import run_agent
-from app.agent.memory import clear_session
-from app.config import get_model_name, settings
+from app.config import get_model_name, get_llm, settings
 from app.utils import _notify_slack_escalation
 from app.agent.db import is_human_connected, save_message_db, mark_escalated, ensure_conversation_exists
 from app.redis_client import redis_client
-from app.agent.memory import save_messages_to_redis, load_messages_from_redis
+from app.agent.memory import save_messages_to_redis, load_messages_from_redis, clear_session
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
-import time
+
 from app.observability.tracing import start_turn_trace, end_turn_trace
 from app.observability.eval_runner import run_eval_pipeline
 from app.observability.langfuse_client import flush_langfuse
-from app.config import get_llm
 
 logger = get_logger(__name__)
 

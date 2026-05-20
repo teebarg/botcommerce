@@ -1,22 +1,9 @@
 import json
+from app.db import get_connection
 from app.logging import get_logger
-import asyncpg
 from typing import Optional
-from app.config import settings
 
 logger = get_logger(__name__)
-
-
-# ─────────────────────────────────────────────────────────────
-# Connection Helper
-# ─────────────────────────────────────────────────────────────
-
-async def get_connection() -> asyncpg.Connection:
-    url: str | None = settings.DATABASE_URL
-    if not url:
-        raise RuntimeError("DATABASE_URL is not set in .env")
-
-    return await asyncpg.connect(url)
 
 async def ensure_conversation_exists(
     conversation_uuid: str,
