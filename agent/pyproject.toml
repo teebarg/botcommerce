@@ -22,7 +22,8 @@ dependencies = [
     "langchain-google-genai==3.2.0",
     "langchain-cerebras==0.8.2",
     "langchain-ollama>=1.0.1",
-    "langfuse>=2.0.0"
+    "langfuse>=2.0.0",
+    "pywebpush==2.3.0",
 ]
 
 [project.optional-dependencies]
