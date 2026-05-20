@@ -1,16 +1,16 @@
+from app.logging import get_logger
 from langchain.agents import AgentExecutor, create_react_agent
 from langchain.prompts import PromptTemplate
 from langchain_core.runnables import RunnableConfig
 from langchain_core.messages import HumanMessage, SystemMessage
-import logging
 import uuid
 import re
 
-from app.config import get_llm, get_settings
+from app.config import get_llm, settings
 from app.agent.tools import get_all_tools
 from app.agent.memory import load_memory_from_redis, save_memory_to_redis
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 # Messages that match these patterns never enter the ReAct loop.
 CONVERSATIONAL_PATTERNS = re.compile(
@@ -84,7 +84,6 @@ Thought: {agent_scratchpad}"""
 
 
 def _create_executor(session_id: str) -> tuple[AgentExecutor, object]:
-    settings = get_settings()
     llm = get_llm()
     tools = get_all_tools()
     memory = load_memory_from_redis(session_id)
@@ -121,11 +120,11 @@ async def run_agent(
     if not session_id:
         session_id = str(uuid.uuid4())
 
-    logger.info(f"[Agent] Session: {session_id} | Customer: {customer_id} | Message: {message[:80]}")
+    logger.debug(f"[Agent] Session: {session_id} | Customer: {customer_id} | Message: {message[:80]}")
 
     # Conversational
     if CONVERSATIONAL_PATTERNS.match(message.strip()):
-        logger.info("[Agent] Conversational message — skipping ReAct loop")
+        logger.debug("[Agent] Conversational message — skipping ReAct loop")
         llm = get_llm()
         reply = await _handle_conversational(message, customer_id, llm)
 

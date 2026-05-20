@@ -1,20 +1,12 @@
-"""
-app/observability/tracing.py
-
-Context-var based tracing helpers.
-The active trace for the current async task is stored in a ContextVar so
-agent_graph.py can attach spans without passing objects through the call stack.
-"""
 from __future__ import annotations
 
-import time
-import logging
 from contextvars import ContextVar
 from typing import Any
 
-from app.observability.langfuse_client import create_trace, get_langfuse
+from app.logging import get_logger
+from app.observability.langfuse_client import create_trace
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 # One trace per async task (one per chat turn)
 _active_trace: ContextVar[Any] = ContextVar("_active_trace", default=None)

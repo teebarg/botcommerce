@@ -1,18 +1,43 @@
 import json
+from app.logging import get_logger
 import jwt
 import time
-import httpx
-import logging
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from langchain_classic.tools import tool
 from app.rag.qdrant_client import search_collection
-from app.config import get_settings
+from app.config import settings
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
+
+
+def _make_http_session() -> requests.Session:
+    session = requests.Session()
+    
+    retry_strategy = Retry(
+        total=3,                        # retry 3 times
+        backoff_factor=0.5,             # wait 0.5s, 1s, 2s between retries
+        status_forcelist=[429, 500, 502, 503, 504],  # retry on these status codes
+        allowed_methods=["GET", "POST"],
+    )
+    
+    adapter = HTTPAdapter(
+        max_retries=retry_strategy,
+        pool_connections=10,
+        pool_maxsize=20,
+    )
+    
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    
+    return session
+
+_http_session = _make_http_session()
 
 
 def _shop_request(method: str, path: str, **kwargs) -> dict:
     """Internal helper for calling the shop API with a short-lived JWT."""
-    settings = get_settings()
     token = jwt.encode(
         {"sub": "agent", "role": "ADMIN", "exp": int(time.time()) + 300},
         settings.SECRET_KEY,
@@ -21,16 +46,27 @@ def _shop_request(method: str, path: str, **kwargs) -> dict:
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     url: str = f"{settings.API_BASE_URL}{path}"
     try:
-        with httpx.Client(timeout=10.0) as client:
-            response = client.request(method, url, headers=headers, **kwargs)
-            response.raise_for_status()
-            return response.json()
-    except httpx.HTTPStatusError as e:
-        logger.error(f"API error: {e.response.status_code} — {e.response.text}")
-        return {"error": f"API error {e.response.status_code}: {e.response.text}"}
-    except httpx.RequestError as e:
-        logger.error(f"API connection error: {e}")
-        return {"error": "Could not connect to the API. Please try again."}
+        response = _http_session.request(
+            method=method,
+            url=url,
+            headers=headers,
+            timeout=(3.0, 10.0),  # (connect_timeout, read_timeout)
+            **kwargs,
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.Timeout:
+        logger.warning(f"[ShopAPI] Timeout: {method} {path}")
+        return {"error": "Request timed out"}
+    except requests.ConnectionError:
+        logger.error(f"[ShopAPI] Connection error: {method} {path}")
+        return {"error": "Service unavailable"}
+    except requests.HTTPError as e:
+        logger.error(f"[ShopAPI] HTTP {e.response.status_code}: {method} {path}")
+        return {"error": f"HTTP {e.response.status_code}"}
+    except Exception as e:
+        logger.error(f"[ShopAPI] Unexpected error: {e}")
+        return {"error": str(e)}
 
 
 @tool
@@ -42,9 +78,9 @@ def search_products(query: str) -> str:
     if not query or not query.strip():
         return "No query provided. Ask the customer what they're looking for."
         
-    results = search_collection("products", query, top_k=3, score_threshold=0.45)
+    results = search_collection("products", query, top_k=5, score_threshold=0.55)
     if not results:
-        return "No matching products found."
+        return "No matching products found. Tell the customer we don't sell that item and offer to help with something else."
 
     summary_lines: list[str] = []
     structured = []
@@ -53,7 +89,6 @@ def search_products(query: str) -> str:
         summary_lines.append(
             f"- {r['name']} (SKU: {r.get('sku','N/A')}) | Price: {r['price']} | Category: {r['category']}"
         )
-
         structured.append({
             "id": r.get("product_id", 0),
             "variant_id": r.get("variant_id", 0),
@@ -65,7 +100,16 @@ def search_products(query: str) -> str:
 
     output = "Top matching products:\n"
     output += "\n".join(summary_lines)
-
+    output += (
+        f"\n\n<!-- AGENT_INSTRUCTION: {len(structured)} product card(s) for '{query}' are displayed in the UI automatically. "
+        "Do NOT repeat product names, SKUs, or prices in your reply. "
+        "Do NOT call search_products again. "
+        "Do NOT ask what the customer is looking for — they already told you. "
+        "Acknowledge specifically what was found, for example: "
+        "'Yes, we carry {query}! Here are some options I found for you 😊 Let me know if anything catches your eye.' "
+        "or 'Found some options for you! Let me know if any catch your eye.' "
+        "Keep it to one or two sentences. -->"
+    )
     output += f"\n\n<!-- PRODUCTS_JSON:{json.dumps(structured, separators=(',', ':'))} -->"
     return output
 
@@ -118,6 +162,7 @@ def check_order_status(order_number: str) -> str:
 
     Input: the order number (e.g. 'ORDFCC4E3EB').
     """
+    from datetime import datetime
 
     order_number = order_number.strip().lstrip("#").strip().upper()
     result = _shop_request("GET", f"/api/order/{order_number}")
@@ -127,22 +172,51 @@ def check_order_status(order_number: str) -> str:
 
     status = (result.get("status") or "PENDING").upper()
     payment_status = (result.get("payment_status") or "PENDING").upper()
+    payment_method = (result.get("payment_method") or "").upper()
+    total = result.get("total") or 0
+    created_at = result.get("created_at") or ""
 
-    items_payload = []
-    for item in result.get("order_items", []):
-        items_payload.append({
+    status_map = {
+        "PENDING": "being processed",
+        "SHIPPED": "on its way",
+        "DELIVERED": "delivered",
+        "CANCELLED": "cancelled",
+    }
+    status_text = status_map.get(status, status.replace("_", " ").lower())
+
+    try:
+        dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+        formatted_date = dt.strftime("%B %d, %Y")
+    except Exception:
+        formatted_date = created_at
+
+    formatted_total = f"₦{float(total):,.0f}"
+
+    if payment_method == "CASH_ON_DELIVERY":
+        payment_note = "Payment will be collected when you pickup at our store."
+    elif payment_status == "SUCCESS":
+        payment_note = "Payment confirmed ✓"
+    elif payment_status == "PENDING":
+        payment_note = "Payment is still pending."
+    else:
+        payment_note = payment_status.replace("_", " ").title()
+
+    items_payload = [
+        {
             "product_id": item.get("product_id"),
             "name": item.get("name"),
             "image": item.get("image"),
             "quantity": item.get("quantity", 1),
             "price": item.get("price"),
-        })
+        }
+        for item in result.get("order_items", [])
+    ]
 
     order_payload = {
         "order_number": order_number,
         "status": status,
         "payment_status": payment_status,
-        "payment_method": result.get("payment_method"),
+        "payment_method": payment_method,
         "shipping_method": result.get("shipping_method"),
         "financials": {
             "subtotal": result.get("subtotal"),
@@ -150,21 +224,41 @@ def check_order_status(order_number: str) -> str:
             "discount": result.get("discount_amount"),
             "wallet_used": result.get("wallet_used"),
             "shipping_fee": result.get("shipping_fee"),
-            "total": result.get("total"),
+            "total": total,
         },
         "items": items_payload,
-        "created_at": result.get("created_at"),
+        "created_at": created_at,
     }
 
-    human_summary: str = (
-        f"Order #{order_number} is currently **{status.replace('_', ' ')}**.\n"
-        f"Payment Status: **{payment_status.replace('_', ' ')}**\n"
-        f"Order value: {result.get('total')}\n"
-        f"Placed On: {result.get('created_at')}"
+    human_summary = (
+        f"Here's the update for order **#{order_number}** 😊\n\n"
+        f"**Status:** Your order is currently {status_text}\n"
+        f"**Order value:** {formatted_total}\n"
+        f"**Payment:** {payment_note}\n"
+        f"**Placed on:** {formatted_date}\n\n"
+        f"Is there anything else I can help you with?"
     )
 
+    agent_note = (
+        f"Order {order_number} found. Status: {status_text}. "
+        f"Value: {formatted_total}. Payment: {payment_note}. "
+        f"Placed: {formatted_date}. "
+        f"The formatted customer reply is in ORDERS_JSON block — extract and return it as-is."
+    )
+
+    formatted_reply = (
+        f"Here's the update for order **#{order_number}** 😊\n\n"
+        f"**Status:** Your order is currently {status_text}\n"
+        f"**Order value:** {formatted_total}\n"
+        f"**Payment:** {payment_note}\n"
+        f"**Placed on:** {formatted_date}\n\n"
+        f"Is there anything else I can help you with?"
+    )
+
+    order_payload["_formatted_reply"] = formatted_reply
+
     return (
-        human_summary
+        agent_note
         + "\n\n<!-- ORDERS_JSON: "
         + json.dumps(order_payload)
         + " -->"

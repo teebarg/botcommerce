@@ -6,9 +6,11 @@ from uuid import UUID
 from meilisearch import Client
 
 from app.core.config import settings
-from app.core.logging import logger
+from app.core.logging import get_logger
 from meilisearch.errors import MeilisearchApiError
 from anyio import to_thread
+
+logger = get_logger(__name__)
 
 client = Client(settings.MEILI_HOST, settings.MEILI_MASTER_KEY)
 
@@ -52,8 +54,8 @@ def get_or_create_index(index_name: str) -> Any:
 
             ensure_index_ready(index)
             return index
-    except Exception:
-        logger.error(f"Error creating index {index_name}")
+    except Exception as e:
+        logger.error(f"Error creating index {index_name}: {e}")
         client.create_index(index_name)
         return client.index(index_name)
 

@@ -31,6 +31,8 @@ class Settings(BaseSettings):
 
     SLACK_WEBHOOK_URL: str | None = ""
 
+    OBSERVABILITY_ENABLED: bool = False
+
     class Config:
         env_file = ".env"
         populate_by_name = True
@@ -44,12 +46,12 @@ settings = get_settings()
 
 def get_llm():
     provider: str = settings.LLM_PROVIDER
+    provider = "cerebras"
 
     if provider == "gemini":
         from langchain_google_genai import ChatGoogleGenerativeAI
         return ChatGoogleGenerativeAI(
             model="gemini-2.5-flash",
-            # model="gemini-2.5-flash-lite",
             google_api_key=settings.GOOGLE_API_KEY,
             temperature=0,
             max_retries=0,
@@ -64,7 +66,6 @@ def get_llm():
     elif provider == "ollama":
         from langchain_ollama import ChatOllama
         return ChatOllama(
-            # model="llama3:latest",
             model="qwen2.5:3b",
             base_url=settings.OLLAMA_URL,
             temperature=0,
@@ -76,4 +77,16 @@ def get_llm():
             groq_api_key=settings.GROQ_API_KEY,
             temperature=0,
             max_tokens=1024,
+            model_kwargs={"tool_choice": "auto"},
         )
+
+
+def get_model_name() -> str:
+    """Extract the actual model name from whichever LLM is active."""
+    llm = get_llm()
+    return (
+        getattr(llm, "model",       None) or  # Groq, Cerebras, Ollama
+        getattr(llm, "model_name",  None) or  # Gemini, older LangChain
+        getattr(llm, "model_id",    None) or
+        settings.LLM_PROVIDER
+    )

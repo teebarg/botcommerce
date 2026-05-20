@@ -1,27 +1,25 @@
-"""
-app/observability/evaluators.py
-
-Four async evaluators, each returning a score (0.0–1.0) + a short note.
-All evaluators are best-effort: they never raise.
-"""
 from __future__ import annotations
 
-import logging
 import re
-import time
 from typing import Any
+from app.logging import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
-# ── 1. Response quality (LLM-as-judge) ───────────────────────────────────────
-
+#1. Response quality (LLM-as-judge)
 _QUALITY_SYSTEM = (
-    "You are an impartial QA evaluator for a customer support chatbot called Seun. "
-    "Given a customer message and the agent's reply, score the reply on two dimensions:\n"
-    "1. Correctness (0-5): Is the information accurate, relevant, and complete?\n"
-    "2. Tone (0-5): Is the reply warm, professional, and appropriately concise?\n\n"
-    "Reply in EXACTLY this format (no other text):\n"
+    "You are an impartial QA evaluator for a customer support chatbot called Seun "
+    "for Thriftbyoba, a fashion and clothing store.\n"
+    "Given a customer message, the tool results, and the agent's reply, "
+    "score the reply on two dimensions:\n"
+    "1. Correctness (0-5): Is the reply accurate and appropriate?\n"
+    "   - If the store does not sell what the customer asked for and the agent "
+    "correctly says so while redirecting to relevant alternatives, score 5.\n"
+    "   - If the agent presents unrelated results as if they match the query, score 0.\n"
+    "   - If the agent used tool results accurately, score 4-5.\n"
+    "2. Tone (0-5): Is the reply warm, professional, and concise?\n\n"
+    "Reply in EXACTLY this format:\n"
     "CORRECTNESS: <integer 0-5>\n"
     "TONE: <integer 0-5>\n"
     "NOTES: <one sentence>"
@@ -32,13 +30,32 @@ async def evaluate_response_quality(
     user_message: str,
     agent_reply: str,
     llm: Any,
+    tools_called: list[dict] = [],
 ) -> tuple[float, str]:
     """
     Use the LLM to judge response quality.
     Returns (score 0-1, short note).
     """
     from langchain_core.messages import HumanMessage, SystemMessage
-    prompt = f"Customer: {user_message}\n\nAgent: {agent_reply}"
+
+    tools_summary = (
+        ", ".join(t["name"] for t in tools_called)
+        if tools_called else "none"
+    )
+    tool_results_detail = (
+        "\n".join(
+            f"- {t['name']}: {t['result_preview'][:150]}"
+            for t in tools_called
+        )
+        if tools_called else "none"
+    )
+
+    prompt = (
+        f"Customer asked: {user_message}\n\n"
+        f"Tools called: {tools_summary}\n"
+        f"Tool results:\n{tool_results_detail}\n\n"
+        f"Agent reply: {agent_reply}"
+    )
     try:
         resp = await llm.ainvoke([
             SystemMessage(content=_QUALITY_SYSTEM),
@@ -58,14 +75,15 @@ async def evaluate_response_quality(
         score = round(((correctness + tone) / 10.0), 2)
         return score, note
     except Exception as exc:
-        logger.debug(f"[Eval] response_quality error: {exc}")
+        logger.error(f"[Eval] response_quality error: {exc}")
         return 0.5, "Eval failed"
 
 
-# ── 2. Tool call accuracy (rule-based) ───────────────────────────────────────
+#2. Tool call accuracy (rule-based)
 
 # Maps intent keywords → expected tools
 _TOOL_EXPECTATIONS: list[tuple[re.Pattern, str]] = [
+    (re.compile(r"do you have|looking for|show me|find me|search for|got any|any.*clothes|any.*tops|any.*shoes", re.I), "search_products"),
     (re.compile(r"order|track|status|delivery", re.I),   "check_order_status"),
     (re.compile(r"refund|return|exchange",       re.I),   "request_refund"),
     (re.compile(r"in stock|available|stock",     re.I),   "check_stock"),
@@ -74,7 +92,7 @@ _TOOL_EXPECTATIONS: list[tuple[re.Pattern, str]] = [
 ]
 
 _FORBIDDEN_ESCALATION_PATTERNS = re.compile(
-    r"not found|no results|couldn't find|don't carry|unavailable|out of stock",
+    r"not found|no results|couldn't find|don't sell|unavailable|out of stock",
     re.I,
 )
 
@@ -83,40 +101,38 @@ async def evaluate_tool_accuracy(
     user_message: str,
     tools_called: list[dict],
     agent_reply: str,
+    tool_expectations: list[tuple] | None = None,
 ) -> tuple[float, str]:
     """
     Heuristic check: did the agent call the right tool(s) for this message?
     Returns (score 0-1, note).
     """
+    expectations = tool_expectations or _TOOL_EXPECTATIONS
     tool_names = {t["name"] for t in tools_called}
 
-    # Check for expected tool
-    for pattern, expected_tool in _TOOL_EXPECTATIONS:
+    for pattern, expected_tool in expectations:
         if pattern.search(user_message):
             if expected_tool in tool_names:
                 return 1.0, f"Correctly called {expected_tool}"
             else:
-                # Might have answered from cache/memory — partial credit
                 return 0.5, f"Expected {expected_tool} but not called"
 
-    # Check escalation wasn't triggered for trivial reasons
     if "escalate_to_human" in tool_names:
         if _FORBIDDEN_ESCALATION_PATTERNS.search(agent_reply):
             return 0.0, "Escalated for a non-critical reason (item not found)"
         return 1.0, "Escalation tool called for a plausible reason"
 
-    # No expectation matched — neutral
     return 0.8, "No specific tool expectation for this message"
 
 
-# ── 3. Escalation decision accuracy ──────────────────────────────────────────
-
+#3. Escalation decision accuracy
 _HIGH_RISK_PATTERNS = re.compile(
     r"fraud|lawsuit|legal action|chargeback|threatening|report you|solicitor",
     re.I,
 )
 _ROUTINE_PATTERNS = re.compile(
-    r"not found|no results|unavailable|don't have|what products|do you sell",
+    r"not found|no results|unavailable|don't have|what products|do you sell"
+    r"|do you have|looking for|show me|find me|any.*clothes|any.*tops",
     re.I,
 )
 
@@ -126,6 +142,8 @@ async def evaluate_escalation_accuracy(
     agent_reply: str,
     escalated: bool,
     tools_called: list[dict],
+    routine_patterns: str = "",
+    high_risk_patterns: str = "",
 ) -> tuple[float, str]:
     """
     Was the escalation decision correct?
@@ -135,8 +153,11 @@ async def evaluate_escalation_accuracy(
     Routine message + not escalated → 1.0
     Ambiguous                        → 0.7
     """
-    is_high_risk = bool(_HIGH_RISK_PATTERNS.search(user_message))
-    is_routine = bool(_ROUTINE_PATTERNS.search(user_message))
+    high_risk_re = re.compile(high_risk_patterns, re.I) if high_risk_patterns else _HIGH_RISK_PATTERNS
+    routine_re   = re.compile(routine_patterns,   re.I) if routine_patterns   else _ROUTINE_PATTERNS
+
+    is_high_risk = bool(high_risk_re.search(user_message))
+    is_routine   = bool(routine_re.search(user_message))
 
     if is_high_risk and escalated:
         return 1.0, "Correct: high-risk message escalated"
@@ -153,7 +174,7 @@ async def evaluate_escalation_accuracy(
     return 0.7, "Escalation decision ambiguous"
 
 
-# ── 4. Latency score ──────────────────────────────────────────────────────────
+#4. Latency score
 
 # Thresholds (ms)
 _LATENCY_EXCELLENT = 1_500   # ≤ 1.5s → 1.0
@@ -174,3 +195,50 @@ def evaluate_latency(latency_ms: float) -> tuple[float, str]:
         return 0.25, f"Poor latency: {latency_ms:.0f}ms"
     else:
         return 0.0, f"Unacceptable latency: {latency_ms:.0f}ms"
+
+
+async def evaluate_context_relevance(
+    user_message: str,
+    tools_called: list[dict],
+    llm: Any,
+) -> tuple[float, str]:
+    """Context relevance (did retrieval return relevant results?)"""
+    return 0.0, "[Eval] context_relevance: Awaiting Implementation"
+    from langchain_core.messages import HumanMessage, SystemMessage
+
+    # Only meaningful when a search tool was called
+    search_tools = [t for t in tools_called if t["name"] in (
+        "search_products", "search_faqs", "search_policies"
+    )]
+    if not search_tools:
+        return 1.0, "No retrieval tools called — not applicable"
+
+    system = (
+        "You are evaluating whether a retrieval tool returned results relevant "
+        "to the customer's query.\n"
+        "Score Context Relevance (0-5):\n"
+        "5 = results are directly relevant to the query\n"
+        "3 = results are partially relevant\n"
+        "0 = results are completely unrelated to the query\n\n"
+        "Reply in EXACTLY this format:\n"
+        "RELEVANCE: <integer 0-5>\n"
+        "NOTES: <one sentence>"
+    )
+    results_text = "\n\n".join(
+        f"Query context: {user_message}\nRetrieved: {t['result_preview']}"
+        for t in search_tools
+    )
+    try:
+        resp = await llm.ainvoke([
+            SystemMessage(content=system),
+            HumanMessage(content=results_text),
+        ])
+        text = resp.content.strip()
+        r_match    = re.search(r"RELEVANCE:\s*(\d)", text)
+        note_match = re.search(r"NOTES:\s*(.+)", text)
+        score = int(r_match.group(1)) / 5.0 if r_match else 0.5
+        note  = note_match.group(1).strip() if note_match else "No note"
+        return round(score, 2), note
+    except Exception as exc:
+        logger.error(f"[Eval] context_relevance error: {exc}")
+        return 0.5, "Eval failed"

@@ -20,7 +20,7 @@ interface NavLinkProp {
 
 const NavLink: React.FC<NavLinkProp> = ({ href = "", title, icon, className }) => {
     return (
-        <div className={cn("flex items-center gap-2", className)}>
+        <div className={cn("flex items-center gap-2 text-sm", className)}>
             {icon}
             <Link to={href}>{title}</Link>
         </div>

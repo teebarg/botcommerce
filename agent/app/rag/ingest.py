@@ -1,14 +1,11 @@
 import asyncio
 import argparse
-import logging
+from app.logging import get_logger
 import asyncpg
 from app.rag.qdrant_client import upsert_documents
-from app.config import get_settings
+from app.config import settings
 
-settings = get_settings()
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 async def get_connection() -> asyncpg.Connection:
@@ -87,15 +84,9 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
         ]))
 
         text: str = " ".join(filter(None, [
-            f"Product: {r['name']}.",
-            f"Product ID: {r['id']}.",
-            f"Variant ID: {r['variant_id']}.",
-            f"Image: {r['image']}.",
-            f"Category: {r['categories']}." if r["categories"] else None,
-            f"Description: {r['description']}." if r["description"] else None,
-            f"SKU: {r['sku']}.",
-            "Is New."                  if r["is_new"]     else "Thrift",
-            variants_summary,
+            r['name'],
+            r['categories'] if r["categories"] else None,
+            r['description'] if r["description"] else None,
         ]))
 
         documents.append({
@@ -113,7 +104,7 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
             "type": "product",
         })
 
-    logger.info(f"Loaded {len(documents)} active products")
+    logger.debug(f"Loaded {len(documents)} active products")
     return documents
 
 
@@ -137,7 +128,7 @@ async def load_faqs(conn: asyncpg.Connection) -> list[dict]:
             "type": "faq",
         })
 
-    logger.info(f"Loaded {len(documents)} active FAQs")
+    logger.debug(f"Loaded {len(documents)} active FAQs")
     return documents
 
 
@@ -193,7 +184,7 @@ async def load_policies(conn: asyncpg.Connection) -> list[dict]:
             "policy_type": "shop_setting",
         })
 
-    logger.info(f"Loaded {len(documents)} policy documents")
+    logger.debug(f"Loaded {len(documents)} policy documents")
     return documents
 
 LOADERS = {
@@ -208,13 +199,13 @@ async def ingest(collection: str) -> None:
     try:
         targets: list[str] = list(LOADERS.keys()) if collection == "all" else [collection]
         for name in targets:
-            logger.info(f"\n{'='*40}\nIngesting: {name}\n{'='*40}")
+            logger.debug(f"\n{'='*40}\nIngesting: {name}\n{'='*40}")
             docs = await LOADERS[name](conn)
             if not docs:
                 logger.warning(f"No documents found for '{name}' — skipping.")
                 continue
             count: int = upsert_documents(name, docs)
-            logger.info(f"✅ {name}: {count} documents upsert into Qdrant")
+            logger.debug(f"✅ {name}: {count} documents upsert into Qdrant")
     finally:
         await conn.close()
 

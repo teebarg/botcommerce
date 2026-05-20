@@ -1,4 +1,5 @@
 from app.models.reviews import Review, Reviews, ReviewCreate, ReviewUpdate
+from app.core.logging import get_logger
 from fastapi import APIRouter, HTTPException, Depends, HTTPException, Query, BackgroundTasks
 from app.core.deps import CurrentUser
 from app.models.generic import Message
@@ -9,6 +10,8 @@ from app.core.permissions import require_admin
 from base64 import b64encode, b64decode
 import json
 import asyncio
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 
@@ -51,7 +54,8 @@ async def index(
                     {sort_field: {"equals": last_value}, "id": {gt_lt: last_id}},
                 ]
             }
-        except Exception:
+        except Exception as e:
+            logger.error(f"[Reviews Index] Build Cursor Filter Failed: {e}")
             raise HTTPException(status_code=400, detail="Invalid cursor")
 
     combined_where = {**where_clause, **cursor_filter} if cursor_filter else where_clause

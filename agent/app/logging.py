@@ -1,0 +1,112 @@
+import logging
+import logging.config
+from app.config import settings
+import httpx
+import asyncio
+
+SUCCESS_LEVEL_NUM = 20
+logging.addLevelName(SUCCESS_LEVEL_NUM, "SUCCESS")
+
+def success(self, message, *args, **kwargs):
+    if self.isEnabledFor(SUCCESS_LEVEL_NUM):
+        self._log(SUCCESS_LEVEL_NUM, message, args, **kwargs)
+
+logging.Logger.success = success
+
+
+async def send_slack_message(text, level="info"):
+    title_map = {"info": "INFO", "warning": "WARNING", "error": "ERROR",
+                 "critical": "CRITICAL", "debug": "DEBUG", "success": "SUCCESS"}
+    emoji_map = {"info": "ℹ️", "warning": "⚠️", "error": "⚠️",
+                 "critical": "🚨", "success": "✅", "debug": "🐛"}
+    color_map = {"info": "#36a64f", "warning": "#FFC107", "error": "#FF0000",
+                 "critical": "#FF0000", "debug": "#000000", "success": "#2ECC71"}
+
+    url = settings.SLACK_WEBHOOK_URL
+    if not url:
+        logging.error(f"No Slack webhook configured")
+        return
+
+    payload = {
+        "attachments": [{
+            "fallback": text,
+            "color": color_map.get(level, "#FF0000"),
+            "title": f"{emoji_map.get(level, 'ℹ️')} {title_map.get(level, 'Notification')}",
+            "text": text,
+        }]
+    }
+    try:
+         async with httpx.AsyncClient() as client:
+            response = await client.post(url, json=payload, timeout=5)
+            return response.status_code == 200
+    except Exception as e:
+        logging.error(f"Failed to send Slack message: {e}")
+        return False
+
+
+class SlackLogHandler(logging.Handler):
+    def __init__(self):
+        super().__init__()
+        self._tasks: set = set()
+
+    def emit(self, record):
+        if record.levelno < SUCCESS_LEVEL_NUM:
+            return
+        try:
+            msg = self.format(record)
+            coro = send_slack_message(
+                msg,
+                level=record.levelname.lower(),
+            )
+
+            try:
+                loop = asyncio.get_running_loop()
+                task = loop.create_task(coro)
+                self._tasks.add(task)
+                task.add_done_callback(self._tasks.discard)
+            except RuntimeError:
+                asyncio.run(coro)
+
+        except Exception:
+            self.handleError(record)
+
+# Dictionary to configure logging
+LOGGING_CONFIG = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "standard": {
+            "format": "%(asctime)s [%(levelname)s] %(name)s: %(funcName)s():\n%(message)s"
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "formatter": "standard",
+            "class": "logging.StreamHandler",
+        },
+        "slack_alerts": {
+            "level": SUCCESS_LEVEL_NUM,
+            "()": SlackLogHandler,
+            "formatter": "standard",
+        },
+    },
+    "loggers": {
+        "": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "app": {
+            "handlers": ["console", "slack_alerts"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+    },
+}
+
+logging.config.dictConfig(LOGGING_CONFIG)
+logger = logging.getLogger(__name__)
+
+def get_logger(name: str) -> logging.Logger:
+    return logging.getLogger(name)

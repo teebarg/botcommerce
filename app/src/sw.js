@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 import { precacheAndRoute, cleanupOutdatedCaches } from "workbox-precaching";
 import { registerRoute } from "workbox-routing";
-import { StaleWhileRevalidate, NetworkFirst, CacheFirst } from "workbox-strategies";
+import { StaleWhileRevalidate, NetworkFirst } from "workbox-strategies";
 import { ExpirationPlugin } from "workbox-expiration";
 import { CacheableResponsePlugin } from "workbox-cacheable-response";
 
@@ -71,7 +71,7 @@ registerRoute(
         plugins: [
             new ExpirationPlugin({
                 maxEntries: 1500,
-                maxAgeSeconds: 30 * 24 * 60 * 120, // 30 Days
+                maxAgeSeconds: 30 * 24 * 60 * 120,
             }),
         ],
     })
