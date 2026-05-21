@@ -61,15 +61,11 @@ SYSTEM_PROMPT = """You are Seun, a warm and helpful customer support agent for T
 ## Product Search
 - ALWAYS call search_products before answering any product question. Never assume what we sell.
 - NEVER call search_products with an empty query. If the question is too vague, ask the customer to be more specific.
+- NEVER call search_products more than once per turn. One call, then write your reply using whatever results came back.
 - When results are returned, DO NOT list products in your reply — they display as cards in the UI automatically.
-  Acknowledge the results naturally and conversationally. Vary your phrasing every time.
-  Never repeat the same sentence twice across a conversation.
-  You can comment on the selection, ask what they're looking for, or invite them to browse — keep it warm and human.
-- If the results clearly do not match what the customer asked for (e.g. they asked for baby diapers but results show clothing), you MUST:
-  1. Tell the customer we don't sell that specific item.
-  2. Call search_products again with a related clothing/fashion query.
-  3. Introduce the alternatives warmly in ONE sentence only.
-- If the customer asks for something completely unrelated to fashion (e.g. electronics, food, furniture), do NOT search. Simply say we are a fashion store and ask if you can help with clothing instead.
+  Acknowledge the results naturally in one or two sentences. Vary your phrasing every time.
+- If results clearly don't match what the customer asked for, tell them we don't carry that item and suggest an alternative in one sentence.
+- If the customer asks for something completely unrelated to fashion, do NOT search. Say we are a fashion store and ask if you can help with clothing.
 
 ## Orders, Stock & Policies
 - Order status: call check_order_status with the order ID.
@@ -118,22 +114,7 @@ class MessageIntent(str, Enum):
     CONVERSATION = "conversation"
     CONTACT_UPDATE = "contact_update"
     OUT_OF_SCOPE = "out_of_scope"
-    FASHION = "fashion"
     NORMAL = "normal"
-
-_UNIFIED_ROUTER_PROMPT = """Classify this customer message into exactly one category:
-
-- escalation_request: wants to speak to a human agent
-- complaint: complaining or had a bad experience
-- conversation: general conversation(hi, hello)
-- contact_update: wants to update contact details
-- out_of_scope: asking about non-fashion items (electronics, food, furniture)
-- fashion: clear fashion/clothing product query
-- normal: everything else (greetings, order tracking, policy questions)
-
-Message: {message}
-
-Reply with ONLY the category label, nothing else."""
 
 _CONVERSATIONAL_PATTERNS = re.compile(
     r"^\s*(hi+|hey+|hello+|howdy|good\s*(morning|afternoon|evening)|"
@@ -179,20 +160,8 @@ async def _classify_message(message: str) -> MessageIntent:
         return MessageIntent.COMPLAINT
     if _CONTACT_UPDATE_RE.search(msg):
         return MessageIntent.CONTACT_UPDATE
-    if _PRODUCT_QUERY_SIGNALS.search(msg):
-        return MessageIntent.FASHION
     if _CONVERSATIONAL_PATTERNS.search(msg):
         return MessageIntent.CONVERSATION
-
-    try:
-        logger.debug(f"[Classify Message] Calling LLM to classify intent..............................")
-        llm = get_llm()
-        resp = await llm.ainvoke([ HumanMessage(content=_UNIFIED_ROUTER_PROMPT.format(message=msg)) ])
-        result = _extract_text_content(resp.content).strip().lower()
-        if result in MessageIntent.__members__.values():
-            return MessageIntent(result)
-    except Exception as e:
-        logger.error(f"[Router] Classification failed: {e}")
 
     return MessageIntent.NORMAL
 
@@ -395,11 +364,6 @@ def build_graph():
                 "\n\nROUTER DECISION: This query is out of scope for a fashion store. "
                 "Do NOT call any tool. Tell the customer we only sell fashion items "
                 "and ask what clothing you can help them find."
-            )
-        elif intent == MessageIntent.FASHION:
-            system += (
-                "\n\nROUTER DECISION: This is a valid fashion query. "
-                "Call search_products and present results normally."
             )
 
         def _count_tokens(msgs: list[BaseMessage]) -> int:
@@ -695,7 +659,7 @@ async def run_agent(
         f"[Agent] Session: {session_id} | Customer: {customer_id} | Message: {message[:80] if len(message) > 80 else message}"
     )
 
-    history: list[BaseMessage] = load_messages_from_redis(session_id)
+    history: list[BaseMessage] = await load_messages_from_redis(session_id)
     history = _sanitize_loaded_history(history)
 
     intent: str = await _classify_message(message)
@@ -709,7 +673,7 @@ async def run_agent(
         )
 
         reply: str = _extract_text_content(resp.content).strip()
-        save_messages_to_redis(
+        await save_messages_to_redis(
             session_id,
             history + [HumanMessage(content=message), AIMessage(content=reply)],
         )
@@ -770,7 +734,15 @@ async def run_agent(
                 break
 
         if not reply:
-            reply = "I'm sorry, I had trouble with that. Could you give me more details?"
+            last_search = next(
+                (m for m in reversed(final_state["messages"])
+                if isinstance(m, ToolMessage) and m.name == "search_products"),
+                None
+            )
+            if last_search:
+                reply = "Here are some options I found for you! Let me know if anything catches your eye. 😊"
+            else:
+                reply = "I'm sorry, I had trouble with that. Could you give me more details?"
 
         if reply.startswith("ESCALATION_REQUIRED:"):
             reason: str = reply.replace("ESCALATION_REQUIRED:", "").strip()
@@ -836,7 +808,7 @@ async def run_agent(
             final_reply=reply,
             called_search=called_search,
         )
-        save_messages_to_redis(session_id, clean_history)
+        await save_messages_to_redis(session_id, clean_history)
 
         sources = final_state.get("sources", [])
         escalated = final_state.get("escalated", False)

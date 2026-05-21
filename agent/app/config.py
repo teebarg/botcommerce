@@ -7,12 +7,11 @@ class Settings(BaseSettings):
     env: str = Field(default="development", alias="ENV")
     DATABASE_URL: str = ""
     SECRET_KEY: str = "specialsecret"
+    
     LLM_PROVIDER: str = Field(default="groq", alias="LLM_PROVIDER")
     CEREBRAS_API_KEY: str = Field(default="", alias="CEREBRAS_API_KEY")
     GOOGLE_API_KEY: str = Field(default="")
-
     GROQ_API_KEY: str = Field(default="", alias="GROQ_API_KEY")
-    GROQ_MODEL: str = Field(default="openai/gpt-oss-120b", alias="GROQ_MODEL")
 
     QDRANT_URL: str = Field(alias="QDRANT_URL")
     QDRANT_API_KEY: str = Field(alias="QDRANT_API_KEY")
@@ -46,7 +45,6 @@ settings = get_settings()
 
 def get_llm():
     provider: str = settings.LLM_PROVIDER
-    provider = "cerebras"
 
     if provider == "gemini":
         from langchain_google_genai import ChatGoogleGenerativeAI
@@ -59,7 +57,7 @@ def get_llm():
     elif provider == "cerebras":
         from langchain_cerebras import ChatCerebras
         return ChatCerebras(
-            model="llama3.1-8b",
+            model="gpt-oss-120b",
             cerebras_api_key=settings.CEREBRAS_API_KEY,
             temperature=0,
         )
@@ -73,7 +71,7 @@ def get_llm():
     else:
         from langchain_groq import ChatGroq
         return ChatGroq(
-            model=settings.GROQ_MODEL,
+            model="openai/gpt-oss-120b",
             groq_api_key=settings.GROQ_API_KEY,
             temperature=0,
             max_tokens=1024,

@@ -10,7 +10,7 @@ from app.schemas.models import ChatRequest, ChatResponse, IngestRequest, HealthR
 from app.agent.agent_graph import run_agent
 from app.config import get_model_name, get_llm, settings
 from app.utils import _notify_slack_escalation
-from app.agent.db import is_human_connected, save_message_db, mark_escalated, ensure_conversation_exists
+from app.customer_support.db import is_human_connected, save_message_db, mark_escalated, ensure_conversation_exists
 from app.redis_client import redis_client
 from app.agent.memory import save_messages_to_redis, load_messages_from_redis, clear_session
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
@@ -149,8 +149,8 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
                 "If you'd like, I can still help with anything else in the meantime."
             )
 
-            history: list[BaseMessage] = load_messages_from_redis(payload.session_id)
-            save_messages_to_redis(
+            history: list[BaseMessage] = await load_messages_from_redis(payload.session_id)
+            await save_messages_to_redis(
                 session_id=payload.session_id,
                 messages=history + [HumanMessage(content=user_msg), AIMessage(content="Complaint request received and sent to support team")],
             )
@@ -290,9 +290,7 @@ async def health_check() -> HealthResponse:
         logger.error(f"error: {str(e)[:50]}")
 
     try:
-        from app.agent.memory import _get_redis
-        r = _get_redis()
-        r.ping()
+        redis_client.ping()
         checks["redis"] = "ok"
     except Exception as e:
         checks["redis"] = "error"
@@ -305,7 +303,7 @@ async def health_check() -> HealthResponse:
 @app.delete("/session/{session_id}", tags=["Admin"])
 async def delete_session(session_id: str):
     """Clear a session's conversation memory."""
-    clear_session(session_id)
+    await clear_session(session_id)
     return {"status": "cleared", "session_id": session_id}
 
 

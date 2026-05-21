@@ -24,22 +24,16 @@ Generate a push notification for Thriftbyoba customers.
 Available products (pick the most exciting 1-2):
 {products}
 
-Active promotions:
-{promotions}
-
 Return ONLY valid JSON with this exact shape:
 {{
   "title": "...",
   "body": "...",
-  "url": "/shop"
+  "url": "/collections"
 }}
 """
 
 
-async def generate_notification_copy(
-    products: list[dict],
-    promotions: list[dict],
-) -> dict:
+async def generate_notification_copy(products: list[dict]) -> dict:
     """Use LLM to generate push notification title and body."""
     try:
         llm = get_llm()
@@ -48,15 +42,8 @@ async def generate_notification_copy(
             f"- {p['name']} at ₦{float(p['price']):,.0f}"
             for p in products[:5]
         )
-        promo_lines = "\n".join(
-            f"- {p['title']}: {p['discount_percent']}% off (code: {p['promo_code']})"
-            for p in promotions[:3]
-        ) or "No active promotions"
 
-        prompt = _COPY_PROMPT.format(
-            products=product_lines,
-            promotions=promo_lines,
-        )
+        prompt = _COPY_PROMPT.format(products=product_lines)
 
         resp = await llm.ainvoke([
             SystemMessage(content=_MARKETING_SYSTEM_PROMPT),

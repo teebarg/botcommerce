@@ -79,7 +79,7 @@ async def websocket(ws: WebSocket) -> None:
     except WebSocketDisconnect:
         logger.debug(f"WebSocket disconnected for user {user_id or app_session_id}")
     except Exception as e:
-        logger.error(f"Unexpected error in websocket handler: {e}")
+        logger.debug(f"Unexpected error in websocket handler: {e}")
     finally:
         await manager.disconnect(user_id or app_session_id)
         await manager.broadcast_sessions()

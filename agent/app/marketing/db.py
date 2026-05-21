@@ -11,7 +11,7 @@ async def get_active_subscribers() -> list[dict]:
         conn = await get_connection()
         rows = await conn.fetchrow(
             """
-            SELECT id, push_subscription
+            SELECT id, push_subscriptions
             FROM push_subscriptions
             """
         )
@@ -41,29 +41,6 @@ async def get_recent_products(limit: int = 10) -> list[dict]:
         return [dict(r) for r in rows]
     except Exception as e:
         logger.error(f"[Marketing DB] Failed to fetch recently added products for notification content: {e}")
-        raise
-    finally:
-        if conn:
-            await conn.close()
-
-
-async def get_active_promotions() -> list[dict]:
-    """Fetch currently active promotions."""
-    try:
-        conn = await get_connection()
-        rows = await conn.fetchrow(
-            """
-            SELECT id, title, description, discount_percent, 
-                valid_until, promo_code
-            FROM promotions
-            WHERE is_active = true
-                AND valid_until > NOW()
-            ORDER BY discount_percent DESC
-            """,
-        )
-        return [dict(r) for r in rows]
-    except Exception as e:
-        logger.error(f"[Marketing DB] Failed to fetch currently active promotions: {e}")
         raise
     finally:
         if conn:

@@ -1,7 +1,5 @@
-from functools import lru_cache
 import json
 from app.logging import get_logger
-import redis
 from langchain_core.messages import (
     AIMessage,
     BaseMessage,
@@ -9,8 +7,7 @@ from langchain_core.messages import (
     SystemMessage,
     ToolMessage,
 )
-
-from app.config import settings
+from app.redis_client import redis_client
 
 logger = get_logger(__name__)
 
@@ -21,10 +18,6 @@ _MESSAGE_TYPES = {
     "system": SystemMessage,
     "tool": ToolMessage,
 }
-
-@lru_cache(maxsize=1)
-def _get_redis() -> redis.Redis:
-    return redis.from_url(settings.REDIS_URL, decode_responses=True, max_connections=20)
 
 
 def _normalise_content(content) -> str:
@@ -98,12 +91,10 @@ def _deserialise(raw: str) -> list[BaseMessage]:
     return messages
 
 
-def load_messages_from_redis(session_id: str) -> list[BaseMessage]:
+async def load_messages_from_redis(session_id: str) -> list[BaseMessage]:
     """Return the stored message history for a session, or [] if none."""
     try:
-        r = _get_redis()
-        key = f"chat:{session_id}:messages"
-        raw = r.get(key)
+        raw = await redis_client.get(f"chat:{session_id}:messages")
         if not raw:
             return []
         messages = _deserialise(raw)
@@ -117,7 +108,7 @@ def load_messages_from_redis(session_id: str) -> list[BaseMessage]:
         return []
 
 
-def save_messages_to_redis(
+async def save_messages_to_redis(
     session_id: str,
     messages: list[BaseMessage],
     ttl_seconds: int = 3600,
@@ -129,18 +120,15 @@ def save_messages_to_redis(
             if not isinstance(m, ToolMessage)
             and not (isinstance(m, AIMessage) and m.tool_calls)
         ]
-        r = _get_redis()
-        key = f"chat:{session_id}:messages"
-        r.setex(key, ttl_seconds, _serialise(clean))
+        await redis_client.setex(f"chat:{session_id}:messages", ttl_seconds, _serialise(clean))
     except Exception as e:
         logger.warning(f"[Memory] Could not save messages for {session_id}: {e}")
 
 
-def clear_session(session_id: str) -> None:
+async def clear_session(session_id: str) -> None:
     """Delete all stored messages for a session."""
     try:
-        r = _get_redis()
-        r.delete(f"chat:{session_id}:messages")
+        await redis_client.delete(f"chat:{session_id}:messages")
         logger.debug(f"[Memory] Cleared session {session_id}")
     except Exception as e:
         logger.warning(f"[Memory] Could not clear session {session_id}: {e}")
