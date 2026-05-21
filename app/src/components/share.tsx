@@ -15,7 +15,7 @@ export default function ShareButton({ text = "Check out these products in our ca
                 await navigator.share({
                     title: "Product Catalog",
                     text: "Check out these products in our catalog",
-                    url: location.href,
+                    url: location.url,
                 });
             } catch (error: any) {
                 if (error.name !== "AbortError") {
@@ -30,7 +30,7 @@ export default function ShareButton({ text = "Check out these products in our ca
     return (
         <ShareUI
             handleNativeShare={handleNativeShare}
-            targetUrl={location.href}
+            targetUrl={location.url}
             text={text}
             trigger={
                 <button className="z-30">

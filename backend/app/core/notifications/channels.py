@@ -1,10 +1,8 @@
+from app.core.notifications.utils.push import send_notifications_to_subscribers
 import httpx
 from abc import ABC, abstractmethod
 from app.core.logging import logger
 from app.core.utils import send_email
-import json
-from pywebpush import webpush, WebPushException
-from app.core.config import settings
 
 
 class NotificationChannel(ABC):
@@ -80,52 +78,8 @@ class WhatsAppChannel(NotificationChannel):
 class PushChannel(NotificationChannel):
     async def send(self, recipient: str, message: str, **kwargs) -> bool:
         try:
-            send_notifications_to_subscribers(subscriptions=kwargs.get("subscriptions", []), notification=kwargs.get("notification", {}))
+            await send_notifications_to_subscribers(subscriptions=kwargs.get("subscriptions", []), notification=kwargs.get("notification", {}))
         except Exception as e:
             logger.error(f"Push notification sending failed: {str(e)}")
             return False
-
-
-def send_notifications_to_subscribers(subscriptions, notification):
-    failed_subscriptions = []
-    sent_subscriptions = []
-
-    vapid_claims: dict[str, str] = {"sub": f"mailto:{settings.ADMIN_EMAIL}"}
-    vapid_private_key: str = settings.VAPID_PRIVATE_KEY
-
-    for subscriber in subscriptions:
-        subscription_info = {
-            "endpoint": subscriber["endpoint"],
-            "keys": {
-                "p256dh": subscriber["p256dh"],
-                "auth": subscriber["auth"],
-            },
-        }
-
-        payload: str = json.dumps({
-            "title": notification["title"],
-            "body": notification["body"],
-            "path": notification.get("path", "/collections"),
-            "data": notification.get("data"),
-            "imageUrl": notification.get("image"),
-            "notificationId": notification.get("notificationId"),
-            "subscriberId": subscriber.get("id"),
-        })
-
-        try:
-            webpush(
-                subscription_info=subscription_info,
-                data=payload,
-                vapid_private_key=vapid_private_key,
-                vapid_claims=vapid_claims,
-            )
-            sent_subscriptions.append(subscriber.get("id"))
-        except WebPushException as ex:
-            failed_subscriptions.append(subscriber.get("id"))
-            logger.error(f"WebPush Error: {ex}")
-
-    if failed_subscriptions:
-        logger.info(f"Failed to send notifications to: {json.dumps(failed_subscriptions)}")
-    logger.info(f"Sent notifications to: {json.dumps(sent_subscriptions)}")
-
-    return {"sentSubscriptions": sent_subscriptions, "failedSubscriptions": failed_subscriptions}
+ 
