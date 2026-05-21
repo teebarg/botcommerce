@@ -165,7 +165,7 @@ export function ShareUI({ trigger, handleNativeShare, targetUrl = "", text = "Ch
             <PopoverContent align="end" className="p-0">
                 <div className="p-2 shadow-hover bg-secondary">
                     <div className="px-2 py-1.5 mb-2">
-                        <h4 className="text-sm font-semibold text-foreground">Share Product</h4>
+                        <h4 className="text-sm font-semibold text-foreground">Share</h4>
                         <p className="text-xs text-muted-foreground">Share with your friends</p>
                     </div>
 
