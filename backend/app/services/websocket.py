@@ -62,7 +62,7 @@ class InMemoryWebSocketManager:
             await self.disconnect(user_id)
             return False
         except Exception as e:
-            logger.error(f"❌ Failed to send message to {user_id}: {e}")
+            logger.warning(f"❌ Failed to send message to {user_id}: {e}")
             await self.disconnect(user_id)
             return False
 
