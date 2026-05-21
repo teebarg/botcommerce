@@ -1,21 +1,19 @@
 import asyncio
 import json
-import logging
 from dataclasses import dataclass
 from typing import TypedDict
 
+from app.core.logging import get_logger
 from pywebpush import WebPushException, webpush
 
 from app.core.config import settings
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
-# --- Move VAPID config to module level — fails fast at import time if misconfigured ---
 _VAPID_PRIVATE_KEY: str = settings.VAPID_PRIVATE_KEY
 _VAPID_CLAIMS: dict[str, str] = {"sub": f"mailto:{settings.ADMIN_EMAIL}"}
 
 
-# --- Typed contracts — no more mystery dicts ---
 class Subscriber(TypedDict):
     id: str
     endpoint: str
@@ -36,7 +34,7 @@ class Notification(TypedDict):
 class DispatchResult:
     sent: list[str]
     failed: list[str]
-    expired: list[str]  # 410 Gone — should be deleted from DB
+    expired: list[str]
 
     @property
     def total(self) -> int:
@@ -91,7 +89,6 @@ async def _send_one(
 
         except WebPushException as ex:
             if ex.response is not None and ex.response.status_code == 410:
-                # Subscription is dead — caller should delete from DB
                 result.expired.append(subscriber_id)
                 logger.warning(
                     "Subscription expired (410) subscriber_id=%s — should be removed",
@@ -120,14 +117,11 @@ async def _send_one(
 async def send_notifications_to_subscribers(
     subscriptions: list[Subscriber],
     notification: Notification,
-    max_concurrency: int = 50,  # Tune based on your push service rate limits
+    max_concurrency: int = 50,
 ) -> DispatchResult:
     """
     Send web push notifications concurrently.
-    Safe to run as a FastAPI BackgroundTask or via asyncio.create_task().
-
     Returns a DispatchResult with sent/failed/expired subscriber IDs.
-    Expired IDs (HTTP 410) should be deleted from your database.
     """
     if not subscriptions:
         logger.info("send_notifications called with empty subscriptions list, skipping")
