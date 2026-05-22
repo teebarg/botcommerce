@@ -14,7 +14,7 @@ from app.customer_support.db import is_human_connected, save_message_db, mark_es
 from app.redis_client import redis_client
 from app.agent.memory import save_messages_to_redis, load_messages_from_redis, clear_session
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
-
+from app import __version__
 from app.observability.tracing import start_turn_trace, end_turn_trace
 from app.observability.eval_runner import run_eval_pipeline
 from app.observability.langfuse_client import flush_langfuse
@@ -45,7 +45,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Customer Support Agent",
     description="AI-powered customer support using LangChain + RAG + Qdrant",
-    version="1.0.0",
+    version=__version__,
     lifespan=lifespan,
 )
 

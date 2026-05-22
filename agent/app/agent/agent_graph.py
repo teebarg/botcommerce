@@ -45,7 +45,6 @@ class AgentState(TypedDict):
     iterations: int = 0
     prompt_tokens: int = 0
     completion_tokens: int = 0
-    query_intent: str = "ambiguous"
 
 
 MAX_ITERATIONS = 6
@@ -113,7 +112,6 @@ class MessageIntent(str, Enum):
     COMPLAINT = "complaint"
     CONVERSATION = "conversation"
     CONTACT_UPDATE = "contact_update"
-    OUT_OF_SCOPE = "out_of_scope"
     NORMAL = "normal"
 
 _CONVERSATIONAL_PATTERNS = re.compile(
@@ -140,11 +138,6 @@ _COMPLAINT_RE = re.compile(
 )
 _CONTACT_UPDATE_RE = re.compile(
     r"(update.{0,15}(contact|address|email|phone)|change.{0,15}(address|email|phone|details))",
-    re.IGNORECASE,
-)
-_PRODUCT_QUERY_SIGNALS = re.compile(
-    r"(do you (sell|have|carry)|looking for|find me|search|show me|any .+in stock"
-    r"|what .+(have|carry|sell)|what about|got any|any .+available)",
     re.IGNORECASE,
 )
 
@@ -347,24 +340,9 @@ def build_graph():
             if first_human:
                 logger.debug(f"[Human Message] {first_human.content}")
 
-            intent_str = state.get("query_intent", "normal")
-            try:
-                intent = MessageIntent(intent_str)
-            except ValueError:
-                intent = MessageIntent.NORMAL
-        else:
-            intent = MessageIntent.NORMAL
-
         system = SYSTEM_PROMPT
         if state.get("customer_id"):
             system += f" The customer ID is {state['customer_id']}."
-
-        if intent == MessageIntent.OUT_OF_SCOPE:
-            system += (
-                "\n\nROUTER DECISION: This query is out of scope for a fashion store. "
-                "Do NOT call any tool. Tell the customer we only sell fashion items "
-                "and ask what clothing you can help them find."
-            )
 
         def _count_tokens(msgs: list[BaseMessage]) -> int:
             return sum(len(str(m.content)) for m in msgs) // 4
@@ -718,7 +696,6 @@ async def run_agent(
         "iterations": 0,
         "prompt_tokens": 0,
         "completion_tokens": 0,
-        "query_intent": intent.value,
     }
 
     try:

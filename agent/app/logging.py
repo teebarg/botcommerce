@@ -4,7 +4,7 @@ from app.config import settings
 import httpx
 import asyncio
 
-SUCCESS_LEVEL_NUM = 20
+SUCCESS_LEVEL_NUM = 25
 logging.addLevelName(SUCCESS_LEVEL_NUM, "SUCCESS")
 
 def success(self, message, *args, **kwargs):
