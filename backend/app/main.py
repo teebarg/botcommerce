@@ -20,7 +20,7 @@ from starlette.middleware.cors import CORSMiddleware
 from app.services.websocket import manager
 from app.services.meilisearch import get_or_create_index
 from app.redis_client import redis_client
-from app import __version__
+
 from app.core.logging import get_logger
 from app.consumer import RedisStreamConsumer
 from app.core.deps import ShopSettingsServiceDep
@@ -55,7 +55,7 @@ async def lifespan(app: FastAPI):
     init_notification_service()
 
     yield
-    
+
     if manager.cleanup_task:
         manager.cleanup_task.cancel()
     await consumer.stop()
@@ -65,7 +65,7 @@ async def lifespan(app: FastAPI):
 if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
     sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
 
-app = FastAPI(title="Botcommerce", openapi_url="/api/openapi.json", version=__version__, lifespan=lifespan)
+app = FastAPI(title="Botcommerce", openapi_url="/api/openapi.json", version="0.1.0", lifespan=lifespan)
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
