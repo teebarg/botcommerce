@@ -1,18 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AlertCircle, CheckCircle } from "lucide-react";
-
 import { Separator } from "@/components/ui/separator";
+import { BtnLink } from "@/components/ui/btnLink";
 
 export const Route = createFileRoute("/_mainLayout/(static)/returns")({
     head: () => ({
         meta: [
-            {
-                name: "description",
-                content: "Returns & Exchanges",
-            },
-            {
-                title: "Returns & Exchanges",
-            },
+            { name: "description", content: "Returns & Exchanges Policy" },
+            { title: "Returns & Exchanges" },
         ],
     }),
     component: RouteComponent,
@@ -22,84 +16,90 @@ function RouteComponent() {
     return (
         <div>
             <div className="bg-card">
-                <div className="max-w-4xl mx-auto px-4 py-8">
-                    <h1 className="text-3xl font-bold">Returns & Exchanges</h1>
-                    <p className="text-muted-foreground mt-1">Easy returns within 30 days of purchase</p>
+                <div className="max-w-3xl mx-auto px-6 py-10">
+                    <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-3">
+                        Store policy
+                    </p>
+                    <h1 className="text-3xl font-medium">Returns & Exchanges</h1>
+                    <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+                        Please read our policy carefully before placing your order. All sales are considered final.
+                    </p>
                 </div>
             </div>
 
             <Separator />
 
-            <div className="max-w-4xl mx-auto px-4 py-12">
-                <div className="space-y-8">
-                    <div className="bg-green-50 border border-green-200 rounded-xl p-6">
-                        <div className="flex items-start">
-                            <CheckCircle className="h-6 w-6 text-green-600 mt-1 mr-3" />
-                            <div>
-                                <h3 className="text-lg font-semibold text-green-900 mb-2">30-Day Return Policy</h3>
-                                <p className="text-green-800">
-                                    We offer hassle-free returns within 30 days of purchase for most items in original condition.
-                                </p>
-                            </div>
-                        </div>
+            <div className="max-w-3xl mx-auto px-6 py-10 space-y-4">
+                {/* No Returns */}
+                <div className="flex items-start gap-4 rounded-xl border bg-muted/40 p-5">
+                    <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 6L6 18M6 6l12 12" />
+                        </svg>
                     </div>
+                    <div>
+                        <h3 className="font-medium text-sm mb-1">No returns accepted</h3>
+                        <p className="text-muted-foreground text-sm leading-relaxed">
+                            We do not accept returns on any items, regardless of the reason. Please make sure you are
+                            fully satisfied with your selection before completing your purchase.
+                        </p>
+                    </div>
+                </div>
 
-                    <div className="bg-card rounded-xl shadow-sm  p-8">
-                        <h2 className="text-xl font-semibold mb-6">Return Process</h2>
-                        <div className="space-y-6">
-                            <div className="flex items-start">
-                                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
-                                    <span className="text-blue-600 font-semibold text-sm">1</span>
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold">Initiate Return</h3>
-                                    <p className="text-muted-foreground">Fill out the return form above with your order details</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start">
-                                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
-                                    <span className="text-blue-600 font-semibold text-sm">2</span>
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold">Print Label</h3>
-                                    <p className="text-muted-foreground">{`We'll email you a prepaid return shipping label`}</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start">
-                                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
-                                    <span className="text-blue-600 font-semibold text-sm">3</span>
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold">Ship Item</h3>
-                                    <p className="text-muted-foreground">Package the item and drop it off at any shipping location</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start">
-                                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
-                                    <span className="text-blue-600 font-semibold text-sm">4</span>
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold">Get Refund</h3>
-                                    <p className="text-muted-foreground">Receive your refund within 3-5 business days after we receive the item</p>
-                                </div>
-                            </div>
-                        </div>
+                {/* No Exchanges */}
+                <div className="flex items-start gap-4 rounded-xl border bg-muted/40 p-5">
+                    <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+                        </svg>
                     </div>
+                    <div>
+                        <h3 className="font-medium text-sm mb-1">No exchanges accepted</h3>
+                        <p className="text-muted-foreground text-sm leading-relaxed">
+                            Exchanges for different sizes, colors, or items are not available. We encourage you to
+                            review product details and sizing guides thoroughly before ordering.
+                        </p>
+                    </div>
+                </div>
 
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
-                        <div className="flex items-start">
-                            <AlertCircle className="h-6 w-6 text-accent-subtle mt-1 mr-3" />
-                            <div>
-                                <h3 className="text-lg font-semibold text-accent mb-2">Return Requirements</h3>
-                                <ul className="text-accent/90 space-y-1">
-                                    <li>• Items must be in original condition</li>
-                                    <li>• Electronics must include all original accessories and packaging</li>
-                                    <li>• Some items like personalized products are not returnable</li>
-                                    <li>• Clearance items are final sale unless defective</li>
-                                </ul>
-                            </div>
+                <Separator className="!my-8" />
+
+                {/* FAQ */}
+                <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground">
+                    Common questions
+                </p>
+
+                <div className="divide-y border rounded-xl overflow-hidden">
+                    {[
+                        {
+                            q: "What if my item arrives damaged or defective?",
+                            a: "If your order arrives in a damaged or defective state, please contact our support team within 48 hours of delivery with photos of the issue. Defective item claims are handled on a case-by-case basis.",
+                        },
+                        {
+                            q: "I ordered the wrong size — can I get a replacement?",
+                            a: "Unfortunately, we are unable to process size or variant exchanges. We recommend consulting the size guide on each product page before ordering.",
+                        },
+                        {
+                            q: "Can I cancel my order after placing it?",
+                            a: "Order cancellations must be requested within 1 hour of purchase and before the order is processed for fulfillment. Once dispatched, an order cannot be cancelled.",
+                        },
+                    ].map(({ q, a }) => (
+                        <div key={q} className="px-5 py-4 bg-card">
+                            <p className="font-medium text-sm mb-1">{q}</p>
+                            <p className="text-muted-foreground text-sm leading-relaxed">{a}</p>
                         </div>
+                    ))}
+                </div>
+
+                {/* Contact CTA */}
+                <div className="flex items-center justify-between rounded-xl border bg-muted/40 px-5 py-4 !mt-8">
+                    <div>
+                        <p className="font-medium text-sm">Still have questions?</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">Our support team is happy to help</p>
                     </div>
+                    <BtnLink href="/contact" size="sm">
+                        Contact support
+                    </BtnLink>
                 </div>
             </div>
         </div>
