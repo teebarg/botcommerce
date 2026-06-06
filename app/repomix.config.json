@@ -37,6 +37,8 @@
         "public/fonts/**",
         ".vercel",
         ".vscode",
-        ".idea"
+        ".idea",
+        "app/repomix.config.json",
+        "app/biome.json"
     ]
 }
