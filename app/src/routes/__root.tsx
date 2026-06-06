@@ -20,7 +20,8 @@ import { ClerkProvider } from "@clerk/tanstack-react-start";
 import { useAppSession } from "@/utils/session";
 import { getShopSettingsPublicFn } from "@/server/store.server";
 import { getSessionId } from "@/utils";
-import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/react";
+
 
 type SessionClaims = {
     firstName?: string;

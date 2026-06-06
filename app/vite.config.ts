@@ -66,6 +66,12 @@ const config = defineConfig({
             },
         }),
     ],
+    resolve: {
+        alias: {
+            // Bypasses the Vercel internal NextJS bundling checks
+            'next/navigation': 'unenv/runtime/mock/proxy',
+        },
+    },
 });
 
 export default config;
