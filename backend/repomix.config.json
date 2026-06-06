@@ -1,6 +1,6 @@
 {
     "output": {
-        "filePath": "backend-context.md"
+        "filePath": "../backend-context.md"
     },
     "include": [
         "app/*.py",
