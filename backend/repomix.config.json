@@ -2,6 +2,20 @@
     "output": {
         "filePath": "backend-context.md"
     },
+    "include": [
+        "app/*.py",
+        "app/routers/**/*.py",
+        "app/models/**/*.py",
+        "app/services/**/*.py",
+        "app/api/**/*.py",
+        "app/core/**/*.py",
+        "app/email-templates/**/*.py",
+        "app/email-templates/**/*.html",
+        "app/lib/**/*.py",
+        "app/schemas/**/*.py",
+        "prisma/**",
+        "pyproject.toml"
+    ],
     "ignore": [
         "node_modules",
         ".git",
@@ -10,13 +24,8 @@
         ".env",
         "dist",
         "build",
-        "app/tests"
-    ],
-    "include": [
-        "**/*.py",
-        "**/*.ts",
-        "**/*.js",
-        "**/*.json",
-        "**/*.md"
+        "app/tests",
+        "scripts",
+        "repomix.config.json"
     ]
 }

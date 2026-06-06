@@ -7,6 +7,7 @@ from fastapi import (
     HTTPException,
     Query,
     BackgroundTasks,
+    Response,
     Request
 )
 from app.core.deps import CurrentUser, UserDep
@@ -38,6 +39,7 @@ from app.redis_client import redis_client
 from collections import Counter
 from prisma.enums import PaymentStatus
 from app.core.permissions import require_admin
+import xml.etree.ElementTree as ET
 
 logger = get_logger(__name__)
 
@@ -76,6 +78,68 @@ def build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any
     return data
 
 router = APIRouter()
+
+@cache_response(key_prefix="merchant_feed", expire=86400) # Caches for 24 hours
+async def generate_xml_string(request: Request):
+    """
+    Generates an RSS 2.0 XML Data Feed for Google Merchant Center.
+    Pulled directly from active products and their corresponding variants.
+    """
+    products = await db.product.find_many(
+        where={"active": True},
+        include={"variants": True, "images": True}
+    )
+    
+    # Establish root elements with Google XML namespaces
+    rss = ET.Element("rss", version="2.0")
+    rss.set("xmlns:g", "http://base.google.com/ns/1.0")
+    
+    channel = ET.SubElement(rss, "channel")
+    ET.SubElement(channel, "title").text = "Thriftbyoba Product Feed"
+    ET.SubElement(channel, "link").text = settings.FRONTEND_HOST
+    ET.SubElement(channel, "description").text = "Automated product sync feed for Google Merchant Center"
+    
+    for prod in products:
+        for variant in prod.variants:
+            item = ET.SubElement(channel, "item")
+            
+            ET.SubElement(item, "g:id").text = variant.sku
+            
+            variant_title = prod.name or ""
+            if variant.color or variant.size:
+                variant_title += f" ({' / '.join(filter(None, [variant.color, variant.size]))})"
+            ET.SubElement(item, "g:title").text = variant_title.strip()
+            
+            ET.SubElement(item, "g:description").text = prod.description or "No description provided."
+            ET.SubElement(item, "g:link").text = f"{settings.FRONTEND_HOST}/products/{prod.slug}"
+            
+            main_image = prod.image or (prod.images[0].image if prod.images else f"{settings.FRONTEND_HOST}/placeholder.jpg")
+            ET.SubElement(item, "g:image_link").text = main_image
+            
+            availability = "in_stock" if variant.inventory > 0 else "out_of_stock"
+            ET.SubElement(item, "g:availability").text = availability
+            
+            # Explicit price configuration format required by Google (e.g. '150.00 NGN')
+            ET.SubElement(item, "g:price").text = f"{variant.price:.2f} NGN"
+            ET.SubElement(item, "g:condition").text = "new" if prod.is_new else "thrift"
+            
+            if variant.size:
+                ET.SubElement(item, "g:size").text = variant.size
+            if variant.color:
+                ET.SubElement(item, "g:color").text = variant.color
+            if variant.age:
+                ET.SubElement(item, "g:age_group").text = variant.age
+
+    xml_str = ET.tostring(rss, encoding="utf-8", method="xml").decode("utf-8")
+    return f'<?xml version="1.0" encoding="utf-8"?>\n{xml_str}'
+
+
+@router.get("/google-merchant-feed.xml")
+async def get_google_merchant_feed(request: Request) -> Response:
+    xml_content = await generate_xml_string(request=request)
+    
+    return Response(content=xml_content, media_type="application/xml")
+
 
 @router.get("/{product_id}/review-status")
 @cache_response("review-status")
