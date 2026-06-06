@@ -6,8 +6,8 @@ from app.models.generic import Message
 from app.prisma_client import prisma as db
 from prisma.errors import PrismaError
 from prisma.enums import Role, Status
-from app.models.user import User, UserSelf, UserAdmin, UserUpdateMe, UserUpdate, PaginatedUsers, GuestUserCreate, PasswordChange
-from app.core.security import verify_password, get_password_hash
+from app.models.user import User, UserSelf, UserAdmin, UserUpdateMe, UserUpdate, PaginatedUsers, GuestUserCreate
+from app.core.security import get_password_hash
 from app.services.recently_viewed import RecentlyViewedService
 from app.models.product import ProductSearch
 from app.services.redis import cache_response, refresh_data
@@ -246,30 +246,6 @@ async def remove_wishlist_item(
         )
         await refresh_data(keys=f"products:wishlist:{user.id}")
         return Message(message="Product deleted successfully")
-    except PrismaError as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-
-
-@router.post("/change-password", response_model=Message)
-async def change_password(
-    password_data: PasswordChange,
-    current_user: CurrentUser,
-) -> Message:
-    """
-    Change user's password.
-    """
-    if not verify_password(password_data.old_password, current_user.hashed_password):
-        raise HTTPException(
-            status_code=400,
-            detail="Incorrect password"
-        )
-
-    try:
-        await db.user.update(
-            where={"id": current_user.id},
-            data={"hashed_password": get_password_hash(password_data.new_password)}
-        )
-        return Message(message="Password updated successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 

@@ -13,7 +13,7 @@ from fastapi import (
 from app.core.deps import CurrentUser, UserDep
 from app.core.logging import get_logger
 from app.core.utils import url_to_list
-from app.models.generic import Message, ImageUpload
+from app.models.generic import Message
 from app.models.product import (
     ProductLite,
     VariantWithStatus,
@@ -29,12 +29,10 @@ from app.services.meilisearch import (
     REQUIRED_SORTABLES
 )
 from app.prisma_client import prisma as db
-from app.core.storage import upload
 from app.core.config import settings
 from app.services.product import index_product, index_products
 from app.services.redis import DEFAULT_EXPIRATION, EnhancedJSONEncoder, cache_response
 from meilisearch.errors import MeilisearchApiError
-from app.services.generic import remove_image_from_storage
 from app.redis_client import redis_client
 from collections import Counter
 from prisma.enums import PaymentStatus
@@ -738,64 +736,6 @@ async def update_variant(variant_id: int, variant: VariantWithStatus, background
 
     return updated_variant
 
-@router.post("/{id}/images", dependencies=[Depends(require_admin)])
-async def upload_images(id: int, image_data: ImageUpload, background_tasks: BackgroundTasks):
-    """
-    Upload images to a product.
-    """
-    product = await db.product.find_unique(where={"id": id}, include={"images": True})
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-
-    try:
-        image_url: str = upload(bucket="product-images", data=image_data)
-
-        image = await db.productimage.create(
-            data={
-                "image": image_url,
-                "product_id": product.id,
-                "order": len(product.images)
-            }
-        )
-        background_tasks.add_task(index_product, product_id=id)
-
-        return image
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-@router.delete("/{id}/images/{image_id}", dependencies=[Depends(require_admin)])
-async def delete_product_image(id: int, image_id: int, background_tasks: BackgroundTasks):
-    """
-    Delete an image from a product images.
-    """
-    product = await db.product.find_unique(where={"id": id})
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-
-    image = await db.productimage.find_unique(where={"id": image_id})
-    if not image:
-        raise HTTPException(status_code=404, detail="Image not found")
-
-    async with db.tx() as tx:
-        try:
-            await remove_image_from_storage(image.image)
-            await tx.productimage.delete(where={"id": image_id})
-        except Exception as e:
-            logger.error(e)
-            raise HTTPException(status_code=400, detail=str(e))
-
-        images = await tx.productimage.find_many(where={"product_id": id}, order={"order": "asc"})
-        for index, image in enumerate(images):
-            await tx.productimage.update(
-                where={"id": image.id},
-                data={"order": index}
-            )
-        background_tasks.add_task(index_product, product_id=id)
-
-        return {"success": True}
-
 
 @router.post("/configure-filterable-attributes")
 async def configure_filterable_attributes(
@@ -850,29 +790,6 @@ async def config_delete_index(index_name: str) -> dict:
         raise HTTPException(
             status_code=500, detail=str(e)
         ) from e
-
-
-@router.patch("/{id}/images/reorder", dependencies=[Depends(require_admin)])
-async def reorder_images(id: int, image_ids: list[int]) -> Message:
-    """
-    Reorder product images.
-    """
-    product = await db.product.find_unique(where={"id": id})
-    if not product:
-        raise HTTPException(status_code=404, detail="product not found")
-
-    for index, image_id in enumerate(image_ids):
-        try:
-            await db.productimage.update(
-                where={"id": image_id},
-                data={"order": index}
-            )
-        except Exception as e:
-            logger.error(e)
-            raise HTTPException(status_code=400, detail=str(e))
-
-    await index_product(product_id=id)
-    return Message(message="Image re-ordered successfully.")
 
 @router.post("/reindex")
 async def reindex_products(background_tasks: BackgroundTasks) -> Message:
