@@ -26,3 +26,7 @@ meilisearch-data
 app/dist
 agent/models
 app/src/routeTree.gen.ts
+
+app/frontend-context.md
+backend/backend-context.md
+agent/agent-context.md

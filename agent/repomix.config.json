@@ -1,0 +1,21 @@
+{
+    "output": {
+        "filePath": "agent-context.md"
+    },
+    "ignore": [
+        "node_modules",
+        ".git",
+        "__pycache__",
+        "venv",
+        ".env",
+        "dist",
+        "build"
+    ],
+    "include": [
+        "**/*.py",
+        "**/*.ts",
+        "**/*.js",
+        "**/*.json",
+        "**/*.md"
+    ]
+}

@@ -100,6 +100,17 @@ dpm:
 	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) prisma migrate dev
 
 
+# Model Context
+frontend-context:
+	@cd app && npx repomix
+
+backend-context:
+	@cd backend && npx repomix
+
+agent-context:
+	@cd agent && npx repomix
+
+
 .PHONY: help
 help:
 	@echo "Available commands:"

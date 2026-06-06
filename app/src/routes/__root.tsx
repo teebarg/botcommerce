@@ -18,22 +18,9 @@ import PageTransitionLoader from "@/components/generic/page-transition-loader";
 import PWABadge from "@/PWAbadge";
 import { ClerkProvider } from "@clerk/tanstack-react-start";
 import { useAppSession } from "@/utils/session";
-import { useRouterState } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { gtag } from "@/utils/gtag";
 import { getShopSettingsPublicFn } from "@/server/store.server";
 import { getSessionId } from "@/utils";
-
-function RouteChangeTracker() {
-    const location = useRouterState({ select: (s) => s.location });
-    useEffect(() => {
-        gtag.pageView({
-            page_path: location.href,
-        });
-    }, [location.href]);
-
-    return null;
-}
+import { Analytics } from "@vercel/analytics/next";
 
 type SessionClaims = {
     firstName?: string;
@@ -171,14 +158,13 @@ function RootComponent() {
     return (
         <RootDocument>
             <PageTransitionLoader />
-            <RouteChangeTracker />
             <Outlet />
         </RootDocument>
     );
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-    const GA_ID = import.meta.env.VITE_GA_ID;
+    // const GA_ID = import.meta.env.VITE_GA_ID;
     const localSessionId = getSessionId();
     return (
         <html suppressHydrationWarning>
@@ -204,7 +190,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                     }}
                 />
                 {/* GA Script */}
-                <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
+                {/* <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
                 <script
                     dangerouslySetInnerHTML={{
                         __html: `
@@ -215,7 +201,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                             gtag('config', '${GA_ID}');
                         `,
                     }}
-                />
+                /> */}
             </head>
             <body className="min-h-screen">
                 <ClerkProvider>
@@ -252,6 +238,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                 />
                                 <PWABadge />
                                 {/* <SafeAreaDebug /> */}
+                                {process.env.NODE_ENV === "production" && <Analytics />}
                                 <Scripts />
                             </CartProvider>
                         </StoreProvider>

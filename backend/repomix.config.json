@@ -1,0 +1,22 @@
+{
+    "output": {
+        "filePath": "backend-context.md"
+    },
+    "ignore": [
+        "node_modules",
+        ".git",
+        "__pycache__",
+        "venv",
+        ".env",
+        "dist",
+        "build",
+        "app/tests"
+    ],
+    "include": [
+        "**/*.py",
+        "**/*.ts",
+        "**/*.js",
+        "**/*.json",
+        "**/*.md"
+    ]
+}
