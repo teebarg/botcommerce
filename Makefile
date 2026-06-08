@@ -101,10 +101,11 @@ dpm:
 
 
 # Model Context
-frontend-context:
+fctx:
 	@cd app && npx repomix
 
-backend-context:
+
+bctx:
 	@cd backend && npx repomix
 
 agent-context:

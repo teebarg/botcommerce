@@ -1,32 +1,36 @@
 {
     "output": {
-        "filePath": "../frontend-context.md",
-        "style": "markdown"
+        "filePath": "../frontend-context.md"
     },
     "include": [
         "src/**/*.{ts,tsx,js,jsx,mdx}"
     ],
-    "ignore": [
-        ".git",
-        ".next",
-        "node_modules",
-        "out",
-        "build",
-        "dist",
-        "coverage",
-        ".turbo",
-        ".env",
-        ".env.*",
-        "package-lock.json",
-        "pnpm-lock.yaml",
-        "yarn.lock",
-        "**/*.test.*",
-        "**/*.spec.*",
-        "public/images/**",
-        "public/icons/**",
-        "public/fonts/**",
-        ".vercel",
-        ".vscode",
-        ".idea"
-    ]
+    "ignore": {
+        "useGitignore": true,
+        "useDefaultPatterns": true,
+        "customPatterns": [
+            ".git",
+            ".env",
+            ".next",
+            "node_modules",
+            "out",
+            "build",
+            "dist",
+            "coverage",
+            ".turbo",
+            ".env",
+            ".env.*",
+            "package-lock.json",
+            "pnpm-lock.yaml",
+            "yarn.lock",
+            "**/*.test.*",
+            "**/*.spec.*",
+            "public/images/**",
+            "public/icons/**",
+            "public/fonts/**",
+            ".vercel",
+            ".vscode",
+            ".idea"
+        ]
+    }
 }
