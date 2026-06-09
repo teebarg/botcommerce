@@ -39,25 +39,6 @@ async def seed():
             }
         )
 
-    logger.debug("Seeding brands...")
-    brands = [
-        {"name": "Nike", "slug": "nike"},
-        {"name": "Adidas", "slug": "adidas"},
-    ]
-    for brand in brands:
-        await db.brand.upsert(
-            where={"slug": brand["slug"]},
-            data={
-                "create": {
-                    "name": brand["name"],
-                    "slug": brand["slug"],
-                    "is_active": True,
-                    "created_at": datetime.now(timezone.utc),
-                },
-                "update": {}
-            }
-        )
-
     logger.debug("Seeding categories...")
     categories = [
         {"name": "Shoes", "slug": "shoes"},

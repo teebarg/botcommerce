@@ -38,9 +38,6 @@ type UpdateVariantInput = {
     length?: number;
     age?: string;
 };
-type UploadImageInput = { id: number; data: any };
-type DeleteImageInput = { id: number; imageId: number };
-type ReorderImagesInput = { id: number; imageIds: number[] };
 
 export const useProductSearch = (params: SearchParams) => {
     return useQuery({
@@ -89,42 +86,6 @@ export const useUpdateVariant = (showToast = true) => {
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to update variant");
-        },
-    });
-};
-
-export const useUploadImages = () => {
-    return useMutation({
-        mutationFn: async ({ id, data }: UploadImageInput) => await clientApi.post<Message>(`/product/${id}/images`, data),
-        onSuccess: () => {
-            toast.success("Images uploaded successfully");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to upload images");
-        },
-    });
-};
-
-export const useDeleteImages = () => {
-    return useMutation({
-        mutationFn: async ({ id, imageId }: DeleteImageInput) => await clientApi.delete<Message>(`/product/${id}/images/${imageId}`),
-        onSuccess: () => {
-            toast.success("Image deleted successfully");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to delete image");
-        },
-    });
-};
-
-export const useReorderImages = () => {
-    return useMutation({
-        mutationFn: async ({ id, imageIds }: ReorderImagesInput) => await clientApi.patch<Message>(`/product/${id}/images/reorder`, imageIds),
-        onSuccess: () => {
-            toast.success("Images reordered successfully");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to reorder images");
         },
     });
 };

@@ -1,44 +1,36 @@
 {
     "output": {
-        "filePath": "frontend-context.md",
-        "style": "markdown"
+        "filePath": "../frontend-context.md"
     },
     "include": [
-        "app/**/*.{ts,tsx,js,jsx,mdx}",
-        "src/**/*.{ts,tsx,js,jsx,mdx}",
-        "components/**/*.{ts,tsx,js,jsx}",
-        "lib/**/*.{ts,tsx,js,jsx}",
-        "hooks/**/*.{ts,tsx,js,jsx}",
-        "providers/**/*.{ts,tsx,js,jsx}",
-        "utils/**/*.{ts,tsx,js,jsx}",
-        "types/**/*.{ts,tsx}",
-        "public/locales/**/*.json",
-        "*.json",
-        "*.md"
+        "src/**/*.{ts,tsx,js,jsx,mdx}"
     ],
-    "ignore": [
-        ".git",
-        ".next",
-        "node_modules",
-        "out",
-        "build",
-        "dist",
-        "coverage",
-        ".turbo",
-        ".env",
-        ".env.*",
-        "package-lock.json",
-        "pnpm-lock.yaml",
-        "yarn.lock",
-        "**/*.test.*",
-        "**/*.spec.*",
-        "public/images/**",
-        "public/icons/**",
-        "public/fonts/**",
-        ".vercel",
-        ".vscode",
-        ".idea",
-        "app/repomix.config.json",
-        "app/biome.json"
-    ]
+    "ignore": {
+        "useGitignore": true,
+        "useDefaultPatterns": true,
+        "customPatterns": [
+            ".git",
+            ".env",
+            ".next",
+            "node_modules",
+            "out",
+            "build",
+            "dist",
+            "coverage",
+            ".turbo",
+            ".env",
+            ".env.*",
+            "package-lock.json",
+            "pnpm-lock.yaml",
+            "yarn.lock",
+            "**/*.test.*",
+            "**/*.spec.*",
+            "public/images/**",
+            "public/icons/**",
+            "public/fonts/**",
+            ".vercel",
+            ".vscode",
+            ".idea"
+        ]
+    }
 }

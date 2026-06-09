@@ -52,8 +52,6 @@ class SlackLogHandler(logging.Handler):
         self._tasks: set = set()
 
     def emit(self, record):
-        if record.levelno < SUCCESS_LEVEL_NUM:
-            return
         try:
             msg = self.format(record)
             channel = getattr(record, "channel", self.channel)
@@ -91,7 +89,7 @@ LOGGING_CONFIG = {
             "class": "logging.StreamHandler",
         },
         "slack_alerts": {
-            "level": SUCCESS_LEVEL_NUM,
+            "level": "INFO",
             "()": SlackLogHandler,
             "formatter": "standard",
             "channel": "alerts",

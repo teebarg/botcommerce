@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Eye, EyeOff, Camera } from "lucide-react";
+import { Camera } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -40,7 +40,6 @@ export const Route = createFileRoute("/_mainLayout/account/profile")({
 });
 
 function RouteComponent() {
-    const [showPassword, setShowPassword] = useState<boolean>(false);
     const [editingSection, setEditingSection] = useState<string | null>(null);
     const invalidate = useInvalidate();
     const [isPending, setIsPending] = useState<boolean>(false);
@@ -80,28 +79,6 @@ function RouteComponent() {
         invalidate("me");
         toast.success("Profile updated successfully");
         setEditingSection(null);
-        setIsPending(false);
-    };
-
-    const handlePasswordSave = async (data: PasswordFormValues) => {
-        setIsPending(true);
-        const { error } = await tryCatch<Message>(
-            clientApi.post<Message>("/users/change-password", {
-                old_password: data.currentPassword,
-                new_password: data.newPassword,
-            })
-        );
-
-        if (error) {
-            toast.error(error);
-            setIsPending(false);
-
-            return;
-        }
-        invalidate("me");
-        toast.success("Password updated successfully");
-        setEditingSection(null);
-        passwordForm.reset();
         setIsPending(false);
     };
 
@@ -214,99 +191,6 @@ function RouteComponent() {
                                         <Button variant="destructive" onClick={handleCancel}>
                                             Cancel
                                         </Button>
-                                    </div>
-                                )}
-                            </form>
-                        </Form>
-                    </div>
-                </div>
-                <div className="bg-card rounded-xl shadow-sm border border-border">
-                    <div className="p-6 border-b border-border">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h3 className="text-lg font-semibold">Password</h3>
-                                <p className="text-sm text-muted-foreground">Update your password</p>
-                            </div>
-                            {editingSection !== "password" && (
-                                <Button className="mt-2 md:mt-0" onClick={() => handleEdit("password")}>
-                                    Change Password
-                                </Button>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="p-6">
-                        <Form {...passwordForm}>
-                            <form onSubmit={passwordForm.handleSubmit(handlePasswordSave)}>
-                                {editingSection === "password" ? (
-                                    <div className="space-y-4">
-                                        <FormField
-                                            control={passwordForm.control}
-                                            name="currentPassword"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Current Password</FormLabel>
-                                                    <FormControl>
-                                                        <div className="relative">
-                                                            <Input
-                                                                placeholder="Enter current password"
-                                                                type={showPassword ? "text" : "password"}
-                                                                {...field}
-                                                            />
-                                                            <button
-                                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
-                                                                type="button"
-                                                                onClick={() => setShowPassword(!showPassword)}
-                                                            >
-                                                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                                            </button>
-                                                        </div>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <FormField
-                                            control={passwordForm.control}
-                                            name="newPassword"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>New Password</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="Enter new password" type="password" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <FormField
-                                            control={passwordForm.control}
-                                            name="confirmPassword"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Confirm New Password</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="Confirm new password" type="password" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <div className="flex space-x-3 mt-6">
-                                            <Button disabled={isPending} isLoading={isPending} type="submit">
-                                                Update Password
-                                            </Button>
-                                            <Button type="button" variant="outline" onClick={handleCancel}>
-                                                Cancel
-                                            </Button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="px-4 py-3 rounded-lg bg-secondary text-muted-foreground">
-                                        Password is hidden for security reasons
                                     </div>
                                 )}
                             </form>

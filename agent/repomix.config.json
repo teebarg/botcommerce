@@ -1,6 +1,6 @@
 {
     "output": {
-        "filePath": "agent-context.md"
+        "filePath": "../agent-context.md"
     },
     "ignore": [
         "node_modules",

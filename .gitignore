@@ -27,6 +27,6 @@ app/dist
 agent/models
 app/src/routeTree.gen.ts
 
-app/frontend-context.md
-backend/backend-context.md
-agent/agent-context.md
+frontend-context.md
+backend-context.md
+agent-context.md
