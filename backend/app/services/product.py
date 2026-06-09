@@ -4,7 +4,7 @@ import base64
 import random
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
-from typing import List, Optional, Any, Dict
+from typing import List, Optional, Any
 from collections import Counter
 from fastapi import HTTPException, Request
 
