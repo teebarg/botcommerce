@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from typing import List, Optional, Any, Dict
 from collections import Counter
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 
 from app.prisma_client import prisma as db
 from app.core.config import settings
@@ -14,7 +14,7 @@ from app.core.logging import get_logger
 from app.core.utils import url_to_list
 from app.models.product import Product
 from app.services.prisma import with_prisma_connection
-from app.services.redis import refresh_product
+from app.services.redis import cache_response, refresh_product
 from app.services.meilisearch import (
     update_document, 
     delete_document, 
@@ -31,12 +31,12 @@ from prisma.enums import PaymentStatus
 logger = get_logger(__name__)
 
 # =====================================================================
-# 1. ROUTE LOGIC SERVICE LAYERS (Clean Architecture)
+# ROUTE LOGIC SERVICE LAYERS (Clean Architecture)
 # =====================================================================
 
 class ProductRepository:
-    def __init__(self, db_client, redis):
-        self.db = db_client
+    def __init__(self, db, redis):
+        self.db = db
         self.redis = redis
 
     async def get_by_slug(self, slug: str):
@@ -81,7 +81,8 @@ class ProductService:
         self.repo = repo
         self.search_repo = search_repo
 
-    async def generate_merchant_feed_xml(self) -> str:
+    @cache_response(key_prefix="merchant_feed", expire=86400) # Caches for 24 hours
+    async def generate_merchant_feed_xml(self, request: Request) -> str:
         """
         Generates Google Merchant Feed.
         Optimized to process 20k+ records in batches to keep memory footprints low.
@@ -286,10 +287,6 @@ class ProductService:
         return json.loads(base64.urlsafe_b64decode(cursor.encode()).decode())
 
 
-# =====================================================================
-# 2. BACKGROUND WORKERS & MAPPER LOGIC (Scale Optimized for 20k items)
-# =====================================================================
-
 @with_prisma_connection
 async def index_product(product_id: int) -> None:
     try:
@@ -319,13 +316,9 @@ async def index_product(product_id: int) -> None:
 async def index_products(product_ids: Optional[List[int]] = None):
     """
     Re-indexes database products.
-    PERFORMANCE FIX: If target IDs are missing, fetch rows in controlled batches 
-    of 500 to protect server RAM from dropping out at 20,000 products.
     """
     try:
         logger.debug("Starting re-indexing process...")
-        
-        # If specific IDs are passed, run normal query layout
         if product_ids:
             products = await db.product.find_many(
                 where={"id": {"in": product_ids}},
@@ -347,7 +340,7 @@ async def index_products(product_ids: Optional[List[int]] = None):
             logger.debug(f"Successfully targeted indexed {len(documents)} products")
             return
 
-        # --- Scale Optimization Strategy: Full Index Rebuild in Chunks ---
+        # Full Index Rebuild in Chunks
         logger.debug("Clearing search index for clean sync...")
         await clear_index(index_name=settings.MEILI_PRODUCTS_INDEX)
 
