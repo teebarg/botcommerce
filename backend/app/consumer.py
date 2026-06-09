@@ -2,8 +2,11 @@ import asyncio
 from app.core.logging import get_logger
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
-from app.services.order import send_notification, process_order_payment
 from app.core.notifications.setup import get_notification_service
+from app.core.config import settings
+from app.core.deps.order import get_order_service
+from app.core.notifications.events import OrderConfirmedEvent
+from app.services.shop_settings import ShopSettingsService
 from prisma.enums import OrderStatus, PaymentStatus, PaymentMethod, CartStatus
 from app.services.recently_viewed import RecentlyViewedService
 from app.services.popular_products import PopularProductsService
@@ -23,6 +26,7 @@ class RedisStreamConsumer:
         self.consumer = consumer
         self.shutdown_event = asyncio.Event()
         self.task = None
+        self.notification = get_notification_service()
 
     async def start(self):
         """Start consumer with auto-restart supervision"""
@@ -139,13 +143,10 @@ class RedisStreamConsumer:
         elif event["type"] == "USER_REGISTERED":
             await self.handle_user_registered(event)
 
-    def get_notification(self):
-        notification = get_notification_service()
-        return notification
-
     async def handle_order_paid(self, event):
         try:
-            await process_order_payment(order_id=int(event["order_id"]), notification=self.get_notification())
+            order_service = get_order_service()
+            await order_service.process_order_payment(order_id=int(event["order_id"]))
         except Exception as e:
             logger.error(
                 f"Failed to process order payment for order {event['order_id']}: {e}")
@@ -183,7 +184,7 @@ class RedisStreamConsumer:
             logger.error(f"Failed to create order in handle_order_created: {str(e)}")
             raise Exception(f"Database error: {str(e)}")
 
-        await send_notification(id=int(event["order_id"]), user_id=int(event["user_id"]), notification=self.get_notification())
+        await self.send_order_notification(id=int(event["order_id"]), user_id=int(event["user_id"]))
         await refresh_data(patterns=["users"])
 
     async def handle_payment_success(self, event):
@@ -250,7 +251,6 @@ class RedisStreamConsumer:
     async def handle_user_registered(self, event) -> None:
         import uuid
         try:
-            notification = self.get_notification()
             code: str = f"{event['first_name'][:4]}{uuid.uuid4().hex[:4]}".upper()
             coupon = await db.coupon.create(data={
                 "code": code,
@@ -269,7 +269,7 @@ class RedisStreamConsumer:
                 first_name=event["first_name"],
                 coupon=coupon
             )
-            await notification.send_notification(
+            await self.notification.send_notification(
                 channel_name="email",
                 recipient=event["email"],
                 subject=welcome_email.subject,
@@ -279,3 +279,42 @@ class RedisStreamConsumer:
         except Exception as e:
             logger.error(f"Failed to send welcome email: {str(e)}")
             raise Exception(f"Email error: {str(e)}")
+
+    async def send_order_notification(self, id: int, user_id: int):
+        try:
+            user = await db.user.find_unique(where={"id": user_id})
+            if not user:
+                logger.error(f"User not found for ID: {user_id}")
+                return
+
+            order = await db.order.find_unique(
+                where={"id": id},
+                include={
+                    "order_items": {
+                        "include": {
+                            "variant": True,
+                        }
+                    },
+                    "user": True,
+                    "shipping_address": True
+                }
+            )
+
+            service = ShopSettingsService()
+            shop_email = await service.get("shop_email")
+            cc_list = [shop_email] if shop_email else []
+
+            order_link: str = f"{settings.FRONTEND_HOST}/order/confirmed/{order.order_number}"
+            items_overview: str = "\n".join(
+                [f"• {it.name} x{it.quantity} - {it.price}" for it in (order.order_items or [])]
+            ) or "No items found"
+
+            await self.notification.dispatch(OrderConfirmedEvent(
+                order=order,
+                user=user,
+                order_link=order_link,
+                items_overview=items_overview,
+                cc_list=cc_list
+            ))
+        except Exception as e:
+            logger.error(f"Failed to send notification: {e}")
