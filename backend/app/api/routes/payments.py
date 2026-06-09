@@ -159,7 +159,7 @@ async def create(*, create: PaymentCreate, notification: Notification, backgroun
                 "payment_method": PaymentMethod.PAYSTACK,
             }
         )
-    background_tasks.add_task(service.process_order_payment, create.order_id, notification)
+    background_tasks.add_task(service.process_order_payment, order_id=create.order_id)
     return payment
 
 

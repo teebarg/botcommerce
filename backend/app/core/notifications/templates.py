@@ -65,10 +65,10 @@ class TemplateEngine:
 
     async def _send_invoice(self, ctx: dict) -> tuple[str, dict]:
         order = ctx.get("order")
-        email_data = generate_payment_receipt(order=order, user=order.get("user"))
+        email_data = await generate_payment_receipt(order=order, user=order.user)
         dict_data = {
             "subject": email_data.subject,
-            "recipient": order.get("user", {}).get("email"),
+            "recipient": order.user.email,
             "cc_list": ctx.get("cc_list")
         }
         return email_data.html_content, dict_data

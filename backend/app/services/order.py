@@ -1,5 +1,5 @@
 import uuid
-from app.core.notifications.events import InvoiceEvent, OrderConfirmedEvent
+from app.core.notifications.events import SendInvoiceEvent, OrderConfirmedEvent
 from fastapi import HTTPException, BackgroundTasks
 from app.models.order import OrderCreate
 from app.core.logging import logger
@@ -19,9 +19,9 @@ from app.services.coupon import CouponService
 
 class OrderService:
     def __init__(
-        self, 
-        db: Prisma, 
-        coupon_service: CouponService, 
+        self,
+        db: Prisma,
+        coupon_service: CouponService,
         settings_service: ShopSettingsService,
         notification_dispatcher: Notification
     ):
@@ -69,8 +69,8 @@ class OrderService:
             data["coupon"] = {"connect": {"id": cart.coupon_id}}
             data["coupon_code"] = cart.coupon_code
             await self.coupon_service.increment_coupon_usage(
-                coupon_id=cart.coupon_id, 
-                user_id=user_id, 
+                coupon_id=cart.coupon_id,
+                user_id=user_id,
                 discount_amount=cart.discount_amount
             )
 
@@ -122,13 +122,13 @@ class OrderService:
     async def create_invoice(self, order_id: int) -> str:
         try:
             order = await self.db.order.find_unique(
-                where={"id": order_id}, 
+                where={"id": order_id},
                 include={"order_items": True, "user": True, "shipping_address": True}
             )
             if not order:
                 logger.error(f"Order not found for ID: {order_id}")
                 raise Exception("Order not found")
-                
+
             shop_settings = await self.db.shopsettings.find_many()
             settings_dict = {setting.key: setting.value for setting in shop_settings}
 
@@ -136,21 +136,16 @@ class OrderService:
             timestamp: str = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename: str = f"invoice_{order.order_number}_{timestamp}_{uuid.uuid4().hex[:8]}.pdf"
 
-            try:
-                result = supabase.storage.from_("invoices").upload(filename, pdf_bytes, {"contentType": "application/pdf"})
-                if not result:
-                    raise Exception("Failed to upload invoice to storage")
-            except Exception as e:
-                logger.error(e)
-                raise Exception("Failed to upload invoice to storage.")
+            result = supabase.storage.from_("invoices").upload(filename, pdf_bytes, {"contentType": "application/pdf"})
+            if not result:
+                raise Exception("Failed to upload invoice to storage")
 
             public_url = supabase.storage.from_("invoices").get_public_url(filename, {"download": filename})
             await self.db.order.update(where={"id": order_id}, data={"invoice_url": public_url})
             await refresh_data(patterns=["orders"], keys=[f"order:{order_id}"])
             return public_url
         except Exception as e:
-            logger.error(f"Unexpected error in download_invoice: {str(e)}")
-            raise Exception("An unexpected error occurred while generating the invoice")
+            raise Exception(str(e))
 
     async def decrement_variant_inventory_for_order(self, order: Any) -> None:
         out_of_stock_variants = []
@@ -162,20 +157,20 @@ class OrderService:
                 if not variant:
                     logger.warning(f"Variant {variant_id} not found for order {order.id}")
                     continue
-                
+
                 new_inventory = max(0, variant.inventory - quantity)
                 update_data: Dict[str, Any] = {"inventory": new_inventory}
                 out_of_stock = False
-                
+
                 if new_inventory == 0 and variant.status != "OUT_OF_STOCK":
                     update_data["status"] = "OUT_OF_STOCK"
                     out_of_stock = True
-                    
+
                 await self.db.productvariant.update(where={"id": variant_id}, data=update_data)
                 await index_product(product_id=variant.product_id)
                 if out_of_stock:
                     out_of_stock_variants.append(variant)
-                    
+
             await refresh_data(patterns=["gallery"])
         except Exception as e:
             logger.error(f"Failed to decrement variant inventory for order {order.id}: {e}")
@@ -199,7 +194,7 @@ class OrderService:
             shop_email: str | None = await self.settings_service.get("shop_email")
             cc_list = [shop_email] if shop_email else []
 
-            await self.notification.dispatch(InvoiceEvent(order=order, cc_list=cc_list))
+            await self.notification.dispatch(SendInvoiceEvent(order=order, cc_list=cc_list))
             logger.debug(f"Invoice email sent to user: {order.user_id}")
         except Exception as e:
             logger.error(f"Failed to generate invoice email: {e}")
@@ -213,15 +208,24 @@ class OrderService:
         if not order:
             logger.error(f"Order not found for ID: {order_id}")
             raise Exception("Order not found")
-            
-        await self.create_invoice(order_id)
-        await self.send_payment_receipt(order=order)
-        
+
+        try:
+            await self.create_invoice(order_id)
+        except Exception as e:
+            logger.error(f"Failed to create invoice for order {order_id}: {e}")
+
+        return
+
+        try:
+             await self.send_payment_receipt(order=order)
+        except Exception as e:
+            logger.error(f"Failed to send payment receipt for order {order_id}: {e}")
+
         try:
             await self.decrement_variant_inventory_for_order(order=order)
         except Exception as e:
             logger.error(f"Failed to decrement variant inventory for order {order_id}: {e}")
-            
+
         try:
             await self.process_referral(order=order)
         except Exception as e:
@@ -305,7 +309,7 @@ class OrderService:
     async def process_referral(self, order: Any) -> None:
         if not order.coupon_code:
             return
-            
+
         coupon_owner = await self.db.user.find_unique(where={"referral_code": order.coupon_code})
         if not coupon_owner:
             return
@@ -327,7 +331,7 @@ class OrderService:
             email_data = await generate_referral_cashback_email(order=order, coupon_owner=coupon_owner)
             shop_email = await self.settings_service.get("shop_email")
             cc_list = [shop_email] if shop_email else []
-            
+
             await self.notification.send_notification(
                 channel_name="email",
                 recipient=coupon_owner.email,

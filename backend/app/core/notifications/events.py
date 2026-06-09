@@ -30,6 +30,6 @@ class SendPushNotificationEvent(BaseNotificationEvent):
     notification: Dict
 
 @dataclass
-class InvoiceEvent(BaseNotificationEvent):
+class SendInvoiceEvent(BaseNotificationEvent):
     order: Dict
     cc_list: List[str]

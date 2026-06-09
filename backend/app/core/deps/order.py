@@ -5,6 +5,7 @@ from app.services.coupon import CouponService
 from app.services.shop_settings import ShopSettingsService
 from app.repositories.order import OrderRepository
 from app.services.order import OrderService
+from app.core.notifications.setup import get_notification_service
 
 def get_order_repository() -> OrderRepository:
     return OrderRepository(db=db)
@@ -14,6 +15,5 @@ def get_order_service() -> OrderService:
         db=db,
         coupon_service=CouponService(),
         settings_service=ShopSettingsService(),
-        notification_dispatcher=Notification()
+        notification_dispatcher=get_notification_service()
     )
-    
