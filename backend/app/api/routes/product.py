@@ -1,8 +1,8 @@
 import json
 from typing import Optional
 from app.core.config import settings
-from app.core.dependencies.product import get_product_service
 from app.core.logging import get_logger
+from app.core.deps.product import get_product_service
 from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks, Response, Request
 
 from app.core.deps import CurrentUser, UserDep

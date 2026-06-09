@@ -10,7 +10,7 @@ from app.models.product import (
 from app.models.gallery import PaginatedProductImages
 from app.core.permissions import require_admin
 from app.prisma_client import prisma as db
-from app.core.dependencies.services import get_gallery_service
+from app.core.deps.services import get_gallery_service
 from app.services.gallery import GalleryService
 from app.services.redis import cache_response, refresh_product
 from app.services.product import index_products, delete_product_index, index_product
