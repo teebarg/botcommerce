@@ -1,8 +1,9 @@
 from app.core.deps import UserDep
-from fastapi import APIRouter, Query, Body, Request
+from app.core.dependencies.services import get_interaction_service
+from fastapi import APIRouter, Query, Body, Request, Depends
 from typing import List, Optional
 from app.schemas.user_interaction import UserInteractionCreate, UserInteractionResponse
-from app.services.user_interaction import log_user_interaction
+from app.services.user_interaction import InteractionService
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
 from app.services.redis import cache_response, refresh_data
@@ -13,11 +14,11 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 @router.post("/batch")
-async def batch_user_interactions(user: UserDep, payload: List[UserInteractionCreate] = Body(...)) -> Message:
+async def batch_user_interactions(user: UserDep, srv: InteractionService = Depends(get_interaction_service), payload: List[UserInteractionCreate] = Body(...)) -> Message:
     if not user:
         return Message(message="You are not logged in")
     for item in payload:
-        await log_user_interaction(
+        await srv.log_user_interaction(
             user_id=user.id,
             product_id=item.product_id,
             type=item.type,

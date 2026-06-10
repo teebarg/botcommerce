@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { getRecentlyViewedFn, getWishlistListingFn } from "@/server/users.server";
+import { getWishlistListingFn } from "@/server/users.server";
 import { clientApi } from "@/utils/api.client";
 import { User, Wishlist } from "@/schemas";
 
@@ -71,13 +71,6 @@ export const useUserWishlist = () => {
   return useQuery(userWishlistQuery());
 };
 
-export const useUserRecentlyViewed = (limit: number = 12, enabled: boolean = true, user_id: number) => {
-    return useQuery({
-        queryKey: ["products", "recently-viewed", user_id],
-        queryFn: () => getRecentlyViewedFn({ data: limit }),
-        enabled: enabled,
-    });
-};
 
 export const useUserCreateWishlist = () => {
     const queryClient = useQueryClient();

@@ -8,8 +8,6 @@ from prisma.errors import PrismaError
 from prisma.enums import Role, Status
 from app.models.user import User, UserSelf, UserAdmin, UserUpdateMe, UserUpdate, PaginatedUsers, GuestUserCreate
 from app.core.security import get_password_hash
-from app.services.recently_viewed import RecentlyViewedService
-from app.models.product import ProductSearch
 from app.services.redis import cache_response, refresh_data
 from app.core.permissions import require_admin
 
@@ -248,16 +246,3 @@ async def remove_wishlist_item(
         return Message(message="Product deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-
-
-@router.get("/recently-viewed")
-@cache_response(key_prefix="products:recently-viewed", key=lambda request, current_user, limit: f"{current_user.id}:{limit}")
-async def get_recently_viewed(
-    request: Request,
-    current_user: CurrentUser,
-    limit: int = Query(default=10, le=20)
-) -> list[ProductSearch]:
-    """Get current user's recently viewed products."""
-    service = RecentlyViewedService()
-    products = await service.get_recently_viewed(current_user.id, limit)
-    return products

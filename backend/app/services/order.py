@@ -8,7 +8,7 @@ from datetime import datetime
 from app.core.deps import Notification, supabase
 from app.services.product import index_product
 from app.core.config import settings
-from app.services.events import publish_order_event
+from app.services.events import EventBus
 from app.services.redis import refresh_data
 from app.services.shop_settings import ShopSettingsService
 from app.services.cart import get_cart
@@ -23,12 +23,14 @@ class OrderService:
         db: Prisma,
         coupon_service: CouponService,
         settings_service: ShopSettingsService,
-        notification_dispatcher: Notification
+        notification_dispatcher: Notification,
+        event_bus: EventBus
     ):
         self.db = db
         self.coupon_service = coupon_service
         self.settings_service = settings_service
         self.notification = notification_dispatcher
+        self.event_bus = event_bus
 
     async def create_order_from_cart(self, order_in: OrderCreate, user_id: int, cart_number: str) -> Any:
         order_number: str = f"ORD{uuid.uuid4().hex[:8].upper()}"
@@ -83,10 +85,10 @@ class OrderService:
             logger.error(f"Failed to create order: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
-        await publish_order_event(order=new_order, type="ORDER_CREATED")
+        await self.event_bus.publish_order_event(order=new_order, type="ORDER_CREATED")
 
         if order_in.payment_status == "SUCCESS":
-            await publish_order_event(order=new_order, type="ORDER_PAID")
+            await self.event_bus.publish_order_event(order=new_order, type="ORDER_PAID")
 
         return new_order
 

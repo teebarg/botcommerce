@@ -11,7 +11,6 @@ from app.prisma_client import prisma as db
 from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
 from app.services.order import OrderService
 from app.core.logging import get_logger
-from app.services.events import publish_event, publish_order_event
 from app.services.redis import refresh_data
 from app.models.cart import Cart
 from app.core.permissions import require_admin, require_user
@@ -110,7 +109,7 @@ async def verify_payment(response: Response, reference: str, user: CurrentUser, 
                 "status": PaymentStatus.SUCCESS,
                 "payment_method": PaymentMethod.PAYSTACK,
             }
-            await publish_event(event=event)
+            await service.event_bus.publish(event=event)
 
             response.delete_cookie(
                 key="_cart_id",
@@ -132,7 +131,7 @@ async def verify_payment(response: Response, reference: str, user: CurrentUser, 
                 "status": PaymentStatus.FAILED,
                 "payment_method": PaymentMethod.PAYSTACK,
             }
-            await publish_event(event=event)
+            await service.event_bus.publish(event=event)
             raise HTTPException(status_code=500, detail="payment verification failed")
 
 
@@ -164,7 +163,7 @@ async def create(*, create: PaymentCreate, notification: Notification, backgroun
 
 
 @router.patch("/{id}/status", dependencies=[Depends(require_admin)])
-async def payment_status(id: int, status: PaymentStatus) -> Order:
+async def payment_status(id: int, status: PaymentStatus, srv: OrderService = Depends(get_order_service)) -> Order:
     """Change payment status"""
     order = await db.order.find_unique(where={"id": id}, include={"order_items": {"include": {"variant": True}}})
     if not order:
@@ -181,7 +180,7 @@ async def payment_status(id: int, status: PaymentStatus) -> Order:
         keys: list[str] = [f"order:{id}"]
 
         if status == PaymentStatus.SUCCESS:
-            await publish_order_event(order=updated_order, type="ORDER_PAID")
+            await srv.event_bus.publish_order_event(order=updated_order, type="ORDER_PAID")
             try:
                 await tx.ordertimeline.create(
                     data={

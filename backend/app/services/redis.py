@@ -43,18 +43,6 @@ class EnhancedJSONEncoder(json.JSONEncoder):
             return o.__dict__
         return str(o)
 
-
-@handle_redis_errors(default=False)
-async def publish_event(event_name: str, payload: dict[str, Any]) -> bool:
-    """
-    Append an event to a Redis Stream for durable consumption by consumers.
-    Stream key format: "events:{event_name}". Payload is stored under the "data" field as JSON.
-    """
-    stream_key: str = f"events:{event_name}"
-    data = {"data": json.dumps(payload, cls=EnhancedJSONEncoder)}
-    await redis_client.xadd(stream_key, data)
-    return True
-
 async def get_redis_dependency(request: Request):
     return request.app.state.redis
 

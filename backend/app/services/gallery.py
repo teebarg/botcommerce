@@ -66,11 +66,10 @@ class GalleryRepository:
 
 class GalleryService:
     """Coordinates Business Domain Logics."""
-    def __init__(self, repo: GalleryRepository, db: Prisma, websocket_manager, recently_viewed_service):
+    def __init__(self, repo: GalleryRepository, db: Prisma, websocket_manager):
         self.repo = repo
         self.db = db
         self.ws_manager = websocket_manager
-        self.recently_viewed_service = recently_viewed_service
 
     @staticmethod
     def _build_variant_data(payload) -> dict[str, Any]:
@@ -158,7 +157,6 @@ class GalleryService:
             logger.error(f"Error deleting product {product_id}: {e}")
             raise HTTPException(status_code=500, detail="Failed to delete product")
 
-        await self.recently_viewed_service.remove_product_from_all(product_id=product_id)
         return product_id, image_urls
 
     async def bulk_save_urls(self, payload: ProductImageBulkUrls) -> dict:

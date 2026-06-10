@@ -7,9 +7,8 @@ from app.models.chat import ChatCloseRequest, PaginatedChats, Chat, ChatRequest,
 from app.models.generic import Message
 from app.services.websocket import manager
 from app.redis_client import redis_client
-from app.core.deps import CurrentUser
+from app.core.deps import ConversationDep, CurrentUser
 from datetime import datetime
-from app.services.chat import get_conversation
 from app.core.permissions import require_admin
 from app.core.logging import get_logger
 
@@ -18,11 +17,11 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 @router.post("/support", dependencies=[Depends(require_admin)])
-async def admin_chat(payload: ChatRequest) -> Message:
+async def admin_chat(payload: ChatRequest, srv: ConversationDep) -> Message:
     """
     Handle admin support chat messages
     """
-    conversation = await get_conversation(payload.conversation_uuid)
+    conversation = await srv.get_conversation(payload.conversation_uuid)
 
     try:
         await db.message.create(
@@ -54,11 +53,11 @@ async def admin_chat(payload: ChatRequest) -> Message:
 
 
 @router.post("/")
-async def customer_chat(payload: ChatRequest) -> Message:
+async def customer_chat(payload: ChatRequest, srv: ConversationDep) -> Message:
     """
     Handle customer regular chat messages
     """
-    conversation = await get_conversation(payload.conversation_uuid)
+    conversation = await srv.get_conversation(payload.conversation_uuid)
 
     await db.message.create(
         data={
@@ -79,8 +78,8 @@ async def customer_chat(payload: ChatRequest) -> Message:
 
 
 @router.post("/handoff", dependencies=[Depends(require_admin)])
-async def handoff(payload: ChatHandoffRequest, user: CurrentUser) -> Message:
-    conversation = await get_conversation(payload.conversation_uuid)
+async def handoff(payload: ChatHandoffRequest, user: CurrentUser, srv: ConversationDep) -> Message:
+    conversation = await srv.get_conversation(payload.conversation_uuid)
 
     if conversation.human_connected:
         raise HTTPException(status_code=400, detail="conversation already connected to human")
@@ -157,8 +156,8 @@ async def delete_chat(id: int) -> Message:
 
 
 @router.post("/status")
-async def status(payload: ChatCloseRequest) -> Message:
-    conversation = await get_conversation(payload.conversation_uuid)
+async def status(payload: ChatCloseRequest, srv: ConversationDep) -> Message:
+    conversation = await srv.get_conversation(payload.conversation_uuid)
 
     await db.conversation.update(
         where={"id": conversation.id},

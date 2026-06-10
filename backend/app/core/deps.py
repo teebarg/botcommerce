@@ -1,8 +1,9 @@
-from app.core.dependencies.services import get_shop_settings_service
+from app.core.dependencies.services import get_conversation_service, get_shop_settings_service
 from typing import Annotated, Literal, Optional
 
 from app.core.notifications.service import NotificationService
 from app.core.notifications.setup import get_notification_service
+from app.services.chat import ConversationService
 import jwt
 from fastapi import Depends, HTTPException, status, Cookie
 from fastapi.security import APIKeyHeader, OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
@@ -178,3 +179,4 @@ PrincipalDep = Annotated[Principal, Depends(get_principal)]
 Notification = Annotated[NotificationService, Depends(get_notification_service)]
 
 SettingsDep = Annotated[ShopSettingsService, Depends(get_shop_settings_service)]
+ConversationDep = Annotated[ConversationService, Depends(get_conversation_service)]

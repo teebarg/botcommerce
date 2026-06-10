@@ -33,14 +33,6 @@ export const getWishlistListingFn = createServerFn().handler(async () => {
     return await api.get<Wishlist>("/users/wishlist");
 });
 
-export const getRecentlyViewedFn = createServerFn({ method: "GET" })
-    .inputValidator(z.number().optional())
-    .handler(async ({ data: limit }) => {
-        return await api.get<ProductSearch[]>("/users/recently-viewed", {
-            params: { limit: limit || 12 },
-        });
-    });
-
 export const getMeTrxnFn = createServerFn().handler(async () => {
     return await api.get<PaginatedWalletTxns>("/wallet/me");
 });
