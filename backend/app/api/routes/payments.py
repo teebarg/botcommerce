@@ -1,4 +1,4 @@
-from app.core.deps.order import get_order_service
+from app.core.dependencies.order import get_order_service
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends, Response
 from app.core.config import settings
 from app.schemas.payment import PaymentInitialize, PaymentCreate

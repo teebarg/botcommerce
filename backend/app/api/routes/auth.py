@@ -1,5 +1,5 @@
 from typing import Annotated
-from app.core.deps.cart import get_cart_service
+from app.core.dependencies.cart import get_cart_service
 from fastapi import APIRouter, Request, Cookie, Response, Depends
 from app.core.config import settings
 from app.prisma_client import prisma as db

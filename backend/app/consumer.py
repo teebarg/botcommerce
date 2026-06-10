@@ -1,12 +1,12 @@
+from app.core.dependencies.services import get_shop_settings_service
 import asyncio
 from app.core.logging import get_logger
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
 from app.core.notifications.setup import get_notification_service
 from app.core.config import settings
-from app.core.deps.order import get_order_service
+from app.core.dependencies.order import get_order_service
 from app.core.notifications.events import OrderConfirmedEvent
-from app.services.shop_settings import ShopSettingsService
 from prisma.enums import OrderStatus, PaymentStatus, PaymentMethod, CartStatus
 from app.services.recently_viewed import RecentlyViewedService
 from app.services.popular_products import PopularProductsService
@@ -27,6 +27,7 @@ class RedisStreamConsumer:
         self.shutdown_event = asyncio.Event()
         self.task = None
         self.notification = get_notification_service()
+        self.shop_settings = get_shop_settings_service()
 
     async def start(self):
         """Start consumer with auto-restart supervision"""
@@ -267,7 +268,8 @@ class RedisStreamConsumer:
             welcome_email = await generate_welcome_email(
                 email_to=event["email"],
                 first_name=event["first_name"],
-                coupon=coupon
+                coupon=coupon,
+                shop_settings=self.shop_settings
             )
             await self.notification.send_notification(
                 channel_name="email",
@@ -300,8 +302,7 @@ class RedisStreamConsumer:
                 }
             )
 
-            service = ShopSettingsService()
-            shop_email = await service.get("shop_email")
+            shop_email = await self.shop_settings.get("shop_email")
             cc_list = [shop_email] if shop_email else []
 
             order_link: str = f"{settings.FRONTEND_HOST}/order/confirmed/{order.order_number}"

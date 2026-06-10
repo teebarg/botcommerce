@@ -10,7 +10,7 @@ from app.models.product import (
 from app.models.gallery import PaginatedProductImages
 from app.core.permissions import require_admin
 from app.prisma_client import prisma as db
-from app.core.deps.services import get_gallery_service
+from app.core.dependencies.services import get_gallery_service
 from app.services.gallery import GalleryService
 from app.services.redis import cache_response, refresh_product
 from app.services.product import index_products, delete_product_index, index_product
@@ -37,12 +37,12 @@ async def image_gallery(
 
 @router.delete("/{image_id}", dependencies=[Depends(require_admin)])
 async def delete_gallery_image(
-    image_id: int, 
+    image_id: int,
     background_tasks: BackgroundTasks,
     service: GalleryService = Depends(get_gallery_service)
 ) -> Message:
     product_id, image_urls = await service.delete_image(image_id)
-    
+
     if not product_id:
         await refresh_product(tags=["gallery"])
         background_tasks.add_task(remove_image_from_storage, image_urls[0])
@@ -77,12 +77,12 @@ async def bulk_delete_gallery_images(
         raise HTTPException(status_code=404, detail="No images found")
 
     background_tasks.add_task(
-        service.process_bulk_delete_task, 
-        payload=payload, 
-        remove_storage_fn=remove_image_from_storage, 
+        service.process_bulk_delete_task,
+        payload=payload,
+        remove_storage_fn=remove_image_from_storage,
         delete_index_fn=delete_product_index
     )
-    
+
     await service.ws_manager.broadcast_to_all({"status": "processing"}, "bulk_action")
     return {"success": True, "message": f"Deleting {len(images)} images..."}
 
@@ -128,12 +128,12 @@ async def bulk_update_products(
         raise HTTPException(status_code=404, detail="No images found")
 
     background_tasks.add_task(
-        service.handle_bulk_update_products, 
-        payload=payload, 
-        images=images, 
+        service.handle_bulk_update_products,
+        payload=payload,
+        images=images,
         index_products_fn=index_products
     )
-    
+
     await service.ws_manager.broadcast_to_all(
         data={"status": "processing", "total": len(images)}, message_type="bulk_action"
     )

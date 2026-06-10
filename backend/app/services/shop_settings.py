@@ -1,5 +1,3 @@
-from app.prisma_client import prisma as db
-from app.redis_client import redis_client
 import json
 from typing import Any
 
@@ -7,8 +5,9 @@ class ShopSettingsService:
     CACHE_PREFIX = "shop-settings:"
     CACHE_EXPIRATION = 3600 * 24 * 30 # 1 week
 
-    def __init__(self):
-        self.redis = redis_client
+    def __init__(self, db, redis):
+        self.db = db
+        self.redis = redis
 
     def _cache_key(self, key: str) -> str:
         return f"{self.CACHE_PREFIX}{key}"
@@ -21,7 +20,7 @@ class ShopSettingsService:
         if cached is not None:
             return cached
 
-        setting = await db.shopsettings.find_first(where={"key": key})
+        setting = await self.db.shopsettings.find_first(where={"key": key})
         if setting:
             await self.redis.set(self._cache_key(key), setting.value, ex=self.CACHE_EXPIRATION)
             return setting.value
@@ -31,7 +30,7 @@ class ShopSettingsService:
         """
         Upsert a setting and refresh Redis
         """
-        setting = await db.shopsettings.upsert(
+        setting = await self.db.shopsettings.upsert(
             where={"key": key},
             data={
                 "create": {"key": key, "value": value, "type": type_},
@@ -49,7 +48,7 @@ class ShopSettingsService:
         if cached is not None:
             return json.loads(cached)
 
-        setting = await db.bankdetails.find_first()
+        setting = await self.db.bankdetails.find_first()
         if setting:
             data = {
                 "account_name": setting.account_name,

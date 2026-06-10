@@ -2,7 +2,7 @@ import json
 from typing import Optional
 from app.core.config import settings
 from app.core.logging import get_logger
-from app.core.deps.product import get_product_service
+from app.core.dependencies.product import get_product_service
 from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks, Response, Request
 
 from app.core.deps import CurrentUser, UserDep
@@ -20,7 +20,7 @@ router = APIRouter()
 
 @router.get("/google-merchant-feed.xml")
 async def get_google_merchant_feed(
-    request: Request, 
+    request: Request,
     service: ProductService = Depends(get_product_service)
 ) -> Response:
     xml_content = await service.generate_merchant_feed_xml(request=request)
@@ -35,7 +35,7 @@ async def get_review_status(
 ) -> ReviewStatus:
     if not user:
         return ReviewStatus(has_purchased=False, has_reviewed=False)
-        
+
     has_purchased, has_reviewed = await service.repo.check_review_status(user.id, product_id)
     return ReviewStatus(has_purchased=has_purchased, has_reviewed=has_reviewed)
 
@@ -84,7 +84,7 @@ async def feed(
 @router.get("/index-products")
 @cache_response("products:collection", tags=["products"])
 async def get_index_products(
-    request: Request, 
+    request: Request,
     service: ProductService = Depends(get_product_service)
 ) -> IndexProducts:
     return await service.query_collection_index()
@@ -108,10 +108,10 @@ async def search(
         ages=ages, width=width, length=length, limit=limit, active=active,
         show_suggestions=show_suggestions, show_facets=show_facets, cursor=None, skip_offset=skip
     )
-    
+
     total_count = res["total_count"]
     total_pages = (total_count // limit) + (total_count % limit > 0)
-    
+
     return {
         "products": res["products"], "facets": res["facets"], "skip": skip,
         "limit": limit, "total_count": total_count, "total_pages": total_pages,
@@ -121,7 +121,7 @@ async def search(
 
 @router.get("/{slug}")
 async def read(
-    request: Request, slug: str, 
+    request: Request, slug: str,
     service: ProductService = Depends(get_product_service)
 ) -> ProductLite:
     cache_key = f"product:slug:{slug}"
@@ -152,7 +152,7 @@ async def update_variant(
 
     update_fields = ["price", "old_price", "inventory", "size", "color", "width", "length", "age"]
     update_data = {f: getattr(variant, f) for f in update_fields if getattr(variant, f, None) is not None}
-    
+
     if "inventory" in update_data:
         update_data["status"] = "IN_STOCK" if update_data["inventory"] > 0 else "OUT_OF_STOCK"
 

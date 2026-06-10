@@ -1,6 +1,6 @@
 from typing import Any, Dict, Optional, Annotated
 from datetime import datetime, timedelta, timezone
-from app.core.deps.cart import get_cart_repository, get_cart_service
+from app.core.dependencies.cart import get_cart_repository, get_cart_service
 from fastapi import APIRouter, HTTPException, Request, BackgroundTasks, Depends, Cookie, Response
 from fastapi.responses import JSONResponse
 
@@ -14,7 +14,7 @@ from prisma.enums import CartStatus
 
 from app.models.generic import Message
 from app.models.cart import (
-    CartUpdate, CartItemCreate, CartItem, Cart, CartLite, 
+    CartUpdate, CartItemCreate, CartItem, Cart, CartLite,
     SendAbandonedCartReminders, PaginatedAbandonedCarts
 )
 from app.core.notifications.events import SendAbandonedCartEvent
@@ -54,24 +54,24 @@ async def add_item_to_cart(
 
 @router.get("/", response_model=Optional[Cart])
 async def get_cart_index(
-    response: Response, 
-    user: UserDep, 
+    response: Response,
+    user: UserDep,
     repo: CartRepository = Depends(get_cart_repository),
     _cart_id: Annotated[str | None, Cookie()] = None
 ):
     cart = await repo.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None, include_relations=True)
     if not cart:
         cart = await repo.create_empty_cart(user_id=user.id if user else None, include_relations=True)
-    
+
     _set_cart_cookie(response, cart.cart_number)
     return cart
 
 
 @router.delete("/items/{item_id}")
 async def delete_cart_item(
-    item_id: int, 
-    user: UserDep, 
-    background_tasks: BackgroundTasks, 
+    item_id: int,
+    user: UserDep,
+    background_tasks: BackgroundTasks,
     repo: CartRepository = Depends(get_cart_repository),
     service: CartService = Depends(get_cart_service),
     _cart_id: Annotated[str | None, Cookie()] = None
@@ -91,10 +91,10 @@ async def delete_cart_item(
 
 @router.put("/items/{item_id}", response_model=CartItem)
 async def update_cart_item(
-    item_id: int, 
-    quantity: int, 
-    user: UserDep, 
-    background_tasks: BackgroundTasks, 
+    item_id: int,
+    quantity: int,
+    user: UserDep,
+    background_tasks: BackgroundTasks,
     repo: CartRepository = Depends(get_cart_repository),
     service: CartService = Depends(get_cart_service),
     _cart_id: Annotated[str | None, Cookie()] = None
@@ -117,8 +117,8 @@ async def update_cart_item(
 
 @router.put("/")
 async def update_cart(
-    cart_update: CartUpdate, 
-    user: UserDep, 
+    cart_update: CartUpdate,
+    user: UserDep,
     repo: CartRepository = Depends(get_cart_repository),
     service: CartService = Depends(get_cart_service),
     _cart_id: Annotated[str | None, Cookie()] = None
@@ -135,7 +135,7 @@ async def update_cart(
                     where={"id": cart_update.shipping_address.id},
                     data={
                         "create": {
-                            **cart_update.shipping_address.model_dump(exclude={"id"}), 
+                            **cart_update.shipping_address.model_dump(exclude={"id"}),
                             "user_id": user.id if user else None
                         },
                         "update": {
@@ -155,46 +155,46 @@ async def update_cart(
             update_data["billing_address"] = {"connect": {"id": address.id}}
             await refresh_data(keys=[f"addresses:{user.id if user else 'guest'}", f"address:{address.id}"])
 
-        if cart_update.status is not None: 
+        if cart_update.status is not None:
             update_data["status"] = cart_update.status
-        if cart_update.email is not None: 
+        if cart_update.email is not None:
             update_data["email"] = cart_update.email
-        if cart_update.phone is not None: 
+        if cart_update.phone is not None:
             update_data["phone"] = cart_update.phone
-        if cart_update.payment_method is not None: 
+        if cart_update.payment_method is not None:
             update_data["payment_method"] = cart_update.payment_method
-        if cart_update.shipping_method is not None: 
+        if cart_update.shipping_method is not None:
             update_data["shipping_method"] = cart_update.shipping_method
 
         if cart_update.shipping_fee is not None:
             update_data["shipping_fee"] = cart_update.shipping_fee
             # Defensive inline projection before full service sync
             update_data["total"] = max(
-                (cart.subtotal or 0) + (cart.tax or 0) + cart_update.shipping_fee - (cart.discount_amount or 0) - (cart.wallet_used or 0), 
+                (cart.subtotal or 0) + (cart.tax or 0) + cart_update.shipping_fee - (cart.discount_amount or 0) - (cart.wallet_used or 0),
                 0
             )
 
-        if user: 
+        if user:
             update_data["user"] = {"connect": {"id": user.id}}
 
         updated_cart = await tx.cart.update(
-            where={"cart_number": cart.cart_number}, 
+            where={"cart_number": cart.cart_number},
             data=update_data
         )
 
     await service.calculate_totals(cart_id=cart.id)
 
     keys = [f"cart:{cart.cart_number}"]
-    if cart.user_id: 
+    if cart.user_id:
         keys.append(f"cart:{cart.user_id}")
     await refresh_data(patterns=["abandoned-carts"], keys=keys)
-    
+
     return updated_cart
 
 
 @router.post("/apply-wallet")
 async def apply_wallet(
-    user: CurrentUser, 
+    user: CurrentUser,
     repo: CartRepository = Depends(get_cart_repository),
     service: CartService = Depends(get_cart_service),
     _cart_id: Annotated[str | None, Cookie()] = None
@@ -211,7 +211,7 @@ async def apply_wallet(
 
 @router.post("/remove-wallet")
 async def remove_wallet(
-    user: CurrentUser, 
+    user: CurrentUser,
     repo: CartRepository = Depends(get_cart_repository),
     service: CartService = Depends(get_cart_service),
     _cart_id: Annotated[str | None, Cookie()] = None
@@ -234,14 +234,14 @@ async def remove_wallet(
 @cache_response(key_prefix="admin:abandoned-carts")
 async def get_admin_abandoned_carts(
     request: Request,
-    search: Optional[str] = None, 
-    hours_threshold: int = 24, 
-    cursor: int | None = None, 
+    search: Optional[str] = None,
+    hours_threshold: int = 24,
+    cursor: int | None = None,
     limit: int = 20
 ) -> PaginatedAbandonedCarts:
     """Retrieves paginated list of abandoned carts for admin dashboard."""
     threshold_time = datetime.now(timezone.utc) - timedelta(hours=hours_threshold)
-    
+
     where_clause: Dict[str, Any] = {
         "status": {"in": [CartStatus.ACTIVE, CartStatus.ABANDONED]},
         "items": {"some": {}},
@@ -266,7 +266,7 @@ async def get_admin_abandoned_carts(
         order={"updated_at": "desc"},
         include={"user": True, "items": {"include": {"variant": {"include": {"product": {"include": {"images": True}}}}}}}
     )
-    
+
     return {
         "items": carts[:limit],
         "next_cursor": carts[-1].id if len(carts) > limit else None,
@@ -279,13 +279,13 @@ async def get_admin_abandoned_carts(
 async def get_abandoned_carts_stats(request: Request, hours_threshold: int = 24):
     """Aggregates recovery metrics and potential revenue."""
     threshold_time = datetime.now(timezone.utc) - timedelta(hours=hours_threshold)
-    
+
     base_filter = {"items": {"some": {}}, "updated_at": {"gt": threshold_time}}
-    
+
     active = await db.cart.count(where={**base_filter, "status": CartStatus.ACTIVE})
     abandoned = await db.cart.count(where={**base_filter, "status": CartStatus.ABANDONED})
     converted = await db.cart.count(where={**base_filter, "status": CartStatus.CONVERTED})
-    
+
     non_converted = await db.cart.find_many(
         where={**base_filter, "status": {"in": [CartStatus.ACTIVE, CartStatus.ABANDONED]}}
     )
@@ -301,13 +301,13 @@ async def get_abandoned_carts_stats(request: Request, hours_threshold: int = 24)
 
 @router.post("/abandoned-carts/send-reminders", dependencies=[Depends(require_admin)])
 async def send_batch_reminders(
-    data: SendAbandonedCartReminders, 
+    data: SendAbandonedCartReminders,
     background_tasks: BackgroundTasks,
     notification: Notification
 ):
     """Queues background reminders for a batch of abandoned carts."""
     threshold_time = datetime.now(timezone.utc) - timedelta(hours=data.hours_threshold)
-    
+
     carts = await db.cart.find_many(
         where={
             "status": {"in": [CartStatus.ACTIVE, CartStatus.ABANDONED]},
@@ -317,16 +317,16 @@ async def send_batch_reminders(
         take=data.limit,
         order={"updated_at": "asc"}
     )
-    
+
     for cart in carts:
         background_tasks.add_task(send_abandoned_cart_reminder, cart.id, notification)
-        
+
     return {"message": "Abandoned reminders queued", "carts_processed": len(carts)}
 
 
 @router.post("/abandoned-carts/{cart_id}/send-reminder", dependencies=[Depends(require_admin)])
 async def send_single_reminder(
-    cart_id: int, 
+    cart_id: int,
     background_tasks: BackgroundTasks,
     notification: Notification
 ):
@@ -334,7 +334,7 @@ async def send_single_reminder(
     cart = await db.cart.find_unique(where={"id": cart_id})
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
-        
+
     background_tasks.add_task(send_abandoned_cart_reminder, cart.id, notification)
     return {"message": f"Reminder successfully queued for cart {cart.cart_number}", "cart_id": cart_id}
 

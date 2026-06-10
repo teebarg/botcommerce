@@ -11,7 +11,7 @@ from app.core.config import settings
 from app.core.deps import CurrentUser, PrincipalDep
 from app.repositories.order import OrderRepository
 from app.services.order import OrderService
-from app.core.deps.order import get_order_repository, get_order_service
+from app.core.dependencies.order import get_order_repository, get_order_service
 
 logger = get_logger(__name__)
 
@@ -101,7 +101,7 @@ async def delete_order(order_id: int, repo: OrderRepository = Depends(get_order_
 
 @router.patch("/{id}/status", dependencies=[Depends(require_admin)])
 async def order_status(
-    id: int, 
+    id: int,
     status: OrderStatus,
     repo: OrderRepository = Depends(get_order_repository)
 ) -> Order:
@@ -127,15 +127,15 @@ async def order_status(
 
 @router.patch("/{order_id}/notes")
 async def update_order_notes(
-    order_id: int, 
-    notes_update: OrderNotesUpdate, 
+    order_id: int,
+    notes_update: OrderNotesUpdate,
     user: CurrentUser,
     repo: OrderRepository = Depends(get_order_repository)
 ) -> Order:
     order = await repo.get_by_id(order_id=order_id)
     if not order or order.user_id != user.id:
         raise HTTPException(status_code=404, detail="Order not found")
-        
+
     updated_order = await db.order.update(where={"id": order_id}, data={"order_notes": notes_update.notes})
     await refresh_data(patterns=["orders", f"order:{order.order_number}"])
     return updated_order
@@ -146,14 +146,14 @@ async def get_order_timeline(order_id: int, repo: OrderRepository = Depends(get_
     order = await repo.get_by_id(order_id=order_id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
-        
+
     return await db.ordertimeline.find_many(where={"order_id": order_id}, order={"created_at": "asc"})
 
 
 @router.post("/{order_id}/return", dependencies=[Depends(require_admin)], response_model=Message)
 async def return_item(
-    order_id: int, 
-    payload: ReturnItemPayload, 
+    order_id: int,
+    payload: ReturnItemPayload,
     background_tasks: BackgroundTasks,
     service: OrderService = Depends(get_order_service)
 ):

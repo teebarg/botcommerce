@@ -7,6 +7,7 @@ from app.services.shop_settings import ShopSettingsService
 from pydantic import BaseModel
 from datetime import datetime
 from app.core.permissions import require_admin
+from app.core.dependencies.services import get_shop_settings_service
 
 logger = get_logger(__name__)
 
@@ -44,12 +45,10 @@ async def get_public_settings(request: Request) -> dict[str, str]:
 
 
 @router.patch("/sync-shop-details", dependencies=[Depends(require_admin)])
-async def sync_shop_details(form_data: dict[str, Any]):
+async def sync_shop_details(form_data: dict[str, Any], service: ShopSettingsService = Depends(get_shop_settings_service)):
     """
     Sync shop details
     """
-    service = ShopSettingsService()
-
     try:
         for key, value in form_data.items():
             if not value:

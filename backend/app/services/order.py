@@ -214,8 +214,6 @@ class OrderService:
         except Exception as e:
             logger.error(f"Failed to create invoice for order {order_id}: {e}")
 
-        return
-
         try:
              await self.send_payment_receipt(order=order)
         except Exception as e:
