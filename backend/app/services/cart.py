@@ -1,10 +1,14 @@
-from typing import Optional
+from app.models.cart import Cart
+from typing import Optional, Dict, Any
+from fastapi import HTTPException
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
-from prisma.enums import CartStatus
-from app.models.cart import Cart
 from app.services.redis import refresh_data
 from app.services.shop_settings import ShopSettingsService
+from app.core.utils import generate_id
+from prisma.enums import CartStatus
+from prisma import Prisma
+from app.services.coupon import CouponService
 
 logger = get_logger(__name__)
 
@@ -27,134 +31,217 @@ async def get_cart(cart_number: Optional[str], user_id: Optional[str]) -> Cart |
     return None
 
 
-async def calculate_cart_totals(cart_id: int):
-    """Helper function to calculate cart totals"""
-    logger.debug(f"Calculating cart totals for cart {cart_id}")
-    try:
-        from app.services.coupon import CouponService
-        service = ShopSettingsService()
+class CartRepository:
+    def __init__(self, db: Prisma):
+        self.db = db
 
-        cart = await db.cart.find_unique(where={"id": cart_id})
+    async def get_active_cart(self, cart_number: Optional[str], user_id: Optional[int], include_relations: bool = False) -> Any:
+        include_clause = {
+            "items": {"include": {"variant": True}},
+            "shipping_address": True
+        } if include_relations else {"items": True}
 
-        tax_rate = float(await service.get("tax_rate"))
-        cart_items = await db.cartitem.find_many(where={"cart_id": cart.id})
-
-        subtotal = sum(item.price * item.quantity for item in cart_items)
-
-        discount_amount = 0.0
-        if cart.coupon_id:
-            coupon_service = CouponService()
-            coupon = await db.coupon.find_unique(where={"id": cart.coupon_id})
-            if coupon:
-                try:
-                    await coupon_service.validate_coupon(
-                        code=coupon.code,
-                        cart=cart,
-                        user_id=cart.user_id
-                    )
-                    discount_amount = await coupon_service.calculate_discount(coupon, subtotal)
-                except Exception:
-                    discount_amount = 0.0
-                    await db.cart.update(
-                        where={"id": cart.id},
-                        data={"coupon_id": None}
-                    )
-
-        wallet_used = 0
-        if cart.wallet_used > 0:
-            wallet_used: float = cart.wallet_used
-
-        new_subtotal: float = max(subtotal - discount_amount, 0)
-        tax: float = new_subtotal * (tax_rate / 100)
-        shipping_fee = cart.shipping_fee or 0
-        total: float = new_subtotal + tax + shipping_fee
-
-        total_after_wallet: float = max(total - wallet_used, 0)
-
-        data={
-            "subtotal": subtotal,
-            "tax": tax,
-            "discount_amount": discount_amount,
-            "total": total_after_wallet,
-        }
-
-        if total <= 0:
-            data["payment_method"] = "WALLET"
-
-        await db.cart.update(where={"id": cart.id}, data=data)
-        await refresh_data(patterns=["carts", "abandoned-carts"])
-    except Exception as e:
-        logger.error(f"Error calculating cart totals: {e}")
-
-
-async def merge_cart(user_id: int, cart_number: Optional[str] = None) -> None:
-    logger.debug(f"Merging cart for user {user_id} with cart number {cart_number}")
-    try:
-        async with db.tx() as tx:
-            user_cart = await tx.cart.find_first(
-                where={"user_id": user_id, "status": "ACTIVE"},
-                include={"items": True},
+        if user_id:
+            cart = await self.db.cart.find_first(
+                where={"user_id": user_id, "status": CartStatus.ACTIVE},
+                include=include_clause,
+                order={"created_at": "desc"}
             )
+            if cart:
+                return cart
 
-            guest_cart = None
-            if cart_number:
+        if cart_number:
+            cart = await self.db.cart.find_unique(
+                where={"cart_number": cart_number, "status": CartStatus.ACTIVE}, 
+                include=include_clause
+            )
+            if cart:
+                return cart
+        return None
+
+    async def create_empty_cart(self, user_id: Optional[int], include_relations: bool = False) -> Any:
+        new_cart_id = generate_id()
+        include_clause = {
+            "items": {"include": {"variant": True}},
+            "shipping_address": True
+        } if include_relations else None
+        
+        return await self.db.cart.create(
+            data={"cart_number": new_cart_id, "user_id": user_id},
+            include=include_clause
+        )
+
+
+class CartService:
+    def __init__(self, db: Prisma, settings_service: ShopSettingsService, coupon_service: CouponService):
+        self.db = db
+        self.settings_service = settings_service
+        self.coupon_service = coupon_service
+
+    async def calculate_totals(self, cart_id: int) -> None:
+        """Calculates and commits subtotal, tax, discounts, and wallet balances cleanly."""
+        logger.debug(f"Recalculating totals for cart ID: {cart_id}")
+        try:
+            cart = await self.db.cart.find_unique(where={"id": cart_id})
+            if not cart:
+                return
+
+            tax_rate = float(await self.settings_service.get("tax_rate"))
+            cart_items = await self.db.cartitem.find_many(where={"cart_id": cart.id})
+
+            subtotal = sum(item.price * item.quantity for item in cart_items)
+            discount_amount = 0.0
+
+            if cart.coupon_id:
+                coupon = await self.db.coupon.find_unique(where={"id": cart.coupon_id})
+                if coupon:
+                    try:
+                        await self.coupon_service.validate_coupon(
+                            code=coupon.code,
+                            cart=cart,
+                            user_id=cart.user_id
+                        )
+                        discount_amount = await self.coupon_service.calculate_discount(coupon, subtotal)
+                    except Exception:
+                        discount_amount = 0.0
+                        await self.db.cart.update(where={"id": cart.id}, data={"coupon_id": None})
+
+            wallet_used = cart.wallet_used or 0.0
+            new_subtotal = max(subtotal - discount_amount, 0.0)
+            tax = new_subtotal * (tax_rate / 100)
+            shipping_fee = cart.shipping_fee or 0.0
+            
+            total = new_subtotal + tax + shipping_fee
+            total_after_wallet = max(total - wallet_used, 0.0)
+
+            data: Dict[str, Any] = {
+                "subtotal": subtotal,
+                "tax": tax,
+                "discount_amount": discount_amount,
+                "total": total_after_wallet,
+            }
+
+            if total_after_wallet <= 0:
+                data["payment_method"] = "WALLET"
+
+            await self.db.cart.update(where={"id": cart.id}, data=data)
+            await refresh_data(patterns=["carts", "abandoned-carts"])
+        except Exception as e:
+            logger.error(f"Error calculating cart totals: {e}", exc_info=True)
+
+    async def add_item(self, cart: Any, variant_id: int, quantity: int) -> Any:
+        variant = await self.db.productvariant.find_unique(
+            where={"id": variant_id},
+            include={"product": {"include": {"images": True}}}
+        )
+
+        if not variant:
+            raise HTTPException(status_code=400, detail="Product variant does not exist")
+        if variant.status != "IN_STOCK":
+            raise HTTPException(status_code=400, detail="Product is out of stock")
+        if quantity > variant.inventory:
+            raise HTTPException(status_code=400, detail=f"Not enough inventory. Only {variant.inventory} items left.")
+
+        return await self.db.cartitem.create(
+            data={
+                "cart_id": cart.id,
+                "cart_number": cart.cart_number,
+                "name": variant.product.name,
+                "slug": variant.product.slug,
+                "variant_id": variant_id,
+                "quantity": quantity,
+                "price": variant.price,
+                "image": variant.product.images[0].image if variant.product.images else variant.product.image
+            },
+            include={"variant": True}
+        )
+
+    async def merge_guest_into_user_cart(self, user_id: int, cart_number: Optional[str] = None) -> None:
+        if not cart_number:
+            return
+            
+        try:
+            async with self.db.tx() as tx:
+                user_cart = await tx.cart.find_first(
+                    where={"user_id": user_id, "status": "ACTIVE"},
+                    include={"items": True},
+                )
                 guest_cart = await tx.cart.find_first(
-                    where={
-                        "cart_number": cart_number,
-                        "user_id": None,
-                        "status": "ACTIVE",
-                    },
+                    where={"cart_number": cart_number, "user_id": None, "status": "ACTIVE"},
                     include={"items": True},
                 )
 
-            # ----------------------------------------
-            # CASE 1: Both carts exist — merge items
-            # ----------------------------------------
-            if user_cart and guest_cart:
-                logger.debug(
-                    f"Merging guest cart {guest_cart.cart_number} "
-                    f"into user cart {user_cart.cart_number}"
-                )
+                if user_cart and guest_cart:
+                    user_items_map = {item.variant_id: item for item in user_cart.items}
 
-                user_items_map = {item.variant_id: item for item in user_cart.items}
+                    for guest_item in guest_cart.items:
+                        existing_item = user_items_map.get(guest_item.variant_id)
+                        if existing_item:
+                            await tx.cartitem.update(
+                                where={"id": existing_item.id},
+                                data={"quantity": existing_item.quantity + guest_item.quantity},
+                            )
+                        else:
+                            await tx.cartitem.update(
+                                where={"id": guest_item.id},
+                                data={"cart_id": user_cart.id, "cart_number": user_cart.cart_number},
+                            )
+                    await tx.cart.delete(where={"id": guest_cart.id})
+                    target_id = user_cart.id
+                elif guest_cart and not user_cart:
+                    await tx.cart.update(where={"id": guest_cart.id}, data={"user_id": user_id})
+                    target_id = guest_cart.id
+                else:
+                    return
 
-                for guest_item in guest_cart.items:
-                    existing_item = user_items_map.get(guest_item.variant_id)
+            await self.calculate_totals(cart_id=target_id)
+        except Exception as e:
+            logger.error(f"Error merging carts: {e}", exc_info=True)
 
-                    if existing_item:
-                        await tx.cartitem.update(
-                            where={"id": existing_item.id},
-                            data={"quantity": existing_item.quantity + guest_item.quantity},
-                        )
-                    else:
-                        await tx.cartitem.update(
-                            where={"id": guest_item.id},
-                            data={
-                                "cart_id": user_cart.id,
-                                "cart_number": user_cart.cart_number,
-                            },
-                        )
+    async def apply_wallet_balance(self, cart: Any, user: Any) -> None:
+        if not user.wallet_balance or user.wallet_balance <= 0:
+            raise HTTPException(status_code=400, detail="Wallet balance is empty")
 
-                await tx.cart.delete(where={"id": guest_cart.id})
+        subtotal = cart.subtotal or 0.0
+        tax = cart.tax or 0.0
+        shipping = cart.shipping_fee or 0.0
+        discount = cart.discount_amount or 0.0
 
-            # ----------------------------------------
-            # CASE 2: Only guest cart exists — claim it
-            # ----------------------------------------
-            elif guest_cart and not user_cart:
-                logger.debug(
-                    f"Claiming guest cart {guest_cart.cart_number} for user {user_id}"
-                )
-                await tx.cart.update(
-                    where={"id": guest_cart.id},
-                    data={"user_id": user_id},
-                )
+        total_payable = max(subtotal + tax + shipping - discount, 0.0)
+        wallet_to_use = min(user.wallet_balance, total_payable)
+        remaining_total = max(total_payable - wallet_to_use, 0.0)
 
-            else:
-                logger.debug(f"No carts to merge for user {user_id}")
-                return
+        data = {"wallet_used": wallet_to_use, "total": remaining_total}
+        if remaining_total <= 0:
+            data["payment_method"] = "WALLET"
 
-        target_cart_id = user_cart.id if user_cart else guest_cart.id
-        await calculate_cart_totals(cart_id=target_cart_id)
+        async with self.db.tx() as tx:
+            await tx.cart.update(where={"id": cart.id}, data=data)
+            await tx.wallettransaction.create(
+                data={
+                    "user": {"connect": {"id": user.id}},
+                    "amount": wallet_to_use,
+                    "reference_code": "WALLET_PAYMENT",
+                    "type": "WITHDRAWAL",
+                    "reference_id": cart.cart_number,
+                }
+            )
+            await tx.user.update(where={"id": user.id}, data={"wallet_balance": {"decrement": wallet_to_use}})
 
-    except Exception as e:
-        logger.error(f"Error merging cart: {e}", exc_info=True)
+    async def remove_wallet_balance(self, cart: Any, user: Any) -> None:
+        wallet_used = cart.wallet_used or 0.0
+        if wallet_used <= 0:
+            raise HTTPException(status_code=400, detail="No wallet balance applied to this cart")
+
+        async with self.db.tx() as tx:
+            await tx.user.update(where={"id": user.id}, data={"wallet_balance": {"increment": wallet_used}})
+            await tx.wallettransaction.create(
+                data={
+                    "user": {"connect": {"id": user.id}},
+                    "amount": wallet_used,
+                    "reference_code": "WALLET_REVERSAL",
+                    "type": "REVERSAL",
+                    "reference_id": cart.cart_number,
+                }
+            )
+            await tx.cart.update(where={"id": cart.id}, data={"wallet_used": 0.0, "payment_method": None})

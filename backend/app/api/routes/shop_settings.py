@@ -1,9 +1,9 @@
 from typing import Any
+from app.core.deps import SettingsDep
 from fastapi import APIRouter, HTTPException, Request, Depends
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
 from app.services.redis import cache_response, refresh_data
-from app.services.shop_settings import ShopSettingsService
 from pydantic import BaseModel
 from datetime import datetime
 from app.core.permissions import require_admin
@@ -44,12 +44,10 @@ async def get_public_settings(request: Request) -> dict[str, str]:
 
 
 @router.patch("/sync-shop-details", dependencies=[Depends(require_admin)])
-async def sync_shop_details(form_data: dict[str, Any]):
+async def sync_shop_details(form_data: dict[str, Any], service: SettingsDep):
     """
     Sync shop details
     """
-    service = ShopSettingsService()
-
     try:
         for key, value in form_data.items():
             if not value:

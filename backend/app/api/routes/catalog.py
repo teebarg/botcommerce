@@ -144,7 +144,7 @@ async def search(
     search_params = {
         "limit": limit,
         "sort": [sort],
-        
+
         "filter": " AND ".join(filters),
     }
 

@@ -1,3 +1,4 @@
+from app.core.dependencies.order import get_order_service
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends, Response
 from app.core.config import settings
 from app.schemas.payment import PaymentInitialize, PaymentCreate
@@ -8,7 +9,7 @@ import httpx
 from datetime import datetime
 from app.prisma_client import prisma as db
 from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
-from app.services.order import create_order_from_cart, process_order_payment
+from app.services.order import OrderService
 from app.core.logging import get_logger
 from app.services.events import publish_event, publish_order_event
 from app.services.redis import refresh_data
@@ -76,7 +77,7 @@ async def create_payment(
     return await initialize_payment(cart, current_user)
 
 @router.get("/verify/{reference}")
-async def verify_payment(response: Response, reference: str, user: CurrentUser) -> Order:
+async def verify_payment(response: Response, reference: str, user: CurrentUser, service: OrderService = Depends(get_order_service)) -> Order:
     """Verify a payment"""
     async with httpx.AsyncClient() as client:
         res = await client.get(
@@ -96,7 +97,7 @@ async def verify_payment(response: Response, reference: str, user: CurrentUser) 
         if data["data"]["status"] == "success":
             cart_number = data["data"]["metadata"]["cart_number"]
 
-            order = await create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cart_number)
+            order = await service.create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cart_number)
 
             await refresh_data(patterns=["orders"])
 
@@ -136,7 +137,7 @@ async def verify_payment(response: Response, reference: str, user: CurrentUser) 
 
 
 @router.post("/", dependencies=[Depends(require_user)])
-async def create(*, create: PaymentCreate, notification: Notification, background_tasks: BackgroundTasks):
+async def create(*, create: PaymentCreate, notification: Notification, background_tasks: BackgroundTasks, service: OrderService = Depends(get_order_service)):
     """
     Create new payment.
     """
@@ -158,7 +159,7 @@ async def create(*, create: PaymentCreate, notification: Notification, backgroun
                 "payment_method": PaymentMethod.PAYSTACK,
             }
         )
-    background_tasks.add_task(process_order_payment, create.order_id, notification)
+    background_tasks.add_task(service.process_order_payment, order_id=create.order_id)
     return payment
 
 

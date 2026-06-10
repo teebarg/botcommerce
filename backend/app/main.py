@@ -23,7 +23,7 @@ from app.redis_client import redis_client
 
 from app.core.logging import get_logger
 from app.consumer import RedisStreamConsumer
-from app.core.deps import ShopSettingsServiceDep
+from app.core.deps import SettingsDep
 from pydantic import BaseModel
 
 STREAM_NAME = "EVENT_STREAMS"
@@ -48,11 +48,11 @@ async def lifespan(app: FastAPI):
     #     if "BUSYGROUP" in str(e):
     #         pass  # group already exists
 
+    init_notification_service()
     consumer = RedisStreamConsumer(redis_client, STREAM_NAME, GROUP_NAME, CONSUMER_NAME)
     app.state.consumer = consumer
     await consumer.start()
     await manager.start()
-    init_notification_service()
 
     yield
 
@@ -139,7 +139,7 @@ async def health():
 
 
 @app.post("/api/contact-form")
-async def contact_form(background_tasks: BackgroundTasks, service: ShopSettingsServiceDep, data: ContactFormCreate):
+async def contact_form(background_tasks: BackgroundTasks, service: SettingsDep, data: ContactFormCreate):
     async def send_email_task():
         email_data = await generate_contact_form_email(
             name=data.name, email=data.email, phone=data.phone, message=data.message
@@ -160,7 +160,7 @@ async def contact_form(background_tasks: BackgroundTasks, service: ShopSettingsS
 
 
 @app.post("/api/newsletter")
-async def newsletter(background_tasks: BackgroundTasks, service: ShopSettingsServiceDep, data: NewsletterCreate):
+async def newsletter(background_tasks: BackgroundTasks, service: SettingsDep, data: NewsletterCreate):
     async def send_email_task():
         try:
             email_data = await generate_newsletter_email(
@@ -182,7 +182,7 @@ async def newsletter(background_tasks: BackgroundTasks, service: ShopSettingsSer
 
 
 @app.post("/api/bulk-purchase")
-async def bulk_purchase(background_tasks: BackgroundTasks, service: ShopSettingsServiceDep, data: BulkPurchaseCreate):
+async def bulk_purchase(background_tasks: BackgroundTasks, service: SettingsDep, data: BulkPurchaseCreate):
     async def send_email_task():
         try:
             email_data = await generate_bulk_purchase_email(

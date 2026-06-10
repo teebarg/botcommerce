@@ -5,7 +5,7 @@ from app.core.logging import logger
 from app.core.notifications.channels import NotificationChannel
 from app.core.notifications.events import (
     BaseNotificationEvent,
-    InvoiceEvent,
+    SendInvoiceEvent,
     OrderConfirmedEvent,
     SendAbandonedCartEvent,
     SendPushNotificationEvent,
@@ -33,7 +33,7 @@ class NotificationService:
                 "template": "send_push_notification",
                 "channels": ["push"]
             },
-            InvoiceEvent: {
+            SendInvoiceEvent: {
                 "template": "send_invoice",
                 "channels": ["email"]
             }

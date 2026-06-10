@@ -1,4 +1,5 @@
 from typing import Annotated
+from app.core.dependencies.cart import get_cart_service
 from fastapi import APIRouter, Request, Cookie, Response, Depends
 from app.core.config import settings
 from app.prisma_client import prisma as db
@@ -6,7 +7,7 @@ import uuid
 from app.core.logging import get_logger
 from app.services.redis import set_session, delete_session
 from app.core.deps import verify_clerk_token
-from app.services.cart import merge_cart
+from app.services.cart import CartService
 
 logger = get_logger(__name__)
 
@@ -26,7 +27,7 @@ async def logout(request: Request, response: Response):
 
 
 @router.post("/exchange")
-async def exchange_token(response: Response, payload=Depends(verify_clerk_token), _cart_id: Annotated[str | None, Cookie()] = None):
+async def exchange_token(response: Response, payload=Depends(verify_clerk_token), _cart_id: Annotated[str | None, Cookie()] = None, cart_service: CartService = Depends(get_cart_service)):
     session_id = str(uuid.uuid4())
 
     clerk_id = payload["sub"]
@@ -67,6 +68,6 @@ async def exchange_token(response: Response, payload=Depends(verify_clerk_token)
         domain=settings.COOKIE_DOMAIN,
         max_age=60 * 60 * 24 * 30,
     )
-    await merge_cart(user_id=user.id, cart_number=_cart_id)
+    await cart_service.merge_guest_into_user_cart(user_id=user.id, cart_number=_cart_id)
 
     return session_data

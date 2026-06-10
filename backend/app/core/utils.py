@@ -13,7 +13,6 @@ from app.models.order import Order
 from app.models.user import User
 from app.models.coupon import Coupon
 from jinja2 import Environment, FileSystemLoader, Template
-from app.services.shop_settings import ShopSettingsService
 
 
 @dataclass
@@ -80,7 +79,8 @@ def slugify(text) -> str:
     return slug
 
 async def merge_metadata(metadata: Optional[dict[str, Any]] = {}) -> dict[str, Any]:
-    service = ShopSettingsService()
+    from app.core.dependencies.services import get_shop_settings_service
+    service = get_shop_settings_service()
     shop_name = await service.get("shop_name")
     shop_address = await service.get("address")
     shop_phone = await service.get("contact_phone")
@@ -282,7 +282,8 @@ async def send_email(
 
 
 async def generate_invoice_email(order: Order, user: User) -> EmailData:
-    service = ShopSettingsService()
+    from app.core.dependencies.services import get_shop_settings_service
+    service = get_shop_settings_service()
     header_title = "Your order has been processed successfully"
     template_name = "paid_invoice.html"
     description = "Your order has been processed"
@@ -446,9 +447,8 @@ async def generate_magic_link_email(email_to: str, magic_link: str, first_name: 
     return EmailData(html_content=html_content, subject="Sign in to your account")
 
 
-async def generate_welcome_email(email_to: str, first_name: str, coupon: Coupon) -> EmailData:
-    service = ShopSettingsService()
-    shop_name: str | None = await service.get("shop_name")
+async def generate_welcome_email(email_to: str, first_name: str, coupon: Coupon, shop_settings) -> EmailData:
+    shop_name: str | None = await shop_settings.get("shop_name")
 
     html_content: str = render_email_template(
         template_name="welcome.html",

@@ -1,3 +1,4 @@
+from app.core.dependencies.services import get_shop_settings_service
 from typing import Annotated, Literal, Optional
 
 from app.core.notifications.service import NotificationService
@@ -176,7 +177,4 @@ PrincipalDep = Annotated[Principal, Depends(get_principal)]
 
 Notification = Annotated[NotificationService, Depends(get_notification_service)]
 
-async def get_shop_settings_service() -> ShopSettingsService:
-    return ShopSettingsService()
-
-ShopSettingsServiceDep = Annotated[ShopSettingsService, Depends(get_shop_settings_service)]
+SettingsDep = Annotated[ShopSettingsService, Depends(get_shop_settings_service)]
