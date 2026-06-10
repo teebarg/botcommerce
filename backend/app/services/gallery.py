@@ -1,6 +1,7 @@
 from typing import Any, Optional, List, Dict
 import random
 import asyncio
+from app.services.storage import MediaStorageService
 from fastapi import HTTPException
 from app.core.logging import get_logger
 from app.core.utils import slugify, generate_sku
@@ -66,10 +67,11 @@ class GalleryRepository:
 
 class GalleryService:
     """Coordinates Business Domain Logics."""
-    def __init__(self, repo: GalleryRepository, db: Prisma, websocket_manager):
+    def __init__(self, repo: GalleryRepository, db: Prisma, websocket_manager, storage_srv: MediaStorageService):
         self.repo = repo
         self.db = db
         self.ws_manager = websocket_manager
+        self.storage = storage_srv
 
     @staticmethod
     def _build_variant_data(payload) -> dict[str, Any]:

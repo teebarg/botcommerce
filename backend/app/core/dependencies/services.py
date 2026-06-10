@@ -1,6 +1,7 @@
 from typing import Annotated
 from app.services.chat import ConversationService
 from backend.app.services.events import EventBus
+from backend.app.services.storage import MediaStorageService
 from backend.app.services.user_interaction import InteractionService
 from fastapi import Depends
 from app.prisma_client import prisma as db
@@ -10,16 +11,21 @@ from app.services.websocket import manager as ws_manager
 from app.services.shop_settings import ShopSettingsService
 from app.services.catalog import CatalogService
 
+def get_storage_service() -> MediaStorageService:
+    return MediaStorageService()
+
 def get_gallery_repository() -> GalleryRepository:
     return GalleryRepository(db=db)
 
 def get_gallery_service(
-    repo: GalleryRepository = Depends(get_gallery_repository)
+    repo: GalleryRepository = Depends(get_gallery_repository),
+    storage_srv: MediaStorageService = Depends(get_storage_service)
 ) -> GalleryService:
     return GalleryService(
         repo=repo,
         db=db,
-        websocket_manager=ws_manager
+        websocket_manager=ws_manager,
+        storage_srv=storage_srv
     )
 
 def get_shop_settings_service() -> ShopSettingsService:
@@ -34,14 +40,6 @@ def get_conversation_service():
 
 def get_event_bus() -> EventBus:
     return EventBus(redis=redis_client)
-
-
-# def get_activity_service():
-#     return ActivityService()
-
-
-# def get_storage_service():
-#     return MediaStorageService()
 
 
 def get_interaction_service(evt_bus: EventBus = Depends(get_event_bus)) -> InteractionService:

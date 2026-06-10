@@ -14,7 +14,6 @@ from app.core.dependencies.services import get_gallery_service
 from app.services.gallery import GalleryService
 from app.services.redis import cache_response, refresh_product
 from app.services.product import index_products, delete_product_index, index_product
-from app.services.generic import remove_image_from_storage
 
 router = APIRouter()
 
@@ -39,17 +38,17 @@ async def image_gallery(
 async def delete_gallery_image(
     image_id: int,
     background_tasks: BackgroundTasks,
-    service: GalleryService = Depends(get_gallery_service)
+    srv: GalleryService = Depends(get_gallery_service)
 ) -> Message:
-    product_id, image_urls = await service.delete_image(image_id)
+    product_id, image_urls = await srv.delete_image(image_id)
 
     if not product_id:
         await refresh_product(tags=["gallery"])
-        background_tasks.add_task(remove_image_from_storage, image_urls[0])
+        background_tasks.add_task(srv.storage.remove_images, image_urls[0])
         return Message(message="Image deleted successfully")
 
     background_tasks.add_task(delete_product_index, product_ids=[product_id])
-    background_tasks.add_task(remove_image_from_storage, image_urls)
+    background_tasks.add_task(srv.storage.remove_images, image_urls)
     return Message(message="Image and all related data deleted successfully")
 
 
@@ -67,7 +66,7 @@ async def bulk_save_image_urls(
 async def bulk_delete_gallery_images(
     payload: ImageBulkDelete,
     background_tasks: BackgroundTasks,
-    service: GalleryService = Depends(get_gallery_service)
+    srv: GalleryService = Depends(get_gallery_service)
 ):
     if not payload.files:
         raise HTTPException(status_code=400, detail="No image IDs provided")
@@ -77,13 +76,13 @@ async def bulk_delete_gallery_images(
         raise HTTPException(status_code=404, detail="No images found")
 
     background_tasks.add_task(
-        service.process_bulk_delete_task,
+        srv.process_bulk_delete_task,
         payload=payload,
-        remove_storage_fn=remove_image_from_storage,
+        remove_storage_fn=srv.storage.remove_images,
         delete_index_fn=delete_product_index
     )
 
-    await service.ws_manager.broadcast_to_all({"status": "processing"}, "bulk_action")
+    await srv.ws_manager.broadcast_to_all({"status": "processing"}, "bulk_action")
     return {"success": True, "message": f"Deleting {len(images)} images..."}
 
 
