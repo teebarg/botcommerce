@@ -46,7 +46,7 @@ export const productFeedQuery = (params: FeedParams) =>
 
 export const catalogFeedQuery = (params: CatalogFeedParams) =>
     queryOptions({
-        queryKey: ["products", "catalog", JSON.stringify(params)],
+        queryKey: ["products", "catalog", params.slug],
         queryFn: () => getCatalogFn({ data: params }),
     });
 

@@ -34,7 +34,7 @@ export function InvalidateProvider({ children }: { children: React.ReactNode }) 
             }
             if (lastMessage.keys) {
                 const keys = parseEventKeys(lastMessage.keys);
-                keys.forEach((key) => {
+                keys.forEach((key: string[]) => {
                     queryClient.invalidateQueries({ queryKey: key });
                 });
             }

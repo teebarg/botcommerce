@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 import emails  # type: ignore
+from fastapi import Request
 from app.core.config import settings
 from app.core.logging import logger
 from app.models.order import Order
@@ -495,3 +496,9 @@ async def generate_abandoned_cart_email(cart_data: dict, user_email: str, user_n
         },
     )
     return EmailData(html_content=html_content, subject="Don't forget your items!")
+
+def get_client_ip(request: Request) -> str:
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host

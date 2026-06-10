@@ -6,6 +6,7 @@ from app.services.gallery import GalleryRepository, GalleryService
 from app.services.websocket import manager as ws_manager
 from app.services.recently_viewed import RecentlyViewedService
 from app.services.shop_settings import ShopSettingsService
+from app.services.catalog import CatalogService
 
 def get_gallery_repository() -> GalleryRepository:
     return GalleryRepository(db=db)
@@ -22,3 +23,6 @@ def get_gallery_service(
 
 def get_shop_settings_service() -> ShopSettingsService:
     return ShopSettingsService(redis=redis_client, db=db)
+
+def get_catalog_service() -> CatalogService:
+    return CatalogService(db=db)

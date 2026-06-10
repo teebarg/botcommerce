@@ -57,7 +57,7 @@ export const useDeleteCollection = () => {
 
 export const catalogsQuery = () =>
     queryOptions({
-        queryKey: ["catalogs"],
+        queryKey: ["catalog"],
         queryFn: () => clientApi.get<PaginatedCatalog>("/catalog/"),
         staleTime: Infinity,
     });

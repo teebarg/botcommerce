@@ -1,15 +1,14 @@
+from app.services.redis import cache_response
 from fastapi import APIRouter, HTTPException, Query, Request, Depends, BackgroundTasks
 from typing import List
 from app.prisma_client import prisma as db
 from app.services.catalog import CatalogService
-from math import ceil
-from app.services.redis import cache_response, refresh_data
+from app.core.dependencies.services import get_catalog_service
 from app.services.product import index_product, index_products
 from app.core.deps import UserDep
 from app.models.generic import Message
-
 from app.core.logging import get_logger
-from app.core.utils import slugify, url_to_list
+from app.core.utils import slugify, url_to_list, get_client_ip
 from app.services.meilisearch import get_or_create_index, ensure_index_ready
 from app.core.config import settings
 from meilisearch.errors import MeilisearchApiError
@@ -21,8 +20,39 @@ logger = get_logger(__name__)
 
 router = APIRouter()
 
-async def invalidate_catalog() -> None:
-    await refresh_data(patterns=["catalog"])
+
+def _build_search_filters(
+    slug: str,
+    cursor: int | None,
+    categories: str,
+    collections: str,
+    min_price: int,
+    max_price: int,
+    sizes: str,
+    colors: str,
+    width: str,
+    length: str,
+) -> list[str]:
+    filters = [f"catalogs IN [{slug}]"]
+
+    if categories:
+        filters.append(f"category_slugs IN {url_to_list(categories)}")
+    if collections:
+        filters.append(f"collection_slugs IN [{collections}]")
+    if min_price and max_price:
+        filters.append(f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}")
+    if sizes:
+        filters.append(f"sizes IN [{sizes}]")
+    if colors:
+        filters.append(f"colors IN [{colors}]")
+    if width:
+        filters.append(f"widths IN [{width}]")
+    if length:
+        filters.append(f"lengths IN [{length}]")
+    if cursor is not None:
+        filters.append(f"id < {cursor}")
+
+    return filters
 
 
 @router.get("/views")
@@ -34,57 +64,22 @@ async def list_catalogs_views() -> List[CatalogView]:
 @cache_response(key_prefix="catalog")
 async def list_catalogs(
     request: Request,
+    catalog_service: CatalogService = Depends(get_catalog_service),
     is_active: bool | None = None,
     product_id: int | None = None,
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
 ) -> Catalogs:
-    filters = []
-    # if query:
-    #     filters.append(f"(sc.title ILIKE '%{query}%' OR sc.slug ILIKE '%{query}%')")
-    if product_id:
-        filters.append(f"EXISTS (SELECT 1 FROM _SharedCollectionProducts ps WHERE ps.\"B\" = sc.id AND ps.\"A\" = {product_id})")
-    if is_active is not None:
-        filters.append(f"sc.is_active = {is_active}")
-
-    where_clause = " AND ".join(filters) if filters else "TRUE"
-
-    catalog_rows = await db.query_raw(
-        f"""
-        SELECT sc.id, sc.slug, sc.title, sc.description, sc.is_active, sc.view_count, created_at,
-               COUNT(ps."A") AS products_count
-        FROM "shared_collections" sc
-        LEFT JOIN "_SharedCollectionProducts" ps ON sc.id = ps."B"
-        WHERE {where_clause}
-        GROUP BY sc.id
-        ORDER BY sc.created_at DESC
-        OFFSET {skip}
-        LIMIT {limit}
-        """
+    return await catalog_service.list(
+        skip=skip,
+        limit=limit,
+        is_active=is_active,
+        product_id=product_id,
     )
 
-    total_result = await db.query_raw(
-        f"""
-        SELECT COUNT(*)::int AS count
-        FROM (
-            SELECT sc.id
-            FROM "shared_collections" sc
-            WHERE {where_clause}
-        ) sub
-        """
-    )
-    total = total_result[0]["count"]
-
-    return {
-        "catalogs": catalog_rows,
-        "skip": skip,
-        "limit": limit,
-        "total_pages": ceil(total / limit) if limit else 1,
-        "total_count": total,
-    }
 
 @router.get("/{slug}")
-@cache_response(key_prefix="product:catalog")
+@cache_response(key_prefix="catalog")
 async def search(
     request: Request,
     slug: str,
@@ -102,49 +97,31 @@ async def search(
     limit: int = Query(default=20, le=100),
     cursor: int | None = Query(default=None),
 ) -> CursorPaginatedCatalog:
-    """
-    Meilisearch keyset pagination (cursor-based)
-    """
-
+    """Meilisearch keyset pagination (cursor-based)"""
     where = {"slug": slug}
     if user is None or user.role != "ADMIN":
         where["is_active"] = True
+
     obj = await db.sharedcollection.find_unique(where=where)
     if not obj:
         raise HTTPException(status_code=404, detail="Catalog not found")
 
-    filters = [f"catalogs IN [{slug}]"]
-
-    if categories:
-        filters.append(f"category_slugs IN {url_to_list(categories)}")
-
-    if collections:
-        filters.append(f"collection_slugs IN [{collections}]")
-
-    if min_price and max_price:
-        filters.append(
-            f"min_variant_price >= {min_price} AND max_variant_price <= {max_price}"
-        )
-
-    if sizes:
-        filters.append(f"sizes IN [{sizes}]")
-
-    if colors:
-        filters.append(f"colors IN [{colors}]")
-
-    if width:
-        filters.append(f"widths IN [{width}]")
-
-    if length:
-        filters.append(f"lengths IN [{length}]")
-
-    if cursor is not None:
-        filters.append(f"id < {cursor}")
+    filters = _build_search_filters(
+        slug=slug,
+        cursor=cursor,
+        categories=categories,
+        collections=collections,
+        min_price=min_price,
+        max_price=max_price,
+        sizes=sizes,
+        colors=colors,
+        width=width,
+        length=length,
+    )
 
     search_params = {
         "limit": limit,
         "sort": [sort],
-
         "filter": " AND ".join(filters),
     }
 
@@ -152,8 +129,7 @@ async def search(
 
     try:
         search_results = index.search(search, search_params)
-
-    except MeilisearchApiError as e:
+    except MeilisearchApiError:
         ensure_index_ready(index)
         search_results = index.search(search, search_params)
 
@@ -177,10 +153,9 @@ async def track_catalog_visit(
     request: Request,
     slug: str,
     user: UserDep,
+    catalog_service: CatalogService = Depends(get_catalog_service),
 ) -> dict:
-    """
-    Track a unique visit to a catalog.
-    """
+    """Track a unique visit to a catalog."""
     where = {"slug": slug}
     if user is None or user.role != "ADMIN":
         where["is_active"] = True
@@ -189,65 +164,63 @@ async def track_catalog_visit(
     if not obj:
         raise HTTPException(status_code=404, detail="Catalog not found")
 
-    client_ip = request.client.host
-    if "x-forwarded-for" in request.headers:
-        client_ip = request.headers["x-forwarded-for"].split(",")[0].strip()
-
-    user_agent = request.headers.get("user-agent")
-
-    is_new_visit = await CatalogService.track_visit(
+    is_new_visit = await catalog_service.track_visit(
         catalog_id=obj.id,
         user_id=user.id if user else None,
-        ip_address=client_ip,
-        user_agent=user_agent
+        ip_address=get_client_ip(request),
+        user_agent=request.headers.get("user-agent"),
     )
 
     if is_new_visit:
-        await invalidate_catalog()
+        await catalog_service.invalidate_cache()
 
-    return {
-        "success": True,
-        "is_new_visit": is_new_visit,
-    }
+    return {"success": True, "is_new_visit": is_new_visit}
+
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create_catalog(data: CatalogCreate) -> Catalog:
+async def create_catalog(
+    data: CatalogCreate,
+    catalog_service: CatalogService = Depends(get_catalog_service),
+) -> Catalog:
     create_data = data.model_dump(exclude_unset=True)
-
-    # if data.products is not None:
-    #     create_data["products"] = {"connect": [{"id": id} for id in data.products]}
-
     create_data["slug"] = slugify(data.title)
     res = await db.sharedcollection.create(data=create_data)
-
-    await invalidate_catalog()
+    await catalog_service.invalidate_cache()
     return res
 
+
 @router.patch("/{id}", dependencies=[Depends(require_admin)])
-async def update_catalog(id: int, data: CatalogUpdate) -> Catalog:
+async def update_catalog(
+    id: int,
+    data: CatalogUpdate,
+    catalog_service: CatalogService = Depends(get_catalog_service),
+) -> Catalog:
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:
         raise HTTPException(status_code=404, detail="Catalog not found")
 
     update_data = data.model_dump(exclude_unset=True)
     if data.products is not None:
-        product_connect = [{"id": id} for id in data.products]
-        update_data["products"] = {"set": product_connect}
+        update_data["products"] = {"set": [{"id": pid} for pid in data.products]}
+
     res = await db.sharedcollection.update(where={"id": id}, data=update_data)
-
-    await invalidate_catalog()
-
+    await catalog_service.invalidate_cache()
     return res
 
+
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete_catalog(id: int) -> Message:
+async def delete_catalog(
+    id: int,
+    catalog_service: CatalogService = Depends(get_catalog_service),
+) -> Message:
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:
         raise HTTPException(status_code=404, detail="Catalog not found")
-    await db.sharedcollection.delete(where={"id": id})
 
-    await invalidate_catalog()
+    await db.sharedcollection.delete(where={"id": id})
+    await catalog_service.invalidate_cache()
     return {"message": "Catalog deleted successfully"}
+
 
 @router.post("/{id}/add-product/{product_id}", dependencies=[Depends(require_admin)])
 async def add_product_to_catalog(id: int, product_id: int, background_tasks: BackgroundTasks) -> Message:
@@ -262,12 +235,12 @@ async def add_product_to_catalog(id: int, product_id: int, background_tasks: Bac
 
     await db.sharedcollection.update(
         where={"id": id},
-        data={"products": {"connect": {"id": product_id}}}
+        data={"products": {"connect": {"id": product_id}}},
     )
 
     background_tasks.add_task(index_product, product_id=product_id)
-
     return {"message": "product added to catalog successfully"}
+
 
 @router.delete("/{id}/remove-product/{product_id}", dependencies=[Depends(require_admin)])
 async def remove_product_from_catalog(id: int, product_id: int, background_tasks: BackgroundTasks) -> Message:
@@ -278,11 +251,7 @@ async def remove_product_from_catalog(id: int, product_id: int, background_tasks
 
     await db.sharedcollection.update(
         where={"id": id},
-        data={
-            "products": {
-                "disconnect": {"id": product_id}
-            }
-        }
+        data={"products": {"disconnect": {"id": product_id}}},
     )
 
     background_tasks.add_task(index_product, product_id=product_id)
@@ -290,7 +259,7 @@ async def remove_product_from_catalog(id: int, product_id: int, background_tasks
 
 
 @router.post("/{id}/add-products", dependencies=[Depends(require_admin)])
-async def bulk_add_products_to_catalog(id: int, data: CatalogBulkAdd, background_tasks: BackgroundTasks) -> Message:
+async def bulk_add_products_to_catalog(id: int, data: CatalogBulkAdd, background_tasks: BackgroundTasks, catalog_service: CatalogService = Depends(get_catalog_service),) -> Message:
     """Bulk add products to a catalog"""
     catalog = await db.sharedcollection.find_unique(where={"id": id})
     if not catalog:
@@ -301,16 +270,12 @@ async def bulk_add_products_to_catalog(id: int, data: CatalogBulkAdd, background
 
     await db.sharedcollection.update(
         where={"id": id},
-        data={"products": {"connect": [{"id": pid} for pid in data.product_ids]}}
+        data={"products": {"connect": [{"id": pid} for pid in data.product_ids]}},
     )
 
-    await manager.broadcast_to_all(
-        data={"status": "completed"},
-        message_type="bulk_action",
-    )
-
+    await manager.broadcast_to_all(data={"status": "completed"}, message_type="bulk_action")
+    await catalog_service.invalidate_cache()
     background_tasks.add_task(index_products, product_ids=data.product_ids)
-
     return {"message": f"Added {len(data.product_ids)} product(s) to catalog"}
 
 
@@ -326,14 +291,9 @@ async def bulk_remove_products_from_catalog(id: int, data: CatalogBulkAdd, backg
 
     await db.sharedcollection.update(
         where={"id": id},
-        data={"products": {"disconnect": [{"id": pid} for pid in data.product_ids]}}
+        data={"products": {"disconnect": [{"id": pid} for pid in data.product_ids]}},
     )
 
-    await manager.broadcast_to_all(
-        data={"status": "completed"},
-        message_type="bulk_action",
-    )
-
+    await manager.broadcast_to_all(data={"status": "completed"}, message_type="bulk_action")
     background_tasks.add_task(index_products, product_ids=data.product_ids)
-
     return {"message": f"Removed {len(data.product_ids)} product(s) from catalog"}
