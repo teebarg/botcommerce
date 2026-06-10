@@ -21,7 +21,4 @@ def get_gallery_service(
     )
 
 def get_shop_settings_service() -> ShopSettingsService:
-    return ShopSettingsService(
-        redis=redis_client,
-        db=db,
-    )
+    return ShopSettingsService(redis=redis_client, db=db)

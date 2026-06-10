@@ -146,7 +146,7 @@ class RedisStreamConsumer:
 
     async def handle_order_paid(self, event):
         try:
-            order_service = get_order_service()
+            order_service = get_order_service(settings_service=self.shop_settings)
             await order_service.process_order_payment(order_id=int(event["order_id"]))
         except Exception as e:
             logger.error(

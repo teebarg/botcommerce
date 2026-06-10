@@ -8,10 +8,10 @@ from app.core.notifications.setup import get_notification_service
 def get_order_repository() -> OrderRepository:
     return OrderRepository(db=db)
 
-def get_order_service(service: SettingsDep) -> OrderService:
+def get_order_service(settings_service: SettingsDep) -> OrderService:
     return OrderService(
         db=db,
         coupon_service=CouponService(),
-        settings_service=service,
+        settings_service=settings_service,
         notification_dispatcher=get_notification_service()
     )
