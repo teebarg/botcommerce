@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from typing import List, Optional, Any
 from collections import Counter
+from backend.app.services.cache import CacheService
 from fastapi import HTTPException, Request
 
 from app.prisma_client import prisma as db
@@ -83,9 +84,10 @@ class SearchRepository:
 
 
 class ProductService:
-    def __init__(self, repo: ProductRepository, search_repo: SearchRepository):
+    def __init__(self, repo: ProductRepository, search_repo: SearchRepository, cache_service: CacheService):
         self.repo = repo
         self.search_repo = search_repo
+        self.cache_service = cache_service
 
     @cache_response(key_prefix="merchant_feed", expire=86400) # Caches for 24 hours
     async def generate_merchant_feed_xml(self, request: Request) -> str:

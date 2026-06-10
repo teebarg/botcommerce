@@ -4,13 +4,18 @@ from app.services.coupon import CouponService
 from app.services.events import EventBus
 from app.services.storage import MediaStorageService
 from app.services.user_interaction import InteractionService
-from fastapi import Depends
+from fastapi import Depends, Request
 from app.prisma_client import prisma as db
 from app.redis_client import redis_client
 from app.services.gallery import GalleryRepository, GalleryService
 from app.services.websocket import manager as ws_manager
 from app.services.shop_settings import ShopSettingsService
 from app.services.catalog import CatalogService
+from app.services.cache import CacheService
+
+def get_cache_service(request: Request) -> CacheService:
+    redis_client = request.app.state.redis 
+    return CacheService(redis_client)
 
 def get_coupon_service() -> CouponService:
     return CouponService(db=db)
@@ -48,3 +53,7 @@ def get_event_bus() -> EventBus:
 
 def get_interaction_service(evt_bus: EventBus = Depends(get_event_bus)) -> InteractionService:
     return InteractionService(event_bus=evt_bus)
+
+
+ConversationDep = Annotated[ConversationService, Depends(get_conversation_service)]
+SettingsDep = Annotated[ShopSettingsService, Depends(get_shop_settings_service)]

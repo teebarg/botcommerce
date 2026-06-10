@@ -1,5 +1,6 @@
 from app.services.redis import refresh_data
 from app.core.notifications.setup import init_notification_service
+from app.core.dependencies.services import SettingsDep
 import sentry_sdk
 import time
 from contextlib import asynccontextmanager
@@ -23,7 +24,6 @@ from app.redis_client import redis_client
 
 from app.core.logging import get_logger
 from app.consumer import RedisStreamConsumer
-from app.core.deps import SettingsDep
 from pydantic import BaseModel
 
 STREAM_NAME = "EVENT_STREAMS"

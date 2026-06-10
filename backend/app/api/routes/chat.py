@@ -1,4 +1,5 @@
 from app.services.redis import refresh_data
+from app.core.dependencies.services import ConversationDep
 from fastapi import APIRouter, HTTPException, Query, Depends
 from app.prisma_client import prisma as db
 from typing import Optional
@@ -7,7 +8,7 @@ from app.models.chat import ChatCloseRequest, PaginatedChats, Chat, ChatRequest,
 from app.models.generic import Message
 from app.services.websocket import manager
 from app.redis_client import redis_client
-from app.core.deps import ConversationDep, CurrentUser
+from app.core.deps import CurrentUser
 from datetime import datetime
 from app.core.permissions import require_admin
 from app.core.logging import get_logger

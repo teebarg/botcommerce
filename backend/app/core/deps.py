@@ -1,11 +1,9 @@
-from app.core.dependencies.services import get_conversation_service, get_shop_settings_service
 from typing import Annotated, Literal, Optional
 
 from app.core.notifications.service import NotificationService
 from app.core.notifications.setup import get_notification_service
-from app.services.chat import ConversationService
-from backend.app.core.dependencies.product import get_product_service
-from backend.app.services.product import ProductService
+from app.core.dependencies.product import get_product_service
+from app.services.product import ProductService
 import jwt
 from fastapi import Depends, HTTPException, status, Cookie
 from fastapi.security import APIKeyHeader, OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
@@ -19,7 +17,6 @@ from app.models.user import UserInternal as User
 from supabase import create_client, Client
 from app.services.redis import get_redis_dependency, get_session
 import redis.asyncio as redis
-from app.services.shop_settings import ShopSettingsService
 from app.core.logging import get_logger
 import time
 import httpx
@@ -180,7 +177,7 @@ PrincipalDep = Annotated[Principal, Depends(get_principal)]
 
 Notification = Annotated[NotificationService, Depends(get_notification_service)]
 
-SettingsDep = Annotated[ShopSettingsService, Depends(get_shop_settings_service)]
-ConversationDep = Annotated[ConversationService, Depends(get_conversation_service)]
+# SettingsDep = Annotated[ShopSettingsService, Depends(get_shop_settings_service)]
+# ConversationDep = Annotated[ConversationService, Depends(get_conversation_service)]
 
 ProductDep = Annotated[ProductService, Depends(get_product_service)]

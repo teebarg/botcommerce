@@ -1,5 +1,5 @@
 from typing import Any
-from app.core.deps import SettingsDep
+from app.core.dependencies.services import SettingsDep
 from fastapi import APIRouter, HTTPException, Request, Depends
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
