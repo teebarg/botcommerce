@@ -5,11 +5,10 @@ from app.core.logging import get_logger
 from app.core.dependencies.product import get_product_service
 from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks, Response, Request
 
-from app.core.deps import CurrentUser, UserDep
+from app.core.deps import CurrentUser, ProductDep, UserDep
 from app.models.generic import Message
 from app.models.product import ProductLite, VariantWithStatus, SearchProducts, FeedProducts, IndexProducts, ReviewStatus
 from app.core.permissions import require_admin
-from app.prisma_client import prisma as db
 from app.services.product import ProductService
 from app.services.redis import DEFAULT_EXPIRATION, EnhancedJSONEncoder, cache_response
 from app.services.product import index_product, index_products
@@ -144,9 +143,9 @@ async def read(
 
 @router.put("/variants/{variant_id}", dependencies=[Depends(require_admin)])
 async def update_variant(
-    variant_id: int, variant: VariantWithStatus, background_tasks: BackgroundTasks,
+    variant_id: int, variant: VariantWithStatus, srv: ProductDep, background_tasks: BackgroundTasks,
 ):
-    existing_variant = await db.productvariant.find_unique(where={"id": variant_id})
+    existing_variant = await srv.repo.get_variant(variant_id=variant_id)
     if not existing_variant:
         raise HTTPException(status_code=404, detail="Variant not found")
 
@@ -157,7 +156,7 @@ async def update_variant(
         update_data["status"] = "IN_STOCK" if update_data["inventory"] > 0 else "OUT_OF_STOCK"
 
     try:
-        updated_variant = await db.productvariant.update(where={"id": variant_id}, data=update_data)
+        updated_variant = await srv.repo.update_variant(variant_id=variant_id, update_data=update_data)
         background_tasks.add_task(index_product, product_id=existing_variant.product_id)
     except Exception as e:
         logger.error(e)

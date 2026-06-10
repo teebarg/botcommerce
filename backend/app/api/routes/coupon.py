@@ -1,5 +1,6 @@
 from app.models.generic import Message
 from typing import Annotated, Optional, List
+from app.core.dependencies.services import get_coupon_service
 from fastapi import APIRouter, Depends, HTTPException, Cookie, Query, Request
 from app.core.deps import UserDep, CurrentUser
 from app.models.coupon import (
@@ -137,23 +138,23 @@ async def delete_coupon(id: int):
 async def apply_coupon(
     code: str = Query(..., description="Coupon code to apply"),
     user: CurrentUser = None,
+    srv: CouponService = Depends(get_coupon_service),
     _cart_id: Annotated[str | None, Cookie()] = None
 ) -> Message:
     """
     Apply a coupon to a cart.
     """
-    service = CouponService()
     cart = await get_cart(cart_number=_cart_id, user_id=user.id if user else None)
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
 
-    coupon = await service.validate_coupon(
+    coupon = await srv.validate_coupon(
         code=code,
         cart=cart,
         user_id=user.id if user else None
     )
 
-    await service.apply_coupon_to_cart(coupon, cart)
+    await srv.apply_coupon_to_cart(coupon, cart)
     await refresh_data(patterns=["abandoned-carts", "coupons"])
     return Message(message="Coupon applied successfully")
 
@@ -161,12 +162,12 @@ async def apply_coupon(
 @router.post("/remove", response_model=dict)
 async def remove_coupon(
     user: UserDep = None,
+    srv: CouponService = Depends(get_coupon_service),
     _cart_id: Annotated[str | None, Cookie()] = None
 ) -> Message:
     """
     Remove coupon from cart.
     """
-    service = CouponService()
     cart = await get_cart(cart_number=_cart_id, user_id=user.id if user else None)
 
     if not cart:
@@ -175,7 +176,7 @@ async def remove_coupon(
     if not cart.coupon_id:
         raise HTTPException(status_code=400, detail="No coupon applied to this cart")
 
-    await service.remove_coupon_from_cart(cart)
+    await srv.remove_coupon_from_cart(cart)
 
     await refresh_data(patterns=["abandoned-carts", "coupons"])
 

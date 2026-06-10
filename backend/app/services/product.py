@@ -59,6 +59,12 @@ class ProductRepository:
         purchase_count, review_count = await asyncio.gather(purchase_count_task, review_count_task)
         return purchase_count > 0, review_count > 0
 
+    async def get_variant(self, variant_id: int):
+        return await self.db.productvariant.find_unique(where={"id": variant_id})
+
+    async def update_variant(self, variant_id: int, update_data: Any):
+        return await self.db.productvariant.update(where={"id": variant_id}, data=update_data)
+
 
 class SearchRepository:
     def __init__(self):
