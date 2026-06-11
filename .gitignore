@@ -1,32 +1,60 @@
-*.pyc
-*.pyo
-__pycache__
-.docker
-.git
-.env
-.env.staging
-.env.docker
-
-.idea/
-
-.DS_Store
-__pycache__
-__debug_bin
-.ipynb_checkpoints
-.python-version
-.idea
-.vscode
-jsconfig.json
-*.code-workspace
-*.bkp
-.vercel
-
-meilisearch-data
-
-app/dist
-agent/models
-app/src/routeTree.gen.ts
-
 frontend-context.md
 backend-context.md
 agent-context.md
+
+agent/models
+
+# ==============================================================================
+# System & IDE Artifacts
+# ==============================================================================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ==============================================================================
+# Local Environment Variables & Secrets
+# ==============================================================================
+.env
+.env.local
+*.env.*
+!.env.example
+
+# ==============================================================================
+# TanStack Start App Caches & Dependencies (app/)
+# ==============================================================================
+app/node_modules/
+app/.output/
+app/.vinxi/
+app/.nitro/
+app/.tanstack/
+app/dev-dist/
+
+app/public/sw.js
+app/public/workbox-*.js
+app/dist
+app/dist-ssr
+*.local
+.env
+
+app/src/routeTree.gen.ts
+
+# ==============================================================================
+# FastAPI Backend Caches & Dependencies (backend/)
+# ==============================================================================
+backend/.venv/
+backend/.uv/
+backend/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.uv/
+
+# ==============================================================================
+# Testing & Playwright Artifacts
+# ==============================================================================
+backend/test-results/
+backend/playwright-report/
+backend/.pytest_cache/

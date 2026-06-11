@@ -1,0 +1,22 @@
+FROM node:20-alpine
+
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+# Copy package definitions directly from the app folder
+COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* bun.lockb* ./
+
+# Install local project dependencies
+RUN \
+  if [ -f "package-lock.json" ]; then npm ci; \
+  elif [ -f "yarn.lock" ]; then yarn --frozen-lockfile; \
+  elif [ -f "pnpm-lock.yaml" ]; then corepack enable pnpm && pnpm i; \
+  elif [ -f "bun.lockb" ]; then corepack enable bun && bun install; \
+  else npm install; \
+  fi
+
+EXPOSE 3000
+EXPOSE 5173
+
+# Bind to all interfaces so the host can proxy the Vinxi dev engine
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
