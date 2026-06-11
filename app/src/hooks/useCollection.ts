@@ -7,7 +7,7 @@ import { Catalog, Collection, Message, PaginatedCatalog } from "@/schemas";
 
 export const collectionsQuery = (params?: { search?: string }) =>
     queryOptions({
-        queryKey: ["collections", params?.search],
+        queryKey: ["collections", params?.search ?? "all"],
         queryFn: () => clientApi.get<Collection[]>("/collection/", { params }),
         staleTime: Infinity,
     });

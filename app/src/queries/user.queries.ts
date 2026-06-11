@@ -70,10 +70,11 @@ export const ordersQuery = (params: { take?: number; status?: any; start_date?: 
         refetchOnMount: false,
     });
 
-export const userAddressesQuery = () =>
+export const userAddressesQuery = (userId: string | null) =>
     queryOptions({
-        queryKey: ["addresses"],
+        queryKey: ["addresses", userId?.toString()],
         queryFn: () => getUserAddressesFn(),
+        enabled: Boolean(userId),
     });
 
 export const collectionQuery = (slug: string) =>

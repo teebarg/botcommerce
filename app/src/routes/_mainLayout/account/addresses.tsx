@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 import type React from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { Edit3, Home, Plus, Trash2 } from "lucide-react";
@@ -86,15 +86,16 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false, in
 };
 
 export const Route = createFileRoute("/_mainLayout/account/addresses")({
-    loader: async ({ context: { queryClient } }) => {
-        await queryClient.ensureQueryData(userAddressesQuery());
+    loader: async ({ context: { queryClient, userId } }) => {
+        await queryClient.ensureQueryData(userAddressesQuery(userId));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
+    const { userId } = useRouteContext({ strict: false });
     const addState = useOverlayTriggerState({});
-    const { data } = useSuspenseQuery(userAddressesQuery());
+    const { data } = useSuspenseQuery(userAddressesQuery(userId!));
     const addresses = data.addresses;
 
     return (

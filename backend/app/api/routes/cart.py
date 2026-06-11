@@ -1,12 +1,12 @@
 from typing import Any, Dict, Optional, Annotated
 from datetime import datetime, timedelta, timezone
 from app.core.dependencies.cart import get_cart_repository, get_cart_service
+from app.services.cache import cacheable
 from fastapi import APIRouter, HTTPException, Request, BackgroundTasks, Depends, Cookie, Response
 from fastapi.responses import JSONResponse
 
 from app.prisma_client import prisma as db
 from app.core.deps import Notification, UserDep, CurrentUser
-from app.services.redis import cache_response, refresh_data
 from app.core.logging import get_logger
 from app.core.permissions import require_admin
 from app.core.config import settings
@@ -15,8 +15,9 @@ from prisma.enums import CartStatus
 from app.models.generic import Message
 from app.models.cart import (
     CartUpdate, CartItemCreate, CartItem, Cart, CartLite,
-    SendAbandonedCartReminders, PaginatedAbandonedCarts
+    SendAbandonedCartReminders
 )
+from app.models.abandoned_cart import PaginatedAbandonedCarts
 from app.core.notifications.events import SendAbandonedCartEvent
 from app.services.cart import CartRepository, CartService
 
@@ -153,7 +154,8 @@ async def update_cart(
 
             update_data["shipping_address"] = {"connect": {"id": address.id}}
             update_data["billing_address"] = {"connect": {"id": address.id}}
-            await refresh_data(keys=[f"addresses:{user.id if user else 'guest'}", f"address:{address.id}"])
+
+            await service.cache.invalidate(tags=[f"addresses:{user.id if user else 'guest'}"])
 
         if cart_update.status is not None:
             update_data["status"] = cart_update.status
@@ -183,11 +185,7 @@ async def update_cart(
         )
 
     await service.calculate_totals(cart_id=cart.id)
-
-    keys = [f"cart:{cart.cart_number}"]
-    if cart.user_id:
-        keys.append(f"cart:{cart.user_id}")
-    await refresh_data(patterns=["abandoned-carts"], keys=keys)
+    await service.cache.invalidate(tags=["abandoned-carts"])
 
     return updated_cart
 
@@ -205,7 +203,8 @@ async def apply_wallet(
 
     await service.apply_wallet_balance(cart=cart, user=user)
     await service.calculate_totals(cart_id=cart.id)
-    await refresh_data(patterns=["user"])
+    # await refresh_data(patterns=["user"])
+    await service.cache.invalidate(tags=["user"])
     return Message(message="Wallet balance applied successfully")
 
 
@@ -222,7 +221,8 @@ async def remove_wallet(
 
     await service.remove_wallet_balance(cart=cart, user=user)
     await service.calculate_totals(cart_id=cart.id)
-    await refresh_data(patterns=["user"])
+    # await refresh_data(patterns=["user"])
+    await service.cache.invalidate(tags=["user"])
     return Message(message="Wallet usage removed from cart session")
 
 
@@ -231,7 +231,7 @@ async def remove_wallet(
 # =====================================================================
 
 @router.get("/abandoned-carts", dependencies=[Depends(require_admin)])
-@cache_response(key_prefix="admin:abandoned-carts")
+@cacheable(key_prefix="abandoned-carts", tags=["abandoned-carts"])
 async def get_admin_abandoned_carts(
     request: Request,
     search: Optional[str] = None,
@@ -267,15 +267,10 @@ async def get_admin_abandoned_carts(
         include={"user": True, "items": {"include": {"variant": {"include": {"product": {"include": {"images": True}}}}}}}
     )
 
-    return {
-        "items": carts[:limit],
-        "next_cursor": carts[-1].id if len(carts) > limit else None,
-        "limit": limit
-    }
-
+    return PaginatedAbandonedCarts(items=carts[:limit], next_cursor=carts[-1].id if len(carts) > limit else None, limit=limit)
 
 @router.get("/abandoned-carts/stats", dependencies=[Depends(require_admin)])
-@cache_response(key_prefix="admin:abandoned-carts:stats")
+@cacheable(key_prefix="abandoned-carts:stats", tags=["abandoned-carts"])
 async def get_abandoned_carts_stats(request: Request, hours_threshold: int = 24):
     """Aggregates recovery metrics and potential revenue."""
     threshold_time = datetime.now(timezone.utc) - timedelta(hours=hours_threshold)

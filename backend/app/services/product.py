@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from typing import List, Optional, Any
 from collections import Counter
-from backend.app.services.cache import CacheService
+from app.services.cache import CacheService
 from fastapi import HTTPException, Request
 
 from app.prisma_client import prisma as db

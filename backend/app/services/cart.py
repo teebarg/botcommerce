@@ -1,9 +1,9 @@
 from app.models.cart import Cart
 from typing import Optional, Dict, Any
+from app.core.dependencies.cache import CacheDep
 from fastapi import HTTPException
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
-from app.services.redis import refresh_data
 from app.services.shop_settings import ShopSettingsService
 from app.core.utils import generate_id
 from prisma.enums import CartStatus
@@ -73,10 +73,11 @@ class CartRepository:
 
 
 class CartService:
-    def __init__(self, db: Prisma, settings_service: ShopSettingsService, coupon_service: CouponService):
+    def __init__(self, db: Prisma, cache: CacheDep, settings_service: ShopSettingsService, coupon_service: CouponService):
         self.db = db
         self.settings_service = settings_service
         self.coupon_service = coupon_service
+        self.cache = cache
 
     async def calculate_totals(self, cart_id: int) -> None:
         """Calculates and commits subtotal, tax, discounts, and wallet balances cleanly."""
@@ -125,7 +126,7 @@ class CartService:
                 data["payment_method"] = "WALLET"
 
             await self.db.cart.update(where={"id": cart.id}, data=data)
-            await refresh_data(patterns=["carts", "abandoned-carts"])
+            await self.cache.invalidate(tags=["abandoned-carts", f"cart:{cart.cart_number}"])
         except Exception as e:
             logger.error(f"Error calculating cart totals: {e}", exc_info=True)
 

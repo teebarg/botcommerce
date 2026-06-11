@@ -1,16 +1,13 @@
 import json
+import inspect
 import time
-from typing import List, Any, Callable, Union, Optional
+from typing import Coroutine, List, Any, Callable, Union, Optional
 from fastapi import Request
-from typing import List, Any, Callable, Union, Optional
 from datetime import datetime, timedelta
 from functools import wraps
-import json
-import inspect
-from fastapi import Request
-
 from app.core.logging import get_logger
 from app.services.websocket import manager
+from redis.asyncio import Redis  # Explicit type hints for the team
 
 logger = get_logger(__name__)
 
@@ -30,107 +27,192 @@ class EnhancedJSONEncoder(json.JSONEncoder):
         return str(o)
 
 class CacheService:
-    def __init__(self, redis_client):
+    def __init__(self, redis_client: Redis) -> None:
         self.redis = redis_client
 
     async def get(self, key: str) -> Optional[Any]:
-        """Safely fetch and parse JSON from cache."""
+        """Safely retrieves and deserializes JSON from Redis. No-op on failure."""
         try:
             cached = await self.redis.get(key)
             return json.loads(cached) if cached else None
         except Exception as e:
-            logger.error(f"[Cache] Read error for key {key}: {e}")
+            logger.error(f"[Cache] Read failure for key '{key}': {e}", exc_info=True)
             return None
 
-    async def set_with_tags(self, key: str, value: Any, expire: int, tags: List[str] = None):
+    async def set_with_tags(self, key: str, value: Any, expire: int, tags: list[str] = None) -> None:
         """
-        Stores cache data and links it to tracking tags using a Sorted Set (ZSET).
-        Scores match the expiration timestamp, preventing memory leaks.
+        Writes data to Redis and indexes it under tags using a Sorted Set (ZSET).
+        Uses timestamps as scores to allow effortless garbage collection of expired keys.
         """
+        tags = tags or []
+        now = int(time.time())
+        expire_at = now + expire
+        
         try:
-            now = int(time.time())
-            expire_at = now + expire
-            serialized_value = json.dumps(value, cls=EnhancedJSONEncoder)
-
+            serialized = json.dumps(value, cls=EnhancedJSONEncoder)
+            
             async with self.redis.pipeline(transaction=False) as pipe:
-                # 1. Set the actual data cache
-                pipe.setex(key, expire, serialized_value)
-
-                # 2. Track tags using expiration time as score
-                for tag in (tags or []):
+                # Set payload with TTL
+                pipe.setex(key, expire, serialized)
+                
+                # Index keys under tags
+                for tag in tags:
                     tag_key = f"tag:{tag}"
                     pipe.zadd(tag_key, {key: expire_at})
-                    pipe.expire(tag_key, expire)  # Keep the tag set alive
-                
+                    pipe.expire(tag_key, expire)  # Prevent tag indexes from outliving data
+                    
                 await pipe.execute()
         except Exception as e:
-            logger.error(f"[Cache] Write error for key {key}: {e}")
+            logger.error(f"[Cache] Write failure for key '{key}': {e}", exc_info=True)
 
-    async def invalidate_tag(self, tag: str) -> None:
+    async def invalidate(self, *keys: str, tags: list[str] = None) -> None:
         """
-        Invalidates all active keys associated with a tag and 
-        cleans up any naturally expired keys from the tracking set.
+        Surgically invalidates explicit keys and/or entire tag groups.
+        Replaces dangerous, un-indexed O(N) database SCANs with highly efficient O(1) lookups.
+        
+        Usage:
+            await service.invalidate("user:123", f"addresses:{id}")
+            await service.invalidate(tags=["coupons", "products"])
         """
-        tag_key = f"tag:{tag}"
+        tag_list = tags or []
         now = int(time.time())
+        valid_keys = [k for k in keys if k and k.strip()]
+        print("valid_keys........................")
+        print(valid_keys)
+        print(tag_list)
+        invalidated_keys = list(valid_keys)
+        invalidated_keys.extend(tag_list)
 
-        try:
-            async with self.redis.pipeline(transaction=False) as pipe:
-                # Proactive Housekeeping: Remove naturally expired keys from this tag set
-                pipe.zremrangebyscore(tag_key, 0, now)
-                # Fetch all remaining active keys under this tag
-                pipe.zrange(tag_key, 0, -1)
-                _, active_keys = await pipe.execute()
+        # Batch delete explicit direct keys
+        if valid_keys:
+            try:
+                async with self.redis.pipeline(transaction=False) as pipe:
+                    pipe.delete(*valid_keys)
+                    await pipe.execute()
+            except Exception as e:
+                logger.error(f"[Cache] Explicit invalidation failed for keys {valid_keys}: {e}", exc_info=True)
 
-            if not active_keys:
-                return
+        # Tag-based invalidation via ZSET index lookups
+        for tag in tag_list:
+            tag_key = f"tag:{tag}"
+            try:
+                async with self.redis.pipeline(transaction=False) as pipe:
+                    # Self-cleaning housekeeping: Evict dead elements from the tracking index
+                    pipe.zremrangebyscore(tag_key, 0, now)
+                    # Retrieve remaining active cache keys under this tag
+                    pipe.zrange(tag_key, 0, -1)
+                    _, active_keys = await pipe.execute()
 
-            # Delete the actual data keys and the tag tracking index itself
-            async with self.redis.pipeline(transaction=False) as pipe:
-                pipe.delete(*active_keys)
-                pipe.delete(tag_key)
-                await pipe.execute()
-                
-        except Exception as e:
-            logger.error(f"[Cache] Invalidation error for tag {tag}: {e}")
+                if active_keys:
+                    # Cast bytes from Redis back to strings if necessary
+                    # decoded_keys = [k.decode('utf-8') if isinstance(k, bytes) else k for k in active_keys]
+                    # invalidated_keys.extend(decoded_keys)
+                    
+                    async with self.redis.pipeline(transaction=False) as pipe:
+                        pipe.delete(*active_keys)
+                        pipe.delete(tag_key)
+                        await pipe.execute()
+            except Exception as e:
+                logger.error(f"[Cache] Tag invalidation failed for tag '{tag}': {e}", exc_info=True)
+
+        # Synchronize cache invalidation downstream to edge clients over WebSockets
+        if invalidated_keys:
+            await manager.broadcast_to_all(
+                data={"keys": list(set(invalidated_keys))},
+                message_type="invalidate",
+            )
 
 
-def cache_response(
+def cacheable(
     key_prefix: str,
-    key: Union[str, Callable[..., str], None] = None,
+    key_builder: Optional[Callable[..., Any]] = None,
     expire: int = DEFAULT_EXPIRATION,
-    tags: List[str] = None,
+    tags: Optional[Union[list[str], Callable[..., list[str]]]] = None  # <-- Can be a list OR a function
 ):
-    def decorator(func: Callable):
+    """Declarative route caching middleware supporting dynamic keys and tags."""
+    def decorator(func: Callable[..., Any]):
         @wraps(func)
-        async def wrapper(*args, **kwargs):
-            request: Request = kwargs.get("request")
+        async def wrapper(*args: Any, **kwargs: Any) -> Any:
+            request: Optional[Request] = kwargs.get("request")
             if not request:
-                raise ValueError("FastAPI Request object missing from endpoint arguments.")
+                raise RuntimeError(f"Mandatory 'request: Request' parameter missing in {func.__name__}")
 
-            # Resolve the CacheService from app state
-            redis_client = request.app.state.redis
-            cache = CacheService(redis_client)
+            cache = CacheService(request.app.state.redis)
 
-            # Build Cache Key
-            if isinstance(key, str):
-                raw_key = f"{key_prefix}:{key}"
-            elif callable(key):
-                sig = inspect.signature(key)
-                filtered_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters.keys()}
-                raw_key = f"{key_prefix}:{key(**filtered_kwargs)}"
+            # 1. Evaluate Dynamic Cache Key
+            if callable(key_builder):
+                sig = inspect.signature(key_builder)
+                filtered_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
+                raw_key = f"{key_prefix}:{key_builder(**filtered_kwargs)}"
             else:
                 raw_key = f"{key_prefix}:{request.url.path}?{request.url.query}"
 
-            # 1. Read hit
+            # 2. Read Hit
             cached_data = await cache.get(raw_key)
             if cached_data is not None:
                 return cached_data
 
-            # 2. Cache miss -> Execute function
+            # 3. Cache Miss -> Execute Controller
             result = await func(*args, **kwargs)
 
-            # 3. Write back safely using the new ZSET implementation
+            # 4. Evaluate Dynamic Tags at Runtime
+            resolved_tags = []
+            if callable(tags):
+                # Inspect the lambda to extract matching parameters from kwargs (like user)
+                sig = inspect.signature(tags)
+                filtered_tags_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
+                resolved_tags = tags(**filtered_tags_kwargs)
+            elif isinstance(tags, list):
+                resolved_tags = tags
+
+            # 5. Populate Cache
+            await cache.set_with_tags(key=raw_key, value=result, expire=expire, tags=resolved_tags)
+
+            return result
+        return wrapper
+    return decorator
+
+
+def cacheable2(
+    key_prefix: str,
+    key_builder: Optional[Callable[..., str]] = None,
+    expire: int = DEFAULT_EXPIRATION,
+    tags: Optional[Union[list[str], Callable[..., list[str]]]] = None,
+):
+    """
+    Declarative route caching middleware. Requires `request: Request` in the endpoint signature.
+    """
+    def decorator(func: Callable[..., Coroutine[Any, Any, Any]]):
+        @wraps(func)
+        async def wrapper(*args: Any, **kwargs: Any) -> Any:
+            request: Optional[Request] = kwargs.get("request")
+            if not request:
+                raise RuntimeError(
+                    f"DeveloperError: @cache on '{func.__name__}' missing mandatory 'request: Request' parameter."
+                )
+
+            # Initialize local CacheService from request scope state
+            cache = CacheService(request.app.state.redis)
+
+            # Deterministic Cache Key Evaluation
+            if callable(key_builder):
+                sig = inspect.signature(key_builder)
+                filtered_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
+                raw_key = f"{key_prefix}:{key_builder(**filtered_kwargs)}"
+            elif isinstance(key_builder, str):
+                raw_key = f"{key_prefix}:{key_builder}"
+            else:
+                raw_key = f"{key_prefix}:{request.url.path}?{request.url.query}"
+
+            # Cache Execution Flow (Cache-Aside pattern)
+            cached_data = await cache.get(raw_key)
+            if cached_data is not None:
+                return cached_data
+
+            # Invoke the underlying controller endpoint
+            result = await func(*args, **kwargs)
+
+            # Populate cache background worker
             await cache.set_with_tags(key=raw_key, value=result, expire=expire, tags=tags)
 
             return result

@@ -1,5 +1,5 @@
-from app.core.dependencies.services import get_cache_service
-from backend.app.services.cache import CacheService
+from app.services.cache import CacheService
+from app.core.dependencies.cache import get_cache_service
 from fastapi import Depends, Request
 from app.prisma_client import prisma as db
 from app.services.product import ProductRepository, SearchRepository, ProductService
