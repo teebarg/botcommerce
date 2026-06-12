@@ -32,7 +32,7 @@ export interface CouponParams {
 export const couponsQuery = (params: CouponParams) => ({
     queryKey: ["coupons", params],
     queryFn: () =>
-        clientApi.get<PaginatedCoupons>("/coupon/", {
+        api.get<PaginatedCoupons>("/coupon/", {
             params: {
                 query: params?.query || "",
                 is_active: params?.isActive,

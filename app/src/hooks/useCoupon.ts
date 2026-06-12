@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { clientApi } from "@/utils/api.client";
 import { Coupon } from "@/schemas";
+import { api } from "@/utils/api";
 
 type CreateCouponData = {
     code: string;
@@ -22,13 +22,8 @@ type UpdateCouponInput = {
 };
 
 export const useCreateCoupon = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
-        mutationFn: async (data: CreateCouponData) => await clientApi.post<Coupon>("/coupon/", data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["coupons"] });
-        },
+        mutationFn: async (data: CreateCouponData) => await api.post<Coupon>("/coupon/", data),
         onError: (error: any) => {
             toast.error("Failed to create coupon: " + (error?.message || "Unknown error"));
         },
@@ -36,12 +31,9 @@ export const useCreateCoupon = () => {
 };
 
 export const useUpdateCoupon = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
-        mutationFn: async ({ id, data }: UpdateCouponInput) => await clientApi.patch<Coupon>(`/coupon/${id}`, data),
+        mutationFn: async ({ id, data }: UpdateCouponInput) => await api.patch<Coupon>(`/coupon/${id}`, data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["coupons"] });
             toast.success("Coupon updated successfully");
         },
         onError: (error: any) => {
@@ -51,12 +43,9 @@ export const useUpdateCoupon = () => {
 };
 
 export const useDeleteCoupon = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
-        mutationFn: async (id: number) => await clientApi.delete<void>(`/coupon/${id}`),
+        mutationFn: async (id: number) => await api.delete<void>(`/coupon/${id}`),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["coupons"] });
             toast.success("Coupon deleted successfully");
         },
         onError: (error: any) => {
@@ -69,7 +58,7 @@ export const useApplyCoupon = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (code: string) => await clientApi.post<Coupon>("/coupon/apply", null, { params: { code } }),
+        mutationFn: async (code: string) => await api.post<Coupon>("/coupon/apply", null, { params: { code } }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Coupon applied successfully");
@@ -87,7 +76,7 @@ export const useRemoveCoupon = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async () => await clientApi.post<void>("/coupon/remove"),
+        mutationFn: async () => await api.post<void>("/coupon/remove"),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Coupon removed successfully");
@@ -99,13 +88,8 @@ export const useRemoveCoupon = () => {
 };
 
 export const useToggleCouponStatus = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
-        mutationFn: async (id: number) => await clientApi.patch<Coupon>(`/coupon/${id}/toggle-status`),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["coupons"] });
-        },
+        mutationFn: async (id: number) => await api.patch<Coupon>(`/coupon/${id}/toggle-status`),
         onError: (error: any) => {
             toast.error("Failed to toggle coupon status: " + (error?.message || "Unknown error"));
         },
@@ -113,13 +97,8 @@ export const useToggleCouponStatus = () => {
 };
 
 export const useAssignCoupon = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
-        mutationFn: async ({ id, userIds }: { id: number; userIds: number[] }) => await clientApi.post<void>(`/coupon/${id}/assign`, userIds),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["coupons"] });
-        },
+        mutationFn: async ({ id, userIds }: { id: number; userIds: number[] }) => await api.post<void>(`/coupon/${id}/assign`, userIds),
         onError: (error: any) => {
             toast.error("Failed to update coupon: " + (error?.message || "Unknown error"));
         },
@@ -140,7 +119,7 @@ interface CouponAnalytics {
 
 export const useCouponsAnalytics = () => {
     return useQuery({
-        queryKey: ["coupons"],
-        queryFn: async () => clientApi.get<CouponAnalytics>("/coupon/analytics"),
+        queryKey: ["coupons", "analytics"],
+        queryFn: async () => api.get<CouponAnalytics>("/coupon/analytics"),
     });
 };

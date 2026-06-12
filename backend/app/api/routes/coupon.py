@@ -1,6 +1,4 @@
-from app.models.generic import Message
 from typing import Annotated, Optional, List
-from app.core.dependencies.services import get_coupon_service
 from fastapi import APIRouter, Depends, HTTPException, Cookie, Query, Request
 from app.core.deps import UserDep, CurrentUser
 from app.models.coupon import (
@@ -12,18 +10,21 @@ from app.models.coupon import (
 from app.services.coupon import CouponService
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
-from app.services.redis import cache_response, refresh_data
 from prisma.errors import PrismaError
 from datetime import datetime, date
 from app.services.cart import get_cart
 from app.core.permissions import require_admin
+from app.models.generic import Message
+from app.core.dependencies.services import get_coupon_service
+from app.services.cache import cacheable
+from app.core.dependencies.cache import CacheDep
 
 logger = get_logger(__name__)
 router = APIRouter()
 
 
 @router.get("/", dependencies=[Depends(require_admin)])
-@cache_response(key_prefix="coupons")
+@cacheable(key_prefix="coupons", tags=["coupons"], expire=2592000)
 async def get_coupons(
     request: Request,
     query: Optional[str] = Query(""),
@@ -60,7 +61,7 @@ async def get_coupons(
 
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create_coupon(coupon_data: CouponCreate) -> Coupon:
+async def create_coupon(coupon_data: CouponCreate, cache: CacheDep) -> Coupon:
     """
     Create a new coupon.
     """
@@ -75,7 +76,7 @@ async def create_coupon(coupon_data: CouponCreate) -> Coupon:
         data["code"] = code
         coupon = await db.coupon.create(data=data)
 
-        await refresh_data(patterns=["coupons"])
+        await cache.invalidate(tags=["coupons"])
         return coupon
     except PrismaError as e:
         logger.error(f"Error creating coupon: {str(e)}")
@@ -83,7 +84,7 @@ async def create_coupon(coupon_data: CouponCreate) -> Coupon:
 
 
 @router.patch("/{id}", dependencies=[Depends(require_admin)])
-async def update_coupon(id: int, coupon_data: CouponUpdate) -> Coupon:
+async def update_coupon(id: int, coupon_data: CouponUpdate, cache: CacheDep) -> Coupon:
     """
     Update a coupon.
     """
@@ -107,7 +108,7 @@ async def update_coupon(id: int, coupon_data: CouponUpdate) -> Coupon:
             data=data
         )
 
-        await refresh_data(patterns=["coupons"])
+        await cache.invalidate(tags=["coupons"])
         return updated_coupon
     except HTTPException:
         raise
@@ -117,7 +118,7 @@ async def update_coupon(id: int, coupon_data: CouponUpdate) -> Coupon:
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete_coupon(id: int):
+async def delete_coupon(id: int, cache: CacheDep):
     """
     Delete a coupon.
     """
@@ -127,7 +128,7 @@ async def delete_coupon(id: int):
 
     try:
         await db.coupon.delete(where={"id": id})
-        await refresh_data(patterns=["coupons"])
+        await cache.invalidate(tags=["coupons"])
         return {"message": "Coupon deleted successfully"}
     except PrismaError as e:
         logger.error(f"Error deleting coupon: {str(e)}")
@@ -136,6 +137,7 @@ async def delete_coupon(id: int):
 
 @router.post("/apply")
 async def apply_coupon(
+    cache: CacheDep,
     code: str = Query(..., description="Coupon code to apply"),
     user: CurrentUser = None,
     srv: CouponService = Depends(get_coupon_service),
@@ -155,12 +157,13 @@ async def apply_coupon(
     )
 
     await srv.apply_coupon_to_cart(coupon, cart)
-    await refresh_data(patterns=["abandoned-carts", "coupons"])
+    await cache.invalidate(tags=["abandoned-carts", "coupons"])
     return Message(message="Coupon applied successfully")
 
 
 @router.post("/remove", response_model=dict)
 async def remove_coupon(
+    cache: CacheDep,
     user: UserDep = None,
     srv: CouponService = Depends(get_coupon_service),
     _cart_id: Annotated[str | None, Cookie()] = None
@@ -178,13 +181,13 @@ async def remove_coupon(
 
     await srv.remove_coupon_from_cart(cart)
 
-    await refresh_data(patterns=["abandoned-carts", "coupons"])
+    await cache.invalidate(tags=["abandoned-carts", "coupons"])
 
     return {"message": "Coupon removed successfully"}
 
 
 @router.post("/{id}/assign", dependencies=[Depends(require_admin)])
-async def assign_coupon(id: int, user_ids: List[int]):
+async def assign_coupon(id: int, cache: CacheDep, user_ids: List[int]):
     """
     Share a coupon with specific users.
 
@@ -199,7 +202,7 @@ async def assign_coupon(id: int, user_ids: List[int]):
             update_data["scope"] = CouponScope.SPECIFIC_USERS
         await db.coupon.update(where={"id": id}, data=update_data)
 
-        await refresh_data(patterns=["coupons"])
+        await cache.invalidate(tags=["coupons"])
         return {"message": f"Coupon shared with {len(user_ids)} user(s) successfully"}
     except PrismaError as e:
         logger.error(f"Error sharing coupon: {str(e)}")
@@ -207,7 +210,7 @@ async def assign_coupon(id: int, user_ids: List[int]):
 
 
 @router.patch("/{id}/toggle-status", dependencies=[Depends(require_admin)])
-async def toggle_coupon_status(id: int) -> Coupon:
+async def toggle_coupon_status(id: int, cache: CacheDep) -> Coupon:
     """
     Toggle coupon active status.
     """
@@ -221,7 +224,7 @@ async def toggle_coupon_status(id: int) -> Coupon:
             data={"is_active": not coupon.is_active}
         )
 
-        await refresh_data(patterns=["coupons"])
+        await cache.invalidate(tags=["coupons"])
         return updated_coupon
     except PrismaError as e:
         logger.error(f"Error toggling coupon status: {str(e)}")

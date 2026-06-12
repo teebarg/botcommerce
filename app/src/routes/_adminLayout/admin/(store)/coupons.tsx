@@ -13,8 +13,8 @@ import { SwipeableCouponCard } from "@/components/admin/coupons/swipeable-coupon
 import { couponsQuery } from "@/queries/admin.queries";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { Coupon, PaginatedCoupons } from "@/schemas";
-import { clientApi } from "@/utils/api.client";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
+import { api } from "@/utils/api";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/coupons")({
     validateSearch: z.object({
@@ -36,7 +36,7 @@ function RouteComponent() {
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteResource<PaginatedCoupons, Coupon>({
         queryKey: ["coupons", "infinite", params],
-        queryFn: (cursor) => clientApi.get<PaginatedCoupons>("/coupon/", { params: { cursor, ...params } }),
+        queryFn: (cursor) => api.get<PaginatedCoupons>("/coupon/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
         initialData: initialCoupons,
@@ -50,10 +50,7 @@ function RouteComponent() {
     };
 
     const toggleStatus = async (id: number) => {
-        try {
-            await toggleMutation.mutateAsync(id);
-            toast.success("Coupon status updated successfully");
-        } catch (error) {}
+        await toggleMutation.mutateAsync(id)
     };
 
     const handleDelete = async (id: number, code: string) => {
@@ -61,7 +58,7 @@ function RouteComponent() {
         try {
             await deleteMutation.mutateAsync(id);
             toast.success("Coupon deleted successfully", { id: toastId });
-        } catch (error) {}
+        } catch (error) { }
     };
     return (
         <div className="mx-auto max-w-5xl w-full py-4 px-2.5">
