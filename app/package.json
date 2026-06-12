@@ -1,12 +1,6 @@
 {
     "name": "shop-frontend",
     "version": "1.0.0",
-    "pnpm": {
-        "onlyBuiltDependencies": [
-            "esbuild",
-            "@clerk/shared"
-        ]
-    },
     "private": true,
     "author": "Adeniyi <neyostica2000@yahoo.com> (https://www.niyi.com.ng)",
     "description": "A robust e-commerce storefront built with Tanstack",
@@ -18,7 +12,7 @@
     "type": "module",
     "scripts": {
         "dev-debug": "echo 'Debug mode - container will stay alive' && tail -f /dev/null",
-        "dev": "cross-env NODE_OPTIONS=--use-system-ca vite dev --host 0.0.0.0 --port 5174",
+        "dev": "cross-env NODE_OPTIONS=--use-system-ca vite dev --host 0.0.0.0",
         "build": "vite build",
         "preview": "vite preview",
         "test": "vitest run",

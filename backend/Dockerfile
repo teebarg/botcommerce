@@ -1,60 +1,48 @@
-# # ---------- STAGE 1: Builder ----------
-# FROM python:3.11-slim AS builder
-# WORKDIR /app
-
-# # Copy uv (fast dependency installer)
-# COPY --from=ghcr.io/astral-sh/uv:0.5.11 /uv /uvx /bin/
-
-# # Environment for uv
-# ENV PATH="/app/.venv/bin:$PATH"
-# ENV UV_COMPILE_BYTECODE=1
-# ENV UV_LINK_MODE=copy
-# ENV UV_HTTP_TIMEOUT=600
-
-# # Copy only dependency metadata
-# COPY pyproject.toml uv.lock ./
-
-# # Install dependencies into a virtual env (.venv)
-# RUN --mount=type=cache,target=/root/.cache/uv \
-#     uv sync --frozen --no-dev
-
-
-# # ---------- STAGE 2: Final Runtime ----------
-# FROM python:3.11-slim AS runtime
-# WORKDIR /app
-
-# # Copy the virtualenv from builder (only compiled packages)
-# COPY --from=builder /app/.venv /app/.venv
-# ENV PATH="/app/.venv/bin:$PATH"
-# ENV PYTHONPATH=/app
-
-# COPY ./app /app/app
-
-# CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
-
-# Stage 1: Fast Build Context
+# ==========================================
+# STAGE 1: The Build Environment
+# ==========================================
 FROM beafdocker/fastapi-base:latest AS builder
+
 WORKDIR /app
+
+# Install Node.js purely to run the Prisma generator engine
+RUN apt-get update && apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY pyproject.toml uv.lock* ./
-RUN uv sync --frozen --no-dev --no-install-project
 
-# Stage 2: Clean Runtime Context
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-install-project --no-dev
+
+COPY prisma ./prisma
+ENV PRISMA_USE_GLOBAL_NODE=true
+
+RUN uv run prisma generate
+
+
+# ==========================================
+# STAGE 2: The Slim Runtime Environment
+# ==========================================
 FROM python:3.11-slim AS runner
+
 WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-ENV PATH="/app/.venv/bin:$PATH"
+# Copy the lean UV binary so we can execute scripts seamlessly
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# Setup a secure non-root boundary
-RUN addgroup --system fastapi && adduser --system --ingroup fastapi appuser
-
-# Copy over ONLY the compiled environment and app source code
+# Bring over only the compiled virtual environment from the builder
 COPY --from=builder /app/.venv /app/.venv
-COPY ./app /app/app
 
-RUN chown -R appuser:fastapi /app
-USER appuser
+# Copy your production application source code
+COPY ./app ./app
+
+# Set optimization flags for Python production performance
+ENV PATH="/app/.venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
 
 EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+
+CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]

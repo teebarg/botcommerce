@@ -1,6 +1,6 @@
 from typing import Optional
-from backend.app.core.dependencies.cache import CacheDep
-from backend.app.services.cache import cacheable
+from app.core.dependencies.cache import CacheDep
+from app.services.cache import cacheable
 from fastapi import APIRouter, HTTPException, Query, Depends, Request
 from app.core.deps import CurrentUser
 from app.models.wishlist import Wishlists, WishlistCreate

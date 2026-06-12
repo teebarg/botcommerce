@@ -16,7 +16,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
 
     if (params) {
         Object.entries(params).forEach(([key, value]) => {
-            if (!value || value === undefined) return;
+            if (value === null || value === undefined) return;
             url.searchParams.append(key, value.toString());
         });
     }
@@ -32,18 +32,21 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
         headers,
     });
 
-    if (response.status === 403) {
-        throw redirect({
-            to: "/forbidden",
-        });
-    }
+    const incomingUrl = new URL(request.url);
+    const currentPathAndSearch = `${incomingUrl.pathname}${incomingUrl.search}`;
 
     if (response.status === 401) {
         throw redirect({
             to: "/sign-in",
             search: {
-                redirect: "/",
+                redirect: currentPathAndSearch,
             },
+        });
+    }
+
+    if (response.status === 403) {
+        throw redirect({
+            to: "/forbidden",
         });
     }
 

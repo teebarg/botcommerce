@@ -4,17 +4,11 @@ services:
       context: ./app
       dockerfile: Dockerfile.dev
     container_name: shop
-    ports:
-      - "3000:3000"       # Primary application server
-      - "5173:5173"       # Vinxi / Vite HMR WebSocket connection
     environment:
       - NODE_ENV=development
-      - WATCHPACK_POLLING=true
     volumes:
       - ./app:/app
       - /app/node_modules
-      - /app/.output
-      - /app/.vinxi
     depends_on:
       shop-api:
         condition: service_healthy
@@ -23,7 +17,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=dev-net
-      - traefik.http.services.shop.loadbalancer.server.port=5173
+      - traefik.http.services.shop.loadbalancer.server.port=3000
       - traefik.http.routers.shop.rule=Host(`shop.localhost`)
       - traefik.http.routers.shop.entrypoints=https
       - traefik.http.routers.shop.tls=true
@@ -57,7 +51,7 @@ services:
         INSTALL_DEV: ${INSTALL_DEV-false}
     platform: linux/amd64 # Patch for M1 Mac
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
       interval: 10s
       timeout: 5s
       retries: 3

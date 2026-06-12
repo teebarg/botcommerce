@@ -112,6 +112,12 @@ agent-context:
 	@cd agent && npx repomix
 
 
+
+# Prod
+test-prod:
+	$(DOCKER_COMPOSE) -f docker-compose.prod.yml up --build
+
+
 .PHONY: help
 help:
 	@echo "Available commands:"
