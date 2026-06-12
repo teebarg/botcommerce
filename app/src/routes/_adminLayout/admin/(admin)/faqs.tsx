@@ -10,12 +10,12 @@ import type { FAQ } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
 import FaqActions from "@/components/admin/faq/faq-actions";
 import SheetDrawer from "@/components/sheet-drawer";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 
 const faqsQuery = () =>
     queryOptions({
         queryKey: ["faqs"],
-        queryFn: () => clientApi.get<FAQ[]>("/faq/"),
+        queryFn: () => api.get<FAQ[]>("/faq/"),
         staleTime: Infinity,
     });
 

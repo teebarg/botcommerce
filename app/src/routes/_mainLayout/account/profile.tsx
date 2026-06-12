@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import type { Message } from "@/schemas";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useInvalidate } from "@/hooks/useApi";
 import { tryCatch } from "@/utils/try-catch";
 import { Separator } from "@/components/ui/separator";
 import { updateAuthSession } from "@/utils/auth-client";
@@ -41,7 +40,6 @@ export const Route = createFileRoute("/_mainLayout/account/profile")({
 
 function RouteComponent() {
     const [editingSection, setEditingSection] = useState<string | null>(null);
-    const invalidate = useInvalidate();
     const [isPending, setIsPending] = useState<boolean>(false);
     const { session } = Route.useRouteContext();
 
@@ -76,7 +74,6 @@ function RouteComponent() {
             email: session?.user?.email!,
             mode: "refresh",
         });
-        invalidate("me");
         toast.success("Profile updated successfully");
         setEditingSection(null);
         setIsPending(false);

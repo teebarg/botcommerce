@@ -6,7 +6,6 @@ import DeliveryOptionForm from "./delivery-option-form";
 import { Button } from "@/components/ui/button";
 import type { DeliveryOption, Message } from "@/schemas";
 import { useDeliveryOptions } from "@/hooks/useApi";
-import { useInvalidate } from "@/hooks/useApi";
 import { Badge } from "@/components/ui/badge";
 import { currency } from "@/utils";
 import ServerError from "@/components/generic/server-error";
@@ -21,7 +20,6 @@ import { clientApi } from "@/utils/api.client";
 const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
     const editState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
-    const invalidate = useInvalidate();
     const [isPending, setIsPending] = useState<boolean>(false);
 
     const getIcon = (iconName: string) => {
@@ -41,7 +39,6 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
 
         if (!error) {
             toast.success("Delivery option deleted successfully");
-            invalidate("delivery");
             deleteState.close();
         }
         setIsPending(false);

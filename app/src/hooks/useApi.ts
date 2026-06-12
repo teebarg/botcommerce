@@ -130,17 +130,8 @@ export const useSendPushNotification = () => {
 export const useDeliveryOptions = () => {
     return useQuery({
         queryKey: ["delivery"],
-        queryFn: () => clientApi.get<DeliveryOption[]>("/delivery/"),
+        queryFn: () => api.get<DeliveryOption[]>("/delivery/"),
         staleTime: Infinity,
     });
 };
 
-export const useInvalidate = () => {
-    const queryClient = useQueryClient();
-
-    const invalidate = (key: string) => {
-        queryClient.invalidateQueries({ queryKey: [key] });
-    };
-
-    return invalidate;
-};

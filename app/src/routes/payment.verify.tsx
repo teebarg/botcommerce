@@ -1,9 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import PaymentLoading from "@/components/store/payment/payment-loading";
-import { useInvalidate } from "@/hooks/useApi";
 import z from "zod";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { clientApi } from "@/utils/api.client";
 import { Order } from "@/schemas";
 
@@ -18,7 +17,7 @@ export const Route = createFileRoute("/payment/verify")({
 
 function RouteComponent() {
     const navigate = useNavigate();
-    const invalidate = useInvalidate();
+    const queryClient = useQueryClient();
     const { reference } = Route.useSearch();
 
     const { data, error, isPending } = useQuery({
@@ -36,7 +35,7 @@ function RouteComponent() {
     }
 
     if (data?.payment_status === "SUCCESS") {
-        invalidate("cart");
+        queryClient.invalidateQueries({ queryKey: ["cart"] });
         navigate({ to: `/order/confirmed/${data?.order_number}` });
     }
 

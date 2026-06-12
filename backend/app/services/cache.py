@@ -125,7 +125,7 @@ class CacheService:
 
 def cacheable(
     key_prefix: str,
-    key_builder: Optional[Union[str, Callable[..., Any]]] = None,
+    key_builder: Optional[Union[str, bool, Callable[..., Any]]] = None,
     expire: int = DEFAULT_EXPIRATION,
     tags: Optional[Union[list[str], Callable[..., list[str]]]] = None  # <-- Can be a list OR a function
 ):
@@ -146,6 +146,8 @@ def cacheable(
                 raw_key = f"{key_prefix}:{key_builder(**filtered_kwargs)}"
             elif isinstance(key_builder, str):
                 raw_key = f"{key_prefix}:{key_builder}"
+            elif isinstance(key_builder, bool) and key_builder == False:
+                raw_key = f"{key_prefix}"
             else:
                 raw_key = f"{key_prefix}:{request.url.path}?{request.url.query}"
 

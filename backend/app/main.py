@@ -1,4 +1,3 @@
-from app.services.redis import refresh_data
 from app.core.notifications.setup import init_notification_service
 from app.core.dependencies.services import SettingsDep
 import sentry_sdk
@@ -319,12 +318,6 @@ async def generate_sitemap(request: Request):
 @app.on_event("startup")
 async def start_websocket_manager():
     await manager.start()
-
-
-@app.post("/api/invalidate-redis")
-async def invalidate_redis(key: str):
-    await refresh_data(patterns=[key])
-    return {"message": "success"}
 
 
 @app.post("/api/process-stale-messages")

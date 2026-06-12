@@ -30,6 +30,10 @@ up:
 update:
 	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) up -d --force-recreate $(s)
 
+.PHONY: update-all
+update-all:
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) up -d --force-recreate
+
 .PHONY: stop
 stop:
 	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) down

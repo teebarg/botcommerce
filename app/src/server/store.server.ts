@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
-import { api } from "@/utils/api.server";
 import type { Address, SearchCatalog, Collection } from "@/schemas";
 import { z } from "zod";
+import { api } from "@/utils/api";
 
 export const CatalogSearchSchema = z.object({
     slug: z.string(),
@@ -27,9 +27,3 @@ export const getCollectionFn = createServerFn({ method: "GET" })
         const res = await api.get<Collection>(`/collection/${data}`);
         return res;
     });
-
-export const getShopSettingsPublicFn = createServerFn().handler(async () => {
-    const res = await api.get<any>("/shop-settings/public");
-    return res as Promise<any>
-});
-

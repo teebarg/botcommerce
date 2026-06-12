@@ -1,9 +1,10 @@
 from typing import Any
 from app.core.dependencies.services import SettingsDep
+from app.core.dependencies.cache import CacheDep
+from app.services.cache import cacheable
 from fastapi import APIRouter, HTTPException, Request, Depends
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
-from app.services.redis import cache_response, refresh_data
 from pydantic import BaseModel
 from datetime import datetime
 from app.core.permissions import require_admin
@@ -20,31 +21,16 @@ class ShopSettings(BaseModel):
     created_at: datetime
 
 @router.get("/")
-@cache_response(key_prefix="shop-settings", key="all")
-async def get_settings(request: Request) -> list[ShopSettings]:
+@cacheable(key_prefix="shop-settings", key_builder=False, expire=259200000)
+async def index(request: Request) -> list[ShopSettings]:
     """
     Get shop settings with optional filtering
     """
     return await db.shopsettings.find_many()
 
 
-@router.get("/public")
-@cache_response(key_prefix="shop-settings", key="public")
-async def get_public_settings(request: Request) -> dict[str, str]:
-    """
-    Get all public settings
-    """
-    try:
-        settings = await db.shopsettings.find_many()
-
-        return { setting.key: setting.value for setting in settings }
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=400, detail=e.detail)
-
-
-@router.patch("/sync-shop-details", dependencies=[Depends(require_admin)])
-async def sync_shop_details(form_data: dict[str, Any], service: SettingsDep):
+@router.patch("/", dependencies=[Depends(require_admin)])
+async def update(form_data: dict[str, Any], cache: CacheDep,  service: SettingsDep):
     """
     Sync shop details
     """
@@ -53,8 +39,8 @@ async def sync_shop_details(form_data: dict[str, Any], service: SettingsDep):
             if not value:
                 continue
             await service.set(key, str(value), type_="SHOP_DETAIL")
-        await refresh_data(patterns=["shop-settings"])
-        return {"message": "Shop details synced successfully"}
+        await cache.invalidate("shop-settings")
+        return {"message": "Shop details updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
