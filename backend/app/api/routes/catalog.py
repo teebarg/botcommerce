@@ -1,4 +1,3 @@
-from app.services.redis import cache_response
 from fastapi import APIRouter, HTTPException, Query, Request, Depends, BackgroundTasks
 from typing import List
 from app.prisma_client import prisma as db
@@ -15,6 +14,7 @@ from meilisearch.errors import MeilisearchApiError
 from app.services.websocket import manager
 from app.models.catalog import Catalog, Catalogs, CatalogView, CursorPaginatedCatalog, CatalogCreate, CatalogUpdate, CatalogBulkAdd
 from app.core.permissions import require_admin
+from app.services.cache import cacheable
 
 logger = get_logger(__name__)
 
@@ -61,16 +61,16 @@ async def list_catalogs_views() -> List[CatalogView]:
 
 
 @router.get("/", dependencies=[Depends(require_admin)])
-@cache_response(key_prefix="catalog")
+@cacheable(key_prefix="catalog", tags=["catalog"])
 async def list_catalogs(
     request: Request,
-    catalog_service: CatalogService = Depends(get_catalog_service),
+    srv: CatalogService = Depends(get_catalog_service),
     is_active: bool | None = None,
     product_id: int | None = None,
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, le=100),
 ) -> Catalogs:
-    return await catalog_service.list(
+    return await srv.list(
         skip=skip,
         limit=limit,
         is_active=is_active,
@@ -79,7 +79,7 @@ async def list_catalogs(
 
 
 @router.get("/{slug}")
-@cache_response(key_prefix="catalog")
+@cacheable(key_prefix="catalog", tags=lambda slug: [f"catalog:{slug}"])
 async def search(
     request: Request,
     slug: str,
@@ -153,7 +153,7 @@ async def track_catalog_visit(
     request: Request,
     slug: str,
     user: UserDep,
-    catalog_service: CatalogService = Depends(get_catalog_service),
+    srv: CatalogService = Depends(get_catalog_service),
 ) -> dict:
     """Track a unique visit to a catalog."""
     where = {"slug": slug}
@@ -164,7 +164,7 @@ async def track_catalog_visit(
     if not obj:
         raise HTTPException(status_code=404, detail="Catalog not found")
 
-    is_new_visit = await catalog_service.track_visit(
+    is_new_visit = await srv.track_visit(
         catalog_id=obj.id,
         user_id=user.id if user else None,
         ip_address=get_client_ip(request),
@@ -172,7 +172,7 @@ async def track_catalog_visit(
     )
 
     if is_new_visit:
-        await catalog_service.invalidate_cache()
+        await srv.invalidate_cache()
 
     return {"success": True, "is_new_visit": is_new_visit}
 
@@ -180,12 +180,12 @@ async def track_catalog_visit(
 @router.post("/", dependencies=[Depends(require_admin)])
 async def create_catalog(
     data: CatalogCreate,
-    catalog_service: CatalogService = Depends(get_catalog_service),
+    srv: CatalogService = Depends(get_catalog_service),
 ) -> Catalog:
     create_data = data.model_dump(exclude_unset=True)
     create_data["slug"] = slugify(data.title)
     res = await db.sharedcollection.create(data=create_data)
-    await catalog_service.invalidate_cache()
+    await srv.invalidate_cache()
     return res
 
 
@@ -193,73 +193,36 @@ async def create_catalog(
 async def update_catalog(
     id: int,
     data: CatalogUpdate,
-    catalog_service: CatalogService = Depends(get_catalog_service),
+    srv: CatalogService = Depends(get_catalog_service),
 ) -> Catalog:
+    slug = None
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:
         raise HTTPException(status_code=404, detail="Catalog not found")
 
     update_data = data.model_dump(exclude_unset=True)
-    if data.products is not None:
-        update_data["products"] = {"set": [{"id": pid} for pid in data.products]}
 
     res = await db.sharedcollection.update(where={"id": id}, data=update_data)
-    await catalog_service.invalidate_cache()
+    await srv.invalidate_cache()
     return res
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
 async def delete_catalog(
     id: int,
-    catalog_service: CatalogService = Depends(get_catalog_service),
+    srv: CatalogService = Depends(get_catalog_service),
 ) -> Message:
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:
         raise HTTPException(status_code=404, detail="Catalog not found")
 
     await db.sharedcollection.delete(where={"id": id})
-    await catalog_service.invalidate_cache()
+    await srv.invalidate_cache()
     return {"message": "Catalog deleted successfully"}
 
 
-@router.post("/{id}/add-product/{product_id}", dependencies=[Depends(require_admin)])
-async def add_product_to_catalog(id: int, product_id: int, background_tasks: BackgroundTasks) -> Message:
-    """Add a product to a catalog"""
-    catalog = await db.sharedcollection.find_unique(where={"id": id})
-    if not catalog:
-        raise HTTPException(status_code=404, detail="Catalog not found")
-
-    product = await db.product.find_unique(where={"id": product_id})
-    if not product:
-        raise HTTPException(status_code=404, detail="product not found")
-
-    await db.sharedcollection.update(
-        where={"id": id},
-        data={"products": {"connect": {"id": product_id}}},
-    )
-
-    background_tasks.add_task(index_product, product_id=product_id)
-    return {"message": "product added to catalog successfully"}
-
-
-@router.delete("/{id}/remove-product/{product_id}", dependencies=[Depends(require_admin)])
-async def remove_product_from_catalog(id: int, product_id: int, background_tasks: BackgroundTasks) -> Message:
-    """Remove a product from a catalog"""
-    catalog = await db.sharedcollection.find_unique(where={"id": id})
-    if not catalog:
-        raise HTTPException(status_code=404, detail="Catalog not found")
-
-    await db.sharedcollection.update(
-        where={"id": id},
-        data={"products": {"disconnect": {"id": product_id}}},
-    )
-
-    background_tasks.add_task(index_product, product_id=product_id)
-    return {"message": "product removed from catalog successfully"}
-
-
 @router.post("/{id}/add-products", dependencies=[Depends(require_admin)])
-async def bulk_add_products_to_catalog(id: int, data: CatalogBulkAdd, background_tasks: BackgroundTasks, catalog_service: CatalogService = Depends(get_catalog_service),) -> Message:
+async def bulk_add_products_to_catalog(id: int, data: CatalogBulkAdd, background_tasks: BackgroundTasks, srv: CatalogService = Depends(get_catalog_service),) -> Message:
     """Bulk add products to a catalog"""
     catalog = await db.sharedcollection.find_unique(where={"id": id})
     if not catalog:
@@ -274,7 +237,7 @@ async def bulk_add_products_to_catalog(id: int, data: CatalogBulkAdd, background
     )
 
     await manager.broadcast_to_all(data={"status": "completed"}, message_type="bulk_action")
-    await catalog_service.invalidate_cache()
+    # await srv.invalidate_cache()
     background_tasks.add_task(index_products, product_ids=data.product_ids)
     return {"message": f"Added {len(data.product_ids)} product(s) to catalog"}
 

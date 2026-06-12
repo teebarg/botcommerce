@@ -4,6 +4,7 @@ from app.services.coupon import CouponService
 from app.services.events import EventBus
 from app.services.storage import MediaStorageService
 from app.services.user_interaction import InteractionService
+from app.core.dependencies.cache import CacheDep
 from fastapi import Depends
 from app.prisma_client import prisma as db
 from app.redis_client import redis_client
@@ -35,8 +36,8 @@ def get_gallery_service(
 def get_shop_settings_service() -> ShopSettingsService:
     return ShopSettingsService(redis=redis_client, db=db)
 
-def get_catalog_service() -> CatalogService:
-    return CatalogService(db=db)
+def get_catalog_service(cache: CacheDep) -> CatalogService:
+    return CatalogService(db=db, cache=cache)
 
 def get_conversation_service():
     return ConversationService()

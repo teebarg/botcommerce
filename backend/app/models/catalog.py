@@ -45,7 +45,6 @@ class CatalogUpdate(BaseModel):
     title: str | None = None
     description: str | None = None
     is_active: bool | None = None
-    products: list[int] | None = None
 
 
 class CatalogBulkAdd(BaseModel):

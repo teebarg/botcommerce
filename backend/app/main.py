@@ -48,7 +48,7 @@ async def lifespan(app: FastAPI):
     #         pass  # group already exists
 
     init_notification_service()
-    consumer = RedisStreamConsumer(redis_client, STREAM_NAME, GROUP_NAME, CONSUMER_NAME)
+    consumer = RedisStreamConsumer(STREAM_NAME, GROUP_NAME, CONSUMER_NAME)
     app.state.consumer = consumer
     await consumer.start()
     await manager.start()

@@ -1,4 +1,3 @@
-from app.core.dependencies.services import get_shop_settings_service
 import asyncio
 from app.core.logging import get_logger
 from app.prisma_client import prisma as db
@@ -7,20 +6,20 @@ from app.core.notifications.setup import get_notification_service
 from app.core.config import settings
 from app.core.dependencies.order import get_order_service
 from app.core.notifications.events import OrderConfirmedEvent
+from app.core.dependencies.cache import get_cache_service
 from prisma.enums import OrderStatus, PaymentStatus, PaymentMethod, CartStatus
 from app.services.recently_viewed import RecentlyViewedService
 from app.services.popular_products import PopularProductsService
 from prisma import Json
 from datetime import datetime
 from app.core.utils import generate_welcome_email
-from app.services.redis import refresh_data
 from datetime import timedelta
+from app.core.dependencies.services import get_shop_settings_service
 
 logger = get_logger(__name__)
 
 class RedisStreamConsumer:
-    def __init__(self, redis_client, stream, group, consumer):
-        self.redis = redis_client
+    def __init__(self, stream, group, consumer):
         self.stream = stream
         self.group = group
         self.consumer = consumer
@@ -28,6 +27,7 @@ class RedisStreamConsumer:
         self.task = None
         self.notification = get_notification_service()
         self.shop_settings = get_shop_settings_service()
+        self.cache = get_cache_service()
 
     async def start(self):
         """Start consumer with auto-restart supervision"""
@@ -81,7 +81,7 @@ class RedisStreamConsumer:
         try:
             while not self.shutdown_event.is_set():
                 try:
-                    events = await self.redis.xreadgroup(
+                    events = await self.cache.redis.xreadgroup(
                         self.group,
                         self.consumer,
                         streams={self.stream: ">"},
@@ -106,7 +106,7 @@ class RedisStreamConsumer:
     async def claim_stale_messages(self):
         """Run occasionally to recover stuck messages."""
         try:
-            claimed = await self.redis.xautoclaim(
+            claimed = await self.cache.redis.xautoclaim(
                 self.stream,
                 self.group,
                 self.consumer,
@@ -127,8 +127,8 @@ class RedisStreamConsumer:
     async def _process(self, msg_id, data):
         try:
             await self.handle_event(data)
-            await self.redis.xack(self.stream, self.group, msg_id)
-            await self.redis.xdel(self.stream, msg_id)
+            await self.cache.redis.xack(self.stream, self.group, msg_id)
+            await self.cache.redis.xdel(self.stream, msg_id)
         except Exception as e:
             logger.error(f"Failed to process {msg_id}: {e}")
 
@@ -186,7 +186,7 @@ class RedisStreamConsumer:
             raise Exception(f"Database error: {str(e)}")
 
         await self.send_order_notification(id=int(event["order_id"]), user_id=int(event["user_id"]))
-        await refresh_data(patterns=["users"])
+        await self.cache.invalidate(tags=["users"])
 
     async def handle_payment_success(self, event):
         try:
@@ -213,7 +213,7 @@ class RedisStreamConsumer:
                 metadata["time_spent"] = int(event.get("time_spent", 0))
 
             key: str = f"user:{event['user_id']}:history"
-            async with self.redis.pipeline(transaction=True) as pipe:
+            async with self.cache.redis.pipeline(transaction=True) as pipe:
                 pipe.lpush(key, event['product_id'])
                 pipe.ltrim(key, 0, 49)
                 pipe.expire(key, 60 * 60 * 24 * 30)
@@ -234,7 +234,7 @@ class RedisStreamConsumer:
 
         try:
             if event["view_type"] == "VIEW":
-                recent_service = RecentlyViewedService()
+                recent_service = RecentlyViewedService(cache=self.cache)
                 await recent_service.add_product(user_id=int(event["user_id"]), product_id=int(event["product_id"]))
 
                 await self.handle_track_popular(product_id=int(event["product_id"]), interaction_type="view")
@@ -277,7 +277,7 @@ class RedisStreamConsumer:
                 subject=welcome_email.subject,
                 message=welcome_email.html_content
             )
-            await refresh_data(patterns=["coupons", "users"])
+            await self.cache.invalidate(tags=["coupons", "users"])
         except Exception as e:
             logger.error(f"Failed to send welcome email: {str(e)}")
             raise Exception(f"Email error: {str(e)}")

@@ -2,26 +2,26 @@ import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { CollectionFormValues } from "@/components/admin/collections/collection-form";
 import type { CatalogFormValues } from "@/components/admin/catalogs/catalog-form";
-import { clientApi } from "@/utils/api.client";
 import { Catalog, Collection, Message, PaginatedCatalog } from "@/schemas";
+import { api } from "@/utils/api";
 
 export const collectionsQuery = (params?: { search?: string }) =>
     queryOptions({
         queryKey: ["collections", params?.search ?? "all"],
-        queryFn: () => clientApi.get<Collection[]>("/collection/", { params }),
+        queryFn: () => api.get<Collection[]>("/collection/", { params }),
         staleTime: Infinity,
     });
 
 export const useCollections = () => {
     return useQuery({
         queryKey: ["collections"],
-        queryFn: () => clientApi.get<Collection[]>(`/collection/`),
+        queryFn: () => api.get<Collection[]>(`/collection/`),
     });
 };
 
 export const useCreateCollection = () => {
     return useMutation({
-        mutationFn: async (data: CollectionFormValues) => await clientApi.post<Collection>("/collection/", data),
+        mutationFn: async (data: CollectionFormValues) => await api.post<Collection>("/collection/", data),
         onSuccess: () => {
             toast.success("Collection created successfully");
         },
@@ -33,7 +33,7 @@ export const useCreateCollection = () => {
 
 export const useUpdateCollection = () => {
     return useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: CollectionFormValues }) => await clientApi.patch<Collection>(`/collection/${id}`, data),
+        mutationFn: async ({ id, data }: { id: number; data: CollectionFormValues }) => await api.patch<Collection>(`/collection/${id}`, data),
         onSuccess: () => {
             toast.success("Collection updated successfully");
         },
@@ -45,7 +45,7 @@ export const useUpdateCollection = () => {
 
 export const useDeleteCollection = () => {
     return useMutation({
-        mutationFn: async (id: number) => await clientApi.delete<Collection>(`/collection/${id}`),
+        mutationFn: async (id: number) => await api.delete<Collection>(`/collection/${id}`),
         onSuccess: () => {
             toast.success("Collection deleted successfully");
         },
@@ -58,7 +58,7 @@ export const useDeleteCollection = () => {
 export const catalogsQuery = () =>
     queryOptions({
         queryKey: ["catalog"],
-        queryFn: () => clientApi.get<PaginatedCatalog>("/catalog/"),
+        queryFn: () => api.get<PaginatedCatalog>("/catalog/"),
         staleTime: Infinity,
     });
 
@@ -68,7 +68,7 @@ export const useCatalogs = () => {
 
 export const useCreateCatalog = () => {
     return useMutation({
-        mutationFn: async (data: CatalogFormValues) => await clientApi.post<Catalog>("/catalog/", data),
+        mutationFn: async (data: CatalogFormValues) => await api.post<Catalog>("/catalog/", data),
         onSuccess: () => {
             toast.success("catalog created successfully");
         },
@@ -80,7 +80,7 @@ export const useCreateCatalog = () => {
 
 export const useUpdateCatalog = () => {
     return useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: CatalogFormValues }) => await clientApi.patch<Catalog>(`/catalog/${id}`, data),
+        mutationFn: async ({ id, data }: { id: number; data: CatalogFormValues }) => await api.patch<Catalog>(`/catalog/${id}`, data),
         onSuccess: () => {
             toast.success("catalog updated successfully");
         },
@@ -92,7 +92,7 @@ export const useUpdateCatalog = () => {
 
 export const useDeleteCatalog = () => {
     return useMutation({
-        mutationFn: async (id: number) => clientApi.delete<Message>(`/catalog/${id}`),
+        mutationFn: async (id: number) => api.delete<Message>(`/catalog/${id}`),
         onSuccess: () => {
             toast.success("catalog deleted successfully");
         },
@@ -102,36 +102,10 @@ export const useDeleteCatalog = () => {
     });
 };
 
-export const useAddProductToCatalog = () => {
-    return useMutation({
-        mutationFn: async ({ catalogId, productId }: { catalogId: number; productId: number }) =>
-            await clientApi.post<{ message: string }>(`/catalog/${catalogId}/add-product/${productId}`),
-        onSuccess: () => {
-            toast.success("Product added to catalog successfully");
-        },
-        onError: (error) => {
-            toast.error("Failed to add product to catalog: " + error);
-        },
-    });
-};
-
-export const useRemoveProductFromCatalog = () => {
-    return useMutation({
-        mutationFn: async ({ catalogId, productId }: { catalogId: number; productId: number }) =>
-            await clientApi.delete<{ message: string }>(`/catalog/${catalogId}/remove-product/${productId}`),
-        onSuccess: () => {
-            toast.success("Product removed from catalog successfully");
-        },
-        onError: (error) => {
-            toast.error("Failed to remove product from catalog: " + error);
-        },
-    });
-};
-
 export const useBulkAddProductsToCatalog = () => {
     return useMutation({
         mutationFn: async ({ catalogId, productIds }: { catalogId: number; productIds: number[] }) =>
-            await clientApi.post<{ message: string }>(`/catalog/${catalogId}/add-products`, { product_ids: productIds }),
+            await api.post<{ message: string }>(`/catalog/${catalogId}/add-products`, { product_ids: productIds }),
         onError: (error) => {
             toast.error("Failed to add products to catalog: " + error);
         },
