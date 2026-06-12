@@ -125,7 +125,7 @@ class CacheService:
 
 def cacheable(
     key_prefix: str,
-    key_builder: Optional[Callable[..., Any]] = None,
+    key_builder: Optional[Union[str, Callable[..., Any]]] = None,
     expire: int = DEFAULT_EXPIRATION,
     tags: Optional[Union[list[str], Callable[..., list[str]]]] = None  # <-- Can be a list OR a function
 ):
@@ -139,62 +139,7 @@ def cacheable(
 
             cache = CacheService(request.app.state.redis)
 
-            # 1. Evaluate Dynamic Cache Key
-            if callable(key_builder):
-                sig = inspect.signature(key_builder)
-                filtered_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
-                raw_key = f"{key_prefix}:{key_builder(**filtered_kwargs)}"
-            else:
-                raw_key = f"{key_prefix}:{request.url.path}?{request.url.query}"
-
-            # 2. Read Hit
-            cached_data = await cache.get(raw_key)
-            if cached_data is not None:
-                return cached_data
-
-            # 3. Cache Miss -> Execute Controller
-            result = await func(*args, **kwargs)
-
-            # 4. Evaluate Dynamic Tags at Runtime
-            resolved_tags = []
-            if callable(tags):
-                # Inspect the lambda to extract matching parameters from kwargs (like user)
-                sig = inspect.signature(tags)
-                filtered_tags_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
-                resolved_tags = tags(**filtered_tags_kwargs)
-            elif isinstance(tags, list):
-                resolved_tags = tags
-
-            # 5. Populate Cache
-            await cache.set_with_tags(key=raw_key, value=result, expire=expire, tags=resolved_tags)
-
-            return result
-        return wrapper
-    return decorator
-
-
-def cacheable2(
-    key_prefix: str,
-    key_builder: Optional[Callable[..., str]] = None,
-    expire: int = DEFAULT_EXPIRATION,
-    tags: Optional[Union[list[str], Callable[..., list[str]]]] = None,
-):
-    """
-    Declarative route caching middleware. Requires `request: Request` in the endpoint signature.
-    """
-    def decorator(func: Callable[..., Coroutine[Any, Any, Any]]):
-        @wraps(func)
-        async def wrapper(*args: Any, **kwargs: Any) -> Any:
-            request: Optional[Request] = kwargs.get("request")
-            if not request:
-                raise RuntimeError(
-                    f"DeveloperError: @cache on '{func.__name__}' missing mandatory 'request: Request' parameter."
-                )
-
-            # Initialize local CacheService from request scope state
-            cache = CacheService(request.app.state.redis)
-
-            # Deterministic Cache Key Evaluation
+            # Evaluate Dynamic Cache Key
             if callable(key_builder):
                 sig = inspect.signature(key_builder)
                 filtered_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
@@ -204,16 +149,23 @@ def cacheable2(
             else:
                 raw_key = f"{key_prefix}:{request.url.path}?{request.url.query}"
 
-            # Cache Execution Flow (Cache-Aside pattern)
             cached_data = await cache.get(raw_key)
             if cached_data is not None:
                 return cached_data
 
-            # Invoke the underlying controller endpoint
             result = await func(*args, **kwargs)
 
-            # Populate cache background worker
-            await cache.set_with_tags(key=raw_key, value=result, expire=expire, tags=tags)
+            # Evaluate Dynamic Tags at Runtime
+            resolved_tags = []
+            if callable(tags):
+                # Inspect the lambda to extract matching parameters from kwargs (like user)
+                sig = inspect.signature(tags)
+                filtered_tags_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
+                resolved_tags = tags(**filtered_tags_kwargs)
+            elif isinstance(tags, list):
+                resolved_tags = tags
+
+            await cache.set_with_tags(key=raw_key, value=result, expire=expire, tags=resolved_tags)
 
             return result
         return wrapper

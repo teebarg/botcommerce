@@ -3,6 +3,7 @@ import { getUsersFn } from "@/server/users.server";
 import { CartStatus, PaginatedAbandonedCarts, PaginatedActivities, PaginatedChats, PaginatedCoupons } from "@/schemas";
 import { clientApi } from "@/utils/api.client";
 import { StatsTrends } from "@/types/models";
+import { api } from "@/utils/api";
 
 export const statsTrendsQuery = () =>
     queryOptions({
@@ -41,7 +42,7 @@ export const couponsQuery = (params: CouponParams) => ({
 
 export const activitiesQuery = () => ({
     queryKey: ["activities"],
-    queryFn: () => clientApi.get<PaginatedActivities>("/activities/"),
+    queryFn: () => api.get<PaginatedActivities>("/activities/"),
 });
 
 interface AbandonedCartStats {

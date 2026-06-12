@@ -2,11 +2,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { clientApi } from "@/utils/api.client";
 import { BankDetails, Chat, ConversationStatus, DeliveryOption, Message } from "@/schemas";
+import { api } from "@/utils/api";
 
 export const useBankDetails = () => {
     return useQuery({
         queryKey: ["bank-details"],
-        queryFn: () => clientApi.get<BankDetails[]>("/bank-details/"),
+        queryFn: () => api.get<BankDetails[]>("/bank-details/"),
     });
 };
 

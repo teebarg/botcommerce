@@ -11,7 +11,7 @@ import { useBankDetails } from "@/hooks/useApi";
 import { useSyncShopDetails } from "@/hooks/useGeneric";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 
 interface ShopPaymentsProps {
     settings: ShopSettings[];
@@ -47,9 +47,10 @@ interface BankDetailsProps {
 const BankDetailComponent: React.FC<BankDetailsProps> = ({ bank }) => {
     const deleteState = useOverlayTriggerState({});
     const deleteMutation = useMutation({
-        mutationFn: async (id: number) => await clientApi.delete<Message>(`/bank-details/${id}`),
+        mutationFn: async (id: number) => await api.delete<Message>(`/bank-details/${id}`),
         onSuccess: () => {
             toast.success("Bank details deleted successfully");
+            deleteState.close()
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to delete bank details");

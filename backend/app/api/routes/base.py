@@ -10,10 +10,11 @@ from prisma.enums import Role
 from app.core.deps import RedisClient
 from typing import Literal, Optional
 from datetime import timedelta, datetime
-from app.services.redis import cache_response, refresh_data
 from app.services.meilisearch import clear_index
 from app.core.config import settings
 from app.core.permissions import require_admin
+from app.core.dependencies.cache import CacheDep
+from app.services.cache import cacheable
 
 router = APIRouter()
 
@@ -38,7 +39,7 @@ async def admin_dashboard_stats():
     }
 
 @router.get("/stats/trends", dependencies=[Depends(require_admin)])
-@cache_response("stats-trends")
+@cacheable(key_prefix="stats-trends")
 async def stats_trends(
     request: Request,
     range: Literal["day", "week", "month"] = Query("day"),
@@ -117,12 +118,10 @@ async def stats_trends(
     }
 
 @router.post("/cache/bust", dependencies=[Depends(require_admin)])
-async def bust_redis_cache(
-    pattern: str = Body(..., embed=True, description="Key or pattern to delete from Redis cache"),
-):
+async def bust_redis_cache(cache: CacheDep, pattern: str = Body(..., embed=True)):
     """Bust Redis cache by key."""
     try:
-        await refresh_data(patterns=[pattern])
+        await cache.invalidate(tags=[pattern])
         return {"success": True, "pattern": pattern}
     except Exception as e:
         return {"success": False, "error": str(e), "pattern": pattern}
