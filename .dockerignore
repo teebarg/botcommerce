@@ -13,3 +13,5 @@ backend/__pycache__/
 .git/
 .gitignore
 .env*
+
+meilisearch-data

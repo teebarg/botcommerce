@@ -1,6 +1,12 @@
 {
     "name": "shop-frontend",
     "version": "1.0.0",
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "esbuild",
+            "@clerk/shared"
+        ]
+    },
     "private": true,
     "author": "Adeniyi <neyostica2000@yahoo.com> (https://www.niyi.com.ng)",
     "description": "A robust e-commerce storefront built with Tanstack",
