@@ -1,7 +1,23 @@
+# ==========================================
+# Configuration Variables
+# ==========================================
 PROJECT_SLUG = shop
 DOCKER_HUB = beafdocker
 DOCKER_COMPOSE = docker compose
 
+# Image tags using the unified namespace variables
+API_IMAGE := $(DOCKER_HUB)/shop-api
+AGENT_IMAGE := $(DOCKER_HUB)/shop-agent
+
+VERSION ?= latest
+GIT_SHA := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+
+# Default service context fallback for clean command executions
+s ?= app
+
+# ==========================================
+# Core Docker Compose Engine Rules
+# ==========================================
 .PHONY: build
 build:
 	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) build
@@ -18,6 +34,18 @@ update:
 stop:
 	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) down
 
+.PHONY: clean
+clean:
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) down -v --remove-orphans
+
+.PHONY: prune
+prune:
+	docker system prune -f --volumes
+	docker builder prune -f
+
+# ==========================================
+# Engineering & Debugging Operations
+# ==========================================
 .PHONY: logs
 logs:
 	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) logs -f $(s)
@@ -30,9 +58,9 @@ bash:
 install:
 	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) uv pip install $(package)
 
-.PHONY: clean
-clean:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) down -v --remove-orphans
+.PHONY: prep
+prep:
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec shop-api ./scripts/prestart.sh
 
 .PHONY: lint-backend
 lint-backend:
@@ -42,51 +70,13 @@ lint-backend:
 test-backend:
 	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) ./scripts/test.sh
 
-.PHONY: prep
-prep:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec shop-api ./scripts/prestart.sh
+.PHONY: uv-lock
+uv-lock:
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) uv lock --check
 
-# Frontend
-.PHONY: fe-dev
-fe-dev:
-	@cd app && pnpm dev
-
-.PHONY: ss
-ss: dbs dps
-	@$(MAKE) -s dbs dps
-
-.PHONY: dbs
-dbs:
-	@cd backend && docker buildx build --platform linux/amd64 -t $(DOCKER_HUB)/$(PROJECT_SLUG)-backend:latest -t $(DOCKER_HUB)/$(PROJECT_SLUG)-backend:$(shell git rev-parse HEAD) . --push
-
-.PHONY: dps
-dps:
-	@docker push $(DOCKER_HUB)/$(PROJECT_SLUG)-backend:latest
-	@docker push $(DOCKER_HUB)/$(PROJECT_SLUG)-backend:$(shell git rev-parse HEAD)
-
-.PHONY: sa
-sa: dba dpa
-	@$(MAKE) -s dba dpa
-
-.PHONY: dba
-dba:
-	@cd agent && docker buildx build --platform linux/amd64 -t $(DOCKER_HUB)/$(PROJECT_SLUG)-agent:latest -t $(DOCKER_HUB)/$(PROJECT_SLUG)-agent:$(shell git rev-parse HEAD) . --push
-
-.PHONY: dpa
-dpa:
-	@docker push $(DOCKER_HUB)/$(PROJECT_SLUG)-agent:latest
-	@docker push $(DOCKER_HUB)/$(PROJECT_SLUG)-agent:$(shell git rev-parse HEAD)
-
-
-.PHONY: activate-env-windows
-activate-env-windows:
-	.venv\Scripts\Activate.ps1
-
-.PHONY: activate-env
-activate-env:
-	source .venv/bin/activate
-
-# prisma helpers
+# ==========================================
+# Database & Prisma Layer Actions
+# ==========================================
 .PHONY: dpf
 dpf:
 	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) prisma format
@@ -99,60 +89,115 @@ dpg:
 dpm:
 	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) prisma migrate dev
 
+.PHONY: db-reset
+db-reset:
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec shop-api prisma migrate reset --force
 
-# Model Context
+# ==========================================
+# Repomix Source Context Frameworks for AI
+# ==========================================
+.PHONY: fctx bctx actx ctx-all
 fctx:
 	@cd app && npx repomix
-
 
 bctx:
 	@cd backend && npx repomix
 
-agent-context:
+actx:
 	@cd agent && npx repomix
 
+ctx-all: fctx bctx actx
 
+# ==========================================
+# Production Testing & Registry Distribution
+# ==========================================
+.PHONY: test-prod build-all build-api build-agent push-all push-api push-agent
 
-# Prod
 test-prod:
 	$(DOCKER_COMPOSE) -f docker-compose.prod.yml up --build
 
+# Build APIs
+build-all: build-api build-agent
 
+build-api:
+	docker build --platform=linux/amd64 \
+		-f backend/Dockerfile \
+		-t $(API_IMAGE):latest \
+		-t $(API_IMAGE):$(VERSION) \
+		-t $(API_IMAGE):$(GIT_SHA) \
+		./backend
+
+build-agent:
+	docker build --platform=linux/amd64 \
+		-f agent/Dockerfile \
+		-t $(AGENT_IMAGE):latest \
+		-t $(AGENT_IMAGE):$(VERSION) \
+		-t $(AGENT_IMAGE):$(GIT_SHA) \
+		./agent
+
+# Push Operations
+push-all: push-api push-agent
+
+push-api:
+	docker push $(API_IMAGE):latest
+	docker push $(API_IMAGE):$(VERSION)
+	docker push $(API_IMAGE):$(GIT_SHA)
+
+push-agent:
+	docker push $(AGENT_IMAGE):latest
+	docker push $(AGENT_IMAGE):$(VERSION)
+	docker push $(AGENT_IMAGE):$(GIT_SHA)
+
+# Shorthand macros matching your clean help parameters
+.PHONY: ss dbs dps sa dba dpa
+ss: build-api push-api
+dbs: build-api
+dps: push-api
+
+sa: build-agent push-agent
+dba: build-agent
+dpa: push-agent
+
+# ==========================================
+# Interactive Systems Help Desk Documentation
+# ==========================================
 .PHONY: help
 help:
 	@echo "Available commands:"
 	@echo ""
-	@echo "  -- Docker / Compose --"
-	@echo "  make build              - Build all Docker containers"
-	@echo "  make up                 - Build and start all containers"
-	@echo "  make update s=<service> - Force recreate a specific service"
-	@echo "  make stop               - Stop and remove containers"
-	@echo "  make clean              - Stop containers, remove volumes and orphans"
+	@echo "  -- Docker / Compose Engine --"
+	@echo "  make build              - Build all development containers"
+	@echo "  make up                 - Build and bring up all development containers"
+	@echo "  make update s=<service> - Force recreate specific service container (default s=app)"
+	@echo "  make stop               - Stop and remove runtime environment"
+	@echo "  make clean              - Pure state wipe (deletes containers, volumes, orphans)"
 	@echo ""
-	@echo "  -- Development --"
-	@echo "  make logs s=<service>   - Tail logs (omit s= for all services)"
-	@echo "  make bash s=<service>   - Open bash shell in a service"
-	@echo "  make install s=<svc> package=<pkg> - Install a uv package in a service"
-	@echo "  make prep               - Run prestart script in shop-api"
-	@echo "  make fe-dev             - Run frontend dev server (pnpm)"
+	@echo "  -- Active Local Development --"
+	@echo "  make logs s=<service>   - Stream logs for target service context (default s=app)"
+	@echo "  make bash s=<service>   - Open interactive container terminal prompt"
+	@echo "  make install s=<svc> package=<pkg> - Synchronize an explicit 'uv' library target"
+	@echo "  make prep               - Execute API database connection prestart verification"
 	@echo ""
-	@echo "  -- Testing & Linting --"
-	@echo "  make lint-backend s=<service>  - Run lint script in a service"
-	@echo "  make test-backend s=<service>  - Run test script in a service"
+	@echo "  -- Testing & Lint Integrity Validation --"
+	@echo "  make lint-backend s=<svc> - Execute linter validations against Python codeblocks"
+	@echo "  make test-backend s=<svc> - Trigger system orchestration suite validations"
 	@echo ""
-	@echo "  -- Prisma --"
-	@echo "  make dpf s=<service>    - Format Prisma schema"
-	@echo "  make dpg s=<service>    - Generate Prisma client"
-	@echo "  make dpm s=<service>    - Run Prisma migrations (dev)"
+	@echo "  -- Prisma Engine Management --"
+	@echo "  make dpf s=<service>    - Run code styling validations over your Schema format"
+	@echo "  make dpg s=<service>    - Force execution compilation for your internal ORM Client"
+	@echo "  make dpm s=<service>    - Deploy dynamic structural delta migrations"
 	@echo ""
-	@echo "  -- Deploy / Push --"
-	@echo "  make ss                 - Build and push backend image (shop-backend)"
-	@echo "  make dbs                - Build backend Docker image for linux/amd64"
-	@echo "  make dps                - Push backend image to Docker Hub"
-	@echo "  make sa                 - Build and push agent image (shop-agent)"
-	@echo "  make dba                - Build agent Docker image for linux/amd64"
-	@echo "  make dpa                - Push agent image to Docker Hub"
+	@echo "  -- Repomix Vector Context Capture for AI --"
+	@echo "  make fctx               - Generate structural snapshot package for Frontend (App)"
+	@echo "  make bctx               - Generate structural snapshot package for Backend (Shop API)"
+	@echo "  make actx               - Generate structural snapshot package for Core Agent engine"
+	@echo "  make ctx-all            - Execute full-stack multi-repo capture workflow"
 	@echo ""
-	@echo "  -- Environment --"
-	@echo "  make activate-env               - Activate venv (Linux/macOS)"
-	@echo "  make activate-env-windows       - Activate venv (Windows PowerShell)"
+	@echo "  -- Production Deployments & Registry Distribution --"
+	@echo "  make test-prod          - Build and execute complete local Multi-Stage deployment run"
+	@echo "  make ss                 - Build and push shop-api backend image to Docker Hub"
+	@echo "  make dbs                - Build backend Docker image for linux/amd64 platform locally"
+	@echo "  make dps                - Push compiled backend variants to active workspace repository"
+	@echo "  make sa                 - Build and push agent-api image to Docker Hub repository"
+	@echo "  make dba                - Build core agent engine image layout container architecture"
+	@echo "  make dpa                - Push active agent image build structures out to Docker Hub"
