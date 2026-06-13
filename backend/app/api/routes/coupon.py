@@ -146,7 +146,7 @@ async def apply_coupon(
     """
     Apply a coupon to a cart.
     """
-    cart = await cart.repo.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    cart = await cart.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
 
@@ -172,7 +172,7 @@ async def remove_coupon(
     """
     Remove coupon from cart.
     """
-    cart = await cart.repo.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    cart = await cart.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
 
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
@@ -240,7 +240,7 @@ async def get_coupon_analytics(
     """
     Get comprehensive coupon analytics with optional date range filtering.
     """
-    
+
     date_filter = {}
     if start_date or end_date:
         date_filter["created_at"] = {}
@@ -248,11 +248,11 @@ async def get_coupon_analytics(
             date_filter["created_at"]["gte"] = datetime.combine(start_date, datetime.min.time())
         if end_date:
             date_filter["created_at"]["lte"] = datetime.combine(end_date, datetime.max.time())
-    
+
     total_coupons = await db.coupon.count(
         where=date_filter if date_filter else None
     )
-    
+
     used_filter = {
         "current_uses": {"gt": 0}
     }
@@ -263,18 +263,18 @@ async def get_coupon_analytics(
     }
     if date_filter:
         used_filter.update(date_filter)
-    
+
     used_coupons = await db.coupon.count(
         where=used_filter
     )
-    
+
     coupons_with_uses = await db.coupon.find_many(
         where=date_filter if date_filter else None,
     )
     total_redemptions = sum(coupon.current_uses for coupon in coupons_with_uses)
-    
+
     now = datetime.utcnow()
-    
+
     active_filter = {
         "is_active": True,
         "OR": [
@@ -290,18 +290,18 @@ async def get_coupon_analytics(
             }
         ]
     }
-    
+
     if date_filter:
         active_filter.update(date_filter)
-    
-    active_coupons_data = await db.coupon.find_many(where=active_filter)    
+
+    active_coupons_data = await db.coupon.find_many(where=active_filter)
     active_coupons = sum(
-        1 for coupon in active_coupons_data 
+        1 for coupon in active_coupons_data
         if coupon.max_uses == 0 or coupon.current_uses < coupon.max_uses
     )
-    
+
     avg_redemption_rate = (used_coupons / total_coupons * 100) if total_coupons > 0 else 0.0
-    
+
     return CouponAnalytics(
         total_coupons=total_coupons,
         used_coupons=used_coupons,
@@ -329,23 +329,23 @@ async def get_detailed_coupon_analytics(
             date_filter["created_at"]["gte"] = datetime.combine(start_date, datetime.min.time())
         if end_date:
             date_filter["created_at"]["lte"] = datetime.combine(end_date, datetime.max.time())
-    
+
     coupons = await db.coupon.find_many(
         where=date_filter if date_filter else None,
     )
-    
+
     # By type
     by_type = {}
     for coupon in coupons:
         discount_type = coupon.discount_type
         by_type[discount_type] = by_type.get(discount_type, 0) + 1
-    
+
     # By scope
     by_scope = {}
     for coupon in coupons:
         scope = coupon.scope
         by_scope[scope] = by_scope.get(scope, 0) + 1
-    
+
     # Top performing coupons
     top_coupons = sorted(coupons, key=lambda x: x.current_uses, reverse=True)[:10]
     top_coupons_data = [
@@ -357,7 +357,7 @@ async def get_detailed_coupon_analytics(
         }
         for coupon in top_coupons
     ]
-    
+
     return {
         "breakdown_by_discount_type": by_type,
         "breakdown_by_scope": by_scope,

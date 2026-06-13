@@ -38,7 +38,7 @@ class OrderService:
 
     async def create_order_from_cart(self, order_in: OrderCreate, user_id: int, cart_number: str) -> Any:
         order_number: str = f"ORD{uuid.uuid4().hex[:8].upper()}"
-        cart = await self.cart.repo.get_active_cart(cart_number=cart_number, user_id=user_id)
+        cart = await self.cart.get_active_cart(cart_number=cart_number, user_id=user_id)
         if not cart:
             raise HTTPException(status_code=404, detail="Cart not found")
 

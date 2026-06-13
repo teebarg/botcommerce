@@ -1,6 +1,6 @@
+from app.core.dependencies.cart import CartDep
 from typing import Any, Dict, Optional, Annotated
 from datetime import datetime, timedelta, timezone
-from app.core.dependencies.cart import get_cart_repository, get_cart_service
 from app.services.cache import cacheable
 from fastapi import APIRouter, HTTPException, Request, BackgroundTasks, Depends, Cookie, Response
 from fastapi.responses import JSONResponse
@@ -19,7 +19,6 @@ from app.models.cart import (
 )
 from app.models.abandoned_cart import PaginatedAbandonedCarts
 from app.core.notifications.events import SendAbandonedCartEvent
-from app.services.cart import CartRepository, CartService
 
 logger = get_logger(__name__)
 
@@ -36,19 +35,18 @@ def _set_cart_cookie(response: Response, token: str) -> None:
 @router.post("/items", response_model=CartItem)
 async def add_item_to_cart(
     response: Response,
+    srv: CartDep,
     item_in: CartItemCreate,
     user: UserDep,
     background_tasks: BackgroundTasks,
-    repo: CartRepository = Depends(get_cart_repository),
-    service: CartService = Depends(get_cart_service),
     _cart_id: Annotated[str | None, Cookie()] = None
 ):
-    cart = await repo.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    cart = await srv.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
     if not cart:
-        cart = await repo.create_empty_cart(user_id=user.id if user else None)
+        cart = await srv.create_empty_cart(user_id=user.id if user else None)
 
-    item = await service.add_item(cart=cart, variant_id=item_in.variant_id, quantity=item_in.quantity)
-    background_tasks.add_task(service.calculate_totals, cart_id=cart.id)
+    item = await srv.add_item(cart=cart, variant_id=item_in.variant_id, quantity=item_in.quantity)
+    background_tasks.add_task(srv.calculate_totals, cart_id=cart.id)
     _set_cart_cookie(response, cart.cart_number)
     return item
 
@@ -57,12 +55,12 @@ async def add_item_to_cart(
 async def get_cart_index(
     response: Response,
     user: UserDep,
-    repo: CartRepository = Depends(get_cart_repository),
+    srv: CartDep,
     _cart_id: Annotated[str | None, Cookie()] = None
 ):
-    cart = await repo.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None, include_relations=True)
+    cart = await srv.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None, include_relations=True)
     if not cart:
-        cart = await repo.create_empty_cart(user_id=user.id if user else None, include_relations=True)
+        cart = await srv.create_empty_cart(user_id=user.id if user else None, include_relations=True)
 
     _set_cart_cookie(response, cart.cart_number)
     return cart
@@ -72,12 +70,11 @@ async def get_cart_index(
 async def delete_cart_item(
     item_id: int,
     user: UserDep,
+    srv: CartDep,
     background_tasks: BackgroundTasks,
-    repo: CartRepository = Depends(get_cart_repository),
-    service: CartService = Depends(get_cart_service),
     _cart_id: Annotated[str | None, Cookie()] = None
 ):
-    cart = await repo.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    cart = await srv.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
     if not cart:
         raise HTTPException(status_code=404, detail="Cart session not found")
 
@@ -86,7 +83,7 @@ async def delete_cart_item(
         raise HTTPException(status_code=404, detail="Cart item relation mismatch")
 
     await db.cartitem.delete(where={"id": item_id})
-    background_tasks.add_task(service.calculate_totals, cart_id=cart.id)
+    background_tasks.add_task(srv.calculate_totals, cart_id=cart.id)
     return {"message": "Item removed from cart successfully"}
 
 
@@ -95,12 +92,11 @@ async def update_cart_item(
     item_id: int,
     quantity: int,
     user: UserDep,
+    srv: CartDep,
     background_tasks: BackgroundTasks,
-    repo: CartRepository = Depends(get_cart_repository),
-    service: CartService = Depends(get_cart_service),
     _cart_id: Annotated[str | None, Cookie()] = None
 ):
-    cart = await repo.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    cart = await srv.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
     if not cart:
         raise HTTPException(status_code=404, detail="Cart sequence missing")
 
@@ -112,7 +108,7 @@ async def update_cart_item(
         raise HTTPException(status_code=400, detail=f"Not enough inventory. Only {cart_item.variant.inventory} items available.")
 
     updated_item = await db.cartitem.update(where={"id": item_id}, data={"quantity": quantity})
-    background_tasks.add_task(service.calculate_totals, cart_id=cart.id)
+    background_tasks.add_task(srv.calculate_totals, cart_id=cart.id)
     return updated_item
 
 
@@ -120,13 +116,12 @@ async def update_cart_item(
 async def update_cart(
     cart_update: CartUpdate,
     user: UserDep,
-    repo: CartRepository = Depends(get_cart_repository),
-    service: CartService = Depends(get_cart_service),
+    srv: CartDep,
     _cart_id: Annotated[str | None, Cookie()] = None
 ) -> CartLite:
-    cart = await repo.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    cart = await srv.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
     if not cart:
-        cart = await repo.create_empty_cart(user_id=user.id if user else None)
+        cart = await srv.create_empty_cart(user_id=user.id if user else None)
 
     async with db.tx() as tx:
         update_data = {}
@@ -155,7 +150,7 @@ async def update_cart(
             update_data["shipping_address"] = {"connect": {"id": address.id}}
             update_data["billing_address"] = {"connect": {"id": address.id}}
 
-            await service.cache.invalidate(tags=[f"addresses:{user.id if user else 'guest'}"])
+            await srv.cache.invalidate(tags=[f"addresses:{user.id if user else 'guest'}"])
 
         if cart_update.status is not None:
             update_data["status"] = cart_update.status
@@ -184,8 +179,8 @@ async def update_cart(
             data=update_data
         )
 
-    await service.calculate_totals(cart_id=cart.id)
-    await service.cache.invalidate(tags=["abandoned-carts"])
+    await srv.calculate_totals(cart_id=cart.id)
+    await srv.cache.invalidate(tags=["abandoned-carts"])
 
     return updated_cart
 
@@ -193,32 +188,30 @@ async def update_cart(
 @router.post("/apply-wallet")
 async def apply_wallet(
     user: CurrentUser,
-    repo: CartRepository = Depends(get_cart_repository),
-    service: CartService = Depends(get_cart_service),
+    srv: CartDep,
     _cart_id: Annotated[str | None, Cookie()] = None
 ) -> Message:
-    cart = await repo.get_active_cart(cart_number=_cart_id, user_id=user.id)
+    cart = await srv.get_active_cart(cart_number=_cart_id, user_id=user.id)
     if not cart or (await db.cartitem.count(where={"cart_id": cart.id})) == 0:
         return JSONResponse(status_code=400, content={"detail": "Your cart is currently empty"})
 
-    await service.apply_wallet_balance(cart=cart, user=user)
-    await service.calculate_totals(cart_id=cart.id)
+    await srv.apply_wallet_balance(cart=cart, user=user)
+    await srv.calculate_totals(cart_id=cart.id)
     return Message(message="Wallet balance applied successfully")
 
 
 @router.post("/remove-wallet")
 async def remove_wallet(
     user: CurrentUser,
-    repo: CartRepository = Depends(get_cart_repository),
-    service: CartService = Depends(get_cart_service),
+    srv: CartDep,
     _cart_id: Annotated[str | None, Cookie()] = None
 ) -> Message:
-    cart = await repo.get_active_cart(cart_number=_cart_id, user_id=user.id)
+    cart = await srv.get_active_cart(cart_number=_cart_id, user_id=user.id)
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
 
-    await service.remove_wallet_balance(cart=cart, user=user)
-    await service.calculate_totals(cart_id=cart.id)
+    await srv.remove_wallet_balance(cart=cart, user=user)
+    await srv.calculate_totals(cart_id=cart.id)
     return Message(message="Wallet usage removed from cart session")
 
 

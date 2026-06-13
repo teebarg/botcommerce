@@ -1,7 +1,6 @@
 from typing import Optional, Dict, Any
-from app.services.cache import CacheService
 from fastapi import HTTPException
-from app.prisma_client import prisma as db
+from app.services.cache import CacheService
 from app.core.logging import get_logger
 from app.services.shop_settings import ShopSettingsService
 from app.core.utils import generate_id
@@ -13,9 +12,13 @@ from app.models.cart import Cart
 logger = get_logger(__name__)
 
 
-class CartRepository:
-    def __init__(self, db: Prisma):
+class CartService:
+    def __init__(self, db: Prisma, cache: CacheService, settings_service: ShopSettingsService, coupon_service: CouponService):
         self.db = db
+        self.settings_service = settings_service
+        self.coupon_service = coupon_service
+        self.cache = cache
+
 
     async def get_active_cart(self, cart_number: Optional[str], user_id: Optional[int], include_relations: bool = False) -> Cart | None:
         include_clause = {
@@ -37,7 +40,7 @@ class CartRepository:
 
         if cart_number:
             cart = await self.db.cart.find_unique(
-                where={"cart_number": cart_number, "status": CartStatus.ACTIVE}, 
+                where={"cart_number": cart_number, "status": CartStatus.ACTIVE},
                 include=include_clause
             )
             if cart:
@@ -50,20 +53,11 @@ class CartRepository:
             "items": {"include": {"variant": True}},
             "shipping_address": True
         } if include_relations else None
-        
+
         return await self.db.cart.create(
             data={"cart_number": new_cart_id, "user_id": user_id},
             include=include_clause
         )
-
-
-class CartService:
-    def __init__(self, db: Prisma, repo: CartRepository, cache: CacheService, settings_service: ShopSettingsService, coupon_service: CouponService):
-        self.db = db
-        self.repo = repo
-        self.settings_service = settings_service
-        self.coupon_service = coupon_service
-        self.cache = cache
 
     async def calculate_totals(self, cart_id: int) -> None:
         """Calculates and commits subtotal, tax, discounts, and wallet balances cleanly."""
@@ -97,7 +91,7 @@ class CartService:
             new_subtotal = max(subtotal - discount_amount, 0.0)
             tax = new_subtotal * (tax_rate / 100)
             shipping_fee = cart.shipping_fee or 0.0
-            
+
             total = new_subtotal + tax + shipping_fee
             total_after_wallet = max(total - wallet_used, 0.0)
 
@@ -146,7 +140,7 @@ class CartService:
     async def merge_guest_into_user_cart(self, user_id: int, cart_number: Optional[str] = None) -> None:
         if not cart_number:
             return
-            
+
         try:
             async with self.db.tx() as tx:
                 user_cart = await tx.cart.find_first(
