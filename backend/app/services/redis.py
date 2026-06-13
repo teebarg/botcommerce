@@ -157,48 +157,6 @@ async def refresh_product(ids: int | List[int]=None, tags: List[str] = None, ful
         message_type="invalidate",
     )
 
-async def refresh_data(keys: List[str] = None, patterns: List[str] = None) -> None:
-    """
-    Invalidate specific keys and/or patterns.
-
-    Example:
-        await invalidate(keys=[f"addresses:{id}", patterns=["addresses"])
-    """
-    key_list = keys or []
-    pattern_list = patterns or []
-
-    if key_list:
-        try:
-            async with redis_client.pipeline(transaction=False) as pipe:
-                for key in key_list:
-                    pipe.delete(key)
-                await pipe.execute()
-        except Exception as e:
-            logger.error(f"Error invalidating keys {key_list}: {e}")
-
-    for pattern in pattern_list:
-        try:
-            cursor = 0
-            while True:
-                cursor, matched_keys = await redis_client.scan(
-                    cursor, match=f"{pattern}*", count=100
-                )
-                if matched_keys:
-                    async with redis_client.pipeline(transaction=False) as pipe:
-                        for key in matched_keys:
-                            pipe.delete(key)
-                        await pipe.execute()
-                if cursor == 0:
-                    break
-        except Exception as e:
-            logger.error(f"Error invalidating pattern {pattern}: {e}")
-
-    await manager.broadcast_to_all(
-        data={"keys": key_list + pattern_list},
-        message_type="invalidate",
-    )
-
-
 async def cache_invalidate_tag(tag: str) -> None:
     tag_key = f"tag:{tag}"
     keys = await redis_client.smembers(tag_key)
