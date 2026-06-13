@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import type { Order } from "@/schemas";
 import { tryCatch } from "@/utils/try-catch";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 
 interface OrderNotesProp {
     order: Order;
@@ -22,7 +22,7 @@ const OrderNotes: React.FC<OrderNotesProp> = ({ order }) => {
         if (!notes.trim()) return;
 
         setIsLoading(true);
-        const { error } = await tryCatch(clientApi.patch<Order>(`/order/${order.id}/notes`, { notes }));
+        const { error } = await tryCatch(api.patch<Order>(`/order/${order.id}/notes`, { notes }));
 
         setIsLoading(false);
 

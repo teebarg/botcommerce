@@ -195,7 +195,6 @@ async def update_catalog(
     data: CatalogUpdate,
     srv: CatalogService = Depends(get_catalog_service),
 ) -> Catalog:
-    slug = None
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:
         raise HTTPException(status_code=404, detail="Catalog not found")

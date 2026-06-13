@@ -1,12 +1,12 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { Order, OrderStatus, PaymentStatus } from "@/schemas";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 
 export const useChangeOrderStatus = () => {
     return useMutation({
         mutationFn: async ({ id, status }: { id: number; status: OrderStatus }) =>
-            await clientApi.patch<Order>(`/order/${id}/status?status=${status}`, {}),
+            await api.patch<Order>(`/order/${id}/status?status=${status}`, {}),
         onSuccess: () => {
             toast.success("Successfully changed order status");
         },
@@ -19,7 +19,7 @@ export const useChangeOrderStatus = () => {
 export const useChangePaymentStatus = () => {
     return useMutation({
         mutationFn: async ({ id, status }: { id: number; status: PaymentStatus }) =>
-            await clientApi.patch<Order>(`/payment/${id}/status?status=${status}`, {}),
+            await api.patch<Order>(`/payment/${id}/status?status=${status}`, {}),
         onSuccess: () => {
             toast.success("Successful!", {
                 description: "Payment status changed successfully",
@@ -46,14 +46,14 @@ export const useOrderTimeline = (orderId?: number) => {
     return useQuery({
         queryKey: ["order-timeline", orderId?.toString()],
         enabled: !!orderId,
-        queryFn: () => clientApi.get<OrderTimelineEntry[]>(`/order/${orderId}/timeline`),
+        queryFn: () => api.get<OrderTimelineEntry[]>(`/order/${orderId}/timeline`),
     });
 };
 
 export const useReturnOrderItem = () => {
     return useMutation({
         mutationFn: async ({ orderId, itemId }: { orderId: number; itemId: number }) =>
-            await clientApi.post<Order>(`/order/${orderId}/return`, { item_id: itemId }),
+            await api.post<Order>(`/order/${orderId}/return`, { item_id: itemId }),
         onSuccess: () => {
             toast.success("Item returned. Inventory updated and totals recalculated.");
         },

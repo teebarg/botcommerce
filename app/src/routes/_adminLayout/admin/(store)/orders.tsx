@@ -8,8 +8,8 @@ import z from "zod";
 import { ordersQuery } from "@/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
-import { clientApi } from "@/utils/api.client";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
+import { api } from "@/utils/api";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/orders")({
     validateSearch: z.object({
@@ -32,7 +32,7 @@ function RouteComponent() {
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedOrders, Order>({
         queryKey: ["orders", "infinite", params],
-        queryFn: (cursor) => clientApi.get<PaginatedOrders>("/order/", { params: { cursor, ...params } }),
+        queryFn: (cursor) => api.get<PaginatedOrders>("/order/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
         initialData: initialData,

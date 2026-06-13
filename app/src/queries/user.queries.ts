@@ -5,6 +5,7 @@ import { getCollectionFn } from "@/server/store.server";
 import { getCatalogFn, getUserAddressesFn } from "@/server/store.server";
 import { clientApi } from "@/utils/api.client";
 import { Order, PaginatedOrders, PaginatedReview } from "@/schemas";
+import { api } from "@/utils/api";
 
 type FeedParams = {
     search?: string;
@@ -59,13 +60,13 @@ export const productQuery = (slug: string) =>
 export const orderQuery = (orderNumber: string) =>
     queryOptions({
         queryKey: ["order", orderNumber],
-        queryFn: () => clientApi.get<Order>(`/order/${orderNumber}`),
+        queryFn: () => api.get<Order>(`/order/${orderNumber}`),
     });
 
 export const ordersQuery = (params: { take?: number; status?: any; start_date?: string; end_date?: string }) =>
     queryOptions({
         queryKey: ["orders", JSON.stringify(params)],
-        queryFn: () => clientApi.get<PaginatedOrders>("/order/", { params }),
+        queryFn: () => api.get<PaginatedOrders>("/order/", { params }),
         staleTime: 1000 * 60 * 60 * 24,
         refetchOnMount: false,
     });

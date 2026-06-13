@@ -1,5 +1,4 @@
 import uuid
-from app.core.notifications.events import SendInvoiceEvent, OrderConfirmedEvent
 from fastapi import HTTPException, BackgroundTasks
 from app.models.order import OrderCreate
 from app.core.logging import logger
@@ -9,12 +8,13 @@ from app.core.deps import Notification, supabase
 from app.services.product import index_product
 from app.core.config import settings
 from app.services.events import EventBus
-from app.services.redis import refresh_data
 from app.services.shop_settings import ShopSettingsService
 from app.services.cart import get_cart
 from typing import Any, Dict
 from prisma import Prisma
 from app.services.coupon import CouponService
+from app.core.notifications.events import SendInvoiceEvent, OrderConfirmedEvent
+from app.services.cache import CacheService
 
 
 class OrderService:
@@ -24,13 +24,15 @@ class OrderService:
         coupon_service: CouponService,
         settings_service: ShopSettingsService,
         notification_dispatcher: Notification,
-        event_bus: EventBus
+        event_bus: EventBus,
+        cache: CacheService
     ):
         self.db = db
         self.coupon_service = coupon_service
         self.settings_service = settings_service
         self.notification = notification_dispatcher
         self.event_bus = event_bus
+        self.cache = cache
 
     async def create_order_from_cart(self, order_in: OrderCreate, user_id: int, cart_number: str) -> Any:
         order_number: str = f"ORD{uuid.uuid4().hex[:8].upper()}"
@@ -90,6 +92,8 @@ class OrderService:
         if order_in.payment_status == "SUCCESS":
             await self.event_bus.publish_order_event(order=new_order, type="ORDER_PAID")
 
+        await self.cache.invalidate(tags=["orders"])
+
         return new_order
 
     async def send_confirmation_notification(self, id: int, user_id: int) -> None:
@@ -144,7 +148,7 @@ class OrderService:
 
             public_url = supabase.storage.from_("invoices").get_public_url(filename, {"download": filename})
             await self.db.order.update(where={"id": order_id}, data={"invoice_url": public_url})
-            await refresh_data(patterns=["orders"], keys=[f"order:{order_id}"])
+            await self.cache.invalidate(f"order:{order_id}", tags=["orders"])
             return public_url
         except Exception as e:
             raise Exception(str(e))
@@ -173,7 +177,7 @@ class OrderService:
                 if out_of_stock:
                     out_of_stock_variants.append(variant)
 
-            await refresh_data(patterns=["gallery"])
+            await self.cache.invalidate(tags=["gallery"])
         except Exception as e:
             logger.error(f"Failed to decrement variant inventory for order {order.id}: {e}")
             raise Exception("Failed to decrement variant inventory for order")
@@ -187,7 +191,7 @@ class OrderService:
                     channel_name="slack",
                     slack_message={"text": slack_text}
                 )
-                await refresh_data(patterns=["orders"])
+                await self.cache.invalidate(tags=["orders"])
             except Exception as e:
                 logger.error(f"Failed to send out-of-stock slack: {e}")
 
@@ -297,7 +301,7 @@ class OrderService:
 
         async def invalidate_caches() -> None:
             try:
-                await refresh_data(patterns=["orders"], keys=[f"order:{order_id}", f"order-timeline:{order_id}"])
+                await self.cache.invalidate(f"order:{order_id}", f"order-timeline:{order_id}", tags=["orders"])
                 if order_item.variant and order_item.variant.product_id:
                     await index_product(product_id=order_item.variant.product_id)
             except Exception as e:

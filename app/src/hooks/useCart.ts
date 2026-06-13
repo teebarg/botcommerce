@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import type { Cart, CartComplete, CartUpdate, Message, Order } from "@/schemas";
 import { useNavigate } from "@tanstack/react-router";
 import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 
 export const useMyCart = () => {
     return useQuery({
@@ -138,7 +139,7 @@ export const useCompleteCart = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (complete: CartComplete) => await clientApi.post<Order>("/order/", complete),
+        mutationFn: async (complete: CartComplete) => await api.post<Order>("/order/", complete),
         onSuccess: async (data) => {
             navigate({ to: `/order/confirmed/${data?.order_number}`, replace: true });
             queryClient.invalidateQueries({ queryKey: ["cart"] });

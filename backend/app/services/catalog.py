@@ -1,6 +1,5 @@
 from typing import Optional
 from app.core.logging import logger
-from app.services.redis import refresh_data
 from math import ceil
 from app.services.cache import CacheService
 
