@@ -1,7 +1,7 @@
 import { api } from "@/utils/api.server";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { PaginatedUsers, PaginatedWalletTxns, ProductSearch, User, Wishlist } from "@/schemas";
+import type { PaginatedUsers, PaginatedWalletTxns, User, Wishlist } from "@/schemas";
 import { AuthUser, useAppSession } from "@/utils/session";
 
 export const UserSearchSchema = z.object({

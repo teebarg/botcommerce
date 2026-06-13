@@ -1,6 +1,4 @@
-from app.models.cart import Cart
 from typing import Optional, Dict, Any
-from app.core.dependencies.cache import CacheDep
 from fastapi import HTTPException
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
@@ -9,25 +7,36 @@ from app.core.utils import generate_id
 from prisma.enums import CartStatus
 from prisma import Prisma
 from app.services.coupon import CouponService
+from app.models.cart import Cart
+from app.core.dependencies.cache import CacheDep
 
 logger = get_logger(__name__)
 
-
 async def get_cart(cart_number: Optional[str], user_id: Optional[str]) -> Cart | None:
-    """Retrieve an existing cart"""
+    """Retrieve an existing cart with items sorted by creation date"""
+    include_query = {
+        "items": {
+            "order": {"created_at": "asc"} 
+        }
+    }
+
     if user_id:
         cart = await db.cart.find_first(
             where={"user_id": user_id, "status": CartStatus.ACTIVE},
-            include={"items": True},
+            include=include_query,
             order={"created_at": "desc"}
         )
         if cart:
             return cart
 
     if cart_number:
-        cart = await db.cart.find_unique(where={"cart_number": cart_number, "status": CartStatus.ACTIVE}, include={"items": True})
+        cart = await db.cart.find_unique(
+            where={"cart_number": cart_number, "status": CartStatus.ACTIVE}, 
+            include=include_query
+        )
         if cart:
             return cart
+            
     return None
 
 

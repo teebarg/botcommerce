@@ -25,6 +25,7 @@ export const CartItemSchema = z
         image: z.string().optional(),
         quantity: z.number(),
         price: z.number(),
+        created_at: z.date(),
     });
 
 export const CartSchema = z

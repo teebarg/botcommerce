@@ -9,7 +9,7 @@ export const useUserAddresses = () => {
     const { isAuthenticated, userId } = useRouteContext({ strict: false });
 
     return useQuery({
-        queryKey: ["addresses", userId],
+        queryKey: ["addresses", `${userId}`],
         queryFn: () => getUserAddressesFn(),
         enabled: isAuthenticated,
     });

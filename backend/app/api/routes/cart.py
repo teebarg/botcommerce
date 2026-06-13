@@ -111,7 +111,7 @@ async def update_cart_item(
     if quantity > cart_item.variant.inventory:
         raise HTTPException(status_code=400, detail=f"Not enough inventory. Only {cart_item.variant.inventory} items available.")
 
-    updated_item = await db.cartitem.update(where={"id": item_id}, data={"quantity": quantity}, include={"variant": True})
+    updated_item = await db.cartitem.update(where={"id": item_id}, data={"quantity": quantity})
     background_tasks.add_task(service.calculate_totals, cart_id=cart.id)
     return updated_item
 
@@ -203,8 +203,6 @@ async def apply_wallet(
 
     await service.apply_wallet_balance(cart=cart, user=user)
     await service.calculate_totals(cart_id=cart.id)
-    # await refresh_data(patterns=["user"])
-    await service.cache.invalidate(tags=["user"])
     return Message(message="Wallet balance applied successfully")
 
 
@@ -221,8 +219,6 @@ async def remove_wallet(
 
     await service.remove_wallet_balance(cart=cart, user=user)
     await service.calculate_totals(cart_id=cart.id)
-    # await refresh_data(patterns=["user"])
-    await service.cache.invalidate(tags=["user"])
     return Message(message="Wallet usage removed from cart session")
 
 

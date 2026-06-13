@@ -8,7 +8,6 @@ import { Separator } from "@/components/ui/separator";
 import Overlay from "@/components/overlay";
 import type { Cart } from "@/schemas";
 import { currency } from "@/utils";
-import { useInvalidateCart } from "@/hooks/useCart";
 import { useInvalidateMe } from "@/hooks/useUser";
 import ImageDisplay from "@/components/image-display";
 import { useRouteContext, useRouter } from "@tanstack/react-router";
@@ -23,7 +22,6 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
     const { session } = useRouteContext({ strict: false });
     const router = useRouter();
     const invalidateMe = useInvalidateMe();
-    const invalidateCart = useInvalidateCart();
 
     if (!cart) return null;
 
@@ -42,8 +40,6 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
             });
 
             invalidateMe();
-            invalidateCart();
-
             toast.success("Impersonated");
 
             await router.invalidate();
