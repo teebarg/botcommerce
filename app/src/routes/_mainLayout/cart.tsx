@@ -172,11 +172,7 @@ function RouteComponent() {
                             Your cart ({itemCount} {itemCount === 1 ? "item" : "items"})
                         </p>
                         <div className="rounded-xl border bg-card overflow-hidden">
-                            {cart.items.sort(
-                                (a, b) =>
-                                    new Date(b.created_at).getTime() -
-                                    new Date(a.created_at).getTime()
-                            ).map((item: CartItem) => (
+                            {cart.items.map((item: CartItem) => (
                                 <CartItemRow key={item.variant_id} item={item} />
                             ))}
                         </div>

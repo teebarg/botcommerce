@@ -9,7 +9,7 @@ from app.services.product import index_product
 from app.core.config import settings
 from app.services.events import EventBus
 from app.services.shop_settings import ShopSettingsService
-from app.services.cart import get_cart
+from app.services.cart import CartService
 from typing import Any, Dict
 from prisma import Prisma
 from app.services.coupon import CouponService
@@ -21,6 +21,7 @@ class OrderService:
     def __init__(
         self,
         db: Prisma,
+        cart_service: CartService,
         coupon_service: CouponService,
         settings_service: ShopSettingsService,
         notification_dispatcher: Notification,
@@ -28,6 +29,7 @@ class OrderService:
         cache: CacheService
     ):
         self.db = db
+        self.cart = cart_service
         self.coupon_service = coupon_service
         self.settings_service = settings_service
         self.notification = notification_dispatcher
@@ -36,7 +38,7 @@ class OrderService:
 
     async def create_order_from_cart(self, order_in: OrderCreate, user_id: int, cart_number: str) -> Any:
         order_number: str = f"ORD{uuid.uuid4().hex[:8].upper()}"
-        cart = await get_cart(cart_number=cart_number, user_id=user_id)
+        cart = await self.cart.repo.get_active_cart(cart_number=cart_number, user_id=user_id)
         if not cart:
             raise HTTPException(status_code=404, detail="Cart not found")
 

@@ -12,12 +12,12 @@ from app.prisma_client import prisma as db
 from app.core.logging import get_logger
 from prisma.errors import PrismaError
 from datetime import datetime, date
-from app.services.cart import get_cart
 from app.core.permissions import require_admin
 from app.models.generic import Message
 from app.core.dependencies.services import get_coupon_service
 from app.services.cache import cacheable
 from app.core.dependencies.cache import CacheDep
+from app.core.dependencies.cart import CartDep
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -146,7 +146,7 @@ async def apply_coupon(
     """
     Apply a coupon to a cart.
     """
-    cart = await get_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    cart = await cart.repo.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
 
@@ -164,6 +164,7 @@ async def apply_coupon(
 @router.post("/remove", response_model=dict)
 async def remove_coupon(
     cache: CacheDep,
+    cart: CartDep,
     user: UserDep = None,
     srv: CouponService = Depends(get_coupon_service),
     _cart_id: Annotated[str | None, Cookie()] = None
@@ -171,7 +172,7 @@ async def remove_coupon(
     """
     Remove coupon from cart.
     """
-    cart = await get_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    cart = await cart.repo.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
 
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")

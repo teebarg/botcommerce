@@ -1,4 +1,5 @@
 from typing import Optional, Dict, Any
+from app.services.cache import CacheService
 from fastapi import HTTPException
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
@@ -8,45 +9,20 @@ from prisma.enums import CartStatus
 from prisma import Prisma
 from app.services.coupon import CouponService
 from app.models.cart import Cart
-from app.core.dependencies.cache import CacheDep
 
 logger = get_logger(__name__)
-
-async def get_cart(cart_number: Optional[str], user_id: Optional[str]) -> Cart | None:
-    """Retrieve an existing cart with items sorted by creation date"""
-    include_query = {
-        "items": {
-            "order": {"created_at": "asc"} 
-        }
-    }
-
-    if user_id:
-        cart = await db.cart.find_first(
-            where={"user_id": user_id, "status": CartStatus.ACTIVE},
-            include=include_query,
-            order={"created_at": "desc"}
-        )
-        if cart:
-            return cart
-
-    if cart_number:
-        cart = await db.cart.find_unique(
-            where={"cart_number": cart_number, "status": CartStatus.ACTIVE}, 
-            include=include_query
-        )
-        if cart:
-            return cart
-            
-    return None
 
 
 class CartRepository:
     def __init__(self, db: Prisma):
         self.db = db
 
-    async def get_active_cart(self, cart_number: Optional[str], user_id: Optional[int], include_relations: bool = False) -> Any:
+    async def get_active_cart(self, cart_number: Optional[str], user_id: Optional[int], include_relations: bool = False) -> Cart | None:
         include_clause = {
-            "items": {"include": {"variant": True}},
+            "items": {
+                "order_by": {"created_at": "asc"},
+                "include": {"variant": True}
+            },
             "shipping_address": True
         } if include_relations else {"items": True}
 
@@ -82,8 +58,9 @@ class CartRepository:
 
 
 class CartService:
-    def __init__(self, db: Prisma, cache: CacheDep, settings_service: ShopSettingsService, coupon_service: CouponService):
+    def __init__(self, db: Prisma, repo: CartRepository, cache: CacheService, settings_service: ShopSettingsService, coupon_service: CouponService):
         self.db = db
+        self.repo = repo
         self.settings_service = settings_service
         self.coupon_service = coupon_service
         self.cache = cache
