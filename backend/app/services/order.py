@@ -87,10 +87,10 @@ class OrderService:
             logger.error(f"Failed to create order: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
-        await self.event_bus.publish_order_event(order=new_order, type="ORDER_CREATED")
+        await self.event_bus.publish_order_event(order=new_order, event_type="ORDER_CREATED")
 
         if order_in.payment_status == "SUCCESS":
-            await self.event_bus.publish_order_event(order=new_order, type="ORDER_PAID")
+            await self.event_bus.publish_order_event(order=new_order, event_type="ORDER_PAID")
 
         await self.cache.invalidate(tags=["orders"])
 

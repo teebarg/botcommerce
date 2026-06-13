@@ -176,7 +176,7 @@ async def payment_status(srv: OrderDep, id: int, status: PaymentStatus) -> Order
         keys: list[str] = [f"order:{id}"]
 
         if status == PaymentStatus.SUCCESS:
-            await srv.event_bus.publish_order_event(order=updated_order, type="ORDER_PAID")
+            await srv.event_bus.publish_order_event(order=updated_order, event_type="ORDER_PAID")
             try:
                 await tx.ordertimeline.create(
                     data={
