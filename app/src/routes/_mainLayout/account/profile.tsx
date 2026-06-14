@@ -12,7 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { tryCatch } from "@/utils/try-catch";
 import { Separator } from "@/components/ui/separator";
 import { updateAuthSession } from "@/utils/auth-client";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 import { getInitials } from "@/utils";
 
 const profileSchema = z.object({
@@ -62,7 +62,7 @@ function RouteComponent() {
 
     const handleProfileSave = async (data: ProfileFormValues) => {
         setIsPending(true);
-        const { error } = await tryCatch<Message>(clientApi.patch<Message>("/users/me", data));
+        const { error } = await tryCatch<Message>(api.patch<Message>("/users/me", data));
 
         if (error) {
             toast.error(error);

@@ -9,7 +9,7 @@ import { useSendCartReminders } from "@/hooks/useAbandonedCart";
 import { AbandonedCartStats } from "@/components/admin/abandoned-carts/stat";
 import { useQuery } from "@tanstack/react-query";
 import { abandonedCartsQuery, abandonedCartStatsQuery } from "@/queries/admin.queries";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { z } from "zod";
@@ -40,7 +40,7 @@ function RouteComponent() {
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedAbandonedCarts, Cart>({
         queryKey: ["abandoned-carts", "infinite", params],
-        queryFn: (cursor) => clientApi.get<PaginatedAbandonedCarts>("/cart/abandoned-carts", { params: { cursor, ...params } }),
+        queryFn: (cursor) => api.get<PaginatedAbandonedCarts>("/cart/abandoned-carts", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
         initialData: data,

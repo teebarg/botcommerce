@@ -5,7 +5,7 @@ import { Check, Copy, Gift, Loader, Share2, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { currency } from "@/utils";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 import { PaginatedWalletTxns, WalletTxn } from "@/schemas";
 import { WalletTxnCard } from "@/components/store/account/WalletTxnCard";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
@@ -32,7 +32,7 @@ function RouteComponent() {
     } = useInfiniteResource<PaginatedWalletTxns, WalletTxn>({
         queryKey: ["wallet", "infinite"],
         queryFn: (cursor) =>
-            clientApi.get("/wallet/me", {
+            api.get("/wallet/me", {
                 params: { cursor },
             }),
         getItems: (page) => page.txns,

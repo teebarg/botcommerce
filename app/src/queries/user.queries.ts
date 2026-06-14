@@ -3,9 +3,8 @@ import { getProductFn, getProductsFeedFn } from "@/server/product.server";
 import { getMeFn, getMeTrxnFn } from "@/server/users.server";
 import { getCollectionFn } from "@/server/store.server";
 import { getCatalogFn, getUserAddressesFn } from "@/server/store.server";
-import { clientApi } from "@/utils/api.client";
-import { Order, PaginatedOrders, PaginatedReview } from "@/schemas";
 import { api } from "@/utils/api";
+import { Order, PaginatedOrders, PaginatedReview } from "@/schemas";
 
 type FeedParams = {
     search?: string;
@@ -87,6 +86,6 @@ export const collectionQuery = (slug: string) =>
 export const reviewsQuery = (params?: { search?: string; product_id?: number; sort?: string }) =>
     queryOptions({
         queryKey: ["reviews", params],
-        queryFn: () => clientApi.get<PaginatedReview>("/reviews/", { params }),
+        queryFn: () => api.get<PaginatedReview>("/reviews/", { params }),
         staleTime: 1000 * 60 * 60 * 24,
     });

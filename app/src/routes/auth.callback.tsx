@@ -1,5 +1,5 @@
 import { loginFn } from "@/server/users.server";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 import { SessionUser } from "@/utils/session";
 import { tryCatch } from "@/utils/try-catch";
 import { useAuth, useUser } from "@clerk/tanstack-react-start";
@@ -43,7 +43,7 @@ function RouteComponent() {
 
             const token = await getToken({ template: "default" });
             const { error, data: sessionUser } = await tryCatch(
-                clientApi.post<SessionUser>("/auth/exchange", {}, { headers: { "X-Auth": token || "t" } })
+                api.post<SessionUser>("/auth/exchange", {}, { headers: { "X-Auth": token || "t" } })
             );
 
             if (error || !sessionUser) {

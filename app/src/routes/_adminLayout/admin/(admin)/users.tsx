@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { usersQuery } from "@/queries/admin.queries";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import { useState } from "react";
@@ -37,7 +37,7 @@ function RouteComponent() {
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedUsers, User>({
         queryKey: ["users", "infinite", params],
-        queryFn: (cursor) => clientApi.get<PaginatedUsers>("/users/", { params: { cursor, ...params } }),
+        queryFn: (cursor) => api.get<PaginatedUsers>("/users/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
         initialData: initialUsers,

@@ -1,14 +1,13 @@
 import { queryOptions } from "@tanstack/react-query";
 import { getUsersFn } from "@/server/users.server";
 import { CartStatus, PaginatedAbandonedCarts, PaginatedActivities, PaginatedChats, PaginatedCoupons } from "@/schemas";
-import { clientApi } from "@/utils/api.client";
-import { StatsTrends } from "@/types/models";
 import { api } from "@/utils/api";
+import { StatsTrends } from "@/types/models";
 
 export const statsTrendsQuery = () =>
     queryOptions({
         queryKey: ["stats", "trends"],
-        queryFn: () => clientApi.get<StatsTrends>("/stats/trends"),
+        queryFn: () => api.get<StatsTrends>("/stats/trends"),
     });
 
 export interface UsersParams {
@@ -54,17 +53,17 @@ interface AbandonedCartStats {
 
 export const abandonedCartStatsQuery = (hours_threshold: string) => ({
     queryKey: ["abandoned-carts", "stats", JSON.stringify({ hours_threshold })],
-    queryFn: () => clientApi.get<AbandonedCartStats>(`/cart/abandoned-carts/stats?hours_threshold=${hours_threshold}`),
+    queryFn: () => api.get<AbandonedCartStats>(`/cart/abandoned-carts/stats?hours_threshold=${hours_threshold}`),
 });
 
 export const abandonedCartsQuery = (params: { search?: string; hours_threshold?: string }) => ({
     queryKey: ["abandoned-carts", JSON.stringify(params)],
-    queryFn: () => clientApi.get<PaginatedAbandonedCarts>("/cart/abandoned-carts", { params }),
+    queryFn: () => api.get<PaginatedAbandonedCarts>("/cart/abandoned-carts", { params }),
 });
 
-export const chatsQuery = (params: { user_id?: number; status?: CartStatus }) =>
+export const chatsQuery = (params: { user_id?: number; status?: any }) =>
     queryOptions({
         queryKey: ["chats", JSON.stringify(params)],
-        queryFn: () => clientApi.get<PaginatedChats>("/chat/", { params }),
+        queryFn: () => api.get<PaginatedChats>("/chat/", { params }),
         staleTime: 1000 * 60 * 60,
     });

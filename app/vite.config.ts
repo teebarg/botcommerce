@@ -10,6 +10,9 @@ import { VitePWA } from "vite-plugin-pwa";
 
 const config = defineConfig({
     server: {
+        hmr: {
+            overlay: true,
+        },
         allowedHosts: true,
         watch: {
             ignored: ["**/routeTree.gen.ts"],

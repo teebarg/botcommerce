@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import PaymentLoading from "@/components/store/payment/payment-loading";
 import z from "zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 import { Order } from "@/schemas";
 
 export const Route = createFileRoute("/payment/verify")({
@@ -22,7 +22,7 @@ function RouteComponent() {
 
     const { data, error, isPending } = useQuery({
         queryKey: ["payment", "verify", reference],
-        queryFn: () => clientApi.get<Order>(`/payment/verify/${reference}`),
+        queryFn: () => api.get<Order>(`/payment/verify/${reference}`),
     });
 
     if (isPending) {

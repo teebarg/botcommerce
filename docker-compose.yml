@@ -6,6 +6,7 @@ services:
     container_name: shop
     environment:
       - NODE_ENV=development
+      - NITRO_DEV_WORKER=false
     volumes:
       - ./app:/app
       - /app/node_modules
@@ -42,6 +43,8 @@ services:
       - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
     networks:
       - dev-net
+    environment:
+      - UV_LINK_MODE=copy # Mutes filesystem crossing warnings cleanly
     env_file:
       - ./backend/.env
     build:
@@ -81,6 +84,7 @@ services:
       - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
     environment:
       - FASTEMBED_CACHE_PATH=/app/models
+      - UV_LINK_MODE=copy
     platform: linux/amd64 # Patch for M1 Mac
     volumes:
       - ./agent:/app

@@ -1,4 +1,4 @@
-import { api } from "@/utils/api.server";
+import { api } from "@/utils/api";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { PaginatedUsers, PaginatedWalletTxns, User, Wishlist } from "@/schemas";
