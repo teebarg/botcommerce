@@ -4,7 +4,7 @@ import { tryCatch } from "@/utils/try-catch";
 import { Gift, Sparkles, Star } from "lucide-react";
 import { cn, currency } from "@/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 import { Message } from "@/schemas";
 
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000;
@@ -98,7 +98,7 @@ export default function PushPermission() {
             auth: sub.toJSON().keys?.auth || "",
         };
 
-        const { error } = await tryCatch(clientApi.post<Message>("/notification/push-fcm", subscriptionData));
+        const { error } = await tryCatch(api.post<Message>("/notification/push-fcm", subscriptionData));
 
         if (error) {
             toast.error(error);

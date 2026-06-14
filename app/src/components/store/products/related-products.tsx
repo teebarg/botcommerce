@@ -1,7 +1,7 @@
 import type { ProductSearch } from "@/schemas/product";
 import ProductCard from "@/components/store/products/product-card";
 import { useQuery } from "@tanstack/react-query";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 
 type RelatedProductsProps = {
     productId: number;
@@ -10,7 +10,7 @@ type RelatedProductsProps = {
 export default function RelatedProducts({ productId }: RelatedProductsProps) {
     const { data } = useQuery({
         queryKey: ["product", "similar", productId],
-        queryFn: async () => await clientApi.get<{ similar: ProductSearch[] }>(`/product/${productId}/similar`, { params: { limit: 12 } }),
+        queryFn: async () => await api.get<{ similar: ProductSearch[] }>(`/product/${productId}/similar`, { params: { limit: 12 } }),
     });
     const productPreviews = data?.similar?.filter((item: ProductSearch) => item.id !== productId);
     if (!productPreviews?.length) {

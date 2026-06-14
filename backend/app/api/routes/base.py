@@ -1,3 +1,4 @@
+from typing import Literal, Optional
 from fastapi import (
     APIRouter,
     Depends,
@@ -7,11 +8,7 @@ from fastapi import (
 )
 from app.prisma_client import prisma as db
 from prisma.enums import Role
-from app.core.deps import RedisClient
-from typing import Literal, Optional
 from datetime import timedelta, datetime
-from app.services.meilisearch import clear_index
-from app.core.config import settings
 from app.core.permissions import require_admin
 from app.core.dependencies.cache import CacheDep
 from app.services.cache import cacheable
@@ -117,21 +114,11 @@ async def stats_trends(
         "trends": trends
     }
 
-@router.post("/cache/bust", dependencies=[Depends(require_admin)])
-async def bust_redis_cache(cache: CacheDep, pattern: str = Body(..., embed=True)):
-    """Bust Redis cache by key."""
-    try:
-        await cache.invalidate(tags=[pattern])
-        return {"success": True, "pattern": pattern}
-    except Exception as e:
-        return {"success": False, "error": str(e), "pattern": pattern}
-
 @router.post("/cache/clear", dependencies=[Depends(require_admin)])
-async def clear_redis_cache(redis: RedisClient):
+async def clear_redis_cache(cache: CacheDep):
     """Clear the entire Redis database"""
     try:
-        await clear_index(settings.MEILI_PRODUCTS_INDEX)
-        result = await redis.flushdb()
+        result = await cache.clear_cache()
         return {"success": result}
     except Exception as e:
         return {"success": False, "error": str(e)}

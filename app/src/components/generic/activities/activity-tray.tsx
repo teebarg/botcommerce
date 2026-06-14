@@ -3,13 +3,13 @@ import { Bell } from "lucide-react";
 import ActivityView from "./activity";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useQuery } from "@tanstack/react-query";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 import { Activity } from "@/schemas";
 
 const ActivityTray: React.FC = () => {
     const { data: activities, isLoading } = useQuery({
         queryKey: ["activity"],
-        queryFn: async () => await clientApi.get<Activity[]>("/activities/me"),
+        queryFn: async () => await api.get<Activity[]>("/activities/me"),
     });
 
     return (

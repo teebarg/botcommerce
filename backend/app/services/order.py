@@ -5,7 +5,7 @@ from app.core.logging import logger
 from app.services.invoice import invoice_service
 from datetime import datetime
 from app.core.deps import Notification, supabase
-from app.services.product import index_product
+from app.services.product import ProductService
 from app.core.config import settings
 from app.services.events import EventBus
 from app.services.shop_settings import ShopSettingsService
@@ -21,16 +21,18 @@ class OrderService:
     def __init__(
         self,
         db: Prisma,
-        cart_service: CartService,
-        coupon_service: CouponService,
+        cart_srv: CartService,
+        product_srv: ProductService,
+        coupon_srv: CouponService,
         settings_service: ShopSettingsService,
         notification_dispatcher: Notification,
         event_bus: EventBus,
         cache: CacheService
     ):
         self.db = db
-        self.cart = cart_service
-        self.coupon_service = coupon_service
+        self.cart = cart_srv
+        self.product_srv = product_srv
+        self.coupon_srv = coupon_srv
         self.settings_service = settings_service
         self.notification = notification_dispatcher
         self.event_bus = event_bus
@@ -74,7 +76,7 @@ class OrderService:
         if cart.coupon_id:
             data["coupon"] = {"connect": {"id": cart.coupon_id}}
             data["coupon_code"] = cart.coupon_code
-            await self.coupon_service.increment_coupon_usage(
+            await self.coupon_srv.increment_coupon_usage(
                 coupon_id=cart.coupon_id,
                 user_id=user_id,
                 discount_amount=cart.discount_amount
@@ -175,7 +177,7 @@ class OrderService:
                     out_of_stock = True
 
                 await self.db.productvariant.update(where={"id": variant_id}, data=update_data)
-                await index_product(product_id=variant.product_id)
+                await self.product_srv.invalidate(product_id=variant.product_id)
                 if out_of_stock:
                     out_of_stock_variants.append(variant)
 
@@ -305,7 +307,7 @@ class OrderService:
             try:
                 await self.cache.invalidate(f"order:{order_id}", f"order-timeline:{order_id}", tags=["orders"])
                 if order_item.variant and order_item.variant.product_id:
-                    await index_product(product_id=order_item.variant.product_id)
+                    await self.product_srv.invalidate(product_id=order_item.variant.product_id)
             except Exception as e:
                 logger.error(f"Failed to invalidate caches/reindex after return: {e}")
 

@@ -1,11 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 import { Message } from "@/schemas";
 
 export const useSendCartReminder = () => {
     return useMutation({
-        mutationFn: async (cartId: number) => await clientApi.post<Message>(`/cart/abandoned-carts/${cartId}/send-reminder`),
+        mutationFn: async (cartId: number) => await api.post<Message>(`/cart/abandoned-carts/${cartId}/send-reminder`),
         onSuccess: () => {
             toast.success("Recovery email sent");
         },
@@ -18,7 +18,7 @@ export const useSendCartReminder = () => {
 export const useSendCartReminders = () => {
     return useMutation({
         mutationFn: async ({ hours_threshold, limit = 20 }: { hours_threshold: number; limit?: number }) =>
-            await clientApi.post<Message>("/cart/abandoned-carts/send-reminders", {
+            await api.post<Message>("/cart/abandoned-carts/send-reminders", {
                 hours_threshold,
                 limit,
             }),

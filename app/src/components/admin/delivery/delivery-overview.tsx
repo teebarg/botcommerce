@@ -15,7 +15,7 @@ import { ZeroState } from "@/components/zero";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { useState } from "react";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 
 const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
     const editState = useOverlayTriggerState({});
@@ -35,7 +35,7 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
 
     const handleDelete = async () => {
         setIsPending(true);
-        const { error } = await tryCatch<Message>(clientApi.delete<Message>(`/delivery/${option.id}`));
+        const { error } = await tryCatch<Message>(api.delete<Message>(`/delivery/${option.id}`));
 
         if (!error) {
             toast.success("Delivery option deleted successfully");

@@ -2,7 +2,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import type { ProductSearch, SearchCatalog } from "@/schemas";
 import { useSearch } from "@tanstack/react-router";
 import NoProductsFound from "@/components/store/products/no-products";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 import { InfiniteList } from "@/components/InfiniteList";
 import ProductCardPLP from "../products/product-card-plp";
 
@@ -19,7 +19,7 @@ export default function CatalogInfinite({ slug, initialData }: Props) {
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery<SearchCatalog>({
         queryKey: ["products", "catalog", slug, "infinite"],
         queryFn: async ({ pageParam }) => {
-            const res = await clientApi.get<SearchCatalog>(`/catalog/${slug}`, { params: { slug, ...search, cursor: pageParam ?? undefined } });
+            const res = await api.get<SearchCatalog>(`/catalog/${slug}`, { params: { slug, ...search, cursor: pageParam ?? undefined } });
             return res;
         },
         initialPageParam: undefined,

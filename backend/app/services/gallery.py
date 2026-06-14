@@ -345,7 +345,7 @@ class GalleryService:
                     if v_data and first_variant_id:
                         await tx.productvariant.update(where={"id": first_variant_id}, data=v_data)
 
-    async def handle_bulk_update_products(self, payload: ImagesBulkUpdate, images, index_products_fn) -> None:
+    async def handle_bulk_update_images(self, payload: ImagesBulkUpdate, images, index_products_fn) -> None:
         failed_ids = []
         created_product_ids = []
 

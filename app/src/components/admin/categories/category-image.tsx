@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import type { Message } from "@/schemas";
 import { tryCatch } from "@/utils/try-catch";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 
 interface ProductImageManagerProps {
     categoryId: number;
@@ -21,7 +21,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
         setIsDeleting(true);
         void (async () => {
             try {
-                const { error } = await tryCatch<Message>(clientApi.delete<Message>(`/category/${categoryId}/image`));
+                const { error } = await tryCatch<Message>(api.delete<Message>(`/category/${categoryId}/image`));
 
                 if (error) {
                     toast.error(error);
@@ -60,7 +60,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
 
                     try {
                         const { error } = await tryCatch<Message>(
-                            clientApi.patch<Message>(`/category/${categoryId}/image`, {
+                            api.patch<Message>(`/category/${categoryId}/image`, {
                                 file: base64.split(",")[1]!, // Remove the data URL prefix
                                 file_name: fileName,
                                 content_type: file.type,

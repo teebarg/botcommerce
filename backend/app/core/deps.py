@@ -2,8 +2,6 @@ from typing import Annotated, Literal, Optional
 
 from app.core.notifications.service import NotificationService
 from app.core.notifications.setup import get_notification_service
-from app.core.dependencies.product import get_product_service
-from app.services.product import ProductService
 import jwt
 from fastapi import Depends, HTTPException, status, Cookie
 from fastapi.security import APIKeyHeader, OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
@@ -15,8 +13,7 @@ from app.prisma_client import prisma
 from meilisearch import Client as MeilisearchClient
 from app.models.user import UserInternal as User
 from supabase import create_client, Client
-from app.services.redis import get_redis_dependency, get_session
-import redis.asyncio as redis
+from app.services.redis import get_session
 from app.core.logging import get_logger
 import time
 import httpx
@@ -30,8 +27,6 @@ reusable_oauth2 = OAuth2PasswordBearer(
 
 meilisearch_client = MeilisearchClient(settings.MEILI_HOST, settings.MEILI_MASTER_KEY, timeout=1.5)
 supabase: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
-
-RedisClient = Annotated[redis.Redis, Depends(get_redis_dependency)]
 
 internal_bearer = HTTPBearer(auto_error=False)
 
@@ -176,8 +171,3 @@ async def get_principal(
 PrincipalDep = Annotated[Principal, Depends(get_principal)]
 
 Notification = Annotated[NotificationService, Depends(get_notification_service)]
-
-# SettingsDep = Annotated[ShopSettingsService, Depends(get_shop_settings_service)]
-# ConversationDep = Annotated[ConversationService, Depends(get_conversation_service)]
-
-ProductDep = Annotated[ProductService, Depends(get_product_service)]

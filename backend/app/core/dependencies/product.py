@@ -1,20 +1,17 @@
-from app.services.cache import CacheService
-from app.core.dependencies.cache import get_cache_service
-from fastapi import Depends, Request
+from typing import Annotated
+from fastapi import Depends
 from app.prisma_client import prisma as db
-from app.services.product import ProductRepository, SearchRepository, ProductService
-
-def get_product_repository(request: Request) -> ProductRepository:
-    # Safely extraction of configured redis engine state
-    redis = getattr(request.app.state, "redis", None)
-    return ProductRepository(db=db, redis=redis)
+from app.redis_client import redis_client
+from app.services.product import SearchRepository, ProductService
+from app.core.dependencies.cache import CacheDep
 
 def get_search_repository() -> SearchRepository:
     return SearchRepository()
 
 def get_product_service(
-    repo: ProductRepository = Depends(get_product_repository),
-    search_repo: SearchRepository = Depends(get_search_repository),
-    cache_service: CacheService = Depends(get_cache_service)
+    cache_srv: CacheDep,
+    search_repo: SearchRepository = Depends(get_search_repository)
 ) -> ProductService:
-    return ProductService(repo=repo, search_repo=search_repo, cache_service=cache_service)
+    return ProductService(db=db, redis=redis_client, search_repo=search_repo, cache_srv=cache_srv)
+
+ProductDep = Annotated[ProductService, Depends(get_product_service)]

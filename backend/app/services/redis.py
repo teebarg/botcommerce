@@ -1,9 +1,8 @@
-from typing import List, Any, Callable, Union, Optional
+from typing import List, Any, Callable, Optional
 from datetime import datetime, timedelta
 from functools import wraps
 
 import json
-import inspect
 from fastapi import Request
 from app.redis_client import redis_client
 from app.core.logging import get_logger
@@ -43,51 +42,6 @@ class EnhancedJSONEncoder(json.JSONEncoder):
             return o.__dict__
         return str(o)
 
-async def get_redis_dependency(request: Request):
-    return request.app.state.redis
-
-def cache_response(
-    key_prefix: str,
-    key: Union[str, Callable[..., str], None] = None,
-    expire: int = DEFAULT_EXPIRATION,
-    tags: List[str] = None,
-):
-    def decorator(func: Callable):
-        @wraps(func)
-        async def wrapper(*args, **kwargs):
-            request: Request = kwargs.get("request")
-            if not request:
-                raise ValueError("FastAPI Request not found")
-
-            redis = request.app.state.redis
-
-            if isinstance(key, str):
-                raw_key = f"{key_prefix}:{key}"
-            elif callable(key):
-                sig = inspect.signature(key)
-                allowed_params = sig.parameters.keys()
-                filtered_kwargs = {k: v for k, v in kwargs.items() if k in allowed_params}
-                raw_key = f"{key_prefix}:{key(**filtered_kwargs)}"
-            else:
-                raw_key = f"{key_prefix}:{request.url.path}?{request.url.query}"
-
-            cached = await redis.get(raw_key)
-            if cached is not None:
-                return json.loads(cached)
-
-            result = await func(*args, **kwargs)
-
-            async with redis.pipeline(transaction=False) as pipe:
-                pipe.setex(raw_key, expire, json.dumps(result, cls=EnhancedJSONEncoder))
-                for tag in (tags or []):
-                    pipe.sadd(f"tag:{tag}", raw_key)
-                    pipe.expire(f"tag:{tag}", expire)
-                await pipe.execute()
-
-            return result
-        return wrapper
-    return decorator
-
 
 async def set_session(session_id: str, data: dict, ttl=60 * 60 * 24 * 30):
     await redis_client.setex(f"session:{session_id}", ttl, json.dumps(data))
@@ -98,73 +52,3 @@ async def get_session(session_id: str):
 
 async def delete_session(session_id: str):
     await redis_client.delete(f"session:{session_id}")
-
-
-async def delete_cache_keys_by_tag(tag: Optional[str] = None) -> None:
-    """
-    Deletes:
-      1. All tag sets matching tag:<tag>:*
-      2. All cache keys stored inside those sets
-
-    Example:
-        tag:product:123 -> {"product:slug:shoe-1"}
-    """
-    if not tag:
-        raise ValueError("tag is required")
-
-    cursor = 0
-    pattern = f"tag:{tag}:*"
-
-    while True:
-        cursor, tag_keys = await redis_client.scan(
-            cursor=cursor,
-            match=pattern,
-            count=100,
-        )
-
-        for tag_key in tag_keys:
-            members = await redis_client.smembers(tag_key)
-
-            async with redis_client.pipeline(transaction=False) as pipe:
-                if members:
-                    pipe.delete(*members)
-
-                pipe.delete(tag_key)
-                await pipe.execute()
-
-        if cursor == 0:
-            break
-
-PRODUCT_CACHE_TAGS = ["product","products", "gallery"]
-
-async def refresh_product(ids: int | List[int]=None, tags: List[str] = None, full: bool = False) -> None:
-    tags_to_invalidate = tags or PRODUCT_CACHE_TAGS
-    def normalize(value):
-        if value is None:
-            return []
-        if isinstance(value, int):
-            return [f"product:{value}"]
-        return [f"product:{id}" for id in value]
-
-    for tag in tags_to_invalidate + normalize(ids):
-        await cache_invalidate_tag(tag)
-
-    if full:
-        await delete_cache_keys_by_tag("product")
-
-    await manager.broadcast_to_all(
-        data={"keys": tags_to_invalidate},
-        message_type="invalidate",
-    )
-
-async def cache_invalidate_tag(tag: str) -> None:
-    tag_key = f"tag:{tag}"
-    keys = await redis_client.smembers(tag_key)
-
-    if not keys:
-        return
-
-    async with redis_client.pipeline(transaction=False) as pipe:
-        pipe.delete(*keys)
-        pipe.delete(tag_key)
-        await pipe.execute()

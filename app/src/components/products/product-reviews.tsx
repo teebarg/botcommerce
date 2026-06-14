@@ -2,7 +2,6 @@ import type React from "react";
 import { ProductReviewsZeroState } from "../store/reviews/review-zero";
 import type { Review, ReviewStatus, SortBy } from "@/schemas";
 import { useQuery } from "@tanstack/react-query";
-import { clientApi } from "@/utils/api.client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -13,6 +12,7 @@ import { Filter, Star } from "lucide-react";
 import { ReviewForm } from "../store/reviews/review-form";
 import { useState } from "react";
 import { reviewsQuery } from "@/queries/user.queries";
+import { api } from "@/utils/api";
 
 interface Prop {
     product_id: number;
@@ -25,7 +25,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id, productName }) => {
     const { data: reviewsData, isLoading } = useQuery(reviewsQuery({ product_id, sort }));
     const { data } = useQuery({
         queryKey: ["products", product_id, sort],
-        queryFn: async () => await clientApi.get<ReviewStatus>(`/product/${product_id}/review-status`),
+        queryFn: async () => await api.get<ReviewStatus>(`/product/${product_id}/review-status`),
     });
 
     const { items, ratings } = reviewsData || {};

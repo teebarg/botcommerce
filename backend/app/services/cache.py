@@ -30,6 +30,14 @@ class CacheService:
     def __init__(self, redis_client: Redis) -> None:
         self.redis = redis_client
 
+    async def clear_cache(self)-> None:
+        """Clear the entire Redis database"""
+        try:
+            return await self.redis.flushdb()
+        except Exception as e:
+            logger.error(f"[Cache] Read failure for key '{key}': {e}", exc_info=True)
+            return None
+
     async def get(self, key: str) -> Optional[Any]:
         """Safely retrieves and deserializes JSON from Redis. No-op on failure."""
         try:

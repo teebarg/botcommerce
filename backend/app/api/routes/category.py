@@ -9,10 +9,10 @@ from app.core.storage import upload, delete_image
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
-from app.services.product import prepare_product_data_for_indexing
 from app.core.permissions import require_admin
 from app.core.dependencies.cache import CacheDep
 from app.services.cache import cacheable
+from app.core.dependencies.product import ProductDep
 
 logger = get_logger(__name__)
 
@@ -20,7 +20,7 @@ router = APIRouter()
 
 @router.get("/home/products", tags=["products"])
 @cacheable(key_prefix="products:home")
-async def get_home_categories_products(request: Request) -> list[CategoryWithProducts]:
+async def get_home_categories_products(request: Request, product_srv: ProductDep) -> list[CategoryWithProducts]:
     categories = await db.category.find_many(
         where={"is_active": True},
         order={"display_order": "asc"},
@@ -29,7 +29,7 @@ async def get_home_categories_products(request: Request) -> list[CategoryWithPro
     )
 
     for category in categories:
-        category.products = [prepare_product_data_for_indexing(product) for product in category.products]
+        category.products = [product_srv._prepare_product_data_for_indexing(product) for product in category.products]
 
     return categories
 

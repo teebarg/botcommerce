@@ -3,7 +3,6 @@ from typing import List
 from app.prisma_client import prisma as db
 from app.services.catalog import CatalogService
 from app.core.dependencies.services import get_catalog_service
-from app.services.product import index_product, index_products
 from app.core.deps import UserDep
 from app.models.generic import Message
 from app.core.logging import get_logger
@@ -15,6 +14,7 @@ from app.services.websocket import manager
 from app.models.catalog import Catalog, Catalogs, CatalogView, CursorPaginatedCatalog, CatalogCreate, CatalogUpdate, CatalogBulkAdd
 from app.core.permissions import require_admin
 from app.services.cache import cacheable
+from app.core.dependencies.product import ProductDep
 
 logger = get_logger(__name__)
 
@@ -221,7 +221,7 @@ async def delete_catalog(
 
 
 @router.post("/{id}/add-products", dependencies=[Depends(require_admin)])
-async def bulk_add_products_to_catalog(id: int, data: CatalogBulkAdd, background_tasks: BackgroundTasks, srv: CatalogService = Depends(get_catalog_service),) -> Message:
+async def bulk_add_products_to_catalog(id: int, data: CatalogBulkAdd, product_srv: ProductDep, background_tasks: BackgroundTasks, srv: CatalogService = Depends(get_catalog_service)) -> Message:
     """Bulk add products to a catalog"""
     catalog = await db.sharedcollection.find_unique(where={"id": id})
     if not catalog:
@@ -237,12 +237,12 @@ async def bulk_add_products_to_catalog(id: int, data: CatalogBulkAdd, background
 
     await manager.broadcast_to_all(data={"status": "completed"}, message_type="bulk_action")
     # await srv.invalidate_cache()
-    background_tasks.add_task(index_products, product_ids=data.product_ids)
+    background_tasks.add_task(product_srv.invalidate_all, product_ids=data.product_ids)
     return {"message": f"Added {len(data.product_ids)} product(s) to catalog"}
 
 
 @router.post("/{id}/remove-products", dependencies=[Depends(require_admin)])
-async def bulk_remove_products_from_catalog(id: int, data: CatalogBulkAdd, background_tasks: BackgroundTasks) -> Message:
+async def bulk_remove_products_from_catalog(id: int, data: CatalogBulkAdd, product_srv: ProductDep, background_tasks: BackgroundTasks) -> Message:
     """Bulk remove products from a catalog"""
     catalog = await db.sharedcollection.find_unique(where={"id": id})
     if not catalog:
@@ -257,5 +257,5 @@ async def bulk_remove_products_from_catalog(id: int, data: CatalogBulkAdd, backg
     )
 
     await manager.broadcast_to_all(data={"status": "completed"}, message_type="bulk_action")
-    background_tasks.add_task(index_products, product_ids=data.product_ids)
+    background_tasks.add_task(product_srv.invalidate_all, product_ids=data.product_ids)
     return {"message": f"Removed {len(data.product_ids)} product(s) from catalog"}

@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from typing import List, Optional, Any
 from collections import Counter
-from app.services.cache import CacheService
+from app.services.cache import CacheService, cacheable
 from fastapi import HTTPException, Request
 
 from app.prisma_client import prisma as db
@@ -14,20 +14,19 @@ from app.core.config import settings
 from app.core.logging import get_logger
 from app.core.utils import url_to_list
 from app.models.product import Product
-from app.services.prisma import with_prisma_connection
-from app.services.redis import cache_response, refresh_product
-from app.services.meilisearch import (
-    update_document, 
-    delete_document, 
-    add_documents_to_index, 
-    clear_index,
-    get_or_create_index, 
-    ensure_index_ready, 
-    REQUIRED_FILTERABLES, 
-    REQUIRED_SORTABLES
-)
-from meilisearch.errors import MeilisearchApiError
 from prisma.enums import PaymentStatus
+from json import JSONEncoder
+from uuid import UUID
+
+from meilisearch import Client
+from meilisearch.errors import MeilisearchApiError
+from anyio import to_thread
+
+
+client = Client(settings.MEILI_HOST, settings.MEILI_MASTER_KEY)
+
+REQUIRED_FILTERABLES: list[str] = ["id", "catalogs", "category_slugs", "collection_slugs", "name", "max_variant_price", "min_variant_price", "active", "sizes", "colors", "ages", "widths", "lengths", "random_score", "freshness_score"]
+REQUIRED_SORTABLES: list[str] = ["id", "created_at", "max_variant_price", "min_variant_price", "random_score", "freshness_score"]
 
 logger = get_logger(__name__)
 
@@ -35,10 +34,120 @@ logger = get_logger(__name__)
 # ROUTE LOGIC SERVICE LAYERS (Clean Architecture)
 # =====================================================================
 
-class ProductRepository:
-    def __init__(self, db, redis):
+class CustomEncoder(JSONEncoder):
+    def default(self, o):
+        if isinstance(o, (UUID, datetime)):
+            return str(o)
+        return super().default(o)
+
+def get_or_create_index(index_name: str) -> Any:
+    """
+    Get or create a Meilisearch index.
+    """
+    try:
+        return client.get_index(index_name)
+    except MeilisearchApiError as e:
+        logger.error(f"MeilisearchApiError: {index_name}")
+        error_code = getattr(e, "code", None)
+        if error_code == "index_not_found":
+            index = client.index(index_name)
+            logger.error(f"Index {index_name} not found")
+            create_task = client.create_index(uid=index_name)
+            index.wait_for_task(create_task.task_uid)
+
+            filter_task = index.update_filterable_attributes(REQUIRED_FILTERABLES)
+            index.wait_for_task(filter_task.task_uid)
+
+            sort_task = index.update_sortable_attributes(REQUIRED_SORTABLES)
+            index.wait_for_task(sort_task.task_uid)
+            return index
+    except Exception as e:
+        logger.error(f"Error creating index {index_name}: {e}")
+        client.create_index(index_name)
+        return client.index(index_name)
+
+
+class SearchRepository:
+    def __init__(self):
+        self.index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
+
+    def ensure_index_ready(self):
+        """
+        Ensures that the given Meilisearch index has the required
+        filterable and sortable attributes.
+        """
+        filter_task = self.index.update_filterable_attributes(REQUIRED_FILTERABLES)
+        self.index.wait_for_task(filter_task.task_uid)
+
+        sort_task = self.index.update_sortable_attributes(REQUIRED_SORTABLES)
+        self.index.wait_for_task(sort_task.task_uid)
+
+    def search_index(self, query: str, options: dict) -> dict:
+        return self.index.search(query, options)
+
+    def get_documents_by_filter(self, filter_str: str, limit: int) -> list:
+        results = self.index.get_documents({"filter": filter_str, "limit": limit})
+        return results.results
+
+    async def update_document(self, index_name: str, document: dict) -> None:
+        """
+        Update a document in a Meilisearch index and wait for completion.
+        """
+        def _update():
+            task = self.index.update_documents([document], serializer=CustomEncoder)
+            self.index.wait_for_task(task.task_uid, timeout_in_ms=30000)
+            return task
+
+        task = await to_thread.run_sync(_update)
+        logger.debug(f"Updated document {document['id']} in index {index_name}, task: {task.task_uid}")
+
+    async def add_documents_to_index(self, index_name: str, documents: list) -> None:
+        """
+        Add documents to a Meilisearch index and wait for completion.
+        """
+        def _add():
+            task = self.index.add_documents(documents, primary_key="id", serializer=CustomEncoder)
+            self.index.wait_for_task(task.task_uid, timeout_in_ms=30000)
+            return task
+
+        task = await to_thread.run_sync(_add)
+        logger.debug(f"Added {len(documents)} documents to index {index_name}, task: {task.task_uid}")
+
+    async def delete_document(self, index_name: str, document_id: str) -> None:
+        """
+        Delete a document from a Meilisearch index and wait for completion.
+        """
+        def _delete():
+            task = self.index.delete_document(document_id)
+            self.index.wait_for_task(task.task_uid, timeout_in_ms=30000)
+            return task
+
+        task = await to_thread.run_sync(_delete)
+        logger.debug(f"Deleted document {document_id} from index {index_name}, task: {task.task_uid}")
+
+    async def clear_index(self, index_name: str) -> None:
+        """
+        Clear all documents from a Meilisearch index and wait for completion.
+        """
+        def _clear():
+            task = self.index.delete_all_documents()
+            self.index.wait_for_task(task.task_uid, timeout_in_ms=30000)
+            return task
+
+        task = await to_thread.run_sync(_clear)
+        logger.debug(f"Cleared index {index_name}, task: {task.task_uid}")
+
+    def update_settings(self):
+        self.index.update_filterable_attributes(REQUIRED_FILTERABLES)
+        self.index.update_sortable_attributes(REQUIRED_SORTABLES)
+
+
+class ProductService:
+    def __init__(self, db, redis, search_repo: SearchRepository, cache_srv: CacheService):
         self.db = db
         self.redis = redis
+        self.search_repo = search_repo
+        self.cache_srv = cache_srv
 
     async def get_by_slug(self, slug: str):
         return await self.db.product.find_unique(
@@ -66,30 +175,7 @@ class ProductRepository:
     async def update_variant(self, variant_id: int, update_data: Any):
         return await self.db.productvariant.update(where={"id": variant_id}, data=update_data)
 
-
-class SearchRepository:
-    def __init__(self):
-        self.index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
-
-    def search_index(self, query: str, options: dict) -> dict:
-        return self.index.search(query, options)
-
-    def get_documents_by_filter(self, filter_str: str, limit: int) -> list:
-        results = self.index.get_documents({"filter": filter_str, "limit": limit})
-        return results.results
-
-    def update_settings(self):
-        self.index.update_filterable_attributes(REQUIRED_FILTERABLES)
-        self.index.update_sortable_attributes(REQUIRED_SORTABLES)
-
-
-class ProductService:
-    def __init__(self, repo: ProductRepository, search_repo: SearchRepository, cache_service: CacheService):
-        self.repo = repo
-        self.search_repo = search_repo
-        self.cache_service = cache_service
-
-    @cache_response(key_prefix="merchant_feed", expire=86400) # Caches for 24 hours
+    @cacheable(key_prefix="merchant_feed", key_builder=False)
     async def generate_merchant_feed_xml(self, request: Request) -> str:
         """
         Generates Google Merchant Feed.
@@ -106,7 +192,7 @@ class ProductService:
         skip = 0
 
         while True:
-            products = await self.repo.db.product.find_many(
+            products = await self.db.product.find_many(
                 where={"active": True},
                 include={"variants": True, "images": True},
                 take=batch_size,
@@ -146,13 +232,13 @@ class ProductService:
 
     async def get_similar_products(self, product_id: int, limit: int) -> list:
         key = f"product:{product_id}:similar"
-        ids = await self.repo.redis.lrange(key, 0, -1)
+        ids = await self.redis.lrange(key, 0, -1)
         if not ids:
             return []
         return self.search_repo.get_documents_by_filter(f"id IN [{','.join(ids)}]", limit)
 
     async def get_personalized_recommendations(self, user_id: int, limit: int) -> list:
-        product_ids = await self.repo.redis.lrange(f"user:{user_id}:history", 0, 4)
+        product_ids = await self.redis.lrange(f"user:{user_id}:history", 0, 4)
         if not product_ids:
             return []
 
@@ -160,7 +246,7 @@ class ProductService:
         seen = set(product_ids)
 
         for pid in product_ids:
-            similar_ids = await self.repo.redis.lrange(f"product:{pid}:similar", 0, -1)
+            similar_ids = await self.redis.lrange(f"product:{pid}:similar", 0, -1)
             for sid in similar_ids:
                 if sid not in seen:
                     recommendation_scores[sid] += 1
@@ -255,7 +341,7 @@ class ProductService:
                 res = self.search_repo.search_index("", search_params)
             except MeilisearchApiError as e:
                 if getattr(e, "code", None) in {"invalid_search_facets", "invalid_search_filter", "invalid_search_sort"}:
-                    ensure_index_ready(self.search_repo.index)
+                    self.search_repo.ensure_index_ready()
                     res = self.search_repo.search_index("", search_params)
                 else:
                     raise HTTPException(status_code=502, detail="Search service communication error")
@@ -294,42 +380,81 @@ class ProductService:
     def _decode_cursor(self, cursor: str) -> dict:
         return json.loads(base64.urlsafe_b64decode(cursor.encode()).decode())
 
+    def _prepare_product_data_for_indexing(self, product: Product) -> dict:
+        created_at: Any | None = getattr(product, "created_at", None)
+        if created_at:
+            age_hours: int = max(
+                (datetime.now(timezone.utc) - created_at).total_seconds() / 3600,
+                1
+            )
+            freshness_score: float = round(1 / age_hours, 6)
+        else:
+            freshness_score = 0
 
-@with_prisma_connection
-async def index_product(product_id: int) -> None:
-    try:
-        product = await db.product.find_unique(
-            where={"id": product_id},
-            include={
-                "categories": True,
-                "collections": True,
-                "variants": True,
-                "images": True,
-                "shared_collections": True,
+        product_dict: dict = {
+            "id": product.id,
+            "name": product.name,
+            "slug": product.slug,
+            "description": product.description,
+            "sku": product.sku,
+            "active": product.active,
+            "is_new": getattr(product, "is_new", False),
+            "random_score": random.random(),
+            "freshness_score": freshness_score,
+        }
+
+        product_dict["collection_slugs"] = [c.slug for c in (product.collections or [])]
+        product_dict["category_slugs"] = [c.slug for c in (product.categories or [])]
+
+        images = [img.image for img in sorted((product.images or []), key=lambda img: img.order)]
+        product_dict["image"] = images[0] if images else None
+
+        variants = [
+            {
+                "id": v.id,
+                "price": v.price,
+                "old_price": v.old_price,
+                "inventory": v.inventory,
+                "size": v.size,
+                "color": v.color,
+                "age": v.age,
+                "width": v.width,
+                "length": v.length,
+                "status": v.status,
             }
+            for v in (product.variants or [])
+        ]
+        product_dict["variants"] = variants
+
+        sizes, colors, ages, widths, lengths = [], [], [], [], []
+        for v in variants:
+            if v.get("size"):   sizes.append(v["size"])
+            if v.get("color"):  colors.append(v["color"])
+            if v.get("age"):    ages.append(v["age"])
+            if v.get("width"):  widths.append(v["width"])
+            if v.get("length"): lengths.append(v["length"])
+
+        product_dict["sizes"] = sizes
+        product_dict["colors"] = colors
+        product_dict["ages"] = ages
+        product_dict["widths"] = widths
+        product_dict["lengths"] = lengths
+
+        variant_prices = [v["price"] for v in variants if v.get("price") is not None]
+        product_dict["min_variant_price"] = min(variant_prices) if variant_prices else 0
+        product_dict["max_variant_price"] = max(variant_prices) if variant_prices else 0
+
+        product_dict["status"] = (
+            "IN STOCK" if any(v["inventory"] > 0 for v in variants) else "OUT OF STOCK"
         )
+        product_dict["catalogs"] = [sc.slug for sc in (product.shared_collections or [])]
 
-        if not product:
-            logger.warning(f"Product with id {product_id} not found for re-indexing.")
-            return
+        return product_dict
 
-        product_data = prepare_product_data_for_indexing(product)
-        await update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
-        await refresh_product(ids=product.id)
-    except Exception as e:
-        logger.error(f"Error re-indexing product {product_id}: {e}")
-
-
-@with_prisma_connection
-async def index_products(product_ids: Optional[List[int]] = None):
-    """
-    Re-indexes database products.
-    """
-    try:
-        logger.debug("Starting re-indexing process...")
-        if product_ids:
-            products = await db.product.find_many(
-                where={"id": {"in": product_ids}},
+    async def invalidate(self, id: int) -> None:
+        try:
+            product = await db.product.find_unique(
+                where={"id": id},
                 include={
                     "categories": True,
                     "collections": True,
@@ -338,142 +463,100 @@ async def index_products(product_ids: Optional[List[int]] = None):
                     "shared_collections": True,
                 }
             )
-            if not products:
-                logger.warning(f"Products with ids {product_ids} not found for re-indexing.")
+
+            if not product:
+                logger.warning(f"Product with id {id} not found for re-indexing.")
                 return
 
-            documents = [prepare_product_data_for_indexing(p) for p in products]
-            await add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
-            await refresh_product(ids=product_ids)
-            logger.debug(f"Successfully targeted indexed {len(documents)} products")
-            return
+            product_data = self._prepare_product_data_for_indexing(product=product)
+            await self.search_repo.update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
+            await self.cache_srv.invalidate(f"product:{id}", tags=["products"])
+        except Exception as e:
+            logger.error(f"Error re-indexing product {id}: {e}")
 
-        # Full Index Rebuild in Chunks
-        logger.debug("Clearing search index for clean sync...")
-        await clear_index(index_name=settings.MEILI_PRODUCTS_INDEX)
 
-        BATCH_SIZE = 500
-        skip = 0
-        total_processed = 0
+    async def invalidate_all(self, product_ids: Optional[List[int]] = None):
+        """
+        Re-indexes database products.
+        """
+        try:
+            logger.debug("Starting re-indexing process...")
+            if product_ids:
+                products = await db.product.find_many(
+                    where={"id": {"in": product_ids}},
+                    include={
+                        "categories": True,
+                        "collections": True,
+                        "variants": True,
+                        "images": True,
+                        "shared_collections": True,
+                    }
+                )
+                if not products:
+                    logger.warning(f"Products with ids {product_ids} not found for re-indexing.")
+                    return
 
-        while True:
-            products_batch = await db.product.find_many(
-                include={
-                    "categories": True,
-                    "collections": True,
-                    "variants": True,
-                    "images": True,
-                    "shared_collections": True,
-                },
-                take=BATCH_SIZE,
-                skip=skip
-            )
-            if not products_batch:
-                break
+                documents = [self._prepare_product_data_for_indexing(p) for p in products]
+                await self.search_repo.add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
+                key=",".join(f"product:{id}" for id in product_ids)
+                self.cache_srv.invalidate(key, tags=["products"])
+                logger.debug(f"Successfully targeted indexed {len(documents)} products")
+                return
 
-            documents = []
-            for product in products_batch:
-                try:
-                    product_data = prepare_product_data_for_indexing(product)
-                    documents.append(product_data)
-                except Exception as e:
-                    logger.error(f"Error preparing product model {product.id}: {e}")
+            # Full Index Rebuild in Chunks
+            logger.debug("Clearing search index for clean sync...")
+            await self.search_repo.clear_index(index_name=settings.MEILI_PRODUCTS_INDEX)
 
-            if documents:
-                await add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
+            BATCH_SIZE = 500
+            skip = 0
+            total_processed = 0
+
+            while True:
+                products_batch = await db.product.find_many(
+                    include={
+                        "categories": True,
+                        "collections": True,
+                        "variants": True,
+                        "images": True,
+                        "shared_collections": True,
+                    },
+                    take=BATCH_SIZE,
+                    skip=skip
+                )
+                if not products_batch:
+                    break
+
+                documents = []
+                for product in products_batch:
+                    try:
+                        product_data = self._prepare_product_data_for_indexing(product)
+                        documents.append(product_data)
+                    except Exception as e:
+                        logger.error(f"Error preparing product model {product.id}: {e}")
+
+                if documents:
+                    await self.search_repo.add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
+                
+                total_processed += len(documents)
+                logger.debug(f"Indexed batch chunk: {skip // BATCH_SIZE + 1} ({len(documents)} records added)")
+                
+                skip += BATCH_SIZE
+                await asyncio.sleep(0.05)  # Yield block back to application loop thread
+
+            self.cache_srv.invalidate(tags=["products"])
+            logger.debug(f"Successfully batch indexed total of {total_processed} products")
             
-            total_processed += len(documents)
-            logger.debug(f"Indexed batch chunk: {skip // BATCH_SIZE + 1} ({len(documents)} records added)")
-            
-            skip += BATCH_SIZE
-            await asyncio.sleep(0.05)  # Yield block back to application loop thread
-
-        await refresh_product(full=True)
-        logger.debug(f"Successfully batch indexed total of {total_processed} products")
-        
-    except Exception as e:
-        logger.error(f"Critical error during product re-indexing: {e}")
+        except Exception as e:
+            logger.error(f"Critical error during product re-indexing: {e}")
 
 
-@with_prisma_connection
-async def delete_product_index(product_ids: List[int]) -> None:
-    try:
-        await asyncio.gather(*[
-            delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(pid))
-            for pid in product_ids
-        ])
-        await refresh_product(ids=product_ids)
-    except Exception as e:
-        logger.error(f"Error deleting products {product_ids} from index: {e}")
-
-
-def prepare_product_data_for_indexing(product: Product) -> dict:
-    created_at: Any | None = getattr(product, "created_at", None)
-    if created_at:
-        age_hours: int = max(
-            (datetime.now(timezone.utc) - created_at).total_seconds() / 3600,
-            1
-        )
-        freshness_score: float = round(1 / age_hours, 6)
-    else:
-        freshness_score = 0
-
-    product_dict: dict = {
-        "id": product.id,
-        "name": product.name,
-        "slug": product.slug,
-        "description": product.description,
-        "sku": product.sku,
-        "active": product.active,
-        "is_new": getattr(product, "is_new", False),
-        "random_score": random.random(),
-        "freshness_score": freshness_score,
-    }
-
-    product_dict["collection_slugs"] = [c.slug for c in (product.collections or [])]
-    product_dict["category_slugs"] = [c.slug for c in (product.categories or [])]
-
-    images = [img.image for img in sorted((product.images or []), key=lambda img: img.order)]
-    product_dict["image"] = images[0] if images else None
-
-    variants = [
-        {
-            "id": v.id,
-            "price": v.price,
-            "old_price": v.old_price,
-            "inventory": v.inventory,
-            "size": v.size,
-            "color": v.color,
-            "age": v.age,
-            "width": v.width,
-            "length": v.length,
-            "status": v.status,
-        }
-        for v in (product.variants or [])
-    ]
-    product_dict["variants"] = variants
-
-    sizes, colors, ages, widths, lengths = [], [], [], [], []
-    for v in variants:
-        if v.get("size"):   sizes.append(v["size"])
-        if v.get("color"):  colors.append(v["color"])
-        if v.get("age"):    ages.append(v["age"])
-        if v.get("width"):  widths.append(v["width"])
-        if v.get("length"): lengths.append(v["length"])
-
-    product_dict["sizes"] = sizes
-    product_dict["colors"] = colors
-    product_dict["ages"] = ages
-    product_dict["widths"] = widths
-    product_dict["lengths"] = lengths
-
-    variant_prices = [v["price"] for v in variants if v.get("price") is not None]
-    product_dict["min_variant_price"] = min(variant_prices) if variant_prices else 0
-    product_dict["max_variant_price"] = max(variant_prices) if variant_prices else 0
-
-    product_dict["status"] = (
-        "IN STOCK" if any(v["inventory"] > 0 for v in variants) else "OUT OF STOCK"
-    )
-    product_dict["catalogs"] = [sc.slug for sc in (product.shared_collections or [])]
-
-    return product_dict
+    async def delete_product_index(self, product_ids: List[int]) -> None:
+        try:
+            await asyncio.gather(*[
+                self.search_repo.delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(pid))
+                for pid in product_ids
+            ])
+            key=",".join(f"product:{id}" for id in product_ids)
+            self.cache_srv.invalidate(key, tags=["products"])
+        except Exception as e:
+            logger.error(f"Error deleting products {product_ids} from index: {e}")

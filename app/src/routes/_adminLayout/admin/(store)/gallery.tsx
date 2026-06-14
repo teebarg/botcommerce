@@ -10,17 +10,17 @@ import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
 import type { PaginatedProductImages, ProductImage } from "@/schemas";
 import { useWebSocket } from "pulsews";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { clientApi } from "@/utils/api.client";
+import { useQuery } from "@tanstack/react-query";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { queryOptions } from "@tanstack/react-query";
 import { z } from "zod";
+import { api } from "@/utils/api";
 
 const galleryQuery = (params?: object) =>
     queryOptions({
         queryKey: ["gallery", params],
-        queryFn: () => clientApi.get<PaginatedProductImages>("/gallery/", { params: params as Record<string, unknown> }),
+        queryFn: () => api.get<PaginatedProductImages>("/gallery/", { params: params as Record<string, unknown> }),
         staleTime: 1000 * 60 * 60 * 24, // 24 hours
         refetchOnMount: false,
     });
@@ -39,7 +39,6 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/gallery")({
 });
 
 function RouteComponent() {
-    const queryClient = useQueryClient();
     const toastId = useRef<string | number | undefined>(undefined);
     const params = Route.useSearch();
     const { data } = useQuery(galleryQuery(params));
@@ -52,7 +51,7 @@ function RouteComponent() {
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedProductImages, ProductImage>({
         queryKey: ["gallery", "infinite", params],
-        queryFn: (cursor) => clientApi.get<PaginatedProductImages>("/gallery/", { params: { cursor, ...params } }),
+        queryFn: (cursor) => api.get<PaginatedProductImages>("/gallery/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
         initialData: data,

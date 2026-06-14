@@ -2,13 +2,13 @@ import { ChevronRight } from "lucide-react";
 import { CategoriesWithProducts, ProductSearch } from "@/schemas";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 import ProductCardPLP from "../products/product-card-plp";
 
 export default function CategoriesWithProductsSection() {
     const { data: categoriesWithProducts } = useQuery({
         queryKey: ["products", "home"],
-        queryFn: () => clientApi.get<CategoriesWithProducts[]>("/category/home/products"),
+        queryFn: () => api.get<CategoriesWithProducts[]>("/category/home/products"),
     });
     return (
         <section className="max-w-8xl mx-auto px-4 py-6 space-y-8">

@@ -1,15 +1,15 @@
-from app.models.reviews import Review, Reviews, ReviewCreate, ReviewUpdate
-from app.core.logging import get_logger
+import json
+import asyncio
 from fastapi import APIRouter, HTTPException, Depends, HTTPException, Query, BackgroundTasks
 from app.core.deps import CurrentUser
 from app.models.generic import Message
 from app.prisma_client import prisma as db
 from prisma.errors import PrismaError
-from app.services.product import index_product
 from app.core.permissions import require_admin
 from base64 import b64encode, b64decode
-import json
-import asyncio
+from app.models.reviews import Review, Reviews, ReviewCreate, ReviewUpdate
+from app.core.logging import get_logger
+from app.core.dependencies.product import ProductDep
 
 logger = get_logger(__name__)
 
@@ -130,7 +130,7 @@ async def index(
     }
 
 @router.post("/")
-async def create(review: ReviewCreate, user: CurrentUser, background_tasks: BackgroundTasks) -> Review:
+async def create(review: ReviewCreate, user: CurrentUser, product_srv: ProductDep, background_tasks: BackgroundTasks) -> Review:
     existing_review = await db.review.find_first(
         where={"user_id": user.id, "product_id": review.product_id}
     )
@@ -155,7 +155,7 @@ async def create(review: ReviewCreate, user: CurrentUser, background_tasks: Back
                 "user_id": user.id
             }
         )
-        background_tasks.add_task(index_product, product_id=review.product_id)
+        background_tasks.add_task(product_srv.invalidate, product_id=review.product_id)
 
         return review
     except PrismaError as e:
