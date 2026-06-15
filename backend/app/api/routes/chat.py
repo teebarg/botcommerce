@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi import APIRouter, HTTPException, Query, Request, Depends
 from app.prisma_client import prisma as db
 from typing import Optional
 from prisma.enums import ConversationStatus
@@ -106,6 +106,7 @@ async def handoff(payload: ChatHandoffRequest, cache: CacheDep, user: CurrentUse
 @router.get("/", dependencies=[Depends(require_admin)])
 @cacheable(key_prefix="chats", tags=["chats"])
 async def index(
+    request: Request,
     uuid: Optional[str] = Query(None),
     status: Optional[ConversationStatus] = Query(None),
     cursor: int | None = None,
@@ -137,7 +138,7 @@ async def index(
 
 @router.get("/{uid}")
 @cacheable(key_prefix="chat", key_builder=lambda uid: uid)
-async def get_chat(uid: str) -> Chat:
+async def get_chat(request: Request, uid: str) -> Chat:
     """Get a chat and all its messages"""
     chat = await db.conversation.find_unique(where={"conversation_uuid": uid}, include={"messages": {"orderBy": {"id": "asc"}}})
     if not chat:

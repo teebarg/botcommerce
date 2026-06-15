@@ -28,7 +28,6 @@ export function InvalidateProvider({ children }: { children: React.ReactNode }) 
 
     useEffect(() => {
         if (!lastMessage) return;
-
         if (lastMessage.type === "invalidate") {
             const handleInvalidation = (keySegments: string[]) => {
                 if (keySegments[0] === "cart" && keySegments[1]) {
@@ -38,6 +37,8 @@ export function InvalidateProvider({ children }: { children: React.ReactNode }) 
                     }
                     return;
                 }
+                console.log("lastMessage........................")
+                console.log(keySegments)
                 queryClient.invalidateQueries({ queryKey: keySegments });
             };
 

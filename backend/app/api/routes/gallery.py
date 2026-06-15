@@ -1,4 +1,5 @@
 from typing import Optional
+from app.core.dependencies.gallery import GalleryDep
 from fastapi import APIRouter, HTTPException, Query, BackgroundTasks, Request, Depends
 
 from app.models.generic import Message, ImageBulkDelete
@@ -10,8 +11,6 @@ from app.models.product import (
 from app.models.gallery import PaginatedProductImages
 from app.core.permissions import require_admin
 from app.prisma_client import prisma as db
-from app.core.dependencies.services import get_gallery_service
-from app.services.gallery import GalleryService
 from app.services.cache import cacheable
 from app.core.dependencies.cache import CacheDep
 from app.core.dependencies.product import ProductDep
@@ -22,15 +21,15 @@ router = APIRouter()
 @cacheable(key_prefix="gallery", tags=["gallery"])
 async def image_gallery(
     request: Request,
+    srv: GalleryDep,
     cursor: Optional[int] = Query(default=None),
     limit: int = Query(default=36, ge=1, le=100),
     sort: str = Query(default="newest", pattern="^(newest|oldest)$"),
     active: Optional[bool] = Query(default=None),
     out_of_stock: bool = Query(default=False),
-    service: GalleryService = Depends(get_gallery_service)
 ) -> PaginatedProductImages:
     """Image gallery endpoint using cursor-based pagination."""
-    return await service.get_gallery_items(
+    return await srv.get_gallery_items(
         cursor=cursor, limit=limit, sort=sort, active=active, out_of_stock=out_of_stock
     )
 
@@ -38,10 +37,10 @@ async def image_gallery(
 @router.delete("/{image_id}", dependencies=[Depends(require_admin)])
 async def delete_gallery_image(
     image_id: int,
+    srv: GalleryDep,
     cache: CacheDep,
     product_srv: ProductDep,
     background_tasks: BackgroundTasks,
-    srv: GalleryService = Depends(get_gallery_service)
 ) -> Message:
     product_id, image_urls = await srv.delete_image(image_id)
 
@@ -58,10 +57,10 @@ async def delete_gallery_image(
 @router.post("/bulk-upload", dependencies=[Depends(require_admin)])
 async def bulk_save_image_urls(
     cache: CacheDep,
+    srv: GalleryDep,
     payload: ProductImageBulkUrls,
-    service: GalleryService = Depends(get_gallery_service)
 ):
-    result = await service.bulk_save_urls(payload)
+    result = await srv.bulk_save_urls(payload)
     await cache.invalidate(tags=["gallery"])
     return result
 
@@ -69,10 +68,10 @@ async def bulk_save_image_urls(
 @router.post("/bulk-delete", dependencies=[Depends(require_admin)])
 async def bulk_delete_gallery_images(
     cache: CacheDep,
+    srv: GalleryDep,
     Product_srv: ProductDep,
     payload: ImageBulkDelete,
     background_tasks: BackgroundTasks,
-    srv: GalleryService = Depends(get_gallery_service)
 ):
     if not payload.files:
         raise HTTPException(status_code=400, detail="No image IDs provided")
@@ -96,14 +95,14 @@ async def bulk_delete_gallery_images(
 @router.post("/{image_id}/metadata", dependencies=[Depends(require_admin)])
 async def create_image_metadata(
     image_id: int,
+    srv: GalleryDep,
     cache: CacheDep,
     payload: ProductImageMetadata,
     product_srv: ProductDep,
     background_tasks: BackgroundTasks,
-    service: GalleryService = Depends(get_gallery_service)
 ):
-    product_id = await service.create_metadata(image_id, payload)
-    background_tasks.add_task(product_srv.invalidate, product_id=product_id)
+    product_id = await srv.create_metadata(image_id, payload)
+    background_tasks.add_task(product_srv.invalidate, id=product_id)
     await cache.invalidate(tags=["gallery"])
     return {"success": True}
 
@@ -111,25 +110,25 @@ async def create_image_metadata(
 @router.patch("/{image_id}/metadata", dependencies=[Depends(require_admin)])
 async def update_image_metadata(
     image_id: int,
+    srv: GalleryDep,
     cache: CacheDep,
     payload: ProductImageMetadata,
     product_srv: ProductDep,
     background_tasks: BackgroundTasks,
-    service: GalleryService = Depends(get_gallery_service)
 ):
-    product_id = await service.update_metadata(image_id, payload)
-    background_tasks.add_task(product_srv.invalidate, product_id=product_id)
+    product_id = await srv.update_metadata(image_id, payload)
+    background_tasks.add_task(product_srv.invalidate, id=product_id)
     await cache.invalidate(tags=["gallery"])
     return {"success": True}
 
 
 @router.patch("/bulk-update", dependencies=[Depends(require_admin)])
 async def bulk_update_products(
+    srv: GalleryDep,
     cache: CacheDep,
     product_srv: ProductDep,
     payload: ImagesBulkUpdate,
     background_tasks: BackgroundTasks,
-    service: GalleryService = Depends(get_gallery_service)
 ) -> Message:
     if not payload.image_ids:
         raise HTTPException(status_code=400, detail="No image IDs provided")
@@ -141,16 +140,16 @@ async def bulk_update_products(
     if not images:
         raise HTTPException(status_code=404, detail="No images found")
 
+    await srv.ws_manager.broadcast_to_all(
+        data={"status": "processing", "total": len(images)}, message_type="bulk_action"
+    )
+
     background_tasks.add_task(
-        service.handle_bulk_update_images,
+        srv.handle_bulk_update_images,
         payload=payload,
         images=images,
         index_products_fn=product_srv.invalidate_all
     )
 
     await cache.invalidate(tags=["gallery"])
-
-    await service.ws_manager.broadcast_to_all(
-        data={"status": "processing", "total": len(images)}, message_type="bulk_action"
-    )
     return {"message": f"Updating {len(images)} products..."}

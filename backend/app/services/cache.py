@@ -1,6 +1,7 @@
 import json
 import inspect
 import time
+import asyncio
 from typing import Coroutine, List, Any, Callable, Union, Optional
 from fastapi import Request
 from datetime import datetime, timedelta
@@ -129,6 +130,7 @@ class CacheService:
                 data={"keys": list(set(invalidated_keys))},
                 message_type="invalidate",
             )
+            await asyncio.sleep(0.01)
 
 
 def cacheable(

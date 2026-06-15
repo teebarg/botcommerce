@@ -27,7 +27,6 @@ class CursorPaginatedCatalog(BaseModel):
     view_count: int = 0
     limit: int
     next_cursor: int | None = None
-    total_count: int
 
 class Catalogs(BaseModel):
     catalogs: list[Catalog]

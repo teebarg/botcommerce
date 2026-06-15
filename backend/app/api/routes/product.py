@@ -68,7 +68,7 @@ async def feed(
 
 
 @router.get("/index-products")
-@cacheable(key_prefix="products:collection", tags=["products"])
+@cacheable(key_prefix="products", key_builder="collections", tags=["products"])
 async def get_index_products(
     request: Request,
     srv: ProductDep,

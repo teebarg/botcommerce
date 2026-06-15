@@ -120,6 +120,9 @@ class CatalogService:
             "total_count": total,
         }
 
-    async def invalidate_cache(self) -> None:
-        """Invalidate all catalog cache keys."""
-        await self.cache.invalidate(tags=["catalog"])
+    async def invalidate(self, slug: Optional[str] = None) -> None:
+        """Invalidate catalog."""
+        tags = ["catalogs"]
+        if slug:
+            tags.append(f"catalog:{slug}")
+        await self.cache.invalidate(tags=tags)

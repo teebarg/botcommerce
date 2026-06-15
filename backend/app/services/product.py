@@ -25,7 +25,7 @@ from anyio import to_thread
 
 client = Client(settings.MEILI_HOST, settings.MEILI_MASTER_KEY)
 
-REQUIRED_FILTERABLES: list[str] = ["id", "catalogs", "category_slugs", "collection_slugs", "name", "max_variant_price", "min_variant_price", "active", "sizes", "colors", "ages", "widths", "lengths", "random_score", "freshness_score"]
+REQUIRED_FILTERABLES: list[str] = ["id", "category_slugs", "collection_slugs", "name", "max_variant_price", "min_variant_price", "active", "sizes", "colors", "ages", "widths", "lengths", "random_score", "freshness_score"]
 REQUIRED_SORTABLES: list[str] = ["id", "created_at", "max_variant_price", "min_variant_price", "random_score", "freshness_score"]
 
 logger = get_logger(__name__)
@@ -447,7 +447,6 @@ class ProductService:
         product_dict["status"] = (
             "IN STOCK" if any(v["inventory"] > 0 for v in variants) else "OUT OF STOCK"
         )
-        product_dict["catalogs"] = [sc.slug for sc in (product.shared_collections or [])]
 
         return product_dict
 
@@ -470,7 +469,7 @@ class ProductService:
 
             product_data = self._prepare_product_data_for_indexing(product=product)
             await self.search_repo.update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
-            await self.cache_srv.invalidate(f"product:{id}", tags=["products"])
+            await self.cache_srv.invalidate(f"product:{id}", tags=["products", "catalog"])
         except Exception as e:
             logger.error(f"Error re-indexing product {id}: {e}")
 
@@ -499,7 +498,9 @@ class ProductService:
                 documents = [self._prepare_product_data_for_indexing(p) for p in products]
                 await self.search_repo.add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
                 key=",".join(f"product:{id}" for id in product_ids)
-                self.cache_srv.invalidate(key, tags=["products"])
+                print("invalidating cache..................")
+                print(key)
+                await self.cache_srv.invalidate(key, tags=["products", "catalog"])
                 logger.debug(f"Successfully targeted indexed {len(documents)} products")
                 return
 
@@ -543,7 +544,7 @@ class ProductService:
                 skip += BATCH_SIZE
                 await asyncio.sleep(0.05)  # Yield block back to application loop thread
 
-            self.cache_srv.invalidate(tags=["products"])
+            self.cache_srv.invalidate(tags=["products", "catalog"])
             logger.debug(f"Successfully batch indexed total of {total_processed} products")
             
         except Exception as e:
@@ -552,11 +553,13 @@ class ProductService:
 
     async def delete_product_index(self, product_ids: List[int]) -> None:
         try:
+            if len(product_ids) == 0:
+                return
             await asyncio.gather(*[
                 self.search_repo.delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(pid))
                 for pid in product_ids
             ])
             key=",".join(f"product:{id}" for id in product_ids)
-            self.cache_srv.invalidate(key, tags=["products"])
+            await self.cache_srv.invalidate(key, tags=["products", "catalog"])
         except Exception as e:
             logger.error(f"Error deleting products {product_ids} from index: {e}")
