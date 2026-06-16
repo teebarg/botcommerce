@@ -1,6 +1,3 @@
-# ==========================================
-# STAGE 1: The Build & Model Download Environment
-# ==========================================
 FROM beafdocker/fastapi-base:latest AS builder
 
 ENV FASTEMBED_CACHE_PATH=/app/models

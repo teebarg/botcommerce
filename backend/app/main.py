@@ -1,3 +1,5 @@
+from typing import Any, Dict
+from app.core.dependencies.product import SearchDep
 from app.core.notifications.setup import init_notification_service
 from app.core.dependencies.services import SettingsDep
 import sentry_sdk
@@ -18,7 +20,6 @@ from fastapi.exceptions import RequestValidationError
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from app.services.websocket import manager
-from app.services.meilisearch import get_or_create_index
 from app.redis_client import redis_client
 
 from app.core.logging import get_logger
@@ -128,13 +129,20 @@ async def root():
 
 
 @app.get("/api/health")
-async def health():
-    user = await db.user.find_unique(
-        where={"id": 1}
-    )
-    # redis_res = await app.state.redis.ping()
-    meilisearch_res = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
-    return {"message": "Server is running", "meilisearch": meilisearch_res, "user": {"id": user.id, "email": user.email}}
+async def health(search_srv: SearchDep) -> Dict[str, Any]:
+    meili_ok = await search_srv.check()
+    postgres_ok = await db.execute_raw("SELECT 1;")
+    redis_ok = True
+    is_healthy = postgres_ok and redis_ok and meili_ok
+    payload = {
+        "status": "healthy" if is_healthy else "unhealthy",
+        "infrastructure": {
+            "postgres": "connected" if postgres_ok else "disconnected",
+            "redis": "connected" if redis_ok else "disconnected",
+            "meilisearch": "connected" if meili_ok else "disconnected"
+        }
+    }
+    return payload
 
 
 @app.post("/api/contact-form")
@@ -145,6 +153,7 @@ async def contact_form(background_tasks: BackgroundTasks, service: SettingsDep, 
         )
 
         shop_email = await service.get("shop_email")
+        print("🚀 ~ send_email_task ~ shop_email:", shop_email)
         if not shop_email:
             logger.error("Shop email not found")
             return

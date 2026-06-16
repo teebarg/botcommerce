@@ -15,6 +15,7 @@ from datetime import datetime
 from app.core.utils import generate_welcome_email
 from datetime import timedelta
 from app.core.dependencies.services import get_shop_settings_service
+from app.core.dependencies.product import get_search_service
 
 logger = get_logger(__name__)
 
@@ -28,6 +29,7 @@ class RedisStreamConsumer:
         self.notification = get_notification_service()
         self.shop_settings = get_shop_settings_service()
         self.cache = get_cache_service()
+        self.search_srv = get_search_service()
 
     async def start(self):
         """Start consumer with auto-restart supervision"""
@@ -146,7 +148,9 @@ class RedisStreamConsumer:
 
     async def handle_order_paid(self, event):
         try:
-            order_service = get_order_service(settings_service=self.shop_settings)
+            order_service = get_order_service(
+                db=db,
+                settings_service=self.shop_settings)
             await order_service.process_order_payment(order_id=int(event["order_id"]))
         except Exception as e:
             logger.error(
@@ -178,7 +182,7 @@ class RedisStreamConsumer:
                     "variant": True,
                 }
             )
-            service = PopularProductsService()
+            service = PopularProductsService(search_srv=self.search_srv)
             for item in order_items:
                 await service.track_product_interaction(product_id=item.variant.product_id, interaction_type="purchase")
         except Exception as e:
@@ -234,7 +238,7 @@ class RedisStreamConsumer:
 
         try:
             if event["view_type"] == "VIEW":
-                recent_service = RecentlyViewedService(cache=self.cache)
+                recent_service = RecentlyViewedService(cache=self.cache, search_srv=self.search_srv)
                 await recent_service.add_product(user_id=int(event["user_id"]), product_id=int(event["product_id"]))
 
                 await self.handle_track_popular(product_id=int(event["product_id"]), interaction_type="view")
@@ -246,7 +250,7 @@ class RedisStreamConsumer:
             raise Exception(f"Redis error: {str(e)}")
 
     async def handle_track_popular(self, product_id: int, interaction_type: str):
-        recent_service = PopularProductsService()
+        recent_service = PopularProductsService(search_srv=self.search_srv)
         await recent_service.track_product_interaction(product_id=product_id, interaction_type=interaction_type)
 
     async def handle_user_registered(self, event) -> None:

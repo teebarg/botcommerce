@@ -38,10 +38,10 @@ async function executeRequest<T>(endpoint: string, options: RequestOptions = {})
         if (serverReq) {
             const incomingUrl = new URL(serverReq.url);
             currentPath = `${incomingUrl.pathname}${incomingUrl.search}`;
-            
+
             const cookie = serverReq.headers.get("Cookie");
             if (cookie) headersInstance.set("Cookie", cookie);
-            
+
             const host = serverReq.headers.get("host");
             if (host) headersInstance.set("Host", host);
           }
@@ -88,7 +88,6 @@ async function executeRequest<T>(endpoint: string, options: RequestOptions = {})
     return response.json();
 }
 
-// Single, clean interface for your whole application code
 export const api = {
     get: <T>(endpoint: string, options?: RequestOptions) =>
         executeRequest<T>(endpoint, { ...options, method: "GET" }),

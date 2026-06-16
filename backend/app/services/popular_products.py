@@ -1,14 +1,14 @@
 from typing import List
 from app.core.logging import get_logger
-from app.core.config import settings
-from app.services.meilisearch import get_or_create_index
 from app.redis_client import redis_client
+from app.services.search import SearchService
 
 logger = get_logger(__name__)
 
 class PopularProductsService:
-    def __init__(self):
+    def __init__(self, search_srv: SearchService):
         self.max_items = 50
+        self.search_srv = search_srv
 
     POPULARITY_KEY = "popular_products"
 
@@ -34,12 +34,10 @@ class PopularProductsService:
         """Get the most popular products"""
         try:
             product_ids = await redis_client.zrevrange(self.POPULARITY_KEY, 0, limit - 1)
-            index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
-
             products = []
             for pid in product_ids:
                 try:
-                    product = index.get_document(int(pid))
+                    product = self.search_srv.get_document_by_id(doc_id=pid)
                     if product:
                         products.append(product)
                 except Exception as e:

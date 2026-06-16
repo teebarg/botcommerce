@@ -1,6 +1,3 @@
-# ==========================================
-# Configuration Variables
-# ==========================================
 PROJECT_SLUG = shop
 DOCKER_HUB = beafdocker
 DOCKER_COMPOSE = docker compose
@@ -12,7 +9,7 @@ AGENT_IMAGE := $(DOCKER_HUB)/shop-agent
 VERSION ?= latest
 GIT_SHA := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 
-# Default service context fallback for clean command executions
+# Default service context fallback
 s ?= app
 
 # ==========================================
@@ -48,7 +45,7 @@ prune:
 	docker builder prune -f
 
 # ==========================================
-# Engineering & Debugging Operations
+# Debugging
 # ==========================================
 .PHONY: logs
 logs:
@@ -98,7 +95,7 @@ db-reset:
 	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec shop-api prisma migrate reset --force
 
 # ==========================================
-# Repomix Source Context Frameworks for AI
+# Repomix Source Context for AI
 # ==========================================
 .PHONY: fctx bctx actx ctx-all
 fctx:
@@ -113,7 +110,7 @@ actx:
 ctx-all: fctx bctx actx
 
 # ==========================================
-# Production Testing & Registry Distribution
+# Production Testing
 # ==========================================
 .PHONY: test-prod build-all build-api build-agent push-all push-api push-agent
 
@@ -151,16 +148,6 @@ push-agent:
 	docker push $(AGENT_IMAGE):latest
 	docker push $(AGENT_IMAGE):$(VERSION)
 	docker push $(AGENT_IMAGE):$(GIT_SHA)
-
-# Shorthand macros matching your clean help parameters
-.PHONY: ss dbs dps sa dba dpa
-ss: build-api push-api
-dbs: build-api
-dps: push-api
-
-sa: build-agent push-agent
-dba: build-agent
-dpa: push-agent
 
 # ==========================================
 # Interactive Systems Help Desk Documentation

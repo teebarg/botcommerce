@@ -60,33 +60,6 @@ def get_or_create_index(index_name: str) -> Any:
         return client.index(index_name)
 
 
-def get_document_by_id(index_name: str, doc_id: str):
-    """
-    Search documents in a Meilisearch index.
-    """
-    try:
-        index = get_or_create_index(index_name)
-        doc = index.get_document(doc_id)
-        return dict(doc)
-    except Exception as e:
-        logger.error(f"Error fetching document by ID: {e}")
-
-
-async def add_documents_to_index(index_name: str, documents: list) -> None:
-    """
-    Add documents to a Meilisearch index and wait for completion.
-    """
-    index = get_or_create_index(index_name)
-
-    def _add():
-        task = index.add_documents(documents, primary_key="id", serializer=CustomEncoder)
-        index.wait_for_task(task.task_uid, timeout_in_ms=30000)
-        return task
-
-    task = await to_thread.run_sync(_add)
-    logger.debug(f"Added {len(documents)} documents to index {index_name}, task: {task.task_uid}")
-
-
 async def update_document(index_name: str, document: dict) -> None:
     """
     Update a document in a Meilisearch index and wait for completion.

@@ -1,3 +1,4 @@
+from app.services.search import SearchService
 import asyncio
 import json
 import base64
@@ -67,86 +68,11 @@ def get_or_create_index(index_name: str) -> Any:
         return client.index(index_name)
 
 
-class SearchRepository:
-    def __init__(self):
-        self.index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
-
-    def ensure_index_ready(self):
-        """
-        Ensures that the given Meilisearch index has the required
-        filterable and sortable attributes.
-        """
-        filter_task = self.index.update_filterable_attributes(REQUIRED_FILTERABLES)
-        self.index.wait_for_task(filter_task.task_uid)
-
-        sort_task = self.index.update_sortable_attributes(REQUIRED_SORTABLES)
-        self.index.wait_for_task(sort_task.task_uid)
-
-    def search_index(self, query: str, options: dict) -> dict:
-        return self.index.search(query, options)
-
-    def get_documents_by_filter(self, filter_str: str, limit: int) -> list:
-        results = self.index.get_documents({"filter": filter_str, "limit": limit})
-        return results.results
-
-    async def update_document(self, index_name: str, document: dict) -> None:
-        """
-        Update a document in a Meilisearch index and wait for completion.
-        """
-        def _update():
-            task = self.index.update_documents([document], serializer=CustomEncoder)
-            self.index.wait_for_task(task.task_uid, timeout_in_ms=30000)
-            return task
-
-        task = await to_thread.run_sync(_update)
-        logger.debug(f"Updated document {document['id']} in index {index_name}, task: {task.task_uid}")
-
-    async def add_documents_to_index(self, index_name: str, documents: list) -> None:
-        """
-        Add documents to a Meilisearch index and wait for completion.
-        """
-        def _add():
-            task = self.index.add_documents(documents, primary_key="id", serializer=CustomEncoder)
-            self.index.wait_for_task(task.task_uid, timeout_in_ms=30000)
-            return task
-
-        task = await to_thread.run_sync(_add)
-        logger.debug(f"Added {len(documents)} documents to index {index_name}, task: {task.task_uid}")
-
-    async def delete_document(self, index_name: str, document_id: str) -> None:
-        """
-        Delete a document from a Meilisearch index and wait for completion.
-        """
-        def _delete():
-            task = self.index.delete_document(document_id)
-            self.index.wait_for_task(task.task_uid, timeout_in_ms=30000)
-            return task
-
-        task = await to_thread.run_sync(_delete)
-        logger.debug(f"Deleted document {document_id} from index {index_name}, task: {task.task_uid}")
-
-    async def clear_index(self, index_name: str) -> None:
-        """
-        Clear all documents from a Meilisearch index and wait for completion.
-        """
-        def _clear():
-            task = self.index.delete_all_documents()
-            self.index.wait_for_task(task.task_uid, timeout_in_ms=30000)
-            return task
-
-        task = await to_thread.run_sync(_clear)
-        logger.debug(f"Cleared index {index_name}, task: {task.task_uid}")
-
-    def update_settings(self):
-        self.index.update_filterable_attributes(REQUIRED_FILTERABLES)
-        self.index.update_sortable_attributes(REQUIRED_SORTABLES)
-
-
 class ProductService:
-    def __init__(self, db, redis, search_repo: SearchRepository, cache_srv: CacheService):
+    def __init__(self, db, redis, search_srv: SearchService, cache_srv: CacheService):
         self.db = db
         self.redis = redis
-        self.search_repo = search_repo
+        self.search_srv = search_srv
         self.cache_srv = cache_srv
 
     async def get_by_slug(self, slug: str):
@@ -205,25 +131,25 @@ class ProductService:
                 for variant in prod.variants:
                     item = ET.SubElement(channel, "item")
                     ET.SubElement(item, "g:id").text = variant.sku
-                    
+
                     variant_title = prod.name or ""
                     if variant.color or variant.size:
                         variant_title += f" ({' / '.join(filter(None, [variant.color, variant.size]))})"
-                    
+
                     ET.SubElement(item, "g:title").text = variant_title.strip()
                     ET.SubElement(item, "g:description").text = prod.description or "No description provided."
                     ET.SubElement(item, "g:link").text = f"{settings.FRONTEND_HOST}/products/{prod.slug}"
-                    
+
                     main_image = prod.image or (prod.images[0].image if prod.images else f"{settings.FRONTEND_HOST}/placeholder.jpg")
                     ET.SubElement(item, "g:image_link").text = main_image
                     ET.SubElement(item, "g:availability").text = "in_stock" if variant.inventory > 0 else "out_of_stock"
                     ET.SubElement(item, "g:price").text = f"{variant.price:.2f} NGN"
                     ET.SubElement(item, "g:condition").text = "new" if prod.is_new else "thrift"
-                    
+
                     if variant.size: ET.SubElement(item, "g:size").text = variant.size
                     if variant.color: ET.SubElement(item, "g:color").text = variant.color
                     if variant.age: ET.SubElement(item, "g:age_group").text = variant.age
-            
+
             skip += batch_size
             await asyncio.sleep(0.01)  # Yield loop to allow other network requests to process
 
@@ -235,7 +161,7 @@ class ProductService:
         ids = await self.redis.lrange(key, 0, -1)
         if not ids:
             return []
-        return self.search_repo.get_documents_by_filter(f"id IN [{','.join(ids)}]", limit)
+        return self.search_srv.get_documents_by_filter(f"id IN [{','.join(ids)}]", limit)
 
     async def get_personalized_recommendations(self, user_id: int, limit: int) -> list:
         product_ids = await self.redis.lrange(f"user:{user_id}:history", 0, 4)
@@ -256,8 +182,8 @@ class ProductService:
 
         top_ids = [pid for pid, _ in recommendation_scores.most_common(10)]
         filter_str = " OR ".join([f"id = {pid}" for pid in top_ids])
-        
-        results = self.search_repo.search_index("", {"filter": filter_str, "limit": limit})
+
+        results = self.search_srv.search_index("", {"filter": filter_str, "limit": limit})
         return results["hits"]
 
     async def get_discovery_feed(self, **kwargs) -> dict:
@@ -285,7 +211,7 @@ class ProductService:
         try:
             if not disable_random_feed:
                 filters = " AND ".join(f for f in [f"random_score >= {feed_seed}", cursor_filter, *base_filters] if f)
-                res = self.search_repo.search_index("", {
+                res = self.search_srv.search_index("", {
                     "limit": limit, "sort": ["random_score:asc", "freshness_score:desc", "id:desc"], "filter": filters
                 })
                 hits = res["hits"]
@@ -293,7 +219,7 @@ class ProductService:
 
                 if len(hits) < limit and not cursor:
                     wrap_filters = " AND ".join(f for f in [f"random_score < {feed_seed}", *base_filters] if f)
-                    wrap_res = self.search_repo.search_index("", {
+                    wrap_res = self.search_srv.search_index("", {
                         "limit": limit - len(hits), "sort": ["random_score:asc", "freshness_score:desc", "id:desc"], "filter": wrap_filters
                     })
                     hits.extend(wrap_res["hits"])
@@ -305,13 +231,13 @@ class ProductService:
                 if show_facets:
                     search_params["facets"] = ["category_slugs", "sizes", "colors", "ages", "widths", "lengths"]
 
-                res = self.search_repo.search_index(search, search_params)
+                res = self.search_srv.search_index(search, search_params)
                 hits = res["hits"]
                 total_count = res["estimatedTotalHits"]
 
             suggestions = []
             if show_suggestions and search:
-                s_res = self.search_repo.search_index(search, {"limit": 4, "attributesToRetrieve": ["name"], "matchingStrategy": "all"})
+                s_res = self.search_srv.search_index(search, {"limit": 4, "attributesToRetrieve": ["name"], "matchingStrategy": "all"})
                 suggestions = list({h["name"] for h in s_res["hits"] if "name" in h})
 
         except MeilisearchApiError as e:
@@ -330,7 +256,7 @@ class ProductService:
     async def query_collection_index(self) -> dict:
         result = {"arrival": [], "featured": [], "trending": []}
         collections = ["trending", "new-arrivals", "featured"]
-        
+
         for col in collections:
             search_params = {
                 "limit": 6 if col == "trending" else 8,
@@ -338,14 +264,14 @@ class ProductService:
                 "filter": f'active = true AND collection_slugs = "{col}"'
             }
             try:
-                res = self.search_repo.search_index("", search_params)
+                res = self.search_srv.search_index("", search_params)
             except MeilisearchApiError as e:
                 if getattr(e, "code", None) in {"invalid_search_facets", "invalid_search_filter", "invalid_search_sort"}:
-                    self.search_repo.ensure_index_ready()
-                    res = self.search_repo.search_index("", search_params)
+                    self.search_srv.ensure_index_ready()
+                    res = self.search_srv.search_index("", search_params)
                 else:
                     raise HTTPException(status_code=502, detail="Search service communication error")
-            
+
             key_name = "arrival" if col == "new-arrivals" else col
             result[key_name] = res["hits"]
         return result
@@ -468,7 +394,7 @@ class ProductService:
                 return
 
             product_data = self._prepare_product_data_for_indexing(product=product)
-            await self.search_repo.update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
+            await self.search_srv.update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
             await self.cache_srv.invalidate(f"product:{id}", tags=["products", "catalog"])
         except Exception as e:
             logger.error(f"Error re-indexing product {id}: {e}")
@@ -496,7 +422,7 @@ class ProductService:
                     return
 
                 documents = [self._prepare_product_data_for_indexing(p) for p in products]
-                await self.search_repo.add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
+                await self.search_srv.add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
                 key=",".join(f"product:{id}" for id in product_ids)
                 print("invalidating cache..................")
                 print(key)
@@ -506,7 +432,7 @@ class ProductService:
 
             # Full Index Rebuild in Chunks
             logger.debug("Clearing search index for clean sync...")
-            await self.search_repo.clear_index(index_name=settings.MEILI_PRODUCTS_INDEX)
+            await self.search_srv.clear_index(index_name=settings.MEILI_PRODUCTS_INDEX)
 
             BATCH_SIZE = 500
             skip = 0
@@ -536,17 +462,17 @@ class ProductService:
                         logger.error(f"Error preparing product model {product.id}: {e}")
 
                 if documents:
-                    await self.search_repo.add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
-                
+                    await self.search_srv.add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
+
                 total_processed += len(documents)
                 logger.debug(f"Indexed batch chunk: {skip // BATCH_SIZE + 1} ({len(documents)} records added)")
-                
+
                 skip += BATCH_SIZE
                 await asyncio.sleep(0.05)  # Yield block back to application loop thread
 
-            self.cache_srv.invalidate(tags=["products", "catalog"])
+            await self.cache_srv.invalidate(tags=["products", "catalog"])
             logger.debug(f"Successfully batch indexed total of {total_processed} products")
-            
+
         except Exception as e:
             logger.error(f"Critical error during product re-indexing: {e}")
 
@@ -556,7 +482,7 @@ class ProductService:
             if len(product_ids) == 0:
                 return
             await asyncio.gather(*[
-                self.search_repo.delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(pid))
+                self.search_srv.delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(pid))
                 for pid in product_ids
             ])
             key=",".join(f"product:{id}" for id in product_ids)
