@@ -41,7 +41,7 @@ export const meTxnsQuery = () =>
 export const productFeedQuery = (params: FeedParams) =>
     queryOptions({
         queryKey: ["products", "list", params],
-        queryFn: () => getProductsFeedFn({ data: { ...params, feed_seed: Number((Math.random() * 0.5).toFixed(1)) } }),
+        queryFn: () => getProductsFeedFn({ data: { ...params, feed_seed: Number((Math.random() * 0.3).toFixed(2)) } }),
     });
 
 export const catalogFeedQuery = (params: CatalogFeedParams) =>
