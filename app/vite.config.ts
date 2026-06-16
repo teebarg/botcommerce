@@ -67,8 +67,12 @@ const config = defineConfig({
     ],
     resolve: {
         alias: {
-            // Bypasses the Vercel internal NextJS bundling checks
             'next/navigation': 'unenv/runtime/mock/proxy',
+        },
+    },
+    build: {
+        rollupOptions: {
+            external: ["node:stream", "node:stream/web", "node:async_hooks"],
         },
     },
 });
