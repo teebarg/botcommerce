@@ -1,21 +1,17 @@
 import { createServerFn } from "@tanstack/react-start";
-import { api } from "@/utils/api.server";
 import type { Address, SearchCatalog, Collection } from "@/schemas";
 import { z } from "zod";
+import { api } from "@/utils/api";
 
 export const CatalogSearchSchema = z.object({
     slug: z.string(),
     sort: z.string().optional(),
-    sizes: z.string().optional(),
-    colors: z.string().optional(),
-    width: z.number().optional(),
-    length: z.number().optional(),
     cursor: z.number().optional(),
 });
 
 export const getCatalogFn = createServerFn()
     .inputValidator((input: unknown) => CatalogSearchSchema.parse(input))
-    .handler(async ({ data }) => await api.get<SearchCatalog>(`/catalog/${data.slug}`, { params: { ...data } }));
+    .handler(async ({ data }) => await api.get<SearchCatalog>(`/catalog/${data.slug}`, { params: { sort: data.sort, cursor: data.sort } }));
 
 export const getUserAddressesFn = createServerFn({ method: "GET" }).handler(async () => {
     return await api.get<{ addresses: Address[] }>("/address/");
@@ -23,13 +19,4 @@ export const getUserAddressesFn = createServerFn({ method: "GET" }).handler(asyn
 
 export const getCollectionFn = createServerFn({ method: "GET" })
     .inputValidator((d: string) => d)
-    .handler(async ({ data }) => {
-        const res = await api.get<Collection>(`/collection/${data}`);
-        return res;
-    });
-
-export const getShopSettingsPublicFn = createServerFn().handler(async () => {
-    const res = await api.get<any>("/shop-settings/public");
-    return res as Promise<any>
-});
-
+    .handler(async ({ data }) => await api.get<Collection>(`/collection/${data}`));

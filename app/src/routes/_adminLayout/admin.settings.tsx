@@ -4,25 +4,18 @@ import { ShopDetails } from "@/components/admin/settings/shop-details";
 import { FeatureToggles } from "@/components/admin/settings/feature-toggles";
 import { ShopPayments } from "@/components/admin/settings/shop-payments";
 import DeliveryOverview from "@/components/admin/delivery/delivery-overview";
-import { queryOptions, useQuery } from "@tanstack/react-query";
-import { clientApi } from "@/utils/api.client";
-import { ShopSettings } from "@/schemas";
-
-const useShopSettingsQuery = () =>
-    queryOptions({
-        queryKey: ["shop-settings", "list"],
-        queryFn: () => clientApi.get<ShopSettings[]>("/shop-settings/"),
-    });
+import { useQuery } from "@tanstack/react-query";
+import { useSettingsQuery } from "@/hooks/useGeneric";
 
 export const Route = createFileRoute("/_adminLayout/admin/settings")({
     loader: async ({ context }) => {
-        await context.queryClient.ensureQueryData(useShopSettingsQuery());
+        await context.queryClient.ensureQueryData(useSettingsQuery());
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { data: settings } = useQuery(useShopSettingsQuery());
+    const { data: settings } = useQuery(useSettingsQuery());
 
     return (
         <div className="py-4 px-2.5 md:px-8 slide-in">

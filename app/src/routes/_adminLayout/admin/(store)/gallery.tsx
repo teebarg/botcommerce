@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { LayoutDashboard, RectangleVertical } from "lucide-react";
 import { GalleryCard } from "@/components/admin/product/gallery-card";
@@ -10,17 +10,17 @@ import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
 import type { PaginatedProductImages, ProductImage } from "@/schemas";
 import { useWebSocket } from "pulsews";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { clientApi } from "@/utils/api.client";
+import { useQuery } from "@tanstack/react-query";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { queryOptions } from "@tanstack/react-query";
 import { z } from "zod";
+import { api } from "@/utils/api";
 
 const galleryQuery = (params?: object) =>
     queryOptions({
         queryKey: ["gallery", params],
-        queryFn: () => clientApi.get<PaginatedProductImages>("/gallery/", { params: params as Record<string, unknown> }),
+        queryFn: () => api.get<PaginatedProductImages>("/gallery/", { params: params as Record<string, unknown> }),
         staleTime: 1000 * 60 * 60 * 24, // 24 hours
         refetchOnMount: false,
     });
@@ -39,8 +39,6 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/gallery")({
 });
 
 function RouteComponent() {
-    const queryClient = useQueryClient();
-    const toastId = useRef<string | number | undefined>(undefined);
     const params = Route.useSearch();
     const { data } = useQuery(galleryQuery(params));
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -49,10 +47,11 @@ function RouteComponent() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { lastMessage } = useWebSocket();
     const { mutateAsync: bulkDeleteImages, isPending: isDeleting } = useBulkDeleteGalleryImages();
+    const BULK_ACTION_TOAST_ID = "bulk-action-toast";
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedProductImages, ProductImage>({
         queryKey: ["gallery", "infinite", params],
-        queryFn: (cursor) => clientApi.get<PaginatedProductImages>("/gallery/", { params: { cursor, ...params } }),
+        queryFn: (cursor) => api.get<PaginatedProductImages>("/gallery/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
         initialData: data,
@@ -71,26 +70,32 @@ function RouteComponent() {
     useEffect(() => {
         if (!lastMessage) return;
 
-        if (lastMessage?.type === "image_upload" && lastMessage?.status === "completed") {
-            toast.success("Products uploaded successfully");
-            setIsLoading(false);
+        if (lastMessage.type === "image_upload") {
+            if (lastMessage.status === "completed") {
+                toast.success("Products uploaded successfully");
+                setIsLoading(false);
+            } else if (lastMessage.status === "processing" && !isLoading) {
+                setIsLoading(true);
+            }
         }
 
-        if (lastMessage?.type === "image_upload" && lastMessage?.status === "processing" && !isLoading) {
-            setIsLoading(true);
-        }
+        if (lastMessage.type === "bulk_action") {
+            if (lastMessage.status === "processing") {
+                toast.loading("Processing...", { id: BULK_ACTION_TOAST_ID });
+            }
 
-        if (lastMessage?.type === "bulk_action" && lastMessage?.status === "processing") {
-            toastId.current = toast.loading("Processing...");
-        }
+            if (lastMessage.status === "completed") {
+                toast.success("Requested Action Completed", {
+                    id: BULK_ACTION_TOAST_ID,
+                    description: "Data updated successfully"
+                });
 
-        if (lastMessage?.type === "bulk_action" && lastMessage?.status === "completed") {
-            toast.success("Done!", { id: toastId.current });
-            setSelectionMode(false);
-            setSelectedImages(new Set());
-            setIsLoading(false);
+                setSelectionMode(false);
+                setSelectedImages(new Set());
+                setIsLoading(false);
+            }
         }
-    }, [lastMessage, isLoading]);
+    }, [lastMessage]);
 
     const handleSelectionChange = (imageId: number, selected: boolean) => {
         setSelectedImages((prev) => {

@@ -4,7 +4,7 @@ import { ConversationStatusSchema, type Chat, type PaginatedChats } from "@/sche
 import { useQuery } from "@tanstack/react-query";
 import z from "zod";
 import { chatsQuery } from "@/queries/admin.queries";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 
@@ -25,7 +25,7 @@ function RouteComponent() {
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedChats, Chat>({
         queryKey: ["chats", "infinite", params],
-        queryFn: (cursor) => clientApi.get<PaginatedChats>("/chat/", { params: { cursor, ...params } }),
+        queryFn: (cursor) => api.get<PaginatedChats>("/chat/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
         initialData: data,

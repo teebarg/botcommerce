@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { tryCatch } from "@/utils/try-catch";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 
 interface CatalogVisitTrackerProps {
     slug: string;
@@ -19,7 +19,7 @@ export function CatalogVisitTracker({ slug }: CatalogVisitTrackerProps) {
         const trackVisit = async () => {
             if (hasTracked) return;
 
-            const { data } = await tryCatch<VisitTrackerResponse>(clientApi.post<VisitTrackerResponse>(`/catalog/${slug}/track-visit`));
+            const { data } = await tryCatch<VisitTrackerResponse>(api.post<VisitTrackerResponse>(`/catalog/${slug}/track-visit`));
 
             if (data) {
                 setHasTracked(true);

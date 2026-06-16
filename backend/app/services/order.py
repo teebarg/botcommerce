@@ -1,38 +1,122 @@
 import uuid
-from app.core.notifications.events import SendInvoiceEvent, OrderConfirmedEvent
+from typing import Optional, Any, Dict
 from fastapi import HTTPException, BackgroundTasks
 from app.models.order import OrderCreate
 from app.core.logging import logger
 from app.services.invoice import invoice_service
 from datetime import datetime
-from app.core.deps import Notification, supabase
-from app.services.product import index_product
+from app.core.deps import Notification
+from app.services.product import ProductService
 from app.core.config import settings
-from app.services.events import publish_order_event
-from app.services.redis import refresh_data
+from app.services.events import EventBus
 from app.services.shop_settings import ShopSettingsService
-from app.services.cart import get_cart
-from typing import Any, Dict
+from app.services.cart import CartService
 from prisma import Prisma
 from app.services.coupon import CouponService
+from app.core.notifications.events import SendInvoiceEvent, OrderConfirmedEvent
+from app.services.cache import CacheService
+from app.services.storage import MediaStorageService
+from app.models.order import Order, PaginatedOrders
 
 
 class OrderService:
     def __init__(
         self,
         db: Prisma,
-        coupon_service: CouponService,
-        settings_service: ShopSettingsService,
-        notification_dispatcher: Notification
+        cart_srv: CartService,
+        product_srv: ProductService,
+        coupon_srv: CouponService,
+        settings_srv: ShopSettingsService,
+        notification_dispatcher: Notification,
+        event_bus: EventBus,
+        cache: CacheService,
+        storage_srv: MediaStorageService
     ):
         self.db = db
-        self.coupon_service = coupon_service
-        self.settings_service = settings_service
-        self.notification = notification_dispatcher
+        self.cart = cart_srv
+        self.product_srv = product_srv
+        self.coupon_srv = coupon_srv
+        self.settings_srv = settings_srv
+        self.notification_srv = notification_dispatcher
+        self.event_bus = event_bus
+        self.cache = cache
+        self.storage_srv = storage_srv
+
+    async def get_by_number(self, order_number: str, include_relations: bool = True) -> Any:
+        if not include_relations:
+            return await self.db.order.find_unique(where={"order_number": order_number})
+        
+        return await self.db.order.find_unique(
+            where={"order_number": order_number},
+            include={
+                "order_items": {"include": {"variant": True}},
+                "user": True,
+                "shipping_address": True
+            }
+        )
+
+    async def get_by_id(self, order_id: int, include_relations: bool = False) -> Any:
+        include_clause = {
+            "order_items": {"include": {"variant": True}},
+            "user": True,
+            "shipping_address": True
+        } if include_relations else None
+        
+        return await self.db.order.find_unique(where={"id": order_id}, include=include_clause)
+
+    async def list_paginated(
+        self,
+        user_id: int,
+        cursor: Optional[int] = None,
+        limit: int = 20,
+        status: Optional[str] = None,
+        order_number: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        customer_id: Optional[int] = None,
+        user_role: str = "CUSTOMER",
+        sort: str = "desc"
+    ) -> PaginatedOrders:
+        where: Dict[str, Any] = {}
+        if status:
+            where["status"] = status
+        if customer_id:
+            where["user_id"] = customer_id
+        if order_number:
+            where["order_number"] = order_number
+        if user_role == "CUSTOMER":
+            where["user_id"] = user_id
+        if start_date:
+            where["created_at"] = {"gte": start_date}
+        if end_date:
+            where["created_at"] = {"lte": end_date}
+
+        orders = await self.db.order.find_many(
+            where=where,
+            order={"created_at": sort},
+            skip=1 if cursor else 0,
+            take=limit + 1,
+            cursor={"id": cursor} if cursor else None,
+            include={
+                "order_items": {"include": {"variant": True}},
+                "user": True,
+                "shipping_address": True,
+                "coupon": True,
+            }
+        )
+        
+        items = orders[:limit]
+        next_cursor = items[-1].id if len(orders) > limit else None
+        
+        return {
+            "items": items,
+            "next_cursor": next_cursor,
+            "limit": limit
+        }
 
     async def create_order_from_cart(self, order_in: OrderCreate, user_id: int, cart_number: str) -> Any:
         order_number: str = f"ORD{uuid.uuid4().hex[:8].upper()}"
-        cart = await get_cart(cart_number=cart_number, user_id=user_id)
+        cart = await self.cart.get_active_cart(cart_number=cart_number, user_id=user_id)
         if not cart:
             raise HTTPException(status_code=404, detail="Cart not found")
 
@@ -68,7 +152,7 @@ class OrderService:
         if cart.coupon_id:
             data["coupon"] = {"connect": {"id": cart.coupon_id}}
             data["coupon_code"] = cart.coupon_code
-            await self.coupon_service.increment_coupon_usage(
+            await self.coupon_srv.increment_coupon_usage(
                 coupon_id=cart.coupon_id,
                 user_id=user_id,
                 discount_amount=cart.discount_amount
@@ -83,10 +167,12 @@ class OrderService:
             logger.error(f"Failed to create order: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
-        await publish_order_event(order=new_order, type="ORDER_CREATED")
+        await self.event_bus.publish_order_event(order=new_order, event_type="ORDER_CREATED")
 
         if order_in.payment_status == "SUCCESS":
-            await publish_order_event(order=new_order, type="ORDER_PAID")
+            await self.event_bus.publish_order_event(order=new_order, event_type="ORDER_PAID")
+
+        await self.cache.invalidate(tags=["orders"])
 
         return new_order
 
@@ -102,14 +188,14 @@ class OrderService:
                 include={"order_items": {"include": {"variant": True}}, "user": True, "shipping_address": True}
             )
 
-            shop_email = await self.settings_service.get("shop_email")
+            shop_email = await self.settings_srv.get("shop_email")
             cc_list = [shop_email] if shop_email else []
             order_link: str = f"{settings.FRONTEND_HOST}/order/confirmed/{order.order_number}"
             items_overview: str = "\n".join(
                 [f"• {it.name} x{it.quantity} - {it.price}" for it in (order.order_items or [])]
             ) or "No items found"
 
-            await self.notification.dispatch(OrderConfirmedEvent(
+            await self.notification_srv.dispatch(OrderConfirmedEvent(
                 order=order,
                 user=user,
                 order_link=order_link,
@@ -136,13 +222,13 @@ class OrderService:
             timestamp: str = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename: str = f"invoice_{order.order_number}_{timestamp}_{uuid.uuid4().hex[:8]}.pdf"
 
-            result = supabase.storage.from_("invoices").upload(filename, pdf_bytes, {"contentType": "application/pdf"})
+            result = self.storage_srv.upload_file(bucket="invoices", filename=filename, bytes=pdf_bytes, content_type="application/pdf")
             if not result:
                 raise Exception("Failed to upload invoice to storage")
 
-            public_url = supabase.storage.from_("invoices").get_public_url(filename, {"download": filename})
+            public_url = self.storage_srv.get_public_url(bucket="invoices", filename=filename)
             await self.db.order.update(where={"id": order_id}, data={"invoice_url": public_url})
-            await refresh_data(patterns=["orders"], keys=[f"order:{order_id}"])
+            await self.cache.invalidate(f"order:{order_id}", tags=["orders"])
             return public_url
         except Exception as e:
             raise Exception(str(e))
@@ -167,34 +253,34 @@ class OrderService:
                     out_of_stock = True
 
                 await self.db.productvariant.update(where={"id": variant_id}, data=update_data)
-                await index_product(product_id=variant.product_id)
+                await self.product_srv.invalidate(id=variant.product_id)
                 if out_of_stock:
                     out_of_stock_variants.append(variant)
 
-            await refresh_data(patterns=["gallery"])
+            await self.cache.invalidate(tags=["gallery"])
         except Exception as e:
             logger.error(f"Failed to decrement variant inventory for order {order.id}: {e}")
             raise Exception("Failed to decrement variant inventory for order")
 
-        if out_of_stock_variants and self.notification:
+        if out_of_stock_variants and self.notification_srv:
             try:
                 slack_text: str = f"🚨 *OUT OF STOCK* 🚨\nOrder ID: {order.id}\n" + "\n".join([
                     f"• SKU: {v.sku}, Product ID: {v.product_id}" for v in out_of_stock_variants
                 ])
-                await self.notification.send_notification(
+                await self.notification_srv.send(
                     channel_name="slack",
                     slack_message={"text": slack_text}
                 )
-                await refresh_data(patterns=["orders"])
+                await self.cache.invalidate(tags=["orders"])
             except Exception as e:
                 logger.error(f"Failed to send out-of-stock slack: {e}")
 
-    async def send_payment_receipt(self, order: Any) -> None:
+    async def send_payment_receipt(self, order: Order) -> None:
         try:
-            shop_email: str | None = await self.settings_service.get("shop_email")
+            shop_email: str | None = await self.settings_srv.get("shop_email")
             cc_list = [shop_email] if shop_email else []
 
-            await self.notification.dispatch(SendInvoiceEvent(order=order, cc_list=cc_list))
+            await self.notification_srv.dispatch(SendInvoiceEvent(order=order, cc_list=cc_list))
             logger.debug(f"Invoice email sent to user: {order.user_id}")
         except Exception as e:
             logger.error(f"Failed to generate invoice email: {e}")
@@ -271,7 +357,7 @@ class OrderService:
             line_amount: float = float(order_item.price) * int(order_item.quantity)
             new_subtotal: float = max(0.0, float(order.subtotal or 0) - line_amount)
 
-            tax_rate_str = await self.settings_service.get("tax_rate")
+            tax_rate_str = await self.settings_srv.get("tax_rate")
             tax_rate = float(tax_rate_str or 0)
             new_tax: float = new_subtotal * (tax_rate / 100.0)
             new_total: float = new_subtotal + new_tax + float(order.shipping_fee or 0)
@@ -295,9 +381,9 @@ class OrderService:
 
         async def invalidate_caches() -> None:
             try:
-                await refresh_data(patterns=["orders"], keys=[f"order:{order_id}", f"order-timeline:{order_id}"])
+                await self.cache.invalidate(f"order:{order_id}", f"order-timeline:{order_id}", tags=["orders"])
                 if order_item.variant and order_item.variant.product_id:
-                    await index_product(product_id=order_item.variant.product_id)
+                    await self.product_srv.invalidate(id=order_item.variant.product_id)
             except Exception as e:
                 logger.error(f"Failed to invalidate caches/reindex after return: {e}")
 
@@ -327,10 +413,10 @@ class OrderService:
         try:
             from app.core.utils import generate_referral_cashback_email
             email_data = await generate_referral_cashback_email(order=order, coupon_owner=coupon_owner)
-            shop_email = await self.settings_service.get("shop_email")
+            shop_email = await self.settings_srv.get("shop_email")
             cc_list = [shop_email] if shop_email else []
 
-            await self.notification.send_notification(
+            await self.notification_srv.send(
                 channel_name="email",
                 recipient=coupon_owner.email,
                 subject=email_data.subject,

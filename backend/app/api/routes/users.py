@@ -1,6 +1,8 @@
 from typing import Optional
+from app.core.dependencies.cache import CacheDep
+from app.services.cache import cacheable
 from fastapi import APIRouter, HTTPException, Query, Depends, Request
-from app.core.deps import CurrentUser, UserDep
+from app.core.deps import CurrentUser
 from app.models.wishlist import Wishlists, WishlistCreate
 from app.models.generic import Message
 from app.prisma_client import prisma as db
@@ -8,9 +10,6 @@ from prisma.errors import PrismaError
 from prisma.enums import Role, Status
 from app.models.user import User, UserSelf, UserAdmin, UserUpdateMe, UserUpdate, PaginatedUsers, GuestUserCreate
 from app.core.security import get_password_hash
-from app.services.recently_viewed import RecentlyViewedService
-from app.models.product import ProductSearch
-from app.services.redis import cache_response, refresh_data
 from app.core.permissions import require_admin
 
 router = APIRouter()
@@ -189,11 +188,12 @@ async def delete(id: int) -> Message:
 
 
 @router.get("/wishlist")
-@cache_response("products:wishlist", key=lambda request, user: user.id if user else None)
-async def read_wishlist(
-    request: Request,
-    user: UserDep
-) -> Wishlists:
+@cacheable(
+    key_prefix="wishlist",
+    key_builder=lambda user: user.id,
+    tags=lambda user: [f"wishlist:{user.id}"]
+)
+async def read_wishlist(request: Request, user: CurrentUser) -> Wishlists:
     if not user:
         return {"wishlists": []}
     items = await db.favorite.find_many(
@@ -205,25 +205,22 @@ async def read_wishlist(
 
 
 @router.post("/wishlist")
-async def create_user_wishlist_item(item: WishlistCreate, user: CurrentUser) -> Message:
+async def create_user_wishlist_item(item: WishlistCreate, user: CurrentUser, cache: CacheDep) -> Message:
     try:
-        favorite = await db.favorite.create(
+        await db.favorite.create(
             data={
                 **item.model_dump(),
                 "user_id": user.id
             }
         )
-        await refresh_data(keys=f"products:wishlist:{user.id}")
+        await cache.invalidate(tags=[f"wishlist:{user.id}"])
         return Message(message="Product added to wishlist")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.delete("/wishlist/{product_id}")
-async def remove_wishlist_item(
-    product_id: int,
-    user: CurrentUser,
-) -> Message:
+async def remove_wishlist_item(product_id: int, user: CurrentUser, cache: CacheDep) -> Message:
     existing = await db.favorite.find_unique(
         where={
             'user_id_product_id': {
@@ -244,20 +241,7 @@ async def remove_wishlist_item(
                 }
             }
         )
-        await refresh_data(keys=f"products:wishlist:{user.id}")
+        await cache.invalidate(tags=[f"wishlist:{user.id}"])
         return Message(message="Product deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-
-
-@router.get("/recently-viewed")
-@cache_response(key_prefix="products:recently-viewed", key=lambda request, current_user, limit: f"{current_user.id}:{limit}")
-async def get_recently_viewed(
-    request: Request,
-    current_user: CurrentUser,
-    limit: int = Query(default=10, le=20)
-) -> list[ProductSearch]:
-    """Get current user's recently viewed products."""
-    service = RecentlyViewedService()
-    products = await service.get_recently_viewed(current_user.id, limit)
-    return products

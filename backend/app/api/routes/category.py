@@ -5,21 +5,22 @@ from app.models.category import Category, CategoryCreate, CategoryUpdate, BulkOr
 from app.models.product import CategoryWithProducts
 from app.models.generic import Message, ImageUpload
 from app.core.utils import slugify
-from app.core.storage import upload, delete_image
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
-from app.services.redis import cache_response, refresh_data
 from app.core.logging import get_logger
-from app.services.product import prepare_product_data_for_indexing
 from app.core.permissions import require_admin
+from app.core.dependencies.cache import CacheDep
+from app.services.cache import cacheable
+from app.core.dependencies.product import ProductDep
+from app.core.dependencies.services import StorageDep
 
 logger = get_logger(__name__)
 
 router = APIRouter()
 
-@router.get("/home/products")
-@cache_response(key_prefix="products:home")
-async def get_home_categories_products(request: Request) -> list[CategoryWithProducts]:
+@router.get("/home/products", tags=["products"])
+@cacheable(key_prefix="products:home")
+async def get_home_categories_products(request: Request, product_srv: ProductDep) -> list[CategoryWithProducts]:
     categories = await db.category.find_many(
         where={"is_active": True},
         order={"display_order": "asc"},
@@ -28,16 +29,13 @@ async def get_home_categories_products(request: Request) -> list[CategoryWithPro
     )
 
     for category in categories:
-        category.products = [prepare_product_data_for_indexing(product) for product in category.products]
+        category.products = [product_srv._prepare_product_data_for_indexing(product) for product in category.products]
 
     return categories
 
 @router.get("/")
-@cache_response(key_prefix="categories")
-async def index(
-    request: Request,
-    query: str = "",
-) -> Optional[list[Category]]:
+@cacheable(key_prefix="categories", key_builder=lambda query: query if query else "all", tags=["categories"])
+async def index(request: Request, query: str = "") -> Optional[list[Category]]:
     """
     Retrieve all categories.
     """
@@ -55,7 +53,7 @@ async def index(
     )
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create(*, data: CategoryCreate) -> Category:
+async def create(data: CategoryCreate, cache: CacheDep) -> Category:
     """
     Create new category.
     """
@@ -63,14 +61,14 @@ async def create(*, data: CategoryCreate) -> Category:
         category = await db.category.create(
             data={**data.model_dump(), "slug": slugify(data.name)}
         )
-        await refresh_data(patterns=["categories"])
+        await cache.invalidate(tags=["categories"])
         return category
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.patch("/reorder", dependencies=[Depends(require_admin)])
-async def reorder_categories(data: BulkOrderUpdate) -> Message:
+async def reorder_categories(data: BulkOrderUpdate, cache: CacheDep) -> Message:
     """Update display order for categories"""
     async with db.tx() as tx:
         try:
@@ -82,7 +80,7 @@ async def reorder_categories(data: BulkOrderUpdate) -> Message:
                         data={"display_order": category_update.display_order}
                     )
 
-            await refresh_data(patterns=["categories"])
+            await cache.invalidate(tags=["categories"])
             return {"message": "categories reordered successfully"}
         except Exception as e:
             logger.error(f"Failed to reorder categories: {str(e)}")
@@ -91,9 +89,9 @@ async def reorder_categories(data: BulkOrderUpdate) -> Message:
 
 @router.patch("/{id}", dependencies=[Depends(require_admin)])
 async def update(
-    *,
     id: int,
     update_data: CategoryUpdate,
+    cache: CacheDep
 ) -> Category:
     """
     Update a category and invalidate cache.
@@ -109,7 +107,7 @@ async def update(
             where={"id": id},
             data=update_data.model_dump(exclude_unset=True)
         )
-        await refresh_data(patterns=["categories"])
+        await cache.invalidate(tags=["categories"])
         return update
     except PrismaError as e:
         logger.error(f"Failed to update category: {str(e)}")
@@ -117,7 +115,7 @@ async def update(
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete(id: int) -> Message:
+async def delete(id: int, cache: CacheDep) -> Message:
     """
     Delete a category.
     """
@@ -128,10 +126,8 @@ async def delete(id: int) -> Message:
         raise HTTPException(status_code=404, detail="Category not found")
 
     try:
-        await db.category.delete(
-            where={"id": id}
-        )
-        await refresh_data(patterns=["categories"])
+        await db.category.delete(where={"id": id})
+        await cache.invalidate(tags=["categories"])
         return Message(message="Category deleted successfully")
     except PrismaError as e:
         logger.error(f"Failed to delete category: {str(e)}")
@@ -139,7 +135,7 @@ async def delete(id: int) -> Message:
 
 
 @router.patch("/{id}/image", dependencies=[Depends(require_admin)])
-async def add_image(id: int, image_data: ImageUpload) -> Category:
+async def add_image(id: int, image_data: ImageUpload, cache: CacheDep, storage_srv: StorageDep) -> Category:
     """
     Add an image to a category.
     """
@@ -150,13 +146,13 @@ async def add_image(id: int, image_data: ImageUpload) -> Category:
         raise HTTPException(status_code=404, detail="Category not found")
 
     try:
-        image_url = upload(bucket="images", data=image_data)
+        image_url: str = storage_srv.upload(bucket="images", data=image_data)
 
         updated_category = await db.category.update(
             where={"id": id},
             data={"image": image_url}
         )
-        await refresh_data(patterns=["categories"])
+        await cache.invalidate(tags=["categories"])
         return updated_category
 
     except Exception as e:
@@ -168,7 +164,7 @@ async def add_image(id: int, image_data: ImageUpload) -> Category:
 
 
 @router.delete("/{id}/image", dependencies=[Depends(require_admin)])
-async def delete_image(id: int) -> Message:
+async def delete_image(id: int, cache: CacheDep, storage_srv: StorageDep) -> Message:
     """
     Delete the image of a category.
     """
@@ -183,13 +179,13 @@ async def delete_image(id: int) -> Message:
 
     try:
         file_path = category.image.split("/storage/v1/object/public/images/")[1]
-        delete_image(bucket="images", file_path=file_path)
+        storage_srv.delete_image(bucket="images", file_path=file_path)
 
         await db.category.update(
             where={"id": id},
             data={"image": None}
         )
-        await refresh_data(patterns=["categories"])
+        await cache.invalidate(tags=["categories"])
         return Message(message="Category image deleted successfully")
 
     except Exception as e:

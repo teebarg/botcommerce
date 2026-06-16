@@ -1,17 +1,17 @@
+from app.services.search import SearchService
 from typing import List
 from datetime import datetime
-from app.services.meilisearch import get_or_create_index
-from app.core.config import settings
-from app.services.websocket import manager
 from app.core.logging import get_logger
 from app.redis_client import redis_client
-from app.services.redis import refresh_data
+from app.services.cache import CacheService
 
 logger = get_logger(__name__)
 
 class RecentlyViewedService:
-    def __init__(self):
+    def __init__(self, cache: CacheService, search_srv: SearchService):
         self.max_items = 12
+        self.cache = cache
+        self.search_srv = search_srv
 
     async def get_key(self, user_id: int) -> str:
         return f"recently_viewed:{user_id}"
@@ -26,7 +26,7 @@ class RecentlyViewedService:
 
         await redis_client.zremrangebyrank(key, 0, -(self.max_items + 1))
 
-        await refresh_data(keys=[f"products:recently-viewed:{user_id}"])
+        await self.cache.invalidate(f"products:recently-viewed:{user_id}")
 
     async def remove_product_from_all(self, product_id: int):
         """Remove a product from all users' recently viewed list"""
@@ -35,21 +35,20 @@ class RecentlyViewedService:
             for key in keys:
                 await redis_client.zrem(key, str(product_id))
 
-            await refresh_data(patterns=["products:recently-viewed"])
+            await self.cache.invalidate(tags=["products:recently-viewed"])
         except Exception as e:
             logger.error(f"Error removing product from recently viewed list: {str(e)}")
 
     async def get_recently_viewed(self, user_id: int, limit: int = 10) -> List[dict]:
         """Get user's recently viewed products"""
-        key = await self.get_key(user_id)
+        key: str = await self.get_key(user_id)
 
         product_ids = await redis_client.zrevrange(key, 0, limit - 1)
-        index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
 
         products = []
         for pid in product_ids:
             try:
-                product = index.get_document(int(pid))
+                product = self.search_srv.get_document_by_id(doc_id=pid)
                 if product:
                     products.append(product)
             except Exception as e:

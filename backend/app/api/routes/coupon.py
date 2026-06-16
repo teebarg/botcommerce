@@ -1,4 +1,3 @@
-from app.models.generic import Message
 from typing import Annotated, Optional, List
 from fastapi import APIRouter, Depends, HTTPException, Cookie, Query, Request
 from app.core.deps import UserDep, CurrentUser
@@ -8,21 +7,23 @@ from app.models.coupon import (
     Coupon,
     PaginatedCoupons, CouponScope, CouponAnalytics
 )
-from app.services.coupon import CouponService
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
-from app.services.redis import cache_response, refresh_data
 from prisma.errors import PrismaError
 from datetime import datetime, date
-from app.services.cart import get_cart
 from app.core.permissions import require_admin
+from app.models.generic import Message
+from app.services.cache import cacheable
+from app.core.dependencies.cache import CacheDep
+from app.core.dependencies.cart import CartDep
+from app.core.dependencies.services import CouponDep
 
 logger = get_logger(__name__)
 router = APIRouter()
 
 
 @router.get("/", dependencies=[Depends(require_admin)])
-@cache_response(key_prefix="coupons")
+@cacheable(key_prefix="coupons", tags=["coupons"], expire=2592000)
 async def get_coupons(
     request: Request,
     query: Optional[str] = Query(""),
@@ -59,13 +60,12 @@ async def get_coupons(
 
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create_coupon(coupon_data: CouponCreate) -> Coupon:
+async def create_coupon(srv: CouponDep, coupon_data: CouponCreate, cache: CacheDep) -> Coupon:
     """
     Create a new coupon.
     """
     code: str = coupon_data.code.upper()
-
-    existing = await db.coupon.find_unique(where={"code": code})
+    existing = await srv.get_by_code(code=code)
     if existing:
         raise HTTPException(status_code=400, detail="Coupon code already exists")
 
@@ -74,7 +74,7 @@ async def create_coupon(coupon_data: CouponCreate) -> Coupon:
         data["code"] = code
         coupon = await db.coupon.create(data=data)
 
-        await refresh_data(patterns=["coupons"])
+        await cache.invalidate(tags=["coupons"])
         return coupon
     except PrismaError as e:
         logger.error(f"Error creating coupon: {str(e)}")
@@ -82,11 +82,11 @@ async def create_coupon(coupon_data: CouponCreate) -> Coupon:
 
 
 @router.patch("/{id}", dependencies=[Depends(require_admin)])
-async def update_coupon(id: int, coupon_data: CouponUpdate) -> Coupon:
+async def update_coupon(id: int, srv: CouponDep, coupon_data: CouponUpdate, cache: CacheDep) -> Coupon:
     """
     Update a coupon.
     """
-    coupon = await db.coupon.find_unique(where={"id": id})
+    coupon = await srv.get_by_id(id=id)
     if not coupon:
         raise HTTPException(status_code=404, detail="Coupon not found")
 
@@ -106,7 +106,7 @@ async def update_coupon(id: int, coupon_data: CouponUpdate) -> Coupon:
             data=data
         )
 
-        await refresh_data(patterns=["coupons"])
+        await cache.invalidate(tags=["coupons"])
         return updated_coupon
     except HTTPException:
         raise
@@ -116,17 +116,17 @@ async def update_coupon(id: int, coupon_data: CouponUpdate) -> Coupon:
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete_coupon(id: int):
+async def delete_coupon(id: int, srv: CouponDep, cache: CacheDep):
     """
     Delete a coupon.
     """
-    coupon = await db.coupon.find_unique(where={"id": id})
+    coupon = await srv.get_by_id(id=id)
     if not coupon:
         raise HTTPException(status_code=404, detail="Coupon not found")
 
     try:
         await db.coupon.delete(where={"id": id})
-        await refresh_data(patterns=["coupons"])
+        await cache.invalidate(tags=["coupons"])
         return {"message": "Coupon deleted successfully"}
     except PrismaError as e:
         logger.error(f"Error deleting coupon: {str(e)}")
@@ -135,6 +135,9 @@ async def delete_coupon(id: int):
 
 @router.post("/apply")
 async def apply_coupon(
+    cache: CacheDep,
+    srv: CouponDep,
+    cart_srv: CartDep,
     code: str = Query(..., description="Coupon code to apply"),
     user: CurrentUser = None,
     _cart_id: Annotated[str | None, Cookie()] = None
@@ -142,32 +145,33 @@ async def apply_coupon(
     """
     Apply a coupon to a cart.
     """
-    service = CouponService()
-    cart = await get_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    cart = await cart_srv.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
 
-    coupon = await service.validate_coupon(
+    coupon = await srv.validate_coupon(
         code=code,
         cart=cart,
         user_id=user.id if user else None
     )
 
-    await service.apply_coupon_to_cart(coupon, cart)
-    await refresh_data(patterns=["abandoned-carts", "coupons"])
+    await srv.apply_coupon_to_cart(coupon, cart)
+    await cache.invalidate(tags=["abandoned-carts", "coupons"])
     return Message(message="Coupon applied successfully")
 
 
 @router.post("/remove", response_model=dict)
 async def remove_coupon(
+    cache: CacheDep,
+    srv: CouponDep,
+    cart_srv: CartDep,
     user: UserDep = None,
     _cart_id: Annotated[str | None, Cookie()] = None
 ) -> Message:
     """
     Remove coupon from cart.
     """
-    service = CouponService()
-    cart = await get_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    cart = await cart_srv.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
 
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
@@ -175,20 +179,20 @@ async def remove_coupon(
     if not cart.coupon_id:
         raise HTTPException(status_code=400, detail="No coupon applied to this cart")
 
-    await service.remove_coupon_from_cart(cart)
+    await srv.remove_coupon_from_cart(cart)
 
-    await refresh_data(patterns=["abandoned-carts", "coupons"])
+    await cache.invalidate(tags=["abandoned-carts", "coupons"])
 
     return {"message": "Coupon removed successfully"}
 
 
 @router.post("/{id}/assign", dependencies=[Depends(require_admin)])
-async def assign_coupon(id: int, user_ids: List[int]):
+async def assign_coupon(id: int, srv: CouponDep, cache: CacheDep, user_ids: List[int]):
     """
     Share a coupon with specific users.
 
     """
-    coupon = await db.coupon.find_unique(where={"id": id})
+    coupon = await srv.get_by_id(id=id)
     if not coupon:
         raise HTTPException(status_code=404, detail="Coupon not found")
 
@@ -198,7 +202,7 @@ async def assign_coupon(id: int, user_ids: List[int]):
             update_data["scope"] = CouponScope.SPECIFIC_USERS
         await db.coupon.update(where={"id": id}, data=update_data)
 
-        await refresh_data(patterns=["coupons"])
+        await cache.invalidate(tags=["coupons"])
         return {"message": f"Coupon shared with {len(user_ids)} user(s) successfully"}
     except PrismaError as e:
         logger.error(f"Error sharing coupon: {str(e)}")
@@ -206,11 +210,11 @@ async def assign_coupon(id: int, user_ids: List[int]):
 
 
 @router.patch("/{id}/toggle-status", dependencies=[Depends(require_admin)])
-async def toggle_coupon_status(id: int) -> Coupon:
+async def toggle_coupon_status(id: int, srv: CouponDep, cache: CacheDep) -> Coupon:
     """
     Toggle coupon active status.
     """
-    coupon = await db.coupon.find_unique(where={"id": id})
+    coupon = await srv.get_by_id(id=id)
     if not coupon:
         raise HTTPException(status_code=404, detail="Coupon not found")
 
@@ -220,7 +224,7 @@ async def toggle_coupon_status(id: int) -> Coupon:
             data={"is_active": not coupon.is_active}
         )
 
-        await refresh_data(patterns=["coupons"])
+        await cache.invalidate(tags=["coupons"])
         return updated_coupon
     except PrismaError as e:
         logger.error(f"Error toggling coupon status: {str(e)}")
@@ -235,7 +239,7 @@ async def get_coupon_analytics(
     """
     Get comprehensive coupon analytics with optional date range filtering.
     """
-    
+
     date_filter = {}
     if start_date or end_date:
         date_filter["created_at"] = {}
@@ -243,11 +247,11 @@ async def get_coupon_analytics(
             date_filter["created_at"]["gte"] = datetime.combine(start_date, datetime.min.time())
         if end_date:
             date_filter["created_at"]["lte"] = datetime.combine(end_date, datetime.max.time())
-    
+
     total_coupons = await db.coupon.count(
         where=date_filter if date_filter else None
     )
-    
+
     used_filter = {
         "current_uses": {"gt": 0}
     }
@@ -258,18 +262,18 @@ async def get_coupon_analytics(
     }
     if date_filter:
         used_filter.update(date_filter)
-    
+
     used_coupons = await db.coupon.count(
         where=used_filter
     )
-    
+
     coupons_with_uses = await db.coupon.find_many(
         where=date_filter if date_filter else None,
     )
     total_redemptions = sum(coupon.current_uses for coupon in coupons_with_uses)
-    
+
     now = datetime.utcnow()
-    
+
     active_filter = {
         "is_active": True,
         "OR": [
@@ -285,18 +289,18 @@ async def get_coupon_analytics(
             }
         ]
     }
-    
+
     if date_filter:
         active_filter.update(date_filter)
-    
-    active_coupons_data = await db.coupon.find_many(where=active_filter)    
+
+    active_coupons_data = await db.coupon.find_many(where=active_filter)
     active_coupons = sum(
-        1 for coupon in active_coupons_data 
+        1 for coupon in active_coupons_data
         if coupon.max_uses == 0 or coupon.current_uses < coupon.max_uses
     )
-    
+
     avg_redemption_rate = (used_coupons / total_coupons * 100) if total_coupons > 0 else 0.0
-    
+
     return CouponAnalytics(
         total_coupons=total_coupons,
         used_coupons=used_coupons,
@@ -324,23 +328,23 @@ async def get_detailed_coupon_analytics(
             date_filter["created_at"]["gte"] = datetime.combine(start_date, datetime.min.time())
         if end_date:
             date_filter["created_at"]["lte"] = datetime.combine(end_date, datetime.max.time())
-    
+
     coupons = await db.coupon.find_many(
         where=date_filter if date_filter else None,
     )
-    
+
     # By type
     by_type = {}
     for coupon in coupons:
         discount_type = coupon.discount_type
         by_type[discount_type] = by_type.get(discount_type, 0) + 1
-    
+
     # By scope
     by_scope = {}
     for coupon in coupons:
         scope = coupon.scope
         by_scope[scope] = by_scope.get(scope, 0) + 1
-    
+
     # Top performing coupons
     top_coupons = sorted(coupons, key=lambda x: x.current_uses, reverse=True)[:10]
     top_coupons_data = [
@@ -352,7 +356,7 @@ async def get_detailed_coupon_analytics(
         }
         for coupon in top_coupons
     ]
-    
+
     return {
         "breakdown_by_discount_type": by_type,
         "breakdown_by_scope": by_scope,

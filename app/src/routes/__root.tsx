@@ -18,9 +18,10 @@ import PageTransitionLoader from "@/components/generic/page-transition-loader";
 import PWABadge from "@/PWAbadge";
 import { ClerkProvider } from "@clerk/tanstack-react-start";
 import { useAppSession } from "@/utils/session";
-import { getShopSettingsPublicFn } from "@/server/store.server";
 import { getSessionId } from "@/utils";
 import { Analytics } from "@vercel/analytics/react";
+import { ShopSettings } from "@/schemas";
+import { useSettingsQuery } from "@/hooks/useGeneric";
 
 
 type SessionClaims = {
@@ -85,13 +86,9 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         if (process.env.MAINTENANCE_MODE === "true" && location.pathname !== "/maintenance") {
             throw redirect({ to: "/maintenance" });
         }
-        const [{ isAuthenticated, userId, sessionClaims }, config] = await Promise.all([
+        const [{ isAuthenticated, userId, sessionClaims }, settings] = await Promise.all([
             fetchUser(),
-            queryClient.ensureQueryData({
-                queryKey: ["shop-settings"],
-                queryFn: () => getShopSettingsPublicFn(),
-                staleTime: Infinity,
-            }),
+            queryClient.ensureQueryData(useSettingsQuery()),
         ]);
         const user = {
             firstName: sessionClaims?.firstName || "",
@@ -109,6 +106,10 @@ export const Route = createRootRouteWithContext<RouterContext>()({
             impersonated: false,
             impersonatedBy: null,
         };
+
+        const config = Object.fromEntries(
+            settings.map((setting: ShopSettings) => [setting.key, setting.value])
+        );
 
         return { isAuthenticated, userId, session, config };
     },

@@ -1,7 +1,7 @@
 from fastapi import (
     APIRouter,
     HTTPException,
-    Request
+    Request,
 )
 from app.core.deps import CurrentUser
 from app.models.address import (
@@ -14,7 +14,8 @@ from app.models.generic import Message
 from app.prisma_client import prisma as db
 from prisma.errors import PrismaError
 from app.core.logging import get_logger
-from app.services.redis import cache_response, refresh_data
+from app.services.cache import cacheable
+from app.core.dependencies.cache import CacheDep
 
 logger = get_logger(__name__)
 
@@ -22,11 +23,8 @@ router = APIRouter()
 
 
 @router.get("/")
-@cache_response("addresses", key=lambda request, user: user.id)
-async def index(
-    request: Request,
-    user: CurrentUser
-) -> Addresses:
+@cacheable(key_prefix="addresses", key_builder=lambda user: user.id, tags=lambda user: [f"addresses:{user.id}"])
+async def index(request: Request, user: CurrentUser) -> Addresses:
     """Get current user addresses."""
     addresses = await db.address.find_many(
         where={"user_id": user.id},
@@ -37,9 +35,9 @@ async def index(
 
 @router.post("/")
 async def create(
-    *,
     user: CurrentUser,
-    create_data: AddressCreate
+    create_data: AddressCreate,
+    cache: CacheDep
 ) -> Address:
     """
     Create new address.
@@ -52,7 +50,7 @@ async def create(
             }
         )
 
-        await refresh_data(patterns=[f"addresses:{user.id}"])
+        await cache.invalidate(tags=[f"addresses:{user.id}"])
         return address
 
     except PrismaError as e:
@@ -67,6 +65,7 @@ async def update(
     id: int,
     user: CurrentUser,
     update_data: AddressUpdate,
+    cache: CacheDep
 ) -> Address:
     """
     Update an address.
@@ -99,7 +98,7 @@ async def update(
             where={"id": id},
             data=update_payload
         )
-        await refresh_data(patterns=[f"addresses:{user.id}"])
+        await cache.invalidate(f"addresses:{user.id}")
         return updated
 
     except PrismaError as e:
@@ -108,7 +107,7 @@ async def update(
 
 
 @router.delete("/{id}")
-async def delete(id: int, user: CurrentUser) -> Message:
+async def delete(id: int, user: CurrentUser, cache: CacheDep) -> Message:
     """
     Delete a address.
     """
@@ -137,7 +136,7 @@ async def delete(id: int, user: CurrentUser) -> Message:
 
             await tx.address.delete(where={"id": id})
 
-        await refresh_data(patterns=[f"addresses:{user.id}"])
+        await cache.invalidate(tags=[f"addresses:{user.id}"])
 
         return Message(message="Address deleted successfully")
     except PrismaError as e:

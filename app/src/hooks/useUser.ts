@@ -1,30 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { getRecentlyViewedFn, getWishlistListingFn } from "@/server/users.server";
-import { clientApi } from "@/utils/api.client";
+import { getWishlistListingFn } from "@/server/users.server";
+import { api } from "@/utils/api";
 import { User, Wishlist } from "@/schemas";
-
-export const useCreateUser = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: async (input: any) => await clientApi.post<User>("/users", input),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["users"] });
-            toast.success("User created successfully");
-        },
-        onError: (error) => {
-            toast.error("Failed to create user" + error);
-        },
-    });
-};
 
 export const useUpdateUser = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ id, input }: { id: number; input: any }) => await clientApi.patch<User>(`/users/${id}`, input),
+        mutationFn: async ({ id, input }: { id: number; input: any }) => await api.patch<User>(`/users/${id}`, input),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["users"] });
-            toast.success("User updated successfully");
         },
         onError: (error) => {
             toast.error("Failed to update user" + error);
@@ -36,10 +21,9 @@ export const useCreateGuestUser = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (input: { first_name: string; last_name: string }) => await clientApi.post<User>("/users/create-guest", input),
+        mutationFn: async (input: { first_name: string; last_name: string }) => await api.post<User>("/users/create-guest", input),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["users"] });
-            toast.success("Guest user created successfully");
         },
         onError: (error) => {
             toast.error("Failed to create guest user" + error);
@@ -51,7 +35,7 @@ export const useDeleteUser = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (id: number) => await clientApi.delete<User>(`/users/${id}`),
+        mutationFn: async (id: number) => await api.delete<User>(`/users/${id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["users"] });
             toast.success("User deleted successfully");
@@ -63,26 +47,19 @@ export const useDeleteUser = () => {
 };
 
 export const userWishlistQuery = () => ({
-  queryKey: ["products", "wishlist"],
-  queryFn: () => getWishlistListingFn(),
+    queryKey: ["products", "wishlist"],
+    queryFn: () => getWishlistListingFn(),
 });
 
 export const useUserWishlist = () => {
-  return useQuery(userWishlistQuery());
+    return useQuery(userWishlistQuery());
 };
 
-export const useUserRecentlyViewed = (limit: number = 12, enabled: boolean = true, user_id: number) => {
-    return useQuery({
-        queryKey: ["products", "recently-viewed", user_id],
-        queryFn: () => getRecentlyViewedFn({ data: limit }),
-        enabled: enabled,
-    });
-};
 
 export const useUserCreateWishlist = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (product_id: number) => await clientApi.post<Wishlist>("/users/wishlist", { product_id }),
+        mutationFn: async (product_id: number) => await api.post<Wishlist>("/users/wishlist", { product_id }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products", "wishlist"] });
             toast.success("Wishlist created successfully");
@@ -96,7 +73,7 @@ export const useUserCreateWishlist = () => {
 export const useUserDeleteWishlist = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (id: number) => await clientApi.delete<Wishlist>(`/users/wishlist/${id}`),
+        mutationFn: async (id: number) => await api.delete<Wishlist>(`/users/wishlist/${id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products", "wishlist"] });
             toast.success("Wishlist deleted successfully");

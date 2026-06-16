@@ -1,0 +1,17 @@
+# Frontend ignores
+app/node_modules/
+app/.output/
+app/.vinxi/
+
+# Backend ignores
+backend/.venv/
+backend/.uv/
+backend/__pycache__/
+*.pyc
+
+# Environmental metadata
+.git/
+.gitignore
+.env*
+
+meilisearch-data

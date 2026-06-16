@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 
 export const useDeleteActivity = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (id: number) => await clientApi.delete<void>(`/activities/${id}`),
+        mutationFn: async (id: number) => await api.delete<void>(`/activities/${id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["activities"] })
             toast.success("Activity deleted successfully");

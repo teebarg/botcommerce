@@ -8,12 +8,12 @@ from typing import Any, Optional
 
 import emails  # type: ignore
 from fastapi import Request
+from jinja2 import Environment, FileSystemLoader, Template
 from app.core.config import settings
 from app.core.logging import logger
 from app.models.order import Order
 from app.models.user import User
 from app.models.coupon import Coupon
-from jinja2 import Environment, FileSystemLoader, Template
 
 
 @dataclass
@@ -255,33 +255,6 @@ async def send_email_brevo(
         raise Exception(f"Brevo email sending failed: {str(e)}")
 
 
-async def send_email(
-    *,
-    email_to: str,
-    subject: str = "",
-    html_content: str = "",
-    cc_list: list[str] = [],
-) -> None:
-    try:
-        if settings.ENVIRONMENT == "local":
-            await send_email_smtp(
-                email_to=email_to,
-                subject=subject,
-                html_content=html_content,
-                cc_list=cc_list
-            )
-        else:
-            await send_email_brevo(
-                email_to=email_to,
-                subject=subject,
-                html_content=html_content,
-                cc_list=cc_list
-        )
-    except Exception as e:
-        logger.error(f"Email sending failed: {str(e)}")
-        raise Exception(f"Email sending failed: {str(e)}")
-
-
 async def generate_invoice_email(order: Order, user: User) -> EmailData:
     from app.core.dependencies.services import get_shop_settings_service
     service = get_shop_settings_service()
@@ -401,7 +374,7 @@ async def generate_referral_cashback_email(order: Order, coupon_owner: User) -> 
             "referral": coupon_owner.first_name,
             "cash_back": order.discount_amount,
             "order_value": order.subtotal,
-            "referred": order.user.first_name,
+            "referred": order.user.first_name if order.user else "",
             "created_at": order.created_at,
             "current_year": datetime.now().year,
             "header_title": header_title,
@@ -465,7 +438,7 @@ async def generate_welcome_email(email_to: str, first_name: str, coupon: Coupon,
             **(await merge_metadata({"description": ""}))
         },
     )
-    return EmailData(html_content=html_content, subject="Welcome to " + shop_name)
+    return EmailData(html_content=html_content, subject=f"Welcome to {shop_name}")
 
 
 async def generate_verification_email(email_to: str, first_name: str, verification_link: str) -> EmailData:
@@ -482,7 +455,7 @@ async def generate_verification_email(email_to: str, first_name: str, verificati
     return EmailData(html_content=html_content, subject="Verify Your Email")
 
 
-async def generate_abandoned_cart_email(cart_data: dict, user_email: str, user_name: str = None) -> EmailData:
+async def generate_abandoned_cart_email(cart_data: dict, user_email: str, user_name: Optional[str] = None) -> EmailData:
     """Generate abandoned cart reminder email"""
     html_content = render_email_template(
         template_name="abandoned_cart.html",

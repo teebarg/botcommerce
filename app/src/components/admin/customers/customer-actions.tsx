@@ -1,11 +1,10 @@
 import type { User } from "@/schemas";
-import { Edit, Trash2, Eye } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { toast } from "sonner";
-import CustomerForm from "./customer-form";
+import CustomerEditForm from "./customer-form";
 import { useDeleteUser, useInvalidateMe } from "@/hooks/useUser";
 import { Button } from "@/components/ui/button";
-import { useInvalidateCart } from "@/hooks/useCart";
 import { updateAuthSession } from "@/utils/auth-client";
 import { useRouteContext, useRouter } from "@tanstack/react-router";
 import SheetDrawer from "@/components/sheet-drawer";
@@ -24,7 +23,6 @@ const CustomerActions = ({ user }: CustomerActionsProps) => {
     const editState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
     const invalidateMe = useInvalidateMe();
-    const invalidateCart = useInvalidateCart();
 
     const onDelete = () => {
         mutateAsync(user.id).then(() => {
@@ -41,7 +39,6 @@ const CustomerActions = ({ user }: CustomerActionsProps) => {
                 impersonatedBy: session?.user?.email,
             });
             invalidateMe();
-            invalidateCart();
 
             toast.success("Impersonated");
             await router.invalidate();
@@ -68,7 +65,7 @@ const CustomerActions = ({ user }: CustomerActionsProps) => {
                 }
                 onOpenChange={editState.setOpen}
             >
-                <CustomerForm user={user} onClose={editState.close} />
+                <CustomerEditForm user={user} onClose={editState.close} />
             </SheetDrawer>
             <ConfirmDrawer
                 open={deleteState.isOpen}

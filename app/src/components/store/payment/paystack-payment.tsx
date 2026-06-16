@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import type { PaymentInitialize } from "@/types/payment";
 import { currency } from "@/utils";
 import { tryCatch } from "@/utils/try-catch";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 
 interface PaystackPaymentProps {
     cartNumber: string;
@@ -19,7 +19,7 @@ export function PaystackPayment({ cartNumber, amount, canContinue }: PaystackPay
 
     const handlePayment = async () => {
         setLoading(true);
-        const { data, error } = await tryCatch<PaymentInitialize>(clientApi.post<PaymentInitialize>(`/payment/initialize/${cartNumber}`));
+        const { data, error } = await tryCatch<PaymentInitialize>(api.post<PaymentInitialize>(`/payment/initialize/${cartNumber}`));
 
         setLoading(false);
 

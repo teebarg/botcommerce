@@ -43,7 +43,7 @@ class NotificationService:
         self.channels[name] = channel
 
 
-    async def dispatch(self, event: BaseNotificationEvent) -> dict[str, bool]:
+    async def dispatch(self, event: BaseNotificationEvent) -> dict[str, bool] | None:
         """
         Dispatch a notification event.
         Returns a result map e.g. {"email": True, "slack": False}.
@@ -93,7 +93,7 @@ class NotificationService:
 
         return (channel_name, success)
 
-    async def send_notification(self, channel_name: str, recipient: str = "", message: str = "", **kwargs) -> bool:
+    async def send(self, channel_name: str = "email", recipient: str = "", message: str = "", **kwargs) -> bool:
         """Low-level send — use dispatch() for event-driven flows."""
         channel = self.channels.get(channel_name)
         if not channel:
@@ -106,7 +106,7 @@ def _event_to_template_name(event_type: type) -> str | None:
     try:
         name = event_type.__name__
         if name.endswith("Event"):
-            name = name[:-5]
+            name: str = name[:-5]
         # CamelCase → snake_case
         import re
         return re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()

@@ -1,15 +1,24 @@
 from datetime import datetime, timezone
 from typing import Optional
 from fastapi import HTTPException
-from app.prisma_client import prisma as db
 from prisma.enums import DiscountType
 from app.models.coupon import Coupon
 from app.models.cart import Cart
 from app.core.logging import get_logger
+from app.prisma_client import Prisma
 
 logger = get_logger(__name__)
 
 class CouponService:
+    def __init__(self, db: Prisma):
+        self.db = db
+
+    async def get_by_id(self, id: int):
+        return await self.db.coupon.find_unique(where={"id": id})
+
+    async def get_by_code(self, code: str):
+        return await self.db.coupon.find_unique(where={"code": code})
+
     async def validate_coupon(
         self,
         code: str,
@@ -20,7 +29,7 @@ class CouponService:
         Validate a coupon code for a cart and user.
         Returns coupon if valid, raises HTTPException if invalid.
         """
-        coupon = await db.coupon.find_unique(
+        coupon = await self.db.coupon.find_unique(
             where={"code": code.upper()},
             include={"users": True}
         )
@@ -55,7 +64,7 @@ class CouponService:
 
         if coupon.max_uses_per_user > 0:
             if user_id:
-                usage_count = await db.couponusage.count(
+                usage_count = await self.db.couponusage.count(
                     where={"coupon_id": coupon.id, "user_id": user_id}
                 )
                 if usage_count >= coupon.max_uses_per_user:
@@ -66,7 +75,7 @@ class CouponService:
 
         # Validate cart requirements
         if cart:
-            cart_items = await db.cartitem.find_many(
+            cart_items = await self.db.cartitem.find_many(
                 where={"cart_id": cart.id}
             )
 
@@ -116,7 +125,7 @@ class CouponService:
         if cart.wallet_used > 0:
             wallet_used: float = cart.wallet_used
         total: float = cart.subtotal + cart.tax + cart.shipping_fee - discount_amount - wallet_used
-        data: dict[str, float] = {
+        data: dict[str, float | int | str] = {
             "coupon_id": coupon.id,
             "coupon_code": coupon.code,
             "discount_amount": discount_amount,
@@ -125,8 +134,7 @@ class CouponService:
         if total < 1:
             data["payment_method"] = "COUPON"
 
-        updated_cart = await db.cart.update( where={"id": cart.id}, data=data)
-
+        updated_cart = await self.db.cart.update( where={"id": cart.id}, data=data)
         return updated_cart
 
     async def remove_coupon_from_cart(self, cart: Cart) -> Cart:
@@ -143,18 +151,17 @@ class CouponService:
         }
         if cart.payment_method == "COUPON":
             data["payment_method"] = "BANK_TRANSFER"
-        updated_cart = await db.cart.update(where={"id": cart.id}, data=data)
-
+        updated_cart = await self.db.cart.update(where={"id": cart.id}, data=data)
         return updated_cart
 
     async def increment_coupon_usage(self, coupon_id: int, user_id: int, discount_amount: float):
         """
         Increment coupon usage count. Called when order is placed.
         """
-        user = await db.user.find_unique(
+        user = await self.db.user.find_unique(
             where={"id": user_id}
         )
-        async with db.tx() as tx:
+        async with self.db.tx() as tx:
             await tx.coupon.update(
                 where={"id": coupon_id},
                 data={"current_uses": {"increment": 1}}

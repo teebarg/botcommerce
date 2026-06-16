@@ -1,5 +1,7 @@
-from app.services.redis import refresh_data
+from typing import Any, Dict
+from app.core.dependencies.product import SearchDep
 from app.core.notifications.setup import init_notification_service
+from app.core.dependencies.services import SettingsDep
 import sentry_sdk
 import time
 from contextlib import asynccontextmanager
@@ -9,22 +11,22 @@ from app.api.main import api_router
 from app.core.config import settings
 from app.core.decorators import limit
 from app.core.utils import (generate_contact_form_email,
-                            generate_newsletter_email, send_email, generate_bulk_purchase_email)
+                            generate_newsletter_email, generate_bulk_purchase_email)
 from app.models.generic import ContactFormCreate, NewsletterCreate, BulkPurchaseCreate
 from app.prisma_client import prisma as db
-from fastapi import BackgroundTasks, FastAPI, Request, Response, HTTPException
+from fastapi import BackgroundTasks, FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from app.services.websocket import manager
-from app.services.meilisearch import get_or_create_index
 from app.redis_client import redis_client
 
 from app.core.logging import get_logger
 from app.consumer import RedisStreamConsumer
-from app.core.deps import SettingsDep
 from pydantic import BaseModel
+from app.core.deps import Notification
+from app.core.dependencies.consumer_factory import consumer_factory
 
 STREAM_NAME = "EVENT_STREAMS"
 GROUP_NAME = "notifications"
@@ -49,7 +51,8 @@ async def lifespan(app: FastAPI):
     #         pass  # group already exists
 
     init_notification_service()
-    consumer = RedisStreamConsumer(redis_client, STREAM_NAME, GROUP_NAME, CONSUMER_NAME)
+    consumer = RedisStreamConsumer(stream=STREAM_NAME, group=GROUP_NAME, consumer=CONSUMER_NAME, db_client=db, service_factory=consumer_factory)
+
     app.state.consumer = consumer
     await consumer.start()
     await manager.start()
@@ -129,17 +132,24 @@ async def root():
 
 
 @app.get("/api/health")
-async def health():
-    user = await db.user.find_unique(
-        where={"id": 1}
-    )
-    # redis_res = await app.state.redis.ping()
-    meilisearch_res = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
-    return {"message": "Server is running", "meilisearch": meilisearch_res, "user": {"id": user.id, "email": user.email}}
+async def health(search_srv: SearchDep) -> Dict[str, Any]:
+    meili_ok = await search_srv.check()
+    postgres_ok = await db.execute_raw("SELECT 1;")
+    redis_ok = True
+    is_healthy = postgres_ok and redis_ok and meili_ok
+    payload = {
+        "status": "healthy" if is_healthy else "unhealthy",
+        "infrastructure": {
+            "postgres": "connected" if postgres_ok else "disconnected",
+            "redis": "connected" if redis_ok else "disconnected",
+            "meilisearch": "connected" if meili_ok else "disconnected"
+        }
+    }
+    return payload
 
 
 @app.post("/api/contact-form")
-async def contact_form(background_tasks: BackgroundTasks, service: SettingsDep, data: ContactFormCreate):
+async def contact_form(background_tasks: BackgroundTasks, service: SettingsDep, notification_srv: Notification, data: ContactFormCreate):
     async def send_email_task():
         email_data = await generate_contact_form_email(
             name=data.name, email=data.email, phone=data.phone, message=data.message
@@ -149,10 +159,11 @@ async def contact_form(background_tasks: BackgroundTasks, service: SettingsDep, 
         if not shop_email:
             logger.error("Shop email not found")
             return
-        await send_email(
-            email_to=shop_email.value,
+        await notification_srv.send(
+            channel_name="email",
+            recipient=shop_email,
             subject=email_data.subject,
-            html_content=email_data.html_content,
+            message=email_data.html_content,
         )
 
     background_tasks.add_task(send_email_task)
@@ -160,7 +171,7 @@ async def contact_form(background_tasks: BackgroundTasks, service: SettingsDep, 
 
 
 @app.post("/api/newsletter")
-async def newsletter(background_tasks: BackgroundTasks, service: SettingsDep, data: NewsletterCreate):
+async def newsletter(background_tasks: BackgroundTasks, service: SettingsDep, notification_srv: Notification, data: NewsletterCreate):
     async def send_email_task():
         try:
             email_data = await generate_newsletter_email(
@@ -170,10 +181,10 @@ async def newsletter(background_tasks: BackgroundTasks, service: SettingsDep, da
             if not shop_email:
                 logger.error("Shop email not found")
                 return
-            await send_email(
-                email_to=data.email,
+            await notification_srv.send(
+                recipient=data.email,
                 subject=email_data.subject,
-                html_content=email_data.html_content,
+                message=email_data.html_content,
             )
         except Exception as e:
             logger.error(f"Failed to send newsletter email: {e}")
@@ -182,7 +193,7 @@ async def newsletter(background_tasks: BackgroundTasks, service: SettingsDep, da
 
 
 @app.post("/api/bulk-purchase")
-async def bulk_purchase(background_tasks: BackgroundTasks, service: SettingsDep, data: BulkPurchaseCreate):
+async def bulk_purchase(background_tasks: BackgroundTasks, service: SettingsDep, notification_srv: Notification, data: BulkPurchaseCreate):
     async def send_email_task():
         try:
             email_data = await generate_bulk_purchase_email(
@@ -197,10 +208,10 @@ async def bulk_purchase(background_tasks: BackgroundTasks, service: SettingsDep,
             if not shop_email:
                 logger.error("Shop email not found")
                 return
-            await send_email(
-                email_to=shop_email.value,
+            await notification_srv.send(
+                recipient=shop_email,
                 subject=email_data.subject,
-                html_content=email_data.html_content,
+                message=email_data.html_content,
             )
         except Exception as e:
             logger.error(f"Failed to send bulk purchase email: {e}")
@@ -321,33 +332,8 @@ async def start_websocket_manager():
     await manager.start()
 
 
-@app.post("/api/invalidate-redis")
-async def invalidate_redis(key: str):
-    await refresh_data(patterns=[key])
-    return {"message": "success"}
-
-
 @app.post("/api/process-stale-messages")
 async def process_stale_messages(request: Request, background_tasks: BackgroundTasks):
     consumer = request.app.state.consumer
     background_tasks.add_task(consumer.claim_stale_messages)
     return {"message": "success"}
-
-
-@app.post("/api/process/{stream_id}")
-async def process_stream_id(stream_id: str, request: Request):
-    r = request.app.state.redis
-    consumer = request.app.state.consumer
-    msgs = await r.xrange(STREAM_NAME, min=stream_id, max=stream_id)
-    if not msgs:
-        raise HTTPException(status_code=404, detail="Message not found")
-
-    msg_id, data = msgs[0]
-    logger.debug(f"📦 Received message: {msg_id} -> {data}")
-
-    try:
-       await consumer.process_stream(msg_id=msg_id, data=data)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error processing event: {str(e)}")
-
-    return {"status": "processed", "id": msg_id}

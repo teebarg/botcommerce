@@ -10,12 +10,12 @@ import {
 import { User, LogOut, Gift, LayoutDashboard, Heart } from "lucide-react";
 import { useNavigate, useRouteContext } from "@tanstack/react-router";
 import { tryCatch } from "@/utils/try-catch";
-import { clientApi } from "@/utils/api.client";
 import { logoutFn } from "@/server/users.server";
 import { Message } from "@/schemas";
 import { useAuth } from "@clerk/tanstack-react-start";
 import { UserAvatar } from "./generic/user-avatar";
 import { useLocation } from "@tanstack/react-router";
+import { api } from "@/utils/api";
 
 export function UserDropdown() {
     const { isAuthenticated, session } = useRouteContext({ strict: false });
@@ -24,7 +24,7 @@ export function UserDropdown() {
     const { signOut } = useAuth();
 
     const handleSignOut = async () => {
-        const { error } = await tryCatch(clientApi.post<Message>("/auth/logout"));
+        const { error } = await tryCatch(api.post<Message>("/auth/logout"));
         if (error) {
             console.error("Logout failed:", error);
             return;

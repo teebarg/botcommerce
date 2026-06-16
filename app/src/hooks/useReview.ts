@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 import { Message, Review } from "@/schemas";
 
 type CreateReviewInput = {
@@ -24,7 +24,7 @@ export const useCreateReview = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (input: CreateReviewInput) => await clientApi.post<Review>("/reviews/", input),
+        mutationFn: async (input: CreateReviewInput) => await api.post<Review>("/reviews/", input),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["reviews"] });
             toast.success("Review successfully created");
@@ -39,7 +39,7 @@ export const useUpdateReview = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ id, input }: UpdateReviewPayload) => await clientApi.patch<Review>(`/reviews/${id}`, input),
+        mutationFn: async ({ id, input }: UpdateReviewPayload) => await api.patch<Review>(`/reviews/${id}`, input),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["reviews"] });
             toast.success("Review successfully updated");
@@ -53,7 +53,7 @@ export const useUpdateReview = () => {
 export const useDeleteReview = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (id: number) => await clientApi.delete<Message>(`/reviews/${id}`),
+        mutationFn: async (id: number) => await api.delete<Message>(`/reviews/${id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["reviews"] });
             toast.success("Review successfully deleted");

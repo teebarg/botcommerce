@@ -62,7 +62,7 @@ const ConfirmDrawer: React.FC<Props> = ({
                             <button
                                 onClick={handleConfirm}
                                 className={cn(
-                                    "w-full py-4 text-center font-semibold text-primary active:bg-primary/10 transition-colors border-b border-border",
+                                    "w-full py-4 text-center font-semibold text-primary active:bg-primary/10 transition-colors border-b border-border cursor-pointer",
                                     variant === "destructive" && "text-destructive active:bg-destructive/10"
                                 )}
                             >
@@ -70,7 +70,7 @@ const ConfirmDrawer: React.FC<Props> = ({
                             </button>
                             <button
                                 onClick={onClose}
-                                className="w-full py-4 text-center font-medium text-muted-foreground active:bg-secondary transition-colors"
+                                className="w-full py-4 text-center font-medium text-muted-foreground active:bg-secondary transition-colors cursor-pointer"
                             >
                                 {cancelText}
                             </button>

@@ -1,19 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 import { BankDetails, Chat, ConversationStatus, DeliveryOption, Message } from "@/schemas";
 
 export const useBankDetails = () => {
     return useQuery({
         queryKey: ["bank-details"],
-        queryFn: () => clientApi.get<BankDetails[]>("/bank-details/"),
+        queryFn: () => api.get<BankDetails[]>("/bank-details/"),
     });
 };
 
 export const useChat = (uid: string) => {
     return useQuery({
         queryKey: ["chat", uid],
-        queryFn: () => clientApi.get<Chat>(`/chat/${uid}`),
+        queryFn: () => api.get<Chat>(`/chat/${uid}`),
         staleTime: 1000 * 60 * 5,
     });
 };
@@ -22,7 +22,7 @@ export const useChatMutation = () => {
     return useMutation({
         mutationFn: async (message: string) => {
             const conversationUuid = localStorage.getItem("chat_session_id");
-            return await clientApi.post<{ reply: string; conversation_uuid: string }>("/chat/", {
+            return await api.post<{ reply: string; conversation_uuid: string }>("/chat/", {
                 conversation_uuid: conversationUuid!,
                 message: message,
             });
@@ -37,7 +37,7 @@ export const useChatMutation = () => {
 export const useChatStatusMutation = () => {
     return useMutation({
         mutationFn: async ({ conversationUuid, status }: { conversationUuid: string; status: ConversationStatus }) => {
-            return await clientApi.post<Message>("/chat/status", {
+            return await api.post<Message>("/chat/status", {
                 conversation_uuid: conversationUuid,
                 status,
             });
@@ -51,7 +51,7 @@ export const useChatStatusMutation = () => {
 export const useAdminMessageMutation = () => {
     return useMutation({
         mutationFn: async ({ conversationUuid, message }: { conversationUuid: string; message: string }) => {
-            return await clientApi.post<Message>("/chat/support", {
+            return await api.post<Message>("/chat/support", {
                 conversation_uuid: conversationUuid,
                 message: message,
             });
@@ -66,7 +66,7 @@ export const useChatHandOff = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ conversationUuid }: { conversationUuid: string }) => {
-            return await clientApi.post<Message>("/chat/handoff", {
+            return await api.post<Message>("/chat/handoff", {
                 conversation_uuid: conversationUuid,
             });
         },
@@ -84,7 +84,7 @@ export const useDeleteChat = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (id: number) => await clientApi.delete<Message>(`/chat/${id}`),
+        mutationFn: async (id: number) => await api.delete<Message>(`/chat/${id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["chats"] });
             toast.success("Chat deleted successfully");
@@ -110,7 +110,7 @@ export const useSendPushNotification = () => {
             path?: string;
             notificationId: string;
         }) =>
-            await clientApi.post<Message>("/notification/push", {
+            await api.post<Message>("/notification/push", {
                 notificationId,
                 title,
                 body,
@@ -129,17 +129,8 @@ export const useSendPushNotification = () => {
 export const useDeliveryOptions = () => {
     return useQuery({
         queryKey: ["delivery"],
-        queryFn: () => clientApi.get<DeliveryOption[]>("/delivery/"),
+        queryFn: () => api.get<DeliveryOption[]>("/delivery/"),
         staleTime: Infinity,
     });
 };
 
-export const useInvalidate = () => {
-    const queryClient = useQueryClient();
-
-    const invalidate = (key: string) => {
-        queryClient.invalidateQueries({ queryKey: [key] });
-    };
-
-    return invalidate;
-};

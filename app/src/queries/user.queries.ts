@@ -3,7 +3,7 @@ import { getProductFn, getProductsFeedFn } from "@/server/product.server";
 import { getMeFn, getMeTrxnFn } from "@/server/users.server";
 import { getCollectionFn } from "@/server/store.server";
 import { getCatalogFn, getUserAddressesFn } from "@/server/store.server";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 import { Order, PaginatedOrders, PaginatedReview } from "@/schemas";
 
 type FeedParams = {
@@ -46,7 +46,7 @@ export const productFeedQuery = (params: FeedParams) =>
 
 export const catalogFeedQuery = (params: CatalogFeedParams) =>
     queryOptions({
-        queryKey: ["products", "catalog", params.slug],
+        queryKey: ["catalog", params.slug],
         queryFn: () => getCatalogFn({ data: params }),
     });
 
@@ -59,21 +59,22 @@ export const productQuery = (slug: string) =>
 export const orderQuery = (orderNumber: string) =>
     queryOptions({
         queryKey: ["order", orderNumber],
-        queryFn: () => clientApi.get<Order>(`/order/${orderNumber}`),
+        queryFn: () => api.get<Order>(`/order/${orderNumber}`),
     });
 
 export const ordersQuery = (params: { take?: number; status?: any; start_date?: string; end_date?: string }) =>
     queryOptions({
         queryKey: ["orders", JSON.stringify(params)],
-        queryFn: () => clientApi.get<PaginatedOrders>("/order/", { params }),
+        queryFn: () => api.get<PaginatedOrders>("/order/", { params }),
         staleTime: 1000 * 60 * 60 * 24,
         refetchOnMount: false,
     });
 
-export const userAddressesQuery = () =>
+export const userAddressesQuery = (userId: string | null) =>
     queryOptions({
-        queryKey: ["addresses"],
+        queryKey: ["addresses", userId?.toString()],
         queryFn: () => getUserAddressesFn(),
+        enabled: Boolean(userId),
     });
 
 export const collectionQuery = (slug: string) =>
@@ -85,6 +86,6 @@ export const collectionQuery = (slug: string) =>
 export const reviewsQuery = (params?: { search?: string; product_id?: number; sort?: string }) =>
     queryOptions({
         queryKey: ["reviews", params],
-        queryFn: () => clientApi.get<PaginatedReview>("/reviews/", { params }),
+        queryFn: () => api.get<PaginatedReview>("/reviews/", { params }),
         staleTime: 1000 * 60 * 60 * 24,
     });

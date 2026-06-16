@@ -9,10 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import type { DeliveryOption } from "@/schemas";
-import { useInvalidate } from "@/hooks/useApi";
 import { ShippingMethodSchema } from "@/schemas";
 import { tryCatch } from "@/utils/try-catch";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -31,8 +30,6 @@ interface DeliveryOptionFormProps {
 }
 
 export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOptionFormProps) {
-    const invalidate = useInvalidate();
-
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -49,9 +46,9 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
         let response = null;
 
         if (initialData?.id) {
-            response = await tryCatch<DeliveryOption>(clientApi.patch<DeliveryOption>(`/delivery/${initialData.id}`, data));
+            response = await tryCatch<DeliveryOption>(api.patch<DeliveryOption>(`/delivery/${initialData.id}`, data));
         } else {
-            response = await tryCatch<DeliveryOption>(clientApi.post<DeliveryOption>("/delivery/", data));
+            response = await tryCatch<DeliveryOption>(api.post<DeliveryOption>("/delivery/", data));
         }
 
         if (response.error) {
@@ -61,7 +58,6 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
         }
 
         toast.success(`${initialData ? "Updated" : "Created"} delivery option successfully`);
-        invalidate("delivery");
         onClose();
     };
 

@@ -1,33 +1,48 @@
-# ---------- STAGE 1: Builder ----------
-FROM python:3.11-slim AS builder
+# ==========================================
+# STAGE 1: The Build Environment
+# ==========================================
+FROM beafdocker/fastapi-base:latest AS builder
+
 WORKDIR /app
 
-# Copy uv (fast dependency installer)
-COPY --from=ghcr.io/astral-sh/uv:0.5.11 /uv /uvx /bin/
+# Install Node.js purely to run the Prisma generator engine
+RUN apt-get update && apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
 
-# Environment for uv
-ENV PATH="/app/.venv/bin:$PATH"
-ENV UV_COMPILE_BYTECODE=1
-ENV UV_LINK_MODE=copy
-ENV UV_HTTP_TIMEOUT=600
+COPY pyproject.toml uv.lock* ./
 
-# Copy only dependency metadata
-COPY pyproject.toml uv.lock ./
-
-# Install dependencies into a virtual env (.venv)
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev
+    uv sync --frozen --no-install-project --no-dev
 
-    
-# ---------- STAGE 2: Final Runtime ----------
-FROM python:3.11-slim AS runtime
+COPY prisma ./prisma
+ENV PRISMA_USE_GLOBAL_NODE=true
+
+RUN uv run prisma generate
+
+
+# ==========================================
+# STAGE 2: The Slim Runtime Environment
+# ==========================================
+FROM python:3.11-slim AS runner
+
 WORKDIR /app
 
-# Copy the virtualenv from builder (only compiled packages)
+# Copy the lean UV binary so we can execute scripts seamlessly
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+# Bring over only the compiled virtual environment from the builder
 COPY --from=builder /app/.venv /app/.venv
-ENV PATH="/app/.venv/bin:$PATH"
-ENV PYTHONPATH=/app
 
-COPY ./app /app/app
+# Copy your production application source code
+COPY ./app ./app
 
-CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
+# Set optimization flags for Python production performance
+ENV PATH="/app/.venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+EXPOSE 8000
+
+CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]

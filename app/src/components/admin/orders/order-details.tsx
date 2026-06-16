@@ -6,7 +6,7 @@ import { OrderStatusBadge } from "./order-status-badge";
 import { useOrderTimeline } from "@/hooks/useOrder";
 import { OrderStatus, type Order, type OrderItem } from "@/schemas";
 import { useReturnOrderItem } from "@/hooks/useOrder";
-import { currency, formatDate } from "@/utils";
+import { cn, currency, formatDate } from "@/utils";
 import { Badge } from "@/components/ui/badge";
 import ImageDisplay from "@/components/image-display";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
@@ -123,6 +123,9 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
                         <div className="border-b border-border py-4 px-2">
                             <h2 className="text-lg font-medium">Order Items</h2>
+                            <div className={cn("rounded-lg border bg-card p-4 text-sm whitespace-pre-wrap leading-relaxed hidden", order.order_notes && "block")}>
+                                {order.order_notes}
+                            </div>
                         </div>
                         <div className="divide-y divide-border">
                             {order.order_items.map((item: OrderItem, idx: number) => (

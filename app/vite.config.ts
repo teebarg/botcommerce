@@ -10,7 +10,9 @@ import { VitePWA } from "vite-plugin-pwa";
 
 const config = defineConfig({
     server: {
-        port: 5173,
+        hmr: {
+            overlay: true,
+        },
         allowedHosts: true,
         watch: {
             ignored: ["**/routeTree.gen.ts"],
@@ -22,9 +24,6 @@ const config = defineConfig({
             externals: {
                 inline: ["@auth/core"],
             },
-            // routeRules: {
-            //     "/sw.js": { headers: { "Cache-Control": "no-cache, no-store, must-revalidate" } },
-            // },
         }),
         viteTsConfigPaths({
             projects: ["./tsconfig.json"],

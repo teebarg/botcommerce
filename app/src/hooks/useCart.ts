@@ -2,12 +2,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { Cart, CartComplete, CartUpdate, Message, Order } from "@/schemas";
 import { useNavigate } from "@tanstack/react-router";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 
 export const useMyCart = () => {
     return useQuery({
         queryKey: ["cart"],
-        queryFn: () => clientApi.get<Cart>("/cart/"),
+        queryFn: () => api.get<Cart>("/cart/"),
         staleTime: 0,
         refetchOnMount: false,
     });
@@ -18,7 +18,7 @@ export const useAddToCart = () => {
 
     return useMutation({
         mutationFn: async ({ variant_id, quantity }: { variant_id: number; quantity: number }) =>
-            await clientApi.post<Cart>("/cart/items", { variant_id, quantity }),
+            await api.post<Cart>("/cart/items", { variant_id, quantity }),
         onMutate: async ({ variant_id, quantity }) => {
             await queryClient.cancelQueries({ queryKey: ["cart"] });
 
@@ -51,7 +51,6 @@ export const useAddToCart = () => {
             return { previousCart };
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Added to cart", { duration: 1000 });
         },
         onError: (error: any, variables, context) => {
@@ -68,7 +67,7 @@ export const useChangeCartQuantity = () => {
 
     return useMutation({
         mutationFn: async ({ item_id, quantity }: { item_id: number; quantity: number }) =>
-            await clientApi.put<Cart>(`/cart/items/${item_id}?quantity=${quantity}`, {}),
+            await api.put<Cart>(`/cart/items/${item_id}?quantity=${quantity}`, {}),
         onMutate: async ({ item_id, quantity }) => {
             await queryClient.cancelQueries({ queryKey: ["cart"] });
 
@@ -90,7 +89,6 @@ export const useChangeCartQuantity = () => {
             return { previousCart };
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Cart updated");
         },
         onError: (error: any, variables, context) => {
@@ -103,13 +101,9 @@ export const useChangeCartQuantity = () => {
 };
 
 export const useUpdateCartDetails = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
-        mutationFn: async (update: CartUpdate) => await clientApi.put<Cart>("/cart/", update),
+        mutationFn: async (update: CartUpdate) => await api.put<Cart>("/cart/", update),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["addresses"] })
-            queryClient.invalidateQueries({ queryKey: ["cart"] })
             toast.success("Cart details updated");
         },
         onError: (error: any) => {
@@ -119,12 +113,9 @@ export const useUpdateCartDetails = () => {
 };
 
 export const useDeleteCartItem = () => {
-    const queryClient = useQueryClient();
-
     return useMutation({
-        mutationFn: async (item_id: number) => await clientApi.delete<Message>(`/cart/items/${item_id}`),
+        mutationFn: async (item_id: number) => await api.delete<Message>(`/cart/items/${item_id}`),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["cart"] });
             toast.success("Item removed from cart");
         },
         onError: (error: any) => {
@@ -138,7 +129,7 @@ export const useCompleteCart = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (complete: CartComplete) => await clientApi.post<Order>("/order/", complete),
+        mutationFn: async (complete: CartComplete) => await api.post<Order>("/order/", complete),
         onSuccess: async (data) => {
             navigate({ to: `/order/confirmed/${data?.order_number}`, replace: true });
             queryClient.invalidateQueries({ queryKey: ["cart"] });
@@ -153,9 +144,9 @@ export const useCompleteCart = () => {
 export const useApplyWalletCredit = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async () => clientApi.post<Message>("/cart/apply-wallet", {}),
+        mutationFn: async () => api.post<Message>("/cart/apply-wallet", {}),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["cart"] });
+            queryClient.invalidateQueries({ queryKey: ["user", "me"] });
             toast.success("Wallet credit applied");
         },
         onError: (error: any) => {
@@ -167,22 +158,13 @@ export const useApplyWalletCredit = () => {
 export const useRemoveWalletCredit = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async () => clientApi.post<Message>("/cart/remove-wallet", {}),
+        mutationFn: async () => api.post<Message>("/cart/remove-wallet", {}),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["cart"] });
+            queryClient.invalidateQueries({ queryKey: ["user", "me"] });
             toast.success("Wallet credit removed");
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to remove wallet credit");
         },
     });
-};
-
-export const useInvalidateCart = () => {
-    const queryClient = useQueryClient();
-    const invalidate = () => {
-        queryClient.removeQueries({ queryKey: ["cart"] });
-    };
-
-    return invalidate;
 };

@@ -1,15 +1,16 @@
-from app.services.redis import cache_response, refresh_data
 from fastapi import APIRouter, HTTPException, Query, Depends, Request
 from app.prisma_client import prisma as db
 from app.models.faq import FAQ, FAQCreate, FAQUpdate
 from typing import Optional, List
 from app.models.generic import Message
 from app.core.permissions import require_admin
+from app.core.dependencies.cache import CacheDep
+from app.services.cache import cacheable
 
 router = APIRouter()
 
 @router.get("/")
-@cache_response(key_prefix="faqs")
+@cacheable(key_prefix="faqs", tags=["faqs"], expire=259200000)
 async def list_faqs(
     request: Request,
     query: Optional[str] = Query(None, min_length=1, description="Search query for FAQ questions"),
@@ -29,7 +30,7 @@ async def list_faqs(
     return faqs
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create_faq(faq: FAQCreate)-> FAQ:
+async def create_faq(cache: CacheDep, faq: FAQCreate)-> FAQ:
     """Create a new FAQ entry"""
     try:
         new_faq = await db.faq.create(
@@ -40,7 +41,7 @@ async def create_faq(faq: FAQCreate)-> FAQ:
                 "is_active": faq.is_active
             }
         )
-        await refresh_data(patterns=["faqs"])
+        await cache.invalidate(tags=["faqs"])
         return new_faq
     except Exception as e:
         if "unique constraint" in str(e).lower():
@@ -49,7 +50,7 @@ async def create_faq(faq: FAQCreate)-> FAQ:
 
 
 @router.patch("/{id}", dependencies=[Depends(require_admin)])
-async def update_faq(faq_update: FAQUpdate, id: int)-> FAQ:
+async def update_faq(cache: CacheDep, faq_update: FAQUpdate, id: int)-> FAQ:
     """Update a FAQ entry"""
     existing_faq = await db.faq.find_unique(where={"id": id})
     if not existing_faq:
@@ -70,7 +71,7 @@ async def update_faq(faq_update: FAQUpdate, id: int)-> FAQ:
             where={"id": id},
             data=update_data
         )
-        await refresh_data(patterns=["faqs"])
+        await cache.invalidate(tags=["faqs"])
         return updated_faq
     except Exception as e:
         if "unique constraint" in str(e).lower():
@@ -78,12 +79,12 @@ async def update_faq(faq_update: FAQUpdate, id: int)-> FAQ:
         raise
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete_faq(id: int)-> Message:
+async def delete_faq(cache: CacheDep, id: int)-> Message:
     """Delete a FAQ entry"""
     existing_faq = await db.faq.find_unique(where={"id": id})
     if not existing_faq:
         raise HTTPException(status_code=404, detail="FAQ not found")
 
     await db.faq.delete(where={"id": id})
-    await refresh_data(patterns=["faqs"])
+    await cache.invalidate(tags=["faqs"])
     return Message(message="FAQ deleted successfully")

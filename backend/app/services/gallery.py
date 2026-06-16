@@ -1,6 +1,7 @@
 from typing import Any, Optional, List, Dict
 import random
 import asyncio
+from app.services.storage import MediaStorageService
 from fastapi import HTTPException
 from app.core.logging import get_logger
 from app.core.utils import slugify, generate_sku
@@ -15,11 +16,37 @@ from app.models.product import (
 
 logger = get_logger(__name__)
 
-class GalleryRepository:
-    """Encapsulates all direct database access layers."""
-    def __init__(self, db: Prisma):
-        self.db = db
 
+class GalleryService:
+    """Coordinates Business Domain Logics."""
+    def __init__(self, db: Prisma, websocket_manager, storage_srv: MediaStorageService):
+        self.db = db
+        self.ws_manager = websocket_manager
+        self.storage = storage_srv
+
+    @staticmethod
+    def _build_variant_data(payload) -> dict[str, Any]:
+        data = {}
+        fields = ["size", "color", "width", "length", "age", "price", "old_price"]
+        for field in fields:
+            if getattr(payload, field, None) is not None:
+                data[field] = getattr(payload, field)
+        
+        if getattr(payload, "inventory", None) is not None:
+            data["inventory"] = payload.inventory
+            data["status"] = "IN_STOCK" if payload.inventory > 0 else "OUT_OF_STOCK"
+        return data
+
+    @staticmethod
+    def _build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any]:
+        data: dict[str, Any] = {}
+        if category_ids:
+            data["categories"] = {"connect": [{"id": cid} for cid in category_ids]}
+        if collection_ids:
+            data["collections"] = {"connect": [{"id": cid} for cid in collection_ids]}
+        return data
+
+    
     async def get_paginated_gallery(
         self, cursor: Optional[int], limit: int, sort: str, active: Optional[bool], out_of_stock: bool
     ) -> List[Dict[str, Any]]:
@@ -63,41 +90,10 @@ class GalleryRepository:
         """
         return await self.db.query_raw(query, cursor or cursor_default, limit + 1)
 
-
-class GalleryService:
-    """Coordinates Business Domain Logics."""
-    def __init__(self, repo: GalleryRepository, db: Prisma, websocket_manager, recently_viewed_service):
-        self.repo = repo
-        self.db = db
-        self.ws_manager = websocket_manager
-        self.recently_viewed_service = recently_viewed_service
-
-    @staticmethod
-    def _build_variant_data(payload) -> dict[str, Any]:
-        data = {}
-        fields = ["size", "color", "width", "length", "age", "price", "old_price"]
-        for field in fields:
-            if getattr(payload, field, None) is not None:
-                data[field] = getattr(payload, field)
-        
-        if getattr(payload, "inventory", None) is not None:
-            data["inventory"] = payload.inventory
-            data["status"] = "IN_STOCK" if payload.inventory > 0 else "OUT_OF_STOCK"
-        return data
-
-    @staticmethod
-    def _build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any]:
-        data: dict[str, Any] = {}
-        if category_ids:
-            data["categories"] = {"connect": [{"id": cid} for cid in category_ids]}
-        if collection_ids:
-            data["collections"] = {"connect": [{"id": cid} for cid in collection_ids]}
-        return data
-
     async def get_gallery_items(self, **kwargs) -> PaginatedProductImages:
         limit = kwargs.get("limit", 36)
         try:
-            images = await self.repo.get_paginated_gallery(**kwargs)
+            images = await self.get_paginated_gallery(**kwargs)
         except Exception as e:
             logger.error(f"Gallery fetch error: {e}")
             raise HTTPException(status_code=500, detail=str(e))
@@ -158,7 +154,6 @@ class GalleryService:
             logger.error(f"Error deleting product {product_id}: {e}")
             raise HTTPException(status_code=500, detail="Failed to delete product")
 
-        await self.recently_viewed_service.remove_product_from_all(product_id=product_id)
         return product_id, image_urls
 
     async def bulk_save_urls(self, payload: ProductImageBulkUrls) -> dict:
@@ -345,7 +340,7 @@ class GalleryService:
                     if v_data and first_variant_id:
                         await tx.productvariant.update(where={"id": first_variant_id}, data=v_data)
 
-    async def handle_bulk_update_products(self, payload: ImagesBulkUpdate, images, index_products_fn) -> None:
+    async def handle_bulk_update_images(self, payload: ImagesBulkUpdate, images, index_products_fn) -> None:
         failed_ids = []
         created_product_ids = []
 

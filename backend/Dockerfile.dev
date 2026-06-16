@@ -1,37 +1,24 @@
-FROM python:3.11-slim
+FROM beafdocker/fastapi-base:latest
 
-# Install uv
-COPY --from=ghcr.io/astral-sh/uv:0.5.11 /uv /uvx /bin/
-
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    UV_PROJECT_ENVIRONMENT=/venv \
-    PATH="/venv/bin:$PATH"
+# Install Node.js explicitly so Prisma CLI and engines can run
+RUN apt-get update && apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
-    curl \
-    libatomic1 \
-    ca-certificates \
-    gnupg \
-    && rm -rf /var/lib/apt/lists/*
+COPY pyproject.toml uv.lock* ./
 
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs
-
-COPY pyproject.toml uv.lock ./
-
+# Fast container caching layer sync
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen
+    uv sync --frozen --no-install-project
 
 COPY prisma ./prisma
 
-# Use system node
 ENV PRISMA_USE_GLOBAL_NODE=true
 
-RUN prisma generate
+RUN uv run prisma generate
 
-COPY . .
-
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+EXPOSE 8000
+CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

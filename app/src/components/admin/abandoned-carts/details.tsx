@@ -1,4 +1,4 @@
-import { MapPin, Clock, Package, Copy, ExternalLink, User } from "lucide-react";
+import { Clock, Package, Copy, User } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import { useOverlayTriggerState } from "react-stately";
@@ -8,7 +8,6 @@ import { Separator } from "@/components/ui/separator";
 import Overlay from "@/components/overlay";
 import type { Cart } from "@/schemas";
 import { currency } from "@/utils";
-import { useInvalidateCart } from "@/hooks/useCart";
 import { useInvalidateMe } from "@/hooks/useUser";
 import ImageDisplay from "@/components/image-display";
 import { useRouteContext, useRouter } from "@tanstack/react-router";
@@ -23,7 +22,6 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
     const { session } = useRouteContext({ strict: false });
     const router = useRouter();
     const invalidateMe = useInvalidateMe();
-    const invalidateCart = useInvalidateCart();
 
     if (!cart) return null;
 
@@ -42,8 +40,6 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
             });
 
             invalidateMe();
-            invalidateCart();
-
             toast.success("Impersonated");
 
             await router.invalidate();
@@ -92,17 +88,6 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                                             <Copy className="h-3 w-3" />
                                         </Button>
                                     </div>
-                                ) : (
-                                    <p className="font-medium">N/A</p>
-                                )}
-                            </div>
-                            <div className="space-y-1">
-                                <p className="text-sm text-muted-foreground">Location</p>
-                                {cart?.user?.addresses?.[0] ? (
-                                    <p className="font-medium flex items-center gap-1.5">
-                                        <MapPin className="h-4 w-4" />
-                                        {cart?.user?.addresses?.[0]?.state}
-                                    </p>
                                 ) : (
                                     <p className="font-medium">N/A</p>
                                 )}

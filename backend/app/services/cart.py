@@ -1,43 +1,31 @@
-from app.models.cart import Cart
 from typing import Optional, Dict, Any
 from fastapi import HTTPException
-from app.prisma_client import prisma as db
+from app.services.cache import CacheService
 from app.core.logging import get_logger
-from app.services.redis import refresh_data
 from app.services.shop_settings import ShopSettingsService
 from app.core.utils import generate_id
 from prisma.enums import CartStatus
 from prisma import Prisma
 from app.services.coupon import CouponService
+from app.models.cart import Cart
 
 logger = get_logger(__name__)
 
 
-async def get_cart(cart_number: Optional[str], user_id: Optional[str]) -> Cart | None:
-    """Retrieve an existing cart"""
-    if user_id:
-        cart = await db.cart.find_first(
-            where={"user_id": user_id, "status": CartStatus.ACTIVE},
-            include={"items": True},
-            order={"created_at": "desc"}
-        )
-        if cart:
-            return cart
-
-    if cart_number:
-        cart = await db.cart.find_unique(where={"cart_number": cart_number, "status": CartStatus.ACTIVE}, include={"items": True})
-        if cart:
-            return cart
-    return None
-
-
-class CartRepository:
-    def __init__(self, db: Prisma):
+class CartService:
+    def __init__(self, db: Prisma, cache: CacheService, settings_srv: ShopSettingsService, coupon_srv: CouponService):
         self.db = db
+        self.settings_srv = settings_srv
+        self.coupon_srv = coupon_srv
+        self.cache = cache
 
-    async def get_active_cart(self, cart_number: Optional[str], user_id: Optional[int], include_relations: bool = False) -> Any:
+
+    async def get_active_cart(self, cart_number: str | None = None, user_id: int | None = None, include_relations: bool = False) -> Cart | None:
         include_clause = {
-            "items": {"include": {"variant": True}},
+            "items": {
+                "order_by": {"created_at": "asc"},
+                "include": {"variant": True}
+            },
             "shipping_address": True
         } if include_relations else {"items": True}
 
@@ -52,7 +40,7 @@ class CartRepository:
 
         if cart_number:
             cart = await self.db.cart.find_unique(
-                where={"cart_number": cart_number, "status": CartStatus.ACTIVE}, 
+                where={"cart_number": cart_number, "status": CartStatus.ACTIVE},
                 include=include_clause
             )
             if cart:
@@ -65,18 +53,11 @@ class CartRepository:
             "items": {"include": {"variant": True}},
             "shipping_address": True
         } if include_relations else None
-        
+
         return await self.db.cart.create(
             data={"cart_number": new_cart_id, "user_id": user_id},
             include=include_clause
         )
-
-
-class CartService:
-    def __init__(self, db: Prisma, settings_service: ShopSettingsService, coupon_service: CouponService):
-        self.db = db
-        self.settings_service = settings_service
-        self.coupon_service = coupon_service
 
     async def calculate_totals(self, cart_id: int) -> None:
         """Calculates and commits subtotal, tax, discounts, and wallet balances cleanly."""
@@ -86,22 +67,22 @@ class CartService:
             if not cart:
                 return
 
-            tax_rate = float(await self.settings_service.get("tax_rate"))
+            tax_rate = float(await self.settings_srv.get("tax_rate"))
             cart_items = await self.db.cartitem.find_many(where={"cart_id": cart.id})
 
             subtotal = sum(item.price * item.quantity for item in cart_items)
             discount_amount = 0.0
 
             if cart.coupon_id:
-                coupon = await self.db.coupon.find_unique(where={"id": cart.coupon_id})
+                coupon = await self.coupon_srv.get_by_id(id=cart.coupon_id)
                 if coupon:
                     try:
-                        await self.coupon_service.validate_coupon(
+                        await self.coupon_srv.validate_coupon(
                             code=coupon.code,
                             cart=cart,
                             user_id=cart.user_id
                         )
-                        discount_amount = await self.coupon_service.calculate_discount(coupon, subtotal)
+                        discount_amount = await self.coupon_srv.calculate_discount(coupon, subtotal)
                     except Exception:
                         discount_amount = 0.0
                         await self.db.cart.update(where={"id": cart.id}, data={"coupon_id": None})
@@ -110,7 +91,7 @@ class CartService:
             new_subtotal = max(subtotal - discount_amount, 0.0)
             tax = new_subtotal * (tax_rate / 100)
             shipping_fee = cart.shipping_fee or 0.0
-            
+
             total = new_subtotal + tax + shipping_fee
             total_after_wallet = max(total - wallet_used, 0.0)
 
@@ -125,7 +106,7 @@ class CartService:
                 data["payment_method"] = "WALLET"
 
             await self.db.cart.update(where={"id": cart.id}, data=data)
-            await refresh_data(patterns=["carts", "abandoned-carts"])
+            await self.cache.invalidate(tags=["abandoned-carts", f"cart:{cart.cart_number}"])
         except Exception as e:
             logger.error(f"Error calculating cart totals: {e}", exc_info=True)
 
@@ -159,7 +140,7 @@ class CartService:
     async def merge_guest_into_user_cart(self, user_id: int, cart_number: Optional[str] = None) -> None:
         if not cart_number:
             return
-            
+
         try:
             async with self.db.tx() as tx:
                 user_cart = await tx.cart.find_first(

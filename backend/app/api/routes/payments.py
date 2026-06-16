@@ -1,20 +1,17 @@
-from app.core.dependencies.order import get_order_service
+import httpx
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends, Response
 from app.core.config import settings
 from app.schemas.payment import PaymentInitialize, PaymentCreate
 from app.models.order import OrderCreate, Order
-from app.core.deps import CurrentUser, Notification
+from app.core.deps import CurrentUser
 from app.models.user import User
-import httpx
 from datetime import datetime
 from app.prisma_client import prisma as db
 from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
-from app.services.order import OrderService
 from app.core.logging import get_logger
-from app.services.events import publish_event, publish_order_event
-from app.services.redis import refresh_data
 from app.models.cart import Cart
 from app.core.permissions import require_admin, require_user
+from app.core.dependencies.order import OrderDep
 
 logger = get_logger(__name__)
 
@@ -77,7 +74,7 @@ async def create_payment(
     return await initialize_payment(cart, current_user)
 
 @router.get("/verify/{reference}")
-async def verify_payment(response: Response, reference: str, user: CurrentUser, service: OrderService = Depends(get_order_service)) -> Order:
+async def verify_payment(response: Response, srv: OrderDep, reference: str, user: CurrentUser) -> Order:
     """Verify a payment"""
     async with httpx.AsyncClient() as client:
         res = await client.get(
@@ -97,9 +94,7 @@ async def verify_payment(response: Response, reference: str, user: CurrentUser, 
         if data["data"]["status"] == "success":
             cart_number = data["data"]["metadata"]["cart_number"]
 
-            order = await service.create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cart_number)
-
-            await refresh_data(patterns=["orders"])
+            order = await srv.create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cart_number)
 
             event = {
                 "type": "PAYMENT_SUCCESS",
@@ -110,7 +105,7 @@ async def verify_payment(response: Response, reference: str, user: CurrentUser, 
                 "status": PaymentStatus.SUCCESS,
                 "payment_method": PaymentMethod.PAYSTACK,
             }
-            await publish_event(event=event)
+            await srv.event_bus.publish(event=event)
 
             response.delete_cookie(
                 key="_cart_id",
@@ -132,12 +127,12 @@ async def verify_payment(response: Response, reference: str, user: CurrentUser, 
                 "status": PaymentStatus.FAILED,
                 "payment_method": PaymentMethod.PAYSTACK,
             }
-            await publish_event(event=event)
+            await srv.event_bus.publish(event=event)
             raise HTTPException(status_code=500, detail="payment verification failed")
 
 
 @router.post("/", dependencies=[Depends(require_user)])
-async def create(*, create: PaymentCreate, notification: Notification, background_tasks: BackgroundTasks, service: OrderService = Depends(get_order_service)):
+async def create(srv: OrderDep, create: PaymentCreate, background_tasks: BackgroundTasks):
     """
     Create new payment.
     """
@@ -159,12 +154,12 @@ async def create(*, create: PaymentCreate, notification: Notification, backgroun
                 "payment_method": PaymentMethod.PAYSTACK,
             }
         )
-    background_tasks.add_task(service.process_order_payment, order_id=create.order_id)
+    background_tasks.add_task(srv.process_order_payment, order_id=create.order_id)
     return payment
 
 
 @router.patch("/{id}/status", dependencies=[Depends(require_admin)])
-async def payment_status(id: int, status: PaymentStatus) -> Order:
+async def payment_status(srv: OrderDep, id: int, status: PaymentStatus) -> Order:
     """Change payment status"""
     order = await db.order.find_unique(where={"id": id}, include={"order_items": {"include": {"variant": True}}})
     if not order:
@@ -181,7 +176,7 @@ async def payment_status(id: int, status: PaymentStatus) -> Order:
         keys: list[str] = [f"order:{id}"]
 
         if status == PaymentStatus.SUCCESS:
-            await publish_order_event(order=updated_order, type="ORDER_PAID")
+            await srv.event_bus.publish_order_event(order=updated_order, event_type="ORDER_PAID")
             try:
                 await tx.ordertimeline.create(
                     data={
@@ -195,5 +190,5 @@ async def payment_status(id: int, status: PaymentStatus) -> Order:
             except Exception as e:
                 logger.error(f"Failed to create order timeline when updating payment status: {str(e)}")
                 raise HTTPException(status_code=400, detail=f"Database error: {str(e)}")
-        await refresh_data(patterns=["orders"], keys=keys)
+        await srv.cache.invalidate(",".join(keys), tags=["orders"])
         return updated_order

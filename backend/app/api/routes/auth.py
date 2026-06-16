@@ -1,13 +1,12 @@
 from typing import Annotated
-from app.core.dependencies.cart import get_cart_service
 from fastapi import APIRouter, Request, Cookie, Response, Depends
 from app.core.config import settings
 from app.prisma_client import prisma as db
 import uuid
 from app.core.logging import get_logger
-from app.services.redis import set_session, delete_session
 from app.core.deps import verify_clerk_token
-from app.services.cart import CartService
+from app.core.dependencies.cart import CartDep
+from app.core.dependencies.cache import CacheDep
 
 logger = get_logger(__name__)
 
@@ -15,11 +14,11 @@ router = APIRouter()
 
 
 @router.post("/logout")
-async def logout(request: Request, response: Response):
+async def logout(request: Request, response: Response, cache_srv: CacheDep):
     session_id = request.cookies.get("session_id")
 
     if session_id:
-        await delete_session(session_id)
+        await cache_srv.delete_session(session_id)
 
     response.delete_cookie("session_id")
 
@@ -27,7 +26,7 @@ async def logout(request: Request, response: Response):
 
 
 @router.post("/exchange")
-async def exchange_token(response: Response, payload=Depends(verify_clerk_token), _cart_id: Annotated[str | None, Cookie()] = None, cart_service: CartService = Depends(get_cart_service)):
+async def exchange_token(response: Response, cache_srv: CacheDep, cart_srv: CartDep, payload=Depends(verify_clerk_token), _cart_id: Annotated[str | None, Cookie()] = None):
     session_id = str(uuid.uuid4())
 
     clerk_id = payload["sub"]
@@ -56,7 +55,7 @@ async def exchange_token(response: Response, payload=Depends(verify_clerk_token)
         "roles": payload.get("roles", []),
     }
 
-    await set_session(session_id, session_data)
+    await cache_srv.set_session(session_id, session_data)
 
     response.set_cookie(
         key="session_id",
@@ -68,6 +67,6 @@ async def exchange_token(response: Response, payload=Depends(verify_clerk_token)
         domain=settings.COOKIE_DOMAIN,
         max_age=60 * 60 * 24 * 30,
     )
-    await cart_service.merge_guest_into_user_cart(user_id=user.id, cart_number=_cart_id)
+    await cart_srv.merge_guest_into_user_cart(user_id=user.id, cart_number=_cart_id)
 
     return session_data

@@ -1,7 +1,7 @@
 import type React from "react";
 import { useEffect } from "react";
 import NotFound from "@/components/generic/not-found";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 import { Message } from "@/schemas";
 
 const ServerError: React.FC<{ error?: string; scenario?: string; stack?: string }> = ({ error, scenario, stack }) => {
@@ -12,7 +12,7 @@ const ServerError: React.FC<{ error?: string; scenario?: string; stack?: string 
                 scenario,
                 stack,
             };
-            clientApi.post<Message>("/log-error", errorData)
+            api.post<Message>("/log-error", errorData)
         }
     }, [error]);
 

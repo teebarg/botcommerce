@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import ReviewItem from "@/components/admin/reviews/review-item";
 import z from "zod";
 import { useQuery } from "@tanstack/react-query";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
@@ -31,7 +31,7 @@ function RouteComponent() {
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedReview, Review>({
         queryKey: ["reviews", "infinite", params],
-        queryFn: (cursor) => clientApi.get<PaginatedReview>("/reviews/", { params: { cursor, ...params } }),
+        queryFn: (cursor) => api.get<PaginatedReview>("/reviews/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
         initialData: initialData,

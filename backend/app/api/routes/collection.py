@@ -14,13 +14,14 @@ from app.prisma_client import prisma as db
 from app.core.utils import slugify
 from prisma.errors import PrismaError
 from typing import Optional
-from app.services.redis import cache_response, refresh_data
 from app.core.permissions import require_admin
+from app.services.cache import cacheable
+from app.core.dependencies.cache import CacheDep
 
 router = APIRouter()
 
 @router.get("/")
-@cache_response(key_prefix="collections", key=lambda request, query: query)
+@cacheable(key_prefix="collections", key_builder=lambda query: query if query else "all", tags=["collections"])
 async def index(request: Request, query: str = "") -> Optional[list[Collection]]:
     """
     Retrieve collections with Redis caching.
@@ -37,7 +38,7 @@ async def index(request: Request, query: str = "") -> Optional[list[Collection]]
 
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create(*, create_data: CollectionCreate) -> Collection:
+async def create(create_data: CollectionCreate, cache: CacheDep) -> Collection:
     """
     Create new collection.
     """
@@ -48,14 +49,14 @@ async def create(*, create_data: CollectionCreate) -> Collection:
                 "slug": slugify(create_data.name)
             }
         )
-        await refresh_data(patterns=["collections"])
+        await cache.invalidate(tags=["collections"])
         return collection
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.get("/{slug}")
-@cache_response(key_prefix="collection", key=lambda request, slug: slug)
+@cacheable(key_prefix="collection", key_builder=lambda slug: slug)
 async def get_by_slug(request: Request, slug: str) -> Collection:
     """
     Get a collection by its slug.
@@ -71,9 +72,9 @@ async def get_by_slug(request: Request, slug: str) -> Collection:
 
 @router.patch("/{id}", dependencies=[Depends(require_admin)])
 async def update(
-    *,
     id: int,
     update_data: CollectionUpdate,
+    cache: CacheDep
 ) -> Collection:
     """
     Update a collection.
@@ -89,7 +90,7 @@ async def update(
             where={"id": id},
             data=update_data.model_dump()
         )
-        await refresh_data(patterns=["collections"], keys=[f"collection:{update.slug}"])
+        await cache.invalidate(f"collection:{update.slug}", tags=["collections"])
         
         return update
     except PrismaError as e:
@@ -97,7 +98,7 @@ async def update(
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete(id: int) -> Message:
+async def delete(id: int, cache: CacheDep) -> Message:
     """
     Delete a collection.
     """
@@ -111,7 +112,7 @@ async def delete(id: int) -> Message:
         await db.collection.delete(
             where={"id": id}
         )
-        await refresh_data(patterns=["collections"], keys=[f"collection:{existing.slug}"])
+        await cache.invalidate(f"collection:{existing.slug}", tags=["collections"])
         return Message(message="Collection deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

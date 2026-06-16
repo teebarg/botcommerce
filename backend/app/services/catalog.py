@@ -1,12 +1,13 @@
 from typing import Optional
 from app.core.logging import logger
-from app.services.redis import refresh_data
 from math import ceil
+from app.services.cache import CacheService
 
 
 class CatalogService:
-    def __init__(self, db):
+    def __init__(self, db, cache: CacheService):
         self.db = db
+        self.cache = cache
 
     async def track_visit(
         self,
@@ -119,6 +120,9 @@ class CatalogService:
             "total_count": total,
         }
 
-    async def invalidate_cache(self) -> None:
-        """Invalidate all catalog cache keys."""
-        await refresh_data(patterns=["catalog"])
+    async def invalidate(self, slug: Optional[str] = None) -> None:
+        """Invalidate catalog."""
+        tags = ["catalogs"]
+        if slug:
+            tags.append(f"catalog:{slug}")
+        await self.cache.invalidate(tags=tags)

@@ -1,6 +1,35 @@
 services:
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile.dev
+    container_name: shop
+    environment:
+      - NODE_ENV=development
+      - NITRO_DEV_WORKER=false
+    volumes:
+      - ./app:/app
+      - /app/node_modules
+    depends_on:
+      shop-api:
+        condition: service_healthy
+    networks:
+      - dev-net
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dev-net
+      - traefik.http.services.shop.loadbalancer.server.port=3000
+      - traefik.http.routers.shop.rule=Host(`shop.localhost`)
+      - traefik.http.routers.shop.entrypoints=https
+      - traefik.http.routers.shop.tls=true
+      - traefik.http.routers.shop-http.rule=Host(`shop.localhost`)
+      - traefik.http.routers.shop-http.entrypoints=http
+      - traefik.http.routers.shop-http.middlewares=redirect-to-https
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+
   shop-api:
     image: shop:${TAG-latest}
+    container_name: shop-api
     labels:
       - traefik.enable=true
       - traefik.docker.network=dev-net
@@ -14,6 +43,8 @@ services:
       - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
     networks:
       - dev-net
+    environment:
+      - UV_LINK_MODE=copy # Mutes filesystem crossing warnings cleanly
     env_file:
       - ./backend/.env
     build:
@@ -22,16 +53,22 @@ services:
       args:
         INSTALL_DEV: ${INSTALL_DEV-false}
     platform: linux/amd64 # Patch for M1 Mac
-    command: fastapi run --reload app/main.py
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     volumes:
-      - ./backend/:/app
+      - ./backend:/app
       - /app/.venv
+      - uv-cache:/root/.cache/uv
 
   agent-api:
     image: shop-agent:${TAG-latest}
     build:
       context: ./agent
       dockerfile: Dockerfile.dev
+    container_name: agent-api
     networks:
       - dev-net
     labels:
@@ -47,12 +84,17 @@ services:
       - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
     environment:
       - FASTEMBED_CACHE_PATH=/app/models
+      - UV_LINK_MODE=copy
     platform: linux/amd64 # Patch for M1 Mac
     volumes:
       - ./agent:/app
       - /app/.venv
-    command: fastapi run --reload app/main.py
+      - uva-cache:/root/.cache/uv
 
 networks:
   dev-net:
     external: true
+
+volumes:
+  uv-cache:
+  uva-cache:

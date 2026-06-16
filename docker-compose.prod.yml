@@ -1,0 +1,20 @@
+services:
+  shop-api-prod:
+    container_name: shop-api-prod
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8000"
+    env_file:
+      - ./backend/.env
+
+  agent-api-prod:
+    container_name: agent-api-prod
+    build:
+      context: ./agent
+      dockerfile: Dockerfile # Points to your new production Dockerfile
+    ports:
+      - "8081:8000"
+    environment:
+      - FASTEMBED_CACHE_PATH=/app/models

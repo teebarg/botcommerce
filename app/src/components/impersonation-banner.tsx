@@ -1,8 +1,6 @@
 import { X } from "lucide-react";
 import { toast } from "sonner";
-
 import { useInvalidateMe } from "@/hooks/useUser";
-import { useInvalidateCart } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
 import { useRouteContext, useRouter } from "@tanstack/react-router";
 import { updateAuthSession } from "@/utils/auth-client";
@@ -10,7 +8,6 @@ import { updateAuthSession } from "@/utils/auth-client";
 export default function ImpersonationBanner() {
     const { session } = useRouteContext({ strict: false });
     const invalidateMe = useInvalidateMe();
-    const invalidateCart = useInvalidateCart();
     const router = useRouter();
 
     const stopImpersonation = async () => {
@@ -23,7 +20,6 @@ export default function ImpersonationBanner() {
             });
 
             invalidateMe();
-            invalidateCart();
 
             toast.success("Exited impersonation");
             await router.invalidate();

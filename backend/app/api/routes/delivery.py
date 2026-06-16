@@ -4,20 +4,22 @@ from typing import List
 from app.models.delivery import DeliveryOption, DeliveryOptionCreate, DeliveryOptionUpdate
 from app.prisma_client import prisma as db
 from app.models.generic import Message
-from app.services.redis import cache_response, refresh_data
 from app.core.permissions import require_admin
+from app.core.dependencies.cache import CacheDep
+from app.services.cache import cacheable
 
 router = APIRouter()
 
 @router.get("/", response_model=List[DeliveryOption])
-@cache_response("delivery")
+@cacheable(key_prefix="delivery", key_builder=False, expire=259200000)
 async def get_delivery_options(request: Request):
     """Get all delivery options"""
     return await db.deliveryoption.find_many(order={"created_at": "desc"})
 
 @router.post("/", dependencies=[Depends(require_admin)])
 async def create_delivery_option(
-    delivery_option: DeliveryOptionCreate
+    delivery_option: DeliveryOptionCreate,
+    cache: CacheDep
 ) -> DeliveryOption:
     """Create a new delivery option"""
     existing = await db.deliveryoption.find_first(
@@ -29,12 +31,13 @@ async def create_delivery_option(
             detail=f"Delivery option with method {delivery_option.method} already exists"
         )
 
-    await refresh_data(patterns=["delivery"])
+    await cache.invalidate("delivery")
 
     return await db.deliveryoption.create(data=delivery_option.model_dump())
 
 @router.patch("/{delivery_option_id}", dependencies=[Depends(require_admin)])
 async def update_delivery_option(
+    cache: CacheDep,
     delivery_option_id: int,
     delivery_option_update: DeliveryOptionUpdate,
 ) -> DeliveryOption:
@@ -53,7 +56,7 @@ async def update_delivery_option(
             where={"id": delivery_option_id},
             data=delivery_option_update.model_dump(exclude_unset=True)
         )
-        await refresh_data(patterns=["delivery"])
+        await cache.invalidate("delivery")
         return res
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -61,6 +64,7 @@ async def update_delivery_option(
 
 @router.delete("/{delivery_option_id}", dependencies=[Depends(require_admin)])
 async def delete_delivery_option(
+    cache: CacheDep,
     delivery_option_id: int,
 ) -> Message:
     """Delete a delivery option"""
@@ -77,5 +81,5 @@ async def delete_delivery_option(
         where={"id": delivery_option_id}
     )
 
-    await refresh_data(patterns=["delivery"])
+    await cache.invalidate("delivery")
     return Message(message="Delivery option deleted successfully")

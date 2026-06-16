@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Message } from "@/schemas";
-import { api } from "@/utils/api.server";
+import { api } from "@/utils/api";
 
 export const Route = createFileRoute("/api/push-event")({
     server: {

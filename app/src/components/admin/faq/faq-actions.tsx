@@ -4,7 +4,6 @@ import { useOverlayTriggerState } from "react-stately";
 import { FaqForm } from "./faq-form";
 import { Button } from "@/components/ui/button";
 import type { FAQ } from "@/schemas";
-import { useInvalidate } from "@/hooks/useApi";
 import { useDeleteFaq } from "@/hooks/useFaq";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
@@ -14,7 +13,6 @@ interface FaqActionsProps {
 }
 
 const FaqActions = ({ faq }: FaqActionsProps) => {
-    const invalidate = useInvalidate();
     const [faqToDelete, setFaqToDelete] = useState<number | null>(null);
     const deleteState = useOverlayTriggerState({});
     const editState = useOverlayTriggerState({});
@@ -24,7 +22,6 @@ const FaqActions = ({ faq }: FaqActionsProps) => {
     const handleDelete = async () => {
         if (!faqToDelete) return;
         mutateAsync(faqToDelete).then(() => {
-            invalidate("faqs");
             setFaqToDelete(null);
             deleteState.close();
         });

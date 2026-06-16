@@ -1,8 +1,8 @@
 from typing import Optional
+from app.services.cache import cacheable
 from fastapi import APIRouter, Depends, Request, Query
 from pydantic import BaseModel
 from app.prisma_client import prisma as db
-from app.services.redis import cache_response
 from app.core.deps import  CurrentUser
 from app.models.user import User
 from datetime import datetime
@@ -27,7 +27,7 @@ class PaginatedWalletTxns(BaseModel):
 router = APIRouter()
 
 @router.get("/", dependencies=[Depends(require_admin)])
-@cache_response(key_prefix="wallet")
+@cacheable(key_prefix="wallet", tags=["wallet"])
 async def index(
     request: Request,
     query: str = "",
@@ -65,7 +65,7 @@ async def index(
 
 
 @router.get("/me")
-@cache_response(key_prefix="wallet")
+@cacheable(key_prefix="wallet", tags=["wallet-me"])
 async def self_txns(
     request: Request,
     user: CurrentUser,

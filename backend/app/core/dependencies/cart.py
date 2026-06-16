@@ -1,16 +1,17 @@
-from app.core.dependencies.services import get_shop_settings_service
+from typing import Annotated
 from fastapi import Depends
 from app.prisma_client import prisma as db
-from app.services.shop_settings import ShopSettingsService
-from app.services.coupon import CouponService
-from app.services.cart import CartRepository, CartService
+from app.services.cart import CartService
+from app.core.dependencies.services import CouponDep
+from app.core.dependencies.cache import CacheDep
+from app.core.dependencies.services import SettingsDep
 
-def get_cart_repository() -> CartRepository:
-    return CartRepository(db=db)
-
-def get_cart_service(settings_service: ShopSettingsService = Depends(get_shop_settings_service)) -> CartService:
+def get_cart_service(cache: CacheDep, coupon_srv: CouponDep, settings_srv: SettingsDep) -> CartService:
     return CartService(
         db=db,
-        settings_service=settings_service,
-        coupon_service=CouponService()
+        settings_srv=settings_srv,
+        coupon_srv=coupon_srv,
+        cache=cache
     )
+
+CartDep = Annotated[CartService, Depends(get_cart_service)]

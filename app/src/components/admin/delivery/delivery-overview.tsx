@@ -6,7 +6,6 @@ import DeliveryOptionForm from "./delivery-option-form";
 import { Button } from "@/components/ui/button";
 import type { DeliveryOption, Message } from "@/schemas";
 import { useDeliveryOptions } from "@/hooks/useApi";
-import { useInvalidate } from "@/hooks/useApi";
 import { Badge } from "@/components/ui/badge";
 import { currency } from "@/utils";
 import ServerError from "@/components/generic/server-error";
@@ -16,12 +15,11 @@ import { ZeroState } from "@/components/zero";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { useState } from "react";
-import { clientApi } from "@/utils/api.client";
+import { api } from "@/utils/api";
 
 const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
     const editState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
-    const invalidate = useInvalidate();
     const [isPending, setIsPending] = useState<boolean>(false);
 
     const getIcon = (iconName: string) => {
@@ -37,11 +35,10 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
 
     const handleDelete = async () => {
         setIsPending(true);
-        const { error } = await tryCatch<Message>(clientApi.delete<Message>(`/delivery/${option.id}`));
+        const { error } = await tryCatch<Message>(api.delete<Message>(`/delivery/${option.id}`));
 
         if (!error) {
             toast.success("Delivery option deleted successfully");
-            invalidate("delivery");
             deleteState.close();
         }
         setIsPending(false);

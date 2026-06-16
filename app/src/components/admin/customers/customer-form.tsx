@@ -6,7 +6,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import type { User } from "@/schemas";
-import { useCreateUser, useUpdateUser } from "@/hooks/useUser";
+import { useUpdateUser } from "@/hooks/useUser";
 
 interface ReviewFormProps {
     user?: User;
@@ -24,11 +24,10 @@ const formSchema = z.object({
     status: z.enum(["PENDING", "ACTIVE", "INACTIVE"]),
 });
 
-export default function CustomerForm({ user, onClose }: ReviewFormProps) {
+export default function CustomerEditForm({ user, onClose }: ReviewFormProps) {
     const { mutate: update, isPending: updateLoading } = useUpdateUser();
-    const { mutate: create, isPending: createLoading } = useCreateUser();
 
-    const loading = updateLoading || createLoading;
+    const loading = updateLoading;
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -42,13 +41,8 @@ export default function CustomerForm({ user, onClose }: ReviewFormProps) {
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         const { ...data } = values;
-
         if (user?.id) {
             update({ id: user.id, input: data });
-        } else {
-            create({
-                ...data,
-            });
         }
     }
 
