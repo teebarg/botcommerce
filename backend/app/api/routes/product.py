@@ -3,13 +3,13 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks, Response, Request
 from app.core.config import settings
 from app.core.logging import get_logger
-from app.core.dependencies.product import ProductDep
+from app.core.dependencies.product import ProductDep, SearchDep
 from app.services.cache import cacheable
 from app.core.deps import CurrentUser, UserDep
 from app.models.generic import Message
 from app.models.product import ProductLite, VariantWithStatus, SearchProducts, FeedProducts, IndexProducts, ReviewStatus
 from app.core.permissions import require_admin
-from app.services.redis import DEFAULT_EXPIRATION, EnhancedJSONEncoder
+from app.services.cache import DEFAULT_EXPIRATION, EnhancedJSONEncoder
 
 logger = get_logger(__name__)
 
@@ -149,9 +149,9 @@ async def update_variant(
 
 
 @router.post("/configure-filterable-attributes")
-async def configure_filterable_attributes(srv: ProductDep) -> Message:
+async def configure_filterable_attributes(search_srv: SearchDep) -> Message:
     try:
-        srv.search_repo.update_settings()
+        search_srv.update_settings()
         return Message(message="Filterable attributes updated successfully.")
     except Exception as e:
         logger.error(f"Error updating attributes: {e}")
@@ -159,10 +159,9 @@ async def configure_filterable_attributes(srv: ProductDep) -> Message:
 
 
 @router.get("/search/clear-index", dependencies=[Depends(require_admin)])
-async def config_clear_index():
-    from app.services.meilisearch import clear_index
+async def config_clear_index(search_srv: SearchDep):
     try:
-        await clear_index(settings.MEILI_PRODUCTS_INDEX)
+        await search_srv.clear_index(settings.MEILI_PRODUCTS_INDEX)
         return {"message": "Index cleared"}
     except Exception as e:
         logger.error(e)
@@ -170,10 +169,9 @@ async def config_clear_index():
 
 
 @router.post("/search/delete-index", dependencies=[Depends(require_admin)])
-async def config_delete_index(index_name: str):
-    from app.services.meilisearch import delete_index
+async def config_delete_index(index_name: str, search_srv: SearchDep):
     try:
-        delete_index(index_name)
+        search_srv.delete_index(index_name)
         return {"message": "Index dropped"}
     except Exception as e:
         logger.error(e)

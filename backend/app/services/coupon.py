@@ -13,6 +13,12 @@ class CouponService:
     def __init__(self, db: Prisma):
         self.db = db
 
+    async def get_by_id(self, id: int):
+        return await self.db.coupon.find_unique(where={"id": id})
+
+    async def get_by_code(self, code: str):
+        return await self.db.coupon.find_unique(where={"code": code})
+
     async def validate_coupon(
         self,
         code: str,
@@ -119,7 +125,7 @@ class CouponService:
         if cart.wallet_used > 0:
             wallet_used: float = cart.wallet_used
         total: float = cart.subtotal + cart.tax + cart.shipping_fee - discount_amount - wallet_used
-        data: dict[str, float] = {
+        data: dict[str, float | int | str] = {
             "coupon_id": coupon.id,
             "coupon_code": coupon.code,
             "discount_amount": discount_amount,

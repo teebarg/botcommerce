@@ -2,7 +2,7 @@ import type { User } from "@/schemas";
 import { Edit, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { toast } from "sonner";
-import CustomerForm from "./customer-form";
+import CustomerEditForm from "./customer-form";
 import { useDeleteUser, useInvalidateMe } from "@/hooks/useUser";
 import { Button } from "@/components/ui/button";
 import { updateAuthSession } from "@/utils/auth-client";
@@ -65,7 +65,7 @@ const CustomerActions = ({ user }: CustomerActionsProps) => {
                 }
                 onOpenChange={editState.setOpen}
             >
-                <CustomerForm user={user} onClose={editState.close} />
+                <CustomerEditForm user={user} onClose={editState.close} />
             </SheetDrawer>
             <ConfirmDrawer
                 open={deleteState.isOpen}

@@ -37,7 +37,7 @@ class TemplateEngine:
 
     async def _send_abandoned_cart(self, ctx: dict) -> tuple[str, dict]:
         cart = ctx.get("cart", {})
-        email = ctx.get("user_email")
+        email: str = ctx.get("user_email", "")
         email_data = await generate_abandoned_cart_email(
             cart_data=cart,
             user_email=email,
@@ -68,7 +68,7 @@ class TemplateEngine:
         email_data = await generate_payment_receipt(order=order, user=order.user)
         dict_data = {
             "subject": email_data.subject,
-            "recipient": order.user.email,
+            "recipient": order.user.email if order.user else "",
             "cc_list": ctx.get("cc_list")
         }
         return email_data.html_content, dict_data

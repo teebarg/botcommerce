@@ -1,10 +1,10 @@
+import httpx
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends, Response
 from app.core.config import settings
 from app.schemas.payment import PaymentInitialize, PaymentCreate
 from app.models.order import OrderCreate, Order
-from app.core.deps import CurrentUser, Notification
+from app.core.deps import CurrentUser
 from app.models.user import User
-import httpx
 from datetime import datetime
 from app.prisma_client import prisma as db
 from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
@@ -132,7 +132,7 @@ async def verify_payment(response: Response, srv: OrderDep, reference: str, user
 
 
 @router.post("/", dependencies=[Depends(require_user)])
-async def create(srv: OrderDep, create: PaymentCreate, notification: Notification, background_tasks: BackgroundTasks):
+async def create(srv: OrderDep, create: PaymentCreate, background_tasks: BackgroundTasks):
     """
     Create new payment.
     """

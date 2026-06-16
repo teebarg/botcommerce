@@ -37,3 +37,5 @@ def get_interaction_service(evt_bus: EventBus = Depends(get_event_bus)) -> Inter
 ConversationDep = Annotated[ConversationService, Depends(get_conversation_service)]
 SettingsDep = Annotated[ShopSettingsService, Depends(get_shop_settings_service)]
 CatalogDep = Annotated[CatalogService, Depends(get_catalog_service)]
+StorageDep = Annotated[MediaStorageService, Depends(get_storage_service)]
+CouponDep = Annotated[CouponService, Depends(get_coupon_service)]

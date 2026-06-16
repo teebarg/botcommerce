@@ -1,5 +1,8 @@
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+from dataclasses import dataclass
+from typing import Dict, List
+
+from app.models.order import Order
+from app.models.cart import Cart
 
 
 @dataclass
@@ -10,7 +13,7 @@ class BaseNotificationEvent:
 
 @dataclass
 class OrderConfirmedEvent(BaseNotificationEvent):
-    order: Dict
+    order: Order
     user: Dict
     order_link: str
     items_overview: str
@@ -18,7 +21,7 @@ class OrderConfirmedEvent(BaseNotificationEvent):
 
 @dataclass
 class SendAbandonedCartEvent(BaseNotificationEvent):
-    cart: Dict
+    cart: Cart
     user_email: str
     user_name: str
     subscriptions: List[Dict]
@@ -31,5 +34,5 @@ class SendPushNotificationEvent(BaseNotificationEvent):
 
 @dataclass
 class SendInvoiceEvent(BaseNotificationEvent):
-    order: Dict
+    order: Order
     cc_list: List[str]

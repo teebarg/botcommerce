@@ -4,7 +4,6 @@ from fastapi import (
     Depends,
     Query,
     Request,
-    Body,
 )
 from app.prisma_client import prisma as db
 from prisma.enums import Role

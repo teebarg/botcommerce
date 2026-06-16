@@ -33,7 +33,7 @@ function RouteComponent() {
     return (
         <div className="px-2.5 md:px-10 py-4">
             <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold">Manage FAQs</h1>
+                <h1 className="text-xl font-bold">Manage FAQs</h1>
                 <SheetDrawer
                     open={state.isOpen}
                     title="Add New FAQ"
@@ -54,7 +54,7 @@ function RouteComponent() {
                         <CardHeader>
                             <div className="flex items-start justify-between gap-4">
                                 <div className="flex-1 min-w-0">
-                                    <h3 className="text-lg font-semibold leading-tight mb-2">{faq.question}</h3>
+                                    <h3 className="font-semibold leading-tight mb-2">{faq.question}</h3>
                                     <div className="flex items-center gap-3">
                                         {faq.category && (
                                             <Badge variant="accent">
@@ -72,8 +72,8 @@ function RouteComponent() {
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="prose prose-sm max-w-none">
-                                <p className="text-muted-foreground leading-relaxed m-0">{faq.answer}</p>
+                            <div className="max-w-none">
+                                <p className="text-muted-foreground leading-relaxed m-0 text-sm">{faq.answer}</p>
                             </div>
                         </CardContent>
                     </Card>

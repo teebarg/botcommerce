@@ -1,15 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, BackgroundTasks, Cookie, Response
 from typing import Annotated, Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, BackgroundTasks, Cookie, Response
+from prisma.enums import OrderStatus
+
 from app.prisma_client import prisma as db
 from app.models.order import Order, OrderCreate, OrderTimelineEntry, PaginatedOrders, OrderNotesUpdate, ReturnItemPayload
-from prisma.enums import OrderStatus
 from app.core.logging import get_logger
 from app.models.generic import Message
 from app.core.permissions import require_admin
 from app.core.config import settings
 from app.core.deps import CurrentUser, PrincipalDep
-from app.repositories.order import OrderRepository
-from app.core.dependencies.order import OrderDep, get_order_repository
+from app.core.dependencies.order import OrderDep
 from app.services.cache import cacheable
 
 logger = get_logger(__name__)
@@ -24,6 +24,8 @@ async def create_order(
     user: CurrentUser,
     _cart_id: Annotated[str | None, Cookie()] = None
 ) -> Order:
+    if _cart_id is None:
+        raise HTTPException(status_code=400, detail="Please provide cart number")
     try:
         order = await srv.create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=_cart_id)
         response.delete_cookie(
@@ -38,14 +40,14 @@ async def create_order(
 @router.get("/{order_id}")
 @cacheable(key_prefix="order", key_builder=lambda order_id, principal: (
     f"{order_id}:admin" if principal.role == "ADMIN" else f"{order_id}:user:{principal.user_id}"
-))
+), tags=lambda order_id:["order", f"order:{order_id}"])
 async def get_order(
     request: Request,
+    srv: OrderDep,
     order_id: str,
     principal: PrincipalDep,
-    repo: OrderRepository = Depends(get_order_repository)
 ) -> Order:
-    order = await repo.get_by_number(order_number=order_id, include_relations=True)
+    order = await srv.get_by_number(order_number=order_id, include_relations=True)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
@@ -61,8 +63,8 @@ async def get_order(
 @cacheable(key_prefix="orders", tags=["orders"])
 async def get_orders(
     request: Request,
+    srv: OrderDep,
     user: CurrentUser,
-    repo: OrderRepository = Depends(get_order_repository),
     cursor: int | None = None,
     take: int = Query(default=20, le=100),
     status: Optional[OrderStatus] = None,
@@ -72,7 +74,7 @@ async def get_orders(
     end_date: Optional[str] = None,
     customer_id: Optional[int] = None,
 ) -> PaginatedOrders:
-    return await repo.list_paginated(
+    return await srv.list_paginated(
         user_id=user.id,
         cursor=cursor,
         limit=take,
@@ -87,24 +89,19 @@ async def get_orders(
 
 
 @router.delete("/{order_id}", dependencies=[Depends(require_admin)])
-async def delete_order(srv: OrderDep, order_id: int, repo: OrderRepository = Depends(get_order_repository)):
-    order = await repo.get_by_id(order_id=order_id)
+async def delete_order(srv: OrderDep, order_id: int):
+    order = await srv.get_by_id(order_id=order_id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
     await db.order.delete(where={"id": order_id})
-    await srv.cache.invalidate(f"order:{order.order_number}", tags=["orders"])
+    await srv.cache.invalidate(tags=["orders", f"order:{order.order_number}"])
     return {"message": "Order deleted successfully"}
 
 
 @router.patch("/{id}/status", dependencies=[Depends(require_admin)])
-async def order_status(
-    srv: OrderDep,
-    id: int,
-    status: OrderStatus,
-    repo: OrderRepository = Depends(get_order_repository)
-) -> Order:
-    order = await repo.get_by_id(order_id=id)
+async def order_status(srv: OrderDep, id: int, status: OrderStatus) -> Order:
+    order = await srv.get_by_id(order_id=id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     if order.status == status:
@@ -120,7 +117,7 @@ async def order_status(
             logger.error(f"Failed to create order timeline: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
-        await srv.cache.invalidate(f"order-timeline:{id}", f"order:{order.order_number}", tags=["orders"])
+        await srv.cache.invalidate(f"order-timeline:{id}", tags=["orders", f"order:{order.order_number}"])
         return updated_order
 
 
@@ -129,21 +126,20 @@ async def update_order_notes(
     srv: OrderDep,
     order_id: int,
     notes_update: OrderNotesUpdate,
-    user: CurrentUser,
-    repo: OrderRepository = Depends(get_order_repository)
+    user: CurrentUser
 ) -> Order:
-    order = await repo.get_by_id(order_id=order_id)
+    order = await srv.get_by_id(order_id=order_id)
     if not order or order.user_id != user.id:
         raise HTTPException(status_code=404, detail="Order not found")
 
     updated_order = await db.order.update(where={"id": order_id}, data={"order_notes": notes_update.notes})
-    await srv.cache.invalidate(f"order:{order.order_number}", tags=["orders"])
+    await srv.cache.invalidate(tags=["orders", f"order:{order.order_number}"])
     return updated_order
 
 
 @router.get("/{order_id}/timeline", dependencies=[Depends(require_admin)], response_model=list[OrderTimelineEntry])
-async def get_order_timeline(order_id: int, repo: OrderRepository = Depends(get_order_repository)):
-    order = await repo.get_by_id(order_id=order_id)
+async def get_order_timeline(srv: OrderDep, order_id: int):
+    order = await srv.get_by_id(order_id=order_id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 

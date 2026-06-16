@@ -37,8 +37,6 @@ export function InvalidateProvider({ children }: { children: React.ReactNode }) 
                     }
                     return;
                 }
-                console.log("lastMessage........................")
-                console.log(keySegments)
                 queryClient.invalidateQueries({ queryKey: keySegments });
             };
 

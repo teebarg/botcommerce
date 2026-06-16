@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import Request, Depends
+from fastapi import Depends
 from app.redis_client import redis_client
 from app.services.cache import CacheService
 

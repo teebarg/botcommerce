@@ -1,32 +1,26 @@
 from typing import Annotated, Literal, Optional
-
-from app.core.notifications.service import NotificationService
-from app.core.notifications.setup import get_notification_service
+import httpx
 import jwt
+import time
 from fastapi import Depends, HTTPException, status, Cookie
 from fastapi.security import APIKeyHeader, OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 
 from app.core import security
 from app.core.config import settings
 from app.prisma_client import prisma
-from meilisearch import Client as MeilisearchClient
 from app.models.user import UserInternal as User
-from supabase import create_client, Client
-from app.services.redis import get_session
 from app.core.logging import get_logger
-import time
-import httpx
 from jose import jwt as jose_jwt
+from app.core.notifications.service import NotificationService
+from app.core.notifications.setup import get_notification_service
+from app.core.dependencies.cache import CacheDep
 
 logger = get_logger(__name__)
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token"
 )
-
-meilisearch_client = MeilisearchClient(settings.MEILI_HOST, settings.MEILI_MASTER_KEY, timeout=1.5)
-supabase: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
 
 internal_bearer = HTTPBearer(auto_error=False)
 
@@ -110,21 +104,21 @@ async def get_internal_service(
         )
 
 
-async def verify_session(session_id: Annotated[str | None, Cookie()] = None) -> User | None:
+async def verify_session(cache_srv: CacheDep, session_id: Annotated[str | None, Cookie()] = None) -> User | None:
     if not session_id:
         raise HTTPException(401, "Missing session cookie")
 
-    session = await get_session(session_id)
+    session = await cache_srv.get_session(session_id)
     if not session:
         raise HTTPException(401, "Invalid session")
 
     return session
 
-async def get_user(session_id: Annotated[str | None, Cookie()] = None) -> User | None:
+async def get_user(cache_srv: CacheDep, session_id: Annotated[str | None, Cookie()] = None) -> User | None:
     if not session_id:
         return None
 
-    session = await get_session(session_id)
+    session = await cache_srv.get_session(session_id)
     if not session:
         return None
 

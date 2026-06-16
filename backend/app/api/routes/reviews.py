@@ -1,5 +1,6 @@
 import json
 import asyncio
+from typing import Optional
 from fastapi import APIRouter, HTTPException, Depends, HTTPException, Query, BackgroundTasks
 from app.core.deps import CurrentUser
 from app.models.generic import Message
@@ -17,7 +18,7 @@ router = APIRouter()
 
 @router.get("/")
 async def index(
-    product_id: int = None,
+    product_id: Optional[int] = None,
     cursor: str = Query(default=None, description="cursor from previous response"),
     limit: int = Query(default=20, le=100, ge=1),
     sort: str = Query(default="newest")

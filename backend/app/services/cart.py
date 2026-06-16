@@ -13,14 +13,14 @@ logger = get_logger(__name__)
 
 
 class CartService:
-    def __init__(self, db: Prisma, cache: CacheService, settings_service: ShopSettingsService, coupon_service: CouponService):
+    def __init__(self, db: Prisma, cache: CacheService, settings_srv: ShopSettingsService, coupon_srv: CouponService):
         self.db = db
-        self.settings_service = settings_service
-        self.coupon_service = coupon_service
+        self.settings_srv = settings_srv
+        self.coupon_srv = coupon_srv
         self.cache = cache
 
 
-    async def get_active_cart(self, cart_number: Optional[str], user_id: Optional[int], include_relations: bool = False) -> Cart | None:
+    async def get_active_cart(self, cart_number: str | None = None, user_id: int | None = None, include_relations: bool = False) -> Cart | None:
         include_clause = {
             "items": {
                 "order_by": {"created_at": "asc"},
@@ -67,22 +67,22 @@ class CartService:
             if not cart:
                 return
 
-            tax_rate = float(await self.settings_service.get("tax_rate"))
+            tax_rate = float(await self.settings_srv.get("tax_rate"))
             cart_items = await self.db.cartitem.find_many(where={"cart_id": cart.id})
 
             subtotal = sum(item.price * item.quantity for item in cart_items)
             discount_amount = 0.0
 
             if cart.coupon_id:
-                coupon = await self.db.coupon.find_unique(where={"id": cart.coupon_id})
+                coupon = await self.coupon_srv.get_by_id(id=cart.coupon_id)
                 if coupon:
                     try:
-                        await self.coupon_service.validate_coupon(
+                        await self.coupon_srv.validate_coupon(
                             code=coupon.code,
                             cart=cart,
                             user_id=cart.user_id
                         )
-                        discount_amount = await self.coupon_service.calculate_discount(coupon, subtotal)
+                        discount_amount = await self.coupon_srv.calculate_discount(coupon, subtotal)
                     except Exception:
                         discount_amount = 0.0
                         await self.db.cart.update(where={"id": cart.id}, data={"coupon_id": None})

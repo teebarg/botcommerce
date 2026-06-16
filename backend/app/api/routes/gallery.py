@@ -1,5 +1,4 @@
 from typing import Optional
-from app.core.dependencies.gallery import GalleryDep
 from fastapi import APIRouter, HTTPException, Query, BackgroundTasks, Request, Depends
 
 from app.models.generic import Message, ImageBulkDelete
@@ -14,6 +13,7 @@ from app.prisma_client import prisma as db
 from app.services.cache import cacheable
 from app.core.dependencies.cache import CacheDep
 from app.core.dependencies.product import ProductDep
+from app.core.dependencies.gallery import GalleryDep
 
 router = APIRouter()
 

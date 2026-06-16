@@ -36,7 +36,7 @@ class CacheService:
         try:
             return await self.redis.flushdb()
         except Exception as e:
-            logger.error(f"[Cache] Read failure for key '{key}': {e}", exc_info=True)
+            logger.error(f"[Cache] Read failure: {e}", exc_info=True)
             return None
 
     async def get(self, key: str) -> Optional[Any]:
@@ -47,6 +47,16 @@ class CacheService:
         except Exception as e:
             logger.error(f"[Cache] Read failure for key '{key}': {e}", exc_info=True)
             return None
+
+    async def set_session(self, session_id: str, data: dict, ttl=60 * 60 * 24 * 30):
+        await self.redis.setex(f"session:{session_id}", ttl, json.dumps(data))
+
+    async def get_session(self, session_id: str):
+        data = await self.redis.get(f"session:{session_id}")
+        return json.loads(data) if data else None
+
+    async def delete_session(self, session_id: str):
+        await self.redis.delete(f"session:{session_id}")
 
     async def set_with_tags(self, key: str, value: Any, expire: int, tags: list[str] = None) -> None:
         """

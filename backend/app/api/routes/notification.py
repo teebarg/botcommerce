@@ -1,16 +1,16 @@
-from app.core.notifications.events import SendPushNotificationEvent
+from typing import Optional, Literal
+from datetime import datetime
+
 from fastapi import APIRouter, BackgroundTasks
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 
 from app.models.generic import Message
 from app.core.logging import get_logger
-from app.services.redis import redis_client
 from app.prisma_client import prisma as db
 from app.core.deps import Notification, UserDep
-
-from typing import Optional, Literal
-from datetime import datetime
+from app.core.notifications.events import SendPushNotificationEvent
+from app.core.dependencies.cache import CacheDep
 
 class PushEventSchema(BaseModel):
     notificationId: str
@@ -38,16 +38,16 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 @router.post("/push-event")
-async def create_push_event(data: PushEventSchema) -> Message:
+async def create_push_event(cache_srv: CacheDep, data: PushEventSchema) -> Message:
     try:
-        await redis_client.xadd("PUSH_EVENT", jsonable_encoder(data, exclude_none=True))
+        await cache_srv.redis.xadd("PUSH_EVENT", jsonable_encoder(data, exclude_none=True))
     except Exception as e:
         logger.error(f"Error creating push event: {e}")
     return Message(message="success")
 
 @router.post("/push-fcm")
-async def push_fcm(data: FCMIn, user: UserDep) -> Message:
-    await redis_client.xadd("FCM", jsonable_encoder(data, exclude_none=True))
+async def push_fcm(cache_srv: CacheDep, data: FCMIn, user: UserDep) -> Message:
+    await cache_srv.redis.xadd("FCM", jsonable_encoder(data, exclude_none=True))
     try:
         await db.pushsubscription.upsert(
             where={

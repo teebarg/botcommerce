@@ -161,3 +161,10 @@ class SearchService:
         except Exception as e:
             logger.error(f"[Health Check] Meilisearch connection timed out or failed: {e}")
             return False
+
+    def delete_index(self, index_name: str) -> None:
+        """
+        Clear index from a Meilisearch.
+        """
+        client.delete_index(index_name)
+        logger.debug(f"Deleted index {index_name}")

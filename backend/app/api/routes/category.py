@@ -5,7 +5,6 @@ from app.models.category import Category, CategoryCreate, CategoryUpdate, BulkOr
 from app.models.product import CategoryWithProducts
 from app.models.generic import Message, ImageUpload
 from app.core.utils import slugify
-from app.core.storage import upload, delete_image
 from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
@@ -13,6 +12,7 @@ from app.core.permissions import require_admin
 from app.core.dependencies.cache import CacheDep
 from app.services.cache import cacheable
 from app.core.dependencies.product import ProductDep
+from app.core.dependencies.services import StorageDep
 
 logger = get_logger(__name__)
 
@@ -135,7 +135,7 @@ async def delete(id: int, cache: CacheDep) -> Message:
 
 
 @router.patch("/{id}/image", dependencies=[Depends(require_admin)])
-async def add_image(id: int, image_data: ImageUpload, cache: CacheDep) -> Category:
+async def add_image(id: int, image_data: ImageUpload, cache: CacheDep, storage_srv: StorageDep) -> Category:
     """
     Add an image to a category.
     """
@@ -146,7 +146,7 @@ async def add_image(id: int, image_data: ImageUpload, cache: CacheDep) -> Catego
         raise HTTPException(status_code=404, detail="Category not found")
 
     try:
-        image_url = upload(bucket="images", data=image_data)
+        image_url: str = storage_srv.upload(bucket="images", data=image_data)
 
         updated_category = await db.category.update(
             where={"id": id},
@@ -164,7 +164,7 @@ async def add_image(id: int, image_data: ImageUpload, cache: CacheDep) -> Catego
 
 
 @router.delete("/{id}/image", dependencies=[Depends(require_admin)])
-async def delete_image(id: int, cache: CacheDep) -> Message:
+async def delete_image(id: int, cache: CacheDep, storage_srv: StorageDep) -> Message:
     """
     Delete the image of a category.
     """
@@ -179,7 +179,7 @@ async def delete_image(id: int, cache: CacheDep) -> Message:
 
     try:
         file_path = category.image.split("/storage/v1/object/public/images/")[1]
-        delete_image(bucket="images", file_path=file_path)
+        storage_srv.delete_image(bucket="images", file_path=file_path)
 
         await db.category.update(
             where={"id": id},

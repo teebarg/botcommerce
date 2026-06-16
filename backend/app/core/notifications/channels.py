@@ -1,8 +1,10 @@
-from app.core.notifications.utils.push import send_notifications_to_subscribers
 import httpx
 from abc import ABC, abstractmethod
 from app.core.logging import logger
-from app.core.utils import send_email
+from app.core.notifications.utils.push import send_notifications_to_subscribers
+from app.core.config import settings
+from app.core.utils import send_email_brevo
+from app.core.utils import send_email_smtp
 
 
 class NotificationChannel(ABC):
@@ -18,29 +20,36 @@ class EmailChannel(NotificationChannel):
         self.username = username
         self.password = password
 
-
-    async def send(self, recipient: str, message: str, cc_list: list[str] = [], **kwargs) -> bool:
+    async def send(self, recipient: str, message: str, **kwargs) -> bool:
         try:
-            await send_email(
-                email_to=recipient,
-                subject=kwargs.get("subject", "Notification"),
-                html_content=message,
-                cc_list=cc_list,
+            if settings.ENVIRONMENT == "local":
+                await send_email_smtp(
+                    email_to=recipient,
+                    subject=kwargs.get("subject", "Notification"),
+                    html_content=message,
+                    cc_list=kwargs.get("cc_list", [])
+                )
+            else:
+                await send_email_brevo(
+                    email_to=recipient,
+                    subject=kwargs.get("subject", "Notification"),
+                    html_content=message,
+                    cc_list=kwargs.get("cc_list", [])
             )
             return True
         except Exception as e:
             logger.error(f"Email sending failed: {str(e)}")
-            return False
+            raise Exception(f"Email sending failed: {str(e)}")
 
 
 class SlackChannel(NotificationChannel):
     def __init__(self, webhook_url: str):
         self.webhook_url = webhook_url
 
-    async def send(self, recipient: str, message: str, slack_message: dict, **kwargs) -> bool:
+    async def send(self, recipient: str, message: str, **kwargs) -> bool:
         try:
             async with httpx.AsyncClient() as client:
-                response = await client.post(self.webhook_url, json=slack_message, timeout=10)
+                response = await client.post(self.webhook_url, json=kwargs.get("slack_message"), timeout=10)
             return response.status_code == 200
         except Exception as e:
             logger.error(f"slack.send_failed: {str(e)}")
@@ -79,6 +88,7 @@ class PushChannel(NotificationChannel):
     async def send(self, recipient: str, message: str, **kwargs) -> bool:
         try:
             await send_notifications_to_subscribers(subscriptions=kwargs.get("subscriptions", []), notification=kwargs.get("notification", {}))
+            return True
         except Exception as e:
             logger.error(f"Push notification sending failed: {str(e)}")
             return False

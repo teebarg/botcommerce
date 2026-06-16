@@ -1,17 +1,14 @@
-from app.core.dependencies.cart import CartDep
 from typing import Any, Dict, Optional, Annotated
 from datetime import datetime, timedelta, timezone
-from app.services.cache import cacheable
 from fastapi import APIRouter, HTTPException, Request, BackgroundTasks, Depends, Cookie, Response
 from fastapi.responses import JSONResponse
-
+from prisma.enums import CartStatus
+from app.services.cache import cacheable
 from app.prisma_client import prisma as db
 from app.core.deps import Notification, UserDep, CurrentUser
 from app.core.logging import get_logger
 from app.core.permissions import require_admin
 from app.core.config import settings
-from prisma.enums import CartStatus
-
 from app.models.generic import Message
 from app.models.cart import (
     CartUpdate, CartItemCreate, CartItem, Cart, CartLite,
@@ -19,6 +16,7 @@ from app.models.cart import (
 )
 from app.models.abandoned_cart import PaginatedAbandonedCarts
 from app.core.notifications.events import SendAbandonedCartEvent
+from app.core.dependencies.cart import CartDep
 
 logger = get_logger(__name__)
 
@@ -26,7 +24,7 @@ router = APIRouter()
 
 MAX_AGE_SECONDS = 365 * 24 * 60 * 60  # 1 year
 
-def _set_cart_cookie(response: Response, token: str) -> None:
+def _set_cart_cookie(response: Response, token: str | None) -> None:
     response.set_cookie(
         key="_cart_id", value=token, max_age=MAX_AGE_SECONDS, path="/",
         httponly=True, secure=True, samesite="none", domain=settings.COOKIE_DOMAIN,
@@ -35,8 +33,8 @@ def _set_cart_cookie(response: Response, token: str) -> None:
 @router.post("/items", response_model=CartItem)
 async def add_item_to_cart(
     response: Response,
-    srv: CartDep,
     item_in: CartItemCreate,
+    srv: CartDep,
     user: UserDep,
     background_tasks: BackgroundTasks,
     _cart_id: Annotated[str | None, Cookie()] = None
@@ -124,7 +122,7 @@ async def update_cart(
         cart = await srv.create_empty_cart(user_id=user.id if user else None)
 
     async with db.tx() as tx:
-        update_data = {}
+        update_data: Any = {}
         if cart_update.shipping_address:
             if cart_update.shipping_address.id:
                 address = await tx.address.upsert(
@@ -216,7 +214,7 @@ async def remove_wallet(
 
 
 # =====================================================================
-# ABANDONED CART MANAGEMENT
+# ABANDONED CART
 # =====================================================================
 
 @router.get("/abandoned-carts", dependencies=[Depends(require_admin)])

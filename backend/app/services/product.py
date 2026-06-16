@@ -1,4 +1,3 @@
-from app.services.search import SearchService
 import asyncio
 import json
 import base64
@@ -16,57 +15,10 @@ from app.core.logging import get_logger
 from app.core.utils import url_to_list
 from app.models.product import Product
 from prisma.enums import PaymentStatus
-from json import JSONEncoder
-from uuid import UUID
-
-from meilisearch import Client
 from meilisearch.errors import MeilisearchApiError
-from anyio import to_thread
-
-
-client = Client(settings.MEILI_HOST, settings.MEILI_MASTER_KEY)
-
-REQUIRED_FILTERABLES: list[str] = ["id", "category_slugs", "collection_slugs", "name", "max_variant_price", "min_variant_price", "active", "sizes", "colors", "ages", "widths", "lengths", "random_score", "freshness_score"]
-REQUIRED_SORTABLES: list[str] = ["id", "created_at", "max_variant_price", "min_variant_price", "random_score", "freshness_score"]
+from app.services.search import SearchService
 
 logger = get_logger(__name__)
-
-# =====================================================================
-# ROUTE LOGIC SERVICE LAYERS (Clean Architecture)
-# =====================================================================
-
-class CustomEncoder(JSONEncoder):
-    def default(self, o):
-        if isinstance(o, (UUID, datetime)):
-            return str(o)
-        return super().default(o)
-
-def get_or_create_index(index_name: str) -> Any:
-    """
-    Get or create a Meilisearch index.
-    """
-    try:
-        return client.get_index(index_name)
-    except MeilisearchApiError as e:
-        logger.error(f"MeilisearchApiError: {index_name}")
-        error_code = getattr(e, "code", None)
-        if error_code == "index_not_found":
-            index = client.index(index_name)
-            logger.error(f"Index {index_name} not found")
-            create_task = client.create_index(uid=index_name)
-            index.wait_for_task(create_task.task_uid)
-
-            filter_task = index.update_filterable_attributes(REQUIRED_FILTERABLES)
-            index.wait_for_task(filter_task.task_uid)
-
-            sort_task = index.update_sortable_attributes(REQUIRED_SORTABLES)
-            index.wait_for_task(sort_task.task_uid)
-            return index
-    except Exception as e:
-        logger.error(f"Error creating index {index_name}: {e}")
-        client.create_index(index_name)
-        return client.index(index_name)
-
 
 class ProductService:
     def __init__(self, db, redis, search_srv: SearchService, cache_srv: CacheService):

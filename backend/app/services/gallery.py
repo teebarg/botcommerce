@@ -16,11 +16,37 @@ from app.models.product import (
 
 logger = get_logger(__name__)
 
-class GalleryRepository:
-    """Encapsulates all direct database access layers."""
-    def __init__(self, db: Prisma):
-        self.db = db
 
+class GalleryService:
+    """Coordinates Business Domain Logics."""
+    def __init__(self, db: Prisma, websocket_manager, storage_srv: MediaStorageService):
+        self.db = db
+        self.ws_manager = websocket_manager
+        self.storage = storage_srv
+
+    @staticmethod
+    def _build_variant_data(payload) -> dict[str, Any]:
+        data = {}
+        fields = ["size", "color", "width", "length", "age", "price", "old_price"]
+        for field in fields:
+            if getattr(payload, field, None) is not None:
+                data[field] = getattr(payload, field)
+        
+        if getattr(payload, "inventory", None) is not None:
+            data["inventory"] = payload.inventory
+            data["status"] = "IN_STOCK" if payload.inventory > 0 else "OUT_OF_STOCK"
+        return data
+
+    @staticmethod
+    def _build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any]:
+        data: dict[str, Any] = {}
+        if category_ids:
+            data["categories"] = {"connect": [{"id": cid} for cid in category_ids]}
+        if collection_ids:
+            data["collections"] = {"connect": [{"id": cid} for cid in collection_ids]}
+        return data
+
+    
     async def get_paginated_gallery(
         self, cursor: Optional[int], limit: int, sort: str, active: Optional[bool], out_of_stock: bool
     ) -> List[Dict[str, Any]]:
@@ -64,41 +90,10 @@ class GalleryRepository:
         """
         return await self.db.query_raw(query, cursor or cursor_default, limit + 1)
 
-
-class GalleryService:
-    """Coordinates Business Domain Logics."""
-    def __init__(self, repo: GalleryRepository, db: Prisma, websocket_manager, storage_srv: MediaStorageService):
-        self.repo = repo
-        self.db = db
-        self.ws_manager = websocket_manager
-        self.storage = storage_srv
-
-    @staticmethod
-    def _build_variant_data(payload) -> dict[str, Any]:
-        data = {}
-        fields = ["size", "color", "width", "length", "age", "price", "old_price"]
-        for field in fields:
-            if getattr(payload, field, None) is not None:
-                data[field] = getattr(payload, field)
-        
-        if getattr(payload, "inventory", None) is not None:
-            data["inventory"] = payload.inventory
-            data["status"] = "IN_STOCK" if payload.inventory > 0 else "OUT_OF_STOCK"
-        return data
-
-    @staticmethod
-    def _build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any]:
-        data: dict[str, Any] = {}
-        if category_ids:
-            data["categories"] = {"connect": [{"id": cid} for cid in category_ids]}
-        if collection_ids:
-            data["collections"] = {"connect": [{"id": cid} for cid in collection_ids]}
-        return data
-
     async def get_gallery_items(self, **kwargs) -> PaginatedProductImages:
         limit = kwargs.get("limit", 36)
         try:
-            images = await self.repo.get_paginated_gallery(**kwargs)
+            images = await self.get_paginated_gallery(**kwargs)
         except Exception as e:
             logger.error(f"Gallery fetch error: {e}")
             raise HTTPException(status_code=500, detail=str(e))

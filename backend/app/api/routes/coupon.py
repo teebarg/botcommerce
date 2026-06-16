@@ -7,17 +7,16 @@ from app.models.coupon import (
     Coupon,
     PaginatedCoupons, CouponScope, CouponAnalytics
 )
-from app.services.coupon import CouponService
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
 from prisma.errors import PrismaError
 from datetime import datetime, date
 from app.core.permissions import require_admin
 from app.models.generic import Message
-from app.core.dependencies.services import get_coupon_service
 from app.services.cache import cacheable
 from app.core.dependencies.cache import CacheDep
 from app.core.dependencies.cart import CartDep
+from app.core.dependencies.services import CouponDep
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -61,13 +60,12 @@ async def get_coupons(
 
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create_coupon(coupon_data: CouponCreate, cache: CacheDep) -> Coupon:
+async def create_coupon(srv: CouponDep, coupon_data: CouponCreate, cache: CacheDep) -> Coupon:
     """
     Create a new coupon.
     """
     code: str = coupon_data.code.upper()
-
-    existing = await db.coupon.find_unique(where={"code": code})
+    existing = await srv.get_by_code(code=code)
     if existing:
         raise HTTPException(status_code=400, detail="Coupon code already exists")
 
@@ -84,11 +82,11 @@ async def create_coupon(coupon_data: CouponCreate, cache: CacheDep) -> Coupon:
 
 
 @router.patch("/{id}", dependencies=[Depends(require_admin)])
-async def update_coupon(id: int, coupon_data: CouponUpdate, cache: CacheDep) -> Coupon:
+async def update_coupon(id: int, srv: CouponDep, coupon_data: CouponUpdate, cache: CacheDep) -> Coupon:
     """
     Update a coupon.
     """
-    coupon = await db.coupon.find_unique(where={"id": id})
+    coupon = await srv.get_by_id(id=id)
     if not coupon:
         raise HTTPException(status_code=404, detail="Coupon not found")
 
@@ -118,11 +116,11 @@ async def update_coupon(id: int, coupon_data: CouponUpdate, cache: CacheDep) -> 
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete_coupon(id: int, cache: CacheDep):
+async def delete_coupon(id: int, srv: CouponDep, cache: CacheDep):
     """
     Delete a coupon.
     """
-    coupon = await db.coupon.find_unique(where={"id": id})
+    coupon = await srv.get_by_id(id=id)
     if not coupon:
         raise HTTPException(status_code=404, detail="Coupon not found")
 
@@ -138,15 +136,16 @@ async def delete_coupon(id: int, cache: CacheDep):
 @router.post("/apply")
 async def apply_coupon(
     cache: CacheDep,
+    srv: CouponDep,
+    cart_srv: CartDep,
     code: str = Query(..., description="Coupon code to apply"),
     user: CurrentUser = None,
-    srv: CouponService = Depends(get_coupon_service),
     _cart_id: Annotated[str | None, Cookie()] = None
 ) -> Message:
     """
     Apply a coupon to a cart.
     """
-    cart = await cart.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    cart = await cart_srv.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
 
@@ -164,15 +163,15 @@ async def apply_coupon(
 @router.post("/remove", response_model=dict)
 async def remove_coupon(
     cache: CacheDep,
-    cart: CartDep,
+    srv: CouponDep,
+    cart_srv: CartDep,
     user: UserDep = None,
-    srv: CouponService = Depends(get_coupon_service),
     _cart_id: Annotated[str | None, Cookie()] = None
 ) -> Message:
     """
     Remove coupon from cart.
     """
-    cart = await cart.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    cart = await cart_srv.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
 
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
@@ -188,12 +187,12 @@ async def remove_coupon(
 
 
 @router.post("/{id}/assign", dependencies=[Depends(require_admin)])
-async def assign_coupon(id: int, cache: CacheDep, user_ids: List[int]):
+async def assign_coupon(id: int, srv: CouponDep, cache: CacheDep, user_ids: List[int]):
     """
     Share a coupon with specific users.
 
     """
-    coupon = await db.coupon.find_unique(where={"id": id})
+    coupon = await srv.get_by_id(id=id)
     if not coupon:
         raise HTTPException(status_code=404, detail="Coupon not found")
 
@@ -211,11 +210,11 @@ async def assign_coupon(id: int, cache: CacheDep, user_ids: List[int]):
 
 
 @router.patch("/{id}/toggle-status", dependencies=[Depends(require_admin)])
-async def toggle_coupon_status(id: int, cache: CacheDep) -> Coupon:
+async def toggle_coupon_status(id: int, srv: CouponDep, cache: CacheDep) -> Coupon:
     """
     Toggle coupon active status.
     """
-    coupon = await db.coupon.find_unique(where={"id": id})
+    coupon = await srv.get_by_id(id=id)
     if not coupon:
         raise HTTPException(status_code=404, detail="Coupon not found")
 

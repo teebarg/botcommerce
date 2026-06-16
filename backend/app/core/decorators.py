@@ -1,11 +1,12 @@
+import time
 import re
+from fastapi import HTTPException, Request
 from collections.abc import Callable
 from functools import wraps
-
-from fastapi import HTTPException
-
-import time
 from typing import Callable, TypeVar, ParamSpec
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 # Type variables for generic function signatures
 T = TypeVar('T')
@@ -91,10 +92,10 @@ def with_retry(
                 except exceptions as e:
                     last_exception = e
                     if attempt == retries:
-                        logging.error(f"Failed after {retries} retries: {str(e)}")
+                        logger.error(f"Failed after {retries} retries: {str(e)}")
                         raise
 
-                    logging.warning(
+                    logger.warning(
                         f"Database operation failed (attempt {attempt + 1}/{retries + 1}): {str(e)}"
                         f"\nRetrying in {current_delay} seconds..."
                     )
