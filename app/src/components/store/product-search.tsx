@@ -38,13 +38,16 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
         }
     }, []);
 
-    useEffect(() => {
-        localStorage.setItem("searchHistory", JSON.stringify(recentSearches));
-    }, [recentSearches]);
+    const handleSearchSubmit = (newSearchTerm: string) => {
+        if (!newSearchTerm.trim()) return;
 
-    const handleSuggestionClick = (suggestion: string) => {
-        searchState.close();
-        navigate({ to: `/search/${suggestion}` });
+        setRecentSearches((prev) => {
+            const updated = [newSearchTerm, ...prev.filter(i => i !== newSearchTerm)].slice(0, 10);
+            localStorage.setItem("searchHistory", JSON.stringify(updated));
+            return updated;
+        });
+
+        navigate({ to: `/search/${encodeURIComponent(newSearchTerm)}` });
     };
 
     const hasResults = query.trim() && !!data?.products?.length;
@@ -151,7 +154,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                                         <button
                                             key={idx}
                                             className="w-full text-left px-3 py-2 rounded-lg hover:bg-search-hover transition-colors"
-                                            onClick={() => handleSuggestionClick(search)}
+                                            onClick={() => handleSearchSubmit(search)}
                                         >
                                             <span className="text-sm text-foreground">{search}</span>
                                         </button>

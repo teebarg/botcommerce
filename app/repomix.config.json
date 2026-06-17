@@ -1,6 +1,7 @@
 {
     "output": {
-        "filePath": "../frontend-context.md"
+        "filePath": "../frontend-context.xml",
+        "style": "xml"
     },
     "include": [
         "src/**/*.{ts,tsx,js,jsx,mdx}"

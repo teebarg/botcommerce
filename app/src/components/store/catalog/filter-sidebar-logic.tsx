@@ -1,5 +1,4 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -409,7 +408,6 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
                 </CollapsibleContent>
             </Collapsible>
 
-            {/* Age Groups */}
             <Collapsible open={openSections.age} onOpenChange={() => toggleSection("age")}>
                 <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
                     <span className="font-medium">Age Group</span>
@@ -421,7 +419,7 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
                             <div key={age} className="flex items-center space-x-2">
                                 <Checkbox id={`age-${age}`} checked={draft.ages.has(age)} onCheckedChange={() => onToggleAge(age)} />
                                 <Label htmlFor={`age-${age}`} className="text-sm cursor-pointer">
-                                    {age}
+                                    {age}ssss
                                 </Label>
                             </div>
                         ))}
