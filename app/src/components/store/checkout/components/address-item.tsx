@@ -42,7 +42,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
 
         if (savedAddress) {
             updateCartDetails.mutateAsync({
-                shipping_address: omit(savedAddress, ["created_at", "updated_at"]) as any,
+                shipping_address: omit(savedAddress, ["created_at"]) as any,
             });
         }
     };

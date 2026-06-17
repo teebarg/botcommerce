@@ -1,8 +1,8 @@
 import re
 from pydantic import BaseModel, EmailStr, field_validator
-from enum import Enum
 from prisma.enums import PaymentMethod, ShippingMethod
 from typing import Optional
+from enum import Enum
 from datetime import datetime
 from app.models.user import User
 from app.models.product import ProductVariant
@@ -22,7 +22,6 @@ class CartAddress(BaseModel):
     address_2: Optional[str] = None
     state: Optional[str] = None
     phone: Optional[str]
-    is_billing: bool
 
 class CartItemCreate(BaseModel):
     variant_id: int

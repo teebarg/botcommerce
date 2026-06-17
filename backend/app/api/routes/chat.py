@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query, Request, Depends
+from prisma.enums import ConversationStatus
 from app.prisma_client import prisma as db
 from typing import Optional
-from prisma.enums import ConversationStatus
 from app.models.chat import ChatCloseRequest, PaginatedChats, Chat, ChatRequest, ChatHandoffRequest
 from app.models.generic import Message
 from app.services.websocket import manager
@@ -128,12 +128,11 @@ async def index(
         include={"user": True, "messages": True}
     )
     items = chats[:limit]
-
-    return {
+    return PaginatedChats.validate({
         "items": items,
         "next_cursor": items[-1].id if len(chats) > limit else None,
         "limit": limit
-    }
+    })
 
 
 @router.get("/{uid}")

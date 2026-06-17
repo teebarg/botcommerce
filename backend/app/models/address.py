@@ -11,10 +11,11 @@ class Address(BaseModel):
     address_2: str | None
     address_type: AddressType | None
     label: str | None
-    city: str | None
     state: str | None
     phone: str | None
-    is_billing: bool
+
+    class Config:
+        from_attributes = True
 
 
 class AddressCreate(BaseModel):
@@ -24,10 +25,8 @@ class AddressCreate(BaseModel):
     address_2: str | None = Field(default=None, max_length=1255)
     address_type: AddressType | None = Field(default=None)
     label: str | None = Field(default=None, max_length=255)
-    city: str | None = Field(default=None, max_length=255)
     state: str = Field(..., max_length=255)
     phone: str | None = Field(default=None, max_length=20)
-    is_billing: bool = Field(default=False)
 
     @field_validator(
         "first_name",
@@ -43,7 +42,6 @@ class AddressCreate(BaseModel):
     @field_validator(
         "last_name",
         "address_2",
-        "city",
         "label",
         mode="before"
     )
@@ -70,7 +68,6 @@ class AddressUpdate(BaseModel):
     address_2: str | None = Field(default=None, max_length=1255)
     address_type: AddressType | None = Field(default=None)
     label: str | None = Field(default=None, max_length=255)
-    city: str | None = Field(default=None, max_length=255)
     state: str | None = Field(default=None, max_length=255)
     phone: str | None = Field(default=None, max_length=20)
 
@@ -91,7 +88,6 @@ class AddressUpdate(BaseModel):
     @field_validator(
         "last_name",
         "address_2",
-        "city",
         "label",
         mode="before"
     )

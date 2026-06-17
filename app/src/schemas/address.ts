@@ -9,10 +9,8 @@ export const AddressSchema = z.object({
     label: z.string().optional(),
     address_1: z.string(),
     address_2: z.string().optional(),
-    city: z.string().optional(),
     state: z.string(),
     phone: z.string(),
-    is_billing: z.boolean().optional(),
     created_at: z.string().optional(),
 });
 

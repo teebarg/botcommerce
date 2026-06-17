@@ -36,7 +36,6 @@ const CheckoutAddressForm: React.FC<Props> = ({ onClose }) => {
         const payload: CartUpdate = {
             shipping_address: {
                 ...values,
-                is_billing: false,
             },
         };
 

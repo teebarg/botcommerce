@@ -159,7 +159,6 @@ function RouteComponent() {
     if (error) return <ServerError />;
     if (!cart) return <div className="py-24"><EmptyCartMessage /></div>;
 
-    const product_ids = cart.items.map((x: CartItem) => x.variant_id);
     const itemCount = cart.items.reduce((acc: number, item: CartItem) => acc + item.quantity, 0);
 
     return (

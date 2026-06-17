@@ -1,8 +1,8 @@
 from pydantic import BaseModel
+from prisma.enums import ConversationStatus
 from datetime import datetime
 from typing import Optional
-from prisma.enums import ConversationStatus
-from app.models.user import User
+from app.models.user import MiniUser
 
 class ChatMessage(BaseModel):
     id: int
@@ -11,11 +11,14 @@ class ChatMessage(BaseModel):
     metadata: Optional[dict] = None
     timestamp: datetime
 
+    class Config:
+        from_attributes = True
+
 class Chat(BaseModel):
     id: int
     conversation_uuid: str
     user_id: Optional[int] = None
-    user: Optional[User] = None
+    user: Optional[MiniUser] = None
     support_id: Optional[int] = None
     support_name: Optional[str] = None
     status: ConversationStatus
@@ -24,6 +27,9 @@ class Chat(BaseModel):
     human_connected: bool = False
     started_at: datetime
     last_active: datetime
+
+    class Config:
+        from_attributes = True
 
 class PaginatedChats(BaseModel):
     items: list[Chat]

@@ -7,6 +7,9 @@ class Wishlist(BaseModel):
     id: int
     product: Optional[ProductLite] = None
 
+    class Config:
+        from_attributes = True
+
 class WishlistCreate(BaseModel):
     product_id: int
 

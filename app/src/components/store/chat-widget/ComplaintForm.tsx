@@ -122,7 +122,6 @@ const ComplaintForm = ({ onSubmitForm, isLastMessage }: ComplaintFormProps) => {
                 {errors.category && <p className="text-xxs text-destructive pl-1">{errors.category}</p>}
             </div>
 
-            {/* Description */}
             <div className="space-y-1">
                 <div className="relative">
                     <FileText className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-muted-foreground" />
@@ -141,7 +140,6 @@ const ComplaintForm = ({ onSubmitForm, isLastMessage }: ComplaintFormProps) => {
                 {errors.description && <p className="text-xxs text-destructive pl-1">{errors.description}</p>}
             </div>
 
-            {/* Order ID */}
             <div className="space-y-1">
                 <div className="relative">
                     <Package className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />

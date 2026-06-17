@@ -18,6 +18,8 @@ from app.services.search import SearchService
 
 logger = get_logger(__name__)
 
+PRODUCT_ATTRIBUTES: list[str] = ["id", "name", "sku", "image", "slug", "active", "is_new", "status", "variants"]
+
 class ProductService:
     def __init__(self, db, redis, search_srv: SearchService, cache_srv: CacheService):
         self.db = db
@@ -133,7 +135,7 @@ class ProductService:
         top_ids = [pid for pid, _ in recommendation_scores.most_common(10)]
         filter_str = " OR ".join([f"id = {pid}" for pid in top_ids])
 
-        results = self.search_srv.search_index("", {"filter": filter_str, "limit": limit})
+        results = self.search_srv.search_index("", {"filter": filter_str, "limit": limit, "attributesToRetrieve": PRODUCT_ATTRIBUTES})
         return results["hits"]
 
     async def get_discovery_feed(self, **kwargs) -> Dict[str, Any]:
@@ -153,7 +155,7 @@ class ProductService:
         base_filters: list[str] = self._build_search_filters_list(kwargs)
         disable_random_feed: bool = self._has_active_filters(kwargs) or bool(search)
 
-        search_params: Dict[str, Any] = {"limit": limit, "offset": offset, "attributesToRetrieve": ["id", "name", "sku", "image", "slug", "active", "is_new", "status", "variants"]}
+        search_params: Dict[str, Any] = {"limit": limit, "offset": offset, "attributesToRetrieve": PRODUCT_ATTRIBUTES}
         if base_filters:
             search_params["filter"] = " AND ".join(base_filters)
         # search_params["facets"] = ["category_slugs", "sizes", "colors", "ages"]
@@ -204,7 +206,8 @@ class ProductService:
             search_params = {
                 "limit": 6 if col == "trending" else 8,
                 "sort": ["id:desc"],
-                "filter": f'active = true AND collection_slugs = "{col}"'
+                "filter": f'active = true AND collection_slugs = "{col}"',
+                "attributesToRetrieve": PRODUCT_ATTRIBUTES
             }
             try:
                 res = self.search_srv.search_index("", search_params)

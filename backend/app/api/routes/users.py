@@ -201,7 +201,7 @@ async def read_wishlist(request: Request, user: CurrentUser) -> Wishlists:
         order={"created_at": "desc"},
         include={"product": {"include" : {"images": True}}}
     )
-    return {"wishlists": items}
+    return Wishlists.validate({"wishlists": items})
 
 
 @router.post("/wishlist")

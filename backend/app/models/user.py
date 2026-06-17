@@ -1,6 +1,7 @@
 from typing import Optional, Literal, List
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, Field, HttpUrl
+from enum import Enum
 
 class UserBase(BaseModel):
     first_name: Optional[str] = Field(default=None, max_length=255)
@@ -36,6 +37,9 @@ class User(UserBase):
     id: int
     email: EmailStr
 
+    class Config:
+        from_attributes = True
+
 class UserSelf(User):
     wallet_balance: Optional[float] = 0
     created_at: datetime
@@ -67,7 +71,8 @@ class MiniUser(BaseModel):
     first_name: str
     last_name: str
 
-from enum import Enum
+    class Config:
+        from_attributes = True
 
 class UserRole(str, Enum):
     USER = "user"

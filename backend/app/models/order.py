@@ -1,19 +1,21 @@
-from app.models.product import ProductVariant
-from pydantic import BaseModel, EmailStr
 from typing import Optional
-from datetime import datetime
+from pydantic import BaseModel, EmailStr
 from prisma.enums import PaymentMethod, ShippingMethod, OrderStatus, PaymentStatus
+from datetime import datetime
+from app.models.product import ProductVariant
 from app.models.user import MiniUser
 from app.models.address import Address
 
 class OrderItemLite(BaseModel):
     id: int
     name: Optional[str]
-    variant_id: Optional[int]
     variant: Optional[ProductVariant]
     price: float
     quantity: int
     image: Optional[str]
+
+    class Config:
+        from_attributes = True
 
 class OrderItemCreate(BaseModel):
     variant_id: int
@@ -47,6 +49,9 @@ class Order(BaseModel):
     order_notes: Optional[str] = None
     invoice_url: Optional[str] = None
     created_at: datetime
+
+    class Config:
+        from_attributes = True
 
 class PaginatedOrders(BaseModel):
     items: list[Order]

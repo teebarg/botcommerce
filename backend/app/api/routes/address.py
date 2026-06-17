@@ -30,8 +30,7 @@ async def index(request: Request, user: CurrentUser) -> Addresses:
         where={"user_id": user.id},
         order={"created_at": "desc"}
     )
-    address_list = [address.dict() for address in addresses]
-    return {"addresses": address_list}
+    return Addresses.validate({"addresses": addresses})
 
 @router.post("/")
 async def create(

@@ -73,7 +73,7 @@ const OrderItemCard: React.FC<{ orderItem: OrderItem; orderId: number }> = ({ or
             </div>
             <div className="grow">
                 <h3 className="text-sm font-medium">{orderItem.name}</h3>
-                <p className="text-sm text-muted-foreground">SKU: {orderItem.variant_id}</p>
+                <p className="text-sm text-muted-foreground">SKU: {orderItem.variant.id}</p>
                 <div className="mt-1 space-y-2">
                     <div className="flex items-center text-sm text-muted-foreground">
                         <span>Qty: {orderItem.quantity}</span>
@@ -191,7 +191,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                                     <p>Not applicable ({order.shipping_method})</p>
                                 ) : (
                                     <>
-                                        <p>{order.shipping_address?.address_1},</p>
+                                        <p>{order.shipping_address?.address_1}, {order.shipping_address?.address_2}</p>
                                         <p>{order.shipping_address?.state}.</p>
                                     </>
                                 )}

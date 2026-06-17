@@ -1,7 +1,6 @@
 from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, BackgroundTasks, Cookie, Response
 from prisma.enums import OrderStatus
-
 from app.prisma_client import prisma as db
 from app.models.order import Order, OrderCreate, OrderTimelineEntry, PaginatedOrders, OrderNotesUpdate, ReturnItemPayload
 from app.core.logging import get_logger
@@ -52,11 +51,11 @@ async def get_order(
         raise HTTPException(status_code=404, detail="Order not found")
 
     if principal.role == "ADMIN" or principal.type == "service":
-        return order
+        return Order.validate(order)
 
     if order.user_id != principal.user_id:
         raise HTTPException(status_code=403, detail="Forbidden")
-    return order
+    return Order.validate(order)
 
 
 @router.get("/")
@@ -74,7 +73,7 @@ async def get_orders(
     end_date: Optional[str] = None,
     customer_id: Optional[int] = None,
 ) -> PaginatedOrders:
-    return await srv.list_paginated(
+    orders =  await srv.list_paginated(
         user_id=user.id,
         cursor=cursor,
         limit=take,
@@ -86,6 +85,7 @@ async def get_orders(
         user_role=user.role,
         sort=sort or "desc"
     )
+    return PaginatedOrders.validate(orders)
 
 
 @router.delete("/{order_id}", dependencies=[Depends(require_admin)])
