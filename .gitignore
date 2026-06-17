@@ -5,9 +5,6 @@ agent-context.md
 agent/models
 meilisearch-data
 
-# ==============================================================================
-# System & IDE Artifacts
-# ==============================================================================
 .DS_Store
 Thumbs.db
 .vscode/
@@ -15,16 +12,13 @@ Thumbs.db
 *.swp
 *.swo
 
-# ==============================================================================
-# Local Environment Variables & Secrets
-# ==============================================================================
 .env
 .env.local
 *.env.*
 !.env.example
 
 # ==============================================================================
-# TanStack Start App Caches & Dependencies (app/)
+# Frontend
 # ==============================================================================
 app/node_modules/
 app/.output/
@@ -43,7 +37,7 @@ app/dist-ssr
 app/src/routeTree.gen.ts
 
 # ==============================================================================
-# FastAPI Backend Caches & Dependencies (backend/)
+# Backend
 # ==============================================================================
 backend/.venv/
 backend/.uv/
@@ -53,9 +47,6 @@ backend/__pycache__/
 *.pyd
 .uv/
 
-# ==============================================================================
-# Testing & Playwright Artifacts
-# ==============================================================================
 backend/test-results/
 backend/playwright-report/
 backend/.pytest_cache/

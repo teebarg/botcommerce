@@ -1,6 +1,3 @@
-# ==========================================
-# STAGE 1: The Build Environment
-# ==========================================
 FROM beafdocker/fastapi-base:latest AS builder
 
 WORKDIR /app
@@ -35,7 +32,6 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 # Bring over only the compiled virtual environment from the builder
 COPY --from=builder /app/.venv /app/.venv
 
-# Copy your production application source code
 COPY ./app ./app
 
 # Set optimization flags for Python production performance

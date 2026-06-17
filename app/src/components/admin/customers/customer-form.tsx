@@ -25,9 +25,7 @@ const formSchema = z.object({
 });
 
 export default function CustomerEditForm({ user, onClose }: ReviewFormProps) {
-    const { mutate: update, isPending: updateLoading } = useUpdateUser();
-
-    const loading = updateLoading;
+    const { mutate: update, isPending } = useUpdateUser();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -131,7 +129,7 @@ export default function CustomerEditForm({ user, onClose }: ReviewFormProps) {
                     <Button variant="destructive" onClick={() => onClose?.()}>
                         Close
                     </Button>
-                    <Button disabled={loading} isLoading={loading} type="submit">
+                    <Button disabled={isPending} isLoading={isPending} type="submit">
                         {user?.id ? "Update" : "Create"}
                     </Button>
                 </div>

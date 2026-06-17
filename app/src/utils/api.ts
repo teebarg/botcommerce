@@ -56,7 +56,6 @@ async function executeRequest<T>(endpoint: string, options: RequestOptions = {})
         headers: headersInstance,
     });
 
-    // 3. Robust Authentication Redirects
     if (response.status === 403) {
         throw redirect({ to: "/forbidden" });
     }
