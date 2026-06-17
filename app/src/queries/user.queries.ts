@@ -4,19 +4,7 @@ import { getMeFn, getMeTrxnFn } from "@/server/users.server";
 import { getCollectionFn } from "@/server/store.server";
 import { getCatalogFn, getUserAddressesFn } from "@/server/store.server";
 import { api } from "@/utils/api";
-import { Order, PaginatedOrders, PaginatedReview } from "@/schemas";
-
-type FeedParams = {
-    search?: string;
-    categories?: string;
-    collections?: string;
-    min_price?: number;
-    max_price?: number;
-    width?: number;
-    length?: number;
-    sort?: string;
-    show_facets?: boolean;
-};
+import { FeedQuery, Order, PaginatedOrders, PaginatedReview } from "@/schemas";
 
 type CatalogFeedParams = {
     slug: string;
@@ -38,10 +26,10 @@ export const meTxnsQuery = () =>
         queryFn: () => getMeTrxnFn(),
     });
 
-export const productFeedQuery = (params: FeedParams) =>
+export const productFeedQuery = (params: FeedQuery) =>
     queryOptions({
         queryKey: ["products", "list", params],
-        queryFn: () => getProductsFeedFn({ data: { ...params, feed_seed: Number((Math.random() * 0.3).toFixed(2)) } }),
+        queryFn: () => getProductsFeedFn({ data: params }),
     });
 
 export const catalogFeedQuery = (params: CatalogFeedParams) =>

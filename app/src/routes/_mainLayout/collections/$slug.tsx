@@ -1,24 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
-import z from "zod";
 import { seo } from "@/utils/seo";
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import { collectionQuery, productFeedQuery } from "@/queries/user.queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
-
-const FeedQuerySchema = z.object({
-    sort: z.enum(["min_variant_price:asc", "min_variant_price:desc", "id:desc", "created_at:desc"]).optional(),
-    max_price: z.number().optional(),
-    min_price: z.number().optional(),
-    cat_ids: z.string().optional(),
-    sizes: z.string().optional(),
-    colors: z.string().optional(),
-    ages: z.string().optional(),
-    width: z.number().optional(),
-    length: z.number().optional(),
-});
+import { FeedQuerySchema } from "@/schemas";
 
 export const Route = createFileRoute("/_mainLayout/collections/$slug")({
-    validateSearch: FeedQuerySchema,
+    validateSearch: (search: Record<string, unknown>) => {
+        const parsed = FeedQuerySchema.parse(search);
+        if (!parsed.feed_seed) {
+            parsed.feed_seed = Math.floor(Math.random() * 1000) + 1000;
+        }
+        return parsed;
+    },
     beforeLoad: ({ search }) => {
         return {
             search,

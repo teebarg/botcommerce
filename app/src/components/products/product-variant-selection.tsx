@@ -5,7 +5,6 @@ import { cn, currency } from "@/utils";
 import { Badge } from "@/components/ui/badge";
 import { useProductVariant } from "@/hooks/useProductVariant";
 import type { ProductLite, ProductVariantLite } from "@/schemas/product";
-import { motion } from "framer-motion";
 
 interface VariantSelectionProps {
     product: ProductLite;

@@ -165,25 +165,12 @@ export const PaginatedCatalogSchema = PagSchema.extend({
     catalogs: z.array(CatalogSchema),
 });
 
-export const FacetSchema = z.object({
-    category_slugs: z.record(z.string(), z.string()).optional(),
-    sizes: z.record(z.string(), z.string()).optional(),
-    colors: z.record(z.string(), z.string()).optional(),
-    ages: z.record(z.string(), z.string()).optional(),
-    widths: z.record(z.string(), z.string()).optional(),
-    lengths: z.record(z.string(), z.string()).optional(),
-});
-
 export const PaginatedProductSearchSchema = PagSchema.extend({
     products: z.array(ProductSearchSchema),
-    facets: FacetSchema.optional(),
-    suggestions: z.array(z.string()),
 });
 
 export const ProductFeedSchema = z.object({
     products: z.array(ProductSearchSchema),
-    facets: FacetSchema.optional(),
-    suggestions: z.array(z.string()),
     feed_seed: z.number(),
     next_cursor: z.string(),
     limit: z.number(),
@@ -227,6 +214,23 @@ export const CategoriesProductsSchema = z.object({
     products: z.array(ProductSearchSchema),
 });
 
+export const FeedQuerySchema = z.object({
+    search: z.string().optional(),
+    sort: z.enum(["min_variant_price:asc", "min_variant_price:desc", "id:desc", "created_at:desc"]).optional(),
+    cat_ids: z.string().optional(),
+    sizes: z.string().optional(),
+    colors: z.string().optional(),
+    ages: z.string().optional(),
+    width: z.number().optional(),
+    length: z.number().optional(),
+    min_price: z.number().optional(),
+    max_price: z.number().optional(),
+    collections: z.string().optional(),
+    feed_seed: z.number().optional(),
+    cursor: z.string().optional(),
+});
+
+export type FeedQuery = z.infer<typeof FeedQuerySchema>;
 export type CategoriesWithProducts = z.infer<typeof CategoriesProductsSchema>;
 
 export type SearchCategory = z.infer<typeof SearchCategorySchema>;
@@ -239,7 +243,6 @@ export type ProductLite = z.infer<typeof ProductLiteSchema>;
 export type ProductSearch = z.infer<typeof ProductSearchSchema>;
 export type PaginatedProductSearch = z.infer<typeof PaginatedProductSearchSchema>;
 export type ProductFeed = z.infer<typeof ProductFeedSchema>;
-export type Facet = z.infer<typeof FacetSchema>;
 
 export type Category = z.infer<typeof CategorySchema>;
 export type Collection = z.infer<typeof CollectionSchema>;

@@ -1,25 +1,7 @@
 import { api } from "@/utils/api";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { ProductSearch, ProductFeed, ProductLite } from "@/schemas";
-
-export const FeedQuerySchema = z.object({
-    search: z.string().optional(),
-    sort: z.string().optional(),
-    show_facets: z.boolean().optional(),
-    show_suggestions: z.boolean().optional(),
-    cat_ids: z.string().optional(),
-    sizes: z.string().optional(),
-    colors: z.string().optional(),
-    ages: z.string().optional(),
-    width: z.number().optional(),
-    length: z.number().optional(),
-    min_price: z.number().optional(),
-    max_price: z.number().optional(),
-    collections: z.string().optional(),
-    feed_seed: z.number().optional(),
-    cursor: z.string().optional(),
-});
+import { type ProductSearch, type ProductFeed, type ProductLite, FeedQuerySchema } from "@/schemas";
 
 export const RelatedProductSearchSchema = z.object({
     productId: z.number().optional(),

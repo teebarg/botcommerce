@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { Clock, Search, TrendingUp, X } from "lucide-react";
+import { Clock, Search, X } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import { useOverlayTriggerState } from "react-stately";
-import { Button } from "@/components/ui/button";
 import type { ProductSearch } from "@/schemas";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/utils";
@@ -28,7 +27,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
     const inputRef = useRef<HTMLInputElement>(null);
     const searchRef = useRef<HTMLInputElement>(null);
 
-    const { data, isLoading } = useProductSearch({ search: debouncedQuery, limit: 4, show_suggestions: true });
+    const { data, isLoading } = useProductSearch({ search: debouncedQuery, limit: 4 });
     const { data: trendingData } = useProductSearch({ collections: "trending", limit: 4 });
 
     useEffect(() => {
@@ -96,7 +95,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                             </button>
                         )}
                     </div>
-                    <div className="flex-1 overflow-y-auto">
+                    <div className="flex-1 overflow-y-auto bg-card">
                         {isLoading && (
                             <div className="flex items-center justify-center py-8">
                                 <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent" />
@@ -104,28 +103,12 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                         )}
                         {hasResults && (
                             <div className="max-w-8xl mx-auto">
-                                <div className="grid grid-cols-[300px_1fr] min-h-full">
-                                    <div className="border-r p-6 sticky top-20 z-10">
-                                        <h3 className="font-semibold text-sm tracking-wider mb-4">SUGGESTIONS</h3>
-                                        <div className="space-y-2">
-                                            {data?.suggestions?.map((term: string) => (
-                                                <button
-                                                    key={term}
-                                                    className="block w-full text-left text-sm hover:text-primary transition-colors py-1"
-                                                    onClick={() => handleSuggestionClick(term)}
-                                                >
-                                                    {term}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div className="p-6">
-                                        <h3 className="font-semibold text-sm tracking-wider mb-4">PRODUCTS</h3>
-                                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                                            {data?.products?.map((product: ProductSearch) => (
-                                                <ProductCardPLP key={product.id} product={product} />
-                                            ))}
-                                        </div>
+                                <div className="p-4">
+                                    <h3 className="font-semibold text-sm tracking-wider mb-4">PRODUCTS</h3>
+                                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                                        {data?.products?.map((product: ProductSearch) => (
+                                            <ProductCardPLP key={product.id} product={product} />
+                                        ))}
                                     </div>
                                 </div>
                                 <Separator className="my-4" />
@@ -147,24 +130,6 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                         )}
                         {(hasNoResults || !query) && (
                             <div className="py-6 space-y-8 max-w-6xl mx-auto">
-                                <div>
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <TrendingUp className="h-5 w-5" />
-                                        <h3 className="font-semibold text-sm tracking-wider">TRENDING SEARCHES</h3>
-                                    </div>
-                                    <div className="flex flex-wrap gap-2 overflow-x-auto">
-                                        {data?.suggestions?.map((term: string) => (
-                                            <Button
-                                                key={term}
-                                                className="rounded-full font-medium text-xs px-4 py-2 h-auto"
-                                                variant="outline"
-                                                onClick={() => handleSuggestionClick(term)}
-                                            >
-                                                {term}
-                                            </Button>
-                                        ))}
-                                    </div>
-                                </div>
                                 <div>
                                     <h3 className="font-semibold text-sm tracking-wider mb-4">TRENDING PRODUCTS</h3>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

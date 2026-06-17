@@ -1,12 +1,12 @@
-import { FeedParams, useProductFeed } from "@/hooks/useProduct";
-import { ProductFeed, ProductSearch } from "@/schemas";
+import { useProductFeed } from "@/hooks/useProduct";
+import { FeedQuery, ProductFeed, ProductSearch } from "@/schemas";
 import { InfiniteList } from "@/components/InfiniteList";
 import ProductCardPLP from "../products/product-card-plp";
 import NoProductsFound from "../products/no-products";
 
 interface Props {
     initialData?: ProductFeed | null;
-    params?: FeedParams;
+    params?: FeedQuery;
 }
 
 export default function InfiniteFeed({ initialData, params }: Props) {

@@ -15,7 +15,7 @@ This repo previously had a different storefront; the active storefront is **TanS
 ![Architecture Diagram](./architecture.png)
 
 - **HTTP API**: FastAPI serves under **`/api/*`** (config: `backend/app/core/config.py` → `API_V1_STR="/api"`).
-- **Search**: Meilisearch is used for fast catalog queries and faceting.
+- **Search**: Meilisearch is used for fast catalog queries.
 - **Cache/session**: Redis for caching, carts/sessions, and as the Celery broker.
 - **DB**: PostgreSQL is the system of record.
 - **Optional services**: Qdrant / vector search are present in code but not enabled in the default `docker-compose.yml`.

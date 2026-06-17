@@ -1,31 +1,57 @@
 import { useQuery, useMutation, useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { Message, PaginatedProductSearch, ProductFeed, ProductVariant } from "@/schemas";
-import { useState } from "react";
+import type { FeedQuery, Message, PaginatedProductSearch, ProductFeed, ProductVariant } from "@/schemas";
 import { api } from "@/utils/api";
+
+
+export const useProductFeed = (initialData: ProductFeed | null, search?: FeedQuery) => {
+    return useInfiniteQuery<
+        ProductFeed,
+        Error,
+        InfiniteData<ProductFeed>,
+        [string, string, string, FeedQuery],
+        string | null
+    >({
+        queryKey: ["products", "list", "infinite", search ?? {}],
+        queryFn: async ({ pageParam }) => {
+            const res = await api.get<ProductFeed>("/product/feed", {
+                params: {
+                    cursor: pageParam ?? undefined,
+                    feed_seed: initialData?.feed_seed,
+                    ...search
+                },
+            });
+            return res;
+        },
+        getNextPageParam: (lastPage) => {
+            return lastPage.next_cursor ?? null;
+        },
+        initialPageParam: null,
+        staleTime: 1000 * 60 * 30,
+        initialData: initialData
+            ? {
+                pages: [initialData],
+                pageParams: [null],
+            }
+            : undefined,
+        initialDataUpdatedAt: initialData ? Date.now() : undefined,
+    });
+};
 
 type SearchParams = {
     search?: string;
-    categories?: string;
     collections?: string;
-    min_price?: number;
-    max_price?: number;
-    skip?: number;
     limit?: number;
-    sort?: string;
-    show_facets?: boolean;
-    show_suggestions?: boolean;
 };
 
-export type FeedParams = {
-    search?: string;
-    categories?: string;
-    collections?: string;
-    min_price?: number;
-    max_price?: number;
-    sort?: string;
-    show_facets?: boolean;
+export const useProductSearch = (params: SearchParams) => {
+    return useQuery({
+        queryKey: ["products", "search", params],
+        queryFn: async () => await api.get<PaginatedProductSearch>("/product/", { params }),
+        staleTime: 1000 * 60 * 30,
+    });
 };
+
 type UpdateVariantInput = {
     id: number;
     price?: number;
@@ -37,42 +63,6 @@ type UpdateVariantInput = {
     width?: number;
     length?: number;
     age?: string;
-};
-
-export const useProductSearch = (params: SearchParams) => {
-    return useQuery({
-        queryKey: ["products", "search", params],
-        queryFn: async () => await api.get<PaginatedProductSearch>("/product/", { params }),
-        staleTime: 1000 * 60 * 30,
-    });
-};
-
-export const useProductFeed = (initialData: ProductFeed | null, search?: FeedParams) => {
-    const [feedSeed, setFeedSeed] = useState<number | null>(initialData?.feed_seed ?? null);
-    return useInfiniteQuery<ProductFeed, Error, InfiniteData<ProductFeed>, [string, string, string, FeedParams | {}], string | null>({
-        queryKey: ["products", "list", `${feedSeed}` || "", search ?? {}],
-        queryFn: async ({ pageParam }) => {
-            const res = await api.get<ProductFeed>("/product/feed", {
-                params: { cursor: pageParam ?? undefined, feed_seed: feedSeed ?? undefined, ...search },
-            });
-            return res;
-        },
-        getNextPageParam: (lastPage) => {
-            if (!feedSeed && lastPage.feed_seed) {
-                setFeedSeed(lastPage.feed_seed);
-            }
-            return lastPage.next_cursor ?? undefined;
-        },
-        initialPageParam: null,
-        staleTime: 1000 * 60 * 30,
-        initialData: initialData
-            ? {
-                  pages: [initialData],
-                  pageParams: [null],
-              }
-            : undefined,
-        initialDataUpdatedAt: initialData ? Date.now() : undefined,
-    });
 };
 
 export const useUpdateVariant = (showToast = true) => {
