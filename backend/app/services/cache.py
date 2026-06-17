@@ -84,7 +84,7 @@ class CacheService:
         except Exception as e:
             logger.error(f"[Cache] Write failure for key '{key}': {e}", exc_info=True)
 
-    async def invalidate(self, *keys: str, tags: list[str] = None) -> None:
+    async def invalidate(self, *keys: str, tags: list[str] | None = None) -> None:
         """
         Surgically invalidates explicit keys and/or entire tag groups.
         Replaces dangerous, un-indexed O(N) database SCANs with highly efficient O(1) lookups.
@@ -96,9 +96,7 @@ class CacheService:
         tag_list = tags or []
         now = int(time.time())
         valid_keys = [k for k in keys if k and k.strip()]
-        print("valid_keys........................")
-        print(valid_keys)
-        print(tag_list)
+
         invalidated_keys = list(valid_keys)
         invalidated_keys.extend(tag_list)
 
@@ -122,11 +120,7 @@ class CacheService:
                     pipe.zrange(tag_key, 0, -1)
                     _, active_keys = await pipe.execute()
 
-                if active_keys:
-                    # Cast bytes from Redis back to strings if necessary
-                    # decoded_keys = [k.decode('utf-8') if isinstance(k, bytes) else k for k in active_keys]
-                    # invalidated_keys.extend(decoded_keys)
-                    
+                if active_keys:                    
                     async with self.redis.pipeline(transaction=False) as pipe:
                         pipe.delete(*active_keys)
                         pipe.delete(tag_key)
@@ -134,7 +128,6 @@ class CacheService:
             except Exception as e:
                 logger.error(f"[Cache] Tag invalidation failed for tag '{tag}': {e}", exc_info=True)
 
-        # Synchronize cache invalidation downstream to edge clients over WebSockets
         if invalidated_keys:
             await manager.broadcast_to_all(
                 data={"keys": list(set(invalidated_keys))},

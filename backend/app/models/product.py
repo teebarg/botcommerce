@@ -9,6 +9,9 @@ class ProductImage(BaseModel):
     image: Optional[str] = None
     order: int = 1
 
+    class Config:
+        from_attributes = True
+
 class ProductVariant(BaseModel):
     id: int
     sku: str
@@ -21,6 +24,9 @@ class ProductVariant(BaseModel):
     color: Optional[str] = None
     width: Optional[int] = None
     length: Optional[int] = None
+
+    class Config:
+        from_attributes = True
 
 class VariantWithStatus(BaseModel):
     id: Optional[int] = None
@@ -59,6 +65,9 @@ class ProductLite(BaseModel):
     variants: Optional[List[ProductVariant]] = None
     active: Optional[bool] = True
     is_new: Optional[bool] = False
+
+    class Config:
+        from_attributes = True
 
 
 class Product(BaseModel):
@@ -105,25 +114,15 @@ class ProductSearch(BaseModel):
     active: Optional[bool] = True
     is_new: Optional[bool] = False
 
-class Facets(BaseModel):
-    category_slugs: Optional[dict[str, int]] = None
-    sizes: Optional[dict[str, int]] = None
-    colors: Optional[dict[str, int]] = None
-    ages: Optional[dict[str, int]] = None
-
 class FeedProducts(BaseModel):
     products: List[ProductSearch]
-    facets: Facets
     total_count: int
-    suggestions: List[str]
     limit: int
     feed_seed: float | None
     next_cursor: str | None
 
 class SearchProducts(BaseModel):
     products: List[ProductSearch]
-    facets: Facets
-    suggestions: List[str]
     skip: int
     limit: int
     total_count: int

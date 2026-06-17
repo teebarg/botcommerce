@@ -2,9 +2,10 @@ import asyncio
 import json
 import base64
 import random
+import math
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Dict
 from collections import Counter
 from app.services.cache import CacheService, cacheable
 from fastapi import HTTPException, Request
@@ -138,71 +139,67 @@ class ProductService:
         results = self.search_srv.search_index("", {"filter": filter_str, "limit": limit})
         return results["hits"]
 
-    async def get_discovery_feed(self, **kwargs) -> dict:
+    async def get_discovery_feed(self, **kwargs) -> Dict[str, Any]:
         search = kwargs.get("search", "")
         limit = kwargs.get("limit", 20)
-        skip_offset = kwargs.get("skip_offset", 0)
-        cursor = kwargs.get("cursor")
-        feed_seed = kwargs.get("feed_seed") or random.random()
-        show_suggestions = kwargs.get("show_suggestions", False)
-        show_facets = kwargs.get("show_facets", False)
+        cursor = kwargs.get("cursor")  # Expected format: an encoded string of an integer offset
         sort = kwargs.get("sort", "id:desc")
+        
+        # Generate or parse a stable integer seed
+        feed_seed = kwargs.get("feed_seed") or random.randint(1000, 9999)
+        offset = 0
+        if cursor:
+            try:
+                offset = int(self._decode_cursor(cursor))
+            except (ValueError, TypeError):
+                offset = 0
 
         base_filters = self._build_search_filters_list(kwargs)
-        disable_random_feed = self._has_active_filters(kwargs)
+        disable_random_feed = self._has_active_filters(kwargs) or bool(search)
 
-        offset = skip_offset
-        cursor_filter = ""
-        if cursor:
-            c = self._decode_cursor(cursor)
-            if disable_random_feed:
-                offset = c.get("offset", 0)
-            else:
-                cursor_filter = f"(random_score > {c['r']} OR (random_score = {c['r']} AND freshness_score < {c['f']}) OR (random_score = {c['r']} AND freshness_score = {c['f']} AND id > {c['id']}))"
+        search_params: Dict[str, Any] = {"limit": limit, "offset": offset, "attributesToRetrieve": ["id", "name", "sku", "image", "slug", "active", "is_new", "status", "variants"]}
+        if base_filters:
+            search_params["filter"] = " AND ".join(base_filters)
+        # search_params["facets"] = ["category_slugs", "sizes", "colors", "ages"]
 
         try:
-            if not disable_random_feed:
-                filters = " AND ".join(f for f in [f"random_score >= {feed_seed}", cursor_filter, *base_filters] if f)
-                res = self.search_srv.search_index("", {
-                    "limit": limit, "sort": ["random_score:asc", "freshness_score:desc", "id:desc"], "filter": filters
-                })
-                hits = res["hits"]
-                total_count = res["estimatedTotalHits"]
-
-                if len(hits) < limit and not cursor:
-                    wrap_filters = " AND ".join(f for f in [f"random_score < {feed_seed}", *base_filters] if f)
-                    wrap_res = self.search_srv.search_index("", {
-                        "limit": limit - len(hits), "sort": ["random_score:asc", "freshness_score:desc", "id:desc"], "filter": wrap_filters
-                    })
-                    hits.extend(wrap_res["hits"])
-                    total_count += wrap_res["estimatedTotalHits"]
-            else:
-                search_params = {"limit": limit, "offset": offset, "sort": [sort]}
-                if base_filters:
-                    search_params["filter"] = " AND ".join(base_filters)
-                if show_facets:
-                    search_params["facets"] = ["category_slugs", "sizes", "colors", "ages", "widths", "lengths"]
-
+            if disable_random_feed:
+                search_params["sort"] = [sort]
                 res = self.search_srv.search_index(search, search_params)
                 hits = res["hits"]
                 total_count = res["estimatedTotalHits"]
+            else:
+                # Discovery Path: No filters. Fetch a larger pool to shuffle in Python memory.
+                # To handle infinite scroll without duplication, we fetch a safety buffer.
+                buffer_limit = limit * 3  # Fetch 60 items instead of 20
+                search_params["limit"] = buffer_limit
+                search_params["sort"] = ["id:desc"]  # Predictable baseline order
+                
+                res = self.search_srv.search_index("", search_params)
+                raw_hits = res["hits"]
+                total_count = res["estimatedTotalHits"]
+                
+                # Deterministic Python Shuffle using the user's persistent seed
+                rng = random.Random(feed_seed)
+                rng.shuffle(raw_hits)
+                
+                hits = raw_hits[:limit]
 
-            suggestions = []
-            if show_suggestions and search:
-                s_res = self.search_srv.search_index(search, {"limit": 4, "attributesToRetrieve": ["name"], "matchingStrategy": "all"})
-                suggestions = list({h["name"] for h in s_res["hits"] if "name" in h})
-
-        except MeilisearchApiError as e:
+        except Exception as e:
             logger.error(f"Meilisearch cluster error: {e}")
-            raise HTTPException(status_code=502, detail="Search service temporarily unavailable")
+            raise HTTPException(status_code=502, detail="Search service unavailable")
 
         next_cursor = None
-        if hits and total_count > (offset + limit):
-            next_cursor = self._encode_cursor(hits[-1]) if not disable_random_feed else self._encode_offset_cursor(offset + limit)
+        next_offset = offset + len(hits)
+        if next_offset < total_count and len(hits) == limit:
+            next_cursor = self._encode_cursor(str(next_offset))
 
         return {
-            "products": hits, "facets": res.get("facetDistribution", {}), "limit": limit,
-            "total_count": total_count, "feed_seed": feed_seed, "next_cursor": next_cursor, "suggestions": suggestions
+            "products": hits,
+            "limit": limit,
+            "total_count": total_count,
+            "feed_seed": feed_seed,
+            "next_cursor": next_cursor,
         }
 
     async def query_collection_index(self) -> dict:
@@ -218,7 +215,7 @@ class ProductService:
             try:
                 res = self.search_srv.search_index("", search_params)
             except MeilisearchApiError as e:
-                if getattr(e, "code", None) in {"invalid_search_facets", "invalid_search_filter", "invalid_search_sort"}:
+                if getattr(e, "code", None) in {"invalid_search_filter", "invalid_search_sort"}:
                     self.search_srv.ensure_index_ready()
                     res = self.search_srv.search_index("", search_params)
                 else:
@@ -249,26 +246,18 @@ class ProductService:
         if kw.get("length"): filters.append(f"lengths IN [{kw['length']}]")
         return filters
 
-    def _encode_cursor(self, hit: dict) -> str:
-        return base64.urlsafe_b64encode(json.dumps({"r": hit["random_score"], "f": hit["freshness_score"], "id": hit["id"]}).encode()).decode()
+    def _encode_cursor(self, value: str) -> str:
+        """Encodes a plain string value (like an offset integer) into a URL-safe base64 string."""
+        return base64.urlsafe_b64encode(value.encode()).decode()
 
-    def _encode_offset_cursor(self, offset: int) -> str:
-        return base64.urlsafe_b64encode(json.dumps({"offset": offset}).encode()).decode()
-
-    def _decode_cursor(self, cursor: str) -> dict:
-        return json.loads(base64.urlsafe_b64decode(cursor.encode()).decode())
+    def _decode_cursor(self, cursor: str) -> str:
+        """Decodes a URL-safe base64 string back into its original plain string value."""
+        try:
+            return base64.urlsafe_b64decode(cursor.encode()).decode()
+        except Exception:
+            return "0"  # Fallback to safety if a user tampers with the cursor string
 
     def _prepare_product_data_for_indexing(self, product: Product) -> dict:
-        created_at: Any | None = getattr(product, "created_at", None)
-        if created_at:
-            age_hours: int = max(
-                (datetime.now(timezone.utc) - created_at).total_seconds() / 3600,
-                1
-            )
-            freshness_score: float = round(1 / age_hours, 6)
-        else:
-            freshness_score = 0
-
         product_dict: dict = {
             "id": product.id,
             "name": product.name,
@@ -277,8 +266,6 @@ class ProductService:
             "sku": product.sku,
             "active": product.active,
             "is_new": getattr(product, "is_new", False),
-            "random_score": random.random(),
-            "freshness_score": freshness_score,
         }
 
         product_dict["collection_slugs"] = [c.slug for c in (product.collections or [])]

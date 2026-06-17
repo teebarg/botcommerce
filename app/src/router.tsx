@@ -39,6 +39,7 @@ export const getRouter = () => {
             userId: null,
         },
         defaultPreload: "intent",
+        defaultPreloadDelay: 50,
         defaultErrorComponent: DefaultCatchBoundary,
         defaultNotFoundComponent: () => <NotFound />,
         Wrap: (props: { children: React.ReactNode }) => {

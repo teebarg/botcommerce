@@ -56,51 +56,40 @@ async def feed(
     sizes: str = Query(default=""), colors: str = Query(default=""), ages: str = Query(default=""),
     width: str = Query(default=""), length: str = Query(default=""),
     limit: int = Query(default=20, le=100), active: bool = Query(default=True),
-    show_suggestions: bool = Query(default=False), show_facets: bool = Query(default=False),
-    feed_seed: Optional[float] = Query(default=None), cursor: Optional[str] = Query(default=None),
+    feed_seed: Optional[int] = Query(default=None), cursor: Optional[str] = Query(default=None),
 ) -> FeedProducts:
     return await srv.get_discovery_feed(
         search=search, sort=sort, cat_ids=cat_ids, collections=collections,
         max_price=max_price, min_price=min_price, sizes=sizes, colors=colors,
         ages=ages, width=width, length=length, limit=limit, active=active,
-        show_suggestions=show_suggestions, show_facets=show_facets, feed_seed=feed_seed, cursor=cursor
+        feed_seed=feed_seed, cursor=cursor
     )
 
 
 @router.get("/index-products")
 @cacheable(key_prefix="products", key_builder="collections", tags=["products"])
-async def get_index_products(
-    request: Request,
-    srv: ProductDep,
-) -> IndexProducts:
+async def get_index_products(request: Request, srv: ProductDep) -> IndexProducts:
     return await srv.query_collection_index()
 
 
 @router.get("/")
 @cacheable(key_prefix="products:search", tags=["products"])
 async def search(
-    request: Request, srv: ProductDep, search: str = "", sort: str = "id:desc",
-    cat_ids: str = Query(default=""), collections: str = Query(default=""),
-    max_price: int = Query(default=50000, gt=0), min_price: int = Query(default=1, gt=0),
-    sizes: str = Query(default=""), colors: str = Query(default=""), ages: str = Query(default=""),
-    width: str = Query(default=""), length: str = Query(default=""),
-    skip: int = Query(default=0, ge=0), limit: int = Query(default=20, le=100), active: bool = Query(default=True),
-    show_suggestions: bool = Query(default=False), show_facets: bool = Query(default=False),
+    request: Request, srv: ProductDep, search: str = "",
+    collections: str = Query(default=""),
+    skip: int = Query(default=0, ge=0), limit: int = Query(default=20, le=100),
 ) -> SearchProducts:
     res = await srv.get_discovery_feed(
-        search=search, sort=sort, cat_ids=cat_ids, collections=collections,
-        max_price=max_price, min_price=min_price, sizes=sizes, colors=colors,
-        ages=ages, width=width, length=length, limit=limit, active=active,
-        show_suggestions=show_suggestions, show_facets=show_facets, cursor=None, skip_offset=skip
+        search=search, sort="id:desc", collections=collections,
+        limit=limit, cursor=None, skip_offset=skip
     )
 
     total_count = res["total_count"]
     total_pages = (total_count // limit) + (total_count % limit > 0)
 
     return {
-        "products": res["products"], "facets": res["facets"], "skip": skip,
-        "limit": limit, "total_count": total_count, "total_pages": total_pages,
-        "suggestions": res["suggestions"]
+        "products": res["products"], "skip": skip,
+        "limit": limit, "total_count": total_count, "total_pages": total_pages
     }
 
 
@@ -115,13 +104,15 @@ async def read(request: Request, slug: str, srv: ProductDep) -> ProductLite:
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
+    new_product = ProductLite.validate(product)
+    
     async with srv.redis.pipeline(transaction=False) as pipe:
-        pipe.setex(cache_key, DEFAULT_EXPIRATION, json.dumps(product, cls=EnhancedJSONEncoder))
+        pipe.setex(cache_key, DEFAULT_EXPIRATION, json.dumps(new_product, cls=EnhancedJSONEncoder))
         pipe.sadd(f"tag:product:{product.id}", cache_key)
         pipe.expire(f"tag:product:{product.id}", DEFAULT_EXPIRATION)
         await pipe.execute()
 
-    return product
+    return new_product
 
 
 @router.put("/variants/{variant_id}", dependencies=[Depends(require_admin)])
