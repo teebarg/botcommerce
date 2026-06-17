@@ -139,10 +139,9 @@ class ProductService:
     async def get_discovery_feed(self, **kwargs) -> Dict[str, Any]:
         search = kwargs.get("search", "")
         limit = kwargs.get("limit", 20)
-        cursor = kwargs.get("cursor")  # Expected format: an encoded string of an integer offset
+        cursor = kwargs.get("cursor")
         sort = kwargs.get("sort", "id:desc")
         
-        # Generate or parse a stable integer seed
         feed_seed = kwargs.get("feed_seed") or random.randint(1000, 9999)
         offset = 0
         if cursor:
@@ -151,8 +150,8 @@ class ProductService:
             except (ValueError, TypeError):
                 offset = 0
 
-        base_filters = self._build_search_filters_list(kwargs)
-        disable_random_feed = self._has_active_filters(kwargs) or bool(search)
+        base_filters: list[str] = self._build_search_filters_list(kwargs)
+        disable_random_feed: bool = self._has_active_filters(kwargs) or bool(search)
 
         search_params: Dict[str, Any] = {"limit": limit, "offset": offset, "attributesToRetrieve": ["id", "name", "sku", "image", "slug", "active", "is_new", "status", "variants"]}
         if base_filters:
@@ -166,7 +165,6 @@ class ProductService:
                 hits = res["hits"]
                 total_count = res["estimatedTotalHits"]
             else:
-                # Discovery Path: No filters. Fetch a larger pool to shuffle in Python memory.
                 buffer_limit = limit * 3
                 search_params["limit"] = buffer_limit
                 search_params["sort"] = ["id:desc"]
@@ -251,7 +249,7 @@ class ProductService:
         try:
             return base64.urlsafe_b64decode(cursor.encode()).decode()
         except Exception:
-            return "0"  # Fallback to safety if a user tampers with the cursor string
+            return "0"
 
     def _prepare_product_data_for_indexing(self, product: Product) -> dict:
         product_dict: dict = {
