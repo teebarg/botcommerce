@@ -216,7 +216,6 @@ export const CategoriesProductsSchema = z.object({
 
 export const FeedQuerySchema = z.object({
     search: z.string().optional(),
-    // sort: z.string().optional(),
     sort: z.enum(["min_variant_price:asc", "min_variant_price:desc", "id:desc", "created_at:desc"]).optional(),
     cat_ids: z.string().optional(),
     sizes: z.string().optional(),

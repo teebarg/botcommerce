@@ -1,10 +1,7 @@
 import asyncio
-import json
 import base64
 import random
-import math
 import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
 from typing import List, Optional, Any, Dict
 from collections import Counter
 from app.services.cache import CacheService, cacheable
@@ -170,10 +167,9 @@ class ProductService:
                 total_count = res["estimatedTotalHits"]
             else:
                 # Discovery Path: No filters. Fetch a larger pool to shuffle in Python memory.
-                # To handle infinite scroll without duplication, we fetch a safety buffer.
-                buffer_limit = limit * 3  # Fetch 60 items instead of 20
+                buffer_limit = limit * 3
                 search_params["limit"] = buffer_limit
-                search_params["sort"] = ["id:desc"]  # Predictable baseline order
+                search_params["sort"] = ["id:desc"]
                 
                 res = self.search_srv.search_index("", search_params)
                 raw_hits = res["hits"]
@@ -221,7 +217,7 @@ class ProductService:
                 else:
                     raise HTTPException(status_code=502, detail="Search service communication error")
 
-            key_name = "arrival" if col == "new-arrivals" else col
+            key_name: str = "arrival" if col == "new-arrivals" else col
             result[key_name] = res["hits"]
         return result
 
@@ -362,9 +358,7 @@ class ProductService:
 
                 documents = [self._prepare_product_data_for_indexing(p) for p in products]
                 await self.search_srv.add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
-                key=",".join(f"product:{id}" for id in product_ids)
-                print("invalidating cache..................")
-                print(key)
+                key: str=",".join(f"product:{id}" for id in product_ids)
                 await self.cache_srv.invalidate(key, tags=["products", "catalog"])
                 logger.debug(f"Successfully targeted indexed {len(documents)} products")
                 return
