@@ -20,8 +20,8 @@ def get_storage_service() -> MediaStorageService:
 def get_shop_settings_service() -> ShopSettingsService:
     return ShopSettingsService(redis=redis_client, db=db)
 
-def get_catalog_service(cache: CacheDep) -> CatalogService:
-    return CatalogService(db=db, cache=cache)
+def get_catalog_service(cache_srv: CacheDep) -> CatalogService:
+    return CatalogService(db=db, cache_srv=cache_srv)
 
 def get_conversation_service():
     return ConversationService()

@@ -95,7 +95,7 @@ async def delete_order(srv: OrderDep, order_id: int):
         raise HTTPException(status_code=404, detail="Order not found")
 
     await db.order.delete(where={"id": order_id})
-    await srv.cache.invalidate(tags=["orders", f"order:{order.order_number}"])
+    await srv.cache_srv.invalidate(tags=["orders", f"order:{order.order_number}"])
     return {"message": "Order deleted successfully"}
 
 
@@ -117,7 +117,7 @@ async def order_status(srv: OrderDep, id: int, status: OrderStatus) -> Order:
             logger.error(f"Failed to create order timeline: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
-        await srv.cache.invalidate(f"order-timeline:{id}", tags=["orders", f"order:{order.order_number}"])
+        await srv.cache_srv.invalidate(f"order-timeline:{id}", tags=["orders", f"order:{order.order_number}"])
         return updated_order
 
 
@@ -133,7 +133,7 @@ async def update_order_notes(
         raise HTTPException(status_code=404, detail="Order not found")
 
     updated_order = await db.order.update(where={"id": order_id}, data={"order_notes": notes_update.notes})
-    await srv.cache.invalidate(tags=["orders", f"order:{order.order_number}"])
+    await srv.cache_srv.invalidate(tags=["orders", f"order:{order.order_number}"])
     return updated_order
 
 

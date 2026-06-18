@@ -29,7 +29,7 @@ class OrderService:
         settings_srv: ShopSettingsService,
         notification_dispatcher: Notification,
         event_bus: EventBus,
-        cache: CacheService,
+        cache_srv: CacheService,
         storage_srv: MediaStorageService
     ):
         self.db = db
@@ -39,7 +39,7 @@ class OrderService:
         self.settings_srv = settings_srv
         self.notification_srv = notification_dispatcher
         self.event_bus = event_bus
-        self.cache = cache
+        self.cache_srv = cache_srv
         self.storage_srv = storage_srv
 
     async def get_by_number(self, order_number: str, include_relations: bool = True) -> Any:
@@ -144,7 +144,7 @@ class OrderService:
                         "variant": {"connect": {"id": item.variant_id}},
                         "quantity": item.quantity,
                         "price": item.price
-                    } for item in cart.items
+                    } for item in cart.items or []
                 ]
             }
         }
@@ -172,7 +172,7 @@ class OrderService:
         if order_in.payment_status == "SUCCESS":
             await self.event_bus.publish_order_event(order=new_order, event_type="ORDER_PAID")
 
-        await self.cache.invalidate(tags=["orders"])
+        await self.cache_srv.invalidate(tags=["orders"])
 
         return new_order
 
@@ -228,7 +228,7 @@ class OrderService:
 
             public_url = self.storage_srv.get_public_url(bucket="invoices", filename=filename)
             await self.db.order.update(where={"id": order_id}, data={"invoice_url": public_url})
-            await self.cache.invalidate(f"order:{order_id}", tags=["orders"])
+            await self.cache_srv.invalidate(f"order:{order_id}", tags=["orders"])
             return public_url
         except Exception as e:
             raise Exception(str(e))
@@ -257,7 +257,7 @@ class OrderService:
                 if out_of_stock:
                     out_of_stock_variants.append(variant)
 
-            await self.cache.invalidate(tags=["gallery"])
+            await self.cache_srv.invalidate(tags=["gallery"])
         except Exception as e:
             logger.error(f"Failed to decrement variant inventory for order {order.id}: {e}")
             raise Exception("Failed to decrement variant inventory for order")
@@ -271,7 +271,7 @@ class OrderService:
                     channel_name="slack",
                     slack_message={"text": slack_text}
                 )
-                await self.cache.invalidate(tags=["orders"])
+                await self.cache_srv.invalidate(tags=["orders"])
             except Exception as e:
                 logger.error(f"Failed to send out-of-stock slack: {e}")
 
@@ -381,7 +381,7 @@ class OrderService:
 
         async def invalidate_caches() -> None:
             try:
-                await self.cache.invalidate(f"order:{order_id}", f"order-timeline:{order_id}", tags=["orders"])
+                await self.cache_srv.invalidate(f"order:{order_id}", f"order-timeline:{order_id}", tags=["orders", f"wallet:{order.user.id}"])
                 if order_item.variant and order_item.variant.product_id:
                     await self.product_srv.invalidate(id=order_item.variant.product_id)
             except Exception as e:
@@ -390,7 +390,7 @@ class OrderService:
         background_tasks.add_task(invalidate_caches)
         return {"message": "Item returned successfully"}
 
-    async def process_referral(self, order: Any) -> None:
+    async def process_referral(self, order: Order) -> None:
         if not order.coupon_code:
             return
 

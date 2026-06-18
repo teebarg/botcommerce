@@ -1,18 +1,15 @@
 from typing import Optional
-from app.services.cache import cacheable
+from datetime import datetime
 from fastapi import APIRouter, Depends, Request, Query
 from pydantic import BaseModel
+from prisma.enums import WalletTransactionType
 from app.prisma_client import prisma as db
 from app.core.deps import  CurrentUser
-from app.models.user import User
-from datetime import datetime
-from prisma.enums import WalletTransactionType
 from app.core.permissions import require_admin
+from app.services.cache import cacheable
 
 class WalletTxn(BaseModel):
     id: str
-    user_id: int
-    user: User
     amount: float
     type: WalletTransactionType
     reference_code: Optional[str] = None
@@ -27,7 +24,7 @@ class PaginatedWalletTxns(BaseModel):
 router = APIRouter()
 
 @router.get("/", dependencies=[Depends(require_admin)])
-@cacheable(key_prefix="wallet", tags=["wallet"])
+@cacheable(key_prefix="wallets", tags=["wallets"])
 async def index(
     request: Request,
     query: str = "",
@@ -65,7 +62,7 @@ async def index(
 
 
 @router.get("/me")
-@cacheable(key_prefix="wallet", tags=["wallet-me"])
+@cacheable(key_prefix="wallet", tags=lambda user: [f"wallet:{user.id}"])
 async def self_txns(
     request: Request,
     user: CurrentUser,
@@ -77,7 +74,6 @@ async def self_txns(
     """
     transactions = await db.wallettransaction.find_many(
         where={"user_id": user.id},
-        include={"user": True},
         order={"created_at": "desc"},
         take=limit + 1,
         skip=1 if cursor else 0,

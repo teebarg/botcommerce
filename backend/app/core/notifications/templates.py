@@ -11,26 +11,69 @@ class TemplateEngine:
             )
         return await getattr(self, method)(context)
 
-
     async def _order_confirmed(self, ctx: dict) -> tuple[str, dict]:
         order = ctx.get("order")
         user = ctx.get("user")
         email = user.email
         email_data = await generate_invoice_email(order=order, user=user)
+
+        items_raw = ctx.get('items_overview', 'No items specified')
+        
+        # Map a hex color or border look based on payment status
+        is_paid = getattr(order, "payment_status", "").lower() == "paid"
+        status_color = "#2eb886" if is_paid else "#ecefc6" 
+        status_emoji = "✅ Paid" if is_paid else f"⏳ {order.payment_status}"
+
         dict_data = {
             "subject": email_data.subject,
             "recipient": email,
             "cc_list": ctx.get("cc_list"),
             "slack_message": {
-                "text": (
-                    f"🛍️ *New Order Created* 🛍️\n"
-                    f"*Order:* <{ctx.get('order_link')}|{order.order_number}>\n"
-                    f"*Customer:* {user.first_name} {user.last_name}\n"
-                    f"*Email:* {email}\n"
-                    f"*Amount:* {order.total}\n"
-                    f"*Payment Status:* {order.payment_status}\n"
-                    f"*Items:*\n{ctx.get('items_overview')}\n"
-                ),
+                # Fallback text required by Slack notifications/popups
+                "text": f"🛍️ New Order {order.order_number} confirmed!",
+                "attachments": [
+                    {
+                        "color": status_color,
+                        "blocks": [
+                            {
+                                "type": "header",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "🛍️ New Order Confirmed",
+                                    "emoji": True
+                                }
+                            },
+                            {
+                                "type": "section",
+                                "fields": [
+                                    {"type": "mrkdwn", "text": f"*Order Link:*\n<{ctx.get('order_link')}|#{order.order_number}>"},
+                                    {"type": "mrkdwn", "text": f"*Total Amount:*\n*₦{order.total}*"}
+                                ]
+                            },
+                            {
+                                "type": "section",
+                                "fields": [
+                                    {"type": "mrkdwn", "text": f"*Customer:*\n{user.first_name} {user.last_name}"},
+                                    {"type": "mrkdwn", "text": f"*Payment Status:*\n{status_emoji}"}
+                                ]
+                            },
+                            {
+                                "type": "section",
+                                "fields": [
+                                    {"type": "mrkdwn", "text": f"*Email:*\n{email}"}
+                                ]
+                            },
+                            {"type": "divider"},
+                            {
+                                "type": "section",
+                                "text": {
+                                    "type": "mrkdwn",
+                                    "text": f"*Items Purchased:*\n```{items_raw}```"
+                                }
+                            }
+                        ]
+                    }
+                ]
             }
         }
         return email_data.html_content, dict_data

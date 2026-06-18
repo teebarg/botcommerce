@@ -82,6 +82,9 @@ class Product(BaseModel):
     active: Optional[bool] = True
     is_new: Optional[bool] = False
 
+    class Config:
+        from_attributes = True
+
 class SearchCategory(BaseModel):
     id: int
     name: Optional[str] = None

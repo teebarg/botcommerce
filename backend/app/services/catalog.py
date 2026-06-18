@@ -5,9 +5,9 @@ from app.services.cache import CacheService
 
 
 class CatalogService:
-    def __init__(self, db, cache: CacheService):
+    def __init__(self, db, cache_srv: CacheService):
         self.db = db
-        self.cache = cache
+        self.cache_srv = cache_srv
 
     async def track_visit(
         self,
@@ -125,4 +125,4 @@ class CatalogService:
         tags = ["catalogs"]
         if slug:
             tags.append(f"catalog:{slug}")
-        await self.cache.invalidate(tags=tags)
+        await self.cache_srv.invalidate(tags=tags)

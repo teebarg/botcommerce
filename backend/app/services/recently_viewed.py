@@ -8,9 +8,9 @@ from app.services.cache import CacheService
 logger = get_logger(__name__)
 
 class RecentlyViewedService:
-    def __init__(self, cache: CacheService, search_srv: SearchService):
+    def __init__(self, cache_srv: CacheService, search_srv: SearchService):
         self.max_items = 12
-        self.cache = cache
+        self.cache_srv = cache_srv
         self.search_srv = search_srv
 
     async def get_key(self, user_id: int) -> str:
@@ -26,7 +26,7 @@ class RecentlyViewedService:
 
         await redis_client.zremrangebyrank(key, 0, -(self.max_items + 1))
 
-        await self.cache.invalidate(f"products:recently-viewed:{user_id}")
+        await self.cache_srv.invalidate(f"products:recently-viewed:{user_id}")
 
     async def remove_product_from_all(self, product_id: int):
         """Remove a product from all users' recently viewed list"""
@@ -35,7 +35,7 @@ class RecentlyViewedService:
             for key in keys:
                 await redis_client.zrem(key, str(product_id))
 
-            await self.cache.invalidate(tags=["products:recently-viewed"])
+            await self.cache_srv.invalidate(tags=["products:recently-viewed"])
         except Exception as e:
             logger.error(f"Error removing product from recently viewed list: {str(e)}")
 

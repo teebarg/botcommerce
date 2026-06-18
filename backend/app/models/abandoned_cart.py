@@ -22,11 +22,11 @@ class UserSchema(BaseModel):
     class Config:
         from_attributes = True
 
-class CleanCartSchema(BaseModel):
+class AbandonedCartSchema(BaseModel):
     id: int
-    user_id: Optional[int]
     user: Optional[UserSchema]
-    cart_number: Optional[str]
+    email: Optional[str]
+    cart_number: str
     status: Optional[CartStatus]
     items: Optional[list[CartItemSchema]] = []
     total: float = 0
@@ -39,6 +39,6 @@ class CleanCartSchema(BaseModel):
         from_attributes = True
 
 class PaginatedAbandonedCarts(BaseModel):
-    items: List[CleanCartSchema]
+    items: List[AbandonedCartSchema]
     next_cursor: Optional[int] = None
     limit: int

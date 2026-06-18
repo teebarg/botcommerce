@@ -4,7 +4,6 @@ from prisma.enums import PaymentMethod, ShippingMethod
 from typing import Optional
 from enum import Enum
 from datetime import datetime
-from app.models.user import User
 from app.models.product import ProductVariant
 
 class CartStatus(str, Enum):
@@ -73,8 +72,6 @@ class CartItem(CartItemBase):
 
 class Cart(BaseModel):
     id: int
-    user_id: Optional[int]
-    user: Optional[User]
     cart_number: Optional[str]
     email: Optional[str]
     phone: Optional[str]

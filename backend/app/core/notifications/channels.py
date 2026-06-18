@@ -48,8 +48,17 @@ class SlackChannel(NotificationChannel):
 
     async def send(self, recipient: str, message: str, **kwargs) -> bool:
         try:
+            slack_payload = kwargs.get("slack_message")
+            if not slack_payload:
+                slack_payload = {"text": message}
+
             async with httpx.AsyncClient() as client:
-                response = await client.post(self.webhook_url, json=kwargs.get("slack_message"), timeout=10)
+                response = await client.post(
+                    self.webhook_url, 
+                    json=slack_payload, 
+                    headers={"Content-Type": "application/json"},
+                    timeout=10
+                )
             return response.status_code == 200
         except Exception as e:
             logger.error(f"slack.send_failed: {str(e)}")

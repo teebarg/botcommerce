@@ -277,7 +277,7 @@ class RedisStreamConsumer:
         try:
             if event["view_type"] == "VIEW":
                 recent_service = RecentlyViewedService(
-                    cache=cache_srv, search_srv=search_srv
+                    cache_srv=cache_srv, search_srv=search_srv
                 )
                 await recent_service.add_product(
                     user_id=int(event["user_id"]), product_id=int(event["product_id"])

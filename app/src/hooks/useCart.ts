@@ -132,6 +132,7 @@ export const useCompleteCart = () => {
         mutationFn: async (complete: CartComplete) => await api.post<Order>("/order/", complete),
         onSuccess: async (data) => {
             navigate({ to: `/order/confirmed/${data?.order_number}`, replace: true });
+            document.cookie = "cookie_name=_cart_id; max-age=0; path=/;";
             queryClient.invalidateQueries({ queryKey: ["cart"] });
         },
         onError: (error: any) => {

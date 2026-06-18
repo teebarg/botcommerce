@@ -20,10 +20,11 @@ export const meQuery = () =>
         queryFn: () => getMeFn(),
     });
 
-export const meTxnsQuery = () =>
+export const meTxnsQuery = (userId: string | null) =>
     queryOptions({
-        queryKey: ["wallet"],
+        queryKey: ["wallet", userId?.toString()],
         queryFn: () => getMeTrxnFn(),
+        enabled: Boolean(userId)
     });
 
 export const productFeedQuery = (params: FeedQuery) =>

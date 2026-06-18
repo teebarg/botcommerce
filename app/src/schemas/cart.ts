@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import {
     ShippingMethodSchema,
     PaymentMethodSchema,
@@ -12,8 +11,8 @@ import {
 } from "./enums";
 import { ProductVariantLiteSchema } from "./product";
 import { type Address, AddressSchema } from "./address";
-import { UserMiniSchema } from "./user";
 import { CursorSchema } from "./common";
+import { UserMiniSchema } from "./user";
 
 export const CartItemSchema = z
     .object({
@@ -31,8 +30,6 @@ export const CartSchema = z
     .object({
         id: z.number(),
         cart_number: z.string(),
-        user_id: z.number().optional(),
-        user: UserMiniSchema.optional(),
         email: z.string().email().optional(),
         phone: z
             .string()
@@ -56,12 +53,29 @@ export const CartSchema = z
         created_at: z.string(),
     });
 
+export const AbandonedCartSchema = z
+    .object({
+        id: z.number(),
+        user: UserMiniSchema.optional(),
+        email: z.string().email().optional(),
+        cart_number: z.string(),
+        status: CartStatusSchema,
+        items: z.array(CartItemSchema),
+        total: z.number(),
+        subtotal: z.number(),
+        tax: z.number(),
+        shipping_fee: z.number(),
+        wallet_used: z.number(),
+        created_at: z.string(),
+    });
+
 export const PaginatedAbandonedCartsSchema = CursorSchema.extend({
-    items: z.array(CartSchema),
+    items: z.array(AbandonedCartSchema),
 })
 
 export type CartItem = z.infer<typeof CartItemSchema>;
 export type Cart = z.infer<typeof CartSchema>;
+export type AbandonedCart = z.infer<typeof AbandonedCartSchema>;
 export type PaginatedAbandonedCarts = z.infer<typeof PaginatedAbandonedCartsSchema>;
 
 export type CartUpdate = {

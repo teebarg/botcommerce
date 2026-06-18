@@ -1,3 +1,4 @@
+from app.models.user import User
 from typing import Optional, Dict, Any
 from fastapi import HTTPException
 from app.services.cache import CacheService
@@ -13,12 +14,11 @@ logger = get_logger(__name__)
 
 
 class CartService:
-    def __init__(self, db: Prisma, cache: CacheService, settings_srv: ShopSettingsService, coupon_srv: CouponService):
+    def __init__(self, db: Prisma, cache_srv: CacheService, settings_srv: ShopSettingsService, coupon_srv: CouponService):
         self.db = db
         self.settings_srv = settings_srv
         self.coupon_srv = coupon_srv
-        self.cache = cache
-
+        self.cache_srv = cache_srv
 
     async def get_active_cart(self, cart_number: str | None = None, user_id: int | None = None, include_relations: bool = False) -> Cart | None:
         include_clause = {
@@ -106,7 +106,7 @@ class CartService:
                 data["payment_method"] = "WALLET"
 
             await self.db.cart.update(where={"id": cart.id}, data=data)
-            await self.cache.invalidate(tags=["abandoned-carts", f"cart:{cart.cart_number}"])
+            await self.cache_srv.invalidate(tags=["abandoned-carts", f"cart:{cart.cart_number}"])
         except Exception as e:
             logger.error(f"Error calculating cart totals: {e}", exc_info=True)
 
@@ -179,7 +179,7 @@ class CartService:
         except Exception as e:
             logger.error(f"Error merging carts: {e}", exc_info=True)
 
-    async def apply_wallet_balance(self, cart: Any, user: Any) -> None:
+    async def apply_wallet_balance(self, cart: Cart, user: User) -> None:
         if not user.wallet_balance or user.wallet_balance <= 0:
             raise HTTPException(status_code=400, detail="Wallet balance is empty")
 
@@ -192,7 +192,7 @@ class CartService:
         wallet_to_use = min(user.wallet_balance, total_payable)
         remaining_total = max(total_payable - wallet_to_use, 0.0)
 
-        data = {"wallet_used": wallet_to_use, "total": remaining_total}
+        data: dict[str, float | str] = {"wallet_used": wallet_to_use, "total": remaining_total}
         if remaining_total <= 0:
             data["payment_method"] = "WALLET"
 
@@ -209,7 +209,7 @@ class CartService:
             )
             await tx.user.update(where={"id": user.id}, data={"wallet_balance": {"decrement": wallet_to_use}})
 
-    async def remove_wallet_balance(self, cart: Any, user: Any) -> None:
+    async def remove_wallet_balance(self, cart: Cart, user: User) -> None:
         wallet_used = cart.wallet_used or 0.0
         if wallet_used <= 0:
             raise HTTPException(status_code=400, detail="No wallet balance applied to this cart")

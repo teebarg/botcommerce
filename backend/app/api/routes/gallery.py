@@ -29,9 +29,10 @@ async def image_gallery(
     out_of_stock: bool = Query(default=False),
 ) -> PaginatedProductImages:
     """Image gallery endpoint using cursor-based pagination."""
-    return await srv.get_gallery_items(
+    items = await srv.get_gallery_items(
         cursor=cursor, limit=limit, sort=sort, active=active, out_of_stock=out_of_stock
     )
+    return PaginatedProductImages.validate(items)
 
 
 @router.delete("/{image_id}", dependencies=[Depends(require_admin)])

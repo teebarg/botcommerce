@@ -148,7 +148,7 @@ async def update_cart(
             update_data["shipping_address"] = {"connect": {"id": address.id}}
             update_data["billing_address"] = {"connect": {"id": address.id}}
 
-            await srv.cache.invalidate(tags=[f"addresses:{user.id if user else 'guest'}"])
+            await srv.cache_srv.invalidate(tags=[f"addresses:{user.id if user else 'guest'}"])
 
         if cart_update.status is not None:
             update_data["status"] = cart_update.status
@@ -178,7 +178,7 @@ async def update_cart(
         )
 
     await srv.calculate_totals(cart_id=cart.id)
-    await srv.cache.invalidate(tags=["abandoned-carts"])
+    await srv.cache_srv.invalidate(tags=["abandoned-carts"])
 
     return updated_cart
 
@@ -254,7 +254,7 @@ async def get_admin_abandoned_carts(
         include={"user": True, "items": {"include": {"variant": {"include": {"product": {"include": {"images": True}}}}}}}
     )
 
-    return PaginatedAbandonedCarts(items=carts[:limit], next_cursor=carts[-1].id if len(carts) > limit else None, limit=limit)
+    return PaginatedAbandonedCarts.validate({"items" : carts[:limit], "next_cursor" : carts[-1].id if len(carts) > limit else None, "limit" : limit})
 
 @router.get("/abandoned-carts/stats", dependencies=[Depends(require_admin)])
 @cacheable(key_prefix="abandoned-carts:stats", tags=["abandoned-carts"])

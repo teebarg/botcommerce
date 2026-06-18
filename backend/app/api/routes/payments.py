@@ -190,5 +190,5 @@ async def payment_status(srv: OrderDep, id: int, status: PaymentStatus) -> Order
             except Exception as e:
                 logger.error(f"Failed to create order timeline when updating payment status: {str(e)}")
                 raise HTTPException(status_code=400, detail=f"Database error: {str(e)}")
-        await srv.cache.invalidate(",".join(keys), tags=["orders"])
+        await srv.cache_srv.invalidate(",".join(keys), tags=["orders"])
         return updated_order
