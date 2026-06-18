@@ -419,7 +419,7 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
                             <div key={age} className="flex items-center space-x-2">
                                 <Checkbox id={`age-${age}`} checked={draft.ages.has(age)} onCheckedChange={() => onToggleAge(age)} />
                                 <Label htmlFor={`age-${age}`} className="text-sm cursor-pointer">
-                                    {age}ssss
+                                    {age}
                                 </Label>
                             </div>
                         ))}
