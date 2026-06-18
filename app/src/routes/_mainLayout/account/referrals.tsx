@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 import { meQuery, meTxnsQuery } from "@/queries/user.queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Check, Copy, Gift, Loader, Share2, Wallet } from "lucide-react";
@@ -12,15 +12,16 @@ import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 
 export const Route = createFileRoute("/_mainLayout/account/referrals")({
-    loader: async ({ context: { queryClient } }) => {
-        await Promise.all([queryClient.ensureQueryData(meQuery()), queryClient.ensureQueryData(meTxnsQuery())]);
+    loader: async ({ context: { queryClient, userId } }) => {
+        await Promise.all([queryClient.ensureQueryData(meQuery()), queryClient.ensureQueryData(meTxnsQuery(userId))]);
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
+    const { userId } = useRouteContext({ strict: false });
     const { data: me } = useSuspenseQuery(meQuery());
-    const { data: initialTxns } = useSuspenseQuery(meTxnsQuery());
+    const { data: initialTxns } = useSuspenseQuery(meTxnsQuery(userId!));
     const [copied, setCopied] = useState<boolean>(false);
 
     const {
@@ -30,7 +31,7 @@ function RouteComponent() {
         isFetchingNextPage,
         isLoading,
     } = useInfiniteResource<PaginatedWalletTxns, WalletTxn>({
-        queryKey: ["wallet", "infinite"],
+        queryKey: ["wallet", userId?.toString(), "infinite"],
         queryFn: (cursor) =>
             api.get("/wallet/me", {
                 params: { cursor },

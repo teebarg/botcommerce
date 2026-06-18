@@ -27,7 +27,7 @@ def consumer_factory(db_instance: Prisma) -> tuple[OrderService, SearchService, 
     storage_srv = get_storage_service()
     
     product_srv = get_product_service(cache_srv=cache_srv, search_srv=search_srv)
-    cart_srv = get_cart_service(cache=cache_srv, settings_srv=settings_srv, coupon_srv=coupon_srv)
+    cart_srv = get_cart_service(cache_srv=cache_srv, settings_srv=settings_srv, coupon_srv=coupon_srv)
     
     order_srv = OrderService(
         db=db_instance,
@@ -37,7 +37,7 @@ def consumer_factory(db_instance: Prisma) -> tuple[OrderService, SearchService, 
         settings_srv=settings_srv,
         notification_dispatcher=notification_srv,
         event_bus=event_bus,
-        cache=cache_srv,
+        cache_srv=cache_srv,
         storage_srv=storage_srv
     )
     

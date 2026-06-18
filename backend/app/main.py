@@ -1,9 +1,14 @@
 from typing import Any, Dict
-from app.core.dependencies.product import SearchDep
-from app.core.notifications.setup import init_notification_service
-from app.core.dependencies.services import SettingsDep
 import sentry_sdk
 import time
+
+from fastapi import BackgroundTasks, FastAPI, Request, Response
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
 from contextlib import asynccontextmanager
 from xml.etree.ElementTree import Element, SubElement, tostring
 
@@ -14,19 +19,16 @@ from app.core.utils import (generate_contact_form_email,
                             generate_newsletter_email, generate_bulk_purchase_email)
 from app.models.generic import ContactFormCreate, NewsletterCreate, BulkPurchaseCreate
 from app.prisma_client import prisma as db
-from fastapi import BackgroundTasks, FastAPI, Request, Response
-from fastapi.responses import JSONResponse
-from fastapi.exceptions import RequestValidationError
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.middleware.cors import CORSMiddleware
 from app.services.websocket import manager
 from app.redis_client import redis_client
-
 from app.core.logging import get_logger
 from app.consumer import RedisStreamConsumer
-from pydantic import BaseModel
 from app.core.deps import Notification
 from app.core.dependencies.consumer_factory import consumer_factory
+from app.core.dependencies.product import SearchDep
+from app.core.notifications.setup import init_notification_service
+from app.core.dependencies.services import SettingsDep
+
 
 STREAM_NAME = "EVENT_STREAMS"
 GROUP_NAME = "notifications"
@@ -248,49 +250,46 @@ async def log_error(payload: ErrorPayload, request: Request, background_tasks: B
 @app.get("/api/sitemap.xml", response_class=Response)
 async def generate_sitemap(request: Request):
     redis = request.app.state.redis
-    base_url = settings.FRONTEND_HOST
+    base_url: str = settings.FRONTEND_HOST.rstrip("/")
 
     cached_sitemap = await redis.get("sitemap")
     if cached_sitemap:
         return Response(content=cached_sitemap, media_type="application/xml")
 
-    products = await db.product.find_many(where={"active": True})
-    categories = await db.category.find_many()
-    collections = await db.collection.find_many()
+    products = await db.query_raw(
+        'SELECT slug FROM "products" WHERE active = true'
+    )
+    categories = await db.query_raw(
+        'SELECT slug FROM "categories"'
+    )
+    collections = await db.query_raw(
+        'SELECT slug FROM "collections"'
+    )
 
-    urlset = Element(
-        "urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
+    urlset = Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
 
     home = SubElement(urlset, "url")
     SubElement(home, "loc").text = f"{base_url}/"
-    SubElement(home, "priority").text = "1.0"
-    SubElement(home, "changefreq").text = "daily"
 
     for collection in collections:
         url = SubElement(urlset, "url")
-        SubElement(
-            url, "loc").text = f"{base_url}/collections/{collection.slug}"
-        SubElement(url, "priority").text = "0.9"
-        SubElement(url, "changefreq").text = "monthly"
+        SubElement(url, "loc").text = f"{base_url}/collections/{collection['slug']}"
 
     for category in categories:
         url = SubElement(urlset, "url")
-        SubElement(
-            url, "loc").text = f"{base_url}/collections?cat_ids={category.slug}"
-        SubElement(url, "priority").text = "0.8"
-        SubElement(url, "changefreq").text = "monthly"
+        SubElement(url, "loc").text = f"{base_url}/collections?cat_ids={category['slug']}"
 
     for product in products:
         url = SubElement(urlset, "url")
-        SubElement(url, "loc").text = f"{base_url}/products/{product.slug}"
-        SubElement(url, "priority").text = "0.6"
-        SubElement(url, "changefreq").text = "weekly"
+        SubElement(url, "loc").text = f"{base_url}/products/{product['slug']}"
 
-    sitemap = tostring(urlset, encoding="utf-8", method="xml")
+    xml_content = tostring(urlset, encoding="utf-8", method="xml")
+    xml_declaration = b'<?xml version="1.0" encoding="UTF-8"?>\n'
+    full_sitemap = xml_declaration + xml_content
 
-    await redis.setex("sitemap", 3600, sitemap)
+    await redis.setex("sitemap", 3600, full_sitemap)
 
-    return Response(content=sitemap, media_type="application/xml")
+    return Response(content=full_sitemap, media_type="application/xml")
 
 
 # @app.post("/api/test-notification")

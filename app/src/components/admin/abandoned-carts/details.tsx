@@ -6,7 +6,7 @@ import { ReminderButton } from "./reminder-button";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Overlay from "@/components/overlay";
-import type { Cart } from "@/schemas";
+import type { AbandonedCart } from "@/schemas";
 import { currency } from "@/utils";
 import { useInvalidateMe } from "@/hooks/useUser";
 import ImageDisplay from "@/components/image-display";
@@ -14,7 +14,7 @@ import { useRouteContext, useRouter } from "@tanstack/react-router";
 import { updateAuthSession } from "@/utils/auth-client";
 
 interface AbandonedCartDetailsDialogProps {
-    cart: Cart | null;
+    cart: AbandonedCart | null;
 }
 
 export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogProps) => {

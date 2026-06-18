@@ -59,15 +59,14 @@ async def websocket(ws: WebSocket) -> None:
                         else:
                             await manager.register(user_id=user_id, websocket=ws)
                             logger.debug(f"Promotion failed, registered {user_id} directly")
-                            continue
+                        await manager.broadcast_sessions()
+                    continue
 
                 elif message_type == "ping":
                     await manager.handle_heartbeat_field(user_id=user_id or app_session_id, field="updated_at", value=str(int(time.time())))
 
                 elif message_type == "path":
                     await manager.handle_heartbeat_field(user_id=user_id or app_session_id, field="path", value=payload.get("path", "/"))
-
-                await manager.broadcast_sessions()
 
             except json.JSONDecodeError:
                 logger.error(f"Invalid JSON received: {msg}")

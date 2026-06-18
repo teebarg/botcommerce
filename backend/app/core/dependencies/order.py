@@ -10,7 +10,7 @@ from app.core.notifications.setup import get_notification_service
 from app.core.dependencies.services import CouponDep, SettingsDep, StorageDep, get_event_bus
 
 def get_order_service(
-    cache: CacheDep,
+    cache_srv: CacheDep,
     cart_srv: CartDep,
     coupon_srv: CouponDep,
     product_srv: ProductDep,
@@ -25,7 +25,7 @@ def get_order_service(
         settings_srv=settings_srv,
         notification_dispatcher=get_notification_service(),
         event_bus=evt_bus,
-        cache=cache,
+        cache_srv=cache_srv,
         storage_srv=storage_srv
     )
 

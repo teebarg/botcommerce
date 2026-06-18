@@ -24,6 +24,9 @@ class ProductImage(BaseModel):
     product_id: Optional[int] = None
     product: Optional[Product] = None
 
+    class Config:
+        from_attributes = True
+
 class PaginatedProductImages(BaseModel):
     items: list[ProductImage]
     next_cursor: int | None

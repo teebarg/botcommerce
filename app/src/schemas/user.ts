@@ -12,18 +12,8 @@ export const UserLiteSchema = z.object({
     image: z.string().optional(),
 });
 
-export const WalletTxnLiteSchema = z.object({
-    id: z.string(),
-    amount: z.number(),
-    type: z.enum(["CASHBACK", "WITHDRAWAL", "ADJUSTMENT", "REVERSAL"]),
-    reference_id: z.string().optional(),
-    reference_code: z.string().optional(),
-    created_at: z.string(),
-});
-
 export const WalletTxnSchema = z.object({
     id: z.string(),
-    user: UserLiteSchema,
     amount: z.number(),
     type: z.enum(["CASHBACK", "WITHDRAWAL", "ADJUSTMENT", "REVERSAL"]),
     reference_id: z.string().optional(),
@@ -75,7 +65,6 @@ export const UserMiniSchema = z.object({
     first_name: z.string(),
     last_name: z.string().optional(),
     email: z.string(),
-    addresses: z.array(AddressSchema).optional(),
 });
 
 export const UserSessionSchema = z.object({

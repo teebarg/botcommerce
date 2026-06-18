@@ -4,17 +4,18 @@ import { AbandonedCartDetailsDialog } from "./details";
 import { ReminderButton } from "./reminder-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { Cart } from "@/schemas";
+import type { AbandonedCart, CartItem } from "@/schemas";
 import { currency } from "@/utils";
 import { useSendCartReminder } from "@/hooks/useAbandonedCart";
 import ImageDisplay from "@/components/image-display";
 
 interface AbandonedCartCardProps {
-    cart: Cart;
+    cart: AbandonedCart;
 }
 
 export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
     const sendReminderMutation = useSendCartReminder();
+    const email = cart.email || cart.user?.email
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -40,24 +41,17 @@ export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
                             <div className="space-y-1">
                                 <div className="flex items-center gap-3">
                                     <h3 className="font-semibold text-lg">
-                                        {cart.user_id ? `${cart.user?.first_name} ${cart.user?.last_name}` : "Guest User"}
+                                        {cart.user?.first_name ? `${cart.user?.first_name} ${cart.user?.last_name}` : "Guest User"}
                                     </h3>
                                     <Badge className={getStatusColor(cart.status!)}>
                                         {cart.status!.charAt(0).toUpperCase() + cart.status!.slice(1)}
                                     </Badge>
                                 </div>
                                 <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                                    {cart.email ||
-                                        (cart.user?.email && (
-                                            <span className="flex items-center gap-1.5">
-                                                <Mail className="h-4 w-4" />
-                                                {cart.email || cart.user?.email}
-                                            </span>
-                                        ))}
-                                    {cart.shipping_address && (
+                                    {email && (
                                         <span className="flex items-center gap-1.5">
-                                            <MapPin className="h-4 w-4" />
-                                            {cart.shipping_address.state}
+                                            <Mail className="h-4 w-4" />
+                                            {email}
                                         </span>
                                     )}
                                 </div>
@@ -74,7 +68,7 @@ export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
                             </div>
                             {cart.items && cart.items.length > 0 && (
                                 <div className="flex gap-2 overflow-x-auto pb-2">
-                                    {cart.items.slice(0, 3).map((item) => (
+                                    {cart.items.slice(0, 3).map((item: CartItem) => (
                                         <div key={item.id} className="group relative">
                                             <div className="w-20 h-20 rounded-lg overflow-hidden border bg-muted">
                                                 <ImageDisplay
@@ -112,7 +106,7 @@ export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
                         </div>
 
                         <div className="flex flex-col gap-2 w-full">
-                            {cart.status !== "CONVERTED" && cart.user_id && <ReminderButton id={cart.id} />}
+                            {cart.status !== "CONVERTED" && !!cart.user && <ReminderButton id={cart.id} />}
                             <AbandonedCartDetailsDialog cart={cart} />
                         </div>
                     </div>
