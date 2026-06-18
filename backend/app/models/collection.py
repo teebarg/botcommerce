@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, Field
 
@@ -7,6 +8,7 @@ class Collection(BaseModel):
     name: str
     slug: str
     is_active: bool = True
+    created_at: datetime
 
 
 class CollectionCreate(BaseModel):
