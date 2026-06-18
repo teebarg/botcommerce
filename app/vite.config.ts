@@ -60,7 +60,7 @@ const config = defineConfig({
                 globPatterns: ["**/*.{js,css,html,png,svg,ico,woff2}", "assets/*.css", "_server/assets/*.css"],
             },
             devOptions: {
-                enabled: true,
+                enabled: false,
                 type: "module",
             },
         }),

@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocation, useRouteContext } from "@tanstack/react-router";
 import { useWebSocket } from "pulsews";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCart } from "./cart-provider";
 
 function parseEventKey(eventKey: string): string[] {
@@ -18,6 +18,20 @@ function parseEventKeys(eventKeys: string[]): string[][] {
 }
 
 export function InvalidateProvider({ children }: { children: React.ReactNode }) {
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    if (!isMounted) {
+        return <>{children}</>;
+    }
+
+    return <InvalidateProviderInner>{children}</InvalidateProviderInner>;
+}
+
+function InvalidateProviderInner({ children }: { children: React.ReactNode }) {
     const location = useLocation();
     const pathname = location.pathname;
     const { session, isAuthenticated } = useRouteContext({ strict: false });
@@ -65,15 +79,18 @@ export function InvalidateProvider({ children }: { children: React.ReactNode }) 
             );
         }
         prevConnectedRef.current = isConnected;
-    }, [isAuthenticated, isConnected]);
+    }, [isAuthenticated, isConnected, send, session]);
 
     useEffect(() => {
-        send(
-            JSON.stringify({
-                type: "path",
-                path: pathname,
-            })
-        );
-    }, [pathname]);
-    return <div>{children}</div>;
+        if (isConnected) {
+            send(
+                JSON.stringify({
+                    type: "path",
+                    path: pathname,
+                })
+            );
+        }
+    }, [pathname, isConnected, send]);
+
+    return <>{children}</>;
 }

@@ -22,6 +22,7 @@ import { getSessionId } from "@/utils";
 import { Analytics } from "@vercel/analytics/react";
 import { ShopSettings } from "@/schemas";
 import { useSettingsQuery } from "@/hooks/useGeneric";
+import { useEffect, useState } from "react";
 
 
 type SessionClaims = {
@@ -167,7 +168,14 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
     // const GA_ID = import.meta.env.VITE_GA_ID;
-    const localSessionId = getSessionId();
+    // const localSessionId = getSessionId();
+    const [isClient, setIsClient] = useState(false);
+    const [localSessionId, setLocalSessionId] = useState<string | null>(null);
+
+    useEffect(() => {
+        setIsClient(true);
+        setLocalSessionId(getSessionId());
+    }, []);
     return (
         <html suppressHydrationWarning>
             <head>
@@ -212,15 +220,19 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                             <CartProvider>
                                 <div className="relative">
                                     <PushPermission />
-                                    <WebSocketProvider
-                                        url={`${import.meta.env.VITE_WS}/api/ws/?session_id=${localSessionId}`}
-                                        debug={true}
-                                        onOpen={() => console.log("WebSocket connected!")}
-                                        onClose={() => console.log("WebSocket disconnected!")}
-                                    >
+                                    {isClient && localSessionId ? (
+                                        <WebSocketProvider
+                                            url={`${import.meta.env.VITE_WS}/api/ws/?session_id=${localSessionId}`}
+                                            debug={true}
+                                            onOpen={() => console.log("WebSocket connected!")}
+                                            onClose={() => console.log("WebSocket disconnected!")}
+                                        >
+                                            <InvalidateProvider>{children}</InvalidateProvider>
+                                            <ImpersonationBanner />
+                                        </WebSocketProvider>
+                                    ) : (
                                         <InvalidateProvider>{children}</InvalidateProvider>
-                                        <ImpersonationBanner />
-                                    </WebSocketProvider>
+                                    )}
                                     {import.meta.env.MODE !== "production" && (
                                         <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
                                     )}

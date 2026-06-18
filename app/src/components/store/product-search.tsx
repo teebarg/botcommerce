@@ -22,7 +22,14 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
     const navigate = useNavigate();
     const [query, setQuery] = useState<string>(initialQuery);
     const [debouncedQuery] = useDebounce(query, searchDelay);
-    const [recentSearches, setRecentSearches] = useState<string[]>([]);
+    const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+        if (typeof window === "undefined") return [];
+        try {
+            return JSON.parse(localStorage.getItem("searchHistory") || "[]");
+        } catch {
+            return [];
+        }
+    });
 
     const inputRef = useRef<HTMLInputElement>(null);
     const searchRef = useRef<HTMLInputElement>(null);

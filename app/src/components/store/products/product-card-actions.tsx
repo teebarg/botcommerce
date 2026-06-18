@@ -3,8 +3,6 @@ import { Check, ShoppingCart } from "lucide-react";
 import type { ProductSearch } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useProductVariant } from "@/hooks/useProductVariant";
-import { type UserInteractionType, useTrackUserInteraction } from "@/hooks/useUserInteraction";
-import { useRouteContext } from "@tanstack/react-router";
 
 const ProductCardActions: React.FC<{
     product: ProductSearch;
@@ -12,23 +10,9 @@ const ProductCardActions: React.FC<{
 }> = ({ product, actionColor = "bg-primary" }) => {
     const { selectedVariant, handleAddToCart, handleWhatsAppPurchase, loading, outOfStock, isAdded } = useProductVariant(product);
 
-    const { isAuthenticated } = useRouteContext({ strict: false });
-    const trackInteraction = useTrackUserInteraction();
-
     const handleAddToCartAndTrack = (e: React.MouseEvent) => {
         e.stopPropagation();
-        handleUserInteraction("CART_ADD");
         handleAddToCart();
-    };
-
-    const handleUserInteraction = async (type: UserInteractionType, metadata?: Record<string, any>) => {
-        if (isAuthenticated && product?.id) {
-            trackInteraction.mutate({
-                product_id: product.id,
-                type,
-                metadata: { source: "product-card", ...metadata },
-            });
-        }
     };
 
     return (

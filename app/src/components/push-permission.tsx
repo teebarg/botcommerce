@@ -64,11 +64,16 @@ function storeSubscriptionKeys(sub: PushSubscription) {
 }
 
 export default function PushPermission() {
+    const [isClient, setIsClient] = useState(false);
     const [permission, setPermission] = useState<NotificationPermission>("default");
     const [subscription, setSubscription] = useState<PushSubscription | null>(null);
     const [isDismissed, setIsDismissed] = useState<boolean>(false);
     const [isChecking, setIsChecking] = useState<boolean>(false);
     const [isSyncing, setIsSyncing] = useState<boolean>(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -202,7 +207,7 @@ export default function PushPermission() {
         setIsDismissed(true);
     }
 
-    if (isDismissed || permission === "granted") return null;
+    if (!isClient || isDismissed || permission === "granted") return null;
 
     return (
         <AnimatePresence>
