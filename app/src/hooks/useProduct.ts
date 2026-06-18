@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
+import { useQuery, useMutation, useInfiniteQuery, type InfiniteData, UseQueryOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { FeedQuery, Message, PaginatedProductSearch, ProductFeed, ProductVariant } from "@/schemas";
 import { api } from "@/utils/api";
@@ -44,11 +44,15 @@ type SearchParams = {
     limit?: number;
 };
 
-export const useProductSearch = (params: SearchParams) => {
+export const useProductSearch = (
+    params: SearchParams,
+    options?: Omit<UseQueryOptions<PaginatedProductSearch, Error>, "queryKey" | "queryFn">
+) => {
     return useQuery({
         queryKey: ["products", "search", params],
         queryFn: async () => await api.get<PaginatedProductSearch>("/product/", { params }),
-        staleTime: 1000 * 60 * 30,
+        staleTime: 1000 * 60 * 60, // 60 minutes default cache duration
+        ...options,
     });
 };
 
