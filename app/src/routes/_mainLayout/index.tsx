@@ -14,6 +14,7 @@ import { HERO_IMAGES } from "@/utils/constants";
 import InfiniteFeed from "@/components/store/collections/infinite-feed";
 import { getIndexProductsFn } from "@/server/product.server";
 import { queryOptions, useQuery } from "@tanstack/react-query";
+import { LazyInView } from "@/components/LazyInView";
 
 const indexProductQuery = () =>
     queryOptions({
@@ -57,14 +58,30 @@ function Home() {
                 subtitle="Get up to 50% OFF on select products."
                 title="Big Sale on Top Brands!"
             />
-            <CategoriesWithProductsSection />
+            <LazyInView
+                fallback={
+                    <div className="flex items-center justify-center py-12">
+                        <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent" />
+                    </div>
+                }
+            >
+                <CategoriesWithProductsSection />
+            </LazyInView>
             <NewArrivals products={data?.arrival || []} />
             <div className="max-w-8xl mx-auto">
                 <div className="px-4 mb-4">
                     <h2 className="font-display text-xl font-semibold">For You</h2>
                     <p className="text-xs text-muted-foreground">Personalized picks based on your style</p>
                 </div>
-                <InfiniteFeed />
+                <LazyInView
+                    fallback={
+                        <div className="flex items-center justify-center py-12">
+                            <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent" />
+                        </div>
+                    }
+                >
+                    <InfiniteFeed />
+                </LazyInView>
             </div>
             <ContactSection />
             <NewsletterSection />

@@ -1,25 +1,39 @@
-import type React from "react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type ReactNode } from "react";
 
-export function LazyInView({ children, rootMargin = "200px" }: { children: React.ReactNode; rootMargin?: string }) {
-    const [isVisible, setIsVisible] = useState<boolean>(false);
+interface LazyInViewProps {
+    children: ReactNode;
+    fallback?: ReactNode;
+    rootMargin?: string
+}
+
+export function LazyInView({ children, fallback = null, rootMargin = "300px" }: LazyInViewProps) {
+    const [isIntersected, setIsIntersected] = useState<boolean>(false);
     const ref = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
+        if (isIntersected) return;
+
         const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting) {
-                    setIsVisible(true);
-                    observer.disconnect();
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsIntersected(true);
                 }
             },
-            { rootMargin }
+            {
+                rootMargin
+            }
         );
 
-        if (ref.current) observer.observe(ref.current);
+        if (ref.current) {
+            observer.observe(ref.current);
+        }
 
         return () => observer.disconnect();
-    }, [rootMargin]);
+    }, [isIntersected]);
 
-    return <div ref={ref}>{isVisible ? children : null}</div>;
+    return (
+        <div ref={ref} className="w-full min-h-[200px]">
+            {isIntersected ? children : fallback}
+        </div>
+    );
 }

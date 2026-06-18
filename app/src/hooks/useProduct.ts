@@ -51,7 +51,7 @@ export const useProductSearch = (
     return useQuery({
         queryKey: ["products", "search", params],
         queryFn: async () => await api.get<PaginatedProductSearch>("/product/", { params }),
-        staleTime: 1000 * 60 * 60, // 60 minutes default cache duration
+        staleTime: 1000 * 60 * 60,
         ...options,
     });
 };

@@ -57,19 +57,26 @@ class SearchService:
     def __init__(self):
         self.index = get_or_create_index(settings.MEILI_PRODUCTS_INDEX)
 
-    def ensure_index_ready(self):
+    async def search_index(self, query: str, options: dict) -> dict:
+        def _search():
+            return self.index.search(query, options)
+            
+        return await to_thread.run_sync(_search)
+
+    async def ensure_index_ready(self):
         """
         Ensures that the given Meilisearch index has the required
-        filterable and sortable attributes.
+        filterable and sortable attributes without locking up worker threads.
         """
-        filter_task = self.index.update_filterable_attributes(REQUIRED_FILTERABLES)
-        self.index.wait_for_task(filter_task.task_uid)
+        def _configure():
+            filter_task = self.index.update_filterable_attributes(REQUIRED_FILTERABLES)
+            self.index.wait_for_task(filter_task.task_uid)
 
-        sort_task = self.index.update_sortable_attributes(REQUIRED_SORTABLES)
-        self.index.wait_for_task(sort_task.task_uid)
+            sort_task = self.index.update_sortable_attributes(REQUIRED_SORTABLES)
+            self.index.wait_for_task(sort_task.task_uid)
 
-    def search_index(self, query: str, options: dict) -> dict:
-        return self.index.search(query, options)
+        await to_thread.run_sync(_configure)
+
 
     def get_document_by_id(self, doc_id: str):
         """

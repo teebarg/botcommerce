@@ -168,7 +168,6 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
     // const GA_ID = import.meta.env.VITE_GA_ID;
-    // const localSessionId = getSessionId();
     const [isClient, setIsClient] = useState(false);
     const [localSessionId, setLocalSessionId] = useState<string | null>(null);
 
