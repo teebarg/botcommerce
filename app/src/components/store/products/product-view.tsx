@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { currency } from "@/utils";
 import { ProductVariantSelection } from "@/components/products/product-variant-selection";
 import type { ProductLite, ProductVariantLite } from "@/schemas";
-import { type UserInteractionType, useTrackUserInteraction } from "@/hooks/useUserInteraction";
 import { Button } from "@/components/ui/button";
 import { useUpdateVariant } from "@/hooks/useProduct";
 import { useRouteContext } from "@tanstack/react-router";
@@ -30,7 +29,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
     const [selectedVariant, setSelectedVariant] = useState<ProductVariantLite | undefined>(product.variants?.[0]);
 
     const { session, isAuthenticated } = useRouteContext({ strict: false });
-    const trackInteraction = useTrackUserInteraction();
     const updateVariant = useUpdateVariant(false);
 
     const { data } = useUserWishlist();
@@ -68,26 +66,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
     useEffect(() => {
         gtag.viewItem({ id: product.id, name: product.name, price: selectedVariant?.price! });
     }, [product.id]);
-
-    useEffect(() => {
-        const startTime = Date.now();
-
-        return () => {
-            const timeSpent = Date.now() - startTime;
-
-            handleUserInteraction("VIEW", { timeSpent: timeSpent.toString() });
-        };
-    }, [session?.id, product?.id]);
-
-    const handleUserInteraction = async (type: UserInteractionType, metadata?: Record<string, any>) => {
-        if (isAuthenticated && product?.id) {
-            trackInteraction.mutate({
-                product_id: product.id,
-                type,
-                metadata: { source: "product-view", ...metadata },
-            });
-        }
-    };
 
     return (
         <div className="max-w-6xl mx-auto w-full md:py-8 md:px-4 md:grid md:grid-cols-2 md:gap-8 md:items-start">

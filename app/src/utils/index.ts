@@ -182,7 +182,8 @@ export const getAvatarColor = (name: string) => {
     return colors[index];
 };
 
-export const formatTime = (input: Date | string): string => {
+export const formatTime = (input: Date | string | undefined): string => {
+    if (!input) return "No Date"
     try {
         let d: Date;
 
@@ -212,15 +213,17 @@ const SESSION_KEY = "app_session_id";
 
 export function getSessionId(): string {
     if (typeof window === "undefined") return "";
-
-    let id = localStorage.getItem(SESSION_KEY);
-
-    if (!id) {
-        id = crypto.randomUUID();
-        localStorage.setItem(SESSION_KEY, id);
-    }
-
-    return id;
+    return localStorage.getItem(SESSION_KEY) || ""; 
 }
+
+export const initializeAppSession = () => {
+    if (typeof window !== "undefined") {
+        let id = localStorage.getItem(SESSION_KEY);
+        if (!id) {
+            id = crypto.randomUUID();
+            localStorage.setItem(SESSION_KEY, id);
+        }
+    }
+};
 
 export { handleError, capitalize, currency, buildUrl, debounce, isEqual, omit, generateId, timeAgo, formatDate };

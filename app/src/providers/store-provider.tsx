@@ -1,5 +1,5 @@
 import type React from "react";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useMemo } from "react";
 import z from "zod";
 import { useRouteContext } from "@tanstack/react-router";
 
@@ -36,13 +36,17 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
     const { config } = useRouteContext({ strict: false });
-    return <StoreContext.Provider value={{ config }}>{children}</StoreContext.Provider>;
+    const value = useMemo(() => ({ config }), [config]);
+
+    return (
+        <StoreContext.Provider value={value}>
+            {children}
+        </StoreContext.Provider>
+    );
 };
 
 export const useConfig = () => {
     const ctx = useContext(StoreContext);
-
     if (!ctx) throw new Error("useConfig must be used within a StoreProvider");
-
     return ctx;
 };

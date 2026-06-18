@@ -22,29 +22,52 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
     const navigate = useNavigate();
     const [query, setQuery] = useState<string>(initialQuery);
     const [debouncedQuery] = useDebounce(query, searchDelay);
-    const [recentSearches, setRecentSearches] = useState<string[]>([]);
+    const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+        if (typeof window === "undefined") return [];
+        try {
+            return JSON.parse(localStorage.getItem("searchHistory") || "[]");
+        } catch {
+            return [];
+        }
+    });
 
     const inputRef = useRef<HTMLInputElement>(null);
-    const searchRef = useRef<HTMLInputElement>(null);
 
-    const { data, isLoading } = useProductSearch({ search: debouncedQuery, limit: 4 });
-    const { data: trendingData } = useProductSearch({ collections: "trending", limit: 4 });
+    const { data, isLoading } = useProductSearch(
+        { search: debouncedQuery, limit: 4 },
+        { enabled: searchState.isOpen && debouncedQuery.trim() !== "" }
+    );
+
+    const { data: trendingData } = useProductSearch(
+        { collections: "trending", limit: 4 },
+        { enabled: searchState.isOpen }
+    );
 
     useEffect(() => {
         const savedHistory = localStorage.getItem("searchHistory");
-
         if (savedHistory) {
             setRecentSearches(JSON.parse(savedHistory));
         }
     }, []);
 
+    // Focus input element automatically when sheet opens
     useEffect(() => {
-        localStorage.setItem("searchHistory", JSON.stringify(recentSearches));
-    }, [recentSearches]);
+        if (searchState.isOpen) {
+            setTimeout(() => inputRef.current?.focus(), 100);
+        }
+    }, [searchState.isOpen]);
 
-    const handleSuggestionClick = (suggestion: string) => {
+    const handleSearchSubmit = (newSearchTerm: string) => {
+        if (!newSearchTerm.trim()) return;
+
+        setRecentSearches((prev) => {
+            const updated = [newSearchTerm, ...prev.filter(i => i !== newSearchTerm)].slice(0, 10);
+            localStorage.setItem("searchHistory", JSON.stringify(updated));
+            return updated;
+        });
+
         searchState.close();
-        navigate({ to: `/search/${suggestion}` });
+        navigate({ to: `/search/${encodeURIComponent(newSearchTerm)}` });
     };
 
     const hasResults = query.trim() && !!data?.products?.length;
@@ -52,15 +75,17 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
 
     return (
         <Sheet open={searchState.isOpen} onOpenChange={searchState.toggle}>
-            <SheetTrigger>
-                <div className="bg-card rounded-2xl hidden md:flex items-center gap-1.5 w-96 px-2 py-3">
-                    <Search className="w-5 h-5 text-muted-foreground" />
-                    <span className="text-foreground text-sm">{query ? query : "Search for products..."}</span>
-                </div>
-                <div className="rounded-md md:hidden h-10 w-10 flex items-center justify-center">
-                    <Search className="w-6 h-6" />
-                    <span className="sr-only">Search</span>
-                </div>
+            <SheetTrigger asChild>
+                <button type="button" className="text-left block cursor-pointer">
+                    <div className="bg-card rounded-2xl hidden md:flex items-center gap-1.5 w-96 px-2 py-3">
+                        <Search className="w-5 h-5 text-muted-foreground" />
+                        <span className="text-foreground text-sm">{query ? query : "Search for products..."}</span>
+                    </div>
+                    <div className="rounded-md md:hidden h-10 w-10 flex items-center justify-center">
+                        <Search className="w-6 h-6" />
+                        <span className="sr-only">Search</span>
+                    </div>
+                </button>
             </SheetTrigger>
             <SheetContent aria-describedby={undefined} side="top" className="h-screen flex px-2.5">
                 <SheetHeader className="sr-only">
@@ -79,16 +104,16 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                             placeholder={placeholder}
                             type="text"
                             value={query}
-                            onChange={(e) => {
-                                setQuery(e.target.value);
-                            }}
+                            onChange={(e) => setQuery(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleSearchSubmit(query)}
                         />
                         {query && (
                             <button
+                                type="button"
                                 className="absolute right-4 p-1 rounded-full hover:bg-muted transition-colors"
                                 onClick={() => {
                                     setQuery("");
-                                    searchRef.current?.focus();
+                                    inputRef.current?.focus();
                                 }}
                             >
                                 <X className="w-4 h-4 text-muted-foreground" />
@@ -116,6 +141,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                                     <LocalizedClientLink
                                         className="inline-block text-left text-sm hover:text-primary transition-colors py-1"
                                         href={`/search/${query}`}
+                                        onClick={() => searchState.close()}
                                     >
                                         See all products
                                     </LocalizedClientLink>
@@ -128,7 +154,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                                 <p className="text-sm text-muted-foreground mt-1">We are sorry but we cant find any results for “{query}”</p>
                             </div>
                         )}
-                        {(hasNoResults || !query) && (
+                        {(hasNoResults || !query.trim()) && trendingData?.products && (
                             <div className="py-6 space-y-8 max-w-6xl mx-auto">
                                 <div>
                                     <h3 className="font-semibold text-sm tracking-wider mb-4">TRENDING PRODUCTS</h3>
@@ -140,8 +166,8 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                                 </div>
                             </div>
                         )}
-                        {recentSearches.length > 0 && (
-                            <div className="mb-4">
+                        {recentSearches.length > 0 && !query.trim() && (
+                            <div className="mb-4 max-w-6xl mx-auto">
                                 <div className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground">
                                     <Clock className="w-4 h-4" />
                                     Recent Searches
@@ -149,9 +175,10 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                                 <div className="space-y-1">
                                     {recentSearches.map((search: string, idx: number) => (
                                         <button
+                                            type="button"
                                             key={idx}
-                                            className="w-full text-left px-3 py-2 rounded-lg hover:bg-search-hover transition-colors"
-                                            onClick={() => handleSuggestionClick(search)}
+                                            className="w-full text-left px-3 py-2 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+                                            onClick={() => handleSearchSubmit(search)}
                                         >
                                             <span className="text-sm text-foreground">{search}</span>
                                         </button>

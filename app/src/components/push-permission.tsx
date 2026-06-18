@@ -64,6 +64,7 @@ function storeSubscriptionKeys(sub: PushSubscription) {
 }
 
 export default function PushPermission() {
+    const [isMounted, setIsMounted] = useState<boolean>(false);
     const [permission, setPermission] = useState<NotificationPermission>("default");
     const [subscription, setSubscription] = useState<PushSubscription | null>(null);
     const [isDismissed, setIsDismissed] = useState<boolean>(false);
@@ -71,7 +72,7 @@ export default function PushPermission() {
     const [isSyncing, setIsSyncing] = useState<boolean>(false);
 
     useEffect(() => {
-        if (typeof window === "undefined") return;
+        setIsMounted(true);
 
         if ("Notification" in window) {
             setPermission(Notification.permission);
@@ -111,9 +112,9 @@ export default function PushPermission() {
         localStorage.setItem("push_synced", "true");
         setIsSyncing(false);
         return true;
-    }, []);
+    }, [isSyncing]);
 
-    const checkSubscription = async () => {
+    const checkSubscription = useCallback(async () => {
         if (isChecking) return;
         setIsChecking(true);
         try {
@@ -135,9 +136,31 @@ export default function PushPermission() {
         } finally {
             setIsChecking(false);
         }
-    };
+    }, [isChecking, syncSubscriptionToBackend]);
+
+    async function subscribeToPush() {
+        const perm = await Notification.requestPermission();
+        setPermission(perm);
+
+        if (perm !== "granted") return;
+        const registration = await navigator.serviceWorker.ready;
+        const sub = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            // @ts-expect-error -- Suppress TS2322 for BufferSource mismatch
+            applicationServerKey: urlBase64ToUint8Array(import.meta.env.VITE_VAPID_PUBLIC_KEY!),
+        });
+
+        if (!sub) {
+            toast.error("You blocked notifications. Please re-enable in browser settings.");
+            return;
+        }
+
+        await syncSubscriptionToBackend(sub);
+    }
 
     useEffect(() => {
+        if (!isMounted) return;
+
         if (permission !== "granted") {
             void (async () => {
                 await subscribeToPush();
@@ -159,34 +182,11 @@ export default function PushPermission() {
             document.removeEventListener("visibilitychange", onVisible);
             document.removeEventListener("pushsubscriptionchange", onPushSubscriptionChange);
         };
-    }, []);
-
-    async function subscribeToPush() {
-        const perm = await Notification.requestPermission();
-
-        setPermission(perm);
-
-        if (perm !== "granted") return;
-        const registration = await navigator.serviceWorker.ready;
-        const sub = await registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            // @ts-expect-error -- Suppress TS2322 for BufferSource mismatch
-            applicationServerKey: urlBase64ToUint8Array(import.meta.env.VITE_VAPID_PUBLIC_KEY!),
-        });
-
-        if (!sub) {
-            toast.error("You blocked notifications. Please re-enable in browser settings.");
-            return;
-        }
-
-        await syncSubscriptionToBackend(sub);
-    }
+    }, [isMounted, permission, checkSubscription]);
 
     async function handleOptIn() {
         if (!("serviceWorker" in navigator)) throw new Error("Service worker not supported");
-
         if (!("PushManager" in window)) throw new Error("Push not supported");
-
         if (subscription) return;
 
         if (permission === "denied") {
@@ -202,11 +202,12 @@ export default function PushPermission() {
         setIsDismissed(true);
     }
 
-    if (isDismissed || permission === "granted") return null;
+    if (!isMounted || isDismissed || permission === "granted") return null;
 
     return (
         <AnimatePresence>
             <div
+                key="push-permission-overlay"
                 className="fixed inset-0 z-50 flex items-end md:items-center justify-center animate-in fade-in duration-300"
             >
                 <div
@@ -223,7 +224,7 @@ export default function PushPermission() {
                         "bg-card rounded-t-[28px] md:rounded-3xl overflow-hidden pb-[var(--sab)]"
                     )}
                 >
-                    <div key="permission">
+                    <div>
                         <div className="pt-8 pb-4 px-6 text-center">
                             <div className="relative py-8 px-6">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary-foreground/10 rounded-full -translate-y-1/2 translate-x-1/2" />
@@ -266,12 +267,14 @@ export default function PushPermission() {
                         </div>
                         <div className="border-t border-border">
                             <button
+                                type="button"
                                 onClick={handleDismiss}
                                 className="w-full py-4 text-center font-medium text-muted-foreground hover:bg-secondary/50 active:bg-secondary transition-colors border-b border-border cursor-pointer"
                             >
                                 Maybe later
                             </button>
                             <button
+                                type="button"
                                 onClick={handleOptIn}
                                 className="w-full py-4 text-center font-semibold text-primary hover:bg-primary/5 active:bg-primary/10 transition-colors cursor-pointer"
                             >

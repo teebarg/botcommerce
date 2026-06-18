@@ -22,6 +22,7 @@ import { getSessionId } from "@/utils";
 import { Analytics } from "@vercel/analytics/react";
 import { ShopSettings } from "@/schemas";
 import { useSettingsQuery } from "@/hooks/useGeneric";
+import { useEffect, useState } from "react";
 
 
 type SessionClaims = {
@@ -167,7 +168,13 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
     // const GA_ID = import.meta.env.VITE_GA_ID;
-    const localSessionId = getSessionId();
+    const [isClient, setIsClient] = useState(false);
+    const [localSessionId, setLocalSessionId] = useState<string | null>(null);
+
+    useEffect(() => {
+        setIsClient(true);
+        setLocalSessionId(getSessionId());
+    }, []);
     return (
         <html suppressHydrationWarning>
             <head>
@@ -177,7 +184,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 <meta name="mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=false, viewport-fit=cover" />
+                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover" />
                 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
                 <script
                     dangerouslySetInnerHTML={{
@@ -212,15 +219,19 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                             <CartProvider>
                                 <div className="relative">
                                     <PushPermission />
-                                    <WebSocketProvider
-                                        url={`${import.meta.env.VITE_WS}/api/ws/?session_id=${localSessionId}`}
-                                        debug={true}
-                                        onOpen={() => console.log("WebSocket connected!")}
-                                        onClose={() => console.log("WebSocket disconnected!")}
-                                    >
+                                    {isClient && localSessionId ? (
+                                        <WebSocketProvider
+                                            url={`${import.meta.env.VITE_WS}/api/ws/?session_id=${localSessionId}`}
+                                            debug={true}
+                                            onOpen={() => console.log("WebSocket connected!")}
+                                            onClose={() => console.log("WebSocket disconnected!")}
+                                        >
+                                            <InvalidateProvider>{children}</InvalidateProvider>
+                                            <ImpersonationBanner />
+                                        </WebSocketProvider>
+                                    ) : (
                                         <InvalidateProvider>{children}</InvalidateProvider>
-                                        <ImpersonationBanner />
-                                    </WebSocketProvider>
+                                    )}
                                     {import.meta.env.MODE !== "production" && (
                                         <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
                                     )}

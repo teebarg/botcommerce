@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowUpDown, Search } from "lucide-react";
-
 import type { Collection } from "@/schemas/product";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -12,6 +11,7 @@ import { CollectionActions } from "@/components/admin/collections/collection-act
 import CollectionItem from "@/components/admin/collections/collection-items";
 import { z } from "zod";
 import { useQuery } from "@tanstack/react-query";
+import { formatDate } from "@/utils";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/collections")({
     validateSearch: z.object({
@@ -74,7 +74,7 @@ function RouteComponent() {
                                         {collection.is_active ? "Active" : "Inactive"}
                                     </Badge>
                                 </TableCell>
-                                <TableCell>{new Date(collection.created_at as string).toLocaleDateString()}</TableCell>
+                                <TableCell>{formatDate(collection.created_at)}</TableCell>
                                 <TableCell className="flex justify-end">
                                     <CollectionActions collection={collection} />
                                 </TableCell>

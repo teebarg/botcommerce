@@ -1,11 +1,11 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request
+from prisma.errors import PrismaError
 from app.models.category import Category, CategoryCreate, CategoryUpdate, BulkOrderUpdate
 from app.models.product import CategoryWithProducts
 from app.models.generic import Message, ImageUpload
 from app.core.utils import slugify
-from prisma.errors import PrismaError
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
 from app.core.permissions import require_admin

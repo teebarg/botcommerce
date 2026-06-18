@@ -12,21 +12,27 @@ export interface UserInteractionPayload {
 
 let buffer: UserInteractionPayload[] = [];
 let flushTimeout: NodeJS.Timeout | null = null;
+let retryQueue: UserInteractionPayload[] = [];
 let retryCount = 0;
 
 const flushBuffer = async () => {
-    if (buffer.length === 0) return;
-    const batch = [...buffer];
+    const batch = [...retryQueue, ...buffer];
+    if (batch.length === 0) return;
 
     buffer = [];
+    retryQueue = [];
+
     try {
-        await api.post<Message>("/user-interactions/batch", batch)
+        await api.post<Message>("/user-interactions/batch", batch);
         retryCount = 0;
     } catch (err: any) {
         retryCount++;
         if (retryCount < 3) {
-            buffer.push(...batch);
-            setTimeout(flushBuffer, 2000 * retryCount);
+            // Keep failures separated from fresh active tracking events
+            retryQueue = batch;
+            // Implement simple exponential backoff curve instead of strict 2-sec intervals
+            const backoffTime = Math.pow(2, retryCount) * 2000;
+            setTimeout(flushBuffer, backoffTime);
         } else {
             retryCount = 0;
         }

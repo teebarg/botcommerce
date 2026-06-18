@@ -6,14 +6,13 @@ from typing import List, Optional, Any, Dict
 from collections import Counter
 from app.services.cache import CacheService, cacheable
 from fastapi import HTTPException, Request
-
+from prisma.enums import PaymentStatus
+from meilisearch.errors import MeilisearchApiError
 from app.prisma_client import prisma as db
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.core.utils import url_to_list
 from app.models.product import Product
-from prisma.enums import PaymentStatus
-from meilisearch.errors import MeilisearchApiError
 from app.services.search import SearchService
 
 logger = get_logger(__name__)
@@ -135,7 +134,7 @@ class ProductService:
         top_ids = [pid for pid, _ in recommendation_scores.most_common(10)]
         filter_str = " OR ".join([f"id = {pid}" for pid in top_ids])
 
-        results = self.search_srv.search_index("", {"filter": filter_str, "limit": limit, "attributesToRetrieve": PRODUCT_ATTRIBUTES})
+        results = await self.search_srv.search_index("", {"filter": filter_str, "limit": limit, "attributesToRetrieve": PRODUCT_ATTRIBUTES})
         return results["hits"]
 
     async def get_discovery_feed(self, **kwargs) -> Dict[str, Any]:
@@ -163,7 +162,7 @@ class ProductService:
         try:
             if disable_random_feed:
                 search_params["sort"] = [sort]
-                res = self.search_srv.search_index(search, search_params)
+                res = await self.search_srv.search_index(search, search_params)
                 hits = res["hits"]
                 total_count = res["estimatedTotalHits"]
             else:
@@ -171,7 +170,7 @@ class ProductService:
                 search_params["limit"] = buffer_limit
                 search_params["sort"] = ["id:desc"]
                 
-                res = self.search_srv.search_index("", search_params)
+                res = await self.search_srv.search_index("", search_params)
                 raw_hits = res["hits"]
                 total_count = res["estimatedTotalHits"]
                 
@@ -199,10 +198,9 @@ class ProductService:
         }
 
     async def query_collection_index(self) -> dict:
-        result = {"arrival": [], "featured": [], "trending": []}
         collections = ["trending", "new-arrivals", "featured"]
-
-        for col in collections:
+        
+        async def fetch_collection(col: str):
             search_params = {
                 "limit": 6 if col == "trending" else 8,
                 "sort": ["id:desc"],
@@ -210,17 +208,21 @@ class ProductService:
                 "attributesToRetrieve": PRODUCT_ATTRIBUTES
             }
             try:
-                res = self.search_srv.search_index("", search_params)
+                res = await self.search_srv.search_index("", search_params)
             except MeilisearchApiError as e:
                 if getattr(e, "code", None) in {"invalid_search_filter", "invalid_search_sort"}:
-                    self.search_srv.ensure_index_ready()
-                    res = self.search_srv.search_index("", search_params)
+                    await self.search_srv.ensure_index_ready()
+                    res = await self.search_srv.search_index("", search_params)
                 else:
                     raise HTTPException(status_code=502, detail="Search service communication error")
-
+            
             key_name: str = "arrival" if col == "new-arrivals" else col
-            result[key_name] = res["hits"]
-        return result
+            return key_name, res.get("hits", [])
+
+        tasks = [fetch_collection(col) for col in collections]
+        completed_tasks = await asyncio.gather(*tasks)
+        
+        return {key: hits for key, hits in completed_tasks}
 
     def _has_active_filters(self, kw) -> bool:
         return any([

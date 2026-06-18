@@ -4,6 +4,7 @@ from fastapi import (
     HTTPException,
     Request
 )
+from prisma.errors import PrismaError
 from app.models.collection import (
     CollectionCreate,
     Collection,
@@ -12,7 +13,6 @@ from app.models.collection import (
 from app.models.generic import Message
 from app.prisma_client import prisma as db
 from app.core.utils import slugify
-from prisma.errors import PrismaError
 from typing import Optional
 from app.core.permissions import require_admin
 from app.services.cache import cacheable

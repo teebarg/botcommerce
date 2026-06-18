@@ -3,6 +3,7 @@ import { FeedQuery, ProductFeed, ProductSearch } from "@/schemas";
 import { InfiniteList } from "@/components/InfiniteList";
 import ProductCardPLP from "../products/product-card-plp";
 import NoProductsFound from "../products/no-products";
+import { useMemo } from "react";
 
 interface Props {
     initialData?: ProductFeed | null;
@@ -11,7 +12,9 @@ interface Props {
 
 export default function InfiniteFeed({ initialData, params }: Props) {
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useProductFeed(initialData || null, params);
-    const products = data?.pages?.flatMap((page) => page.products) ?? (initialData ? initialData.products : []);
+    const products = useMemo(() => {
+        return data?.pages?.flatMap((page) => page.products) ?? (initialData ? initialData.products : []);
+    }, [data, initialData]);
     const hasProducts = products.length > 0;
 
     if (isPending) {

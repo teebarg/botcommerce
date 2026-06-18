@@ -1,5 +1,4 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -409,7 +408,6 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
                 </CollapsibleContent>
             </Collapsible>
 
-            {/* Age Groups */}
             <Collapsible open={openSections.age} onOpenChange={() => toggleSection("age")}>
                 <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
                     <span className="font-medium">Age Group</span>
