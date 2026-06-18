@@ -17,7 +17,6 @@ class TemplateEngine:
         email = user.email
         email_data = await generate_invoice_email(order=order, user=user)
 
-        # Format items overview so it looks clean inside a block code box or layout
         items_raw = ctx.get('items_overview', 'No items specified')
         
         # Map a hex color or border look based on payment status

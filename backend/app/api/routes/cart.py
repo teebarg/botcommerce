@@ -254,7 +254,7 @@ async def get_admin_abandoned_carts(
         include={"user": True, "items": {"include": {"variant": {"include": {"product": {"include": {"images": True}}}}}}}
     )
 
-    return PaginatedAbandonedCarts.validate({"items":carts[:limit], "next_cursor":carts[-1].id if len(carts) > limit else None, "limit":limit})
+    return PaginatedAbandonedCarts.validate({"items" : carts[:limit], "next_cursor" : carts[-1].id if len(carts) > limit else None, "limit" : limit})
 
 @router.get("/abandoned-carts/stats", dependencies=[Depends(require_admin)])
 @cacheable(key_prefix="abandoned-carts:stats", tags=["abandoned-carts"])
