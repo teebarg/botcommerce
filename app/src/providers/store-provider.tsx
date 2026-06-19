@@ -1,7 +1,6 @@
 import type React from "react";
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext } from "react";
 import z from "zod";
-import { useRouteContext } from "@tanstack/react-router";
 
 const ConfigTypeSchema = z.object({
     shop_name: z.string().optional(),
@@ -34,12 +33,9 @@ type StoreContextType = {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
-    const { config } = useRouteContext({ strict: false });
-    const value = useMemo(() => ({ config }), [config]);
-
+export const StoreProvider = ({ config, children }: { config: StoreContextType | undefined; children: React.ReactNode }) => {
     return (
-        <StoreContext.Provider value={value}>
+        <StoreContext.Provider value={config}>
             {children}
         </StoreContext.Provider>
     );

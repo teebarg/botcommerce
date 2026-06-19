@@ -15,6 +15,7 @@ import InfiniteFeed from "@/components/store/collections/infinite-feed";
 import { getIndexProductsFn } from "@/server/product.server";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { LazyInView } from "@/components/LazyInView";
+import { categoriesQuery } from "@/hooks/useCategories";
 
 const indexProductQuery = () =>
     queryOptions({
@@ -27,6 +28,7 @@ const indexProductQuery = () =>
 export const Route = createFileRoute("/_mainLayout/")({
     component: Home,
     loader: async ({ context: { queryClient } }) => {
+        queryClient.prefetchQuery(categoriesQuery());
         queryClient.prefetchQuery(indexProductQuery());
         const image = HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)];
         return {
@@ -37,26 +39,24 @@ export const Route = createFileRoute("/_mainLayout/")({
 
 function Home() {
     const { heroImage } = Route.useLoaderData();
-    const { data } = useQuery(indexProductQuery());
+    const { data, isPending } = useQuery(indexProductQuery());
 
     return (
         <div className="animate-in fade-in-50 duration-300">
-            <HeroSection image={heroImage} />
-            <CategoriesSection />
             <SaleBanner />
-            <SizesGrid />
+            <CategoriesSection />
+            <NewArrivals products={data?.arrival || []} isLoading={isPending} />
+            <HeroSection image={heroImage} />
+            <Trending products={data?.trending || []} isLoading={isPending} />
             <PromotionalBanner
-                btnClass="text-purple-600"
-                outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-8xl"
                 subtitle="Get up to 50% OFF on select products."
                 title="Big Sale on Top Brands!"
+                href="/collections"
             />
-            <Featured products={data?.featured || []} />
-            <Trending products={data?.trending || []} />
+            <SizesGrid />
+            <Featured products={data?.featured || []} isLoading={isPending} />
             <PromotionalBanner
-                btnClass="text-purple-600"
-                outerClass="from-purple-500 via-pink-500 to-orange-400 my-4 mx-2 md:mx-auto max-w-8xl"
-                subtitle="Get up to 50% OFF on select products."
+                subtitle="Get free deliveries on order above ₦50,000."
                 title="Big Sale on Top Brands!"
             />
             <LazyInView
@@ -68,8 +68,7 @@ function Home() {
             >
                 <CategoriesWithProductsSection />
             </LazyInView>
-            <NewArrivals products={data?.arrival || []} />
-            <div className="max-w-8xl mx-auto">
+            <div className="max-w-8xl mx-auto px-2">
                 <div className="px-4 mb-4">
                     <h2 className="font-display text-xl font-semibold">For You</h2>
                     <p className="text-xs text-muted-foreground">Personalized picks based on your style</p>

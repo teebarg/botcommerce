@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { getUsersFn } from "@/server/users.server";
-import { CartStatus, PaginatedAbandonedCarts, PaginatedActivities, PaginatedChats, PaginatedCoupons } from "@/schemas";
+import { PaginatedAbandonedCarts, PaginatedActivities, PaginatedChats, PaginatedCoupons } from "@/schemas";
 import { api } from "@/utils/api";
 import { StatsTrends } from "@/types/models";
 

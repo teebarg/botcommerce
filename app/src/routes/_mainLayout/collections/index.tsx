@@ -1,9 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
-import InfiniteScrollClient from "@/components/store/collections/scroll-client";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { productFeedQuery } from "@/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { FeedQuerySchema } from "@/schemas";
 import { PageLoader } from "@/components/generic/page-loader";
+import InfiniteFeed from "@/components/store/collections/infinite-feed";
 
 export const Route = createFileRoute("/_mainLayout/collections/")({
     validateSearch: (search: Record<string, unknown>) => {
@@ -19,14 +19,16 @@ export const Route = createFileRoute("/_mainLayout/collections/")({
             search,
         };
     },
-    loader: async ({ context: { queryClient, search }, params }) => {
+    loader: async ({ context: { queryClient, search } }) => {
         queryClient.prefetchQuery(productFeedQuery({ ...search }));
     },
-    pendingComponent: () => (<PageLoader variant="grid" cols={4} rows={6} className="max-w-7xl w-full mx-auto py-2" />)
 });
 
 function RouteComponent() {
-    const { data } = useQuery(productFeedQuery(Route.useSearch()));
+    const search = useSearch({ strict: false });
+    const { data, isLoading } = useQuery(productFeedQuery(Route.useSearch()));
 
-    return <InfiniteScrollClient initialData={data} />;
+    if (isLoading) return <PageLoader variant="grid" cols={4} rows={6} className="max-w-7xl w-full mx-auto py-2" />
+
+    return <InfiniteFeed initialData={data} params={{ ...search }} />
 }

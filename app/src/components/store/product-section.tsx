@@ -9,7 +9,6 @@ interface ProductSectionProps {
     title: string;
     subtitle?: string;
     products: ProductSearch[];
-    showGradient?: boolean;
     href?: string;
 }
 
@@ -19,7 +18,7 @@ interface ScrollState {
     activeIndex: number;
 }
 
-const ProductSection = ({ title, subtitle, products, href, showGradient = false }: ProductSectionProps) => {
+const ProductSection = ({ title, subtitle, products, href }: ProductSectionProps) => {
     const listRef = useRef<HTMLUListElement>(null);
     const [scrollState, setScrollState] = useState<ScrollState>({
         atStart: true,

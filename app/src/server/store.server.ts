@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import type { Address, SearchCatalog, Collection } from "@/schemas";
+import type { Address, SearchCatalog, Collection, Category } from "@/schemas";
 import { z } from "zod";
 import { api } from "@/utils/api";
 
@@ -20,3 +20,5 @@ export const getUserAddressesFn = createServerFn({ method: "GET" }).handler(asyn
 export const getCollectionFn = createServerFn({ method: "GET" })
     .inputValidator((d: string) => d)
     .handler(async ({ data }) => await api.get<Collection>(`/collection/${data}`));
+
+export const getCategoriesFn = createServerFn().inputValidator((query?: string) => query).handler(async ({ data }) => await api.get<Category[]>(`/category/`, { params: { query: data } }));

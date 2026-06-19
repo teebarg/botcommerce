@@ -1,38 +1,61 @@
-import { ProductSearch } from "@/schemas";
-import LocalizedClientLink from "@/components/ui/link";
-import { TrendingUp } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import type { ProductSearch } from "@/schemas";
+import { currency } from "@/utils";
+import { PageLoader } from "@/components/generic/page-loader";
 
-export default function Trending({ products }: { products: ProductSearch[] }) {
-    if (!products || products.length === 0) {
-        return null;
-    }
+export default function Trending({ products, isLoading }: { products: ProductSearch[], isLoading?: boolean }) {
+    if (isLoading) return <PageLoader variant="product-section" />;
+    if (!products?.length) return null;
+    const [hero, ...rest] = products.slice(0, 3);
+
     return (
-        <div className="max-w-8xl mx-auto">
-            {products?.length && products?.length > 0 && (
-                <section className="py-8 px-2">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                            <TrendingUp className="w-5 h-5 text-primary" />
-                            <h2 className="text-lg md:text-xl font-bold text-foreground">Trending Now</h2>
+        <section className="py-6 max-w-8xl mx-auto px-2">
+            <div className="flex items-center justify-between mb-3">
+                <div>
+                    <h2 className="font-display text-xl font-semibold">Trending now</h2>
+                    <p className="text-xs text-muted-foreground">What everyone's buying</p>
+                </div>
+                <Link to="/collections/$slug" params={{ slug: 'trending' }} className="text-sm text-accent font-medium">
+                    See all →
+                </Link>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+                <Link
+                    to="/collections/$slug"
+                    params={{ slug: "trending" }}
+                    className="rounded-xl overflow-hidden border border-border bg-card row-span-2"
+                >
+                    <img
+                        src={hero?.image || "/placeholder.jpg"}
+                        alt={hero?.name}
+                        className="w-full object-cover"
+                        style={{ height: "100%", maxHeight: 500 }}
+                    />
+                    <div className="p-3">
+                        <span className="text-xs bg-accent-subtle text-accent-subtle-foreground px-2 py-0.5 rounded-full font-medium">Hot</span>
+                        <p className="text-sm font-medium mt-1.5 truncate">{hero?.name}</p>
+                        <p className="text-xs text-muted-foreground">{currency(hero?.variants?.[0]?.price ?? 0)}</p>
+                    </div>
+                </Link>
+                {rest.map((product) => (
+                    <Link
+                        key={product.id}
+                        to="/collections/$slug"
+                        params={{ slug: "trending" }}
+                        className="rounded-xl overflow-hidden border border-border bg-card"
+                    >
+                        <img
+                            src={product.image || "/placeholder.jpg"}
+                            alt={product.name}
+                            className="w-full object-cover aspect-square"
+                        />
+                        <div className="p-3">
+                            <p className="text-xs font-medium truncate">{product.name}</p>
+                            <p className="text-xs text-muted-foreground">{currency(product?.variants?.[0]?.price ?? 0)}</p>
                         </div>
-                        <LocalizedClientLink className="text-sm text-accent mr-1" href="/collections/trending">
-                            View All
-                        </LocalizedClientLink>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 px-2">
-                        {products?.map((product: ProductSearch) => (
-                            <Link key={product.id} to="/collections/$slug" params={{ slug: "trending" }} className="w-full h-full">
-                                <img
-                                    src={product.image || "/placeholder.jpg"}
-                                    alt={product.name}
-                                    className="w-full h-full max-h-80 object-cover transition-transform duration-500 group-hover:scale-110"
-                                />
-                            </Link>
-                        ))}
-                    </div>
-                </section>
-            )}
-        </div>
+                    </Link>
+                ))}
+            </div>
+        </section>
     );
 }

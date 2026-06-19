@@ -1,9 +1,8 @@
-import { HeadContent, Outlet, Scripts, createRootRouteWithContext, redirect } from "@tanstack/react-router";
+import { HeadContent, Outlet, Scripts, createRootRouteWithContext, redirect, useLoaderData } from "@tanstack/react-router";
 import { Toaster } from "sonner";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { CartProvider } from "@/providers/cart-provider";
 import { StoreProvider } from "@/providers/store-provider";
-import ImpersonationBanner from "@/components/impersonation-banner";
 import PushPermission from "@/components/push-permission";
 import { seo } from "@/utils/seo";
 import NotFound from "@/components/generic/not-found";
@@ -114,9 +113,9 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
         return { isAuthenticated, userId, session, config };
     },
-    loader: async ({ context: { config } }) => {
+    loader: async ({ context }) => {
         return {
-            config,
+            config: context.config,
         };
     },
     head: ({ loaderData }) => {
@@ -133,7 +132,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
                 ...seo({
                     title,
                     description,
-                    url: `${baseUrl}}`,
+                    url: `${baseUrl}`,
                     image: "/default-og.png",
                     name: title,
                 }),
@@ -168,11 +167,11 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
     // const GA_ID = import.meta.env.VITE_GA_ID;
-    const [isClient, setIsClient] = useState(false);
     const [localSessionId, setLocalSessionId] = useState<string | null>(null);
+    const { config } = useLoaderData({ from: Route.id });
+    console.log("[Root]........")
 
     useEffect(() => {
-        setIsClient(true);
         setLocalSessionId(getSessionId());
     }, []);
     return (
@@ -215,11 +214,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             <body className="min-h-screen">
                 <ClerkProvider>
                     <ThemeProvider>
-                        <StoreProvider>
+                        <StoreProvider config={config}>
                             <CartProvider>
                                 <div className="relative">
                                     <PushPermission />
-                                    {isClient && localSessionId ? (
+                                    {localSessionId && (
                                         <WebSocketProvider
                                             url={`${import.meta.env.VITE_WS}/api/ws/?session_id=${localSessionId}`}
                                             debug={true}
@@ -227,12 +226,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                             onClose={() => console.log("WebSocket disconnected!")}
                                         >
                                             <InvalidateProvider>{children}</InvalidateProvider>
-                                            <ImpersonationBanner />
                                         </WebSocketProvider>
-                                    ) : (
-                                        <InvalidateProvider>{children}</InvalidateProvider>
                                     )}
-                                    {import.meta.env.MODE !== "production" && (
+                                                                        {import.meta.env.MODE !== "production" && (
                                         <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
                                     )}
                                 </div>

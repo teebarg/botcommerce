@@ -1,10 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { seo } from "@/utils/seo";
-import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import { collectionQuery, productFeedQuery } from "@/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { FeedQuerySchema } from "@/schemas";
 import { PageLoader } from "@/components/generic/page-loader";
+import InfiniteFeed from "@/components/store/collections/infinite-feed";
 
 export const Route = createFileRoute("/_mainLayout/collections/$slug")({
     validateSearch: (search: Record<string, unknown>) => {
@@ -54,7 +54,10 @@ export const Route = createFileRoute("/_mainLayout/collections/$slug")({
 
 function RouteComponent() {
     const { slug } = Route.useParams();
-    const { data } = useQuery(productFeedQuery({ ...Route.useSearch(), collections: slug }));
+    const search = useSearch({ strict: false });
+    const { data, isLoading } = useQuery(productFeedQuery({ ...Route.useSearch(), collections: slug }));
 
-    return <InfiniteScrollClient initialData={data} collection_slug={slug!} />;
+    if (isLoading) return <PageLoader variant="grid" cols={4} rows={6} className="max-w-7xl w-full mx-auto py-2" />
+
+    return <InfiniteFeed initialData={data} params={{ ...search, collections: slug }} />
 }

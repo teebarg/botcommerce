@@ -74,7 +74,6 @@
     --aspect-gallery: 4 / 6;
 
     --container-8xl: 88rem;
-    --container-9xl: 96rem;
 
     --radius-1xl: 0.875rem;
 
@@ -295,15 +294,12 @@
 @layer base {
     * {
         @apply border-border outline-ring/50;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
     }
 
     body {
         @apply bg-background text-foreground font-sans antialiased pt-[var(--sat)] pb-[var(--sab)];
-    }
-
-    * {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
     }
     
     *::-webkit-scrollbar {

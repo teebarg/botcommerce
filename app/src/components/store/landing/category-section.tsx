@@ -1,38 +1,47 @@
 import { Link } from "@tanstack/react-router";
-
-import { useCategories } from "@/hooks/useCategories";
+import { categoriesQuery } from "@/hooks/useCategories";
 import type { Category } from "@/schemas/product";
-import ComponentLoader from "@/components/component-loader";
+import { useQuery } from "@tanstack/react-query";
 
-const CategoriesSection: React.FC = () => {
-    const { data: categories, isLoading } = useCategories();
+function CategoryPillsSkeleton() {
+    return (
+        <>
+            {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                    key={i}
+                    className="shrink-0 h-9 rounded-full bg-muted animate-pulse"
+                    style={{ width: `${[64, 80, 72, 88, 68, 76][i]}px` }}
+                />
+            ))}
+        </>
+    );
+}
+
+export default function CategoriesSection() {
+    const { data, isPending  } = useQuery(categoriesQuery());
 
     return (
-        <div className="bg-linear-to-b from-background to-card/30">
-            <div className="max-w-8xl mx-auto px-4 py-8 w-full text-left md:text-center">
-                <h2 className="text-lg md:text-3xl font-bold mb-2 mt-6">Shop by category</h2>
-                {isLoading ? (
-                    <ComponentLoader className="h-48" />
-                ) : (
-                    <div className="flex overflow-x-auto pb-4 gap-5">
-                        {(categories || []).map((category: Category, idx: number) => (
-                            <Link
-                                key={idx}
-                                className="shrink-0 relative w-32 h-32 rounded-2xl overflow-hidden"
-                                to="/collections"
-                                search={(prev) => ({ ...prev, cat_ids: category.slug })}
-                            >
-                                <img src={category.image || "/placeholder.jpg"} alt={category.name} className="w-full h-full object-cover" />
-                                <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent flex items-end">
-                                    <span className="text-sm font-semibold p-3 w-full text-center text-white">{category.name}</span>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-                )}
-            </div>
+        <div className="px-6 py-4 flex gap-2 overflow-x-auto md:flex-wrap md:overflow-visible max-w-8xl mx-auto">
+            <Link
+                to="/collections"
+                className="shrink-0 px-4 py-2 rounded-full text-sm font-medium bg-foreground text-background"
+            >
+                All
+            </Link>
+            {isPending ? (
+                <CategoryPillsSkeleton />
+            ) : (
+                (data || []).map((category: Category) => (
+                    <Link
+                        key={category.id}
+                        to="/collections"
+                        search={(prev: any) => ({ ...prev, cat_ids: category.slug })}
+                        className="shrink-0 px-4 py-2 rounded-full text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors"
+                    >
+                        {category.name}
+                    </Link>
+                ))
+            )}
         </div>
     );
-};
-
-export default CategoriesSection;
+}

@@ -4,13 +4,13 @@ import { Shield, Tag, ArrowRight, Trash2, Plus, Minus } from "lucide-react";
 import ServerError from "@/components/generic/server-error";
 import type { CartItem } from "@/schemas";
 import { useCart } from "@/providers/cart-provider";
-import ComponentLoader from "@/components/component-loader";
 import EmptyCartMessage from "@/components/store/cart/empty-message";
 import { Separator } from "@/components/ui/separator";
 import { currency } from "@/utils";
 import ImageDisplay from "@/components/image-display";
 import { useChangeCartQuantity, useDeleteCartItem } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
+import { PageLoader } from "@/components/generic/page-loader";
 
 export const Route = createFileRoute("/_mainLayout/cart")({
     head: () => ({
@@ -155,7 +155,7 @@ function OrderSummary({ cart }: { cart: NonNullable<ReturnType<typeof useCart>["
 function RouteComponent() {
     const { cart, isLoading, error } = useCart();
 
-    if (isLoading) return <ComponentLoader className="h-[400px]" />;
+    if (isLoading) return <PageLoader variant="cart" className="max-w-2xl lg:max-w-5xl mx-auto px-4 py-6 md:py-12 w-full" />;
     if (error) return <ServerError />;
     if (!cart) return <div className="py-24"><EmptyCartMessage /></div>;
 

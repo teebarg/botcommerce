@@ -23,7 +23,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                     </label>
                 )}
                 <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2">{startContent}</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground [&>svg]:w-4 [&>svg]:h-4">
+                        {startContent}
+                    </span>
                     <input
                         ref={ref}
                         className={cn(
@@ -38,7 +40,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         type={type}
                         {...props}
                     />
-                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2">{endContent}</span>
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground [&>svg]:w-4 [&>svg]:h-4">
+                        {endContent}
+                    </span>
                     {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
                     {error && <p className="text-xs text-rose-500 mt-0.5">{error}</p>}
                 </div>

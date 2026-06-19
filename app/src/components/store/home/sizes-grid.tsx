@@ -1,27 +1,24 @@
-import LocalizedClientLink from "@/components/ui/link";
+import { Link } from "@tanstack/react-router";
 
 const sizes = ["8", "10", "12", "14", "16", "18", "20", "22"];
 
-const SizesGrid = () => {
+export default function SizesGrid() {
     return (
-        <section className="py-8 px-4 md:px-2">
-            <div className="max-w-7xl mx-auto">
-                <div className="text-center mb-4">
-                    <h2 className="text-base md:text-3xl font-bold">Shop by Size</h2>
-                </div>
-                <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4">
-                    {sizes?.map((item: string, idx: number) => (
-                        <LocalizedClientLink key={idx} href={`/collections?sizes=${item}`}>
-                            <div className="w-18 md:w-20 h-18 md:h-20 rounded-full bg-accent text-accent-foreground flex flex-col items-center justify-center font-bold">
-                                <span className="text-lg md:text-2xl leading-none">{item}</span>
-                                <span className="text-lg leading-none">UK</span>
-                            </div>
-                        </LocalizedClientLink>
-                    ))}
-                </div>
+        <section className="py-6 px-4 max-w-8xl mx-auto">
+            <h2 className="font-display text-xl font-semibold mb-4">Shop by size</h2>
+            <div className="flex flex-wrap gap-3">
+                {sizes.map((size) => (
+                    <Link
+                        key={size}
+                        to="/collections"
+                        search={{ sizes: size }}
+                        className="w-12 h-12 rounded-full border border-border flex flex-col items-center justify-center hover:bg-foreground hover:text-background hover:border-foreground transition-colors"
+                    >
+                        <span className="text-sm font-semibold leading-none">{size}</span>
+                        <span className="text-[9px] text-muted-foreground leading-none mt-0.5">UK</span>
+                    </Link>
+                ))}
             </div>
         </section>
     );
-};
-
-export default SizesGrid;
+}
