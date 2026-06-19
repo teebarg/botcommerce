@@ -81,7 +81,7 @@ function RouteComponent() {
 
         if (lastMessage.type === "bulk_action") {
             if (lastMessage.status === "processing") {
-                toast.loading("Processing...", { id: BULK_ACTION_TOAST_ID });
+                toast.loading("Processing...", { id: BULK_ACTION_TOAST_ID, description: "Bulk image deletion in progress." });
             }
 
             if (lastMessage.status === "completed") {

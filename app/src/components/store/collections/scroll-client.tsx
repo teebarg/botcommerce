@@ -20,7 +20,7 @@ export default function InfiniteScrollClient({ initialData, collection_slug, sea
     return (
         <div className="max-w-9xl mx-auto w-full py-4 px-2 slide-in">
             <div className="flex gap-6">
-                <aside className="h-[calc(100vh-6rem)] w-96 hidden md:flex flex-col overflow-hidden sticky top-24">
+                <aside className="h-[calc(100vh-6rem)] w-80 hidden md:flex flex-col overflow-hidden sticky top-24">
                     <div className="flex items-center justify-between w-full">
                         <h2 className="font-semibold">FILTER & SORT</h2>
                         <Button

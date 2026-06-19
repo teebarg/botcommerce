@@ -2,8 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { seo } from "@/utils/seo";
 import InfiniteScrollClient from "@/components/store/collections/scroll-client";
 import { collectionQuery, productFeedQuery } from "@/queries/user.queries";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { FeedQuerySchema } from "@/schemas";
+import { PageLoader } from "@/components/generic/page-loader";
 
 export const Route = createFileRoute("/_mainLayout/collections/$slug")({
     validateSearch: (search: Record<string, unknown>) => {
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/_mainLayout/collections/$slug")({
     loaderDeps: ({ search }) => search,
     loader: async ({ params: { slug }, context: { search, config, queryClient } }) => {
         const collection = await queryClient.ensureQueryData(collectionQuery(slug));
-        await queryClient.ensureQueryData(productFeedQuery({ collections: collection?.slug, ...search }));
+        queryClient.prefetchQuery(productFeedQuery({ collections: collection?.slug, ...search }));
         return {
             collection,
             config,
@@ -48,11 +49,12 @@ export const Route = createFileRoute("/_mainLayout/collections/$slug")({
         };
     },
     component: RouteComponent,
+    pendingComponent: () => (<PageLoader variant="grid" cols={4} rows={6} className="max-w-7xl w-full mx-auto py-2" />)
 });
 
 function RouteComponent() {
     const { slug } = Route.useParams();
-    const { data } = useSuspenseQuery(productFeedQuery({ ...Route.useSearch(), collections: slug }));
+    const { data } = useQuery(productFeedQuery({ ...Route.useSearch(), collections: slug }));
 
     return <InfiniteScrollClient initialData={data} collection_slug={slug!} />;
 }

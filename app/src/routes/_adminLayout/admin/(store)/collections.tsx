@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/collections")(
     }),
     loaderDeps: ({ search }) => search,
     loader: async ({ context: { queryClient }, deps }) => {
-        await queryClient.ensureQueryData(collectionsQuery(deps));
+        queryClient.prefetchQuery(collectionsQuery(deps));
     },
     pendingComponent: () => (
         <div className="px-3 md:px-10 py-2">
