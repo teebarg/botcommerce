@@ -12,6 +12,7 @@ import CollectionItem from "@/components/admin/collections/collection-items";
 import { z } from "zod";
 import { useQuery } from "@tanstack/react-query";
 import { formatDate } from "@/utils";
+import { PageLoader } from "@/components/generic/page-loader";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/collections")({
     validateSearch: z.object({
@@ -21,6 +22,11 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/collections")(
     loader: async ({ context: { queryClient }, deps }) => {
         await queryClient.ensureQueryData(collectionsQuery(deps));
     },
+    pendingComponent: () => (
+        <div className="px-3 md:px-10 py-2">
+            <PageLoader variant="list" rows={6} />
+        </div>
+    ),
     component: RouteComponent,
 });
 

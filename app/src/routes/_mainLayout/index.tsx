@@ -20,13 +20,14 @@ const indexProductQuery = () =>
     queryOptions({
         queryKey: ["products", "collections"],
         queryFn: () => getIndexProductsFn(),
-        staleTime: 1000 * 60 * 30,
+        staleTime: 1000 * 60 * 60,
+        gcTime: 1000 * 60 * 60 * 2,
     });
 
 export const Route = createFileRoute("/_mainLayout/")({
     component: Home,
     loader: async ({ context: { queryClient } }) => {
-        await queryClient.ensureQueryData(indexProductQuery());
+        queryClient.prefetchQuery(indexProductQuery());
         const image = HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)];
         return {
             heroImage: image,

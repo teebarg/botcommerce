@@ -8,7 +8,6 @@ import type { Cart, DeliveryOption } from "@/schemas";
 import { useUpdateCartDetails } from "@/hooks/useCart";
 import { useConfig } from "@/providers/store-provider";
 import ComponentLoader from "@/components/component-loader";
-import { motion } from "framer-motion";
 
 interface DeliveryStepProps {
     cart: Cart;

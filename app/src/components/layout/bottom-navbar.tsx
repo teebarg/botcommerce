@@ -3,7 +3,6 @@ import { Home, Search, User } from "lucide-react";
 import StoreMenuComp from "./store-mobile-menu-drawer";
 import { CartComponent } from "@/components/store/cart/cart-component";
 import LocalizedClientLink from "@/components/ui/link";
-import { motion } from "framer-motion";
 
 const ButtonNav = () => {
     interface NavLink {
