@@ -29,7 +29,7 @@ const StatusBadge = ({ isSuccess, activityType }: { isSuccess: boolean; activity
 };
 
 const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
-    const { config } = useConfig();
+    const { shop_name } = useConfig();
 
     const handleDownload = (url: string, filename: string) => {
         const link = document.createElement("a");
@@ -62,7 +62,7 @@ const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
                         </div>
 
                         <div className="flex items-center text-xs text-muted-foreground mb-3">
-                            <span className="font-medium">{config?.shop_name}</span>
+                            <span className="font-medium">{shop_name}</span>
                             <span className="mx-2">•</span>
                             <span>{formatDistanceToNow(new Date(activity.created_at))}</span>
                         </div>

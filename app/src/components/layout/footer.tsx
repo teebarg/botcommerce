@@ -46,7 +46,7 @@ const support = [
 ];
 
 export default function Footer() {
-    const { config } = useConfig();
+    const { shop_name, facebook, instagram, tiktok, twitter } = useConfig();
     const { data: collections } = useCollections();
 
     const { data: cat } = useCategories();
@@ -57,7 +57,7 @@ export default function Footer() {
             <div className="hidden md:block mx-auto max-w-7xl px-6 pb-8 pt-8 sm:pt-24 lg:px-8 md:pt-32">
                 <div className="hidden md:grid md:grid-cols-3 md:gap-8">
                     <div className="md:pr-8">
-                        <h3 className="text-xl font-semibold">{config?.shop_name}</h3>
+                        <h3 className="text-xl font-semibold">{shop_name}</h3>
                         <p className="text-sm text-muted-foreground">
                             {`We are a dedicated online store offering a wide range of high-quality and fun products for kids. Our mission is to bring
                             joy and happiness to every child's life.`}
@@ -66,7 +66,7 @@ export default function Footer() {
                             <a
                                 aria-label="Twitter"
                                 className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-                                href={`https://web.facebook.com/profile.php?id=${config?.facebook}`}
+                                href={`https://web.facebook.com/profile.php?id=${facebook}`}
                                 target="_blank"
                             >
                                 <Facebook className="text-primary" />
@@ -74,7 +74,7 @@ export default function Footer() {
                             <a
                                 aria-label="Instagram"
                                 className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-                                href={`https://www.instagram.com/${config?.instagram}`}
+                                href={`https://www.instagram.com/${instagram}`}
                                 target="_blank"
                             >
                                 <Instagram className="text-primary" />
@@ -82,7 +82,7 @@ export default function Footer() {
                             <a
                                 aria-label="Tiktok"
                                 className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-                                href={`https://www.tiktok.com/@${config?.tiktok}`}
+                                href={`https://www.tiktok.com/@${tiktok}`}
                                 target="_blank"
                             >
                                 <MessageSquare className="text-primary" />
@@ -90,7 +90,7 @@ export default function Footer() {
                             <a
                                 aria-label="X"
                                 className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-                                href={`https://x.com/${config?.twitter}`}
+                                href={`https://x.com/${twitter}`}
                                 target="_blank"
                             >
                                 <Twitter className="text-primary" />
@@ -166,7 +166,7 @@ export default function Footer() {
                 <Separator className="my-4" />
                 <div>
                     <p className="text-sm text-muted-foreground">
-                        &copy; {new Date().getFullYear()} {config?.shop_name}. All rights reserved.
+                        &copy; {new Date().getFullYear()} {shop_name}. All rights reserved.
                     </p>
                 </div>
             </div>

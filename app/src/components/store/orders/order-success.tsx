@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 
 import OrderItems from "./order-items";
 import OrderSummary from "./order-summary";
@@ -18,16 +18,15 @@ type OrderConfirmationProps = {
 
 const SuccessConfirmation: React.FC<OrderConfirmationProps> = ({ order, onContinueShopping }) => {
     return (
-        <div className="w-full max-w-3xl mx-auto rounded-xl px-2 md:px-6 pt-8">
+        <div className="max-w-2xl mx-auto px-4 py-6 md:py-8 w-full">
             <FadeInComponent>
                 <div className="text-center mb-6">
-                    <div className="inline-flex items-center justify-center w-20 h-20 bg-emerald-100 rounded-full mb-4 animate-pulse">
-                        <Check className="w-12 h-12 text-emerald-700" />
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-emerald-100 rounded-full mb-3 animate-pulse">
+                        <Check className="w-5 h-5 text-emerald-700" />
                     </div>
 
-                    <h2 className="text-2xl font-bold mb-2">Order Confirmed!</h2>
-
-                    <p className="text-muted-foreground">{`Thank you for your purchase. We've sent a confirmation to ${order.email}.`}</p>
+                    <h2 className="text-xl font-semibold mb-1">Order Confirmed!</h2>
+                    <p className="text-muted-foreground text-sm">{`Thank you for your purchase. We've sent a confirmation to ${order.email}.`}</p>
                 </div>
             </FadeInComponent>
 
@@ -56,11 +55,10 @@ const SuccessConfirmation: React.FC<OrderConfirmationProps> = ({ order, onContin
             </FadeInComponent>
 
             <FadeInComponent delay="650ms">
-                <div className="mt-6 space-y-3">
-                    <Button className="w-full" size="lg" onClick={onContinueShopping}>
-                        Continue Shopping
-                    </Button>
-                </div>
+                <Button className="w-full mt-6 rounded-full" size="lg" onClick={onContinueShopping}>
+                    Continue shopping
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
             </FadeInComponent>
         </div>
     );

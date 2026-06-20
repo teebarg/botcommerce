@@ -68,7 +68,7 @@ function Home() {
             >
                 <CategoriesWithProductsSection />
             </LazyInView>
-            <div className="max-w-8xl mx-auto px-2">
+            <div className="max-w-sxl mx-auto px-2">
                 <div className="px-4 mb-4">
                     <h2 className="font-display text-xl font-semibold">For You</h2>
                     <p className="text-xs text-muted-foreground">Personalized picks based on your style</p>

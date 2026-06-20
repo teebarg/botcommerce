@@ -11,7 +11,7 @@ import { gtag } from "@/utils/gtag";
 
 export const useProductVariant = (product: ProductLite | ProductSearch) => {
     const { cart } = useCart();
-    const { config } = useConfig();
+    const { whatsapp } = useConfig();
     const { mutateAsync: addToCart, isPending: creating } = useAddToCart();
     const { mutateAsync: updateQuantity, isPending: updating } = useChangeCartQuantity();
     const [isAdded, setIsAdded] = useState<boolean>(false);
@@ -237,7 +237,7 @@ export const useProductVariant = (product: ProductLite | ProductSearch) => {
             }/products/${product.slug}`;
         }
 
-        const whatsappUrl = `https://wa.me/${config?.whatsapp}?text=${encodeURIComponent(message)}`;
+        const whatsappUrl = `https://wa.me/${whatsapp}?text=${encodeURIComponent(message)}`;
 
         window.open(whatsappUrl, "_blank");
         markFirstWhatsAppMessageSent();

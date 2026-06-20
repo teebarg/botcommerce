@@ -1,51 +1,33 @@
-import type React from "react";
-
 import { currency } from "@/utils";
 import type { OrderItem } from "@/schemas";
-import { Badge } from "@/components/ui/badge";
 import ImageDisplay from "@/components/image-display";
 
-const OrderItemComponent: React.FC<{ item: OrderItem }> = ({ item }) => {
+export default function OrderItemComponent({ item }: { item: OrderItem }) {
+    const variantText = [
+        item.variant?.size && `Size: ${item.variant.size}`,
+        item.variant?.color && `Color: ${item.variant.color}`,
+        item.variant?.width && `Waist: ${item.variant.width}`,
+        item.variant?.length && `Length: ${item.variant.length}`,
+        item.variant?.age && `Age: ${item.variant.age}`,
+    ].filter(Boolean).join(" · ");
+
     return (
-        <div className="flex gap-3 p-4">
-            <div className="relative">
-                <div className="relative h-16 w-16 md:h-20 md:w-20 shrink-0 overflow-hidden rounded-lg bg-card ring-1 ring-border">
-                    <ImageDisplay className="rounded-lg" url={item?.image} alt={item.name} />
-                </div>
+        <div className="flex items-center gap-3 px-4 py-3">
+            <div className="relative w-16 h-16 shrink-0 overflow-hidden rounded-lg bg-card ring-1 ring-border">
+                <ImageDisplay className="rounded-lg" url={item?.image} alt={item.name} />
             </div>
 
             <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-start mb-1">
-                    <h3 className="font-semibold line-clamp-2 leading-tight text-md">{item.name}</h3>
-                </div>
-
-                {item.variant && (item.variant.size || item.variant.color || item.variant.width || item.variant.length || item.variant.age) && (
-                    <div className="flex flex-wrap gap-1.5 mb-2">
-                        {item.variant.size && <Badge variant="accent-subtle">Size: {item.variant.size}</Badge>}
-
-                        {item.variant.color && (
-                            <Badge variant="accent-subtle">
-                                <div
-                                    className="w-2.5 h-2.5 rounded-full border border-border mr-1"
-                                    style={{ backgroundColor: item.variant.color.toLowerCase() }}
-                                />
-                                {item.variant.color}
-                            </Badge>
-                        )}
-                        {item.variant.width && <Badge variant="accent-subtle">Waist: {item.variant.width}</Badge>}
-                        {item.variant.length && <Badge variant="accent-subtle">Length: {item.variant.length}</Badge>}
-                        {item.variant.age && <Badge variant="accent-subtle">Age: {item.variant.age}</Badge>}
-                    </div>
-                )}
-
-                <div className="flex items-center gap-2 mb-2">
-                    <span>{item.quantity}x</span> <span className="font-semibold text-muted-foreground text-sm">{currency(Number(item.price) || 0)}</span>
-                </div>
-
-                <p className="font-semibold mt-1">Subtotal: {currency((Number(item.price) || 0) * item.quantity)}</p>
+                <p className="text-sm font-medium truncate">{item.name}</p>
+                {variantText && <p className="text-xs text-muted-foreground mt-0.5">{variantText}</p>}
+                <p className="text-xs text-muted-foreground mt-1">
+                    {item.quantity} × {currency(Number(item.price) || 0)}
+                </p>
             </div>
+
+            <span className="text-sm font-medium shrink-0">
+                {currency((Number(item.price) || 0) * item.quantity)}
+            </span>
         </div>
     );
-};
-
-export default OrderItemComponent;
+}

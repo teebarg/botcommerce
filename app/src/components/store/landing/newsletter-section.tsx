@@ -10,7 +10,7 @@ const benefits = [
 export default function NewsletterSection() {
     return (
         <section className="border-t border-border mt-8">
-            <div className="max-w-8xl mx-auto px-4 py-16">
+            <div className="max-w-sxl mx-auto px-4 py-16">
                 <div className="max-w-xl mb-10">
                     <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-1">Newsletter</p>
                     <h2 className="font-display text-2xl font-semibold mb-2">Stay in the loop</h2>

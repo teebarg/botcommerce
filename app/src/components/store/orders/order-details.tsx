@@ -14,7 +14,7 @@ interface OrderDetailsProps {
 }
 
 const OrderDetails = ({ order }: OrderDetailsProps) => {
-    const { config } = useConfig();
+    const { address } = useConfig();
 
     return (
         <div className="flex-1 flex flex-col overflow-hidden">
@@ -142,7 +142,7 @@ const OrderDetails = ({ order }: OrderDetailsProps) => {
                         <CardContent>
                             {order.shipping_method === "PICKUP" ? (
                                 <div className="text-sm space-y-1">
-                                    <p className="font-medium text-foreground">{config?.address}</p>
+                                    <p className="font-medium text-foreground">{address}</p>
                                     <p className="text-muted-foreground">Open Mon-Sat: 9am - 6pm</p>
                                 </div>
                             ) : (

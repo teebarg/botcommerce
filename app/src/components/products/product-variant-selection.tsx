@@ -12,6 +12,52 @@ interface VariantSelectionProps {
     onVariantChange: (variant: ProductVariantLite | undefined) => void;
 }
 
+
+function OptionGroup({
+    label,
+    options,
+    selected,
+    isAvailable,
+    onToggle,
+}: {
+    label: string;
+    options: (number | string | undefined | null)[];
+    selected: number | string | null;
+    isAvailable: (value: number | string) => boolean | undefined;
+    onToggle: (value: any) => void;
+}) {
+    return (
+        <div>
+            <p className="text-sm font-medium text-foreground mb-2.5">{label}</p>
+            <div className="flex flex-wrap gap-2">
+                {options.map((opt) => {
+                    if (!opt) return null;
+                    const available = isAvailable(opt);
+                    const isSelected = selected === opt;
+
+                    return (
+                        <button
+                            key={opt}
+                            disabled={!available}
+                            onClick={() => available && onToggle(opt)}
+                            className={cn(
+                                "px-4 py-2 rounded-full text-sm font-medium border transition-colors",
+                                isSelected
+                                    ? "bg-foreground text-background border-foreground"
+                                    : available
+                                        ? "bg-background border-border hover:bg-muted"
+                                        : "bg-muted text-muted-foreground border-border cursor-not-allowed opacity-50"
+                            )}
+                        >
+                            {opt}
+                        </button>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
 export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ product, onVariantChange }) => {
     const {
         selectedColor,
@@ -41,38 +87,31 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
     }, [selectedVariant]);
 
     return (
-        <div className="space-y-6 mt-4">
+        <div className="space-y-5">
             {sizes?.length > 0 && (
-                <div>
-                    <p className="text-sm font-medium text-foreground mb-3">Select Size</p>
-                    <div className="flex flex-wrap gap-2">
-                        {sizes.map((size) => (
-                            <button
-                                key={size}
-                                onClick={() => isOptionAvailable("size", size!) && toggleSizeSelect(size!)}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                                    selectedSize === size ? "bg-primary text-primary-foreground" : "bg-muted text-foreground hover:bg-muted/80"
-                                }`}
-                            >
-                                {size}
-                            </button>
-                        ))}
-                    </div>
-                </div>
+                <OptionGroup
+                    label="Size"
+                    options={sizes}
+                    selected={selectedSize}
+                    isAvailable={(v) => isOptionAvailable("size", v)}
+                    onToggle={(v) => toggleSizeSelect(v.toString())}
+                />
             )}
 
             {safeColors.length > 0 && (
-                <div className="mb-6">
-                    <h3 className="text-sm font-medium text-foreground mb-3">Color: {selectedColor}</h3>
-                    <div className="flex gap-3">
-                        {safeColors.map((color: string, idx: number) => (
+                <div>
+                    <p className="text-sm font-medium text-foreground mb-2.5">Color: {selectedColor}</p>
+                    <div className="flex gap-2.5">
+                        {safeColors.map((color, idx) => (
                             <button
                                 key={idx}
                                 onClick={() => isOptionAvailable("color", color) && toggleColorSelect(color)}
-                                className={`w-10 h-10 rounded-full border-2 transition-all ${
-                                    selectedColor === color ? "border-primary scale-110" : "border-transparent"
-                                }`}
+                                className={cn(
+                                    "w-9 h-9 rounded-full border-2 transition-all",
+                                    selectedColor === color ? "border-foreground scale-110" : "border-border"
+                                )}
                                 style={{ backgroundColor: color.toLowerCase() }}
+                                title={color}
                             />
                         ))}
                     </div>
@@ -80,136 +119,73 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
             )}
 
             {ages?.length > 0 && (
-                <div className="space-y-3">
-                    <h3 className="text-sm font-medium">Age Range</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {ages?.map((age) => {
-                            if (!age) {
-                                return null;
-                            }
-                            const available = isOptionAvailable("age", age!);
-                            const isSelected = selectedAge === age;
-
-                            return (
-                                <button
-                                    key={age}
-                                    className={cn(
-                                        "px-6 py-2 text-sm font-medium border border-border rounded-md transition-all duration-200",
-                                        isSelected
-                                            ? "bg-accent text-accent-foreground"
-                                            : available
-                                              ? "bg-card"
-                                              : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
-                                    )}
-                                    disabled={!available}
-                                    onClick={() => available && toggleAgeSelect(age)}
-                                >
-                                    {age}
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
+                <OptionGroup
+                    label="Age range"
+                    options={ages}
+                    selected={selectedAge}
+                    isAvailable={(v) => isOptionAvailable("age", v)}
+                    onToggle={toggleAgeSelect}
+                />
             )}
 
             {widths?.length > 0 && (
-                <div className="space-y-3">
-                    <h3 className="text-sm font-medium">Widths</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {widths?.map((width) => {
-                            if (!width) {
-                                return null;
-                            }
-                            const available = isOptionAvailable("width", width!);
-                            const isSelected = selectedWidth === width;
-
-                            return (
-                                <button
-                                    key={width}
-                                    className={cn(
-                                        "px-6 py-2 text-sm font-medium border border-border rounded-md transition-all duration-200",
-                                        isSelected
-                                            ? "bg-accent text-accent-foreground"
-                                            : available
-                                              ? "bg-card"
-                                              : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
-                                    )}
-                                    disabled={!available}
-                                    onClick={() => available && toggleWidthSelect(width)}
-                                >
-                                    {width}
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
+                <OptionGroup
+                    label="Waist"
+                    options={widths}
+                    selected={selectedWidth}
+                    isAvailable={(v) => isOptionAvailable("width", v)}
+                    onToggle={toggleWidthSelect}
+                />
             )}
 
             {lengths?.length > 0 && (
-                <div className="space-y-3">
-                    <h3 className="text-sm font-medium">Lengths</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {lengths?.map((length) => {
-                            if (!length) {
-                                return null;
-                            }
-                            const available = isOptionAvailable("length", length!);
-                            const isSelected = selectedLength === length;
-
-                            return (
-                                <button
-                                    key={length}
-                                    className={cn(
-                                        "px-6 py-2 text-sm font-medium border border-border rounded-md transition-all duration-200",
-                                        isSelected
-                                            ? "bg-accent text-accent-foreground"
-                                            : available
-                                              ? "bg-card"
-                                              : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
-                                    )}
-                                    disabled={!available}
-                                    onClick={() => available && toggleLengthSelect(length)}
-                                >
-                                    {length}
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
+                <OptionGroup
+                    label="Length"
+                    options={lengths}
+                    selected={selectedLength}
+                    isAvailable={(v) => isOptionAvailable("length", v)}
+                    onToggle={toggleLengthSelect}
+                />
             )}
 
             {selectedVariant && (
-                <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div className="flex justify-between items-center">
+                <div className="rounded-xl border border-border bg-card p-4">
+                    <div className="flex justify-between items-start">
                         <div>
-                            <p className="text-sm font-medium">Selected Variant</p>
-                            <p className="text-xs text-muted-foreground">SKU: {selectedVariant.sku}</p>
+                            <p className="text-sm font-medium">Selected variant</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">SKU: {selectedVariant.sku}</p>
                         </div>
                         <div className="text-right">
-                            <p className="text-lg font-bold">{currency(selectedVariant.price)}</p>
+                            <p className="text-base font-semibold">{currency(selectedVariant.price)}</p>
                             {selectedVariant.old_price > 0 && (
-                                <p className="text-sm text-muted-foreground line-through">{currency(selectedVariant.old_price)}</p>
+                                <p className="text-xs text-muted-foreground line-through">{currency(selectedVariant.old_price)}</p>
                             )}
                         </div>
                     </div>
-                    <div className="mt-2 flex justify-between items-center">
+                    <div className="mt-3 flex justify-between items-center">
                         <Badge variant={selectedVariant.status === "IN_STOCK" ? "success-subtle" : "destructive"}>
-                            {selectedVariant.status === "IN_STOCK" ? "In Stock" : "Out of Stock"}
+                            {selectedVariant.status === "IN_STOCK" ? "In stock" : "Out of stock"}
                         </Badge>
-                        <span className="text-xs text-gray-400">{selectedVariant.inventory} available</span>
+                        <span className="text-xs text-muted-foreground">{selectedVariant.inventory} available</span>
                     </div>
                 </div>
             )}
 
-            <div className="flex items-center gap-4 animate-in fade-in duration-300">
+            <div className="flex items-center gap-4">
                 <p className="text-sm font-medium text-foreground">Quantity</p>
-                <div className="flex items-center gap-3 bg-muted rounded-lg p-1">
-                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-2 rounded-md hover:bg-background transition-colors">
-                        <Minus className="w-4 h-4" />
+                <div className="flex items-center gap-3 bg-secondary rounded-full p-1">
+                    <button
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-background transition-colors"
+                    >
+                        <Minus className="w-3.5 h-3.5" />
                     </button>
-                    <span className="w-8 text-center font-medium">{quantity}</span>
-                    <button onClick={() => setQuantity(quantity + 1)} className="p-2 rounded-md hover:bg-background transition-colors">
-                        <Plus className="w-4 h-4" />
+                    <span className="w-6 text-center text-sm font-medium">{quantity}</span>
+                    <button
+                        onClick={() => setQuantity(quantity + 1)}
+                        className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-background transition-colors"
+                    >
+                        <Plus className="w-3.5 h-3.5" />
                     </button>
                 </div>
             </div>

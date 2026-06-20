@@ -8,7 +8,7 @@ interface HeroSectionProps {
 export default function HeroSection({ image }: HeroSectionProps) {
     return (
         <div>
-            <section className="md:hidden relative h-[65svh] w-full overflow-hidden">
+            <section className="md:hidden relative h-[55svh] w-full overflow-hidden">
                 <img src={image} alt="New collection" className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 px-5 pb-8 space-y-3">
@@ -41,8 +41,8 @@ export default function HeroSection({ image }: HeroSectionProps) {
                 </div>
             </section>
 
-            <section className="hidden md:block relative min-h-[60vh] overflow-hidden bg-card">
-                <div className="max-w-8xl mx-auto px-6 py-20 grid grid-cols-2 gap-12 items-center">
+            <section className="hidden md:block relative overflow-hidden bg-card">
+                <div className="max-w-5xl mx-auto px-6 py-20 grid grid-cols-2 gap-12 items-center">
                     <div className="space-y-5">
                         <span className="inline-block border border-border text-muted-foreground text-xs font-medium px-3 py-1.5 rounded-full">
                             New Collection

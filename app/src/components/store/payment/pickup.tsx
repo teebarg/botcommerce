@@ -10,7 +10,7 @@ interface PickupProps {
 }
 
 const Pickup: React.FC<PickupProps> = ({ amount, canContinue }) => {
-    const { config } = useConfig();
+    const { address } = useConfig();
     const completeCart = useCompleteCart();
 
     const onPaymentCompleted = async () => {
@@ -28,7 +28,7 @@ const Pickup: React.FC<PickupProps> = ({ amount, canContinue }) => {
                         <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
                         <div className="ml-2">
                             <p className="text-sm font-semibold">Collection Point</p>
-                            <p className="text-sm text-muted-foreground">{config?.address}</p>
+                            <p className="text-sm text-muted-foreground">{address}</p>
                             <p className="text-sm text-muted-foreground">Open Mon-Sat: 9am - 6pm</p>
                         </div>
                     </div>

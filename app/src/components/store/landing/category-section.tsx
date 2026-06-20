@@ -21,7 +21,7 @@ export default function CategoriesSection() {
     const { data, isPending  } = useQuery(categoriesQuery());
 
     return (
-        <div className="px-6 py-4 flex gap-2 overflow-x-auto md:flex-wrap md:overflow-visible max-w-8xl mx-auto">
+        <div className="px-2 mt-4 flex gap-2 overflow-x-auto md:flex-wrap md:overflow-visible max-w-sxl mx-auto">
             <Link
                 to="/collections"
                 className="shrink-0 px-4 py-2 rounded-full text-sm font-medium bg-foreground text-background"

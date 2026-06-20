@@ -24,7 +24,7 @@ interface PaymentStepProps {
 }
 
 const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
-    const { config } = useConfig();
+    const { payment_paystack, payment_bank, payment_cash } = useConfig();
     const updateCartDetails = useUpdateCartDetails();
     const [selectedPaymentMethod, setSelectedPaymentMethod] = React.useState<PaymentMethod | null>(null);
     const canContinue = Boolean(cart?.phone) && Boolean(cart?.payment_method);
@@ -63,9 +63,9 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                             >
                                 {payMethods.map((item: { id: string; provider_id: PaymentMethod }, idx: number) => {
                                     if (
-                                        (item.provider_id === PaymentMethod.CASH_ON_DELIVERY && config?.payment_cash != "true") ||
-                                        (item.provider_id === PaymentMethod.BANK_TRANSFER && config?.payment_bank != "true") ||
-                                        (item.provider_id === PaymentMethod.PAYSTACK && config?.payment_paystack != "true") ||
+                                        (item.provider_id === PaymentMethod.CASH_ON_DELIVERY && payment_cash != "true") ||
+                                        (item.provider_id === PaymentMethod.BANK_TRANSFER && payment_bank != "true") ||
+                                        (item.provider_id === PaymentMethod.PAYSTACK && payment_paystack != "true") ||
                                         (cart?.shipping_method !== "PICKUP" && item.provider_id === PaymentMethod.CASH_ON_DELIVERY)
                                     ) {
                                         return null;

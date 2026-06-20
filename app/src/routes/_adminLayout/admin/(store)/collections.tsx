@@ -22,17 +22,20 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/collections")(
     loader: async ({ context: { queryClient }, deps }) => {
         queryClient.prefetchQuery(collectionsQuery(deps));
     },
-    pendingComponent: () => (
-        <div className="px-3 md:px-10 py-2">
-            <PageLoader variant="list" rows={6} />
-        </div>
-    ),
     component: RouteComponent,
 });
 
 function RouteComponent() {
     const params = Route.useSearch();
-    const { data: collections, error } = useQuery(collectionsQuery(params));
+    const { data: collections, isPending, error } = useQuery(collectionsQuery(params));
+
+    if (isPending) {
+        return (
+            <div className="px-3 md:px-10 py-2">
+                <PageLoader variant="list" rows={6} />
+            </div>
+        )
+    }
 
     if (error) {
         return <ServerError />;

@@ -15,7 +15,7 @@ export default function CategoriesWithProductsSection() {
     });
     if (isLoading) return <PageLoader variant="grid" cols={4} rows={6} className="max-w-7xl w-full mx-auto py-2" />
     return (
-        <section className="max-w-8xl mx-auto px-2 py-6 space-y-8">
+        <section className="max-w-sxl mx-auto px-2 py-6 space-y-8">
             {data?.map((category: CategoriesWithProducts) => {
                 if (category.products.length === 0) return null;
 

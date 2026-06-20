@@ -101,7 +101,7 @@ const ProductSection = ({ title, subtitle, products, href }: ProductSectionProps
     );
 
     return (
-        <section className="relative py-6 max-w-8xl mx-auto">
+        <section className="relative py-6 max-w-sxl mx-auto">
             <Button
                 aria-label="Scroll backward"
                 className="carousel-nav-link -left-6"

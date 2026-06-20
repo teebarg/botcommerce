@@ -4,7 +4,7 @@ const sizes = ["8", "10", "12", "14", "16", "18", "20", "22"];
 
 export default function SizesGrid() {
     return (
-        <section className="py-6 px-4 max-w-8xl mx-auto">
+        <section className="py-6 px-4 max-w-sxl mx-auto">
             <h2 className="font-display text-xl font-semibold mb-4">Shop by size</h2>
             <div className="flex flex-wrap gap-3">
                 {sizes.map((size) => (

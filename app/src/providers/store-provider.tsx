@@ -27,13 +27,9 @@ const ConfigTypeSchema = z.object({
 
 type ConfigType = z.infer<typeof ConfigTypeSchema>
 
-type StoreContextType = {
-    config?: ConfigType;
-};
+const StoreContext = createContext<ConfigType | undefined>(undefined);
 
-const StoreContext = createContext<StoreContextType | undefined>(undefined);
-
-export const StoreProvider = ({ config, children }: { config: StoreContextType | undefined; children: React.ReactNode }) => {
+export const StoreProvider = ({ config, children }: { config: ConfigType | undefined; children: React.ReactNode }) => {
     return (
         <StoreContext.Provider value={config}>
             {children}

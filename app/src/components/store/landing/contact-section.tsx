@@ -10,10 +10,10 @@ const contactItems = [
 ];
 
 export default function ContactSection() {
-    const { config } = useConfig();
+    const config  = useConfig();
 
     return (
-        <section className="py-12 max-w-8xl mx-auto px-4">
+        <section className="py-12 max-w-sxl mx-auto px-4">
             <div className="mb-4">
                 <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-1">Contact</p>
                 <h2 className="font-display text-2xl font-semibold">Get in touch</h2>

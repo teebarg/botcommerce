@@ -16,19 +16,17 @@ type OrderConfirmationProps = {
 };
 
 const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShopping }) => {
-    const { config } = useConfig();
+    const { address } = useConfig();
 
     return (
-        <div className="w-full max-w-3xl mx-auto rounded-xl px-2 md:px-6 pt-16">
+        <div className="max-w-2xl mx-auto px-4 py-6 md:py-8 w-full">
             <FadeInComponent>
                 <div className="text-center mb-6">
-                    <div className="inline-flex items-center justify-center w-20 h-20 bg-yellow-100 rounded-full mb-4 animate-pulse">
-                        <ShoppingBag className="w-12 h-12 text-yellow-600" />
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-yellow-100 rounded-full mb-3 animate-pulse">
+                        <ShoppingBag className="w-5 h-5 text-yellow-600" />
                     </div>
-
-                    <h2 className="text-2xl font-bold">Pickup Order</h2>
-
-                    <p className="text-muted-foreground">Please visit our store to complete your order.</p>
+                    <h2 className="text-xl font-semibold mb-1">Pickup Order</h2>
+                    <p className="text-muted-foreground text-sm">Please visit our store to complete your order.</p>
                 </div>
             </FadeInComponent>
 
@@ -37,16 +35,16 @@ const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShoppi
             </FadeInComponent>
 
             <FadeInComponent delay="100ms">
-                <div className="bg-card rounded-xl shadow-sm p-4 mb-6">
-                    <h3 className="text-lg font-medium mb-4">Collection Point</h3>
-                    <div className="space-y-1">
+                <div className="rounded-xl border bg-card p-4 mb-4">
+                    <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-3">Collection point</p>
+                    <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                            <span className="text-muted-foreground text-sm">Address</span>
-                            <span className="font-medium">{config?.address}</span>
+                            <span className="text-muted-foreground">Address</span>
+                            <span className="font-medium">{address}</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="text-muted-foreground text-sm">Opening Hours</span>
-                            <span className="font-medium">Mon-Sat: 9am - 6pm</span>
+                            <span className="text-muted-foreground">Opening hours</span>
+                            <span className="font-medium">Mon–Sat: 9am–6pm</span>
                         </div>
                     </div>
                 </div>
@@ -92,12 +90,10 @@ const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShoppi
             </FadeInComponent>
 
             <FadeInComponent delay="700ms">
-                <div className="mt-6">
-                    <Button className="w-full" size="lg" onClick={onContinueShopping}>
-                        Continue Shopping
-                        <ArrowRight className="ml-2 w-4 h-4" />
-                    </Button>
-                </div>
+                <Button className="w-full mt-6 rounded-full" size="lg" onClick={onContinueShopping}>
+                    Continue shopping
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
             </FadeInComponent>
         </div>
     );

@@ -33,7 +33,7 @@ export default function CatalogInfinite({ slug, initialData }: Props) {
     const hasProducts = products.length > 0;
 
     return (
-        <main className="max-w-8xl mx-auto w-full px-2 py-4">
+        <main className="max-w-sxl mx-auto w-full px-2 py-4">
             {!hasProducts && <NoProductsFound />}
             {hasProducts && (
                 <InfiniteList hasMore={!!hasNextPage} isLoading={isFetchingNextPage} onLoadMore={fetchNextPage}>
