@@ -38,7 +38,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
         <div className="flex-1 overflow-y-auto slide-in">
             <div className="space-y-6 px-4">
                 <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold">Payment Details</h2>
+                    <h2 className="text-xl font-bold">Payment Details</h2>
                     <p className="text-muted-foreground text-sm">Complete your order</p>
                 </div>
 

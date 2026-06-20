@@ -29,11 +29,11 @@ const config = defineConfig({
             projects: ["./tsconfig.json"],
         }),
         tailwindcss(),
-        tanstackStart(),
-        viteReact(),
+        tanstackStart(), 
         tanstackRouter({
             autoCodeSplitting: true,
         }),
+         viteReact(),
         VitePWA({
             strategies: "injectManifest",
             srcDir: "src",

@@ -1,48 +1,71 @@
 import type React from "react";
-import CartControl from "./cart-control";
 import { currency } from "@/utils";
 import type { CartItem } from "@/schemas";
-import { Badge } from "@/components/ui/badge";
 import ImageDisplay from "@/components/image-display";
+import { Minus, Trash2, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useChangeCartQuantity, useDeleteCartItem } from "@/hooks/useCart";
 
 const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
+
+    const updateQuantity = useChangeCartQuantity();
+    const deleteItem = useDeleteCartItem();
+
+    const onUpdateQuantity = async (id: number, quantity: number) => {
+        await updateQuantity.mutateAsync({ item_id: id, quantity });
+    };
+
+    const removeItem = async (id: number) => {
+        deleteItem.mutateAsync(id);
+    };
+
     return (
-        <div className="flex gap-3">
-            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-card ring-1 ring-border">
+        <div className="flex items-center gap-3 px-2.5 py-2 border-b last:border-b-0">
+            <div className="relative w-20 h-20 shrink-0 overflow-hidden rounded-lg bg-card ring-1 ring-border">
                 <ImageDisplay className="rounded-lg" url={item?.image} alt={item.name} />
             </div>
 
             <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-start mb-1">
-                    <h3 className="font-semibold line-clamp-1 leading-tight text-md">{item.name}</h3>
-                </div>
-
-                {item.variant && (item.variant.size || item.variant.color || item.variant.width || item.variant.length || item.variant.age) && (
-                    <div className="flex flex-wrap gap-1.5 mb-2">
-                        {item.variant.size && <Badge variant="accent-subtle">Size: {item.variant.size}</Badge>}
-
-                        {item.variant.color && (
-                            <Badge variant="accent-subtle">
-                                <div
-                                    className="w-2.5 h-2.5 rounded-full border border-border mr-1"
-                                    style={{ backgroundColor: item.variant.color.toLowerCase() }}
-                                />
-                                {item.variant.color}
-                            </Badge>
-                        )}
-                        {item.variant.width && <Badge variant="accent-subtle">Waist: {item.variant.width}</Badge>}
-                        {item.variant.length && <Badge variant="accent-subtle">Length: {item.variant.length}</Badge>}
-                        {item.variant.age && <Badge variant="accent-subtle">Age: {item.variant.age}</Badge>}
-                    </div>
+                <p className="text-sm font-medium truncate max-w-[35vw]">{item.name}</p>
+                {item.variant && (
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                        {[
+                            item.variant.size && `Size: ${item.variant.size}`,
+                            item.variant.color && `Color: ${item.variant.color}`,
+                            item.variant.width && `Width: ${item.variant.width}`,
+                            item.variant.length && `Length: ${item.variant.length}`,
+                            item.variant.age && `Age: ${item.variant.age}`,
+                        ]
+                            .filter(Boolean)
+                            .join(" · ")}
+                    </p>
                 )}
-
-                <div className="flex items-center gap-2 mb-2">
-                    <span className="font-bold text-xl">{currency(Number(item.price) || 0)}</span>
+                <div className="flex items-center gap-2 mt-2">
+                    <button
+                        disabled={item.quantity <= 1}
+                        onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                        className="w-8 h-8 rounded-md border flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label="Decrease quantity"
+                    >
+                        <Minus className="w-4 h-4" />
+                    </button>
+                    <span className="text-sm font-medium w-4 text-center">{updateQuantity.isPending ? "..." : item.quantity}</span>
+                    <button
+                        disabled={updateQuantity.isPending || Boolean(item.variant?.inventory && item.quantity >= item.variant.inventory)}
+                        onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                        className="w-8 h-8 rounded-md border flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label="Increase quantity"
+                    >
+                        <Plus className="w-4 h-4" />
+                    </button>
                 </div>
+            </div>
 
-                <CartControl item={item} />
-
-                <p className="text-xs text-muted-foreground mt-1">Subtotal: {currency((Number(item.price) || 0) * item.quantity)}</p>
+            <div className="flex flex-col items-end gap-1.5 shrink-0">
+                <span className="text-sm font-medium">{currency(item.price * item.quantity)}</span>
+                <Button disabled={deleteItem.isPending} isLoading={deleteItem.isPending} size="icon" variant="ghost" onClick={() => removeItem(item.id)}>
+                    <Trash2 className="h-4 w-4 text-rose-500" />
+                </Button>
             </div>
         </div>
     );

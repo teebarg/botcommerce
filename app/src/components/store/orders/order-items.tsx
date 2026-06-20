@@ -3,7 +3,7 @@ import OrderItemComponent from "./order-item";
 import type { OrderItem } from "@/schemas";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
-export default function OrderItems({ items, showDetails }: { items: OrderItem[]; showDetails: boolean }) {
+export default function OrderItems({ items, showDetails = true }: { items: OrderItem[]; showDetails?: boolean }) {
     const [expanded, setExpanded] = useState(showDetails);
 
     return (

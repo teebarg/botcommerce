@@ -3,7 +3,6 @@
 import type * as React from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { Circle, Check, Loader2 } from "lucide-react";
-
 import { cn } from "@/utils";
 
 const radioVariants = {
@@ -15,26 +14,26 @@ const radioVariants = {
     },
     card: {
         container: "grid gap-3",
-        item: "group relative cursor-pointer flex items-center gap-3 rounded-lg border-1 border-input bg-card p-4 transition-all duration-200 hover:border-primary/10 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-primary/10",
+        item: "group relative cursor-pointer flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-colors hover:border-foreground/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-foreground",
         indicator: "absolute right-4 top-4 flex items-center justify-center",
-        icon: "size-5 text-primary opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
+        icon: "size-4 text-foreground opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
     },
     pill: {
         container: "flex flex-wrap gap-2",
-        item: "group relative flex items-center gap-2 rounded-full border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium transition-all duration-200 hover:border-blue-300 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-blue-500 data-[state=checked]:bg-blue-500 data-[state=checked]:text-white",
+        item: "group relative flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background",
         indicator: "flex items-center justify-center",
-        icon: "size-4 opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
+        icon: "size-3.5 opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
     },
     button: {
         container: "grid gap-2",
-        item: "group relative flex items-center justify-center gap-2 rounded-md border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm font-medium transition-all duration-200 hover:border-blue-300 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-blue-500 data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-500 data-[state=checked]:to-blue-600 data-[state=checked]:text-white data-[state=checked]:shadow-md",
+        item: "group relative flex items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background",
         indicator: "flex items-center justify-center",
-        icon: "size-4 opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
+        icon: "size-3.5 opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
     },
     delivery: {
         container: "grid gap-2",
-        item: "flex items-start space-x-4 p-6 rounded-lg border-2 cursor-pointer transition-all duration-300 border-border hover:border-primary/20 data-[state=checked]:border-primary/30 data-[state=checked]:bg-primary/5 data-[state=checked]:shadow-primary group relative focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
-        indicator: "flex items-center justify-center",
+        item: "flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-colors hover:border-foreground/20 data-[state=checked]:border-foreground data-[state=checked]:bg-secondary group relative focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+        indicator: "flex items-center justify-center mt-0.5",
         icon: "size-4 opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
     },
 };
@@ -47,7 +46,6 @@ function RadioGroup({
     variant?: keyof typeof radioVariants;
 }) {
     const variantStyles = radioVariants[variant];
-
     return <RadioGroupPrimitive.Root className={cn(variantStyles.container, className)} {...props} />;
 }
 
@@ -81,10 +79,10 @@ function RadioGroupItem({
                 </RadioGroupPrimitive.Item>
             )}
             {loading && (
-                <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 dark:bg-black/50 pointer-events-auto">
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 rounded-[inherit] pointer-events-auto">
                     <div className="flex items-center gap-2">
-                        <Loader2 className="animate-spin text-muted-foreground size-6" />
-                        <span className="text-xs text-muted-foreground">Processing...</span>
+                        <Loader2 className="animate-spin text-muted-foreground size-5" />
+                        <span className="text-xs text-muted-foreground">Processing…</span>
                     </div>
                 </div>
             )}

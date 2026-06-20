@@ -1,6 +1,7 @@
 import { DollarSign, Package, ShoppingCart, Users } from "lucide-react";
 import StatCard from "@/components/ui/stat-card";
 import { currency } from "@/utils";
+import EmptyState from "@/components/generic/empty";
 
 const StatComponent = ({ summary }: { summary?: any }) => {
     const getPercentageChange = (growth: number): { value: string; trend: "up" | "down" | "neutral" } => {
@@ -12,9 +13,11 @@ const StatComponent = ({ summary }: { summary?: any }) => {
 
     if (!summary) {
         return (
-            <div className="px-2 md:px-10 py-6 text-center">
-                <p>Stats not found</p>
-            </div>
+            <EmptyState
+                icon={Package}
+                title="No stats yet"
+                description="There is currently no available stats."
+            />
         );
     }
 

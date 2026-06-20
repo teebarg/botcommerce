@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { api } from "@/utils/api";
+import { PageLoader } from "@/components/generic/page-loader";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/orders")({
     validateSearch: z.object({
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/orders")({
         await queryClient.ensureQueryData(ordersQuery(deps));
     },
     component: RouteComponent,
+    pendingComponent: () => (<PageLoader variant="list" rows={6} className="max-w-7xl w-full mx-auto py-2" />)
 });
 
 function RouteComponent() {
@@ -41,7 +43,7 @@ function RouteComponent() {
     return (
         <div className="px-4 md:px-10 py-2">
             <div className="mb-6 flex flex-col">
-                <h1 className="text-2xl font-medium">Order view</h1>
+                <h1 className="text-xl font-medium">Order view</h1>
                 <p className="text-muted-foreground text-sm">Manage your orders.</p>
             </div>
             <div>
@@ -60,13 +62,15 @@ function RouteComponent() {
                 <OrderFilters />
                 <div className="mt-4">
                     {items.length > 0 && (
-                        <InfiniteResourceList
-                            items={items}
-                            onLoadMore={fetchNextPage}
-                            hasMore={hasNextPage}
-                            isLoading={isFetchingNextPage}
-                            renderItem={(item: Order) => <OrderCard key={item.id} order={item} />}
-                        />
+                        <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
+                            <InfiniteResourceList
+                                items={items}
+                                onLoadMore={fetchNextPage}
+                                hasMore={hasNextPage}
+                                isLoading={isFetchingNextPage}
+                                renderItem={(item: Order) => <OrderCard key={item.id} order={item} />}
+                            />
+                        </div>
                     )}
                     {items.length === 0 && (
                         <div className="text-center py-8">

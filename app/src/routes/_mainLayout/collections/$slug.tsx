@@ -49,7 +49,7 @@ export const Route = createFileRoute("/_mainLayout/collections/$slug")({
         };
     },
     component: RouteComponent,
-    pendingComponent: () => (<PageLoader variant="grid" cols={4} rows={6} className="max-w-7xl w-full mx-auto py-2" />)
+    pendingComponent: () => (<PageLoader variant="grid" rows={6} className="max-w-7xl w-full mx-auto py-2" />)
 });
 
 function RouteComponent() {

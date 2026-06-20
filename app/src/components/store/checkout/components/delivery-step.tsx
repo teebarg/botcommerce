@@ -87,15 +87,16 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
                     ))}
                 </RadioGroup>
             </div>
-            <div className="flex justify-end py-2 sticky px-4 bottom-0 border-t md:border-t-0 bg-background mt-4">
+            <div className="flex justify-end py-3 px-4 sticky bottom-0 border-t border-border bg-background mt-4">
                 <Button
                     size="lg"
                     onClick={handleContinue}
                     disabled={updateCartDetails.isPending || !canContinue}
-                    className="bg-gradient-action hover:opacity-90 transition-opacity h-14 rounded-2xl text-base font-semibold w-full md:w-sm"
+                    isLoading={updateCartDetails.isPending}
+                    className="rounded-full text-sm font-semibold w-full md:w-auto md:px-10"
                 >
                     Continue
-                    <ChevronRight className="h-5 w-5" />
+                    <ChevronRight className="h-4 w-4" />
                 </Button>
             </div>
         </>

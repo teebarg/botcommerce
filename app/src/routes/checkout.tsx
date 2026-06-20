@@ -71,7 +71,7 @@ function RouteComponent() {
             >
                 <div className="flex items-center gap-2">
                     <BackButton />
-                    <h1 className="text-xl font-bold">Checkout</h1>
+                    <h1 className="text-lg font-bold">Checkout</h1>
                 </div>
                 <div className="flex items-center gap-1">
                     <ThemeToggle />

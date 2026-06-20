@@ -11,6 +11,8 @@ import ImageDisplay from "@/components/image-display";
 import { useChangeCartQuantity, useDeleteCartItem } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
 import { PageLoader } from "@/components/generic/page-loader";
+import CartSummary from "@/components/store/cart/cart-summary";
+import CartItemComponent from "@/components/store/cart/cart-item";
 
 export const Route = createFileRoute("/_mainLayout/cart")({
     head: () => ({
@@ -172,14 +174,14 @@ function RouteComponent() {
                         </p>
                         <div className="rounded-xl border bg-card overflow-hidden">
                             {cart.items.map((item: CartItem) => (
-                                <CartItemRow key={item.variant_id} item={item} />
+                                <CartItemComponent key={item.variant_id} item={item} />
                             ))}
                         </div>
                     </div>
 
                     <div className="lg:w-80 lg:sticky lg:top-6 space-y-4 shrink-0">
-                        <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground">Order summary</p>
-                        <OrderSummary cart={cart} />
+                        <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground">Cart summary</p>
+                        <CartSummary cart={cart} />
                     </div>
                 </div>
             </div>
