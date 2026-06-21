@@ -4,12 +4,10 @@ import { PriceLabel } from "@/components/store/products/price-label";
 import { DiscountBadge } from "@/components/store/products/discount-badge";
 import type { ProductSearch } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
-import MediaDisplay from "@/components/media-display";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { IsNew } from "@/components/products/product-badges";
 import { Link } from "@tanstack/react-router";
 import ProductCardActions from "./product-card-actions";
-// import ImageLightbox from "@/components/ImageLightbox";
 import ProductTag from "./product-tag";
 import ImageLightbox from "@/components/image-lightbox";
 
@@ -19,7 +17,6 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale" }) => {
-    const [lightboxOpen, setLightboxOpen] = useState<boolean>(false);
     const { priceInfo, outOfStock } = useProductVariant(product);
     const isNew = useMemo(() => !!product?.is_new, [product]);
 
@@ -27,7 +24,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale" }) 
         <>
             <div className="shrink-0 relative cursor-pointer group w-60 md:w-72">
                 <div className="relative h-80 md:h-96 rounded-xl border border-border overflow-hidden">
-                    {/* <MediaDisplay url={product.image} alt={product.name} /> */}
                     <ImageLightbox
                         url={product.image}
                         alt={product.name}
@@ -57,7 +53,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale" }) 
 
                 <ProductCardActions product={product} actionColor="bg-gradient-action" />
             </div>
-            {/* <ImageLightbox image={lightboxOpen ? product.image : null} onClose={() => setLightboxOpen(false)} /> */}
         </>
     );
 };

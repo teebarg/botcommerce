@@ -117,7 +117,6 @@ const EscalationForm = ({ onSubmitForm, isLastMessage }: EscalationFormProps) =>
                 {errors.category && <p className="text-xxs text-destructive pl-1">{errors.category}</p>}
             </div>
 
-            {/* Summary */}
             <div className="space-y-1">
                 <div className="relative">
                     <FileText className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-muted-foreground" />

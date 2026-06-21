@@ -9,9 +9,10 @@ interface ImageLightboxProps {
     alt: string;
     className?: string;
     imgClassName?: string;
+    disabled?: boolean;
 }
 
-export default function ImageLightbox({ url, alt, className, imgClassName }: ImageLightboxProps) {
+export default function ImageLightbox({ url, alt, className, imgClassName, disabled = false }: ImageLightboxProps) {
     const [open, setOpen] = useState(false);
 
     const close = useCallback(() => setOpen(false), []);
@@ -20,14 +21,22 @@ export default function ImageLightbox({ url, alt, className, imgClassName }: Ima
         <>
             <button
                 type="button"
-                onClick={() => setOpen(true)}
-                className={cn("relative block w-full h-full cursor-zoom-in", className)}
+                onClick={(e) => {
+                    if (disabled) return;
+                    e.stopPropagation();
+                    setOpen(true);
+                }}
+                className={cn(
+                    "relative block w-full h-full", 
+                    disabled ? "cursor-pointer" : "cursor-zoom-in",
+                    className
+                )}
                 aria-label={`Enlarge image: ${alt}`}
             >
                 <ImageDisplay url={url} alt={alt} className={imgClassName} />
             </button>
 
-            {open &&
+            {open && !disabled &&
                 createPortal(
                     <div
                         className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center animate-in fade-in duration-200"
@@ -48,7 +57,6 @@ export default function ImageLightbox({ url, alt, className, imgClassName }: Ima
                             src={url || "/placeholder.jpg"}
                             alt={alt}
                             className="max-w-[92vw] max-h-[88vh] object-contain touch-pinch-zoom"
-                            onClick={(e) => e.stopPropagation()}
                         />
                     </div>,
                     document.body

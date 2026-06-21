@@ -1,13 +1,12 @@
 import type React from "react";
 import { currency } from "@/utils";
 import type { CartItem } from "@/schemas";
-import ImageDisplay from "@/components/image-display";
 import { Minus, Trash2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useChangeCartQuantity, useDeleteCartItem } from "@/hooks/useCart";
+import ImageLightbox from "@/components/image-lightbox";
 
 const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
-
     const updateQuantity = useChangeCartQuantity();
     const deleteItem = useDeleteCartItem();
 
@@ -20,13 +19,18 @@ const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
     };
 
     return (
-        <div className="flex items-center gap-3 px-2.5 py-2 border-b last:border-b-0">
+        <div className="flex items-center gap-3 px-2.5 py-2 border-b last:border-b-0 w-full min-w-0">
             <div className="relative w-20 h-20 shrink-0 overflow-hidden rounded-lg bg-card ring-1 ring-border">
-                <ImageDisplay className="rounded-lg" url={item?.image} alt={item.name} />
+                <ImageLightbox
+                    url={item?.image}
+                    alt={item.name}
+                    className="w-full h-full"
+                    imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
             </div>
 
             <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate max-w-[35vw]">{item.name}</p>
+                <p className="text-sm font-medium truncate">{item.name}</p>
                 {item.variant && (
                     <p className="text-xs text-muted-foreground mt-0.5">
                         {[
@@ -42,7 +46,7 @@ const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
                 )}
                 <div className="flex items-center gap-2 mt-2">
                     <button
-                        disabled={item.quantity <= 1}
+                        disabled={updateQuantity.isPending || item.quantity <= 1}
                         onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
                         className="w-8 h-8 rounded-md border flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Decrease quantity"

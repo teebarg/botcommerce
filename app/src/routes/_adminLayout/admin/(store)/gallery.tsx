@@ -16,6 +16,7 @@ import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { queryOptions } from "@tanstack/react-query";
 import { z } from "zod";
 import { api } from "@/utils/api";
+import { PageLoader } from "@/components/generic/page-loader";
 
 const galleryQuery = (params?: object) =>
     queryOptions({
@@ -36,6 +37,7 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/gallery")({
         await queryClient.ensureQueryData(galleryQuery(deps));
     },
     component: RouteComponent,
+    pendingComponent: () => (<PageLoader variant="grid" rows={6} className="max-w-7xl w-full mx-auto py-2" />)
 });
 
 function RouteComponent() {

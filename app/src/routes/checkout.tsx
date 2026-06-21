@@ -81,7 +81,7 @@ function RouteComponent() {
                 </div>
             </header>{" "}
             {isLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-[1fr_360px] gap-x-8 px-2 pt-4">
+                <div className="grid grid-cols-1 md:grid-cols-[1fr_360px] gap-x-4 px-2 pt-4">
                     <ComponentLoader className="rounded-md h-192 md:mt-8" />
                     <div className="relative hidden md:block">
                         <ComponentLoader className="h-192 w-full rounded-md" />
@@ -90,11 +90,9 @@ function RouteComponent() {
             ) : !cart ? (
                 <EmptyCartMessage />
             ) : (
-                <main className="flex md:gap-8 overflow-hidden h-sc">
+                <main className="flex overflow-hidden h-sc">
                     <CheckoutFlow cart={cart} />
-                    <div className="mb-24 md:mb-0 hidden md:block">
-                        <CheckoutSummary />
-                    </div>
+                    <CheckoutSummary cart={cart} />
                 </main>
             )}
         </div>
