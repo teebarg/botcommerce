@@ -9,8 +9,9 @@ import { useMemo, useState } from "react";
 import { IsNew } from "@/components/products/product-badges";
 import { Link } from "@tanstack/react-router";
 import ProductCardActions from "./product-card-actions";
-import ImageLightbox from "@/components/ImageLightbox";
+// import ImageLightbox from "@/components/ImageLightbox";
 import ProductTag from "./product-tag";
+import ImageLightbox from "@/components/image-lightbox";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -25,8 +26,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale" }) 
     return (
         <>
             <div className="shrink-0 relative cursor-pointer group w-60 md:w-72">
-                <div onClick={() => setLightboxOpen(true)} className="relative rounded-2xl overflow-visible h-80 md:h-96">
-                    <MediaDisplay url={product.image} alt={product.name} />
+                <div className="relative h-80 md:h-96 rounded-xl border border-border overflow-hidden">
+                    {/* <MediaDisplay url={product.image} alt={product.name} /> */}
+                    <ImageLightbox
+                        url={product.image}
+                        alt={product.name}
+                        className="w-full h-full"
+                        imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
                     <DiscountBadge
                         discount={priceInfo.maxDiscountPercent}
                         isFlatPrice={priceInfo.minPrice === priceInfo.maxPrice}
@@ -50,7 +57,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale" }) 
 
                 <ProductCardActions product={product} actionColor="bg-gradient-action" />
             </div>
-            <ImageLightbox image={lightboxOpen ? product.image : null} onClose={() => setLightboxOpen(false)} />
+            {/* <ImageLightbox image={lightboxOpen ? product.image : null} onClose={() => setLightboxOpen(false)} /> */}
         </>
     );
 };

@@ -4,53 +4,68 @@ import { PriceLabel } from "@/components/store/products/price-label";
 import type { ProductSearch } from "@/schemas/product";
 import { Link } from "@tanstack/react-router";
 import ProductCardActions from "./product-card-actions";
-import { useMemo, useState } from "react";
-import ImageLightbox from "@/components/ImageLightbox";
+import { useMemo } from "react";
 import ProductTag from "./product-tag";
 import { IsNew } from "@/components/products/product-badges";
-import ImageDisplay from "@/components/image-display";
+import ImageLightbox from "@/components/image-lightbox";
 
 interface ProductCardProps {
     product: ProductSearch;
 }
 
 const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
-    const [lightboxOpen, setLightboxOpen] = useState<boolean>(false);
     const { priceInfo, outOfStock } = useProductVariant(product);
     const isNew = useMemo(() => !!product?.is_new, [product]);
 
     return (
-        <>
-            <div className="relative group cursor-pointer bg-background animate-in fade-in duration-300">
+        <div className="relative group cursor-pointer bg-card animate-in fade-in duration-300 rounded-xl border border-border overflow-hidden flex flex-col justify-between">
+            <div className="relative w-full aspect-product overflow-hidden">
                 {Boolean(priceInfo.maxDiscountPercent) && (
-                    <div className="absolute top-2 left-2 z-10 bg-destructive text-destructive-foreground px-2 py-1 text-xxs font-bold">
+                    <div className="absolute top-2 left-2 z-10 bg-destructive text-destructive-foreground px-2 py-1 text-xxs font-bold rounded-sm">
                         -{priceInfo.maxDiscountPercent}%
                     </div>
                 )}
+                {isNew && (
+                    <div className="absolute top-2 right-2 z-10">
+                        <IsNew />
+                    </div>
+                )}
 
-                <div
-                    className="relative aspect-[3/4] overflow-hidden"
-                    style={{ boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.05)" }}
-                    onClick={() => setLightboxOpen(true)}
+                <ImageLightbox
+                    url={product.image}
+                    alt={product.name}
+                    className="w-full h-full"
+                    imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+
+                {outOfStock && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-background/20 backdrop-blur-xs">
+                        <span className="bg-foreground text-background px-4 py-2 text-xxs font-bold uppercase tracking-[0.2em]">
+                            Sold Out
+                        </span>
+                    </div>
+                )}
+                <ProductTag product={product} />
+            </div>
+
+            <div className="p-3 flex flex-col gap-1.5 flex-1 justify-between">
+                <Link
+                    to="/products/$slug"
+                    preload={false}
+                    className="flex flex-col gap-1"
+                    params={{ slug: product?.slug }}
                 >
-                    <ImageDisplay url={product.image} alt={product.name} className="h-full" />
-                    {isNew && <IsNew />}
-                    {outOfStock && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="bg-foreground text-background px-4 py-2 text-xxs font-bold uppercase tracking-[0.2em]">Sold Out</span>
-                        </div>
-                    )}
-                    <ProductTag product={product} />
-                </div>
-                <Link to="/products/$slug" preload={false} className="block px-1 py-2" params={{ slug: product?.slug }}>
-                    <h3 className="line-clamp-1 text-xs">{product?.name}</h3>
+                    <h3 className="line-clamp-2 text-xs font-medium tracking-wide text-foreground/90 group-hover:text-primary transition-colors truncate">
+                        {product?.name}
+                    </h3>
                     <PriceLabel priceInfo={priceInfo} />
                 </Link>
 
-                <ProductCardActions product={product} actionColor="bg-gradient-action" />
+                <div className="pt-1.5 transform translate-y-1 group-hover:translate-y-0 transition-all duration-200">
+                    <ProductCardActions product={product} actionColor="bg-gradient-action" />
+                </div>
             </div>
-            <ImageLightbox image={lightboxOpen ? product?.image : null} onClose={() => setLightboxOpen(false)} />
-        </>
+        </div>
     );
 };
 
