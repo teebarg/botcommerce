@@ -207,8 +207,8 @@ export const useProductVariant = (product: ProductLite | ProductSearch) => {
         setTimeout(() => setIsAdded(false), 3000);
     };
 
-    const handleWhatsAppPurchase = (e: React.MouseEvent) => {
-        e.stopPropagation();
+    const handleWhatsAppPurchase = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
 
         const variantInfo = selectedVariant
             ? [

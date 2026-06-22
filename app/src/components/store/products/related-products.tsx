@@ -20,11 +20,11 @@ export default function RelatedProducts({ productId }: RelatedProductsProps) {
     return (
         <div>
             <div className="flex flex-col items-center text-center mb-12">
-                <span className="text-base text-muted-foreground">Related products</span>
-                <p className="text-lg md:text-xl text-foreground max-w-lg">You might also want to check out these products.</p>
+                <span className="text-sm text-muted-foreground">Related products</span>
+                <p className="text-base md:text-xl text-foreground max-w-lg">You might also want to check out these products.</p>
             </div>
 
-            <ul className="grid grid-cols-2 md:grid-cols-4 gap-x-2 md:gap-x-6 gap-y-8">
+            <ul className="grid grid-cols-2 md:grid-cols-4 gap-x-2 md:gap-x-4 gap-y-8">
                 {productPreviews?.slice(0, 4)?.map((product: ProductSearch, idx: number) => (
                     <li key={idx}>
                         <ProductCard product={product} />

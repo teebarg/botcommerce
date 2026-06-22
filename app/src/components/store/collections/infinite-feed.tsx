@@ -1,9 +1,9 @@
 import { useProductFeed } from "@/hooks/useProduct";
 import { FeedQuery, ProductFeed, ProductSearch } from "@/schemas";
 import { InfiniteList } from "@/components/InfiniteList";
-import ProductCardPLP from "../products/product-card-plp";
 import NoProductsFound from "../products/no-products";
 import { useMemo } from "react";
+import ProductCard from "../products/product-card-revamped";
 
 interface Props {
     initialData?: ProductFeed | null;
@@ -24,8 +24,8 @@ export default function InfiniteFeed({ initialData, params }: Props) {
     return (
         <InfiniteList hasMore={!!hasNextPage} isLoading={isFetchingNextPage} onLoadMore={fetchNextPage}>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:gap-4 gap-2">
-                {products?.map((product: ProductSearch, idx: number) => (
-                    <ProductCardPLP key={product.id + product.slug + idx} product={product} />
+                {products?.map((product: ProductSearch) => (
+                    <ProductCard key={product.id + product.slug} product={product} />
                 ))}
             </div>
         </InfiniteList>

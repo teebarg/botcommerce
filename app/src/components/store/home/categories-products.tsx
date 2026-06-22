@@ -3,8 +3,8 @@ import { CategoriesWithProducts, ProductSearch } from "@/schemas";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/utils/api";
-import ProductCardPLP from "../products/product-card-plp";
 import { PageLoader } from "@/components/generic/page-loader";
+import ProductCard from "../products/product-card-revamped";
 
 export default function CategoriesWithProductsSection() {
     const { data, isLoading } = useQuery({
@@ -13,7 +13,7 @@ export default function CategoriesWithProductsSection() {
         staleTime: 1000 * 60 * 30,
         gcTime: 1000 * 60 * 60,
     });
-    if (isLoading) return <PageLoader variant="grid" cols={4} rows={6} className="max-w-7xl w-full mx-auto py-2" />
+    if (isLoading) return <PageLoader variant="grid" rows={6} className="max-w-7xl w-full mx-auto py-2" />
     return (
         <section className="max-w-sxl mx-auto px-2 py-6 space-y-8">
             {data?.map((category: CategoriesWithProducts) => {
@@ -35,7 +35,7 @@ export default function CategoriesWithProductsSection() {
 
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                             {category.products.map((product: ProductSearch) => (
-                                <ProductCardPLP key={product.id} product={product} />
+                                <ProductCard key={product.id} product={product} />
                             ))}
                         </div>
                     </div>

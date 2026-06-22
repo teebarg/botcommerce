@@ -71,7 +71,7 @@
     --background-image-gradient-subtle: var(--gradient-subtle);
 
     --aspect-product: 4 / 5;
-    --aspect-gallery: 4 / 6;
+    --aspect-gallery: 4 / 5.5;
 
     --container-8xl: 88rem;
     --container-sxl: 78rem;
@@ -302,7 +302,7 @@
     body {
         @apply bg-background text-foreground font-sans antialiased pt-[var(--sat)] pb-[var(--sab)];
     }
-    
+
     *::-webkit-scrollbar {
         display: none;
     }

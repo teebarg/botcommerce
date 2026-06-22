@@ -15,7 +15,11 @@ interface ImageLightboxProps {
 export default function ImageLightbox({ url, alt, className, imgClassName, disabled = false }: ImageLightboxProps) {
     const [open, setOpen] = useState(false);
 
-    const close = useCallback(() => setOpen(false), []);
+    const close = useCallback((e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault()
+        setOpen(false)
+    }, []);
 
     return (
         <>
@@ -24,10 +28,11 @@ export default function ImageLightbox({ url, alt, className, imgClassName, disab
                 onClick={(e) => {
                     if (disabled) return;
                     e.stopPropagation();
+                    e.preventDefault()
                     setOpen(true);
                 }}
                 className={cn(
-                    "relative block w-full h-full", 
+                    "relative block w-full h-full",
                     disabled ? "cursor-pointer" : "cursor-zoom-in",
                     className
                 )}
