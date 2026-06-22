@@ -3,9 +3,8 @@ import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import NoProductsFound from "../products/no-products";
 import { useProductFeed } from "@/hooks/useProduct";
 import { FeedQuery, ProductFeed, ProductSearch } from "@/schemas";
-// import ProductCard from "../products/product-card-revamped";
+import ProductCard from "../products/product-card-revamped";
 import ProductCardPLP from "../products/product-card-plp";
-import ProductCard from "../products/product-card";
 
 // Helper hook to track column counts mirroring your Tailwind classes
 function useGridColumns() {
