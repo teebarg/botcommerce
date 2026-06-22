@@ -52,11 +52,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }
     };
 
     return (
-        <Link
-            to="/products/$slug"
-            params={{ slug: product.slug }}
-            className="relative block w-full aspect-gallery rounded-xl overflow-hidden border border-border bg-secondary group"
-        >
+        <div className="relative block w-full aspect-gallery rounded-xl overflow-hidden border border-border bg-secondary group">
             {/* <ImageLightboxRevamped
                 url={product.image}
                 alt={product.name}
@@ -72,16 +68,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }
                 className="w-full h-full"
                 imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
-            {/* <img
-                src={product.image || "/placeholder.jpg"}
-                alt={product.name}
-                loading="lazy"
-                decoding="async"
-                className={cn(
-                    "w-full h-full object-cover transition-transform duration-300 group-hover:scale-105",
-                    outOfStock && "grayscale opacity-60"
-                )}
-            /> */}
 
             {/* top-left badges */}
             {!outOfStock && hasDiscount && (
@@ -120,7 +106,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }
                     outOfStock ? "from-black/40 to-transparent" : "from-black/80 via-black/40 to-transparent"
                 )}
             >
-                <p className="text-white text-xs font-medium truncate drop-shadow-sm">{product.name}</p>
+                <Link
+                    to="/products/$slug"
+                    params={{ slug: product.slug }}
+                    className="text-white text-xs font-medium truncate drop-shadow-sm"
+                >
+                    {product.name}
+                </Link>
                 <div className="flex items-baseline gap-1.5 mt-0.5">
                     <span className="text-white font-medium drop-shadow-sm">{currency(minPrice)}</span>
                     {!outOfStock && hasDiscount && (
@@ -147,7 +139,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }
                     </button>
                 </div>
             )}
-        </Link>
+        </div>
     );
 };
 
