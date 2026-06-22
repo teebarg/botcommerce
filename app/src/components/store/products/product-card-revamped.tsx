@@ -1,13 +1,11 @@
 import type React from "react";
-import { useProductVariant } from "@/hooks/useProductVariant";
 import type { ProductSearch } from "@/schemas/product";
 import { Link } from "@tanstack/react-router";
-// import ImageLightbox from "@/components/image-lightbox";
 import { Heart, ShoppingBag } from "lucide-react";
 import { currency, cn } from "@/utils";
 import { useUserCreateWishlist, useUserDeleteWishlist } from "@/hooks/useUser";
 import ImageDisplay from "@/components/image-display";
-// import ImageLightboxRevamped from "@/components/image-lightbox-revamped";
+import { useProductCardVariant } from "@/hooks/useProductCardVariant";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -28,7 +26,7 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
 );
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }) => {
-    const { priceInfo, handleAddToCart, handleWhatsAppPurchase, outOfStock } = useProductVariant(product);
+    const { priceInfo, handleAddToCart, handleWhatsAppPurchase, outOfStock } = useProductCardVariant(product);
     const { minPrice, maxCompareAtPrice, hasDiscount, maxDiscountPercent } = priceInfo;
     const { mutate: createWishlist } = useUserCreateWishlist();
     const { mutate: deleteWishlist } = useUserDeleteWishlist();
@@ -53,22 +51,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }
 
     return (
         <div className="relative block w-full aspect-gallery rounded-xl overflow-hidden border border-border bg-secondary group">
-            {/* <ImageLightboxRevamped
-                url={product.image}
-                alt={product.name}
-                className="w-full h-full"
-                imgClassName={cn(
-                    "w-full h-full object-cover transition-transform duration-300 group-hover:scale-105",
-                    outOfStock && "grayscale opacity-60"
-                )}
-            /> */}
-            {/* <ImageLightbox
-                url={product.image}
-                alt={product.name}
-                className="w-full h-full"
-                imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            /> */}
-
             <ImageDisplay url={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
 
             {/* top-left badges */}
