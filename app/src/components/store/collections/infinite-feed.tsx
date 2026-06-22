@@ -23,9 +23,9 @@ export default function InfiniteFeed({ initialData, params }: Props) {
 
     return (
         <InfiniteList hasMore={!!hasNextPage} isLoading={isFetchingNextPage} onLoadMore={fetchNextPage}>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:gap-4 gap-2">
-                {products?.map((product: ProductSearch) => (
-                    <ProductCard key={product.id + product.slug} product={product} />
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:gap-4 gap-1.5">
+                {products?.map((product: ProductSearch, idx: number) => (
+                    <ProductCard key={idx} product={product} />
                 ))}
             </div>
         </InfiniteList>

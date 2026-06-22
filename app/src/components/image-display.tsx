@@ -18,7 +18,7 @@ const ImageDisplay: React.FC<MediaDisplayProps> = ({ url, alt, className, ...pro
 
     return (
         <>
-            {!mediaLoaded && <img src="/placeholder.jpg" alt="placeholder" className="absolute inset-0 w-full h-full max-h-[400px] object-cover" />}
+            {!mediaLoaded && <img src="/placeholder.jpg" alt="placeholder" className="absolute inset-0 w-full h-full object-cover" />}
             <img
                 alt={alt}
                 className={cn("w-full h-full object-cover transition-opacity duration-500", mediaLoaded ? "opacity-100" : "opacity-0", className)}

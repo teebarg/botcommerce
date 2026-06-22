@@ -6,6 +6,7 @@ import ImageLightbox from "@/components/image-lightbox";
 import { Heart, ShoppingBag } from "lucide-react";
 import { currency, cn } from "@/utils";
 import { useUserCreateWishlist, useUserDeleteWishlist } from "@/hooks/useUser";
+import ImageLightboxRevamped from "@/components/image-lightbox-revamped";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -55,7 +56,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }
             params={{ slug: product.slug }}
             className="relative block w-full aspect-gallery rounded-xl overflow-hidden border border-border bg-secondary group"
         >
-            <ImageLightbox
+            <ImageLightboxRevamped
                 url={product.image}
                 alt={product.name}
                 className="w-full h-full"
@@ -72,7 +73,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }
                 </span>
             )}
             {!outOfStock && !hasDiscount && product.is_new && (
-                <span className="absolute top-2 left-2 bg-white/95 text-foreground text-[10px] font-medium px-2 py-1 rounded-full">
+                <span className="absolute top-2 left-2 bg-emerald-500 text-white text-[10px] font-medium px-2 py-1 rounded-full">
                     New
                 </span>
             )}

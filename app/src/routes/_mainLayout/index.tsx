@@ -16,6 +16,7 @@ import { getIndexProductsFn } from "@/server/product.server";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { LazyInView } from "@/components/LazyInView";
 import { categoriesQuery } from "@/hooks/useCategories";
+import { LightboxProvider } from "@/providers/lightbox-provider";
 
 const indexProductQuery = () =>
     queryOptions({
@@ -80,7 +81,10 @@ function Home() {
                         </div>
                     }
                 >
-                    <InfiniteFeed />
+                    <LightboxProvider>
+                        <InfiniteFeed />
+                    </LightboxProvider>
+                    {/* <InfiniteFeed /> */}
                 </LazyInView>
             </div>
             <ContactSection />
