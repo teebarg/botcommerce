@@ -2,11 +2,11 @@ import type React from "react";
 import { useProductVariant } from "@/hooks/useProductVariant";
 import type { ProductSearch } from "@/schemas/product";
 import { Link } from "@tanstack/react-router";
-import ImageLightbox from "@/components/image-lightbox";
+// import ImageLightbox from "@/components/image-lightbox";
 import { Heart, ShoppingBag } from "lucide-react";
 import { currency, cn } from "@/utils";
 import { useUserCreateWishlist, useUserDeleteWishlist } from "@/hooks/useUser";
-import ImageLightboxRevamped from "@/components/image-lightbox-revamped";
+// import ImageLightboxRevamped from "@/components/image-lightbox-revamped";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -56,11 +56,21 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }
             params={{ slug: product.slug }}
             className="relative block w-full aspect-gallery rounded-xl overflow-hidden border border-border bg-secondary group"
         >
-            <ImageLightboxRevamped
+            {/* <ImageLightboxRevamped
                 url={product.image}
                 alt={product.name}
                 className="w-full h-full"
                 imgClassName={cn(
+                    "w-full h-full object-cover transition-transform duration-300 group-hover:scale-105",
+                    outOfStock && "grayscale opacity-60"
+                )}
+            /> */}
+            <img
+                src={product.image || "/placeholder.jpg"}
+                alt={product.name}
+                loading="lazy"
+                decoding="async"
+                className={cn(
                     "w-full h-full object-cover transition-transform duration-300 group-hover:scale-105",
                     outOfStock && "grayscale opacity-60"
                 )}

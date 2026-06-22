@@ -81,10 +81,10 @@ function Home() {
                         </div>
                     }
                 >
-                    <LightboxProvider>
+                    {/* <LightboxProvider>
                         <InfiniteFeed />
-                    </LightboxProvider>
-                    {/* <InfiniteFeed /> */}
+                    </LightboxProvider> */}
+                    <InfiniteFeed />
                 </LazyInView>
             </div>
             <ContactSection />

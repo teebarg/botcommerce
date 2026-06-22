@@ -30,11 +30,11 @@ function RouteComponent() {
     const { data, isLoading } = useQuery(productFeedQuery(Route.useSearch()));
 
     if (isLoading) return <PageLoader variant="grid" rows={6} className="max-w-7xl w-full mx-auto py-2" />
-    return (
-        <LightboxProvider>
-            <InfiniteFeed initialData={data} params={{ ...search }} />
-        </LightboxProvider>
-    );
+    // return (
+    //     <LightboxProvider>
+    //         <InfiniteFeed initialData={data} params={{ ...search }} />
+    //     </LightboxProvider>
+    // );
 
-    // return <InfiniteFeed initialData={data} params={{ ...search }} />
+    return <InfiniteFeed initialData={data} params={{ ...search }} />
 }

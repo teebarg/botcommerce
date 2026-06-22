@@ -60,11 +60,11 @@ function RouteComponent() {
 
     if (isLoading) return <PageLoader variant="grid" rows={6} className="max-w-7xl w-full mx-auto py-2" />
 
-    return (
-        <LightboxProvider>
-            <InfiniteFeed initialData={data} params={{ ...search, collections: slug }} />
-        </LightboxProvider>
-    );
+    // return (
+    //     <LightboxProvider>
+    //         <InfiniteFeed initialData={data} params={{ ...search, collections: slug }} />
+    //     </LightboxProvider>
+    // );
 
-    // return <InfiniteFeed initialData={data} params={{ ...search, collections: slug }} />
+    return <InfiniteFeed initialData={data} params={{ ...search, collections: slug }} />
 }
