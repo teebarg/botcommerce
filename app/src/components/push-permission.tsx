@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { toast } from "sonner";
 import { tryCatch } from "@/utils/try-catch";
 import { Gift, Sparkles, Star } from "lucide-react";
@@ -8,6 +8,7 @@ import { api } from "@/utils/api";
 import { Message } from "@/schemas";
 
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000;
+const INITIAL_DELAY_DURATION = 10 * 60 * 1000;
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -70,6 +71,8 @@ export default function PushPermission() {
     const [isDismissed, setIsDismissed] = useState<boolean>(false);
     const [isChecking, setIsChecking] = useState<boolean>(false);
     const [isSyncing, setIsSyncing] = useState<boolean>(false);
+    const [isDelayPassed, setIsDelayPassed] = useState<boolean>(false);
+    const timerRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         setIsMounted(true);
@@ -88,6 +91,27 @@ export default function PushPermission() {
             return;
         }
         setIsDismissed(false);
+
+        let sessionStart = sessionStorage.getItem("push_session_start");
+        if (!sessionStart) {
+            sessionStart = Date.now().toString();
+            sessionStorage.setItem("push_session_start", sessionStart);
+        }
+
+        const timeElapsed = Date.now() - Number(sessionStart);
+        const timeRemaining = INITIAL_DELAY_DURATION - timeElapsed;
+
+        if (timeRemaining <= 0) {
+            setIsDelayPassed(true);
+        } else {
+            timerRef.current = setTimeout(() => {
+                setIsDelayPassed(true);
+            }, timeRemaining);
+        }
+
+        return () => {
+            if (timerRef.current) clearTimeout(timerRef.current);
+        };
     }, []);
 
     const syncSubscriptionToBackend = useCallback(async (sub: PushSubscription) => {
@@ -122,7 +146,9 @@ export default function PushPermission() {
             const sub = await registration.pushManager.getSubscription();
 
             if (!sub) {
-                subscribeToPush();
+                if (Notification.permission === "granted") {
+                    subscribeToPush();
+                }
                 return;
             }
             if (hasSubscriptionChanged(sub) || !localStorage.getItem("push_synced")) {
@@ -161,11 +187,10 @@ export default function PushPermission() {
     useEffect(() => {
         if (!isMounted) return;
 
-        if (permission !== "granted") {
-            void (async () => {
-                await subscribeToPush();
-            })();
+        if (permission === "granted") {
+            checkSubscription();
         }
+
         const onVisible = () => {
             if (document.visibilityState === "visible") {
                 checkSubscription();
@@ -202,7 +227,8 @@ export default function PushPermission() {
         setIsDismissed(true);
     }
 
-    if (!isMounted || isDismissed || permission === "granted") return null;
+    // Safety gates: Don't render if unmounted, already dismissed, permission matches, or the 10m window hasn't completed
+    if (!isMounted || isDismissed || permission === "granted" || !isDelayPassed) return null;
 
     return (
         <AnimatePresence>

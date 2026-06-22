@@ -93,14 +93,9 @@ const GalleryCampaign: React.FC<Props> = ({ image }) => {
                         />
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
-                        <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-border group">
-                            <img src={image} alt={image ?? "Selected visual asset"} className="w-full h-full object-cover" />
-                        </div>
-                        <div>
-                            <Label>Destination URL</Label>
-                            <Input value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="/…" />
-                        </div>
+                    <div>
+                        <Label>Destination URL</Label>
+                        <Input value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="/…" />
                     </div>
 
                     <ConfirmDrawer
