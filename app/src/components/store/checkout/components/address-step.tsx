@@ -74,15 +74,15 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
                     </SheetDrawer>
                 </div>
             </div>
-            <div className="sheet-footer">
+            <div className="checkout-footer">
                 <Button
-                    disabled={!Boolean(address)}
                     size="lg"
                     onClick={handleContinue}
-                    className="bg-gradient-action hover:opacity-90 transition-opacity h-14 rounded-2xl font-semibold w-full md:w-sm"
+                    disabled={!Boolean(address)}
+                    className="rounded-full text-sm font-semibold w-full md:w-auto md:px-10"
                 >
                     Continue
-                    <ChevronRight className="h-5 w-5" />
+                    <ChevronRight className="h-4 w-4" />
                 </Button>
             </div>
         </>

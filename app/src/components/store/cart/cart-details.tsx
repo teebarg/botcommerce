@@ -1,12 +1,10 @@
 import type React from "react";
-import { ArrowRight, Info, ShoppingCart } from "lucide-react";
+import { Info, ShoppingCart } from "lucide-react";
 import CartItemComponent from "./cart-item";
-import { useRouter, useRouterState } from "@tanstack/react-router";
-import type { Cart } from "@/schemas";
+import type { Cart, CartItem } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import { currency } from "@/utils";
-import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import CartSummary from "./cart-summary";
 
 interface Props {
     onClose?: () => void;
@@ -15,9 +13,6 @@ interface Props {
 }
 
 const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
-    const router = useRouter();
-    const routerState = useRouterState();
-    const path = routerState.location.pathname;
     return (
         <div className="flex-1 flex flex-col overflow-hidden py-2">
             {cart?.items && cart?.items?.length > 0 && (
@@ -41,60 +36,14 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
                 </div>
             ) : (
                 <>
-                    <ScrollArea className="flex-1 px-6">
-                        <div className="space-y-4 py-4">
-                            {cart?.items?.map((item, index: number) => (
-                                <div key={index} className="p-3 rounded-2xl bg-secondary/50">
-                                    <CartItemComponent key={index} item={item} />
-                                </div>
+                    <ScrollArea className="flex-1 px-4 py-4">
+                        <div className="rounded-xl border bg-card overflow-hidden">
+                            {cart?.items?.map((item: CartItem) => (
+                                <CartItemComponent key={item.variant_id} item={item} />
                             ))}
                         </div>
                     </ScrollArea>
-                    {cart?.items && cart?.items?.length > 0 && (
-                        <div className="px-6 pt-4 border-t border-border space-y-2">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Subtotal</span>
-                                <span className="font-medium">{currency(cart?.subtotal || 0)}</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Tax</span>
-                                <span className="font-medium">{currency(cart?.tax)}</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Shipping</span>
-                                <span className="font-medium">{shippingFee === 0 ? "Free" : `${currency(shippingFee || 0)}`}</span>
-                            </div>
-                            {cart?.discount_amount > 0 && (
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">Discount</span>
-                                    <span className="font-medium text-primary">-{currency(cart?.discount_amount)}</span>
-                                </div>
-                            )}
-                            {cart?.wallet_used > 0 && (
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">Wallet Used</span>
-                                    <span className="font-medium text-primary">-{currency(cart?.wallet_used)}</span>
-                                </div>
-                            )}
-                            <Separator />
-                            <div className="flex justify-between text-lg font-bold">
-                                <span>Total</span>
-                                <span>{currency(cart?.total || 0)}</span>
-                            </div>
-                            {path !== "/checkout" && (
-                                <Button
-                                    onClick={() => router.navigate({ to: "/checkout" })}
-                                    className="w-full h-12 rounded-2xl bg-gradient-primary text-white font-semibold gap-2 shadow-background/30 shadow-xl"
-                                >
-                                    Proceed to Checkout
-                                    <ArrowRight className="w-5 h-5" />
-                                </Button>
-                            )}
-                            <button className="w-full text-primary py-2 text-sm hover:underline" onClick={onClose}>
-                                Continue Shopping
-                            </button>
-                        </div>
-                    )}
+                    <CartSummary cart={cart!} />
                 </>
             )}
         </div>

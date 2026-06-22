@@ -16,7 +16,7 @@ type Filters = {
     sizes: string;
     colors: string;
     cat_ids: string;
-    sort: "id:desc" | "created_at:desc";
+    sort: "min_variant_price:asc"| "min_variant_price:desc" | "id:desc" | "created_at:desc";
     width: string | undefined;
     length: string | undefined;
     max_price: string | undefined;

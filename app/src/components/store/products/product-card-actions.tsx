@@ -16,32 +16,39 @@ const ProductCardActions: React.FC<{
     };
 
     return (
-        <div className="flex items-center gap-2">
-            <Button className={`flex-1 ${actionColor}`} disabled={loading || !selectedVariant || outOfStock} onClick={handleAddToCartAndTrack}>
+        <div className="flex items-center gap-2 w-full mt-auto">
+            <Button
+                className={`flex-1 relative overflow-hidden font-medium text-xs h-9 tracking-wide transition-all duration-300 ${actionColor}`}
+                disabled={loading || !selectedVariant || outOfStock}
+                onClick={handleAddToCartAndTrack}
+            >
                 {loading ? (
-                    "Adding..."
+                    <span className="animate-pulse">Adding...</span>
                 ) : (
-                    <>
-                        <span className={`flex items-center transition-all duration-300 ${isAdded ? "opacity-0 scale-75" : "opacity-100 scale-100"}`}>
-                            <ShoppingCart className="h-5 w-5 mr-2" />
+                    <div className="relative w-full h-full flex items-center justify-center">
+                        <span className={`flex items-center justify-center transition-all duration-300 ${isAdded ? "opacity-0 translate-y-2 scale-90 pointer-events-none" : "opacity-100 translate-y-0 scale-100"}`}>
+                            <ShoppingCart className="h-4 w-4 mr-1.5 shrink-0" />
                             Add
                         </span>
-                        <span
-                            className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${isAdded ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}
-                        >
-                            <Check className="h-5 w-5 animate-scale-in" />
+                        <span className={`absolute flex items-center justify-center transition-all duration-300 ${isAdded ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-2 scale-90 pointer-events-none"}`}>
+                            <Check className="h-4 w-4 mr-1.5 shrink-0 stroke-[3]" />
+                            Added
                         </span>
-                    </>
+                    </div>
                 )}
             </Button>
             <Button
-                className="w-auto text-emerald-700 hover:text-emerald-600 hover:bg-transparent"
+                className="h-9 w-9 text-emerald-600 hover:text-emerald-500 hover:bg-emerald-500/10 shrink-0 rounded-lg transition-colors"
                 disabled={loading || !selectedVariant || outOfStock}
                 size="icon"
                 variant="ghost"
-                onClick={handleWhatsAppPurchase}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    handleWhatsAppPurchase(e);
+                }}
+                title="Purchase via WhatsApp"
             >
-                <svg className="w-9 h-9" fill="none" height="25" viewBox="0 0 25 25" width="25" xmlns="http://www.w3.org/2000/svg">
+                <svg className="w-7 h-7" fill="none" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M18.1225 14.9458C17.8183 14.7895 16.3033 14.0473 16.0215 13.9469C15.7397 13.8409 15.5332 13.7907 15.3295 14.1032C15.123 14.4129 14.5371 15.102 14.3529 15.3113C14.1744 15.5178 13.993 15.5429 13.6889 15.3894C11.8808 14.4854 10.695 13.7767 9.50361 11.7315C9.18832 11.1874 9.8189 11.2265 10.4076 10.0518C10.5081 9.84534 10.4578 9.66956 10.3797 9.51331C10.3016 9.35706 9.68776 7.84478 9.43106 7.22815C9.18274 6.62826 8.92604 6.71197 8.7391 6.70081C8.56053 6.68965 8.35684 6.68965 8.15037 6.68965C7.9439 6.68965 7.61187 6.76777 7.33006 7.0719C7.04825 7.38161 6.25305 8.12659 6.25305 9.63887C6.25305 11.1511 7.35517 12.616 7.50584 12.8225C7.66209 13.0289 9.67381 16.1316 12.7625 17.4681C14.7157 18.3107 15.4802 18.3833 16.4567 18.2382C17.051 18.1489 18.2759 17.496 18.5298 16.7734C18.7837 16.0535 18.7837 15.4369 18.7084 15.3085C18.6331 15.1718 18.4266 15.0937 18.1225 14.9458Z"
                         fill="currentColor"

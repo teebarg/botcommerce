@@ -12,11 +12,8 @@ export const collectionsQuery = (params?: { search?: string }) =>
         staleTime: Infinity,
     });
 
-export const useCollections = () => {
-    return useQuery({
-        queryKey: ["collections"],
-        queryFn: () => api.get<Collection[]>(`/collection/`),
-    });
+export const useCollections = (params?: { search?: string }) => {
+    return useQuery(collectionsQuery(params));
 };
 
 export const useCreateCollection = () => {

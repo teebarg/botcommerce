@@ -1,163 +1,26 @@
-import { Package, MapPin, Download } from "lucide-react";
+import { Download } from "lucide-react";
 import OrderOverview from "./order-overview";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import type { Order, OrderItem } from "@/schemas";
-import { currency } from "@/utils";
-import { useConfig } from "@/providers/store-provider";
-import ImageDisplay from "@/components/image-display";
+import type { Order } from "@/schemas";
+import OrderSummary from "./order-summary";
+import OrderItems from "./order-items";
+import OrderAddress from "./order-address";
 
 interface OrderDetailsProps {
     order: Order;
 }
 
 const OrderDetails = ({ order }: OrderDetailsProps) => {
-    const { config } = useConfig();
-
     return (
         <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="grid gap-6 lg:grid-cols-3 overflow-y-auto px-2">
+            <div className="grid gap-6 lg:grid-cols-3 overflow-y-auto px-2 py-4">
                 <div className="lg:col-span-2 space-y-6">
                     <OrderOverview order={order} />
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Package className="h-5 w-5" />
-                                Items ({order.order_items.length})
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                {order.order_items.map((item: OrderItem, idx: number) => (
-                                    <div key={idx}>
-                                        <div className="flex items-center gap-4">
-                                            <div className="h-36 w-36 relative rounded-lg overflow-hidden">
-                                                {item.image && <ImageDisplay alt={item.image} url={item.image} />}
-                                            </div>
-                                            <div className="flex-1">
-                                                <h4 className="font-medium">{item.name}</h4>
-                                                <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
-                                                {item.variant && (item.variant.size || item.variant.color || item.variant.width || item.variant.length) && (
-                                                    <div className="flex flex-wrap gap-1.5 mb-2 mt-4">
-                                                        {item.variant.color && (
-                                                            <div className="flex items-center gap-1">
-                                                                <span className="text-xs text-muted-foreground">Color:</span>
-                                                                <Badge className="text-sm px-2 py-0.5" variant="accent-subtle">
-                                                                    {item.variant.color}
-                                                                </Badge>
-                                                            </div>
-                                                        )}
-                                                        {item.variant.size && (
-                                                            <div className="flex items-center gap-1">
-                                                                <span className="text-xs text-muted-foreground">Size:</span>
-                                                                <Badge className="text-sm px-2 py-0.5" variant="accent-subtle">
-                                                                    {item.variant.size}
-                                                                </Badge>
-                                                            </div>
-                                                        )}
-                                                        {item.variant.width && (
-                                                            <div className="flex items-center gap-1">
-                                                                <span className="text-xs text-muted-foreground">Waist:</span>
-                                                                <Badge className="text-sm px-2 py-0.5" variant="accent-subtle">
-                                                                    {item.variant.width}
-                                                                </Badge>
-                                                            </div>
-                                                        )}
-                                                        {item.variant.length && (
-                                                            <div className="flex items-center gap-1">
-                                                                <span className="text-xs text-muted-foreground">Length:</span>
-                                                                <Badge className="text-sm px-2 py-0.5" variant="accent-subtle">
-                                                                    {item.variant.length}
-                                                                </Badge>
-                                                            </div>
-                                                        )}
-                                                        {item.variant.age && (
-                                                            <div className="flex items-center gap-1">
-                                                                <span className="text-xs text-muted-foreground">Age:</span>
-                                                                <Badge className="text-sm px-2 py-0.5" variant="accent-subtle">
-                                                                    {item.variant.age}
-                                                                </Badge>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="font-medium">{currency(item.price)}</p>
-                                            </div>
-                                        </div>
-                                        {idx < order.order_items.length - 1 && <Separator className="mt-4" />}
-                                    </div>
-                                ))}
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <OrderItems items={order.order_items} />
                 </div>
                 <div className="space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">Payment Summary</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Subtotal</span>
-                                <span className="text-foreground">{currency(order.subtotal)}</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Shipping</span>
-                                <span className="text-foreground">{currency(order.shipping_fee)}</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Tax</span>
-                                <span className="text-foreground">{currency(order.tax)}</span>
-                            </div>
-                            {order.discount_amount > 0 && (
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">Discount</span>
-                                    <span className="font-semibold text-primary">-{currency(order.discount_amount)}</span>
-                                </div>
-                            )}
-                            {order.wallet_used > 0 && (
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">Wallet Used</span>
-                                    <span className="font-semibold text-primary">-{currency(order.wallet_used)}</span>
-                                </div>
-                            )}
-                            <Separator />
-                            <div className="flex justify-between font-medium">
-                                <span className="text-foreground">Total</span>
-                                <span className="text-foreground">{currency(order.total)}</span>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <MapPin className="h-5 w-5" />
-                                {order.shipping_method === "PICKUP" ? "Pickup Point" : "Shipping Address"}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            {order.shipping_method === "PICKUP" ? (
-                                <div className="text-sm space-y-1">
-                                    <p className="font-medium text-foreground">{config?.address}</p>
-                                    <p className="text-muted-foreground">Open Mon-Sat: 9am - 6pm</p>
-                                </div>
-                            ) : (
-                                <div className="text-sm space-y-1">
-                                    <p className="font-medium text-foreground">
-                                        {order.shipping_address?.first_name} {order.shipping_address?.last_name}
-                                    </p>
-                                    <p className="text-muted-foreground">{order.shipping_address?.address_1}{order.shipping_address?.address_2}</p>
-                                    <p className="text-muted-foreground">{order.shipping_address?.state}</p>
-                                    <p className="text-muted-foreground">{order.shipping_address?.phone}</p>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-
+                    <OrderSummary order={order} />
+                    <OrderAddress order={order} />
                     <div className="space-y-3">
                         <Button className="w-full" variant="outline">
                             Contact Support

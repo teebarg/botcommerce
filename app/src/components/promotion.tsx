@@ -1,43 +1,28 @@
-import type React from "react";
-
-import { BtnLink } from "@/components/ui/btnLink";
+import { Link } from "@tanstack/react-router";
 import { cn } from "@/utils";
 
 interface Props {
     title: string;
     subtitle?: string;
-    icon?: React.ReactNode;
-    outerClass?: string;
-    btnClass?: string;
     href?: string;
+    className?: string;
 }
 
-const PromotionalBanner: React.FC<Props> = ({ title, subtitle, icon, outerClass, btnClass, href = "/" }) => {
+export default function PromotionalBanner({ title, subtitle, href = "/collections", className }: Props) {
     return (
-        <div
-            className={cn(
-                "bg-linear-to-r from-blue-600 to-purple-700 p-4 mx-2 md:mx-0 mb-2 rounded-xl shadow-lg flex items-center justify-between overflow-hidden",
-                outerClass
-            )}
-        >
-            <div className="flex items-center space-x-3">
-                {icon}
+        <div className="mx-2">
+            <div className={cn("my-3 rounded-2xl bg-secondary px-5 py-4 flex items-center justify-between max-w-sxl mx-auto", className)}>
                 <div>
-                    <h3 className="text-white font-bold text-base animate-fade-in-up">{title}</h3>
-                    <p className="text-white/80 text-xs animate-fade-in-up delay-100">{subtitle}</p>
+                    <p className="font-semibold text-foreground text-sm">{title}</p>
+                    {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
                 </div>
+                <Link
+                    to={href}
+                    className="shrink-0 bg-foreground text-background text-xs font-semibold px-4 py-2 rounded-full"
+                >
+                    Shop
+                </Link>
             </div>
-            <BtnLink
-                className={cn(
-                    "bg-white text-blue-600 hover:bg-white hover:text-blue-600 py-2 rounded-full! flex items-center text-sm font-semibold",
-                    btnClass
-                )}
-                href={href}
-            >
-                <span>Shop Now</span>
-            </BtnLink>
         </div>
     );
-};
-
-export default PromotionalBanner;
+}

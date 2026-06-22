@@ -3,18 +3,22 @@ import { toast } from "sonner";
 import type { CategoryFormValues } from "@/components/admin/categories/category-form";
 import { api } from "@/utils/api";
 import { Category } from "@/schemas";
+import { getCategoriesFn } from "@/server/store.server";
 
-export const categoriesQuery = () =>
+export const categoriesQuery = (query?: string) =>
     queryOptions({
-        queryKey: ["categories"],
-        queryFn: () => api.get<Category[]>("/category/"),
+        queryKey: ["categories", query],
+        queryFn: () => getCategoriesFn({ data: query }),
         staleTime: Infinity,
+        gcTime: 1000 * 60 * 60 * 2,
     });
 
 export const useCategories = (query?: string) => {
     return useQuery({
         queryKey: ["categories", query],
-        queryFn: () => api.get<Category[]>(`/category/`, { params: { query: query ?? "" } }),
+        queryFn: () => api.get<Category[]>(`/category/`, { params: { query } }),
+        staleTime: Infinity,
+        gcTime: 1000 * 60 * 60,
     });
 };
 

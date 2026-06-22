@@ -18,7 +18,7 @@ export const Route = createFileRoute("/maintenance")({
 });
 
 function RouteComponent() {
-    const { config } = useConfig();
+    const config = useConfig();
     const { startDate, endDate } = useMemo(() => {
         const start = new Date();
         start.setHours(start.getHours() - 1);

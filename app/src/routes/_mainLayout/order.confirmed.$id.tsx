@@ -6,12 +6,12 @@ import PendingPayment from "@/components/store/orders/order-pending";
 import FailedPayment from "@/components/store/orders/order-failed";
 import { orderQuery } from "@/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { gtag } from "@/utils/gtag";
 import { PaymentMethod } from "@/schemas";
+import OrderStatusLoader from "@/components/store/orders/order-loader";
+import NotFound from "@/components/generic/not-found";
+import { Receipt } from "lucide-react";
 
 export const Route = createFileRoute("/_mainLayout/order/confirmed/$id")({
-    ssr: false,
     loader: async ({ params: { id }, context: { queryClient } }) => {
         try {
             await queryClient.ensureQueryData(orderQuery(id));
@@ -23,15 +23,25 @@ export const Route = createFileRoute("/_mainLayout/order/confirmed/$id")({
     errorComponent: ({ error }) => {
         if (error.message === "ORDER_NOT_FOUND") {
             return (
-                <div className="py-24 text-center flex-1">
-                    <h1 className="text-xl font-semibold">Order not found</h1>
-                    <p className="text-muted-foreground">This order may have expired or does not exist.</p>
-                </div>
+                <NotFound
+                    icon={Receipt}
+                    eyebrow="Order unavailable"
+                    title="Order not found"
+                    description="This order may have expired or does not exist."
+                    showSearch={false}
+                    primaryAction={{ label: "View your orders", to: "/account/orders" }}
+                    quickLinks={[
+                        { to: "/account/orders", label: "My orders" },
+                        { to: "/collections", label: "Continue shopping" },
+                        { to: "/contact", label: "Contact support" },
+                    ]}
+                />
             );
         }
 
         throw error;
     },
+    pendingComponent: () => <OrderStatusLoader />
 });
 
 function RouteComponent() {
@@ -39,32 +49,11 @@ function RouteComponent() {
     useOneTimeConfetti(id, "firework");
 
     const navigate = useNavigate();
-    const { data: order } = useQuery({ ...orderQuery(id), staleTime: 0 });
+    const { data: order } = useQuery(orderQuery(id));
 
     const onContinueShopping = () => {
         navigate({ to: "/collections" });
     };
-
-    useEffect(() => {
-        const done = localStorage.getItem(`gtag:${id}`);
-        if (done || !order) return;
-
-        gtag.purchase({
-            order_id: order.order_number,
-            value: order.total,
-            items: order.order_items.map((item) => ({
-                id: item.id,
-                name: item.name,
-                price: item.price,
-                quantity: item.quantity,
-            })),
-        });
-        localStorage.setItem(`gtag:${id}`, "1");
-    }, [order]);
-
-    if (!order) {
-        return <div className="flex items-center justify-center py-12 px-2 bg-secondary">Order not found</div>;
-    }
 
     if (order?.payment_method === PaymentMethod.CASH_ON_DELIVERY) {
         return (

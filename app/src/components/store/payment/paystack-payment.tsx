@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { Globe } from "lucide-react";
+import { Check, ChevronRight, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { PaymentInitialize } from "@/types/payment";
 import { currency } from "@/utils";
@@ -39,39 +39,38 @@ export function PaystackPayment({ cartNumber, amount, canContinue }: PaystackPay
     return (
         <>
             <div className="px-4 mt-4">
-                <div className="p-4 bg-accent/10 rounded-lg">
-                    <h4 className="font-medium mb-3 flex items-center space-x-2">
-                        <Globe className="h-4 w-4 text-accent" />
-                        <span>Paystack Payment</span>
-                    </h4>
-                    <div className="space-y-3">
-                        <p className="text-sm text-muted-foreground">
-                            {`You will be redirected to Paystack's secure payment gateway to complete your transaction.`}
-                        </p>
-                        <div className="flex items-center space-x-2 text-sm">
-                            <div className="w-2 h-2 bg-green-500 rounded-full" />
-                            <span>Secure SSL encryption</span>
-                        </div>
-                        <div className="flex items-center space-x-2 text-sm">
-                            <div className="w-2 h-2 bg-green-500 rounded-full" />
-                            <span>Multiple payment options available</span>
-                        </div>
-                        <div className="flex items-center space-x-2 text-sm">
-                            <div className="w-2 h-2 bg-green-500 rounded-full" />
-                            <span>Instant payment confirmation</span>
-                        </div>
+                <div className="rounded-xl border border-border bg-card p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                        <Globe className="h-4 w-4 text-muted-foreground" />
+                        <h4 className="text-sm font-medium">Paystack payment</h4>
                     </div>
+                    <p className="text-sm text-muted-foreground mb-3">
+                        {`You'll be redirected to Paystack's secure payment gateway to complete your transaction.`}
+                    </p>
+                    <ul className="space-y-1.5">
+                        {[
+                            "Secure SSL encryption",
+                            "Multiple payment options available",
+                            "Instant payment confirmation",
+                        ].map((item) => (
+                            <li key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <Check className="h-3.5 w-3.5 text-success shrink-0" />
+                                {item}
+                            </li>
+                        ))}
+                    </ul>
                 </div>
             </div>
-            <div className="flex justify-end py-2 sticky px-4 bottom-0 border-t md:border-t-0 bg-background mt-4">
+            <div className="checkout-footer">
                 <Button
                     disabled={loading || !canContinue}
                     isLoading={loading}
                     size="lg"
                     onClick={handlePayment}
-                    className="bg-gradient-action hover:opacity-90 transition-opacity h-14 rounded-2xl text-base font-semibold w-full md:w-sm"
+                    className="rounded-full text-sm font-semibold w-full md:w-auto md:px-10"
                 >
                     Pay {currency(amount)} Now
+                    <ChevronRight className="h-4 w-4" />
                 </Button>
             </div>
         </>

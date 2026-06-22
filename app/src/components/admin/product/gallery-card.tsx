@@ -1,12 +1,7 @@
 import { GalleryCardActions } from "./gallery-card-actions";
-import { Badge } from "@/components/ui/badge";
 import { cn, currency } from "@/utils";
-import type { Collection, ProductImage, ProductVariantLite } from "@/schemas";
-import MediaDisplay from "@/components/media-display";
-import { IsNew } from "@/components/products/product-badges";
-import { useState } from "react";
-import ImageLightbox from "@/components/ImageLightbox";
-import { GalleryCampaign } from "./gallery-campaign";
+import type { ProductImage } from "@/schemas";
+import ImageLightbox from "@/components/image-lightbox";
 
 interface GalleryCardProps {
     image: ProductImage;
@@ -16,96 +11,114 @@ interface GalleryCardProps {
 }
 
 export function GalleryCard({ image, isSelected = false, onSelectionChange, selectionMode = false }: GalleryCardProps) {
-    const [lightboxOpen, setLightboxOpen] = useState<boolean>(false);
+    if (!image) return null;
 
-    const isProductInactive =
-        !image.product?.active || image.product?.variants?.length == 0 || image.product?.variants?.every((v) => v.inventory <= 0);
+    const product = image.product;
+    const variants = product?.variants || [];
+    const item = product?.variants?.[0];
 
-    if (!image) return;
+    const attributes = [
+        item?.size && `Size: ${item.size}`,
+        item?.color && `Color: ${item.color}`,
+        item?.width && `W: ${item.width}`,
+        item?.length && `L: ${item.length}`,
+        item?.age && `Age: ${item.age}`,
+    ].filter(Boolean);
 
-    const handleSelectionChange = (checked: boolean) => {
-        if (!selectionMode) {
-            setLightboxOpen(true);
-            return;
-        }
-        onSelectionChange?.(image.id, checked);
-    };
+    const totalInventory = variants.reduce((acc, v) => acc + (v.inventory || 0), 0);
+    const isOutOfStock = totalInventory <= 0;
+    const isInactive = !product?.active;
+
+    const statusLabel = isInactive ? "Draft" : isOutOfStock ? "Out of Stock" : "Active";
+    const statusColorClass = isInactive
+        ? "bg-muted text-muted-foreground border-border"
+        : isOutOfStock
+            ? "bg-destructive/10 text-destructive border-destructive/20"
+            : "bg-success-subtle text-success-subtle-foreground border-success/20";
 
     return (
-        <>
-            <div
-                className={cn(
-                    "relative group overflow-hidden bg-background animate-in fade-in cursor-pointer transition-all duration-150",
-                    isProductInactive ? "ring-2 ring-red-500 opacity-50" : "",
-                    isSelected
-                        ? "ring-2 ring-green-600 ring-offset-2 scale-[0.97]"
-                        : "hover:ring-2 hover:ring-green-300 hover:ring-offset-1"
+        <div
+            className={cn(
+                "relative w-full aspect-gallery overflow-hidden bg-secondary border border-border rounded-1xl transition-all duration-200 shadow-xs hover:shadow-md",
+                selectionMode ? "cursor-pointer" : "cursor-default",
+                isSelected ? "ring-2 ring-primary ring-offset-1" : ""
+            )}
+            onClick={() => selectionMode && onSelectionChange?.(image.id, !isSelected)}
+        >
+            <ImageLightbox
+                url={image?.image}
+                alt={product?.name || ""}
+                className="absolute inset-0 w-full h-full"
+                imgClassName={cn(
+                    "w-full h-full object-cover transition-transform duration-300",
+                    isInactive || isOutOfStock ? "grayscale opacity-60" : ""
                 )}
-            >
-                <div
-                    className="relative aspect-[3/4] overflow-hidden bg-secondary"
-                    style={{ boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.05)" }}
-                    onClick={() => handleSelectionChange(!isSelected)}
-                >
-                    <MediaDisplay url={image.image} alt={image.product?.name || ""} />
-                    {isSelected && (
-                        <div className="absolute inset-0 bg-green-500/20 pointer-events-none transition-opacity duration-150" />
-                    )}
+                disabled={selectionMode}
+            />
 
-                    {selectionMode && (
-                        <div className={cn(
-                            "absolute top-2 left-2 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-150 z-10",
-                            isSelected
-                                ? "bg-green-600 border-green-600"
-                                : "bg-white/80 border-gray-300"
-                        )}>
-                            {isSelected && (
-                                <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 12 12" fill="none">
-                                    <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            )}
-                        </div>
+            {/* Top status overlays */}
+            <div className="absolute top-2 left-2 flex flex-col gap-1.5 z-10 pointer-events-none">
+                <span className={cn("text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm border backdrop-blur-md", statusColorClass, statusLabel == "Active" && "hidden")}>
+                    {statusLabel}
+                </span>
+                {product?.is_new && (
+                    <span className="w-fit bg-accent text-accent-foreground text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm shadow-sm">
+                        New
+                    </span>
+                )}
+            </div>
+
+            {selectionMode && (
+                <div className={cn(
+                    "absolute top-2 right-2 w-5 h-5 rounded-full border flex items-center justify-center transition-all z-10 shadow-sm pointer-events-none",
+                    isSelected ? "bg-primary border-primary scale-100" : "bg-white/90 border-neutral-300 scale-95"
+                )}>
+                    {isSelected && (
+                        <svg className="w-3 h-3 text-primary-foreground" viewBox="0 0 12 12" fill="none">
+                            <path d="M2.5 6l2.5 2.5 4.5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
                     )}
-                    {image.product && (
-                        <div className={cn("absolute top-2 left-1/2 -translate-x-1/2", selectionMode && "hidden")}>
-                            <Badge className="text-base font-bold">
-                                {currency(image.product.variants?.[0]?.price || 0)}
-                            </Badge>
-                        </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/20 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        {!selectionMode && <GalleryCardActions image={image} />}
-                    </div>
-                    <div className={cn("absolute top-2 left-2 flex flex-wrap gap-1", selectionMode && "hidden")}>
-                        {image.product?.collections?.slice(0, 2).map((item: Collection, idx: number) => (
-                            <Badge key={idx} variant="warning">
-                                {item.name}
-                            </Badge>
-                        ))}
-                    </div>
-                    <div className={cn("absolute top-2 right-2 flex flex-wrap gap-1", selectionMode && "hidden")}>
-                        {image.product?.variants?.map((item: ProductVariantLite, idx: number) => (
-                            <Badge key={idx} className={cn(item.size ? "" : "hidden")} variant="success-subtle">
-                                UK: {item.size}
-                            </Badge>
-                        ))}
-                    </div>
-                    {image.product?.variants?.[0]?.age && (
-                        <div className="absolute top-2 right-2 flex flex-wrap gap-1">
-                            {image.product?.variants?.map((item: ProductVariantLite, idx: number) => (
-                                <Badge key={idx} variant="success">
-                                    {item.age}
-                                </Badge>
-                            ))}
-                        </div>
-                    )}
-                    {image.product?.is_new && <IsNew className={cn("right-0 bottom-0 top-auto left-auto", selectionMode && "hidden")} />}
-                    <div className={cn("absolute bottom-0 left-0", selectionMode && "hidden")} onClick={(e) => e.stopPropagation()}>
-                        <GalleryCampaign image={image.image} />
+                </div>
+            )}
+
+            {!selectionMode && (
+                <div className="absolute inset-0 flex items-start justify-end p-2 z-10 pointer-events-none">
+                    <div className="pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+                        <GalleryCardActions image={image} />
                     </div>
                 </div>
-            </div>
-            <ImageLightbox image={lightboxOpen ? image.image : null} onClose={() => setLightboxOpen(false)} />
-        </>
+            )}
+
+            {(variants.length > 0 || attributes.length > 0) && (
+                <div className="absolute bottom-0 inset-x-0 z-10 pointer-events-none">
+                    <div className="bg-gradient-to-t from-black/85 via-black/50 to-transparent pt-8 pb-2 px-2.5">
+                        <div className="flex items-end justify-between gap-2">
+                            {variants.length > 0 && (
+                                <span className="text-sm font-bold text-white drop-shadow-sm">
+                                    {currency(variants[0]?.price || 0)}
+                                </span>
+                            )}
+                            {attributes.length > 0 && (
+                                <div className="flex flex-wrap justify-end gap-1 max-w-[65%]">
+                                    {attributes.slice(0, 2).map((attr, i) => (
+                                        <span
+                                            key={i}
+                                            className="text-[9px] font-medium text-white/90 bg-white/15 backdrop-blur-sm px-1.5 py-0.5 rounded-xs"
+                                        >
+                                            {attr}
+                                        </span>
+                                    ))}
+                                    {attributes.length > 2 && (
+                                        <span className="text-[9px] font-medium text-white/70 px-1">
+                                            +{attributes.length - 2}
+                                        </span>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }

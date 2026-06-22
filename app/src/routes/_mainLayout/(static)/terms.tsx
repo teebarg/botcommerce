@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_mainLayout/(static)/terms")({
 });
 
 function RouteComponent() {
-    const { config } = useConfig();
+    const config = useConfig();
 
     const sections = [
         {

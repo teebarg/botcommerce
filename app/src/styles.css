@@ -71,10 +71,10 @@
     --background-image-gradient-subtle: var(--gradient-subtle);
 
     --aspect-product: 4 / 5;
-    --aspect-gallery: 4 / 6;
+    --aspect-gallery: 4 / 5.5;
 
     --container-8xl: 88rem;
-    --container-9xl: 96rem;
+    --container-sxl: 78rem;
 
     --radius-1xl: 0.875rem;
 
@@ -295,17 +295,14 @@
 @layer base {
     * {
         @apply border-border outline-ring/50;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
     }
 
     body {
         @apply bg-background text-foreground font-sans antialiased pt-[var(--sat)] pb-[var(--sab)];
     }
 
-    * {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-    }
-    
     *::-webkit-scrollbar {
         display: none;
     }
@@ -325,6 +322,10 @@
 
     .sheet-footer {
         @apply bg-background/80 backdrop-blur-2xl flex gap-2 justify-end p-4 border-t border-border;
+    }
+
+    .checkout-footer {
+        @apply flex justify-end py-2 px-4 sticky bottom-0 border-t border-border bg-background mt-4 md:border-t-0
     }
 
     .h-sc {

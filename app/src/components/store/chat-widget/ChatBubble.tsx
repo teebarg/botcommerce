@@ -26,7 +26,7 @@ const ChatHeader = ({ onClose }: { onClose: () => void }) => {
 export const ChatBubble = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const { isMobile } = useMediaQuery()
-    const { config } = useConfig();
+    const { feature_chatbot } = useConfig();
     const location = useLocation();
     const isFirstRender = useRef(true);
 
@@ -38,7 +38,7 @@ export const ChatBubble = () => {
         setIsOpen(false);
     }, [location.pathname]);
 
-    if (config?.feature_chatbot != "true") {
+    if (feature_chatbot != "true") {
         return null;
     }
 

@@ -32,7 +32,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
     const updateVariant = useUpdateVariant(false);
 
     const { data } = useUserWishlist();
-
     const inWishlist = !!data?.wishlists?.find((wishlist) => wishlist.product_id === product.id);
 
     const handleMarkVariantOutOfStock = async (variant: ProductVariantLite) => {
@@ -50,17 +49,11 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         },
                     },
                     duration: 10000,
-                    onAutoClose: () => {
-                        window.location.reload();
-                    },
-                    onDismiss: () => {
-                        window.location.reload();
-                    },
+                    onAutoClose: () => window.location.reload(),
+                    onDismiss: () => window.location.reload(),
                 });
             })
-            .finally(() => {
-                confirmState.close();
-            });
+            .finally(() => confirmState.close());
     };
 
     useEffect(() => {
@@ -69,7 +62,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
 
     return (
         <div className="max-w-6xl mx-auto w-full md:py-8 md:px-4 md:grid md:grid-cols-2 md:gap-8 md:items-start">
-            <div className="relative aspect-square md:aspect-product md:rounded-3xl md:overflow-hidden md:sticky md:top-16">
+            <div className="relative aspect-square md:aspect-product md:rounded-2xl md:overflow-hidden md:sticky md:top-16 bg-secondary">
                 <img
                     key={currentImageIndex}
                     src={product.images?.[currentImageIndex]?.image || "/placeholder.jpg"}
@@ -78,66 +71,67 @@ const ProductView: React.FC<Props> = ({ product }) => {
                     decoding="async"
                     loading="lazy"
                     onLoad={() => setImageLoaded(true)}
-                    className={`w-full h-full object-cover transition-opacity duration-300 opacity-0 data-[loaded=true]:opacity-100 ${
-                        outOfStock ? "opacity-60 grayscale" : ""
-                    }`}
+                    className={`w-full h-full object-cover transition-opacity duration-300 opacity-0 data-[loaded=true]:opacity-100 ${outOfStock ? "opacity-60 grayscale" : ""
+                        }`}
                 />
 
-                <div className="absolute top-4 left-4 flex flex-col gap-2 md:top-6 md:left-6">
-                    {isNew && <span className="px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full">NEW</span>}
-                </div>
-                <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2">
+                {isNew && (
+                    <span className="absolute top-4 left-4 md:top-6 md:left-6 px-3 py-1 bg-foreground text-background text-xs font-semibold rounded-full">
+                        New
+                    </span>
+                )}
+
+                <div className="absolute inset-x-0 bottom-4 flex justify-center gap-1.5">
                     {product.images?.map((_, idx) => (
                         <button
                             key={idx}
                             onClick={() => setCurrentImageIndex(idx)}
-                            className={`w-2 h-2 rounded-full transition-all ${idx === currentImageIndex ? "bg-primary w-6" : "bg-white/50"}`}
+                            className={`h-1.5 rounded-full transition-all ${idx === currentImageIndex ? "bg-white w-6" : "bg-white/50 w-1.5"
+                                }`}
                         />
                     ))}
                 </div>
 
                 <button
                     onClick={() => setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length)}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-white/20 transition-colors"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background/90 border border-border flex items-center justify-center hover:bg-background transition-colors"
                 >
-                    <ChevronLeft className="w-5 h-5" />
+                    <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button
                     onClick={() => setCurrentImageIndex((prev) => (prev + 1) % product.images.length)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-white/20 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background/90 border border-border flex items-center justify-center hover:bg-background transition-colors"
                 >
-                    <ChevronRight className="w-5 h-5" />
+                    <ChevronRight className="w-4 h-4" />
                 </button>
             </div>
 
-            <div className="py-6 px-2 space-y-5 md:py-0">
-                <div className="flex items-center justify-between">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                        <span className="text-sm font-bold text-white">R</span>
-                    </div>
+            <div className="py-6 px-4 md:px-0 space-y-5">
+                <div className="flex items-center justify-end">
                     <ShareButton text="Check out this product!" />
                 </div>
 
-                <h1 className="text-2xl md:text-3xl font-bold text-foreground">{product.name}</h1>
-
-                {selectedVariant && (
-                    <div className="flex items-baseline gap-3">
-                        <span className="text-3xl md:text-4xl font-bold text-foreground">{currency(selectedVariant?.price)}</span>
-                        {selectedVariant?.old_price > selectedVariant?.price && (
-                            <span className="text-lg text-muted-foreground line-through">{currency(selectedVariant?.old_price)}</span>
-                        )}
-                    </div>
-                )}
+                <div>
+                    <h1 className="text-xl md:text-2xl font-display font-semibold text-foreground">{product.name}</h1>
+                    {selectedVariant && (
+                        <div className="flex items-baseline gap-2 mt-1.5">
+                            <span className="text-2xl font-semibold text-foreground">{currency(selectedVariant?.price)}</span>
+                            {selectedVariant?.old_price > selectedVariant?.price && (
+                                <span className="text-sm text-muted-foreground line-through">{currency(selectedVariant?.old_price)}</span>
+                            )}
+                        </div>
+                    )}
+                </div>
 
                 {isAuthenticated && session?.user?.isAdmin && product?.variants?.length ? (
-                    <div className="flex flex-col gap-2 mt-4">
+                    <div className="rounded-xl border border-border overflow-hidden">
                         {product.variants?.map((v) => (
-                            <div key={v.id} className="flex lg:flex-row items-center justify-between text-sm gap-2 bg-secondary p-2">
-                                <div className="flex flex-col md:flex-row md:items-center gap-3">
+                            <div key={v.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-3 border-b border-border last:border-0">
+                                <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                                     <span>SKU: {v.sku}</span>
                                     <span>Inventory: {v.inventory}</span>
-                                    <span className={v.inventory > 0 ? "text-emerald-600" : "text-red-600"}>
-                                        {v.inventory > 0 ? "IN_STOCK" : "OUT_OF_STOCK"}
+                                    <span className={v.inventory > 0 ? "text-success" : "text-destructive"}>
+                                        {v.inventory > 0 ? "In stock" : "Out of stock"}
                                     </span>
                                 </div>
                                 {v.inventory > 0 && (
@@ -145,7 +139,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                         open={confirmState.isOpen}
                                         onOpenChange={confirmState.setOpen}
                                         trigger={
-                                            <Button size="sm" variant="destructive">
+                                            <Button size="sm" variant="destructive" className="rounded-full">
                                                 Mark out of stock
                                             </Button>
                                         }
@@ -164,25 +158,22 @@ const ProductView: React.FC<Props> = ({ product }) => {
 
                 <ProductVariantSelection product={product} onVariantChange={setSelectedVariant} />
 
-                <div className="mt-4">
-                    <p className="line-clamp-3 text-base text-muted-foreground">{product.description}</p>
-                </div>
-
                 <ProductVariantActions product={product} inWishlist={inWishlist} />
 
                 <div className="pt-4 border-t border-border">
-                    <p className="text-sm font-medium text-foreground mb-2">Description</p>
+                    <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-2">Description</p>
                     <p className="text-sm text-muted-foreground leading-relaxed">{product.description}</p>
                 </div>
-                <div className="pt-4 border-t border-border space-y-3">
-                    <div className="flex justify-between text-sm">
+
+                <div className="rounded-xl border border-border bg-card divide-y divide-border">
+                    <div className="flex justify-between px-4 py-3 text-sm">
                         <span className="text-muted-foreground">SKU</span>
-                        <span className="text-foreground font-medium">{product.sku}</span>
+                        <span className="font-medium">{product.sku}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between px-4 py-3 text-sm">
                         <span className="text-muted-foreground">Availability</span>
-                        <span className={`font-medium ${!outOfStock ? "text-green-600" : "text-destructive"}`}>
-                            {!outOfStock ? "In Stock" : "Out of Stock"}
+                        <span className={`font-medium ${!outOfStock ? "text-success" : "text-destructive"}`}>
+                            {!outOfStock ? "In stock" : "Out of stock"}
                         </span>
                     </div>
                 </div>

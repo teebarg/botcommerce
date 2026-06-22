@@ -8,7 +8,6 @@ import type { Cart, DeliveryOption } from "@/schemas";
 import { useUpdateCartDetails } from "@/hooks/useCart";
 import { useConfig } from "@/providers/store-provider";
 import ComponentLoader from "@/components/component-loader";
-import { motion } from "framer-motion";
 
 interface DeliveryStepProps {
     cart: Cart;
@@ -16,7 +15,7 @@ interface DeliveryStepProps {
 }
 
 const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
-    const { config } = useConfig();
+    const { address } = useConfig();
     const { data, isPending } = useDeliveryOptions();
     const deliveryOptions = data?.filter((item: DeliveryOption) => item.is_active);
     const updateCartDetails = useUpdateCartDetails();
@@ -80,7 +79,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <MapPin className="h-4 w-4" />
-                                        {option.amount === 0 ? <span>{config?.address}</span> : <span>Available nationwide</span>}
+                                        {option.amount === 0 ? <span>{address}</span> : <span>Available nationwide</span>}
                                     </div>
                                 </div>
                             </div>
@@ -88,15 +87,16 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
                     ))}
                 </RadioGroup>
             </div>
-            <div className="flex justify-end py-2 sticky px-4 bottom-0 border-t md:border-t-0 bg-background mt-4">
+            <div className="flex justify-end py-3 px-4 sticky bottom-0 border-t border-border bg-background mt-4">
                 <Button
                     size="lg"
                     onClick={handleContinue}
                     disabled={updateCartDetails.isPending || !canContinue}
-                    className="bg-gradient-action hover:opacity-90 transition-opacity h-14 rounded-2xl text-base font-semibold w-full md:w-sm"
+                    isLoading={updateCartDetails.isPending}
+                    className="rounded-full text-sm font-semibold w-full md:w-auto md:px-10"
                 >
                     Continue
-                    <ChevronRight className="h-5 w-5" />
+                    <ChevronRight className="h-4 w-4" />
                 </Button>
             </div>
         </>

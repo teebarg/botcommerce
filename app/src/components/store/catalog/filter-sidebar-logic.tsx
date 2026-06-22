@@ -27,7 +27,7 @@ type DraftFilters = {
     colors: Set<string>;
     ages: Set<string>;
     categories: Set<string>;
-    sort: string;
+    sort: "min_variant_price:asc"| "min_variant_price:desc" | "id:desc" | "created_at:desc";
     minPrice: string;
     maxPrice: string;
     width: string;

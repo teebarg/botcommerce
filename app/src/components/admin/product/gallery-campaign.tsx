@@ -54,9 +54,9 @@ const GalleryCampaign: React.FC<Props> = ({ image }) => {
                 </header>
             }
             trigger={
-                <div className="p-2 bg-amber-500">
-                    <Radio className="h-5 w-5 text-white" />
-                </div>
+                <Button className="w-8 h-8 bg-white/90 hover:bg-white text-black rounded-full shadow-sm" size="icon">
+                    <Radio className="h-3.5 w-3.5" />
+                </Button>
             }
             onOpenChange={state.setOpen}
         >

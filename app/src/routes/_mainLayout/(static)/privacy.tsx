@@ -18,7 +18,7 @@ const Pill = ({ icon, label }: { icon: React.ReactNode; label: string }) => (
 );
 
 function RouteComponent() {
-    const { config } = useConfig();
+    const config = useConfig();
 
     const collected = [
         { icon: "👤", label: "Name & email" },

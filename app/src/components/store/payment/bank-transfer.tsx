@@ -1,4 +1,4 @@
-import { Banknote } from "lucide-react";
+import { Banknote, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { currency } from "@/utils";
 import { useBankDetails } from "@/hooks/useApi";
@@ -26,46 +26,44 @@ const BankTransfer: React.FC<BankTransferProps> = ({ amount, canContinue }) => {
     return (
         <>
             <div className="px-4">
-                <div className="p-4 bg-accent/10 rounded-lg mt-4">
-                    <h4 className="font-medium mb-3 flex items-center space-x-2">
-                        <Banknote className="h-4 w-4" />
-                        <span>Bank Transfer Details</span>
-                    </h4>
+                <div className="rounded-xl border border-border bg-card p-4 mt-4">
+                    <div className="flex items-center gap-2 mb-3">
+                        <Banknote className="h-4 w-4 text-muted-foreground" />
+                        <h4 className="text-sm font-medium">Bank transfer details</h4>
+                    </div>
+
                     <div className="space-y-2 text-sm">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <Label className="font-medium">Bank Name:</Label>
-                                <p>{bankDetails?.[0]?.bank_name}</p>
-                            </div>
-                            <div>
-                                <Label className="font-medium">Account Name:</Label>
-                                <p>{bankDetails?.[0]?.account_name}</p>
-                            </div>
+                        <div className="flex justify-between">
+                            <span className="text-muted-foreground">Bank name</span>
+                            <span className="font-medium">{bankDetails?.[0]?.bank_name}</span>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <Label className="font-medium">Account Number:</Label>
-                                <p>{bankDetails?.[0]?.account_number}</p>
-                            </div>
+                        <div className="flex justify-between">
+                            <span className="text-muted-foreground">Account name</span>
+                            <span className="font-medium">{bankDetails?.[0]?.account_name}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-muted-foreground">Account number</span>
+                            <span className="font-medium">{bankDetails?.[0]?.account_number}</span>
                         </div>
                     </div>
-                    <div className="mt-3 p-3 bg-background rounded border-l-4 border-accent">
-                        <p className="text-sm text-muted-foreground">
-                            Please include the order number in your transfer description. Your order will be processed once payment is received (1-3
-                            business days).
+
+                    <div className="mt-3 pt-3 border-t border-border">
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                            Include the order number in your transfer description. Your order will be processed once payment is received (1–3 business days).
                         </p>
                     </div>
                 </div>
             </div>
-            <div className="flex justify-end py-2 sticky px-4 bottom-0 border-t md:border-t-0 bg-background mt-4">
+            <div className="checkout-footer">
                 <Button
                     disabled={completeCart.isPending || !canContinue}
                     isLoading={completeCart.isPending}
                     onClick={onPaymentCompleted}
                     size="lg"
-                    className="bg-gradient-action hover:opacity-90 transition-opacity h-14 rounded-2xl text-base font-semibold w-full md:w-sm"
+                    className="rounded-full text-sm font-semibold w-full md:w-auto md:px-10"
                 >
                     Pay {currency(amount)} via Bank Transfer
+                    <ChevronRight className="h-4 w-4" />
                 </Button>
             </div>
         </>

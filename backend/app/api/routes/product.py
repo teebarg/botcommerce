@@ -100,12 +100,12 @@ async def read(request: Request, slug: str, srv: ProductDep) -> ProductLite:
     if cached:
         return json.loads(cached)
 
-    product = await srv.get_by_slug(slug)
+    product = await srv.get_by_slug(slug=slug)
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
     new_product = ProductLite.validate(product)
-    
+
     async with srv.redis.pipeline(transaction=False) as pipe:
         pipe.setex(cache_key, DEFAULT_EXPIRATION, json.dumps(new_product, cls=EnhancedJSONEncoder))
         pipe.sadd(f"tag:product:{product.id}", cache_key)

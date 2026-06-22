@@ -7,9 +7,9 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { cn } from "@/utils";
 import { useProductSearch } from "@/hooks/useProduct";
 import { Separator } from "@/components/ui/separator";
-import LocalizedClientLink from "@/components/ui/link";
 import { useNavigate } from "@tanstack/react-router";
-import ProductCardPLP from "./products/product-card-plp";
+import { Link } from '@tanstack/react-router'
+import ProductCard from "./products/product-card-revamped";
 
 interface SearchDialogProps {
     initialQuery?: string;
@@ -120,7 +120,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                             </button>
                         )}
                     </div>
-                    <div className="flex-1 overflow-y-auto bg-card">
+                    <div className="flex-1 overflow-y-auto bg-card py-2">
                         {isLoading && (
                             <div className="flex items-center justify-center py-8">
                                 <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent" />
@@ -128,23 +128,24 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                         )}
                         {hasResults && (
                             <div className="max-w-8xl mx-auto">
-                                <div className="p-4">
+                                <div className="p-2">
                                     <h3 className="font-semibold text-sm tracking-wider mb-4">PRODUCTS</h3>
                                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                                         {data?.products?.map((product: ProductSearch) => (
-                                            <ProductCardPLP key={product.id} product={product} />
+                                            <ProductCard key={product.id} product={product} />
                                         ))}
                                     </div>
                                 </div>
                                 <Separator className="my-4" />
-                                <div className="text-right">
-                                    <LocalizedClientLink
-                                        className="inline-block text-left text-sm hover:text-primary transition-colors py-1"
-                                        href={`/search/${query}`}
+                                <div className="text-right px-2">
+                                    <Link
+                                        className="text-sm hover:text-primary transition-colors"
+                                        to="/collections"
+                                        search={(prev: any) => ({ ...prev, search: query })}
                                         onClick={() => searchState.close()}
                                     >
                                         See all products
-                                    </LocalizedClientLink>
+                                    </Link>
                                 </div>
                             </div>
                         )}
@@ -160,7 +161,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                                     <h3 className="font-semibold text-sm tracking-wider mb-4">TRENDING PRODUCTS</h3>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                         {trendingData?.products?.map((product: ProductSearch) => (
-                                            <ProductCardPLP key={product.id} product={product} />
+                                            <ProductCard key={product.id} product={product} />
                                         ))}
                                     </div>
                                 </div>

@@ -9,7 +9,6 @@ interface ProductSectionProps {
     title: string;
     subtitle?: string;
     products: ProductSearch[];
-    showGradient?: boolean;
     href?: string;
 }
 
@@ -19,7 +18,7 @@ interface ScrollState {
     activeIndex: number;
 }
 
-const ProductSection = ({ title, subtitle, products, href, showGradient = false }: ProductSectionProps) => {
+const ProductSection = ({ title, subtitle, products, href }: ProductSectionProps) => {
     const listRef = useRef<HTMLUListElement>(null);
     const [scrollState, setScrollState] = useState<ScrollState>({
         atStart: true,
@@ -102,7 +101,7 @@ const ProductSection = ({ title, subtitle, products, href, showGradient = false 
     );
 
     return (
-        <section className="relative py-6 max-w-8xl mx-auto">
+        <section className="relative py-6 max-w-sxl mx-auto">
             <Button
                 aria-label="Scroll backward"
                 className="carousel-nav-link -left-6"
@@ -132,7 +131,7 @@ const ProductSection = ({ title, subtitle, products, href, showGradient = false 
                 </Link>
             </div>
 
-            <ul ref={listRef} className="flex gap-4 overflow-x-auto px-2 md:px-0">
+            <ul ref={listRef} className="flex gap-2 overflow-x-auto px-2 md:px-0">
                 {products.map((product) => (
                     <li key={product.id} data-card>
                         <ProductCard product={product} />

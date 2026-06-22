@@ -1,4 +1,3 @@
-import { Calendar, Package } from "lucide-react";
 import { useMemo } from "react";
 import { useOverlayTriggerState } from "react-stately";
 import OrderDetails from "./order-details";
@@ -18,39 +17,33 @@ const OrderCard = ({ order }: { order: Order }) => {
         <Overlay
             open={state.isOpen}
             trigger={
-                <div className="bg-card rounded-2xl p-4 border border-border flex flex-col gap-2">
-                    <div className="flex gap-2">
-                        <p className="font-semibold">{order.order_number}</p>
+                <div className="block rounded-xl border border-border bg-card p-4 hover:border-foreground/20 transition-colors">
+                    <div className="flex items-center justify-between mb-3">
+                        <div>
+                            <p className="text-sm font-medium">{order.order_number}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">{formatDate(order.created_at)}</p>
+                        </div>
                         <OrderStatusBadge status={order.status} />
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
-                            {formatDate(order.created_at)}
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <Package className="h-4 w-4" />
-                            {numberOfProducts} {numberOfProducts > 1 ? "items" : "item"}
-                        </div>
-                        <div>{currency(order.total)}</div>
-                    </div>
-                    <div className="flex flex-wrap gap-4">
-                        {order.order_items.slice(0, 2).map((item: OrderItem, idx: number) => (
-                            <div
-                                key={idx}
-                                className="aspect-product h-40 w-40 relative rounded-lg overflow-hidden"
-                            >
+
+                    <div className="flex gap-2 mb-3">
+                        {order.order_items.slice(0, 4).map((item: OrderItem, idx: number) => (
+                            <div key={idx} className="relative w-14 h-14 shrink-0 rounded-lg overflow-hidden bg-secondary ring-1 ring-border">
                                 {item.image && <ImageDisplay alt={item?.name || item.image} url={item.image} />}
                             </div>
                         ))}
-                        {order.order_items.length > 6 && (
-                            <div className="flex flex-col items-center justify-center">
-                                <div className="w-16 h-16 rounded-lg flex items-center justify-center mb-2">
-                                    <span className="text-sm font-medium text-muted-foreground">+{order.order_items.length - 6}</span>
-                                </div>
-                                <span className="text-xs text-muted-foreground">more</span>
+                        {order.order_items.length > 4 && (
+                            <div className="w-14 h-14 shrink-0 rounded-lg bg-secondary flex items-center justify-center">
+                                <span className="text-xs font-medium text-muted-foreground">+{order.order_items.length - 4}</span>
                             </div>
                         )}
+                    </div>
+
+                    <div className="flex items-center justify-between pt-3 border-t border-border text-sm">
+                        <span className="text-muted-foreground">
+                            {numberOfProducts} {numberOfProducts > 1 ? "items" : "item"}
+                        </span>
+                        <span className="font-medium">{currency(order.total)}</span>
                     </div>
                 </div>
             }

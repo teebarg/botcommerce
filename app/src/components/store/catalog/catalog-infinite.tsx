@@ -3,7 +3,7 @@ import type { ProductSearch, SearchCatalog } from "@/schemas";
 import NoProductsFound from "@/components/store/products/no-products";
 import { api } from "@/utils/api";
 import { InfiniteList } from "@/components/InfiniteList";
-import ProductCardPLP from "../products/product-card-plp";
+import ProductCard from "../products/product-card-revamped";
 
 interface Props {
     slug: string;
@@ -33,13 +33,13 @@ export default function CatalogInfinite({ slug, initialData }: Props) {
     const hasProducts = products.length > 0;
 
     return (
-        <main className="max-w-8xl mx-auto w-full px-2 py-4">
+        <main className="max-w-sxl mx-auto w-full px-2 py-4">
             {!hasProducts && <NoProductsFound />}
             {hasProducts && (
                 <InfiniteList hasMore={!!hasNextPage} isLoading={isFetchingNextPage} onLoadMore={fetchNextPage}>
                     <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 md:gap-4 gap-2">
-                        {products?.map((product: ProductSearch, idx: number) => (
-                            <ProductCardPLP key={product.id + product.slug + idx} product={product} />
+                        {products?.map((product: ProductSearch) => (
+                            <ProductCard key={product.id} product={product} />
                         ))}
                     </div>
                 </InfiniteList>

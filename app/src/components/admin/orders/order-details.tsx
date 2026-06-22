@@ -1,5 +1,5 @@
 import type React from "react";
-import { User, CreditCard, Truck, Calendar, Clock, ShieldAlert, PackageCheck, Download, RefreshCw, Package, XCircle, RotateCcw } from "lucide-react";
+import { Truck, Calendar, ShieldAlert, PackageCheck, Download, RefreshCw, Package, XCircle, RotateCcw } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import OrderProcessingAction from "./order-processing-actions";
 import { OrderStatusBadge } from "./order-status-badge";
@@ -12,10 +12,21 @@ import ImageDisplay from "@/components/image-display";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { Button } from "@/components/ui/button";
 import { ReactElement } from "react";
+import OrderSummary from "@/components/store/orders/order-summary";
 
 interface OrderDetailsProps {
     order: Order;
     onClose: () => void;
+}
+
+const timelineDotColor: Record<string, string> = {
+    DELIVERED: "bg-success",
+    CANCELED: "bg-destructive",
+    REFUNDED: "bg-destructive",
+};
+
+function getDotColor(status: string) {
+    return timelineDotColor[status] ?? "bg-foreground";
 }
 
 const orderStatusMap: Record<OrderStatus, { icon: ReactElement; label: string; color: string }> = {
@@ -56,46 +67,56 @@ const orderStatusMap: Record<OrderStatus, { icon: ReactElement; label: string; c
     },
 };
 
-const OrderItemCard: React.FC<{ orderItem: OrderItem; orderId: number }> = ({ orderItem, orderId }) => {
+const OrderItemCard: React.FC<{ item: OrderItem; orderId: number }> = ({ item, orderId }) => {
     const deleteState = useOverlayTriggerState({});
     const { mutateAsync: returnItem, isPending } = useReturnOrderItem();
 
     const handleRemove = () => {
-        returnItem({ orderId, itemId: orderItem.id }).then(() => {
+        returnItem({ orderId, itemId: item.id }).then(() => {
             deleteState.close();
         });
     };
 
+    const variantText = [
+        item.variant?.size && `Size: ${item.variant.size}`,
+        item.variant?.color && `Color: ${item.variant.color}`,
+        item.variant?.width && `Waist: ${item.variant.width}`,
+        item.variant?.length && `Length: ${item.variant.length}`,
+        item.variant?.age && `Age: ${item.variant.age}`,
+    ].filter(Boolean).join(" · ");
+
     return (
-        <div className="flex gap-4 px-2.5 py-4">
-            <div className="h-28 w-28 rounded-lg overflow-hidden">
-                <ImageDisplay alt={orderItem.name} url={orderItem.image} />
+        <div className="flex items-start gap-3 px-4 py-3">
+            <div className="relative w-16 h-16 shrink-0 overflow-hidden rounded-lg bg-card ring-1 ring-border">
+                <ImageDisplay className="rounded-lg" url={item?.image} alt={item.name} />
             </div>
-            <div className="grow">
-                <h3 className="text-sm font-medium">{orderItem.name}</h3>
-                <p className="text-sm text-muted-foreground">SKU: {orderItem.variant.id}</p>
-                <div className="mt-1 space-y-2">
-                    <div className="flex items-center text-sm text-muted-foreground">
-                        <span>Qty: {orderItem.quantity}</span>
-                    </div>
-                    {orderItem.variant?.inventory < 1 && (
-                        <Badge variant="destructive">
-                            <span>Out of stock</span>
-                        </Badge>
-                    )}
-                    <div className="font-semibold">{currency(orderItem.price)}</div>
-                </div>
+
+            <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{item.name}</p>
+                {variantText && <p className="text-xs text-muted-foreground mt-0.5">{variantText}</p>}
+                <p className="text-xs text-muted-foreground mt-1">
+                    {item.quantity} × {currency(Number(item.price) || 0)}
+                </p>
+                {item.variant?.inventory < 1 && (
+                    <Badge variant="destructive">
+                        <span>Out of stock</span>
+                    </Badge>
+                )}
+                <ConfirmDrawer
+                    open={deleteState.isOpen}
+                    onOpenChange={deleteState.setOpen}
+                    trigger={<Button variant="destructive" size="xs" className="mt-2">Return</Button>}
+                    onClose={deleteState.close}
+                    onConfirm={handleRemove}
+                    title={`Return ${item.name}`}
+                    confirmText="Return"
+                    isLoading={isPending}
+                />
             </div>
-            <ConfirmDrawer
-                open={deleteState.isOpen}
-                onOpenChange={deleteState.setOpen}
-                trigger={<Button variant="destructive">Return</Button>}
-                onClose={deleteState.close}
-                onConfirm={handleRemove}
-                title={`Return ${orderItem.name}`}
-                confirmText="Return"
-                isLoading={isPending}
-            />
+
+            <span className="text-sm font-medium shrink-0">
+                {currency((Number(item.price) || 0) * item.quantity)}
+            </span>
         </div>
     );
 };
@@ -104,11 +125,11 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
     const { data: timeline } = useOrderTimeline(order?.id);
 
     return (
-        <div className="px-2 sm:px-6 pb-4 overflow-y-auto">
+        <div className="px-2 sm:px-6 py-4 overflow-y-auto">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold">Order: {order.order_number}</h1>
-                    <div className="flex items-center">
+                    <h1 className="text-xl font-bold">Order: {order.order_number}</h1>
+                    <div className="flex items-center text-sm">
                         <Calendar className="w-4 h-4 text-muted-foreground mr-2" />
                         <span className="text-muted-foreground">{formatDate(order.created_at)}.</span>
                     </div>
@@ -121,221 +142,157 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
                     <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-border py-4 px-2">
-                            <h2 className="text-lg font-medium">Order Items</h2>
-                            <div className={cn("rounded-lg border bg-card p-4 text-sm whitespace-pre-wrap leading-relaxed hidden", order.order_notes && "block")}>
-                                {order.order_notes}
+                        <div className={cn("rounded-xl border bg-card p-4 mb-4 hidden", order.order_notes && "block")}>
+                            <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-2">Notes</p>
+                            <p className="text-sm text-foreground">{order.order_notes}</p>
+                        </div>
+                        <div className="rounded-xl border bg-card overflow-hidden mb-4">
+                            <div className="w-full flex justify-between items-center px-4 py-3">
+                                <span className="text-sm font-medium">Order items ({order.order_items.length})</span>
+                            </div>
+                            <div className="divide-y divide-border border-t">
+                                {order.order_items.map((item, idx) => (
+                                    <OrderItemCard key={idx} orderId={order.id} item={item} />
+                                ))}
                             </div>
                         </div>
-                        <div className="divide-y divide-border">
-                            {order.order_items.map((item: OrderItem, idx: number) => (
-                                <OrderItemCard key={idx} orderId={order.id} orderItem={item} />
-                            ))}
-                        </div>
-                        <div className="border-t border-input px-2 py-4 space-y-2">
-                            <div className="flex justify-between text-sm font-medium">
-                                <p>Subtotal</p>
-                                <p className="font-semibold">{currency(order.subtotal)}</p>
-                            </div>
-                            <div className="flex justify-between text-sm font-medium">
-                                <p>Shipping</p>
-                                <p className="font-semibold">{currency(order.shipping_fee)}</p>
-                            </div>
-                            <div className="flex justify-between text-sm font-medium">
-                                <p>Tax</p>
-                                <p className="font-semibold">{currency(order.tax)}</p>
-                            </div>
-                            {order.discount_amount > 0 && (
-                                <div className="flex justify-between text-sm font-medium">
-                                    <p>Discount</p>
-                                    <p className="font-semibold text-primary">
-                                        -{currency(order.discount_amount)}
-                                        {order.coupon_code && ` (${order.coupon_code})`}
-                                    </p>
-                                </div>
-                            )}
-                            {order.wallet_used > 0 && (
-                                <div className="flex justify-between text-sm font-medium">
-                                    <p>Wallet</p>
-                                    <p className="font-semibold text-primary">
-                                        -{currency(order.wallet_used)}
-                                    </p>
-                                </div>
-                            )}
-                            <div className="flex justify-between text-sm font-medium mt-4">
-                                <p>Total</p>
-                                <p className="font-semibold text-lg">{currency(order.total)}</p>
-                            </div>
-                        </div>
+                        <OrderSummary order={order} />
                     </div>
 
-                    <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-input py-4 px-2">
-                            <h2 className="text-lg font-medium flex items-center">
-                                <User className="w-5 h-5 mr-2 text-muted-foreground" />
-                                Customer Information
-                            </h2>
+                    <div className="rounded-xl border border-border bg-card overflow-hidden">
+                        <div className="border-b border-border px-4 py-3">
+                            <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground">Customer information</p>
                         </div>
-                        <div className="px-4 py-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="px-4 py-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <h3 className="text-sm font-medium text-muted-foreground">Contact Details</h3>
-                                <p className="font-medium">
+                                <p className="text-xs text-muted-foreground mb-1">Contact details</p>
+                                <p className="text-sm font-medium">
                                     {order.user?.first_name} {order.user?.last_name}
                                 </p>
-                                <p>{order.user?.email}</p>
-                                <p>{order.shipping_address?.phone}</p>
+                                <p className="text-sm text-muted-foreground">{order.user?.email}</p>
+                                <p className="text-sm text-muted-foreground">{order.shipping_address?.phone}</p>
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-muted-foreground">Shipping Address</h3>
+                                <p className="text-xs text-muted-foreground mb-1">Shipping address</p>
                                 {!order.shipping_address ? (
-                                    <p>Not applicable ({order.shipping_method})</p>
+                                    <p className="text-sm text-muted-foreground">Not applicable ({order.shipping_method})</p>
                                 ) : (
                                     <>
-                                        <p>{order.shipping_address?.address_1}, {order.shipping_address?.address_2}</p>
-                                        <p>{order.shipping_address?.state}.</p>
+                                        <p className="text-sm font-medium">
+                                            {order.shipping_address?.address_1}, {order.shipping_address?.address_2}
+                                        </p>
+                                        <p className="text-sm text-muted-foreground">{order.shipping_address?.state}</p>
                                     </>
                                 )}
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-muted-foreground">Contact Number</h3>
-                                <p>{order?.phone}</p>
+                                <p className="text-xs text-muted-foreground mb-1">Contact number</p>
+                                <p className="text-sm font-medium">{order?.phone}</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-input py-4 px-2">
-                            <h2 className="text-lg font-medium flex items-center">
-                                <CreditCard className="w-5 h-5 mr-2 text-muted-foreground" />
-                                Payment Information
-                            </h2>
+                    <div className="rounded-xl border border-border bg-card overflow-hidden">
+                        <div className="border-b border-border px-4 py-3">
+                            <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground">Payment information</p>
                         </div>
-                        <div className="px-2 py-6">
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <p className="text-muted-foreground">
-                                        <span className="font-medium">Method:</span> {order.payment_method}
-                                    </p>
-                                </div>
-                                <OrderStatusBadge status={order.status} />
+                        <div className="px-4 py-4 flex justify-between items-center">
+                            <div>
+                                <p className="text-xs text-muted-foreground mb-0.5">Method</p>
+                                <p className="text-sm font-medium">{order.payment_method}</p>
                             </div>
+                            <OrderStatusBadge status={order.status} />
                         </div>
                     </div>
 
-                    <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-input py-4 px-2">
-                            <h2 className="text-lg font-medium flex items-center">
-                                <Truck className="w-5 h-5 mr-2 text-muted-foreground" />
-                                Shipping Information
-                            </h2>
+                    <div className="rounded-xl border border-border bg-card overflow-hidden">
+                        <div className="border-b border-border px-4 py-3">
+                            <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground">Shipping information</p>
                         </div>
-                        <div className="px-2 py-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <p className="text-muted-foreground">
-                                        <span className="font-medium">Method:</span> <span className="font-semibold">{order.shipping_method}</span>
-                                    </p>
-                                    <p className="text-muted-foreground">
-                                        <span className="font-medium">Tracking:</span> <span className="font-semibold">{order.order_number}</span>
-                                    </p>
-                                </div>
+                        <div className="px-4 py-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p className="text-xs text-muted-foreground mb-0.5">Method</p>
+                                <p className="text-sm font-medium">{order.shipping_method}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-muted-foreground mb-0.5">Tracking</p>
+                                <p className="text-sm font-medium">{order.order_number}</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="space-y-6">
-                    <div className="bg-background shadow-sm rounded-lg overflow-hidden">
-                        <div className="border-b border-input py-4 px-2">
-                            <h2 className="text-lg font-medium">Actions</h2>
+                <div className="space-y-4">
+                    <div className="rounded-xl border border-border bg-card overflow-hidden">
+                        <div className="border-b border-border px-4 py-3">
+                            <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground">Actions</p>
                         </div>
-                        <div className="px-2 py-6 space-y-4">
+                        <div className="px-4 py-4 space-y-3">
                             <OrderProcessingAction order={order} />
                             {order.payment_status === "SUCCESS" && order.invoice_url && (
                                 <a
                                     download
-                                    className="flex items-center justify-center text-sm font-medium transition-colors bg-transparent border border-primary text-primary py-2 px-4 rounded-lg w-full"
                                     href={order.invoice_url}
+                                    className="flex items-center justify-center gap-2 text-sm font-medium border border-border text-foreground py-2.5 px-4 rounded-full w-full hover:bg-muted transition-colors"
                                 >
-                                    <Download className="w-4 h-4 mr-2 group-hover/link:-translate-y-px transition-transform" />
-                                    Download Invoice
+                                    <Download className="w-4 h-4" />
+                                    Download invoice
                                 </a>
                             )}
                         </div>
                     </div>
 
-                    <div className="bg-background shadow-sm rounded-lg overflow-hidden pb-6">
-                        <div className="border-b border-input py-4 px-2">
-                            <h2 className="text-lg font-medium">Order Timeline</h2>
+                    <div className="rounded-xl border border-border bg-card overflow-hidden">
+                        <div className="border-b border-border px-4 py-3">
+                            <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground">Order timeline</p>
                         </div>
-                        <div className="px-4 py-6">
-                            <div className="flow-root">
-                                <ul className="-mb-8">
-                                    <li>
-                                        <div className="relative pb-6">
-                                            <span aria-hidden="true" className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" />
-                                            <div className="relative flex space-x-3">
-                                                <div>
-                                                    <span className="h-8 w-8 rounded-full bg-violet-600 flex items-center justify-center ring-8 ring-secondary">
-                                                        <Clock className="h-5 w-5 text-white" />
-                                                    </span>
-                                                </div>
-                                                <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                                                    <div>
-                                                        <p className="text-sm text-muted-foreground">Order placed</p>
-                                                    </div>
-                                                    <div className="text-right text-sm whitespace-nowrap text-muted-foreground">
-                                                        <time>{formatDate(order.created_at)}</time>
-                                                    </div>
-                                                </div>
+                        <div className="px-4 py-4">
+                            {timeline?.length === 0 ? (
+                                <p className="text-sm text-muted-foreground">No timeline events found</p>
+                            ) : (
+                                <ul>
+                                    <li className="relative pb-5 last:pb-0">
+                                        <span aria-hidden="true" className="absolute top-3 left-[5px] -ml-px h-full w-px bg-border" />
+                                        <div className="relative flex items-start gap-3">
+                                            <span className="mt-1 h-2.5 w-2.5 rounded-full bg-foreground shrink-0" />
+                                            <div className="flex-1 min-w-0 flex justify-between gap-3">
+                                                <p className="text-sm font-medium">Order placed</p>
+                                                <time className="text-xs text-muted-foreground whitespace-nowrap">{formatDate(order.created_at)}</time>
                                             </div>
                                         </div>
                                     </li>
-                                    {(timeline || []).map((evt, idx) => (
-                                        <li key={idx}>
-                                            <div className="relative pb-6">
-                                                <span
-                                                    aria-hidden="true"
-                                                    className={
-                                                        idx === (timeline?.length || 0) - 1
-                                                            ? "hidden"
-                                                            : "absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
-                                                    }
-                                                />
-                                                <div className="relative flex space-x-3">
-                                                    <div>
-                                                        <span
-                                                            className={
-                                                                orderStatusMap[evt.to_status as keyof typeof orderStatusMap].color +
-                                                                " h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-secondary"
-                                                            }
-                                                        >
-                                                            {orderStatusMap[evt.to_status as keyof typeof orderStatusMap].icon}
-                                                        </span>
-                                                    </div>
-                                                    <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                                                        <div className="flex-1">
-                                                            <p className="text-sm text-muted-foreground">
-                                                                {orderStatusMap[evt.to_status as keyof typeof orderStatusMap].label}
-                                                            </p>
-                                                            {evt.message && <p className="text-sm text-muted-foreground">{evt.message}</p>}
+
+                                    {(timeline || []).map((evt, idx) => {
+                                        const isLast = idx === (timeline?.length || 0) - 1;
+                                        const status = evt.to_status as keyof typeof orderStatusMap;
+
+                                        return (
+                                            <li key={idx} className="relative pb-5 last:pb-0">
+                                                {!isLast && (
+                                                    <span aria-hidden="true" className="absolute top-3 left-[5px] -ml-px h-full w-px bg-border" />
+                                                )}
+                                                <div className="relative flex items-start gap-3">
+                                                    <span className={`mt-1 h-2.5 w-2.5 rounded-full shrink-0 ${getDotColor(evt.to_status!)}`} />
+                                                    <div className="flex-1 min-w-0 flex justify-between gap-3">
+                                                        <div>
+                                                            <p className="text-sm font-medium">{orderStatusMap[status].label}</p>
+                                                            {evt.message && (
+                                                                <p className="text-xs text-muted-foreground mt-0.5">{evt.message}</p>
+                                                            )}
                                                         </div>
-                                                        <div className="text-right text-sm whitespace-nowrap text-muted-foreground">
-                                                            <time>{formatDate(evt.created_at)}</time>
-                                                        </div>
+                                                        <time className="text-xs text-muted-foreground whitespace-nowrap">{formatDate(evt.created_at)}</time>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </li>
-                                    ))}
+                                            </li>
+                                        );
+                                    })}
                                 </ul>
-                            </div>
-                            {timeline?.length === 0 && <p className="text-sm text-muted-foreground">No timeline events found</p>}
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

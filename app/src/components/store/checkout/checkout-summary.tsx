@@ -1,15 +1,18 @@
-import CartTotals from "@/components/store/cart/cart-totals";
 import { Separator } from "@/components/ui/separator";
-import CartItems from "@/components/store/cart/cart-items";
+import CartSummary from "../cart/cart-summary";
+import { Cart, CartItem } from "@/schemas";
+import CartItemComponent from "../cart/cart-item";
 
-const CheckoutSummary = () => {
+const CheckoutSummary: React.FC<{ cart: Cart }> = ({ cart }) => {
     return (
-        <div className="relative md:sticky md:top-16 flex gap-y-8 w-full rounded-xl md:shadow-md px-2 py-4 md:px-6 md:py-8 lg:w-[400px] lg:flex-none mt-6 sm:mt-0">
-            <div className="w-full">
-                <h2 className="font-medium">Cart Summary</h2>
-                <Separator className="my-2" />
-                <CartTotals />
-                <CartItems className="max-h-[40vh] overflow-y-auto" />
+        <div className="relative md:sticky md:top-0 px-2 py-4 md:w-[400px] hidden md:block min-w-0 overflow-hidden">
+            <h2 className="font-medium">Cart Summary</h2>
+            <Separator className="my-2" />
+            <CartSummary cart={cart!} />
+            <div className="max-h-[55vh] w-full bg-card overflow-y-auto rounded-xl mt-4">
+                {cart?.items?.map((item: CartItem) => (
+                    <CartItemComponent key={item.variant_id} item={item} />
+                ))}
             </div>
         </div>
     );

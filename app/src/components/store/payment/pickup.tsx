@@ -1,4 +1,4 @@
-import { MapPin } from "lucide-react";
+import { ChevronRight, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useConfig } from "@/providers/store-provider";
 import { useCompleteCart } from "@/hooks/useCart";
@@ -10,7 +10,7 @@ interface PickupProps {
 }
 
 const Pickup: React.FC<PickupProps> = ({ amount, canContinue }) => {
-    const { config } = useConfig();
+    const { address } = useConfig();
     const completeCart = useCompleteCart();
 
     const onPaymentCompleted = async () => {
@@ -22,36 +22,43 @@ const Pickup: React.FC<PickupProps> = ({ amount, canContinue }) => {
 
     return (
         <>
-            <div className="space-y-4 px-4">
-                <div className="space-y-3 p-4 bg-accent/5 rounded-lg">
-                    <div className="flex items-start mb-3">
-                        <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
-                        <div className="ml-2">
-                            <p className="text-sm font-semibold">Collection Point</p>
-                            <p className="text-sm text-muted-foreground">{config?.address}</p>
-                            <p className="text-sm text-muted-foreground">Open Mon-Sat: 9am - 6pm</p>
+            <div className="px-4">
+                <div className="rounded-xl border border-border bg-card p-4">
+                    <div className="flex items-start gap-3 mb-3">
+                        <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                        <div>
+                            <p className="text-sm font-medium">Collection point</p>
+                            <p className="text-sm text-muted-foreground mt-0.5">{address}</p>
+                            <p className="text-sm text-muted-foreground">Open Mon–Sat: 9am–6pm</p>
                         </div>
                     </div>
 
-                    <div className="border-t border-border pt-3">
-                        <p className="text-sm font-semibold mb-1">Important Information:</p>
-                        <ul className="text-xs text-muted-foreground space-y-1">
-                            <li>• Please bring your order confirmation email</li>
-                            <li>• You can pay with cash or card at collection</li>
-                            <li>• Orders are held for 3 days before being returned to stock</li>
+                    <div className="pt-3 border-t border-border">
+                        <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-2">Important information</p>
+                        <ul className="space-y-1.5">
+                            {[
+                                "Bring your order confirmation email",
+                                "Pay with cash or card at collection",
+                                "Orders are held for 3 days before being returned to stock",
+                            ].map((item) => (
+                                <li key={item} className="text-xs text-muted-foreground pl-3 relative before:content-['·'] before:absolute before:left-0">
+                                    {item}
+                                </li>
+                            ))}
                         </ul>
                     </div>
                 </div>
             </div>
-            <div className="flex justify-end py-2 sticky px-4 bottom-0 border-t md:border-t-0 bg-background mt-4">
+            <div className="checkout-footer">
                 <Button
                     disabled={completeCart.isPending || !canContinue}
                     isLoading={completeCart.isPending}
                     size="lg"
                     onClick={onPaymentCompleted}
-                    className="bg-gradient-action hover:opacity-90 transition-opacity h-14 rounded-2xl text-base font-semibold w-full md:w-sm"
+                    className="rounded-full text-sm font-semibold w-full md:w-auto md:px-10"
                 >
                     Confirm Order for Pickup
+                    <ChevronRight className="h-4 w-4" />
                 </Button>
             </div>
         </>
