@@ -63,6 +63,7 @@
         "@tanstack/react-router-devtools": "^1.132.0",
         "@tanstack/react-router-ssr-query": "^1.131.7",
         "@tanstack/react-start": "^1.132.0",
+        "@tanstack/react-virtual": "^3.14.3",
         "@tanstack/router-plugin": "^1.132.0",
         "@upstash/redis": "^1.35.7",
         "@vercel/analytics": "^2.0.1",

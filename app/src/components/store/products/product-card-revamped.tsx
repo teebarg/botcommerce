@@ -6,6 +6,7 @@ import { Link } from "@tanstack/react-router";
 import { Heart, ShoppingBag } from "lucide-react";
 import { currency, cn } from "@/utils";
 import { useUserCreateWishlist, useUserDeleteWishlist } from "@/hooks/useUser";
+import ImageLightbox from "@/components/image-lightbox";
 // import ImageLightboxRevamped from "@/components/image-lightbox-revamped";
 
 interface ProductCardProps {
@@ -65,7 +66,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }
                     outOfStock && "grayscale opacity-60"
                 )}
             /> */}
-            <img
+            <ImageLightbox
+                url={product.image}
+                alt={product.name}
+                className="w-full h-full"
+                imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            {/* <img
                 src={product.image || "/placeholder.jpg"}
                 alt={product.name}
                 loading="lazy"
@@ -74,7 +81,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }
                     "w-full h-full object-cover transition-transform duration-300 group-hover:scale-105",
                     outOfStock && "grayscale opacity-60"
                 )}
-            />
+            /> */}
 
             {/* top-left badges */}
             {!outOfStock && hasDiscount && (
