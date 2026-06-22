@@ -103,7 +103,7 @@ export default function InfiniteFeed({ initialData, params }: Props) {
                             }}
                         >
                             {rowItems.map((product: ProductSearch, idx: number) => (
-                                <ProductCardPLP key={product.id || idx} product={product} />
+                                <ProductCard key={product.id || idx} product={product} />
                             ))}
                         </div>
                     );

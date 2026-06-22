@@ -115,7 +115,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     },
     loader: async ({ context }) => {
         return {
-            config: context.config,
+            config: context.config ?? {},
         };
     },
     head: ({ loaderData }) => {
@@ -168,8 +168,8 @@ function RootComponent() {
 function RootDocument({ children }: { children: React.ReactNode }) {
     // const GA_ID = import.meta.env.VITE_GA_ID;
     const [localSessionId, setLocalSessionId] = useState<string | null>(null);
-    const { config } = useLoaderData({ from: Route.id });
-    console.log("[Root]........")
+    const loaderData = useLoaderData({ from: Route.id }) as any;
+    const config = loaderData?.config ?? {};
 
     useEffect(() => {
         setLocalSessionId(getSessionId());

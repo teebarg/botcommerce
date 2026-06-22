@@ -6,7 +6,7 @@ export const Route = createFileRoute('/whatsapp')({
     beforeLoad: ({ context }) => {
         console.log(context.config)
         // Construct the official WhatsApp click-to-chat URL
-        const whatsappUrl = `https://wa.me/${context.config.whatsapp}?text=${DEFAULT_MESSAGE}`
+        const whatsappUrl = `https://wa.me/${context.config?.whatsapp}?text=${DEFAULT_MESSAGE}`
 
         if (typeof window !== 'undefined') {
             window.location.href = whatsappUrl

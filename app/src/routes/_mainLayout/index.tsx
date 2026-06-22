@@ -68,7 +68,7 @@ function Home() {
                     </div>
                 }
             >
-                <CategoriesWithProductsSection />
+                <CategoriesWithProductsSection /> 
             </LazyInView>
             <div className="max-w-sxl mx-auto px-2">
                 <div className="px-4 mb-4">
