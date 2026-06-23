@@ -1,10 +1,8 @@
-import { useMemo } from "react";
-import ProductCard from "../products/product-card-revamped";
+import { useEffect, useRef, useState, useMemo } from "react";
+// import ProductCard from "../products/product-card-revamped";
 import { useProductFeed } from "@/hooks/useProduct";
-import { FeedQuery, ProductFeed, ProductSearch } from "@/schemas";
-import { InfiniteGrid } from "@/components/infinite-list/infiniteGrid";
-import EmptyState from "@/components/generic/empty";
-import { Package } from "lucide-react";
+import { FeedQuery, ProductFeed } from "@/schemas";
+import ProductCard from "../products/product-card-skin";
 
 interface Props {
     initialData?: ProductFeed | null;
@@ -13,37 +11,45 @@ interface Props {
 
 export default function InfiniteFeed({ initialData, params }: Props) {
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useProductFeed(initialData || null, params);
+    const sentinelRef = useRef<HTMLDivElement>(null);
 
     // Flatten data: O(n) but happens only when page data changes
-    const items = useMemo(() =>
+    const products = useMemo(() =>
         data?.pages?.flatMap((page) => page.products) ?? (initialData?.products ?? []),
-        [data, initialData]);
+    [data, initialData]);
+
+    // Intersection Observer to trigger next page
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+                fetchNextPage();
+            }
+        }, { rootMargin: '400px' }); // Load early before user hits the bottom
+
+        const currentSentinel = sentinelRef.current;
+        if (currentSentinel) observer.observe(currentSentinel);
+
+        return () => {
+            if (currentSentinel) observer.unobserve(currentSentinel);
+        };
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     return (
-        <InfiniteGrid
-            items={items}
-            keyExtractor={(product) => product.id}
-            renderItem={(product: ProductSearch) => (
-                <div className="relative block w-full aspect-gallery rounded-xl overflow-hidden border border-border bg-secondary group">{product.name}</div>
+        <div className="w-full">
+            {/* Native Grid: No absolute positioning, perfectly responsive */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1.5 md:gap-4">
+                {products.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                ))}
+            </div>
+
+            {/* Sentinel at the bottom */}
+            <div ref={sentinelRef} className="h-10 w-full" />
+
+            {/* Loading indicator */}
+            {isFetchingNextPage && (
+                <div className="py-10 text-center">Loading more products...</div>
             )}
-            fetchNextPage={fetchNextPage}
-            hasNextPage={hasNextPage}
-            isFetchingNextPage={isFetchingNextPage}
-            gridClassName="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
-            rootMargin="800px"
-            // Keep ~160 cards rendered at once (40 rows @ 4 cols)
-            maxRendered={160}
-            loadingSlots={8}
-            emptyState={<EmptyState
-                icon={Package}
-                title="No orders yet"
-                description={`Your orders will appear here when they are available`}
-            />}
-            endMessage={
-                <p className="text-center text-sm text-muted-foreground py-8">
-                    All {items.length} images loaded
-                </p>
-            }
-        />
-    )
+        </div>
+    );
 }
