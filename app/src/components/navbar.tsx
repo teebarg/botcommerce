@@ -16,8 +16,8 @@ export const Navbar = ({ children, className }: { children: React.ReactNode; cla
         <NavbarContext.Provider value={{ expanded, setExpanded }}>
             <nav
                 className={cn(
-                    "flex z-30 w-full items-center justify-center data-[menu-open=true]:border-none sticky top-safe inset-x-0 backdrop-blur-lg",
-                    "data-[menu-open=true]:backdrop-blur-xl backdrop-saturate-150 h-auto py-1.5",
+                    "flex z-30 w-full items-center justify-center data-[menu-open=true]:border-none sticky top-safe inset-x-0",
+                    "h-auto py-1.5",
                     className
                 )}
                 data-menu-open={expanded}

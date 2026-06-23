@@ -1,6 +1,6 @@
 import { Separator } from "../ui/separator";
 
-type LoaderVariant = "list" | "grid" | "detail" | "inline" | "cart" | "product-list"| "product-section";
+type LoaderVariant = "list" | "grid" | "detail" | "inline" | "cart" | "product-list" | "product-section" | "radio" | "box" | "account";
 
 interface PageLoaderProps {
     variant?: LoaderVariant;
@@ -15,6 +15,41 @@ function Skeleton({ className = "", style = {} }: { className?: string; style?: 
             className={`animate-pulse rounded bg-muted ${className}`}
             style={style}
         />
+    );
+}
+
+function BoxLoader() {
+    return (
+        <div
+            className="flex items-center gap-3 px-5 py-4 border border-border rounded-xl bg-card"
+        >
+            <Skeleton className="size-10 rounded-md shrink-0" />
+            <div className="flex-1 flex flex-col gap-1.5">
+                <Skeleton className="h-4 w-[45%]" />
+                <Skeleton className="h-3 w-[28%]" />
+            </div>
+            <Skeleton className="h-6 w-16 rounded-full" />
+        </div>
+    );
+}
+
+function RadioLoader({ rows = 4 }: { rows?: number }) {
+    return (
+        <div className="space-y-2.5">
+            {Array.from({ length: rows }).map((_, i) => (
+                <div
+                    key={i}
+                    className="flex items-center gap-3 px-5 py-6 border border-border rounded-xl bg-card"
+                >
+                    <Skeleton className="size-10 rounded-md shrink-0" />
+                    <div className="flex-1 flex flex-col gap-1.5">
+                        <Skeleton className="h-4 w-[45%]" />
+                        <Skeleton className="h-3 w-[28%]" />
+                    </div>
+                    <Skeleton className="h-6 w-16 rounded-full" />
+                </div>
+            ))}
+        </div>
     );
 }
 
@@ -161,6 +196,36 @@ function ProductSectionLoader() {
     );
 }
 
+function AccountLoader() {
+    return (
+        <div className="px-2 md:px-0 pt-6 space-y-6">
+            <div className="text-center">
+                <div className="w-20 h-20 mx-auto rounded-full bg-border/40 flex items-center justify-center mb-4">
+                    <Skeleton className="w-full h-full rounded-full" />
+                </div>
+                <Skeleton className="h-5 w-48 mx-auto mb-2" />
+                <Skeleton className="h-3.5 w-36 mx-auto" />
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="bg-card rounded-2xl p-4 text-center border border-border flex flex-col items-center">
+                        <Skeleton className="w-10 h-10 rounded-xl mb-2" />
+                        <Skeleton className="h-6 w-8 mb-1.5" />
+                        <Skeleton className="h-3 w-16" />
+                    </div>
+                ))}
+            </div>
+
+            <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                    <BoxLoader key={i} />
+                ))}
+            </div>
+        </div>
+    );
+}
+
 export function PageLoader({ variant = "list", rows, className = "" }: PageLoaderProps) {
     return (
         <div className={className}>
@@ -171,6 +236,9 @@ export function PageLoader({ variant = "list", rows, className = "" }: PageLoade
             {variant === "cart" && <CartLoader />}
             {variant === "product-list" && <ProductListLoader />}
             {variant === "product-section" && <ProductSectionLoader />}
+            {variant === "radio" && <RadioLoader />}
+            {variant === "box" && <BoxLoader />}
+            {variant === "account" && <AccountLoader />}
         </div>
     );
 }

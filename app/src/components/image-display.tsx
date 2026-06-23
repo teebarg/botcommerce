@@ -16,9 +16,7 @@ const ImageDisplay: React.FC<MediaDisplayProps> = ({ url, alt, className }) => {
 
     return (
         <div className="relative w-full h-full overflow-hidden bg-muted">
-            {!mediaLoaded && (
-                <div className="absolute inset-0 animate-pulse bg-card" />
-            )}
+            {!mediaLoaded && <img src="/placeholder.jpg" alt="placeholder" className="absolute inset-0 w-full h-full object-cover" />}
 
             <img
                 alt={alt}

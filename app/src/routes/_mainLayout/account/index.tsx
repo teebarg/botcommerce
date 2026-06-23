@@ -7,6 +7,7 @@ import Overlay from "@/components/overlay";
 import OrderDetails from "@/components/store/orders/order-details";
 import { ordersQuery } from "@/queries/user.queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { PageLoader } from "@/components/generic/page-loader";
 
 const OrderItem: React.FC<{ order: Order; idx: number }> = ({ order, idx }) => {
     const state = useOverlayTriggerState({});
@@ -57,6 +58,7 @@ export const Route = createFileRoute("/_mainLayout/account/")({
         await queryClient.ensureQueryData(ordersQuery({}));
     },
     component: RouteComponent,
+    pendingComponent: () => (<PageLoader variant="account" />)
 });
 
 function RouteComponent() {

@@ -33,7 +33,7 @@ export const InfiniteScroll = ({
     const observerTarget = useRef<HTMLDivElement>(null);
 
     const handleObserver = useCallback(
-        (entries: any) => {
+        (entries: IntersectionObserverEntry[]) => {
             const [entry] = entries;
             if (entry.isIntersecting && hasMore && !isLoading) {
                 onLoadMore();
@@ -59,7 +59,11 @@ export const InfiniteScroll = ({
     return (
         <div className={className}>
             {children}
-            <div ref={observerTarget} className="h-px" />
+            <div
+                ref={observerTarget}
+                aria-hidden
+                className="h-px w-full"
+            />
             {isLoading && loader}
             {!hasMore && !isLoading && endMessage}
         </div>

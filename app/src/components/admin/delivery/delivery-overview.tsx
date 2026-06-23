@@ -10,12 +10,12 @@ import { Badge } from "@/components/ui/badge";
 import { currency } from "@/utils";
 import ServerError from "@/components/generic/server-error";
 import { tryCatch } from "@/utils/try-catch";
-import ComponentLoader from "@/components/component-loader";
 import { ZeroState } from "@/components/zero";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { useState } from "react";
 import { api } from "@/utils/api";
+import { PageLoader } from "@/components/generic/page-loader";
 
 const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
     const editState = useOverlayTriggerState({});
@@ -107,13 +107,14 @@ const DeliveryOverview: React.FC = () => {
     const addState = useOverlayTriggerState({});
 
     const { data: deliveryOptions, isLoading, error } = useDeliveryOptions();
+    console.log(isLoading)
 
     if (error) {
         return <ServerError error={error.message} scenario="delivery" stack={error.stack} />;
     }
 
     if (isLoading) {
-        return <ComponentLoader className="h-[400px]" />;
+        return <PageLoader variant="list" rows={4} />;
     }
 
     if (!deliveryOptions || deliveryOptions.length === 0) {

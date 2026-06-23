@@ -94,7 +94,7 @@ const GetApp: React.FC = () => {
 
     if (showIosBanner) {
         return (
-            <div className="fixed inset-x-4 top-16 z-70 rounded-2xl bg-white/95 shadow-xl border border-gray-200 backdrop-blur-sm overflow-hidden">
+            <div className="fixed inset-x-4 top-16 z-70 rounded-2xl bg-white/95 shadow-xl border border-gray-200 overflow-hidden">
                 <div className="h-1 w-full bg-gradient-action" />
                 <div className="p-4">
                     <div className="flex items-start gap-3">

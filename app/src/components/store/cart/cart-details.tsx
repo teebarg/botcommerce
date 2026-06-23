@@ -3,18 +3,16 @@ import { Info, ShoppingCart } from "lucide-react";
 import CartItemComponent from "./cart-item";
 import type { Cart, CartItem } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import CartSummary from "./cart-summary";
 
 interface Props {
     onClose?: () => void;
     cart: Cart | null;
-    shippingFee?: number;
 }
 
-const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
+const CartDetails: React.FC<Props> = ({ onClose, cart }) => {
     return (
-        <div className="flex-1 flex flex-col overflow-hidden py-2">
+        <div className="flex-1 flex flex-col overflow-hidden pt-2">
             {cart?.items && cart?.items?.length > 0 && (
                 <p className="bg-card text-card-foreground p-2 rounded flex gap-2 mx-4" data-testid="urgentMessage-read">
                     <Info />
@@ -36,13 +34,11 @@ const CartDetails: React.FC<Props> = ({ onClose, cart, shippingFee }) => {
                 </div>
             ) : (
                 <>
-                    <ScrollArea className="flex-1 px-4 py-4">
-                        <div className="rounded-xl border bg-card overflow-hidden">
-                            {cart?.items?.map((item: CartItem) => (
-                                <CartItemComponent key={item.variant_id} item={item} />
-                            ))}
-                        </div>
-                    </ScrollArea>
+                    <div className="flex-1 bg-card overflow-y-auto rounded-xl my-4 mx-2">
+                        {cart?.items?.map((item: CartItem) => (
+                            <CartItemComponent key={item.variant_id} item={item} />
+                        ))}
+                    </div>
                     <CartSummary cart={cart!} />
                 </>
             )}
