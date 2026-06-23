@@ -17,6 +17,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { z } from "zod";
 import { api } from "@/utils/api";
 import { PageLoader } from "@/components/generic/page-loader";
+import { InfiniteGrid } from "@/components/infinite-list/infiniteGrid";
 
 const galleryQuery = (params?: object) =>
     queryOptions({
@@ -176,6 +177,34 @@ function RouteComponent() {
                             </Button>
                         </div>
                     </div>
+                    <InfiniteGrid
+                        items={items}
+                        keyExtractor={(image) => image.id}
+                        renderItem={(image) => (
+                            <GalleryCard
+                                image={image}
+                                selectionMode={selectionMode}
+                                isSelected={selectedImages.has(image?.id)}
+                                onSelectionChange={handleSelectionChange}
+                            />
+                        )}
+                        fetchNextPage={fetchNextPage}
+                        hasNextPage={hasNextPage}
+                        isFetchingNextPage={isFetchingNextPage}
+                        // Gallery-specific grid layout
+                        gridClassName="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
+                        // Pre-fetch 2 viewport heights ahead
+                        rootMargin="800px"
+                        // Keep ~160 cards rendered at once (40 rows @ 4 cols)
+                        maxRendered={160}
+                        loadingSlots={8}
+                        emptyState={<GalleryEmpty />}
+                        endMessage={
+                            <p className="text-center text-sm text-muted-foreground py-8">
+                                All {items.length} images loaded
+                            </p>
+                        }
+                    />
                     {items.length > 0 && (
                         <InfiniteResourceList
                             className={cn(
@@ -209,6 +238,15 @@ function RouteComponent() {
                     )}
                 </div>
             )}
+        </div>
+    );
+}
+
+
+function GalleryEmpty() {
+    return (
+        <div className="flex flex-col items-center justify-center py-24 text-center gap-3">
+            <p className="text-muted-foreground text-sm">No images yet</p>
         </div>
     );
 }
