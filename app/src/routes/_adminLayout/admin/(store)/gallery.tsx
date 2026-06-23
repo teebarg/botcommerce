@@ -177,34 +177,37 @@ function RouteComponent() {
                             </Button>
                         </div>
                     </div>
-                    <InfiniteGrid
-                        items={items}
-                        keyExtractor={(image) => image.id}
-                        renderItem={(image) => (
-                            <GalleryCard
-                                image={image}
-                                selectionMode={selectionMode}
-                                isSelected={selectedImages.has(image?.id)}
-                                onSelectionChange={handleSelectionChange}
-                            />
-                        )}
-                        fetchNextPage={fetchNextPage}
-                        hasNextPage={hasNextPage}
-                        isFetchingNextPage={isFetchingNextPage}
-                        // Gallery-specific grid layout
-                        gridClassName="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
-                        // Pre-fetch 2 viewport heights ahead
-                        rootMargin="800px"
-                        // Keep ~160 cards rendered at once (40 rows @ 4 cols)
-                        maxRendered={160}
-                        loadingSlots={8}
-                        emptyState={<GalleryEmpty />}
-                        endMessage={
-                            <p className="text-center text-sm text-muted-foreground py-8">
-                                All {items.length} images loaded
-                            </p>
-                        }
-                    />
+                    {items.length > 0 && (
+                        <InfiniteGrid
+                            items={items}
+                            keyExtractor={(image) => image.id}
+                            renderItem={(image) => (
+                                <GalleryCard
+                                    image={image}
+                                    selectionMode={selectionMode}
+                                    isSelected={selectedImages.has(image?.id)}
+                                    onSelectionChange={handleSelectionChange}
+                                />
+                            )}
+                            fetchNextPage={fetchNextPage}
+                            hasNextPage={hasNextPage}
+                            isFetchingNextPage={isFetchingNextPage}
+                            // Gallery-specific grid layout
+                            gridClassName="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
+                            // Pre-fetch 2 viewport heights ahead
+                            rootMargin="800px"
+                            // Keep ~160 cards rendered at once (40 rows @ 4 cols)
+                            maxRendered={160}
+                            loadingSlots={8}
+                            emptyState={<GalleryEmpty />}
+                            endMessage={
+                                <p className="text-center text-sm text-muted-foreground py-8">
+                                    All {items.length} images loaded
+                                </p>
+                            }
+                        />
+                    )}
+                    <div className="h-44 bg-amber-700 text-white p-8">jsjjsj sok</div>
                     {items.length > 0 && (
                         <InfiniteResourceList
                             className={cn(
