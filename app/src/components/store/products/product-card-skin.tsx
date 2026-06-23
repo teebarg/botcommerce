@@ -87,26 +87,26 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }
                 </>
             )}
 
-            <div
+            {/* <div
                 className={cn(
                     "absolute bottom-0 inset-x-0 pt-6 pb-2 px-2.5 bg-gradient-to-t",
                     outOfStock ? "from-black/40 to-transparent" : "from-black/80 via-black/40 to-transparent"
                 )}
             >
-                {/* <Link
+                <Link
                     to="/products/$slug"
                     params={{ slug: product.slug }}
                     className="text-white text-xs font-medium truncate drop-shadow-sm"
                 >
                     {product.name}
-                </Link> */}
+                </Link>
                 <div className="flex items-baseline gap-1.5 mt-0.5">
                     <span className="text-white font-medium drop-shadow-sm">{currency(minPrice)}</span>
                     {!outOfStock && hasDiscount && (
                         <span className="text-white/55 text-[10px] line-through">{currency(maxCompareAtPrice)}</span>
                     )}
                 </div>
-            </div>
+            </div> */}
 
             {!outOfStock && (
                 <div className="absolute bottom-2 right-2 flex gap-1.5">
