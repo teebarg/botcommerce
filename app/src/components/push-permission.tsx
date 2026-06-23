@@ -260,7 +260,7 @@ export default function PushPermission() {
                                     <div className="relative">
                                         <div className="absolute inset-0 bg-accent/30 rounded-2xl blur-xl animate-pulse-glow" />
                                         <div className="relative bg-card p-5 rounded-2xl">
-                                            <Gift className="w-12 h-12 text-primary" strokeWidth={2} />
+                                            <Gift className="w-10 h-10 text-primary" strokeWidth={2} />
                                         </div>
                                         <div className="absolute -top-2 -left-2 animate-sparkle-burst" style={{ animationDelay: "0s" }}>
                                             <Star className="w-4 h-4 text-accent fill-accent" />
@@ -277,7 +277,7 @@ export default function PushPermission() {
                                     </div>
                                 </div>
                             </div>
-                            <h2 className="text-lg font-semibold mb-2">
+                            <h2 className="text-lg font-semibold">
                                 You Have a Gift! 🎁
                             </h2>
                             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -295,14 +295,14 @@ export default function PushPermission() {
                             <button
                                 type="button"
                                 onClick={handleDismiss}
-                                className="w-full py-4 text-center font-medium text-muted-foreground hover:bg-secondary/50 active:bg-secondary transition-colors border-b border-border cursor-pointer"
+                                className="w-full py-4 text-center font-medium text-sm text-muted-foreground hover:bg-secondary/50 active:bg-secondary transition-colors border-b border-border cursor-pointer"
                             >
                                 Maybe later
                             </button>
                             <button
                                 type="button"
                                 onClick={handleOptIn}
-                                className="w-full py-4 text-center font-semibold text-primary hover:bg-primary/5 active:bg-primary/10 transition-colors cursor-pointer"
+                                className="w-full py-4 text-center font-semibold text-sm text-primary hover:bg-primary/5 active:bg-primary/10 transition-colors cursor-pointer"
                             >
                                 Claim My Gift!
                             </button>

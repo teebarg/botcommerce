@@ -213,12 +213,3 @@ function RouteComponent() {
         </div>
     );
 }
-
-
-function GalleryEmpty() {
-    return (
-        <div className="flex flex-col items-center justify-center py-24 text-center gap-3">
-            <p className="text-muted-foreground text-sm">No images yet</p>
-        </div>
-    );
-}
