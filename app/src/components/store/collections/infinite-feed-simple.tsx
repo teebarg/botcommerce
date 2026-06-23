@@ -24,16 +24,12 @@ export default function InfiniteFeed({ initialData, params }: Props) {
             items={items}
             keyExtractor={(product) => product.id}
             renderItem={(product: ProductSearch) => (
-                <ProductCard
-                    product={product}
-                />
+                <div className="relative block w-full aspect-gallery rounded-xl overflow-hidden border border-border bg-secondary group">{product.name}</div>
             )}
             fetchNextPage={fetchNextPage}
             hasNextPage={hasNextPage}
             isFetchingNextPage={isFetchingNextPage}
-            // Gallery-specific grid layout
             gridClassName="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
-            // Pre-fetch 2 viewport heights ahead
             rootMargin="800px"
             // Keep ~160 cards rendered at once (40 rows @ 4 cols)
             maxRendered={160}
