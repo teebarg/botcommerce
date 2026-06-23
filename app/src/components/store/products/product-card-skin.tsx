@@ -26,8 +26,10 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
 );
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }) => {
-    const { priceInfo, handleAddToCart, handleWhatsAppPurchase, outOfStock } = useProductCardVariant(product);
-    const { minPrice, maxCompareAtPrice, hasDiscount, maxDiscountPercent } = priceInfo;
+    // const { priceInfo, handleAddToCart, handleWhatsAppPurchase, outOfStock } = useProductCardVariant(product);
+    const { minPrice, maxCompareAtPrice, hasDiscount, maxDiscountPercent } = {minPrice: 1000, maxCompareAtPrice: 2000, hasDiscount: true, maxDiscountPercent: 500};
+    const outOfStock = true
+    // const { minPrice, maxCompareAtPrice, hasDiscount, maxDiscountPercent } = priceInfo;
     const { mutate: createWishlist } = useUserCreateWishlist();
     const { mutate: deleteWishlist } = useUserDeleteWishlist();
 
@@ -40,13 +42,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }
     const onAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        if (!outOfStock) handleAddToCart();
+        // if (!outOfStock) handleAddToCart();
     };
 
     const onWhatsApp = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        if (!outOfStock) handleWhatsAppPurchase();
+        // if (!outOfStock) handleWhatsAppPurchase();
     };
 
     return (
