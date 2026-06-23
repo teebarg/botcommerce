@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Heart } from "lucide-react";
 import type { ProductImage } from "@/schemas";
 import { useUserDeleteWishlist } from "@/hooks/useUser";
-import ImageDisplay from "../image-display";
+import ImageLightbox from "../image-lightbox";
 
 interface WishlistItemProps {
     id: number;
@@ -19,17 +19,28 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, slug, name, images }) =
     };
 
     return (
-        <div id={id.toString()} className="relative group md:bg-card">
-            <div className="relative aspect-[3/4] overflow-hidden bg-secondary" style={{ boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.05)" }}>
-                {images?.[0] && <ImageDisplay alt={name} url={images?.[0].image} />}
-            </div>
-            <Link className="font-medium line-clamp-1 text-sm mt-1" to="/products/$slug" params={{ slug }}>
-                {name}
-            </Link>
-            <button aria-label="remove from wishlist" className="absolute top-2 right-2 cursor-pointer" onClick={onRemove}>
-                <Heart className="w-10 h-10 fill-primary text-transparent" />
+        <Link to="/products/$slug" params={{ slug }} id={id.toString()} className="relative group bg-card aspect-gallery rounded-2xl overflow-hidden">
+            <ImageLightbox
+                url={images?.[0].image}
+                alt={name}
+                className="w-full h-full"
+                imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <button
+                onClick={onRemove}
+                aria-label="Remove from wishlist"
+                className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-black/35 flex items-center justify-center"
+            >
+                <Heart className="w-3.5 h-3.5 fill-white text-white" />
             </button>
-        </div>
+            <div
+                className="absolute bottom-0 inset-x-0 pt-6 pb-2 px-2 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
+            >
+                <div className="text-white text-xs font-medium truncate drop-shadow-sm pr-8">
+                    {name}
+                </div>
+            </div>
+        </Link>
     );
 };
 

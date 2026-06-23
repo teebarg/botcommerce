@@ -1,15 +1,13 @@
 import type React from "react";
 import type { ProductSearch } from "@/schemas/product";
 import { Link } from "@tanstack/react-router";
-import { Heart, ShoppingBag } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import { currency, cn } from "@/utils";
-import { useUserCreateWishlist, useUserDeleteWishlist } from "@/hooks/useUser";
 import { useProductCardVariant } from "@/hooks/useProductCardVariant";
 import ImageLightbox from "@/components/image-lightbox";
 
 interface ProductCardProps {
     product: ProductSearch;
-    inWishlist?: boolean;
 }
 
 const WhatsAppIcon = ({ className }: { className?: string }) => (
@@ -25,17 +23,17 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
     </svg>
 );
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const { priceInfo, handleAddToCart, handleWhatsAppPurchase, outOfStock } = useProductCardVariant(product);
     const { minPrice, maxCompareAtPrice, hasDiscount, maxDiscountPercent } = priceInfo;
-    const { mutate: createWishlist } = useUserCreateWishlist();
-    const { mutate: deleteWishlist } = useUserDeleteWishlist();
+    // const { mutate: createWishlist } = useUserCreateWishlist();
+    // const { mutate: deleteWishlist } = useUserDeleteWishlist();
 
-    const toggleWishlist = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        inWishlist ? deleteWishlist(product.id) : createWishlist(product.id);
-    };
+    // const toggleWishlist = (e: React.MouseEvent) => {
+    //     e.preventDefault();
+    //     e.stopPropagation();
+    //     inWishlist ? deleteWishlist(product.id) : createWishlist(product.id);
+    // };
 
     const onAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -62,7 +60,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }
                 imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
 
-            {/* top-left badges */}
             {!outOfStock && hasDiscount && (
                 <span className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-[10px] font-medium px-2 py-1 rounded-full">
                     -{maxDiscountPercent}%
@@ -74,13 +71,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }
                 </span>
             )}
 
-            <button
+            {/* <button
                 onClick={toggleWishlist}
                 aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
                 className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-black/35 flex items-center justify-center"
             >
                 <Heart className={cn("w-3.5 h-3.5", inWishlist ? "fill-white text-white" : "text-white")} />
-            </button>
+            </button> */}
 
             {outOfStock && (
                 <>

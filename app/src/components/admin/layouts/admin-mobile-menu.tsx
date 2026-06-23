@@ -61,11 +61,11 @@ const AdminMobileMenu: React.FC = () => {
                         <LocalizedClientLink
                             key={idx}
                             preload={false}
-                            className="flex items-center justify-between w-full p-3 text-left transition-colors"
+                            className="flex items-center justify-between w-full p-2.5 text-left transition-colors"
                             href={item.href}
                             active="bg-accent/20 text-accent"
                         >
-                            <div className="flex items-center space-x-3">
+                            <div className="flex items-center space-x-3 text-sm">
                                 <span className={pathname === item.href ? "text-accent" : "text-muted-foreground"}>{item.icon}</span>
                                 <span>{item.label}</span>
                             </div>

@@ -10,6 +10,7 @@ import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import { reviewsQuery } from "@/queries/user.queries";
+import EmptyState from "@/components/generic/empty";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/reviews")({
     validateSearch: z.object({
@@ -67,9 +68,10 @@ function RouteComponent() {
                     />
                 )}
                 {items.length === 0 && (
-                    <div className="text-center py-8">
-                        <p className="text-muted-foreground">No reviews found</p>
-                    </div>
+                    <EmptyState
+                        title=">No reviews found"
+                        description="Please adjust the time range or search query"
+                    />
                 )}
             </div>
         </div>

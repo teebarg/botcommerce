@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ChevronDown, FileImage, Plus, Save } from "lucide-react";
+import { FileImage, Plus, Save } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import CategoryAction from "./categories-control";
 import CategoryImageManager from "./category-image";
@@ -8,9 +8,9 @@ import type { Category } from "@/schemas/product";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useReorderCategories } from "@/hooks/useCategories";
-import { ZeroState } from "@/components/zero";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
+import EmptyState from "@/components/generic/empty";
 
 interface Props {
     data?: Category[];
@@ -38,7 +38,6 @@ const CategoryImage: React.FC<{ image: string | undefined; categoryId: number }>
 
 const CategoryTree: React.FC<Props> = ({ data }) => {
     const addState = useOverlayTriggerState({});
-    const [expandedCategories, setExpandedCategories] = useState<number[]>([]);
     const reorderCategories = useReorderCategories();
     const [hasChanges, setHasChanges] = useState<boolean>(false);
     const [categories, setCategories] = useState<Category[]>(data || []);
@@ -46,10 +45,6 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
     useEffect(() => {
         setCategories(data || []);
     }, [data]);
-
-    const toggleCategory = (id: number) => {
-        setExpandedCategories((prev: number[]) => (prev.includes(id) ? prev.filter((item: number) => item !== id) : [...prev, id]));
-    };
 
     const moveCategory = (categoryId: number, direction: string) => {
         const currentIndex = categories?.findIndex((cat) => cat.id === categoryId);
@@ -161,10 +156,10 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                 </div>
 
                 {(!categories || categories.length === 0) && (
-                    <ZeroState
+                    <EmptyState
                         title="No categories yet"
                         description="Start organizing your products by creating your first category. You can add images to make navigation easier."
-                        icon={<FileImage className="w-8 h-8 text-gray-400" />}
+                        icon={FileImage}
                     />
                 )}
             </div>

@@ -26,7 +26,7 @@ export const OrderSchema = z
         total: z.number(),
         subtotal: z.number(),
         tax: z.number(),
-        discount_amount: z.number(),
+        discount_amount: z.number().optional(),
         wallet_used: z.number(),
         status: OrderStatusSchema,
         payment_status: PaymentStatusSchema,

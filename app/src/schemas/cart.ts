@@ -41,7 +41,7 @@ export const CartSchema = z
         tax: z.number(),
         shipping_fee: z.number(),
         wallet_used: z.number(),
-        discount_amount: z.number(),
+        discount_amount: z.number().optional(),
         discounts: z.any().optional(),
         coupon_id: z.number().optional(),
         coupon_code: z.string().optional(),

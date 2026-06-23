@@ -10,12 +10,12 @@ import { Badge } from "@/components/ui/badge";
 import { currency } from "@/utils";
 import ServerError from "@/components/generic/server-error";
 import { tryCatch } from "@/utils/try-catch";
-import { ZeroState } from "@/components/zero";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { useState } from "react";
 import { api } from "@/utils/api";
 import { PageLoader } from "@/components/generic/page-loader";
+import EmptyState from "@/components/generic/empty";
 
 const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
     const editState = useOverlayTriggerState({});
@@ -119,7 +119,8 @@ const DeliveryOverview: React.FC = () => {
 
     if (!deliveryOptions || deliveryOptions.length === 0) {
         return (
-            <ZeroState title="No delivery options yet" description="Start organizing your delivery options by creating your first delivery option." />
+            <EmptyState title="No delivery options yet" description="Start organizing your delivery options by creating your first delivery option." />
+
         );
     }
 

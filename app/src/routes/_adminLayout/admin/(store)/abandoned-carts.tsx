@@ -14,6 +14,7 @@ import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { z } from "zod";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
+import EmptyState from "@/components/generic/empty";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/abandoned-carts")({
     validateSearch: z.object({
@@ -105,9 +106,10 @@ function RouteComponent() {
                         />
                     )}
                     {items.length === 0 && (
-                        <div className="text-center py-12 px-2 bg-secondary">
-                            <p className="text-muted-foreground">No abandoned carts found, adjust the time range or search query</p>
-                        </div>
+                        <EmptyState
+                            title="No abandoned cart found"
+                            description="Please adjust the time range or search query"
+                        />
                     )}
                 </div>
             </div>
