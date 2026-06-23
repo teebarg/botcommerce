@@ -5,11 +5,11 @@ import { Check, Tag, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/providers/cart-provider";
-import ComponentLoader from "@/components/component-loader";
 import { useApplyCoupon, useRemoveCoupon } from "@/hooks/useCoupon";
 import { toast } from "sonner";
 import { fireConfetti } from "@/utils/confetti";
 import { Label } from "@/components/ui/label";
+import { PageLoader } from "@/components/generic/page-loader";
 
 const DiscountCode: React.FC = () => {
     const { cart, isLoading } = useCart();
@@ -51,7 +51,7 @@ const DiscountCode: React.FC = () => {
         } catch (error: any) { }
     };
 
-    if (isLoading) return <ComponentLoader className="h-[100px]" />;
+    if (isLoading) return <PageLoader variant="box" />;
     return (
         <div
             className="p-4 rounded-2xl bg-card border border-border animate-in fade-in duration-300"

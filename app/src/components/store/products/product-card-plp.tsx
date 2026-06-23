@@ -39,7 +39,7 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
                 />
 
                 {outOfStock && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-background/20 backdrop-blur-xs">
+                    <div className="absolute inset-0 flex items-center justify-center bg-background/20">
                         <span className="bg-foreground text-background px-4 py-2 text-xxs font-bold uppercase tracking-[0.2em]">
                             Sold Out
                         </span>

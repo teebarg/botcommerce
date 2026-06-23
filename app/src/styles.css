@@ -71,7 +71,7 @@
     --background-image-gradient-subtle: var(--gradient-subtle);
 
     --aspect-product: 4 / 5;
-    --aspect-gallery: 4 / 5.8;
+    --aspect-gallery: 4 / 5.9;
 
     --container-8xl: 88rem;
     --container-sxl: 78rem;
@@ -313,11 +313,11 @@
         @apply animate-in slide-in-from-left-50 duration-300
     }
     .glass {
-        @apply bg-white/8 backdrop-blur-xl border border-white/12;
+        @apply bg-white/10 border border-white/15 shadow-sm;
     }
 
     .carousel-nav-link {
-        @apply h-12 w-12 z-10 absolute top-1/2 -translate-y-1/2 hidden md:flex rounded-full bg-card-foreground hover:bg-foreground text-card shadow-md backdrop-blur disabled:opacity-40 disabled:pointer-events-none;
+        @apply h-12 w-12 z-10 absolute top-1/2 -translate-y-1/2 hidden md:flex rounded-full bg-card-foreground hover:bg-foreground text-card shadow-md bg-white/10 disabled:opacity-40 disabled:pointer-events-none;
     }
 
     .sheet-footer {

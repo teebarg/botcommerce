@@ -4,7 +4,6 @@ import { useOverlayTriggerState } from "react-stately";
 import type { Address } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useUpdateCartDetails } from "@/hooks/useCart";
-import ComponentLoader from "@/components/component-loader";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { useDeleteAddress } from "@/hooks/useAddress";
@@ -122,11 +121,6 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                     description="Are you sure you want to delete this address?"
                 />
             </div>
-            {updateCartDetails.isPending && (
-                <div className="absolute top-0 left-0 w-full h-full bg-white/70 dark:bg-black/50 z-50 flex items-center justify-center">
-                    <ComponentLoader />
-                </div>
-            )}
         </div>
     );
 };

@@ -6,11 +6,11 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
 import type { Address } from "@/schemas";
-import ComponentLoader from "@/components/component-loader";
 import { useUserAddresses } from "@/hooks/useAddress";
 import SheetDrawer from "@/components/sheet-drawer";
 import { useOverlayTriggerState } from "react-stately";
 import CheckoutAddressForm from "../checkout-address-form";
+import { PageLoader } from "@/components/generic/page-loader";
 
 interface AddressStepProps {
     address: Address | null | undefined;
@@ -32,7 +32,7 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
     };
 
     if (isLoading) {
-        return <ComponentLoader className="h-48" />;
+        return <PageLoader variant="radio" rows={4} className="px-4" />;
     }
 
     return (

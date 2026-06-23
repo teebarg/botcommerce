@@ -3,10 +3,7 @@ import { productFeedQuery } from "@/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import { FeedQuerySchema } from "@/schemas";
 import { PageLoader } from "@/components/generic/page-loader";
-import InfiniteFeed from "@/components/store/collections/infinite-feed-simple";
-// import InfiniteFeed from "@/components/store/collections/infinite-feed";
-// import InfiniteFeed from "@/components/store/collections/infinite-feed-extra";
-// import InfiniteFeed from "@/components/store/collections/infinite-feed-revamped";
+import InfiniteFeed from "@/components/store/collections/infinite-feed";
 
 export const Route = createFileRoute("/_mainLayout/collections/")({
     validateSearch: (search: Record<string, unknown>) => {

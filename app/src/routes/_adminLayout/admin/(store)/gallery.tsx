@@ -195,6 +195,7 @@ function RouteComponent() {
                                     onSelectionChange={handleSelectionChange}
                                 />
                             )}
+                            loader={<PageLoader variant="grid" rows={4} className="max-w-7xl w-full mx-auto py-2" />}
                         />
                     )}
                     {selectedImages.size > 0 && (

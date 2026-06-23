@@ -4,8 +4,8 @@ import { Link } from "@tanstack/react-router";
 import { Heart, ShoppingBag } from "lucide-react";
 import { currency, cn } from "@/utils";
 import { useUserCreateWishlist, useUserDeleteWishlist } from "@/hooks/useUser";
-import ImageDisplay from "@/components/image-display";
 import { useProductCardVariant } from "@/hooks/useProductCardVariant";
+import ImageLightbox from "@/components/image-lightbox";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -50,8 +50,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }
     };
 
     return (
-        <div className="relative block w-full aspect-gallery rounded-xl overflow-hidden border border-border bg-secondary group">
-            <ImageDisplay url={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        <Link
+            to="/products/$slug"
+            params={{ slug: product.slug }}
+            className="relative block w-full aspect-gallery rounded-xl overflow-hidden border border-border bg-secondary group"
+        >
+            <ImageLightbox
+                url={product.image}
+                alt={product.name}
+                className="w-full h-full"
+                imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
 
             {/* top-left badges */}
             {!outOfStock && hasDiscount && (
@@ -68,7 +77,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }
             <button
                 onClick={toggleWishlist}
                 aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
-                className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-black/35 backdrop-blur-sm flex items-center justify-center"
+                className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-black/35 flex items-center justify-center"
             >
                 <Heart className={cn("w-3.5 h-3.5", inWishlist ? "fill-white text-white" : "text-white")} />
             </button>
@@ -86,17 +95,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }
 
             <div
                 className={cn(
-                    "absolute bottom-0 inset-x-0 pt-6 pb-2 px-2.5 bg-gradient-to-t",
+                    "absolute bottom-0 inset-x-0 pt-6 pb-2 px-2 bg-gradient-to-t",
                     outOfStock ? "from-black/40 to-transparent" : "from-black/80 via-black/40 to-transparent"
                 )}
             >
-                <Link
-                    to="/products/$slug"
-                    params={{ slug: product.slug }}
-                    className="text-white text-xs font-medium truncate drop-shadow-sm"
-                >
+                <div className="text-white text-xs font-medium truncate drop-shadow-sm pr-8">
                     {product.name}
-                </Link>
+                </div>
                 <div className="flex items-baseline gap-1.5 mt-0.5">
                     <span className="text-white font-medium drop-shadow-sm">{currency(minPrice)}</span>
                     {!outOfStock && hasDiscount && (
@@ -106,24 +111,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, inWishlist = false }
             </div>
 
             {!outOfStock && (
-                <div className="absolute bottom-2 right-2 flex gap-1.5">
+                <div className="absolute bottom-2 right-1 flex gap-1.5">
                     <button
                         onClick={onWhatsApp}
                         aria-label="Buy on WhatsApp"
-                        className="w-8 h-8 rounded-full bg-white flex items-center justify-center"
+                        className="w-[34px] h-[34px] rounded-full bg-white flex items-center justify-center"
                     >
-                        <WhatsAppIcon className="w-5 h-5 text-success" />
+                        <WhatsAppIcon className="w-[22px] h-[22px] text-success" />
                     </button>
                     <button
                         onClick={onAddToCart}
                         aria-label="Add to cart"
-                        className="w-8 h-8 rounded-full bg-foreground flex items-center justify-center"
+                        className="w-[34px] h-[34px] rounded-full bg-foreground flex items-center justify-center"
                     >
-                        <ShoppingBag className="w-5 h-5 text-background" />
+                        <ShoppingBag className="w-[22px] h-[22px] text-background" />
                     </button>
                 </div>
             )}
-        </div>
+        </Link>
     );
 };
 

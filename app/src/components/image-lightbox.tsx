@@ -17,7 +17,7 @@ export default function ImageLightbox({ url, alt, className, imgClassName, disab
 
     const close = useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
-        e.preventDefault()
+        e.preventDefault();
         setOpen(false)
     }, []);
 
@@ -44,7 +44,7 @@ export default function ImageLightbox({ url, alt, className, imgClassName, disab
             {open && !disabled &&
                 createPortal(
                     <div
-                        className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center animate-in fade-in duration-200"
+                        className="fixed inset-0 z-[150] bg-black/95 flex items-center justify-center animate-in fade-in duration-200 pointer-events-auto"
                         onClick={close}
                         role="dialog"
                         aria-modal="true"
@@ -62,6 +62,7 @@ export default function ImageLightbox({ url, alt, className, imgClassName, disab
                             src={url || "/placeholder.jpg"}
                             alt={alt}
                             className="max-w-[92vw] max-h-[88vh] object-contain touch-pinch-zoom"
+                            onClick={close}
                         />
                     </div>,
                     document.body

@@ -7,7 +7,7 @@ import { currency } from "@/utils";
 import type { Cart, DeliveryOption } from "@/schemas";
 import { useUpdateCartDetails } from "@/hooks/useCart";
 import { useConfig } from "@/providers/store-provider";
-import ComponentLoader from "@/components/component-loader";
+import { PageLoader } from "@/components/generic/page-loader";
 
 interface DeliveryStepProps {
     cart: Cart;
@@ -40,7 +40,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
     const canContinue = !!cart.shipping_method;
 
     if (isPending) {
-        return <ComponentLoader className="h-48" />;
+        return <PageLoader variant="radio" rows={4} className="px-4" />;
     }
 
     return (

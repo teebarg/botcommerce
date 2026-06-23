@@ -38,7 +38,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale" }) 
                     {isNew && <IsNew />}
                     {outOfStock && (
                         <div className="absolute inset-0 bg-black/35 flex items-center justify-center">
-                            <Badge className="text-sm backdrop-blur-sm" variant="accent-subtle">
+                            <Badge className="text-sm" variant="accent-subtle">
                                 Out of Stock
                             </Badge>
                         </div>

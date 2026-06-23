@@ -11,13 +11,11 @@ import NewArrivals from "@/components/store/home/arrival";
 import NewsletterSection from "@/components/store/landing/newsletter-section";
 import CategoriesWithProductsSection from "@/components/store/home/categories-products";
 import { HERO_IMAGES } from "@/utils/constants";
-// import InfiniteFeed from "@/components/store/collections/infinite-feed";
+import InfiniteFeed from "@/components/store/collections/infinite-feed";
 import { getIndexProductsFn } from "@/server/product.server";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { LazyInView } from "@/components/LazyInView";
 import { categoriesQuery } from "@/hooks/useCategories";
-import { LightboxProvider } from "@/providers/lightbox-provider";
-import InfiniteFeed from "@/components/store/collections/infinite-feed-revamped";
 
 const indexProductQuery = () =>
     queryOptions({
@@ -82,9 +80,6 @@ function Home() {
                         </div>
                     }
                 >
-                    {/* <LightboxProvider>
-                        <InfiniteFeed />
-                    </LightboxProvider> */}
                     <InfiniteFeed />
                 </LazyInView>
             </div>

@@ -5,13 +5,13 @@ import { CartComponent } from "@/components/store/cart/cart-component";
 import CheckoutSummary from "@/components/store/checkout/checkout-summary";
 import { useCart } from "@/providers/cart-provider";
 import CheckoutFlow from "@/components/store/checkout/components/checkout-flow";
-import ComponentLoader from "@/components/component-loader";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { BackButton } from "@/components/back";
 import { meQuery } from "@/queries/user.queries";
 import { useEffect } from "react";
 import { gtag } from "@/utils/gtag";
 import { SignInRedirect } from "@/utils/reuseable";
+import { PageLoader } from "@/components/generic/page-loader";
 
 export const Route = createFileRoute("/checkout")({
     beforeLoad: ({ context }) => {
@@ -81,12 +81,7 @@ function RouteComponent() {
                 </div>
             </header>{" "}
             {isLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-[1fr_360px] gap-x-4 px-2 pt-4">
-                    <ComponentLoader className="rounded-md h-192 md:mt-8" />
-                    <div className="relative hidden md:block">
-                        <ComponentLoader className="h-192 w-full rounded-md" />
-                    </div>
-                </div>
+                <PageLoader variant="detail" className="px-4 py-4" />
             ) : !cart ? (
                 <EmptyCartMessage />
             ) : (

@@ -4,6 +4,8 @@ services:
       context: ./app
       dockerfile: Dockerfile.dev
     container_name: shop
+    ports:
+      - "4444:3000"
     environment:
       - NODE_ENV=development
       - NITRO_DEV_WORKER=false
