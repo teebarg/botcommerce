@@ -1,6 +1,7 @@
 import { ShoppingCart, DollarSign, TrendingUp, BarChart3 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { currency } from "@/utils";
+import { PageLoader } from "@/components/generic/page-loader";
 
 interface Stat {
     active_count: number;
@@ -11,9 +12,10 @@ interface Stat {
 
 interface AbandonedCartStatsProps {
     stat: Stat;
+    isLoading: boolean;
 }
 
-export const AbandonedCartStats = ({ stat }: AbandonedCartStatsProps) => {
+export const AbandonedCartStats = ({ stat, isLoading }: AbandonedCartStatsProps) => {
     const stats = [
         {
             title: "Active Carts",
@@ -45,10 +47,14 @@ export const AbandonedCartStats = ({ stat }: AbandonedCartStatsProps) => {
         },
     ];
 
+    if (isLoading) {
+        return <PageLoader variant="card" />
+    }
+
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {stats.map((stat, index) => (
-                <Card key={index} className="border-t-4 border-t-accent-subtle">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+            {stats.map((stat, idx: number) => (
+                <Card key={idx} className="border-t-4 border-t-accent-subtle">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">{stat.title}</CardTitle>
                         <stat.icon className={`h-5 w-5 ${stat.color}`} />

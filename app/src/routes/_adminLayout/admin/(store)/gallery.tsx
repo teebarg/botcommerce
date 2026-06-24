@@ -17,6 +17,8 @@ import { queryOptions } from "@tanstack/react-query";
 import { z } from "zod";
 import { api } from "@/utils/api";
 import { PageLoader } from "@/components/generic/page-loader";
+import EmptyState from "@/components/generic/empty";
+import AdminPageLoading from "@/components/admin/admin-loader";
 
 const galleryQuery = (params?: object) =>
     queryOptions({
@@ -34,7 +36,7 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/gallery")({
     }),
     loaderDeps: ({ search }) => search,
     loader: async ({ context: { queryClient }, deps }) => {
-        await queryClient.ensureQueryData(galleryQuery(deps));
+        queryClient.prefetchQuery(galleryQuery(deps));
     },
     component: RouteComponent,
     pendingComponent: () => (<PageLoader variant="grid" rows={6} className="max-w-7xl w-full mx-auto py-2" />)
@@ -42,7 +44,7 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/gallery")({
 
 function RouteComponent() {
     const params = Route.useSearch();
-    const { data } = useQuery(galleryQuery(params));
+    const { data, isPending } = useQuery(galleryQuery(params));
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
@@ -132,84 +134,83 @@ function RouteComponent() {
                 <p className="text-sm text-muted-foreground">Manage your product images.</p>
             </div>
             <GalleryImagesUpload />
-
-            {items.length === 0 ? (
-                <div className="text-center">No images found</div>
-            ) : (
-                <div>
-                    <div className="mb-4 sticky top-[calc(var(--sat)+4rem)] z-40 bg-background -mx-2 px-4 py-4 flex gap-2 justify-between">
-                        <div className="rounded-full p-1 flex items-center gap-2 bg-secondary w-1/2">
-                            <div className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "grid" && "bg-background")}>
-                                <Button
-                                    className="h-auto w-auto hover:bg-transparent"
-                                    size="icon"
-                                    variant="ghost"
-                                    onClick={() => setViewMode("grid")}
-                                >
-                                    <LayoutDashboard className="h-6 w-6" />
-                                </Button>
-                            </div>
-                            <div className={cn("rounded-full flex flex-1 items-center justify-center py-2", viewMode === "list" && "bg-background")}>
-                                <Button
-                                    className="h-auto w-auto hover:bg-transparent"
-                                    size="icon"
-                                    variant="ghost"
-                                    onClick={() => setViewMode("list")}
-                                >
-                                    <RectangleVertical className="h-6 w-6" />
-                                </Button>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2 w-1/2">
+            <div>
+                <div className="mb-4 sticky top-[calc(var(--sat)+4rem)] z-40 bg-background -mx-2 px-4 py-4 flex gap-2 justify-between">
+                    <div className="rounded-full p-1 flex gap-2 bg-secondary w-1/2">
+                        <div className={cn("rounded-full flex flex-1 justify-center", viewMode === "grid" && "bg-background")}>
                             <Button
-                                className="w-full rounded-full"
-                                size="lg"
-                                variant={selectionMode ? "destructive" : "default"}
-                                onClick={() => {
-                                    setSelectionMode(!selectionMode);
-                                    if (selectionMode) {
-                                        setSelectedImages(new Set());
-                                    }
-                                }}
+                                className="h-auto w-auto hover:bg-transparent"
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => setViewMode("grid")}
                             >
-                                {selectionMode ? "Cancel Bulk" : "Select Bulk"}
+                                <LayoutDashboard className="h-6 w-6" />
+                            </Button>
+                        </div>
+                        <div className={cn("rounded-full flex flex-1 justify-center", viewMode === "list" && "bg-background")}>
+                            <Button
+                                className="h-auto w-auto hover:bg-transparent"
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => setViewMode("list")}
+                            >
+                                <RectangleVertical className="h-6 w-6" />
                             </Button>
                         </div>
                     </div>
-                    {items.length > 0 && (
-                        <InfiniteResourceList
-                            className={cn(
-                                "mb-8 w-full grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2",
-                                viewMode === "grid" ? "" : "grid-cols-1"
-                            )}
-                            items={items}
-                            onLoadMore={fetchNextPage}
-                            hasMore={hasNextPage}
-                            isLoading={isFetchingNextPage}
-                            renderItem={(item: ProductImage, idx: number) => (
-                                <GalleryCard
-                                    key={idx}
-                                    image={item}
-                                    isSelected={selectedImages.has(item?.id)}
-                                    selectionMode={selectionMode}
-                                    onSelectionChange={handleSelectionChange}
-                                />
-                            )}
-                            loader={<PageLoader variant="grid" rows={4} className="max-w-7xl w-full mx-auto py-2" />}
-                        />
-                    )}
-                    {selectedImages.size > 0 && (
-                        <ProductBulkActions
-                            isLoading={isDeleting}
-                            selectedCount={selectedImages.size}
-                            selectedImageIds={Array.from(selectedImages)}
-                            selectedProductIds={selectedProductIds}
-                            onClearSelection={() => setSelectedImages(new Set())}
-                            onDelete={handleBulkDelete}
-                        />
-                    )}
+                    <div className="w-1/2">
+                        <Button
+                            className="w-full rounded-full"
+                            size="lg"
+                            variant={selectionMode ? "destructive" : "default"}
+                            onClick={() => {
+                                setSelectionMode(!selectionMode);
+                                if (selectionMode) {
+                                    setSelectedImages(new Set());
+                                }
+                            }}
+                        >
+                            {selectionMode ? "Cancel Bulk" : "Select Bulk"}
+                        </Button>
+                    </div>
                 </div>
-            )}
+                {isPending ? (
+                    <AdminPageLoading />
+                ) : items.length > 0 ? (
+                    <InfiniteResourceList
+                        className={cn(
+                            "mb-8 w-full grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2",
+                            viewMode === "grid" ? "" : "grid-cols-1"
+                        )}
+                        items={items}
+                        onLoadMore={fetchNextPage}
+                        hasMore={hasNextPage}
+                        isLoading={isFetchingNextPage}
+                        renderItem={(item: ProductImage, idx: number) => (
+                            <GalleryCard
+                                key={idx}
+                                image={item}
+                                isSelected={selectedImages.has(item?.id)}
+                                selectionMode={selectionMode}
+                                onSelectionChange={handleSelectionChange}
+                            />
+                        )}
+                        loader={<PageLoader variant="grid" rows={4} className="max-w-7xl w-full mx-auto py-2" />}
+                    />
+                ) : (
+                    <EmptyState title="No images found" description="Please upload images" />
+                )}
+                {selectedImages.size > 0 && (
+                    <ProductBulkActions
+                        isLoading={isDeleting}
+                        selectedCount={selectedImages.size}
+                        selectedImageIds={Array.from(selectedImages)}
+                        selectedProductIds={selectedProductIds}
+                        onClearSelection={() => setSelectedImages(new Set())}
+                        onDelete={handleBulkDelete}
+                    />
+                )}
+            </div>
         </div>
     );
 }

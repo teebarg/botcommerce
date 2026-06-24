@@ -11,6 +11,7 @@ import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { api } from "@/utils/api";
 import AdminPageLoading from "@/components/admin/admin-loader";
+import EmptyState from "@/components/generic/empty";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/orders")({
     validateSearch: z.object({
@@ -39,10 +40,6 @@ function RouteComponent() {
         initialData: initialData,
     });
 
-    if (isPending){
-        return <AdminPageLoading />
-    }
-
     return (
         <div className="px-4 md:px-10 py-2">
             <div className="mb-6 flex flex-col">
@@ -64,7 +61,9 @@ function RouteComponent() {
                 </div>
                 <OrderFilters />
                 <div className="mt-4">
-                    {items.length > 0 && (
+                    {isPending ? (
+                        <AdminPageLoading />
+                    ) : items.length > 0 ? (
                         <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
                             <InfiniteResourceList
                                 items={items}
@@ -74,11 +73,8 @@ function RouteComponent() {
                                 renderItem={(item: Order) => <OrderCard key={item.id} order={item} />}
                             />
                         </div>
-                    )}
-                    {items.length === 0 && (
-                        <div className="text-center py-8">
-                            <p className="text-muted-foreground">No orders found</p>
-                        </div>
+                    ) : (
+                        <EmptyState title="No orders found" />
                     )}
                 </div>
             </div>

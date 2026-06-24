@@ -13,6 +13,7 @@ import { z } from "zod";
 import { useQuery } from "@tanstack/react-query";
 import { formatDate } from "@/utils";
 import { PageLoader } from "@/components/generic/page-loader";
+import EmptyState from "@/components/generic/empty";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/collections")({
     validateSearch: z.object({
@@ -28,14 +29,6 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/collections")(
 function RouteComponent() {
     const params = Route.useSearch();
     const { data: collections, isPending, error } = useQuery(collectionsQuery(params));
-
-    if (isPending) {
-        return (
-            <div className="px-3 md:px-10 py-2">
-                <PageLoader variant="list" rows={6} />
-            </div>
-        )
-    }
 
     if (error) {
         return <ServerError />;
@@ -72,7 +65,13 @@ function RouteComponent() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {collections?.map((collection: Collection, idx: number) => (
+                        {isPending ? (
+                            <TableRow>
+                                <TableCell className="text-center py-4 text-sm text-muted-foreground" colSpan={5}>
+                                    Loading...
+                                </TableCell>
+                            </TableRow>
+                        ) : collections.length > 0 ? collections?.map((collection: Collection, idx: number) => (
                             <TableRow key={idx} className="odd:bg-background">
                                 <TableCell>{idx + 1}</TableCell>
                                 <TableCell className="flex-1">
@@ -88,13 +87,12 @@ function RouteComponent() {
                                     <CollectionActions collection={collection} />
                                 </TableCell>
                             </TableRow>
-                        ))}
-                        {collections?.length === 0 && (
-                            <TableRow>
-                                <TableCell className="text-center py-4 text-lg text-muted-foreground" colSpan={5}>
-                                    No collections found.
-                                </TableCell>
-                            </TableRow>
+                        )) : (
+                        <TableRow>
+                            <TableCell className="text-center py-4 text-lg text-muted-foreground" colSpan={5}>
+                                No collections found.
+                            </TableCell>
+                        </TableRow>
                         )}
                     </TableBody>
                 </Table>
@@ -102,16 +100,14 @@ function RouteComponent() {
             <div className="md:hidden">
                 <div>
                     <div className="flex flex-col gap-3">
-                        {collections?.map((collection: Collection, idx: number) => (
+                        {isPending ? (
+                            <PageLoader variant="list" rows={6} />
+                        ) : collections.length > 0 ? collections?.map((collection: Collection, idx: number) => (
                             <CollectionItem key={idx} collection={collection} />
-                        ))}
+                        )) : (
+                            <EmptyState title="No collections found" description="No collections created yet" />
+                        )}
                     </div>
-
-                    {collections?.length === 0 && (
-                        <div className="text-center py-8 bg-background rounded-lg">
-                            <p className="text-muted-foreground">No collections found</p>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>

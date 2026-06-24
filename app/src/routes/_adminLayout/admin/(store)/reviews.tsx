@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Search } from "lucide-react";
+import { MessageCircle, Search } from "lucide-react";
 import type { PaginatedReview, Review } from "@/schemas";
 import { Input } from "@/components/ui/input";
 import ReviewItem from "@/components/admin/reviews/review-item";
@@ -11,6 +11,7 @@ import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import { reviewsQuery } from "@/queries/user.queries";
 import EmptyState from "@/components/generic/empty";
+import { PageLoader } from "@/components/generic/page-loader";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/reviews")({
     validateSearch: z.object({
@@ -20,7 +21,7 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/reviews")({
     }),
     loaderDeps: ({ search }) => search,
     loader: async ({ context: { queryClient }, deps }) => {
-        await queryClient.ensureQueryData(reviewsQuery(deps));
+        queryClient.prefetchQuery(reviewsQuery(deps));
     },
     component: RouteComponent,
 });
@@ -28,7 +29,7 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/reviews")({
 function RouteComponent() {
     const params = Route.useSearch();
     const { updateQuery } = useUpdateQuery(200);
-    const { data: initialData } = useQuery(reviewsQuery(params));
+    const { data: initialData, isPending } = useQuery(reviewsQuery(params));
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedReview, Review>({
         queryKey: ["reviews", "infinite", params],
@@ -39,7 +40,7 @@ function RouteComponent() {
     });
 
     return (
-        <div className="px-3 md:px-12 py-4">
+        <div className="px-3 py-4">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 className="text-2xl font-semibold">Reviews</h1>
@@ -58,19 +59,21 @@ function RouteComponent() {
                 </div>
             </div>
             <div className="mt-4">
-                {items.length > 0 && (
+                {isPending ? (
+                    <PageLoader variant="list" />
+                ) : items?.length == 0 ? (
+                    <EmptyState
+                        title="No reviews found"
+                        description="Please adjust the time range or search query"
+                        icon={MessageCircle}
+                    />
+                ) : (
                     <InfiniteResourceList
                         items={items}
                         onLoadMore={fetchNextPage}
                         hasMore={hasNextPage}
                         isLoading={isFetchingNextPage}
                         renderItem={(item: Review) => <ReviewItem key={item.id} review={item} />}
-                    />
-                )}
-                {items.length === 0 && (
-                    <EmptyState
-                        title="No reviews found"
-                        description="Please adjust the time range or search query"
                     />
                 )}
             </div>

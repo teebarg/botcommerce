@@ -7,16 +7,18 @@ import { activitiesQuery } from "@/queries/admin.queries";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { api } from "@/utils/api";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
+import EmptyState from "@/components/generic/empty";
+import { PageLoader } from "@/components/generic/page-loader";
 
 export const Route = createFileRoute("/_adminLayout/admin/(admin)/activities")({
     loader: async ({ context: { queryClient } }) => {
-        await queryClient.ensureQueryData(activitiesQuery());
+        queryClient.prefetchQuery(activitiesQuery());
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { data } = useQuery(activitiesQuery());
+    const { data, isPending } = useQuery(activitiesQuery());
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedActivities, Activity>({
         queryKey: ["activities", "infinite"],
         queryFn: (cursor) => api.get<PaginatedActivities>("/activities/", { params: { cursor } }),
@@ -26,10 +28,18 @@ function RouteComponent() {
     });
 
     return (
-        <div className="px-2.5 md:px-10 py-4">
-            <h1 className="text-xl font-bold mb-2">Activities History</h1>
-            <div className="max-w-6xl mx-auto px-1 md:px-6">
-                {items.length > 0 && (
+        <div className="px-2 py-4">
+            <h1 className="font-semibold mb-2 uppercase">Activities</h1>
+            <div className="max-w-5xl mx-auto">
+                {isPending ? (
+                    <PageLoader variant="list" />
+                ) : items?.length == 0 ? (
+                    <EmptyState
+                        title="No activities yet"
+                        description="Activities will appear here"
+                        icon={ActivityIcon}
+                    />
+                ) : (
                     <InfiniteResourceList
                         items={items}
                         onLoadMore={fetchNextPage}
@@ -37,15 +47,6 @@ function RouteComponent() {
                         isLoading={isFetchingNextPage}
                         renderItem={(item: Activity) => <ActivityItem key={item.id} activity={item} />}
                     />
-                )}
-                {items?.length === 0 && (
-                    <div className="text-center py-12 bg-secondary">
-                        <div className="w-16 h-16 mx-auto mb-4 bg-accent/10 rounded-full flex items-center justify-center">
-                            <ActivityIcon className="w-8 h-8 text-accent" />
-                        </div>
-                        <h3 className="text-xl font-medium">No activities yet</h3>
-                        <p className="text-muted-foreground">Activities will appear here</p>
-                    </div>
                 )}
             </div>
         </div>

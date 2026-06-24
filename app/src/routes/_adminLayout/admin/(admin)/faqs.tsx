@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
+import { MessageCircle, Plus } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { Button } from "@/components/ui/button";
 import { FaqForm } from "@/components/admin/faq/faq-form";
@@ -11,6 +11,8 @@ import { Badge } from "@/components/ui/badge";
 import FaqActions from "@/components/admin/faq/faq-actions";
 import SheetDrawer from "@/components/sheet-drawer";
 import { api } from "@/utils/api";
+import EmptyState from "@/components/generic/empty";
+import { PageLoader } from "@/components/generic/page-loader";
 
 const faqsQuery = () =>
     queryOptions({
@@ -21,17 +23,17 @@ const faqsQuery = () =>
 
 export const Route = createFileRoute("/_adminLayout/admin/(admin)/faqs")({
     loader: async ({ context }) => {
-        await context.queryClient.ensureQueryData(faqsQuery());
+        context.queryClient.prefetchQuery(faqsQuery());
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { data: faqs = [] } = useQuery(faqsQuery());
+    const { data: faqs = [], isPending } = useQuery(faqsQuery());
     const state = useOverlayTriggerState({});
 
     return (
-        <div className="px-2.5 md:px-10 py-4">
+        <div className="px-2 max-w-5xl mx-auto py-4">
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-xl font-bold">Manage FAQs</h1>
                 <SheetDrawer
@@ -49,7 +51,21 @@ function RouteComponent() {
                 </SheetDrawer>
             </div>
             <div className="space-y-4">
-                {faqs.map((faq: FAQ, idx: number) => (
+                {isPending ? (
+                    <PageLoader variant="list" />
+                ) : faqs?.length == 0 ? (
+                    <EmptyState
+                        title="No FAQs found"
+                        description="You havent created FAQs for your shop"
+                        icon={MessageCircle}
+                        action={
+                            <Button onClick={state.open}>
+                                <Plus className="w-4 h-4" />
+                                Add New FAQ
+                            </Button>
+                        }
+                    />
+                ) : faqs.map((faq: FAQ, idx: number) => (
                     <Card key={idx} className="group hover:border-input bg-card">
                         <CardHeader>
                             <div className="flex items-start justify-between gap-4">
@@ -78,13 +94,6 @@ function RouteComponent() {
                         </CardContent>
                     </Card>
                 ))}
-                {faqs.length === 0 && (
-                    <Card className="bg-card">
-                        <CardContent className="py-8">
-                            <p className="text-center text-muted-foreground">No FAQs found</p>
-                        </CardContent>
-                    </Card>
-                )}
             </div>
         </div>
     );

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal, UserCircle } from "lucide-react";
 import type { PaginatedUsers, User } from "@/schemas";
 import CustomerCreateGuest from "@/components/admin/customers/customer-create-guest";
 import CustomerFilter from "@/components/admin/customers/customer-filter";
@@ -13,6 +13,8 @@ import { api } from "@/utils/api";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import { useState } from "react";
+import EmptyState from "@/components/generic/empty";
+import { PageLoader } from "@/components/generic/page-loader";
 
 export const Route = createFileRoute("/_adminLayout/admin/(admin)/users")({
     validateSearch: z.object({
@@ -23,7 +25,7 @@ export const Route = createFileRoute("/_adminLayout/admin/(admin)/users")({
     }),
     loaderDeps: ({ search }) => search,
     loader: async ({ deps, context }) => {
-        await context.queryClient.ensureQueryData(usersQuery(deps));
+        context.queryClient.prefetchQuery(usersQuery(deps));
     },
     component: RouteComponent,
 });
@@ -33,7 +35,7 @@ function RouteComponent() {
     const { updateQuery } = useUpdateQuery(200);
     const [filterOpen, setFilterOpen] = useState<boolean>(false);
 
-    const { data: initialUsers } = useQuery(usersQuery(params));
+    const { data: initialUsers, isPending } = useQuery(usersQuery(params));
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedUsers, User>({
         queryKey: ["users", "infinite", params],
@@ -44,7 +46,7 @@ function RouteComponent() {
     });
 
     return (
-        <div className="px-3 md:px-10 py-4 slide-in">
+        <div className="px-3 py-4">
             <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
                     <h3 className="text-xl font-semibold">Customers view</h3>
@@ -80,7 +82,15 @@ function RouteComponent() {
                     />
                 </div>
                 <div className="mt-4">
-                    {items.length > 0 && (
+                    {isPending ? (
+                        <PageLoader variant="list" />
+                    ) : items?.length == 0 ? (
+                        <EmptyState
+                            title="No users found"
+                            description="You currently don't have users in your system"
+                            icon={UserCircle}
+                        />
+                    ) : items.length > 0 && (
                         <InfiniteResourceList
                             items={items}
                             onLoadMore={fetchNextPage}
@@ -88,11 +98,6 @@ function RouteComponent() {
                             isLoading={isFetchingNextPage}
                             renderItem={(item: User) => <CustomerCard key={item.id} user={item} />}
                         />
-                    )}
-                    {items.length === 0 && (
-                        <div className="text-center py-10">
-                            <p className="text-muted-foreground">No users found</p>
-                        </div>
                     )}
                 </div>
             </div>

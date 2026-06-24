@@ -7,6 +7,9 @@ import { chatsQuery } from "@/queries/admin.queries";
 import { api } from "@/utils/api";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
+import { PageLoader } from "@/components/generic/page-loader";
+import { MessageCircle } from "lucide-react";
+import EmptyState from "@/components/generic/empty";
 
 export const Route = createFileRoute("/_adminLayout/admin/(admin)/chats")({
     validateSearch: z.object({
@@ -14,14 +17,14 @@ export const Route = createFileRoute("/_adminLayout/admin/(admin)/chats")({
     }),
     loaderDeps: ({ search }) => search,
     loader: async ({ context, deps }) => {
-        await context.queryClient.ensureQueryData(chatsQuery(deps));
+        context.queryClient.prefetchQuery(chatsQuery(deps));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
     const params = Route.useSearch();
-    const { data } = useQuery(chatsQuery(params));
+    const { data, isPending } = useQuery(chatsQuery(params));
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedChats, Chat>({
         queryKey: ["chats", "infinite", params],
@@ -32,10 +35,18 @@ function RouteComponent() {
     });
 
     return (
-        <div className="px-2.5 md:px-10 mt-2">
-            <h3 className="text-2xl font-medium">Chats view</h3>
+        <div className="px-2.5 mt-2">
+            <h3 className="text-xl font-medium">Chats view</h3>
             <p className="text-muted-foreground text-sm mb-4">Manage your chats.</p>
-            {items.length > 0 && (
+            {isPending ? (
+                <PageLoader variant="list" />
+            ) : items?.length == 0 ? (
+                <EmptyState
+                    title="No chat found"
+                    description="You currently don't have escalated conversations"
+                    icon={MessageCircle}
+                />
+            ) : (
                 <InfiniteResourceList
                     items={items}
                     onLoadMore={fetchNextPage}
@@ -43,11 +54,6 @@ function RouteComponent() {
                     isLoading={isFetchingNextPage}
                     renderItem={(item: Chat) => <ChatsCard key={item.id} chat={item} />}
                 />
-            )}
-            {items.length === 0 && (
-                <div className="text-center py-10 bg-card">
-                    <p className="text-muted-foreground">No chat found</p>
-                </div>
             )}
         </div>
     );

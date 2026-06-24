@@ -1,15 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingDown, DollarSign, Percent, Users, Tag } from "lucide-react";
 import { useCouponsAnalytics } from "@/hooks/useCoupon";
+import { PageLoader } from "@/components/generic/page-loader";
 
 const AnalyticsStats = () => {
-    const { data } = useCouponsAnalytics();
+    const { data, isPending } = useCouponsAnalytics();
 
     const totalCoupons = data?.total_coupons || 0;
     const usedCoupons = data?.used_coupons || 0;
     const totalRedemptions = data?.total_redemptions || 0;
     const avgRedemptionRate = data?.avg_redemption_rate || 0;
     const activeCoupons = data?.active_coupons || 0;
+
+    if (isPending) {
+        return <PageLoader variant="card" />
+    }
 
     return (
         <div className="grid gap-4 grid-cols-2 md:grid-cols-4 mb-6">

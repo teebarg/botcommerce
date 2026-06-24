@@ -53,13 +53,13 @@ function RadioLoader({ rows = 4 }: { rows?: number }) {
     );
 }
 
-function ListLoader({ rows = 4 }: { rows?: number }) {
+function ListLoader({ rows = 6 }: { rows?: number }) {
     return (
-        <div className="rounded-xl border border-border overflow-hidden bg-card">
+        <div className="space-y-3">
             {Array.from({ length: rows }).map((_, i) => (
                 <div
                     key={i}
-                    className="flex items-center gap-3 px-5 py-4 border-b border-border last:border-0"
+                    className="flex items-center gap-3 px-5 py-4 border border-border bg-card rounded-xl"
                 >
                     <Skeleton className="size-8 rounded-md shrink-0" />
                     <div className="flex-1 flex flex-col gap-1.5">
@@ -230,10 +230,10 @@ function CardLoader() {
     return (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="bg-card rounded-2xl p-4 text-center border border-border flex flex-col items-center">
-                    <Skeleton className="w-10 h-10 rounded-xl mb-2" />
-                    <Skeleton className="h-6 w-8 mb-1.5" />
-                    <Skeleton className="h-3 w-16" />
+                <div key={i} className="bg-card rounded-2xl p-4 border border-border">
+                    <Skeleton className="w-44 h-6 rounded-xl mb-2" />
+                    <Skeleton className="h-6 w-36 mb-1.5" />
+                    <Skeleton className="h-4 w-20" />
                 </div>
             ))}
         </div>

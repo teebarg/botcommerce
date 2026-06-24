@@ -1,7 +1,6 @@
 import { Star } from "lucide-react";
-
+import { Separator } from "@/components/ui/separator";
 import { ReviewActions } from "./reviews-actions";
-import { Card } from "@/components/ui/card";
 import type { Review } from "@/schemas";
 
 interface ReviewListProps {
@@ -10,30 +9,49 @@ interface ReviewListProps {
 
 const ReviewItem = ({ review }: ReviewListProps) => {
     return (
-        <div className="space-y-4">
-            <Card key={review.id} className="p-4 hover:shadow-md transition-shadow">
-                <div className="flex justify-between items-start">
-                    <div>
-                        <div className="flex items-center space-x-1">
-                            {[...Array(5)].map((_, i) => (
-                                <Star key={i} className={i < review?.rating ? "fill-warning text-warning" : "text-gray-300"} size={16} />
-                            ))}
-                        </div>
-                        <p className="text-sm text-muted-foreground mt-1">Product ID: {review?.product_id}</p>
-                    </div>
+        <div>
+            <div className="py-6">
+                <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground">
+                        Product #{review?.product_id}
+                    </p>
                     <span
-                        className={`text-xs px-2 py-1 rounded-full ${
-                            review?.verified ? "bg-success-subtle text-success-subtle-foreground" : "bg-accent/20 text-accent"
+                        className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                            review?.verified
+                                ? "bg-success-subtle text-success-subtle-foreground"
+                                : "bg-muted text-muted-foreground"
                         }`}
                     >
-                        {review?.verified ? "Verified" : "Un-verified"}
+                        {review?.verified ? "Verified" : "Unverified"}
                     </span>
                 </div>
 
-                <p className="mt-2 text-sm">{review?.comment}</p>
-                <p className="mt-2 text-xs text-muted-foreground mb-4">Posted on {new Date(review?.created_at).toLocaleDateString()}</p>
-                <ReviewActions review={review} />
-            </Card>
+                <div className="flex items-center gap-0.5 mb-3">
+                    {[...Array(5)].map((_, i) => (
+                        <Star
+                            key={i}
+                            size={14}
+                            className={i < review?.rating ? "fill-warning text-warning" : "fill-muted text-muted"}
+                        />
+                    ))}
+                </div>
+
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                    {review?.comment}
+                </p>
+
+                <div className="rounded-xl border bg-muted/40 px-5 py-3.5 flex items-center justify-between">
+                    <p className="text-xs text-muted-foreground">
+                        {new Date(review?.created_at).toLocaleDateString("en-US", {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                        })}
+                    </p>
+                    <ReviewActions review={review} />
+                </div>
+            </div>
+            <Separator />
         </div>
     );
 };

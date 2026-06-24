@@ -37,7 +37,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id, productName }) => {
         <div className="max-w-6xl mx-auto px-4 py-12">
             <div className="mb-6">
                 <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-1">Reviews</p>
-                <h2 className="font-display text-xl font-semibold">Customer reviews & ratings</h2>
+                <h2 className="font-display font-semibold">Customer reviews & ratings</h2>
             </div>
             {items?.length === 0 ? (
                 <ProductReviewsZeroState productName={productName} product_id={product_id} />

@@ -15,6 +15,7 @@ import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { z } from "zod";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import EmptyState from "@/components/generic/empty";
+import { PageLoader } from "@/components/generic/page-loader";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/abandoned-carts")({
     validateSearch: z.object({
@@ -23,10 +24,8 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/abandoned-cart
     }),
     loaderDeps: ({ search }) => search,
     loader: async ({ deps, context: { queryClient } }) => {
-        await Promise.all([
-            queryClient.ensureQueryData(abandonedCartStatsQuery(deps.time || "24")),
-            queryClient.ensureQueryData(abandonedCartsQuery({ hours_threshold: deps.time || "24" })),
-        ]);
+        queryClient.prefetchQuery(abandonedCartStatsQuery(deps.time || "24"))
+        queryClient.prefetchQuery(abandonedCartsQuery({ hours_threshold: deps.time || "24" }))
     },
     component: RouteComponent,
 });
@@ -36,8 +35,8 @@ function RouteComponent() {
     const { updateQuery } = useUpdateQuery(200);
     const { mutate: sendReminders, isPending: sendRemindersLoading } = useSendCartReminders();
 
-    const { data: stats } = useQuery(abandonedCartStatsQuery(params.time || "24"));
-    const { data } = useQuery(abandonedCartsQuery({ hours_threshold: params.time || "24" }));
+    const { data: stats, isLoading } = useQuery(abandonedCartStatsQuery(params.time || "24"));
+    const { data, isPending } = useQuery(abandonedCartsQuery({ hours_threshold: params.time || "24" }));
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedAbandonedCarts, Cart>({
         queryKey: ["abandoned-carts", "infinite", params],
@@ -50,9 +49,9 @@ function RouteComponent() {
     return (
         <div className="bg-background">
             <div className="border-b bg-background sticky top-16 z-10">
-                <div className="container mx-auto px-4 py-4">
+                <div className="max-w-5xl mx-auto px-2 py-4">
                     <div className="mb-4">
-                        <h1 className="text-2xl font-bold">Abandoned Carts</h1>
+                        <h1 className="text-xl font-bold">Abandoned Carts</h1>
                         <p className="text-muted-foreground text-sm">Monitor and recover lost sales opportunities</p>
                     </div>
                     <div className="flex flex-col md:flex-row md:justify-between gap-3">
@@ -93,10 +92,12 @@ function RouteComponent() {
                     </div>
                 </div>
             </div>
-            <div className="container mx-auto px-4 py-2">
-                {stats && <AbandonedCartStats stat={stats} />}
+            <div className="max-w-5xl mx-auto px-2 py-2">
+                {stats && <AbandonedCartStats stat={stats} isLoading={isLoading} />}
                 <div className="mt-4 space-y-4">
-                    {items.length > 0 && (
+                    {isPending ? (
+                        <PageLoader variant="list" rows={6} />
+                    ) : items.length > 0 ? (
                         <InfiniteResourceList
                             items={items}
                             onLoadMore={fetchNextPage}
@@ -104,8 +105,7 @@ function RouteComponent() {
                             isLoading={isFetchingNextPage}
                             renderItem={(item: Cart) => <AbandonedCartCard key={item.id} cart={item} />}
                         />
-                    )}
-                    {items.length === 0 && (
+                    ) : (
                         <EmptyState
                             title="No abandoned cart found"
                             description="Please adjust the time range or search query"

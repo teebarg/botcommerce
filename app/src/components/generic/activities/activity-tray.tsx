@@ -15,13 +15,13 @@ const ActivityTray: React.FC = () => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <button className="inline-flex items-center text-muted-foreground cursor-pointer outline-none">
+                <button className="text-muted-foreground cursor-pointer">
                     <Bell size={22} />
                 </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="md:w-[450px] w-full p-0" sideOffset={5}>
                 <div className="max-h-[calc(100svh-100px)] overflow-y-auto overflow-x-hidden">
-                    {isLoading ? <div className="h-full p-4">Loading your activities...</div> : <ActivityView activities={activities} />}
+                    <ActivityView activities={activities} isLoading={isLoading} />
                 </div>
             </DropdownMenuContent>
         </DropdownMenu>

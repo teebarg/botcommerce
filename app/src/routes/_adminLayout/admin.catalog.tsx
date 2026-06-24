@@ -7,17 +7,19 @@ import type { DBCatalog } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import SheetDrawer from "@/components/sheet-drawer";
 import { catalogsQuery, useCatalogs } from "@/hooks/useCollection";
+import EmptyState from "@/components/generic/empty";
+import { PageLoader } from "@/components/generic/page-loader";
 
 export const Route = createFileRoute("/_adminLayout/admin/catalog")({
     loader: async ({ context: { queryClient } }) => {
-        await queryClient.ensureQueryData(catalogsQuery());
+        queryClient.prefetchQuery(catalogsQuery());
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
     const state = useOverlayTriggerState({});
-    const { data } = useCatalogs();
+    const { data, isPending } = useCatalogs();
 
     return (
         <div className="px-3 py-2 slide-in">
@@ -37,8 +39,19 @@ function RouteComponent() {
                     <CatalogForm current={undefined} onClose={() => state.close()} />
                 </SheetDrawer>
             </div>
-            {data?.catalogs?.length === 0 ? (
-                <div>No Catalogs found.</div>
+            {isPending ? (
+                <PageLoader variant="list" />
+            ) : data?.catalogs?.length == 0 ? (
+                <EmptyState
+                    title="No catalogs available"
+                    description="Click Add New below to create catalog"
+                    action={
+                        <Button className="mx-auto" onClick={state.open}>
+                            <Plus className="w-4 h-4" />
+                            Add New
+                        </Button>
+                    }
+                />
             ) : (
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                     {data?.catalogs?.map((col: DBCatalog, idx: number) => (

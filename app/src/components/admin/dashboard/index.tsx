@@ -3,8 +3,9 @@ import type { Order } from "@/schemas";
 import OrderCard from "../orders/order-card";
 import EmptyState from "@/components/generic/empty";
 import { Package } from "lucide-react";
+import { PageLoader } from "@/components/generic/page-loader";
 
-const RecentOrdersList = ({ orders }: { orders: Order[] }) => {
+const RecentOrdersList = ({ orders, isLoading }: { orders: Order[], isLoading: boolean }) => {
     if (!orders) {
         return (
             <EmptyState
@@ -13,6 +14,10 @@ const RecentOrdersList = ({ orders }: { orders: Order[] }) => {
                 description={`Your orders will appear here when they are available`}
             />
         );
+    }
+
+    if (isLoading) {
+        return <PageLoader variant="list" />
     }
 
     return (

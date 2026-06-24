@@ -11,9 +11,11 @@ import { useReorderCategories } from "@/hooks/useCategories";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import EmptyState from "@/components/generic/empty";
+import { PageLoader } from "@/components/generic/page-loader";
 
 interface Props {
     data?: Category[];
+    isPending: boolean
 }
 
 const CategoryImage: React.FC<{ image: string | undefined; categoryId: number }> = ({ image, categoryId }) => {
@@ -25,7 +27,7 @@ const CategoryImage: React.FC<{ image: string | undefined; categoryId: number }>
             onOpenChange={stateState.setOpen}
             onClose={stateState.close}
             trigger={
-                <div className="relative w-20 h-20 overflow-hidden rounded-xl">
+                <div className="relative w-16 h-16 overflow-hidden rounded-xl">
                     <img alt={image || "placeholder"} className="cursor-pointer w-full h-full object-cover" src={image || "/placeholder.jpg"} />
                 </div>
             }
@@ -36,7 +38,7 @@ const CategoryImage: React.FC<{ image: string | undefined; categoryId: number }>
     );
 };
 
-const CategoryTree: React.FC<Props> = ({ data }) => {
+const CategoryTree: React.FC<Props> = ({ data, isPending }) => {
     const addState = useOverlayTriggerState({});
     const reorderCategories = useReorderCategories();
     const [hasChanges, setHasChanges] = useState<boolean>(false);
@@ -77,19 +79,19 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
 
     return (
         <React.Fragment>
-            <div className="w-full max-w-6xl mx-auto p-2 md:p-4 space-y-6">
+            <div className="w-full max-w-5xl mx-auto p-2 space-y-6">
                 <div className="bg-linear-to-r from-primary/20 via-secondary/20 to-accent/20 rounded-2xl p-8">
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                         <div>
-                            <h1 className="text-2xl font-bold">Product Categories</h1>
-                            <p className="text-muted-foreground mb-2">Organize and manage your product catalog with ease</p>
-                            <Badge variant="accent">{categories?.length || 0} Categories</Badge>
+                            <h1 className="text-lg font-semibold">Product Categories</h1>
+                            <p className="text-muted-foreground mb-2 text-sm">Organize and manage your product catalog with ease</p>
+                            <Badge variant="accent">{isPending ? "..." : categories?.length || 0} Categories</Badge>
                         </div>
                         <SheetDrawer
                             open={addState.isOpen}
                             title="Create Category"
                             trigger={
-                                <Button className="bg-white text-gray-900 px-6 py-3 rounded-xl font-semibold hover:bg-blue-50 shadow-lg" size="lg">
+                                <Button className="bg-white text-gray-900 px-6 py-2 rounded-xl font-semibold hover:bg-blue-50 shadow-lg" size="lg">
                                     <Plus className="w-5 h-5" />
                                     Add New Category
                                 </Button>
@@ -104,64 +106,53 @@ const CategoryTree: React.FC<Props> = ({ data }) => {
                 <div className="space-y-4">
                     <div className="sticky top-16 z-10 bg-background space-y-2">
                         {hasChanges && (
-                            <div className="mt-4 p-3 bg-accent/20 border border-accent/20 rounded-md">
-                                <p className="text-sm text-accent">
-                                    {`You have unsaved changes. Click "Save Order" to apply the new category order.`}
+                            <div className="flex items-center justify-between gap-4 bg-warning-subtle border border-warning/20 rounded-xl px-4 py-2.5">
+                                <p className="text-xs text-warning-subtle-foreground">
+                                    You have unsaved order changes
                                 </p>
+                                <Button
+                                    size="sm"
+                                    disabled={reorderCategories.isPending}
+                                    onClick={saveOrder}
+                                    className="gap-1.5 shrink-0"
+                                >
+                                    <Save className="w-3.5 h-3.5" />
+                                    {reorderCategories.isPending ? "Saving…" : "Save order"}
+                                </Button>
                             </div>
-                        )}
-                        {hasChanges && (
-                            <Button disabled={reorderCategories.isPending} size="lg" onClick={saveOrder}>
-                                <Save size={16} />
-                                <span>{reorderCategories.isPending ? "Saving..." : "Save Order"}</span>
-                            </Button>
                         )}
                     </div>
-                    {(categories || []).map((category: Category, idx: number) => (
+                    {isPending ? (
+                        <PageLoader variant="list" rows={6} />
+                    ) : categories.length > 0 ? categories.map((category: Category, idx: number) => (
                         <div
                             key={idx}
-                            className="bg-card rounded-2xl shadow-sm border border-input overflow-hidden hover:shadow-md transition-shadow"
+                            className="bg-card flex items-center gap-4 py-4 px-2 rounded-2xl shadow-sm"
                         >
-                            <div className="group">
-                                <div className="py-4 px-2">
-                                    <div className="flex items-center gap-4">
-                                        <CategoryImage categoryId={category.id} image={category.image} />
-
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-start justify-between gap-4">
-                                                <div className="min-w-0 flex-1">
-                                                    <h3 className="text-xl font-semibold mb-2 truncate line-clamp-1">{category.name}</h3>
-                                                    <div className="flex flex-wrap items-center gap-3">
-                                                        <Badge variant={category.is_active ? "success-subtle" : "destructive"}>
-                                                            {category.is_active ? "Active" : "Inactive"}
-                                                        </Badge>
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex items-center gap-2 shrink-0">
-                                                    <CategoryAction
-                                                        categoriesLength={categories?.length}
-                                                        category={category}
-                                                        index={idx}
-                                                        onOrderChange={moveCategory}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <CategoryImage categoryId={category.id} image={category.image} />
+                            <div className="flex-1 min-w-0 flex justify-between gap-4">
+                                <div className="min-w-0 flex-1">
+                                    <h3 className="font-semibold truncate">{category.name}</h3>
+                                    <Badge variant={category.is_active ? "success-subtle" : "destructive"}>
+                                        {category.is_active ? "Active" : "Inactive"}
+                                    </Badge>
                                 </div>
+                                <CategoryAction
+                                    categoriesLength={categories?.length}
+                                    category={category}
+                                    index={idx}
+                                    onOrderChange={moveCategory}
+                                />
                             </div>
                         </div>
-                    ))}
+                    )) : (
+                        <EmptyState
+                            title="No categories yet"
+                            description="Start organizing your products by creating your first category."
+                            icon={FileImage}
+                        />
+                    )}
                 </div>
-
-                {(!categories || categories.length === 0) && (
-                    <EmptyState
-                        title="No categories yet"
-                        description="Start organizing your products by creating your first category. You can add images to make navigation easier."
-                        icon={FileImage}
-                    />
-                )}
             </div>
         </React.Fragment>
     );

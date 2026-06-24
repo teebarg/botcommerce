@@ -2,8 +2,9 @@ import { DollarSign, Package, ShoppingCart, Users } from "lucide-react";
 import StatCard from "@/components/ui/stat-card";
 import { currency } from "@/utils";
 import EmptyState from "@/components/generic/empty";
+import { PageLoader } from "@/components/generic/page-loader";
 
-const StatComponent = ({ summary }: { summary?: any }) => {
+const StatComponent = ({ summary, isPending }: { summary?: any, isPending: boolean }) => {
     const getPercentageChange = (growth: number): { value: string; trend: "up" | "down" | "neutral" } => {
         return {
             value: `${growth}%`,
@@ -19,6 +20,10 @@ const StatComponent = ({ summary }: { summary?: any }) => {
                 description="There is currently no available stats."
             />
         );
+    }
+
+    if (isPending) {
+        return <PageLoader variant="card" />
     }
 
     return (

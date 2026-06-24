@@ -22,13 +22,14 @@ const ChatsActions: React.FC<CustomerActionsProps> = ({ chat }) => {
     };
 
     return (
-        <div className="flex gap-1.5 mt-2">
+        <div className="flex gap-1.5">
             <Overlay
                 open={state.isOpen}
                 title="Chat"
                 trigger={
-                    <Button className="bg-primary/10 hover:bg-primary/20" size="icon" variant="ghost">
-                        <Eye className="h-5 w-5 text-primary" />
+                    <Button className="bg-primary/10 hover:bg-primary/2 px-0 min-w-24" size="sm">
+                        <Eye className="h-4 w-4 text-primary" />
+                        View
                     </Button>
                 }
                 onOpenChange={state.setOpen}
@@ -40,8 +41,9 @@ const ChatsActions: React.FC<CustomerActionsProps> = ({ chat }) => {
                 open={deleteState.isOpen}
                 onOpenChange={deleteState.setOpen}
                 trigger={
-                    <Button className="bg-destructive/10 hover:bg-destructive/20" size="icon" variant="ghost">
-                        <Trash2 className="h-5 w-5 text-destructive" />
+                    <Button className="bg-destructive/10 hover:bg-destructive/20 px-0 min-w-24" size="sm">
+                        <Trash2 className="h-4 w-4" />
+                        Delete
                     </Button>
                 }
                 onClose={deleteState.close}
