@@ -13,7 +13,6 @@ import { userAddressesQuery } from "@/queries/user.queries";
 import AddressForm from "@/components/store/account/address-form";
 import EmptyState from "@/components/generic/empty";
 import { PageLoader } from "@/components/generic/page-loader";
-import { Separator } from "@/components/ui/separator";
 
 type AddressItemProps = {
     address: Address;
@@ -31,9 +30,11 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false }) 
     };
 
     return (
-        <div>
-            <div className="py-6">
-                {/* Eyebrow row */}
+        <div className={cn(
+            "rounded-2xl border overflow-hidden",
+            isActive ? "border-primary/40 bg-primary/[0.02]" : "bg-card border-border"
+        )}>
+            <div className="px-5 pt-5 pb-4">
                 <div className="flex items-center justify-between mb-3">
                     <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground">
                         Delivery address
@@ -45,68 +46,64 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false }) 
                     )}
                 </div>
 
-                {/* Name */}
                 <h3 className="text-sm font-medium mb-1">
                     {address?.first_name} {address?.last_name}
                 </h3>
-
-                {/* Address lines */}
                 <p className="text-sm text-muted-foreground leading-relaxed">
                     {address.address_1}
                     {address.address_2 && <>, {address.address_2}</>}
                 </p>
-                <p className="text-sm text-muted-foreground mb-4">{address.state}</p>
+                <p className="text-sm text-muted-foreground">{address.state}</p>
+            </div>
 
-                {/* Footer card */}
-                <div className="rounded-xl border bg-muted/40 px-5 py-3.5 flex items-center justify-between">
-                    <p className="text-xs text-muted-foreground">
-                        <Home className="inline w-3 h-3 mr-1.5 mb-0.5" />
-                        Home
-                    </p>
-                    <div className="flex items-center gap-1.5">
-                        <SheetDrawer
-                            open={editState.isOpen}
-                            title="Edit address"
-                            trigger={
-                                <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
-                                    onClick={editState.open}
-                                >
-                                    <Edit3 className="h-3.5 w-3.5" />
-                                </Button>
-                            }
-                            onOpenChange={editState.setOpen}
-                            showHeader={true}
-                        >
-                            <AddressForm mode="edit" address={address} onClose={editState.close} />
-                        </SheetDrawer>
-                        <ConfirmDrawer
-                            open={deleteState.isOpen}
-                            onOpenChange={deleteState.setOpen}
-                            trigger={
-                                <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                >
-                                    <Trash2 className="h-3.5 w-3.5" />
-                                </Button>
-                            }
-                            onClose={deleteState.close}
-                            onConfirm={onConfirmDelete}
-                            title={`Delete ${address.first_name}'s address`}
-                            description="Are you sure you want to delete this address? This action cannot be undone."
-                            isLoading={deleteAddress.isPending}
-                        />
-                    </div>
+            <div className="flex items-center justify-between px-5 py-3 border-t border-border bg-muted/40">
+                <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <Home className="w-3 h-3" />
+                    Home
+                </p>
+                <div className="flex items-center gap-1.5">
+                    <SheetDrawer
+                        open={editState.isOpen}
+                        title="Edit address"
+                        trigger={
+                            <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                                onClick={editState.open}
+                            >
+                                <Edit3 className="h-3.5 w-3.5" />
+                            </Button>
+                        }
+                        onOpenChange={editState.setOpen}
+                        showHeader={true}
+                    >
+                        <AddressForm mode="edit" address={address} onClose={editState.close} />
+                    </SheetDrawer>
+                    <ConfirmDrawer
+                        open={deleteState.isOpen}
+                        onOpenChange={deleteState.setOpen}
+                        trigger={
+                            <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                            >
+                                <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                        }
+                        onClose={deleteState.close}
+                        onConfirm={onConfirmDelete}
+                        title={`Delete ${address.first_name}'s address`}
+                        description="Are you sure you want to delete this address? This action cannot be undone."
+                        isLoading={deleteAddress.isPending}
+                    />
                 </div>
             </div>
-            <Separator />
         </div>
     );
 };
+
 export const Route = createFileRoute("/_mainLayout/account/addresses")({
     loader: async ({ context: { queryClient, userId } }) => {
         queryClient.prefetchQuery(userAddressesQuery(userId));
