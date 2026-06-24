@@ -107,8 +107,8 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                                 key={idx}
                                 onClick={() => isOptionAvailable("color", color) && toggleColorSelect(color)}
                                 className={cn(
-                                    "w-9 h-9 rounded-full border-2 transition-all",
-                                    selectedColor === color ? "border-foreground scale-110" : "border-border"
+                                    "w-9 h-9 rounded-full border-2",
+                                    selectedColor === color ? "border-foreground" : "border-border"
                                 )}
                                 style={{ backgroundColor: color.toLowerCase() }}
                                 title={color}

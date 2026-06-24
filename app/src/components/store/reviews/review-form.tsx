@@ -62,7 +62,7 @@ export const ReviewForm = ({ onClose, product_id }: ReviewFormProps) => {
                                             <button
                                                 key={star}
                                                 aria-label={`Rate ${star} star${star > 1 ? "s" : ""}`}
-                                                className="p-1 hover:scale-110 transition-transform"
+                                                className="p-1"
                                                 type="button"
                                                 onClick={() => setValue("rating", star, { shouldValidate: true })}
                                             >

@@ -73,7 +73,6 @@ export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
                                             <div className="w-20 h-20 rounded-lg overflow-hidden border bg-muted">
                                                 <ImageDisplay
                                                     alt={item.name}
-                                                    className="group-hover:scale-110 transition-transform duration-300"
                                                     url={item.image}
                                                 />
                                             </div>

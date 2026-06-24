@@ -69,7 +69,7 @@ function RouteComponent() {
                 )}
                 {items.length === 0 && (
                     <EmptyState
-                        title=">No reviews found"
+                        title="No reviews found"
                         description="Please adjust the time range or search query"
                     />
                 )}

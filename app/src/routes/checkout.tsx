@@ -66,9 +66,7 @@ function RouteComponent() {
     }
     return (
         <div className="max-w-7xl mx-auto w-full flex flex-col overflow-hidden">
-            <header
-                className="sticky h-16 top-0 z-50 bg-background/80 backdrop-blur-xl flex justify-between items-center border-b border-border px-2.5 shrink-0"
-            >
+            <header className="sticky h-16 top-0 z-50 bg-background/60 flex justify-between items-center border-b border-border px-2.5 shrink-0">
                 <div className="flex items-center gap-2">
                     <BackButton />
                     <h1 className="text-lg font-bold">Checkout</h1>

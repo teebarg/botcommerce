@@ -13,7 +13,7 @@ const CheckoutStepIndicator: React.FC<CheckoutStepIndicatorProps> = ({ currentSt
     const steps: CheckoutStep[] = ["delivery", "address", "payment"];
 
     return (
-        <div className="p-4 bg-background/80 backdrop-blur">
+        <div className="p-4 bg-background/60">
             <div className="flex gap-2">
                 {steps.map((step, idx) => {
                     const isCompleted = completedSteps.includes(step);

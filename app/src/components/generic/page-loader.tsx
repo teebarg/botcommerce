@@ -1,6 +1,6 @@
 import { Separator } from "../ui/separator";
 
-type LoaderVariant = "list" | "grid" | "detail" | "inline" | "cart" | "product-list" | "product-section" | "radio" | "box" | "account";
+type LoaderVariant = "list" | "grid" | "detail" | "inline" | "cart" | "product-list" | "product-section" | "radio" | "box" | "account" | "card";
 
 interface PageLoaderProps {
     variant?: LoaderVariant;
@@ -226,6 +226,20 @@ function AccountLoader() {
     );
 }
 
+function CardLoader() {
+    return (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-card rounded-2xl p-4 text-center border border-border flex flex-col items-center">
+                    <Skeleton className="w-10 h-10 rounded-xl mb-2" />
+                    <Skeleton className="h-6 w-8 mb-1.5" />
+                    <Skeleton className="h-3 w-16" />
+                </div>
+            ))}
+        </div>
+    );
+}
+
 export function PageLoader({ variant = "list", rows, className = "" }: PageLoaderProps) {
     return (
         <div className={className}>
@@ -239,6 +253,7 @@ export function PageLoader({ variant = "list", rows, className = "" }: PageLoade
             {variant === "radio" && <RadioLoader />}
             {variant === "box" && <BoxLoader />}
             {variant === "account" && <AccountLoader />}
+            {variant === "card" && <CardLoader />}
         </div>
     );
 }

@@ -179,7 +179,7 @@ export function BulkImageSheetForm({ onClose, imageIds }: BulkImageSheetFormProp
                                 <button
                                     key={field}
                                     onClick={() => toggleFieldSelection(field as FieldKey)}
-                                    className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium cursor-pointer transition-all active:scale-95 ${
+                                    className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium cursor-pointer ${
                                         isActive
                                             ? "bg-primary/15 text-primary border border-primary/30 shadow-md"
                                             : "bg-secondary text-secondary-foreground"

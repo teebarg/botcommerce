@@ -54,7 +54,7 @@ export const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
     };
 
     return (
-        <div className="px-3 pt-3 pb-[calc(var(--sab)+4px)] border-t border-border bg-background/80 backdrop-blur-xl">
+        <div className="px-3 pt-3 pb-[calc(var(--sab)+4px)] border-t border-border bg-background/80">
             {file && (
                 <div className="flex items-center gap-2 mb-2 px-3 py-2 glass rounded-xl">
                     <Paperclip className="w-3.5 h-3.5 text-muted-foreground" />

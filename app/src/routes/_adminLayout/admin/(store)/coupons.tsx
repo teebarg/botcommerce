@@ -15,6 +15,7 @@ import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { Coupon, PaginatedCoupons } from "@/schemas";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { api } from "@/utils/api";
+import AdminPageLoading from "@/components/admin/admin-loader";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/coupons")({
     validateSearch: z.object({
@@ -23,14 +24,14 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/coupons")({
     }),
     loaderDeps: ({ search }) => search,
     loader: async ({ deps, context: { queryClient } }) => {
-        await queryClient.ensureQueryData(couponsQuery(deps));
+        queryClient.prefetchQuery(couponsQuery(deps));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
     const params = Route.useSearch();
-    const { data: initialCoupons } = useQuery(couponsQuery(params));
+    const { data: initialCoupons, isPending } = useQuery(couponsQuery(params));
     const toggleMutation = useToggleCouponStatus();
     const deleteMutation = useDeleteCoupon();
 
@@ -60,6 +61,10 @@ function RouteComponent() {
             toast.success("Coupon deleted successfully", { id: toastId });
         } catch (error) { }
     };
+
+    if (isPending){
+        return <AdminPageLoading />
+    }
     return (
         <div className="mx-auto max-w-5xl w-full py-4 px-2.5">
             <div className="flex md:flex-row flex-col md:items-center md:justify-between mb-6 gap-2">

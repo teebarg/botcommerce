@@ -24,7 +24,7 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, slug, name, images }) =
                 url={images?.[0].image}
                 alt={name}
                 className="w-full h-full"
-                imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                imgClassName="w-full h-full object-cover"
             />
             <button
                 onClick={onRemove}

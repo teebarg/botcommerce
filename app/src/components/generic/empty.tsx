@@ -1,4 +1,4 @@
-import type { LucideIcon } from "lucide-react";
+import { SearchX, type LucideIcon } from "lucide-react";
 import { cn } from "@/utils";
 
 interface EmptyStateProps {
@@ -10,7 +10,7 @@ interface EmptyStateProps {
     className?: string;
 }
 
-export default function EmptyState({ icon: Icon, title, description, action, children, className }: EmptyStateProps) {
+export default function EmptyState({ icon: Icon = SearchX, title, description, action, children, className }: EmptyStateProps) {
     return (
         <div className={cn("text-center py-12 px-4", className)}>
             {Icon && (

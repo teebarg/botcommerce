@@ -1,3 +1,4 @@
+import { useConfig } from "@/providers/store-provider";
 import { loginFn } from "@/server/users.server";
 import { api } from "@/utils/api";
 import { SessionUser } from "@/utils/session";
@@ -5,7 +6,7 @@ import { tryCatch } from "@/utils/try-catch";
 import { useAuth, useUser } from "@clerk/tanstack-react-start";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate, useRouteContext } from "@tanstack/react-router";
-import { motion } from "framer-motion";
+import { ShoppingBag, Check, Lock } from "lucide-react";
 import { useEffect } from "react";
 import { z } from "zod";
 
@@ -18,6 +19,29 @@ export const Route = createFileRoute("/auth/callback")({
     validateSearch: authCallbackSchema,
 });
 
+const steps = [
+    {
+        label: "Identity verified",
+        description: "Clerk confirmed your credentials",
+        status: "completed" as const,
+    },
+    {
+        label: "Exchanging session",
+        description: "Generating your secure token",
+        status: "active" as const,
+    },
+    {
+        label: "Loading your profile",
+        description: "Cart, preferences and order history",
+        status: "pending" as const,
+    },
+    {
+        label: "Ready",
+        description: "Taking you to your destination",
+        status: "pending" as const,
+    },
+];
+
 function RouteComponent() {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
@@ -25,6 +49,7 @@ function RouteComponent() {
     const { isAuthenticated } = useRouteContext({ strict: false });
     const { getToken } = useAuth();
     const search = Route.useSearch();
+    const { shop_name } = useConfig();
 
     useEffect(() => {
         if (!isLoaded) return;
@@ -35,7 +60,6 @@ function RouteComponent() {
                 return;
             }
 
-            // Prevent double execution
             if (isAuthenticated && sessionStorage.getItem("auth_exchanged")) {
                 window.location.href = search.redirect || "/";
                 return;
@@ -63,72 +87,72 @@ function RouteComponent() {
     }, [isLoaded, isSignedIn]);
 
     return (
-        <div
-            className="min-h-screen flex items-center justify-center px-4"
-            style={{
-                background: "#0c0b09",
-                backgroundImage: "radial-gradient(ellipse 80% 60% at 50% 0%, #1c1810 0%, #0c0b09 70%)",
-            }}
-        >
-            {/* Corner accents */}
-            <span className="absolute top-5 left-5 w-4 h-4 border-t border-l border-[#c9a96e33]" />
-            <span className="absolute bottom-5 right-5 w-4 h-4 border-b border-r border-[#c9a96e33]" />
+        <div className="fixed inset-0 z-10 flex items-center justify-center bg-background px-6">
+            <div className="w-full max-w-sm">
 
-            <div
-                className="flex flex-col items-center"
-            >
-                {/* Monogram ring */}
-                <div className="relative w-[72px] h-[72px] mb-8">
-                    <div className="absolute inset-0 rounded-full border border-[#c9a96e22]" />
-                    <motion.div
-                        className="absolute inset-0 rounded-full"
-                        style={{ border: "1px solid transparent", borderTopColor: "#c9a96e", borderRightColor: "#c9a96e88" }}
-                        animate={{ rotate: 360 }}
-                        transition={{ repeat: Infinity, duration: 1.4, ease: "linear" }}
-                    />
-                    <motion.span
-                        className="absolute inset-0 flex items-center justify-center text-[#c9a96e]"
-                        style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, fontWeight: 300, letterSpacing: "0.05em" }}
-                        animate={{ opacity: [0.7, 1, 0.7] }}
-                        transition={{ repeat: Infinity, duration: 2.8, ease: "easeInOut" }}
-                    >
-                        R
-                    </motion.span>
+                <div className="flex items-center gap-2.5 mb-10">
+                    <div className="w-7 h-7 rounded-md border border-border bg-card flex items-center justify-center shrink-0">
+                        <ShoppingBag className="w-3.5 h-3.5 text-foreground" />
+                    </div>
+                    <span className="text-sm font-medium text-foreground">{shop_name}</span>
                 </div>
 
-                <h1
-                    style={{ fontFamily: "'Cormorant Garamond', serif" }}
-                    className="text-2xl tracking-[0.12em] uppercase text-[#e8dfc8] m-0 font-light"
-                >
-                    Signing you in
-                </h1>
-
-                <div
-                    className="w-8 h-px my-3"
-                    style={{ background: "linear-gradient(90deg, transparent, #c9a96e, transparent)" }}
-                />
-
-                <p
-                    className="text-xxs tracking-[0.2em] uppercase text-[#8a7d65] m-0 mb-10"
-                    style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300 }}
-                >
-                    Verifying your session
+                <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-3">
+                    Welcome back
+                </p>
+                <h1 className="text-2xl font-medium text-foreground mb-1.5">Signing you in</h1>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-10">
+                    Just a moment while we set up your session securely.
                 </p>
 
-                <div
-                    className="w-[260px] flex flex-col gap-[10px]"
-                >
-                    {[100, 72, 88, 55].map((w, i) => (
-                        <div
-                            key={i}
-                            className="h-px rounded-sm overflow-hidden"
-                            style={{
-                                width: `${w}%`,
-                                background: "#1e1c16",
-                            }}
-                        />
+                <div className="flex flex-col mb-10">
+                    {steps.map(({ label, description, status }, i) => (
+                        <div key={i} className="flex gap-3.5">
+                            <div className="flex flex-col items-center shrink-0">
+                                {status === "completed" && (
+                                    <div className="w-5 h-5 rounded-full bg-success-subtle flex items-center justify-center shrink-0">
+                                        <Check className="w-3 h-3 text-success-subtle-foreground" />
+                                    </div>
+                                )}
+                                {status === "active" && (
+                                    <div className="w-5 h-5 rounded-full border-[1.5px] border-foreground flex items-center justify-center shrink-0">
+                                        <div className="w-2 h-2 rounded-full bg-foreground animate-pulse" />
+                                    </div>
+                                )}
+                                {status === "pending" && (
+                                    <div className="w-5 h-5 rounded-full border-[1.5px] border-border shrink-0" />
+                                )}
+                                {i < steps.length - 1 && (
+                                    <div className="w-px flex-1 my-1.5 bg-border" />
+                                )}
+                            </div>
+                            <div className={`pt-0.5 ${i < steps.length - 1 ? "pb-5" : ""}`}>
+                                <p className={`text-sm font-medium mb-0.5 ${
+                                    status === "completed"
+                                        ? "text-success-subtle-foreground"
+                                        : status === "active"
+                                        ? "text-foreground"
+                                        : "text-muted-foreground/40"
+                                }`}>
+                                    {label}
+                                </p>
+                                <p className={`text-xs leading-relaxed ${
+                                    status === "pending"
+                                        ? "text-muted-foreground/30"
+                                        : "text-muted-foreground"
+                                }`}>
+                                    {description}
+                                </p>
+                            </div>
+                        </div>
                     ))}
                 </div>
+
+                <div className="flex items-center gap-2">
+                    <Lock className="w-3 h-3 text-muted-foreground/50 shrink-0" />
+                    <span className="text-xs text-muted-foreground/50">Secured by Clerk · End-to-end encrypted</span>
+                </div>
+
             </div>
         </div>
     );

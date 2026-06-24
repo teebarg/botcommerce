@@ -1,12 +1,12 @@
-import { createFileRoute, useSearch } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { productFeedQuery } from "@/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
-import { FeedQuerySchema } from "@/schemas";
+import { FeedQuery, FeedQuerySchema } from "@/schemas";
 import { PageLoader } from "@/components/generic/page-loader";
 import InfiniteFeed from "@/components/store/collections/infinite-feed";
 
 export const Route = createFileRoute("/_mainLayout/collections/")({
-    validateSearch: (search: Record<string, unknown>) => {
+    validateSearch: (search: FeedQuery) => {
         const parsed = FeedQuerySchema.parse(search);
         if (!parsed.feed_seed) {
             parsed.feed_seed = Math.floor(Math.random() * 1000) + 1000;
@@ -25,10 +25,10 @@ export const Route = createFileRoute("/_mainLayout/collections/")({
 });
 
 function RouteComponent() {
-    const search = useSearch({ strict: false });
+    const search = Route.useSearch();
     const { data, isLoading } = useQuery(productFeedQuery(search));
 
-    if (isLoading) return <PageLoader variant="grid" rows={6} className="max-w-7xl w-full mx-auto py-2" />
+    if (isLoading) return <PageLoader variant="grid" rows={6} className="py-2" />
 
     return <InfiniteFeed initialData={data} params={{ ...search }} />
 }

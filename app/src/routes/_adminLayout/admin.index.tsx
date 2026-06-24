@@ -4,17 +4,23 @@ import StatComponent from "@/components/admin/dashboard/stat-component";
 import { statsTrendsQuery } from "@/queries/admin.queries";
 import { useQuery } from "@tanstack/react-query";
 import { ordersQuery } from "@/queries/user.queries";
+import AdminPageLoading from "@/components/admin/admin-loader";
 
 export const Route = createFileRoute("/_adminLayout/admin/")({
     loader: async ({ context: { queryClient } }) => {
-        await Promise.all([queryClient.ensureQueryData(ordersQuery({ take: 5 })), queryClient.ensureQueryData(statsTrendsQuery())]);
+        queryClient.prefetchQuery(ordersQuery({ take: 5 }))
+        queryClient.prefetchQuery(statsTrendsQuery())
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { data: paginatedOrders } = useQuery(ordersQuery({ take: 5 }));
-    const { data: statsTrends } = useQuery(statsTrendsQuery());
+    const { data: paginatedOrders, isLoading } = useQuery(ordersQuery({ take: 5 }));
+    const { data: statsTrends, isPending } = useQuery(statsTrendsQuery());
+
+    if (isLoading || isPending){
+        return <AdminPageLoading />
+    }
 
     return (
         <div className="py-2.5 space-y-3 slide-in">

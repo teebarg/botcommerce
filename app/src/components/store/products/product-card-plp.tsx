@@ -35,7 +35,7 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
                     url={product.image}
                     alt={product.name}
                     className="w-full h-full"
-                    imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    imgClassName="w-full h-full object-cover"
                 />
 
                 {outOfStock && (

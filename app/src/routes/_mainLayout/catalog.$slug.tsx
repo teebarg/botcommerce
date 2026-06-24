@@ -5,6 +5,7 @@ import { CatalogVisitTracker } from "@/components/store/catalog/catalog-visit-tr
 import { catalogFeedQuery } from "@/queries/user.queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import CatalogInfinite from "@/components/store/catalog/catalog-infinite";
+import { PageLoader } from "@/components/generic/page-loader";
 
 export const CatalogSearchSchema = z.object({
     sizes: z.string().optional(),
@@ -46,16 +47,17 @@ export const Route = createFileRoute("/_mainLayout/catalog/$slug")({
         };
     },
     component: RouteComponent,
+    pendingComponent: () => (<PageLoader variant="grid" rows={6} className="py-2" />)
 });
 
 function RouteComponent() {
     const search = Route.useSearch();
     const { slug } = Route.useParams();
-    const { data: catalog } = useSuspenseQuery(catalogFeedQuery({ ...search, slug }));
+    const { data } = useSuspenseQuery(catalogFeedQuery({ ...search, slug }));
     return (
         <>
             <CatalogVisitTracker slug={slug} />
-            <CatalogInfinite initialData={catalog} slug={slug} />
+            <CatalogInfinite initialData={data} slug={slug} />
         </>
     );
 }

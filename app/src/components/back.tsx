@@ -43,7 +43,7 @@ const BackButton: React.FC<Props> = ({ onClick, className }) => {
 
     return (
         <button
-            className={cn("p-2.5 rounded-full bg-background/80 backdrop-blur-sm shadow-lg border border-border", className)}
+            className={cn("p-2.5 rounded-full bg-background/80 shadow-lg border border-border cursor-pointer", className)}
             onClick={handleGoBack}
         >
             <ArrowLeft className="w-5 h-5 text-foreground" />

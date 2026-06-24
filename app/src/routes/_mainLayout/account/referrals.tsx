@@ -76,12 +76,12 @@ function RouteComponent() {
                     </div>
 
                     <div className="flex items-center gap-3 mt-3">
-                        <div className="flex-1 bg-white/20 backdrop-blur-sm rounded-xl px-4 py-3 font-mono text-2xl font-bold tracking-widest text-center">
+                        <div className="flex-1 bg-white/20 rounded-xl px-4 py-3 font-mono text-2xl font-bold tracking-widest text-center">
                             {me?.referral_code}
                         </div>
                         <button
                             onClick={handleCopy}
-                            className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center active:scale-95"
+                            className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center"
                         >
                             {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
                         </button>
@@ -89,7 +89,7 @@ function RouteComponent() {
 
                     <button
                         onClick={handleShare}
-                        className="w-full mt-4 py-3 rounded-xl bg-white/20 backdrop-blur-sm font-medium flex items-center justify-center gap-2 text-sm active:scale-95"
+                        className="w-full mt-4 py-3 rounded-xl bg-white/20 font-medium flex items-center justify-center gap-2 text-sm"
                     >
                         <Share2 className="w-4 h-4" />
                         Share with Friends

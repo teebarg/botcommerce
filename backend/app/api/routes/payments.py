@@ -1,5 +1,6 @@
 import httpx
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends, Response
+from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
 from app.core.config import settings
 from app.schemas.payment import PaymentInitialize, PaymentCreate
 from app.models.order import OrderCreate, Order
@@ -7,7 +8,6 @@ from app.core.deps import CurrentUser
 from app.models.user import User
 from datetime import datetime
 from app.prisma_client import prisma as db
-from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
 from app.core.logging import get_logger
 from app.models.cart import Cart
 from app.core.permissions import require_admin, require_user
@@ -28,8 +28,7 @@ async def initialize_payment(cart: Cart, user: User) -> PaymentInitialize:
                 f"{PAYSTACK_BASE_URL}/transaction/initialize",
                 json={
                     "email": user.email,
-                    # "amount": int(cart.total * 100),  # Convert to kobo
-                    "amount": 500,  # Convert to kobo
+                    "amount": int(cart.total * 100),  # Convert to kobo
                     "reference": f"CART-{cart.id}-{datetime.now().timestamp()}",
                     "callback_url": f"{settings.FRONTEND_HOST}/payment/verify",
                     "metadata": {

@@ -371,7 +371,7 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
                             <button
                                 key={size}
                                 onClick={() => onToggleSize(size)}
-                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors active:scale-95 ${draft.sizes.has(size)
+                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${draft.sizes.has(size)
                                         ? "bg-primary text-primary-foreground"
                                         : "bg-secondary text-secondary-foreground hover:bg-muted"
                                     }`}
@@ -394,7 +394,7 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
                             <button
                                 key={color.name}
                                 onClick={() => onToggleColor(color.name)}
-                                className={`relative w-8 h-8 rounded-full border-2 transition-all active:scale-95 ${draft.colors.has(color.name)
+                                className={`relative w-8 h-8 rounded-full border-2 ${draft.colors.has(color.name)
                                         ? "border-primary ring-2 ring-primary ring-offset-2 ring-offset-background"
                                         : "border-border hover:border-muted-foreground"
                                     }`}

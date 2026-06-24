@@ -1,38 +1,75 @@
 import type React from "react";
-import { CheckCircle2, ShoppingBag } from "lucide-react";
+import { ShoppingBag, Check } from "lucide-react";
 
 const PaymentLoading: React.FC = () => {
     return (
-        <div className="min-h-screen bg-linear-to-b from-violet-50 to-violet-100 flex items-center justify-center p-4 fixed inset-0 z-10">
-            <div className="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden">
-                <div className="p-8">
-                    <div className="flex justify-center mb-8">
-                        <div className="relative animate-in zoom-in-0 duration-500">
-                            <div className="w-24 h-24 rounded-full border-4 border-violet-200 border-t-violet-500 animate-spin" />
-                            <ShoppingBag className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-violet-500 w-10 h-10" />
+        <div className="fixed inset-0 z-10 flex items-center justify-center bg-background p-4">
+            <div className="w-full max-w-md border border-border rounded-xl overflow-hidden bg-card">
+
+                <div className="px-8 py-7 border-b border-border">
+                    <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-3">
+                        Checkout
+                    </p>
+                    <div className="flex items-center gap-3">
+                        <div className="relative shrink-0 w-9 h-9">
+                            <svg
+                                className="absolute inset-0 animate-spin"
+                                width="36"
+                                height="36"
+                                viewBox="0 0 36 36"
+                            >
+                                <circle
+                                    cx="18" cy="18" r="15"
+                                    fill="none"
+                                    className="stroke-border"
+                                    strokeWidth="2"
+                                />
+                                <circle
+                                    cx="18" cy="18" r="15"
+                                    fill="none"
+                                    className="stroke-foreground"
+                                    strokeWidth="2"
+                                    strokeDasharray="30 70"
+                                    strokeLinecap="round"
+                                />
+                            </svg>
+                            <ShoppingBag className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 text-foreground" />
                         </div>
-                    </div>
-                    <h2 className="text-2xl font-bold text-center text-gray-800 mb-2">Processing Your Order</h2>
-
-                    <p className="text-gray-600 text-center mb-8">Please wait while we verify your payment</p>
-
-                    <div className="space-y-4">
-                        <ProcessStep description="Your payment has been successfully received" isCompleted={true} title="Payment Received" />
-                        <ProcessStep
-                            description="We're verifying your order details"
-                            isActive={true}
-                            isCompleted={false}
-                            title="Order Verification"
-                        />
-                        <ProcessStep description="Your order will be confirmed shortly" isCompleted={false} title="Order Confirmation" />
+                        <div>
+                            <h1 className="text-base font-medium text-foreground">Processing your order</h1>
+                            <p className="text-sm text-muted-foreground">Please wait while we verify your payment</p>
+                        </div>
                     </div>
                 </div>
 
-                <div className="bg-violet-50 p-6">
-                    <div className="flex items-center justify-between text-sm text-gray-600">
-                        <span>Order</span>
-                        <span>Estimated time: 30 seconds</span>
+                <div className="px-8 py-6">
+                    <div className="flex flex-col">
+                        <ProcessStep
+                            title="Payment received"
+                            description="Your payment has been successfully received"
+                            status="completed"
+                            isLast={false}
+                        />
+                        <ProcessStep
+                            title="Order verification"
+                            description="We're verifying your order details"
+                            status="active"
+                            isLast={false}
+                        />
+                        <ProcessStep
+                            title="Order confirmation"
+                            description="Your order will be confirmed shortly"
+                            status="pending"
+                            isLast={true}
+                        />
                     </div>
+                </div>
+
+                <div className="px-8 py-4 bg-muted/40 border-t border-border flex items-center justify-between">
+                    <span className="text-xs font-medium tracking-widest uppercase text-muted-foreground">
+                        Estimated time
+                    </span>
+                    <span className="text-xs text-muted-foreground">~30 seconds</span>
                 </div>
             </div>
         </div>
@@ -42,29 +79,46 @@ const PaymentLoading: React.FC = () => {
 interface ProcessStepProps {
     title: string;
     description: string;
-    isCompleted: boolean;
-    isActive?: boolean;
+    status: "completed" | "active" | "pending";
+    isLast: boolean;
 }
 
-function ProcessStep({ title, description, isCompleted, isActive = false }: ProcessStepProps) {
+function ProcessStep({ title, description, status, isLast }: ProcessStepProps) {
     return (
-        <div className="flex items-start space-x-4">
-            <div className="shrink-0">
-                {isCompleted ? (
-                    <div className="animate-in zoom-in-0 duration-300">
-                        <CheckCircle2 className="w-6 h-6 text-green-500" />
-                    </div>
-                ) : (
-                    <div className={`w-6 h-6 rounded-full border-2 ${isActive ? "border-violet-500" : "border-gray-300"}`}>
-                        {isActive && (
-                            <div className="w-full h-full rounded-full bg-violet-500 animate-pulse" />
-                        )}
+        <div className="flex gap-3.5">
+            <div className="flex flex-col items-center shrink-0">
+                {status === "completed" && (
+                    <div className="w-5 h-5 rounded-full bg-success-subtle flex items-center justify-center shrink-0">
+                        <Check className="w-3 h-3 text-success-subtle-foreground" />
                     </div>
                 )}
+                {status === "active" && (
+                    <div className="w-5 h-5 rounded-full border-[1.5px] border-foreground flex items-center justify-center shrink-0">
+                        <div className="w-2 h-2 rounded-full bg-foreground animate-pulse" />
+                    </div>
+                )}
+                {status === "pending" && (
+                    <div className="w-5 h-5 rounded-full border-[1.5px] border-border shrink-0" />
+                )}
+                {!isLast && (
+                    <div className="w-px flex-1 mt-1.5 mb-1.5 bg-border" />
+                )}
             </div>
-            <div>
-                <h3 className={`font-medium ${isCompleted ? "text-green-500" : isActive ? "text-violet-500" : "text-gray-400"}`}>{title}</h3>
-                <p className={`text-sm ${isCompleted || isActive ? "text-gray-600" : "text-gray-400"}`}>{description}</p>
+            <div className={`pt-0.5 ${!isLast ? "pb-5" : ""}`}>
+                <p className={`text-sm font-medium mb-0.5 ${
+                    status === "completed"
+                        ? "text-success-subtle-foreground"
+                        : status === "active"
+                        ? "text-foreground"
+                        : "text-muted-foreground/50"
+                }`}>
+                    {title}
+                </p>
+                <p className={`text-xs leading-relaxed ${
+                    status === "pending" ? "text-muted-foreground/40" : "text-muted-foreground"
+                }`}>
+                    {description}
+                </p>
             </div>
         </div>
     );

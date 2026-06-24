@@ -8,7 +8,7 @@ import { useLocation } from "@tanstack/react-router";
 
 const ChatHeader = ({ onClose }: { onClose: () => void }) => {
     return (
-        <div className="flex items-center gap-3 px-4 pb-3 pt-[calc(var(--sat)+12px)] border-b border-border bg-card/50 backdrop-blur-sm shrink-0 rounded-t-2xl">
+        <div className="flex items-center gap-3 px-4 pb-3 pt-[calc(var(--sat)+12px)] border-b border-border bg-card/50 shrink-0 rounded-t-2xl">
             <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-orange-800" />
             </div>

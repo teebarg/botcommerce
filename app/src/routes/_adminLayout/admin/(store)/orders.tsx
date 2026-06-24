@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { api } from "@/utils/api";
-import { PageLoader } from "@/components/generic/page-loader";
+import AdminPageLoading from "@/components/admin/admin-loader";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/orders")({
     validateSearch: z.object({
@@ -21,15 +21,14 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/orders")({
     }),
     loaderDeps: ({ search }) => search,
     loader: async ({ context: { queryClient }, deps }) => {
-        await queryClient.ensureQueryData(ordersQuery(deps));
+        queryClient.prefetchQuery(ordersQuery(deps));
     },
     component: RouteComponent,
-    pendingComponent: () => (<PageLoader variant="list" rows={6} className="max-w-7xl w-full mx-auto py-2" />)
 });
 
 function RouteComponent() {
     const params = Route.useSearch();
-    const { data: initialData } = useQuery(ordersQuery(params));
+    const { data: initialData, isPending } = useQuery(ordersQuery(params));
     const { updateQuery } = useUpdateQuery(200);
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedOrders, Order>({
@@ -39,6 +38,10 @@ function RouteComponent() {
         getNextCursor: (page) => page.next_cursor,
         initialData: initialData,
     });
+
+    if (isPending){
+        return <AdminPageLoading />
+    }
 
     return (
         <div className="px-4 md:px-10 py-2">

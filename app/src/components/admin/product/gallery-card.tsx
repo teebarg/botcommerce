@@ -70,8 +70,8 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
 
             {selectionMode && (
                 <div className={cn(
-                    "absolute top-2 right-2 w-5 h-5 rounded-full border flex items-center justify-center transition-all z-10 shadow-sm pointer-events-none",
-                    isSelected ? "bg-primary border-primary scale-100" : "bg-white/90 border-neutral-300 scale-95"
+                    "absolute top-2 right-2 w-5 h-5 rounded-full border flex items-center justify-center z-10 shadow-sm pointer-events-none",
+                    isSelected ? "bg-primary border-primary" : "bg-white/90 border-neutral-300"
                 )}>
                     {isSelected && (
                         <svg className="w-3 h-3 text-primary-foreground" viewBox="0 0 12 12" fill="none">
