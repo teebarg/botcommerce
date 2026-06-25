@@ -6,7 +6,7 @@ import { ShopPayments } from "@/components/admin/settings/shop-payments";
 import DeliveryOverview from "@/components/admin/delivery/delivery-overview";
 import { useQuery } from "@tanstack/react-query";
 import { useSettingsQuery } from "@/hooks/useGeneric";
-import AdminPageLoading from "@/components/admin/admin-loader";
+import { PageLoader } from "@/components/generic/page-loader";
 
 export const Route = createFileRoute("/_adminLayout/admin/settings")({
     loader: async ({ context }) => {
@@ -29,7 +29,7 @@ function RouteComponent() {
                     <TabsTrigger value="delivery">Delivery</TabsTrigger>
                 </TabsList>
                 <TabsContent value="shop-details">
-                    {isPending ? (<AdminPageLoading />) : (<ShopDetails settings={settings || []} />)}
+                    {isPending ? (<PageLoader variant="list" />) : (<ShopDetails settings={settings || []} />)}
                 </TabsContent>
                 <TabsContent value="details">
                     <FeatureToggles toggles={settings || []} />

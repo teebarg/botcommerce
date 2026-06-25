@@ -12,7 +12,6 @@ export const Route = createFileRoute("/payment/verify")({
     }),
     loaderDeps: ({ search: { reference } }) => ({ reference }),
     component: RouteComponent,
-    pendingComponent: PaymentLoading,
 });
 
 function RouteComponent() {

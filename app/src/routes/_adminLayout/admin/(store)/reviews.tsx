@@ -4,7 +4,6 @@ import type { PaginatedReview, Review } from "@/schemas";
 import { Input } from "@/components/ui/input";
 import ReviewItem from "@/components/admin/reviews/review-item";
 import z from "zod";
-import { useQuery } from "@tanstack/react-query";
 import { api } from "@/utils/api";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
@@ -29,14 +28,12 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/reviews")({
 function RouteComponent() {
     const params = Route.useSearch();
     const { updateQuery } = useUpdateQuery(200);
-    const { data: initialData, isPending } = useQuery(reviewsQuery(params));
 
-    const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedReview, Review>({
+    const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedReview, Review>({
         queryKey: ["reviews", "infinite", params],
         queryFn: (cursor) => api.get<PaginatedReview>("/reviews/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
-        initialData: initialData,
     });
 
     return (

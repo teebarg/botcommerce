@@ -36,7 +36,7 @@ export default function NotFound({
     eyebrow = "Error 404",
     title = "Page not found",
     description = "The page you're looking for doesn't exist or has been moved.",
-    showSearch = true,
+    showSearch = false,
     primaryAction = { label: "Go to homepage", to: "/" },
     showBackButton = true,
     quickLinks = DEFAULT_LINKS,

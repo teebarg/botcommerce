@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import ServerError from "@/components/generic/server-error";
-import EmptyCartMessage from "@/components/store/cart/empty-message";
 import { CartComponent } from "@/components/store/cart/cart-component";
 import CheckoutSummary from "@/components/store/checkout/checkout-summary";
 import { useCart } from "@/providers/cart-provider";
@@ -12,6 +11,9 @@ import { useEffect } from "react";
 import { gtag } from "@/utils/gtag";
 import { SignInRedirect } from "@/utils/reuseable";
 import { PageLoader } from "@/components/generic/page-loader";
+import EmptyState from "@/components/generic/empty";
+import { BtnLink } from "@/components/ui/btnLink";
+import { ShoppingCart } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({
     beforeLoad: ({ context }) => {
@@ -81,7 +83,16 @@ function RouteComponent() {
             {isLoading ? (
                 <PageLoader variant="detail" className="px-4 py-4" />
             ) : !cart ? (
-                <EmptyCartMessage />
+                <EmptyState
+                    title="Your cart is empty"
+                    description="Continue shopping to explore more."
+                    action={
+                        <BtnLink className="mt-4 rounded-full text-sm" href="/collections">
+                            Continue Shopping
+                        </BtnLink>
+                    }
+                    icon={ShoppingCart}
+                />
             ) : (
                 <main className="flex overflow-hidden h-sc">
                     <CheckoutFlow cart={cart} />

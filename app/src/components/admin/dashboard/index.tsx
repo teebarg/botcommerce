@@ -21,7 +21,7 @@ const RecentOrdersList = ({ orders, isLoading }: { orders: Order[], isLoading: b
     }
 
     return (
-        <div className="px-4 md:px-10 py-2">
+        <div className="py-2">
             <div className="flex justify-between items-center">
                 <h3 className="text-lg font-medium font-display">Recent Orders</h3>
                 <Link className="text-sm font-medium text-accent" to="/admin/orders">

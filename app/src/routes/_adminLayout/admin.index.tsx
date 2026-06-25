@@ -18,7 +18,7 @@ function RouteComponent() {
     const { data: statsTrends, isPending } = useQuery(statsTrendsQuery());
 
     return (
-        <div className="py-2.5 space-y-3 slide-in">
+        <div className="px-2.5 max-w-7xl space-y-2 slide-in">
             <StatComponent summary={statsTrends?.summary} isPending={isPending} />
             <RecentOrdersList orders={paginatedOrders?.items || []} isLoading={isLoading} />
         </div>

@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/categories")({
 function RouteComponent() {
     const { data, error, isPending } = useCategories();
 
-    if (error) return <ServerError />;
+    if (error) return <ServerError error={error.message} stack={error.stack} scenario="admin categories" />;
 
     return (
         <CategoryTree data={data} isPending={isPending} />

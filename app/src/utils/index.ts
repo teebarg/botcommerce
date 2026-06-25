@@ -117,7 +117,10 @@ const generateId = (prefix: string = "cart_", length: number = 25): string => {
 };
 
 // Helper function to format timestamps into "time ago"
-const timeAgo = (timestamp: string) => {
+const timeAgo = (timestamp: string | undefined) => {
+    if (!timestamp) {
+        return
+    }
     const now = new Date();
     const activityDate = new Date(timestamp);
     const diff = Math.floor((now.getTime() - activityDate.getTime()) / 1000);

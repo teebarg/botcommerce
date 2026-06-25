@@ -1,7 +1,6 @@
 import type React from "react";
 import { useOverlayTriggerState } from "react-stately";
-import { Edit, Trash2 } from "lucide-react";
-import { Eye } from "lucide-react";
+import { Edit, Trash2, Eye } from "lucide-react";
 import { CatalogForm } from "./catalog-form";
 import { Button } from "@/components/ui/button";
 import { useDeleteCatalog } from "@/hooks/useCollection";
@@ -21,22 +20,30 @@ const CatalogActions: React.FC<Props> = ({ item }) => {
     const deleteMutation = useDeleteCatalog();
 
     const onConfirmDelete = async () => {
-        deleteMutation.mutateAsync(item.id).then(() => {
-            deleteState.close();
-        });
+        deleteMutation.mutateAsync(item.id).then(() => deleteState.close());
     };
 
     return (
-        <div className="relative flex items-center justify-end gap-2 mt-4">
-            <Button className="bg-primary/10" size="icon" variant="ghost" onClick={() => navigate({ to: `/catalog/${item.slug}` })}>
-                <Eye className="h-5 w-5 text-primary" />
+        <div className="flex items-center gap-1">
+            <Button
+                size="icon"
+                variant="ghost"
+                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                onClick={() => navigate({ to: `/catalog/${item.slug}` })}
+            >
+                <Eye className="h-3.5 w-3.5" />
             </Button>
             <SheetDrawer
                 open={editState.isOpen}
-                title="Edit Catalog"
+                title="Edit catalog"
                 trigger={
-                    <Button className="bg-accent/10" variant="ghost" size="icon">
-                        <Edit className="h-5 w-5 text-accent" />
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                        onClick={editState.open}
+                    >
+                        <Edit className="h-3.5 w-3.5" />
                     </Button>
                 }
                 onOpenChange={editState.setOpen}
@@ -47,9 +54,12 @@ const CatalogActions: React.FC<Props> = ({ item }) => {
                 open={deleteState.isOpen}
                 onOpenChange={deleteState.setOpen}
                 trigger={
-                    <Button variant="destructive">
-                        <Trash2 className="h-5 w-5 mr-1" />
-                        Delete
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                    >
+                        <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                 }
                 onClose={deleteState.close}

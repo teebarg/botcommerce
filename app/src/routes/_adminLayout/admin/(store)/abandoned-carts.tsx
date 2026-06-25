@@ -36,14 +36,12 @@ function RouteComponent() {
     const { mutate: sendReminders, isPending: sendRemindersLoading } = useSendCartReminders();
 
     const { data: stats, isLoading } = useQuery(abandonedCartStatsQuery(params.time || "24"));
-    const { data, isPending } = useQuery(abandonedCartsQuery({ hours_threshold: params.time || "24" }));
 
-    const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedAbandonedCarts, Cart>({
+    const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedAbandonedCarts, Cart>({
         queryKey: ["abandoned-carts", "infinite", params],
         queryFn: (cursor) => api.get<PaginatedAbandonedCarts>("/cart/abandoned-carts", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
-        initialData: data,
     });
 
     return (
@@ -96,7 +94,7 @@ function RouteComponent() {
                 {stats && <AbandonedCartStats stat={stats} isLoading={isLoading} />}
                 <div className="mt-4 space-y-4">
                     {isPending ? (
-                        <PageLoader variant="list" rows={6} />
+                        <PageLoader variant="list" />
                     ) : items.length > 0 ? (
                         <InfiniteResourceList
                             items={items}

@@ -28,7 +28,6 @@ export const Route = createFileRoute("/_mainLayout/order/confirmed/$id")({
                     eyebrow="Order unavailable"
                     title="Order not found"
                     description="This order may have expired or does not exist."
-                    showSearch={false}
                     primaryAction={{ label: "View your orders", to: "/account/orders" }}
                     quickLinks={[
                         { to: "/account/orders", label: "My orders" },

@@ -5,7 +5,6 @@ import CustomerCreateGuest from "@/components/admin/customers/customer-create-gu
 import CustomerFilter from "@/components/admin/customers/customer-filter";
 import CustomerCard from "@/components/admin/customers/customer-card";
 import z from "zod";
-import { useQuery } from "@tanstack/react-query";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { usersQuery } from "@/queries/admin.queries";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
@@ -35,14 +34,11 @@ function RouteComponent() {
     const { updateQuery } = useUpdateQuery(200);
     const [filterOpen, setFilterOpen] = useState<boolean>(false);
 
-    const { data: initialUsers, isPending } = useQuery(usersQuery(params));
-
-    const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedUsers, User>({
+    const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedUsers, User>({
         queryKey: ["users", "infinite", params],
         queryFn: (cursor) => api.get<PaginatedUsers>("/users/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
-        initialData: initialUsers,
     });
 
     return (

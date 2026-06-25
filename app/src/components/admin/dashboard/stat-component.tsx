@@ -12,6 +12,10 @@ const StatComponent = ({ summary, isPending }: { summary?: any, isPending: boole
         };
     };
 
+    if (isPending) {
+        return <PageLoader variant="card" />
+    }
+
     if (!summary) {
         return (
             <EmptyState
@@ -22,14 +26,9 @@ const StatComponent = ({ summary, isPending }: { summary?: any, isPending: boole
         );
     }
 
-    if (isPending) {
-        return <PageLoader variant="card" />
-    }
-
     return (
-        <div className="px-4 md:px-10">
+        <div className="py-2">
             <h2 className="text-lg font-medium">Store Overview</h2>
-
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 <StatCard
                     icon={<DollarSign size={20} />}

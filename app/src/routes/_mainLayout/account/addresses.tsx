@@ -4,7 +4,6 @@ import { useOverlayTriggerState } from "react-stately";
 import { Edit3, Home, HomeIcon, Plus, Trash2 } from "lucide-react";
 import type { Address } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/utils";
 import { useDeleteAddress } from "@/hooks/useAddress";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import SheetDrawer from "@/components/sheet-drawer";
@@ -20,7 +19,7 @@ type AddressItemProps = {
     index: number;
 };
 
-const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false }) => {
+const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = true }) => {
     const editState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
     const deleteAddress = useDeleteAddress();
@@ -30,10 +29,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = false }) 
     };
 
     return (
-        <div className={cn(
-            "rounded-2xl border overflow-hidden",
-            isActive ? "border-primary/40 bg-primary/[0.02]" : "bg-card border-border"
-        )}>
+        <div className="rounded-2xl border overflow-hidden bg-card border-border">
             <div className="px-5 pt-5 pb-4">
                 <div className="flex items-center justify-between mb-3">
                     <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground">

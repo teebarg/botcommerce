@@ -16,7 +16,13 @@ const ServerError: React.FC<{ error?: string; scenario?: string; stack?: string 
         }
     }, [error]);
 
-    return <NotFound />;
+    return (
+        <NotFound 
+            eyebrow={error || "An error occurred"} 
+            title={error || "An error occurred"} 
+            description={stack || "Please contact administrator."} 
+        />
+    );
 };
 
 export default ServerError;

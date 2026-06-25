@@ -310,7 +310,7 @@
 
 @layer utilities {
     .slide-in {
-        @apply animate-in slide-in-from-left-50 duration-300
+        @apply animate-in slide-in-from-bottom-50 duration-300
     }
     .glass {
         @apply bg-white/10 border border-white/15 shadow-sm;
