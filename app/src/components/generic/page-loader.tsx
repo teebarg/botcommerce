@@ -73,7 +73,7 @@ function ListLoader({ rows = 6 }: { rows?: number }) {
     );
 }
 
-function GridLoader({ rows = 2 }: { rows?: number }) {
+function GridLoader({ rows = 4 }: { rows?: number }) {
     const count = 2 * rows;
     return (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">

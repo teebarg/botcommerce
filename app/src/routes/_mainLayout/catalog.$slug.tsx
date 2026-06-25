@@ -47,7 +47,11 @@ export const Route = createFileRoute("/_mainLayout/catalog/$slug")({
         };
     },
     component: RouteComponent,
-    pendingComponent: () => (<PageLoader variant="grid" rows={6} className="py-2" />)
+    pendingComponent: () => (
+        <div className="px-2">
+            <PageLoader variant="grid" />
+        </div>
+    )
 });
 
 function RouteComponent() {

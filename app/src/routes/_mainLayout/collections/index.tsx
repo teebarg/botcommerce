@@ -28,7 +28,7 @@ function RouteComponent() {
     const search = Route.useSearch();
     const { data, isLoading } = useQuery(productFeedQuery(search));
 
-    if (isLoading) return <PageLoader variant="grid" rows={6} className="py-2" />
+    if (isLoading) return <PageLoader variant="grid" />
 
     return <InfiniteFeed initialData={data} params={{ ...search }} />
 }

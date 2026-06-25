@@ -32,7 +32,7 @@ function RouteComponent() {
         <div className="max-w-6xl mx-auto py-6 px-2">
             <h1 className="text-xl font-semibold text-center mb-4">Your Wishlist</h1>
             {isPending ? (
-                <PageLoader variant="grid" rows={6} className="py-2" />
+                <PageLoader variant="grid" />
             ) : data?.wishlists && data.wishlists.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mt-6">
                     {data.wishlists.map((item: WishItem, idx: number) => (

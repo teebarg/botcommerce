@@ -103,7 +103,7 @@ const CategoryTree: React.FC<Props> = ({ data, isPending }) => {
                     </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-2">
                     <div className="sticky top-16 z-10 bg-background space-y-2">
                         {hasChanges && (
                             <div className="flex items-center justify-between gap-4 bg-warning-subtle border border-warning/20 rounded-xl px-4 py-2.5">
@@ -123,11 +123,17 @@ const CategoryTree: React.FC<Props> = ({ data, isPending }) => {
                         )}
                     </div>
                     {isPending ? (
-                        <PageLoader variant="list" rows={6} />
-                    ) : categories.length > 0 ? categories.map((category: Category, idx: number) => (
+                        <PageLoader variant="list" />
+                    ) : categories.length == 0 ? (
+                        <EmptyState
+                            title="No categories yet"
+                            description="Start organizing your products by creating your first category."
+                            icon={FileImage}
+                        />
+                    ) : categories.map((category: Category, idx: number) => (
                         <div
                             key={idx}
-                            className="bg-card flex items-center gap-4 py-4 px-2 rounded-2xl shadow-sm"
+                            className="bg-card flex items-center gap-4 py-4 px-2 rounded-xl"
                         >
                             <CategoryImage categoryId={category.id} image={category.image} />
                             <div className="flex-1 min-w-0 flex justify-between gap-4">
@@ -145,13 +151,7 @@ const CategoryTree: React.FC<Props> = ({ data, isPending }) => {
                                 />
                             </div>
                         </div>
-                    )) : (
-                        <EmptyState
-                            title="No categories yet"
-                            description="Start organizing your products by creating your first category."
-                            icon={FileImage}
-                        />
-                    )}
+                    ))}
                 </div>
             </div>
         </React.Fragment>
