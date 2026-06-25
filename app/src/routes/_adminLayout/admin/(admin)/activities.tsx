@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ActivityItem } from "@/components/generic/activities/ActivityItem";
-import { useQuery } from "@tanstack/react-query";
 import type { Activity, PaginatedActivities } from "@/schemas";
 import { ActivityIcon } from "lucide-react";
 import { activitiesQuery } from "@/queries/admin.queries";
@@ -18,13 +17,11 @@ export const Route = createFileRoute("/_adminLayout/admin/(admin)/activities")({
 });
 
 function RouteComponent() {
-    const { data, isPending } = useQuery(activitiesQuery());
-    const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedActivities, Activity>({
+    const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedActivities, Activity>({
         queryKey: ["activities", "infinite"],
         queryFn: (cursor) => api.get<PaginatedActivities>("/activities/", { params: { cursor } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
-        initialData: data,
     });
 
     return (

@@ -10,7 +10,6 @@ import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
 import type { PaginatedProductImages, ProductImage } from "@/schemas";
 import { useWebSocket } from "pulsews";
-import { useQuery } from "@tanstack/react-query";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { queryOptions } from "@tanstack/react-query";
@@ -18,7 +17,6 @@ import { z } from "zod";
 import { api } from "@/utils/api";
 import { PageLoader } from "@/components/generic/page-loader";
 import EmptyState from "@/components/generic/empty";
-import AdminPageLoading from "@/components/admin/admin-loader";
 
 const galleryQuery = (params?: object) =>
     queryOptions({
@@ -39,12 +37,10 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/gallery")({
         queryClient.prefetchQuery(galleryQuery(deps));
     },
     component: RouteComponent,
-    pendingComponent: () => (<PageLoader variant="grid" rows={6} className="max-w-7xl w-full mx-auto py-2" />)
 });
 
 function RouteComponent() {
     const params = Route.useSearch();
-    const { data, isPending } = useQuery(galleryQuery(params));
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
@@ -53,12 +49,11 @@ function RouteComponent() {
     const { mutateAsync: bulkDeleteImages, isPending: isDeleting } = useBulkDeleteGalleryImages();
     const BULK_ACTION_TOAST_ID = "bulk-action-toast";
 
-    const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedProductImages, ProductImage>({
+    const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedProductImages, ProductImage>({
         queryKey: ["gallery", "infinite", params],
         queryFn: (cursor) => api.get<PaginatedProductImages>("/gallery/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
-        initialData: data,
     });
 
     const selectedProductIds = useMemo(() => {
@@ -175,7 +170,7 @@ function RouteComponent() {
                     </div>
                 </div>
                 {isPending ? (
-                    <AdminPageLoading />
+                    <PageLoader variant="grid" />
                 ) : items.length > 0 ? (
                     <InfiniteResourceList
                         className={cn(
@@ -195,7 +190,7 @@ function RouteComponent() {
                                 onSelectionChange={handleSelectionChange}
                             />
                         )}
-                        loader={<PageLoader variant="grid" rows={4} className="max-w-7xl w-full mx-auto py-2" />}
+                        loader={<PageLoader variant="grid" />}
                     />
                 ) : (
                     <EmptyState title="No images found" description="Please upload images" />

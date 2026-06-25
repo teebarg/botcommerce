@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import React from "react";
-import { Tag } from "lucide-react";
+import { ShoppingCart, Tag } from "lucide-react";
 import ServerError from "@/components/generic/server-error";
 import type { CartItem } from "@/schemas";
 import { useCart } from "@/providers/cart-provider";
-import EmptyCartMessage from "@/components/store/cart/empty-message";
 import { PageLoader } from "@/components/generic/page-loader";
 import CartSummary from "@/components/store/cart/cart-summary";
 import CartItemComponent from "@/components/store/cart/cart-item";
+import EmptyState from "@/components/generic/empty";
+import { BtnLink } from "@/components/ui/btnLink";
 
 export const Route = createFileRoute("/_mainLayout/cart")({
     head: () => ({
@@ -34,15 +35,26 @@ function PromoBanner() {
 function RouteComponent() {
     const { cart, isLoading, error } = useCart();
 
-    if (isLoading) return <PageLoader variant="cart" className="max-w-2xl lg:max-w-5xl mx-auto px-4 py-6 md:py-12 w-full" />;
-    if (error) return <ServerError />;
-    if (!cart) return <div className="py-24"><EmptyCartMessage /></div>;
+    if (isLoading) return <PageLoader variant="cart" className="max-w-5xl mx-auto px-4 py-6" />;
+    if (error) return <ServerError stack={error} scenario="cart page" />;
+    if (!cart) {
+        return <EmptyState
+            title="Your cart is empty"
+            description="Continue shopping to explore more."
+            action={
+                <BtnLink className="mt-4 rounded-full text-sm" href="/collections">
+                    Continue Shopping
+                </BtnLink>
+            }
+            icon={ShoppingCart}
+        />
+    }
 
     const itemCount = cart.items.reduce((acc: number, item: CartItem) => acc + item.quantity, 0);
 
     return (
         <React.Fragment>
-            <div className="max-w-2xl lg:max-w-5xl mx-auto px-4 py-6 md:py-12 w-full">
+            <div className="max-w-5xl mx-auto px-4 py-6">
                 <PromoBanner />
                 <div className="flex flex-col lg:flex-row lg:items-start gap-6">
                     <div className="flex-1 min-w-0">

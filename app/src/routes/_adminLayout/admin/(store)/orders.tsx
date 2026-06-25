@@ -6,12 +6,11 @@ import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import OrderFilters from "@/components/admin/orders/order-filters";
 import z from "zod";
 import { ordersQuery } from "@/queries/user.queries";
-import { useQuery } from "@tanstack/react-query";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { api } from "@/utils/api";
-import AdminPageLoading from "@/components/admin/admin-loader";
 import EmptyState from "@/components/generic/empty";
+import { PageLoader } from "@/components/generic/page-loader";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/orders")({
     validateSearch: z.object({
@@ -29,20 +28,18 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/orders")({
 
 function RouteComponent() {
     const params = Route.useSearch();
-    const { data: initialData, isPending } = useQuery(ordersQuery(params));
     const { updateQuery } = useUpdateQuery(200);
 
-    const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedOrders, Order>({
+    const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedOrders, Order>({
         queryKey: ["orders", "infinite", params],
         queryFn: (cursor) => api.get<PaginatedOrders>("/order/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
-        initialData: initialData,
     });
 
     return (
-        <div className="px-4 md:px-10 py-2">
-            <div className="mb-6 flex flex-col">
+        <div className="px-4 py-2">
+            <div className="mb-6">
                 <h1 className="text-xl font-medium">Order view</h1>
                 <p className="text-muted-foreground text-sm">Manage your orders.</p>
             </div>
@@ -62,7 +59,7 @@ function RouteComponent() {
                 <OrderFilters />
                 <div className="mt-4">
                     {isPending ? (
-                        <AdminPageLoading />
+                        <PageLoader variant="list" />
                     ) : items.length > 0 ? (
                         <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
                             <InfiniteResourceList

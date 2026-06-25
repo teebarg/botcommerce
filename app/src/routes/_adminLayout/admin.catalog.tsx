@@ -23,8 +23,8 @@ function RouteComponent() {
 
     return (
         <div className="px-3 py-2 slide-in">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Catalogs</h1>
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-xl font-semibold">Catalogs</h1>
                 <SheetDrawer
                     open={state.isOpen}
                     title="Add New Catalog"
@@ -53,7 +53,7 @@ function RouteComponent() {
                     }
                 />
             ) : (
-                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
                     {data?.catalogs?.map((col: DBCatalog, idx: number) => (
                         <CatalogCard key={idx} catalog={col} />
                     ))}

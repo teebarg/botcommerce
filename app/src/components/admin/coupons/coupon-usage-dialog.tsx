@@ -1,14 +1,11 @@
 import { useState } from "react";
 import { History } from "lucide-react";
-
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Card, CardContent } from "@/components/ui/card";
 import type { CouponUsage } from "@/schemas/common";
 import { currency, formatDate } from "@/utils";
+import { Separator } from "@/components/ui/separator";
 
 interface CouponUsageDialogProps {
     couponCode: string;
@@ -17,99 +14,80 @@ interface CouponUsageDialogProps {
     assignedUserIds?: number[];
 }
 
-export const CouponUsageDialog = ({ couponCode, usageHistory, couponType, assignedUserIds }: CouponUsageDialogProps) => {
+
+export const CouponUsageDialog = ({ couponCode, usageHistory }: CouponUsageDialogProps) => {
     const [open, setOpen] = useState(false);
     const totalDiscountGiven = usageHistory.reduce((total, usage) => total + usage.discount_amount, 0);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="w-full sm:w-auto" size="sm" variant="accent-subtle">
-                    <History className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline">Usage History ({usageHistory.length})</span>
-                    <span className="sm:hidden">History ({usageHistory.length})</span>
+                <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 text-xs text-muted-foreground hover:text-foreground hover:bg-muted gap-1.5"
+                >
+                    <History className="h-3.5 w-3.5" />
+                    History ({usageHistory.length})
                 </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-4xl w-[95vw] sm:w-full max-h-[85vh] overflow-y-auto">
-                <DialogHeader>
-                    <DialogTitle className="text-lg md:text-xl">Usage History: {couponCode}</DialogTitle>
-                    <DialogDescription className="text-sm">Track who used this coupon and when</DialogDescription>
+
+            <DialogContent className="max-w-lg w-[95vw] sm:w-full max-h-[75vh] flex flex-col gap-0 p-0 overflow-hidden">
+
+                <DialogHeader className="px-6 pt-6 pb-5 shrink-0">
+                    <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-1">
+                        Coupon
+                    </p>
+                    <DialogTitle className="text-base font-medium mb-4">
+                        {couponCode}
+                    </DialogTitle>
+
+                    <div className="grid grid-cols-2 gap-2.5">
+                        <div className="bg-muted/60 rounded-xl px-4 py-2.5">
+                            <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-1">
+                                Total uses
+                            </p>
+                            <p className="text-2xl font-medium">{usageHistory.length}</p>
+                        </div>
+                        <div className="bg-muted/60 rounded-xl px-4 py-2.5">
+                            <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-1">
+                                Discount given
+                            </p>
+                            <p className="text-2xl font-medium">{currency(totalDiscountGiven)}</p>
+                        </div>
+                    </div>
                 </DialogHeader>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 p-3 md:p-4 rounded-lg bg-muted/50">
-                    <div>
-                        <p className="text-xs md:text-sm text-muted-foreground">Total Uses</p>
-                        <p className="text-xl md:text-2xl font-bold">{usageHistory.length}</p>
-                    </div>
-                    <div>
-                        <p className="text-xs md:text-sm text-muted-foreground">Total Discount Given</p>
-                        <p className="text-xl md:text-2xl font-bold text-destructive">{currency(totalDiscountGiven)}</p>
-                    </div>
-                </div>
+                <Separator />
 
                 {usageHistory.length === 0 ? (
-                    <div className="text-center py-12">
-                        <History className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                        <p className="text-muted-foreground">No usage history yet</p>
-                        <p className="text-sm text-muted-foreground mt-1">This coupon hasn't been used by anyone</p>
+                    <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+                        <History className="h-8 w-8 text-muted-foreground/30 mb-3" />
+                        <p className="text-sm font-medium mb-1">No usage yet</p>
+                        <p className="text-xs text-muted-foreground">
+                            This coupon hasn't been used by anyone.
+                        </p>
                     </div>
                 ) : (
-                    <>
-                        <div className="hidden md:block">
-                            <ScrollArea className="h-[400px] rounded-md border">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>User</TableHead>
-                                            <TableHead>Email</TableHead>
-                                            <TableHead>Date Used</TableHead>
-                                            <TableHead className="text-right">Discount Applied</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {usageHistory.map((record: CouponUsage) => (
-                                            <TableRow key={record.id}>
-                                                <TableCell className="font-medium">{record.name}</TableCell>
-                                                <TableCell className="text-muted-foreground">{record.email}</TableCell>
-                                                <TableCell>
-                                                    <div className="flex flex-col">
-                                                        <span>{formatDate(record.created_at)}</span>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    <Badge variant="destructive">-{currency(record.discount_amount)}</Badge>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </ScrollArea>
+                    <ScrollArea className="flex-1 overflow-y-auto">
+                        <div className="px-6">
+                            {usageHistory.map((record, i) => (
+                                <div key={record.id}>
+                                    <div className="py-4 flex items-center justify-between gap-4">
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-medium truncate">{record.name}</p>
+                                            <p className="text-xs text-muted-foreground truncate">{record.email}</p>
+                                        </div>
+                                        <div className="text-right shrink-0">
+                                            <p className="text-sm font-medium">−{currency(record.discount_amount)}</p>
+                                            <p className="text-xs text-muted-foreground">{formatDate(record.created_at)}</p>
+                                        </div>
+                                    </div>
+                                    {i < usageHistory.length - 1 && <Separator />}
+                                </div>
+                            ))}
                         </div>
-
-                        <ScrollArea className="md:hidden h-[400px]">
-                            <div className="space-y-3">
-                                {usageHistory.map((record: CouponUsage) => (
-                                    <Card key={record.id}>
-                                        <CardContent className="p-4 space-y-2">
-                                            <div className="flex justify-between items-start">
-                                                <div>
-                                                    <p className="font-medium">{record.name}</p>
-                                                    <p className="text-xs text-muted-foreground">{record.email}</p>
-                                                </div>
-                                                <Badge variant="destructive">-{currency(record.discount_amount)}</Badge>
-                                            </div>
-                                            <div className="flex justify-between text-sm">
-                                                <div>
-                                                    <p className="text-muted-foreground text-xs">Date</p>
-                                                    <p>{formatDate(record.created_at)}</p>
-                                                </div>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
-                        </ScrollArea>
-                    </>
+                    </ScrollArea>
                 )}
             </DialogContent>
         </Dialog>

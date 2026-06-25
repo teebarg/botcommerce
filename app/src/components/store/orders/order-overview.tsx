@@ -1,4 +1,4 @@
-import { CheckCircle, Package, Calendar, Clock, RefreshCw, X, Truck } from "lucide-react";
+import { CheckCircle, Package, Clock, RefreshCw, X, Truck } from "lucide-react";
 import { Order, OrderStatus } from "@/schemas";
 import { formatDate } from "@/utils";
 

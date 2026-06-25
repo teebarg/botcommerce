@@ -1,4 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { LockKeyhole } from 'lucide-react';
+import { useConfig } from "@/providers/store-provider";
 
 export const Route = createFileRoute("/forbidden")({
     component: RouteComponent,
@@ -6,16 +8,13 @@ export const Route = createFileRoute("/forbidden")({
 
 function RouteComponent() {
     const navigate = useNavigate();
+    const { shop_email } = useConfig();
 
     return (
         <div className="min-h-screen bg-background flex items-center justify-center px-4">
             <div className="bg-card rounded-2xl shadow-sm p-10 max-w-md w-full text-center">
-                <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <rect x="5" y="11" width="14" height="10" rx="2" />
-                        <path strokeLinecap="round" d="M8 11V7a4 4 0 0 1 8 0v4" />
-                        <circle cx="12" cy="16" r="1.5" fill="currentColor" stroke="none" />
-                    </svg>
+                <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <LockKeyhole className="w-7 h-7 text-red-600" />
                 </div>
                 <span className="inline-block bg-red-50 text-red-700 text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
                     403 Forbidden
@@ -43,21 +42,21 @@ function RouteComponent() {
                 <div className="flex gap-2">
                     <button
                         onClick={() => navigate({ to: "/" })}
-                        className="flex-1 py-2.5 text-sm rounded-xl border border-gray-200 text-muted-foreground hover:bg-gray-50 transition-colors"
+                        className="flex-1 py-2.5 text-sm rounded-xl border border-border"
                     >
                         Go back
                     </button>
                     <button
                         onClick={() => navigate({ to: "/collections" })}
-                        className="flex-1 py-2.5 text-sm rounded-xl bg-gray-900 text-white font-medium hover:bg-gray-700 transition-colors"
+                        className="flex-1 py-2.5 text-sm rounded-xl bg-gray-900 text-white font-medium"
                     >
                         Go to store
                     </button>
                 </div>
 
-                <p className="text-xs text-gray-400 mt-5">
+                <p className="text-xs text-muted-foreground mt-5">
                     Need access?{" "}
-                    <a href="mailto:admin@yourstore.com" className="underline underline-offset-2">
+                    <a href={`mailto:${shop_email}`} className="underline underline-offset-2">
                         Contact an admin
                     </a>
                 </p>

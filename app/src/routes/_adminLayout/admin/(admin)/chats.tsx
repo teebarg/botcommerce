@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import ChatsCard from "@/components/admin/chats/chats-card";
 import { ConversationStatusSchema, type Chat, type PaginatedChats } from "@/schemas";
-import { useQuery } from "@tanstack/react-query";
 import z from "zod";
 import { chatsQuery } from "@/queries/admin.queries";
 import { api } from "@/utils/api";
@@ -24,14 +23,12 @@ export const Route = createFileRoute("/_adminLayout/admin/(admin)/chats")({
 
 function RouteComponent() {
     const params = Route.useSearch();
-    const { data, isPending } = useQuery(chatsQuery(params));
 
-    const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedChats, Chat>({
+    const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedChats, Chat>({
         queryKey: ["chats", "infinite", params],
         queryFn: (cursor) => api.get<PaginatedChats>("/chat/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
-        initialData: data,
     });
 
     return (

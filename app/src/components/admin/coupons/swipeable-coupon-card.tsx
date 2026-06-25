@@ -65,7 +65,7 @@ export const SwipeableCouponCard = ({ coupon, onCopy, onToggleStatus, onDelete }
 
             <div
                 {...handlers}
-                className="relative bg-background"
+                className="relative bg-card"
                 style={{
                     transform: `translateX(${swipeOffset}px)`,
                     transition: isSwiping ? "none" : "transform 0.3s ease-out",

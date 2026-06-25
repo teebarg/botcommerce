@@ -1,7 +1,6 @@
 import AccountNav from "@/components/layout/account-nav";
 import { SignInRedirect } from "@/utils/reuseable";
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
-import { AnimatePresence, motion } from "framer-motion";
 import { Box, Gift, MapPin, Package, User } from "lucide-react";
 
 export const Route = createFileRoute("/_mainLayout/account")({
@@ -81,26 +80,9 @@ function RouteComponent() {
                 <div className="md:w-60 hidden md:block">
                     <div className="md:sticky md:top-16">{isAuthenticated && <AccountNav />}</div>
                 </div>
-                <AnimatePresence mode="wait" custom={0}>
-                    <motion.div
-                        custom={0}
-                        variants={{
-                            enter: { opacity: 0, x: -300 },
-                            exit: { opacity: 0, x: 300 },
-                            center: { opacity: 1, x: 0 },
-                        }}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        transition={{
-                            x: { type: "spring", stiffness: 300, damping: 30 },
-                            opacity: { duration: 0.2 },
-                        }}
-                        className="flex-1"
-                    >
-                        <Outlet />
-                    </motion.div>
-                </AnimatePresence>
+                <div className="flex-1">
+                    <Outlet />
+                </div>
             </div>
         </div>
     );
