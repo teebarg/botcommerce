@@ -1,7 +1,6 @@
 import React from "react";
 import type { CheckoutStep } from "./checkout-flow";
 import { cn } from "@/utils";
-import { motion } from "framer-motion";
 
 interface CheckoutStepIndicatorProps {
     currentStep: CheckoutStep;
@@ -20,18 +19,13 @@ const CheckoutStepIndicator: React.FC<CheckoutStepIndicatorProps> = ({ currentSt
                     const isActive = currentStep === step;
                     const isClickable = isCompleted || isActive;
                     return (
-                        <motion.div
+                        <div
                             key={idx}
                             className={cn(
                                 "h-1 flex-1 rounded-full transition-colors duration-300",
                                 isClickable ? "cursor-pointer" : "opacity-50 cursor-not-allowed",
                                 isCompleted ? "bg-accent" : "bg-secondary"
                             )}
-                            initial={false}
-                            animate={{
-                                scale: isActive ? [1, 1.1, 1] : 1,
-                            }}
-                            transition={{ duration: 0.3 }}
                             onClick={() => isClickable && onStepClick(step)}
                         />
                     );
