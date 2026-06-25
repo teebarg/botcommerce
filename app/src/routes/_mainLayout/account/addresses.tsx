@@ -8,7 +8,7 @@ import { cn } from "@/utils";
 import { useDeleteAddress } from "@/hooks/useAddress";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import SheetDrawer from "@/components/sheet-drawer";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { userAddressesQuery } from "@/queries/user.queries";
 import AddressForm from "@/components/store/account/address-form";
 import EmptyState from "@/components/generic/empty";
@@ -114,7 +114,7 @@ export const Route = createFileRoute("/_mainLayout/account/addresses")({
 function RouteComponent() {
     const { userId } = useRouteContext({ strict: false });
     const addState = useOverlayTriggerState({});
-    const { data, isPending } = useSuspenseQuery(userAddressesQuery(userId!));
+    const { data, isPending } = useQuery(userAddressesQuery(userId!));
 
     return (
         <div className="w-full px-2 pt-6">

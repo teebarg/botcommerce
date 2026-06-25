@@ -99,7 +99,7 @@ function RouteComponent() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2">
                 <div
                     className="bg-card rounded-2xl p-4 text-center border border-border"
                 >

@@ -3,7 +3,7 @@ import type { Order } from "@/schemas";
 import OrderCard from "@/components/store/orders/order-card";
 import { BtnLink } from "@/components/ui/btnLink";
 import { ordersQuery } from "@/queries/user.queries";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { PageLoader } from "@/components/generic/page-loader";
 import EmptyState from "@/components/generic/empty";
 
@@ -15,10 +15,10 @@ export const Route = createFileRoute("/_mainLayout/account/orders")({
 });
 
 function RouteComponent() {
-    const { data, isPending } = useSuspenseQuery(ordersQuery({ take: 20 }));
+    const { data, isPending } = useQuery(ordersQuery({ take: 20 }));
     return (
         <div className="w-full px-2 pt-6">
-            <div className="mb-8">
+            <div className="mb-4">
                 <h1 className="text-xl">Orders</h1>
                 <p className="text-sm text-muted-foreground">
                     View your previous orders and their status. You can also create returns or exchanges for your orders if needed.
@@ -38,12 +38,12 @@ function RouteComponent() {
                             }
                         />
                     ) : (
-                            <div className="flex flex-col gap-y-8 w-full">
-                                {data?.items?.map((o: Order, idx: number) => (
-                                    <OrderCard key={idx} order={o} />
-                                ))}
-                            </div>
-                        )
+                        <div className="flex flex-col gap-y-2">
+                            {data?.items?.map((o: Order, idx: number) => (
+                                <OrderCard key={idx} order={o} />
+                            ))}
+                        </div>
+                    )
                 }
             </div>
         </div>
