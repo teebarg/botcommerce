@@ -4,42 +4,47 @@ import OrderCard from "@/components/store/orders/order-card";
 import { BtnLink } from "@/components/ui/btnLink";
 import { ordersQuery } from "@/queries/user.queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { PageLoader } from "@/components/generic/page-loader";
+import EmptyState from "@/components/generic/empty";
 
 export const Route = createFileRoute("/_mainLayout/account/orders")({
     loader: async ({ context: { queryClient } }) => {
-        await queryClient.ensureQueryData(ordersQuery({ take: 20 }));
+        queryClient.prefetchQuery(ordersQuery({ take: 20 }));
     },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { data } = useSuspenseQuery(ordersQuery({ take: 20 }));
+    const { data, isPending } = useSuspenseQuery(ordersQuery({ take: 20 }));
     return (
-        <div className="w-full px-2.5 pt-6 slide-in" data-testid="orders-page-wrapper">
+        <div className="w-full px-2 pt-6">
             <div className="mb-8">
-                <h1 className="text-2xl">Orders</h1>
+                <h1 className="text-xl">Orders</h1>
                 <p className="text-sm text-muted-foreground">
                     View your previous orders and their status. You can also create returns or exchanges for your orders if needed.
                 </p>
             </div>
             <div>
-                {data?.items?.length ? (
-                    <div className="flex flex-col gap-y-8 w-full">
-                        {data?.items?.map((o: Order, idx: number) => (
-                            <OrderCard key={idx} order={o} />
-                        ))}
-                    </div>
-                ) : (
-                    <div className="w-full flex flex-col items-center" data-testid="no-orders-container">
-                        <h2 className="text-lg">Nothing to see here</h2>
-                        <p>You don&apos;t have any orders yet, let us change that {":)"}</p>
-                        <div className="mt-8">
-                            <BtnLink data-testid="continue-shopping-button" href="/collections">
-                                Continue shopping
-                            </BtnLink>
-                        </div>
-                    </div>
-                )}
+                {isPending ? (
+                    <PageLoader variant="list" />
+                    ) : data?.items?.length == 0 ? (
+                        <EmptyState
+                            title="Nothing to see here"
+                            description={`You don&apos;t have any orders yet, let us change that`}
+                            action={
+                                <BtnLink href="/collections">
+                                    Continue shopping
+                                </BtnLink>
+                            }
+                        />
+                    ) : (
+                            <div className="flex flex-col gap-y-8 w-full">
+                                {data?.items?.map((o: Order, idx: number) => (
+                                    <OrderCard key={idx} order={o} />
+                                ))}
+                            </div>
+                        )
+                }
             </div>
         </div>
     );

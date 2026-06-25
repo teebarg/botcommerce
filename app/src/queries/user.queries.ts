@@ -4,7 +4,7 @@ import { getMeFn, getMeTrxnFn } from "@/server/users.server";
 import { getCollectionFn, getOrderFn } from "@/server/store.server";
 import { getCatalogFn, getUserAddressesFn } from "@/server/store.server";
 import { api } from "@/utils/api";
-import { FeedQuery, Order, PaginatedOrders, PaginatedReview } from "@/schemas";
+import { FeedQuery, PaginatedOrders, PaginatedReview } from "@/schemas";
 
 type CatalogFeedParams = {
     slug: string;
@@ -51,7 +51,7 @@ export const orderQuery = (orderNumber: string) =>
         queryFn: () => getOrderFn({ data: orderNumber }),
     });
 
-export const ordersQuery = (params: { take?: number; status?: any; start_date?: string; end_date?: string }) =>
+export const ordersQuery = (params?: { take?: number; status?: any; start_date?: string; end_date?: string }) =>
     queryOptions({
         queryKey: ["orders", JSON.stringify(params)],
         queryFn: () => api.get<PaginatedOrders>("/order/", { params }),

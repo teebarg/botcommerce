@@ -1,13 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { cn, currency, formatDate } from "@/utils";
-import { ChevronRight, Clock, Heart, MapPin, Package } from "lucide-react";
+import { ChevronRight, Clock, Heart, Home, MapPin, Package } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import type { Order } from "@/schemas";
 import Overlay from "@/components/overlay";
 import OrderDetails from "@/components/store/orders/order-details";
 import { ordersQuery } from "@/queries/user.queries";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { PageLoader } from "@/components/generic/page-loader";
+import EmptyState from "@/components/generic/empty";
 
 const OrderItem: React.FC<{ order: Order; idx: number }> = ({ order, idx }) => {
     const state = useOverlayTriggerState({});
@@ -55,23 +56,20 @@ const OrderItem: React.FC<{ order: Order; idx: number }> = ({ order, idx }) => {
 
 export const Route = createFileRoute("/_mainLayout/account/")({
     loader: async ({ context: { queryClient } }) => {
-        await queryClient.ensureQueryData(ordersQuery({}));
+        queryClient.prefetchQuery(ordersQuery());
     },
     component: RouteComponent,
-    pendingComponent: () => (<PageLoader variant="account" />)
 });
 
 function RouteComponent() {
     const { session } = Route.useRouteContext();
-    const { data } = useSuspenseQuery(ordersQuery({}));
+    const { data, isPending } = useQuery(ordersQuery());
 
     return (
-        <div className="px-2 md:px-0 pt-6 space-y-6 slide-in">
+        <div className="px-2 md:px-0 pt-6 space-y-6">
             <div className="text-center">
-                <div className="w-20 h-20 mx-auto rounded-full bg-primary mb-4">
-                    <div className="w-full h-full rounded-full bg-background flex items-center justify-center overflow-hidden">
-                        <img src={session?.user?.image} className="object-contain" />
-                    </div>
+                <div className="w-16 h-16 mx-auto rounded-full bg-primary mb-4 overflow-hidden">
+                    <img src={session?.user?.image} className="object-contain" />
                 </div>
                 <h2 className="text-xl font-bold">Welcome back, {session?.user?.firstName}!</h2>
                 <p className="text-muted-foreground text-sm">Member since January 2024</p>
@@ -81,7 +79,7 @@ function RouteComponent() {
                     <div className="w-10 h-10 mx-auto rounded-xl bg-primary flex items-center justify-center mb-2">
                         <Heart className="w-5 h-5 text-white" />
                     </div>
-                    <p className="text-2xl font-bold">{data?.items?.length}</p>
+                    <p className="text-2xl font-bold">{isPending ? "..." : data?.items?.length}</p>
                     <p className="text-xs text-muted-foreground">Total Orders</p>
                 </div>
                 <div
@@ -97,7 +95,7 @@ function RouteComponent() {
                     className="bg-card rounded-2xl p-4 text-center border border-border"
                 >
                     <div className="w-10 h-10 mx-auto rounded-xl bg-primary flex items-center justify-center mb-2">
-                        <Package className="w-5 h-5 text-white" />
+                        <Home className="w-5 h-5 text-white" />
                     </div>
                     <p className="text-2xl font-bold">1</p>
                     <p className="text-xs text-muted-foreground">Saved Addresses</p>
@@ -111,18 +109,18 @@ function RouteComponent() {
                         <ChevronRight className="w-4 h-4" />
                     </Link>
                 </div>
-
                 <div className="space-y-3">
-                    {data?.items?.slice(0, 5)?.map((order: Order, idx: number) => (
+                    {isPending ? (
+                        <PageLoader variant="list" />
+                    ) : data?.items?.length == 0 ? (
+                        <EmptyState
+                            title="No orders found"
+                            description="You currently don't have no orders"
+                            icon={Package}
+                        />
+                    ) : data?.items?.slice(0, 5)?.map((order: Order, idx: number) => (
                         <OrderItem key={idx} order={order} idx={idx} />
                     ))}
-                    {data?.items?.length === 0 && (
-                        <div
-                            className="bg-card rounded-2xl p-4 border border-border flex items-center gap-4"
-                        >
-                            No orders found
-                        </div>
-                    )}
                 </div>
             </div>
         </div>

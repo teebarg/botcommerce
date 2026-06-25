@@ -5,7 +5,6 @@ import { Separator } from "@/components/ui/separator";
 import LocalizedClientLink from "@/components/ui/link";
 import AnalyticsStats from "@/components/admin/coupons/analytics-stats";
 import z from "zod";
-import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useDeleteCoupon, useToggleCouponStatus } from "@/hooks/useCoupon";
 import { SwipeableCouponCard } from "@/components/admin/coupons/swipeable-coupon-card";
@@ -14,8 +13,8 @@ import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { Coupon, PaginatedCoupons } from "@/schemas";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { api } from "@/utils/api";
-import AdminPageLoading from "@/components/admin/admin-loader";
 import EmptyState from "@/components/generic/empty";
+import { PageLoader } from "@/components/generic/page-loader";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/coupons")({
     validateSearch: z.object({
@@ -31,16 +30,14 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/coupons")({
 
 function RouteComponent() {
     const params = Route.useSearch();
-    const { data: initialCoupons, isPending } = useQuery(couponsQuery(params));
     const toggleMutation = useToggleCouponStatus();
     const deleteMutation = useDeleteCoupon();
 
-    const { items, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteResource<PaginatedCoupons, Coupon>({
+    const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending} = useInfiniteResource<PaginatedCoupons, Coupon>({
         queryKey: ["coupons", "infinite", params],
         queryFn: (cursor) => api.get<PaginatedCoupons>("/coupon/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
-        initialData: initialCoupons,
     });
 
     const handleCopy = (code: string) => {
@@ -84,8 +81,10 @@ function RouteComponent() {
             <AnalyticsStats />
             <div className="space-y-4">
                 {isPending ? (
-                    <AdminPageLoading />
-                ) : items.length > 0 ? (
+                <PageLoader variant="card"  />
+            ) : items?.length == 0 ? (
+                <EmptyState title="No coupons found" description="No coupons created yet" />
+            ) : (
                     <InfiniteResourceList
                         items={items}
                         onLoadMore={fetchNextPage}
@@ -101,8 +100,6 @@ function RouteComponent() {
                             />
                         )}
                     />
-                ) : (
-                    <EmptyState title="No coupons found" description="No coupons created yet" />
                 )}
             </div>
         </div>
