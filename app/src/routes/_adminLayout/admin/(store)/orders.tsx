@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { OrderStatusSchema, type Order, type PaginatedOrders } from "@/schemas";
-import OrderCard from "@/components/admin/orders/order-card";
+import { OrderCard } from "@/components/admin/orders/order-card";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import OrderFilters from "@/components/admin/orders/order-filters";
 import z from "zod";
@@ -61,15 +61,13 @@ function RouteComponent() {
                     {isPending ? (
                         <PageLoader variant="list" />
                     ) : items.length > 0 ? (
-                        <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
-                            <InfiniteResourceList
-                                items={items}
-                                onLoadMore={fetchNextPage}
-                                hasMore={hasNextPage}
-                                isLoading={isFetchingNextPage}
-                                renderItem={(item: Order) => <OrderCard key={item.id} order={item} />}
-                            />
-                        </div>
+                        <InfiniteResourceList
+                            items={items}
+                            onLoadMore={fetchNextPage}
+                            hasMore={hasNextPage}
+                            isLoading={isFetchingNextPage}
+                            renderItem={(item: Order) => <OrderCard key={item.id} order={item} />}
+                        />
                     ) : (
                         <EmptyState title="No orders found" />
                     )}

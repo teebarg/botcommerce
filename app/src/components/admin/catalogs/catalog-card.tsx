@@ -15,7 +15,7 @@ export const CatalogCard: React.FC<{ catalog: DBCatalog }> = ({ catalog }) => (
                     <h3 className="text-sm font-medium truncate">{catalog.title}</h3>
                 </div>
                 <span className={`shrink-0 text-xs font-medium px-2 py-0.5 rounded-full ${catalog.is_active
-                        ? "bg-success-subtle text-success-subtle-foreground"
+                        ? "bg-success text-success-foreground"
                         : "bg-muted text-muted-foreground"
                     }`}>
                     {catalog.is_active ? "Active" : "Inactive"}
@@ -41,7 +41,7 @@ export const CatalogCard: React.FC<{ catalog: DBCatalog }> = ({ catalog }) => (
             </span>
         </div>
 
-        <div className="border-t border-border px-5 py-3 bg-muted/40 flex items-center justify-between">
+        <div className="border-t border-border px-5 py-3 bg-muted/50 flex items-center justify-between">
             <SocialShare catalog={catalog} />
             <CatalogActions item={catalog} />
         </div>

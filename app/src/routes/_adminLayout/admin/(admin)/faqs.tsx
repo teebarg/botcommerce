@@ -78,7 +78,7 @@ function RouteComponent() {
                                                 {faq.category}
                                             </Badge>
                                         )}
-                                        <Badge variant={faq.is_active ? "success-subtle" : "destructive"}>
+                                        <Badge variant={faq.is_active ? "success" : "destructive"}>
                                             {faq.is_active ? <Eye className="w-3 h-3 mr-1" /> : <EyeOff className="w-3 h-3 mr-1" />}
                                             {faq.is_active ? "Active" : "Inactive"}
                                         </Badge>

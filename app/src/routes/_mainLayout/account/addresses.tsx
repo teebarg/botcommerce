@@ -36,7 +36,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = true }) =
                         Delivery address
                     </p>
                     {isActive && (
-                        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-success-subtle text-success-subtle-foreground">
+                        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-success text-success-foreground">
                             Active
                         </span>
                     )}
@@ -52,7 +52,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = true }) =
                 <p className="text-sm text-muted-foreground">{address.state}</p>
             </div>
 
-            <div className="flex items-center justify-between px-5 py-3 border-t border-border bg-muted/40">
+            <div className="flex items-center justify-between px-5 py-2 border-t border-border bg-muted/40">
                 <p className="text-xs text-muted-foreground flex items-center gap-1.5">
                     <Home className="w-3 h-3" />
                     Home
@@ -65,10 +65,10 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = true }) =
                             <Button
                                 size="icon"
                                 variant="ghost"
-                                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                                className="text-muted-foreground hover:text-foreground hover:bg-muted"
                                 onClick={editState.open}
                             >
-                                <Edit3 className="h-3.5 w-3.5" />
+                                <Edit3 className="h-4 w-4" />
                             </Button>
                         }
                         onOpenChange={editState.setOpen}
@@ -83,9 +83,9 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = true }) =
                             <Button
                                 size="icon"
                                 variant="ghost"
-                                className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                className="text-destructive hover:bg-destructive/10"
                             >
-                                <Trash2 className="h-3.5 w-3.5" />
+                                <Trash2 className="h-4 w-4" />
                             </Button>
                         }
                         onClose={deleteState.close}

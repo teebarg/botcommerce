@@ -28,7 +28,7 @@ const Overlay: React.FC<OverlayProps> = ({
             <SheetContent aria-describedby={undefined} side={side} className={cn("w-full sm:max-w-lg px-0 flex flex-col sheet-safe", sheetClassName)}>
                 {showHeader && (
                     <SheetHeader className="px-4 py-2.5">
-                        <SheetTitle className="flex items-center gap-3 text-xl">{title}</SheetTitle>
+                        <SheetTitle className="flex items-center gap-3">{title}</SheetTitle>
                     </SheetHeader>
                 )}
                 {children}

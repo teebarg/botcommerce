@@ -1,94 +1,51 @@
-import { CheckCircle, Package, PackageCheck, RefreshCw, RotateCcw, ShieldAlert, Truck, XCircle } from "lucide-react";
-import type { JSX } from "react";
+import { OrderStatus } from "@/schemas";
 
-import { Badge } from "@/components/ui/badge";
-import { BadgeVariant, OrderStatus } from "@/schemas";
+interface PillProps {
+    label: string;
+    variant: "warn" | "success" | "blue" | "orange" | "red" | "muted";
+}
 
-export const PaymentStatusBadge = ({ status }: { status: string }) => {
-    const statusConfig: Record<
-        string,
-        { icon: JSX.Element; label: string; variant: BadgeVariant }
-    > = {
-        ["PENDING"]: {
-            icon: <ShieldAlert className="mr-1" size={14} />,
-            label: "Payment Pending",
-            variant: "warning",
-        },
-        ["FAILED"]: {
-            icon: <XCircle className="mr-1" size={14} />,
-            label: "Payment Failed",
-            variant: "destructive",
-        },
-        ["SUCCESS"]: {
-            icon: <CheckCircle className="mr-1" size={14} />,
-            label: "Payment Successful",
-            variant: "success",
-        },
-        ["REFUNDED"]: {
-            icon: <RotateCcw className="mr-1" size={14} />,
-            label: "Payment Refunded",
-            variant: "default",
-        },
+function Pill({ label, variant }: PillProps) {
+    const styles: Record<PillProps["variant"], string> = {
+        warn: "bg-warning-subtle text-warning-subtle-foreground",
+        success: "bg-success text-success-foreground",
+        blue: "bg-primary/10 text-primary",
+        orange: "bg-accent-subtle text-accent-subtle-foreground",
+        red: "bg-destructive/10 text-destructive",
+        muted: "bg-muted text-muted-foreground",
     };
 
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
-
     return (
-        <Badge variant={config.variant}>
-            {config.icon}
-            {config.label}
-        </Badge>
+        <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full whitespace-nowrap ${styles[variant]}`}>
+            <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60 shrink-0" />
+            {label}
+        </span>
     );
-};
+}
 
-export const OrderStatusBadge = ({ status }: { status: OrderStatus }) => {
-    const statusConfig: Record<
-        OrderStatus,
-        { icon: JSX.Element; label: string; variant: BadgeVariant }
-    > = {
-        [OrderStatus.PENDING]: {
-            icon: <ShieldAlert className="mr-1" size={14} />,
-            label: "Pending",
-            variant: "warning-subtle",
-        },
-        [OrderStatus.PROCESSING]: {
-            icon: <RefreshCw className="mr-1" size={14} />,
-            label: "Processing",
-            variant: "default",
-        },
-        [OrderStatus.SHIPPED]: {
-            icon: <Package className="mr-1" size={14} />,
-            label: "Order Packed",
-            variant: "accent-subtle",
-        },
-        [OrderStatus.OUT_FOR_DELIVERY]: {
-            icon: <Truck className="mr-1" size={14} />,
-            label: "Out for delivery",
-            variant: "accent",
-        },
-        [OrderStatus.DELIVERED]: {
-            icon: <PackageCheck className="mr-1" size={14} />,
-            label: "Delivered",
-            variant: "success",
-        },
-        [OrderStatus.CANCELED]: {
-            icon: <XCircle className="mr-1" size={14} />,
-            label: "Canceled",
-            variant: "destructive",
-        },
-        [OrderStatus.REFUNDED]: {
-            icon: <RotateCcw className="mr-1" size={14} />,
-            label: "Refunded",
-            variant: "success-subtle",
-        },
+export function PaymentStatusBadge({ status }: { status: string }) {
+    const config: Record<string, { label: string; variant: PillProps["variant"] }> = {
+        PENDING: { label: "Unpaid", variant: "warn" },
+        SUCCESS: { label: "Paid", variant: "success" },
+        FAILED: { label: "Failed", variant: "red" },
+        REFUNDED: { label: "Refunded", variant: "muted" },
     };
-    
-    const config = statusConfig[status] || statusConfig[OrderStatus.PENDING];
 
-    return (
-        <Badge variant={config.variant}>
-            {config.icon}
-            {config.label}
-        </Badge>
-    );
-};
+    const c = config[status] ?? config.PENDING;
+    return <Pill label={c.label} variant={c.variant} />;
+}
+
+export function OrderStatusBadge({ status }: { status: OrderStatus }) {
+    const config: Record<OrderStatus, { label: string; variant: PillProps["variant"] }> = {
+        [OrderStatus.PENDING]: { label: "Pending", variant: "warn" },
+        [OrderStatus.PROCESSING]: { label: "Processing", variant: "blue" },
+        [OrderStatus.SHIPPED]: { label: "Order Packed", variant: "blue" },
+        [OrderStatus.OUT_FOR_DELIVERY]: { label: "Out for Delivery", variant: "orange" },
+        [OrderStatus.DELIVERED]: { label: "Delivered", variant: "success" },
+        [OrderStatus.CANCELED]: { label: "Cancelled", variant: "red" },
+        [OrderStatus.REFUNDED]: { label: "Refunded", variant: "muted" },
+    };
+
+    const c = config[status] ?? config[OrderStatus.PENDING];
+    return <Pill label={c.label} variant={c.variant} />;
+}

@@ -88,8 +88,8 @@ function ProcessStep({ title, description, status, isLast }: ProcessStepProps) {
         <div className="flex gap-3.5">
             <div className="flex flex-col items-center shrink-0">
                 {status === "completed" && (
-                    <div className="w-5 h-5 rounded-full bg-success-subtle flex items-center justify-center shrink-0">
-                        <Check className="w-3 h-3 text-success-subtle-foreground" />
+                    <div className="w-5 h-5 rounded-full bg-success flex items-center justify-center shrink-0">
+                        <Check className="w-3 h-3 text-success-foreground" />
                     </div>
                 )}
                 {status === "active" && (
@@ -107,7 +107,7 @@ function ProcessStep({ title, description, status, isLast }: ProcessStepProps) {
             <div className={`pt-0.5 ${!isLast ? "pb-5" : ""}`}>
                 <p className={`text-sm font-medium mb-0.5 ${
                     status === "completed"
-                        ? "text-success-subtle-foreground"
+                        ? "text-success-foreground"
                         : status === "active"
                         ? "text-foreground"
                         : "text-muted-foreground/50"

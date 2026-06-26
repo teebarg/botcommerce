@@ -20,7 +20,7 @@ const StatusBadge = ({ status }: { status: ConversationStatus }) => {
 
     const variants: Record<ConversationStatus, BadgeVariant> = {
         ["ABANDONED"]: "destructive",
-        ["ACTIVE"]: "success-subtle",
+        ["ACTIVE"]: "success",
         ["COMPLETED"]: "warning",
     };
 

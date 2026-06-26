@@ -10,20 +10,6 @@ const OFFLINE_SHELL = "/";
 
 precacheAndRoute(self.__WB_MANIFEST);
 
-// We use a custom handler for navigation requests (page loads)
-// const navigationHandler = async (params) => {
-//     try {
-//         return await new NetworkFirst({
-//             cacheName: "pages-cache",
-//         }).handle(params);
-//     } catch (error) {
-//         const fallback = await caches.match(OFFLINE_SHELL);
-//         if (fallback) return fallback;
-
-//         return Response.error();
-//     }
-// };
-
 // Target TanStack Server Functions (Read-Only)
 registerRoute(
     ({ url, request }) => {
@@ -50,15 +36,6 @@ registerRoute(
     })()
 );
 
-// const navigationRoute = new NavigationRoute(navigationHandler, {
-//     denylist: [
-//         /^\/api/,
-//         /^\/_serverFn/,
-//         /\/[^\/]+\.[^\/]+$/, // Ignore files with extensions (images, etc.)
-//     ],
-// });
-
-// registerRoute(navigationRoute);
 cleanupOutdatedCaches();
 
 // IMAGE CACHING
@@ -114,6 +91,8 @@ self.addEventListener("push", (event) => {
         badge: "/pr-logo.png",
         vibrate: [200, 100, 200],
         requireInteraction: true,
+        tag: data.tag || "general-alert", 
+        renotify: true,               
         actions: [
             { action: "view", title: "View" },
             { action: "dismiss", title: "Dismiss" },

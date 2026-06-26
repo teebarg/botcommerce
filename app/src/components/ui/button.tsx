@@ -7,7 +7,7 @@ import { Loader } from "lucide-react";
 import { cn } from "@/utils";
 
 const buttonVariants = cva(
-    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 min-w-28",
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
     {
         variants: {
             variant: {
@@ -20,17 +20,16 @@ const buttonVariants = cva(
                 accent: "bg-accent text-accent-foreground hover:bg-accent/90",
                 "accent-subtle": "bg-accent-subtle text-accent-subtle-foreground hover:bg-accent-subtle/90 border border-accent-subtle-foreground/20",
                 success: "bg-success text-success-foreground hover:bg-success/90",
-                "success-subtle": "bg-success-subtle text-success-subtle-foreground hover:bg-success-subtle/90 border border-success-subtle-foreground/20",
                 warning: "bg-warning text-warning-foreground hover:bg-warning/90",
                 "warning-subtle": "bg-warning-subtle text-warning-subtle-foreground hover:bg-warning-subtle/90 border border-warning-subtle-foreground/20"
             },
             size: {
-                default: "h-8 px-4 py-2",
+                default: "h-8 px-4 py-2 min-w-24",
                 xxs: "rounded-lg px-1.5 py-1.5 text-xs",
                 xs: "h-7 rounded-md px-2",
                 sm: "h-9 rounded-md px-3",
-                lg: "h-11 rounded-md px-8",
-                xl: "h-14 rounded-2xl px-10 text-lg",
+                lg: "h-11 rounded-md px-8 min-w-24",
+                xl: "h-14 rounded-2xl px-10 text-lg min-w-24",
                 icon: "h-9 w-9 min-w-auto",
             },
         },

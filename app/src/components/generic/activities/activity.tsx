@@ -22,7 +22,7 @@ const ActivityTypeIcon = ({ type, isSuccess }: { type: string; isSuccess: boolea
 };
 
 const statusVariant = (type: string, isSuccess: boolean) => {
-    if (type === "PRODUCT_EXPORT") return isSuccess ? "success-subtle" : "destructive";
+    if (type === "PRODUCT_EXPORT") return isSuccess ? "success" : "destructive";
     return "success";
 };
 

@@ -47,9 +47,7 @@
     --color-card: hsl(var(--card));
 
     --color-success: hsl(var(--success));
-    --color-success-subtle: hsl(var(--success-subtle));
     --color-success-foreground: hsl(var(--success-foreground));
-    --color-success-subtle-foreground: hsl(var(--success-subtle-foreground));
 
     --color-warning: hsl(var(--warning));
     --color-warning-subtle: hsl(var(--warning-subtle));
@@ -218,10 +216,8 @@
     --accent-subtle: 48 100% 97%;
     --accent-subtle-foreground: 26 72% 31%;
 
-    --success: 160 84% 39%;
+    --success: 160 60% 15%;
     --success-foreground: 0 0% 100%;
-    --success-subtle: 152 76% 95%;
-    --success-subtle-foreground: 160 84% 25%;
 
     --warning: 38 92% 50%;
     --warning-foreground: 20 14% 4%;
@@ -271,11 +267,6 @@
     --accent-foreground: 20 14% 4%;
     --accent-subtle: 25 75% 27%;
     --accent-subtle-foreground: 261 87% 86%;
-
-    --success: 160 74% 45%;
-    --success-foreground: 0 0% 100%;
-    --success-subtle: 160 60% 15%;
-    --success-subtle-foreground: 160 74% 75%;
 
     --warning: 43 96% 56%;
     --warning-foreground: 20 14% 4%;

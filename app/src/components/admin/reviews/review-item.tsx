@@ -2,6 +2,7 @@ import { Star } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ReviewActions } from "./reviews-actions";
 import type { Review } from "@/schemas";
+import { Badge } from "@/components/ui/badge";
 
 interface ReviewListProps {
     review: Review;
@@ -15,17 +16,8 @@ const ReviewItem = ({ review }: ReviewListProps) => {
                     <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground">
                         Product #{review?.product_id}
                     </p>
-                    <span
-                        className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                            review?.verified
-                                ? "bg-success-subtle text-success-subtle-foreground"
-                                : "bg-muted text-muted-foreground"
-                        }`}
-                    >
-                        {review?.verified ? "Verified" : "Unverified"}
-                    </span>
+                    <Badge variant={review?.verified ? "success": "ghost"}>{review?.verified ? "Verified" : "Unverified"}</Badge>
                 </div>
-
                 <div className="flex items-center gap-0.5 mb-3">
                     {[...Array(5)].map((_, i) => (
                         <Star
@@ -35,12 +27,10 @@ const ReviewItem = ({ review }: ReviewListProps) => {
                         />
                     ))}
                 </div>
-
                 <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                     {review?.comment}
                 </p>
-
-                <div className="rounded-xl border bg-muted/40 px-5 py-3.5 flex items-center justify-between">
+                <div className="rounded-xl border bg-muted/40 px-5 py-2 flex items-center justify-between">
                     <p className="text-xs text-muted-foreground">
                         {new Date(review?.created_at).toLocaleDateString("en-US", {
                             month: "long",

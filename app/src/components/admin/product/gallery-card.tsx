@@ -34,7 +34,7 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
         ? "bg-muted text-muted-foreground border-border"
         : isOutOfStock
             ? "bg-destructive/10 text-destructive border-destructive/20"
-            : "bg-success-subtle text-success-subtle-foreground border-success/20";
+            : "bg-success text-success-foreground border-success/20";
 
     return (
         <div

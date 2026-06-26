@@ -52,7 +52,7 @@ export const CatalogForm: React.FC<CatalogFormPropd> = ({ current, onClose }) =>
     return (
         <Form {...form}>
             <form className="flex-1 flex flex-col overflow-hidden" onSubmit={handleSubmit(onSubmit)}>
-                <div className="flex-1 overflow-y-auto px-4 space-y-4">
+                <div className="flex-1 overflow-y-auto px-4 space-y-4 pb-4">
                     <FormField
                         control={control}
                         name="title"
