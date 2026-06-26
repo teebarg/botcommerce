@@ -88,13 +88,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 </span>
             )}
 
-            {/* <button
+            {/* <Button
                 onClick={toggleWishlist}
                 aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
-                className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-black/35 flex items-center justify-center"
+                className="absolute top-2 right-2 z-10 rounded-full bg-black/35"
+                size="icon"
+                variant="ghost"
             >
-                <Heart className={cn("w-3.5 h-3.5", inWishlist ? "fill-white text-white" : "text-white")} />
-            </button> */}
+                <Heart className={cn("w-4 h-4", inWishlist ? "fill-white text-white" : "text-white")} />
+            </Button> */}
 
             {outOfStock && (
                 <>

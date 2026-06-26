@@ -80,7 +80,7 @@ const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
                     <Button
                         size="xs"
                         variant="ghost"
-                        className="h-7 px-2.5 text-xs font-medium border border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                        className="border border-emerald-200 text-emerald-700 hover:bg-emerald-50"
                         onClick={() => handleDownload(activity.action_download_url!)}
                     >
                         <Download size={12} className="mr-1.5" />
@@ -99,14 +99,13 @@ const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
                 aria-label="Delete activity"
                 disabled={isPending}
                 size="icon"
-                variant="ghost"
-                className="shrink-0 w-7 h-7 text-muted-foreground hover:text-red-500 hover:bg-red-50"
+                variant="destructive"
                 onClick={() => deleteActivity(activity.id)}
             >
                 {isPending ? (
-                    <div className="animate-spin h-3.5 w-3.5 border-2 border-border border-t-red-500 rounded-full" />
+                    <div className="animate-spin h-4 w-4 border-2 border-border border-t-white rounded-full" />
                 ) : (
-                    <Trash2 size={14} />
+                    <Trash2 className="h-4 w-4" />
                 )}
             </Button>
         </div>
