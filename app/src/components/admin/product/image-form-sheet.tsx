@@ -295,10 +295,10 @@ export function ImageSheetForm({ onClose, imageId, currentProduct }: ProductShee
                 </Card>
             </div>
             <div className="sheet-footer">
-                <Button variant="outline" onClick={onClose}>
+                <Button variant="outline" size="md" onClick={onClose}>
                     Close
                 </Button>
-                <Button disabled={isDisabled} isLoading={isPending} onClick={handleSubmit}>
+                <Button size="md" disabled={isDisabled} isLoading={isPending} onClick={handleSubmit}>
                     Save
                 </Button>
             </div>

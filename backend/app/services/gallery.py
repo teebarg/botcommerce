@@ -13,16 +13,18 @@ from app.models.product import (
     ImagesBulkUpdate,
     ProductImageBulkUrls,
 )
+from app.services.cache import CacheService
 
 logger = get_logger(__name__)
 
 
 class GalleryService:
     """Coordinates Business Domain Logics."""
-    def __init__(self, db: Prisma, websocket_manager, storage_srv: MediaStorageService):
+    def __init__(self, db: Prisma, websocket_manager, storage_srv: MediaStorageService, cache_srv: CacheService):
         self.db = db
         self.ws_manager = websocket_manager
         self.storage = storage_srv
+        self.cache_srv = cache_srv
 
     @staticmethod
     def _build_variant_data(payload) -> dict[str, Any]:
@@ -31,7 +33,7 @@ class GalleryService:
         for field in fields:
             if getattr(payload, field, None) is not None:
                 data[field] = getattr(payload, field)
-        
+
         if getattr(payload, "inventory", None) is not None:
             data["inventory"] = payload.inventory
             data["status"] = "IN_STOCK" if payload.inventory > 0 else "OUT_OF_STOCK"
@@ -46,7 +48,7 @@ class GalleryService:
             data["collections"] = {"connect": [{"id": cid} for cid in collection_ids]}
         return data
 
-    
+
     async def get_paginated_gallery(
         self, cursor: Optional[int], limit: int, sort: str, active: Optional[bool], out_of_stock: bool
     ) -> List[Dict[str, Any]]:
@@ -68,9 +70,9 @@ class GalleryService:
             """)
 
         extra_filters_sql = "\n".join(extra_filters)
-        
+
         query = f"""
-            SELECT 
+            SELECT
                 pi.id, pi.image, pi."order", pi.product_id,
                 p.id AS p_id, p.sku AS p_sku, p.name AS p_name,
                 p.description AS p_description, p.slug AS p_slug,
@@ -150,6 +152,7 @@ class GalleryService:
                     tx.productvariant.delete_many(where={"product_id": product_id}),
                 )
                 await tx.product.delete(where={"id": product_id})
+            await self.invalidate()
         except Exception as e:
             logger.error(f"Error deleting product {product_id}: {e}")
             raise HTTPException(status_code=500, detail="Failed to delete product")
@@ -163,6 +166,7 @@ class GalleryService:
         create_rows = [{"image": url, "order": 0} for url in payload.urls]
         try:
             await self.db.productimage.create_many(data=create_rows)
+            await self.invalidate()
             return {"success": True, "count": len(create_rows)}
         except Exception as e:
             logger.error(e)
@@ -188,7 +192,7 @@ class GalleryService:
             errors = [r for r in results if isinstance(r, Exception)]
             if errors:
                 logger.error(f"Some delete tasks failed: {errors}")
-
+            await self.invalidate()
             await self.ws_manager.broadcast_to_all({"status": "completed"}, "bulk_action")
         except Exception as e:
             logger.error(f"Error processing bulk delete: {str(e)}")
@@ -234,6 +238,7 @@ class GalleryService:
                             "size": v.size, "color": v.color, "width": v.width, "length": v.length, "age": v.age,
                         })
                     await asyncio.gather(*[_create_variant(v) for v in payload.variants])
+                await self.invalidate()
                 return product.id
         except HTTPException:
             raise
@@ -287,6 +292,7 @@ class GalleryService:
                                 "sku": generate_sku(), "image": existing_image.image
                             })
                     await asyncio.gather(*[_upsert_variant(v) for v in payload.variants])
+                await self.invalidate()
                 return existing_image.product_id
         except HTTPException:
             raise
@@ -350,9 +356,14 @@ class GalleryService:
             except Exception as e:
                 logger.error(f"Error processing image {image.id}: {e}")
                 failed_ids.append(image.id)
-                
+
         await index_products_fn(product_ids=created_product_ids)
+        await self.invalidate()
         status = "completed" if not failed_ids else "partial"
         await self.ws_manager.broadcast_to_all({
             "status": status, "failed_ids": failed_ids, "success_count": len(images) - len(failed_ids)
         }, "bulk_action")
+
+    async def invalidate(self) -> None:
+        """Invalidate gallery."""
+        await self.cache_srv.invalidate(tags=["gallery"])
