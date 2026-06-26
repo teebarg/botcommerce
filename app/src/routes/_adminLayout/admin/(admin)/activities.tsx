@@ -25,9 +25,9 @@ function RouteComponent() {
     });
 
     return (
-        <div className="px-2 py-4">
+        <div className="px-2 py-4 max-w-5xl">
             <h1 className="font-semibold mb-2 uppercase">Activities</h1>
-            <div className="max-w-5xl mx-auto">
+            <div>
                 {isPending ? (
                     <PageLoader variant="list" />
                 ) : items?.length == 0 ? (

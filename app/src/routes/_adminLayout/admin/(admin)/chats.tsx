@@ -32,7 +32,7 @@ function RouteComponent() {
     });
 
     return (
-        <div className="px-2.5 mt-2">
+        <div className="px-2.5 mt-2 max-w-5xl">
             <h3 className="text-xl font-medium">Chats view</h3>
             <p className="text-muted-foreground text-sm mb-4">Manage your chats.</p>
             {isPending ? (
