@@ -71,7 +71,6 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
                     variant="outline"
                     disabled={isPending}
                     isLoading={isPending}
-                    // className="text-muted-foreground hover:text-foreground hover:bg-muted"
                     onClick={() => handlePublish(false)}
                 >
                     Unpublish
@@ -82,7 +81,6 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
                     variant="outline"
                     disabled={isPending}
                     isLoading={isPending}
-                    // className="text-foreground hover:bg-muted"
                     onClick={() => handlePublish(true)}
                 >
                     Publish
