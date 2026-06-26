@@ -21,24 +21,26 @@ export const ProductVariantActions: React.FC<VariantSelectionProps> = ({ product
 
     return (
         <div className="flex items-center gap-2">
-            <button
+            <Button
                 onClick={(e) => {
                     e.stopPropagation();
                     inWishlist ? removeWishlist() : addWishlist();
                 }}
                 className={cn(
-                    "shrink-0 w-12 h-12 rounded-xl border flex items-center justify-center transition-colors",
-                    inWishlist ? "bg-secondary border-foreground" : "bg-background border-border hover:bg-muted"
+                    "rounded-xl h-12 w-12",
+                    inWishlist && "text-success"
                 )}
+                size="icon"
+                variant="outline"
             >
-                <Heart className={cn("w-5 h-5", inWishlist ? "fill-foreground text-foreground" : "text-foreground")} />
-            </button>
+                <Heart className="w-6 h-6 text-current" />
+            </Button>
 
             <Button
-                className="shrink-0 w-12 h-12 rounded-xl text-success hover:text-success hover:bg-secondary"
+                className="shrink-0 w-12 h-12 rounded-xl"
                 disabled={!selectedVariant || outOfStock}
                 size="icon"
-                variant="ghost"
+                variant="outline"
                 onClick={handleWhatsAppPurchase}
             >
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg">
@@ -53,17 +55,19 @@ export const ProductVariantActions: React.FC<VariantSelectionProps> = ({ product
                 </svg>
             </Button>
 
-            <button
+            <Button
                 onClick={!outOfStock ? handleAddToCart : undefined}
                 disabled={outOfStock}
                 className={cn(
-                    "flex-1 h-12 px-6 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors",
+                    "flex-1 h-12 px-6 rounded-xl",
                     outOfStock
                         ? "bg-muted text-muted-foreground cursor-not-allowed"
                         : isAdded
                             ? "bg-success text-success-foreground"
                             : "bg-foreground text-background hover:opacity-90"
                 )}
+                variant="outline"
+                size="lg"
             >
                 {outOfStock ? (
                     "Out of stock"
@@ -75,7 +79,7 @@ export const ProductVariantActions: React.FC<VariantSelectionProps> = ({ product
                         Add to cart
                     </>
                 )}
-            </button>
+            </Button>
         </div>
     );
 };

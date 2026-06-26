@@ -26,7 +26,7 @@ export const ReviewCard = ({ review }: ReviewCardProps) => {
                     <h3 className="text-sm font-medium">{review.title}</h3>
                 </div>
                 {review.verified && (
-                    <Badge variant="success-subtle" className="flex items-center gap-1 shrink-0">
+                    <Badge variant="success" className="flex items-center gap-1 shrink-0">
                         <Shield className="w-3 h-3" />
                         Verified
                     </Badge>

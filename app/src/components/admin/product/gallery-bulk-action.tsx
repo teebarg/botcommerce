@@ -3,7 +3,6 @@ import { useOverlayTriggerState } from "react-stately";
 import { BulkImageSheetForm } from "./bulk-image-form-sheet";
 import { CatalogBulkProductUpdate } from "./bulk-product-catalog-update";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import Overlay from "@/components/overlay";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 
@@ -32,76 +31,84 @@ export const ProductBulkActions = ({
 
     return (
         <div
-            className="animate-slide-up fixed left-1/2 transform -translate-x-1/2 bg-card border border-border rounded-full px-6 py-3 flex items-center gap-2 transition-all duration-300 max-w-90vw w-auto"
-            style={{
-                bottom: `calc(var(--sab) + 1rem)`,
-            }}
+            className="z-50 animate-slide-up fixed left-1/2 -translate-x-1/2 bg-card border border-border rounded-full px-4 py-2.5 flex items-center gap-1.5 shadow-md"
+            style={{ bottom: `calc(var(--sab) + 1rem)` }}
         >
-            <Badge className="mr-2 text-sm whitespace-nowrap" variant="accent">
+            <span className="text-xs text-muted-foreground px-2 mr-1 whitespace-nowrap">
                 {selectedCount} selected
-            </Badge>
+            </span>
 
-            <div className="flex items-center gap-1 sm:gap-2">
-                <Overlay
-                    open={editState.isOpen}
-                    title="Bulk Products Update"
-                    trigger={
-                        <Button className="h-8 px-2 sm:px-3 min-w-0" size="sm" variant="ghost" onClick={editState.open}>
-                            <Edit3 className="h-5 w-5 sm:mr-1" />
-                            <span className="hidden sm:inline">Edit</span>
-                        </Button>
-                    }
-                    onOpenChange={editState.setOpen}
-                >
+            <div className="w-px h-4 bg-border" />
+
+            <Overlay
+                open={editState.isOpen}
+                title="Bulk Products Update"
+                trigger={
+                    <Button size="sm" variant="ghost" onClick={editState.open}>
+                        <Edit3 className="h-4 w-4 sm:mr-1.5" />
+                        <span className="hidden sm:inline text-xs">Edit</span>
+                    </Button>
+                }
+                onOpenChange={editState.setOpen}
+            >
+                {editState.isOpen && (
                     <BulkImageSheetForm imageIds={selectedImageIds} onClose={editState.close} />
-                </Overlay>
+                )}
+            </Overlay>
 
-                <Overlay
-                    open={addToSharedState.isOpen}
-                    title="Update Catalog"
-                    trigger={
-                        <Button className="h-8 px-2 sm:px-3 min-w-0" disabled={isLoading} size="sm" variant="ghost" onClick={addToSharedState.open}>
-                            <Boxes className="h-5 w-5 sm:mr-1" />
-                            <span className="hidden sm:inline">Catalog</span>
-                        </Button>
-                    }
-                    onOpenChange={addToSharedState.setOpen}
-                >
+            <Overlay
+                open={addToSharedState.isOpen}
+                title="Update Catalog"
+                trigger={
+                    <Button size="sm" variant="ghost" disabled={isLoading} onClick={addToSharedState.open}>
+                        <Boxes className="h-4 w-4 sm:mr-1.5" />
+                        <span className="hidden sm:inline text-xs">Catalog</span>
+                    </Button>
+                }
+                onOpenChange={addToSharedState.setOpen}
+            >
+                {addToSharedState.isOpen && (
                     <CatalogBulkProductUpdate
                         selectedCount={selectedCount}
                         selectedImageIds={selectedImageIds}
                         selectedProductIds={selectedProductIds}
                         onClose={addToSharedState.close}
                     />
-                </Overlay>
+                )}
+            </Overlay>
 
-                <ConfirmDrawer
-                    open={deleteState.isOpen}
-                    onOpenChange={deleteState.setOpen}
-                    trigger={
-                        <Button
-                            className="h-8 px-2 sm:px-3 text-destructive hover:text-destructive-foreground min-w-0"
-                            disabled={isLoading}
-                            size="sm"
-                            variant="ghost"
-                        >
-                            <Trash2 className="h-5 w-5 sm:mr-1" />
-                            <span className="hidden sm:inline">Delete</span>
-                        </Button>
-                    }
-                    onClose={deleteState.close}
-                    onConfirm={onDelete}
-                    title="Delete Products"
-                    description="Are you sure you want to delete these products?"
-                    isLoading={isLoading}
-                />
+            <ConfirmDrawer
+                open={deleteState.isOpen}
+                onOpenChange={deleteState.setOpen}
+                trigger={
+                    <Button
+                        className="text-destructive hover:bg-destructive/10"
+                        size="sm"
+                        variant="ghost"
+                        disabled={isLoading}
+                    >
+                        <Trash2 className="h-4 w-4 sm:mr-1.5" />
+                        <span className="hidden sm:inline text-xs">Delete</span>
+                    </Button>
+                }
+                onClose={deleteState.close}
+                onConfirm={onDelete}
+                title="Delete Products"
+                description="Are you sure you want to delete these products?"
+                isLoading={isLoading}
+            />
 
-                <div className="w-px h-4 bg-border mx-1" />
+            <div className="w-px h-4 bg-border" />
 
-                <Button disabled={isLoading} size="icon" variant="destructive" onClick={onClearSelection}>
-                    <X className="h-5 w-5" />
-                </Button>
-            </div>
+            <Button
+                size="icon"
+                variant="ghost"
+                className="text-muted-foreground hover:text-foreground hover:bg-muted"
+                disabled={isLoading}
+                onClick={onClearSelection}
+            >
+                <X className="h-4 w-4" />
+            </Button>
         </div>
     );
 };

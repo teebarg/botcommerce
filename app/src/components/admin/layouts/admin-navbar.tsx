@@ -19,11 +19,10 @@ const AdminNavbar = () => {
             </NavbarContent>
 
             <NavbarContent className="flex basis-1/5 sm:basis-full" justify="end">
-                <NavbarItem className="flex">
+                <NavbarItem className="flex text-base">
                     <LocalizedClientLink href="/">Store</LocalizedClientLink>
                 </NavbarItem>
                 <NavbarItem className="flex items-center gap-2.5">
-                    {/* <Notification /> */}
                     <GalleryFilters />
                     <ThemeToggle />
                     <ActivityTray />

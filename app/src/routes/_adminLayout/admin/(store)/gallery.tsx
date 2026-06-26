@@ -124,48 +124,41 @@ function RouteComponent() {
 
     return (
         <div className="px-2 py-4">
-            <div className="mb-8">
-                <h3 className="text-lg font-semibold">Image Gallery</h3>
-                <p className="text-sm text-muted-foreground">Manage your product images.</p>
-            </div>
             <GalleryImagesUpload />
             <div>
-                <div className="mb-4 sticky top-[calc(var(--sat)+4rem)] z-40 bg-background -mx-2 px-4 py-4 flex gap-2 justify-between">
-                    <div className="rounded-full p-1 flex gap-2 bg-secondary w-1/2">
-                        <div className={cn("rounded-full flex flex-1 justify-center", viewMode === "grid" && "bg-background")}>
-                            <Button
-                                className="h-auto w-auto hover:bg-transparent"
-                                size="icon"
-                                variant="ghost"
-                                onClick={() => setViewMode("grid")}
-                            >
-                                <LayoutDashboard className="h-6 w-6" />
-                            </Button>
-                        </div>
-                        <div className={cn("rounded-full flex flex-1 justify-center", viewMode === "list" && "bg-background")}>
-                            <Button
-                                className="h-auto w-auto hover:bg-transparent"
-                                size="icon"
-                                variant="ghost"
-                                onClick={() => setViewMode("list")}
-                            >
-                                <RectangleVertical className="h-6 w-6" />
-                            </Button>
-                        </div>
-                    </div>
-                    <div className="w-1/2">
+                <div className="sticky top-[calc(var(--sat)+4rem)] z-40 bg-background -mx-2 px-4 py-2.5 mb-4 flex items-center justify-between gap-3 border-b border-border">
+                    <div className="flex items-center gap-0.5 bg-muted rounded-lg p-0.5">
                         <Button
-                            className="w-full rounded-full"
-                            size="lg"
-                            variant={selectionMode ? "destructive" : "default"}
+                            size="icon"
+                            variant="ghost"
+                            className={cn("rounded-md", viewMode === "grid" ? "bg-background shadow-xs text-foreground" : "text-muted-foreground")}
+                            onClick={() => setViewMode("grid")}
+                        >
+                            <LayoutDashboard className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            size="icon"
+                            variant="ghost"
+                            className={cn("rounded-md", viewMode === "list" ? "bg-background shadow-xs text-foreground" : "text-muted-foreground")}
+                            onClick={() => setViewMode("list")}
+                        >
+                            <RectangleVertical className="h-4 w-4" />
+                        </Button>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        {selectionMode && selectedImages.size > 0 && (
+                            <span className="text-xs text-muted-foreground">{selectedImages.size} selected</span>
+                        )}
+                        <Button
+                            size="sm"
+                            variant={selectionMode ? "destructive" : "outline"}
                             onClick={() => {
                                 setSelectionMode(!selectionMode);
-                                if (selectionMode) {
-                                    setSelectedImages(new Set());
-                                }
+                                if (selectionMode) setSelectedImages(new Set());
                             }}
                         >
-                            {selectionMode ? "Cancel Bulk" : "Select Bulk"}
+                            {selectionMode ? "Cancel" : "Select"}
                         </Button>
                     </div>
                 </div>

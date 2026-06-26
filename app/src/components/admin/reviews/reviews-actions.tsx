@@ -35,10 +35,10 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
                     <Button
                         size="icon"
                         variant="ghost"
-                        className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                        className="text-foreground hover:bg-muted"
                         onClick={editState.open}
                     >
-                        <Pencil className="h-3.5 w-3.5" />
+                        <Pencil className="h-4 w-4" />
                     </Button>
                 }
                 onOpenChange={editState.setOpen}
@@ -53,9 +53,9 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
                     <Button
                         size="icon"
                         variant="ghost"
-                        className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                        className="text-destructive hover:bg-destructive/10"
                     >
-                        <Trash2 className="h-3.5 w-3.5" />
+                        <Trash2 className="h-4 w-4" />
                     </Button>
                 }
                 onClose={deleteState.close}
@@ -68,10 +68,9 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
             {review.verified ? (
                 <Button
                     size="sm"
-                    variant="ghost"
+                    variant="outline"
                     disabled={isPending}
                     isLoading={isPending}
-                    className="h-7 text-xs text-muted-foreground hover:text-foreground hover:bg-muted"
                     onClick={() => handlePublish(false)}
                 >
                     Unpublish
@@ -79,10 +78,9 @@ const ReviewActions: React.FC<Props> = ({ review }) => {
             ) : (
                 <Button
                     size="sm"
-                    variant="ghost"
+                    variant="outline"
                     disabled={isPending}
                     isLoading={isPending}
-                    className="h-7 text-xs text-foreground hover:bg-muted"
                     onClick={() => handlePublish(true)}
                 >
                     Publish

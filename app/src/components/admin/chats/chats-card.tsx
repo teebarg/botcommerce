@@ -9,7 +9,7 @@ interface ChatsCardProps {
 
 const statusVariant: Record<ConversationStatus, BadgeVariant> = {
     [ConversationStatus.ABANDONED]: "destructive",
-    [ConversationStatus.ACTIVE]: "success-subtle",
+    [ConversationStatus.ACTIVE]: "success",
     [ConversationStatus.COMPLETED]: "accent",
 };
 

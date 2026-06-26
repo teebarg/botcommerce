@@ -94,7 +94,6 @@ export function GalleryFilters() {
             </PopoverTrigger>
 
             <PopoverContent align="end" className="w-72 p-0">
-                {/* Header */}
                 <div className="flex items-center justify-between px-4 py-3">
                     <span className="text-sm font-medium">Filters</span>
                     {activeCount > 0 && (

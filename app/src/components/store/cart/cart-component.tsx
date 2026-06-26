@@ -8,6 +8,7 @@ import { useCart } from "@/providers/cart-provider";
 import { ShoppingBag, ShoppingCart } from "lucide-react";
 
 const CartComponent: React.FC = () => {
+    const state = useOverlayTriggerState({});
     const { cart } = useCart();
 
     const totalItems =
@@ -15,15 +16,13 @@ const CartComponent: React.FC = () => {
             return acc + item.quantity;
         }, 0) || 0;
 
-    const state = useOverlayTriggerState({});
-
     return (
         <Overlay
             open={state.isOpen}
             onOpenChange={state.setOpen}
             title={
                 <>
-                    <ShoppingBag className="w-6 h-6 text-primary" /> {`Your Cart (${totalItems})`}
+                    <ShoppingBag className="w-5 h-5 text-primary" /> <span className="text-base">{`Your Cart (${totalItems})`}</span>
                 </>
             }
             trigger={
@@ -35,7 +34,7 @@ const CartComponent: React.FC = () => {
                 </Button>
             }
         >
-            <CartDetails cart={cart!} onClose={state.close} />
+            {state.isOpen && (<CartDetails cart={cart!} onClose={state.close} />)}
         </Overlay>
     );
 };

@@ -151,7 +151,7 @@ export function BulkImageSheetForm({ onClose, imageIds }: BulkImageSheetFormProp
 
     return (
         <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="space-y-4 px-2 py-4 flex-1 overflow-y-auto">
+            <div className="space-y-4 px-2 pb-4 flex-1 overflow-y-auto">
                 <Card className="p-4 bg-muted/50">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">

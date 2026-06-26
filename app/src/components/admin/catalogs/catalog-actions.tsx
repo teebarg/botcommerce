@@ -28,10 +28,10 @@ const CatalogActions: React.FC<Props> = ({ item }) => {
             <Button
                 size="icon"
                 variant="ghost"
-                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                className="text-muted-foreground hover:text-foreground hover:bg-muted border border-border"
                 onClick={() => navigate({ to: `/catalog/${item.slug}` })}
             >
-                <Eye className="h-3.5 w-3.5" />
+                <Eye className="h-4 w-4" />
             </Button>
             <SheetDrawer
                 open={editState.isOpen}
@@ -40,10 +40,10 @@ const CatalogActions: React.FC<Props> = ({ item }) => {
                     <Button
                         size="icon"
                         variant="ghost"
-                        className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                        className="text-muted-foreground hover:text-foreground hover:bg-muted border border-border"
                         onClick={editState.open}
                     >
-                        <Edit className="h-3.5 w-3.5" />
+                        <Edit className="h-4 w-4" />
                     </Button>
                 }
                 onOpenChange={editState.setOpen}
@@ -57,9 +57,9 @@ const CatalogActions: React.FC<Props> = ({ item }) => {
                     <Button
                         size="icon"
                         variant="ghost"
-                        className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10 border border-destructive/20"
                     >
-                        <Trash2 className="h-3.5 w-3.5" />
+                        <Trash2 className="h-4 w-4" />
                     </Button>
                 }
                 onClose={deleteState.close}

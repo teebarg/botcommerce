@@ -4,6 +4,7 @@ import { Heart } from "lucide-react";
 import type { ProductImage } from "@/schemas";
 import { useUserDeleteWishlist } from "@/hooks/useUser";
 import ImageLightbox from "../image-lightbox";
+import { Button } from "@/components/ui/button";
 
 interface WishlistItemProps {
     id: number;
@@ -26,13 +27,15 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, slug, name, images }) =
                 className="w-full h-full"
                 imgClassName="w-full h-full object-cover"
             />
-            <button
+            <Button
                 onClick={onRemove}
                 aria-label="Remove from wishlist"
-                className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-black/35 flex items-center justify-center"
+                className="absolute top-2 right-2 z-10 rounded-full bg-black/35"
+                size="icon"
+                variant="ghost"
             >
-                <Heart className="w-3.5 h-3.5 fill-white text-white" />
-            </button>
+                <Heart className="w-4 h-4 fill-destructive text-destructive" />
+            </Button>
             <div
                 className="absolute bottom-0 inset-x-0 pt-6 pb-2 px-2 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
             >

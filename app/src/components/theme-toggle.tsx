@@ -1,6 +1,7 @@
 import { Moon, Sun, Monitor } from "lucide-react";
 import { useTheme } from "@/providers/theme-provider";
 import { useEffect, useState } from "react";
+import { Button } from "./ui/button";
 
 export function ThemeToggle() {
     const { userTheme, setTheme } = useTheme();
@@ -11,7 +12,7 @@ export function ThemeToggle() {
     }, []);
 
     if (!mounted) {
-        return <button aria-label="Toggle theme" className="h-10 w-10" suppressHydrationWarning />;
+        return <button aria-label="Toggle theme" className="h-9 w-9" suppressHydrationWarning />;
     }
 
     const toggleTheme = () => {
@@ -21,21 +22,22 @@ export function ThemeToggle() {
     const getThemeIcon = () => {
         switch (userTheme) {
             case "dark":
-                return <Sun className="h-5 w-5" />;
+                return <Sun className="h-4 w-4" />;
             case "light":
-                return <Moon className="h-5 w-5" />;
+                return <Moon className="h-4 w-4" />;
             default:
-                return <Monitor className="h-5 w-5" />;
+                return <Monitor className="h-4 w-4" />;
         }
     };
 
     return (
-        <button
+        <Button
             aria-label="Toggle theme"
-            className="h-10 w-10 rounded-md border p-2 hover:bg-card cursor-pointer"
+            size="icon"
+            variant="outline"
             onClick={toggleTheme}
         >
             {getThemeIcon()}
-        </button>
+        </Button>
     );
 }

@@ -139,7 +139,7 @@ const CategoryTree: React.FC<Props> = ({ data, isPending }) => {
                             <div className="flex-1 min-w-0 flex justify-between gap-4">
                                 <div className="min-w-0 flex-1">
                                     <h3 className="font-semibold truncate">{category.name}</h3>
-                                    <Badge variant={category.is_active ? "success-subtle" : "destructive"}>
+                                    <Badge variant={category.is_active ? "success" : "destructive"}>
                                         {category.is_active ? "Active" : "Inactive"}
                                     </Badge>
                                 </div>

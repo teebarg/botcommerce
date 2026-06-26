@@ -29,7 +29,7 @@ const CollectionItem = ({ collection }: CollectionItemProps) => {
             <div className="px-5 pt-5 pb-4">
                 <div className="flex items-center justify-between mb-3">
                     <p className="font-mono bg-muted px-2 py-1 rounded text-sm text-muted-foreground w-auto">/collections/{collection.slug}</p>
-                    <Badge variant={collection.is_active ? "success-subtle" : "destructive"}>{collection.is_active ? "Active" : "Inactive"}</Badge>
+                    <Badge variant={collection.is_active ? "success" : "destructive"}>{collection.is_active ? "Active" : "Inactive"}</Badge>
                 </div>
                 <h3 className="text-sm font-medium mb-1.5">
                     {collection?.name}
@@ -48,10 +48,10 @@ const CollectionItem = ({ collection }: CollectionItemProps) => {
                             <Button
                                 size="icon"
                                 variant="ghost"
-                                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                                className="text-muted-foreground hover:text-foreground hover:bg-muted"
                                 onClick={editState.open}
                             >
-                                <Edit3 className="h-3.5 w-3.5" />
+                                <Edit3 className="h-4 w-4" />
                             </Button>
                         }
                         onOpenChange={editState.setOpen}
@@ -66,9 +66,9 @@ const CollectionItem = ({ collection }: CollectionItemProps) => {
                             <Button
                                 size="icon"
                                 variant="ghost"
-                                className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
                             >
-                                <Trash2 className="h-3.5 w-3.5" />
+                                <Trash2 className="h-4 w-4" />
                             </Button>
                         }
                         onClose={deleteState.close}

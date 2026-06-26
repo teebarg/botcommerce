@@ -24,10 +24,10 @@ export const CouponUsageDialog = ({ couponCode, usageHistory }: CouponUsageDialo
             <DialogTrigger asChild>
                 <Button
                     size="sm"
-                    variant="ghost"
-                    className="h-7 text-xs text-muted-foreground hover:text-foreground hover:bg-muted gap-1.5"
+                    variant="outline"
+                    className="text-muted-foreground hover:text-foreground bg-muted gap-1.5"
                 >
-                    <History className="h-3.5 w-3.5" />
+                    <History className="h-4 w-4" />
                     History ({usageHistory.length})
                 </Button>
             </DialogTrigger>

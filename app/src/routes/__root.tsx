@@ -178,7 +178,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <html suppressHydrationWarning>
             <head>
                 <HeadContent />
-                <link rel="manifest" href="/manifest.webmanifest" />
                 <meta name="theme-color" content="#0f172a" />
                 <meta name="mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-capable" content="yes" />

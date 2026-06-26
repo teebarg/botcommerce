@@ -35,6 +35,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     //     inWishlist ? deleteWishlist(product.id) : createWishlist(product.id);
     // };
 
+    const item = product?.variants?.[0];
+
+    const attributes = [
+        item?.size && `Size: ${item.size}`,
+        item?.width && `W: ${item.width}`,
+        item?.length && `L: ${item.length}`,
+        item?.age && `Age: ${item.age}`,
+    ].filter(Boolean);
+
     const onAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -56,6 +65,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <ImageLightbox
                 url={product.image}
                 alt={product.name}
+                size={product.variants?.[0]?.size}
                 className="w-full h-full"
                 imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
@@ -71,13 +81,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 </span>
             )}
 
-            {/* <button
+
+            {(attributes.length > 0) && (
+                <span className="absolute top-2 right-2 text-xxs font-medium text-white bg-indigo-700 px-2 py-1 rounded-lg">
+                    {attributes.join(", ")}
+                </span>
+            )}
+
+            {/* <Button
                 onClick={toggleWishlist}
                 aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
-                className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-black/35 flex items-center justify-center"
+                className="absolute top-2 right-2 z-10 rounded-full bg-black/35"
+                size="icon"
+                variant="ghost"
             >
-                <Heart className={cn("w-3.5 h-3.5", inWishlist ? "fill-white text-white" : "text-white")} />
-            </button> */}
+                <Heart className={cn("w-4 h-4", inWishlist ? "fill-white text-white" : "text-white")} />
+            </Button> */}
 
             {outOfStock && (
                 <>
@@ -96,7 +115,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     outOfStock ? "from-black/40 to-transparent" : "from-black/80 via-black/40 to-transparent"
                 )}
             >
-                <div className="text-white text-xs font-medium truncate drop-shadow-sm pr-8">
+                <div className="text-white text-xs font-medium truncate drop-shadow-sm pr-24">
                     {product.name}
                 </div>
                 <div className="flex items-baseline gap-1.5 mt-0.5">
@@ -112,16 +131,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     <button
                         onClick={onWhatsApp}
                         aria-label="Buy on WhatsApp"
-                        className="w-[34px] h-[34px] rounded-full bg-white flex items-center justify-center"
+                        className="w-10 h-10 rounded-full bg-success flex items-center justify-center"
                     >
-                        <WhatsAppIcon className="w-[22px] h-[22px] text-success" />
+                        <WhatsAppIcon className="w-6 h-6 text-success-foreground" />
                     </button>
                     <button
                         onClick={onAddToCart}
                         aria-label="Add to cart"
-                        className="w-[34px] h-[34px] rounded-full bg-foreground flex items-center justify-center"
+                        className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center"
                     >
-                        <ShoppingBag className="w-[22px] h-[22px] text-background" />
+                        <ShoppingBag className="w-6 h-6 text-gray-800" />
                     </button>
                 </div>
             )}

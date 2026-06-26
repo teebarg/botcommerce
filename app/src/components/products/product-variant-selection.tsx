@@ -5,6 +5,7 @@ import { cn, currency } from "@/utils";
 import { Badge } from "@/components/ui/badge";
 import { useProductVariant } from "@/hooks/useProductVariant";
 import type { ProductLite, ProductVariantLite } from "@/schemas/product";
+import { Button } from "@/components/ui/button";
 
 interface VariantSelectionProps {
     product: ProductLite;
@@ -163,7 +164,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                         </div>
                     </div>
                     <div className="mt-3 flex justify-between items-center">
-                        <Badge variant={selectedVariant.status === "IN_STOCK" ? "success-subtle" : "destructive"}>
+                        <Badge variant={selectedVariant.status === "IN_STOCK" ? "success" : "destructive"}>
                             {selectedVariant.status === "IN_STOCK" ? "In stock" : "Out of stock"}
                         </Badge>
                         <span className="text-xs text-muted-foreground">{selectedVariant.inventory} available</span>
@@ -174,19 +175,23 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
             <div className="flex items-center gap-4">
                 <p className="text-sm font-medium text-foreground">Quantity</p>
                 <div className="flex items-center gap-3 bg-secondary rounded-full p-1">
-                    <button
+                    <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-background transition-colors"
+                        className="rounded-full hover:bg-background"
                     >
-                        <Minus className="w-3.5 h-3.5" />
-                    </button>
+                        <Minus className="w-4 h-4" />
+                    </Button>
                     <span className="w-6 text-center text-sm font-medium">{quantity}</span>
-                    <button
+                    <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => setQuantity(quantity + 1)}
-                        className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-background transition-colors"
+                        className="rounded-full hover:bg-background"
                     >
-                        <Plus className="w-3.5 h-3.5" />
-                    </button>
+                        <Plus className="w-4 h-4" />
+                    </Button>
                 </div>
             </div>
         </div>

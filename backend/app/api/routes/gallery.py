@@ -11,7 +11,6 @@ from app.models.gallery import PaginatedProductImages
 from app.core.permissions import require_admin
 from app.prisma_client import prisma as db
 from app.services.cache import cacheable
-from app.core.dependencies.cache import CacheDep
 from app.core.dependencies.product import ProductDep
 from app.core.dependencies.gallery import GalleryDep
 
@@ -39,7 +38,6 @@ async def image_gallery(
 async def delete_gallery_image(
     image_id: int,
     srv: GalleryDep,
-    cache: CacheDep,
     product_srv: ProductDep,
     background_tasks: BackgroundTasks,
 ) -> Message:
@@ -51,24 +49,19 @@ async def delete_gallery_image(
 
     background_tasks.add_task(product_srv.delete_product_index, product_ids=[product_id])
     background_tasks.add_task(srv.storage.remove_images, image_urls)
-    await cache.invalidate(tags=["gallery"])
     return Message(message="Image and all related data deleted successfully")
 
 
 @router.post("/bulk-upload", dependencies=[Depends(require_admin)])
 async def bulk_save_image_urls(
-    cache: CacheDep,
     srv: GalleryDep,
     payload: ProductImageBulkUrls,
 ):
-    result = await srv.bulk_save_urls(payload)
-    await cache.invalidate(tags=["gallery"])
-    return result
+    return await srv.bulk_save_urls(payload)
 
 
 @router.post("/bulk-delete", dependencies=[Depends(require_admin)])
 async def bulk_delete_gallery_images(
-    cache: CacheDep,
     srv: GalleryDep,
     Product_srv: ProductDep,
     payload: ImageBulkDelete,
@@ -87,8 +80,6 @@ async def bulk_delete_gallery_images(
         remove_storage_fn=srv.storage.remove_images,
         delete_index_fn=Product_srv.delete_product_index
     )
-    await cache.invalidate(tags=["gallery"])
-
     await srv.ws_manager.broadcast_to_all({"status": "processing"}, "bulk_action")
     return {"success": True, "message": f"Deleting {len(images)} images..."}
 
@@ -97,14 +88,12 @@ async def bulk_delete_gallery_images(
 async def create_image_metadata(
     image_id: int,
     srv: GalleryDep,
-    cache: CacheDep,
     payload: ProductImageMetadata,
     product_srv: ProductDep,
     background_tasks: BackgroundTasks,
 ):
     product_id = await srv.create_metadata(image_id, payload)
     background_tasks.add_task(product_srv.invalidate, id=product_id)
-    await cache.invalidate(tags=["gallery"])
     return {"success": True}
 
 
@@ -112,21 +101,18 @@ async def create_image_metadata(
 async def update_image_metadata(
     image_id: int,
     srv: GalleryDep,
-    cache: CacheDep,
     payload: ProductImageMetadata,
     product_srv: ProductDep,
     background_tasks: BackgroundTasks,
 ):
     product_id = await srv.update_metadata(image_id, payload)
     background_tasks.add_task(product_srv.invalidate, id=product_id)
-    await cache.invalidate(tags=["gallery"])
     return {"success": True}
 
 
 @router.patch("/bulk-update", dependencies=[Depends(require_admin)])
 async def bulk_update_products(
     srv: GalleryDep,
-    cache: CacheDep,
     product_srv: ProductDep,
     payload: ImagesBulkUpdate,
     background_tasks: BackgroundTasks,
@@ -152,5 +138,4 @@ async def bulk_update_products(
         index_products_fn=product_srv.invalidate_all
     )
 
-    await cache.invalidate(tags=["gallery"])
     return {"message": f"Updating {len(images)} products..."}

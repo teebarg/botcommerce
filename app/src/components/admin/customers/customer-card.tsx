@@ -12,7 +12,7 @@ const CustomerCard = ({ user }: CustomerCardProps) => {
     const getStatusBadge = (status?: any) => {
         const variants: Record<any, BadgeVariant> = {
             ["PENDING"]: "warning",
-            ["ACTIVE"]: "success-subtle",
+            ["ACTIVE"]: "success",
             ["INACTIVE"]: "destructive",
         };
 

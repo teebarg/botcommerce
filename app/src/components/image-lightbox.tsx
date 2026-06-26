@@ -10,10 +10,11 @@ interface ImageLightboxProps {
     className?: string;
     imgClassName?: string;
     disabled?: boolean;
+    size?: string | null;
 }
 
-export default function ImageLightbox({ url, alt, className, imgClassName, disabled = false }: ImageLightboxProps) {
-    const [open, setOpen] = useState(false);
+export default function ImageLightbox({ url, alt, className, imgClassName, size, disabled = false }: ImageLightboxProps) {
+        const [open, setOpen] = useState(false);
 
     const close = useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
@@ -64,6 +65,13 @@ export default function ImageLightbox({ url, alt, className, imgClassName, disab
                             className="max-w-[92vw] max-h-[88vh] object-contain touch-pinch-zoom"
                             onClick={close}
                         />
+                        {size && (
+                            <div className="absolute top-12 left-8 bg-white text-black px-3 py-1">
+                                <span className="text-lg font-medium">
+                                    Size: {size}
+                                </span>
+                            </div>
+                        )}
                     </div>,
                     document.body
                 )}

@@ -19,7 +19,7 @@ const ActivityTypeIcon = ({ type, isSuccess }: { type: string; isSuccess: boolea
 
 const StatusBadge = ({ isSuccess, activityType }: { isSuccess: boolean; activityType: string }) => {
     if (activityType === "PRODUCT_EXPORT") {
-        return <Badge variant={isSuccess ? "success-subtle" : "destructive"}>{isSuccess ? "Completed" : "Failed"}</Badge>;
+        return <Badge variant={isSuccess ? "success" : "destructive"}>{isSuccess ? "Completed" : "Failed"}</Badge>;
     }
     return <Badge variant="success">Success</Badge>;
 };

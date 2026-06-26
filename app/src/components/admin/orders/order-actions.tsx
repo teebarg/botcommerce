@@ -14,19 +14,24 @@ const OrderActions: React.FC<OrderActionsProps> = ({ order }) => {
     const state = useOverlayTriggerState({});
 
     return (
-        <div className="flex items-center flex-wrap gap-2 w-full">
+        <div className="flex items-center gap-2">
             <Overlay
                 open={state.isOpen}
                 sheetClassName="md:max-w-7xl"
                 title="Order Details"
                 trigger={
-                    <Button className="flex-1" onClick={state.open}>
-                        View Details
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className="rounded-full text-xs"
+                        onClick={state.open}
+                    >
+                        View details
                     </Button>
                 }
                 onOpenChange={state.setOpen}
             >
-                <OrderDetails order={order} onClose={() => state.close()} />
+                {state.isOpen && <OrderDetails order={order} onClose={state.close} />}
             </Overlay>
             <OrderProcessingAction order={order} />
         </div>
