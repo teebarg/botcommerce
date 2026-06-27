@@ -1,3 +1,4 @@
+import time
 import json
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks, Response, Request
@@ -95,7 +96,7 @@ async def search(
 
 @router.get("/{slug}")
 async def read(request: Request, slug: str, srv: ProductDep) -> ProductLite:
-    cache_key = f"product:slug:{slug}"
+    cache_key: str = f"product:{slug}"
     cached = await srv.redis.get(cache_key)
     if cached:
         return json.loads(cached)
@@ -106,18 +107,23 @@ async def read(request: Request, slug: str, srv: ProductDep) -> ProductLite:
 
     new_product = ProductLite.validate(product)
 
-    async with srv.redis.pipeline(transaction=False) as pipe:
-        pipe.setex(cache_key, DEFAULT_EXPIRATION, json.dumps(new_product, cls=EnhancedJSONEncoder))
-        pipe.sadd(f"tag:product:{product.id}", cache_key)
-        pipe.expire(f"tag:product:{product.id}", DEFAULT_EXPIRATION)
-        await pipe.execute()
+    try:
+        now = int(time.time())
+        expire_at = now + DEFAULT_EXPIRATION
+        async with srv.redis.pipeline(transaction=False) as pipe:
+            pipe.setex(cache_key, DEFAULT_EXPIRATION, json.dumps(new_product, cls=EnhancedJSONEncoder))
+            pipe.zadd(f"tag:product:{product.id}", {cache_key: expire_at})
+            pipe.expire(f"tag:product:{product.id}", DEFAULT_EXPIRATION)
+            await pipe.execute()
+    except Exception as e:
+            logger.error(f"[Product Cache] Write failure for key '{cache_key}': {e}", exc_info=True)
 
     return new_product
 
 
 @router.put("/variants/{variant_id}", dependencies=[Depends(require_admin)])
 async def update_variant(
-    variant_id: int, variant: VariantWithStatus, srv: ProductDep, background_tasks: BackgroundTasks,
+    variant_id: int, variant: VariantWithStatus, srv: ProductDep,
 ):
     existing_variant = await srv.get_variant(variant_id=variant_id)
     if not existing_variant:
@@ -131,7 +137,7 @@ async def update_variant(
 
     try:
         updated_variant = await srv.update_variant(variant_id=variant_id, update_data=update_data)
-        background_tasks.add_task(srv.invalidate, product_id=existing_variant.product_id)
+        await srv.invalidate(id=existing_variant.product_id)
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=400, detail=str(e))

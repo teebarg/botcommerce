@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import type { ProductSearch } from "@/schemas/product";
 import { currency } from "@/utils";
-import { useAddToCart } from "./useCart";
+import { useAddToCart, useChangeCartQuantity } from "./useCart";
 import { useConfig } from "@/providers/store-provider";
 import { useCart } from "@/providers/cart-provider";
 import { isFirstWhatsAppMessage, markFirstWhatsAppMessageSent } from "@/utils/whatsapp-message-state";
@@ -9,7 +9,10 @@ import { isFirstWhatsAppMessage, markFirstWhatsAppMessageSent } from "@/utils/wh
 export const useProductCardVariant = (product: ProductSearch) => {
     const { cart } = useCart();
     const { whatsapp } = useConfig();
-    const { mutateAsync: addToCart } = useAddToCart();
+    const { mutateAsync: addToCart, isPending: creating } = useAddToCart();
+    const { mutateAsync: updateQuantity, isPending: updating } = useChangeCartQuantity();
+
+    const loading = creating || updating;
 
     const firstInStockVariant = useMemo(
         () => product?.variants?.find((v) => v.inventory > 0) ?? product?.variants?.[0],
@@ -37,7 +40,7 @@ export const useProductCardVariant = (product: ProductSearch) => {
         if (!firstInStockVariant) return;
         const variantInCart = cart?.items?.find((item) => item.variant_id === firstInStockVariant.id);
         if (variantInCart) {
-            // already in cart — no-op from card, let them go to cart
+            updateQuantity({ item_id: variantInCart.id, quantity: variantInCart.quantity + 1 })
             return;
         }
         addToCart({ variant_id: firstInStockVariant.id, quantity: 1 });
@@ -63,5 +66,5 @@ export const useProductCardVariant = (product: ProductSearch) => {
         markFirstWhatsAppMessageSent();
     };
 
-    return { priceInfo, outOfStock, handleAddToCart, handleWhatsAppPurchase };
+    return { priceInfo, outOfStock, handleAddToCart, handleWhatsAppPurchase, loading };
 };

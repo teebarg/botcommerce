@@ -45,7 +45,7 @@ class OrderService:
     async def get_by_number(self, order_number: str, include_relations: bool = True) -> Any:
         if not include_relations:
             return await self.db.order.find_unique(where={"order_number": order_number})
-        
+
         return await self.db.order.find_unique(
             where={"order_number": order_number},
             include={
@@ -61,7 +61,7 @@ class OrderService:
             "user": True,
             "shipping_address": True
         } if include_relations else None
-        
+
         return await self.db.order.find_unique(where={"id": order_id}, include=include_clause)
 
     async def list_paginated(
@@ -104,10 +104,10 @@ class OrderService:
                 "coupon": True,
             }
         )
-        
+
         items = orders[:limit]
         next_cursor = items[-1].id if len(orders) > limit else None
-        
+
         return {
             "items": items,
             "next_cursor": next_cursor,
@@ -378,6 +378,7 @@ class OrderService:
                 )
             except Exception as e:
                 logger.error(f"Failed to append order timeline for return: {e}")
+            await self.cache_srv.invalidate(f"order:{order_id}", tags=["orders"])
 
         async def invalidate_caches() -> None:
             try:

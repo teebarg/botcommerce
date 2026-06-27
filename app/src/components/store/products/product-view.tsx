@@ -130,7 +130,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                 <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                                     <span>SKU: {v.sku}</span>
                                     <span>Inventory: {v.inventory}</span>
-                                    <span className={v.inventory > 0 ? "text-success" : "text-destructive"}>
+                                    <span className={v.inventory > 0 ? "text-emerald-500" : "text-destructive"}>
                                         {v.inventory > 0 ? "In stock" : "Out of stock"}
                                     </span>
                                 </div>

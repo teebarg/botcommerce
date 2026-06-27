@@ -142,7 +142,7 @@ class ProductService:
         limit = kwargs.get("limit", 20)
         cursor = kwargs.get("cursor")
         sort = kwargs.get("sort", "id:desc")
-        
+
         feed_seed = kwargs.get("feed_seed") or random.randint(1000, 9999)
         offset = 0
         if cursor:
@@ -169,15 +169,15 @@ class ProductService:
                 buffer_limit = limit * 3
                 search_params["limit"] = buffer_limit
                 search_params["sort"] = ["id:desc"]
-                
+
                 res = await self.search_srv.search_index("", search_params)
                 raw_hits = res["hits"]
                 total_count = res["estimatedTotalHits"]
-                
+
                 # Deterministic Python Shuffle using the user's persistent seed
                 rng = random.Random(feed_seed)
                 rng.shuffle(raw_hits)
-                
+
                 hits = raw_hits[:limit]
 
         except Exception as e:
@@ -199,7 +199,7 @@ class ProductService:
 
     async def query_collection_index(self) -> dict:
         collections = ["trending", "new-arrivals", "featured"]
-        
+
         async def fetch_collection(col: str):
             search_params = {
                 "limit": 6 if col == "trending" else 8,
@@ -215,13 +215,13 @@ class ProductService:
                     res = await self.search_srv.search_index("", search_params)
                 else:
                     raise HTTPException(status_code=502, detail="Search service communication error")
-            
+
             key_name: str = "arrival" if col == "new-arrivals" else col
             return key_name, res.get("hits", [])
 
         tasks = [fetch_collection(col) for col in collections]
         completed_tasks = await asyncio.gather(*tasks)
-        
+
         return {key: hits for key, hits in completed_tasks}
 
     def _has_active_filters(self, kw) -> bool:
@@ -333,7 +333,7 @@ class ProductService:
 
             product_data = self._prepare_product_data_for_indexing(product=product)
             await self.search_srv.update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
-            await self.cache_srv.invalidate(f"product:{id}", tags=["products", "catalog"])
+            await self.cache_srv.invalidate(f"product:{product.slug}", tags=["products", "catalog", f"product:{id}"])
         except Exception as e:
             logger.error(f"Error re-indexing product {id}: {e}")
 

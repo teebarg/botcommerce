@@ -1,10 +1,10 @@
 import type React from "react";
 import type { ProductSearch } from "@/schemas/product";
 import { Link } from "@tanstack/react-router";
-import { ShoppingBag } from "lucide-react";
 import { currency, cn } from "@/utils";
 import { useProductCardVariant } from "@/hooks/useProductCardVariant";
 import ImageLightbox from "@/components/image-lightbox";
+import { Button } from "@/components/ui/button";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -24,7 +24,7 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
 );
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-    const { priceInfo, handleAddToCart, handleWhatsAppPurchase, outOfStock } = useProductCardVariant(product);
+    const { priceInfo, handleAddToCart, handleWhatsAppPurchase, outOfStock, loading } = useProductCardVariant(product);
     const { minPrice, maxCompareAtPrice, hasDiscount, maxDiscountPercent } = priceInfo;
     // const { mutate: createWishlist } = useUserCreateWishlist();
     // const { mutate: deleteWishlist } = useUserDeleteWishlist();
@@ -60,90 +60,94 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <Link
             to="/products/$slug"
             params={{ slug: product.slug }}
-            className="relative block w-full aspect-gallery rounded-xl overflow-hidden border border-border bg-secondary group"
+            className="relative2 block w-full rounded-xl overflow-hidden border border-border bg-secondary group"
         >
-            <ImageLightbox
-                url={product.image}
-                alt={product.name}
-                size={product.variants?.[0]?.size}
-                className="w-full h-full"
-                imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
+            <div className="relative aspect-gallery">
+                <ImageLightbox
+                    url={product.image}
+                    alt={product.name}
+                    size={product.variants?.[0]?.size}
+                    className="w-full h-full"
+                    imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
 
-            {!outOfStock && hasDiscount && (
-                <span className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-2xs font-medium px-2 py-1 rounded-full">
-                    -{maxDiscountPercent}%
-                </span>
-            )}
-            {!outOfStock && !hasDiscount && product.is_new && (
-                <span className="absolute top-2 left-2 bg-emerald-500 text-white text-2xs font-medium px-2 py-1 rounded-full">
-                    New
-                </span>
-            )}
-
-
-            {(attributes.length > 0) && (
-                <span className="absolute top-2 right-2 text-2xs font-medium text-white bg-indigo-700 px-2 py-1 rounded-lg">
-                    {attributes.join(", ")}
-                </span>
-            )}
-
-            {/* <Button
-                onClick={toggleWishlist}
-                aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
-                className="absolute top-2 right-2 z-10 rounded-full bg-black/35"
-                size="icon"
-                variant="ghost"
-            >
-                <Heart className={cn("w-4 h-4", inWishlist ? "fill-white text-white" : "text-white")} />
-            </Button> */}
-
-            {outOfStock && (
-                <>
-                    <div className="absolute inset-0 bg-black/55" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="bg-foreground text-background text-2xs font-medium px-3.5 py-1.5 rounded-full tracking-wide">
-                            Sold out
-                        </span>
-                    </div>
-                </>
-            )}
-
-            <div
-                className={cn(
-                    "absolute bottom-0 inset-x-0 pt-6 pb-2 px-2 bg-gradient-to-t",
-                    outOfStock ? "from-black/40 to-transparent" : "from-black/80 via-black/40 to-transparent"
+                {!outOfStock && hasDiscount && (
+                    <span className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-2xs font-medium px-2 py-1 rounded-full">
+                        -{maxDiscountPercent}%
+                    </span>
                 )}
-            >
-                <div className="text-white text-xs font-medium truncate drop-shadow-sm pr-24">
-                    {product.name}
-                </div>
-                <div className="flex items-baseline gap-1.5">
-                    <span className="text-white text-lg font-medium drop-shadow-sm">{currency(minPrice)}</span>
-                    {!outOfStock && hasDiscount && (
-                        <span className="text-white/55 text-xs line-through">{currency(maxCompareAtPrice)}</span>
+                {!outOfStock && !hasDiscount && product.is_new && (
+                    <span className="absolute top-2 left-2 bg-emerald-500 text-white text-2xs font-medium px-2 py-1 rounded-full">
+                        New
+                    </span>
+                )}
+
+
+                {(attributes.length > 0) && (
+                    <span className="absolute top-2 right-2 text-2xs font-medium text-white bg-indigo-700 px-2 py-1 rounded-lg">
+                        {attributes.join(", ")}
+                    </span>
+                )}
+
+                {/* <Button
+                    onClick={toggleWishlist}
+                    aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                    className="absolute top-2 right-2 z-10 rounded-full bg-black/35"
+                    size="icon"
+                    variant="ghost"
+                >
+                    <Heart className={cn("w-4 h-4", inWishlist ? "fill-white text-white" : "text-white")} />
+                </Button> */}
+
+                {outOfStock && (
+                    <>
+                        <div className="absolute inset-0 bg-black/55" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="bg-foreground text-background text-2xs font-medium px-3.5 py-1.5 rounded-full tracking-wide">
+                                Sold out
+                            </span>
+                        </div>
+                    </>
+                )}
+
+                <div
+                    className={cn(
+                        "absolute bottom-0 inset-x-0 pt-4 pb-2 px-2 bg-gradient-to-t",
+                        outOfStock ? "from-black/40 to-transparent" : "from-black/80 via-black/40 to-transparent"
                     )}
+                >
+                    <div className="text-white text-xs font-medium truncate drop-shadow-sm pr-4 sr-only">
+                        {product.name}
+                    </div>
+                    <div className="flex items-baseline gap-1.5">
+                        <span className="text-white text-lg font-medium drop-shadow-sm">{currency(minPrice)}</span>
+                        {!outOfStock && hasDiscount && (
+                            <span className="text-white/55 text-sm line-through">{currency(maxCompareAtPrice)}</span>
+                        )}
+                    </div>
                 </div>
             </div>
-
-            {!outOfStock && (
-                <div className="absolute bottom-2 right-1 flex gap-1.5">
-                    <button
-                        onClick={onWhatsApp}
-                        aria-label="Buy on WhatsApp"
-                        className="w-10 h-10 rounded-full bg-success flex items-center justify-center"
-                    >
-                        <WhatsAppIcon className="w-6 h-6 text-success-foreground" />
-                    </button>
-                    <button
-                        onClick={onAddToCart}
-                        aria-label="Add to cart"
-                        className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center"
-                    >
-                        <ShoppingBag className="w-6 h-6 text-gray-800" />
-                    </button>
-                </div>
-            )}
+            <div className="flex gap-2 bg-card py-2 px-2.5">
+                <Button
+                    onClick={onAddToCart}
+                    aria-label="Add to cart"
+                    variant="ghost"
+                    className="border border-foreground/70 flex-1"
+                    size="sm"
+                    disabled={outOfStock}
+                    isLoading={loading}
+                >
+                        Add to cart
+                </Button>
+                <button
+                    onClick={onWhatsApp}
+                    aria-label="Buy on WhatsApp"
+                    className="w-10 h-10 rounded-full bg-success flex items-center justify-center"
+                    disabled={outOfStock}
+                >
+                    <WhatsAppIcon className="w-7 h-7 text-success-foreground" />
+                </button>
+            </div>
         </Link>
     );
 };
