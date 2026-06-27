@@ -118,10 +118,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 <div className="text-white text-xs font-medium truncate drop-shadow-sm pr-24">
                     {product.name}
                 </div>
-                <div className="flex items-baseline gap-1.5 mt-0.5">
-                    <span className="text-white font-medium drop-shadow-sm">{currency(minPrice)}</span>
+                <div className="flex items-baseline gap-1.5">
+                    <span className="text-white text-lg font-medium drop-shadow-sm">{currency(minPrice)}</span>
                     {!outOfStock && hasDiscount && (
-                        <span className="text-white/55 text-2xs line-through">{currency(maxCompareAtPrice)}</span>
+                        <span className="text-white/55 text-xs line-through">{currency(maxCompareAtPrice)}</span>
                     )}
                 </div>
             </div>

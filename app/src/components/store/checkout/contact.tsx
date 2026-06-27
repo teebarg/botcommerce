@@ -69,7 +69,7 @@ const CartContactForm = () => {
                                             }}
                                         />
 
-                                        <Button type="submit" disabled={updateCartDetails.isPending || !form.formState.isValid}>
+                                        <Button size="sm" className="min-w-20 h-8" type="submit" disabled={updateCartDetails.isPending || !form.formState.isValid}>
                                             {updateCartDetails.isPending ? "Saving..." : "Save"}
                                         </Button>
                                     </div>

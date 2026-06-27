@@ -99,7 +99,7 @@ const DiscountCode: React.FC = () => {
                     <Button
                         onClick={applyDiscountCode}
                         variant={appliedDiscount ? "success" : "default"}
-                        className={cn(appliedDiscount && "bg-primary")}
+                        className={cn("min-w-20 h-8", appliedDiscount && "bg-primary")}
                         isLoading={applyMutation.isPending}
                     >
                         {appliedDiscount ? <Check className="w-4 h-4" /> : "Apply"}

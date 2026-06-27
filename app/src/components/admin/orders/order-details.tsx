@@ -8,11 +8,11 @@ import { OrderStatus, type Order, type OrderItem } from "@/schemas";
 import { useReturnOrderItem } from "@/hooks/useOrder";
 import { cn, currency, formatDate } from "@/utils";
 import { Badge } from "@/components/ui/badge";
-import ImageDisplay from "@/components/image-display";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { Button } from "@/components/ui/button";
 import { ReactElement } from "react";
 import OrderSummary from "@/components/store/orders/order-summary";
+import ImageLightbox from "@/components/image-lightbox";
 
 interface OrderDetailsProps {
     order: Order;
@@ -88,7 +88,12 @@ const OrderItemCard: React.FC<{ item: OrderItem; orderId: number }> = ({ item, o
     return (
         <div className="flex items-start gap-3 px-4 py-3">
             <div className="relative w-16 h-16 shrink-0 overflow-hidden rounded-lg bg-card ring-1 ring-border">
-                <ImageDisplay className="rounded-lg" url={item?.image} alt={item.name} />
+                <ImageLightbox
+                    url={item?.image}
+                    alt={item?.name}
+                    className="w-full h-full"
+                    imgClassName="w-full h-full object-cover"
+                />
             </div>
 
             <div className="flex-1 min-w-0">
