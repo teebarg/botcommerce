@@ -21,7 +21,7 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
         <div className="relative group cursor-pointer bg-card animate-in fade-in duration-300 rounded-xl border border-border overflow-hidden flex flex-col justify-between">
             <div className="relative w-full aspect-product overflow-hidden">
                 {Boolean(priceInfo.maxDiscountPercent) && (
-                    <div className="absolute top-2 left-2 z-10 bg-destructive text-destructive-foreground px-2 py-1 text-xxs font-bold rounded-sm">
+                    <div className="absolute top-2 left-2 z-10 bg-destructive text-destructive-foreground px-2 py-1 text-2xs font-bold rounded-sm">
                         -{priceInfo.maxDiscountPercent}%
                     </div>
                 )}
@@ -40,7 +40,7 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
 
                 {outOfStock && (
                     <div className="absolute inset-0 flex items-center justify-center bg-background/20">
-                        <span className="bg-foreground text-background px-4 py-2 text-xxs font-bold uppercase tracking-[0.2em]">
+                        <span className="bg-foreground text-background px-4 py-2 text-2xs font-bold uppercase tracking-[0.2em]">
                             Sold Out
                         </span>
                     </div>

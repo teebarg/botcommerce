@@ -75,15 +75,15 @@ const OrderCard = ({ order }: OrderCardProps) => {
 
             <div className="grid grid-cols-2 gap-3 px-4 py-3 border-b border-border">
                 <div>
-                    <p className="text-xxs font-medium uppercase tracking-widest text-muted-foreground mb-1">Total</p>
+                    <p className="text-2xs font-medium uppercase tracking-widest text-muted-foreground mb-1">Total</p>
                     <p className="text-sm font-semibold text-foreground">{currency(order.total)}</p>
                 </div>
                 <div>
-                    <p className="text-xxs font-medium uppercase tracking-widest text-muted-foreground mb-1">Status</p>
+                    <p className="text-2xs font-medium uppercase tracking-widest text-muted-foreground mb-1">Status</p>
                     <OrderStatusBadge status={order.status} />
                 </div>
                 <div>
-                    <p className="text-xxs font-medium uppercase tracking-widest text-muted-foreground mb-1">Items</p>
+                    <p className="text-2xs font-medium uppercase tracking-widest text-muted-foreground mb-1">Items</p>
                     <p className="text-sm text-foreground">{order.order_items.length} {order.order_items.length === 1 ? "item" : "items"}</p>
                 </div>
             </div>

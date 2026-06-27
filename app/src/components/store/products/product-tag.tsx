@@ -21,7 +21,7 @@ const ProductTag = ({ product }: ProductTagProps) => {
         }
         if (variant?.size) {
             return (
-                <div className="text-xxs">
+                <div className="text-2xs">
                     uk<span className="text-base">{variant.size}</span>
                 </div>
             );

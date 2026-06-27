@@ -58,11 +58,11 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
 
             {/* Top status overlays */}
             <div className="absolute top-2 left-2 flex flex-col gap-1.5 z-10 pointer-events-none">
-                <span className={cn("text-xxs font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm border", statusColorClass, statusLabel == "Active" && "hidden")}>
+                <span className={cn("text-2xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm border", statusColorClass, statusLabel == "Active" && "hidden")}>
                     {statusLabel}
                 </span>
                 {product?.is_new && (
-                    <span className="w-fit bg-accent text-accent-foreground text-xxs font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm shadow-sm">
+                    <span className="w-fit bg-accent text-accent-foreground text-2xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm shadow-sm">
                         New
                     </span>
                 )}

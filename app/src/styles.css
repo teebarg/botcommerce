@@ -17,8 +17,8 @@
     --font-display: "Outfit Variable", sans-serif;
     --font-sans: "Lexend Variable", sans-serif;
 
-    --text-xxs: 0.625rem;
-    --text-xxs--line-height: calc(1 / 0.625);
+    --text-2xs: 0.625rem;
+    --text-2xs--line-height: calc(1 / 0.625);
 
     --text-sm: 0.8125rem;
     --text-sm--line-height: calc(1 / 0.8125);
@@ -84,7 +84,7 @@
     --animate-slide-up: slide-up 0.8s ease-out;
     --animate-scale-in: scale-in 0.4s ease-out;
     --animate-sparkle-burst: sparkle-burst 1.5s ease-in-out 0s infinite normal none running;
-    --animate-fade-in: slide-up 0.5s ease-out 0.2s both;
+    --animate-slide-fade-in: slide-up 0.5s ease-out 0.2s both;
     --animate-wave: wave 1.5s ease-in-out infinite;
     --animate-progress-bar: progress-bar 2s ease-out forwards;
 

@@ -14,7 +14,7 @@ const EscalationCard = () => (
         <AlertTriangle className="w-5 h-5 text-destructive flex-shrink-0" />
         <div>
             <p className="text-xs font-semibold text-foreground">Escalated to Human Agent</p>
-            <p className="text-xxs text-muted-foreground">Average wait time: ~2 minutes</p>
+            <p className="text-2xs text-muted-foreground">Average wait time: ~2 minutes</p>
         </div>
     </div>
 );
@@ -24,7 +24,7 @@ const ComplaintCard = () => (
         <CheckCircle className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
         <div>
             <p className="text-xs font-semibold text-foreground">Complaint Submitted</p>
-            <p className="text-xxs text-muted-foreground">Our support team will review your complaint and get back to you within 24 hours.</p>
+            <p className="text-2xs text-muted-foreground">Our support team will review your complaint and get back to you within 24 hours.</p>
         </div>
     </div>
 );
@@ -41,7 +41,7 @@ function SourceBadges({ sources }: { sources: string[] }) {
             {sources.map((s) => (
                 <span
                     key={s}
-                    className="text-xxs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200 font-medium tracking-wide"
+                    className="text-2xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200 font-medium tracking-wide"
                 >
                     {icons[s] ?? "📄"} {s}
                 </span>
@@ -145,12 +145,12 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastMessage, isEd
                         {!!message.metadata?.products?.length && <ProductRecommendation products={message.metadata.products || []} />}
                         {isAgent && <SourceBadges sources={message.metadata?.sources ?? []} />}
                         <div className={`flex items-center gap-1.5 mt-1 ${isAssistant ? "justify-start" : "justify-end"}`}>
-                            <p className="text-xxs text-muted-foreground">{formatTime(message.timestamp)}</p>
+                            <p className="text-2xs text-muted-foreground">{formatTime(message.timestamp)}</p>
                             {isEditable && (
                                 <>
                                     {/* <button
                                         onClick={() => setIsEditing(true)}
-                                        className="text-xxs text-muted-foreground hover:text-foreground transition-colors underline"
+                                        className="text-2xs text-muted-foreground hover:text-foreground transition-colors underline"
                                     >
                                         Edit
                                     </button> */}

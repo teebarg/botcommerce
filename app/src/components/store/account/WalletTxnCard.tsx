@@ -37,7 +37,7 @@ export function WalletTxnCard({ txn, index }: Props) {
                     {isCredit ? "+" : ""}
                     {currency(txn.amount)}
                 </p>
-                <p className="text-xxs text-muted-foreground">{formatDate(txn.created_at)}</p>
+                <p className="text-2xs text-muted-foreground">{formatDate(txn.created_at)}</p>
             </div>
         </div>
     );
