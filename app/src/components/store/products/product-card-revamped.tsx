@@ -71,12 +71,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             />
 
             {!outOfStock && hasDiscount && (
-                <span className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-[10px] font-medium px-2 py-1 rounded-full">
+                <span className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-xxs font-medium px-2 py-1 rounded-full">
                     -{maxDiscountPercent}%
                 </span>
             )}
             {!outOfStock && !hasDiscount && product.is_new && (
-                <span className="absolute top-2 left-2 bg-emerald-500 text-white text-[10px] font-medium px-2 py-1 rounded-full">
+                <span className="absolute top-2 left-2 bg-emerald-500 text-white text-xxs font-medium px-2 py-1 rounded-full">
                     New
                 </span>
             )}
@@ -102,7 +102,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 <>
                     <div className="absolute inset-0 bg-black/55" />
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="bg-foreground text-background text-[10px] font-medium px-3.5 py-1.5 rounded-full tracking-wide">
+                        <span className="bg-foreground text-background text-xxs font-medium px-3.5 py-1.5 rounded-full tracking-wide">
                             Sold out
                         </span>
                     </div>
@@ -121,7 +121,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 <div className="flex items-baseline gap-1.5 mt-0.5">
                     <span className="text-white font-medium drop-shadow-sm">{currency(minPrice)}</span>
                     {!outOfStock && hasDiscount && (
-                        <span className="text-white/55 text-[10px] line-through">{currency(maxCompareAtPrice)}</span>
+                        <span className="text-white/55 text-xxs line-through">{currency(maxCompareAtPrice)}</span>
                     )}
                 </div>
             </div>

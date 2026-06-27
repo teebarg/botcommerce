@@ -58,11 +58,11 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
 
             {/* Top status overlays */}
             <div className="absolute top-2 left-2 flex flex-col gap-1.5 z-10 pointer-events-none">
-                <span className={cn("text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm border", statusColorClass, statusLabel == "Active" && "hidden")}>
+                <span className={cn("text-xxs font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm border", statusColorClass, statusLabel == "Active" && "hidden")}>
                     {statusLabel}
                 </span>
                 {product?.is_new && (
-                    <span className="w-fit bg-accent text-accent-foreground text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm shadow-sm">
+                    <span className="w-fit bg-accent text-accent-foreground text-xxs font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm shadow-sm">
                         New
                     </span>
                 )}
@@ -94,9 +94,16 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
                     <div className="bg-gradient-to-t from-black/85 via-black/50 to-transparent pt-8 pb-2 px-2.5">
                         <div className="flex items-end justify-between gap-2">
                             {variants.length > 0 && (
-                                <span className="text-sm font-bold text-white drop-shadow-sm">
-                                    {currency(variants[0]?.price || 0)}
-                                </span>
+                                <div className="flex gap-1">
+                                    <span className="text-sm font-semibold text-white drop-shadow-sm">
+                                        {currency(variants[0]?.price || 0)}
+                                    </span>
+                                    {variants[0]?.old_price > 0 && (
+                                        <span className="text-xs text-white line-through">
+                                            {currency(variants[0]?.old_price || 0)}
+                                        </span>
+                                    )}
+                                </div>
                             )}
                             {attributes.length > 0 && (
                                 <div className="flex flex-wrap justify-end gap-1 max-w-[65%]">

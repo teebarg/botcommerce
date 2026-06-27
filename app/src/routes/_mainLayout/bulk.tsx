@@ -167,7 +167,7 @@ function RouteComponent() {
                                             <div className="flex items-center gap-2 mb-0.5">
                                                 <span className="text-sm font-medium text-foreground">{option.name}</span>
                                                 {option.popular && (
-                                                    <span className="text-[10px] font-medium bg-warning-subtle text-warning-subtle-foreground px-2 py-0.5 rounded-full">
+                                                    <span className="text-xxs font-medium bg-warning-subtle text-warning-subtle-foreground px-2 py-0.5 rounded-full">
                                                         Popular
                                                     </span>
                                                 )}
