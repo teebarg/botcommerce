@@ -1,9 +1,8 @@
 "use client";
 
 import { useLocation, useSearch } from "@tanstack/react-router";
-import { SlidersHorizontal, X } from "lucide-react";
+import { Check, ChevronsUpDown, SlidersHorizontal, X } from "lucide-react";
 import { useEffect, useState } from "react";
-
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -11,17 +10,26 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
+import { useCategories } from "@/hooks/useCategories";
+import { Category } from "@/schemas";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/utils";
+import { Input } from "@/components/ui/input";
 
 type Filters = {
     sort: "newest" | "oldest";
     active: "true" | "false" | "all";
     out_of_stock: boolean;
+    category_slug: string;
+    name: string;
 };
 
 const DEFAULTS: Filters = {
     sort: "newest",
     active: "all",
     out_of_stock: false,
+    category_slug: "",
+    name: "",
 };
 
 function parseFilters(search: Record<string, unknown>): Filters {
@@ -29,6 +37,8 @@ function parseFilters(search: Record<string, unknown>): Filters {
         sort: search.sort === "oldest" ? "oldest" : "newest",
         active: search.active == true ? "true" : search.active == false ? "false" : "all",
         out_of_stock: search.out_of_stock ? true : false,
+        category_slug: typeof search.category_slug === "string" ? search.category_slug : "",
+        name: typeof search.name === "string" ? search.name : "",
     };
 }
 
@@ -37,6 +47,8 @@ function countActiveFilters(filters: Filters): number {
     if (filters.sort !== DEFAULTS.sort) count++;
     if (filters.active !== DEFAULTS.active) count++;
     if (filters.out_of_stock !== DEFAULTS.out_of_stock) count++;
+    if (filters.category_slug !== DEFAULTS.category_slug) count++;
+    if (filters.name !== DEFAULTS.name) count++;
     return count;
 }
 
@@ -44,19 +56,24 @@ export function GalleryFilters() {
     const { updateQuery } = useUpdateQuery();
     const search = useSearch({ strict: false }) as Record<string, unknown>;
     const [open, setOpen] = useState(false);
+    const [categoryOpen, setCategoryOpen] = useState(false);
     const [draft, setDraft] = useState<Filters>(() => parseFilters(search));
     const location = useLocation();
     const show = location.pathname.startsWith("/admin/gallery");
 
+    const { data: categories = [] } = useCategories();
+
     useEffect(() => {
         setDraft(parseFilters(search));
-    }, [search.sort, search.active, search.out_of_stock]);
+    }, [search.sort, search.active, search.out_of_stock, search.category_slug, search.name]);
 
     function handleApply() {
         updateQuery([
             { key: "sort", value: draft.sort === DEFAULTS.sort ? "" : draft.sort },
             { key: "active", value: draft.active === DEFAULTS.active ? "" : draft.active },
             { key: "out_of_stock", value: draft.out_of_stock ? "true" : "" },
+            { key: "category_slug", value: draft.category_slug },
+            { key: "name", value: draft.name },
         ]);
         setOpen(false);
     }
@@ -67,6 +84,8 @@ export function GalleryFilters() {
             { key: "sort", value: "" },
             { key: "active", value: "" },
             { key: "out_of_stock", value: "" },
+            { key: "category_slug", value: "" },
+            { key: "name", value: "" },
         ]);
         setOpen(false);
     }
@@ -75,7 +94,11 @@ export function GalleryFilters() {
     const isDirty =
         draft.sort !== parseFilters(search).sort ||
         draft.active !== parseFilters(search).active ||
-        draft.out_of_stock !== parseFilters(search).out_of_stock;
+        draft.out_of_stock !== parseFilters(search).out_of_stock ||
+        draft.category_slug !== parseFilters(search).category_slug ||
+        draft.name !== parseFilters(search).name;
+
+    const selectedCategory = categories.find((c: Category) => c.slug === draft.category_slug);
 
     if (!show) return null;
 
@@ -109,7 +132,88 @@ export function GalleryFilters() {
 
                 <Separator />
 
-                <div className="space-y-5 px-4 py-4">
+                <div className="space-y-5 p-5">
+                    <div className="space-y-2">
+                        <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                            Product name
+                        </Label>
+                        <Input
+                            placeholder="Search by name..."
+                            value={draft.name}
+                            onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
+                            className="h-8 text-sm"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                            Category
+                        </Label>
+                        <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    aria-expanded={categoryOpen}
+                                    className="w-full h-8 justify-between text-sm font-normal"
+                                >
+                                    <span className={cn(!selectedCategory && "text-muted-foreground")}>
+                                        {selectedCategory ? selectedCategory.name : "All categories"}
+                                    </span>
+                                    <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-64 p-0" align="start">
+                                <Command>
+                                    <CommandInput placeholder="Search categories..." className="h-8 text-sm" />
+                                    <CommandList>
+                                        <CommandEmpty className="py-4 text-center text-xs text-muted-foreground">
+                                            No categories found
+                                        </CommandEmpty>
+                                        <CommandGroup>
+                                            {/* Clear option */}
+                                            <CommandItem
+                                                value="__all__"
+                                                onSelect={() => {
+                                                    setDraft((d) => ({ ...d, category_slug: "" }));
+                                                    setCategoryOpen(false);
+                                                }}
+                                            >
+                                                <Check className={cn("mr-2 h-3.5 w-3.5", !draft.category_slug ? "opacity-100" : "opacity-0")} />
+                                                All categories
+                                            </CommandItem>
+                                            {categories.map((cat: Category) => (
+                                                <CommandItem
+                                                    key={cat.slug}
+                                                    value={cat.name}
+                                                    onSelect={() => {
+                                                        setDraft((d) => ({
+                                                            ...d,
+                                                            category_slug: d.category_slug === cat.slug ? "" : cat.slug,
+                                                        }));
+                                                        setCategoryOpen(false);
+                                                    }}
+                                                >
+                                                    <Check className={cn("mr-2 h-3.5 w-3.5", draft.category_slug === cat.slug ? "opacity-100" : "opacity-0")} />
+                                                    {cat.name}
+                                                </CommandItem>
+                                            ))}
+                                        </CommandGroup>
+                                    </CommandList>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
+                        {draft.category_slug && (
+                            <button
+                                onClick={() => setDraft((d) => ({ ...d, category_slug: "" }))}
+                                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                                <X className="h-3 w-3" />
+                                Clear category
+                            </button>
+                        )}
+                    </div>
+
                     <div className="space-y-2">
                         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Sort by</Label>
                         <ToggleGroup
@@ -152,7 +256,10 @@ export function GalleryFilters() {
                             <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Out of stock</Label>
                             <p className="text-xs text-muted-foreground">Show only sold out items</p>
                         </div>
-                        <Switch checked={draft.out_of_stock} onCheckedChange={(val) => setDraft((d) => ({ ...d, out_of_stock: val }))} />
+                        <Switch
+                            checked={draft.out_of_stock}
+                            onCheckedChange={(val) => setDraft((d) => ({ ...d, out_of_stock: val }))}
+                        />
                     </div>
                 </div>
 

@@ -26,6 +26,7 @@ app/.vinxi/
 app/.nitro/
 app/.tanstack/
 app/dev-dist/
+app/.pnpm-store/
 
 app/public/sw.js
 app/public/workbox-*.js

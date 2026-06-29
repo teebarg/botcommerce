@@ -31,6 +31,9 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/gallery")({
         cursor: z.string().optional(),
         active: z.boolean().optional(),
         sort: z.enum(["newest", "oldest"]).default("newest"),
+        out_of_stock: z.boolean().optional(),
+        category_slug: z.string().optional(),
+        name: z.string().optional(),
     }),
     loaderDeps: ({ search }) => search,
     loader: async ({ context: { queryClient }, deps }) => {
@@ -186,7 +189,7 @@ function RouteComponent() {
                         loader={<PageLoader variant="grid" />}
                     />
                 ) : (
-                    <EmptyState title="No images found" description="Please upload images" />
+                    <EmptyState title="No images found" description="Please upload images or adjust your search filters." />
                 )}
                 {selectedImages.size > 0 && (
                     <ProductBulkActions

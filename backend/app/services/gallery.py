@@ -50,7 +50,8 @@ class GalleryService:
 
 
     async def get_paginated_gallery(
-        self, cursor: Optional[int], limit: int, sort: str, active: Optional[bool], out_of_stock: bool
+        self, cursor: Optional[int], limit: int, sort: str, active: Optional[bool],
+        out_of_stock: bool, category_slug: Optional[str] = None, name: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         order_dir = "ASC" if sort == "oldest" else "DESC"
         cursor_op = ">" if sort == "oldest" else "<"
@@ -68,6 +69,20 @@ class GalleryService:
                     AND pv2.inventory > 0
                 )
             """)
+
+        if category_slug:
+            extra_filters.append("""
+                AND EXISTS (
+                    SELECT 1 FROM "_ProductCategories" cp2
+                    JOIN "categories" pc2 ON pc2.id = cp2."A"
+                    WHERE cp2."B" = p.id AND pc2.slug = $3
+                )
+            """)
+
+        if name:
+            # $3 is taken by category_slug if present, so name becomes $3 or $4
+            param_index = 4 if category_slug else 3
+            extra_filters.append(f'AND p.name ILIKE ${param_index}')
 
         extra_filters_sql = "\n".join(extra_filters)
 
@@ -90,7 +105,14 @@ class GalleryService:
             WHERE pi."order" = 0 AND pi.id {cursor_op} $1 {extra_filters_sql}
             GROUP BY pi.id, p.id ORDER BY pi.id {order_dir} LIMIT $2
         """
-        return await self.db.query_raw(query, cursor or cursor_default, limit + 1)
+        # Build positional args — $1 cursor, $2 limit, then optional extras
+        args: list = [cursor or cursor_default, limit + 1]
+        if category_slug:
+            args.append(category_slug)
+        if name:
+            args.append(f"%{name}%")
+
+        return await self.db.query_raw(query, *args)
 
     async def get_gallery_items(self, **kwargs) -> PaginatedProductImages:
         limit = kwargs.get("limit", 36)
