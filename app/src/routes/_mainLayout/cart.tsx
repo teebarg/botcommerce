@@ -1,14 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import React from "react";
 import { ShoppingCart, Tag } from "lucide-react";
 import ServerError from "@/components/generic/server-error";
 import type { CartItem } from "@/schemas";
-import { useCart } from "@/providers/cart-provider";
 import { PageLoader } from "@/components/generic/page-loader";
 import CartSummary from "@/components/store/cart/cart-summary";
 import CartItemComponent from "@/components/store/cart/cart-item";
 import EmptyState from "@/components/generic/empty";
 import { BtnLink } from "@/components/ui/btnLink";
+import { useCartSummary } from "@/hooks/useCartSummary";
 
 export const Route = createFileRoute("/_mainLayout/cart")({
     head: () => ({
@@ -33,7 +32,7 @@ function PromoBanner() {
 }
 
 function RouteComponent() {
-    const { cart, isLoading, error } = useCart();
+    const { cart, isLoading, error, totalItems } = useCartSummary();
 
     if (isLoading) return <PageLoader variant="cart" className="max-w-5xl mx-auto px-4 py-6" />;
     if (error) return <ServerError stack={error} scenario="cart page" />;
@@ -50,30 +49,26 @@ function RouteComponent() {
         />
     }
 
-    const itemCount = cart.items.reduce((acc: number, item: CartItem) => acc + item.quantity, 0);
-
     return (
-        <React.Fragment>
-            <div className="max-w-5xl mx-auto px-4 py-6">
-                <PromoBanner />
-                <div className="flex flex-col lg:flex-row lg:items-start gap-6">
-                    <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-3">
-                            Your cart ({itemCount} {itemCount === 1 ? "item" : "items"})
-                        </p>
-                        <div className="rounded-xl border bg-card overflow-hidden">
-                            {cart.items.map((item: CartItem) => (
-                                <CartItemComponent key={item.variant_id} item={item} />
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="lg:w-80 lg:sticky lg:top-6 space-y-4 shrink-0">
-                        <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground">Cart summary</p>
-                        <CartSummary cart={cart} />
+        <div className="max-w-5xl mx-auto w-full px-4 py-6">
+            <PromoBanner />
+            <div className="flex flex-col lg:flex-row lg:items-start gap-6">
+                <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-3">
+                        Your cart ({totalItems} {totalItems === 1 ? "item" : "items"})
+                    </p>
+                    <div className="rounded-xl border bg-card overflow-hidden">
+                        {cart?.items.map((item: CartItem) => (
+                            <CartItemComponent key={item.variant_id} item={item} />
+                        ))}
                     </div>
                 </div>
+
+                <div className="lg:w-80 lg:sticky lg:top-6 space-y-4 shrink-0">
+                    <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground">Cart summary</p>
+                    <CartSummary cart={cart} />
+                </div>
             </div>
-        </React.Fragment>
+        </div>
     );
 }

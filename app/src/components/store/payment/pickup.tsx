@@ -2,6 +2,7 @@ import { ChevronRight, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useConfig } from "@/providers/store-provider";
 import { useCompleteCart } from "@/hooks/useCart";
+import { currency } from "@/utils";
 
 interface PickupProps {
     amount: number;
@@ -57,7 +58,7 @@ const Pickup: React.FC<PickupProps> = ({ amount, canContinue }) => {
                     onClick={onPaymentCompleted}
                     className="rounded-full text-sm font-semibold w-full md:w-auto md:px-10"
                 >
-                    Confirm Order for Pickup
+                    Confirm Order {currency(amount)} for Pickup
                     <ChevronRight className="h-4 w-4" />
                 </Button>
             </div>

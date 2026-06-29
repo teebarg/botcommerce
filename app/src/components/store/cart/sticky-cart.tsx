@@ -1,18 +1,10 @@
-import { useCart } from "@/providers/cart-provider";
 import { Link } from "@tanstack/react-router";
 import { ShoppingCart, ArrowRight } from "lucide-react";
-import type { CartItem } from "@/schemas";
 import { currency } from "@/utils";
+import { useCartSummary } from "@/hooks/useCartSummary";
 
 export function StickyCartBar() {
-    const { cart, isLoading } = useCart();
-
-    const totalItems =
-        cart?.items?.reduce((acc: number, item: CartItem) => acc + item.quantity, 0) ?? 0;
-
-    const totalAmount =
-        cart?.items?.reduce((acc: number, item: CartItem) => acc + item.price * item.quantity, 0) ?? 0;
-
+    const { subtotal, totalItems, isLoading } = useCartSummary();
     if (isLoading || totalItems === 0) return null;
 
     return (
@@ -46,7 +38,7 @@ export function StickyCartBar() {
                 </div>
                 <div className="flex items-baseline gap-1.5">
                     <span className="font-display font-semibold text-sm text-foreground">
-                        {currency(totalAmount)}
+                        {currency(subtotal)}
                     </span>
                     <span className="text-2xs text-muted-foreground">
                         {totalItems} {totalItems === 1 ? "item" : "items"}

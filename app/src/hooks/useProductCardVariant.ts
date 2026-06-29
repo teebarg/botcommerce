@@ -5,6 +5,7 @@ import { useAddToCart, useChangeCartQuantity } from "./useCart";
 import { useConfig } from "@/providers/store-provider";
 import { useCart } from "@/providers/cart-provider";
 import { isFirstWhatsAppMessage, markFirstWhatsAppMessageSent } from "@/utils/whatsapp-message-state";
+import { toast } from "sonner";
 
 export const useProductCardVariant = (product: ProductSearch) => {
     const { cart } = useCart();
@@ -40,6 +41,10 @@ export const useProductCardVariant = (product: ProductSearch) => {
         if (!firstInStockVariant) return;
         const variantInCart = cart?.items?.find((item) => item.variant_id === firstInStockVariant.id);
         if (variantInCart) {
+            if (variantInCart?.quantity >= variantInCart?.variant.inventory) {
+                toast.error(`You can only add ${variantInCart.variant.inventory} items`)
+                return
+            }
             updateQuantity({ item_id: variantInCart.id, quantity: variantInCart.quantity + 1 })
             return;
         }

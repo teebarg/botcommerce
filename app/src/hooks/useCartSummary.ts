@@ -3,7 +3,7 @@ import { useCart } from "@/providers/cart-provider";
 import { CartItem } from "@/schemas";
 
 export const useCartSummary = () => {
-    const { cart } = useCart();
+    const { cart, isLoading, error } = useCart();
 
     return useMemo(() => {
         const items = cart?.items ?? [];
@@ -32,6 +32,9 @@ export const useCartSummary = () => {
         );
 
         return {
+            cart,
+            isLoading,
+            error,
             subtotal,
             discountAmount,
             shippingFee,

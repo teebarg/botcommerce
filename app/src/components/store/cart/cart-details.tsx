@@ -37,7 +37,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart }) => {
                             <CartItemComponent key={item.variant_id} item={item} />
                         ))}
                     </div>
-                    <CartSummary cart={cart!} />
+                    <CartSummary cart={cart!} showSecured={true} className="rounded-none border-none" />
                 </>
             )}
         </div>
