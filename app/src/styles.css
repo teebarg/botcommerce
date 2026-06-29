@@ -187,6 +187,8 @@
 }
 
 :root {
+    --mobile-header-height: 62.75px;
+
     --background: 0 0% 100%;
     --foreground: 0 0% 9%;
     --card: 0 0% 97%;

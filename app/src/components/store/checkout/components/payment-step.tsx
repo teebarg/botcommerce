@@ -11,6 +11,7 @@ import DiscountCode from "./discount-code";
 import CartContactForm from "../contact";
 import { ZeroPayment } from "../../payment/zero-payment";
 import WalletDeduction from "./wallet-deduction";
+import { OrderReconciliation } from "./cart-reconcillation";
 
 const payMethods: { id: string; provider_id: PaymentMethod }[] = [
     { id: "pickup", provider_id: PaymentMethod.CASH_ON_DELIVERY },
@@ -27,7 +28,8 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
     const { payment_paystack, payment_bank, payment_cash } = useConfig();
     const updateCartDetails = useUpdateCartDetails();
     const [selectedPaymentMethod, setSelectedPaymentMethod] = React.useState<PaymentMethod | null>(null);
-    const canContinue = Boolean(cart?.phone) && Boolean(cart?.payment_method);
+    const hasOutOfStock = cart?.items?.some((item) => item.variant?.status === "OUT_OF_STOCK") ?? false;
+    const canContinue = Boolean(cart?.phone) && Boolean(cart?.payment_method) && !hasOutOfStock;
 
     const handleChange = (providerId: PaymentMethod) => {
         setSelectedPaymentMethod(providerId);
@@ -48,7 +50,9 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
 
                 <CartContactForm />
 
-                {cart?.phone && (
+                {cart?.phone && <OrderReconciliation cart={cart} />}
+
+                {!hasOutOfStock && cart?.phone && (
                     <div className="slide-in">
                         {cart?.total! < 1 ? (
                             <ZeroPayment />

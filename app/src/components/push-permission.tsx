@@ -8,7 +8,7 @@ import { api } from "@/utils/api";
 import { Message } from "@/schemas";
 
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000;
-const INITIAL_DELAY_DURATION = 10 * 60 * 1000;
+const INITIAL_DELAY_DURATION = 5 * 60 * 1000;
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);

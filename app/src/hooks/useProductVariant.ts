@@ -8,6 +8,7 @@ import { useCart } from "@/providers/cart-provider";
 import { isFirstWhatsAppMessage, markFirstWhatsAppMessageSent } from "@/utils/whatsapp-message-state";
 import { CartItem } from "@/schemas";
 import { gtag } from "@/utils/gtag";
+import { toast } from "sonner";
 
 export const useProductVariant = (product: ProductLite | ProductSearch) => {
     const { cart } = useCart();
@@ -179,6 +180,10 @@ export const useProductVariant = (product: ProductLite | ProductSearch) => {
         if (!selectedVariant) return;
 
         if (variantInCart) {
+            if (variantInCart.quantity >= variantInCart.variant.inventory) {
+                toast.error(`You can only add ${variantInCart.variant.inventory} items`)
+                return
+            }
             updateQuantity({ item_id: variantInCart.id, quantity: variantInCart.quantity + quantity }).then(() => {
                 setIsAdded(true);
                 gtag.addToCart({

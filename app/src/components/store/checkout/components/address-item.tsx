@@ -74,7 +74,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                     >
                         {getTypeIcon(address.address_type)}
                     </div>
-                    <div>
+                    <div className="text-sm">
                         <p className="font-semibold">{address?.first_name + " " + address?.last_name}</p>
                         <p className="text-muted-foreground font-medium text-sm truncate text-wrap">{address.address_1}</p>
                         <p className="text-muted-foreground text-sm">{address.state}</p>
@@ -95,8 +95,9 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                     title="Address"
                     trigger={
                         <Button
+                            className="border border-border"
                             size="icon"
-                            variant="accent"
+                            variant="ghost"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <Edit3 className="w-4 h-4" />
@@ -110,8 +111,8 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, addresses, sel
                     open={deleteState.isOpen}
                     onOpenChange={deleteState.setOpen}
                     trigger={
-                        <Button size="icon" variant="destructive" onClick={(e) => e.stopPropagation()}>
-                            <Trash2 className="w-4 h-4" />
+                        <Button size="icon" variant="ghost" className="border border-destructive/40" onClick={(e) => e.stopPropagation()}>
+                            <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
                     }
                     onClose={deleteState.close}

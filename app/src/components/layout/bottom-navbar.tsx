@@ -12,33 +12,23 @@ const ButtonNav = () => {
     }
 
     const nav: NavLink[] = [
-        {
-            icon: <Home className="h-7 w-7" />,
-            label: "Home",
-            href: "/",
-        },
-        {
-            icon: <Search className="h-7 w-7" />,
-            label: "Shop",
-            href: "/collections",
-        },
-        {
-            icon: <User className="h-7 w-7" />,
-            label: "Account",
-            href: "/account",
-        },
+        { icon: <Home className="h-7 w-7" />, label: "Home", href: "/" },
+        { icon: <Search className="h-7 w-7" />, label: "Shop", href: "/collections" },
+        { icon: <User className="h-7 w-7" />, label: "Account", href: "/account" },
     ];
 
     return (
         <nav
             className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/60 backdrop-blur-md shadow-xl flex items-center justify-between px-8 pt-3 text-2xs"
-            style={{
-                paddingBottom: `calc(var(--sab) + 12px)`,
-            }}
+            style={{ paddingBottom: `calc(var(--sab) + 12px)` }}
         >
             {nav.map((item: NavLink, idx: number) => (
                 <div key={idx} className="flex flex-col items-center">
-                    <LocalizedClientLink active="bg-gradient-primary text-white rounded-xl" className="p-1.5" href={item.href}>
+                    <LocalizedClientLink
+                        active="bg-gradient-primary text-white rounded-xl"
+                        className="p-1.5"
+                        href={item.href}
+                    >
                         {item.icon}
                     </LocalizedClientLink>
                     {item.label}

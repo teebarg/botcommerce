@@ -4,6 +4,7 @@ import StoreNavbar from "@/components/layout/store-nav";
 import ButtonNav from "@/components/layout/bottom-navbar";
 import { ChatBubble } from "@/components/store/chat-widget/ChatBubble";
 import MobileHeader from "@/components/layout/mobile-navbar";
+import { StickyCartBar } from "@/components/store/cart/sticky-cart";
 
 export const Route = createFileRoute("/_mainLayout")({
     component: MainLayoutComponent,
@@ -17,6 +18,7 @@ function MainLayoutComponent() {
         <div className="flex flex-col min-h-screen">
             <StoreNavbar />
             <MobileHeader />
+            <StickyCartBar />
             <main className="flex-1 flex flex-col pt-16 md:pt-0 pb-8">
                 <Outlet />
             </main>

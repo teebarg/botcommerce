@@ -22,12 +22,6 @@ class EmailData(BaseModel):
     email: EmailStr
     url: HttpUrl
 
-class GooglePayload(BaseModel):
-    email: EmailStr
-    first_name: str
-    last_name: str
-    image: Optional[str] = None
-
 class UserUpdateMe(BaseModel):
     first_name: Optional[str] = Field(default=None, max_length=255)
     last_name: Optional[str] = Field(default=None, max_length=255)
@@ -68,8 +62,8 @@ class GuestUserCreate(BaseModel):
 
 class MiniUser(BaseModel):
     email: EmailStr
-    first_name: str
-    last_name: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -82,8 +76,8 @@ class UserRole(str, Enum):
 class AuthUser(BaseModel):
     sub: str
     email: EmailStr
-    firstName: str
-    lastName: str
+    firstName: Optional[str] = None
+    lastName: Optional[str] = None
     image_url: HttpUrl | None = None
     role: UserRole
     roles: List[UserRole]

@@ -19,6 +19,9 @@ s ?= app
 build:
 	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) build
 
+build-no-cache:
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) build --no-cache
+
 .PHONY: up
 up:
 	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) up --build
