@@ -9,16 +9,8 @@ export function StickyCartBar() {
 
     return (
         <div
-            className="
-                md:hidden
-                sticky z-30
-                mx-3 mb-1
-                flex items-center justify-between
-                rounded-xl border border-border
-                bg-card px-4 py-2.5
-                shadow-sm
-                animate-in slide-in-from-top-2 duration-300
-            "
+            className="md:hidden sticky z-30 flex items-center justify-between bg-background/60 backdrop-blur-md
+             px-6 py-3 shadow-sm animate-in slide-in-from-top-2 duration-300"
             style={{ top: "calc(var(--sat) + 62.75px)" }}
         >
             <div className="flex items-center gap-2.5">
