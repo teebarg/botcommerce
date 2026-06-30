@@ -21,7 +21,7 @@ function RouteComponent() {
             <div className="mb-4">
                 <h1 className="text-xl">Orders</h1>
                 <p className="text-sm text-muted-foreground">
-                    View your previous orders and their status. You can also create returns or exchanges for your orders if needed.
+                    View your previous orders and their status.
                 </p>
             </div>
             <div>

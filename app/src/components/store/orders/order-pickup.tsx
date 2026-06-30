@@ -36,7 +36,7 @@ const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShoppi
 
             <FadeInComponent delay="100ms">
                 <div className="rounded-xl border bg-card p-4 mb-4">
-                    <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-3">Collection point</p>
+                    <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-3">Pickup point</p>
                     <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                             <span className="text-muted-foreground">Address</span>

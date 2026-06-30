@@ -117,13 +117,13 @@ function RouteComponent() {
 
             <div className="px-2 md:px-0">
                 <div className="bg-card rounded-xl shadow-sm border border-border mb-6">
-                    <div className="flex items-center justify-between p-6">
+                    <div className="flex items-center justify-between px-6 py-4">
                         <div>
-                            <h3 className="text-lg font-semibold">Profile Information</h3>
-                            <p className="text-sm text-muted-foreground">Update your personal details</p>
+                            <h3 className="text-base font-semibold">Profile Information</h3>
+                            <p className="text-xs text-muted-foreground">Update your personal details</p>
                         </div>
                         {editingSection !== "profile" && (
-                            <Button className="mt-2 md:mt-0" onClick={() => handleEdit("profile")}>
+                            <Button size="md" onClick={() => handleEdit("profile")}>
                                 Edit
                             </Button>
                         )}
@@ -144,7 +144,7 @@ function RouteComponent() {
                                                     {editingSection === "profile" ? (
                                                         <Input placeholder="Enter first name" {...field} />
                                                     ) : (
-                                                        <div className="px-4 py-3 rounded-lg text-foreground bg-secondary">
+                                                        <div className="px-4 py-2 rounded-lg text-foreground bg-secondary">
                                                             {field.value || "Not set"}
                                                         </div>
                                                     )}
@@ -164,7 +164,7 @@ function RouteComponent() {
                                                     {editingSection === "profile" ? (
                                                         <Input placeholder="Enter last name" {...field} />
                                                     ) : (
-                                                        <div className="px-4 py-3 rounded-lg text-foreground bg-secondary">
+                                                        <div className="px-4 py-2 rounded-lg text-foreground bg-secondary">
                                                             {field.value || "Not set"}
                                                         </div>
                                                     )}
@@ -177,15 +177,15 @@ function RouteComponent() {
 
                                 <div>
                                     <label className="block text-sm font-medium text-muted-foreground mb-2">Email Address</label>
-                                    <div className="px-4 py-3 rounded-lg text-foreground bg-secondary">{session?.user?.email}</div>
+                                    <div className="px-4 py-2 rounded-lg text-foreground bg-secondary">{session?.user?.email}</div>
                                 </div>
 
                                 {editingSection === "profile" && (
-                                    <div className="flex space-x-3 mt-6">
-                                        <Button disabled={isPending} isLoading={isPending} type="submit">
+                                    <div className="flex gap-2 mt-6">
+                                        <Button size="md" disabled={isPending} isLoading={isPending} type="submit">
                                             Save Changes
                                         </Button>
-                                        <Button variant="destructive" onClick={handleCancel}>
+                                        <Button size="md" variant="destructive" onClick={handleCancel}>
                                             Cancel
                                         </Button>
                                     </div>

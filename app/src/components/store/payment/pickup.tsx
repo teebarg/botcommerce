@@ -28,7 +28,7 @@ const Pickup: React.FC<PickupProps> = ({ amount, canContinue }) => {
                     <div className="flex items-start gap-3 mb-3">
                         <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                         <div>
-                            <p className="text-sm font-medium">Collection point</p>
+                            <p className="text-sm font-medium">Pickup point</p>
                             <p className="text-sm text-muted-foreground mt-0.5">{address}</p>
                             <p className="text-sm text-muted-foreground">Open Mon–Sat: 9am–6pm</p>
                         </div>

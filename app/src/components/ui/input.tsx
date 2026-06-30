@@ -31,7 +31,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         className={cn(
                             "file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground",
                             "flex w-full text-sm focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 px-1 bg-background",
-                            "border rounded-md px-3 py-2 shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring",
+                            "border rounded-md px-3 py-2.5 shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring",
                             startContent && "pl-12",
                             endContent && "pr-12",
                             className

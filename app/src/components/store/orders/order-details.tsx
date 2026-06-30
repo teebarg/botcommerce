@@ -13,7 +13,7 @@ interface OrderDetailsProps {
 const OrderDetails = ({ order }: OrderDetailsProps) => {
     return (
         <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="grid gap-6 lg:grid-cols-3 overflow-y-auto px-2 py-4">
+            <div className="grid md:gap-2 lg:grid-cols-3 px-2 pt-2">
                 <div className="lg:col-span-2 space-y-6">
                     <OrderOverview order={order} />
                     <OrderItems items={order.order_items} />
@@ -28,7 +28,7 @@ const OrderDetails = ({ order }: OrderDetailsProps) => {
                         {order.invoice_url && (
                             <a
                                 download
-                                className="flex items-center justify-center text-sm font-medium transition-colors bg-transparent border border-primary text-primary py-2 px-4 rounded-lg w-full"
+                                className="flex items-center justify-center text-sm font-medium transition-colors bg-transparent border border-primary text-primary py-2.5 px-4 rounded-lg w-full"
                                 href={order.invoice_url}
                             >
                                 <Download className="w-4 h-4 mr-2 group-hover/link:-translate-y-px transition-transform" />
