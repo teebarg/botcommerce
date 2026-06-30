@@ -28,7 +28,7 @@ const StatComponent = ({ summary, isPending }: { summary?: any, isPending: boole
 
     return (
         <div className="py-2">
-            <h2 className="text-lg font-medium">Store Overview</h2>
+            <h2 className="font-medium">Store Overview</h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 <StatCard
                     icon={<DollarSign size={20} />}

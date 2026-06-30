@@ -31,12 +31,7 @@ const ProductCardPLP: React.FC<ProductCardProps> = ({ product }) => {
                     </div>
                 )}
 
-                <ImageLightbox
-                    url={product.image}
-                    alt={product.name}
-                    className="w-full h-full"
-                    imgClassName="w-full h-full object-cover"
-                />
+                <ImageLightbox url={product.image} alt={product.name} />
 
                 {outOfStock && (
                     <div className="absolute inset-0 flex items-center justify-center bg-background/20">

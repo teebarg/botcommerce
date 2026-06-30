@@ -21,12 +21,7 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ id, slug, name, images }) =
 
     return (
         <Link to="/products/$slug" params={{ slug }} id={id.toString()} className="relative group bg-card aspect-gallery rounded-2xl overflow-hidden">
-            <ImageLightbox
-                url={images?.[0].image}
-                alt={name}
-                className="w-full h-full"
-                imgClassName="w-full h-full object-cover"
-            />
+            <ImageLightbox url={images?.[0].image} alt={name} />
             <Button
                 onClick={onRemove}
                 aria-label="Remove from wishlist"

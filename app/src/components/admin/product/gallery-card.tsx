@@ -44,10 +44,7 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
                 url={image?.image}
                 alt={product?.name || ""}
                 className="absolute inset-0 w-full h-full"
-                imgClassName={cn(
-                    "w-full h-full object-cover transition-transform duration-300",
-                    isInactive || isOutOfStock ? "grayscale opacity-60" : ""
-                )}
+                imgClassName={cn(isInactive || isOutOfStock ? "grayscale opacity-60" : "")}
                 disabled={selectionMode}
             />
 

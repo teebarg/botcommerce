@@ -67,8 +67,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     url={product.image}
                     alt={product.name}
                     size={product.variants?.[0]?.size}
-                    className="w-full h-full"
-                    imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    imgClassName="group-hover:scale-105"
                 />
 
                 {!outOfStock && hasDiscount && (

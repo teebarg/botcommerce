@@ -1,7 +1,7 @@
 import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 import { meQuery, meTxnsQuery } from "@/queries/user.queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Check, Copy, Gift, Loader, Share2, Wallet } from "lucide-react";
+import { Check, Copy, Gift, Share2, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { currency } from "@/utils";
@@ -123,12 +123,6 @@ function RouteComponent() {
                         onLoadMore={fetchNextPage}
                         hasMore={hasNextPage}
                         isLoading={isFetchingNextPage}
-                        loader={
-                            <div className="flex flex-col items-center justify-center text-blue-600">
-                                <Loader className="h-8 w-8 animate-spin mb-2" />
-                                <p className="text-sm font-medium text-muted-foreground">Loading more transactions...</p>
-                            </div>
-                        }
                         renderItem={(txn, i) => <WalletTxnCard key={txn.id} txn={txn} index={i} />}
                     />
                 )}

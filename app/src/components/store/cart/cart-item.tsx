@@ -22,12 +22,7 @@ const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
     return (
         <div className={cn("flex items-center gap-3 px-2.5 py-2 border-b last:border-b-0 w-full min-w-0", oos && "bg-destructive/5")}>
             <div className="relative w-14 h-14 shrink-0 overflow-hidden rounded-lg bg-card ring-1 ring-border">
-                <ImageLightbox
-                    url={item?.image}
-                    alt={item.name}
-                    className="w-full h-full"
-                    imgClassName="w-full h-full object-cover"
-                />
+                <ImageLightbox url={item?.image} alt={item.name} />
             </div>
             <div className="flex-1 min-w-0">
                 <div className="flex gap-1.5">

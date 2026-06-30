@@ -67,7 +67,7 @@ const orderStatusMap: Record<OrderStatus, { icon: ReactElement; label: string; c
     },
 };
 
-const OrderItemCard: React.FC<{ item: OrderItem; orderId: number }> = ({ item, orderId }) => {
+const OrderItemCard: React.FC<{ item: OrderItem; orderId: number, isPaid: boolean }> = ({ item, orderId, isPaid = false }) => {
     const deleteState = useOverlayTriggerState({});
     const { mutateAsync: returnItem, isPending } = useReturnOrderItem();
 
@@ -78,50 +78,49 @@ const OrderItemCard: React.FC<{ item: OrderItem; orderId: number }> = ({ item, o
     };
 
     const variantText = [
-        item.variant?.size && `Size: ${item.variant.size}`,
+        item.variant?.size && `S: ${item.variant.size}`,
         item.variant?.color && `Color: ${item.variant.color}`,
-        item.variant?.width && `Waist: ${item.variant.width}`,
-        item.variant?.length && `Length: ${item.variant.length}`,
+        item.variant?.width && `W: ${item.variant.width}`,
+        item.variant?.length && `L: ${item.variant.length}`,
         item.variant?.age && `Age: ${item.variant.age}`,
     ].filter(Boolean).join(" · ");
 
+    const outOfStock = item.variant?.inventory < 1
+
     return (
-        <div className="flex items-start gap-3 px-4 py-3">
-            <div className="relative w-16 h-16 shrink-0 overflow-hidden rounded-lg bg-card ring-1 ring-border">
+        <div className="flex items-start gap-4 px-4 py-2.5">
+            <div className={cn("relative w-16 h-16 shrink-0 overflow-hidden rounded-lg bg-card ring-1 ring-border", outOfStock && "opacity-50")}>
                 <ImageLightbox
                     url={item?.image}
                     alt={item?.name}
-                    className="w-full h-full"
-                    imgClassName="w-full h-full object-cover"
                 />
             </div>
-
             <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{item.name}</p>
+                <div className={cn("flex items-center justify-between gap-2", outOfStock && "line-through text-muted-foreground")}>
+                    <p className="text-sm font-medium truncate">{item.name}</p>
+                    {outOfStock && (
+                        <Badge variant="destructive" className="shrink-0">
+                            <span>Out of stock</span>
+                        </Badge>
+                    )}
+                </div>
                 {variantText && <p className="text-xs text-muted-foreground mt-0.5">{variantText}</p>}
                 <p className="text-xs text-muted-foreground mt-1">
                     {item.quantity} × {currency(Number(item.price) || 0)}
                 </p>
-                {item.variant?.inventory < 1 && (
-                    <Badge variant="destructive">
-                        <span>Out of stock</span>
-                    </Badge>
+                {!isPaid && (
+                    <ConfirmDrawer
+                        open={deleteState.isOpen}
+                        onOpenChange={deleteState.setOpen}
+                        trigger={<Button variant="destructive" size="xs" className="mt-2">Return</Button>}
+                        onClose={deleteState.close}
+                        onConfirm={handleRemove}
+                        title={`Return ${item.name}`}
+                        confirmText="Return"
+                        isLoading={isPending}
+                    />
                 )}
-                <ConfirmDrawer
-                    open={deleteState.isOpen}
-                    onOpenChange={deleteState.setOpen}
-                    trigger={<Button variant="destructive" size="xs" className="mt-2">Return</Button>}
-                    onClose={deleteState.close}
-                    onConfirm={handleRemove}
-                    title={`Return ${item.name}`}
-                    confirmText="Return"
-                    isLoading={isPending}
-                />
             </div>
-
-            <span className="text-sm font-medium shrink-0">
-                {currency((Number(item.price) || 0) * item.quantity)}
-            </span>
         </div>
     );
 };
@@ -157,7 +156,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order, onClose }) => {
                             </div>
                             <div className="divide-y divide-border border-t">
                                 {order.order_items.map((item, idx) => (
-                                    <OrderItemCard key={idx} orderId={order.id} item={item} />
+                                    <OrderItemCard key={idx} orderId={order.id} item={item} isPaid={order.payment_status === "SUCCESS"} />
                                 ))}
                             </div>
                         </div>

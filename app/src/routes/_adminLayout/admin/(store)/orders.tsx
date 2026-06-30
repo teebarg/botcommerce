@@ -62,7 +62,6 @@ function RouteComponent() {
                         <PageLoader variant="list" />
                     ) : items.length > 0 ? (
                         <InfiniteResourceList
-                            className="md:space-y-2"
                             items={items}
                             onLoadMore={fetchNextPage}
                             hasMore={hasNextPage}

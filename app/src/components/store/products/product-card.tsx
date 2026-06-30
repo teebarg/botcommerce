@@ -27,8 +27,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, variant = "sale" }) 
                     <ImageLightbox
                         url={product.image}
                         alt={product.name}
-                        className="w-full h-full"
-                        imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        imgClassName="group-hover:scale-105"
                     />
                     <DiscountBadge
                         discount={priceInfo.maxDiscountPercent}

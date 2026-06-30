@@ -34,7 +34,7 @@ export default function CategoriesWithProductsSection() {
                                 </Link>
                             </div>
 
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
                                 {category.products.map((product: ProductSearch) => (
                                     <ProductCard key={product.id} product={product} />
                                 ))}

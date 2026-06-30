@@ -14,7 +14,7 @@ interface Props<T> {
 export function InfiniteResourceList<T>({ items, renderItem, onLoadMore, hasMore, isLoading, loader, className }: Props<T>) {
     return (
         <InfiniteScroll onLoadMore={onLoadMore} hasMore={hasMore} isLoading={isLoading} loader={loader}>
-            <div className={cn("space-y-2 md:space-y-0", className)}>{items.map((item, index) => renderItem(item, index))}</div>
+            <div className={cn("space-y-2", className)}>{items.map((item, index) => renderItem(item, index))}</div>
         </InfiniteScroll>
     );
 }
