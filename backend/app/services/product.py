@@ -421,7 +421,7 @@ class ProductService:
                 self.search_srv.delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(pid))
                 for pid in product_ids
             ])
-            key=",".join(f"product:{id}" for id in product_ids)
-            await self.cache_srv.invalidate(key, tags=["products", "catalog"])
+            key: str=",".join(f"product:{id}" for id in product_ids)
+            await self.cache_srv.invalidate(key, tags=["products", "catalog", "stats-trends"])
         except Exception as e:
             logger.error(f"Error deleting products {product_ids} from index: {e}")

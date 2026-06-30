@@ -6,7 +6,7 @@ import { StatsTrends } from "@/types/models";
 
 export const statsTrendsQuery = () =>
     queryOptions({
-        queryKey: ["stats", "trends"],
+        queryKey: ["stats-trends"],
         queryFn: () => api.get<StatsTrends>("/stats/trends"),
     });
 

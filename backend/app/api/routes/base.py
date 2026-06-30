@@ -35,7 +35,7 @@ async def admin_dashboard_stats():
     }
 
 @router.get("/stats/trends", dependencies=[Depends(require_admin)])
-@cacheable(key_prefix="stats-trends")
+@cacheable(key_prefix="stats-trends", tags=["stats-trends"])
 async def stats_trends(
     request: Request,
     range: Literal["day", "week", "month"] = Query("day"),

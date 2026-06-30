@@ -116,9 +116,23 @@ class OrderService:
 
     async def create_order_from_cart(self, order_in: OrderCreate, user_id: int, cart_number: str) -> Any:
         order_number: str = f"ORD{uuid.uuid4().hex[:8].upper()}"
-        cart = await self.cart.get_active_cart(cart_number=cart_number, user_id=user_id)
+        cart = await self.cart.get_active_cart(cart_number=cart_number, user_id=user_id, include_relations=True)
         if not cart:
             raise HTTPException(status_code=404, detail="Cart not found")
+
+        if not cart.items:
+            raise HTTPException(status_code=400, detail="Your cart is empty")
+
+        out_of_stock_items = [
+            item for item in cart.items
+            if getattr(item.variant, "status", None) == "OUT_OF_STOCK"
+        ]
+        if out_of_stock_items:
+            names = ", ".join(item.name or "Unnamed item" for item in out_of_stock_items)
+            raise HTTPException(
+                status_code=400,
+                detail=f"Some items in your cart are out of stock and must be removed before checkout: {names}",
+            )
 
         data: Dict[str, Any] = {
             "order_number": order_number,
@@ -172,7 +186,7 @@ class OrderService:
         if order_in.payment_status == "SUCCESS":
             await self.event_bus.publish_order_event(order=new_order, event_type="ORDER_PAID")
 
-        await self.cache_srv.invalidate(tags=["orders"])
+        await self.cache_srv.invalidate(tags=["orders", "stats-trends"])
 
         return new_order
 

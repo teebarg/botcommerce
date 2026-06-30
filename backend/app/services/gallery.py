@@ -174,7 +174,7 @@ class GalleryService:
                     tx.productvariant.delete_many(where={"product_id": product_id}),
                 )
                 await tx.product.delete(where={"id": product_id})
-            await self.invalidate()
+            await self.invalidate(tags=["stats-trends"])
         except Exception as e:
             logger.error(f"Error deleting product {product_id}: {e}")
             raise HTTPException(status_code=500, detail="Failed to delete product")
@@ -260,7 +260,7 @@ class GalleryService:
                             "size": v.size, "color": v.color, "width": v.width, "length": v.length, "age": v.age,
                         })
                     await asyncio.gather(*[_create_variant(v) for v in payload.variants])
-                await self.invalidate()
+                await self.invalidate(tags=["stats-trends"])
                 return product.id
         except HTTPException:
             raise
@@ -345,6 +345,7 @@ class GalleryService:
                 product = await tx.product.create(data=product_data)
                 await tx.productimage.update(where={"id": image.id}, data={"product": {"connect": {"id": product.id}}})
                 await tx.productvariant.create(data={**variant_data, "product_id": product.id})
+                await self.cache_srv.invalidate(tags=["stats-trends"])
             created_product_ids.append(product.id)
         else:
             created_product_ids.append(image.product_id)
@@ -386,6 +387,6 @@ class GalleryService:
             "status": status, "failed_ids": failed_ids, "success_count": len(images) - len(failed_ids)
         }, "bulk_action")
 
-    async def invalidate(self) -> None:
+    async def invalidate(self, tags: list[str] | None = None) -> None:
         """Invalidate gallery."""
-        await self.cache_srv.invalidate(tags=["gallery"])
+        await self.cache_srv.invalidate(tags=["gallery"] + (tags or []))

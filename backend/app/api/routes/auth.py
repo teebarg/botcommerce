@@ -31,10 +31,7 @@ async def exchange_token(response: Response, cache_srv: CacheDep, cart_srv: Cart
 
     clerk_id = payload["sub"]
 
-    user = await db.user.find_unique(
-        where={"clerk_id": clerk_id}
-    )
-
+    user = await db.user.find_unique(where={"clerk_id": clerk_id})
     if not user:
         user = await db.user.upsert(
             where={"email": payload["email"]},
@@ -43,6 +40,7 @@ async def exchange_token(response: Response, cache_srv: CacheDep, cart_srv: Cart
                 "update": {"clerk_id": clerk_id},
             },
         )
+        await cache_srv.invalidate(tags=["stats-trends"])
 
     session_data = {
         "id": user.id,

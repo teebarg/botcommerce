@@ -12,6 +12,8 @@ import CartContactForm from "../contact";
 import { ZeroPayment } from "../../payment/zero-payment";
 import WalletDeduction from "./wallet-deduction";
 import { OrderReconciliation } from "./cart-reconcillation";
+import { ShoppingBag } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 const payMethods: { id: string; provider_id: PaymentMethod }[] = [
     { id: "pickup", provider_id: PaymentMethod.CASH_ON_DELIVERY },
@@ -29,7 +31,8 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
     const updateCartDetails = useUpdateCartDetails();
     const [selectedPaymentMethod, setSelectedPaymentMethod] = React.useState<PaymentMethod | null>(null);
     const hasOutOfStock = cart?.items?.some((item) => item.variant?.status === "OUT_OF_STOCK") ?? false;
-    const canContinue = Boolean(cart?.phone) && Boolean(cart?.payment_method) && !hasOutOfStock;
+    const isCartEmpty = (cart?.items?.length ?? 0) === 0;
+    const canContinue = Boolean(cart?.phone) && Boolean(cart?.payment_method) && !hasOutOfStock && !isCartEmpty;
 
     const handleChange = (providerId: PaymentMethod) => {
         setSelectedPaymentMethod(providerId);
@@ -44,64 +47,95 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                     <p className="text-muted-foreground text-sm">Complete your order</p>
                 </div>
 
-                <DiscountCode />
-
-                <WalletDeduction cart={cart!} />
-
-                <CartContactForm />
-
-                {cart?.phone && <OrderReconciliation cart={cart} />}
-
-                {!hasOutOfStock && cart?.phone && (
-                    <div className="slide-in">
-                        {cart?.total! < 1 ? (
-                            <ZeroPayment />
-                        ) : (
-                            <RadioGroupWithLabel
-                                className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4"
-                                label="Payment Method"
-                                value={cart?.payment_method || ""}
-                                onValueChange={(value: string) => {
-                                    handleChange(value as PaymentMethod);
-                                }}
-                            >
-                                {payMethods.map((item: { id: string; provider_id: PaymentMethod }, idx: number) => {
-                                    if (
-                                        (item.provider_id === PaymentMethod.CASH_ON_DELIVERY && payment_cash != "true") ||
-                                        (item.provider_id === PaymentMethod.BANK_TRANSFER && payment_bank != "true") ||
-                                        (item.provider_id === PaymentMethod.PAYSTACK && payment_paystack != "true") ||
-                                        (cart?.shipping_method !== "PICKUP" && item.provider_id === PaymentMethod.CASH_ON_DELIVERY)
-                                    ) {
-                                        return null;
-                                    }
-
-                                    return (
-                                        <RadioGroupItem
-                                            key={idx}
-                                            loading={updateCartDetails.isPending && selectedPaymentMethod === item.provider_id}
-                                            value={item.provider_id}
-                                            variant="card"
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <div className="shrink-0 mt-0.5 text-primary">{paymentInfoMap[item.provider_id]?.icon}</div>
-                                                <div className="text-left">
-                                                    <div className="font-medium">{paymentInfoMap[item.provider_id]?.title}</div>
-                                                    <div className="text-sm text-muted-foreground">
-                                                        {paymentInfoMap[item.provider_id]?.description}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </RadioGroupItem>
-                                    );
-                                })}
-                            </RadioGroupWithLabel>
-                        )}
+                {isCartEmpty && (
+                    <div className="rounded-xl border border-border bg-card px-4 py-6 flex flex-col items-center text-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                            <ShoppingBag className="w-6 h-6 text-muted-foreground" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium">Your cart is empty</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                                Add items to your cart before continuing to payment.
+                            </p>
+                        </div>
+                        <Link
+                            to="/collections"
+                            className="mt-1 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium px-5 py-2 transition-opacity hover:opacity-90"
+                        >
+                            Continue shopping
+                        </Link>
                     </div>
                 )}
+
+                {!isCartEmpty && (
+                    <>
+
+                        <DiscountCode />
+
+                        <WalletDeduction cart={cart!} />
+
+                        <CartContactForm />
+
+                        {cart?.phone && <OrderReconciliation cart={cart} />}
+
+                        {!hasOutOfStock && cart?.phone && cart?.items?.length > 0 && (
+                            <div className="slide-in">
+                                {cart?.total! < 1 ? (
+                                    <ZeroPayment />
+                                ) : (
+                                    <RadioGroupWithLabel
+                                        className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4"
+                                        label="Payment Method"
+                                        value={cart?.payment_method || ""}
+                                        onValueChange={(value: string) => {
+                                            handleChange(value as PaymentMethod);
+                                        }}
+                                    >
+                                        {payMethods.map((item: { id: string; provider_id: PaymentMethod }, idx: number) => {
+                                            if (
+                                                (item.provider_id === PaymentMethod.CASH_ON_DELIVERY && payment_cash != "true") ||
+                                                (item.provider_id === PaymentMethod.BANK_TRANSFER && payment_bank != "true") ||
+                                                (item.provider_id === PaymentMethod.PAYSTACK && payment_paystack != "true") ||
+                                                (cart?.shipping_method !== "PICKUP" && item.provider_id === PaymentMethod.CASH_ON_DELIVERY)
+                                            ) {
+                                                return null;
+                                            }
+
+                                            return (
+                                                <RadioGroupItem
+                                                    key={idx}
+                                                    loading={updateCartDetails.isPending && selectedPaymentMethod === item.provider_id}
+                                                    value={item.provider_id}
+                                                    variant="card"
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="shrink-0 mt-0.5 text-primary">{paymentInfoMap[item.provider_id]?.icon}</div>
+                                                        <div className="text-left">
+                                                            <div className="font-medium">{paymentInfoMap[item.provider_id]?.title}</div>
+                                                            <div className="text-sm text-muted-foreground">
+                                                                {paymentInfoMap[item.provider_id]?.description}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </RadioGroupItem>
+                                            );
+                                        })}
+                                    </RadioGroupWithLabel>
+                                )}
+                            </div>
+                        )}
+                    </>
+                )}
             </div>
-            {cart?.payment_method === PaymentMethod.PAYSTACK && <PaystackPayment amount={cart.total} cartNumber={cart.cart_number} canContinue={canContinue} />}
-            {cart?.payment_method === PaymentMethod.BANK_TRANSFER && <BankTransfer amount={cart.total} canContinue={canContinue} />}
-            {cart?.payment_method === PaymentMethod.CASH_ON_DELIVERY && <Pickup amount={cart.total} canContinue={canContinue} />}
+            {!isCartEmpty && cart?.payment_method === PaymentMethod.PAYSTACK && (
+                <PaystackPayment amount={cart.total} cartNumber={cart.cart_number} canContinue={canContinue} />
+            )}
+            {!isCartEmpty && cart?.payment_method === PaymentMethod.BANK_TRANSFER && (
+                <BankTransfer amount={cart.total} canContinue={canContinue} />
+            )}
+            {!isCartEmpty && cart?.payment_method === PaymentMethod.CASH_ON_DELIVERY && (
+                <Pickup amount={cart.total} canContinue={canContinue} />
+            )}
         </div>
     );
 };
