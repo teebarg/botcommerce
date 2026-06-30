@@ -2,6 +2,7 @@ import { GalleryCardActions } from "./gallery-card-actions";
 import { cn, currency } from "@/utils";
 import type { ProductImage } from "@/schemas";
 import ImageLightbox from "@/components/image-lightbox";
+import { Badge } from "@/components/ui/badge";
 
 interface GalleryCardProps {
     image: ProductImage;
@@ -26,15 +27,9 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
     ].filter(Boolean);
 
     const totalInventory = variants.reduce((acc, v) => acc + (v.inventory || 0), 0);
-    const isOutOfStock = totalInventory <= 0;
-    const isInactive = !product?.active;
-
-    const statusLabel = isInactive ? "Draft" : isOutOfStock ? "Out of Stock" : "Active";
-    const statusColorClass = isInactive
-        ? "bg-muted text-muted-foreground border-border"
-        : isOutOfStock
-            ? "bg-destructive/10 text-destructive border-destructive/20"
-            : "bg-success text-success-foreground border-success/20";
+    const hasProduct = Boolean(product)
+    const isInactive = hasProduct && !product?.active;
+    const isOutOfStock = hasProduct && totalInventory <= 0;
 
     return (
         <div
@@ -57,14 +52,15 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
             />
 
             {/* Top status overlays */}
-            <div className="absolute top-2 left-2 flex flex-col gap-1.5 z-10 pointer-events-none">
-                <span className={cn("text-2xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm border", statusColorClass, statusLabel == "Active" && "hidden")}>
-                    {statusLabel}
-                </span>
+            <div className="absolute top-2 left-2 grid gap-1.5 z-10 pointer-events-none">
+                {isOutOfStock && (
+                    <Badge variant="destructive" type="sm">Out of stock</Badge>
+                )}
+                {isInactive && (
+                    <Badge variant="ghost" type="sm">Not in store</Badge>
+                )}
                 {product?.is_new && (
-                    <span className="w-fit bg-accent text-accent-foreground text-2xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm shadow-sm">
-                        New
-                    </span>
+                    <Badge variant="accent" className="w-fit uppercase tracking-wider" type="sm">New</Badge>
                 )}
             </div>
 
@@ -81,7 +77,7 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
                 </div>
             )}
 
-            {!selectionMode && (
+            {!selectionMode && hasProduct && (
                 <div className="absolute inset-0 flex items-start justify-end p-2 z-10 pointer-events-none">
                     <div className="pointer-events-auto" onClick={(e) => e.stopPropagation()}>
                         <GalleryCardActions image={image} />
