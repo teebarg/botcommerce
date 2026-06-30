@@ -29,13 +29,3 @@ async def compute_similarity():
                 pipe.ltrim(key, 0, 9)
                 pipe.expire(key, 60 * 60 * 24 * 30)
                 await pipe.execute()
-
-
-def parse_variants(value):
-    import json
-    if isinstance(value, str):
-        try:
-            return json.loads(value)
-        except json.JSONDecodeError:
-            return []
-    return value

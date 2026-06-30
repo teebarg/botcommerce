@@ -2,18 +2,24 @@ import type { ProductSearch } from "@/schemas/product";
 import ProductCard from "@/components/store/products/product-card";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/utils/api";
+import { PageLoader } from "@/components/generic/page-loader";
 
 type RelatedProductsProps = {
     productId: number;
 };
 
 export default function RelatedProducts({ productId }: RelatedProductsProps) {
-    const { data } = useQuery({
-        queryKey: ["product", "similar", productId],
+    const { data, isPending, error } = useQuery({
+        queryKey: ["products", "similar", productId],
         queryFn: async () => await api.get<{ similar: ProductSearch[] }>(`/product/${productId}/similar`, { params: { limit: 12 } }),
     });
+    
+    if (isPending) {
+        return <PageLoader variant="grid" />
+    }
+
     const productPreviews = data?.similar?.filter((item: ProductSearch) => item.id !== productId);
-    if (!productPreviews?.length) {
+    if (error || !productPreviews?.length) {
         return null;
     }
 
@@ -23,8 +29,7 @@ export default function RelatedProducts({ productId }: RelatedProductsProps) {
                 <span className="text-sm text-muted-foreground">Related products</span>
                 <p className="text-base md:text-xl text-foreground max-w-lg">You might also want to check out these products.</p>
             </div>
-
-            <ul className="grid grid-cols-2 md:grid-cols-4 gap-x-2 md:gap-x-4 gap-y-8">
+            <ul className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 {productPreviews?.slice(0, 4)?.map((product: ProductSearch, idx: number) => (
                     <li key={idx}>
                         <ProductCard product={product} />
