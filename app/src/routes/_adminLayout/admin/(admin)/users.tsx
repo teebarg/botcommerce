@@ -42,7 +42,7 @@ function RouteComponent() {
     });
 
     return (
-        <div className="px-3 py-4">
+        <div className="px-3 py-4 max-w-5xl">
             <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
                     <h3 className="text-xl font-semibold">Customers view</h3>

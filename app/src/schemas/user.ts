@@ -51,12 +51,9 @@ export const SessionSchema = z.object({
     last_name: z.string().optional(),
     email: z.string().optional(),
     image: z.string().optional(),
-    isActive: z.boolean(),
-    isAdmin: z.boolean(),
     status: z.enum(["PENDING", "ACTIVE", "INACTIVE"]),
     role: z.enum(["ADMIN", "CUSTOMER"]),
     roles: z.array(z.string()),
-    // addresses: z.array(AddressSchema).optional(),
     isImpersonating: z.boolean().optional(),
     impersonatedBy: z.string().optional(),
 });
@@ -82,5 +79,4 @@ export type AuthUser = {
     email?: string;
     role?: string;
     roles?: string[];
-    isAdmin?: boolean;
 };

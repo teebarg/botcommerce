@@ -7,7 +7,6 @@ import { Address, Message } from "@/schemas";
 
 export const useUserAddresses = () => {
     const { isAuthenticated, userId } = useRouteContext({ strict: false });
-
     return useQuery({
         queryKey: ["addresses", `${userId}`],
         queryFn: () => getUserAddressesFn(),

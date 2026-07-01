@@ -6,7 +6,7 @@ import { DefaultCatchBoundary } from '@/components/DefaultCatchBoundary'
 import NotFound from '@/components/generic/not-found'
 
 export type SessionContext = {
-    userId?: number;
+    userId: number | null;
     isImpersonating: boolean;
     impersonatedBy: string | null;
     isAdmin: boolean
@@ -22,6 +22,7 @@ export type SessionContext = {
 };
 
 const defaultSession: SessionContext = {
+    userId: null,
     isImpersonating: false,
     impersonatedBy: null,
     isAdmin: false,

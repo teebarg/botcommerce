@@ -29,8 +29,8 @@ const CustomerFilter = ({ open, onOpenChange }: CustomerFilterProps) => {
     };
 
     return (
-        <div className="pb-4 md:pb-2 px-4">
-            <div className="py-4 space-y-5">
+        <div>
+            <div className="p-4 space-y-5">
                 <div className="space-y-2">
                     <h3 className="text-sm font-medium">Purchase History</h3>
                     <div className="space-y-3">
@@ -97,12 +97,11 @@ const CustomerFilter = ({ open, onOpenChange }: CustomerFilterProps) => {
                     </div>
                 </div>
             </div>
-
-            <div className="flex justify-end gap-2 mt-4">
-                <Button variant="accent" onClick={handleReset}>
+            <div className="flex justify-end gap-2 border-t border-border p-4">
+                <Button size="md" variant="outline" onClick={handleReset}>
                     Reset
                 </Button>
-                <Button onClick={handleApply}>Apply Filters</Button>
+                <Button size="md" onClick={handleApply}>Apply Filters</Button>
             </div>
         </div>
     );

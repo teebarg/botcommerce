@@ -12,7 +12,7 @@ import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 
 export const Route = createFileRoute("/_mainLayout/account/referrals")({
-    loader: async ({ context: { queryClient, userId } }) => {
+    loader: async ({ context: { queryClient, userId = null } }) => {
         await Promise.all([queryClient.ensureQueryData(meQuery()), queryClient.ensureQueryData(meTxnsQuery(userId))]);
     },
     component: RouteComponent,

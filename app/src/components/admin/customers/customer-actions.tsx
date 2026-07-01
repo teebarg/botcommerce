@@ -29,24 +29,22 @@ const CustomerActions = ({ user }: CustomerActionsProps) => {
             await impersonateUser.mutateAsync(user.id);
             toast.loading("Impersonating.........");
             window.location.reload();
-        } catch (err) {
-            console.error("Impersonation failed", err);
-        }
+        } catch (err) {}
     };
 
     return (
-        <div className="flex">
+        <div className="flex justify-end gap-1.5">
             {user.role !== "ADMIN" && (
-                <Button size="icon" title="Impersonate" variant="ghost" onClick={handleImpersonate}>
-                    <Eye className="h-5 w-5" />
+                <Button size="icon" variant="outline" onClick={handleImpersonate}>
+                    <Eye className="h-4 w-4" />
                 </Button>
             )}
             <SheetDrawer
                 open={editState.isOpen}
                 title="Edit Customer"
                 trigger={
-                    <Button size="icon" variant="ghost">
-                        <Edit className="h-5 w-5" />
+                    <Button size="icon" variant="outline">
+                        <Edit className="h-4 w-4" />
                     </Button>
                 }
                 onOpenChange={editState.setOpen}
@@ -57,8 +55,8 @@ const CustomerActions = ({ user }: CustomerActionsProps) => {
                 open={deleteState.isOpen}
                 onOpenChange={deleteState.setOpen}
                 trigger={
-                    <Button size="icon" variant="ghost">
-                        <Trash2 className="text-red-500 h-5 w-5 cursor-pointer" />
+                    <Button className="border-destructive/30" size="icon" variant="outline">
+                        <Trash2 className="text-destructive/70 h-4 w-4" />
                     </Button>
                 }
                 onClose={deleteState.close}
