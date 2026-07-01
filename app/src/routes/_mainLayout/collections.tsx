@@ -3,6 +3,7 @@ import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FilterSidebarLogic, FilterSidebarRef } from "@/components/store/catalog/filter-sidebar-logic";
+import FilterChips from "@/components/store/collections/filter-chips";
 
 export const Route = createFileRoute('/_mainLayout/collections')({
   component: RouteComponent,
@@ -31,6 +32,7 @@ function RouteComponent() {
           </div>
         </aside>
         <main className="w-full flex-1 relative px-1 rounded-xl">
+          <FilterChips value="for-you" />
           <Outlet />
         </main>
       </div>

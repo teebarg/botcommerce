@@ -9,10 +9,10 @@ import InfiniteFeed from "@/components/store/collections/infinite-feed";
 export const Route = createFileRoute("/_mainLayout/collections/$slug")({
     validateSearch: (search: FeedQuery) => {
         const parsed = FeedQuerySchema.parse(search);
-        if (!parsed.feed_seed) {
-            parsed.feed_seed = Math.floor(Math.random() * 1000) + 1000;
-        }
-        return parsed;
+        return {
+            ...parsed,
+            feed_seed: parsed.feed_seed ?? Math.floor(Math.random() * 1000) + 1000,
+        };
     },
     beforeLoad: ({ search }) => {
         return {
