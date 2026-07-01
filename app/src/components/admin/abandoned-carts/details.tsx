@@ -8,10 +8,8 @@ import { Separator } from "@/components/ui/separator";
 import Overlay from "@/components/overlay";
 import type { AbandonedCart } from "@/schemas";
 import { currency } from "@/utils";
-import { useInvalidateMe } from "@/hooks/useUser";
+import { useImpersonateUser } from "@/hooks/useUser";
 import ImageDisplay from "@/components/image-display";
-import { useRouter } from "@tanstack/react-router";
-import { impersonateFn } from "@/server/users.server";
 
 interface AbandonedCartDetailsDialogProps {
     cart: AbandonedCart | null;
@@ -19,8 +17,7 @@ interface AbandonedCartDetailsDialogProps {
 
 export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogProps) => {
     const state = useOverlayTriggerState({});
-    const router = useRouter();
-    const invalidateMe = useInvalidateMe();
+    const impersonateUser = useImpersonateUser();
 
     if (!cart) return null;
 
@@ -32,13 +29,9 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
     const handleImpersonation = async () => {
         try {
             if (!cart?.user?.id) return;
-            await impersonateFn({data: { userId: cart?.user?.id}})
-
-            invalidateMe();
-            toast.success("Impersonated");
-
-            await router.invalidate();
-            await router.navigate({ to: "/" });
+            await impersonateUser.mutateAsync(cart?.user?.id);
+            toast.loading("Impersonating.........");
+            window.location.reload();
         } catch (err) {
             console.error("Impersonation failed", err);
         }

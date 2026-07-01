@@ -3,12 +3,10 @@ import { Edit, Eye, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { toast } from "sonner";
 import CustomerEditForm from "./customer-form";
-import { useDeleteUser, useInvalidateMe } from "@/hooks/useUser";
+import { useDeleteUser, useImpersonateUser } from "@/hooks/useUser";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "@tanstack/react-router";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
-import { impersonateFn } from "@/server/users.server";
 
 interface CustomerActionsProps {
     user: User;
@@ -16,10 +14,9 @@ interface CustomerActionsProps {
 
 const CustomerActions = ({ user }: CustomerActionsProps) => {
     const { mutateAsync, isPending } = useDeleteUser();
-    const router = useRouter();
     const editState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
-    const invalidateMe = useInvalidateMe();
+    const impersonateUser = useImpersonateUser();
 
     const onDelete = () => {
         mutateAsync(user.id).then(() => {
@@ -29,12 +26,9 @@ const CustomerActions = ({ user }: CustomerActionsProps) => {
 
     const handleImpersonate = async () => {
         try {
-            await impersonateFn({data: { userId: user.id }})
-            invalidateMe();
-
-            toast.success("Impersonated");
-            await router.invalidate();
-            await router.navigate({ to: "/" });
+            await impersonateUser.mutateAsync(user.id);
+            toast.loading("Impersonating.........");
+            window.location.reload();
         } catch (err) {
             console.error("Impersonation failed", err);
         }

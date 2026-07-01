@@ -19,50 +19,22 @@ import { ClerkProvider } from "@clerk/tanstack-react-start";
 import { AppSession, useAppSession } from "@/utils/session";
 import { getSessionId } from "@/utils";
 import { Analytics } from "@vercel/analytics/react";
-import { AuthUser, ShopSettings } from "@/schemas";
+import { ShopSettings } from "@/schemas";
 import { useSettingsQuery } from "@/hooks/useGeneric";
 import { useEffect, useState } from "react";
 import ImpersonationBanner from "@/components/impersonation-banner";
-// import { getCurrentUserFn } from "@/server/users.server";
 
-// type AuthUser = {
-//     firstName?: string;
-//     lastName?: string;
-//     image_url?: string;
-//     image?: string;
-//     email?: string;
-//     role?: string;
-//     roles?: string[];
-//     isAdmin?: boolean;
-// };
-
-type Session = {
-    id: string;
-    user: AuthUser;
-    isimpersonating: boolean;
-    impersonatedBy: string | null;
-};
-
-type AuthState = {
-    isAuthenticated: boolean;
-    userId: string | null;
-    data: AuthUser | null;
-};
 
 interface RouterContext extends AppSession {
-    // isAuthenticated: boolean;
-    // userId: string | null;
-    // session: AppSession | null;
     queryClient: QueryClient;
     config: any;
 }
 
 const fetchUser = createServerFn().handler(async (): Promise<AppSession> => {
     const {data} = await useAppSession();
-    console.log(data)
     return {
         ...data,
-        isAdmin: data?.user?.roles?.includes("admin") || false,
+        isAdmin: ["ADMIN"].includes(data?.user?.role || ""),
         isAuthenticated: Boolean(data.userId)
     }
 });
@@ -76,19 +48,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
             fetchUser(),
             queryClient.ensureQueryData(useSettingsQuery()),
         ]);
-        // const user = {
-        //     firstName: data?.firstName || "",
-        //     lastName: data?.lastName || "",
-        //     image: data?.image_url || "",
-        //     email: data?.email || "",
-        //     role: data?.role || "",
-        //     roles: data?.roles || [],
-        //     isAdmin: data?.roles?.includes("admin") || false,
-        // };
-
-        // const {id, impersonatedBy, isImpersonating, user} = userSession
-
-        // const session: AppSession = userSession;
 
         const config = Object.fromEntries(
             settings.map((setting: ShopSettings) => [setting.key, setting.value])
@@ -97,7 +56,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         return { ...session, config };
     },
     loader: async ({ context }) => {
-        // console.log(context)
         return {
             config: context.config ?? {},
         };

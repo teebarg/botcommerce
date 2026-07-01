@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_adminLayout")({
         if (!context.isAuthenticated) {
             throw new Error("Not authenticated");
         }
-        if (!["admin"].includes(context.user?.role || "")) {
+        if (!context.isAdmin) {
             throw redirect({ to: "/" });
         }
     },

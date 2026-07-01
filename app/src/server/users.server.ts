@@ -55,28 +55,11 @@ export const loginFn = createServerFn({ method: "POST" })
         });
     });
 
-export const impersonateFn = createServerFn({ method: "POST" })
-    .inputValidator((d: { userId: number }) => d)
+export const updateAppSessionFn = createServerFn({ method: "POST" })
+    .inputValidator((d: Session) => d)
     .handler(async ({ data }) => {
-        const result = await api.post<Session>(`/auth/impersonate/${data.userId}`);
-        console.log("result", result)
         const session = await useAppSession();
-        const { id, isImpersonating, impersonatedBy, ...user } = result
-        await session.update({
-            userId: id,
-            user,
-            isImpersonating,
-            impersonatedBy,
-        });
-        return result;
-    });
-
-export const stopImpersonationFn = createServerFn({ method: "POST" })
-    .handler(async () => {
-        const res = await api.post<Session>("/auth/stop-impersonation");
-        console.log("res", res)
-        const session = await useAppSession();
-        const { id, isImpersonating, impersonatedBy, ...user } = res
+        const { id, isImpersonating, impersonatedBy, ...user } = data
         await session.update({
             userId: id,
             user,

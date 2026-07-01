@@ -1,16 +1,6 @@
 import { AuthUser } from "@/schemas";
 import { useSession } from "@tanstack/react-start/server";
 
-// export type AuthUser = {
-//     firstName?: string;
-//     lastName?: string;
-//     image?: string;
-//     email?: string;
-//     role?: string;
-//     roles?: string[];
-//     isAdmin?: boolean;
-// };
-
 export type AppSession = {
     userId?: number;
     user?: AuthUser | null;

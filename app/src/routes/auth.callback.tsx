@@ -72,7 +72,7 @@ function RouteComponent() {
 
             if (error || !sessionUser) {
                 console.error("Auth exchange failed:", error);
-                window.location.href = "/sign-in";
+                window.location.href = "/";
                 return;
             }
 

@@ -1,17 +1,16 @@
 from typing import Annotated, Literal, Optional
+import time
 import httpx
 import jwt
-import time
 from fastapi import Depends, HTTPException, status, Cookie
 from fastapi.security import APIKeyHeader, OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
-
+from jose import jwt as jose_jwt
 from app.core import security
 from app.core.config import settings
 from app.prisma_client import prisma
 from app.models.user import UserInternal as User
 from app.core.logging import get_logger
-from jose import jwt as jose_jwt
 from app.core.notifications.service import NotificationService
 from app.core.notifications.setup import get_notification_service
 from app.core.dependencies.cache import CacheDep
@@ -69,7 +68,7 @@ async def verify_clerk_token(token: Annotated[str | None, Depends(APIKeyHeader(n
             jwks,
             algorithms=["RS256"],
             issuer=settings.CLERK_ISSUER_URL,
-            options={"verify_aud": False},
+            options={"verify_aud": False, "leeway": 10},
         )
     except Exception as e:
         logger.error(f"[Verify Clerk Token] Error occurred verifying clerk token: {e}")
