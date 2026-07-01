@@ -1,23 +1,20 @@
 import type { User } from "@/schemas";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Eye, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { toast } from "sonner";
 import CustomerEditForm from "./customer-form";
 import { useDeleteUser, useInvalidateMe } from "@/hooks/useUser";
 import { Button } from "@/components/ui/button";
-import { updateAuthSession } from "@/utils/auth-client";
-import { useRouteContext, useRouter } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
+import { impersonateFn } from "@/server/users.server";
 
 interface CustomerActionsProps {
     user: User;
 }
 
 const CustomerActions = ({ user }: CustomerActionsProps) => {
-    const { session } = useRouteContext({
-        strict: false,
-    });
     const { mutateAsync, isPending } = useDeleteUser();
     const router = useRouter();
     const editState = useOverlayTriggerState({});
@@ -32,12 +29,7 @@ const CustomerActions = ({ user }: CustomerActionsProps) => {
 
     const handleImpersonate = async () => {
         try {
-            await updateAuthSession({
-                email: user?.email!,
-                mode: "impersonate",
-                impersonated: true,
-                impersonatedBy: session?.user?.email,
-            });
+            await impersonateFn({data: { userId: user.id }})
             invalidateMe();
 
             toast.success("Impersonated");
@@ -50,11 +42,11 @@ const CustomerActions = ({ user }: CustomerActionsProps) => {
 
     return (
         <div className="flex">
-            {/* {user.role !== "ADMIN" && (
+            {user.role !== "ADMIN" && (
                 <Button size="icon" title="Impersonate" variant="ghost" onClick={handleImpersonate}>
                     <Eye className="h-5 w-5" />
                 </Button>
-            )} */}
+            )}
             <SheetDrawer
                 open={editState.isOpen}
                 title="Edit Customer"

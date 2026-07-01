@@ -1,8 +1,8 @@
 import { api } from "@/utils/api";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { PaginatedUsers, PaginatedWalletTxns, User, Wishlist } from "@/schemas";
-import { AuthUser, useAppSession } from "@/utils/session";
+import type { PaginatedUsers, PaginatedWalletTxns, Session, User, Wishlist } from "@/schemas";
+import { useAppSession } from "@/utils/session";
 
 export const UserSearchSchema = z.object({
     query: z.string().optional(),
@@ -39,18 +39,48 @@ export const getMeTrxnFn = createServerFn().handler(async () => {
 
 export const logoutFn = createServerFn().handler(async () => {
     const session = await useAppSession();
-
     session.clear();
 });
 
 export const loginFn = createServerFn({ method: "POST" })
-    .inputValidator((d: { sessionUser: any }) => d)
+    .inputValidator((d: { sessionUser: Session }) => d)
     .handler(async ({ data }) => {
         const session = await useAppSession();
+        const { id, isImpersonating, impersonatedBy, ...user } = data.sessionUser
         await session.update({
-            id: data?.sessionUser?.id,
-            user: {
-                ...(data?.sessionUser as AuthUser),
-            },
+            userId: id,
+            user,
+            isImpersonating,
+            impersonatedBy,
+        });
+    });
+
+export const impersonateFn = createServerFn({ method: "POST" })
+    .inputValidator((d: { userId: number }) => d)
+    .handler(async ({ data }) => {
+        const result = await api.post<Session>(`/auth/impersonate/${data.userId}`);
+        console.log("result", result)
+        const session = await useAppSession();
+        const { id, isImpersonating, impersonatedBy, ...user } = result
+        await session.update({
+            userId: id,
+            user,
+            isImpersonating,
+            impersonatedBy,
+        });
+        return result;
+    });
+
+export const stopImpersonationFn = createServerFn({ method: "POST" })
+    .handler(async () => {
+        const res = await api.post<Session>("/auth/stop-impersonation");
+        console.log("res", res)
+        const session = await useAppSession();
+        const { id, isImpersonating, impersonatedBy, ...user } = res
+        await session.update({
+            userId: id,
+            user,
+            isImpersonating,
+            impersonatedBy,
         });
     });

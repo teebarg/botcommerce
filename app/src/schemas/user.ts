@@ -46,17 +46,18 @@ export const PaginatedUsersSchema = CursorSchema.extend({
 });
 
 export const SessionSchema = z.object({
-    id: z.number().optional(),
+    id: z.number(),
     first_name: z.string(),
     last_name: z.string().optional(),
-    email: z.string(),
-    image: z.string().nullable().optional(),
+    email: z.string().optional(),
+    image: z.string().optional(),
     isActive: z.boolean(),
     isAdmin: z.boolean(),
     status: z.enum(["PENDING", "ACTIVE", "INACTIVE"]),
     role: z.enum(["ADMIN", "CUSTOMER"]),
-    addresses: z.array(AddressSchema).optional(),
-    impersonated: z.boolean().optional(),
+    roles: z.array(z.string()),
+    // addresses: z.array(AddressSchema).optional(),
+    isImpersonating: z.boolean().optional(),
     impersonatedBy: z.string().optional(),
 });
 
@@ -67,24 +68,19 @@ export const UserMiniSchema = z.object({
     email: z.string(),
 });
 
-export const UserSessionSchema = z.object({
-    id: z.number().optional(),
-    first_name: z.string(),
-    last_name: z.string().optional(),
-    email: z.string(),
-    image: z.string().nullable().optional(),
-    isActive: z.boolean(),
-    isAdmin: z.boolean(),
-    status: z.enum(["PENDING", "ACTIVE", "INACTIVE"]),
-    role: z.enum(["ADMIN", "CUSTOMER"]),
-    addresses: z.array(AddressSchema).optional(),
-    impersonated: z.boolean().optional(),
-    impersonatedBy: z.string().optional(),
-});
-
 export type WalletTxn = z.infer<typeof WalletTxnSchema>;
 export type PaginatedWalletTxns = z.infer<typeof PaginatedWalletTxnsSchema>;
 export type User = z.infer<typeof UserSchema>;
 export type PaginatedUsers = z.infer<typeof PaginatedUsersSchema>;
 export type Session = z.infer<typeof SessionSchema>;
-export type UserSession = z.infer<typeof UserSessionSchema>;
+
+export type AuthUser = {
+    firstName?: string;
+    lastName?: string;
+    image_url?: string;
+    image?: string;
+    email?: string;
+    role?: string;
+    roles?: string[];
+    isAdmin?: boolean;
+};

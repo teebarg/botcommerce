@@ -59,7 +59,7 @@ function getChatSessionId(): string {
 }
 
 export const useSupportChat = () => {
-    const { session, isAuthenticated } = useRouteContext({ strict: false });
+    const { isAuthenticated, userId } = useRouteContext({ strict: false });
     const { lastMessage: lastWsMessage } = useWebSocket();
     const [messages, setMessages] = useState<ChatMessage[]>(loadLocalHistory);
     const [loading, setLoading] = useState<boolean>(false);
@@ -169,7 +169,7 @@ export const useSupportChat = () => {
                         type: "message",
                         message: text,
                         session_id: getChatSessionId(),
-                        customer_id: isAuthenticated ? session?.id : null,
+                        customer_id: isAuthenticated ? userId : null,
                         app_session_id: getSessionId(),
                     }),
                 });
@@ -230,7 +230,7 @@ export const useSupportChat = () => {
                     form_type: formType,
                     data: formData,
                     session_id: getChatSessionId(),
-                    customer_id: isAuthenticated ? session?.id : null,
+                    customer_id: isAuthenticated ? userId : null,
                     app_session_id: getSessionId(),
                 }),
             });

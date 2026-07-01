@@ -1,24 +1,27 @@
+import { AuthUser } from "@/schemas";
 import { useSession } from "@tanstack/react-start/server";
 
-export type AuthUser = {
-    firstName?: string;
-    lastName?: string;
-    image?: string;
-    email?: string;
-    role?: string;
-    roles?: string[];
-    isAdmin?: boolean;
-};
+// export type AuthUser = {
+//     firstName?: string;
+//     lastName?: string;
+//     image?: string;
+//     email?: string;
+//     role?: string;
+//     roles?: string[];
+//     isAdmin?: boolean;
+// };
 
-export type SessionUser = {
-    id: string | null;
-    user: AuthUser;
-    impersonated: boolean;
-    impersonatedBy: string | null;
+export type AppSession = {
+    userId?: number;
+    user?: AuthUser | null;
+    isImpersonating?: boolean;
+    impersonatedBy?: string | null;
+    isAdmin?: boolean
+    isAuthenticated?: boolean
 };
 
 export function useAppSession() {
-    return useSession<SessionUser>({
+    return useSession<AppSession>({
         password: process.env.SESSION_PASSWORD!,
         cookie: {
             secure: process.env.NODE_ENV === "production",

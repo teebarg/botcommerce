@@ -1,5 +1,7 @@
 from typing import Annotated
+from fastapi.exceptions import HTTPException
 from fastapi import APIRouter, Request, Cookie, Response, Depends
+from app.core.permissions import require_admin
 from app.core.config import settings
 from app.prisma_client import prisma as db
 import uuid
@@ -51,6 +53,8 @@ async def exchange_token(response: Response, cache_srv: CacheDep, cart_srv: Cart
         "image": payload.get("image_url"),
         "role": payload.get("role"),
         "roles": payload.get("roles", []),
+        "isImpersonating": False,
+        "impersonatedBy": None,
     }
 
     await cache_srv.set_session(session_id, session_data)
@@ -68,3 +72,91 @@ async def exchange_token(response: Response, cache_srv: CacheDep, cart_srv: Cart
     await cart_srv.merge_guest_into_user_cart(user_id=user.id, cart_number=_cart_id)
 
     return session_data
+
+
+@router.post("/impersonate/{user_id}")
+async def impersonate(
+    user_id: int,
+    response: Response,
+    cache_srv: CacheDep,
+    current_user=Depends(require_admin),
+):
+    print("current_user", current_user)
+    target = await db.user.find_unique(
+        where={
+            "id": user_id
+        }
+    )
+    print(target)
+    if not target:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    session_id = str(uuid.uuid4())
+
+    session_data = {
+        "id": target.id,
+        "firstName": target.first_name,
+        "lastName": target.last_name,
+        "email": target.email,
+        "image": target.image,
+        "role": target.role,
+        "isImpersonating": True,
+        "impersonatedBy": current_user["id"],
+    }
+
+    await cache_srv.set_session(session_id, session_data)
+    response.set_cookie(
+        key="session_id",
+        value=session_id,
+        httponly=True,
+        secure=True,
+        samesite="none",
+        domain=settings.COOKIE_DOMAIN,
+        max_age=60 * 60 * 24 * 30,
+    )
+    return session_data
+
+
+@router.post("/stop-impersonation")
+async def stop_impersonation(request: Request, response: Response, cache_srv: CacheDep):
+    session_id = request.cookies.get("session_id")
+    session = await cache_srv.get_session(session_id)
+    # admin_id = current_session.get("impersonated_by")
+    print(session)
+    admin_id = session.get("impersonatedBy")
+    if not admin_id:
+        raise HTTPException(400, "Not impersonating")
+
+    admin = await db.user.find_unique(
+        where={
+            "id": admin_id
+        }
+    )
+
+    session_id = str(uuid.uuid4())
+
+    await cache_srv.set_session(
+        session_id,
+        {
+            "id": admin.id,
+            "firstName": admin.first_name,
+            "lastName": admin.last_name,
+            "email": admin.email,
+            "image": admin.image,
+            "role": admin.role,
+
+            "isImpersonating": False,
+            "impersonatedBy": None,
+        }
+    )
+
+    response.set_cookie(
+        key="session_id",
+        value=session_id,
+        httponly=True,
+        secure=True,
+        samesite="none",
+        domain=settings.COOKIE_DOMAIN,
+        max_age=60 * 60 * 24 * 30,
+    )
+    return { "success": True }

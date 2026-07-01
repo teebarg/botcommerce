@@ -3,22 +3,16 @@ import { toast } from "sonner";
 import { useInvalidateMe } from "@/hooks/useUser";
 import { Button } from "@/components/ui/button";
 import { useRouteContext, useRouter } from "@tanstack/react-router";
-import { updateAuthSession } from "@/utils/auth-client";
+import { stopImpersonationFn } from "@/server/users.server";
 
 export default function ImpersonationBanner() {
-    const { session } = useRouteContext({ strict: false });
+    const { isImpersonating } = useRouteContext({ strict: false });
     const invalidateMe = useInvalidateMe();
     const router = useRouter();
 
     const stopImpersonation = async () => {
         try {
-            await updateAuthSession({
-                email: session?.impersonatedBy!,
-                mode: "impersonate",
-                impersonated: false,
-                impersonatedBy: null,
-            });
-
+            await stopImpersonationFn()
             invalidateMe();
 
             toast.success("Exited impersonation");
@@ -29,7 +23,7 @@ export default function ImpersonationBanner() {
         }
     };
 
-    if (!session?.impersonated) return null;
+    if (!isImpersonating) return null;
 
     return (
         <div className="fixed bottom-24 md:bottom-12 left-4 z-50 flex items-center px-3 py-2 gap-1 rounded-md bg-amber-100 text-amber-900 shadow-md border border-amber-300">

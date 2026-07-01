@@ -28,7 +28,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
     const isNew = useMemo(() => !!product?.is_new, [product]);
     const [selectedVariant, setSelectedVariant] = useState<ProductVariantLite | undefined>(product.variants?.[0]);
 
-    const { session, isAuthenticated } = useRouteContext({ strict: false });
+    const { isAuthenticated, isAdmin } = useRouteContext({ strict: false });
     const updateVariant = useUpdateVariant(false);
 
     const { data } = useUserWishlist();
@@ -123,7 +123,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                     )}
                 </div>
 
-                {isAuthenticated && session?.user?.isAdmin && product?.variants?.length ? (
+                {isAuthenticated && isAdmin && product?.variants?.length ? (
                     <div className="rounded-xl border border-border overflow-hidden">
                         {product.variants?.map((v) => (
                             <div key={v.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-3 border-b border-border last:border-0">

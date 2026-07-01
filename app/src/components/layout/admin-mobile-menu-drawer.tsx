@@ -10,7 +10,7 @@ const MenuComp: React.FC = () => {
     const location = useLocation();
     const pathname = location.pathname;
     const state = useOverlayTriggerState({});
-    const { session } = useRouteContext({ strict: false });
+    const { user } = useRouteContext({ strict: false });
 
     useEffect(() => {
         state.close();
@@ -28,9 +28,9 @@ const MenuComp: React.FC = () => {
                             <UserAvatar />
                             <div className="text-white">
                                 <div>
-                                    {session?.user?.firstName} {session?.user?.lastName}
+                                    {user?.firstName} {user?.lastName}
                                 </div>
-                                <div className="text-xs text-left">{session?.user?.email}</div>
+                                <div className="text-xs text-left">{user?.email}</div>
                             </div>
                         </div>
                     </DrawerTitle>

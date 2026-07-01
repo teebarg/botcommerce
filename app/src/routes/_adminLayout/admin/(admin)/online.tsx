@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useWebSocket } from "pulsews";
 import OnlineAvatar from "@/components/admin/online/OnlineAvatar";
 
-interface Session {
+interface OnlineSession {
     id: string;
     type: string;
     email?: string;
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_adminLayout/admin/(admin)/online")({
 });
 
 function RouteComponent() {
-    const [sessions, setSessions] = useState<Session[]>([]);
+    const [sessions, setSessions] = useState<OnlineSession[]>([]);
     const { lastMessage } = useWebSocket();
 
     useEffect(() => {
@@ -58,7 +58,7 @@ function RouteComponent() {
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-3 max-h-96 overflow-y-auto">
-                            {sessions.map((user: Session, idx: number) => (
+                            {sessions.map((user: OnlineSession, idx: number) => (
                                 <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-secondary">
                                     <div className="flex items-center gap-3">
                                         <OnlineAvatar email={user.email} />

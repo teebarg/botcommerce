@@ -1,4 +1,4 @@
-import { Clock, Package, Copy, User } from "lucide-react";
+import { Clock, Package, Copy, User, ExternalLink } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import { useOverlayTriggerState } from "react-stately";
@@ -10,8 +10,8 @@ import type { AbandonedCart } from "@/schemas";
 import { currency } from "@/utils";
 import { useInvalidateMe } from "@/hooks/useUser";
 import ImageDisplay from "@/components/image-display";
-import { useRouteContext, useRouter } from "@tanstack/react-router";
-import { updateAuthSession } from "@/utils/auth-client";
+import { useRouter } from "@tanstack/react-router";
+import { impersonateFn } from "@/server/users.server";
 
 interface AbandonedCartDetailsDialogProps {
     cart: AbandonedCart | null;
@@ -19,7 +19,6 @@ interface AbandonedCartDetailsDialogProps {
 
 export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogProps) => {
     const state = useOverlayTriggerState({});
-    const { session } = useRouteContext({ strict: false });
     const router = useRouter();
     const invalidateMe = useInvalidateMe();
 
@@ -32,12 +31,8 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
 
     const handleImpersonation = async () => {
         try {
-            await updateAuthSession({
-                email: cart?.user?.email!,
-                mode: "impersonate",
-                impersonated: true,
-                impersonatedBy: session?.user?.email,
-            });
+            if (!cart?.user?.id) return;
+            await impersonateFn({data: { userId: cart?.user?.id}})
 
             invalidateMe();
             toast.success("Impersonated");
@@ -165,12 +160,12 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                 </div>
 
                 <div className="sheet-footer">
-                    {/* {cart?.user?.email && (
+                    {cart?.user?.email && (
                         <Button variant="accent" onClick={handleImpersonation}>
                             <ExternalLink className="h-4 w-4" />
                             Impersonate
                         </Button>
-                    )} */}
+                    )}
                     <Button variant="outline" onClick={() => state.close()}>
                         Cancel
                     </Button>

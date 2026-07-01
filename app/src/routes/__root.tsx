@@ -16,69 +16,55 @@ import { InvalidateProvider } from "@/providers/invalidate-provider";
 import PageTransitionLoader from "@/components/generic/page-transition-loader";
 import PWABadge from "@/PWAbadge";
 import { ClerkProvider } from "@clerk/tanstack-react-start";
-import { useAppSession } from "@/utils/session";
+import { AppSession, useAppSession } from "@/utils/session";
 import { getSessionId } from "@/utils";
 import { Analytics } from "@vercel/analytics/react";
-import { ShopSettings } from "@/schemas";
+import { AuthUser, ShopSettings } from "@/schemas";
 import { useSettingsQuery } from "@/hooks/useGeneric";
 import { useEffect, useState } from "react";
+import ImpersonationBanner from "@/components/impersonation-banner";
+// import { getCurrentUserFn } from "@/server/users.server";
 
-
-type SessionClaims = {
-    firstName?: string;
-    lastName?: string;
-    image_url?: string;
-    email?: string;
-    role?: string;
-    roles?: string[];
-};
-
-type AuthUser = {
-    firstName?: string;
-    lastName?: string;
-    image?: string;
-    email?: string;
-    role?: string;
-    roles?: string[];
-    isAdmin?: boolean;
-};
+// type AuthUser = {
+//     firstName?: string;
+//     lastName?: string;
+//     image_url?: string;
+//     image?: string;
+//     email?: string;
+//     role?: string;
+//     roles?: string[];
+//     isAdmin?: boolean;
+// };
 
 type Session = {
     id: string;
     user: AuthUser;
-    impersonated: boolean;
+    isimpersonating: boolean;
     impersonatedBy: string | null;
 };
 
 type AuthState = {
     isAuthenticated: boolean;
     userId: string | null;
-    sessionClaims: SessionClaims | null;
+    data: AuthUser | null;
 };
 
-interface RouterContext {
-    isAuthenticated: boolean;
-    userId: string | null;
-    session: Session | null;
+interface RouterContext extends AppSession {
+    // isAuthenticated: boolean;
+    // userId: string | null;
+    // session: AppSession | null;
     queryClient: QueryClient;
     config: any;
 }
 
-const fetchUser = createServerFn().handler(async (): Promise<AuthState> => {
-    const session = await useAppSession();
-
+const fetchUser = createServerFn().handler(async (): Promise<AppSession> => {
+    const {data} = await useAppSession();
+    console.log(data)
     return {
-        isAuthenticated: Boolean(session.data.id),
-        userId: session.data.id || null,
-        sessionClaims: {
-            firstName: session.data.user?.firstName,
-            lastName: session.data.user?.lastName,
-            image_url: session.data.user?.image,
-            email: session.data.user?.email,
-            role: session.data.user?.role,
-            roles: session.data.user?.roles,
-        },
-    };
+        ...data,
+        isAdmin: data?.user?.roles?.includes("admin") || false,
+        isAuthenticated: Boolean(data.userId)
+    }
 });
 
 export const Route = createRootRouteWithContext<RouterContext>()({
@@ -86,34 +72,32 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         if (process.env.MAINTENANCE_MODE === "true" && location.pathname !== "/maintenance") {
             throw redirect({ to: "/maintenance" });
         }
-        const [{ isAuthenticated, userId, sessionClaims }, settings] = await Promise.all([
+        const [session, settings] = await Promise.all([
             fetchUser(),
             queryClient.ensureQueryData(useSettingsQuery()),
         ]);
-        const user = {
-            firstName: sessionClaims?.firstName || "",
-            lastName: sessionClaims?.lastName || "",
-            image: sessionClaims?.image_url || "",
-            email: sessionClaims?.email || "",
-            role: sessionClaims?.role || "",
-            roles: sessionClaims?.roles || [],
-            isAdmin: sessionClaims?.roles?.includes("admin") || false,
-        };
+        // const user = {
+        //     firstName: data?.firstName || "",
+        //     lastName: data?.lastName || "",
+        //     image: data?.image_url || "",
+        //     email: data?.email || "",
+        //     role: data?.role || "",
+        //     roles: data?.roles || [],
+        //     isAdmin: data?.roles?.includes("admin") || false,
+        // };
 
-        const session: Session | null = {
-            id: userId || "",
-            user,
-            impersonated: false,
-            impersonatedBy: null,
-        };
+        // const {id, impersonatedBy, isImpersonating, user} = userSession
+
+        // const session: AppSession = userSession;
 
         const config = Object.fromEntries(
             settings.map((setting: ShopSettings) => [setting.key, setting.value])
         );
 
-        return { isAuthenticated, userId, session, config };
+        return { ...session, config };
     },
     loader: async ({ context }) => {
+        // console.log(context)
         return {
             config: context.config ?? {},
         };
@@ -246,6 +230,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                 />
                                 <PWABadge />
                                 {/* <SafeAreaDebug /> */}
+                                <ImpersonationBanner />
                                 {process.env.NODE_ENV === "production" && <Analytics />}
                                 <Scripts />
                             </CartProvider>
