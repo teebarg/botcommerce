@@ -1,7 +1,7 @@
 import { useConfig } from "@/providers/store-provider";
+import { Session } from "@/schemas";
 import { loginFn } from "@/server/users.server";
 import { api } from "@/utils/api";
-import { SessionUser } from "@/utils/session";
 import { tryCatch } from "@/utils/try-catch";
 import { useAuth, useUser } from "@clerk/tanstack-react-start";
 import { useQueryClient } from "@tanstack/react-query";
@@ -67,12 +67,12 @@ function RouteComponent() {
 
             const token = await getToken({ template: "default" });
             const { error, data: sessionUser } = await tryCatch(
-                api.post<SessionUser>("/auth/exchange", {}, { headers: { "X-Auth": token || "t" } })
+                api.post<Session>("/auth/exchange", {}, { headers: { "X-Auth": token || "token" } })
             );
 
             if (error || !sessionUser) {
                 console.error("Auth exchange failed:", error);
-                window.location.href = "/sign-in";
+                window.location.href = "/";
                 return;
             }
 
@@ -147,12 +147,10 @@ function RouteComponent() {
                         </div>
                     ))}
                 </div>
-
                 <div className="flex items-center gap-2">
                     <Lock className="w-3 h-3 text-muted-foreground/50 shrink-0" />
                     <span className="text-xs text-muted-foreground/50">Secured by Clerk · End-to-end encrypted</span>
                 </div>
-
             </div>
         </div>
     );

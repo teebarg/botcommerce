@@ -34,7 +34,7 @@ export function InvalidateProvider({ children }: { children: React.ReactNode }) 
 function InvalidateProviderInner({ children }: { children: React.ReactNode }) {
     const location = useLocation();
     const pathname = location.pathname;
-    const { session, isAuthenticated } = useRouteContext({ strict: false });
+    const { isAuthenticated, userId, user } = useRouteContext({ strict: false });
     const { cart } = useCart();
     const queryClient = useQueryClient();
     const { lastMessage, send, isConnected } = useWebSocket();
@@ -73,13 +73,13 @@ function InvalidateProviderInner({ children }: { children: React.ReactNode }) {
             send(
                 JSON.stringify({
                     type: "init",
-                    id: session?.id,
-                    email: session?.user.email,
+                    id: userId,
+                    email: user?.email,
                 })
             );
         }
         prevConnectedRef.current = isConnected;
-    }, [isAuthenticated, isConnected, send, session]);
+    }, [isAuthenticated, isConnected, send, user]);
 
     useEffect(() => {
         if (isConnected) {

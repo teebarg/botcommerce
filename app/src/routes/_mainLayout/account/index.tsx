@@ -62,16 +62,16 @@ export const Route = createFileRoute("/_mainLayout/account/")({
 });
 
 function RouteComponent() {
-    const { session } = Route.useRouteContext();
+    const { user } = Route.useRouteContext();
     const { data, isPending } = useQuery(ordersQuery());
 
     return (
         <div className="px-2 md:px-0 pt-6 space-y-6">
             <div className="text-center">
                 <div className="w-16 h-16 mx-auto rounded-full bg-primary mb-4 overflow-hidden">
-                    <img src={session?.user?.image} className="object-contain" />
+                    <img src={user?.image} className="object-contain" />
                 </div>
-                <h2 className="text-xl font-bold">Welcome back, {session?.user?.firstName}!</h2>
+                <h2 className="text-xl font-bold">Welcome back, {user?.firstName}!</h2>
                 <p className="text-muted-foreground text-sm">Member since January 2024</p>
             </div>
             <div className="grid grid-cols-3 gap-3">

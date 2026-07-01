@@ -108,11 +108,24 @@ class ProductService:
         return f'<?xml version="1.0" encoding="utf-8"?>\n{xml_str}'
 
     async def get_similar_products(self, product_id: int, limit: int) -> list:
-        key = f"product:{product_id}:similar"
+        key: str = f"product:{product_id}:similar"
         ids = await self.redis.lrange(key, 0, -1)
         if not ids:
             return []
-        return self.search_srv.get_documents_by_filter(f"id IN [{','.join(ids)}]", limit)
+
+        ids = ids[:limit]
+
+        documents = self.search_srv.get_documents_by_filter(
+            f"id IN [{','.join(ids)}]", limit
+        )
+
+        documents = [dict(doc) for doc in documents]
+
+        # re-sort here using the Redis order (which IS the similarity ranking)
+        order_map = {int(pid): idx for idx, pid in enumerate(ids)}
+        documents.sort(key=lambda doc: order_map.get(doc["id"], len(ids)))
+
+        return documents
 
     async def get_personalized_recommendations(self, user_id: int, limit: int) -> list:
         product_ids = await self.redis.lrange(f"user:{user_id}:history", 0, 4)

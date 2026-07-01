@@ -1,4 +1,4 @@
-import { Clock, Package, Copy, User } from "lucide-react";
+import { Clock, Package, Copy, User, ExternalLink } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import { useOverlayTriggerState } from "react-stately";
@@ -8,10 +8,8 @@ import { Separator } from "@/components/ui/separator";
 import Overlay from "@/components/overlay";
 import type { AbandonedCart } from "@/schemas";
 import { currency } from "@/utils";
-import { useInvalidateMe } from "@/hooks/useUser";
+import { useImpersonateUser } from "@/hooks/useUser";
 import ImageDisplay from "@/components/image-display";
-import { useRouteContext, useRouter } from "@tanstack/react-router";
-import { updateAuthSession } from "@/utils/auth-client";
 
 interface AbandonedCartDetailsDialogProps {
     cart: AbandonedCart | null;
@@ -19,9 +17,7 @@ interface AbandonedCartDetailsDialogProps {
 
 export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogProps) => {
     const state = useOverlayTriggerState({});
-    const { session } = useRouteContext({ strict: false });
-    const router = useRouter();
-    const invalidateMe = useInvalidateMe();
+    const impersonateUser = useImpersonateUser();
 
     if (!cart) return null;
 
@@ -32,18 +28,10 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
 
     const handleImpersonation = async () => {
         try {
-            await updateAuthSession({
-                email: cart?.user?.email!,
-                mode: "impersonate",
-                impersonated: true,
-                impersonatedBy: session?.user?.email,
-            });
-
-            invalidateMe();
-            toast.success("Impersonated");
-
-            await router.invalidate();
-            await router.navigate({ to: "/" });
+            if (!cart?.user?.id) return;
+            await impersonateUser.mutateAsync(cart?.user?.id);
+            toast.loading("Impersonating.........");
+            window.location.reload();
         } catch (err) {
             console.error("Impersonation failed", err);
         }
@@ -165,12 +153,12 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                 </div>
 
                 <div className="sheet-footer">
-                    {/* {cart?.user?.email && (
+                    {cart?.user?.email && (
                         <Button variant="accent" onClick={handleImpersonation}>
                             <ExternalLink className="h-4 w-4" />
                             Impersonate
                         </Button>
-                    )} */}
+                    )}
                     <Button variant="outline" onClick={() => state.close()}>
                         Cancel
                     </Button>

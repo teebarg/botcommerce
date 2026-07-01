@@ -139,7 +139,7 @@ const storeItems = [
 ];
 
 export function AdminSidebar() {
-    const { session } = useRouteContext({ strict: false });
+    const { user } = useRouteContext({ strict: false });
     const { toggleSidebar, state } = useSidebar();
 
     return (
@@ -218,8 +218,8 @@ export function AdminSidebar() {
                                     <div className="flex items-center gap-2">
                                         <UserAvatar />
                                         <div className="flex flex-col">
-                                            <p className="font-semibold">{session?.user?.firstName ?? "User"}</p>
-                                            <p className="text-xs text-muted-foreground">{session?.user?.email ?? "User"}</p>
+                                            <p className="font-semibold">{user?.firstName ?? "User"}</p>
+                                            <p className="text-xs text-muted-foreground">{user?.email ?? "User"}</p>
                                         </div>
                                     </div>
                                     <ChevronUp className="ml-auto" />

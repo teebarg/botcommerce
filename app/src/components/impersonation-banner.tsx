@@ -1,44 +1,31 @@
-import { X } from "lucide-react";
 import { toast } from "sonner";
-import { useInvalidateMe } from "@/hooks/useUser";
+import { useStopImpersonation } from "@/hooks/useUser";
 import { Button } from "@/components/ui/button";
 import { useRouteContext, useRouter } from "@tanstack/react-router";
-import { updateAuthSession } from "@/utils/auth-client";
+import { useCallback } from "react";
 
 export default function ImpersonationBanner() {
-    const { session } = useRouteContext({ strict: false });
-    const invalidateMe = useInvalidateMe();
+    const { isImpersonating } = useRouteContext({ strict: false });
     const router = useRouter();
+    const stopImpersonation = useStopImpersonation();
 
-    const stopImpersonation = async () => {
+    const handleStopImpersonation = useCallback(async () => {
         try {
-            await updateAuthSession({
-                email: session?.impersonatedBy!,
-                mode: "impersonate",
-                impersonated: false,
-                impersonatedBy: null,
-            });
-
-            invalidateMe();
-
-            toast.success("Exited impersonation");
-            await router.invalidate();
-            await router.navigate({ to: "/" });
+            await stopImpersonation.mutateAsync();
+            toast.loading("Exiting Impersonation..........");
+            window.location.reload();
         } catch (err) {
             console.error("Impersonation failed", err);
         }
-    };
+    }, [stopImpersonation.mutateAsync, router]);
 
-    if (!session?.impersonated) return null;
+    if (!isImpersonating) return null;
 
     return (
-        <div className="fixed bottom-24 md:bottom-12 left-4 z-50 flex items-center px-3 py-2 gap-1 rounded-md bg-amber-100 text-amber-900 shadow-md border border-amber-300">
-            <span className="text-sm mr-3">Impersonation mode</span>
-            <Button className="underline" size="sm" variant="ghost" onClick={stopImpersonation}>
+        <div className="fixed bottom-24 md:bottom-12 left-4 z-50 flex items-center justify-between px-2.5 py-1.5 rounded-md bg-amber-100 text-amber-900 shadow-md">
+            <span className="text-sm">Impersonation mode</span>
+            <Button className="underline" size="sm" variant="ghost" onClick={handleStopImpersonation}>
                 Exit
-            </Button>
-            <Button aria-label="dismiss" size="icon" variant="ghost" onClick={stopImpersonation}>
-                <X className="h-4 w-4" />
             </Button>
         </div>
     );

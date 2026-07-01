@@ -3,12 +3,12 @@ import { cn, getInitials } from "@/utils";
 import { useRouteContext } from "@tanstack/react-router";
 
 export function UserAvatar({ className }: { className?: string }) {
-    const { session } = useRouteContext({ strict: false });
+    const { user } = useRouteContext({ strict: false });
 
     return (
         <Avatar className={cn("h-8 w-8 cursor-pointer", className)}>
-            <AvatarImage alt={session?.user?.firstName} src={session?.user?.image ?? undefined} />
-            <AvatarFallback className="bg-green-600 text-white text-xs">{getInitials(session?.user?.firstName ?? "")}</AvatarFallback>
+            <AvatarImage alt={user?.firstName} src={user?.image ?? undefined} />
+            <AvatarFallback className="bg-green-600 text-white text-xs">{getInitials(user?.firstName ?? "")}</AvatarFallback>
         </Avatar>
     );
 }

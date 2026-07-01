@@ -1,7 +1,7 @@
 from pydantic import BaseModel
+from prisma.enums import CartStatus
 from typing import List, Optional
 from datetime import datetime
-from prisma.enums import CartStatus
 
 class CartItemSchema(BaseModel):
     id: int
@@ -15,8 +15,8 @@ class CartItemSchema(BaseModel):
 
 class UserSchema(BaseModel):
     id: int
-    first_name: str
-    last_name: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
     email: str
 
     class Config:
