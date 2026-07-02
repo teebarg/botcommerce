@@ -67,7 +67,7 @@ export const AgeRangeSelector = ({ selectedRange, onChange }: AgeRangeSelectorPr
 
             <div>
                 {!showCustomInput ? (
-                    <Button className="border-dashed" type="button" size="md" onClick={() => setShowCustomInput(true)}>
+                    <Button className="border-dashed" type="button" onClick={() => setShowCustomInput(true)}>
                         <Plus className="h-4 w-4" />
                         Custom Range
                     </Button>

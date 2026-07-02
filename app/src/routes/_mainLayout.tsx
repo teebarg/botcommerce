@@ -4,6 +4,7 @@ import ButtonNav from "@/components/layout/bottom-navbar";
 import { ChatBubble } from "@/components/store/chat-widget/ChatBubble";
 import { StickyCartBar } from "@/components/store/cart/sticky-cart";
 import StoreNavbar from "@/components/layout/shop-header";
+import FloatingActionDeck from "@/components/store/collections/floating-deck";
 
 export const Route = createFileRoute("/_mainLayout")({
     component: MainLayoutComponent,
@@ -22,6 +23,7 @@ function MainLayoutComponent() {
             </main>
             <Footer />
             <ChatBubble />
+            <FloatingActionDeck />
             <ButtonNav />
         </div>
     );

@@ -187,9 +187,6 @@
 }
 
 :root {
-    --mobile-header-height: 62.75px;
-    --mobile-cart-header-height: 118px;
-
     --background: 0 0% 100%;
     --foreground: 0 0% 9%;
     --card: 0 0% 97%;
@@ -229,12 +226,12 @@
 
     --radius: 0.5rem;
 
-    --sat: env(safe-area-inset-top, 0px);
-    --sab: env(safe-area-inset-bottom, 0px);
+    /* --sat: env(safe-area-inset-top, 0px);
+    --sab: env(safe-area-inset-bottom, 0px); */
     --sal: env(safe-area-inset-left, 0px);
     --sar: env(safe-area-inset-right, 0px);
-    /* --sat: 44px;
-    --sab: 34px; */
+    --sat: 44px;
+    --sab: 34px;
 
     --sidebar: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -309,6 +306,19 @@
 
     .glass {
         @apply bg-background/80 backdrop-blur-md;
+    }
+
+    .glass3 {
+        @apply bg-background/70 backdrop-blur-xl;
+        @apply border border-white/20 dark:border-white/10;
+        @apply shadow-lg shadow-black/15 dark:shadow-black/40;
+    }
+
+    .glass1 {
+        @apply bg-white/15 dark:bg-white/10;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgb(255 255 255 / 0.18);
     }
 
     .carousel-nav-link {

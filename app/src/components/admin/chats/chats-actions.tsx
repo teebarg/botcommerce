@@ -27,8 +27,8 @@ const ChatsActions: React.FC<CustomerActionsProps> = ({ chat }) => {
                 open={state.isOpen}
                 title="Chat"
                 trigger={
-                    <Button className="bg-primary/10 hover:bg-primary/2 px-0 min-w-24" size="sm">
-                        <Eye className="h-4 w-4 text-primary" />
+                    <Button className="min-w-24" size="sm" variant="outline">
+                        <Eye className="h-4 w-4" />
                         View
                     </Button>
                 }
@@ -41,7 +41,7 @@ const ChatsActions: React.FC<CustomerActionsProps> = ({ chat }) => {
                 open={deleteState.isOpen}
                 onOpenChange={deleteState.setOpen}
                 trigger={
-                    <Button className="bg-destructive/10 hover:bg-destructive/20 px-0 min-w-24" size="sm">
+                    <Button className="min-w-24 border-destructive/30 text-destructive/75 hover:text-destructive/75" size="sm" variant="outline">
                         <Trash2 className="h-4 w-4" />
                         Delete
                     </Button>

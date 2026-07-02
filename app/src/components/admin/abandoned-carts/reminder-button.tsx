@@ -23,7 +23,7 @@ export const ReminderButton = ({ id }: ReminderButtonProps) => {
             open={state.isOpen}
             onOpenChange={state.setOpen}
             trigger={
-                <Button className="border border-muted-foreground" size="md" variant="ghost" disabled={sendReminderMutation.isPending}>
+                <Button className="border border-muted-foreground" variant="ghost" disabled={sendReminderMutation.isPending}>
                     <Mail className="h-4 w-4" />
                     Send Reminder
                 </Button>

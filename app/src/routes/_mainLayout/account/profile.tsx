@@ -118,7 +118,7 @@ function RouteComponent() {
                             <p className="text-xs text-muted-foreground">Update your personal details</p>
                         </div>
                         {editingSection !== "profile" && (
-                            <Button size="md" onClick={() => handleEdit("profile")}>
+                            <Button onClick={() => handleEdit("profile")}>
                                 Edit
                             </Button>
                         )}
@@ -169,18 +169,16 @@ function RouteComponent() {
                                         )}
                                     />
                                 </div>
-
                                 <div>
                                     <label className="block text-sm font-medium text-muted-foreground mb-2">Email Address</label>
                                     <div className="px-4 py-2 rounded-lg text-foreground bg-secondary">{user?.email}</div>
                                 </div>
-
                                 {editingSection === "profile" && (
                                     <div className="flex gap-2 mt-6">
-                                        <Button size="md" disabled={isPending} isLoading={isPending} type="submit">
+                                        <Button disabled={isPending} isLoading={isPending} type="submit">
                                             Save Changes
                                         </Button>
-                                        <Button size="md" variant="destructive" onClick={handleCancel}>
+                                        <Button variant="destructive" onClick={handleCancel}>
                                             Cancel
                                         </Button>
                                     </div>

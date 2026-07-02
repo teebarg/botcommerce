@@ -4,8 +4,7 @@ import { useOverlayTriggerState } from "react-stately";
 import { Button } from "@/components/ui/button";
 import { FaqForm } from "@/components/admin/faq/faq-form";
 import { queryOptions, useQuery } from "@tanstack/react-query";
-import { Eye, EyeOff, Tag } from "lucide-react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Tag } from "lucide-react";
 import type { FAQ } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
 import FaqActions from "@/components/admin/faq/faq-actions";
@@ -33,9 +32,9 @@ function RouteComponent() {
     const state = useOverlayTriggerState({});
 
     return (
-        <div className="px-2 max-w-5xl mx-auto py-4">
+        <div className="px-2 py-2 max-w-5xl">
             <div className="flex justify-between items-center mb-4">
-                <h1 className="text-xl font-bold">Manage FAQs</h1>
+                <h1 className="text-lg font-semibold">Manage FAQs</h1>
                 <SheetDrawer
                     open={state.isOpen}
                     title="Add New FAQ"
@@ -66,33 +65,26 @@ function RouteComponent() {
                         }
                     />
                 ) : faqs.map((faq: FAQ, idx: number) => (
-                    <Card key={idx} className="group hover:border-input bg-card">
-                        <CardHeader>
-                            <div className="flex items-start justify-between gap-4">
-                                <div className="flex-1 min-w-0">
-                                    <h3 className="font-semibold leading-tight mb-2">{faq.question}</h3>
-                                    <div className="flex items-center gap-3">
-                                        {faq.category && (
-                                            <Badge variant="accent">
-                                                <Tag className="w-3 h-3 mr-1" />
-                                                {faq.category}
-                                            </Badge>
-                                        )}
-                                        <Badge variant={faq.is_active ? "success" : "destructive"}>
-                                            {faq.is_active ? <Eye className="w-3 h-3 mr-1" /> : <EyeOff className="w-3 h-3 mr-1" />}
-                                            {faq.is_active ? "Active" : "Inactive"}
-                                        </Badge>
-                                    </div>
-                                </div>
-                                <FaqActions faq={faq} />
+                    <div key={idx} className="bg-card rounded-2xl border border-border">
+                        <div className="flex items-start justify-between gap-4 p-4">
+                            <div className="min-w-0 space-y-1.5">
+                                <p className="text-xs font-medium text-muted-foreground truncate">
+                                    {faq.question}
+                                </p>
+                                <h3 className="text-sm font-medium">{faq.answer}</h3>
                             </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="max-w-none">
-                                <p className="text-muted-foreground leading-relaxed m-0 text-sm">{faq.answer}</p>
-                            </div>
-                        </CardContent>
-                    </Card>
+                            <Badge variant={faq.is_active ? "success" : "destructive"}>
+                                {faq.is_active ? "Active" : "Inactive"}
+                            </Badge>
+                        </div>
+                        <div className="border-t border-border px-5 py-2 bg-muted/50 flex items-center justify-between">
+                            <Badge variant="accent">
+                                <Tag className="w-3 h-3 mr-1" />
+                                {faq.category}
+                            </Badge>
+                            <FaqActions faq={faq} />
+                        </div>
+                    </div>
                 ))}
             </div>
         </div>

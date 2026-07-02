@@ -76,10 +76,10 @@ export default function CustomerCreateGuest() {
                         />
                     </div>
                     <div className="flex justify-end gap-2 p-4 border-t border-border">
-                        <Button size="md" type="button" variant="outline" onClick={() => createState.close()}>
+                        <Button type="button" variant="outline" onClick={() => createState.close()}>
                             Cancel
                         </Button>
-                        <Button size="md" disabled={isPending} isLoading={isPending} type="submit">
+                        <Button disabled={isPending} isLoading={isPending} type="submit">
                             Create
                         </Button>
                     </div>

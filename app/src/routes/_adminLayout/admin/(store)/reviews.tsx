@@ -39,10 +39,10 @@ function RouteComponent() {
     return (
         <div className="px-2 py-4">
             <div>
-                <h1 className="text-xl font-semibold">Reviews</h1>
+                <h1 className="text-lg font-semibold">Reviews</h1>
                 <p className="text-muted-foreground text-sm">Manage your product reviews</p>
             </div>
-            <div className="glass sticky top-[var(--admin-nav-height)] z-40 -mx-2 p-2 mb-4">
+            <div className="glass sticky top-[calc(var(--sat)+var(--admin-nav-height))] z-40 -mx-2 p-2 mb-4">
                 <Input
                     className="bg-card"
                     placeholder="Search reviews..."
@@ -53,7 +53,7 @@ function RouteComponent() {
                     onChange={(e) => updateQuery([{ key: "search", value: e.target.value }])}
                 />
             </div>
-            <div className="mt-4">
+            <div>
                 {isPending ? (
                     <PageLoader variant="list" />
                 ) : items?.length == 0 ? (

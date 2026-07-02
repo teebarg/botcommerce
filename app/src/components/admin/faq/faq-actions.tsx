@@ -33,8 +33,8 @@ const FaqActions = ({ faq }: FaqActionsProps) => {
                 open={editState.isOpen}
                 title="Edit FAQ"
                 trigger={
-                    <Button size="icon" variant="accent">
-                        <Pencil className="h-5 w-5" />
+                    <Button size="icon" variant="outline">
+                        <Pencil className="h-4 w-4" />
                     </Button>
                 }
                 onOpenChange={editState.setOpen}
@@ -51,7 +51,7 @@ const FaqActions = ({ faq }: FaqActionsProps) => {
                 onOpenChange={deleteState.setOpen}
                 trigger={
                     <Button size="icon" variant="destructive" onClick={() => setFaqToDelete(faq.id)}>
-                        <Trash2 className="h-5 w-5" />
+                        <Trash2 className="h-4 w-4" />
                     </Button>
                 }
                 onClose={deleteState.close}

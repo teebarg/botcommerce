@@ -23,7 +23,7 @@ function RouteComponent() {
 
     return (
         <div className="px-3 py-2 slide-in">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-2">
                 <h1 className="text-xl font-semibold">Catalogs</h1>
                 <SheetDrawer
                     open={state.isOpen}

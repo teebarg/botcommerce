@@ -43,7 +43,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
             sheetClassName="min-w-[30vw]"
             title={<div className="py-1.5">{cart.status !== "CONVERTED" && <ReminderButton id={cart.id} />}</div>}
             trigger={
-                <Button size="md" onClick={state.open}>
+                <Button onClick={state.open}>
                     View Details
                 </Button>
             }
@@ -157,7 +157,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                             Impersonate
                         </Button>
                     )}
-                    <Button size="md" variant="outline" onClick={() => state.close()}>
+                    <Button variant="outline" onClick={() => state.close()}>
                         Cancel
                     </Button>
                 </div>

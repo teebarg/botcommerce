@@ -34,7 +34,7 @@ function RouteComponent() {
                 <h1 className="text-xl font-medium">Collections</h1>
                 <p className="text-muted-foreground text-sm">Manage your collections</p>
             </div>
-            <div className="sticky flex items-center gap-2 glass top-[var(--admin-nav-height)] -mx-2 z-40 p-2">
+            <div className="sticky flex items-center gap-2 glass top-[calc(var(--sat)+var(--admin-nav-height))] -mx-2 z-40 p-2">
                 <div className="relative w-full sm:w-64">
                     <Input className="w-full bg-card" placeholder="Search collections..." startContent={<Search />} type="search" />
                 </div>

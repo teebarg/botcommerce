@@ -9,14 +9,14 @@ import { useRouterState } from "@tanstack/react-router";
 import { FilterSidebarLogic, FilterSidebarRef } from "./catalog/filter-sidebar-logic";
 import { useSearch } from "@tanstack/react-router";
 
-interface MobileFilterProps {}
+interface MobileFilterProps { }
 
 type Filters = {
     ages: string;
     sizes: string;
     colors: string;
     cat_ids: string;
-    sort: "min_variant_price:asc"| "min_variant_price:desc" | "id:desc" | "created_at:desc";
+    sort: "min_variant_price:asc" | "min_variant_price:desc" | "id:desc" | "created_at:desc";
     width: string | undefined;
     length: string | undefined;
     max_price: string | undefined;
@@ -63,7 +63,7 @@ function countActiveFilters(filters: Filters): number {
     return count;
 }
 
-const MobileFilter: React.FC<MobileFilterProps> = ({}) => {
+const MobileFilter: React.FC<MobileFilterProps> = ({ }) => {
     const { location } = useRouterState();
     const filterState = useOverlayTriggerState({});
     const sidebarRef = useRef<FilterSidebarRef>(null);
@@ -87,17 +87,14 @@ const MobileFilter: React.FC<MobileFilterProps> = ({}) => {
                 </div>
             }
             trigger={
-                <div className="flex items-center justify-between px-4 py-3">
-                    <button className="flex items-center gap-2 text-2xs font-bold uppercase tracking-widest text-foreground transition-colors hover:text-muted-foreground">
-                        <SlidersHorizontal className="w-3.5 h-3.5" />
-                        Filters
-                        {activeCount > 0 && (
-                            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-2xs font-medium text-background">
-                                {activeCount}
-                            </span>
-                        )}
-                    </button>
-                </div>
+                <button className="relative w-12 h-12 rounded-full glass3 shadow-md flex items-center justify-center">
+                    <SlidersHorizontal className="w-5 h-5" />
+                    {activeCount > 0 && (
+                        <span className="absolute -top-0.5 -right-0.5 flex h-4.5 min-w-4.5 px-1 items-center justify-center rounded-full bg-primary text-[9px] font-black text-primary-foreground border-2 border-background">
+                            {activeCount}
+                        </span>
+                    )}
+                </button>
             }
             onOpenChange={filterState.setOpen}
             side="left"

@@ -46,7 +46,7 @@ function RouteComponent() {
 
     return (
         <div className="bg-background">
-            <div className="border-b bg-background sticky glass top-[var(--admin-nav-height)] z-10">
+            <div className="border-b bg-background sticky glass top-[calc(var(--sat)+var(--admin-nav-height))] z-10">
                 <div className="max-w-5xl mx-auto px-2 py-4">
                     <div className="mb-4">
                         <h1 className="text-xl font-bold">Abandoned Carts</h1>

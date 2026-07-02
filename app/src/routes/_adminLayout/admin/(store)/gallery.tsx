@@ -128,7 +128,7 @@ function RouteComponent() {
     return (
         <div className="px-2 py-4">
             <GalleryImagesUpload />
-            <div className="glass sticky top-[var(--admin-nav-height)] z-40 -mx-2 p-2 mb-4 flex items-center justify-between border-b border-border">
+            <div className="glass sticky top-[calc(var(--sat)+var(--admin-nav-height))] z-40 -mx-2 p-2 mb-4 flex items-center justify-between border-b border-border">
                 <div className="flex items-center gap-0.5 bg-muted rounded-lg p-0.5">
                     <Button
                         size="icon"
