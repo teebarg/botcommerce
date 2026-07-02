@@ -1,7 +1,7 @@
 import { Moon, Sun, Monitor } from "lucide-react";
-import { useTheme } from "@/providers/theme-provider";
+import { useTheme, type UserTheme } from "@/providers/theme-provider";
 import { useEffect, useState } from "react";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 
 export function ThemeToggle() {
     const { userTheme, setTheme } = useTheme();
@@ -16,26 +16,43 @@ export function ThemeToggle() {
     }
 
     const toggleTheme = () => {
-        setTheme(userTheme === "dark" ? "light" : "dark");
+        const cycleMap: Record<UserTheme, UserTheme> = {
+            light: "dark",
+            dark: "system",
+            system: "light",
+        };
+        setTheme(cycleMap[userTheme]);
     };
 
     const getThemeIcon = () => {
         switch (userTheme) {
-            case "dark":
-                return <Sun className="h-4 w-4" />;
             case "light":
+                return <Sun className="h-4 w-4" />;
+            case "dark":
                 return <Moon className="h-4 w-4" />;
-            default:
+            case "system":
                 return <Monitor className="h-4 w-4" />;
+        }
+    };
+
+    const getAriaLabel = () => {
+        switch (userTheme) {
+            case "light":
+                return "Switch to dark theme";
+            case "dark":
+                return "Switch to system theme";
+            case "system":
+                return "Switch to light theme";
         }
     };
 
     return (
         <Button
-            aria-label="Toggle theme"
+            aria-label={getAriaLabel()}
             size="icon"
             variant="outline"
             onClick={toggleTheme}
+            title={`Theme: ${userTheme}`}
         >
             {getThemeIcon()}
         </Button>

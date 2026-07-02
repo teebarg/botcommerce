@@ -32,7 +32,7 @@ function RouteComponent() {
           </div>
         </aside>
         <main className="w-full flex-1 relative px-1 rounded-xl">
-          <FilterChips value="for-you" />
+          <FilterChips />
           <Outlet />
         </main>
       </div>

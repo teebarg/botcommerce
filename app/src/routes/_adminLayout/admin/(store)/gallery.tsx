@@ -128,80 +128,78 @@ function RouteComponent() {
     return (
         <div className="px-2 py-4">
             <GalleryImagesUpload />
-            <div>
-                <div className="sticky top-[calc(var(--sat)+4rem)] z-40 bg-background -mx-2 px-4 py-2.5 mb-4 flex items-center justify-between gap-3 border-b border-border">
-                    <div className="flex items-center gap-0.5 bg-muted rounded-lg p-0.5">
-                        <Button
-                            size="icon"
-                            variant="ghost"
-                            className={cn("rounded-md", viewMode === "grid" ? "bg-background shadow-xs text-foreground" : "text-muted-foreground")}
-                            onClick={() => setViewMode("grid")}
-                        >
-                            <LayoutDashboard className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            size="icon"
-                            variant="ghost"
-                            className={cn("rounded-md", viewMode === "list" ? "bg-background shadow-xs text-foreground" : "text-muted-foreground")}
-                            onClick={() => setViewMode("list")}
-                        >
-                            <RectangleVertical className="h-4 w-4" />
-                        </Button>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        {selectionMode && selectedImages.size > 0 && (
-                            <span className="text-xs text-muted-foreground">{selectedImages.size} selected</span>
-                        )}
-                        <Button
-                            size="sm"
-                            variant={selectionMode ? "destructive" : "outline"}
-                            onClick={() => {
-                                setSelectionMode(!selectionMode);
-                                if (selectionMode) setSelectedImages(new Set());
-                            }}
-                        >
-                            {selectionMode ? "Cancel" : "Select"}
-                        </Button>
-                    </div>
+            <div className="sticky top-[var(--admin-nav-height)] z-40 bg-background -mx-2 px-4 py-2.5 mb-4 flex items-center justify-between border-b border-border">
+                <div className="flex items-center gap-0.5 bg-muted rounded-lg p-0.5">
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        className={cn("rounded-md", viewMode === "grid" ? "bg-background shadow-xs text-foreground" : "text-muted-foreground")}
+                        onClick={() => setViewMode("grid")}
+                    >
+                        <LayoutDashboard className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        className={cn("rounded-md", viewMode === "list" ? "bg-background shadow-xs text-foreground" : "text-muted-foreground")}
+                        onClick={() => setViewMode("list")}
+                    >
+                        <RectangleVertical className="h-4 w-4" />
+                    </Button>
                 </div>
-                {isPending ? (
-                    <PageLoader variant="grid" />
-                ) : items.length > 0 ? (
-                    <InfiniteResourceList
-                        className={cn(
-                            "mb-8 w-full grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2",
-                            viewMode === "grid" ? "" : "grid-cols-1"
-                        )}
-                        items={items}
-                        onLoadMore={fetchNextPage}
-                        hasMore={hasNextPage}
-                        isLoading={isFetchingNextPage}
-                        renderItem={(item: ProductImage, idx: number) => (
-                            <GalleryCard
-                                key={idx}
-                                image={item}
-                                isSelected={selectedImages.has(item?.id)}
-                                selectionMode={selectionMode}
-                                onSelectionChange={handleSelectionChange}
-                            />
-                        )}
-                        loader={<PageLoader variant="grid" />}
-                    />
-                ) : (
-                    <EmptyState title="No images found" description="Please upload images or adjust your search filters." />
-                )}
-                {selectedImages.size > 0 && (
-                    <ProductBulkActions
-                        isLoading={isDeleting}
-                        selectedCount={selectedImages.size}
-                        selectedImageIds={Array.from(selectedImages)}
-                        selectedProductIds={selectedProductIds}
-                        onClearSelection={() => setSelectedImages(new Set())}
-                        onDelete={handleBulkDelete}
-                    />
-                )}
+
+                <div className="flex items-center gap-2">
+                    {selectionMode && selectedImages.size > 0 && (
+                        <span className="text-xs text-muted-foreground">{selectedImages.size} selected</span>
+                    )}
+                    <Button
+                        size="sm"
+                        variant={selectionMode ? "destructive" : "outline"}
+                        onClick={() => {
+                            setSelectionMode(!selectionMode);
+                            if (selectionMode) setSelectedImages(new Set());
+                        }}
+                    >
+                        {selectionMode ? "Cancel" : "Select"}
+                    </Button>
+                </div>
             </div>
+            {isPending ? (
+                <PageLoader variant="grid" />
+            ) : items.length > 0 ? (
+                <InfiniteResourceList
+                    className={cn(
+                        "mb-8 w-full grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2",
+                        viewMode === "grid" ? "" : "grid-cols-1"
+                    )}
+                    items={items}
+                    onLoadMore={fetchNextPage}
+                    hasMore={hasNextPage}
+                    isLoading={isFetchingNextPage}
+                    renderItem={(item: ProductImage, idx: number) => (
+                        <GalleryCard
+                            key={idx}
+                            image={item}
+                            isSelected={selectedImages.has(item?.id)}
+                            selectionMode={selectionMode}
+                            onSelectionChange={handleSelectionChange}
+                        />
+                    )}
+                    loader={<PageLoader variant="grid" />}
+                />
+            ) : (
+                <EmptyState title="No images found" description="Please upload images or adjust your search filters." />
+            )}
+            {selectedImages.size > 0 && (
+                <ProductBulkActions
+                    isLoading={isDeleting}
+                    selectedCount={selectedImages.size}
+                    selectedImageIds={Array.from(selectedImages)}
+                    selectedProductIds={selectedProductIds}
+                    onClearSelection={() => setSelectedImages(new Set())}
+                    onDelete={handleBulkDelete}
+                />
+            )}
         </div>
     );
 }

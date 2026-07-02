@@ -2,16 +2,42 @@ import { Link } from "@tanstack/react-router";
 import { ShoppingCart, ArrowRight } from "lucide-react";
 import { currency } from "@/utils";
 import { useCartSummary } from "@/hooks/useCartSummary";
+import { useEffect, useRef } from "react";
 
 export function StickyCartBar() {
     const { subtotal, totalItems, isLoading } = useCartSummary();
+    const barRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (isLoading || totalItems === 0) {
+            document.documentElement.style.setProperty("--cart-bar-bottom", "var(--nav-height)");
+            return;
+        }
+        if (!barRef.current) return;
+
+        const observer = new ResizeObserver((entries) => {
+            for (let entry of entries) {
+                const height = entry.borderBoxSize[0].blockSize;
+                document.documentElement.style.setProperty(
+                    "--cart-bar-bottom",
+                    `calc(var(--nav-height) + ${height}px)`
+                );
+            }
+        });
+
+        observer.observe(barRef.current);
+
+        return () => observer.disconnect();
+    }, [isLoading, totalItems]);
+
     if (isLoading || totalItems === 0) return null;
 
     return (
         <div
+            ref={barRef}
             className="md:hidden sticky z-30 flex items-center justify-between bg-background/60 backdrop-blur-md
              px-6 py-3 shadow-sm animate-in slide-in-from-top-2 duration-300"
-            style={{ top: "calc(var(--sat) + 62.75px)" }}
+            style={{ top: "var(--nav-height)" }}
         >
             <div className="flex items-center gap-2.5">
                 <div className="relative">
@@ -37,7 +63,6 @@ export function StickyCartBar() {
                     </span>
                 </div>
             </div>
-
             <Link
                 to="/checkout"
                 className="

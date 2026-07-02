@@ -9,7 +9,7 @@ import Overlay from "@/components/overlay";
 import type { AbandonedCart } from "@/schemas";
 import { currency } from "@/utils";
 import { useImpersonateUser } from "@/hooks/useUser";
-import ImageDisplay from "@/components/image-display";
+import ImageLightbox from "@/components/image-lightbox";
 
 interface AbandonedCartDetailsDialogProps {
     cart: AbandonedCart | null;
@@ -56,7 +56,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                             <User className="h-5 w-5" />
                             Customer Information
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg border bg-linear-to-br from-accent/5 to-primary/5">
+                        <div className="grid grid-cols-1 gap-4 p-4 rounded-lg border bg-card">
                             <div className="space-y-1">
                                 <p className="text-sm text-muted-foreground">Name</p>
                                 {cart?.user?.first_name ? (
@@ -90,23 +90,21 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                     <Separator />
 
                     <div className="space-y-4">
-                        <h3 className="font-semibold text-lg flex items-center gap-2">
+                        <h3 className="font-semibold flex items-center gap-2">
                             <Package className="h-5 w-5" />
                             Cart Items ({cart.items.length})
                         </h3>
                         <div className="space-y-3">
                             {cart.items.map((item) => (
-                                <div key={item.id} className="flex gap-4 p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors">
-                                    <div className="w-20 h-20 rounded-lg overflow-hidden border bg-muted shrink-0">
-                                        <ImageDisplay alt={item.name} url={item.image} />
+                                <div key={item.id} className="flex items-center gap-4 px-4 py-2 rounded-lg border bg-card">
+                                    <div className="w-16 h-16 rounded-lg overflow-hidden border bg-muted shrink-0">
+                                        <ImageLightbox url={item?.image} alt={item.name} />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h4 className="font-medium mb-1">{item.name}</h4>
-                                        <p className="text-sm text-muted-foreground mb-2">Quantity: {item.quantity}</p>
-                                        <div className="flex items-center justify-between">
-                                            <p className="text-sm font-medium">{currency(item.price)}</p>
-                                            <p className="font-semibold">{currency(item.price * item.quantity)}</p>
-                                        </div>
+                                        <h4 className="font-medium mb-1 text-sm truncate">{item.name}</h4>
+                                        <p className="text-xs text-muted-foreground mt-0.5">
+                                            {item.quantity} × {currency(item.price)}
+                                        </p>
                                     </div>
                                 </div>
                             ))}
@@ -127,7 +125,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                             <Separator />
                             <div className="flex justify-between items-center">
                                 <span className="font-semibold">Total</span>
-                                <span className="text-2xl font-bold">{currency(cart.total)}</span>
+                                <span className="text-base font-bold">{currency(cart.total)}</span>
                             </div>
                         </div>
                     </div>
@@ -159,7 +157,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                             Impersonate
                         </Button>
                     )}
-                    <Button variant="outline" onClick={() => state.close()}>
+                    <Button size="md" variant="outline" onClick={() => state.close()}>
                         Cancel
                     </Button>
                 </div>
