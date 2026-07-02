@@ -306,8 +306,9 @@
     .slide-in {
         @apply animate-in slide-in-from-bottom-50 duration-300
     }
+
     .glass {
-        @apply bg-white/10 border border-white/15 shadow-sm;
+        @apply bg-background/80 backdrop-blur-md;
     }
 
     .carousel-nav-link {

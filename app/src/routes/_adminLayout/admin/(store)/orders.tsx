@@ -38,25 +38,27 @@ function RouteComponent() {
     });
 
     return (
-        <div className="px-4 py-2">
-            <div className="mb-6">
+        <div className="px-2 py-2">
+            <div className="mb-2">
                 <h1 className="text-xl font-medium">Order view</h1>
                 <p className="text-muted-foreground text-sm">Manage your orders.</p>
             </div>
             <div>
-                <div className="relative mb-4">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Search className="text-gray-400" size={18} />
+                <div className="sticky glass top-[var(--admin-nav-height)] z-40 -mx-2 p-2">
+                    <div className="relative mb-4">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Search className="text-gray-400" size={18} />
+                        </div>
+                        <input
+                            className="pl-10 pr-4 py-2 w-full border border-input rounded-lg focus:outline-none"
+                            placeholder="Search orders..."
+                            type="text"
+                            value={params.search ?? ""}
+                            onChange={(e) => updateQuery([{ key: "search", value: e.target.value }])}
+                        />
                     </div>
-                    <input
-                        className="pl-10 pr-4 py-2 w-full border border-input rounded-lg focus:outline-none"
-                        placeholder="Search orders..."
-                        type="text"
-                        value={params.search ?? ""}
-                        onChange={(e) => updateQuery([{ key: "search", value: e.target.value }])}
-                    />
+                    <OrderFilters />
                 </div>
-                <OrderFilters />
                 <div className="mt-4">
                     {isPending ? (
                         <PageLoader variant="list" />

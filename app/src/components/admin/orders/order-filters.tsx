@@ -87,7 +87,7 @@ const OrderFilters: React.FC = () => {
                     Clear
                 </Button>
             </div>
-            <div className="flex max-w-[90vw] md:hidden gap-2 overflow-x-auto pb-1">
+            <div className="flex md:hidden gap-2 overflow-x-auto pb-1">
                 <button
                     onClick={() => updateStatusQuery()}
                     className={`shrink-0 px-3.5 py-1.5 text-xs font-medium rounded-full border transition-colors ${!search.status
