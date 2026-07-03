@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { getProductFn, getProductsFeedFn } from "@/server/product.server";
 import { getMeFn, getMeTrxnFn } from "@/server/users.server";
-import { getCollectionFn, getOrderFn } from "@/server/store.server";
+import { getCollectionFn } from "@/server/store.server";
 import { getCatalogFn, getUserAddressesFn } from "@/server/store.server";
 import { api } from "@/utils/api";
 import { FeedQuery, PaginatedOrders, PaginatedReview } from "@/schemas";
@@ -43,12 +43,6 @@ export const productQuery = (slug: string) =>
     queryOptions({
         queryKey: ["product", "slug", slug],
         queryFn: () => getProductFn({ data: slug }),
-    });
-
-export const orderQuery = (orderNumber: string) =>
-    queryOptions({
-        queryKey: ["order", orderNumber],
-        queryFn: () => getOrderFn({ data: orderNumber }),
     });
 
 export const ordersQuery = (params?: { take?: number; status?: any; start_date?: string; end_date?: string }) =>

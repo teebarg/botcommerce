@@ -15,7 +15,6 @@ import InfiniteFeed from "@/components/store/collections/infinite-feed";
 import { getIndexProductsFn } from "@/server/product.server";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { LazyInView } from "@/components/LazyInView";
-import { categoriesQuery } from "@/hooks/useCategories";
 
 const indexProductQuery = () =>
     queryOptions({
@@ -28,7 +27,6 @@ const indexProductQuery = () =>
 export const Route = createFileRoute("/_mainLayout/")({
     component: Home,
     loader: async ({ context: { queryClient } }) => {
-        queryClient.prefetchQuery(categoriesQuery());
         queryClient.prefetchQuery(indexProductQuery());
         const image = HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)];
         return {
@@ -66,7 +64,7 @@ function Home() {
                     </div>
                 }
             >
-                <CategoriesWithProductsSection /> 
+                <CategoriesWithProductsSection />
             </LazyInView>
             <div className="max-w-sxl mx-auto px-2">
                 <div className="px-4 mb-4">

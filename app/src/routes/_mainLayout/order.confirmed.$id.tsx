@@ -4,55 +4,47 @@ import OrderPickup from "@/components/store/orders/order-pickup";
 import SuccessConfirmation from "@/components/store/orders/order-success";
 import PendingPayment from "@/components/store/orders/order-pending";
 import FailedPayment from "@/components/store/orders/order-failed";
-import { orderQuery } from "@/queries/user.queries";
-import { useQuery } from "@tanstack/react-query";
 import { PaymentMethod } from "@/schemas";
 import OrderStatusLoader from "@/components/store/orders/order-loader";
 import NotFound from "@/components/generic/not-found";
 import { Receipt } from "lucide-react";
+import { useOrder } from "@/hooks/useOrder";
 
 export const Route = createFileRoute("/_mainLayout/order/confirmed/$id")({
-    loader: async ({ params: { id }, context: { queryClient } }) => {
-        try {
-            await queryClient.ensureQueryData(orderQuery(id));
-        } catch (err) {
-            throw new Error("ORDER_NOT_FOUND");
-        }
-    },
     component: RouteComponent,
-    errorComponent: ({ error }) => {
-        if (error.message === "ORDER_NOT_FOUND") {
-            return (
-                <NotFound
-                    icon={Receipt}
-                    eyebrow="Order unavailable"
-                    title="Order not found"
-                    description="This order may have expired or does not exist."
-                    primaryAction={{ label: "View your orders", to: "/account/orders" }}
-                    quickLinks={[
-                        { to: "/account/orders", label: "My orders" },
-                        { to: "/collections", label: "Continue shopping" },
-                        { to: "/contact", label: "Contact support" },
-                    ]}
-                />
-            );
-        }
-
-        throw error;
-    },
-    pendingComponent: () => <OrderStatusLoader />
 });
 
 function RouteComponent() {
     const { id } = Route.useParams();
+    const { data: order, error, isPending } = useOrder(id);
     useOneTimeConfetti(id, "firework");
 
     const navigate = useNavigate();
-    const { data: order } = useQuery(orderQuery(id));
 
     const onContinueShopping = () => {
         navigate({ to: "/collections" });
     };
+
+    if (isPending) {
+        return <OrderStatusLoader />
+    }
+
+    if (error) {
+        return (
+            <NotFound
+                icon={Receipt}
+                eyebrow="Order unavailable"
+                title="Order not found"
+                description="This order may have expired or does not exist."
+                primaryAction={{ label: "View your orders", to: "/account/orders" }}
+                quickLinks={[
+                    { to: "/account/orders", label: "My orders" },
+                    { to: "/collections", label: "Continue shopping" },
+                    { to: "/contact", label: "Contact support" },
+                ]}
+            />
+        )
+    }
 
     if (order?.payment_method === PaymentMethod.CASH_ON_DELIVERY) {
         return (

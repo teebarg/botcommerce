@@ -3,6 +3,15 @@ import { toast } from "sonner";
 import type { Order, OrderStatus, PaymentStatus } from "@/schemas";
 import { api } from "@/utils/api";
 
+export const useOrder = (orderNumber: string) => {
+    return useQuery({
+        queryKey: ["order", orderNumber],
+        queryFn: () => api.get<Order>(`/order/${orderNumber}`),
+        staleTime: 1000 * 60 * 60,
+        gcTime: 1000 * 60 * 60 * 2,
+    });
+};
+
 export const useChangeOrderStatus = () => {
     return useMutation({
         mutationFn: async ({ id, status }: { id: number; status: OrderStatus }) =>

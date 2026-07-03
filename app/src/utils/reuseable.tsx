@@ -6,6 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Separator } from "@/components/ui/separator";
 import { useRouterState } from "@tanstack/react-router";
 import { SignIn } from "@clerk/tanstack-react-start";
+import { useOverlayTriggerState } from "react-stately";
 
 export function renderText(text: string): React.ReactNode {
     return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) => {
@@ -116,6 +117,7 @@ interface ShareUIProps {
 }
 
 export function ShareUI({ trigger, handleNativeShare, targetUrl = "", text = "Check out these products in our catalog" }: ShareUIProps) {
+    const state = useOverlayTriggerState({});
     const { location } = useRouterState();
     const filterRoutes = ["/collections", "/search", "/admin/catalog", "/products"];
 
@@ -125,6 +127,7 @@ export function ShareUI({ trigger, handleNativeShare, targetUrl = "", text = "Ch
         try {
             await navigator.clipboard.writeText(targetUrl);
             toast.success("Link copied to clipboard!");
+            state.close()
         } catch (error: any) {
             toast.error("Copy Failed", {
                 description: "Unable to copy URL to clipboard.",
@@ -153,6 +156,7 @@ export function ShareUI({ trigger, handleNativeShare, targetUrl = "", text = "Ch
         if (shareUrl) {
             window.open(shareUrl, "_blank", "width=600,height=400");
         }
+        state.close()
     };
 
     if (!show) {
@@ -160,7 +164,7 @@ export function ShareUI({ trigger, handleNativeShare, targetUrl = "", text = "Ch
     }
 
     return (
-        <Popover>
+        <Popover open={state.isOpen} onOpenChange={state.setOpen}>
             <PopoverTrigger asChild>{trigger}</PopoverTrigger>
             <PopoverContent align="end" className="p-0">
                 <div className="p-2 shadow-hover bg-card">

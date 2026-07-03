@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { categoriesQuery } from "@/hooks/useCategories";
+import { useCategories } from "@/hooks/useCategories";
 import type { Category } from "@/schemas/product";
-import { useQuery } from "@tanstack/react-query";
 
 function CategoryPillsSkeleton() {
     return (
@@ -18,7 +17,7 @@ function CategoryPillsSkeleton() {
 }
 
 export default function CategoriesSection() {
-    const { data, isPending  } = useQuery(categoriesQuery());
+    const { data, isPending } = useCategories();
 
     return (
         <div className="px-2 mt-4 flex gap-2 overflow-x-auto md:flex-wrap md:overflow-visible max-w-sxl mx-auto">
