@@ -16,7 +16,7 @@ function MainLayoutComponent() {
     return (
         <div className="flex flex-col min-h-screen">
             <StoreNavbar />
-            <main className="flex-1 flex flex-col pt-16 md:pt-0 pb-8">
+            <main className="flex-1 flex flex-col pt-[var(--nav-height)] pb-8">
                 <Outlet />
             </main>
             <Footer />
