@@ -36,7 +36,7 @@ const StoreNavbar = () => {
             ref={navRef}
             className="fixed top-0 inset-x-0 z-50 w-full border-b border-border/40 bg-background/60 backdrop-blur-md"
         >
-            <div className="w-full max-w-7xl mx-auto px-4">
+            <div className="w-full max-w-7xl mx-auto px-2">
                 <div className="flex md:hidden items-center justify-between py-2.5 pt-[calc(var(--sat)+10px)] w-full gap-2">
                     <div className="flex items-center gap-1.5 shrink-0">
                         <BackButton />
@@ -50,9 +50,9 @@ const StoreNavbar = () => {
                         {totalItems > 0 ? (
                             <LocalizedClientLink
                                 href="/checkout"
-                                className="flex items-center gap-2 bg-gradient-action rounded-full pl-4 pr-2 py-2 max-w-full active:scale-[0.97] transition-transform"
+                                className="flex items-center gap-0.5 bg-gradient-action rounded-full p-2 max-w-full active:scale-[0.97] transition-transform"
                             >
-                                <span className="text-sm font-display font-medium text-primary-foreground whitespace-nowrap">
+                                <span className="text-xs font-display font-medium text-primary-foreground whitespace-nowrap">
                                     Checkout
                                 </span>
                                 <span className="w-[3px] h-[3px] rounded-full bg-primary-foreground/40 shrink-0" />
