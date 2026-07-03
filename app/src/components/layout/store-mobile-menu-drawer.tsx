@@ -31,7 +31,7 @@ const StoreMenuComp: React.FC = () => {
     const location = useLocation();
     const pathname = location.pathname;
     const state = useOverlayTriggerState({});
-    const { session, isAuthenticated } = useRouteContext({ strict: false });
+    const { isAuthenticated, isAdmin } = useRouteContext({ strict: false });
 
     useEffect(() => {
         state.close();
@@ -58,7 +58,7 @@ const StoreMenuComp: React.FC = () => {
                         <NavLink href="/collections" icon={<LayoutGrid className="h-6 w-6" />} title="Collections" />
                         <NavLink href="/checkout" icon={<CreditCard className="h-6 w-6" />} title="Checkout" />
                         {isAuthenticated && <NavLink href="/wishlist" icon={<Heart className="h-6 w-6" />} title="Favorites" />}
-                        {session?.user?.isAdmin && <NavLink href="/admin" icon={<User2 className="h-6 w-6" />} title="Admin" />}
+                        {isAdmin && <NavLink href="/admin" icon={<User2 className="h-6 w-6" />} title="Admin" />}
                     </div>
 
                     <Separator className="my-8" />

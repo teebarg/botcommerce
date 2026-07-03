@@ -33,7 +33,7 @@ async def get_review_status(request: Request, product_id: int, user: UserDep, sr
 
 
 @router.get("/{id}/similar")
-@cacheable(key_prefix="product:similar", tags=lambda id: ["product:{id}"])
+@cacheable(key_prefix="similar", tags=lambda id: ["products"])
 async def recommend(request: Request, srv: ProductDep, id: int, limit: int = Query(default=20, le=100)):
     items = await srv.get_similar_products(product_id=id, limit=limit)
     return {"similar": items}

@@ -1,4 +1,4 @@
-import { Clock, Package, Copy, User } from "lucide-react";
+import { Clock, Package, Copy, User, ExternalLink } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import { useOverlayTriggerState } from "react-stately";
@@ -8,10 +8,8 @@ import { Separator } from "@/components/ui/separator";
 import Overlay from "@/components/overlay";
 import type { AbandonedCart } from "@/schemas";
 import { currency } from "@/utils";
-import { useInvalidateMe } from "@/hooks/useUser";
-import ImageDisplay from "@/components/image-display";
-import { useRouteContext, useRouter } from "@tanstack/react-router";
-import { updateAuthSession } from "@/utils/auth-client";
+import { useImpersonateUser } from "@/hooks/useUser";
+import ImageLightbox from "@/components/image-lightbox";
 
 interface AbandonedCartDetailsDialogProps {
     cart: AbandonedCart | null;
@@ -19,9 +17,7 @@ interface AbandonedCartDetailsDialogProps {
 
 export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogProps) => {
     const state = useOverlayTriggerState({});
-    const { session } = useRouteContext({ strict: false });
-    const router = useRouter();
-    const invalidateMe = useInvalidateMe();
+    const impersonateUser = useImpersonateUser();
 
     if (!cart) return null;
 
@@ -32,18 +28,10 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
 
     const handleImpersonation = async () => {
         try {
-            await updateAuthSession({
-                email: cart?.user?.email!,
-                mode: "impersonate",
-                impersonated: true,
-                impersonatedBy: session?.user?.email,
-            });
-
-            invalidateMe();
-            toast.success("Impersonated");
-
-            await router.invalidate();
-            await router.navigate({ to: "/" });
+            if (!cart?.user?.id) return;
+            await impersonateUser.mutateAsync(cart?.user?.id);
+            toast.loading("Impersonating.........");
+            window.location.reload();
         } catch (err) {
             console.error("Impersonation failed", err);
         }
@@ -55,7 +43,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
             sheetClassName="min-w-[30vw]"
             title={<div className="py-1.5">{cart.status !== "CONVERTED" && <ReminderButton id={cart.id} />}</div>}
             trigger={
-                <Button size="md" onClick={state.open}>
+                <Button onClick={state.open}>
                     View Details
                 </Button>
             }
@@ -68,7 +56,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                             <User className="h-5 w-5" />
                             Customer Information
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg border bg-linear-to-br from-accent/5 to-primary/5">
+                        <div className="grid grid-cols-1 gap-4 p-4 rounded-lg border bg-card">
                             <div className="space-y-1">
                                 <p className="text-sm text-muted-foreground">Name</p>
                                 {cart?.user?.first_name ? (
@@ -102,23 +90,21 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                     <Separator />
 
                     <div className="space-y-4">
-                        <h3 className="font-semibold text-lg flex items-center gap-2">
+                        <h3 className="font-semibold flex items-center gap-2">
                             <Package className="h-5 w-5" />
                             Cart Items ({cart.items.length})
                         </h3>
                         <div className="space-y-3">
                             {cart.items.map((item) => (
-                                <div key={item.id} className="flex gap-4 p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors">
-                                    <div className="w-20 h-20 rounded-lg overflow-hidden border bg-muted shrink-0">
-                                        <ImageDisplay alt={item.name} url={item.image} />
+                                <div key={item.id} className="flex items-center gap-4 px-4 py-2 rounded-lg border bg-card">
+                                    <div className="w-16 h-16 rounded-lg overflow-hidden border bg-muted shrink-0">
+                                        <ImageLightbox url={item?.image} alt={item.name} />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h4 className="font-medium mb-1">{item.name}</h4>
-                                        <p className="text-sm text-muted-foreground mb-2">Quantity: {item.quantity}</p>
-                                        <div className="flex items-center justify-between">
-                                            <p className="text-sm font-medium">{currency(item.price)}</p>
-                                            <p className="font-semibold">{currency(item.price * item.quantity)}</p>
-                                        </div>
+                                        <h4 className="font-medium mb-1 text-sm truncate">{item.name}</h4>
+                                        <p className="text-xs text-muted-foreground mt-0.5">
+                                            {item.quantity} × {currency(item.price)}
+                                        </p>
                                     </div>
                                 </div>
                             ))}
@@ -139,7 +125,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                             <Separator />
                             <div className="flex justify-between items-center">
                                 <span className="font-semibold">Total</span>
-                                <span className="text-2xl font-bold">{currency(cart.total)}</span>
+                                <span className="text-base font-bold">{currency(cart.total)}</span>
                             </div>
                         </div>
                     </div>
@@ -165,12 +151,12 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                 </div>
 
                 <div className="sheet-footer">
-                    {/* {cart?.user?.email && (
+                    {cart?.user?.email && (
                         <Button variant="accent" onClick={handleImpersonation}>
                             <ExternalLink className="h-4 w-4" />
                             Impersonate
                         </Button>
-                    )} */}
+                    )}
                     <Button variant="outline" onClick={() => state.close()}>
                         Cancel
                     </Button>

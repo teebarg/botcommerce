@@ -56,8 +56,8 @@ function RouteComponent() {
     const { isAuthenticated } = Route.useRouteContext();
     return (
         <div className="flex-1">
-            <div className="bg-background/60 backdrop-blur-md md:hidden sticky z-20 top-[calc(var(--sat)+64px)]">
-                <ul className="grid grid-cols-5 px-2">
+            <div className="bg-background/60 backdrop-blur-md md:hidden sticky z-20 top-[var(--nav-height)]">
+                <ul className="grid grid-cols-5 px-2 py-1">
                     {navLinks.map((link, idx: number) => (
                         <li key={idx}>
                             <Link

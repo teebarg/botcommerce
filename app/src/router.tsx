@@ -6,11 +6,11 @@ import { DefaultCatchBoundary } from '@/components/DefaultCatchBoundary'
 import NotFound from '@/components/generic/not-found'
 
 export type SessionContext = {
-    isAuthenticated: boolean;
-    userId: string | null;
-    impersonated: boolean;
+    userId: number | null;
+    isImpersonating: boolean;
     impersonatedBy: string | null;
-    id: string;
+    isAdmin: boolean
+    isAuthenticated: boolean;
     user: {
         firstName: string;
         lastName: string;
@@ -18,16 +18,15 @@ export type SessionContext = {
         email: string;
         role: string;
         roles: string[];
-        isAdmin: boolean;
     };
 };
 
 const defaultSession: SessionContext = {
-    isAuthenticated: false,
     userId: null,
-    impersonated: false,
+    isImpersonating: false,
     impersonatedBy: null,
-    id: "",
+    isAdmin: false,
+    isAuthenticated: false,
     user: {
         firstName: "",
         lastName: "",
@@ -35,7 +34,6 @@ const defaultSession: SessionContext = {
         email: "",
         role: "",
         roles: [],
-        isAdmin: false,
     },
 };
 
@@ -46,9 +44,7 @@ export function getRouter() {
         routeTree,
         scrollRestoration: true,
         context: {
-            queryClient, session: defaultSession, config: {},
-            isAuthenticated: false,
-            userId: null,
+            queryClient, config: {}, ...defaultSession
         },
         defaultPreload: 'intent',
         defaultErrorComponent: DefaultCatchBoundary,

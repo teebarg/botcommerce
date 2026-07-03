@@ -20,7 +20,7 @@ export const meQuery = () =>
         queryFn: () => getMeFn(),
     });
 
-export const meTxnsQuery = (userId: string | null) =>
+export const meTxnsQuery = (userId: number | null) =>
     queryOptions({
         queryKey: ["wallet", userId?.toString()],
         queryFn: () => getMeTrxnFn(),
@@ -59,7 +59,7 @@ export const ordersQuery = (params?: { take?: number; status?: any; start_date?:
         refetchOnMount: false,
     });
 
-export const userAddressesQuery = (userId: string | null) =>
+export const userAddressesQuery = (userId: number | null) =>
     queryOptions({
         queryKey: ["addresses", userId?.toString()],
         queryFn: () => getUserAddressesFn(),

@@ -7,6 +7,7 @@ import { productQuery } from "@/queries/user.queries";
 import { useQuery } from "@tanstack/react-query";
 import NotFound from "@/components/generic/not-found";
 import ProductPageLoader from "@/components/store/products/product-page-loader";
+import RelatedProducts from "@/components/store/products/related-products";
 
 export const Route = createFileRoute("/_mainLayout/products/$slug")({
     loader: async ({ context: { queryClient }, params: { slug } }) => {
@@ -72,9 +73,9 @@ function RouteComponent() {
     return (
         <main className="flex flex-col">
             <ProductView product={product} />
-            {/* <LazyInView>
+            <LazyInView>
                 <RelatedProducts productId={product.id} />
-            </LazyInView> */}
+            </LazyInView>
             <LazyInView>
                 <ReviewsSection productName={product.name} product_id={product.id} />
             </LazyInView>

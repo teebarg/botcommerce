@@ -37,25 +37,23 @@ function RouteComponent() {
     });
 
     return (
-        <div className="px-3 py-4">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h1 className="text-2xl font-semibold">Reviews</h1>
-                    <p className="text-muted-foreground text-sm">Manage your product reviews</p>
-                </div>
-                <div className="flex w-full items-center gap-2 md:w-auto mb-4">
-                    <Input
-                        className="bg-card"
-                        placeholder="Search reviews..."
-                        startContent={<Search />}
-                        type="search"
-                        wrapperClass="flex-1"
-                        value={params.search ?? ""}
-                        onChange={(e) => updateQuery([{ key: "search", value: e.target.value }])}
-                    />
-                </div>
+        <div className="px-2 py-4">
+            <div>
+                <h1 className="text-lg font-semibold">Reviews</h1>
+                <p className="text-muted-foreground text-sm">Manage your product reviews</p>
             </div>
-            <div className="mt-4">
+            <div className="glass sticky top-[calc(var(--sat)+var(--admin-nav-height))] z-40 -mx-2 p-2 mb-4">
+                <Input
+                    className="bg-card"
+                    placeholder="Search reviews..."
+                    startContent={<Search />}
+                    type="search"
+                    wrapperClass="flex-1"
+                    value={params.search ?? ""}
+                    onChange={(e) => updateQuery([{ key: "search", value: e.target.value }])}
+                />
+            </div>
+            <div>
                 {isPending ? (
                     <PageLoader variant="list" />
                 ) : items?.length == 0 ? (

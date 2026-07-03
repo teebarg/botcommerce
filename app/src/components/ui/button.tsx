@@ -13,7 +13,7 @@ const buttonVariants = cva(
             variant: {
                 default: "bg-primary text-primary-foreground hover:bg-primary/90",
                 destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-                outline: "border border-input bg-background hover:bg-secondary hover:text-secondary-foreground",
+                outline: "bg-transparent border border-foreground/20 hover:text-secondary-foreground hover:bg-muted/20",
                 secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
                 ghost: "hover:bg-secondary hover:text-secondary-foreground",
                 link: "text-primary underline-offset-4 hover:underline",
@@ -21,14 +21,15 @@ const buttonVariants = cva(
                 "accent-subtle": "bg-accent-subtle text-accent-subtle-foreground hover:bg-accent-subtle/90 border border-accent-subtle-foreground/20",
                 success: "bg-success text-success-foreground hover:bg-success/90",
                 warning: "bg-warning text-warning-foreground hover:bg-warning/90",
-                "warning-subtle": "bg-warning-subtle text-warning-subtle-foreground hover:bg-warning-subtle/90 border border-warning-subtle-foreground/20"
+                "warning-subtle": "bg-warning-subtle text-warning-subtle-foreground hover:bg-warning-subtle/90 border border-warning-subtle-foreground/20",
+                inverse: "bg-foreground text-background hover:bg-foreground/90",
             },
             size: {
-                default: "h-10 px-4 py-2 min-w-24",
+                default: "h-9 px-3 py-2 min-w-16",
                 xxs: "rounded-lg px-1.5 py-1.5 text-xs",
                 xs: "h-7 rounded-md px-2",
                 sm: "h-9 rounded-md px-3",
-                md: "h-9 rounded-md px-3 min-w-20",
+                md: "h-10 rounded-md px-4 min-w-20",
                 lg: "h-11 rounded-md px-8 min-w-24",
                 xl: "h-14 rounded-2xl px-10 text-lg min-w-24",
                 icon: "h-9 w-9 min-w-auto",

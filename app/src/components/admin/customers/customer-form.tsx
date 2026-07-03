@@ -126,7 +126,7 @@ export default function CustomerEditForm({ user, onClose }: ReviewFormProps) {
                     </FormItem>
                 </div>
                 <div className="flex gap-2 justify-end p-4 border-t border-border">
-                    <Button variant="destructive" onClick={() => onClose?.()}>
+                    <Button variant="outline" onClick={() => onClose?.()}>
                         Close
                     </Button>
                     <Button disabled={isPending} isLoading={isPending} type="submit">

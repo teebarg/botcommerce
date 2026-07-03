@@ -32,7 +32,7 @@ export function LazyInView({ children, fallback = null, rootMargin = "300px" }: 
     }, [isIntersected]);
 
     return (
-        <div ref={ref} className="w-full min-h-[200px]">
+        <div ref={ref}>
             {isIntersected ? children : fallback}
         </div>
     );

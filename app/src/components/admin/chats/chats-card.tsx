@@ -22,7 +22,7 @@ const MetaRow = ({ label, value, mono }: { label: string; value: React.ReactNode
 
 const ChatsCard = ({ chat }: ChatsCardProps) => {
     return (
-        <div className="bg-card border border-border rounded-lg p-4 mb-2.5">
+        <div className="bg-card border border-border rounded-xl p-4 mb-2.5">
             <div className="flex items-start justify-between mb-3">
                 <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5">
                     <MetaRow label="ID" value={chat.conversation_uuid} mono />
@@ -35,7 +35,6 @@ const ChatsCard = ({ chat }: ChatsCardProps) => {
                     {chat.status}
                 </Badge>
             </div>
-
             <div className="border-t border-border pt-3">
                 <ChatsActions chat={chat} />
             </div>

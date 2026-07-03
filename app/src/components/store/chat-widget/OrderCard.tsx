@@ -20,7 +20,7 @@ export const OrderCard = ({ order }: { order: ChatOrder | null }) => {
     const Icon = config.icon;
 
     return (
-        <div className="glass rounded-2xl p-4 space-y-3 max-w-xs animate-in fade-in duration-300">
+        <div className="bg-card rounded-2xl p-4 space-y-3 max-w-xs animate-in fade-in duration-300">
             <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground font-mono">#{order.order_number}</span>
                 <span className={`flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${config.bg} ${config.color}`}>

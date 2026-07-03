@@ -1,8 +1,8 @@
 import { Star } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
 import { ReviewActions } from "./reviews-actions";
 import type { Review } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
+import { timeAgo } from "@/utils";
 
 interface ReviewListProps {
     review: Review;
@@ -10,13 +10,11 @@ interface ReviewListProps {
 
 const ReviewItem = ({ review }: ReviewListProps) => {
     return (
-        <div>
-            <div className="py-6">
+        <div className="rounded-2xl border overflow-hidden bg-card border-border">
+            <div className="p-4">
                 <div className="flex items-center justify-between mb-3">
-                    <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground">
-                        Product #{review?.product_id}
-                    </p>
-                    <Badge variant={review?.verified ? "success": "ghost"}>{review?.verified ? "Verified" : "Unverified"}</Badge>
+                    <p className="font-mono bg-muted px-2 py-1 rounded text-sm text-muted-foreground w-auto">Product #{review?.product_id}</p>
+                    <Badge variant={review?.verified ? "success" : "ghost"}>{review?.verified ? "Verified" : "Unverified"}</Badge>
                 </div>
                 <div className="flex items-center gap-0.5 mb-3">
                     {[...Array(5)].map((_, i) => (
@@ -27,21 +25,16 @@ const ReviewItem = ({ review }: ReviewListProps) => {
                         />
                     ))}
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                <p className="text-sm text-muted-foreground leading-relaxed">
                     {review?.comment}
                 </p>
-                <div className="rounded-xl border bg-muted/40 px-5 py-2 flex items-center justify-between">
-                    <p className="text-xs text-muted-foreground">
-                        {new Date(review?.created_at).toLocaleDateString("en-US", {
-                            month: "long",
-                            day: "numeric",
-                            year: "numeric",
-                        })}
-                    </p>
-                    <ReviewActions review={review} />
-                </div>
             </div>
-            <Separator />
+            <div className="flex items-center justify-between px-5 py-2 border-t border-border bg-muted/40">
+                <div className="text-xs text-muted-foreground">
+                    {timeAgo(review?.created_at)}
+                </div>
+                <ReviewActions review={review} />
+            </div>
         </div>
     );
 };

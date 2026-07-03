@@ -60,7 +60,7 @@ interface ChatMessageProps {
 }
 
 const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastMessage, isEditable }: ChatMessageProps) => {
-    const { session } = useRouteContext({ strict: false });
+    const { user } = useRouteContext({ strict: false });
     const isAgent = message.sender === "BOT";
     const isAssistant = ["SYSTEM", "BOT"].includes(message.sender);
     const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -160,7 +160,7 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastMessage, isEd
                     </>
                 )}
             </div>
-            {!isAssistant && chatAvatar(session?.user?.image)}
+            {!isAssistant && chatAvatar(user?.image)}
         </div>
     );
 };

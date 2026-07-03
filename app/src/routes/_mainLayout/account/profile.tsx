@@ -11,7 +11,6 @@ import type { Message } from "@/schemas";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { tryCatch } from "@/utils/try-catch";
 import { Separator } from "@/components/ui/separator";
-import { updateAuthSession } from "@/utils/auth-client";
 import { api } from "@/utils/api";
 import { getInitials } from "@/utils";
 
@@ -41,13 +40,13 @@ export const Route = createFileRoute("/_mainLayout/account/profile")({
 function RouteComponent() {
     const [editingSection, setEditingSection] = useState<string | null>(null);
     const [isPending, setIsPending] = useState<boolean>(false);
-    const { session } = Route.useRouteContext();
+    const { user } = Route.useRouteContext();
 
     const profileForm = useForm<ProfileFormValues>({
         resolver: zodResolver(profileSchema),
         defaultValues: {
-            first_name: session?.user?.firstName ?? "",
-            last_name: session?.user?.lastName ?? "",
+            first_name: user?.firstName ?? "",
+            last_name: user?.lastName ?? "",
         },
     });
 
@@ -70,10 +69,6 @@ function RouteComponent() {
 
             return;
         }
-        await updateAuthSession({
-            email: session?.user?.email!,
-            mode: "refresh",
-        });
         toast.success("Profile updated successfully");
         setEditingSection(null);
         setIsPending(false);
@@ -101,7 +96,7 @@ function RouteComponent() {
                     <div className="w-24 h-24 rounded-full bg-accent p-1">
                         <div className="w-full h-full rounded-full bg-secondary flex items-center justify-center overflow-hidden">
                             <span className="text-3xl font-bold text-foreground">
-                                {getInitials(session?.user?.firstName ?? "")}
+                                {getInitials(user?.firstName ?? "")}
                             </span>
                         </div>
                     </div>
@@ -110,9 +105,9 @@ function RouteComponent() {
                     </button>
                 </div>
                 <p className="mt-3 font-semibold">
-                    {session?.user?.firstName} {session?.user?.lastName}
+                    {user?.firstName} {user?.lastName}
                 </p>
-                <p className="text-sm text-muted-foreground">{session?.user?.email}</p>
+                <p className="text-sm text-muted-foreground">{user?.email}</p>
             </div>
 
             <div className="px-2 md:px-0">
@@ -123,7 +118,7 @@ function RouteComponent() {
                             <p className="text-xs text-muted-foreground">Update your personal details</p>
                         </div>
                         {editingSection !== "profile" && (
-                            <Button size="md" onClick={() => handleEdit("profile")}>
+                            <Button onClick={() => handleEdit("profile")}>
                                 Edit
                             </Button>
                         )}
@@ -174,18 +169,16 @@ function RouteComponent() {
                                         )}
                                     />
                                 </div>
-
                                 <div>
                                     <label className="block text-sm font-medium text-muted-foreground mb-2">Email Address</label>
-                                    <div className="px-4 py-2 rounded-lg text-foreground bg-secondary">{session?.user?.email}</div>
+                                    <div className="px-4 py-2 rounded-lg text-foreground bg-secondary">{user?.email}</div>
                                 </div>
-
                                 {editingSection === "profile" && (
                                     <div className="flex gap-2 mt-6">
-                                        <Button size="md" disabled={isPending} isLoading={isPending} type="submit">
+                                        <Button disabled={isPending} isLoading={isPending} type="submit">
                                             Save Changes
                                         </Button>
-                                        <Button size="md" variant="destructive" onClick={handleCancel}>
+                                        <Button variant="destructive" onClick={handleCancel}>
                                             Cancel
                                         </Button>
                                     </div>

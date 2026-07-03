@@ -15,6 +15,14 @@ logger = get_logger(__name__)
 
 router = APIRouter()
 
+def orders_cache_key(user, request: Request):
+    if user.role == "ADMIN":
+        scope = "admin"
+    else:
+        scope: str = f"user:{user.id}"
+
+    return f"{scope}:{request.url.query}"
+
 @router.post("/")
 async def create_order(
     response: Response,
@@ -59,7 +67,7 @@ async def get_order(
 
 
 @router.get("/")
-@cacheable(key_prefix="orders", tags=["orders"])
+@cacheable(key_prefix="orders", key_builder=orders_cache_key, tags=["orders"])
 async def get_orders(
     request: Request,
     srv: OrderDep,

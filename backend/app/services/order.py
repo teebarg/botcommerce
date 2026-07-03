@@ -1,6 +1,7 @@
 import uuid
 from typing import Optional, Any, Dict
 from fastapi import HTTPException, BackgroundTasks
+from prisma import Prisma
 from app.models.order import OrderCreate
 from app.core.logging import logger
 from app.services.invoice import invoice_service
@@ -11,7 +12,6 @@ from app.core.config import settings
 from app.services.events import EventBus
 from app.services.shop_settings import ShopSettingsService
 from app.services.cart import CartService
-from prisma import Prisma
 from app.services.coupon import CouponService
 from app.core.notifications.events import SendInvoiceEvent, OrderConfirmedEvent
 from app.services.cache import CacheService

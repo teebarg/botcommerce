@@ -12,6 +12,7 @@ import { userAddressesQuery } from "@/queries/user.queries";
 import AddressForm from "@/components/store/account/address-form";
 import EmptyState from "@/components/generic/empty";
 import { PageLoader } from "@/components/generic/page-loader";
+import { Badge } from "@/components/ui/badge";
 
 type AddressItemProps = {
     address: Address;
@@ -36,9 +37,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = true }) =
                         Delivery address
                     </p>
                     {isActive && (
-                        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-success text-success-foreground">
-                            Active
-                        </span>
+                        <Badge variant="success">Active</Badge>
                     )}
                 </div>
 
@@ -101,7 +100,7 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = true }) =
 };
 
 export const Route = createFileRoute("/_mainLayout/account/addresses")({
-    loader: async ({ context: { queryClient, userId } }) => {
+    loader: async ({ context: { queryClient, userId = null } }) => {
         queryClient.prefetchQuery(userAddressesQuery(userId));
     },
     component: RouteComponent,
@@ -110,7 +109,7 @@ export const Route = createFileRoute("/_mainLayout/account/addresses")({
 function RouteComponent() {
     const { userId } = useRouteContext({ strict: false });
     const addState = useOverlayTriggerState({});
-    const { data, isPending } = useQuery(userAddressesQuery(userId!));
+    const { data, isPending } = useQuery(userAddressesQuery(userId ?? null));
 
     return (
         <div className="w-full px-2 pt-6">

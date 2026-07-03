@@ -16,9 +16,10 @@ import { useAuth } from "@clerk/tanstack-react-start";
 import { UserAvatar } from "./generic/user-avatar";
 import { useLocation } from "@tanstack/react-router";
 import { api } from "@/utils/api";
+import ShareButton from "./share";
 
 export function UserDropdown() {
-    const { isAuthenticated, session } = useRouteContext({ strict: false });
+    const { isAuthenticated, isImpersonating, userId, isAdmin, user } = useRouteContext({ strict: false });
     const location = useLocation();
     const navigate = useNavigate();
     const { signOut } = useAuth();
@@ -29,7 +30,7 @@ export function UserDropdown() {
             console.error("Logout failed:", error);
             return;
         }
-        await signOut({ sessionId: session?.id });
+        await signOut({ sessionId: userId?.toString() });
         await logoutFn();
         sessionStorage.clear();
         navigate({ to: "/" });
@@ -57,8 +58,8 @@ export function UserDropdown() {
             <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">{session?.user?.firstName || "User"}</p>
-                        <p className="text-xs leading-none text-muted-foreground">{session?.user?.email}</p>
+                        <p className="text-sm font-medium leading-none">{user?.firstName || "User"}</p>
+                        <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -66,7 +67,7 @@ export function UserDropdown() {
                     <User className="mr-2 h-4 w-4" />
                     <span>Account</span>
                 </DropdownMenuItem>
-                {session?.user?.isAdmin && (
+                {isAdmin && (
                     <DropdownMenuItem className="cursor-pointer" onClick={() => navigate({ to: "/admin" })}>
                         <LayoutDashboard className="mr-2 h-4 w-4" />
                         <span>Admin Panel</span>
@@ -80,11 +81,15 @@ export function UserDropdown() {
                     <Heart className="mr-2 h-4 w-4" />
                     <span>Favorites</span>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive" onClick={handleSignOut}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Sign Out</span>
-                </DropdownMenuItem>
+                {!isImpersonating && (
+                    <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive" onClick={handleSignOut}>
+                            <LogOut className="mr-2 h-4 w-4" />
+                            <span>Sign Out</span>
+                        </DropdownMenuItem>
+                    </>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );

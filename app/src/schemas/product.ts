@@ -223,10 +223,10 @@ export const FeedQuerySchema = z.object({
     ages: z.string().optional(),
     width: z.number().optional(),
     length: z.number().optional(),
-    min_price: z.number().optional(),
-    max_price: z.number().optional(),
+    min_price: z.coerce.number().optional(),
+    max_price: z.coerce.number().optional(),
     collections: z.string().optional(),
-    feed_seed: z.number().optional(),
+    feed_seed: z.coerce.number().optional(),
     cursor: z.string().optional(),
 });
 

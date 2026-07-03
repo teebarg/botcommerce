@@ -1,12 +1,10 @@
 import type { User } from "@/schemas";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Eye, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { toast } from "sonner";
 import CustomerEditForm from "./customer-form";
-import { useDeleteUser, useInvalidateMe } from "@/hooks/useUser";
+import { useDeleteUser, useImpersonateUser } from "@/hooks/useUser";
 import { Button } from "@/components/ui/button";
-import { updateAuthSession } from "@/utils/auth-client";
-import { useRouteContext, useRouter } from "@tanstack/react-router";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 
@@ -15,14 +13,10 @@ interface CustomerActionsProps {
 }
 
 const CustomerActions = ({ user }: CustomerActionsProps) => {
-    const { session } = useRouteContext({
-        strict: false,
-    });
     const { mutateAsync, isPending } = useDeleteUser();
-    const router = useRouter();
     const editState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
-    const invalidateMe = useInvalidateMe();
+    const impersonateUser = useImpersonateUser();
 
     const onDelete = () => {
         mutateAsync(user.id).then(() => {
@@ -32,35 +26,25 @@ const CustomerActions = ({ user }: CustomerActionsProps) => {
 
     const handleImpersonate = async () => {
         try {
-            await updateAuthSession({
-                email: user?.email!,
-                mode: "impersonate",
-                impersonated: true,
-                impersonatedBy: session?.user?.email,
-            });
-            invalidateMe();
-
-            toast.success("Impersonated");
-            await router.invalidate();
-            await router.navigate({ to: "/" });
-        } catch (err) {
-            console.error("Impersonation failed", err);
-        }
+            await impersonateUser.mutateAsync(user.id);
+            toast.loading("Impersonating.........");
+            window.location.reload();
+        } catch (err) {}
     };
 
     return (
-        <div className="flex">
-            {/* {user.role !== "ADMIN" && (
-                <Button size="icon" title="Impersonate" variant="ghost" onClick={handleImpersonate}>
-                    <Eye className="h-5 w-5" />
+        <div className="flex justify-end gap-1.5">
+            {user.role !== "ADMIN" && (
+                <Button size="icon" variant="outline" onClick={handleImpersonate}>
+                    <Eye className="h-4 w-4" />
                 </Button>
-            )} */}
+            )}
             <SheetDrawer
                 open={editState.isOpen}
                 title="Edit Customer"
                 trigger={
-                    <Button size="icon" variant="ghost">
-                        <Edit className="h-5 w-5" />
+                    <Button size="icon" variant="outline">
+                        <Edit className="h-4 w-4" />
                     </Button>
                 }
                 onOpenChange={editState.setOpen}
@@ -71,8 +55,8 @@ const CustomerActions = ({ user }: CustomerActionsProps) => {
                 open={deleteState.isOpen}
                 onOpenChange={deleteState.setOpen}
                 trigger={
-                    <Button size="icon" variant="ghost">
-                        <Trash2 className="text-red-500 h-5 w-5 cursor-pointer" />
+                    <Button className="border-destructive/30" size="icon" variant="outline">
+                        <Trash2 className="text-destructive/70 h-4 w-4" />
                     </Button>
                 }
                 onClose={deleteState.close}

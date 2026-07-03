@@ -29,18 +29,16 @@ function RouteComponent() {
     if (error) return <ServerError error={error.message} stack={error.stack} scenario="admin collections" />;
 
     return (
-        <div className="px-2.5 py-2 max-w-5xl">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
-                <div>
-                    <h1 className="text-xl font-medium">Collections</h1>
-                    <p className="text-muted-foreground text-sm">Manage your collections</p>
+        <div className="px-2 py-2 max-w-4xl">
+            <div>
+                <h1 className="text-xl font-medium">Collections</h1>
+                <p className="text-muted-foreground text-sm">Manage your collections</p>
+            </div>
+            <div className="sticky flex items-center gap-2 glass top-[calc(var(--sat)+var(--admin-nav-height))] -mx-2 z-40 p-2">
+                <div className="relative w-full sm:w-64">
+                    <Input className="w-full bg-card" placeholder="Search collections..." startContent={<Search />} type="search" />
                 </div>
-                <div className="flex w-full items-center gap-2 sm:w-auto">
-                    <div className="relative w-full sm:w-64">
-                        <Input className="w-full bg-card" placeholder="Search collections..." startContent={<Search />} type="search" />
-                    </div>
-                    <CreateCollection />
-                </div>
+                <CreateCollection />
             </div>
             <div className="space-y-2.5">
                 {isPending ? (

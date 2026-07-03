@@ -27,7 +27,7 @@ const CategoryImage: React.FC<{ image: string | undefined; categoryId: number }>
             onOpenChange={stateState.setOpen}
             onClose={stateState.close}
             trigger={
-                <div className="relative w-16 h-16 overflow-hidden rounded-xl">
+                <div className="relative w-12 h-12 overflow-hidden rounded-xl">
                     <img alt={image || "placeholder"} className="cursor-pointer w-full h-full object-cover" src={image || "/placeholder.jpg"} />
                 </div>
             }
@@ -133,7 +133,7 @@ const CategoryTree: React.FC<Props> = ({ data, isPending }) => {
                     ) : categories.map((category: Category, idx: number) => (
                         <div
                             key={idx}
-                            className="bg-card flex items-center gap-4 py-4 px-2 rounded-xl"
+                            className="bg-card flex items-center gap-4 py-3 px-2 rounded-xl"
                         >
                             <CategoryImage categoryId={category.id} image={category.image} />
                             <div className="flex-1 min-w-0 flex justify-between gap-4">

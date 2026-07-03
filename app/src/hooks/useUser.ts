@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { getWishlistListingFn } from "@/server/users.server";
+import { getWishlistListingFn, updateAppSessionFn } from "@/server/users.server";
 import { api } from "@/utils/api";
-import { User, Wishlist } from "@/schemas";
+import { Session, User, Wishlist } from "@/schemas";
 
 export const useUpdateUser = () => {
     const queryClient = useQueryClient();
@@ -46,6 +46,30 @@ export const useDeleteUser = () => {
     });
 };
 
+export const useImpersonateUser = () => {
+    return useMutation({
+        mutationFn: async (userId: number) => {
+            const result = await api.post<Session>(`/auth/impersonate/${userId}`);
+            await updateAppSessionFn({ data: result });
+        },
+        onError: (error) => {
+            toast.error("Failed to Impersonate", { description: `${error}` });
+        },
+    });
+};
+
+export const useStopImpersonation = () => {
+    return useMutation({
+        mutationFn: async () => {
+            const result = await api.post<Session>(`/auth/stop-impersonation`);
+            await updateAppSessionFn({ data: result });
+        },
+        onError: (error) => {
+            toast.error("Failed to stop impersonation", { description: `${error}` });
+        },
+    });
+};
+
 export const userWishlistQuery = () => ({
     queryKey: ["products", "wishlist"],
     queryFn: () => getWishlistListingFn(),
@@ -82,14 +106,4 @@ export const useUserDeleteWishlist = () => {
             toast.error("Failed to delete wishlist" + error);
         },
     });
-};
-
-export const useInvalidateMe = () => {
-    const queryClient = useQueryClient();
-
-    const invalidate = () => {
-        queryClient.removeQueries({ queryKey: ["me"] });
-    };
-
-    return invalidate;
 };

@@ -287,7 +287,7 @@ export default function PushPermission() {
                         <div className="relative bg-muted rounded-2xl p-6 border-2 border-accent/30 text-center mb-6 mx-6">
                             <p className="text-sm text-muted-foreground mb-2">Your gift is worth</p>
                             <div className="flex items-center justify-center gap-2">
-                                <span className="text-5xl font-extrabold text-accent">{currency(50000)}</span>
+                                <span className="text-5xl font-extrabold text-accent">{currency(20000)}</span>
                             </div>
                             <p className="text-sm font-medium text-primary mt-2">Shopping Credits</p>
                         </div>
