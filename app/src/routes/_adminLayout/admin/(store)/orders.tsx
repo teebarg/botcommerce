@@ -34,7 +34,7 @@ function RouteComponent() {
     });
 
     return (
-        <div className="px-2 py-2">
+        <div className="px-2 py-2 max-w-5xl">
             <div className="mb-2">
                 <h1 className="text-xl font-medium">Order view</h1>
                 <p className="text-muted-foreground text-sm">Manage your orders.</p>

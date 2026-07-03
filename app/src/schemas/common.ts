@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { ShippingMethodSchema, ShopSettingsTypeSchema } from "./enums";
 
-
 export const CursorSchema = z.object({
     next_cursor: z.string().optional(),
     limit: z.number(),

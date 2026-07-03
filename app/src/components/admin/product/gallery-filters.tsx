@@ -71,7 +71,7 @@ export function GalleryFilters() {
         updateQuery([
             { key: "sort", value: draft.sort === DEFAULTS.sort ? "" : draft.sort },
             { key: "active", value: draft.active === DEFAULTS.active ? "" : draft.active },
-            { key: "out_of_stock", value: draft.out_of_stock ? "true" : "" },
+            { key: "out_of_stock", value: draft.out_of_stock ? true : "" },
             { key: "category_slug", value: draft.category_slug },
             { key: "name", value: draft.name },
         ]);
@@ -171,7 +171,6 @@ export function GalleryFilters() {
                                             No categories found
                                         </CommandEmpty>
                                         <CommandGroup>
-                                            {/* Clear option */}
                                             <CommandItem
                                                 value="__all__"
                                                 onSelect={() => {

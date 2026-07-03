@@ -26,6 +26,10 @@ build-no-cache:
 up:
 	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) up --build
 
+.PHONY: up-backend
+up-backend:
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) --profile backend-only up --build
+
 .PHONY: update
 update:
 	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) up -d --force-recreate $(s)
@@ -91,11 +95,15 @@ dpg:
 
 .PHONY: dpm
 dpm:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) prisma migrate dev
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec shop-api uv run prisma migrate dev
 
 .PHONY: db-reset
 db-reset:
 	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec shop-api prisma migrate reset --force
+
+.PHONY: seed
+seed:
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec shop-api uv run python app/seed.py
 
 # ==========================================
 # Repomix Source Context for AI

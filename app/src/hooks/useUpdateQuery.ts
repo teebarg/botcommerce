@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "@tanstack/react-router";
 
 interface QueryParam {
     key: string;
-    value: string;
+    value?: string | number | boolean | null;
 }
 
 const useUpdateQuery = (delay = 500) => {
@@ -20,7 +20,11 @@ const useUpdateQuery = (delay = 500) => {
                         prev as Record<string, string>
                     );
                     data.forEach(({ key, value }) => {
-                        value ? params.set(key, value) : params.delete(key);
+                        if (value === undefined || value === null || value === "") {
+                            params.delete(key);
+                        } else {
+                            params.set(key, String(value));
+                        }
                     });
                     return Object.fromEntries(params);
                 },

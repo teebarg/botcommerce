@@ -5,18 +5,13 @@ import type { DBCatalog } from "@/schemas";
 import { formatDate } from "@/utils";
 
 export const CatalogCard: React.FC<{ catalog: DBCatalog }> = ({ catalog }) => (
-    <div className="bg-card rounded-2xl border border-border overflow-hidden">
+    <div className="bg-card rounded-2xl border border-border">
         <div className="p-4">
             <div className="flex items-start justify-between gap-4 mb-2">
-                <div className="min-w-0">
-                    <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-1 truncate">
-                        /{catalog.slug}
-                    </p>
-                    <h3 className="text-sm font-medium truncate">{catalog.title}</h3>
-                </div>
+                <h3 className="min-w-0 text-sm font-medium truncate">{catalog.title}</h3>
                 <span className={`shrink-0 text-xs font-medium px-2 py-0.5 rounded-full ${catalog.is_active
-                        ? "bg-success text-success-foreground"
-                        : "bg-muted text-muted-foreground"
+                    ? "bg-success text-success-foreground"
+                    : "bg-muted text-muted-foreground"
                     }`}>
                     {catalog.is_active ? "Active" : "Inactive"}
                 </span>
