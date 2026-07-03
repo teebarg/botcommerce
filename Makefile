@@ -24,7 +24,7 @@ build-no-cache:
 
 .PHONY: up
 up:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) up --build
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) --profile dev up --build
 
 .PHONY: up-backend
 up-backend:
