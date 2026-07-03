@@ -1,14 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
-import { getUsersFn } from "@/server/users.server";
 import { PaginatedAbandonedCarts, PaginatedActivities, PaginatedChats, PaginatedCoupons } from "@/schemas";
 import { api } from "@/utils/api";
-import { StatsTrends } from "@/types/models";
-
-export const statsTrendsQuery = () =>
-    queryOptions({
-        queryKey: ["stats-trends"],
-        queryFn: () => api.get<StatsTrends>("/stats/trends"),
-    });
 
 export interface UsersParams {
     query?: string;
@@ -16,12 +8,6 @@ export interface UsersParams {
     status?: "ACTIVE" | "INACTIVE" | "PENDING";
     sort?: string;
 }
-
-export const usersQuery = (params: UsersParams) =>
-    queryOptions({
-        queryKey: ["users", params],
-        queryFn: () => getUsersFn({ data: { ...params } }),
-    });
 
 export interface CouponParams {
     query?: string;

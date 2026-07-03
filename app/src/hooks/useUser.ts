@@ -70,13 +70,11 @@ export const useStopImpersonation = () => {
     });
 };
 
-export const userWishlistQuery = () => ({
-    queryKey: ["products", "wishlist"],
-    queryFn: () => getWishlistListingFn(),
-});
-
 export const useUserWishlist = () => {
-    return useQuery(userWishlistQuery());
+    return useQuery({
+        queryKey: ["products", "wishlist"],
+        queryFn: () => getWishlistListingFn(),
+    });
 };
 
 

@@ -2,10 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import z from "zod";
 import { seo } from "@/utils/seo";
 import { CatalogVisitTracker } from "@/components/store/catalog/catalog-visit-tracker";
-import { catalogFeedQuery } from "@/queries/user.queries";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import CatalogInfinite from "@/components/store/catalog/catalog-infinite";
-import { PageLoader } from "@/components/generic/page-loader";
 
 export const CatalogSearchSchema = z.object({
     sizes: z.string().optional(),
@@ -21,18 +18,9 @@ export const Route = createFileRoute("/_mainLayout/catalog/$slug")({
             search,
         };
     },
-    loader: async ({ params: { slug }, context: { search, queryClient } }) => {
-        const catalog = await queryClient.ensureQueryData(catalogFeedQuery({ ...search, slug }));
-        return {
-            catalog,
-            slug,
-        };
-    },
     head: ({ loaderData }) => {
-        const catalog = loaderData?.catalog;
-        const title = catalog?.title || "";
-        const description = catalog?.description || `Curated product list: ${title}`;
-
+        const title = "catalog";
+        const description = "Curated product list";
         return {
             title,
             meta: [
@@ -47,21 +35,14 @@ export const Route = createFileRoute("/_mainLayout/catalog/$slug")({
         };
     },
     component: RouteComponent,
-    pendingComponent: () => (
-        <div className="px-2">
-            <PageLoader variant="grid" />
-        </div>
-    )
 });
 
 function RouteComponent() {
-    const search = Route.useSearch();
     const { slug } = Route.useParams();
-    const { data } = useSuspenseQuery(catalogFeedQuery({ ...search, slug }));
     return (
         <>
             <CatalogVisitTracker slug={slug} />
-            <CatalogInfinite initialData={data} slug={slug} />
+            <CatalogInfinite slug={slug} />
         </>
     );
 }

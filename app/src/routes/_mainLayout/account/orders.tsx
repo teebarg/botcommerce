@@ -2,20 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import type { Order } from "@/schemas";
 import OrderCard from "@/components/store/orders/order-card";
 import { BtnLink } from "@/components/ui/btnLink";
-import { ordersQuery } from "@/queries/user.queries";
-import { useQuery } from "@tanstack/react-query";
 import { PageLoader } from "@/components/generic/page-loader";
 import EmptyState from "@/components/generic/empty";
+import { useOrders } from "@/hooks/useOrder";
 
 export const Route = createFileRoute("/_mainLayout/account/orders")({
-    loader: async ({ context: { queryClient } }) => {
-        queryClient.prefetchQuery(ordersQuery({ take: 20 }));
-    },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { data, isPending } = useQuery(ordersQuery({ take: 20 }));
+    const { data, isPending } = useOrders({ take: 20 });
     return (
         <div className="w-full px-2 pt-6">
             <div className="mb-4">

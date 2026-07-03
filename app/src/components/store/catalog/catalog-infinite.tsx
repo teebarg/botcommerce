@@ -4,14 +4,14 @@ import NoProductsFound from "@/components/store/products/no-products";
 import { api } from "@/utils/api";
 import { InfiniteList } from "@/components/InfiniteList";
 import ProductCard from "../products/product-card-revamped";
+import { PageLoader } from "@/components/generic/page-loader";
 
 interface Props {
     slug: string;
-    initialData: SearchCatalog;
 }
 
-export default function CatalogInfinite({ slug, initialData }: Props) {
-    const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery<SearchCatalog>({
+export default function CatalogInfinite({ slug }: Props) {
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteQuery<SearchCatalog>({
         queryKey: ["catalog", slug, "infinite"],
         queryFn: async ({ pageParam }) => {
             const res = await api.get<SearchCatalog>(`/catalog/${slug}`, { params: { cursor: pageParam ?? undefined } });
@@ -19,23 +19,15 @@ export default function CatalogInfinite({ slug, initialData }: Props) {
         },
         initialPageParam: undefined,
         getNextPageParam: (lastPage: SearchCatalog) => lastPage.next_cursor ?? undefined,
-        staleTime: 1000 * 60 * 30,
-        initialData: initialData
-            ? {
-                pages: [initialData],
-                pageParams: [undefined],
-            }
-            : undefined,
-        initialDataUpdatedAt: initialData ? Date.now() : undefined,
     });
 
     const products = data?.pages.flatMap((p) => p.products) || [];
-    const hasProducts = products.length > 0;
 
     return (
         <main className="max-w-sxl mx-auto w-full px-2 py-4">
-            {!hasProducts && <NoProductsFound />}
-            {hasProducts && (
+            {isPending ? (
+                <PageLoader variant="grid" />
+            ): products.length > 0 ? (
                 <InfiniteList hasMore={!!hasNextPage} isLoading={isFetchingNextPage} onLoadMore={fetchNextPage}>
                     <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 md:gap-4 gap-2">
                         {products?.map((product: ProductSearch) => (
@@ -43,6 +35,8 @@ export default function CatalogInfinite({ slug, initialData }: Props) {
                         ))}
                     </div>
                 </InfiniteList>
+            ): (
+                <NoProductsFound />
             )}
         </main>
     );

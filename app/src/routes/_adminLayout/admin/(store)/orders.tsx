@@ -3,7 +3,6 @@ import { OrderStatusSchema, type Order, type PaginatedOrders } from "@/schemas";
 import { OrderCard } from "@/components/admin/orders/order-card";
 import OrderFilters from "@/components/admin/orders/order-filters";
 import z from "zod";
-import { ordersQuery } from "@/queries/user.queries";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { api } from "@/utils/api";
@@ -18,9 +17,6 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/orders")({
         end_date: z.string().optional(),
     }),
     loaderDeps: ({ search }) => search,
-    loader: async ({ context: { queryClient }, deps }) => {
-        queryClient.prefetchQuery(ordersQuery(deps));
-    },
     component: RouteComponent,
 });
 

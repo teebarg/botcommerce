@@ -4,13 +4,27 @@ import { ORDER_GRID, OrderCard, OrderTable } from "../orders/order-card";
 import EmptyState from "@/components/generic/empty";
 import { Package } from "lucide-react";
 import { PageLoader } from "@/components/generic/page-loader";
+import { useOrders } from "@/hooks/useOrder";
+import NotFound from "@/components/generic/not-found";
 
-const RecentOrdersList = ({ orders, isLoading }: { orders: Order[]; isLoading: boolean }) => {
+const RecentOrdersList = () => {
+    const { data, error, isLoading } = useOrders({ take: 5 });
+
     if (isLoading) {
         return <PageLoader variant="list" />;
     }
 
-    if (!orders || orders.length === 0) {
+    if (error) {
+        return (
+            <NotFound
+                eyebrow={`${error}` || "An error occurred"}
+                title={`${error}` || "An error occurred"}
+                description={"Please contact administrator."}
+            />
+        )
+    }
+
+    if (!data || data?.items?.length === 0) {
         return (
             <EmptyState
                 icon={Package}
@@ -37,13 +51,13 @@ const RecentOrdersList = ({ orders, isLoading }: { orders: Order[]; isLoading: b
                     <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Payment</span>
                     <span />
                 </div>
-                {orders.map((order) => (
+                {data?.items?.map((order: Order) => (
                     <OrderTable key={order.id} order={order} />
                 ))}
             </div>
 
             <div className="lg:hidden space-y-2">
-                {orders.map((order) => (
+                {data?.items?.map((order: Order) => (
                     <OrderCard key={order.id} order={order} />
                 ))}
             </div>

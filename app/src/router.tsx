@@ -38,7 +38,15 @@ const defaultSession: SessionContext = {
 };
 
 export function getRouter() {
-    const queryClient = new QueryClient()
+    const queryClient = new QueryClient({
+        defaultOptions: {
+            queries: {
+                refetchOnMount: true, // Options: true, false, 'always'
+                staleTime: 1000 * 60 * 60 , // Recommendation: 5 minutes
+                gcTime: 1000 * 60 * 60 * 2,
+            },
+        },
+    })
 
     const router = createRouter({
         routeTree,

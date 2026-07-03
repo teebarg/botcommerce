@@ -8,7 +8,6 @@ import { api } from "@/utils/api";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
-import { reviewsQuery } from "@/queries/user.queries";
 import EmptyState from "@/components/generic/empty";
 import { PageLoader } from "@/components/generic/page-loader";
 
@@ -19,9 +18,6 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/reviews")({
         sort: z.string().optional(),
     }),
     loaderDeps: ({ search }) => search,
-    loader: async ({ context: { queryClient }, deps }) => {
-        queryClient.prefetchQuery(reviewsQuery(deps));
-    },
     component: RouteComponent,
 });
 

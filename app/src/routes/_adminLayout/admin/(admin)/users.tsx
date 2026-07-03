@@ -6,7 +6,6 @@ import CustomerFilter from "@/components/admin/customers/customer-filter";
 import CustomerCard from "@/components/admin/customers/customer-card";
 import z from "zod";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
-import { usersQuery } from "@/queries/admin.queries";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { api } from "@/utils/api";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
@@ -23,9 +22,6 @@ export const Route = createFileRoute("/_adminLayout/admin/(admin)/users")({
         status: z.enum(["ACTIVE", "INACTIVE", "PENDING"]).optional(),
     }),
     loaderDeps: ({ search }) => search,
-    loader: async ({ deps, context }) => {
-        context.queryClient.prefetchQuery(usersQuery(deps));
-    },
     component: RouteComponent,
 });
 

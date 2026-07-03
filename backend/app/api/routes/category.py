@@ -1,5 +1,4 @@
 from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException, Request
 from prisma.errors import PrismaError
 from app.models.category import Category, CategoryCreate, CategoryUpdate, BulkOrderUpdate
