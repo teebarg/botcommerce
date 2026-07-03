@@ -322,10 +322,10 @@ class GalleryService:
             logger.error(f"Error updating image metadata {image_id}: {e}")
             raise HTTPException(status_code=500, detail=str(e))
 
-    async def _process_single_image(self, image, payload: ImagesBulkUpdate, created_product_ids: list) -> None:
+    async def _process_single_image(self, image, payload: ImagesBulkUpdate, product_ids: list) -> None:
         if image.product_id is None:
-            name = f"{random.choice(['Classic', 'Premium', 'Superior', 'Deluxe', 'Luxury'])} {random.randint(10000, 99999)}"
-            slug = slugify(name)
+            name: str = f"{random.choice(['Classic', 'Premium', 'Superior', 'Deluxe', 'Luxury'])} {random.randint(10000, 99999)}"
+            slug: str = slugify(name)
             existing = await self.db.product.find_first(where={"slug": slug})
             if existing:
                 slug = f"{slug}-{generate_sku().lower()}"
@@ -345,10 +345,9 @@ class GalleryService:
                 product = await tx.product.create(data=product_data)
                 await tx.productimage.update(where={"id": image.id}, data={"product": {"connect": {"id": product.id}}})
                 await tx.productvariant.create(data={**variant_data, "product_id": product.id})
-                await self.cache_srv.invalidate(tags=["stats-trends"])
-            created_product_ids.append(product.id)
+            product_ids.append(product.id)
         else:
-            created_product_ids.append(image.product_id)
+            product_ids.append(image.product_id)
             relation_updates = {}
             if payload.data.category_ids:
                 relation_updates["categories"] = {"set": [{"id": cid} for cid in payload.data.category_ids]}
@@ -371,17 +370,19 @@ class GalleryService:
 
     async def handle_bulk_update_images(self, payload: ImagesBulkUpdate, images, index_products_fn) -> None:
         failed_ids = []
-        created_product_ids = []
+        product_ids = []
+        existing_product_ids = []
 
         for image in images:
             try:
-                await self._process_single_image(image, payload, created_product_ids)
+                await self._process_single_image(image, payload, product_ids)
+                if image.product_id is not None:
+                    existing_product_ids.append(image.product_id)
             except Exception as e:
                 logger.error(f"Error processing image {image.id}: {e}")
                 failed_ids.append(image.id)
 
-        await index_products_fn(product_ids=created_product_ids)
-        await self.invalidate()
+        await index_products_fn(product_ids=product_ids, existing_product_ids=existing_product_ids)
         status = "completed" if not failed_ids else "partial"
         await self.ws_manager.broadcast_to_all({
             "status": status, "failed_ids": failed_ids, "success_count": len(images) - len(failed_ids)

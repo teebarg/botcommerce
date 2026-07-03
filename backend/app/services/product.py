@@ -351,7 +351,7 @@ class ProductService:
             logger.error(f"Error re-indexing product {id}: {e}")
 
 
-    async def invalidate_all(self, product_ids: Optional[List[int]] = None):
+    async def invalidate_all(self, product_ids: Optional[List[int]] = None, existing_product_ids: Optional[List[int]] = None):
         """
         Re-indexes database products.
         """
@@ -374,8 +374,13 @@ class ProductService:
 
                 documents = [self._prepare_product_data_for_indexing(p) for p in products]
                 await self.search_srv.add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
-                key: str=",".join(f"product:{id}" for id in product_ids)
-                await self.cache_srv.invalidate(key, tags=["products", "catalog"])
+                existing_set = set(existing_product_ids or [])
+                keys: str = ",".join(
+                    f"product:{product_id}"
+                    for product_id in product_ids
+                    if product_id in existing_set
+                )
+                await self.cache_srv.invalidate(keys, tags=["products", "catalog", "gallery"] + ["stats-trends"] if len(product_ids) > 0 else [] )
                 logger.debug(f"Successfully targeted indexed {len(documents)} products")
                 return
 

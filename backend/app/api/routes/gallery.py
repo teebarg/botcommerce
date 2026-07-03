@@ -1,6 +1,5 @@
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Query, BackgroundTasks, Request, Depends
-
 from app.models.generic import Message, ImageBulkDelete
 from app.models.product import (
     ProductImageMetadata,

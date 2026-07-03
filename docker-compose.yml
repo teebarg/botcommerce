@@ -4,11 +4,14 @@ services:
       context: ./app
       dockerfile: Dockerfile.dev
     container_name: shop
+    profiles: ["dev", "frontend-only"]
     ports:
       - "4444:3000"
     environment:
       - NODE_ENV=development
       - NITRO_DEV_WORKER=false
+    env_file:
+      - app/.env.docker
     volumes:
       - ./app:/app
       - /app/node_modules
@@ -32,6 +35,7 @@ services:
   shop-api:
     image: shop:${TAG-latest}
     container_name: shop-api
+    profiles: ["dev", "backend-only"]
     labels:
       - traefik.enable=true
       - traefik.docker.network=dev-net
@@ -71,6 +75,7 @@ services:
       context: ./agent
       dockerfile: Dockerfile.dev
     container_name: agent-api
+    profiles: ["dev", "backend-only"]
     networks:
       - dev-net
     labels:

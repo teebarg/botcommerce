@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { ProductStatusSchema } from "./enums";
 import { CursorSchema } from "./common";
+import { booleanParam } from "./search-schemas";
 
 const PagSchema = z.object({
     skip: z.number(),
@@ -230,7 +231,17 @@ export const FeedQuerySchema = z.object({
     cursor: z.string().optional(),
 });
 
+export const GalleryQuerySchema = z.object({
+    cursor: z.string().optional(),
+    active: booleanParam,
+    sort: z.enum(["newest", "oldest"]).default("newest"),
+    out_of_stock: booleanParam,
+    category_slug: z.string().optional(),
+    name: z.string().optional(),
+});
+
 export type FeedQuery = z.infer<typeof FeedQuerySchema>;
+export type GalleryQuery = z.infer<typeof GalleryQuerySchema>;
 export type CategoriesWithProducts = z.infer<typeof CategoriesProductsSchema>;
 
 export type SearchCategory = z.infer<typeof SearchCategorySchema>;

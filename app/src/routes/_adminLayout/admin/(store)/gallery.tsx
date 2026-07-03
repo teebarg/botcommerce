@@ -8,33 +8,25 @@ import { GalleryImagesUpload } from "@/components/admin/product/gallery-images-u
 import { useBulkDeleteGalleryImages } from "@/hooks/useGallery";
 import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
-import type { PaginatedProductImages, ProductImage } from "@/schemas";
+import { GalleryQuery, GalleryQuerySchema, type PaginatedProductImages, type ProductImage } from "@/schemas";
 import { useWebSocket } from "pulsews";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { queryOptions } from "@tanstack/react-query";
-import { z } from "zod";
 import { api } from "@/utils/api";
 import { PageLoader } from "@/components/generic/page-loader";
 import EmptyState from "@/components/generic/empty";
 
-const galleryQuery = (params?: object) =>
+const galleryQuery = (params?: GalleryQuery) =>
     queryOptions({
         queryKey: ["gallery", params],
-        queryFn: () => api.get<PaginatedProductImages>("/gallery/", { params: params as Record<string, unknown> }),
-        staleTime: 1000 * 60 * 60 * 24, // 24 hours
+        queryFn: () => api.get<PaginatedProductImages>("/gallery/", { params }),
+        staleTime: 1000 * 60 * 60 * 24,
         refetchOnMount: false,
     });
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/gallery")({
-    validateSearch: z.object({
-        cursor: z.string().optional(),
-        active: z.boolean().optional(),
-        sort: z.enum(["newest", "oldest"]).default("newest"),
-        out_of_stock: z.boolean().optional(),
-        category_slug: z.string().optional(),
-        name: z.string().optional(),
-    }),
+    validateSearch: GalleryQuerySchema,
     loaderDeps: ({ search }) => search,
     loader: async ({ context: { queryClient }, deps }) => {
         queryClient.prefetchQuery(galleryQuery(deps));
