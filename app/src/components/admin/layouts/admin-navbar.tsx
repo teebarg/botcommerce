@@ -26,7 +26,7 @@ const AdminNavbar = () => {
     return (
         <header
             ref={navRef}
-            className="sticky top-[var(--sat)] z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-md"
+            className="sticky top-[var(--sat)] z-50 w-full border-b border-border/40 glass"
         >
             <div className="flex items-center justify-between h-16 w-full max-w-[1440px] mx-auto px-4 gap-4">
                 <div className="flex items-center gap-4">
