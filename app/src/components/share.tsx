@@ -33,7 +33,7 @@ export default function ShareButton({ text = "Check out these products in our ca
             targetUrl={location.url}
             text={text}
             trigger={
-                <button className="w-12 h-12 rounded-full glass3 shadow-md flex items-center justify-center text-foreground">
+                <button className="w-12 h-12 rounded-full glass flex items-center justify-center text-white shadow-lg shadow-black/20 active:scale-95 transition-transform" >
                     <Share2 className="h-5 w-5" />
                 </button>
             }

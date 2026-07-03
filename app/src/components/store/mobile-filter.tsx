@@ -87,7 +87,7 @@ const MobileFilter: React.FC<MobileFilterProps> = ({ }) => {
                 </div>
             }
             trigger={
-                <button className="relative w-12 h-12 rounded-full glass3 shadow-md flex items-center justify-center">
+                <button className="relative w-12 h-12 rounded-full glass flex items-center justify-center text-white shadow-lg shadow-black/20 active:scale-95 transition-transform">
                     <SlidersHorizontal className="w-5 h-5" />
                     {activeCount > 0 && (
                         <span className="absolute -top-0.5 -right-0.5 flex h-4.5 min-w-4.5 px-1 items-center justify-center rounded-full bg-primary text-[9px] font-black text-primary-foreground border-2 border-background">

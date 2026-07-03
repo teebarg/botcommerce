@@ -6,8 +6,6 @@ import { CartComponent } from "@/components/store/cart/cart-component";
 import { UserDropdown } from "../user-button";
 import { ThemeToggle } from "../theme-toggle";
 import { BackButton } from "@/components/back";
-import MobileFilter from "@/components/store/mobile-filter";
-import ShareButton from "../share";
 import GetApp from "@/components/get-app";
 import LocalizedClientLink from "@/components/ui/link";
 import { useConfig } from "@/providers/store-provider";
@@ -39,24 +37,7 @@ const StoreNavbar = () => {
             className="fixed top-0 inset-x-0 z-50 w-full border-b border-border/40 bg-background/60 backdrop-blur-md"
         >
             <div className="w-full max-w-7xl mx-auto px-4">
-                {/* <div className="flex md:hidden items-center gap-1 py-3 pt-[calc(var(--sat)+12px)] w-full">
-                    <div className="flex gap-2 items-center flex-1">
-                        <BackButton />
-                        <Link to="/">
-                            <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-                                <ShoppingBag className="w-5 h-5 text-white" />
-                            </div>
-                        </Link>
-                        <MobileFilter />
-                    </div>
-                    <ShareButton />
-                    <SearchDialog />
-                    <GetApp />
-                    <UserDropdown />
-                </div> */}
-
                 <div className="flex md:hidden items-center justify-between py-2.5 pt-[calc(var(--sat)+10px)] w-full gap-2">
-                    {/* Left Utility Wing */}
                     <div className="flex items-center gap-1.5 shrink-0">
                         <BackButton />
                         <Link to="/" className="active:scale-95 transition-transform">
@@ -64,30 +45,33 @@ const StoreNavbar = () => {
                                 <ShoppingBag className="w-4.5 h-4.5 text-white" />
                             </div>
                         </Link>
-                        {/* <MobileFilter /> */}
                     </div>
-
-                    {totalItems > 0 ? (
-                        <LocalizedClientLink 
-                            href="/checkout"
-                            className="flex-1 max-w-[190px] h-9 rounded-full bg-primary text-primary-foreground pl-3 pr-2 flex items-center justify-between gap-1 shadow-sm active:scale-[0.98] transition-all"
-                        >
-                            <div className="flex flex-col text-left min-w-0">
-                                <span className="text-[9px] font-bold uppercase tracking-wider opacity-80 leading-none">Checkout</span>
-                                <span className="text-xs font-display font-bold tracking-tight truncate mt-0.5">
-                                    {currency(subtotal)} <span className="font-normal opacity-80 font-sans text-[10px]">({totalItems})</span>
+                    <div className="flex-1 flex justify-center px-2 min-w-0">
+                        {totalItems > 0 ? (
+                            <LocalizedClientLink
+                                href="/checkout"
+                                className="flex items-center gap-2 bg-gradient-action rounded-full pl-4 pr-2 py-2 max-w-full active:scale-[0.97] transition-transform"
+                            >
+                                <span className="text-sm font-display font-medium text-primary-foreground whitespace-nowrap">
+                                    Checkout
                                 </span>
-                            </div>
-                            <ArrowRight className="w-3.5 h-3.5 opacity-90" />
-                        </LocalizedClientLink>
-                    ) : (
-                        <span className="flex-1 text-center font-display text-sm font-bold tracking-tight text-foreground truncate px-2">
-                            {shop_name}
-                        </span>
-                    )}
+                                <span className="w-[3px] h-[3px] rounded-full bg-primary-foreground/40 shrink-0" />
+                                <span className="text-xs font-medium text-primary-foreground/75 whitespace-nowrap">
+                                    {currency(subtotal)}
+                                </span>
+                                <span className="w-6 h-6 rounded-full bg-primary-foreground/15 flex items-center justify-center shrink-0">
+                                    <ArrowRight className="w-3.5 h-3.5 text-primary-foreground" />
+                                </span>
+                            </LocalizedClientLink>
+                        ) : (
+                            <span className="font-display text-[15px] font-medium tracking-tight text-foreground truncate">
+                                {shop_name}
+                            </span>
+                        )}
+                    </div>
                     <div className="flex items-center gap-1 shrink-0">
                         <SearchDialog />
-                        {/* <ShareButton /> */}
+                        <GetApp />
                         <UserDropdown />
                     </div>
                 </div>
@@ -115,7 +99,6 @@ const StoreNavbar = () => {
                     <div className="flex gap-3 items-center">
                         <CartComponent />
                         <ThemeToggle />
-
                         <div className="flex">
                             {isAuthenticated ? (
                                 <LocalizedClientLink
