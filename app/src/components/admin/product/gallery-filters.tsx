@@ -266,6 +266,7 @@ export function GalleryFilters() {
                             <Calendar className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none z-10" />
                             <DateRangePicker
                                 className="[&_button]:h-8 [&_button]:pl-8 [&_button]:text-xs"
+                                contentClassName="w-[50vw]"
                                 placeholder="Custom range..."
                                 value={
                                     draft.start_date

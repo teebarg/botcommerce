@@ -8,17 +8,16 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/utils";
-import { useMediaQuery } from "@/hooks/use-media-query";
 
 interface DateRangePickerProps {
     className?: string;
+    contentClassName?: string;
     value?: DateRange;
     onChange?: (date: DateRange | undefined) => void;
     placeholder?: string;
 }
 
-export function DateRangePicker({ className, value, onChange, placeholder = "Pick a date range" }: DateRangePickerProps) {
-    const { isMobile } = useMediaQuery();
+export function DateRangePicker({ className, contentClassName, value, onChange, placeholder = "Pick a date range" }: DateRangePickerProps) {
     return (
         <div className={cn("grid gap-2", className)}>
             <Popover>
@@ -42,12 +41,11 @@ export function DateRangePicker({ className, value, onChange, placeholder = "Pic
                         )}
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent align="start" className="w-auto p-0" collisionPadding={16}>
+                <PopoverContent className={cn("w-auto p-0", contentClassName)}>
                     <Calendar
-                        initialFocus
                         defaultMonth={value?.from}
                         mode="range"
-                        numberOfMonths={isMobile ? 1 : 2}
+                        numberOfMonths={2}
                         selected={value}
                         onSelect={onChange}
                     />
