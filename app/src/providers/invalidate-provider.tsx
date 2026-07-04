@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocation, useRouteContext } from "@tanstack/react-router";
-import { useWebSocket } from "pulsews";
+import { useWebSocket, useWebSocketMessage } from "pulsews";
 import { useEffect, useRef, useState } from "react";
 import { useCart } from "./cart-provider";
 
@@ -18,7 +18,7 @@ function parseEventKeys(eventKeys: string[]): string[][] {
 }
 
 export function InvalidateProvider({ children }: { children: React.ReactNode }) {
-    const [isMounted, setIsMounted] = useState(false);
+    const [isMounted, setIsMounted] = useState<boolean>(false);
 
     useEffect(() => {
         setIsMounted(true);
@@ -37,36 +37,31 @@ function InvalidateProviderInner({ children }: { children: React.ReactNode }) {
     const { isAuthenticated, userId, user } = useRouteContext({ strict: false });
     const { cart } = useCart();
     const queryClient = useQueryClient();
-    const { lastMessage, send, isConnected } = useWebSocket();
+    const { send, isConnected } = useWebSocket();
     const prevConnectedRef = useRef<boolean>(false);
+    const hasConnectedBeforeRef = useRef<boolean>(false);
 
-    useEffect(() => {
-        if (!lastMessage) return;
-        if (lastMessage.type === "invalidate") {
-            const handleInvalidation = (keySegments: string[]) => {
-                if (keySegments[0] === "cart" && keySegments[1]) {
-                    const incomingCartId = keySegments[1];
-                    if (incomingCartId === cart?.cart_number) {
-                        queryClient.invalidateQueries({ queryKey: ["cart"] });
-                    }
-                    return;
+    useWebSocketMessage((message) => {
+        if (message.type !== "invalidate") return;
+        const handleInvalidation = (keySegments: string[]) => {
+            if (keySegments[0] === "cart" && keySegments[1]) {
+                const incomingCartId = keySegments[1];
+                if (incomingCartId === cart?.cart_number) {
+                    queryClient.invalidateQueries({ queryKey: ["cart"] });
                 }
-                queryClient.invalidateQueries({ queryKey: keySegments });
-            };
-
-            if (lastMessage.key) {
-                const keys = parseEventKey(lastMessage.key);
-                handleInvalidation(keys);
+                return;
             }
+            queryClient.invalidateQueries({ queryKey: keySegments });
+        };
 
-            if (lastMessage.keys) {
-                const keysArray = parseEventKeys(lastMessage.keys);
-                keysArray.forEach((keySegments: string[]) => {
-                    handleInvalidation(keySegments);
-                });
-            }
+        if (message.key) {
+            handleInvalidation(parseEventKey(message.key));
         }
-    }, [lastMessage, queryClient, cart]);
+
+        if (message.keys) {
+            parseEventKeys(message.keys).forEach(handleInvalidation);
+        }
+    }, [queryClient]);
 
     useEffect(() => {
         if (isAuthenticated && isConnected && !prevConnectedRef.current) {
@@ -77,6 +72,13 @@ function InvalidateProviderInner({ children }: { children: React.ReactNode }) {
                     email: user?.email,
                 })
             );
+            if (hasConnectedBeforeRef.current) {
+                queryClient.invalidateQueries({ queryKey: ["orders"] });
+                queryClient.invalidateQueries({ queryKey: ["products"] });
+                queryClient.invalidateQueries({ queryKey: ["gallery"] });
+            }
+    
+            hasConnectedBeforeRef.current = true;
         }
         prevConnectedRef.current = isConnected;
     }, [isAuthenticated, isConnected, send, user]);
