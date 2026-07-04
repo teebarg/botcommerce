@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { LayoutDashboard, RectangleVertical } from "lucide-react";
 import { GalleryCard } from "@/components/admin/product/gallery-card";
@@ -9,7 +9,7 @@ import { useBulkDeleteGalleryImages } from "@/hooks/useGallery";
 import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { GalleryQuerySchema, type PaginatedProductImages, type ProductImage } from "@/schemas";
-import { useWebSocket } from "pulsews";
+import { useWebSocketMessage } from "pulsews";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { api } from "@/utils/api";
@@ -28,7 +28,6 @@ function RouteComponent() {
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const { lastMessage } = useWebSocket();
     const { mutateAsync: bulkDeleteImages, isPending: isDeleting } = useBulkDeleteGalleryImages();
     const BULK_ACTION_TOAST_ID = "bulk-action-toast";
 
@@ -49,35 +48,32 @@ function RouteComponent() {
         return Array.from(ids);
     }, [selectedImages, items]);
 
-    useEffect(() => {
-        if (!lastMessage) return;
-
-        if (lastMessage.type === "image_upload") {
-            if (lastMessage.status === "completed") {
+    useWebSocketMessage((msg) => {
+        if (msg.type === "image_upload") {
+            if (msg.status === "completed") {
                 toast.success("Products uploaded successfully");
                 setIsLoading(false);
-            } else if (lastMessage.status === "processing" && !isLoading) {
+            } else if (msg.status === "processing" && !isLoading) {
                 setIsLoading(true);
             }
         }
 
-        if (lastMessage.type === "bulk_action") {
-            if (lastMessage.status === "processing") {
+        if (msg.type === "bulk_action") {
+            if (msg.status === "processing") {
                 toast.loading("Processing...", { id: BULK_ACTION_TOAST_ID, description: "Bulk image deletion in progress." });
             }
 
-            if (lastMessage.status === "completed") {
+            if (msg.status === "completed") {
                 toast.success("Requested Action Completed", {
                     id: BULK_ACTION_TOAST_ID,
                     description: "Data updated successfully"
                 });
-
                 setSelectionMode(false);
                 setSelectedImages(new Set());
                 setIsLoading(false);
             }
         }
-    }, [lastMessage]);
+    });
 
     const handleSelectionChange = (imageId: number, selected: boolean) => {
         setSelectedImages((prev) => {

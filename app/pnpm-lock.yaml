@@ -150,8 +150,8 @@ importers:
         specifier: latest
         version: 3.0.1-alpha.1(@upstash/redis@1.35.7)(idb-keyval@6.2.2)(lru-cache@11.2.4)(rollup@2.80.0)(vite@7.2.7(@types/node@22.19.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.0)(tsx@4.21.0))
       pulsews:
-        specifier: ^1.0.1
-        version: 1.0.1
+        specifier: 1.0.2
+        version: 1.0.2
       react:
         specifier: ^19.2.0
         version: 19.2.1
@@ -4236,8 +4236,8 @@ packages:
   prop-types@15.8.1:
     resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
 
-  pulsews@1.0.1:
-    resolution: {integrity: sha512-Epva+ROEPLA38THv+nS+XrDm4NJ3Z8SpfHgHHKZGKKduwmLxB2U75rNxFTSi4+FbJ9iHF4/sQVsF3+ZekBtypQ==}
+  pulsews@1.0.2:
+    resolution: {integrity: sha512-E8kg9Moy95FI2T+15AIg+Sa1ouUR5KR0ZkkduNHFyOfZnGC/uizg/L7d/gf/t7I7h1wBl2imu0DDBXCC69PLlw==}
 
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
@@ -9356,7 +9356,7 @@ snapshots:
       object-assign: 4.1.1
       react-is: 16.13.1
 
-  pulsews@1.0.1: {}
+  pulsews@1.0.2: {}
 
   punycode@2.3.1: {}
 

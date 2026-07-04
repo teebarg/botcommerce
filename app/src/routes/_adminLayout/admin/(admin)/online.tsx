@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Users, UserCheck, Eye, TrendingUp } from "lucide-react";
 import UserCounter from "@/components/admin/online/UserCounter";
 import ActivityIndicator from "@/components/admin/online/ActivityIndicator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useWebSocket } from "pulsews";
+import { useWebSocketMessage } from "pulsews";
 import OnlineAvatar from "@/components/admin/online/OnlineAvatar";
 
 interface OnlineSession {
@@ -23,13 +23,12 @@ export const Route = createFileRoute("/_adminLayout/admin/(admin)/online")({
 
 function RouteComponent() {
     const [sessions, setSessions] = useState<OnlineSession[]>([]);
-    const { lastMessage } = useWebSocket();
 
-    useEffect(() => {
-        if (lastMessage?.type === "online-users") {
-            setSessions(lastMessage.users);
+    useWebSocketMessage((msg) => {
+        if (msg?.type === "online-users") {
+            setSessions(msg.users);
         }
-    }, [lastMessage]);
+    });
 
     const total = sessions.length;
     const loggedIn = sessions.filter((s) => s.type === "user").length;
