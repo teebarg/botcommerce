@@ -6,14 +6,11 @@ import { CatalogForm } from "@/components/admin/catalogs/catalog-form";
 import type { DBCatalog } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import SheetDrawer from "@/components/sheet-drawer";
-import { catalogsQuery, useCatalogs } from "@/hooks/useCollection";
+import { useCatalogs } from "@/hooks/useCollection";
 import EmptyState from "@/components/generic/empty";
 import { PageLoader } from "@/components/generic/page-loader";
 
 export const Route = createFileRoute("/_adminLayout/admin/catalog")({
-    loader: async ({ context: { queryClient } }) => {
-        queryClient.prefetchQuery(catalogsQuery());
-    },
     component: RouteComponent,
 });
 

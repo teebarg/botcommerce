@@ -12,22 +12,12 @@ import NewsletterSection from "@/components/store/landing/newsletter-section";
 import CategoriesWithProductsSection from "@/components/store/home/categories-products";
 import { HERO_IMAGES } from "@/utils/constants";
 import InfiniteFeed from "@/components/store/collections/infinite-feed";
-import { getIndexProductsFn } from "@/server/product.server";
-import { queryOptions, useQuery } from "@tanstack/react-query";
 import { LazyInView } from "@/components/LazyInView";
-
-const indexProductQuery = () =>
-    queryOptions({
-        queryKey: ["products", "collections"],
-        queryFn: () => getIndexProductsFn(),
-        staleTime: 1000 * 60 * 60,
-        gcTime: 1000 * 60 * 60 * 2,
-    });
+import { useIndexProducts } from "@/hooks/useProduct";
 
 export const Route = createFileRoute("/_mainLayout/")({
     component: Home,
-    loader: async ({ context: { queryClient } }) => {
-        queryClient.prefetchQuery(indexProductQuery());
+    loader: async () => {
         const image = HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)];
         return {
             heroImage: image,
@@ -37,7 +27,7 @@ export const Route = createFileRoute("/_mainLayout/")({
 
 function Home() {
     const { heroImage } = Route.useLoaderData();
-    const { data, isPending } = useQuery(indexProductQuery());
+    const { data, isPending } = useIndexProducts();
 
     return (
         <div className="animate-in fade-in-50 duration-300">

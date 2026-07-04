@@ -6,7 +6,6 @@ import CustomerFilter from "@/components/admin/customers/customer-filter";
 import CustomerCard from "@/components/admin/customers/customer-card";
 import z from "zod";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
-import { usersQuery } from "@/queries/admin.queries";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { api } from "@/utils/api";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
@@ -22,10 +21,6 @@ export const Route = createFileRoute("/_adminLayout/admin/(admin)/users")({
         role: z.enum(["ADMIN", "CUSTOMER"]).optional(),
         status: z.enum(["ACTIVE", "INACTIVE", "PENDING"]).optional(),
     }),
-    loaderDeps: ({ search }) => search,
-    loader: async ({ deps, context }) => {
-        context.queryClient.prefetchQuery(usersQuery(deps));
-    },
     component: RouteComponent,
 });
 
@@ -35,7 +30,7 @@ function RouteComponent() {
     const [filterOpen, setFilterOpen] = useState<boolean>(false);
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedUsers, User>({
-        queryKey: ["users", "infinite", params],
+        queryKey: ["users", params],
         queryFn: (cursor) => api.get<PaginatedUsers>("/users/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,

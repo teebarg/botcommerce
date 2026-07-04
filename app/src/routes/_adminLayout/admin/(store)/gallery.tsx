@@ -8,29 +8,17 @@ import { GalleryImagesUpload } from "@/components/admin/product/gallery-images-u
 import { useBulkDeleteGalleryImages } from "@/hooks/useGallery";
 import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
-import { GalleryQuery, GalleryQuerySchema, type PaginatedProductImages, type ProductImage } from "@/schemas";
+import { GalleryQuerySchema, type PaginatedProductImages, type ProductImage } from "@/schemas";
 import { useWebSocket } from "pulsews";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
-import { queryOptions } from "@tanstack/react-query";
 import { api } from "@/utils/api";
 import { PageLoader } from "@/components/generic/page-loader";
 import EmptyState from "@/components/generic/empty";
 
-const galleryQuery = (params?: GalleryQuery) =>
-    queryOptions({
-        queryKey: ["gallery", params],
-        queryFn: () => api.get<PaginatedProductImages>("/gallery/", { params }),
-        staleTime: 1000 * 60 * 60 * 24,
-        refetchOnMount: false,
-    });
-
 export const Route = createFileRoute("/_adminLayout/admin/(store)/gallery")({
     validateSearch: GalleryQuerySchema,
     loaderDeps: ({ search }) => search,
-    loader: async ({ context: { queryClient }, deps }) => {
-        queryClient.prefetchQuery(galleryQuery(deps));
-    },
     component: RouteComponent,
 });
 
@@ -45,7 +33,7 @@ function RouteComponent() {
     const BULK_ACTION_TOAST_ID = "bulk-action-toast";
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedProductImages, ProductImage>({
-        queryKey: ["gallery", "infinite", params],
+        queryKey: ["gallery", params],
         queryFn: (cursor) => api.get<PaginatedProductImages>("/gallery/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,

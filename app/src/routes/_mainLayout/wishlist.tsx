@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import WishlistItem from "@/components/store/wishlist";
 import type { WishItem } from "@/schemas";
-import { userWishlistQuery, useUserWishlist } from "@/hooks/useUser";
+import { useUserWishlist } from "@/hooks/useUser";
 import { SignInRedirect } from "@/utils/reuseable";
 import EmptyState from "@/components/generic/empty";
 import { PageLoader } from "@/components/generic/page-loader";
@@ -11,9 +11,6 @@ export const Route = createFileRoute("/_mainLayout/wishlist")({
         if (!context.isAuthenticated) {
             throw new Error("Not authenticated");
         }
-    },
-    loader: async ({ context: { queryClient } }) => {
-        queryClient.prefetchQuery(userWishlistQuery());
     },
     errorComponent: ({ error }) => {
         if (error.message === "Not authenticated") {

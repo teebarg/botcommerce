@@ -2,12 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import type { Collection } from "@/schemas/product";
 import { Input } from "@/components/ui/input";
-import { collectionsQuery } from "@/hooks/useCollection";
+import { useCollections } from "@/hooks/useCollection";
 import ServerError from "@/components/generic/server-error";
 import { CreateCollection } from "@/components/admin/collections/create-collection";
 import CollectionItem from "@/components/admin/collections/collection-items";
 import { z } from "zod";
-import { useQuery } from "@tanstack/react-query";
 import { PageLoader } from "@/components/generic/page-loader";
 import EmptyState from "@/components/generic/empty";
 
@@ -15,16 +14,12 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/collections")(
     validateSearch: z.object({
         search: z.string().optional(),
     }),
-    loaderDeps: ({ search }) => search,
-    loader: async ({ context: { queryClient }, deps }) => {
-        queryClient.prefetchQuery(collectionsQuery(deps));
-    },
     component: RouteComponent,
 });
 
 function RouteComponent() {
     const params = Route.useSearch();
-    const { data: collections, isPending, error } = useQuery(collectionsQuery(params));
+    const { data: collections, isPending, error } = useCollections(params);
 
     if (error) return <ServerError error={error.message} stack={error.stack} scenario="admin collections" />;
 

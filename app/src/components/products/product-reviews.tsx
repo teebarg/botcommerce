@@ -4,13 +4,12 @@ import { Star, Filter } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { useQuery } from "@tanstack/react-query";
 import { ProductReviewsZeroState } from "../store/reviews/review-zero";
-import type { Review, ReviewStatus, SortBy } from "@/schemas";
+import type { PaginatedReview, Review, ReviewStatus, SortBy } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ReviewCard } from "@/components/store/reviews/review-card";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ReviewForm } from "../store/reviews/review-form";
-import { reviewsQuery } from "@/queries/user.queries";
 import { api } from "@/utils/api";
 import ReviewsLoader from "./product-review-loader";
 
@@ -22,7 +21,10 @@ interface Prop {
 const ReviewsSection: React.FC<Prop> = ({ product_id, productName }) => {
     const state = useOverlayTriggerState({});
     const [sort, setSort] = useState<SortBy>("newest");
-    const { data: reviewsData, isLoading } = useQuery(reviewsQuery({ product_id, sort }));
+    const {data: reviewsData, isPending} = useQuery({
+        queryKey: ["reviews", { product_id, sort }],
+        queryFn: () => api.get<PaginatedReview>("/reviews/", { params: { product_id, sort } }),
+    })
     const { data } = useQuery({
         queryKey: ["products", product_id, "review-status"],
         queryFn: async () => await api.get<ReviewStatus>(`/product/${product_id}/review-status`),
@@ -31,7 +33,7 @@ const ReviewsSection: React.FC<Prop> = ({ product_id, productName }) => {
     const { items, ratings } = reviewsData || {};
     const getPercentage = (count: number) => (count / (ratings?.count || 1)) * 100;
 
-    if (isLoading) return <ReviewsLoader />;
+    if (isPending) return <ReviewsLoader />;
 
     return (
         <div className="max-w-6xl mx-auto px-4 py-12">

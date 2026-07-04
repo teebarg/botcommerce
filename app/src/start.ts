@@ -6,6 +6,7 @@ initializeAppSession();
 
 export const startInstance = createStart(() => {
     return {
+        defaultSsr: true,
         requestMiddleware: [clerkMiddleware()],
     };
 });

@@ -10,7 +10,6 @@ export const Route = createFileRoute("/payment/verify")({
     validateSearch: z.object({
         reference: z.string(),
     }),
-    loaderDeps: ({ search: { reference } }) => ({ reference }),
     component: RouteComponent,
 });
 

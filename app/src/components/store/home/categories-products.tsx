@@ -10,8 +10,6 @@ export default function CategoriesWithProductsSection() {
     const { data, isLoading } = useQuery({
         queryKey: ["products", "home"],
         queryFn: () => api.get<CategoriesWithProducts[]>("/category/home/products"),
-        staleTime: 1000 * 60 * 30,
-        gcTime: 1000 * 60 * 60,
     });
     return (
         <section className="max-w-sxl mx-auto px-2 py-6 space-y-8">

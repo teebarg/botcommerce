@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import ChatsCard from "@/components/admin/chats/chats-card";
 import { ConversationStatusSchema, type Chat, type PaginatedChats } from "@/schemas";
 import z from "zod";
-import { chatsQuery } from "@/queries/admin.queries";
 import { api } from "@/utils/api";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
@@ -14,10 +13,6 @@ export const Route = createFileRoute("/_adminLayout/admin/(admin)/chats")({
     validateSearch: z.object({
         status: ConversationStatusSchema.optional(),
     }),
-    loaderDeps: ({ search }) => search,
-    loader: async ({ context, deps }) => {
-        context.queryClient.prefetchQuery(chatsQuery(deps));
-    },
     component: RouteComponent,
 });
 

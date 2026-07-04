@@ -89,7 +89,7 @@ const OrderItemCard: React.FC<{ item: OrderItem; orderId: number, isPaid: boolea
 
     return (
         <div className="flex items-start gap-4 px-4 py-2.5">
-            <div className={cn("relative w-16 h-16 shrink-0 overflow-hidden rounded-lg bg-card ring-1 ring-border", outOfStock && "opacity-50")}>
+            <div className={cn("relative w-16 h-16 shrink-0 overflow-hidden rounded-lg bg-card ring-1 ring-border", !isPaid && outOfStock && "opacity-50")}>
                 <ImageLightbox
                     url={item?.image}
                     alt={item?.name}

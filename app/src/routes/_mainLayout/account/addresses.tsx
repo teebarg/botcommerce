@@ -1,14 +1,12 @@
-import { createFileRoute, useRouteContext } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import type React from "react";
 import { useOverlayTriggerState } from "react-stately";
 import { Edit3, Home, HomeIcon, Plus, Trash2 } from "lucide-react";
 import type { Address } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import { useDeleteAddress } from "@/hooks/useAddress";
+import { useDeleteAddress, useUserAddresses } from "@/hooks/useAddress";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import SheetDrawer from "@/components/sheet-drawer";
-import { useQuery } from "@tanstack/react-query";
-import { userAddressesQuery } from "@/queries/user.queries";
 import AddressForm from "@/components/store/account/address-form";
 import EmptyState from "@/components/generic/empty";
 import { PageLoader } from "@/components/generic/page-loader";
@@ -100,16 +98,12 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = true }) =
 };
 
 export const Route = createFileRoute("/_mainLayout/account/addresses")({
-    loader: async ({ context: { queryClient, userId = null } }) => {
-        queryClient.prefetchQuery(userAddressesQuery(userId));
-    },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { userId } = useRouteContext({ strict: false });
     const addState = useOverlayTriggerState({});
-    const { data, isPending } = useQuery(userAddressesQuery(userId ?? null));
+    const { data, isPending } = useUserAddresses()
 
     return (
         <div className="w-full px-2 pt-6">

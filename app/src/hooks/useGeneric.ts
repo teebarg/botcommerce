@@ -43,6 +43,4 @@ export const useContactForm = () => {
 export const useSettingsQuery = () => queryOptions({
     queryKey: ["shop-settings"],
     queryFn: () => api.get<ShopSettings[]>("/shop-settings/"),
-    staleTime: 1000 * 60 * 60,
-    gcTime: 1000 * 60 * 60 * 2,
 });

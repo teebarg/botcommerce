@@ -3,7 +3,7 @@ import { MessageCircle, Plus } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { Button } from "@/components/ui/button";
 import { FaqForm } from "@/components/admin/faq/faq-form";
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Tag } from "lucide-react";
 import type { FAQ } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
@@ -13,22 +13,16 @@ import { api } from "@/utils/api";
 import EmptyState from "@/components/generic/empty";
 import { PageLoader } from "@/components/generic/page-loader";
 
-const faqsQuery = () =>
-    queryOptions({
-        queryKey: ["faqs"],
-        queryFn: () => api.get<FAQ[]>("/faq/"),
-        staleTime: Infinity,
-    });
-
 export const Route = createFileRoute("/_adminLayout/admin/(admin)/faqs")({
-    loader: async ({ context }) => {
-        context.queryClient.prefetchQuery(faqsQuery());
-    },
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { data: faqs = [], isPending } = useQuery(faqsQuery());
+    const { data: faqs = [], isPending } = useQuery({
+        queryKey: ["faqs"],
+        queryFn: () => api.get<FAQ[]>("/faq/"),
+        staleTime: Infinity,
+    });
     const state = useOverlayTriggerState({});
 
     return (

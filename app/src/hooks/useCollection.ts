@@ -1,19 +1,16 @@
-import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { CollectionFormValues } from "@/components/admin/collections/collection-form";
 import type { CatalogFormValues } from "@/components/admin/catalogs/catalog-form";
 import { Catalog, Collection, Message, PaginatedCatalog } from "@/schemas";
 import { api } from "@/utils/api";
 
-export const collectionsQuery = (params?: { search?: string }) =>
-    queryOptions({
+export const useCollections = (params?: { search?: string }) => {
+    return useQuery({
         queryKey: ["collections", params?.search ?? "all"],
         queryFn: () => api.get<Collection[]>("/collection/", { params }),
         staleTime: Infinity,
     });
-
-export const useCollections = (params?: { search?: string }) => {
-    return useQuery(collectionsQuery(params));
 };
 
 export const useCreateCollection = () => {
@@ -52,15 +49,11 @@ export const useDeleteCollection = () => {
     });
 };
 
-export const catalogsQuery = () =>
-    queryOptions({
+export const useCatalogs = () => {
+    return useQuery({
         queryKey: ["catalogs"],
         queryFn: () => api.get<PaginatedCatalog>("/catalog/"),
-        staleTime: Infinity,
     });
-
-export const useCatalogs = () => {
-    return useQuery(catalogsQuery());
 };
 
 export const useCreateCatalog = () => {

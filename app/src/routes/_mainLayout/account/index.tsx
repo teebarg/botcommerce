@@ -5,10 +5,9 @@ import { useOverlayTriggerState } from "react-stately";
 import type { Order } from "@/schemas";
 import Overlay from "@/components/overlay";
 import OrderDetails from "@/components/store/orders/order-details";
-import { ordersQuery } from "@/queries/user.queries";
-import { useQuery } from "@tanstack/react-query";
 import { PageLoader } from "@/components/generic/page-loader";
 import EmptyState from "@/components/generic/empty";
+import { useOrders } from "@/hooks/useOrder";
 
 const OrderItem: React.FC<{ order: Order; idx: number }> = ({ order, idx }) => {
     const state = useOverlayTriggerState({});
@@ -55,15 +54,12 @@ const OrderItem: React.FC<{ order: Order; idx: number }> = ({ order, idx }) => {
 };
 
 export const Route = createFileRoute("/_mainLayout/account/")({
-    loader: async ({ context: { queryClient } }) => {
-        queryClient.prefetchQuery(ordersQuery());
-    },
     component: RouteComponent,
 });
 
 function RouteComponent() {
     const { user } = Route.useRouteContext();
-    const { data, isPending } = useQuery(ordersQuery());
+    const { data, isPending } = useOrders();
 
     return (
         <div className="px-2 md:px-0 pt-6 space-y-6">

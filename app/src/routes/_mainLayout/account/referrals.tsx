@@ -1,7 +1,7 @@
 import { createFileRoute, useRouteContext } from "@tanstack/react-router";
-import { meQuery, meTxnsQuery } from "@/queries/user.queries";
+import { meQuery } from "@/queries/user.queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Check, Copy, Gift, Share2, Wallet } from "lucide-react";
+import { Banknote, Check, Copy, Gift, Share2, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { currency } from "@/utils";
@@ -10,10 +10,12 @@ import { PaginatedWalletTxns, WalletTxn } from "@/schemas";
 import { WalletTxnCard } from "@/components/store/account/WalletTxnCard";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
+import { PageLoader } from "@/components/generic/page-loader";
+import EmptyState from "@/components/generic/empty";
 
 export const Route = createFileRoute("/_mainLayout/account/referrals")({
-    loader: async ({ context: { queryClient, userId = null } }) => {
-        await Promise.all([queryClient.ensureQueryData(meQuery()), queryClient.ensureQueryData(meTxnsQuery(userId))]);
+    loader: async ({ context: { queryClient } }) => {
+        await Promise.all([queryClient.ensureQueryData(meQuery())]);
     },
     component: RouteComponent,
 });
@@ -21,7 +23,6 @@ export const Route = createFileRoute("/_mainLayout/account/referrals")({
 function RouteComponent() {
     const { userId } = useRouteContext({ strict: false });
     const { data: me } = useSuspenseQuery(meQuery());
-    const { data: initialTxns } = useSuspenseQuery(meTxnsQuery(userId!));
     const [copied, setCopied] = useState<boolean>(false);
 
     const {
@@ -29,16 +30,15 @@ function RouteComponent() {
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
-        isLoading,
+        isPending,
     } = useInfiniteResource<PaginatedWalletTxns, WalletTxn>({
-        queryKey: ["wallet", userId?.toString(), "infinite"],
+        queryKey: ["wallet", userId?.toString()],
         queryFn: (cursor) =>
             api.get("/wallet/me", {
                 params: { cursor },
             }),
         getItems: (page) => page.txns,
         getNextCursor: (page) => page.next_cursor,
-        initialData: initialTxns,
     });
 
     const handleCopy = async () => {
@@ -116,14 +116,21 @@ function RouteComponent() {
                     <h3 className="font-semibold">Wallet Transactions</h3>
                     <span className="text-xs text-muted-foreground">{txns.length} transactions</span>
                 </div>
-
-                {!isLoading && txns.length > 0 && (
+                {isPending ? (
+                    <PageLoader variant="list" />
+                ) : txns.length > 0 ? (
                     <InfiniteResourceList
                         items={txns}
                         onLoadMore={fetchNextPage}
                         hasMore={hasNextPage}
                         isLoading={isFetchingNextPage}
                         renderItem={(txn, i) => <WalletTxnCard key={txn.id} txn={txn} index={i} />}
+                    />
+                ) : (
+                    <EmptyState
+                        icon={Banknote}
+                        title="No stats yet"
+                        description="There is currently no available stats."
                     />
                 )}
             </div>

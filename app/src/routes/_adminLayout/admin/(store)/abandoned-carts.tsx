@@ -8,7 +8,6 @@ import type { Cart, PaginatedAbandonedCarts } from "@/schemas";
 import { useSendCartReminders } from "@/hooks/useAbandonedCart";
 import { AbandonedCartStats } from "@/components/admin/abandoned-carts/stat";
 import { useQuery } from "@tanstack/react-query";
-import { abandonedCartsQuery, abandonedCartStatsQuery } from "@/queries/admin.queries";
 import { api } from "@/utils/api";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
@@ -17,16 +16,18 @@ import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import EmptyState from "@/components/generic/empty";
 import { PageLoader } from "@/components/generic/page-loader";
 
+interface AbandonedCartStats {
+    active_count: number;
+    abandoned_count: number;
+    converted_count: number;
+    potential_revenue: number;
+}
+
 export const Route = createFileRoute("/_adminLayout/admin/(store)/abandoned-carts")({
     validateSearch: z.object({
         search: z.string().optional(),
         time: z.string().optional(),
     }),
-    loaderDeps: ({ search }) => search,
-    loader: async ({ deps, context: { queryClient } }) => {
-        queryClient.prefetchQuery(abandonedCartStatsQuery(deps.time || "24"))
-        queryClient.prefetchQuery(abandonedCartsQuery({ hours_threshold: deps.time || "24" }))
-    },
     component: RouteComponent,
 });
 
@@ -35,7 +36,10 @@ function RouteComponent() {
     const { updateQuery } = useUpdateQuery(200);
     const { mutate: sendReminders, isPending: sendRemindersLoading } = useSendCartReminders();
 
-    const { data: stats, isLoading } = useQuery(abandonedCartStatsQuery(params.time || "24"));
+    const { data: stats, isLoading } = useQuery({
+        queryKey: ["abandoned-carts", "stats", JSON.stringify({ hours_threshold: params.time })],
+        queryFn: () => api.get<AbandonedCartStats>(`/cart/abandoned-carts/stats?hours_threshold=${params.time}`),
+    });
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedAbandonedCarts, Cart>({
         queryKey: ["abandoned-carts", "infinite", params],

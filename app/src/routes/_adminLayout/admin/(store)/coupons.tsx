@@ -8,7 +8,6 @@ import z from "zod";
 import { toast } from "sonner";
 import { useDeleteCoupon, useToggleCouponStatus } from "@/hooks/useCoupon";
 import { SwipeableCouponCard } from "@/components/admin/coupons/swipeable-coupon-card";
-import { couponsQuery } from "@/queries/admin.queries";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { Coupon, PaginatedCoupons } from "@/schemas";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
@@ -21,10 +20,6 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/coupons")({
         query: z.string().optional(),
         isActive: z.boolean().optional(),
     }),
-    loaderDeps: ({ search }) => search,
-    loader: async ({ deps, context: { queryClient } }) => {
-        queryClient.prefetchQuery(couponsQuery(deps));
-    },
     component: RouteComponent,
 });
 
@@ -34,7 +29,7 @@ function RouteComponent() {
     const deleteMutation = useDeleteCoupon();
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending} = useInfiniteResource<PaginatedCoupons, Coupon>({
-        queryKey: ["coupons", "infinite", params],
+        queryKey: ["coupons", params],
         queryFn: (cursor) => api.get<PaginatedCoupons>("/coupon/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,

@@ -3,8 +3,16 @@ import StatCard from "@/components/ui/stat-card";
 import { currency } from "@/utils";
 import EmptyState from "@/components/generic/empty";
 import { PageLoader } from "@/components/generic/page-loader";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/utils/api";
+import { StatsTrends } from "@/types/models";
 
-const StatComponent = ({ summary, isPending }: { summary?: any, isPending: boolean }) => {
+const StatComponent = () => {
+    const { data, isPending } = useQuery({
+        queryKey: ["stats-trends"],
+        queryFn: () => api.get<StatsTrends>("/stats/trends"),
+    })
+    const summary = data?.summary
     const getPercentageChange = (growth: number): { value: string; trend: "up" | "down" | "neutral" } => {
         return {
             value: `${growth}%`,

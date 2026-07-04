@@ -8,7 +8,6 @@ import { api } from "@/utils/api";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
-import { reviewsQuery } from "@/queries/user.queries";
 import EmptyState from "@/components/generic/empty";
 import { PageLoader } from "@/components/generic/page-loader";
 
@@ -18,10 +17,6 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/reviews")({
         product_id: z.number().optional(),
         sort: z.string().optional(),
     }),
-    loaderDeps: ({ search }) => search,
-    loader: async ({ context: { queryClient }, deps }) => {
-        queryClient.prefetchQuery(reviewsQuery(deps));
-    },
     component: RouteComponent,
 });
 
@@ -30,7 +25,7 @@ function RouteComponent() {
     const { updateQuery } = useUpdateQuery(200);
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedReview, Review>({
-        queryKey: ["reviews", "infinite", params],
+        queryKey: ["reviews", params, "infinite"],
         queryFn: (cursor) => api.get<PaginatedReview>("/reviews/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
