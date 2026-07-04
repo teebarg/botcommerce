@@ -31,7 +31,7 @@ interface RouterContext extends AppSession {
 }
 
 const fetchUser = createServerFn().handler(async (): Promise<AppSession> => {
-    const {data} = await useAppSession();
+    const { data } = await useAppSession();
     return {
         ...data,
         isAdmin: ["ADMIN"].includes(data?.user?.role || ""),
@@ -169,7 +169,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                             <InvalidateProvider>{children}</InvalidateProvider>
                                         </WebSocketProvider>
                                     )}
-                                                                        {import.meta.env.MODE !== "production" && (
+                                    {import.meta.env.MODE !== "production" && (
                                         <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
                                     )}
                                 </div>

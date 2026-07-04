@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ActivityItem } from "@/components/generic/activities/ActivityItem";
 import type { Activity, PaginatedActivities } from "@/schemas";
 import { ActivityIcon } from "lucide-react";
-import { activitiesQuery } from "@/queries/admin.queries";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { api } from "@/utils/api";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
@@ -10,15 +9,12 @@ import EmptyState from "@/components/generic/empty";
 import { PageLoader } from "@/components/generic/page-loader";
 
 export const Route = createFileRoute("/_adminLayout/admin/(admin)/activities")({
-    loader: async ({ context: { queryClient } }) => {
-        queryClient.prefetchQuery(activitiesQuery());
-    },
     component: RouteComponent,
 });
 
 function RouteComponent() {
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedActivities, Activity>({
-        queryKey: ["activities", "infinite"],
+        queryKey: ["activities"],
         queryFn: (cursor) => api.get<PaginatedActivities>("/activities/", { params: { cursor } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,

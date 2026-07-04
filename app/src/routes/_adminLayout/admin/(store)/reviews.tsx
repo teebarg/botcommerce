@@ -17,7 +17,6 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/reviews")({
         product_id: z.number().optional(),
         sort: z.string().optional(),
     }),
-    loaderDeps: ({ search }) => search,
     component: RouteComponent,
 });
 
@@ -26,7 +25,7 @@ function RouteComponent() {
     const { updateQuery } = useUpdateQuery(200);
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedReview, Review>({
-        queryKey: ["reviews", "infinite", params],
+        queryKey: ["reviews", params, "infinite"],
         queryFn: (cursor) => api.get<PaginatedReview>("/reviews/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,

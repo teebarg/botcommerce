@@ -21,7 +21,6 @@ export const Route = createFileRoute("/_adminLayout/admin/(admin)/users")({
         role: z.enum(["ADMIN", "CUSTOMER"]).optional(),
         status: z.enum(["ACTIVE", "INACTIVE", "PENDING"]).optional(),
     }),
-    loaderDeps: ({ search }) => search,
     component: RouteComponent,
 });
 
@@ -31,7 +30,7 @@ function RouteComponent() {
     const [filterOpen, setFilterOpen] = useState<boolean>(false);
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedUsers, User>({
-        queryKey: ["users", "infinite", params],
+        queryKey: ["users", params],
         queryFn: (cursor) => api.get<PaginatedUsers>("/users/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,

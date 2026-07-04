@@ -17,10 +17,10 @@ s ?= app
 # ==========================================
 .PHONY: build
 build:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) build
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) --profile dev build
 
 build-no-cache:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) build --no-cache
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) --profile dev build --no-cache
 
 .PHONY: up
 up:

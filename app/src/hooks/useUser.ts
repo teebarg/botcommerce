@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { getWishlistListingFn, updateAppSessionFn } from "@/server/users.server";
+import { updateAppSessionFn } from "@/server/users.server";
 import { api } from "@/utils/api";
 import { Session, User, Wishlist } from "@/schemas";
 
@@ -73,7 +73,7 @@ export const useStopImpersonation = () => {
 export const useUserWishlist = () => {
     return useQuery({
         queryKey: ["products", "wishlist"],
-        queryFn: () => getWishlistListingFn(),
+        queryFn: () => api.get<Wishlist>("/users/wishlist"),
     });
 };
 

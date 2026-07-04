@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useInfiniteQuery, type InfiniteData, UseQueryOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { FeedQuery, Message, PaginatedProductSearch, ProductFeed, ProductVariant } from "@/schemas";
+import type { FeedQuery, Message, PaginatedProductSearch, ProductFeed, ProductSearch, ProductVariant } from "@/schemas";
 import { api } from "@/utils/api";
 
 
@@ -27,7 +27,6 @@ export const useProductFeed = (initialData: ProductFeed | null, search?: FeedQue
             return lastPage.next_cursor ?? null;
         },
         initialPageParam: null,
-        staleTime: 1000 * 60 * 30,
         initialData: initialData
             ? {
                 pages: [initialData],
@@ -53,6 +52,19 @@ export const useProductSearch = (
         queryFn: async () => await api.get<PaginatedProductSearch>("/product/", { params }),
         staleTime: 1000 * 60 * 60,
         ...options,
+    });
+};
+
+interface IndexProducts {
+    arrival: ProductSearch[];
+    featured: ProductSearch[];
+    trending: ProductSearch[];
+}
+
+export const useIndexProducts = () => {
+    return useQuery({
+        queryKey: ["products", "collections"],
+        queryFn: async () => await api.get<IndexProducts>("/product/index-products"),
     });
 };
 

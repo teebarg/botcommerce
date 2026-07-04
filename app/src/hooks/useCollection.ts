@@ -5,15 +5,12 @@ import type { CatalogFormValues } from "@/components/admin/catalogs/catalog-form
 import { Catalog, Collection, Message, PaginatedCatalog } from "@/schemas";
 import { api } from "@/utils/api";
 
-export const collectionsQuery = (params?: { search?: string }) =>
-    queryOptions({
+export const useCollections = (params?: { search?: string }) => {
+    return useQuery({
         queryKey: ["collections", params?.search ?? "all"],
         queryFn: () => api.get<Collection[]>("/collection/", { params }),
         staleTime: Infinity,
     });
-
-export const useCollections = (params?: { search?: string }) => {
-    return useQuery(collectionsQuery(params));
 };
 
 export const useCreateCollection = () => {

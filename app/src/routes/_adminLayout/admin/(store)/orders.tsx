@@ -16,7 +16,6 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/orders")({
         start_date: z.string().optional(),
         end_date: z.string().optional(),
     }),
-    loaderDeps: ({ search }) => search,
     component: RouteComponent,
 });
 

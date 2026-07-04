@@ -8,7 +8,6 @@ export const useCategories = (query?: string) => {
     return useQuery({
         queryKey: ["categories", query],
         queryFn: () => api.get<Category[]>(`/category/`, { params: { query } }),
-        staleTime: Infinity,
     });
 };
 
