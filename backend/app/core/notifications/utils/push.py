@@ -5,13 +5,13 @@ from typing import TypedDict
 
 from app.core.logging import get_logger
 from pywebpush import WebPushException, webpush
+from urllib.parse import urlparse
 
 from app.core.config import settings
 
 logger = get_logger(__name__)
 
 _VAPID_PRIVATE_KEY: str = settings.VAPID_PRIVATE_KEY
-_VAPID_CLAIMS: dict[str, str] = {"sub": f"mailto:{settings.ADMIN_EMAIL}"}
 
 
 class Subscriber(TypedDict):
@@ -70,7 +70,8 @@ async def _send_one(
     async with semaphore:  # Caps concurrent outbound connections
         try:
             _validate_subscriber(subscriber)
-            payload = _build_payload(subscriber, notification)
+            payload: str = _build_payload(subscriber, notification)
+            parsed = urlparse(subscriber["endpoint"])
 
             await asyncio.to_thread(  # webpush is sync — run in thread pool
                 webpush,
@@ -83,17 +84,13 @@ async def _send_one(
                 },
                 data=payload,
                 vapid_private_key=_VAPID_PRIVATE_KEY,
-                vapid_claims=_VAPID_CLAIMS,
+                vapid_claims={"sub": f"mailto:{settings.ADMIN_EMAIL}", "aud": f"{parsed.scheme}://{parsed.netloc}"},
             )
             result.sent.append(subscriber_id)
 
         except WebPushException as ex:
             if ex.response is not None and ex.response.status_code == 410:
                 result.expired.append(subscriber_id)
-                logger.warning(
-                    "Subscription expired (410) subscriber_id=%s — should be removed",
-                    subscriber_id,
-                )
             else:
                 result.failed.append(subscriber_id)
                 logger.error(
@@ -143,5 +140,12 @@ async def send_notifications_to_subscribers(
         len(result.failed),
         len(result.expired),
     )
+
+    if result.expired:
+        logger.warning(
+            "Expired push tokens (%d):\n%s",
+            len(result.expired),
+            "\n".join(f"- {token}" for token in result.expired),
+        )
 
     return result
