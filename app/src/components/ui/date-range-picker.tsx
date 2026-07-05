@@ -41,7 +41,7 @@ export function DateRangePicker({ className, contentClassName, value, onChange, 
                         )}
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent className={cn("w-auto p-0", contentClassName)}>
+                <PopoverContent align="start" className={cn("p-0 w-screen max-w-[calc(100vw-16rem)] md:max-w-md", contentClassName)}>
                     <Calendar
                         defaultMonth={value?.from}
                         mode="range"

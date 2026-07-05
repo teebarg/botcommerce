@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocation, useSearch } from "@tanstack/react-router";
-import { Calendar, Check, ChevronsUpDown, SlidersHorizontal, X } from "lucide-react";
+import { Check, ChevronsUpDown, SlidersHorizontal, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -161,6 +161,59 @@ export function GalleryFilters() {
                 <div className="space-y-5 p-5">
                     <div className="space-y-2">
                         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                            Upload date
+                        </Label>
+                        <div className="grid grid-cols-4 gap-1">
+                            {[
+                                { days: 0, label: "Today" },
+                                { days: 7, label: "7d" },
+                                { days: 14, label: "14d" },
+                                { days: 30, label: "30d" },
+                            ].map(({ days, label }) => (
+                                <Button
+                                    key={days}
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 px-0 text-xs"
+                                    onClick={() => setDraft((d) => ({ ...d, ...applyDatePreset(days) }))}
+                                >
+                                    {label}
+                                </Button>
+                            ))}
+                        </div>
+                        <DateRangePicker
+                            placeholder="Custom range..."
+                            value={
+                                draft.start_date
+                                    ? {
+                                            from: new Date(draft.start_date),
+                                            to: draft.end_date ? new Date(draft.end_date) : undefined,
+                                        }
+                                    : undefined
+                            }
+                            onChange={(range) => {
+                                if (range?.from && range?.to) {
+                                    setDraft((d) => ({
+                                        ...d,
+                                        start_date: range.from!.toISOString(),
+                                        end_date: range.to!.toISOString(),
+                                    }));
+                                }
+                            }}
+                        />
+                        {draft.start_date && (
+                            <button
+                                onClick={() => setDraft((d) => ({ ...d, start_date: "", end_date: "" }))}
+                                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                                <X className="h-3 w-3" />
+                                Clear date
+                            </button>
+                        )}
+                    </div>
+                    <div className="space-y-2">
+                        <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                             Product name
                         </Label>
                         <Input
@@ -238,66 +291,6 @@ export function GalleryFilters() {
                             </button>
                         )}
                     </div>
-
-                    <div className="space-y-2">
-                        <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                            Upload date
-                        </Label>
-                        <div className="grid grid-cols-4 gap-1">
-                            {[
-                                { days: 0, label: "Today" },
-                                { days: 7, label: "7d" },
-                                { days: 14, label: "14d" },
-                                { days: 30, label: "30d" },
-                            ].map(({ days, label }) => (
-                                <Button
-                                    key={days}
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-8 px-0 text-xs"
-                                    onClick={() => setDraft((d) => ({ ...d, ...applyDatePreset(days) }))}
-                                >
-                                    {label}
-                                </Button>
-                            ))}
-                        </div>
-                        <div className="relative">
-                            <Calendar className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none z-10" />
-                            <DateRangePicker
-                                className="[&_button]:h-8 [&_button]:pl-8 [&_button]:text-xs"
-                                contentClassName="w-[50vw]"
-                                placeholder="Custom range..."
-                                value={
-                                    draft.start_date
-                                        ? {
-                                              from: new Date(draft.start_date),
-                                              to: draft.end_date ? new Date(draft.end_date) : undefined,
-                                          }
-                                        : undefined
-                                }
-                                onChange={(range) => {
-                                    if (range?.from && range?.to) {
-                                        setDraft((d) => ({
-                                            ...d,
-                                            start_date: range.from!.toISOString(),
-                                            end_date: range.to!.toISOString(),
-                                        }));
-                                    }
-                                }}
-                            />
-                        </div>
-                        {draft.start_date && (
-                            <button
-                                onClick={() => setDraft((d) => ({ ...d, start_date: "", end_date: "" }))}
-                                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                            >
-                                <X className="h-3 w-3" />
-                                Clear date
-                            </button>
-                        )}
-                    </div>
-
                     <div className="space-y-2">
                         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Sort by</Label>
                         <ToggleGroup
