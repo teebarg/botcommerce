@@ -54,7 +54,7 @@ export const AbandonedCartStats = ({ stat, isLoading }: AbandonedCartStatsProps)
     return (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
             {stats.map((stat, idx: number) => (
-                <Card key={idx} className="border-t-4 border-t-accent-subtle">
+                <Card key={idx} className="border-t-4 border-t-accent">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">{stat.title}</CardTitle>
                         <stat.icon className={`h-5 w-5 ${stat.color}`} />

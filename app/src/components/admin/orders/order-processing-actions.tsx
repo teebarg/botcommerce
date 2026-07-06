@@ -13,10 +13,10 @@ interface OrderProcessingActionProps {
 const statusConfig: Record<OrderStatus, { nextStatus: OrderStatus | null; actionLabel: string; variant: ButtonVariant }> = {
     [OrderStatus.REFUNDED]: { nextStatus: null, actionLabel: "", variant: "destructive" },
     [OrderStatus.PENDING]: { nextStatus: OrderStatus.PROCESSING, actionLabel: "Mark as Processing", variant: "warning" },
-    [OrderStatus.PROCESSING]: { nextStatus: OrderStatus.SHIPPED, actionLabel: "Order Packed", variant: "warning-subtle" },
-    [OrderStatus.SHIPPED]: { nextStatus: OrderStatus.OUT_FOR_DELIVERY, actionLabel: "Mark Out for Delivery", variant: "accent-subtle" },
-    [OrderStatus.OUT_FOR_DELIVERY]: { nextStatus: OrderStatus.DELIVERED, actionLabel: "Mark Delivered", variant: "accent" },
-    [OrderStatus.DELIVERED]: { nextStatus: null, actionLabel: "", variant: "success" },
+    [OrderStatus.PROCESSING]: { nextStatus: OrderStatus.SHIPPED, actionLabel: "Mark as Order Packed", variant: "default" },
+    [OrderStatus.SHIPPED]: { nextStatus: OrderStatus.OUT_FOR_DELIVERY, actionLabel: "Mark Out for Delivery", variant: "accent" },
+    [OrderStatus.OUT_FOR_DELIVERY]: { nextStatus: OrderStatus.DELIVERED, actionLabel: "Mark Delivered", variant: "success" },
+    [OrderStatus.DELIVERED]: { nextStatus: null, actionLabel: "", variant: "outline" },
     [OrderStatus.CANCELED]: { nextStatus: null, actionLabel: "", variant: "destructive" },
 };
 
@@ -40,7 +40,7 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
                 open={paymentState.isOpen}
                 onOpenChange={paymentState.setOpen}
                 trigger={
-                    <Button variant="warning-subtle" size="sm" className="rounded-full text-xs">
+                    <Button variant="inverse" size="sm" className="rounded-full text-xs">
                         Update payment
                     </Button>
                 }
@@ -73,7 +73,7 @@ const OrderProcessingAction: React.FC<OrderProcessingActionProps> = ({ order }) 
                 open={stateState.isOpen}
                 onOpenChange={stateState.setOpen}
                 trigger={
-                    <Button size="sm" className="rounded-full text-xs" disabled={isPending} isLoading={isPending}>
+                    <Button variant={config.variant} size="sm" className="rounded-full text-xs" disabled={isPending} isLoading={isPending}>
                         {config.actionLabel}
                     </Button>
                 }
