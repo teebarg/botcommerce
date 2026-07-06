@@ -1,5 +1,6 @@
 from typing import Annotated, Optional, List
 from fastapi import APIRouter, Depends, HTTPException, Cookie, Query, Request
+from prisma.errors import PrismaError
 from app.core.deps import UserDep, CurrentUser
 from app.models.coupon import (
     CouponCreate,
@@ -9,7 +10,6 @@ from app.models.coupon import (
 )
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
-from prisma.errors import PrismaError
 from datetime import datetime, date
 from app.core.permissions import require_admin
 from app.models.generic import Message

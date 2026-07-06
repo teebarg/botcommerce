@@ -24,11 +24,11 @@ build-no-cache:
 
 .PHONY: up
 up:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) --profile dev up --build
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) --profile dev up
 
 .PHONY: up-backend
 up-backend:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) --profile backend-only up --build
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) --profile backend-only up
 
 .PHONY: update
 update:
@@ -87,11 +87,11 @@ uv-lock:
 # ==========================================
 .PHONY: dpf
 dpf:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) prisma format
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec shop-api uv run prisma format
 
 .PHONY: dpg
 dpg:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) prisma generate
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec shop-api uv run prisma generate
 
 .PHONY: dpm
 dpm:

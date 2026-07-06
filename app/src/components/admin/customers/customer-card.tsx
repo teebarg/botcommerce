@@ -3,11 +3,11 @@ import { Badge } from "@/components/ui/badge";
 import CustomerActions from "./customer-actions";
 import { timeAgo } from "@/utils";
 
-interface CustomerCardProps {
+interface Props {
     user: User;
 }
 
-const CustomerCard = ({ user }: CustomerCardProps) => {
+const CustomerCard = ({ user }: Props) => {
     const fullName = `${user?.first_name} ${user?.last_name}`;
 
     const getStatusBadge = (status?: any) => {
@@ -22,12 +22,15 @@ const CustomerCard = ({ user }: CustomerCardProps) => {
     return (
         <div className="bg-card rounded-2xl border border-border overflow-hidden">
             <div className="flex items-start justify-between gap-4 p-4">
-                <div className="min-w-0 space-y-1.5">
-                    <p className="text-xs font-medium uppercase text-muted-foreground truncate">
+                <div className="min-w-0 space-y-1.5 text-xs">
+                    <p className="font-medium uppercase text-muted-foreground truncate">
                         {fullName}
                     </p>
                     <h3 className="text-sm font-medium truncate">{user.email}</h3>
-                    <div className="text-xs text-muted-foreground">
+                    {user.phone && (
+                        <p className="font-medium">{user.phone}</p>
+                    )}
+                    <div className="text-muted-foreground">
                         {timeAgo(user?.created_at)}
                     </div>
                 </div>

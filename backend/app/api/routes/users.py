@@ -2,12 +2,12 @@ from typing import Optional
 from app.core.dependencies.cache import CacheDep
 from app.services.cache import cacheable
 from fastapi import APIRouter, HTTPException, Query, Depends, Request
+from prisma.errors import PrismaError
+from prisma.enums import Role, Status
 from app.core.deps import CurrentUser
 from app.models.wishlist import Wishlists, WishlistCreate
 from app.models.generic import Message
 from app.prisma_client import prisma as db
-from prisma.errors import PrismaError
-from prisma.enums import Role, Status
 from app.models.user import User, UserSelf, UserAdmin, UserUpdateMe, UserUpdate, PaginatedUsers, GuestUserCreate
 from app.core.security import get_password_hash
 from app.core.permissions import require_admin
@@ -39,34 +39,37 @@ async def read_user_me(
 async def update_user_me(
     user_in: UserUpdateMe,
     user: CurrentUser,
+    cache_srv: CacheDep
 ) -> User:
     """
     Update own user.
     """
-    if user_in.email:
-        existing = await db.user.find_unique(
-            where={
-                "email": user_in.email,
-                "NOT": {
-                    "id": user.id
-                }
-            }
-        )
-        if existing:
-            raise HTTPException(status_code=400, detail="Email already registered")
-
+    # if user_in.email:
+    #     existing = await db.user.find_unique(
+    #         where={
+    #             "email": user_in.email,
+    #             "NOT": {
+    #                 "id": user.id
+    #             }
+    #         }
+    #     )
+    #     if existing:
+    #         raise HTTPException(status_code=400, detail="Email already registered")
     try:
         update = await db.user.update(
             where={"id": user.id},
             data=user_in.model_dump(exclude_unset=True)
         )
+        await cache_srv.invalidate(tags=["users"])
         return update
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.get("/", dependencies=[Depends(require_admin)])
+@cacheable(key_prefix="users", tags=["users"])
 async def index(
+    request: Request,
     query: str = "",
     role: Optional[Role] = None,
     status: Optional[Status] = None,
@@ -101,15 +104,15 @@ async def index(
     )
     items = users[:limit]
 
-    return {
+    return PaginatedUsers.validate({
         "items": items,
         "next_cursor": items[-1].id if len(users) > limit else None,
         "limit": limit
-    }
+    })
 
 
 @router.post("/create-guest", dependencies=[Depends(require_admin)])
-async def create_guest_user(payload: GuestUserCreate) -> User:
+async def create_guest_user(payload: GuestUserCreate, cache_srv: CacheDep) -> User:
     """
     Admin-only: Create a new user with an email in the guest.com domain.
     """
@@ -119,8 +122,8 @@ async def create_guest_user(payload: GuestUserCreate) -> User:
             safe = safe.replace("..", ".")
         return safe.strip('.')
 
-    username = f"{normalize(payload.first_name)}.{normalize(payload.last_name)}"
-    email = f"{username}@guest.com"
+    username: str = f"{normalize(payload.first_name)}.{normalize(payload.last_name)}"
+    email: str = f"{username}@guest.com"
 
     existing = await db.user.find_unique(where={"email": email})
     if existing:
@@ -137,6 +140,7 @@ async def create_guest_user(payload: GuestUserCreate) -> User:
                 "status": "ACTIVE",
             }
         )
+        await cache_srv.invalidate(tags=["users"])
         return created
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -144,9 +148,9 @@ async def create_guest_user(payload: GuestUserCreate) -> User:
 
 @router.patch("/{id}", dependencies=[Depends(require_admin)])
 async def update(
-    *,
     id: int,
     update_data: UserUpdate,
+    cache_srv: CacheDep
 ) -> UserAdmin:
     """
     Update a user.
@@ -162,13 +166,14 @@ async def update(
             where={"id": id},
             data=update_data.model_dump(exclude_unset=True)
         )
+        await cache_srv.invalidate(tags=["users"])
         return update
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete(id: int) -> Message:
+async def delete(id: int, cache_srv: CacheDep) -> Message:
     """
     Delete a user.
     """
@@ -182,6 +187,7 @@ async def delete(id: int) -> Message:
         await db.user.delete(
             where={"id": id}
         )
+        await cache_srv.invalidate(tags=["users"])
         return Message(message="User deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
