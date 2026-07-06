@@ -24,7 +24,7 @@ const discountBadgeVariants = cva(
             variant: {
                 sale: [
                     "bg-gradient-action px-3 py-1.5 rounded-lg",
-                    "shadow-accent hover:shadow-accent-subtle",
+                    "shadow-accent hover:shadow-accent",
                     "before:content-[''] before:absolute before:inset-0",
                     "before:bg-gradient-to-r before:from-transparent before:via-white/30 before:to-transparent",
                     "before:animate-shimmer before:bg-[length:200%_100%]",

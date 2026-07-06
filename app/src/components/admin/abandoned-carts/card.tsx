@@ -77,7 +77,7 @@ export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
                                                 />
                                             </div>
                                             {item.quantity > 1 && (
-                                                <Badge className="absolute top-0 -right-3 h-5 w-5 p-0 justify-center" variant="accent-subtle">
+                                                <Badge className="absolute top-0 -right-3 h-5 w-5 p-0 justify-center" variant="accent">
                                                     {item.quantity}
                                                 </Badge>
                                             )}

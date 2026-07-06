@@ -238,6 +238,8 @@ export const GalleryQuerySchema = z.object({
     out_of_stock: booleanParam,
     category_slug: z.string().optional(),
     name: z.string().optional(),
+    start_date: z.string().optional(),
+    end_date: z.string().optional(),
 });
 
 export type FeedQuery = z.infer<typeof FeedQuerySchema>;

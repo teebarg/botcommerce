@@ -14,6 +14,7 @@ import type { Message } from "@/schemas";
 import { useConfig } from "@/providers/store-provider";
 import { api } from "@/utils/api";
 import { cn } from "@/utils";
+import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_mainLayout/bulk")({
     component: RouteComponent,
@@ -167,9 +168,9 @@ function RouteComponent() {
                                             <div className="flex items-center gap-2 mb-0.5">
                                                 <span className="text-sm font-medium text-foreground">{option.name}</span>
                                                 {option.popular && (
-                                                    <span className="text-2xs font-medium bg-warning-subtle text-warning-subtle-foreground px-2 py-0.5 rounded-full">
+                                                    <Badge variant="accent">
                                                         Popular
-                                                    </span>
+                                                    </Badge>
                                                 )}
                                             </div>
                                             <p className="text-xs text-muted-foreground">{option.description}</p>

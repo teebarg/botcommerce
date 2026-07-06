@@ -103,8 +103,8 @@ function RouteComponent() {
                 <div
                     className="bg-card rounded-2xl p-4 text-center border border-border"
                 >
-                    <div className="w-10 h-10 mx-auto rounded-xl bg-accent-subtle flex items-center justify-center mb-2">
-                        <Wallet className="w-5 h-5 text-accent-subtle-foreground" />
+                    <div className="w-10 h-10 mx-auto rounded-xl bg-accent flex items-center justify-center mb-2">
+                        <Wallet className="w-5 h-5 text-accent-foreground" />
                     </div>
                     <p className="text-xl font-bold">{currency(me.wallet_balance)}</p>
                     <p className="text-xs text-muted-foreground">Wallet Balance</p>

@@ -15,6 +15,7 @@ services:
     volumes:
       - ./app:/app
       - /app/node_modules
+      - app-node-modules:/app/node_modules
     depends_on:
       shop-api:
         condition: service_healthy
@@ -103,5 +104,6 @@ networks:
     external: true
 
 volumes:
+  app-node-modules:
   uv-cache:
   uva-cache:

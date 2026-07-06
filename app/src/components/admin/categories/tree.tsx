@@ -106,8 +106,8 @@ const CategoryTree: React.FC<Props> = ({ data, isPending }) => {
                 <div className="space-y-2">
                     <div className="sticky top-16 z-10 bg-background space-y-2">
                         {hasChanges && (
-                            <div className="flex items-center justify-between gap-4 bg-warning-subtle border border-warning/20 rounded-xl px-4 py-2.5">
-                                <p className="text-xs text-warning-subtle-foreground">
+                            <div className="flex items-center justify-between gap-4 bg-secondary rounded-xl px-4 py-2.5">
+                                <p className="text-xs text-muted-foreground">
                                     You have unsaved order changes
                                 </p>
                                 <Button

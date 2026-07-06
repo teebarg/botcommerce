@@ -15,6 +15,7 @@ import { Category } from "@/schemas";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/utils";
 import { Input } from "@/components/ui/input";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
 
 type Filters = {
     sort: "newest" | "oldest";
@@ -22,6 +23,8 @@ type Filters = {
     out_of_stock: boolean;
     category_slug: string;
     name: string;
+    start_date: string;
+    end_date: string;
 };
 
 const DEFAULTS: Filters = {
@@ -30,6 +33,8 @@ const DEFAULTS: Filters = {
     out_of_stock: false,
     category_slug: "",
     name: "",
+    start_date: "",
+    end_date: "",
 };
 
 function parseFilters(search: Record<string, unknown>): Filters {
@@ -39,6 +44,8 @@ function parseFilters(search: Record<string, unknown>): Filters {
         out_of_stock: search.out_of_stock ? true : false,
         category_slug: typeof search.category_slug === "string" ? search.category_slug : "",
         name: typeof search.name === "string" ? search.name : "",
+        start_date: typeof search.start_date === "string" ? search.start_date : "",
+        end_date: typeof search.end_date === "string" ? search.end_date : "",
     };
 }
 
@@ -49,7 +56,19 @@ function countActiveFilters(filters: Filters): number {
     if (filters.out_of_stock !== DEFAULTS.out_of_stock) count++;
     if (filters.category_slug !== DEFAULTS.category_slug) count++;
     if (filters.name !== DEFAULTS.name) count++;
+    if (filters.start_date) count++;
     return count;
+}
+
+function applyDatePreset(days: number): Pick<Filters, "start_date" | "end_date"> {
+    const to = new Date();
+    const from = new Date();
+    if (days === 0) {
+        from.setHours(0, 0, 0, 0);
+    } else {
+        from.setDate(from.getDate() - days);
+    }
+    return { start_date: from.toISOString(), end_date: to.toISOString() };
 }
 
 export function GalleryFilters() {
@@ -65,7 +84,7 @@ export function GalleryFilters() {
 
     useEffect(() => {
         setDraft(parseFilters(search));
-    }, [search.sort, search.active, search.out_of_stock, search.category_slug, search.name]);
+    }, [search.sort, search.active, search.out_of_stock, search.category_slug, search.name, search.start_date, search.end_date]);
 
     function handleApply() {
         updateQuery([
@@ -74,6 +93,8 @@ export function GalleryFilters() {
             { key: "out_of_stock", value: draft.out_of_stock ? true : "" },
             { key: "category_slug", value: draft.category_slug },
             { key: "name", value: draft.name },
+            { key: "start_date", value: draft.start_date },
+            { key: "end_date", value: draft.end_date },
         ]);
         setOpen(false);
     }
@@ -86,17 +107,22 @@ export function GalleryFilters() {
             { key: "out_of_stock", value: "" },
             { key: "category_slug", value: "" },
             { key: "name", value: "" },
+            { key: "start_date", value: "" },
+            { key: "end_date", value: "" },
         ]);
         setOpen(false);
     }
 
-    const activeCount = countActiveFilters(parseFilters(search));
+    const applied = parseFilters(search);
+    const activeCount = countActiveFilters(applied);
     const isDirty =
-        draft.sort !== parseFilters(search).sort ||
-        draft.active !== parseFilters(search).active ||
-        draft.out_of_stock !== parseFilters(search).out_of_stock ||
-        draft.category_slug !== parseFilters(search).category_slug ||
-        draft.name !== parseFilters(search).name;
+        draft.sort !== applied.sort ||
+        draft.active !== applied.active ||
+        draft.out_of_stock !== applied.out_of_stock ||
+        draft.category_slug !== applied.category_slug ||
+        draft.name !== applied.name ||
+        draft.start_date !== applied.start_date ||
+        draft.end_date !== applied.end_date;
 
     const selectedCategory = categories.find((c: Category) => c.slug === draft.category_slug);
 
@@ -116,7 +142,7 @@ export function GalleryFilters() {
                 </Button>
             </PopoverTrigger>
 
-            <PopoverContent align="end" className="w-72 p-0">
+            <PopoverContent align="end" className="w-96 p-0">
                 <div className="flex items-center justify-between px-4 py-3">
                     <span className="text-sm font-medium">Filters</span>
                     {activeCount > 0 && (
@@ -133,6 +159,59 @@ export function GalleryFilters() {
                 <Separator />
 
                 <div className="space-y-5 p-5">
+                    <div className="space-y-2">
+                        <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                            Upload date
+                        </Label>
+                        <div className="grid grid-cols-4 gap-1">
+                            {[
+                                { days: 0, label: "Today" },
+                                { days: 7, label: "7d" },
+                                { days: 14, label: "14d" },
+                                { days: 30, label: "30d" },
+                            ].map(({ days, label }) => (
+                                <Button
+                                    key={days}
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 px-0 text-xs"
+                                    onClick={() => setDraft((d) => ({ ...d, ...applyDatePreset(days) }))}
+                                >
+                                    {label}
+                                </Button>
+                            ))}
+                        </div>
+                        <DateRangePicker
+                            placeholder="Custom range..."
+                            value={
+                                draft.start_date
+                                    ? {
+                                            from: new Date(draft.start_date),
+                                            to: draft.end_date ? new Date(draft.end_date) : undefined,
+                                        }
+                                    : undefined
+                            }
+                            onChange={(range) => {
+                                if (range?.from && range?.to) {
+                                    setDraft((d) => ({
+                                        ...d,
+                                        start_date: range.from!.toISOString(),
+                                        end_date: range.to!.toISOString(),
+                                    }));
+                                }
+                            }}
+                        />
+                        {draft.start_date && (
+                            <button
+                                onClick={() => setDraft((d) => ({ ...d, start_date: "", end_date: "" }))}
+                                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                                <X className="h-3 w-3" />
+                                Clear date
+                            </button>
+                        )}
+                    </div>
                     <div className="space-y-2">
                         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                             Product name
@@ -212,7 +291,6 @@ export function GalleryFilters() {
                             </button>
                         )}
                     </div>
-
                     <div className="space-y-2">
                         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Sort by</Label>
                         <ToggleGroup

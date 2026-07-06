@@ -27,11 +27,13 @@ async def image_gallery(
     out_of_stock: bool = Query(default=False),
     category_slug: Optional[str] = Query(default=None),
     name: Optional[str] = Query(default=None),
+    start_date: Optional[str] = Query(default=None),
+    end_date: Optional[str] = Query(default=None),
 ) -> PaginatedProductImages:
     """Image gallery endpoint using cursor-based pagination."""
     items = await srv.get_gallery_items(
         cursor=cursor, limit=limit, sort=sort, active=active, out_of_stock=out_of_stock,
-        category_slug=category_slug, name=name,
+        category_slug=category_slug, name=name, start_date=start_date, end_date=end_date,
     )
     return PaginatedProductImages.validate(items)
 

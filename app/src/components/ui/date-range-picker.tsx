@@ -11,12 +11,13 @@ import { cn } from "@/utils";
 
 interface DateRangePickerProps {
     className?: string;
+    contentClassName?: string;
     value?: DateRange;
     onChange?: (date: DateRange | undefined) => void;
     placeholder?: string;
 }
 
-export function DateRangePicker({ className, value, onChange, placeholder = "Pick a date range" }: DateRangePickerProps) {
+export function DateRangePicker({ className, contentClassName, value, onChange, placeholder = "Pick a date range" }: DateRangePickerProps) {
     return (
         <div className={cn("grid gap-2", className)}>
             <Popover>
@@ -40,8 +41,14 @@ export function DateRangePicker({ className, value, onChange, placeholder = "Pic
                         )}
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent align="start" className="w-auto p-0">
-                    <Calendar initialFocus defaultMonth={value?.from} mode="range" numberOfMonths={2} selected={value} onSelect={onChange} />
+                <PopoverContent align="start" className={cn("p-0 w-screen max-w-[calc(100vw-16rem)] md:max-w-md", contentClassName)}>
+                    <Calendar
+                        defaultMonth={value?.from}
+                        mode="range"
+                        numberOfMonths={2}
+                        selected={value}
+                        onSelect={onChange}
+                    />
                 </PopoverContent>
             </Popover>
         </div>

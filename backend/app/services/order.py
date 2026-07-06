@@ -86,10 +86,12 @@ class OrderService:
             where["order_number"] = order_number
         if user_role == "CUSTOMER":
             where["user_id"] = user_id
-        if start_date:
-            where["created_at"] = {"gte": start_date}
-        if end_date:
-            where["created_at"] = {"lte": end_date}
+        if start_date or end_date:
+            where["created_at"] = {}
+            if start_date:
+                where["created_at"]["gte"] = start_date
+            if end_date:
+                where["created_at"]["lte"] = end_date
 
         orders = await self.db.order.find_many(
             where=where,

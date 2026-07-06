@@ -63,12 +63,12 @@ const PendingPayment: React.FC<OrderConfirmationProps> = ({ order, onContinueSho
 
             {order?.payment_method === "BANK_TRANSFER" && (
                 <FadeInComponent delay="200ms">
-                    <div className="rounded-xl border border-accent/30 bg-accent-subtle p-4 mb-4">
+                    <div className="rounded-xl border bg-card p-4 mb-4">
                         <div className="flex items-center gap-2 mb-2">
-                            <AlertCircle className="w-4 h-4 text-accent-subtle-foreground" />
-                            <span className="text-sm font-medium text-accent-subtle-foreground">Next steps</span>
+                            <AlertCircle className="w-4 h-4 text-accent" />
+                            <span className="text-sm font-medium text-accent">Next steps</span>
                         </div>
-                        <ul className="text-sm text-accent-subtle-foreground/90 space-y-1 pl-1">
+                        <ul className="text-sm text-muted-foreground space-y-1 pl-1">
                             <li>· Transfer the exact amount to our bank account</li>
                             <li>· Include order number {order.order_number} in the description</li>
                             <li>· We'll process your order once payment is confirmed</li>

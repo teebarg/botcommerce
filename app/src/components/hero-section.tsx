@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { currency } from "@/utils";
+import { Badge } from "./ui/badge";
 
 interface HeroSectionProps {
     image: string;
@@ -12,9 +13,7 @@ export default function HeroSection({ image }: HeroSectionProps) {
                 <img src={image} alt="New collection" className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 px-5 pb-8 space-y-3">
-                    <span className="inline-block bg-white/15 text-white text-xs font-medium px-3 py-1 rounded-full tracking-wide">
-                        New In
-                    </span>
+                    <Badge type="full" className="bg-white/15 text-white text-xs px-3 py-1 tracking-wide" variant="ghost">New In</Badge>
                     <h1 className="text-3xl font-display font-semibold text-white leading-tight">
                         Premium<br />Collection
                     </h1>

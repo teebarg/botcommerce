@@ -37,7 +37,7 @@ export default function Trending({ products, isLoading }: { products: ProductSea
                         />
                     </div>
                     <div className="p-3 shrink-0">
-                        <span className="text-xs bg-accent-subtle text-accent-subtle-foreground px-2 py-0.5 rounded-full font-medium">Hot</span>
+                        <span className="text-xs bg-accent text-accent-foreground px-2 py-0.5 rounded-full font-medium">Hot</span>
                         <p className="text-sm font-medium mt-1.5 truncate">{hero?.name}</p>
                         <p className="text-xs text-muted-foreground">{currency(hero?.variants?.[0]?.price ?? 0)}</p>
                     </div>

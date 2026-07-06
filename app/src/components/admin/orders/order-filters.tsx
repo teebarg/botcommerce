@@ -3,7 +3,6 @@ import { useMemo, useState } from "react";
 import {
     Search,
     SlidersHorizontal,
-    Calendar,
     Clock,
     PackageSearch,
     Truck,
@@ -189,29 +188,26 @@ export const OrderFilters: React.FC = () => {
                                     <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Creation Date Window</label>
                                     <div className="grid grid-cols-4 gap-1.5 text-xs">
                                         {[
-                                            { key: 0, label: "Today" }, 
-                                            { key: 7, label: "7 Days" }, 
-                                            { key: 14, label: "14 Days" }, 
+                                            { key: 0, label: "Today" },
+                                            { key: 7, label: "7 Days" },
+                                            { key: 14, label: "14 Days" },
                                             { key: 30, label: "30 Days" }
                                         ].map((i) => (
                                             <button key={i.key} onClick={() => applyDatePreset(i.key)} className="h-9 rounded-lg border border-border bg-card/20 font-medium hover:bg-muted transition-colors">{i.label}</button>
                                         ))}
                                     </div>
-                                    <div className="relative pt-1 custom-sheet-calendar-wrapper">
-                                        <Calendar className="absolute left-3 top-[17px] h-4 w-4 text-muted-foreground opacity-60 z-10 pointer-events-none" />
-                                        <DateRangePicker
-                                            placeholder="Or select a custom range..."
-                                            value={search.start_date ? { from: new Date(search.start_date), to: search.end_date ? new Date(search.end_date) : undefined } : undefined}
-                                            onChange={(range) => {
-                                                if (range?.from && range?.to) {
-                                                    updateQuery([
-                                                        { key: "start_date", value: range.from.toISOString() },
-                                                        { key: "end_date", value: range.to.toISOString() },
-                                                    ]);
-                                                }
-                                            }}
-                                        />
-                                    </div>
+                                    <DateRangePicker
+                                        placeholder="Or select a custom range..."
+                                        value={search.start_date ? { from: new Date(search.start_date), to: search.end_date ? new Date(search.end_date) : undefined } : undefined}
+                                        onChange={(range) => {
+                                            if (range?.from && range?.to) {
+                                                updateQuery([
+                                                    { key: "start_date", value: range.from.toISOString() },
+                                                    { key: "end_date", value: range.to.toISOString() },
+                                                ]);
+                                            }
+                                        }}
+                                    />
                                 </div>
                             </div>
                             <div className="p-4 border-t border-border bg-card/20 flex gap-2">
