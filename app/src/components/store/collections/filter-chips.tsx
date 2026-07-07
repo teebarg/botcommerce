@@ -53,8 +53,8 @@ const chipCn = (active: boolean) =>
     cn(
         "flex items-center gap-1 shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors",
         active
-            ? "bg-primary/10 text-primary border-transparent"
-            : "bg-transparent text-foreground border-foreground/40 hover:border-foreground/30"
+            ? "bg-destructive/20 text-destructive border-transparent"
+            : "bg-transparent text-foreground border-foreground/30 hover:border-foreground/30"
     );
 
 const FilterChips = () => {
@@ -63,7 +63,7 @@ const FilterChips = () => {
 
     return (
         <div
-            className="flex gap-1 z-50 overflow-x-auto -mx-2 md:mx-0 px-2 md:px-0 py-3.5 scrollbar-hide sticky bg-background/60 backdrop-blur-md"
+            className="flex gap-1 z-50 overflow-x-auto -mx-2 md:mx-0 px-2 md:px-0 py-3.5 scrollbar-hide sticky glass"
             style={{ top: "var(--nav-height)" }}
             role="tablist"
             aria-label="Discovery filters"

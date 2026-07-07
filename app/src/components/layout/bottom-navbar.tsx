@@ -19,7 +19,7 @@ const ButtonNav = () => {
 
     return (
         <nav
-            className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/60 backdrop-blur-md shadow-xl flex items-center justify-between px-8 pt-3 text-2xs"
+            className="md:hidden fixed bottom-0 inset-x-0 z-40 glass shadow-xl flex items-center justify-between px-8 pt-3 text-2xs"
             style={{ paddingBottom: `calc(var(--sab) + 12px)` }}
         >
             {nav.map((item: NavLink, idx: number) => (
