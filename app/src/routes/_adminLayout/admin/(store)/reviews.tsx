@@ -32,12 +32,12 @@ function RouteComponent() {
     });
 
     return (
-        <div className="px-2 py-4">
+        <div className="px-2 py-4 max-w-5xl">
             <div>
                 <h1 className="text-lg font-semibold">Reviews</h1>
                 <p className="text-muted-foreground text-sm">Manage your product reviews</p>
             </div>
-            <div className="glass sticky top-[calc(var(--sat)+var(--admin-nav-height))] z-40 -mx-2 p-2 mb-4">
+            <div className="glass sticky top-[calc(var(--sat)+var(--admin-nav-height))] z-40 -mx-2 p-2 mt-4 mb-2">
                 <Input
                     className="bg-card"
                     placeholder="Search reviews..."
