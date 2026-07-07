@@ -132,7 +132,7 @@ class GalleryService:
         return await self.db.query_raw(query, *args)
 
     async def get_gallery_items(self, **kwargs) -> PaginatedProductImages:
-        limit = kwargs.get("limit", 36)
+        limit = kwargs.get("limit", 40)
         try:
             images = await self.get_paginated_gallery(**kwargs)
         except Exception as e:

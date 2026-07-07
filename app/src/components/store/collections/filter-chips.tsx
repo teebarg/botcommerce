@@ -16,14 +16,14 @@ type FilterDef = {
 );
 
 const FILTERS: FilterDef[] = [
-    {
-        id: "for-you",
-        label: "For you",
-        icon: Sparkles,
-        to: "/collections",
-        isActive: (pathname, search) =>
-            pathname === "/collections" && !search.slug && !search.min_price,
-    },
+    // {
+    //     id: "for-you",
+    //     label: "For you",
+    //     icon: Sparkles,
+    //     to: "/collections",
+    //     isActive: (pathname, search) =>
+    //         pathname === "/collections" && !search.slug && !search.min_price,
+    // },
     {
         id: "trending",
         label: "Trending",
@@ -35,6 +35,7 @@ const FILTERS: FilterDef[] = [
     {
         id: "new-arrivals",
         label: "New arrivals",
+        icon: Sparkles,
         to: "/collections/$slug",
         params: { slug: "new-arrivals" },
         isActive: (pathname, _) => pathname == "/collections/new-arrivals",

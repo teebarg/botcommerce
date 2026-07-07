@@ -121,7 +121,6 @@ class FeedProducts(BaseModel):
     products: List[ProductSearch]
     total_count: int
     limit: int
-    feed_seed: float | None
     next_cursor: str | None
 
 class SearchProducts(BaseModel):
