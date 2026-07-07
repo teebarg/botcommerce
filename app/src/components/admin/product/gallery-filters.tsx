@@ -192,7 +192,7 @@ export function GalleryFilters() {
                                         All categories
                                     </SelectItem>
                                     {categories.map((item: Category) => (
-                                        <SelectItem key={item.slug} value={item.name}>
+                                        <SelectItem key={item.slug} value={item.slug}>
                                             {item.name}
                                         </SelectItem>
                                     ))}
