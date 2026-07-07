@@ -384,6 +384,7 @@ class ProductService:
                         "images": True,
                         "shared_collections": True,
                     },
+                    where={"active": True},
                     take=BATCH_SIZE,
                     skip=skip
                 )
