@@ -91,11 +91,6 @@ const AccountItems = [
 ];
 
 const storeItems = [
-    // {
-    //     title: "Products",
-    //     url: "/admin/products",
-    //     icon: Box,
-    // },
     {
         title: "Gallery",
         url: "/admin/gallery",
@@ -164,7 +159,7 @@ export function AdminSidebar() {
                             {AdminItems.map((item, idx: number) => (
                                 <SidebarMenuItem key={idx}>
                                     <SidebarMenuButton asChild>
-                                        <LocalizedClientLink href={item.url} active="bg-primary/20 text-primary">
+                                        <LocalizedClientLink href={item.url} active="bg-primary/20 text-primary" className="text-sm">
                                             <item.icon />
                                             <span>{item.title}</span>
                                         </LocalizedClientLink>
@@ -181,7 +176,7 @@ export function AdminSidebar() {
                             {storeItems.map((item, idx: number) => (
                                 <SidebarMenuItem key={idx}>
                                     <SidebarMenuButton asChild>
-                                        <LocalizedClientLink href={item.url} active="bg-primary/20 text-primary">
+                                        <LocalizedClientLink href={item.url} active="bg-primary/20 text-primary" className="text-sm">
                                             <item.icon />
                                             <span>{item.title}</span>
                                         </LocalizedClientLink>
@@ -198,7 +193,7 @@ export function AdminSidebar() {
                             {AccountItems.map((item, idx: number) => (
                                 <SidebarMenuItem key={idx}>
                                     <SidebarMenuButton asChild>
-                                        <LocalizedClientLink href={item.url} active="bg-primary/20 text-primary">
+                                        <LocalizedClientLink href={item.url} active="bg-primary/20 text-primary" className="text-sm">
                                             <item.icon />
                                             <span>{item.title}</span>
                                         </LocalizedClientLink>
