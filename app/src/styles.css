@@ -293,7 +293,7 @@
     }
 
     .glass {
-        @apply bg-background/80 backdrop-blur-md;
+        @apply bg-background/70 backdrop-blur-md;
     }
 
     .carousel-nav-link {

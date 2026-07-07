@@ -4,7 +4,6 @@ from typing import Any, Optional
 from meilisearch import Client
 from meilisearch.errors import MeilisearchApiError
 from anyio import to_thread
-
 from app.core.config import settings
 from app.core.logging import get_logger
 from json import JSONEncoder
@@ -14,7 +13,7 @@ from uuid import UUID
 client = Client(settings.MEILI_HOST, settings.MEILI_MASTER_KEY)
 
 REQUIRED_FILTERABLES: list[str] = ["id", "category_slugs", "collection_slugs", "name", "max_variant_price", "min_variant_price", "active", "sizes", "colors", "ages", "widths", "lengths"]
-REQUIRED_SORTABLES: list[str] = ["id", "created_at", "max_variant_price", "min_variant_price"]
+REQUIRED_SORTABLES: list[str] = ["id", "random_score", "created_at", "max_variant_price", "min_variant_price"]
 
 logger = get_logger(__name__)
 

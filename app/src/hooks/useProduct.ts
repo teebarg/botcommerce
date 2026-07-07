@@ -17,7 +17,6 @@ export const useProductFeed = (initialData: ProductFeed | null, search?: FeedQue
             const res = await api.get<ProductFeed>("/product/feed", {
                 params: {
                     cursor: pageParam ?? undefined,
-                    feed_seed: initialData?.feed_seed,
                     ...search
                 },
             });

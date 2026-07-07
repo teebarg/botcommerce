@@ -34,7 +34,7 @@ const StoreNavbar = () => {
     return (
         <header
             ref={navRef}
-            className="fixed top-0 inset-x-0 z-50 w-full border-b border-border/40 bg-background/60 backdrop-blur-md"
+            className="fixed top-0 inset-x-0 z-50 w-full glass"
         >
             <div className="w-full max-w-7xl mx-auto px-2">
                 <div className="flex md:hidden items-center justify-between py-2.5 pt-[calc(var(--sat)+10px)] w-full gap-2">

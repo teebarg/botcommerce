@@ -156,7 +156,6 @@ class ProductService:
         cursor = kwargs.get("cursor")
         sort = kwargs.get("sort", "id:desc")
 
-        feed_seed = kwargs.get("feed_seed") or random.randint(1000, 9999)
         offset = 0
         if cursor:
             try:
@@ -170,29 +169,13 @@ class ProductService:
         search_params: Dict[str, Any] = {"limit": limit, "offset": offset, "attributesToRetrieve": PRODUCT_ATTRIBUTES}
         if base_filters:
             search_params["filter"] = " AND ".join(base_filters)
-        # search_params["facets"] = ["category_slugs", "sizes", "colors", "ages"]
+
+        search_params["sort"] = [sort] if disable_random_feed else ["random_score:asc"]
 
         try:
-            if disable_random_feed:
-                search_params["sort"] = [sort]
-                res = await self.search_srv.search_index(search, search_params)
-                hits = res["hits"]
-                total_count = res["estimatedTotalHits"]
-            else:
-                buffer_limit = limit * 3
-                search_params["limit"] = buffer_limit
-                search_params["sort"] = ["id:desc"]
-
-                res = await self.search_srv.search_index("", search_params)
-                raw_hits = res["hits"]
-                total_count = res["estimatedTotalHits"]
-
-                # Deterministic Python Shuffle using the user's persistent seed
-                rng = random.Random(feed_seed)
-                rng.shuffle(raw_hits)
-
-                hits = raw_hits[:limit]
-
+            res = await self.search_srv.search_index(search if disable_random_feed else "", search_params)
+            hits = res["hits"]
+            total_count = res["estimatedTotalHits"]
         except Exception as e:
             logger.error(f"Meilisearch cluster error: {e}")
             raise HTTPException(status_code=502, detail="Search service unavailable")
@@ -206,7 +189,6 @@ class ProductService:
             "products": hits,
             "limit": limit,
             "total_count": total_count,
-            "feed_seed": feed_seed,
             "next_cursor": next_cursor,
         }
 
@@ -278,6 +260,7 @@ class ProductService:
             "sku": product.sku,
             "active": product.active,
             "is_new": getattr(product, "is_new", False),
+            "random_score": random.random(),
         }
 
         product_dict["collection_slugs"] = [c.slug for c in (product.collections or [])]

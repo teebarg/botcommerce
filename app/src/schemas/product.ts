@@ -172,7 +172,6 @@ export const PaginatedProductSearchSchema = PagSchema.extend({
 
 export const ProductFeedSchema = z.object({
     products: z.array(ProductSearchSchema),
-    feed_seed: z.number(),
     next_cursor: z.string(),
     limit: z.number(),
     total_count: z.number(),
@@ -227,7 +226,6 @@ export const FeedQuerySchema = z.object({
     min_price: z.coerce.number().optional(),
     max_price: z.coerce.number().optional(),
     collections: z.string().optional(),
-    feed_seed: z.coerce.number().optional(),
     cursor: z.string().optional(),
 });
 
