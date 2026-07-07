@@ -1,26 +1,25 @@
 "use client";
 
 import { useLocation, useSearch } from "@tanstack/react-router";
-import { Check, ChevronsUpDown, SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import { useCategories } from "@/hooks/useCategories";
 import { Category } from "@/schemas";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { cn } from "@/utils";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { useOverlayTriggerState } from "react-stately";
+import SheetDrawer from "@/components/sheet-drawer";
 
 type Filters = {
     sort: "newest" | "oldest";
     active: "true" | "false" | "all";
-    out_of_stock: boolean;
+    inventory: "out_of_stock" | "in_stock" | "all";
     category_slug: string;
     name: string;
     start_date: string;
@@ -30,7 +29,7 @@ type Filters = {
 const DEFAULTS: Filters = {
     sort: "newest",
     active: "all",
-    out_of_stock: false,
+    inventory: "all",
     category_slug: "",
     name: "",
     start_date: "",
@@ -41,7 +40,7 @@ function parseFilters(search: Record<string, unknown>): Filters {
     return {
         sort: search.sort === "oldest" ? "oldest" : "newest",
         active: search.active == true ? "true" : search.active == false ? "false" : "all",
-        out_of_stock: search.out_of_stock ? true : false,
+        inventory: search.inventory == "in_stock" ? "in_stock" : search.inventory == "out_of_stock" ? "out_of_stock" : "all",
         category_slug: typeof search.category_slug === "string" ? search.category_slug : "",
         name: typeof search.name === "string" ? search.name : "",
         start_date: typeof search.start_date === "string" ? search.start_date : "",
@@ -53,7 +52,7 @@ function countActiveFilters(filters: Filters): number {
     let count = 0;
     if (filters.sort !== DEFAULTS.sort) count++;
     if (filters.active !== DEFAULTS.active) count++;
-    if (filters.out_of_stock !== DEFAULTS.out_of_stock) count++;
+    if (filters.inventory !== DEFAULTS.inventory) count++;
     if (filters.category_slug !== DEFAULTS.category_slug) count++;
     if (filters.name !== DEFAULTS.name) count++;
     if (filters.start_date) count++;
@@ -72,10 +71,9 @@ function applyDatePreset(days: number): Pick<Filters, "start_date" | "end_date">
 }
 
 export function GalleryFilters() {
+    const state = useOverlayTriggerState({});
     const { updateQuery } = useUpdateQuery();
     const search = useSearch({ strict: false }) as Record<string, unknown>;
-    const [open, setOpen] = useState(false);
-    const [categoryOpen, setCategoryOpen] = useState(false);
     const [draft, setDraft] = useState<Filters>(() => parseFilters(search));
     const location = useLocation();
     const show = location.pathname.startsWith("/admin/gallery");
@@ -84,19 +82,19 @@ export function GalleryFilters() {
 
     useEffect(() => {
         setDraft(parseFilters(search));
-    }, [search.sort, search.active, search.out_of_stock, search.category_slug, search.name, search.start_date, search.end_date]);
+    }, [search.sort, search.active, search.inventory, search.category_slug, search.name, search.start_date, search.end_date]);
 
     function handleApply() {
         updateQuery([
             { key: "sort", value: draft.sort === DEFAULTS.sort ? "" : draft.sort },
             { key: "active", value: draft.active === DEFAULTS.active ? "" : draft.active },
-            { key: "out_of_stock", value: draft.out_of_stock ? true : "" },
-            { key: "category_slug", value: draft.category_slug },
+            { key: "inventory", value: draft.inventory === DEFAULTS.inventory ? "" : draft.inventory },
+            { key: "category_slug", value: draft.category_slug == "_all_" ? "" : draft.category_slug },
             { key: "name", value: draft.name },
             { key: "start_date", value: draft.start_date },
             { key: "end_date", value: draft.end_date },
         ]);
-        setOpen(false);
+        state.close()
     }
 
     function handleReset() {
@@ -104,13 +102,13 @@ export function GalleryFilters() {
         updateQuery([
             { key: "sort", value: "" },
             { key: "active", value: "" },
-            { key: "out_of_stock", value: "" },
+            { key: "inventory", value: "" },
             { key: "category_slug", value: "" },
             { key: "name", value: "" },
             { key: "start_date", value: "" },
             { key: "end_date", value: "" },
         ]);
-        setOpen(false);
+        state.close()
     }
 
     const applied = parseFilters(search);
@@ -118,32 +116,20 @@ export function GalleryFilters() {
     const isDirty =
         draft.sort !== applied.sort ||
         draft.active !== applied.active ||
-        draft.out_of_stock !== applied.out_of_stock ||
+        draft.inventory !== applied.inventory ||
         draft.category_slug !== applied.category_slug ||
         draft.name !== applied.name ||
         draft.start_date !== applied.start_date ||
         draft.end_date !== applied.end_date;
 
-    const selectedCategory = categories.find((c: Category) => c.slug === draft.category_slug);
-
     if (!show) return null;
 
     return (
-        <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="relative gap-2">
-                    <SlidersHorizontal className="h-4 w-4" />
-                    Filters
-                    {activeCount > 0 && (
-                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-2xs font-medium text-background">
-                            {activeCount}
-                        </span>
-                    )}
-                </Button>
-            </PopoverTrigger>
-
-            <PopoverContent align="end" className="w-96 p-0">
-                <div className="flex items-center justify-between px-4 py-3">
+        <SheetDrawer
+            open={state.isOpen}
+            sheetClassName="min-w-[30vw]"
+            title={
+                <div className="flex items-center justify-between px-3 py-0 md:py-4 w-full">
                     <span className="text-sm font-medium">Filters</span>
                     {activeCount > 0 && (
                         <button
@@ -155,10 +141,74 @@ export function GalleryFilters() {
                         </button>
                     )}
                 </div>
-
+            }
+            trigger={
+                <Button variant="outline" size="sm" className="relative gap-2">
+                    <SlidersHorizontal className="h-4 w-4" />
+                    Filters
+                    {activeCount > 0 && (
+                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-2xs font-medium text-background">
+                            {activeCount}
+                        </span>
+                    )}
+                </Button>
+            }
+            onOpenChange={state.setOpen}
+        >
+            <div>
                 <Separator />
-
                 <div className="space-y-5 p-5">
+                    <div className="space-y-2">
+                        <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                            Product name
+                        </Label>
+                        <Input
+                            placeholder="Search by name..."
+                            value={draft.name}
+                            onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
+                            className="h-10 text-sm"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                            Categories
+                        </Label>
+                        <Select
+                            value={draft.category_slug == "" ? "_all_" : draft.category_slug}
+                            onValueChange={(value) => (
+                                setDraft((d) => ({
+                                    ...d,
+                                    category_slug: d.category_slug === value ? "" : value,
+                                }))
+                            )}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="All Categories" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectItem value="_all_">
+                                        All categories
+                                    </SelectItem>
+                                    {categories.map((item: Category) => (
+                                        <SelectItem key={item.slug} value={item.name}>
+                                            {item.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                        {draft.category_slug && (
+                            <button
+                                onClick={() => setDraft((d) => ({ ...d, category_slug: "" }))}
+                                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                                <X className="h-3 w-3" />
+                                Clear category
+                            </button>
+                        )}
+                    </div>
                     <div className="space-y-2">
                         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                             Upload date
@@ -187,9 +237,9 @@ export function GalleryFilters() {
                             value={
                                 draft.start_date
                                     ? {
-                                            from: new Date(draft.start_date),
-                                            to: draft.end_date ? new Date(draft.end_date) : undefined,
-                                        }
+                                        from: new Date(draft.start_date),
+                                        to: draft.end_date ? new Date(draft.end_date) : undefined,
+                                    }
                                     : undefined
                             }
                             onChange={(range) => {
@@ -213,98 +263,18 @@ export function GalleryFilters() {
                         )}
                     </div>
                     <div className="space-y-2">
-                        <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                            Product name
-                        </Label>
-                        <Input
-                            placeholder="Search by name..."
-                            value={draft.name}
-                            onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
-                            className="h-8 text-sm"
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                            Category
-                        </Label>
-                        <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    role="combobox"
-                                    aria-expanded={categoryOpen}
-                                    className="w-full h-8 justify-between text-sm font-normal"
-                                >
-                                    <span className={cn(!selectedCategory && "text-muted-foreground")}>
-                                        {selectedCategory ? selectedCategory.name : "All categories"}
-                                    </span>
-                                    <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-64 p-0" align="start">
-                                <Command>
-                                    <CommandInput placeholder="Search categories..." className="h-8 text-sm" />
-                                    <CommandList>
-                                        <CommandEmpty className="py-4 text-center text-xs text-muted-foreground">
-                                            No categories found
-                                        </CommandEmpty>
-                                        <CommandGroup>
-                                            <CommandItem
-                                                value="__all__"
-                                                onSelect={() => {
-                                                    setDraft((d) => ({ ...d, category_slug: "" }));
-                                                    setCategoryOpen(false);
-                                                }}
-                                            >
-                                                <Check className={cn("mr-2 h-3.5 w-3.5", !draft.category_slug ? "opacity-100" : "opacity-0")} />
-                                                All categories
-                                            </CommandItem>
-                                            {categories.map((cat: Category) => (
-                                                <CommandItem
-                                                    key={cat.slug}
-                                                    value={cat.name}
-                                                    onSelect={() => {
-                                                        setDraft((d) => ({
-                                                            ...d,
-                                                            category_slug: d.category_slug === cat.slug ? "" : cat.slug,
-                                                        }));
-                                                        setCategoryOpen(false);
-                                                    }}
-                                                >
-                                                    <Check className={cn("mr-2 h-3.5 w-3.5", draft.category_slug === cat.slug ? "opacity-100" : "opacity-0")} />
-                                                    {cat.name}
-                                                </CommandItem>
-                                            ))}
-                                        </CommandGroup>
-                                    </CommandList>
-                                </Command>
-                            </PopoverContent>
-                        </Popover>
-                        {draft.category_slug && (
-                            <button
-                                onClick={() => setDraft((d) => ({ ...d, category_slug: "" }))}
-                                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                            >
-                                <X className="h-3 w-3" />
-                                Clear category
-                            </button>
-                        )}
-                    </div>
-                    <div className="space-y-2">
                         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Sort by</Label>
                         <ToggleGroup
                             type="single"
                             value={draft.sort}
                             onValueChange={(val) => val && setDraft((d) => ({ ...d, sort: val as Filters["sort"] }))}
-                            className="grid grid-cols-2 gap-1"
+                            className="grid grid-cols-2 gap-1.5"
                         >
-                            <ToggleGroupItem value="newest" className="h-8 text-xs data-[state=on]:bg-foreground data-[state=on]:text-background">
-                                Newest
-                            </ToggleGroupItem>
-                            <ToggleGroupItem value="oldest" className="h-8 text-xs data-[state=on]:bg-foreground data-[state=on]:text-background">
-                                Oldest
-                            </ToggleGroupItem>
+                            {[{ value: "newest", label: "Newest" }, { value: "oldest", label: "Oldest" }].map(({ value, label }) => (
+                                <ToggleGroupItem value={value} className="h-8 text-xs bg-secondary data-[state=on]:bg-foreground data-[state=on]:text-background">
+                                    {label}
+                                </ToggleGroupItem>
+                            ))}
                         </ToggleGroup>
                     </div>
 
@@ -314,29 +284,34 @@ export function GalleryFilters() {
                             type="single"
                             value={draft.active}
                             onValueChange={(val) => val && setDraft((d) => ({ ...d, active: val as Filters["active"] }))}
-                            className="grid grid-cols-3 gap-1"
+                            className="grid grid-cols-3 gap-1.5"
                         >
-                            <ToggleGroupItem value="all" className="h-8 text-xs data-[state=on]:bg-foreground data-[state=on]:text-background">
-                                All
-                            </ToggleGroupItem>
-                            <ToggleGroupItem value="true" className="h-8 text-xs data-[state=on]:bg-foreground data-[state=on]:text-background">
-                                Active
-                            </ToggleGroupItem>
-                            <ToggleGroupItem value="false" className="h-8 text-xs data-[state=on]:bg-foreground data-[state=on]:text-background">
-                                Inactive
-                            </ToggleGroupItem>
+                            {[{ value: "all", label: "All" }, { value: "true", label: "In store" }, { value: "false", label: "Out store" }].map(({ value, label }) => (
+                                <ToggleGroupItem value={value} className="h-8 text-xs bg-secondary data-[state=on]:bg-foreground data-[state=on]:text-background">
+                                    {label}
+                                </ToggleGroupItem>
+                            ))}
                         </ToggleGroup>
                     </div>
 
-                    <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Out of stock</Label>
-                            <p className="text-xs text-muted-foreground">Show only sold out items</p>
-                        </div>
-                        <Switch
-                            checked={draft.out_of_stock}
-                            onCheckedChange={(val) => setDraft((d) => ({ ...d, out_of_stock: val }))}
-                        />
+                    <div className="space-y-2">
+                        <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Inventory</Label>
+                        <ToggleGroup
+                            type="single"
+                            value={draft.inventory}
+                            onValueChange={(val) => val && setDraft((d) => ({ ...d, inventory: val as Filters["inventory"] }))}
+                            className="grid grid-cols-3 gap-1.5"
+                        >
+                            {[
+                                { value: "all", label: "All" },
+                                { value: "out_of_stock", label: "Out of stock" },
+                                { value: "in_stock", label: "In stock" }
+                            ].map(({ value, label }) => (
+                                <ToggleGroupItem value={value} className="h-8 text-xs bg-secondary data-[state=on]:bg-foreground data-[state=on]:text-background">
+                                    {label}
+                                </ToggleGroupItem>
+                            ))}
+                        </ToggleGroup>
                     </div>
                 </div>
 
@@ -349,7 +324,7 @@ export function GalleryFilters() {
                         className="flex-1"
                         onClick={() => {
                             setDraft(parseFilters(search));
-                            setOpen(false);
+                            state.close();
                         }}
                     >
                         Cancel
@@ -358,7 +333,7 @@ export function GalleryFilters() {
                         Apply
                     </Button>
                 </div>
-            </PopoverContent>
-        </Popover>
-    );
+            </div>
+        </SheetDrawer >
+    )
 }

@@ -115,6 +115,7 @@ async def update_cart(
     cart_update: CartUpdate,
     user: UserDep,
     srv: CartDep,
+    background_tasks: BackgroundTasks,
     _cart_id: Annotated[str | None, Cookie()] = None
 ) -> CartLite:
     cart = await srv.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
@@ -156,6 +157,8 @@ async def update_cart(
             update_data["email"] = cart_update.email
         if cart_update.phone is not None:
             update_data["phone"] = cart_update.phone
+            if user:
+                background_tasks.add_task(srv.update_contact, user_id=user.id, phone=cart_update.phone)
         if cart_update.payment_method is not None:
             update_data["payment_method"] = cart_update.payment_method
         if cart_update.shipping_method is not None:

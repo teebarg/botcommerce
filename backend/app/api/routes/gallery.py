@@ -24,7 +24,7 @@ async def image_gallery(
     limit: int = Query(default=36, ge=1, le=100),
     sort: str = Query(default="newest", pattern="^(newest|oldest)$"),
     active: Optional[bool] = Query(default=None),
-    out_of_stock: bool = Query(default=False),
+    inventory: str = Query(default="all", pattern="^(all|in_stock|out_of_stock)$"),
     category_slug: Optional[str] = Query(default=None),
     name: Optional[str] = Query(default=None),
     start_date: Optional[str] = Query(default=None),
@@ -32,7 +32,7 @@ async def image_gallery(
 ) -> PaginatedProductImages:
     """Image gallery endpoint using cursor-based pagination."""
     items = await srv.get_gallery_items(
-        cursor=cursor, limit=limit, sort=sort, active=active, out_of_stock=out_of_stock,
+        cursor=cursor, limit=limit, sort=sort, active=active, inventory=inventory,
         category_slug=category_slug, name=name, start_date=start_date, end_date=end_date,
     )
     return PaginatedProductImages.validate(items)

@@ -1,12 +1,12 @@
-from app.models.user import User
 from typing import Optional, Dict, Any
 from fastapi import HTTPException
+from prisma.enums import CartStatus
+from prisma import Prisma
 from app.services.cache import CacheService
 from app.core.logging import get_logger
 from app.services.shop_settings import ShopSettingsService
 from app.core.utils import generate_id
-from prisma.enums import CartStatus
-from prisma import Prisma
+from app.models.user import User
 from app.services.coupon import CouponService
 from app.models.cart import Cart
 
@@ -53,9 +53,12 @@ class CartService:
             "items": {"include": {"variant": True}},
             "shipping_address": True
         } if include_relations else None
+        target = None
+        if user_id:
+            target = await self.db.user.find_unique(where={"id": user_id})
 
         return await self.db.cart.create(
-            data={"cart_number": new_cart_id, "user_id": user_id},
+            data={"cart_number": new_cart_id, "user_id": user_id, "phone": target.phone if target else None},
             include=include_clause
         )
 
@@ -226,3 +229,14 @@ class CartService:
                 }
             )
             await tx.cart.update(where={"id": cart.id}, data={"wallet_used": 0.0, "payment_method": None})
+
+    async def update_contact(self, user_id, phone) -> None:
+        await self.db.user.update_many(
+            where={
+                "id": user_id,
+                "phone": None,
+            },
+            data={
+                "phone": phone
+            },
+        )

@@ -23,6 +23,7 @@ import { ShopSettings } from "@/schemas";
 import { useSettingsQuery } from "@/hooks/useGeneric";
 import { useEffect, useState } from "react";
 import ImpersonationBanner from "@/components/impersonation-banner";
+import { SafeAreaDebug } from "@/components/safe-area-debug";
 
 
 interface RouterContext extends AppSession {
@@ -187,9 +188,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                     }}
                                 />
                                 <PWABadge />
-                                {/* <SafeAreaDebug /> */}
                                 <ImpersonationBanner />
                                 {process.env.NODE_ENV === "production" && <Analytics />}
+                                {process.env.NODE_ENV !== "production" && <SafeAreaDebug />}
                                 <Scripts />
                             </CartProvider>
                         </StoreProvider>

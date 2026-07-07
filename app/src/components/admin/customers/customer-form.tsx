@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import type { User } from "@/schemas";
 import { useUpdateUser } from "@/hooks/useUser";
+import { phoneSchema } from "@/lib/validation";
 
 interface ReviewFormProps {
     user?: User;
@@ -20,6 +21,7 @@ const formSchema = z.object({
     last_name: z.string().min(2, {
         message: "Last name must be at least 2 characters.",
     }),
+    phone: phoneSchema,
     role: z.enum(["ADMIN", "CUSTOMER"]),
     status: z.enum(["PENDING", "ACTIVE", "INACTIVE"]),
 });
@@ -32,6 +34,7 @@ export default function CustomerEditForm({ user, onClose }: ReviewFormProps) {
         defaultValues: {
             first_name: user?.first_name || "",
             last_name: user?.last_name || "",
+            phone: user?.phone || "",
             role: user?.role || "CUSTOMER",
             status: user?.status || "PENDING",
         },
@@ -69,6 +72,19 @@ export default function CustomerEditForm({ user, onClose }: ReviewFormProps) {
                                 <FormLabel>Last Name</FormLabel>
                                 <FormControl>
                                     <Input placeholder="Enter last name" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Phone</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Enter phone" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

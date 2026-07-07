@@ -13,10 +13,12 @@ import { tryCatch } from "@/utils/try-catch";
 import { Separator } from "@/components/ui/separator";
 import { api } from "@/utils/api";
 import { getInitials } from "@/utils";
+import { phoneSchema } from "@/lib/validation";
 
 const profileSchema = z.object({
     first_name: z.string().min(1, "First name is required").max(255, "First name is too long"),
     last_name: z.string().min(1, "Last name is required").max(255, "Last name is too long"),
+    phone: phoneSchema
 });
 
 const passwordSchema = z
@@ -47,6 +49,7 @@ function RouteComponent() {
         defaultValues: {
             first_name: user?.firstName ?? "",
             last_name: user?.lastName ?? "",
+            phone: user?.phone ?? ""
         },
     });
 
@@ -168,10 +171,29 @@ function RouteComponent() {
                                             </FormItem>
                                         )}
                                     />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-muted-foreground mb-2">Email Address</label>
-                                    <div className="px-4 py-2 rounded-lg text-foreground bg-secondary">{user?.email}</div>
+                                    <FormField
+                                        control={profileForm.control}
+                                        name="phone"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Phone</FormLabel>
+                                                <FormControl>
+                                                    {editingSection === "profile" ? (
+                                                        <Input placeholder="Enter last name" {...field} />
+                                                    ) : (
+                                                        <div className="px-4 py-2 rounded-lg text-foreground bg-secondary">
+                                                            {field.value || "Not set"}
+                                                        </div>
+                                                    )}
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <div>
+                                        <label className="block text-sm font-medium text-muted-foreground mb-2">Email Address</label>
+                                        <div className="px-4 py-2 rounded-lg text-foreground bg-secondary">{user?.email}</div>
+                                    </div>
                                 </div>
                                 {editingSection === "profile" && (
                                     <div className="flex gap-2 mt-6">

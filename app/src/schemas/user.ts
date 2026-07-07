@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { AddressSchema } from "./address";
 import { CursorSchema } from "./index";
+import { phoneSchema } from "@/lib/validation";
 
 export const UserLiteSchema = z.object({
     id: z.number(),
@@ -30,6 +30,7 @@ export const UserSchema = z
         id: z.number(),
         first_name: z.string(),
         last_name: z.string().optional(),
+        phone: z.string().optional(),
         email: z.string().email(),
         emailVerified: z.string(),
         status: z.enum(["PENDING", "ACTIVE", "INACTIVE"]),
@@ -50,6 +51,7 @@ export const SessionSchema = z.object({
     first_name: z.string(),
     last_name: z.string().optional(),
     email: z.string().optional(),
+    phone: phoneSchema,
     image: z.string().optional(),
     status: z.enum(["PENDING", "ACTIVE", "INACTIVE"]),
     role: z.enum(["ADMIN", "CUSTOMER"]),
@@ -77,6 +79,7 @@ export type AuthUser = {
     image_url?: string;
     image?: string;
     email?: string;
+    phone?: string;
     role?: string;
     roles?: string[];
 };
