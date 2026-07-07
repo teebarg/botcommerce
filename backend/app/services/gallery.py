@@ -50,8 +50,8 @@ class GalleryService:
 
 
     async def get_paginated_gallery(
-        self, cursor: Optional[int], limit: int, sort: str, active: Optional[bool],
-        out_of_stock: bool, category_slug: Optional[str] = None, name: Optional[str] = None,
+        self, cursor: Optional[int], limit: int, sort: str, active: Optional[bool], inventory: str,
+        category_slug: Optional[str] = None, name: Optional[str] = None,
         start_date: Optional[str] = None, end_date: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         order_dir = "ASC" if sort == "oldest" else "DESC"
@@ -62,9 +62,17 @@ class GalleryService:
         if active is not None:
             extra_filters.append(f"AND p.active = {str(active).lower()}")
 
-        if out_of_stock:
+        if inventory == "out_of_stock":
             extra_filters.append("""
                 AND NOT EXISTS (
+                    SELECT 1 FROM "product_variants" pv2
+                    WHERE pv2.product_id = p.id
+                    AND pv2.inventory > 0
+                )
+            """)
+        elif inventory == "in_stock":
+            extra_filters.append("""
+                AND EXISTS (
                     SELECT 1 FROM "product_variants" pv2
                     WHERE pv2.product_id = p.id
                     AND pv2.inventory > 0

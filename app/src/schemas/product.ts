@@ -235,7 +235,7 @@ export const GalleryQuerySchema = z.object({
     cursor: z.string().optional(),
     active: booleanParam,
     sort: z.enum(["newest", "oldest"]).default("newest"),
-    out_of_stock: booleanParam,
+    inventory: z.enum(["all", "in_stock", "out_of_stock"]).default("all"),
     category_slug: z.string().optional(),
     name: z.string().optional(),
     start_date: z.string().optional(),
