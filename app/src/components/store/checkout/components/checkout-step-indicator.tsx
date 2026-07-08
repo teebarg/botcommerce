@@ -9,7 +9,7 @@ interface CheckoutStepIndicatorProps {
 }
 
 const CheckoutStepIndicator: React.FC<CheckoutStepIndicatorProps> = ({ currentStep, completedSteps, onStepClick }) => {
-    const steps: CheckoutStep[] = ["delivery", "address", "payment"];
+    const steps: CheckoutStep[] = ["delivery", "payment"];
 
     return (
         <div className="p-4 bg-background/60">

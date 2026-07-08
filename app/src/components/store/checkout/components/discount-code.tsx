@@ -53,20 +53,10 @@ const DiscountCode: React.FC = () => {
 
     if (isLoading) return <PageLoader variant="box" />;
     return (
-        <div
-            className="p-4 rounded-2xl bg-card border border-border animate-in fade-in duration-300"
-        >
-            <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">
-                    <Tag className="w-5 h-5 text-primary" />
-                </div>
-                <Label className="font-semibold">Coupon Code</Label>
-            </div>
+        <div className="flex items-center gap-2 p-3 rounded-lg border border-dashed border-accent animate-in fade-in duration-300">
             {appliedDiscount ? (
-                <div
-                    className="flex items-center justify-between p-4 gap-4 text-sm mt-2 w-fit border-primary border rounded-xl animate-in fade-in slide-in-from-top-2 duration-300"
-                >
-                    <div className="flex items-center gap-3">
+                <>
+                    <div className="flex items-center gap-3 flex-1">
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary">
                             <Check className="h-4 w-4 text-white" />
                         </div>
@@ -75,36 +65,42 @@ const DiscountCode: React.FC = () => {
                             <p className="text-xs text-muted-foreground">-{appliedDiscount} discount applied</p>
                         </div>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={removeDiscountCode} disabled={removeMutation.isPending} className="h-8 w-8">
+                    <Button variant="accent" size="icon" onClick={removeDiscountCode} disabled={removeMutation.isPending} className="h-8 w-8">
                         <X className="h-4 w-4" />
                     </Button>
-                </div>
+                </>
             ) : (
-                <div className="flex gap-2">
-                    <Input
-                        value={code}
-                        onChange={(e) => setCode(e.target.value.toUpperCase())}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                                applyDiscountCode();
-                            }
-                        }}
-                        className="flex-1 bg-secondary border-0 uppercase"
-                        data-testid="discount-input"
-                        name="code"
-                        placeholder="Enter coupon code"
-                        type="text"
-                        disabled={applyMutation.isPending || removeMutation.isPending}
-                    />
+                <>
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary">
+                        <Tag className="h-4 w-4 text-white" />
+                    </div>
+                    <div className="flex-1 bg">
+                        <Input
+                            value={code}
+                            onChange={(e) => setCode(e.target.value.toUpperCase())}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    applyDiscountCode();
+                                }
+                            }}
+                            className="border-0 uppercase focus-visible:ring-0"
+                            data-testid="discount-input"
+                            name="code"
+                            placeholder="Enter coupon code"
+                            type="text"
+                            disabled={applyMutation.isPending || removeMutation.isPending}
+                        />
+                    </div>
                     <Button
                         onClick={applyDiscountCode}
-                        variant={appliedDiscount ? "success" : "default"}
-                        className={cn("min-w-20 h-8", appliedDiscount && "bg-primary")}
+                        variant="ghost"
+                        className="bg-transparent text-accent"
                         isLoading={applyMutation.isPending}
+                        disabled={!code}
                     >
-                        {appliedDiscount ? <Check className="w-4 h-4" /> : "Apply"}
+                        Apply
                     </Button>
-                </div>
+                </>
             )}
         </div>
     );

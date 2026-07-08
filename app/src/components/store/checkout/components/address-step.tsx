@@ -36,56 +36,42 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
     }
 
     return (
-        <>
-            <div className="space-y-4 px-4 py-4 flex-1 overflow-y-auto slide-in">
-                <div className="text-center mb-8">
-                    <h2 className="text-xl font-bold">Delivery Address</h2>
-                    <p className="text-muted-foreground text-sm">Where should we send your order?</p>
-                </div>
-
+        <div className="space-y-4 px-4 py-4 flex-1 overflow-y-auto slide-in">
+            <div className="text-center mb-1">
+                <h2 className="text-xl font-bold">Delivery Address</h2>
+                <p className="text-muted-foreground text-sm">Where should we send your order?</p>
+            </div>
+            <div className="space-y-3">
                 <div className="space-y-3">
-                    <div className="space-y-3">
-                        <Label className="text-base font-medium block">Select Address</Label>
-                        <RadioGroup value={selectedAddressId} onValueChange={setSelectedAddressId}>
-                            {addresses.map((addr: Address, idx: number) => (
-                                <div key={addr.id}>
-                                    <AddressCard key={idx} address={addr} addresses={addresses} selectedAddress={selectedAddress} />
-                                </div>
-                            ))}
-                        </RadioGroup>
-                    </div>
-                    <SheetDrawer
-                        open={state.isOpen}
-                        title="Address"
-                        trigger={
-                            <Button
-                                variant="outline"
-                                className="w-full h-auto p-4 rounded-2xl border-2 border-dashed justify-start gap-4 border-primary bg-primary/5"
-                            >
-                                <div className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center">
-                                    <Plus className="w-5 h-5" />
-                                </div>
-                                <span className="font-medium">Add New Address</span>
-                            </Button>
-                        }
-                        onOpenChange={state.setOpen}
-                    >
-                        <CheckoutAddressForm onClose={state.close} />
-                    </SheetDrawer>
+                    <Label className="text-base font-medium block">Select Address</Label>
+                    <RadioGroup value={selectedAddressId} onValueChange={setSelectedAddressId}>
+                        {addresses.map((addr: Address, idx: number) => (
+                            <div key={addr.id}>
+                                <AddressCard key={idx} address={addr} addresses={addresses} selectedAddress={selectedAddress} />
+                            </div>
+                        ))}
+                    </RadioGroup>
                 </div>
-            </div>
-            <div className="checkout-footer">
-                <Button
-                    size="lg"
-                    onClick={handleContinue}
-                    disabled={!Boolean(address)}
-                    className="rounded-full text-sm font-semibold w-full md:w-auto md:px-10"
+                <SheetDrawer
+                    open={state.isOpen}
+                    title="Address"
+                    trigger={
+                        <Button
+                            variant="outline"
+                            className="w-full h-auto p-4 rounded-2xl border-2 border-dashed justify-start gap-4 border-primary bg-primary/5"
+                        >
+                            <div className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center">
+                                <Plus className="w-5 h-5" />
+                            </div>
+                            <span className="font-medium">Add New Address</span>
+                        </Button>
+                    }
+                    onOpenChange={state.setOpen}
                 >
-                    Continue
-                    <ChevronRight className="h-4 w-4" />
-                </Button>
+                    <CheckoutAddressForm onClose={state.close} />
+                </SheetDrawer>
             </div>
-        </>
+        </div>
     );
 };
 
