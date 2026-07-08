@@ -1,7 +1,7 @@
-import re
-from pydantic import BaseModel, Field, field_validator
+from datetime import datetime
+from pydantic import BaseModel, Field
 from prisma.enums import AddressType
-from app.lib.validation import normalize_phone
+from app.lib.validation import PhoneNumber, RequiredString, OptionalString
 
 class Address(BaseModel):
     id: int
@@ -13,98 +13,27 @@ class Address(BaseModel):
     label: str | None
     state: str | None
     phone: str | None
+    created_at: datetime | None = None
 
     class Config:
         from_attributes = True
 
+class AddressBase(BaseModel):
+    address_type: AddressType | None = None
+    label: OptionalString = Field(default=None, max_length=255)
+    address_2: OptionalString = Field(default=None, max_length=1255)
+    last_name: OptionalString = Field(default=None, max_length=255)
+    phone: PhoneNumber = None
 
-class AddressCreate(BaseModel):
-    first_name: str = Field(..., max_length=255)
-    last_name: str | None = Field(default=None, max_length=255)
-    address_1: str = Field(..., max_length=1255)
-    address_2: str | None = Field(default=None, max_length=1255)
-    address_type: AddressType | None = Field(default=None)
-    label: str | None = Field(default=None, max_length=255)
-    state: str = Field(..., max_length=255)
-    phone: str | None = Field(default=None, max_length=20)
+class AddressCreate(AddressBase):
+    first_name: RequiredString = Field(max_length=255)
+    address_1: RequiredString = Field(max_length=1255)
+    state: RequiredString = Field(max_length=55)
 
-    @field_validator(
-        "first_name",
-        "address_1",
-        "state",
-        mode="before"
-    )
-    def not_empty(cls, v, info):
-        if not v or str(v).strip() == "":
-            raise ValueError(f"{info.field_name} cannot be empty")
-        return v.strip()
-
-    @field_validator(
-        "last_name",
-        "address_2",
-        "label",
-        mode="before"
-    )
-    def empty_to_none(cls, v):
-        if v is None:
-            return None
-        v = v.strip()
-        return v if v else None
-
-    @field_validator("phone", mode="before")
-    def validate_phone(cls, v):
-        if not v:
-            return None
-        normalized = normalize_phone(v)
-        if not re.fullmatch(r"^\+\d{7,15}$", normalized):
-            raise ValueError("Invalid phone number format")
-        return normalized
-
-
-class AddressUpdate(BaseModel):
-    first_name: str | None = Field(default=None, max_length=255)
-    last_name: str | None = Field(default=None, max_length=255)
-    address_1: str | None = Field(default=None, max_length=1255)
-    address_2: str | None = Field(default=None, max_length=1255)
-    address_type: AddressType | None = Field(default=None)
-    label: str | None = Field(default=None, max_length=255)
-    state: str | None = Field(default=None, max_length=255)
-    phone: str | None = Field(default=None, max_length=20)
-
-    @field_validator(
-        "first_name",
-        "address_1",
-        "state",
-        mode="before"
-    )
-    def empty_required_fields(cls, v):
-        if v is None:
-            return None
-        v = v.strip()
-        if v == "":
-            raise ValueError("Field cannot be empty")
-        return v
-
-    @field_validator(
-        "last_name",
-        "address_2",
-        "label",
-        mode="before"
-    )
-    def empty_to_none(cls, v):
-        if v is None:
-            return None
-        v = v.strip()
-        return v if v else None
-
-    @field_validator("phone", mode="before")
-    def validate_phone(cls, v):
-        if not v:
-            return None
-        normalized = normalize_phone(v)
-        if not re.fullmatch(r"^\+\d{7,15}$", normalized):
-            raise ValueError("Invalid phone number format")
-        return normalized
+class AddressUpdate(AddressBase):
+    first_name: OptionalString = Field(default=None, max_length=255)
+    address_1: OptionalString = Field(default=None, max_length=1255)
+    state: OptionalString = Field(default=None, max_length=55)
 
 class Addresses(BaseModel):
     addresses: list[Address]

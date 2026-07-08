@@ -8,7 +8,6 @@ from pydantic import (
     PostgresDsn,
     ValidationInfo,
     computed_field,
-    field_validator,
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
 

@@ -16,7 +16,6 @@ import { useAuth } from "@clerk/tanstack-react-start";
 import { UserAvatar } from "./generic/user-avatar";
 import { useLocation } from "@tanstack/react-router";
 import { api } from "@/utils/api";
-import ShareButton from "./share";
 
 export function UserDropdown() {
     const { isAuthenticated, isImpersonating, userId, isAdmin, user } = useRouteContext({ strict: false });

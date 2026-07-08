@@ -38,19 +38,17 @@ const AccountNav = () => {
     return (
         <div>
             <div className="pb-4">
-                <h3 className="text-base">Account</h3>
+                <h3 className="text-sm">Account</h3>
             </div>
-            <div className="text-base">
-                <ul className="flex mb-0 justify-start items-start flex-col gap-y-4">
-                    {navLinks?.map((link, index: number) => (
-                        <li key={`account-${index}`}>
-                            <AccountNavLink data-testid={link.dataTestid} href={link.href}>
-                                {link.label}
-                            </AccountNavLink>
-                        </li>
-                    ))}
-                </ul>
-            </div>
+            <ul className="flex flex-col justify-start items-start gap-y-2 text-base">
+                {navLinks?.map((link, index: number) => (
+                    <li key={`account-${index}`}>
+                        <AccountNavLink data-testid={link.dataTestid} href={link.href}>
+                            {link.label}
+                        </AccountNavLink>
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 };

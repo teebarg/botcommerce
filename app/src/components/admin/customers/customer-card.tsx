@@ -20,7 +20,7 @@ const CustomerCard = ({ user }: Props) => {
     };
 
     return (
-        <div className="bg-card rounded-2xl border border-border overflow-hidden">
+        <div className="bg-card rounded-2xl border border-border">
             <div className="flex items-start justify-between gap-4 p-4">
                 <div className="min-w-0 space-y-1.5 text-xs">
                     <p className="font-medium uppercase text-muted-foreground truncate">
@@ -36,7 +36,7 @@ const CustomerCard = ({ user }: Props) => {
                 </div>
                 {getStatusBadge(user.status)}
             </div>
-            <div className="border-t border-border px-5 py-2 bg-muted/50 flex items-center justify-between">
+            <div className="border-t border-border px-4 py-2 bg-muted/50 flex items-center justify-between">
                 <Badge variant={user.role == "ADMIN" ? "accent" : "default"}>{user.role}</Badge>
                 <CustomerActions user={user} />
             </div>

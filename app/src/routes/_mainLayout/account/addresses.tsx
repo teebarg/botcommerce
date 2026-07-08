@@ -11,6 +11,7 @@ import AddressForm from "@/components/store/account/address-form";
 import EmptyState from "@/components/generic/empty";
 import { PageLoader } from "@/components/generic/page-loader";
 import { Badge } from "@/components/ui/badge";
+import { timeAgo } from "@/utils";
 
 type AddressItemProps = {
     address: Address;
@@ -29,28 +30,26 @@ const AddressItem: React.FC<AddressItemProps> = ({ address, isActive = true }) =
 
     return (
         <div className="rounded-2xl border overflow-hidden bg-card border-border">
-            <div className="px-5 pt-5 pb-4">
-                <div className="flex items-center justify-between mb-3">
-                    <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground">
-                        Delivery address
+            <div className="flex items-start justify-between px-4 py-4">
+                <div className="space-y-1.5">
+                    <h3 className="text-sm font-medium">
+                        {address?.first_name} {address?.last_name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                        {address.address_1}
+                        {address.address_2 && <>, {address.address_2}</>}
+                        <br />
+                        {address.state && <>{address.state}.</>}
                     </p>
-                    {isActive && (
-                        <Badge variant="success">Active</Badge>
-                    )}
+                    <p className="text-xs text-muted-foreground">{timeAgo(address.created_at)}</p>
                 </div>
-
-                <h3 className="text-sm font-medium mb-1">
-                    {address?.first_name} {address?.last_name}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                    {address.address_1}
-                    {address.address_2 && <>, {address.address_2}</>}
-                </p>
-                <p className="text-sm text-muted-foreground">{address.state}</p>
+                {isActive && (
+                    <Badge variant="success">Active</Badge>
+                )}
             </div>
 
-            <div className="flex items-center justify-between px-5 py-2 border-t border-border bg-muted/40">
-                <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+            <div className="flex items-center justify-between px-4 py-2 border-t border-border bg-muted/40">
+                <p className="text-xs flex items-center gap-1.5">
                     <Home className="w-3 h-3" />
                     Home
                 </p>
@@ -115,9 +114,9 @@ function RouteComponent() {
                 open={addState.isOpen}
                 title="Add new address"
                 trigger={
-                    <Button>
-                        <Plus className="h-5 w-5" />
-                        <span className="font-semibold">Add new address</span>
+                    <Button size="sm">
+                        <Plus className="h-4 w-4" />
+                        Add new address
                     </Button>
                 }
                 onOpenChange={addState.setOpen}

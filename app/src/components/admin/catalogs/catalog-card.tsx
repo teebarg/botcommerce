@@ -21,7 +21,7 @@ export const CatalogCard: React.FC<{ catalog: DBCatalog }> = ({ catalog }) => (
             )}
         </div>
 
-        <div className="border-t border-border px-5 py-3 flex items-center gap-4">
+        <div className="border-t border-border px-4 py-2 flex items-center gap-4">
             <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Eye className="h-3.5 w-3.5" />
                 {catalog.view_count} views
@@ -36,7 +36,7 @@ export const CatalogCard: React.FC<{ catalog: DBCatalog }> = ({ catalog }) => (
             </span>
         </div>
 
-        <div className="border-t border-border px-5 py-2.5 bg-muted/50 flex items-center justify-between">
+        <div className="border-t border-border px-4 py-2 bg-muted/50 flex items-center justify-between">
             <SocialShare catalog={catalog} />
             <CatalogActions item={catalog} />
         </div>

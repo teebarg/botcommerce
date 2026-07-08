@@ -1,14 +1,14 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { toast } from "sonner";
 import { tryCatch } from "@/utils/try-catch";
-import { Gift, Sparkles, Star } from "lucide-react";
-import { cn, currency } from "@/utils";
+import { Bell, Package, Tag, Truck } from "lucide-react";
+import { cn } from "@/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { api } from "@/utils/api";
 import { Message } from "@/schemas";
 
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000;
-const INITIAL_DELAY_DURATION = 5 * 60 * 1000;
+const INITIAL_DELAY_DURATION = 20 * 1000;
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -64,6 +64,24 @@ function storeSubscriptionKeys(sub: PushSubscription) {
     localStorage.setItem("push_subscription_keys", JSON.stringify(subscriptionData));
 }
 
+const BENEFITS = [
+    {
+        icon: Package,
+        title: "New bales",
+        detail: "First pick before a fresh bale sells out",
+    },
+    {
+        icon: Tag,
+        title: "Price drops",
+        detail: "Get the alert the moment prices come down",
+    },
+    {
+        icon: Truck,
+        title: "Order updates",
+        detail: "Real-time status from checkout to delivery",
+    },
+] as const;
+
 export default function PushPermission() {
     const [isMounted, setIsMounted] = useState<boolean>(false);
     const [permission, setPermission] = useState<NotificationPermission>("default");
@@ -71,6 +89,7 @@ export default function PushPermission() {
     const [isDismissed, setIsDismissed] = useState<boolean>(false);
     const [isChecking, setIsChecking] = useState<boolean>(false);
     const [isSyncing, setIsSyncing] = useState<boolean>(false);
+    const [isSubscribing, setIsSubscribing] = useState<boolean>(false);
     const [isDelayPassed, setIsDelayPassed] = useState<boolean>(false);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -115,7 +134,7 @@ export default function PushPermission() {
     }, []);
 
     const syncSubscriptionToBackend = useCallback(async (sub: PushSubscription) => {
-        if (isSyncing) return;
+        if (isSyncing) return false;
         setIsSyncing(true);
         const subscriptionData = {
             endpoint: sub.endpoint,
@@ -146,13 +165,9 @@ export default function PushPermission() {
             const sub = await registration.pushManager.getSubscription();
 
             if (!sub) {
-                if (Notification.permission === "granted") {
-                    subscribeToPush();
-                }
                 return;
             }
             if (hasSubscriptionChanged(sub) || !localStorage.getItem("push_synced")) {
-                console.debug("Subscription changed, syncing to backend");
                 await syncSubscriptionToBackend(sub);
             } else {
                 setSubscription(sub);
@@ -165,23 +180,31 @@ export default function PushPermission() {
     }, [isChecking, syncSubscriptionToBackend]);
 
     async function subscribeToPush() {
-        const perm = await Notification.requestPermission();
-        setPermission(perm);
+        setIsSubscribing(true);
+        try {
+            const perm = await Notification.requestPermission();
+            setPermission(perm);
 
-        if (perm !== "granted") return;
-        const registration = await navigator.serviceWorker.ready;
-        const sub = await registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            // @ts-expect-error -- Suppress TS2322 for BufferSource mismatch
-            applicationServerKey: urlBase64ToUint8Array(import.meta.env.VITE_VAPID_PUBLIC_KEY!),
-        });
+            if (perm !== "granted") return;
 
-        if (!sub) {
-            toast.error("You blocked notifications. Please re-enable in browser settings.");
-            return;
+            const registration = await navigator.serviceWorker.ready;
+            const sub = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                // @ts-expect-error -- Suppress TS2322 for BufferSource mismatch
+                applicationServerKey: urlBase64ToUint8Array(import.meta.env.VITE_VAPID_PUBLIC_KEY!),
+            });
+
+            const synced = await syncSubscriptionToBackend(sub);
+            if (!synced) {
+                // syncSubscriptionToBackend already surfaced a toast
+                return;
+            }
+        } catch (err) {
+            console.error("Push subscribe failed", err);
+            toast.error("Couldn't turn on notifications. Please try again.");
+        } finally {
+            setIsSubscribing(false);
         }
-
-        await syncSubscriptionToBackend(sub);
     }
 
     useEffect(() => {
@@ -210,12 +233,18 @@ export default function PushPermission() {
     }, [isMounted, permission, checkSubscription]);
 
     async function handleOptIn() {
-        if (!("serviceWorker" in navigator)) throw new Error("Service worker not supported");
-        if (!("PushManager" in window)) throw new Error("Push not supported");
-        if (subscription) return;
+        if (!("serviceWorker" in navigator)) {
+            toast.error("Notifications aren't supported in this browser.");
+            return;
+        }
+        if (!("PushManager" in window)) {
+            toast.error("Notifications aren't supported in this browser.");
+            return;
+        }
+        if (subscription || isSubscribing) return;
 
         if (permission === "denied") {
-            toast.error("You blocked notifications. Please re-enable in browser settings.", { duration: 5000 });
+            toast.error("Notifications are blocked. Enable them in your browser settings.", { duration: 5000 });
             return;
         }
 
@@ -227,89 +256,81 @@ export default function PushPermission() {
         setIsDismissed(true);
     }
 
-    // Safety gates: Don't render if unmounted, already dismissed, permission matches, or the 10m window hasn't completed
+    function handleClose() {
+        setIsDismissed(true);
+    }
+
     if (!isMounted || isDismissed || permission === "granted" || !isDelayPassed) return null;
 
     return (
         <AnimatePresence>
-            <div
+            <motion.div
                 key="push-permission-overlay"
-                className="fixed inset-0 z-50 flex items-end md:items-center justify-center animate-in fade-in duration-300"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-end md:items-center justify-center"
             >
-                <div
-                    onClick={handleDismiss}
-                    className="absolute inset-0 bg-black/60"
-                />
+                <div onClick={handleClose} className="absolute inset-0 bg-black/60" />
                 <motion.div
-                    initial={{ opacity: 0, y: 100, scale: 0.95 }}
+                    initial={{ opacity: 0, y: 80, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 100, scale: 0.95 }}
-                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                    exit={{ opacity: 0, y: 80, scale: 0.98 }}
+                    transition={{ type: "spring", damping: 28, stiffness: 320 }}
                     className={cn(
                         "relative w-full md:max-w-sm shadow-2xl border border-border/50",
                         "bg-card rounded-t-[28px] md:rounded-3xl overflow-hidden pb-[var(--sab)]"
                     )}
                 >
-                    <div>
-                        <div className="pt-8 pb-4 px-6 text-center">
-                            <div className="relative py-8 px-6">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-primary-foreground/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-                                <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary-foreground/10 rounded-full translate-y-1/2 -translate-x-1/2" />
+                    <div className="pt-7 pb-5 px-6 text-center">
+                        <div className="flex justify-center mb-4">
+                            <div className="relative flex items-center justify-center w-14 h-14 rounded-2xl bg-accent/15">
+                                <Bell className="w-6 h-6 text-accent" strokeWidth={2} />
+                                <div className="absolute -inset-1 rounded-2xl border border-accent/30" />
+                            </div>
+                        </div>
+                        <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1.5">
+                            Notifications
+                        </p>
+                        <h2 className="text-lg font-semibold leading-snug">
+                            Be first to know when a new bale drops
+                        </h2>
+                        <p className="text-sm text-muted-foreground leading-relaxed mt-1.5">
+                            Turn on notifications so you don&apos;t miss the good pieces before they&apos;re gone.
+                        </p>
+                    </div>
 
-                                <div className="relative flex justify-center">
-                                    <div className="relative">
-                                        <div className="absolute inset-0 bg-accent/30 rounded-2xl blur-xl animate-pulse-glow" />
-                                        <div className="relative bg-card p-5 rounded-2xl">
-                                            <Gift className="w-10 h-10 text-primary" strokeWidth={2} />
-                                        </div>
-                                        <div className="absolute -top-2 -left-2 animate-sparkle-burst" style={{ animationDelay: "0s" }}>
-                                            <Star className="w-4 h-4 text-accent fill-accent" />
-                                        </div>
-                                        <div className="absolute -top-1 -right-2 animate-sparkle-burst" style={{ animationDelay: "0.5s" }}>
-                                            <Star className="w-3 h-3 text-accent fill-accent" />
-                                        </div>
-                                        <div className="absolute -bottom-1 -left-1 animate-sparkle-burst" style={{ animationDelay: "1s" }}>
-                                            <Star className="w-3 h-3 text-accent fill-accent" />
-                                        </div>
-                                        <div className="absolute -bottom-2 -right-1 animate-sparkle-burst" style={{ animationDelay: "0.75s" }}>
-                                            <Sparkles className="w-4 h-4 text-accent" />
-                                        </div>
-                                    </div>
+                    <div className="divide-y divide-border border-y border-border">
+                        {BENEFITS.map(({ icon: Icon, title, detail }) => (
+                            <div key={title} className="flex items-start gap-3 px-6 py-3.5">
+                                <Icon className="w-[18px] h-[18px] text-accent mt-0.5 shrink-0" strokeWidth={2} />
+                                <div>
+                                    <p className="text-sm font-medium">{title}</p>
+                                    <p className="text-xs text-muted-foreground mt-0.5">{detail}</p>
                                 </div>
                             </div>
-                            <h2 className="text-lg font-semibold">
-                                You Have a Gift! 🎁
-                            </h2>
-                            <p className="text-sm text-muted-foreground leading-relaxed">
-                                We have something special waiting just for you
-                            </p>
-                        </div>
-                        <div className="relative bg-muted rounded-2xl p-6 border-2 border-accent/30 text-center mb-6 mx-6">
-                            <p className="text-sm text-muted-foreground mb-2">Your gift is worth</p>
-                            <div className="flex items-center justify-center gap-2">
-                                <span className="text-5xl font-extrabold text-accent">{currency(20000)}</span>
-                            </div>
-                            <p className="text-sm font-medium text-primary mt-2">Shopping Credits</p>
-                        </div>
-                        <div className="border-t border-border">
-                            <button
-                                type="button"
-                                onClick={handleDismiss}
-                                className="w-full py-4 text-center font-medium text-sm text-muted-foreground hover:bg-secondary/50 active:bg-secondary transition-colors border-b border-border cursor-pointer"
-                            >
-                                Maybe later
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleOptIn}
-                                className="w-full py-4 text-center font-semibold text-sm text-primary hover:bg-primary/5 active:bg-primary/10 transition-colors cursor-pointer"
-                            >
-                                Claim My Gift!
-                            </button>
-                        </div>
+                        ))}
+                    </div>
+
+                    <div className="px-6 pt-4 pb-2">
+                        <button
+                            type="button"
+                            onClick={handleOptIn}
+                            disabled={isSubscribing}
+                            className="w-full py-3.5 rounded-xl bg-accent text-accent-foreground font-medium text-sm hover:bg-accent/90 active:bg-accent/80 transition-colors disabled:opacity-60 cursor-pointer"
+                        >
+                            {isSubscribing ? "Turning on…" : "Turn on notifications"}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleDismiss}
+                            className="w-full py-3 text-center font-medium text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                        >
+                            Not now
+                        </button>
                     </div>
                 </motion.div>
-            </div>
+            </motion.div>
         </AnimatePresence>
     );
 }

@@ -1,9 +1,10 @@
 from pydantic import BaseModel
+from app.lib.validation import PhoneNumber
 
 class ContactFormCreate(BaseModel):
     name: str
     email: str
-    phone: str = ""
+    phone: PhoneNumber = None
     message: str = "bearer"
 
 
