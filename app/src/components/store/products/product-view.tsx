@@ -14,7 +14,7 @@ import { ProductVariantActions } from "@/components/products/product-variant-act
 import ShareButton from "@/components/share";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { useOverlayTriggerState } from "react-stately";
-import { gtag } from "@/utils/gtag";
+import { track } from "@/lib/analytics";
 
 interface Props {
     product: ProductLite;
@@ -57,7 +57,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
     };
 
     useEffect(() => {
-        gtag.viewItem({ id: product.id, name: product.name, price: selectedVariant?.price! });
+        track("product_viewed", { product_id: product.id })
     }, [product.id]);
 
     return (
