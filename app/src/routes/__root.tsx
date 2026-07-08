@@ -174,7 +174,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                         <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
                                     )}
                                 </div>
-                                {/* {import.meta.env.MODE !== "production" && <TanStackRouterDevtoolsPanel />} */}
                                 <Toaster
                                     closeButton
                                     richColors

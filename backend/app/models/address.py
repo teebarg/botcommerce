@@ -1,7 +1,7 @@
 import re
 from pydantic import BaseModel, Field, field_validator
 from prisma.enums import AddressType
-from app.lib.validation import normalize_phone
+from app.lib.validation import PhoneNumber
 
 class Address(BaseModel):
     id: int
@@ -25,8 +25,8 @@ class AddressCreate(BaseModel):
     address_2: str | None = Field(default=None, max_length=1255)
     address_type: AddressType | None = Field(default=None)
     label: str | None = Field(default=None, max_length=255)
-    state: str = Field(..., max_length=255)
-    phone: str | None = Field(default=None, max_length=20)
+    state: str = Field(..., max_length=55)
+    phone: PhoneNumber = None
 
     @field_validator(
         "first_name",
@@ -51,15 +51,6 @@ class AddressCreate(BaseModel):
         v = v.strip()
         return v if v else None
 
-    @field_validator("phone", mode="before")
-    def validate_phone(cls, v):
-        if not v:
-            return None
-        normalized = normalize_phone(v)
-        if not re.fullmatch(r"^\+\d{7,15}$", normalized):
-            raise ValueError("Invalid phone number format")
-        return normalized
-
 
 class AddressUpdate(BaseModel):
     first_name: str | None = Field(default=None, max_length=255)
@@ -69,7 +60,7 @@ class AddressUpdate(BaseModel):
     address_type: AddressType | None = Field(default=None)
     label: str | None = Field(default=None, max_length=255)
     state: str | None = Field(default=None, max_length=255)
-    phone: str | None = Field(default=None, max_length=20)
+    phone: PhoneNumber = None
 
     @field_validator(
         "first_name",
@@ -96,15 +87,6 @@ class AddressUpdate(BaseModel):
             return None
         v = v.strip()
         return v if v else None
-
-    @field_validator("phone", mode="before")
-    def validate_phone(cls, v):
-        if not v:
-            return None
-        normalized = normalize_phone(v)
-        if not re.fullmatch(r"^\+\d{7,15}$", normalized):
-            raise ValueError("Invalid phone number format")
-        return normalized
 
 class Addresses(BaseModel):
     addresses: list[Address]
