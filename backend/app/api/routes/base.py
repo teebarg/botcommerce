@@ -1,12 +1,7 @@
 from typing import Literal, Optional
-from fastapi import (
-    APIRouter,
-    Depends,
-    Query,
-    Request,
-)
-from app.prisma_client import prisma as db
+from fastapi import APIRouter, Depends, Query, Request
 from prisma.enums import Role
+from app.prisma_client import prisma as db
 from datetime import timedelta, datetime
 from app.core.permissions import require_admin
 from app.core.dependencies.cache import CacheDep

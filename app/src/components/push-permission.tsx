@@ -6,6 +6,7 @@ import { cn } from "@/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { api } from "@/utils/api";
 import { Message } from "@/schemas";
+import { track } from "@/lib/analytics";
 
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000;
 const INITIAL_DELAY_DURATION = 20 * 1000;
@@ -184,6 +185,7 @@ export default function PushPermission() {
         try {
             const perm = await Notification.requestPermission();
             setPermission(perm);
+            track(perm === "granted" ? "push_permission_granted" : "push_permission_denied");
 
             if (perm !== "granted") return;
 
@@ -196,11 +198,13 @@ export default function PushPermission() {
 
             const synced = await syncSubscriptionToBackend(sub);
             if (!synced) {
+                track("push_sync_failed");
                 // syncSubscriptionToBackend already surfaced a toast
                 return;
             }
+            track("push_subscribed");
         } catch (err) {
-            console.error("Push subscribe failed", err);
+            track("push_subscribe_failed", { message: err instanceof Error ? err.message : String(err) });
             toast.error("Couldn't turn on notifications. Please try again.");
         } finally {
             setIsSubscribing(false);
@@ -233,17 +237,17 @@ export default function PushPermission() {
     }, [isMounted, permission, checkSubscription]);
 
     async function handleOptIn() {
-        if (!("serviceWorker" in navigator)) {
-            toast.error("Notifications aren't supported in this browser.");
-            return;
-        }
-        if (!("PushManager" in window)) {
+        track("push_cta_clicked");
+
+        if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+            track("push_unsupported_browser");
             toast.error("Notifications aren't supported in this browser.");
             return;
         }
         if (subscription || isSubscribing) return;
 
         if (permission === "denied") {
+            track("push_already_blocked");
             toast.error("Notifications are blocked. Enable them in your browser settings.", { duration: 5000 });
             return;
         }
@@ -252,15 +256,24 @@ export default function PushPermission() {
     }
 
     function handleDismiss() {
+        track("push_dismissed_not_now");
         localStorage.setItem("push_dismissed_until", (Date.now() + DISMISS_DURATION).toString());
         setIsDismissed(true);
     }
 
     function handleClose() {
+        track("push_dismissed_backdrop");
         setIsDismissed(true);
     }
 
-    if (!isMounted || isDismissed || permission === "granted" || !isDelayPassed) return null;
+    const isVisible = isMounted && !isDismissed && permission !== "granted" && isDelayPassed;
+
+    useEffect(() => {
+        if (isVisible) track("push_prompt_shown");
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isVisible]);
+
+    if (!isVisible) return null;
 
     return (
         <AnimatePresence>

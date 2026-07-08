@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from app.api.routes import (
     auth,
     activities,
+    analytics,
     address,
     bank_details,
     cart,
@@ -30,6 +31,7 @@ from app.api.routes import (
 api_router = APIRouter()
 api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 api_router.include_router(activities.router, prefix="/activities", tags=["activities"])
+api_router.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
 api_router.include_router(address.router, prefix="/address", tags=["address"])
 api_router.include_router(bank_details.router, prefix="/bank-details", tags=["bank-details"])
 api_router.include_router(base.router, prefix="", tags=["base"])

@@ -4,6 +4,8 @@ import CartItemComponent from "./cart-item";
 import type { Cart, CartItem } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import CartSummary from "./cart-summary";
+import { useEffect } from "react";
+import { track } from "@/lib/analytics";
 
 interface Props {
     onClose?: () => void;
@@ -11,6 +13,10 @@ interface Props {
 }
 
 const CartDetails: React.FC<Props> = ({ onClose, cart }) => {
+    useEffect(() => {
+        if (!cart) return;
+        track("cart_viewed", { cart_id: cart.cart_number })
+    }, [cart]);
     return (
         <div className="flex-1 flex flex-col overflow-hidden pt-2">
             {cart?.items?.length === 0 ? (

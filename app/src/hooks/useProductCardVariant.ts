@@ -6,6 +6,7 @@ import { useConfig } from "@/providers/store-provider";
 import { useCart } from "@/providers/cart-provider";
 import { isFirstWhatsAppMessage, markFirstWhatsAppMessageSent } from "@/utils/whatsapp-message-state";
 import { toast } from "sonner";
+import { track } from "@/lib/analytics";
 
 export const useProductCardVariant = (product: ProductSearch) => {
     const { cart } = useCart();
@@ -46,9 +47,11 @@ export const useProductCardVariant = (product: ProductSearch) => {
                 return
             }
             updateQuantity({ item_id: variantInCart.id, quantity: variantInCart.quantity + 1 })
+            track("product_added_to_cart", { variant_id: variantInCart.id })
             return;
         }
         addToCart({ variant_id: firstInStockVariant.id, quantity: 1 });
+        track("product_added_to_cart", { variant_id: firstInStockVariant.id })
     };
 
     const handleWhatsAppPurchase = () => {

@@ -2,7 +2,7 @@ import { redirect } from "@tanstack/react-router";
 
 const isServer = typeof window === "undefined";
 
-const baseURL = isServer
+export const baseURL = isServer
     ? (process.env.API_URL || "http://shop-api:8000")
     : (import.meta.env.VITE_API_URL || "https://api.shop.localhost");
 
