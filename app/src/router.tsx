@@ -9,9 +9,10 @@ export function getRouter() {
     const queryClient = new QueryClient({
         defaultOptions: {
             queries: {
-                refetchOnMount: true,
+                refetchOnMount: false,
                 staleTime: 1000 * 60 * 30,
                 gcTime: 1000 * 60 * 60,
+                refetchOnWindowFocus: false,
             },
         },
     })
@@ -21,7 +22,8 @@ export function getRouter() {
         context: {
             queryClient, config: {}
         },
-        defaultPreload: 'intent',
+        defaultPreload: false,
+        defaultPreloadDelay: 150,
         defaultErrorComponent: DefaultCatchBoundary,
         defaultNotFoundComponent: () => <NotFound />,
     })
