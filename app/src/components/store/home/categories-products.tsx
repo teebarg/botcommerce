@@ -4,7 +4,7 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/utils/api";
 import { PageLoader } from "@/components/generic/page-loader";
-import ProductCard from "../products/product-card-revamped";
+import ProductCard from "@/components/store/products/product-card-revamped";
 
 export default function CategoriesWithProductsSection() {
     const { data, isLoading } = useQuery({

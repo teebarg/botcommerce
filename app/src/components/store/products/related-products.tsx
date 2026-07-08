@@ -1,8 +1,8 @@
 import type { ProductSearch } from "@/schemas/product";
-import ProductCard from "@/components/store/products/product-card";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/utils/api";
 import { PageLoader } from "@/components/generic/page-loader";
+import ProductCard from "@/components/store/products/product-card-revamped";
 
 type RelatedProductsProps = {
     productId: number;
@@ -11,7 +11,7 @@ type RelatedProductsProps = {
 export default function RelatedProducts({ productId }: RelatedProductsProps) {
     const { data, isPending, error } = useQuery({
         queryKey: ["products", "similar", productId],
-        queryFn: async () => await api.get<{ similar: ProductSearch[] }>(`/product/${productId}/similar`, { params: { limit: 12 } }),
+        queryFn: async () => await api.get<{ similar: ProductSearch[] }>(`/product/${productId}/similar`, { params: { limit: 4 } }),
     });
     
     if (isPending) {
@@ -24,13 +24,13 @@ export default function RelatedProducts({ productId }: RelatedProductsProps) {
     }
 
     return (
-        <div>
-            <div className="flex flex-col items-center text-center mb-12">
+        <div className="max-w-sxl mx-auto">
+            <div className="flex flex-col items-center text-center mb-8">
                 <span className="text-sm text-muted-foreground">Related products</span>
-                <p className="text-base md:text-xl text-foreground max-w-lg">You might also want to check out these products.</p>
+                <p className="text-base text-foreground max-w-lg">You might also want to check out these products.</p>
             </div>
             <ul className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                {productPreviews?.slice(0, 4)?.map((product: ProductSearch, idx: number) => (
+                {productPreviews?.map((product: ProductSearch, idx: number) => (
                     <li key={idx}>
                         <ProductCard product={product} />
                     </li>
