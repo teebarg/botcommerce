@@ -1,7 +1,7 @@
 import { api } from "@/utils/api";
 import { createServerFn } from "@tanstack/react-start";
 import type { Session, User } from "@/schemas";
-import { useAppSession } from "@/utils/session";
+import { AppSession, useAppSession } from "@/utils/session";
 
 export const getMeFn = createServerFn({ method: "GET" }).handler(async () => {
     return await api.get<User>("/users/me");
@@ -13,9 +13,18 @@ export const getUserFn = createServerFn({ method: "GET" })
         return await api.get<User>(`/users/get-user?email=${email}`);
     });
 
+export const fetchUserFn = createServerFn().handler(async (): Promise<AppSession> => {
+    const { data } = await useAppSession();
+    return {
+        ...data,
+        isAdmin: ["ADMIN"].includes(data?.user?.role || ""),
+        isAuthenticated: Boolean(data.userId)
+    }
+});
+
 export const logoutFn = createServerFn().handler(async () => {
     const session = await useAppSession();
-    session.clear();
+    await session.clear();
 });
 
 export const loginFn = createServerFn({ method: "POST" })

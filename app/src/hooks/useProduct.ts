@@ -63,6 +63,7 @@ export const useIndexProducts = () => {
     return useQuery({
         queryKey: ["products", "collections"],
         queryFn: async () => await api.get<IndexProducts>("/product/index-products"),
+        staleTime: 1000 * 60 * 60,
     });
 };
 
