@@ -1,10 +1,10 @@
 import { ShoppingBag } from "lucide-react";
-import { gtag } from "@/utils/gtag";
 import { useMemo } from "react";
 import { useCart } from "@/providers/cart-provider";
 import { CartItem, ChatProduct } from "@/schemas";
 import { useAddToCart, useChangeCartQuantity } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
+import { track } from "@/lib/analytics";
 
 export const ProductCard = ({ product }: { product: ChatProduct }) => {
     const { cart } = useCart();
@@ -22,12 +22,7 @@ export const ProductCard = ({ product }: { product: ChatProduct }) => {
 
         if (variantInCart) {
             updateQuantity({ item_id: variantInCart.id, quantity: variantInCart.quantity + 1 }).then(() => {
-                gtag.addToCart({
-                    product_id: product.id,
-                    product_name: product.name,
-                    quantity: variantInCart.quantity + 1,
-                    price: Number(product.price),
-                });
+                track("product_added_to_cart", { variant_id: product.id })
             });
             return;
         }
@@ -35,12 +30,7 @@ export const ProductCard = ({ product }: { product: ChatProduct }) => {
             variant_id: product.variant_id,
             quantity: 1,
         }).then(() => {
-            gtag.addToCart({
-                product_id: product.id,
-                product_name: product.name,
-                quantity: 1,
-                price: Number(product.price),
-            });
+            track("product_added_to_cart", { variant_id: product.id })
         });
     };
     return (

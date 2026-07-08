@@ -7,8 +7,8 @@ import type { ProductLite, ProductSearch, ProductVariantLite } from "@/schemas/p
 import { useCart } from "@/providers/cart-provider";
 import { isFirstWhatsAppMessage, markFirstWhatsAppMessageSent } from "@/utils/whatsapp-message-state";
 import { CartItem } from "@/schemas";
-import { gtag } from "@/utils/gtag";
 import { toast } from "sonner";
+import { track } from "@/lib/analytics";
 
 export const useProductVariant = (product: ProductLite | ProductSearch) => {
     const { cart } = useCart();
@@ -186,12 +186,7 @@ export const useProductVariant = (product: ProductLite | ProductSearch) => {
             }
             updateQuantity({ item_id: variantInCart.id, quantity: variantInCart.quantity + quantity }).then(() => {
                 setIsAdded(true);
-                gtag.addToCart({
-                    product_id: product.id.toString(),
-                    product_name: product.name,
-                    quantity,
-                    price: selectedVariant.price,
-                });
+                track("product_added_to_cart", { variant_id: product.id })
             });
             setTimeout(() => setIsAdded(false), 3000);
 
@@ -202,12 +197,7 @@ export const useProductVariant = (product: ProductLite | ProductSearch) => {
             quantity,
         }).then(() => {
             setIsAdded(true);
-            gtag.addToCart({
-                product_id: product.id.toString(),
-                product_name: product.name,
-                quantity,
-                price: selectedVariant.price,
-            });
+            track("product_added_to_cart", { variant_id: product.id })
         });
         setTimeout(() => setIsAdded(false), 3000);
     };

@@ -3,7 +3,7 @@ import { FeedQuery, ProductFeed, ProductSearch } from "@/schemas";
 import { InfiniteList } from "@/components/InfiniteList";
 import NoProductsFound from "../products/no-products";
 import { useMemo } from "react";
-import ProductCard from "../products/product-card-revamped";
+import ProductCard from "@/components/store/products/product-card-revamped";
 
 interface Props {
     initialData?: ProductFeed | null;
@@ -23,7 +23,7 @@ export default function InfiniteFeed({ initialData, params }: Props) {
 
     return (
         <InfiniteList hasMore={!!hasNextPage} isLoading={isFetchingNextPage} onLoadMore={fetchNextPage}>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:gap-4 gap-1.5">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:gap-2 gap-1.5">
                 {products?.map((product: ProductSearch, idx: number) => (
                     <ProductCard key={idx} product={product} />
                 ))}

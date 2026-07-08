@@ -3,7 +3,7 @@ import type { ProductSearch, SearchCatalog } from "@/schemas";
 import NoProductsFound from "@/components/store/products/no-products";
 import { api } from "@/utils/api";
 import { InfiniteList } from "@/components/InfiniteList";
-import ProductCard from "../products/product-card-revamped";
+import ProductCard from "@/components/store/products/product-card-revamped";
 import { PageLoader } from "@/components/generic/page-loader";
 
 interface Props {

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ProductSearch } from "@/schemas";
-import ProductCard from "./products/product-card";
+import ProductCard from "@/components/store/products/product-card-revamped";
 
 interface ProductSectionProps {
     title: string;
@@ -134,7 +134,7 @@ const ProductSection = ({ title, subtitle, products, href }: ProductSectionProps
             <ul ref={listRef} className="flex gap-2 overflow-x-auto px-2 md:px-0">
                 {products.map((product) => (
                     <li key={product.id} data-card>
-                        <ProductCard product={product} />
+                        <ProductCard product={product} className="w-60 md:w-72" />
                     </li>
                 ))}
             </ul>

@@ -9,7 +9,7 @@ import { useProductSearch } from "@/hooks/useProduct";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "@tanstack/react-router";
 import { Link } from '@tanstack/react-router'
-import ProductCard from "./products/product-card-revamped";
+import ProductCard from "@/components/store/products/product-card-revamped";
 
 interface SearchDialogProps {
     initialQuery?: string;

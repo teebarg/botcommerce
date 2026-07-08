@@ -8,12 +8,12 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { BackButton } from "@/components/back";
 import { meQuery } from "@/queries/user.queries";
 import { useEffect } from "react";
-import { gtag } from "@/utils/gtag";
 import { SignInRedirect } from "@/utils/reuseable";
 import { PageLoader } from "@/components/generic/page-loader";
 import EmptyState from "@/components/generic/empty";
 import { BtnLink } from "@/components/ui/btnLink";
 import { ShoppingCart } from "lucide-react";
+import { track } from "@/lib/analytics";
 
 export const Route = createFileRoute("/checkout")({
     beforeLoad: ({ context }) => {
@@ -50,17 +50,7 @@ function RouteComponent() {
 
     useEffect(() => {
         if (!cart) return;
-
-        gtag.beginCheckout({
-            cart_id: cart.cart_number,
-            value: cart.total,
-            items: cart.items.map((item) => ({
-                id: item.id,
-                name: item.name,
-                price: item.price,
-                quantity: item.quantity,
-            })),
-        });
+        track("checkout_started", { cart_id: cart.cart_number, value: cart.total })
     }, [cart]);
 
     if (error) {

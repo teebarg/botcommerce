@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 
 interface ProductCardProps {
     product: ProductSearch;
+    className?: string
 }
 
 const WhatsAppIcon = ({ className }: { className?: string }) => (
@@ -23,7 +24,7 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
     </svg>
 );
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
     const { priceInfo, handleAddToCart, handleWhatsAppPurchase, outOfStock, loading } = useProductCardVariant(product);
     const { minPrice, maxCompareAtPrice, hasDiscount, maxDiscountPercent } = priceInfo;
     // const { mutate: createWishlist } = useUserCreateWishlist();
@@ -60,7 +61,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <Link
             to="/products/$slug"
             params={{ slug: product.slug }}
-            className="relative2 block w-full rounded-xl overflow-hidden border border-border bg-secondary group"
+            className={cn("block w-full rounded-xl overflow-hidden border border-border group", className)}
         >
             <div className="relative aspect-gallery">
                 <ImageLightbox
@@ -126,17 +127,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     </div>
                 </div>
             </div>
-            <div className="flex gap-2 bg-card py-2 px-2.5">
+            <div className="flex gap-2 py-2 px-2.5">
                 <Button
                     onClick={onAddToCart}
                     aria-label="Add to cart"
-                    variant="ghost"
-                    className="border border-foreground/70 flex-1"
+                    variant="outline"
+                    className="flex-1"
                     size="sm"
                     disabled={outOfStock}
                     isLoading={loading}
                 >
-                        Add to cart
+                    Add to cart
                 </Button>
                 <button
                     onClick={onWhatsApp}
