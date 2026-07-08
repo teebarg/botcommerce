@@ -50,7 +50,7 @@ class ChatRequest(BaseModel):
     )
     customer_id: Optional[int] = Field(
         default=None,
-        gt=0,  # must be positive if provided
+        gt=0,
         description="Customer ID if the user is logged in."
     )
     app_session_id: str = Field(min_length=1, max_length=100)

@@ -71,7 +71,7 @@ function RouteComponent() {
                                 {faq.is_active ? "Active" : "Inactive"}
                             </Badge>
                         </div>
-                        <div className="border-t border-border px-5 py-2 bg-muted/50 flex items-center justify-between">
+                        <div className="border-t border-border px-4 py-2 bg-muted/50 flex items-center justify-between">
                             <Badge variant="accent">
                                 <Tag className="w-3 h-3 mr-1" />
                                 {faq.category}
