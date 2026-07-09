@@ -80,7 +80,7 @@ const AddressForm: React.FC<AddressFormProps> = ({ mode, address, onClose }) => 
     return (
         <Form {...form}>
             <form className="flex-1 flex flex-col overflow-hidden" onSubmit={form.handleSubmit(onSubmit)}>
-                <div className="overflow-y-auto flex-1 px-4 space-y-4">
+                <div className="overflow-y-auto flex-1 px-4 pb-4 space-y-4">
                     {mode === "create" && (
                         <FormField
                             control={form.control}
@@ -210,9 +210,8 @@ const AddressForm: React.FC<AddressFormProps> = ({ mode, address, onClose }) => 
                         )}
                     />
                 </div>
-
-                <div className="flex gap-3 mt-6 justify-end px-4 py-2 border-t">
-                    <Button type="button" variant="destructive" onClick={onClose}>
+                <div className="sheet-footer">
+                    <Button type="button" variant="outline" onClick={onClose}>
                         Cancel
                     </Button>
                     <Button type="submit" disabled={isDisabled} isLoading={isLoading}>

@@ -26,7 +26,7 @@ const Pickup: React.FC<PickupProps> = ({ amount, canContinue }) => {
                 isLoading={completeCart.isPending}
                 size="lg"
                 onClick={onPaymentCompleted}
-                className="rounded-full text-sm font-semibold w-full md:w-auto md:px-10"
+                className="rounded-full text-md font-semibold w-full md:w-auto md:px-10"
             >
                 Confirm Order {currency(amount)} for Pickup
                 <ChevronRight className="h-4 w-4" />

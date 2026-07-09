@@ -1,5 +1,5 @@
 import type React from "react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
     Search,
     SlidersHorizontal,
@@ -18,6 +18,7 @@ import { useSearch } from "@tanstack/react-router";
 import { useOverlayTriggerState } from "react-stately";
 import { Button } from "@/components/ui/button";
 import SheetDrawer from "@/components/sheet-drawer";
+import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
 
 const PIPELINE = [
     { status: "PENDING", label: "Pending", icon: Clock },
@@ -34,12 +35,7 @@ export const OrderFilters: React.FC = () => {
     const state = useOverlayTriggerState({});
     const { updateQuery } = useUpdateQuery(200);
     const search = useSearch({ strict: false }) as Record<string, string | undefined>;
-    const [searchValue, setSearchValue] = useState(search.search ?? "");
-
-    const onSearchChange = (value: string) => {
-        setSearchValue(value);
-        updateQuery([{ key: "search", value }]);
-    };
+    const { value: searchValue, onChange: onSearchChange } = useDebouncedSearch("search", search.search);
 
     const clearAll = () => {
         updateQuery([
@@ -48,7 +44,7 @@ export const OrderFilters: React.FC = () => {
             { key: "start_date", value: "" },
             { key: "end_date", value: "" },
         ]);
-        setSearchValue("");
+        onSearchChange("");
         state.close();
     };
 

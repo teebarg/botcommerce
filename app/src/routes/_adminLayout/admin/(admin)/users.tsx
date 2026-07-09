@@ -9,10 +9,10 @@ import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { api } from "@/utils/api";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
-import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import { useState } from "react";
 import EmptyState from "@/components/generic/empty";
 import { PageLoader } from "@/components/generic/page-loader";
+import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
 
 export const Route = createFileRoute("/_adminLayout/admin/(admin)/users")({
     validateSearch: z.object({
@@ -26,8 +26,8 @@ export const Route = createFileRoute("/_adminLayout/admin/(admin)/users")({
 
 function RouteComponent() {
     const params = Route.useSearch();
-    const { updateQuery } = useUpdateQuery(200);
     const [filterOpen, setFilterOpen] = useState<boolean>(false);
+    const { value: searchValue, onChange: onSearchChange } = useDebouncedSearch("query", params.query);
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedUsers, User>({
         queryKey: ["users", params],
@@ -52,8 +52,8 @@ function RouteComponent() {
                             className="pl-10 pr-12 py-2 w-full border border-input rounded-lg focus:outline-none"
                             placeholder="Search customers..."
                             type="text"
-                            value={params.query ?? ""}
-                            onChange={(e) => updateQuery([{ key: "query", value: e.target.value }])}
+                            value={searchValue}
+                            onChange={(e) => onSearchChange(e.target.value)}
                         />
                         <ConfirmDrawer
                             open={filterOpen}

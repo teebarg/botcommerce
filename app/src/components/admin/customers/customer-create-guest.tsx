@@ -75,7 +75,7 @@ export default function CustomerCreateGuest() {
                             )}
                         />
                     </div>
-                    <div className="flex justify-end gap-2 p-4 border-t border-border">
+                    <div className="sheet-footer">
                         <Button type="button" variant="outline" onClick={() => createState.close()}>
                             Cancel
                         </Button>

@@ -14,8 +14,8 @@ const statusConfig: Record<OrderStatus, { nextStatus: OrderStatus | null; action
     [OrderStatus.REFUNDED]: { nextStatus: null, actionLabel: "", variant: "destructive" },
     [OrderStatus.PENDING]: { nextStatus: OrderStatus.PROCESSING, actionLabel: "Mark as Processing", variant: "warning" },
     [OrderStatus.PROCESSING]: { nextStatus: OrderStatus.SHIPPED, actionLabel: "Mark as Order Packed", variant: "default" },
-    [OrderStatus.SHIPPED]: { nextStatus: OrderStatus.OUT_FOR_DELIVERY, actionLabel: "Mark Out for Delivery", variant: "accent" },
-    [OrderStatus.OUT_FOR_DELIVERY]: { nextStatus: OrderStatus.DELIVERED, actionLabel: "Mark Delivered", variant: "success" },
+    [OrderStatus.SHIPPED]: { nextStatus: OrderStatus.OUT_FOR_DELIVERY, actionLabel: "Mark as Out for Delivery", variant: "accent" },
+    [OrderStatus.OUT_FOR_DELIVERY]: { nextStatus: OrderStatus.DELIVERED, actionLabel: "Mark as Delivered", variant: "success" },
     [OrderStatus.DELIVERED]: { nextStatus: null, actionLabel: "", variant: "outline" },
     [OrderStatus.CANCELED]: { nextStatus: null, actionLabel: "", variant: "destructive" },
 };

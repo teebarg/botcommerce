@@ -21,7 +21,7 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ cart }) => {
             completed.push("delivery");
         }
 
-        if (cart.payment_method) {
+        if (cart.status == "CONVERTED") {
             completed.push("payment");
         }
 

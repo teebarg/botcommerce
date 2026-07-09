@@ -97,8 +97,8 @@ const CustomerFilter = ({ open, onOpenChange }: CustomerFilterProps) => {
                     </div>
                 </div>
             </div>
-            <div className="flex justify-end gap-2 border-t border-border p-4">
-                <Button variant="outline" onClick={handleReset}>
+            <div className="sheet-footer">
+                <Button variant="inverse" onClick={handleReset}>
                     Reset
                 </Button>
                 <Button onClick={handleApply}>Apply Filters</Button>

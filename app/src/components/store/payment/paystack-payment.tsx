@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { Check, ChevronRight, Globe } from "lucide-react";
+import { Check, ChevronRight, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { PaymentInitialize } from "@/types/payment";
 import { currency } from "@/utils";
@@ -11,7 +11,6 @@ interface PaystackPaymentProps {
     cartNumber: string;
     amount: number;
     canContinue: boolean;
-    onSuccess?: () => void;
 }
 
 export function PaystackPayment({ cartNumber, amount, canContinue }: PaystackPaymentProps) {
@@ -19,39 +18,39 @@ export function PaystackPayment({ cartNumber, amount, canContinue }: PaystackPay
 
     const handlePayment = async () => {
         setLoading(true);
-        const { data, error } = await tryCatch<PaymentInitialize>(api.post<PaymentInitialize>(`/payment/initialize/${cartNumber}`));
+        const { data, error } = await tryCatch<PaymentInitialize>(
+            api.post<PaymentInitialize>(`/payment/initialize/${encodeURIComponent(cartNumber)}`)
+        );
 
         setLoading(false);
 
         if (error) {
-            toast.error(error);
-
+            toast.error(error ?? "Something went wrong");
             return;
         }
         if (!data?.authorization_url) {
             toast.error("Authorization URL not found");
-
             return;
         }
-        window.location.href = data?.authorization_url ?? "/";
+        window.location.href = data.authorization_url;
     };
 
     return (
         <>
             <div className="px-4 mt-4">
-                <div className="rounded-xl border border-border bg-card p-4">
+                <div className="rounded-xl bg-card p-4">
                     <div className="flex items-center gap-2 mb-3">
-                        <Globe className="h-4 w-4 text-muted-foreground" />
-                        <h4 className="text-sm font-medium">Paystack payment</h4>
+                        <ShieldCheck className="h-4 w-4 text-primary" />
+                        <h4 className="text-sm font-medium">Pay with Paystack</h4>
                     </div>
                     <p className="text-sm text-muted-foreground mb-3">
-                        {`You'll be redirected to Paystack's secure payment gateway to complete your transaction.`}
+                        {`You'll be redirected to Paystack to complete payment, then brought right back here.`}
                     </p>
-                    <ul className="space-y-1.5">
+                    <ul className="space-y-2">
                         {[
-                            "Secure SSL encryption",
-                            "Multiple payment options available",
-                            "Instant payment confirmation",
+                            "Card, bank transfer, or USSD",
+                            "Instant confirmation, no delays",
+                            "Your card details never touch our servers",
                         ].map((item) => (
                             <li key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <Check className="h-3.5 w-3.5 text-success shrink-0" />
@@ -67,7 +66,7 @@ export function PaystackPayment({ cartNumber, amount, canContinue }: PaystackPay
                     isLoading={loading}
                     size="lg"
                     onClick={handlePayment}
-                    className="rounded-full text-sm font-semibold w-full md:w-auto md:px-10"
+                    className="rounded-full text-md font-semibold w-full md:w-auto md:px-10"
                 >
                     Pay {currency(amount)} Now
                     <ChevronRight className="h-4 w-4" />

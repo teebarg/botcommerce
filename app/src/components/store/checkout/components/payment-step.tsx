@@ -1,6 +1,6 @@
 import React from "react";
 import { paymentInfoMap } from "@/utils/constants";
-import { RadioGroupItem, RadioGroupWithLabel } from "@/components/ui/radio-group";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Cart, PaymentMethod } from "@/schemas";
 import { useUpdateCartDetails } from "@/hooks/useCart";
 import { PaystackPayment } from "@/components/store/payment/paystack-payment";
@@ -41,7 +41,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
 
     return (
         <div className="flex-1 overflow-y-auto slide-in">
-            <div className="space-y-4 px-4">
+            <div className="space-y-6 px-4">
                 <div className="text-center">
                     <h2 className="text-xl font-bold">Payment Details</h2>
                     <p className="text-muted-foreground text-sm">Complete your order</p>
@@ -83,44 +83,46 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                                 {cart?.total! < 1 ? (
                                     <ZeroPayment />
                                 ) : (
-                                    <RadioGroupWithLabel
-                                        className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4"
-                                        label="Payment Method"
-                                        value={cart?.payment_method || ""}
-                                        onValueChange={(value: string) => {
-                                            handleChange(value as PaymentMethod);
-                                        }}
-                                    >
-                                        {payMethods.map((item: { id: string; provider_id: PaymentMethod }, idx: number) => {
-                                            if (
-                                                (item.provider_id === PaymentMethod.CASH_ON_DELIVERY && payment_cash != "true") ||
-                                                (item.provider_id === PaymentMethod.BANK_TRANSFER && payment_bank != "true") ||
-                                                (item.provider_id === PaymentMethod.PAYSTACK && payment_paystack != "true") ||
-                                                (cart?.shipping_method !== "PICKUP" && item.provider_id === PaymentMethod.CASH_ON_DELIVERY)
-                                            ) {
-                                                return null;
-                                            }
+                                    <div>
+                                        <div className="text-xs text-muted-foreground mb-1 ml-0.5">Choose your payment method.</div>
+                                        <RadioGroup
+                                            className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4"
+                                            value={cart?.payment_method || ""}
+                                            onValueChange={(value: string) => {
+                                                handleChange(value as PaymentMethod);
+                                            }}
+                                        >
+                                            {payMethods.map((item: { id: string; provider_id: PaymentMethod }, idx: number) => {
+                                                if (
+                                                    (item.provider_id === PaymentMethod.CASH_ON_DELIVERY && payment_cash != "true") ||
+                                                    (item.provider_id === PaymentMethod.BANK_TRANSFER && payment_bank != "true") ||
+                                                    (item.provider_id === PaymentMethod.PAYSTACK && payment_paystack != "true") ||
+                                                    (cart?.shipping_method !== "PICKUP" && item.provider_id === PaymentMethod.CASH_ON_DELIVERY)
+                                                ) {
+                                                    return null;
+                                                }
 
-                                            return (
-                                                <RadioGroupItem
-                                                    key={idx}
-                                                    loading={updateCartDetails.isPending && selectedPaymentMethod === item.provider_id}
-                                                    value={item.provider_id}
-                                                    variant="card"
-                                                >
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="shrink-0 mt-0.5 text-primary">{paymentInfoMap[item.provider_id]?.icon}</div>
-                                                        <div className="text-left">
-                                                            <div className="font-medium">{paymentInfoMap[item.provider_id]?.title}</div>
-                                                            <div className="text-sm text-muted-foreground">
-                                                                {paymentInfoMap[item.provider_id]?.description}
+                                                return (
+                                                    <RadioGroupItem
+                                                        key={idx}
+                                                        loading={updateCartDetails.isPending && selectedPaymentMethod === item.provider_id}
+                                                        value={item.provider_id}
+                                                        variant="payment"
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="shrink-0">{paymentInfoMap[item.provider_id]?.icon}</div>
+                                                            <div className="text-left">
+                                                                <div className="font-semibold text-md">{paymentInfoMap[item.provider_id]?.title}</div>
+                                                                <div className="text-sm text-muted-foreground">
+                                                                    {paymentInfoMap[item.provider_id]?.description}
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </RadioGroupItem>
-                                            );
-                                        })}
-                                    </RadioGroupWithLabel>
+                                                    </RadioGroupItem>
+                                                );
+                                            })}
+                                        </RadioGroup>
+                                    </div>
                                 )}
                             </div>
                         )}

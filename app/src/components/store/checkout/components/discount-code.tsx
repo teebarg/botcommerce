@@ -1,19 +1,20 @@
 import type React from "react";
 import { useMemo, useState } from "react";
-import { cn, currency } from "@/utils";
-import { Check, Tag, X } from "lucide-react";
+import { currency } from "@/utils";
+import { Check, ChevronDown, Tag } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/providers/cart-provider";
 import { useApplyCoupon, useRemoveCoupon } from "@/hooks/useCoupon";
 import { toast } from "sonner";
 import { fireConfetti } from "@/utils/confetti";
-import { Label } from "@/components/ui/label";
 import { PageLoader } from "@/components/generic/page-loader";
+import { AnimatePresence, motion } from "framer-motion";
 
 const DiscountCode: React.FC = () => {
     const { cart, isLoading } = useCart();
     const [code, setCode] = useState<string>("");
+    const [isOpen, setIsOpen] = useState<boolean>(false);
     const applyMutation = useApplyCoupon();
     const removeMutation = useRemoveCoupon();
 
@@ -53,55 +54,64 @@ const DiscountCode: React.FC = () => {
 
     if (isLoading) return <PageLoader variant="box" />;
     return (
-        <div className="flex items-center gap-2 p-3 rounded-lg border border-dashed border-accent animate-in fade-in duration-300">
-            {appliedDiscount ? (
-                <>
-                    <div className="flex items-center gap-3 flex-1">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary">
-                            <Check className="h-4 w-4 text-white" />
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium">Coupon Applied</p>
-                            <p className="text-xs text-muted-foreground">-{appliedDiscount} discount applied</p>
-                        </div>
-                    </div>
-                    <Button variant="accent" size="icon" onClick={removeDiscountCode} disabled={removeMutation.isPending} className="h-8 w-8">
-                        <X className="h-4 w-4" />
-                    </Button>
-                </>
-            ) : (
-                <>
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary">
-                        <Tag className="h-4 w-4 text-white" />
-                    </div>
-                    <div className="flex-1 bg">
-                        <Input
-                            value={code}
-                            onChange={(e) => setCode(e.target.value.toUpperCase())}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    applyDiscountCode();
-                                }
-                            }}
-                            className="border-0 uppercase focus-visible:ring-0"
-                            data-testid="discount-input"
-                            name="code"
-                            placeholder="Enter coupon code"
-                            type="text"
-                            disabled={applyMutation.isPending || removeMutation.isPending}
-                        />
-                    </div>
-                    <Button
-                        onClick={applyDiscountCode}
-                        variant="ghost"
-                        className="bg-transparent text-accent"
-                        isLoading={applyMutation.isPending}
-                        disabled={!code}
+        <div>
+            <button className="flex items-center justify-between mb-2 w-full" onClick={() => setIsOpen(!isOpen)}>
+                <div className="flex items-center gap-1.5">
+                    <Tag className="h-4 w-4 text-accent" />
+                    <p className="text-sm">Have a coupon code?</p>
+                </div>
+                <ChevronDown className="h-5 w-5" />
+            </button>
+            <AnimatePresence>
+                {(isOpen || appliedDiscount) && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
                     >
-                        Apply
-                    </Button>
-                </>
-            )}
+                        {appliedDiscount ? (
+                            <div className="flex bg-emerald-100 text-emerald-950 dark:bg-emerald-950 dark:text-emerald-200 p-2 rounded-xl">
+                                <div className="flex items-center gap-1.5 flex-1">
+                                    <Check className="h-4 w-4" />
+                                    <p className="text-sm">Code applied - You saved {appliedDiscount} </p>
+                                </div>
+                                <Button variant="ghost" onClick={removeDiscountCode} disabled={removeMutation.isPending} className="text-sm bg-transparent">
+                                    Remove
+                                </Button>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2 py-1 rounded-lg border border-dashed border-accent animate-in fade-in duration-300">
+                                <div className="flex-1">
+                                    <Input
+                                        value={code}
+                                        onChange={(e) => setCode(e.target.value.toUpperCase())}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                applyDiscountCode();
+                                            }
+                                        }}
+                                        className="border-0 uppercase focus-visible:ring-0 rounded-none shadow-none"
+                                        data-testid="discount-input"
+                                        name="code"
+                                        placeholder="Enter coupon code"
+                                        type="text"
+                                        disabled={applyMutation.isPending || removeMutation.isPending}
+                                    />
+                                </div>
+                                <Button
+                                    onClick={applyDiscountCode}
+                                    variant="ghost"
+                                    className="bg-transparent text-accent"
+                                    isLoading={applyMutation.isPending}
+                                    disabled={!code}
+                                >
+                                    Apply
+                                </Button>
+                            </div>
+                        )}
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

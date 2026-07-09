@@ -21,7 +21,7 @@ const formSchema = z.object({
     last_name: z.string().min(2, {
         message: "Last name must be at least 2 characters.",
     }),
-    phone: phoneSchema,
+    phone: z.union([z.literal(""), phoneSchema]),
     role: z.enum(["ADMIN", "CUSTOMER"]),
     status: z.enum(["PENDING", "ACTIVE", "INACTIVE"]),
 });
@@ -141,7 +141,7 @@ export default function CustomerEditForm({ user, onClose }: ReviewFormProps) {
                         <FormMessage />
                     </FormItem>
                 </div>
-                <div className="flex gap-2 justify-end p-4 border-t border-border">
+                <div className="sheet-footer">
                     <Button variant="outline" onClick={() => onClose?.()}>
                         Close
                     </Button>
