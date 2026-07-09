@@ -4,23 +4,23 @@ import type { JSX } from "react";
 export const paymentInfoMap: Record<string, { title: string; description: string; icon: JSX.Element | any }> = {
     PAYSTACK: {
         title: "Paystack",
-        description: "Fast and secure payments",
-        icon: <CreditCard size={20} />,
+        description: "Card, USSD or Bank app",
+        icon: <CreditCard />,
     },
     BANK_TRANSFER: {
         title: "Bank Transfer",
-        description: "Make a direct bank transfer.",
-        icon: <Building size={20} />,
+        description: "Make a direct bank transfer",
+        icon: <Building />,
     },
     CREDIT_CARD: {
         title: "Debit Card",
         description: "Checkout securely with your Debit card",
-        icon: <CreditCard size={20} />,
+        icon: <CreditCard />,
     },
     CASH_ON_DELIVERY: {
         title: "Pay at Pickup",
         description: "Pay when you pick up your order",
-        icon: <ShoppingBag size={20} />,
+        icon: <ShoppingBag />,
     },
 };
 

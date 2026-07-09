@@ -1,12 +1,11 @@
 import type React from "react";
 import { useState } from "react";
 import DeliveryStep from "./delivery-step";
-import AddressStep from "./address-step";
 import PaymentStep from "./payment-step";
 import CheckoutStepIndicator from "./checkout-step-indicator";
 import type { Cart } from "@/schemas";
 
-export type CheckoutStep = "delivery" | "address" | "payment";
+export type CheckoutStep = "delivery" | "payment";
 
 interface CheckoutFlowProps {
     cart: Omit<Cart, "refundable_amount" | "refunded_total">;
@@ -22,11 +21,7 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ cart }) => {
             completed.push("delivery");
         }
 
-        if (cart.shipping_method !== "PICKUP" && cart.shipping_address) {
-            completed.push("address");
-        }
-
-        if (cart.payment_method) {
+        if (cart.status == "CONVERTED") {
             completed.push("payment");
         }
 
@@ -45,28 +40,14 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ cart }) => {
                 return (
                     <DeliveryStep
                         cart={cart}
-                        onComplete={() => {
-                            if (cart.shipping_method === "PICKUP") {
-                                setCurrentStep("payment");
-                            } else {
-                                setCurrentStep("address");
-                            }
-                        }}
+                        onComplete={() => setCurrentStep("payment")}
                     />
                 );
-            case "address":
-                return <AddressStep address={cart.shipping_address} onComplete={() => setCurrentStep("payment")} />;
             case "payment":
                 return (
                     <PaymentStep
                         cart={cart}
-                        onBack={() => {
-                            if (cart.shipping_method === "PICKUP") {
-                                setCurrentStep("delivery");
-                            } else {
-                                setCurrentStep("address");
-                            }
-                        }}
+                        onBack={() => setCurrentStep("delivery")}
                     />
                 );
             default:

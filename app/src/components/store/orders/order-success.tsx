@@ -18,7 +18,7 @@ type OrderConfirmationProps = {
 
 const SuccessConfirmation: React.FC<OrderConfirmationProps> = ({ order, onContinueShopping }) => {
     return (
-        <div className="max-w-2xl mx-auto px-4 py-6 md:py-8 w-full">
+        <div className="max-w-2xl mx-auto px-2 py-6 md:py-8 w-full">
             <FadeInComponent>
                 <div className="text-center mb-6">
                     <div className="inline-flex items-center justify-center w-12 h-12 bg-emerald-100 rounded-full mb-3 animate-pulse">

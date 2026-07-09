@@ -15,6 +15,7 @@ import { z } from "zod";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import EmptyState from "@/components/generic/empty";
 import { PageLoader } from "@/components/generic/page-loader";
+import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
 
 interface AbandonedCartStats {
     active_count: number;
@@ -35,10 +36,11 @@ function RouteComponent() {
     const params = Route.useSearch();
     const { updateQuery } = useUpdateQuery(200);
     const { mutate: sendReminders, isPending: sendRemindersLoading } = useSendCartReminders();
+    const { value: searchValue, onChange: onSearchChange } = useDebouncedSearch("search", params.search);
 
     const { data: stats, isLoading } = useQuery({
         queryKey: ["abandoned-carts", "stats", JSON.stringify({ hours_threshold: params.time })],
-        queryFn: () => api.get<AbandonedCartStats>(`/cart/abandoned-carts/stats?hours_threshold=${params.time}`),
+        queryFn: () => api.get<AbandonedCartStats>(`/cart/abandoned-carts/stats?hours_threshold=${params.time ?? 24}`),
     });
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedAbandonedCarts, Cart>({
@@ -62,8 +64,8 @@ function RouteComponent() {
                             <Input
                                 className="pl-10 bg-card"
                                 placeholder="Search by customer name or email..."
-                                value={params.search ?? ""}
-                                onChange={(e) => updateQuery([{ key: "search", value: e.target.value }])}
+                                value={searchValue}
+                                onChange={(e) => onSearchChange(e.target.value)}
                             />
                         </div>
                         <div className="flex flex-col md:flex-row items-center gap-2">

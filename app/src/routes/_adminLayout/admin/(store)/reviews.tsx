@@ -7,9 +7,9 @@ import z from "zod";
 import { api } from "@/utils/api";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
-import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import EmptyState from "@/components/generic/empty";
 import { PageLoader } from "@/components/generic/page-loader";
+import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
 
 export const Route = createFileRoute("/_adminLayout/admin/(store)/reviews")({
     validateSearch: z.object({
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_adminLayout/admin/(store)/reviews")({
 
 function RouteComponent() {
     const params = Route.useSearch();
-    const { updateQuery } = useUpdateQuery(200);
+    const { value: searchValue, onChange: onSearchChange } = useDebouncedSearch("search", params.search);
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedReview, Review>({
         queryKey: ["reviews", params, "infinite"],
@@ -44,8 +44,8 @@ function RouteComponent() {
                     startContent={<Search />}
                     type="search"
                     wrapperClass="flex-1"
-                    value={params.search ?? ""}
-                    onChange={(e) => updateQuery([{ key: "search", value: e.target.value }])}
+                    value={searchValue}
+                    onChange={(e) => onSearchChange(e.target.value)}
                 />
             </div>
             <div>

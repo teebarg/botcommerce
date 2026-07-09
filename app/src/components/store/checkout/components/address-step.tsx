@@ -1,8 +1,6 @@
 import type React from "react";
-import { useState, useMemo } from "react";
-import { ChevronRight, Plus } from "lucide-react";
-import { AddressCard } from "./address-item";
-import { Label } from "@/components/ui/label";
+import { useEffect, useState } from "react";
+import { Plus } from "lucide-react";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
 import type { Address } from "@/schemas";
@@ -11,81 +9,70 @@ import SheetDrawer from "@/components/sheet-drawer";
 import { useOverlayTriggerState } from "react-stately";
 import CheckoutAddressForm from "../checkout-address-form";
 import { PageLoader } from "@/components/generic/page-loader";
+import { AddressCard } from "./address-card";
+import { omit } from "@/utils";
+import { useUpdateCartDetails } from "@/hooks/useCart";
 
 interface AddressStepProps {
     address: Address | null | undefined;
-    onComplete?: () => void;
 }
 
-const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
+const AddressStep: React.FC<AddressStepProps> = ({ address }) => {
     const state = useOverlayTriggerState({});
     const { data, isLoading } = useUserAddresses();
     const addresses = data?.addresses ?? [];
+    const [selectedAddressId, setSelectedAddressId] = useState<string>(address?.id?.toString() ?? "");
+    const updateCartDetails = useUpdateCartDetails();
 
-    const selectedAddress = useMemo(() => addresses.find((a) => a.id === address?.id), [addresses, address]);
-    const [selectedAddressId, setSelectedAddressId] = useState<string>("");
+    useEffect(() => {
+        setSelectedAddressId(address?.id?.toString() ?? "")
+    }, [address])
 
-    const handleContinue = () => {
-        if (address && onComplete) {
-            onComplete();
+    const handleSelectionChange = (id: string) => {
+        if (updateCartDetails.isPending) return;
+        setSelectedAddressId(id)
+        const savedAddress = addresses.find((a) => a.id.toString() == id);
+        if (savedAddress) {
+            updateCartDetails.mutateAsync({
+                shipping_address: omit(savedAddress, ["created_at"]) as any,
+            });
         }
-    };
+    }
 
     if (isLoading) {
         return <PageLoader variant="radio" rows={4} className="px-4" />;
     }
 
     return (
-        <>
-            <div className="space-y-4 px-4 py-4 flex-1 overflow-y-auto slide-in">
-                <div className="text-center mb-8">
-                    <h2 className="text-xl font-bold">Delivery Address</h2>
-                    <p className="text-muted-foreground text-sm">Where should we send your order?</p>
-                </div>
-
-                <div className="space-y-3">
-                    <div className="space-y-3">
-                        <Label className="text-base font-medium block">Select Address</Label>
-                        <RadioGroup value={selectedAddressId} onValueChange={setSelectedAddressId}>
-                            {addresses.map((addr: Address, idx: number) => (
-                                <div key={addr.id}>
-                                    <AddressCard key={idx} address={addr} addresses={addresses} selectedAddress={selectedAddress} />
-                                </div>
-                            ))}
-                        </RadioGroup>
-                    </div>
-                    <SheetDrawer
-                        open={state.isOpen}
-                        title="Address"
-                        trigger={
-                            <Button
-                                variant="outline"
-                                className="w-full h-auto p-4 rounded-2xl border-2 border-dashed justify-start gap-4 border-primary bg-primary/5"
-                            >
-                                <div className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center">
-                                    <Plus className="w-5 h-5" />
-                                </div>
-                                <span className="font-medium">Add New Address</span>
-                            </Button>
-                        }
-                        onOpenChange={state.setOpen}
-                    >
-                        <CheckoutAddressForm onClose={state.close} />
-                    </SheetDrawer>
-                </div>
+        <div className="space-y-4 py-4">
+            <div className="text-center mb-4">
+                <h2 className="text-xl font-bold">Delivery Address</h2>
+                <p className="text-muted-foreground text-sm">Where should we send your order?</p>
             </div>
-            <div className="checkout-footer">
-                <Button
-                    size="lg"
-                    onClick={handleContinue}
-                    disabled={!Boolean(address)}
-                    className="rounded-full text-sm font-semibold w-full md:w-auto md:px-10"
+            <div className="space-y-3">
+                <RadioGroup variant="address" value={selectedAddressId} onValueChange={handleSelectionChange}>
+                    {addresses.map((addr: Address, idx: number) => (
+                        <AddressCard key={idx} address={addr} />
+                    ))}
+                </RadioGroup>
+                <SheetDrawer
+                    open={state.isOpen}
+                    title="Address"
+                    trigger={
+                        <Button
+                            variant="outline"
+                            className="w-full h-auto p-4 rounded-2xl border border-dashed text-accent"
+                        >
+                            <Plus className="w-5 h-5" />
+                            <span className="font-medium">Add new address</span>
+                        </Button>
+                    }
+                    onOpenChange={state.setOpen}
                 >
-                    Continue
-                    <ChevronRight className="h-4 w-4" />
-                </Button>
+                    <CheckoutAddressForm onClose={state.close} />
+                </SheetDrawer>
             </div>
-        </>
+        </div>
     );
 };
 

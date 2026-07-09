@@ -12,12 +12,6 @@ const radioVariants = {
         indicator: "relative flex items-center justify-center",
         icon: "fill-primary absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2",
     },
-    card: {
-        container: "grid gap-3",
-        item: "group relative cursor-pointer flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-colors hover:border-foreground/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-foreground",
-        indicator: "absolute right-4 top-4 flex items-center justify-center",
-        icon: "size-4 text-foreground opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
-    },
     pill: {
         container: "flex flex-wrap gap-2",
         item: "group relative flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background",
@@ -31,10 +25,22 @@ const radioVariants = {
         icon: "size-3.5 opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
     },
     delivery: {
+        container: "grid gap-2.5",
+        item: "group relative flex items-start gap-3 p-4 rounded-1xl bg-card cursor-pointer transition-all duration-200 hover:border-accent/40 data-[state=checked]:border data-[state=checked]:border-accent data-[state=checked]:shadow-[0_0_16px_hsl(var(--accent)/0.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+        indicator: "hidden",
+        icon: "size-3.5 text-accent-foreground",
+    },
+    address: {
+        container: "space-y-2",
+        item: "group relative w-full text-left p-3.5 rounded-1xl border border-border bg-card cursor-pointer transition-all duration-200 hover:border-accent/40 data-[state=checked]:border-accent data-[state=checked]:shadow-[0_0_16px_hsl(var(--accent)/0.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+        indicator: "hidden",
+        icon: "size-3 text-accent-foreground",
+    },
+    payment: {
         container: "grid gap-2",
-        item: "flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-colors hover:border-foreground/20 data-[state=checked]:border-foreground data-[state=checked]:bg-secondary group relative focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
-        indicator: "flex items-center justify-center mt-0.5",
-        icon: "size-4 opacity-0 transition-opacity duration-200 group-data-[state=checked]:opacity-100",
+        item: "group relative flex items-center gap-3 p-4 pr-12 rounded-1xl border border-border bg-cardp cursor-pointer transition-all duration-200 hover:border-accent/40 data-[state=checked]:border-accent data-[state=checked]:shadow-[0_0_16px_hsl(var(--accent)/0.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+        indicator: "absolute right-4 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center",
+        icon: "h-6 w-6 text-accent",
     },
 };
 
@@ -90,28 +96,4 @@ function RadioGroupItem({
     );
 }
 
-function RadioGroupWithLabel({
-    className,
-    variant = "default",
-    label,
-    description,
-    ...props
-}: React.ComponentProps<typeof RadioGroupPrimitive.Root> & {
-    variant?: keyof typeof radioVariants;
-    label?: string;
-    description?: string;
-}) {
-    return (
-        <div className="space-y-3">
-            {label && (
-                <div className="space-y-1">
-                    <h3 className="text-sm font-medium">{label}</h3>
-                    {description && <p className="text-sm text-muted-foreground">{description}</p>}
-                </div>
-            )}
-            <RadioGroup className={className} variant={variant} {...props} />
-        </div>
-    );
-}
-
-export { RadioGroup, RadioGroupItem, RadioGroupWithLabel };
+export { RadioGroup, RadioGroupItem };

@@ -38,7 +38,6 @@ const CheckoutAddressForm: React.FC<Props> = ({ onClose }) => {
                 ...values,
             },
         };
-
         updateCartDetails.mutateAsync(payload).then(() => {
             onClose?.();
         });
@@ -48,31 +47,6 @@ const CheckoutAddressForm: React.FC<Props> = ({ onClose }) => {
         <Form {...form}>
             <form className="flex-1 flex flex-col overflow-hidden" onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="space-y-4 px-3 flex-1 overflow-y-auto pb-4">
-                    <FormField
-                        control={form.control}
-                        name="address_type"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Address Type</FormLabel>
-                                <Select value={field.value} onValueChange={field.onChange}>
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select type" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        <SelectItem value="HOME">Home</SelectItem>
-                                        <SelectItem value="WORK">Work</SelectItem>
-                                        <SelectItem value="BILLING">Billing</SelectItem>
-                                        <SelectItem value="SHIPPING">Shipping</SelectItem>
-                                        <SelectItem value="OTHER">Other</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
                     <div className="grid grid-cols-2 gap-3">
                         <FormField
                             control={form.control}
@@ -110,7 +84,7 @@ const CheckoutAddressForm: React.FC<Props> = ({ onClose }) => {
                             <FormItem>
                                 <FormLabel>Address</FormLabel>
                                 <FormControl>
-                                    <Input {...field} autoComplete="address-line1" placeholder="123 Main St" />
+                                    <Input {...field} autoComplete="address-line1" placeholder="12, moore street, lekki" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -161,9 +135,8 @@ const CheckoutAddressForm: React.FC<Props> = ({ onClose }) => {
                         )}
                     />
                 </div>
-
-                <div className="sheet-footer flex gap-3 justify-end p-4 border-t">
-                    <Button type="button" variant="destructive" onClick={onClose}>
+                <div className="sheet-footer">
+                    <Button type="button" variant="outline" onClick={onClose}>
                         Cancel
                     </Button>
                     <Button type="submit" disabled={updateCartDetails.isPending} isLoading={updateCartDetails.isPending}>

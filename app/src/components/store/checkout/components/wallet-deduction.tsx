@@ -26,32 +26,19 @@ const WalletDeduction: React.FC<{ cart: Cart }> = ({ cart }) => {
         return null;
     }
     return (
-        <div
-            className={cn(
-                "p-4 rounded-2xl border-2 transition-all animate-in fade-in slide-in-from-left-4 duration-300",
-                useWalletCredit ? "border-primary bg-primary/10" : "border-border bg-card"
-            )}
-        >
+        <div className={cn("p-3 rounded-xl", useWalletCredit ? "bg-accent/10" : "bg-card")}>
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div
-                        className={cn(
-                            "w-10 h-10 rounded-xl flex items-center justify-center transition-colors",
-                            useWalletCredit ? "bg-accent" : "bg-secondary"
-                        )}
-                    >
-                        <Wallet className={cn("w-5 h-5", useWalletCredit ? "text-accent-foreground" : "text-primary")} />
-                    </div>
+                    <Wallet className={cn("w-6 h-6", useWalletCredit ? "text-accent" : "")} />
                     <div>
                         <Label className="font-semibold">Referral Credit</Label>
                         <p className="text-xs text-muted-foreground">
-                            Available balance: <span className="font-semibold text-primary">{currency(me.wallet_balance)}</span>
+                            <span className="font-semibold text-primary">{currency(me.wallet_balance)}</span> available
                         </p>
                     </div>
                 </div>
                 <Switch checked={useWalletCredit} onCheckedChange={(checked) => onToggleWalletCredit?.(checked)} />
             </div>
-
             <AnimatePresence>
                 {cart.wallet_used > 0 && (
                     <motion.div

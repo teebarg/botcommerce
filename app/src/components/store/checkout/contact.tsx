@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { useCart } from "@/providers/cart-provider";
 import { useUpdateCartDetails } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { formatPhone, normalizePhone } from "@/lib/validation";
 
 const ContactFormSchema = z.object({
@@ -40,47 +39,44 @@ const CartContactForm = () => {
     };
 
     return (
-        <div className="p-4 rounded-2xl bg-card border border-border">
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
-                    <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">
-                            <Phone className="w-5 h-5 text-primary" />
-                        </div>
-                        <Label className="font-semibold">Contact Number</Label>
-                    </div>
-                    <FormField
-                        control={form.control}
-                        name="phone"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <div className="relative flex gap-2 items-center">
-                                        <Input
-                                            inputMode="tel"
-                                            autoComplete="tel"
-                                            className="bg-secondary border-0"
-                                            placeholder="0803 123 4567"
-                                            value={formatPhone(field.value)}
-                                            onChange={(e) => {
-                                                const raw = e.target.value;
-                                                const digitsOnly = raw.replace(/\D/g, "");
-                                                field.onChange(digitsOnly);
-                                            }}
-                                        />
-
-                                        <Button size="sm" className="min-w-20 h-8" type="submit" disabled={updateCartDetails.isPending || !form.formState.isValid}>
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+                <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormControl>
+                                <div>
+                                    <div className="text-xs text-muted-foreground mb-1 ml-0.5">How do we contact you?</div>
+                                    <div className="relative flex gap-2 items-center rounded-xl border border-border py-2 px-4">
+                                        <Phone className="w-5 h-5" />
+                                        <div className="flex-1">
+                                            <Input
+                                                inputMode="tel"
+                                                autoComplete="tel"
+                                                className="border-0 shadow-none focus-visible:ring-0 rounded-none"
+                                                placeholder="0803 123 4567"
+                                                value={formatPhone(field.value)}
+                                                onChange={(e) => {
+                                                    const raw = e.target.value;
+                                                    const digitsOnly = raw.replace(/\D/g, "");
+                                                    field.onChange(digitsOnly);
+                                                }}
+                                            />
+                                        </div>
+                                        <Button variant="ghost" size="sm" className="bg-transparent text-accent" type="submit" disabled={updateCartDetails.isPending || !form.formState.isValid}>
                                             {updateCartDetails.isPending ? "Saving..." : "Save"}
                                         </Button>
                                     </div>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </form>
-            </Form>
-        </div>
+                                </div>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            </form>
+        </Form>
     );
 };
 

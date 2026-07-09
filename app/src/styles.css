@@ -23,6 +23,9 @@
     --text-sm: 0.8125rem;
     --text-sm--line-height: calc(1 / 0.8125);
 
+    --text-md: 0.906rem;
+    --text-md--line-height: calc(1 / 0.906);
+
     --color-background: hsl(var(--background));
     --color-foreground: hsl(var(--foreground));
 
@@ -185,20 +188,20 @@
 :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 9%;
-    --card: 0 0% 97%;
+    --card: 0 0% 95%;
     --card-foreground: 0 0% 9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 9%;
     --primary: 219 100% 53%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96%;
+    --secondary: 0 0% 91%;
     --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96%;
+    --muted: 0 0% 91%;
     --muted-foreground: 0 0% 45%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%;
+    --border: 0 0% 87%;
     --input: 0 0% 90%;
     --ring: 219 100% 53%;
 
@@ -255,7 +258,7 @@
     --input: 0 0% 22%;
     --ring: 219 100% 53%;
 
-    --accent: 43 96% 56%;
+    --accent: 37 91% 58%;
     --accent-foreground: 20 14% 4%;
 
     --warning: 43 96% 56%;
@@ -284,6 +287,20 @@
 
     *::-webkit-scrollbar {
         display: none;
+    }
+
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus, 
+    input:-webkit-autofill:active {
+        /* Matches your --input CSS variable dynamically */
+        -webkit-box-shadow: 0 0 0 1000px hsl(var(--background)) inset !important;
+        
+        /* Matches your text color dynamically */
+        -webkit-text-fill-color: hsl(var(--foreground)) !important;
+        
+        /* Ensures the text font family mirrors your theme */
+        font-family: inherit !important;
     }
 }
 
