@@ -22,16 +22,25 @@ export const Route = createFileRoute("/_mainLayout/products/$slug")({
     },
     head: ({ loaderData }) => {
         const product = loaderData?.product;
+        if (!product) {
+            return {
+                title: "Product Not Found | Revoque",
+                meta: [
+                    { name: "robots", content: "noindex, nofollow" }
+                ]
+            };
+        }
+
         const baseUrl = import.meta.env.VITE_BASE_URL;
-        const title = product?.name || "";
+        const title = product.name || "";
 
         return {
             meta: [
                 ...seo({
                     title,
-                    description: product?.description || "",
-                    url: `${baseUrl}/products/${product?.slug}`,
-                    image: product?.images?.[0]?.image,
+                    description: product.description || "",
+                    url: `${baseUrl}/products/${product.slug}`,
+                    image: product.images?.[0]?.image,
                     name: title,
                 }),
             ],

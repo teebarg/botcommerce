@@ -9,14 +9,13 @@ import NotFound from "@/components/generic/not-found";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { WebSocketProvider } from "pulsews";
 import appCss from "@/styles.css?url";
-import { createServerFn } from "@tanstack/react-start";
 import { ThemeProvider } from "@/providers/theme-provider";
 import type { QueryClient } from "@tanstack/react-query";
 import { InvalidateProvider } from "@/providers/invalidate-provider";
 import PageTransitionLoader from "@/components/generic/page-transition-loader";
 import PWABadge from "@/PWAbadge";
 import { ClerkProvider } from "@clerk/tanstack-react-start";
-import { AppSession, useAppSession } from "@/utils/session";
+import { AppSession } from "@/utils/session";
 import { getSessionId } from "@/utils";
 import { Analytics } from "@vercel/analytics/react";
 import { ShopSettings } from "@/schemas";
@@ -24,21 +23,13 @@ import { useSettingsQuery } from "@/hooks/useGeneric";
 import { useEffect, useState } from "react";
 import ImpersonationBanner from "@/components/impersonation-banner";
 import { SafeAreaDebug } from "@/components/safe-area-debug";
-
+import { fetchUserFn } from "@/server/users.server";
 
 interface RouterContext extends AppSession {
     queryClient: QueryClient;
     config: any;
 }
 
-const fetchUser = createServerFn().handler(async (): Promise<AppSession> => {
-    const { data } = await useAppSession();
-    return {
-        ...data,
-        isAdmin: ["ADMIN"].includes(data?.user?.role || ""),
-        isAuthenticated: Boolean(data.userId)
-    }
-});
 
 export const Route = createRootRouteWithContext<RouterContext>()({
     beforeLoad: async ({ context: { queryClient }, location }) => {
@@ -46,7 +37,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
             throw redirect({ to: "/maintenance" });
         }
         const [session, settings] = await Promise.all([
-            fetchUser(),
+            fetchUserFn(),
             queryClient.ensureQueryData(useSettingsQuery()),
         ]);
 

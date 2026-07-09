@@ -1,4 +1,4 @@
-import { redirect } from "@tanstack/react-router";
+import { notFound, redirect } from "@tanstack/react-router";
 
 const isServer = typeof window === "undefined";
 
@@ -58,6 +58,10 @@ async function executeRequest<T>(endpoint: string, options: RequestOptions = {})
 
     if (response.status === 403) {
         throw redirect({ to: "/forbidden" });
+    }
+
+    if (response.status === 404) {
+        throw notFound();
     }
 
     if (response.status === 401) {
