@@ -1,5 +1,5 @@
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,10 @@ const AddressStep: React.FC<AddressStepProps> = ({ address }) => {
     const addresses = data?.addresses ?? [];
     const [selectedAddressId, setSelectedAddressId] = useState<string>(address?.id?.toString() ?? "");
     const updateCartDetails = useUpdateCartDetails();
+
+    useEffect(() => {
+        setSelectedAddressId(address?.id?.toString() ?? "")
+    }, [address])
 
     const handleSelectionChange = (id: string) => {
         if (updateCartDetails.isPending) return;
