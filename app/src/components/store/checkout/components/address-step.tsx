@@ -1,7 +1,7 @@
 import type React from "react";
 import { useState, useMemo } from "react";
-import { ChevronRight, Plus } from "lucide-react";
-import { AddressCard } from "./address-item";
+import { Plus } from "lucide-react";
+// import { AddressCard } from "./address-item";
 import { Label } from "@/components/ui/label";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import SheetDrawer from "@/components/sheet-drawer";
 import { useOverlayTriggerState } from "react-stately";
 import CheckoutAddressForm from "../checkout-address-form";
 import { PageLoader } from "@/components/generic/page-loader";
+import { AddressCard } from "./address-card";
 
 interface AddressStepProps {
     address: Address | null | undefined;
@@ -25,12 +26,6 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
     const selectedAddress = useMemo(() => addresses.find((a) => a.id === address?.id), [addresses, address]);
     const [selectedAddressId, setSelectedAddressId] = useState<string>("");
 
-    const handleContinue = () => {
-        if (address && onComplete) {
-            onComplete();
-        }
-    };
-
     if (isLoading) {
         return <PageLoader variant="radio" rows={4} className="px-4" />;
     }
@@ -44,10 +39,11 @@ const AddressStep: React.FC<AddressStepProps> = ({ address, onComplete }) => {
             <div className="space-y-3">
                 <div className="space-y-3">
                     <Label className="text-base font-medium block">Select Address</Label>
-                    <RadioGroup value={selectedAddressId} onValueChange={setSelectedAddressId}>
+                    <RadioGroup variant="address" value={selectedAddressId} onValueChange={setSelectedAddressId}>
                         {addresses.map((addr: Address, idx: number) => (
                             <div key={addr.id}>
-                                <AddressCard key={idx} address={addr} addresses={addresses} selectedAddress={selectedAddress} />
+                                {/* <AddressCard key={idx} address={addr} addresses={addresses} selectedAddress={selectedAddress} /> */}
+                                <AddressCard key={idx} address={addr} />
                             </div>
                         ))}
                     </RadioGroup>
