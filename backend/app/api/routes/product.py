@@ -105,17 +105,12 @@ async def read(request: Request, slug: str, srv: ProductDep) -> ProductLite:
         raise HTTPException(status_code=404, detail="Product not found")
 
     new_product = ProductLite.validate(product)
-
-    try:
-        now = int(time.time())
-        expire_at = now + DEFAULT_EXPIRATION
-        async with srv.redis.pipeline(transaction=False) as pipe:
-            pipe.setex(cache_key, DEFAULT_EXPIRATION, json.dumps(new_product, cls=EnhancedJSONEncoder))
-            pipe.zadd(f"tag:product:{product.id}", {cache_key: expire_at})
-            pipe.expire(f"tag:product:{product.id}", DEFAULT_EXPIRATION)
-            await pipe.execute()
-    except Exception as e:
-            logger.error(f"[Product Cache] Write failure for key '{cache_key}': {e}", exc_info=True)
+    await srv.cache_srv.set_with_tags(
+        key=cache_key,
+        value=new_product,
+        expire=DEFAULT_EXPIRATION,
+        tags=[f"product:{product.id}"],
+    )
 
     return new_product
 

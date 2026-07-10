@@ -40,6 +40,10 @@ class Settings(BaseSettings):
     FRONTEND_HOST: str = "http://localhost:3000"
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
 
+    @property
+    def is_production(self) -> bool:
+        return self.ENVIRONMENT.lower() in ["prod", "production"]
+
     @computed_field  # type: ignore[misc]
     @property
     def server_host(self) -> str:
@@ -103,6 +107,7 @@ class Settings(BaseSettings):
     CLOUDINARY_API_SECRET: str = ""
 
     BREVO_API_KEY: str = "key"
+    VERCEL_API_TOKEN: str = ""
 
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)

@@ -1,9 +1,9 @@
 from typing import Annotated
-from fastapi import Depends
+from fastapi import Depends, Request
 from app.redis_client import redis_client
 from app.services.cache import CacheService
 
-def get_cache_service() -> CacheService:
-    return CacheService(redis_client=redis_client)
+def get_cache_service(request: Request) -> CacheService:
+    return CacheService(redis_client=redis_client, l1=getattr(request.app.state, "l1_cache", None))
 
 CacheDep = Annotated[CacheService, Depends(get_cache_service)]
