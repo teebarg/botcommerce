@@ -1,6 +1,8 @@
 from typing import Callable, ParamSpec, TypeVar
-from app.core.logging import get_logger
+import httpx
 from fastapi import Response, Request
+from app.core.logging import get_logger
+from app.core.config import settings
 
 logger = get_logger(__name__)
 
@@ -73,3 +75,18 @@ async def add_cache_headers(
         response.headers[_CACHE_CONTROL] = (request.state.cache_control)
 
     return response
+
+
+async def purge_vercel_tags(*tags: str) -> None:
+    if not tags:
+        return
+    try:
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            resp = await client.post(
+                "https://api.vercel.com/v1/edge-cache/invalidate-by-tag",
+                headers={"Authorization": f"Bearer {settings.VERCEL_API_TOKEN}"},
+                json={"tags": list(tags)},
+            )
+            resp.raise_for_status()
+    except httpx.HTTPError as e:
+        logger.warning(f"Vercel purge failed for tags {tags}: {e}")

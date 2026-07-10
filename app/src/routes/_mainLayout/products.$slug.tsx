@@ -4,7 +4,7 @@ import ProductView from "@/components/store/products/product-view";
 import { seo } from "@/utils/seo";
 import { LazyInView } from "@/components/LazyInView";
 import { productQuery } from "@/queries/user.queries";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import NotFound from "@/components/generic/not-found";
 import ProductPageLoader from "@/components/store/products/product-page-loader";
 import RelatedProducts from "@/components/store/products/related-products";
@@ -66,7 +66,7 @@ export const Route = createFileRoute("/_mainLayout/products/$slug")({
 
 function RouteComponent() {
     const { slug } = Route.useParams();
-    const { data: product } = useQuery(productQuery(slug));
+    const { data: product } = useSuspenseQuery(productQuery(slug));
 
     if (!product) {
         return <NotFound

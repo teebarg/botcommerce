@@ -22,7 +22,7 @@ export function getRouter() {
         context: {
             queryClient, config: {}
         },
-        defaultPreload: false,
+        defaultPreload: "intent",
         defaultPreloadDelay: 150,
         defaultErrorComponent: DefaultCatchBoundary,
         defaultNotFoundComponent: () => <NotFound />,
@@ -30,6 +30,17 @@ export function getRouter() {
     setupRouterSsrQueryIntegration({
         router,
         queryClient,
+        dehydrateOptions: {
+            shouldDehydrateQuery: (query: any) => query.meta?.ssr !== false,
+        },
+        hydrateOptions: {
+            defaultOptions: {
+                queries: {
+                    gcTime: 60_000,
+                },
+            },
+        },
+
     })
 
     return router
