@@ -1,11 +1,11 @@
 from typing import Any
+from fastapi import APIRouter, HTTPException, Request, Depends
+from pydantic import BaseModel
 from app.core.dependencies.services import SettingsDep
 from app.core.dependencies.cache import CacheDep
 from app.services.cache import cacheable
-from fastapi import APIRouter, HTTPException, Request, Depends
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
-from pydantic import BaseModel
 from datetime import datetime
 from app.core.permissions import require_admin
 

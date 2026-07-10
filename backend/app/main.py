@@ -1,7 +1,7 @@
 from typing import Any, Dict
 import sentry_sdk
 import time
-
+import asyncio
 from fastapi import BackgroundTasks, FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
@@ -28,7 +28,8 @@ from app.core.dependencies.consumer_factory import consumer_factory
 from app.core.dependencies.product import SearchDep
 from app.core.notifications.setup import init_notification_service
 from app.core.dependencies.services import SettingsDep
-
+from app.services.cache import L1Cache, run_l1_invalidation_listener
+from app.lib.cache import add_cache_headers
 
 STREAM_NAME = "EVENT_STREAMS"
 GROUP_NAME = "notifications"
@@ -36,13 +37,13 @@ CONSUMER_NAME = "notif-api-worker"
 
 logger = get_logger(__name__)
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.debug("🚀starting servers......:")
     await db.connect()
 
     app.state.redis = redis_client
+    app.state.l1_cache = L1Cache(max_size=5000, ttl=60.0)
 
     # try:
     #     logger.debug("Creating Redis stream and group")
@@ -59,13 +60,19 @@ async def lifespan(app: FastAPI):
     await consumer.start()
     await manager.start()
 
+    listener_task = asyncio.create_task(
+        run_l1_invalidation_listener(app.state.redis, app.state.l1_cache)
+    )
+
     yield
 
     if manager.cleanup_task:
         manager.cleanup_task.cancel()
     await consumer.stop()
     await db.disconnect()
-    await redis_client.close()
+
+    listener_task.cancel()
+    await app.state.redis.close()
 
 if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
     sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
@@ -115,7 +122,7 @@ class TimingMiddleware(BaseHTTPMiddleware):
 
 
 app.add_middleware(TimingMiddleware)
-
+app.middleware("http")(add_cache_headers)
 if settings.all_cors_origins:
     app.add_middleware(
         CORSMiddleware,
@@ -124,6 +131,7 @@ if settings.all_cors_origins:
         allow_methods=["*"],
         allow_headers=["*"],
         max_age=600,
+        expose_headers=["X-Cache", "X-Cache-TTL"],
     )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
