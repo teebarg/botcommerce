@@ -1,13 +1,10 @@
-from typing import Callable, ParamSpec, TypeVar
+from typing import Callable
 import httpx
 from fastapi import Response, Request
 from app.core.logging import get_logger
 from app.core.config import settings
 
 logger = get_logger(__name__)
-
-P = ParamSpec("P")
-R = TypeVar("R")
 
 _REFRESH_HEADER = "x-cache-refresh"
 _CACHE_STATUS_HEADER = "X-Cache"
@@ -94,20 +91,21 @@ async def purge_vercel_tags(*tags: str) -> None:
     except httpx.HTTPError as e:
         logger.warning(f"Vercel purge failed for tags {tags}: {e}")
 
-async def purge_cdn_urls(*paths: str) -> None:
-    """Purge exact URLs from Cloudflare's edge cache. Use for single-resource
-    routes with deterministic URLs (product/{slug}, shop/settings) — not for
-    paginated/filtered list endpoints, which have unenumerable URL variants."""
-    if not paths or not settings.is_production:
-        return
-    urls: list[str] = [f"{settings.DOMAIN}{p}" for p in paths]
-    try:
-        async with httpx.AsyncClient(timeout=3.0) as client:
-            resp = await client.post(
-                f"https://api.cloudflare.com/client/v4/zones/{settings.CF_ZONE_ID}/purge_cache",
-                headers={"Authorization": f"Bearer {settings.CF_API_TOKEN}"},
-                json={"files": urls},
-            )
-            resp.raise_for_status()
-    except httpx.HTTPError as e:
-        logger.warning(f"Cloudflare purge failed for {urls}: {e}")
+# TODO: IMP
+# async def purge_cdn_urls(*paths: str) -> None:
+#     """Purge exact URLs from Cloudflare's edge cache. Use for single-resource
+#     routes with deterministic URLs (product/{slug}, shop/settings) — not for
+#     paginated/filtered list endpoints, which have unenumerable URL variants."""
+#     if not paths or not settings.is_production:
+#         return
+#     urls: list[str] = [f"{settings.DOMAIN}{p}" for p in paths]
+#     try:
+#         async with httpx.AsyncClient(timeout=3.0) as client:
+#             resp = await client.post(
+#                 f"https://api.cloudflare.com/client/v4/zones/{settings.CF_ZONE_ID}/purge_cache",
+#                 headers={"Authorization": f"Bearer {settings.CF_API_TOKEN}"},
+#                 json={"files": urls},
+#             )
+#             resp.raise_for_status()
+#     except httpx.HTTPError as e:
+#         logger.warning(f"Cloudflare purge failed for {urls}: {e}")

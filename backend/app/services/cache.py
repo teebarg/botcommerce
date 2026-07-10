@@ -176,10 +176,10 @@ class CacheService:
         tag_list = tags or []
         now = int(time.time())
         valid_keys = [k for k in keys if k and k.strip()]
-        invalidated_keys = list(valid_keys)      # mixed keys+tags, WS payload — unchanged
+        invalidated_keys = list(valid_keys)
         invalidated_keys.extend(tag_list)
 
-        all_concrete_keys: set[str] = set(valid_keys)  # real cache keys — what L1/pub-sub need
+        all_concrete_keys: set[str] = set(valid_keys)
 
         if valid_keys:
             try:
