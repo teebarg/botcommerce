@@ -22,12 +22,11 @@ class ShopSettings(BaseModel):
     created_at: datetime
 
 @router.get("/")
-@cacheable(key_prefix="shop-settings", key_builder=False, tags=["shop-settings"], expire=60 * 60 * 24 * 30)
+@cacheable(key_prefix="shop-settings", key_builder=False, tags=["shop-settings"], expire=60 * 60 * 24 * 30, cdn_ttl=3600, cdn_swr=86400)
 async def index(request: Request) -> list[ShopSettings]:
     """
     Get shop settings with optional filtering
     """
-    set_public_cache(request)
     return await db.shopsettings.find_many()
 
 

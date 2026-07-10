@@ -3,13 +3,14 @@ import inspect
 import time
 import asyncio
 from collections import OrderedDict
-from typing import Coroutine, List, Any, Callable, Union, Optional
+from typing import Any, Callable, Union, Optional
 from fastapi import Request
+from redis.asyncio import Redis  # Explicit type hints for the team
 from datetime import datetime, timedelta
 from functools import wraps
 from app.core.logging import get_logger
 from app.services.websocket import manager
-from redis.asyncio import Redis  # Explicit type hints for the team
+from app.lib.cache import set_public_cache
 
 logger = get_logger(__name__)
 
@@ -226,7 +227,9 @@ def cacheable(
     key_prefix: str,
     key_builder: Optional[Union[str, bool, Callable[..., Any]]] = None,
     expire: int = DEFAULT_EXPIRATION,
-    tags: Optional[Union[list[str], Callable[..., list[str]]]] = None
+    tags: Optional[Union[list[str], Callable[..., list[str]]]] = None,
+    cdn_ttl: Optional[int] = None,
+    cdn_swr: int = 3600,
 ):
     """Declarative route caching middleware supporting dynamic keys and tags."""
     def decorator(func: Callable[..., Any]):
@@ -251,6 +254,9 @@ def cacheable(
                 raw_key = f"{key_prefix}"
             else:
                 raw_key = f"{key_prefix}:{request.url.path}?{request.url.query}"
+
+            if cdn_ttl is not None:
+                set_public_cache(request, edge_ttl=cdn_ttl, swr=cdn_swr)
 
             cached_data = await cache.get(raw_key)
             if cached_data is not None:
