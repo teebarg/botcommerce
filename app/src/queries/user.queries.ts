@@ -18,7 +18,7 @@ export const productFeedQuery = (params: FeedQuery) =>
 
 export const productQuery = (slug: string) =>
     queryOptions({
-        queryKey: ["product", "slug", slug],
+        queryKey: ["product", slug],
         queryFn: () => getProductFn({ data: slug }),
     });
 
