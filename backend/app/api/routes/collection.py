@@ -21,7 +21,7 @@ from app.core.dependencies.cache import CacheDep
 router = APIRouter()
 
 @router.get("/")
-@cacheable(key_prefix="collections", key_builder=lambda query: query if query else "all", tags=["collections"])
+@cacheable(key_prefix="collections", key_builder=lambda query: query if query else "all", tags=["collections"], cdn_ttl=3600, cdn_swr=86400)
 async def index(request: Request, query: str = "") -> Optional[list[Collection]]:
     """
     Retrieve collections with Redis caching.
@@ -91,7 +91,7 @@ async def update(
             data=update_data.model_dump()
         )
         await cache.invalidate(f"collection:{update.slug}", tags=["collections"])
-        
+
         return update
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

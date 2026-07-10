@@ -18,7 +18,12 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 @router.get("/home/products", tags=["products"])
-@cacheable(key_prefix="products:home")
+@cacheable(
+    key_prefix="products:home",
+    tags=["products", "catalog"],
+    cdn_ttl=60,
+    cdn_swr=3600,
+)
 async def get_home_categories_products(request: Request, product_srv: ProductDep) -> list[CategoryWithProducts]:
     categories = await db.category.find_many(
         where={"is_active": True},
@@ -33,7 +38,7 @@ async def get_home_categories_products(request: Request, product_srv: ProductDep
     return categories
 
 @router.get("/")
-@cacheable(key_prefix="categories", key_builder=lambda query: query if query else "all", tags=["categories"])
+@cacheable(key_prefix="categories", key_builder=lambda query: query if query else "all", tags=["categories"], cdn_ttl=3600, cdn_swr=86400)
 async def index(request: Request, query: str = "") -> Optional[list[Category]]:
     """
     Retrieve all categories.

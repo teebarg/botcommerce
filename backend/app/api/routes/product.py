@@ -1,4 +1,3 @@
-import time
 import json
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks, Response, Request
@@ -10,7 +9,8 @@ from app.core.deps import CurrentUser, UserDep
 from app.models.generic import Message
 from app.models.product import ProductLite, VariantWithStatus, SearchProducts, FeedProducts, IndexProducts, ReviewStatus
 from app.core.permissions import require_admin
-from app.services.cache import DEFAULT_EXPIRATION, EnhancedJSONEncoder
+from app.services.cache import DEFAULT_EXPIRATION
+from app.lib.cache import set_public_cache
 
 logger = get_logger(__name__)
 
@@ -95,6 +95,7 @@ async def search(
 
 @router.get("/{slug}")
 async def read(request: Request, slug: str, srv: ProductDep) -> ProductLite:
+    set_public_cache(request, edge_ttl=60, swr=3600)
     cache_key: str = f"product:{slug}"
     cached = await srv.redis.get(cache_key)
     if cached:
