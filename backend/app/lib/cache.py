@@ -16,16 +16,19 @@ _CACHE_CONTROL = "Cache-Control"
 
 def set_public_cache(
     request: Request,
-    ttl: int,
-    swr: int = 3600,
+    browser_ttl: int = 60,
+    edge_ttl: int = 3600,
+    swr: int = 86400,
     status: str = "HIT",
 ):
     set_cache_headers(
         request,
         status=status,
-        ttl=ttl,
+        ttl=edge_ttl,
         cache_control=(
-            f"public, max-age={ttl}, "
+            f"public, "
+            f"max-age={browser_ttl}, "
+            f"s-maxage={edge_ttl}, "
             f"stale-while-revalidate={swr}"
         ),
     )
@@ -78,7 +81,7 @@ async def add_cache_headers(
 
 
 async def purge_vercel_tags(*tags: str) -> None:
-    if not tags:
+    if not tags or not settings.is_production:
         return
     try:
         async with httpx.AsyncClient(timeout=3.0) as client:
@@ -90,3 +93,21 @@ async def purge_vercel_tags(*tags: str) -> None:
             resp.raise_for_status()
     except httpx.HTTPError as e:
         logger.warning(f"Vercel purge failed for tags {tags}: {e}")
+
+async def purge_cdn_urls(*paths: str) -> None:
+    """Purge exact URLs from Cloudflare's edge cache. Use for single-resource
+    routes with deterministic URLs (product/{slug}, shop/settings) — not for
+    paginated/filtered list endpoints, which have unenumerable URL variants."""
+    if not paths or not settings.is_production:
+        return
+    urls: list[str] = [f"{settings.DOMAIN}{p}" for p in paths]
+    try:
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            resp = await client.post(
+                f"https://api.cloudflare.com/client/v4/zones/{settings.CF_ZONE_ID}/purge_cache",
+                headers={"Authorization": f"Bearer {settings.CF_API_TOKEN}"},
+                json={"files": urls},
+            )
+            resp.raise_for_status()
+    except httpx.HTTPError as e:
+        logger.warning(f"Cloudflare purge failed for {urls}: {e}")

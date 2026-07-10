@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import type { ContactFormValues } from "@/components/store/contact-form";
 import { Message, ShopSettings } from "@/schemas";
 import { api } from "@/utils/api";
+import { getShopSettingsFn } from "@/queries/generic.queries";
 
 export const useSyncShopDetails = () => {
     return useMutation({
@@ -40,8 +41,8 @@ export const useContactForm = () => {
     });
 };
 
-export const useSettingsQuery = () => queryOptions({
-    queryKey: ["shop-settings"],
-    queryFn: () => api.get<ShopSettings[]>("/shop-settings/"),
-    staleTime: 1000 * 60 * 60 * 24
-});
+export const useSettingsQuery = () =>
+    queryOptions({
+        queryKey: ["shop-settings"],
+        queryFn: () => getShopSettingsFn(),
+    });

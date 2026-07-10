@@ -105,7 +105,7 @@ async def read(request: Request, slug: str, srv: ProductDep) -> ProductLite:
         raise HTTPException(status_code=404, detail="Product not found")
 
     new_product = ProductLite.validate(product)
-    await srv.redis.set_with_tags(
+    await srv.cache_srv.set_with_tags(
         key=cache_key,
         value=new_product,
         expire=DEFAULT_EXPIRATION,

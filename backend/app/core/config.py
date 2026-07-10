@@ -40,6 +40,10 @@ class Settings(BaseSettings):
     FRONTEND_HOST: str = "http://localhost:3000"
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
 
+    @property
+    def is_production(self) -> bool:
+        return self.ENVIRONMENT.lower() in ["prod", "production"]
+
     @computed_field  # type: ignore[misc]
     @property
     def server_host(self) -> str:

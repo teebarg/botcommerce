@@ -12,7 +12,7 @@ import RelatedProducts from "@/components/store/products/related-products";
 export const Route = createFileRoute("/_mainLayout/products/$slug")({
     loader: async ({ context: { queryClient }, params: { slug } }) => {
         try {
-            const product = await queryClient.ensureQueryData(productQuery(slug));
+            const product = await queryClient.fetchQuery(productQuery(slug));
             return {
                 product,
             };
