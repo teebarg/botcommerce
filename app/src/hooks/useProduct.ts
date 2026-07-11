@@ -1,40 +1,8 @@
-import { useQuery, useMutation, useInfiniteQuery, type InfiniteData, UseQueryOptions } from "@tanstack/react-query";
+import { useQuery, useMutation, queryOptions, keepPreviousData } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { FeedQuery, Message, PaginatedProductSearch, ProductFeed, ProductSearch, ProductVariant } from "@/schemas";
+import type { Message, PaginatedProductSearch, ProductVariant } from "@/schemas";
 import { api } from "@/utils/api";
-
-
-export const useProductFeed = (initialData: ProductFeed | null, search?: FeedQuery) => {
-    return useInfiniteQuery<
-        ProductFeed,
-        Error,
-        InfiniteData<ProductFeed>,
-        [string, string, string, FeedQuery],
-        string | null
-    >({
-        queryKey: ["products", "list", "infinite", search ?? {}],
-        queryFn: async ({ pageParam }) => {
-            const res = await api.get<ProductFeed>("/product/feed", {
-                params: {
-                    cursor: pageParam ?? undefined,
-                    ...search
-                },
-            });
-            return res;
-        },
-        getNextPageParam: (lastPage) => {
-            return lastPage.next_cursor ?? null;
-        },
-        initialPageParam: null,
-        initialData: initialData
-            ? {
-                pages: [initialData],
-                pageParams: [null],
-            }
-            : undefined,
-        initialDataUpdatedAt: initialData ? Date.now() : undefined,
-    });
-};
+import { getCategoriesProductsFn, getIndexProductsFn } from "@/server/product.server";
 
 type SearchParams = {
     search?: string;
@@ -42,30 +10,26 @@ type SearchParams = {
     limit?: number;
 };
 
-export const useProductSearch = (
-    params: SearchParams,
-    options?: Omit<UseQueryOptions<PaginatedProductSearch, Error>, "queryKey" | "queryFn">
-) => {
+export const useProductSearch = (params: SearchParams, enabled: boolean = false) => {
     return useQuery({
         queryKey: ["products", "search", params],
         queryFn: async () => await api.get<PaginatedProductSearch>("/product/", { params }),
-        ...options,
+        placeholderData: keepPreviousData,
+        enabled,
     });
 };
 
-interface IndexProducts {
-    arrival: ProductSearch[];
-    featured: ProductSearch[];
-    trending: ProductSearch[];
-}
-
-export const useIndexProducts = () => {
-    return useQuery({
+export const indexProductsQuery = () =>
+    queryOptions({
         queryKey: ["products", "collections"],
-        queryFn: async () => await api.get<IndexProducts>("/product/index-products"),
-        staleTime: 1000 * 60 * 60,
+        queryFn: () => getIndexProductsFn(),
     });
-};
+
+export const categoriesProductsQuery = () =>
+    queryOptions({
+        queryKey: ["products", "home"],
+        queryFn: () => getCategoriesProductsFn(),
+    });
 
 type UpdateVariantInput = {
     id: number;

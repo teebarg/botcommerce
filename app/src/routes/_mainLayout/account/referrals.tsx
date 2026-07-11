@@ -15,7 +15,7 @@ import EmptyState from "@/components/generic/empty";
 
 export const Route = createFileRoute("/_mainLayout/account/referrals")({
     loader: async ({ context: { queryClient } }) => {
-        await Promise.all([queryClient.ensureQueryData(meQuery())]);
+        await queryClient.ensureQueryData(meQuery())
     },
     component: RouteComponent,
 });

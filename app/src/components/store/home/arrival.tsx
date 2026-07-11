@@ -1,15 +1,15 @@
-import { PageLoader } from "@/components/generic/page-loader";
 import ProductSection from "../product-section";
-import type { ProductSearch } from "@/schemas";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { indexProductsQuery } from "@/hooks/useProduct";
 
-export default function NewArrivals({ products, isLoading }: { products: ProductSearch[], isLoading?: boolean }) {
-    if (isLoading) return <PageLoader variant="product-section" />;
-    if (!products?.length) return null;
+export default function NewArrivals() {
+    const { data } = useSuspenseQuery(indexProductsQuery());
+    if (!data?.arrival?.length) return null;
     return (
         <ProductSection
             title="New arrivals"
             subtitle="Just landed this week"
-            products={products}
+            products={data?.arrival}
             href="/collections/new-arrivals"
         />
     );

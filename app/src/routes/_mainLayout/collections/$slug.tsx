@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { seo } from "@/utils/seo";
-import { collectionQuery, productFeedQuery } from "@/queries/user.queries";
-import { useQuery } from "@tanstack/react-query";
+import { collectionQuery, productFeedInfiniteQuery } from "@/queries/user.queries";
 import { FeedQuerySchema } from "@/schemas";
 import { PageLoader } from "@/components/generic/page-loader";
-import InfiniteFeed from "@/components/store/collections/infinite-feed";
+import { Suspense } from "react";
+import { ProductFeed } from "@/components/store/collections/product-feed";
 
 export const Route = createFileRoute("/_mainLayout/collections/$slug")({
     validateSearch: FeedQuerySchema,
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/_mainLayout/collections/$slug")({
     loaderDeps: ({ search }) => search,
     loader: async ({ params: { slug }, context: { search, config, queryClient } }) => {
         const collection = await queryClient.ensureQueryData(collectionQuery(slug));
-        queryClient.fetchQuery(productFeedQuery({ collections: collection?.slug, ...search }));
+        queryClient.fetchInfiniteQuery(productFeedInfiniteQuery({ collections: collection?.slug, ...search }));
         return {
             collection,
             config,
@@ -43,15 +43,15 @@ export const Route = createFileRoute("/_mainLayout/collections/$slug")({
         };
     },
     component: RouteComponent,
-    pendingComponent: () => (<PageLoader variant="grid" />)
 });
 
 function RouteComponent() {
     const { slug } = Route.useParams();
     const search = Route.useSearch();
-    const { data, isLoading } = useQuery(productFeedQuery({ ...search, collections: slug }));
 
-    if (isLoading) return <PageLoader variant="grid" />
-
-    return <InfiniteFeed initialData={data} params={{ ...search, collections: slug }} />
+    return (
+        <Suspense fallback={<PageLoader variant="grid" />}>
+            <ProductFeed params={{ ...search, collections: slug }} />
+        </Suspense>
+    );
 }

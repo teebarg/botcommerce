@@ -1,16 +1,16 @@
-import { PageLoader } from "@/components/generic/page-loader";
 import ProductSection from "../product-section";
-import { ProductSearch } from "@/schemas";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { indexProductsQuery } from "@/hooks/useProduct";
 
-export default function Featured({ products, isLoading }: { products: ProductSearch[], isLoading?: boolean }) {
-    if (isLoading) return <PageLoader variant="product-section" />;
-    if (products?.length === 0) return null;
+export default function Featured() {
+    const { data } = useSuspenseQuery(indexProductsQuery());
+    if (!data?.featured?.length) return null;
     return (
         <ProductSection
-            title="New arrivals"
-            subtitle="Our specials"
-            products={products}
-            href="/collections/new-arrivals"
+            title="Featured"
+            subtitle="Our featured collection"
+            products={data?.featured}
+            href="/collections/featured"
         />
     );
 }

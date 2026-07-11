@@ -4,19 +4,20 @@ import { ShopDetails } from "@/components/admin/settings/shop-details";
 import { FeatureToggles } from "@/components/admin/settings/feature-toggles";
 import { ShopPayments } from "@/components/admin/settings/shop-payments";
 import DeliveryOverview from "@/components/admin/delivery/delivery-overview";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useSettingsQuery } from "@/hooks/useGeneric";
 import { PageLoader } from "@/components/generic/page-loader";
 
 export const Route = createFileRoute("/_adminLayout/admin/settings")({
     loader: async ({ context }) => {
-        context.queryClient.prefetchQuery(useSettingsQuery());
+        await context.queryClient.ensureQueryData(useSettingsQuery());
     },
     component: RouteComponent,
+    pendingComponent: () => <PageLoader variant="detail" />
 });
 
 function RouteComponent() {
-    const { data: settings, isPending } = useQuery(useSettingsQuery());
+    const { data: settings } = useSuspenseQuery(useSettingsQuery());
 
     return (
         <div className="py-4 px-2.5 md:px-8 slide-in">
@@ -29,7 +30,7 @@ function RouteComponent() {
                     <TabsTrigger value="delivery">Delivery</TabsTrigger>
                 </TabsList>
                 <TabsContent value="shop-details">
-                    {isPending ? (<PageLoader variant="list" />) : (<ShopDetails settings={settings || []} />)}
+                    <ShopDetails settings={settings || []} />
                 </TabsContent>
                 <TabsContent value="details">
                     <FeatureToggles toggles={settings || []} />
