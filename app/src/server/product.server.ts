@@ -7,6 +7,15 @@ export const getProductsFeedFn = createServerFn()
     .inputValidator(FeedQuerySchema)
     .handler(async ({ data }) => {
         const res = await api.get<ProductFeed>("/product/feed", { params: { limit: 40, ...data } });
+
+        setResponseHeaders(
+            new Headers({
+                "Cache-Control": "public, max-age=30",
+                "Vercel-CDN-Cache-Control": "public, max-age=30, stale-while-revalidate=300",
+                "Vercel-Cache-Tag": "products-feed",
+            }),
+        );
+
         return res;
     });
 

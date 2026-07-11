@@ -16,7 +16,7 @@ export const Route = createFileRoute("/_mainLayout/collections/$slug")({
     loaderDeps: ({ search }) => search,
     loader: async ({ params: { slug }, context: { search, config, queryClient } }) => {
         const collection = await queryClient.ensureQueryData(collectionQuery(slug));
-        queryClient.prefetchQuery(productFeedQuery({ collections: collection?.slug, ...search }));
+        queryClient.fetchQuery(productFeedQuery({ collections: collection?.slug, ...search }));
         return {
             collection,
             config,

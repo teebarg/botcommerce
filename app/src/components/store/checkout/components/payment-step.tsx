@@ -129,13 +129,13 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                     </>
                 )}
             </div>
-            {!isCartEmpty && cart?.payment_method === PaymentMethod.PAYSTACK && (
+            {!hasOutOfStock && !isCartEmpty && cart?.payment_method === PaymentMethod.PAYSTACK && (
                 <PaystackPayment amount={cart.total} cartNumber={cart.cart_number} canContinue={canContinue} />
             )}
-            {!isCartEmpty && cart?.payment_method === PaymentMethod.BANK_TRANSFER && (
+            {!hasOutOfStock && !isCartEmpty && cart?.payment_method === PaymentMethod.BANK_TRANSFER && (
                 <BankTransfer amount={cart.total} canContinue={canContinue} />
             )}
-            {!isCartEmpty && cart?.payment_method === PaymentMethod.CASH_ON_DELIVERY && (
+            {!hasOutOfStock && !isCartEmpty && cart?.payment_method === PaymentMethod.CASH_ON_DELIVERY && (
                 <Pickup amount={cart.total} canContinue={canContinue} />
             )}
         </div>

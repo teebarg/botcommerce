@@ -15,6 +15,7 @@ import ShareButton from "@/components/share";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { useOverlayTriggerState } from "react-stately";
 import { track } from "@/lib/analytics";
+import { ClientOnly } from "@/components/client-only";
 
 interface Props {
     product: ProductLite;
@@ -28,7 +29,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
     const isNew = useMemo(() => !!product?.is_new, [product]);
     const [selectedVariant, setSelectedVariant] = useState<ProductVariantLite | undefined>(product.variants?.[0]);
 
-    const { isAuthenticated, isAdmin } = useRouteContext({ strict: false });
+    const { isAdmin } = useRouteContext({ strict: false });
     const updateVariant = useUpdateVariant(false);
 
     const { data } = useUserWishlist();
@@ -123,38 +124,40 @@ const ProductView: React.FC<Props> = ({ product }) => {
                     )}
                 </div>
 
-                {isAuthenticated && isAdmin && product?.variants?.length ? (
-                    <div className="rounded-xl border border-border overflow-hidden">
-                        {product.variants?.map((v) => (
-                            <div key={v.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-3 border-b border-border last:border-0">
-                                <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                                    <span>SKU: {v.sku}</span>
-                                    <span>Inventory: {v.inventory}</span>
-                                    <span className={v.inventory > 0 ? "text-emerald-500" : "text-destructive"}>
-                                        {v.inventory > 0 ? "In stock" : "Out of stock"}
-                                    </span>
+                <ClientOnly>
+                    {isAdmin && product?.variants?.length ? (
+                        <div className="rounded-xl border border-border overflow-hidden">
+                            {product.variants?.map((v) => (
+                                <div key={v.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-3 border-b border-border last:border-0">
+                                    <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                                        <span>SKU: {v.sku}</span>
+                                        <span>Inventory: {v.inventory}</span>
+                                        <span className={v.inventory > 0 ? "text-emerald-500" : "text-destructive"}>
+                                            {v.inventory > 0 ? "In stock" : "Out of stock"}
+                                        </span>
+                                    </div>
+                                    {v.inventory > 0 && (
+                                        <ConfirmDrawer
+                                            open={confirmState.isOpen}
+                                            onOpenChange={confirmState.setOpen}
+                                            trigger={
+                                                <Button size="sm" variant="destructive" className="rounded-full">
+                                                    Mark out of stock
+                                                </Button>
+                                            }
+                                            onClose={confirmState.close}
+                                            onConfirm={() => handleMarkVariantOutOfStock(v)}
+                                            title="Mark out of stock"
+                                            description="Are you sure you want to mark this variant as out of stock?"
+                                            confirmText="Confirm"
+                                            isLoading={updateVariant.isPending}
+                                        />
+                                    )}
                                 </div>
-                                {v.inventory > 0 && (
-                                    <ConfirmDrawer
-                                        open={confirmState.isOpen}
-                                        onOpenChange={confirmState.setOpen}
-                                        trigger={
-                                            <Button size="sm" variant="destructive" className="rounded-full">
-                                                Mark out of stock
-                                            </Button>
-                                        }
-                                        onClose={confirmState.close}
-                                        onConfirm={() => handleMarkVariantOutOfStock(v)}
-                                        title="Mark out of stock"
-                                        description="Are you sure you want to mark this variant as out of stock?"
-                                        confirmText="Confirm"
-                                        isLoading={updateVariant.isPending}
-                                    />
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                ) : null}
+                            ))}
+                        </div>
+                    ) : null}
+                </ClientOnly>
 
                 <ProductVariantSelection product={product} onVariantChange={setSelectedVariant} />
 

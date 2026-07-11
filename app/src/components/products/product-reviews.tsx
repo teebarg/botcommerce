@@ -12,6 +12,7 @@ import SheetDrawer from "@/components/sheet-drawer";
 import { ReviewForm } from "../store/reviews/review-form";
 import { api } from "@/utils/api";
 import ReviewsLoader from "./product-review-loader";
+import { ClientOnly } from "@/components/client-only";
 
 interface Prop {
     product_id: number;
@@ -99,16 +100,18 @@ const ReviewsSection: React.FC<Prop> = ({ product_id, productName }) => {
                                     <SelectItem value="lowest">Lowest rated</SelectItem>
                                 </SelectContent>
                             </Select>
-                            {data && data.has_purchased && !data.has_reviewed && (
-                                <SheetDrawer
-                                    open={state.isOpen}
-                                    title="Write a review"
-                                    trigger={<Button className="rounded-full">Write a review</Button>}
-                                    onOpenChange={state.setOpen}
-                                >
-                                    <ReviewForm product_id={product_id} onClose={state.close} />
-                                </SheetDrawer>
-                            )}
+                            <ClientOnly>
+                                {data && data.has_purchased && !data.has_reviewed && (
+                                    <SheetDrawer
+                                        open={state.isOpen}
+                                        title="Write a review"
+                                        trigger={<Button className="rounded-full">Write a review</Button>}
+                                        onOpenChange={state.setOpen}
+                                    >
+                                        <ReviewForm product_id={product_id} onClose={state.close} />
+                                    </SheetDrawer>
+                                )}
+                            </ClientOnly>
                         </div>
                     </div>
 

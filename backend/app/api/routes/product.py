@@ -49,7 +49,7 @@ async def get_recommendations(
 
 
 @router.get("/feed")
-@cacheable(key_prefix="products:list", tags=["products"])
+@cacheable(key_prefix="products:list", tags=["products"], cdn_ttl=30, cdn_swr=300)
 async def feed(
     request: Request, srv: ProductDep, search: str = "", sort: str = "id:desc",
     cat_ids: str = Query(default=""), collections: str = Query(default=""),
