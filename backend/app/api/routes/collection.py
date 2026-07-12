@@ -17,7 +17,7 @@ from app.core.utils import slugify
 from app.core.permissions import require_admin
 from app.services.cache import cacheable
 from app.core.dependencies.cache import CacheDep
-from app.lib.cache import purge_vercel_tags, purge_cdn_urls
+from app.core.dependencies.services import CollectionDep
 
 router = APIRouter()
 
@@ -39,7 +39,7 @@ async def index(request: Request, query: str = "") -> Optional[list[Collection]]
 
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create(create_data: CollectionCreate, cache: CacheDep) -> Collection:
+async def create(create_data: CollectionCreate, srv: CollectionDep) -> Collection:
     """
     Create new collection.
     """
@@ -50,7 +50,7 @@ async def create(create_data: CollectionCreate, cache: CacheDep) -> Collection:
                 "slug": slugify(create_data.name)
             }
         )
-        await cache.invalidate(tags=["collections"])
+        await srv.invalidate()
         return collection
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -74,6 +74,7 @@ async def get_by_slug(request: Request, slug: str) -> Collection:
 @router.patch("/{id}", dependencies=[Depends(require_admin)])
 async def update(
     id: int,
+    srv: CollectionDep,
     update_data: CollectionUpdate,
     cache: CacheDep
 ) -> Collection:
@@ -91,16 +92,14 @@ async def update(
             where={"id": id},
             data=update_data.model_dump()
         )
-        await cache.invalidate(f"collection:{update.slug}", tags=["collections"])
-        await purge_vercel_tags(f"collection:{update.slug}")
-        await purge_cdn_urls(f"/api/collection/{update.slug}")
+        await srv.invalidate(slug=update.slug)
         return update
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete(id: int, cache: CacheDep) -> Message:
+async def delete(id: int, srv: CollectionDep, cache: CacheDep) -> Message:
     """
     Delete a collection.
     """
@@ -114,9 +113,7 @@ async def delete(id: int, cache: CacheDep) -> Message:
         await db.collection.delete(
             where={"id": id}
         )
-        await cache.invalidate(f"collection:{existing.slug}", tags=["collections"])
-        await purge_vercel_tags(f"collection:{existing.slug}")
-        await purge_cdn_urls(f"/api/collection/{existing.slug}")
+        await srv.invalidate(slug=existing.slug)
         return Message(message="Collection deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

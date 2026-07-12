@@ -46,4 +46,3 @@ async def update(form_data: dict[str, Any], cache: CacheDep,  service: SettingsD
         return {"message": "Shop details updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-

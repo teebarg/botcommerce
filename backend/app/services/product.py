@@ -367,7 +367,7 @@ class ProductService:
                     if product_id in existing_set
                 )
                 key_paths: str = ",".join(
-                    f"/product/{p.slug}"
+                    f"/api/product/{p.slug}"
                     for p in products
                     if p.id in existing_set
                 )

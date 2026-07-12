@@ -8,10 +8,10 @@ from app.core.utils import slugify
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
 from app.core.permissions import require_admin
-from app.core.dependencies.cache import CacheDep
 from app.services.cache import cacheable
 from app.core.dependencies.product import ProductDep
 from app.core.dependencies.services import StorageDep
+from app.core.dependencies.services import CategoryDep
 
 logger = get_logger(__name__)
 
@@ -56,7 +56,7 @@ async def index(request: Request, query: str = "") -> Optional[list[Category]]:
     )
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create(data: CategoryCreate, cache: CacheDep) -> Category:
+async def create(data: CategoryCreate, srv: CategoryDep) -> Category:
     """
     Create new category.
     """
@@ -64,14 +64,14 @@ async def create(data: CategoryCreate, cache: CacheDep) -> Category:
         category = await db.category.create(
             data={**data.model_dump(), "slug": slugify(data.name)}
         )
-        await cache.invalidate(tags=["categories"])
+        await srv.invalidate()
         return category
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.patch("/reorder", dependencies=[Depends(require_admin)])
-async def reorder_categories(data: BulkOrderUpdate, cache: CacheDep) -> Message:
+async def reorder_categories(data: BulkOrderUpdate, srv: CategoryDep) -> Message:
     """Update display order for categories"""
     async with db.tx() as tx:
         try:
@@ -82,8 +82,7 @@ async def reorder_categories(data: BulkOrderUpdate, cache: CacheDep) -> Message:
                         where={"id": category_update.id},
                         data={"display_order": category_update.display_order}
                     )
-
-            await cache.invalidate(tags=["categories"])
+            await srv.invalidate()
             return {"message": "categories reordered successfully"}
         except Exception as e:
             logger.error(f"Failed to reorder categories: {str(e)}")
@@ -94,14 +93,12 @@ async def reorder_categories(data: BulkOrderUpdate, cache: CacheDep) -> Message:
 async def update(
     id: int,
     update_data: CategoryUpdate,
-    cache: CacheDep
+    srv: CategoryDep
 ) -> Category:
     """
     Update a category and invalidate cache.
     """
-    existing = await db.category.find_unique(
-        where={"id": id}
-    )
+    existing = await db.category.find_unique(where={"id": id})
     if not existing:
         raise HTTPException(status_code=404, detail="Category not found")
 
@@ -110,7 +107,7 @@ async def update(
             where={"id": id},
             data=update_data.model_dump(exclude_unset=True)
         )
-        await cache.invalidate(tags=["categories"])
+        await srv.invalidate()
         return update
     except PrismaError as e:
         logger.error(f"Failed to update category: {str(e)}")
@@ -118,7 +115,7 @@ async def update(
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete(id: int, cache: CacheDep) -> Message:
+async def delete(id: int, srv: CategoryDep) -> Message:
     """
     Delete a category.
     """
@@ -130,7 +127,7 @@ async def delete(id: int, cache: CacheDep) -> Message:
 
     try:
         await db.category.delete(where={"id": id})
-        await cache.invalidate(tags=["categories"])
+        await srv.invalidate()
         return Message(message="Category deleted successfully")
     except PrismaError as e:
         logger.error(f"Failed to delete category: {str(e)}")
@@ -138,7 +135,7 @@ async def delete(id: int, cache: CacheDep) -> Message:
 
 
 @router.patch("/{id}/image", dependencies=[Depends(require_admin)])
-async def add_image(id: int, image_data: ImageUpload, cache: CacheDep, storage_srv: StorageDep) -> Category:
+async def add_image(id: int, srv: CategoryDep, image_data: ImageUpload, storage_srv: StorageDep) -> Category:
     """
     Add an image to a category.
     """
@@ -155,7 +152,7 @@ async def add_image(id: int, image_data: ImageUpload, cache: CacheDep, storage_s
             where={"id": id},
             data={"image": image_url}
         )
-        await cache.invalidate(tags=["categories"])
+        await srv.invalidate()
         return updated_category
 
     except Exception as e:
@@ -167,7 +164,7 @@ async def add_image(id: int, image_data: ImageUpload, cache: CacheDep, storage_s
 
 
 @router.delete("/{id}/image", dependencies=[Depends(require_admin)])
-async def delete_image(id: int, cache: CacheDep, storage_srv: StorageDep) -> Message:
+async def delete_image(id: int, srv: CategoryDep, storage_srv: StorageDep) -> Message:
     """
     Delete the image of a category.
     """
@@ -188,7 +185,7 @@ async def delete_image(id: int, cache: CacheDep, storage_srv: StorageDep) -> Mes
             where={"id": id},
             data={"image": None}
         )
-        await cache.invalidate(tags=["categories"])
+        await srv.invalidate()
         return Message(message="Category image deleted successfully")
 
     except Exception as e:
