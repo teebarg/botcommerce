@@ -8,6 +8,7 @@ from app.core.dependencies.cache import CacheDep
 from fastapi import Depends
 from app.prisma_client import prisma as db
 from app.redis_client import redis_client
+from app.services.bank_details import BankDetailsService
 from app.services.shop_settings import ShopSettingsService
 from app.services.catalog import CatalogService
 from app.services.categories import CategoryService
@@ -40,6 +41,9 @@ def get_category_service(cache_srv: CacheDep) -> CategoryService:
 def get_collection_service(cache_srv: CacheDep) -> CollectionService:
     return CollectionService(cache_srv=cache_srv)
 
+def get_bank_details_service(cache_srv: CacheDep) -> BankDetailsService:
+    return BankDetailsService(cache_srv=cache_srv)
+
 ConversationDep = Annotated[ConversationService, Depends(get_conversation_service)]
 SettingsDep = Annotated[ShopSettingsService, Depends(get_shop_settings_service)]
 CatalogDep = Annotated[CatalogService, Depends(get_catalog_service)]
@@ -47,3 +51,4 @@ StorageDep = Annotated[MediaStorageService, Depends(get_storage_service)]
 CouponDep = Annotated[CouponService, Depends(get_coupon_service)]
 CategoryDep = Annotated[CategoryService, Depends(get_category_service)]
 CollectionDep = Annotated[CollectionService, Depends(get_collection_service)]
+BankDetailsDep = Annotated[BankDetailsService, Depends(get_bank_details_service)]

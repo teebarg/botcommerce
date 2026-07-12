@@ -332,7 +332,7 @@ class ProductService:
             await self.search_srv.update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
             await self.cache_srv.invalidate(f"product:{product.slug}", tags=["products", "catalog", f"product:{id}"])
             await purge_vercel_tags(f"product:{product.slug}", "products")
-            await purge_cdn_urls(f"/product/{product.slug}")
+            await purge_cdn_urls(f"/api/product/{product.slug}")
         except Exception as e:
             logger.error(f"Error re-indexing product {id}: {e}")
 

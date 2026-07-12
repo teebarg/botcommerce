@@ -160,13 +160,13 @@ async def health(search_srv: SearchDep) -> Dict[str, Any]:
 
 
 @app.post("/api/contact-form")
-async def contact_form(background_tasks: BackgroundTasks, service: SettingsDep, notification_srv: Notification, data: ContactFormCreate):
+async def contact_form(background_tasks: BackgroundTasks, settings_srv: SettingsDep, notification_srv: Notification, data: ContactFormCreate):
     async def send_email_task():
         email_data = await generate_contact_form_email(
-            name=data.name, email=data.email, phone=data.phone, message=data.message
+            name=data.name, email=data.email, phone=data.phone or "", message=data.message
         )
 
-        shop_email = await service.get("shop_email")
+        shop_email = await settings_srv.get("shop_email")
         if not shop_email:
             logger.error("Shop email not found")
             return
@@ -182,13 +182,13 @@ async def contact_form(background_tasks: BackgroundTasks, service: SettingsDep, 
 
 
 @app.post("/api/newsletter")
-async def newsletter(background_tasks: BackgroundTasks, service: SettingsDep, notification_srv: Notification, data: NewsletterCreate):
+async def newsletter(background_tasks: BackgroundTasks, settings_srv: SettingsDep, notification_srv: Notification, data: NewsletterCreate):
     async def send_email_task():
         try:
             email_data = await generate_newsletter_email(
                 email=data.email,
             )
-            shop_email = await service.get("shop_email")
+            shop_email = await settings_srv.get("shop_email")
             if not shop_email:
                 logger.error("Shop email not found")
                 return
@@ -204,7 +204,7 @@ async def newsletter(background_tasks: BackgroundTasks, service: SettingsDep, no
 
 
 @app.post("/api/bulk-purchase")
-async def bulk_purchase(background_tasks: BackgroundTasks, service: SettingsDep, notification_srv: Notification, data: BulkPurchaseCreate):
+async def bulk_purchase(background_tasks: BackgroundTasks, settings_srv: SettingsDep, notification_srv: Notification, data: BulkPurchaseCreate):
     async def send_email_task():
         try:
             email_data = await generate_bulk_purchase_email(
@@ -215,7 +215,7 @@ async def bulk_purchase(background_tasks: BackgroundTasks, service: SettingsDep,
                 quantity=data.quantity,
                 message=data.message,
             )
-            shop_email = await service.get("shop_email")
+            shop_email = await settings_srv.get("shop_email")
             if not shop_email:
                 logger.error("Shop email not found")
                 return

@@ -31,7 +31,7 @@ async def index(request: Request) -> list[ShopSettings]:
 
 
 @router.patch("/", dependencies=[Depends(require_admin)])
-async def update(form_data: dict[str, Any], cache: CacheDep,  service: SettingsDep):
+async def update(form_data: dict[str, Any], cache: CacheDep, srv: SettingsDep):
     """
     Sync shop details
     """
@@ -39,7 +39,7 @@ async def update(form_data: dict[str, Any], cache: CacheDep,  service: SettingsD
         for key, value in form_data.items():
             if not value:
                 continue
-            await service.set(key, str(value), type_="SHOP_DETAIL")
+            await srv.set(key, str(value), type_="SHOP_DETAIL")
         await cache.invalidate(tags=["shop-settings"])
         await purge_vercel_tags("shop-settings")
         await purge_cdn_urls("/api/shop-settings/")

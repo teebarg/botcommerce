@@ -2,10 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from app.models.bank_details import BankDetails, BankDetailsCreate, BankDetailsUpdate
 from app.core.permissions import require_admin
 from app.prisma_client import prisma as db
-from app.core.dependencies.cache import CacheDep
 from app.services.cache import cacheable
 from app.core.logging import get_logger
-from app.lib.cache import purge_cdn_urls
+from app.core.dependencies.services import BankDetailsDep
 
 logger = get_logger(__name__)
 
@@ -23,11 +22,10 @@ async def index(request: Request) -> list[BankDetails]:
 
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create(bank_details: BankDetailsCreate, cache: CacheDep) -> BankDetails:
+async def create(bank_details: BankDetailsCreate, srv: BankDetailsDep) -> BankDetails:
     try:
         bank_details = await db.bankdetails.create(data=bank_details.model_dump())
-        await cache.invalidate(tags=["bank-details"])
-        await purge_cdn_urls("/api/bank-details/")
+        await srv.invalidate()
         return bank_details
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -37,25 +35,23 @@ async def create(bank_details: BankDetailsCreate, cache: CacheDep) -> BankDetail
 async def update(
     id: int,
     bank_details: BankDetailsUpdate,
-    cache: CacheDep
+    srv: BankDetailsDep
 ) -> BankDetails:
     try:
         bank_details = await db.bankdetails.update(
             where={"id": id},
             data=bank_details.model_dump(exclude_unset=True)
         )
-        await cache.invalidate(tags=["bank-details"])
-        await purge_cdn_urls("/api/bank-details/")
+        await srv.invalidate()
         return bank_details
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete(id: int, cache: CacheDep):
+async def delete(id: int, srv: BankDetailsDep):
     try:
         await db.bankdetails.delete(where={"id": id})
-        await cache.invalidate(tags=["bank-details"])
-        await purge_cdn_urls("/api/bank-details/")
+        await srv.invalidate()
         return {"message": "Bank details deleted successfully"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
