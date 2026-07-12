@@ -49,7 +49,7 @@ async def get_recommendations(
 
 
 @router.get("/feed")
-@cacheable(key_prefix="products:list", tags=["products"])
+@cacheable(key_prefix="products:list", tags=["products"], cdn_ttl=30, cdn_swr=300)
 async def feed(
     request: Request, srv: ProductDep, search: str = "", sort: str = "id:desc",
     cat_ids: str = Query(default=""), collections: str = Query(default=""),
@@ -67,13 +67,13 @@ async def feed(
 
 
 @router.get("/index-products")
-@cacheable(key_prefix="products", key_builder="collections", tags=["products"])
+@cacheable(key_prefix="products", key_builder="collections", tags=["products"], cdn_ttl=60, cdn_swr=3600)
 async def get_index_products(request: Request, srv: ProductDep) -> IndexProducts:
     return await srv.query_collection_index()
 
 
 @router.get("/")
-@cacheable(key_prefix="products:search", tags=["products"])
+@cacheable(key_prefix="products:search", tags=["products"], cdn_ttl=30, cdn_swr=300)
 async def search(
     request: Request, srv: ProductDep, search: str = "",
     collections: str = Query(default=""),

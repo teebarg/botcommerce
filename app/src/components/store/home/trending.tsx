@@ -1,13 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import type { ProductSearch } from "@/schemas";
 import { currency } from "@/utils";
-import { PageLoader } from "@/components/generic/page-loader";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { indexProductsQuery } from "@/hooks/useProduct";
 
-export default function Trending({ products, isLoading }: { products: ProductSearch[], isLoading?: boolean }) {
-    if (isLoading) return <PageLoader variant="product-section" />;
-    if (!products?.length) return null;
+export default function Trending() {
+    const { data } = useSuspenseQuery(indexProductsQuery());
+    if (!data?.trending?.length) return null;
 
-    const [hero, ...rest] = products.slice(0, 5);
+    const [hero, ...rest] = data?.trending?.slice(0, 5);
     const small = rest.slice(0, 2);
     const extraSmall = rest.slice(2, 4);
 

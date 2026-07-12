@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { productFeedQuery } from "@/queries/user.queries";
-import { useQuery } from "@tanstack/react-query";
 import { FeedQuerySchema } from "@/schemas";
 import { PageLoader } from "@/components/generic/page-loader";
-import InfiniteFeed from "@/components/store/collections/infinite-feed";
+import { ProductFeed } from "@/components/store/collections/product-feed";
+import { Suspense } from "react";
+import { productFeedInfiniteQuery } from "@/queries/user.queries";
 
 export const Route = createFileRoute("/_mainLayout/collections/")({
     validateSearch: FeedQuerySchema,
@@ -13,16 +13,19 @@ export const Route = createFileRoute("/_mainLayout/collections/")({
             search,
         };
     },
-    loader: async ({ context: { queryClient, search } }) => {
-        queryClient.prefetchQuery(productFeedQuery({ ...search }));
-    },
+    loader: ({ context: { queryClient, search } }) => {
+        queryClient.fetchInfiniteQuery(
+            productFeedInfiniteQuery(search)
+        )
+    }
 });
 
 function RouteComponent() {
     const search = Route.useSearch();
-    const { data, isLoading } = useQuery(productFeedQuery(search));
 
-    if (isLoading) return <PageLoader variant="grid" />
-
-    return <InfiniteFeed initialData={data} params={{ ...search }} />
+    return (
+        <Suspense fallback={<PageLoader variant="grid" />}>
+            <ProductFeed params={{ ...search }} />
+        </Suspense>
+    );
 }

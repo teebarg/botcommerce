@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import (
     APIRouter,
     Depends,
@@ -13,10 +14,10 @@ from app.models.collection import (
 from app.models.generic import Message
 from app.prisma_client import prisma as db
 from app.core.utils import slugify
-from typing import Optional
 from app.core.permissions import require_admin
 from app.services.cache import cacheable
 from app.core.dependencies.cache import CacheDep
+from app.lib.cache import purge_vercel_tags
 
 router = APIRouter()
 
@@ -56,7 +57,7 @@ async def create(create_data: CollectionCreate, cache: CacheDep) -> Collection:
 
 
 @router.get("/{slug}")
-@cacheable(key_prefix="collection", key_builder=lambda slug: slug)
+@cacheable(key_prefix="collection", key_builder=lambda slug: slug, cdn_ttl=3600, cdn_swr=86400)
 async def get_by_slug(request: Request, slug: str) -> Collection:
     """
     Get a collection by its slug.
@@ -91,7 +92,7 @@ async def update(
             data=update_data.model_dump()
         )
         await cache.invalidate(f"collection:{update.slug}", tags=["collections"])
-
+        await purge_vercel_tags(f"collection:{update.slug}")
         return update
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -113,6 +114,7 @@ async def delete(id: int, cache: CacheDep) -> Message:
             where={"id": id}
         )
         await cache.invalidate(f"collection:{existing.slug}", tags=["collections"])
+        await purge_vercel_tags(f"collection:{existing.slug}")
         return Message(message="Collection deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

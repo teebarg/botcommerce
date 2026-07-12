@@ -33,15 +33,8 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
 
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const { data, isLoading } = useProductSearch(
-        { search: debouncedQuery, limit: 4 },
-        { enabled: searchState.isOpen && debouncedQuery.trim() !== "" }
-    );
-
-    const { data: trendingData } = useProductSearch(
-        { collections: "trending", limit: 4 },
-        { enabled: searchState.isOpen }
-    );
+    const { data, isLoading } = useProductSearch({ search: debouncedQuery, limit: 4 }, searchState.isOpen && debouncedQuery.trim() !== "");
+    const { data: trendingData } = useProductSearch({ collections: "trending", limit: 4 }, searchState.isOpen);
 
     useEffect(() => {
         const savedHistory = localStorage.getItem("searchHistory");
@@ -67,7 +60,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
         });
 
         searchState.close();
-        navigate({ to: `/search/${encodeURIComponent(newSearchTerm)}` });
+        navigate({ to: `/collections/?search=${encodeURIComponent(newSearchTerm)}` });
     };
 
     const hasResults = query.trim() && !!data?.products?.length;
@@ -87,7 +80,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                     </div>
                 </button>
             </SheetTrigger>
-            <SheetContent aria-describedby={undefined} side="top" className="h-screen flex px-2.5">
+            <SheetContent aria-describedby={undefined} side="top" className="h-screen flex px-2.5 bg-background/90">
                 <SheetHeader className="sr-only">
                     <SheetTitle>Search Products</SheetTitle>
                     <SheetDescription>Search for products, categories, and more</SheetDescription>
@@ -120,7 +113,7 @@ export const SearchDialog = ({ initialQuery = "", searchDelay = 500, placeholder
                             </button>
                         )}
                     </div>
-                    <div className="flex-1 overflow-y-auto bg-card py-2">
+                    <div className="flex-1 overflow-y-auto py-2">
                         {isLoading && (
                             <div className="flex items-center justify-center py-8">
                                 <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent" />

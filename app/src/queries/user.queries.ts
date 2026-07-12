@@ -1,8 +1,9 @@
-import { queryOptions } from "@tanstack/react-query";
-import { getProductFn, getProductsFeedFn } from "@/server/product.server";
+import { getProductFn } from "@/server/product.server";
 import { getMeFn } from "@/server/users.server";
 import { getCollectionFn } from "@/server/store.server";
-import { FeedQuery } from "@/schemas";
+import { type InfiniteData, infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
+import type { FeedQuery, ProductFeed } from "@/schemas";
+import { api } from "@/utils/api";
 
 export const meQuery = () =>
     queryOptions({
@@ -10,11 +11,43 @@ export const meQuery = () =>
         queryFn: () => getMeFn(),
     });
 
-export const productFeedQuery = (params: FeedQuery) =>
-    queryOptions({
-        queryKey: ["products", "list", params],
-        queryFn: () => getProductsFeedFn({ data: params }),
-    });
+export function normalizeFeedQuery(search?: FeedQuery) {
+    return {
+        search: search?.search ?? "",
+        collections: search?.collections ?? null,
+        cat_ids: search?.cat_ids ?? null,
+        sort: search?.sort ?? "id:desc",
+        min_price: search?.min_price ?? null,
+        max_price: search?.max_price ?? null,
+        sizes: search?.sizes ?? null,
+        ages: search?.ages ?? null,
+        width: search?.width ?? null,
+        length: search?.length ?? null,
+        cursor: search?.cursor ?? null,
+    } as const;
+}
+
+export const productFeedInfiniteQuery = (search?: FeedQuery) =>
+    infiniteQueryOptions<
+        ProductFeed,
+        Error,
+        InfiniteData<ProductFeed>,
+        [string, string, any],
+        string | null
+    >({
+        queryKey: ["products", "feed", normalizeFeedQuery(search)],
+        queryFn: async ({ pageParam }) => {
+            const res = await api.get<ProductFeed>("/product/feed", {
+                params: {
+                    cursor: pageParam ?? undefined,
+                    ...search
+                },
+            });
+            return res;
+        },
+        getNextPageParam: lastPage => lastPage.next_cursor ?? null,
+        initialPageParam: null,
+    })
 
 export const productQuery = (slug: string) =>
     queryOptions({

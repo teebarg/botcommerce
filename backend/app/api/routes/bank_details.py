@@ -11,7 +11,13 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 @router.get("/")
-@cacheable(key_prefix="bank-details", tags=["bank-details"], expire=2592000)
+@cacheable(
+    key_prefix="bank-details",
+    tags=["bank-details"],
+    expire=2592000,
+    cdn_ttl=86400,        # 1 day edge — safe given "rarely changes"
+    cdn_swr=604800,       # 7 day stale-while-revalidate as backstop
+)
 async def list_bank_details(request: Request) -> list[BankDetails]:
     return await db.bankdetails.find_many(order={"created_at": "desc"})
 
