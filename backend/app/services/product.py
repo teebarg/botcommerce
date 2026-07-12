@@ -371,7 +371,6 @@ class ProductService:
                     for p in products
                     if p.id in existing_set
                 )
-                print(key_paths)
                 await self.cache_srv.invalidate(keys, tags=["products", "catalog", "gallery"] + ["stats-trends"] if len(product_ids) > 0 else [] )
                 await purge_vercel_tags(keys, "products")
                 await purge_cdn_urls(key_paths)

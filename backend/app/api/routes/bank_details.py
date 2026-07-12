@@ -5,6 +5,7 @@ from app.prisma_client import prisma as db
 from app.core.dependencies.cache import CacheDep
 from app.services.cache import cacheable
 from app.core.logging import get_logger
+from app.lib.cache import purge_cdn_urls
 
 logger = get_logger(__name__)
 
@@ -17,22 +18,23 @@ router = APIRouter()
     expire=2592000,
     browser_ttl=600, cdn_ttl=31536000, cdn_swr=604800
 )
-async def list_bank_details(request: Request) -> list[BankDetails]:
+async def index(request: Request) -> list[BankDetails]:
     return await db.bankdetails.find_many(order={"created_at": "desc"})
 
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create_bank_details(bank_details: BankDetailsCreate, cache: CacheDep) -> BankDetails:
+async def create(bank_details: BankDetailsCreate, cache: CacheDep) -> BankDetails:
     try:
         bank_details = await db.bankdetails.create(data=bank_details.model_dump())
         await cache.invalidate(tags=["bank-details"])
+        await purge_cdn_urls("/api/bank-details/")
         return bank_details
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.put("/{id}", dependencies=[Depends(require_admin)])
-async def update_bank_details(
+async def update(
     id: int,
     bank_details: BankDetailsUpdate,
     cache: CacheDep
@@ -43,15 +45,17 @@ async def update_bank_details(
             data=bank_details.model_dump(exclude_unset=True)
         )
         await cache.invalidate(tags=["bank-details"])
+        await purge_cdn_urls("/api/bank-details/")
         return bank_details
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete_bank_details(id: int, cache: CacheDep):
+async def delete(id: int, cache: CacheDep):
     try:
         await db.bankdetails.delete(where={"id": id})
         await cache.invalidate(tags=["bank-details"])
+        await purge_cdn_urls("/api/bank-details/")
         return {"message": "Bank details deleted successfully"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
