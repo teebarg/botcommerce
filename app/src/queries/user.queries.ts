@@ -1,9 +1,8 @@
-import { getProductFn } from "@/server/product.server";
+import { getProductFeedFn, getProductFn, getCatalogFeedFn } from "@/server/product.server";
 import { getMeFn } from "@/server/users.server";
 import { getCollectionFn } from "@/server/store.server";
 import { type InfiniteData, infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
-import type { FeedQuery, ProductFeed } from "@/schemas";
-import { api } from "@/utils/api";
+import type { FeedQuery, ProductFeed, SearchCatalog } from "@/schemas";
 
 export const meQuery = () =>
     queryOptions({
@@ -36,16 +35,22 @@ export const productFeedInfiniteQuery = (search?: FeedQuery) =>
         string | null
     >({
         queryKey: ["products", "feed", normalizeFeedQuery(search)],
-        queryFn: async ({ pageParam }) => {
-            const res = await api.get<ProductFeed>("/product/feed", {
-                params: {
-                    cursor: pageParam ?? undefined,
-                    ...search
-                },
-            });
-            return res;
-        },
+        queryFn: async ({ pageParam }) => await getProductFeedFn({ data: { cursor: pageParam ?? undefined, ...search } }),
         getNextPageParam: lastPage => lastPage.next_cursor ?? null,
+        initialPageParam: null,
+    })
+
+export const catalogInfiniteQuery = (slug: string) =>
+    infiniteQueryOptions<
+        SearchCatalog,
+        Error,
+        InfiniteData<SearchCatalog>,
+        [string, string],
+        number | null
+    >({
+        queryKey: ["catalog", slug],
+        queryFn: async ({ pageParam }) => await getCatalogFeedFn({ data: { slug, cursor: pageParam ?? undefined } }),
+        getNextPageParam: (lastPage: SearchCatalog) => lastPage.next_cursor ?? null,
         initialPageParam: null,
     })
 

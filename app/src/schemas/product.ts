@@ -214,6 +214,10 @@ export const CategoriesProductsSchema = z.object({
     products: z.array(ProductSearchSchema),
 });
 
+export const CatalogQuerySchema = z.object({
+    cursor: z.string().optional(),
+});
+
 export const FeedQuerySchema = z.object({
     search: z.string().optional(),
     sort: z.enum(["min_variant_price:asc", "min_variant_price:desc", "id:desc", "created_at:desc"]).optional(),

@@ -23,7 +23,7 @@ async def list_catalogs_views() -> List[CatalogView]:
 
 
 @router.get("/", dependencies=[Depends(require_admin)])
-@cacheable(key_prefix="catalogs", tags=["catalogs"])
+@cacheable(key_prefix="catalogs", tags=["catalogs"], cdn_ttl=30, cdn_swr=300)
 async def list_catalogs(
     request: Request,
     srv: CatalogDep,
@@ -66,7 +66,7 @@ async def search(
             }
         }
     }
-    
+
     if user is None or user.role != "ADMIN":
         product_where["active"] = True
 
@@ -81,7 +81,7 @@ async def search(
 
     has_more = len(products) > limit
     sliced_products = products[:limit]
-    
+
     # Keyset cursor extraction
     next_cursor = sliced_products[-1].id if has_more and sliced_products else None
 
