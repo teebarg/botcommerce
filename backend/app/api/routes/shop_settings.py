@@ -8,7 +8,7 @@ from app.prisma_client import prisma as db
 from app.core.logging import get_logger
 from datetime import datetime
 from app.core.permissions import require_admin
-from app.lib.cache import purge_vercel_tags, set_public_cache
+from app.lib.cache import purge_vercel_tags, purge_cdn_urls
 
 logger = get_logger(__name__)
 
@@ -22,7 +22,7 @@ class ShopSettings(BaseModel):
     created_at: datetime
 
 @router.get("/")
-@cacheable(key_prefix="shop-settings", key_builder=False, tags=["shop-settings"], expire=60 * 60 * 24 * 30, cdn_ttl=3600, cdn_swr=86400)
+@cacheable(key_prefix="shop-settings", key_builder=False, tags=["shop-settings"], expire=60 * 60 * 24 * 30, browser_ttl=600, cdn_ttl=31536000, cdn_swr=604800)
 async def index(request: Request) -> list[ShopSettings]:
     """
     Get shop settings with optional filtering
@@ -42,6 +42,7 @@ async def update(form_data: dict[str, Any], cache: CacheDep,  service: SettingsD
             await service.set(key, str(value), type_="SHOP_DETAIL")
         await cache.invalidate(tags=["shop-settings"])
         await purge_vercel_tags("shop-settings")
+        await purge_cdn_urls("/api/shop-settings/")
         return {"message": "Shop details updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

@@ -23,7 +23,7 @@ async def list_catalogs_views() -> List[CatalogView]:
 
 
 @router.get("/", dependencies=[Depends(require_admin)])
-@cacheable(key_prefix="catalogs", tags=["catalogs"], cdn_ttl=30, cdn_swr=300)
+@cacheable(key_prefix="catalogs", tags=["catalogs"])
 async def list_catalogs(
     request: Request,
     srv: CatalogDep,
@@ -41,7 +41,12 @@ async def list_catalogs(
 
 
 @router.get("/{slug}")
-@cacheable(key_prefix="catalog", tags=lambda slug: ["catalog", f"catalog:{slug}"])
+@cacheable(
+    key_prefix="catalog",
+    key_builder=lambda slug, user, limit=20, cursor=None: f"{slug}:{'admin' if user and user.role == 'ADMIN' else 'public'}:{limit}:{cursor or 0}",
+    tags=lambda slug: ["catalog", f"catalog:{slug}"],
+    browser_ttl=60, cdn_ttl=600, cdn_swr=60
+)
 async def search(
     request: Request,
     slug: str,

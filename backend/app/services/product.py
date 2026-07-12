@@ -14,7 +14,7 @@ from app.core.logging import get_logger
 from app.core.utils import url_to_list
 from app.models.product import Product
 from app.services.search import SearchService
-from app.lib.cache import purge_vercel_tags
+from app.lib.cache import purge_vercel_tags, purge_cdn_urls
 
 logger = get_logger(__name__)
 
@@ -332,6 +332,7 @@ class ProductService:
             await self.search_srv.update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
             await self.cache_srv.invalidate(f"product:{product.slug}", tags=["products", "catalog", f"product:{id}"])
             await purge_vercel_tags(f"product:{product.slug}", "products")
+            await purge_cdn_urls(f"/product/{product.slug}")
         except Exception as e:
             logger.error(f"Error re-indexing product {id}: {e}")
 
@@ -365,8 +366,15 @@ class ProductService:
                     for product_id in product_ids
                     if product_id in existing_set
                 )
+                key_paths: str = ",".join(
+                    f"/product/{p.slug}"
+                    for p in products
+                    if p.id in existing_set
+                )
+                print(key_paths)
                 await self.cache_srv.invalidate(keys, tags=["products", "catalog", "gallery"] + ["stats-trends"] if len(product_ids) > 0 else [] )
                 await purge_vercel_tags(keys, "products")
+                await purge_cdn_urls(key_paths)
                 logger.debug(f"Successfully targeted indexed {len(documents)} products")
                 return
 
