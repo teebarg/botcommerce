@@ -16,7 +16,7 @@ export const getIndexProductsFn = createServerFn()
             new Headers({
                 "Cache-Control": "public, max-age=30",
                 "Vercel-CDN-Cache-Control": "public, max-age=30, stale-while-revalidate=300",
-                "Vercel-Cache-Tag": "index-products",
+                "Vercel-Cache-Tag": "index-products,products",
             }),
         );
         return res;
@@ -29,7 +29,7 @@ export const getCategoriesProductsFn = createServerFn()
             new Headers({
                 "Cache-Control": "public, max-age=30",
                 "Vercel-CDN-Cache-Control": "public, max-age=30, stale-while-revalidate=300",
-                "Vercel-Cache-Tag": "categories-products",
+                "Vercel-Cache-Tag": "categories-products,products",
             }),
         );
         return res;
@@ -44,7 +44,7 @@ export const getProductsFeedFn = createServerFn()
             new Headers({
                 "Cache-Control": "public, max-age=30",
                 "Vercel-CDN-Cache-Control": "public, max-age=30, stale-while-revalidate=300",
-                "Vercel-Cache-Tag": "products-feed",
+                "Vercel-Cache-Tag": "products-feed,products",
             }),
         );
 

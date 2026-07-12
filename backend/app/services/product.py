@@ -331,7 +331,7 @@ class ProductService:
             product_data = self._prepare_product_data_for_indexing(product=product)
             await self.search_srv.update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
             await self.cache_srv.invalidate(f"product:{product.slug}", tags=["products", "catalog", f"product:{id}"])
-            await purge_vercel_tags(f"product:{product.slug}", "products-feed", "index-products", "categories-products")
+            await purge_vercel_tags(f"product:{product.slug}", "products")
         except Exception as e:
             logger.error(f"Error re-indexing product {id}: {e}")
 
@@ -366,6 +366,7 @@ class ProductService:
                     if product_id in existing_set
                 )
                 await self.cache_srv.invalidate(keys, tags=["products", "catalog", "gallery"] + ["stats-trends"] if len(product_ids) > 0 else [] )
+                await purge_vercel_tags(keys, "products")
                 logger.debug(f"Successfully targeted indexed {len(documents)} products")
                 return
 
@@ -411,6 +412,7 @@ class ProductService:
                 await asyncio.sleep(0.05)  # Yield block back to application loop thread
 
             await self.cache_srv.invalidate(tags=["products", "catalog"])
+            await purge_vercel_tags("products")
             logger.debug(f"Successfully batch indexed total of {total_processed} products")
 
         except Exception as e:
@@ -427,5 +429,6 @@ class ProductService:
             ])
             key: str=",".join(f"product:{id}" for id in product_ids)
             await self.cache_srv.invalidate(key, tags=["products", "catalog", "stats-trends"])
+            await purge_vercel_tags("products")
         except Exception as e:
             logger.error(f"Error deleting products {product_ids} from index: {e}")
