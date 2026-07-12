@@ -76,14 +76,13 @@ async def add_cache_headers(
 
     return response
 
-
 async def purge_vercel_tags(*tags: str) -> None:
     if not tags or not settings.is_production:
         return
     try:
         async with httpx.AsyncClient(timeout=3.0) as client:
             resp = await client.post(
-                "https://api.vercel.com/v1/edge-cache/invalidate-by-tag",
+                f"https://api.vercel.com/v1/edge-cache/invalidate-by-tag?projectIdOrName={settings.VERCEL_PROJECT_ID}",
                 headers={"Authorization": f"Bearer {settings.VERCEL_API_TOKEN}"},
                 json={"tags": list(tags)},
             )

@@ -108,6 +108,7 @@ class Settings(BaseSettings):
 
     BREVO_API_KEY: str = "key"
     VERCEL_API_TOKEN: str = ""
+    VERCEL_PROJECT_ID: str = ""
 
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)
