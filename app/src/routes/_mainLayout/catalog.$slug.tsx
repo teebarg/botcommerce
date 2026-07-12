@@ -1,21 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
-import z from "zod";
 import { seo } from "@/utils/seo";
 import { CatalogVisitTracker } from "@/components/store/catalog/catalog-visit-tracker";
-import CatalogInfinite from "@/components/store/catalog/catalog-infinite";
-
-export const CatalogSearchSchema = z.object({
-    sizes: z.string().optional(),
-    width: z.number().optional(),
-    length: z.number().optional(),
-});
+import { CatalogQuerySchema } from "@/schemas";
+import { PageLoader } from "@/components/generic/page-loader";
+import { catalogInfiniteQuery } from "@/queries/user.queries";
+import { Suspense } from "react";
+import { CatalogFeed } from "@/components/store/catalog/catalog-feed";
 
 export const Route = createFileRoute("/_mainLayout/catalog/$slug")({
-    validateSearch: CatalogSearchSchema,
-    beforeLoad: ({ search }) => {
-        return {
-            search,
-        };
+    validateSearch: CatalogQuerySchema,
+    loader: async ({ params: { slug }, context: { queryClient } }) => {
+        queryClient.fetchInfiniteQuery(
+            catalogInfiniteQuery(slug)
+        )
     },
     head: ({ params }) => {
         const title = `Catalog: ${params.slug}`;
@@ -38,9 +35,11 @@ export const Route = createFileRoute("/_mainLayout/catalog/$slug")({
 function RouteComponent() {
     const { slug } = Route.useParams();
     return (
-        <>
+        <main className="max-w-sxl mx-auto w-full px-2 py-4">
             <CatalogVisitTracker slug={slug} />
-            <CatalogInfinite slug={slug} />
-        </>
+            <Suspense fallback={<PageLoader variant="grid" />}>
+                <CatalogFeed slug={slug} />
+            </Suspense>
+        </main>
     );
 }

@@ -73,6 +73,7 @@ async def add_cache_headers(
 
     if hasattr(request.state, "cache_control"):
         response.headers[_CACHE_CONTROL] = (request.state.cache_control)
+        response.headers["Vary"] = "Origin"
 
     return response
 
@@ -90,21 +91,20 @@ async def purge_vercel_tags(*tags: str) -> None:
     except httpx.HTTPError as e:
         logger.warning(f"Vercel purge failed for tags {tags}: {e}")
 
-# TODO: IMP
-# async def purge_cdn_urls(*paths: str) -> None:
-#     """Purge exact URLs from Cloudflare's edge cache. Use for single-resource
-#     routes with deterministic URLs (product/{slug}, shop/settings) — not for
-#     paginated/filtered list endpoints, which have unenumerable URL variants."""
-#     if not paths or not settings.is_production:
-#         return
-#     urls: list[str] = [f"{settings.DOMAIN}{p}" for p in paths]
-#     try:
-#         async with httpx.AsyncClient(timeout=3.0) as client:
-#             resp = await client.post(
-#                 f"https://api.cloudflare.com/client/v4/zones/{settings.CF_ZONE_ID}/purge_cache",
-#                 headers={"Authorization": f"Bearer {settings.CF_API_TOKEN}"},
-#                 json={"files": urls},
-#             )
-#             resp.raise_for_status()
-#     except httpx.HTTPError as e:
-#         logger.warning(f"Cloudflare purge failed for {urls}: {e}")
+async def purge_cdn_urls(*paths: str) -> None:
+    """Purge exact URLs from Cloudflare's edge cache. Use for single-resource
+    routes with deterministic URLs (product/{slug}, shop/settings) — not for
+    paginated/filtered list endpoints, which have unenumerable URL variants."""
+    if not paths or not settings.is_production:
+        return
+    urls: list[str] = [f"{settings.DOMAIN}{p}" for p in paths]
+    try:
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            resp = await client.post(
+                f"https://api.cloudflare.com/client/v4/zones/{settings.CF_ZONE_ID}/purge_cache",
+                headers={"Authorization": f"Bearer {settings.CF_API_TOKEN}"},
+                json={"files": urls},
+            )
+            resp.raise_for_status()
+    except httpx.HTTPError as e:
+        logger.warning(f"Cloudflare purge failed for {urls}: {e}")

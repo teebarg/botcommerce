@@ -41,7 +41,12 @@ async def list_catalogs(
 
 
 @router.get("/{slug}")
-@cacheable(key_prefix="catalog", tags=lambda slug: ["catalog", f"catalog:{slug}"])
+@cacheable(
+    key_prefix="catalog",
+    key_builder=lambda slug, user, limit=20, cursor=None: f"{slug}:{'admin' if user and user.role == 'ADMIN' else 'public'}:{limit}:{cursor or 0}",
+    tags=lambda slug: ["catalog", f"catalog:{slug}"],
+    browser_ttl=60, cdn_ttl=600, cdn_swr=60
+)
 async def search(
     request: Request,
     slug: str,
@@ -66,7 +71,7 @@ async def search(
             }
         }
     }
-    
+
     if user is None or user.role != "ADMIN":
         product_where["active"] = True
 
@@ -81,7 +86,7 @@ async def search(
 
     has_more = len(products) > limit
     sliced_products = products[:limit]
-    
+
     # Keyset cursor extraction
     next_cursor = sliced_products[-1].id if has_more and sliced_products else None
 
