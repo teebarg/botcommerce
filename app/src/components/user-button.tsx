@@ -8,7 +8,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { User, LogOut, Gift, LayoutDashboard, Heart } from "lucide-react";
-import { useNavigate, useRouteContext } from "@tanstack/react-router";
+import { useNavigate, useRouteContext, useRouter } from "@tanstack/react-router";
 import { tryCatch } from "@/utils/try-catch";
 import { logoutFn } from "@/server/users.server";
 import { Message } from "@/schemas";
@@ -16,10 +16,13 @@ import { useAuth } from "@clerk/tanstack-react-start";
 import { UserAvatar } from "./generic/user-avatar";
 import { useLocation } from "@tanstack/react-router";
 import { api } from "@/utils/api";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function UserDropdown() {
     const { isAuthenticated, isImpersonating, userId, isAdmin, user } = useRouteContext({ strict: false });
+    const queryClient = useQueryClient();
     const location = useLocation();
+    const router = useRouter()
     const navigate = useNavigate();
     const { signOut } = useAuth();
 
@@ -32,6 +35,9 @@ export function UserDropdown() {
         await signOut({ sessionId: userId?.toString() });
         await logoutFn();
         sessionStorage.clear();
+        queryClient.setQueryData(["session"], null)
+        queryClient.invalidateQueries({ queryKey: ["session"] })
+        router.invalidate();
         navigate({ to: "/" });
     };
 
