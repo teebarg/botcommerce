@@ -14,18 +14,19 @@ from app.core.logging import get_logger
 from app.core.utils import url_to_list
 from app.models.product import Product
 from app.services.search import SearchService
-from app.lib.cache import purge_vercel_tags, purge_cdn_urls
+from app.services.cdn import CdnService
 
 logger = get_logger(__name__)
 
 PRODUCT_ATTRIBUTES: list[str] = ["id", "name", "sku", "image", "slug", "active", "is_new", "status", "variants"]
 
 class ProductService:
-    def __init__(self, db, redis, search_srv: SearchService, cache_srv: CacheService):
+    def __init__(self, db, redis, search_srv: SearchService, cache_srv: CacheService, cdn_srv: CdnService):
         self.db = db
         self.redis = redis
         self.search_srv = search_srv
         self.cache_srv = cache_srv
+        self.cdn_srv = cdn_srv
 
     async def get_by_slug(self, slug: str):
         return await self.db.product.find_unique(
@@ -330,9 +331,12 @@ class ProductService:
 
             product_data = self._prepare_product_data_for_indexing(product=product)
             await self.search_srv.update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
-            await self.cache_srv.invalidate(f"product:{product.slug}", tags=["products", "catalog", f"product:{id}"])
-            await purge_vercel_tags(f"product:{product.slug}", "products")
-            await purge_cdn_urls(f"/api/product/{product.slug}")
+            await asyncio.gather(
+                self.cdn_srv.purge_cloudfare(f"/api/product/{product.slug}"),
+                self.cdn_srv.purge_vercel(f"product:{product.slug}", "products"),
+                return_exceptions=True
+            )
+            await self.cache_srv.invalidate(f"product:{product.slug}", tags=["products", "catalog"])
         except Exception as e:
             logger.error(f"Error re-indexing product {id}: {e}")
 
@@ -360,20 +364,22 @@ class ProductService:
 
                 documents = [self._prepare_product_data_for_indexing(p) for p in products]
                 await self.search_srv.add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
+
                 existing_set = set(existing_product_ids or [])
-                keys: str = ",".join(
-                    f"product:{product_id}"
-                    for product_id in product_ids
-                    if product_id in existing_set
+                cloudfare_paths = [f"/api/product/{p.slug}" for p in products if p.id in existing_set]
+                vercel_tags = [f"product:{p.slug}" for p in products if p.id in existing_set]
+
+                tasks = []
+                if cloudfare_paths:
+                    tasks.append(self.cdn_srv.purge_cloudfare(*cloudfare_paths))
+                if vercel_tags:
+                    tasks.append(self.cdn_srv.purge_vercel(*vercel_tags, "products"))
+                if tasks:
+                    await asyncio.gather(*tasks, return_exceptions=True)
+                await self.cache_srv.invalidate(
+                    *vercel_tags, 
+                    tags=["products", "catalog", "gallery", "stats-trends"]
                 )
-                key_paths: str = ",".join(
-                    f"/api/product/{p.slug}"
-                    for p in products
-                    if p.id in existing_set
-                )
-                await self.cache_srv.invalidate(keys, tags=["products", "catalog", "gallery"] + ["stats-trends"] if len(product_ids) > 0 else [] )
-                await purge_vercel_tags(keys, "products")
-                await purge_cdn_urls(key_paths)
                 logger.debug(f"Successfully targeted indexed {len(documents)} products")
                 return
 
@@ -418,8 +424,8 @@ class ProductService:
                 skip += BATCH_SIZE
                 await asyncio.sleep(0.05)  # Yield block back to application loop thread
 
+            await self.cdn_srv.purge_vercel("products")
             await self.cache_srv.invalidate(tags=["products", "catalog"])
-            await purge_vercel_tags("products")
             logger.debug(f"Successfully batch indexed total of {total_processed} products")
 
         except Exception as e:
@@ -434,8 +440,8 @@ class ProductService:
                 self.search_srv.delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(pid))
                 for pid in product_ids
             ])
-            key: str=",".join(f"product:{id}" for id in product_ids)
-            await self.cache_srv.invalidate(key, tags=["products", "catalog", "stats-trends"])
-            await purge_vercel_tags("products")
+            keys: list[str] = [f"product:{id}" for id in product_ids]
+            await self.cdn_srv.purge_vercel("products")
+            await self.cache_srv.invalidate(tags=["products", "catalog", "stats-trends"] + keys)
         except Exception as e:
             logger.error(f"Error deleting products {product_ids} from index: {e}")

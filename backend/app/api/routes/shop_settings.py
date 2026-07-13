@@ -1,14 +1,14 @@
+import asyncio
 from typing import Any
 from fastapi import APIRouter, HTTPException, Request, Depends
 from pydantic import BaseModel
 from app.core.dependencies.services import SettingsDep
-from app.core.dependencies.cache import CacheDep
+from app.core.dependencies.cache import CacheDep, CdnDep
 from app.services.cache import cacheable
 from app.prisma_client import prisma as db
 from app.core.logging import get_logger
 from datetime import datetime
 from app.core.permissions import require_admin
-from app.lib.cache import purge_vercel_tags, purge_cdn_urls
 
 logger = get_logger(__name__)
 
@@ -31,7 +31,7 @@ async def index(request: Request) -> list[ShopSettings]:
 
 
 @router.patch("/", dependencies=[Depends(require_admin)])
-async def update(form_data: dict[str, Any], cache: CacheDep, srv: SettingsDep):
+async def update(form_data: dict[str, Any], cdn_srv: CdnDep, cache: CacheDep, srv: SettingsDep):
     """
     Sync shop details
     """
@@ -40,9 +40,12 @@ async def update(form_data: dict[str, Any], cache: CacheDep, srv: SettingsDep):
             if not value:
                 continue
             await srv.set(key, str(value), type_="SHOP_DETAIL")
+        await asyncio.gather(
+            cdn_srv.purge_cloudfare("/api/shop-settings/"),
+            cdn_srv.purge_vercel("shop-settings"),
+            return_exceptions=True
+        )
         await cache.invalidate(tags=["shop-settings"])
-        await purge_vercel_tags("shop-settings")
-        await purge_cdn_urls("/api/shop-settings/")
         return {"message": "Shop details updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

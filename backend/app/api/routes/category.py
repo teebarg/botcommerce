@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, BackgroundTasks
 from prisma.errors import PrismaError
 from app.models.category import Category, CategoryCreate, CategoryUpdate, BulkOrderUpdate
 from app.models.product import CategoryWithProducts
@@ -56,7 +56,7 @@ async def index(request: Request, query: str = "") -> Optional[list[Category]]:
     )
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create(data: CategoryCreate, srv: CategoryDep) -> Category:
+async def create(data: CategoryCreate, srv: CategoryDep, bg_tasks: BackgroundTasks) -> Category:
     """
     Create new category.
     """
@@ -64,14 +64,14 @@ async def create(data: CategoryCreate, srv: CategoryDep) -> Category:
         category = await db.category.create(
             data={**data.model_dump(), "slug": slugify(data.name)}
         )
-        await srv.invalidate()
+        bg_tasks.add_task(srv.invalidate)
         return category
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.patch("/reorder", dependencies=[Depends(require_admin)])
-async def reorder_categories(data: BulkOrderUpdate, srv: CategoryDep) -> Message:
+async def reorder_categories(data: BulkOrderUpdate, srv: CategoryDep, bg_tasks: BackgroundTasks) -> Message:
     """Update display order for categories"""
     async with db.tx() as tx:
         try:
@@ -82,7 +82,7 @@ async def reorder_categories(data: BulkOrderUpdate, srv: CategoryDep) -> Message
                         where={"id": category_update.id},
                         data={"display_order": category_update.display_order}
                     )
-            await srv.invalidate()
+            bg_tasks.add_task(srv.invalidate)
             return {"message": "categories reordered successfully"}
         except Exception as e:
             logger.error(f"Failed to reorder categories: {str(e)}")
@@ -93,7 +93,8 @@ async def reorder_categories(data: BulkOrderUpdate, srv: CategoryDep) -> Message
 async def update(
     id: int,
     update_data: CategoryUpdate,
-    srv: CategoryDep
+    srv: CategoryDep, 
+    bg_tasks: BackgroundTasks
 ) -> Category:
     """
     Update a category and invalidate cache.
@@ -107,7 +108,7 @@ async def update(
             where={"id": id},
             data=update_data.model_dump(exclude_unset=True)
         )
-        await srv.invalidate()
+        bg_tasks.add_task(srv.invalidate)
         return update
     except PrismaError as e:
         logger.error(f"Failed to update category: {str(e)}")
@@ -115,7 +116,7 @@ async def update(
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete(id: int, srv: CategoryDep) -> Message:
+async def delete(id: int, srv: CategoryDep, bg_tasks: BackgroundTasks) -> Message:
     """
     Delete a category.
     """
@@ -127,7 +128,7 @@ async def delete(id: int, srv: CategoryDep) -> Message:
 
     try:
         await db.category.delete(where={"id": id})
-        await srv.invalidate()
+        bg_tasks.add_task(srv.invalidate)
         return Message(message="Category deleted successfully")
     except PrismaError as e:
         logger.error(f"Failed to delete category: {str(e)}")
@@ -135,7 +136,7 @@ async def delete(id: int, srv: CategoryDep) -> Message:
 
 
 @router.patch("/{id}/image", dependencies=[Depends(require_admin)])
-async def add_image(id: int, srv: CategoryDep, image_data: ImageUpload, storage_srv: StorageDep) -> Category:
+async def add_image(id: int, srv: CategoryDep, image_data: ImageUpload, storage_srv: StorageDep, bg_tasks: BackgroundTasks) -> Category:
     """
     Add an image to a category.
     """
@@ -152,7 +153,7 @@ async def add_image(id: int, srv: CategoryDep, image_data: ImageUpload, storage_
             where={"id": id},
             data={"image": image_url}
         )
-        await srv.invalidate()
+        bg_tasks.add_task(srv.invalidate)
         return updated_category
 
     except Exception as e:
@@ -164,7 +165,7 @@ async def add_image(id: int, srv: CategoryDep, image_data: ImageUpload, storage_
 
 
 @router.delete("/{id}/image", dependencies=[Depends(require_admin)])
-async def delete_image(id: int, srv: CategoryDep, storage_srv: StorageDep) -> Message:
+async def delete_image(id: int, srv: CategoryDep, storage_srv: StorageDep, bg_tasks: BackgroundTasks) -> Message:
     """
     Delete the image of a category.
     """
@@ -185,7 +186,7 @@ async def delete_image(id: int, srv: CategoryDep, storage_srv: StorageDep) -> Me
             where={"id": id},
             data={"image": None}
         )
-        await srv.invalidate()
+        bg_tasks.add_task(srv.invalidate)
         return Message(message="Category image deleted successfully")
 
     except Exception as e:

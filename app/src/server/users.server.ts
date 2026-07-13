@@ -7,12 +7,6 @@ export const getMeFn = createServerFn({ method: "GET" }).handler(async () => {
     return await api.get<User>("/users/me");
 });
 
-export const getUserFn = createServerFn({ method: "GET" })
-    .inputValidator((d: string) => d)
-    .handler(async ({ data: email }) => {
-        return await api.get<User>(`/users/get-user?email=${email}`);
-    });
-
 export const fetchUserFn = createServerFn().handler(async (): Promise<AppSession> => {
     const { data } = await useAppSession();
     return {

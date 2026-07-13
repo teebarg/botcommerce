@@ -83,9 +83,10 @@ async def purge_vercel_tags(*tags: str) -> None:
     try:
         async with httpx.AsyncClient(timeout=3.0) as client:
             resp = await client.post(
-                f"https://api.vercel.com/v1/edge-cache/invalidate-by-tag?projectIdOrName={settings.VERCEL_PROJECT_ID}",
+                "https://api.vercel.com/v1/edge-cache/invalidate-by-tags",
+                params={"projectIdOrName": settings.VERCEL_PROJECT_ID},
                 headers={"Authorization": f"Bearer {settings.VERCEL_API_TOKEN}"},
-                json={"tags": list(tags)},
+                json={"tags": list(tags), "target": "production"},
             )
             resp.raise_for_status()
     except httpx.HTTPError as e:
