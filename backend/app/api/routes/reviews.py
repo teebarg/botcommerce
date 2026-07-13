@@ -1,7 +1,7 @@
 import json
 import asyncio
 from typing import Optional
-from fastapi import APIRouter, HTTPException, Depends, HTTPException, Query, BackgroundTasks
+from fastapi import APIRouter, HTTPException, Depends, HTTPException, Query, BackgroundTasks, Request
 from prisma.errors import PrismaError
 from app.core.deps import CurrentUser
 from app.models.generic import Message
@@ -20,6 +20,7 @@ router = APIRouter()
 @router.get("/")
 @cacheable(key_prefix="reviews", tags=["reviews"], expire=2592000, browser_ttl=300, cdn_ttl=3600, cdn_swr=86400)
 async def index(
+    request: Request,
     product_id: Optional[int] = None,
     cursor: str = Query(default=None, description="cursor from previous response"),
     limit: int = Query(default=20, le=100, ge=1),
