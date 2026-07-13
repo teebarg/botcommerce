@@ -23,7 +23,8 @@ export function getRouter() {
             queryClient, config: {}
         },
         defaultPreload: "intent",
-        defaultPreloadDelay: 150,
+        defaultPreloadDelay: 400,
+        defaultPreloadStaleTime: 30_000,
         defaultErrorComponent: DefaultCatchBoundary,
         defaultNotFoundComponent: () => <NotFound />,
     })

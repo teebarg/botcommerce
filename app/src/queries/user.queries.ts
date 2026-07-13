@@ -6,7 +6,7 @@ import type { FeedQuery, ProductFeed, SearchCatalog } from "@/schemas";
 
 export const meQuery = () =>
     queryOptions({
-        queryKey: ["user", "me"],
+        queryKey: ["user"],
         queryFn: () => getMeFn(),
     });
 
