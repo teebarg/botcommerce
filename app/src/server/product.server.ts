@@ -3,6 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { setResponseHeaders } from "@tanstack/react-start/server";
 import { type ProductFeed, type ProductLite, CategoriesWithProducts, FeedQuerySchema, ProductSearch, SearchCatalog } from "@/schemas";
 import { z } from "zod";
+import { notFound } from "@tanstack/react-router";
 
 interface IndexProducts {
     arrival: ProductSearch[];
@@ -56,6 +57,10 @@ export const getProductFn = createServerFn({ method: "GET" })
     .inputValidator((d: string) => d)
     .handler(async ({ data }) => {
         const res = await api.get<ProductLite>(`/product/${data}`);
+
+        if (!res) {
+            throw notFound();
+        }
 
         setResponseHeaders(
             new Headers({
