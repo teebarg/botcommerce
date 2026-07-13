@@ -10,13 +10,15 @@ from app.core.permissions import require_admin
 from base64 import b64encode, b64decode
 from app.models.reviews import Review, Reviews, ReviewCreate, ReviewUpdate
 from app.core.logging import get_logger
-from app.core.dependencies.product import ProductDep
+from app.core.dependencies.services import ReviewDep
+from app.services.cache import cacheable
 
 logger = get_logger(__name__)
 
 router = APIRouter()
 
 @router.get("/")
+@cacheable(key_prefix="reviews", tags=["reviews"], expire=2592000, browser_ttl=300, cdn_ttl=3600, cdn_swr=86400)
 async def index(
     product_id: Optional[int] = None,
     cursor: str = Query(default=None, description="cursor from previous response"),
@@ -131,7 +133,7 @@ async def index(
     }
 
 @router.post("/")
-async def create(review: ReviewCreate, user: CurrentUser, product_srv: ProductDep, background_tasks: BackgroundTasks) -> Review:
+async def create(srv: ReviewDep, review: ReviewCreate, user: CurrentUser, bg_tasks: BackgroundTasks) -> Review:
     existing_review = await db.review.find_first(
         where={"user_id": user.id, "product_id": review.product_id}
     )
@@ -156,7 +158,7 @@ async def create(review: ReviewCreate, user: CurrentUser, product_srv: ProductDe
                 "user_id": user.id
             }
         )
-        background_tasks.add_task(product_srv.invalidate, product_id=review.product_id)
+        bg_tasks.add_task(srv.invalidate)
 
         return review
     except PrismaError as e:
@@ -165,8 +167,10 @@ async def create(review: ReviewCreate, user: CurrentUser, product_srv: ProductDe
 
 @router.patch("/{id}", dependencies=[Depends(require_admin)])
 async def update(
+    srv: ReviewDep,
     id: int,
     update_data: ReviewUpdate,
+    bg_tasks: BackgroundTasks
 ) -> Review:
     """
     Update a review.
@@ -182,13 +186,14 @@ async def update(
             where={"id": id},
             data=update_data.model_dump(exclude_unset=True)
         )
+        bg_tasks.add_task(srv.invalidate)
         return update
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete(id: int) -> Message:
+async def delete(id: int, srv: ReviewDep, bg_tasks: BackgroundTasks) -> Message:
     existing = await db.review.find_unique(
         where={"id": id}
     )
@@ -199,6 +204,7 @@ async def delete(id: int) -> Message:
         await db.review.delete(
             where={"id": id}
         )
+        bg_tasks.add_task(srv.invalidate)
         return Message(message="Review deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

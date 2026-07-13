@@ -45,7 +45,7 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
     };
 
     return (
-        <div className="flex items-start justify-between p-4 bg-card rounded-2xl border border-border overflow-hidden">
+        <div className="flex items-start justify-between p-4 bg-card rounded-2xl">
             <div className="flex items-start gap-4 flex-1">
                 <div className="p-3 rounded-xl bg-accent/10">
                     <div className="text-accent">{getIcon(option.method)}</div>
@@ -71,13 +71,13 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
                 </div>
             </div>
 
-            <div className="flex items-center ml-4">
+            <div className="flex items-center gap-2 ml-4">
                 <SheetDrawer
                     open={editState.isOpen}
                     title="Edit Delivery Option"
                     trigger={
-                        <Button size="icon" variant="ghost" onClick={editState.open}>
-                            <Pencil className="h-5 w-5" />
+                        <Button size="iconOnly" variant="ghost" onClick={editState.open}>
+                            <Pencil className="h-6 w-6" />
                         </Button>
                     }
                     onOpenChange={editState.setOpen}
@@ -88,8 +88,8 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
                     open={deleteState.isOpen}
                     onOpenChange={deleteState.setOpen}
                     trigger={
-                        <Button className="p-2 text-red-600 bg-red-50" size="icon">
-                            <Trash2 className="w-4 h-4" />
+                        <Button className="text-destructive" size="iconOnly" variant="ghost">
+                            <Trash2 className="h-6 w-6" />
                         </Button>
                     }
                     onClose={deleteState.close}

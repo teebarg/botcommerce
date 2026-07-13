@@ -3,7 +3,8 @@ from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
-    Request
+    Request,
+    BackgroundTasks
 )
 from prisma.errors import PrismaError
 from app.models.collection import (
@@ -16,7 +17,6 @@ from app.prisma_client import prisma as db
 from app.core.utils import slugify
 from app.core.permissions import require_admin
 from app.services.cache import cacheable
-from app.core.dependencies.cache import CacheDep
 from app.core.dependencies.services import CollectionDep
 
 router = APIRouter()
@@ -39,7 +39,7 @@ async def index(request: Request, query: str = "") -> Optional[list[Collection]]
 
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create(create_data: CollectionCreate, srv: CollectionDep) -> Collection:
+async def create(create_data: CollectionCreate, srv: CollectionDep, bg_tasks: BackgroundTasks) -> Collection:
     """
     Create new collection.
     """
@@ -50,7 +50,7 @@ async def create(create_data: CollectionCreate, srv: CollectionDep) -> Collectio
                 "slug": slugify(create_data.name)
             }
         )
-        await srv.invalidate()
+        bg_tasks.add_task(srv.invalidate)
         return collection
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -76,7 +76,7 @@ async def update(
     id: int,
     srv: CollectionDep,
     update_data: CollectionUpdate,
-    cache: CacheDep
+    bg_tasks: BackgroundTasks
 ) -> Collection:
     """
     Update a collection.
@@ -92,14 +92,14 @@ async def update(
             where={"id": id},
             data=update_data.model_dump()
         )
-        await srv.invalidate(slug=update.slug)
+        bg_tasks.add_task(srv.invalidate, slug=update.slug)
         return update
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete(id: int, srv: CollectionDep, cache: CacheDep) -> Message:
+async def delete(id: int, srv: CollectionDep, bg_tasks: BackgroundTasks) -> Message:
     """
     Delete a collection.
     """
@@ -110,10 +110,8 @@ async def delete(id: int, srv: CollectionDep, cache: CacheDep) -> Message:
         raise HTTPException(status_code=404, detail="Collection not found")
 
     try:
-        await db.collection.delete(
-            where={"id": id}
-        )
-        await srv.invalidate(slug=existing.slug)
+        await db.collection.delete(where={"id": id})
+        bg_tasks.add_task(srv.invalidate, slug=existing.slug)
         return Message(message="Collection deleted successfully")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

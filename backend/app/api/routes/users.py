@@ -14,19 +14,6 @@ from app.core.permissions import require_admin
 
 router = APIRouter()
 
-
-@router.get("/get-user")
-async def get_user(
-    email: str,
-) -> User:
-    user = await db.user.find_first(
-        where={
-            "email": email,
-        }
-    )
-    return user
-
-
 @router.get("/me")
 async def read_user_me(
     user: CurrentUser

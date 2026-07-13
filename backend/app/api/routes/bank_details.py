@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, BackgroundTasks
 from app.models.bank_details import BankDetails, BankDetailsCreate, BankDetailsUpdate
 from app.core.permissions import require_admin
 from app.prisma_client import prisma as db
@@ -22,10 +22,10 @@ async def index(request: Request) -> list[BankDetails]:
 
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create(bank_details: BankDetailsCreate, srv: BankDetailsDep) -> BankDetails:
+async def create(bank_details: BankDetailsCreate, srv: BankDetailsDep, bg_tasks: BackgroundTasks) -> BankDetails:
     try:
         bank_details = await db.bankdetails.create(data=bank_details.model_dump())
-        await srv.invalidate()
+        bg_tasks.add_task(srv.invalidate)
         return bank_details
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -35,23 +35,24 @@ async def create(bank_details: BankDetailsCreate, srv: BankDetailsDep) -> BankDe
 async def update(
     id: int,
     bank_details: BankDetailsUpdate,
-    srv: BankDetailsDep
+    srv: BankDetailsDep,
+    bg_tasks: BackgroundTasks
 ) -> BankDetails:
     try:
         bank_details = await db.bankdetails.update(
             where={"id": id},
             data=bank_details.model_dump(exclude_unset=True)
         )
-        await srv.invalidate()
+        bg_tasks.add_task(srv.invalidate)
         return bank_details
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete(id: int, srv: BankDetailsDep):
+async def delete(id: int, srv: BankDetailsDep, bg_tasks: BackgroundTasks):
     try:
         await db.bankdetails.delete(where={"id": id})
-        await srv.invalidate()
+        bg_tasks.add_task(srv.invalidate)
         return {"message": "Bank details deleted successfully"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
