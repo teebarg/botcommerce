@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 from pydantic import BaseModel
 
 from contextlib import asynccontextmanager
@@ -77,7 +78,7 @@ async def lifespan(app: FastAPI):
 if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
     sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
 
-app = FastAPI(title="Botcommerce", openapi_url="/api/openapi.json", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="Botcommerce", redirect_slashes=False, openapi_url="/api/openapi.json", version="0.1.0", lifespan=lifespan)
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -121,6 +122,7 @@ class TimingMiddleware(BaseHTTPMiddleware):
         return response
 
 
+app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
 app.add_middleware(TimingMiddleware)
 app.middleware("http")(add_cache_headers)
 if settings.all_cors_origins:
