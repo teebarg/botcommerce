@@ -1,8 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { updateAppSessionFn } from "@/server/users.server";
+import { fetchUserFn, updateAppSessionFn } from "@/server/users.server";
 import { api } from "@/utils/api";
 import { Session, User, Wishlist } from "@/schemas";
+import { queryOptions } from '@tanstack/react-query'
+
+export const authQueryOptions = () => queryOptions({
+    queryKey: ["session"],
+    queryFn: () => fetchUserFn(),
+    staleTime: 5 * 60 * 1000,
+})
 
 export const useUpdateUser = () => {
     return useMutation({

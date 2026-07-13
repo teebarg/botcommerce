@@ -62,6 +62,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
             to="/products/$slug"
             params={{ slug: product.slug }}
             className={cn("block w-full rounded-xl overflow-hidden border border-border group", className)}
+            preload={false}
         >
             <div className="relative aspect-gallery">
                 <ImageLightbox

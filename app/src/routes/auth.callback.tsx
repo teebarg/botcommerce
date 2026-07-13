@@ -5,7 +5,7 @@ import { api } from "@/utils/api";
 import { tryCatch } from "@/utils/try-catch";
 import { useAuth, useUser } from "@clerk/tanstack-react-start";
 import { useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, useNavigate, useRouteContext } from "@tanstack/react-router";
+import { createFileRoute, useRouteContext, useRouter } from "@tanstack/react-router";
 import { ShoppingBag, Check, Lock } from "lucide-react";
 import { useEffect } from "react";
 import { z } from "zod";
@@ -44,7 +44,7 @@ const steps = [
 
 function RouteComponent() {
     const queryClient = useQueryClient();
-    const navigate = useNavigate();
+    const router = useRouter()
     const { isLoaded, isSignedIn } = useUser();
     const { isAuthenticated } = useRouteContext({ strict: false });
     const { getToken } = useAuth();
@@ -79,8 +79,10 @@ function RouteComponent() {
             await loginFn({ data: { sessionUser } });
 
             sessionStorage.setItem("auth_exchanged", "true");
+            queryClient.invalidateQueries({ queryKey: ["session"] })
             queryClient.invalidateQueries({ queryKey: ["cart"] });
-            navigate({ to: search.redirect || "/" });
+            router.invalidate();
+            window.location.assign(search.redirect || "/");
         };
 
         run();

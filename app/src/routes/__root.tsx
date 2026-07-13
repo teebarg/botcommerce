@@ -23,13 +23,12 @@ import { useSettingsQuery } from "@/hooks/useGeneric";
 import { useEffect, useState } from "react";
 import ImpersonationBanner from "@/components/impersonation-banner";
 import { SafeAreaDebug } from "@/components/safe-area-debug";
-import { fetchUserFn } from "@/server/users.server";
+import { authQueryOptions } from "@/hooks/useUser";
 
 interface RouterContext extends AppSession {
     queryClient: QueryClient;
     config: any;
 }
-
 
 export const Route = createRootRouteWithContext<RouterContext>()({
     beforeLoad: async ({ context: { queryClient }, location }) => {
@@ -37,7 +36,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
             throw redirect({ to: "/maintenance" });
         }
         const [session, settings] = await Promise.all([
-            fetchUserFn(),
+            queryClient.ensureQueryData(authQueryOptions()),
             queryClient.ensureQueryData(useSettingsQuery()),
         ]);
 

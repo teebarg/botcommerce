@@ -146,7 +146,7 @@ export const useApplyWalletCredit = () => {
     return useMutation({
         mutationFn: async () => api.post<Message>("/cart/apply-wallet", {}),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["user", "me"] });
+            queryClient.invalidateQueries({ queryKey: ["user"] });
             toast.success("Wallet credit applied");
         },
         onError: (error: any) => {
@@ -160,7 +160,7 @@ export const useRemoveWalletCredit = () => {
     return useMutation({
         mutationFn: async () => api.post<Message>("/cart/remove-wallet", {}),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["user", "me"] });
+            queryClient.invalidateQueries({ queryKey: ["user"] });
             toast.success("Wallet credit removed");
         },
         onError: (error: any) => {

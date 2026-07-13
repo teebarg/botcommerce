@@ -110,6 +110,9 @@ class Settings(BaseSettings):
     VERCEL_API_TOKEN: str = ""
     VERCEL_PROJECT_ID: str = ""
 
+    CF_API_TOKEN: str = ""
+    CF_ZONE_ID: str = ""
+
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)
         env_file=".env",
