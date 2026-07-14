@@ -15,8 +15,9 @@ const authCallbackSchema = z.object({
 });
 
 export const Route = createFileRoute("/auth/callback")({
-    component: RouteComponent,
     validateSearch: authCallbackSchema,
+    ssr: false,
+    component: RouteComponent,
 });
 
 const steps = [

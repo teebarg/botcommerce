@@ -38,6 +38,12 @@ export const Route = createFileRoute("/_mainLayout/products/$slug")({
         const title = product.name || "";
 
         return {
+            links: [
+                {
+                    rel: 'canonical',
+                    href: `${baseUrl}/products/${product.slug}`,
+                },
+            ],
             meta: [
                 ...seo({
                     title,

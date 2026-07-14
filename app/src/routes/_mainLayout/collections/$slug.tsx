@@ -31,6 +31,12 @@ export const Route = createFileRoute("/_mainLayout/collections/$slug")({
 
         return {
             title,
+            links: [
+                {
+                    rel: 'canonical',
+                    href: `${baseUrl}/collections/${collection?.slug}`,
+                },
+            ],
             meta: [
                 ...seo({
                     title,
