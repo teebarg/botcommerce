@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Separator } from "@/components/ui/separator";
 import { currency } from "@/utils";
 
-export const Route = createFileRoute("/_mainLayout/(static)/shipping")({
+export const Route = createFileRoute("/_mainLayout/_static/shipping")({
     head: () => ({
         meta: [{ name: "description", content: "Shipping Information" }, { title: "Shipping Information" }],
     }),
@@ -37,7 +37,7 @@ function RouteComponent() {
         },
         {
             q: "What if my package is lost or damaged?",
-            a: "We'll replace lost or damaged packages at no cost to you. Contact our support team with your order number and we'll get it sorted.",
+            a: `We"ll replace lost or damaged packages at no cost to you.Contact our support team with your order number and we"ll get it sorted.`,
         },
     ];
 
@@ -64,7 +64,7 @@ function RouteComponent() {
                                         <p className="text-sm font-medium">{opt.name}</p>
                                         <p className="text-xs text-muted-foreground mt-0.5">{opt.time}</p>
                                     </div>
-                                    <span className={`text-sm font-medium ${opt.cost === "Free" ? "text-emerald-700" : ""}`}>{opt.cost}</span>
+                                    <span className={`text-sm font-medium ${opt.cost === `Free` ? `text-emerald-700` : ``}`}>{opt.cost}</span>
                                 </div>
                             ))}
                         </div>

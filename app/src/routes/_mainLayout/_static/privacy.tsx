@@ -3,7 +3,7 @@ import { BtnLink } from "@/components/ui/btnLink";
 import { Separator } from "@/components/ui/separator";
 import { useConfig } from "@/providers/store-provider";
 
-export const Route = createFileRoute("/_mainLayout/(static)/privacy")({
+export const Route = createFileRoute("/_mainLayout/_static/privacy")({
     head: () => ({
         meta: [{ name: "description", content: "Privacy Policy" }, { title: "Privacy Policy" }],
     }),

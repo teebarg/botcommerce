@@ -3,7 +3,7 @@ import { BtnLink } from "@/components/ui/btnLink";
 import { Separator } from "@/components/ui/separator";
 import { useConfig } from "@/providers/store-provider";
 
-export const Route = createFileRoute("/_mainLayout/(static)/terms")({
+export const Route = createFileRoute("/_mainLayout/_static/terms")({
     head: () => ({
         meta: [
             { name: "description", content: "Terms and Conditions" },

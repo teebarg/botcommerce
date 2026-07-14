@@ -1,7 +1,7 @@
 import UnderConstruction from "@/components/under-construction";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_mainLayout/(static)/about")({
+export const Route = createFileRoute("/_mainLayout/_static/about")({
     head: () => ({
         meta: [
             {

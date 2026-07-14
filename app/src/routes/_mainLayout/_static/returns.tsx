@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Separator } from "@/components/ui/separator";
 import { BtnLink } from "@/components/ui/btnLink";
 
-export const Route = createFileRoute("/_mainLayout/(static)/returns")({
+export const Route = createFileRoute("/_mainLayout/_static/returns")({
     head: () => ({
         meta: [
             { name: "description", content: "Returns & Exchanges Policy" },
