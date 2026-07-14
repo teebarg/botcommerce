@@ -160,9 +160,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                             <InvalidateProvider>{children}</InvalidateProvider>
                                         </WebSocketProvider>
                                     )}
-                                    {import.meta.env.MODE !== "production" && (
-                                        <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
-                                    )}
                                 </div>
                                 <Toaster
                                     closeButton
@@ -178,13 +175,16 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                 />
                                 <PWABadge />
                                 <ImpersonationBanner />
-                                {process.env.NODE_ENV === "production" && <Analytics />}
-                                {process.env.NODE_ENV !== "production" && <SafeAreaDebug />}
-                                <Scripts />
                             </CartProvider>
                         </StoreProvider>
                     </ThemeProvider>
                 </ClerkProvider>
+                {process.env.NODE_ENV === "production" && <Analytics />}
+                {process.env.NODE_ENV !== "production" && <SafeAreaDebug />}
+                {import.meta.env.MODE !== "production" && (
+                    <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
+                )}
+                <Scripts />
             </body>
         </html>
     );

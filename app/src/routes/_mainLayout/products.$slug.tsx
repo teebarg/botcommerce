@@ -11,18 +11,11 @@ import RelatedProducts from "@/components/store/products/related-products";
 
 export const Route = createFileRoute("/_mainLayout/products/$slug")({
     loader: async ({ context: { queryClient }, params: { slug } }) => {
-        try {
-            const product = await queryClient.fetchQuery(productQuery(slug));
-            if (!product) {
-                throw notFound();
-            }
-            return {
-                product,
-            };
-        } catch (err) {
-            // throw new Error("PRODUCT_NOT_FOUND");
-            throw notFound();
-        }
+        // const data = await queryClient.ensureQueryData(productQuery(slug));
+        // return {
+        //     product: data,
+        // }
+        throw notFound()
     },
     head: ({ loaderData }) => {
         const product = loaderData?.product;
@@ -50,7 +43,11 @@ export const Route = createFileRoute("/_mainLayout/products/$slug")({
             ],
         };
     },
+    errorComponent: () => {
+        return <div>Post not found</div>
+    },
     notFoundComponent: () => {
+        console.log("Not found...........")
         return (
             <NotFound
                 eyebrow="Product unavailable"
@@ -62,20 +59,6 @@ export const Route = createFileRoute("/_mainLayout/products/$slug")({
             />
         );
     },
-    errorComponent: ({ error }) => {
-        if (error.message === "PRODUCT_NOT_FOUND") {
-            return (
-                <NotFound
-                    eyebrow="Product unavailable"
-                    title="Product not found"
-                    description="This product may have been removed or the link is incorrect."
-                    showSearch
-                    primaryAction={{ label: "Browse collections", to: "/collections" }}
-                    variant="auto"
-                />
-            );
-        }
-    },
     pendingComponent: () => <ProductPageLoader />,
     component: RouteComponent,
 });
@@ -83,17 +66,7 @@ export const Route = createFileRoute("/_mainLayout/products/$slug")({
 function RouteComponent() {
     const { slug } = Route.useParams();
     const { data: product } = useSuspenseQuery(productQuery(slug));
-
-    if (!product) {
-        return <NotFound
-            eyebrow="Product unavailable"
-            title="Product not found"
-            description="This product may have been removed or the link is incorrect."
-            showSearch
-            primaryAction={{ label: "Browse collections", to: "/collections" }}
-            variant="auto"
-        />;
-    }
+    console.log("🚀 ~ RouteComponent ~ product:", product)
 
     return (
         <main className="flex flex-col">

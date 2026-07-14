@@ -58,10 +58,6 @@ export const getProductFn = createServerFn({ method: "GET" })
     .handler(async ({ data }) => {
         const res = await api.get<ProductLite>(`/product/${data}`);
 
-        if (!res) {
-            throw notFound();
-        }
-
         setResponseHeaders(
             new Headers({
                 "Cache-Control": "public, max-age=60",
