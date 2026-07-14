@@ -1,7 +1,7 @@
 import ContactSection from '@/components/store/landing/contact-section';
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/_mainLayout/(static)/contact-us')({
+export const Route = createFileRoute('/_mainLayout/_static/contact-us')({
     head: () => ({
         meta: [
             {

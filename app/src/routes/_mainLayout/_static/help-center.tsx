@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_mainLayout/(static)/help-center")({
+export const Route = createFileRoute("/_mainLayout/_static/help-center")({
     head: () => ({
         meta: [{ name: "description", content: "Help Center" }, { title: "Help Center" }],
     }),

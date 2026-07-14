@@ -8,7 +8,7 @@ import OrderOverview from "./order-overview";
 import FadeInComponent from "@/components/generic/fade-in-component";
 import type { Order } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import { useConfig } from "@/providers/store-provider";
+import PickupCard from "../checkout/components/pickup-card";
 
 type OrderConfirmationProps = {
     order: Order;
@@ -16,10 +16,8 @@ type OrderConfirmationProps = {
 };
 
 const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShopping }) => {
-    const { address } = useConfig();
-
     return (
-        <div className="max-w-2xl mx-auto px-2 py-6 md:py-8 w-full">
+        <div className="max-w-2xl mx-auto px-2 py-6 md:py-8 w-full space-y-4">
             <FadeInComponent>
                 <div className="text-center mb-6">
                     <div className="inline-flex items-center justify-center w-12 h-12 bg-yellow-100 rounded-full mb-3 animate-pulse">
@@ -35,19 +33,7 @@ const OrderPickup: React.FC<OrderConfirmationProps> = ({ order, onContinueShoppi
             </FadeInComponent>
 
             <FadeInComponent delay="100ms">
-                <div className="rounded-xl border bg-card p-4 mb-4">
-                    <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-3">Pickup point</p>
-                    <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground">Address</span>
-                            <span className="font-medium">{address}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground">Opening hours</span>
-                            <span className="font-medium">Mon–Sat: 9am–6pm</span>
-                        </div>
-                    </div>
-                </div>
+                <PickupCard />
             </FadeInComponent>
 
             {order?.payment_method === "BANK_TRANSFER" && (

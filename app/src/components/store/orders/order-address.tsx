@@ -1,22 +1,14 @@
 import { MapPin, Truck } from "lucide-react";
 import type { DeliveryOption, Order } from "@/schemas";
-import { useConfig } from "@/providers/store-provider";
 import { useDeliveryOptions } from "@/hooks/useApi";
+import PickupCard from "../checkout/components/pickup-card";
 
 export default function OrderAddress({ order }: { order: Order }) {
-    const { address } = useConfig();
     const { data: deliveryOptions } = useDeliveryOptions();
 
     if (order.shipping_method === "PICKUP") {
         return (
-            <div className="rounded-xl border bg-card p-4 mb-4 flex items-start gap-3">
-                <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                <div>
-                    <p className="text-sm font-medium">Pickup point</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{address}</p>
-                    <p className="text-xs text-muted-foreground">Open Mon–Sat: 9am–6pm</p>
-                </div>
-            </div>
+            <PickupCard />
         );
     }
 
