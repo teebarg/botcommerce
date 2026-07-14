@@ -1,4 +1,4 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, isNotFound, notFound } from "@tanstack/react-router";
 import ReviewsSection from "@/components/products/product-reviews";
 import ProductView from "@/components/store/products/product-view";
 import { seo } from "@/utils/seo";
@@ -17,6 +17,9 @@ export const Route = createFileRoute("/_mainLayout/products/$slug")({
                 product,
             };
         } catch (err) {
+            if (isNotFound(err)) {
+                throw err
+            }
             throw notFound();
         }
     },
