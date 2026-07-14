@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import ReviewsSection from "@/components/products/product-reviews";
 import ProductView from "@/components/store/products/product-view";
 import { seo } from "@/utils/seo";
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_mainLayout/products/$slug")({
                 product,
             };
         } catch (err) {
-            throw new Error("PRODUCT_NOT_FOUND");
+            throw notFound();
         }
     },
     head: ({ loaderData }) => {
@@ -46,19 +46,17 @@ export const Route = createFileRoute("/_mainLayout/products/$slug")({
             ],
         };
     },
-    errorComponent: ({ error }) => {
-        if (error.message === "PRODUCT_NOT_FOUND") {
-            return (
-                <NotFound
-                    eyebrow="Product unavailable"
-                    title="Product not found"
-                    description="This product may have been removed or the link is incorrect."
-                    showSearch
-                    primaryAction={{ label: "Browse collections", to: "/collections" }}
-                    variant="auto"
-                />
-            );
-        }
+    notFoundComponent: () => {
+        return (
+            <NotFound
+                eyebrow="Product unavailable"
+                title="Product not found"
+                description="This product may have been removed or the link is incorrect."
+                showSearch
+                primaryAction={{ label: "Browse collections", to: "/collections" }}
+                variant="auto"
+            />
+        );
     },
     pendingComponent: () => <ProductPageLoader />,
     component: RouteComponent,
@@ -67,17 +65,6 @@ export const Route = createFileRoute("/_mainLayout/products/$slug")({
 function RouteComponent() {
     const { slug } = Route.useParams();
     const { data: product } = useSuspenseQuery(productQuery(slug));
-
-    if (!product) {
-        return <NotFound
-            eyebrow="Product unavailable"
-            title="Product not found"
-            description="This product may have been removed or the link is incorrect."
-            showSearch
-            primaryAction={{ label: "Browse collections", to: "/collections" }}
-            variant="auto"
-        />;
-    }
 
     return (
         <main className="flex flex-col">
