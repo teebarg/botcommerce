@@ -1,9 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute } from "@tanstack/react-router";
 import ServerError from "@/components/generic/server-error";
 import { useCategories } from "@/hooks/useCategories";
 import CategoryTree from "@/components/admin/categories/tree";
 
-export const Route = createFileRoute("/_adminLayout/admin/(store)/categories")({
+export const Route = createLazyFileRoute("/_adminLayout/admin/(store)/categories")({
     component: RouteComponent,
 });
 
