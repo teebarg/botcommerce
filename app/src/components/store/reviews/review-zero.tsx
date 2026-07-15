@@ -2,9 +2,8 @@ import { Star } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { ReviewForm } from "./review-form";
 import { Button } from "@/components/ui/button";
-import { useRouteContext } from "@tanstack/react-router";
+import { Link, useLocation, useRouteContext } from "@tanstack/react-router";
 import SheetDrawer from "@/components/sheet-drawer";
-import { UserDropdown } from "@/components/user-button";
 import EmptyState from "@/components/generic/empty";
 
 interface ProductReviewsZeroStateProps {
@@ -15,6 +14,7 @@ interface ProductReviewsZeroStateProps {
 export const ProductReviewsZeroState = ({ productName, product_id }: ProductReviewsZeroStateProps) => {
     const { isAuthenticated } = useRouteContext({ strict: false });
     const state = useOverlayTriggerState({});
+    const location = useLocation();
 
     return (
         <EmptyState
@@ -32,7 +32,7 @@ export const ProductReviewsZeroState = ({ productName, product_id }: ProductRevi
                         <ReviewForm product_id={product_id} onClose={state.close} />
                     </SheetDrawer>
                 ) : (
-                    <UserDropdown />
+                    <Link className="text-sm bg-foreground text-background hover:bg-foreground/90 rounded-1xl py-2 px-3 font-medium" to="/sign-in" search={{redirect: location.pathname}}>Sign in to leave a review</Link>
                 )
             }
         />

@@ -12,7 +12,7 @@ import SheetDrawer from "@/components/sheet-drawer";
 import { ReviewForm } from "../store/reviews/review-form";
 import { api } from "@/utils/api";
 import ReviewsLoader from "./product-review-loader";
-import { ClientOnly } from "@/components/client-only";
+import { ClientOnly } from "@tanstack/react-router";
 
 interface Prop {
     product_id: number;
