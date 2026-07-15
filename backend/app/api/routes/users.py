@@ -11,6 +11,7 @@ from app.prisma_client import prisma as db
 from app.models.user import User, UserSelf, UserAdmin, UserUpdateMe, UserUpdate, PaginatedUsers, GuestUserCreate
 from app.core.security import get_password_hash
 from app.core.permissions import require_admin
+from app.core.deps import UserDep
 
 router = APIRouter()
 
@@ -181,12 +182,8 @@ async def delete(id: int, cache_srv: CacheDep) -> Message:
 
 
 @router.get("/wishlist")
-@cacheable(
-    key_prefix="wishlist",
-    key_builder=lambda user: user.id,
-    tags=lambda user: [f"wishlist:{user.id}"]
-)
-async def read_wishlist(request: Request, user: CurrentUser) -> Wishlists:
+@cacheable(key_prefix="wishlist", tags=lambda user: [f"wishlist:{user.id if user else 'None'}", "products"])
+async def read_wishlist(request: Request, user: UserDep) -> Wishlists:
     if not user:
         return {"wishlists": []}
     items = await db.favorite.find_many(

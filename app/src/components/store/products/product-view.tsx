@@ -7,15 +7,13 @@ import { ProductVariantSelection } from "@/components/products/product-variant-s
 import type { ProductLite, ProductVariantLite } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useUpdateVariant } from "@/hooks/useProduct";
-import { useRouteContext } from "@tanstack/react-router";
-import { useUserWishlist } from "@/hooks/useUser";
+import { ClientOnly, useRouteContext } from "@tanstack/react-router";
 import { useProductVariant } from "@/hooks/useProductVariant";
 import { ProductVariantActions } from "@/components/products/product-variant-actions";
 import ShareButton from "@/components/share";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { useOverlayTriggerState } from "react-stately";
 import { track } from "@/lib/analytics";
-import { ClientOnly } from "@/components/client-only";
 
 interface Props {
     product: ProductLite;
@@ -31,9 +29,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
 
     const { isAdmin } = useRouteContext({ strict: false });
     const updateVariant = useUpdateVariant(false);
-
-    const { data } = useUserWishlist();
-    const inWishlist = !!data?.wishlists?.find((wishlist) => wishlist.product_id === product.id);
 
     const handleMarkVariantOutOfStock = async (variant: ProductVariantLite) => {
         if (!variant?.id) return;
@@ -161,7 +156,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
 
                 <ProductVariantSelection product={product} onVariantChange={setSelectedVariant} />
 
-                <ProductVariantActions product={product} inWishlist={inWishlist} />
+                <ProductVariantActions product={product} />
 
                 <div className="pt-4 border-t border-border">
                     <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-2">Description</p>
