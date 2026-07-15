@@ -20,6 +20,7 @@ export const Route = createFileRoute("/_adminLayout")({
 
         throw error;
     },
+    ssr: false,
     component: RouteComponent,
 });
 

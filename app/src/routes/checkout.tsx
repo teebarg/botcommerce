@@ -42,6 +42,7 @@ export const Route = createFileRoute("/checkout")({
 
         throw error;
     },
+    ssr: false,
     component: RouteComponent,
 });
 

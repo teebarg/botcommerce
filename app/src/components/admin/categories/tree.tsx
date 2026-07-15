@@ -80,7 +80,7 @@ const CategoryTree: React.FC<Props> = ({ data, isPending }) => {
     return (
         <React.Fragment>
             <div className="w-full max-w-5xl mx-auto p-2 space-y-6">
-                <div className="bg-linear-to-r from-primary/20 via-secondary/20 to-accent/20 rounded-2xl p-8">
+                <div className="bg-linear-to-r from-primary/20 via-secondary/20 to-accent/20 rounded-2xl px-6 py-4">
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                         <div>
                             <h1 className="text-lg font-semibold">Product Categories</h1>
