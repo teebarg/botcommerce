@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Bot } from "lucide-react";
 
 const TypingIndicator = () => (
@@ -8,11 +7,10 @@ const TypingIndicator = () => (
         </div>
         <div className="glass rounded-2xl rounded-tl-sm px-4 py-3 flex gap-1.5 items-center">
             {[0, 1, 2].map((i) => (
-                <motion.span
+                <span
                     key={i}
-                    className="w-2 h-2 rounded-full bg-muted-foreground"
-                    animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1, 0.8] }}
-                    transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15 }}
+                    className="w-2 h-2 rounded-full bg-muted-foreground animate-pulse"
+                    style={{ animationDelay: `${i * 150}ms` }}
                 />
             ))}
         </div>

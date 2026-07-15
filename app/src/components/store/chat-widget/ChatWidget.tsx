@@ -1,5 +1,4 @@
 import { useRef, useEffect } from "react";
-import { AnimatePresence } from "framer-motion";
 import { Trash2 } from "lucide-react";
 import { QuickReplies } from "./QuickReplies";
 import { useSupportChat } from "./useSupportChat";
@@ -27,22 +26,20 @@ export const ChatWidget = () => {
                 </div>
             )}
             <div ref={scrollRef} className="flex-1 overflow-y-auto py-4 space-y-3">
-                <AnimatePresence mode="popLayout">
-                    {messages.map((msg, index) => {
-                        const isEditable = msg.content !== "User provided response" && msg.id === lastUserMessage?.id;
-                        return (
-                            <ChatMessage
-                                key={msg.id}
-                                message={msg}
-                                index={index}
-                                isLastMessage={index === messages.length - 1}
-                                isEditable={isEditable}
-                                onSend={handleSendMessage}
-                                onSubmitForm={sendFormSubmission}
-                            />
-                        );
-                    })}
-                </AnimatePresence>
+                {messages.map((msg, index) => {
+                    const isEditable = msg.content !== "User provided response" && msg.id === lastUserMessage?.id;
+                    return (
+                        <ChatMessage
+                            key={msg.id}
+                            message={msg}
+                            index={index}
+                            isLastMessage={index === messages.length - 1}
+                            isEditable={isEditable}
+                            onSend={handleSendMessage}
+                            onSubmitForm={sendFormSubmission}
+                        />
+                    );
+                })}
 
                 {isTyping && <TypingIndicator />}
 

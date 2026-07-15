@@ -1,6 +1,5 @@
 import { cn } from "@/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { AnimatePresence } from "framer-motion";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
@@ -39,7 +38,7 @@ const SheetDrawer: React.FC<OverlayProps> = ({
                     <DrawerHeader>
                         <DrawerTitle>{title}</DrawerTitle>
                     </DrawerHeader>
-                    <AnimatePresence mode="wait">{children}</AnimatePresence>
+                    {children}
                 </DrawerContent>
             </Drawer>
         );
@@ -55,7 +54,7 @@ const SheetDrawer: React.FC<OverlayProps> = ({
                 <SheetHeader className={showHeader ? "px-4 mt-1" : "sr-only"}>
                     <SheetTitle className="flex items-center gap-3 text-xl">{title}</SheetTitle>
                 </SheetHeader>
-                <AnimatePresence mode="wait">{children}</AnimatePresence>
+                {children}
             </SheetContent>
         </Sheet>
     );

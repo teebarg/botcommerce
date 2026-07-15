@@ -30,7 +30,7 @@ const config = defineConfig({
         }),
         tailwindcss(),
         tanstackStart(), 
-        tanstackRouter({ target: 'react', autoCodeSplitting: true }),
+        tanstackRouter({ autoCodeSplitting: false }),
         viteReact(),
         VitePWA({
             strategies: "injectManifest",

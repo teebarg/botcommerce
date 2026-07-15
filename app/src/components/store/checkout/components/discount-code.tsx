@@ -1,6 +1,6 @@
 import type React from "react";
 import { useMemo, useState } from "react";
-import { currency } from "@/utils";
+import { cn, currency } from "@/utils";
 import { Check, ChevronDown, Tag } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,6 @@ import { useApplyCoupon, useRemoveCoupon } from "@/hooks/useCoupon";
 import { toast } from "sonner";
 import { fireConfetti } from "@/utils/confetti";
 import { PageLoader } from "@/components/generic/page-loader";
-import { AnimatePresence, motion } from "framer-motion";
 
 const DiscountCode: React.FC = () => {
     const { cart, isLoading } = useCart();
@@ -62,13 +61,12 @@ const DiscountCode: React.FC = () => {
                 </div>
                 <ChevronDown className="h-5 w-5" />
             </button>
-            <AnimatePresence>
+            <div className={cn(
+                "grid transition-[grid-template-rows] duration-300 ease-out",
+                isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+            )}>
                 {(isOpen || appliedDiscount) && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                    >
+                    <div className="overflow-hidden min-h-0">
                         {appliedDiscount ? (
                             <div className="flex bg-emerald-100 text-emerald-950 dark:bg-emerald-950 dark:text-emerald-200 p-2 rounded-xl">
                                 <div className="flex items-center gap-1.5 flex-1">
@@ -109,9 +107,9 @@ const DiscountCode: React.FC = () => {
                                 </Button>
                             </div>
                         )}
-                    </motion.div>
+                    </div>
                 )}
-            </AnimatePresence>
+            </div>
         </div>
     );
 };

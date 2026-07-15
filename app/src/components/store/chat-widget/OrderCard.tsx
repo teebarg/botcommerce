@@ -1,5 +1,4 @@
 import { Package, Truck, CheckCircle2, RotateCcw, LucideIcon, XCircle } from "lucide-react";
-import { motion } from "framer-motion";
 import { currency } from "@/utils";
 import { ChatOrder, OrderStatus } from "@/schemas";
 
@@ -30,11 +29,9 @@ export const OrderCard = ({ order }: { order: ChatOrder | null }) => {
             </div>
 
             <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${config.progress}%` }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="h-full rounded-full bg-gradient-primary"
+                <div
+                    className="h-full rounded-full bg-gradient-primary transition-[width] duration-700 ease-out"
+                    style={{ width: `${config.progress}%` }}
                 />
             </div>
 

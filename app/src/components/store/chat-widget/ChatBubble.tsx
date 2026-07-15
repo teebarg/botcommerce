@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { MessageCircle, Sparkles, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { ChatWidget } from "./ChatWidget";
 import { useConfig } from "@/providers/store-provider";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -44,52 +43,34 @@ export const ChatBubble = () => {
 
     return (
         <>
-            <AnimatePresence>
-                {isOpen && (
-                    <>
-                        {isMobile ? (
-                            <motion.div
-                                initial={{ y: "100%" }}
-                                animate={{ y: 0 }}
-                                exit={{ y: "100%" }}
-                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                className="fixed inset-0 z-[60] bg-background flex flex-col"
-                            >
-                                <ChatHeader onClose={() => setIsOpen(false)} />
-                                <ChatWidget />
-                            </motion.div>
-                        ) : (
-                            <motion.div
-                                initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                                transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                                className="fixed bottom-24 right-6 z-[60] w-[400px] h-[700px] rounded-3xl border border-border bg-background shadow-2xl overflow-hidden flex flex-col"
-                            >
-                                <ChatHeader onClose={() => setIsOpen(false)} />
-                                <ChatWidget />
-                            </motion.div>
-                        )}
-                    </>
-                )}
-            </AnimatePresence>
+            {isOpen && (
+                <>
+                    {isMobile ? (
+                        <div className="fixed inset-0 z-[60] bg-background flex flex-col">
+                            <ChatHeader onClose={() => setIsOpen(false)} />
+                            <ChatWidget />
+                        </div>
+                    ) : (
+                        <div
+                            className="fixed bottom-24 right-6 z-[60] w-[400px] h-[700px] rounded-3xl border border-border bg-background shadow-2xl overflow-hidden flex flex-col"
+                        >
+                            <ChatHeader onClose={() => setIsOpen(false)} />
+                            <ChatWidget />
+                        </div>
+                    )}
+                </>
+            )}
 
-            <AnimatePresence>
-                {!isOpen && (
-                    <motion.button
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => setIsOpen(true)}
-                        className="fixed right-5 z-50 w-14 h-14 rounded-full bg-primary shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
-                        style={{ boxShadow: "0 0 30px hsl(350 89% 60% / 0.4)", bottom: "calc(90px + var(--sab))" }}
-                    >
-                        <MessageCircle className="w-6 h-6 text-primary-foreground" />
-                        <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-destructive" />
-                    </motion.button>
-                )}
-            </AnimatePresence>
+            {!isOpen && (
+                <button
+                    onClick={() => setIsOpen(true)}
+                    className="fixed right-5 z-50 w-14 h-14 rounded-full bg-primary shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
+                    style={{ boxShadow: "0 0 30px hsl(350 89% 60% / 0.4)", bottom: "calc(90px + var(--sab))" }}
+                >
+                    <MessageCircle className="w-6 h-6 text-primary-foreground" />
+                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-destructive" />
+                </button>
+            )}
         </>
     );
 };

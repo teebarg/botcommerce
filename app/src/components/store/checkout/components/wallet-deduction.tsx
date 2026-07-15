@@ -1,5 +1,4 @@
 import { cn, currency } from "@/utils";
-import { AnimatePresence, motion } from "framer-motion";
 import { Wallet } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -39,24 +38,17 @@ const WalletDeduction: React.FC<{ cart: Cart }> = ({ cart }) => {
                 </div>
                 <Switch checked={useWalletCredit} onCheckedChange={(checked) => onToggleWalletCredit?.(checked)} />
             </div>
-            <AnimatePresence>
-                {cart.wallet_used > 0 && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="overflow-hidden"
-                    >
-                        <div className="mt-3 pt-3 border-t border-border/50 flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Credit applied</span>
-                            <span className="font-bold text-primary">-{currency(cart.wallet_used)}</span>
-                        </div>
-                        <p className="text-2xs text-muted-foreground mt-1">
-                            Full wallet balance will be applied. Remaining amount charged to your payment method.
-                        </p>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {cart.wallet_used > 0 && (
+                <div className="overflow-hidden min-h-0">
+                    <div className="mt-3 pt-3 border-t border-border/50 flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Credit applied</span>
+                        <span className="font-bold text-primary">-{currency(cart.wallet_used)}</span>
+                    </div>
+                    <p className="text-2xs text-muted-foreground mt-1">
+                        Full wallet balance will be applied. Remaining amount charged to your payment method.
+                    </p>
+                </div>
+            )}
         </div>
     );
 };
