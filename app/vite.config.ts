@@ -29,7 +29,7 @@ const config = defineConfig({
             projects: ["./tsconfig.json"],
         }),
         tailwindcss(),
-        tanstackStart(), 
+        tanstackStart(),
         tanstackRouter({ autoCodeSplitting: false }),
         viteReact(),
         VitePWA({
@@ -71,6 +71,16 @@ const config = defineConfig({
     build: {
         rollupOptions: {
             external: ["node:stream", "node:stream/web", "node:async_hooks"],
+            output: {
+                manualChunks(id) {
+                    if (id.includes("node_modules")) {
+                        if (id.includes("lucide-react")) return "icons";
+                        if (id.includes("@radix-ui")) return "radix";
+                        if (id.includes("react-dom") || id.includes("/react/") || id.includes("react-router")) return "vendor-react";
+                        return "vendor"; // catch-all for the rest of node_modules
+                    }
+                },
+            },
         },
     },
 });

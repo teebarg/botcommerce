@@ -38,17 +38,22 @@ const WalletDeduction: React.FC<{ cart: Cart }> = ({ cart }) => {
                 </div>
                 <Switch checked={useWalletCredit} onCheckedChange={(checked) => onToggleWalletCredit?.(checked)} />
             </div>
-            {cart.wallet_used > 0 && (
-                <div className="overflow-hidden min-h-0">
-                    <div className="mt-3 pt-3 border-t border-border/50 flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Credit applied</span>
-                        <span className="font-bold text-primary">-{currency(cart.wallet_used)}</span>
+            <div className={cn(
+                "grid transition-[grid-template-rows] duration-300 ease-out",
+                cart.wallet_used > 0 ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+            )}>
+                {cart.wallet_used > 0 && (
+                    <div className="min-h-0">
+                        <div className="mt-3 pt-3 border-t border-border/50 flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Credit applied</span>
+                            <span className="font-bold text-primary">-{currency(cart.wallet_used)}</span>
+                        </div>
+                        <p className="text-2xs text-muted-foreground mt-1">
+                            Full wallet balance will be applied. Remaining amount charged to your payment method.
+                        </p>
                     </div>
-                    <p className="text-2xs text-muted-foreground mt-1">
-                        Full wallet balance will be applied. Remaining amount charged to your payment method.
-                    </p>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 };

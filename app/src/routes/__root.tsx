@@ -162,31 +162,33 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                             <InvalidateProvider>{children}</InvalidateProvider>
                                         </WebSocketProvider>
                                     )}
-                                    {import.meta.env.MODE !== "production" && (
-                                        <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
-                                    )}
                                 </div>
-                                <Toaster
-                                    closeButton
-                                    richColors
-                                    duration={5000}
-                                    expand={false}
-                                    position="top-right"
-                                    toastOptions={{
-                                        style: {
-                                            marginTop: "var(--sat)",
-                                        },
-                                    }}
-                                />
                                 <PWABadge />
                                 <ImpersonationBanner />
-                                {process.env.NODE_ENV === "production" && <Analytics />}
-                                {process.env.NODE_ENV !== "production" && <SafeAreaDebug />}
-                                <Scripts />
                             </CartProvider>
                         </StoreProvider>
                     </ThemeProvider>
                 </ClerkProvider>
+                <Toaster
+                    closeButton
+                    richColors
+                    duration={5000}
+                    expand={false}
+                    position="top-right"
+                    toastOptions={{
+                        style: {
+                            marginTop: "var(--sat)",
+                        },
+                    }}
+                />
+                {import.meta.env.MODE !== "production" && (
+                    <>
+                        <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
+                        <SafeAreaDebug />
+                    </>
+                )}
+                {process.env.NODE_ENV === "production" && <Analytics />}
+                <Scripts />
             </body>
         </html>
     );
