@@ -20,11 +20,7 @@ const config = defineConfig({
     },
     plugins: [
         devtools(),
-        nitro({
-            externals: {
-                inline: ["@auth/core"],
-            },
-        }),
+        nitro(),
         viteTsConfigPaths({
             projects: ["./tsconfig.json"],
         }),
@@ -89,10 +85,10 @@ const config = defineConfig({
             external: ["node:stream", "node:stream/web", "node:async_hooks"],
             output: {
                 manualChunks(id) {
-                    if (id.includes("node_modules")) {
-                        if (id.includes("lucide-react")) return "icons";
-                        if (id.includes("@radix-ui")) return "radix";
-                        if (id.includes("react-dom") || id.includes("/react/") || id.includes("@tanstack/react-router") || id.includes("@tanstack/react-query")) return "vendor-react";
+                    const filepath = id.replace(/\\/g, '/');
+                    if (filepath.includes("node_modules")) {
+                        if (filepath.includes("lucide-react")) return "icons";
+                        if (filepath.includes("@radix-ui")) return "radix";
                     }
                 },
             },
