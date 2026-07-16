@@ -93,7 +93,6 @@ const config = defineConfig({
                         if (id.includes("lucide-react")) return "icons";
                         if (id.includes("@radix-ui")) return "radix";
                         if (id.includes("react-dom") || id.includes("/react/") || id.includes("@tanstack/react-router") || id.includes("@tanstack/react-query")) return "vendor-react";
-                        return "vendor"; // catch-all for the rest of node_modules
                     }
                 },
             },
