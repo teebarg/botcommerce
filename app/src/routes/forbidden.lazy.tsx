@@ -1,8 +1,8 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate, createLazyFileRoute } from "@tanstack/react-router";
 import { LockKeyhole } from 'lucide-react';
 import { useConfig } from "@/providers/store-provider";
 
-export const Route = createFileRoute("/forbidden")({
+export const Route = createLazyFileRoute("/forbidden")({
     component: RouteComponent,
 });
 

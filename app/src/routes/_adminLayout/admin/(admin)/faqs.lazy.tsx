@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute } from "@tanstack/react-router";
 import { MessageCircle, Plus } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { api } from "@/utils/api";
 import EmptyState from "@/components/generic/empty";
 import { PageLoader } from "@/components/generic/page-loader";
 
-export const Route = createFileRoute("/_adminLayout/admin/(admin)/faqs")({
+export const Route = createLazyFileRoute("/_adminLayout/admin/(admin)/faqs")({
     component: RouteComponent,
 });
 

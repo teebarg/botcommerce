@@ -3,7 +3,6 @@ import { Toaster } from "sonner";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { CartProvider } from "@/providers/cart-provider";
 import { StoreProvider } from "@/providers/store-provider";
-import PushPermission from "@/components/push-permission";
 import { seo } from "@/utils/seo";
 import NotFound from "@/components/generic/not-found";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
@@ -20,10 +19,11 @@ import { getSessionId } from "@/utils";
 import { Analytics } from "@vercel/analytics/react";
 import { ShopSettings } from "@/schemas";
 import { useSettingsQuery } from "@/hooks/useGeneric";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import ImpersonationBanner from "@/components/impersonation-banner";
 import { SafeAreaDebug } from "@/components/safe-area-debug";
 import { authQueryOptions } from "@/hooks/useUser";
+const PushPermission = lazy(() => import("@/components/push-permission"));
 
 interface RouterContext extends AppSession {
     queryClient: QueryClient;
@@ -149,7 +149,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                         <StoreProvider config={config}>
                             <CartProvider>
                                 <div className="relative">
-                                    <PushPermission />
+                                    <Suspense fallback={null}>
+                                        <PushPermission />
+                                    </Suspense>
                                     {localSessionId && (
                                         <WebSocketProvider
                                             url={`${import.meta.env.VITE_WS}/api/ws/?session_id=${localSessionId}`}
@@ -160,31 +162,33 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                                             <InvalidateProvider>{children}</InvalidateProvider>
                                         </WebSocketProvider>
                                     )}
-                                    {import.meta.env.MODE !== "production" && (
-                                        <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
-                                    )}
                                 </div>
-                                <Toaster
-                                    closeButton
-                                    richColors
-                                    duration={5000}
-                                    expand={false}
-                                    position="top-right"
-                                    toastOptions={{
-                                        style: {
-                                            marginTop: "var(--sat)",
-                                        },
-                                    }}
-                                />
                                 <PWABadge />
                                 <ImpersonationBanner />
-                                {process.env.NODE_ENV === "production" && <Analytics />}
-                                {process.env.NODE_ENV !== "production" && <SafeAreaDebug />}
-                                <Scripts />
                             </CartProvider>
                         </StoreProvider>
                     </ThemeProvider>
                 </ClerkProvider>
+                <Toaster
+                    closeButton
+                    richColors
+                    duration={5000}
+                    expand={false}
+                    position="top-right"
+                    toastOptions={{
+                        style: {
+                            marginTop: "var(--sat)",
+                        },
+                    }}
+                />
+                {import.meta.env.MODE !== "production" && (
+                    <>
+                        <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
+                        <SafeAreaDebug />
+                    </>
+                )}
+                {process.env.NODE_ENV === "production" && <Analytics />}
+                <Scripts />
             </body>
         </html>
     );

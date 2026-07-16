@@ -1,6 +1,6 @@
 import type * as React from "react";
 
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 import LocalizedClientLink from "@/components/ui/link";
 import { buttonVariants } from "@/components/ui/button";
 import { ButtonVariant } from "@/schemas";

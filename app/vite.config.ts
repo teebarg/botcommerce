@@ -20,17 +20,13 @@ const config = defineConfig({
     },
     plugins: [
         devtools(),
-        nitro({
-            externals: {
-                inline: ["@auth/core"],
-            },
-        }),
+        nitro(),
         viteTsConfigPaths({
             projects: ["./tsconfig.json"],
         }),
         tailwindcss(),
-        tanstackStart(), 
-        tanstackRouter({ target: 'react', autoCodeSplitting: true }),
+        tanstackStart(),
+        tanstackRouter({ autoCodeSplitting: true }),
         viteReact(),
         VitePWA({
             strategies: "injectManifest",
@@ -55,7 +51,23 @@ const config = defineConfig({
             },
             injectManifest: {
                 globDirectory: ".output/public",
-                globPatterns: ["**/*.{js,css,html,png,svg,ico,woff2}", "assets/*.css", "_server/assets/*.css"],
+                globPatterns: [
+                    "assets/main-*.js",
+                    "assets/vendor-clerk-*.js",
+                    "assets/vendor-stately-*.js",
+                    "assets/radix-*.js",
+                    "assets/icons-*.js",
+                    "assets/_mainLayout-*.js",
+                    "assets/styles-*.css",
+                    "assets/*.woff2",
+                ],
+                globIgnores: [
+                    "**/node_modules/**/*",
+                    "assets/account*",
+                    "assets/_adminLayout*",
+                    "assets/admin.*",
+                    "**/*.lazy-*.js",
+                ],
             },
             devOptions: {
                 enabled: false,
@@ -69,8 +81,25 @@ const config = defineConfig({
         },
     },
     build: {
+        chunkSizeWarningLimit: 600,
         rollupOptions: {
             external: ["node:stream", "node:stream/web", "node:async_hooks"],
+            output: {
+                experimentalMinChunkSize: 5000,
+                manualChunks(id) {
+                    const filepath = id.replace(/\\/g, '/');
+                    if (filepath.includes("node_modules")) {
+                        if (filepath.includes("lucide-react")) return "icons";
+                        if (filepath.includes("@radix-ui")) return "radix";
+                        if (filepath.includes("@clerk/")) return "vendor-clerk";
+                        if (filepath.includes("react-stately")) return "vendor-stately";
+
+                        if (filepath.includes("src/components/ui/")) {
+                            return "shared-ui-primitives";
+                        }
+                    }
+                },
+            },
         },
     },
 });

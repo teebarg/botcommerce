@@ -1,10 +1,11 @@
 import type React from "react";
-import { cn, currency } from "@/utils";
+import { currency } from "@/utils";
 import type { Cart } from "@/schemas";
 import { ArrowRight, Shield } from "lucide-react";
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { Separator } from "@/components/ui/separator";
 import { useCartSummary } from "@/hooks/useCartSummary";
+import { cn } from "@/utils/cn";
 
 const CartSummary: React.FC<{ cart: Cart, className?: string, showSecured?: boolean }> = ({ cart, className, showSecured = false }) => {
     const router = useRouter();

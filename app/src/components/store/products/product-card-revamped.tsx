@@ -1,10 +1,11 @@
 import type React from "react";
 import type { ProductSearch } from "@/schemas/product";
 import { Link } from "@tanstack/react-router";
-import { currency, cn } from "@/utils";
+import { currency } from "@/utils";
 import { useProductCardVariant } from "@/hooks/useProductCardVariant";
 import ImageLightbox from "@/components/image-lightbox";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/utils/cn";
 
 interface ProductCardProps {
     product: ProductSearch;

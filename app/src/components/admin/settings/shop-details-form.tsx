@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import type { ShopSettings } from "@/schemas";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 import { Button } from "@/components/ui/button";
 import { useSyncShopDetails } from "@/hooks/useGeneric";
 

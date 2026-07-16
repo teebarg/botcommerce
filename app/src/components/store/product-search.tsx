@@ -4,7 +4,7 @@ import { useDebounce } from "use-debounce";
 import { useOverlayTriggerState } from "react-stately";
 import type { ProductSearch } from "@/schemas";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 import { useProductSearch } from "@/hooks/useProduct";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "@tanstack/react-router";

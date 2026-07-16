@@ -6,7 +6,7 @@ import Overlay from "@/components/overlay";
 import { useCart } from "@/providers/cart-provider";
 import { ShoppingBag, ShoppingCart } from "lucide-react";
 import { useCartSummary } from "@/hooks/useCartSummary";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 
 const CartComponent: React.FC = () => {
     const state = useOverlayTriggerState({});

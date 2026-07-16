@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 
 interface Props {
     title: string;

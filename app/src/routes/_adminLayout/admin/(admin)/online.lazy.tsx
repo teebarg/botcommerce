@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Users, UserCheck, Eye, TrendingUp } from "lucide-react";
 import UserCounter from "@/components/admin/online/UserCounter";
@@ -17,7 +17,7 @@ interface OnlineSession {
     name: string;
 }
 
-export const Route = createFileRoute("/_adminLayout/admin/(admin)/online")({
+export const Route = createLazyFileRoute("/_adminLayout/admin/(admin)/online")({
     component: RouteComponent,
 });
 

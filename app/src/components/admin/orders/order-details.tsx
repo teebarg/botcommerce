@@ -6,13 +6,14 @@ import { OrderStatusBadge } from "./order-status-badge";
 import { useOrderTimeline } from "@/hooks/useOrder";
 import { OrderStatus, type Order, type OrderItem } from "@/schemas";
 import { useReturnOrderItem } from "@/hooks/useOrder";
-import { cn, currency, formatDate } from "@/utils";
+import { currency, formatDate } from "@/utils";
 import { Badge } from "@/components/ui/badge";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { Button } from "@/components/ui/button";
 import { ReactElement } from "react";
 import OrderSummary from "@/components/store/orders/order-summary";
 import ImageLightbox from "@/components/image-lightbox";
+import { cn } from "@/utils/cn";
 
 interface OrderDetailsProps {
     order: Order;

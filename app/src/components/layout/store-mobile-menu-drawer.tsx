@@ -4,7 +4,7 @@ import { MenuIcon } from "lucide-react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation, useRouteContext } from "@tanstack/react-router";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 import type React from "react";
 import { CreditCard, Heart, Home, LayoutGrid, User2, User as UserIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";

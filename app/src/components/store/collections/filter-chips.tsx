@@ -1,6 +1,6 @@
 import type React from "react";
 import { Sparkles, Flame } from "lucide-react";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 import { Link, useLocation, useSearch } from "@tanstack/react-router";
 
 type DiscoveryFilter = "for-you" | "trending" | "new-arrivals" | "under-1k";

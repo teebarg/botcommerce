@@ -2,8 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { toast } from "sonner";
 import { tryCatch } from "@/utils/try-catch";
 import { Bell, Package, Tag, Truck } from "lucide-react";
-import { cn } from "@/utils";
-import { AnimatePresence, motion } from "framer-motion";
+import { cn } from "@/utils/cn";
 import { api } from "@/utils/api";
 import { Message } from "@/schemas";
 import { track } from "@/lib/analytics";
@@ -276,74 +275,66 @@ export default function PushPermission() {
     if (!isVisible) return null;
 
     return (
-        <AnimatePresence>
-            <motion.div
-                key="push-permission-overlay"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-end md:items-center justify-center"
+        <div
+            key="push-permission-overlay"
+            className="fixed inset-0 z-50 flex items-end md:items-center justify-center animate-in fade-in duration-300"
+        >
+            <div onClick={handleClose} className="absolute inset-0 bg-black/60" />
+            <div
+                className={cn(
+                    "relative w-full md:max-w-sm shadow-2xl border border-border/50",
+                    "bg-card rounded-t-[28px] md:rounded-3xl overflow-hidden pb-[var(--sab)]",
+                    "animate-in slide-in-from-bottom-8 md:zoom-in-95 duration-300 ease-out"
+                )}
             >
-                <div onClick={handleClose} className="absolute inset-0 bg-black/60" />
-                <motion.div
-                    initial={{ opacity: 0, y: 80, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 80, scale: 0.98 }}
-                    transition={{ type: "spring", damping: 28, stiffness: 320 }}
-                    className={cn(
-                        "relative w-full md:max-w-sm shadow-2xl border border-border/50",
-                        "bg-card rounded-t-[28px] md:rounded-3xl overflow-hidden pb-[var(--sab)]"
-                    )}
-                >
-                    <div className="pt-7 pb-5 px-6 text-center">
-                        <div className="flex justify-center mb-4">
-                            <div className="relative flex items-center justify-center w-14 h-14 rounded-2xl bg-accent/15">
-                                <Bell className="w-6 h-6 text-accent" strokeWidth={2} />
-                                <div className="absolute -inset-1 rounded-2xl border border-accent/30" />
+                <div className="pt-7 pb-5 px-6 text-center">
+                    <div className="flex justify-center mb-4">
+                        <div className="relative flex items-center justify-center w-14 h-14 rounded-2xl bg-accent/15">
+                            <Bell className="w-6 h-6 text-accent" strokeWidth={2} />
+                            <div className="absolute -inset-1 rounded-2xl border border-accent/30" />
+                        </div>
+                    </div>
+                    <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1.5">
+                        Notifications
+                    </p>
+                    <h2 className="text-lg font-semibold leading-snug">
+                        Be first to know when a new bale drops
+                    </h2>
+                    <p className="text-sm text-muted-foreground leading-relaxed mt-1.5">
+                        Turn on notifications so you don&apos;t miss the good pieces before they&apos;re gone.
+                    </p>
+                </div>
+
+                <div className="divide-y divide-border border-y border-border">
+                    {BENEFITS.map(({ icon: Icon, title, detail }) => (
+                        <div key={title} className="flex items-start gap-3 px-6 py-3.5">
+                            <Icon className="w-[18px] h-[18px] text-accent mt-0.5 shrink-0" strokeWidth={2} />
+                            <div>
+                                <p className="text-sm font-medium">{title}</p>
+                                <p className="text-xs text-muted-foreground mt-0.5">{detail}</p>
                             </div>
                         </div>
-                        <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1.5">
-                            Notifications
-                        </p>
-                        <h2 className="text-lg font-semibold leading-snug">
-                            Be first to know when a new bale drops
-                        </h2>
-                        <p className="text-sm text-muted-foreground leading-relaxed mt-1.5">
-                            Turn on notifications so you don&apos;t miss the good pieces before they&apos;re gone.
-                        </p>
-                    </div>
+                    ))}
+                </div>
 
-                    <div className="divide-y divide-border border-y border-border">
-                        {BENEFITS.map(({ icon: Icon, title, detail }) => (
-                            <div key={title} className="flex items-start gap-3 px-6 py-3.5">
-                                <Icon className="w-[18px] h-[18px] text-accent mt-0.5 shrink-0" strokeWidth={2} />
-                                <div>
-                                    <p className="text-sm font-medium">{title}</p>
-                                    <p className="text-xs text-muted-foreground mt-0.5">{detail}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="px-6 pt-4 pb-2">
-                        <button
-                            type="button"
-                            onClick={handleOptIn}
-                            disabled={isSubscribing}
-                            className="w-full py-3.5 rounded-xl bg-accent text-accent-foreground font-medium text-sm hover:bg-accent/90 active:bg-accent/80 transition-colors disabled:opacity-60 cursor-pointer"
-                        >
-                            {isSubscribing ? "Turning on…" : "Turn on notifications"}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleDismiss}
-                            className="w-full py-3 text-center font-medium text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                        >
-                            Not now
-                        </button>
-                    </div>
-                </motion.div>
-            </motion.div>
-        </AnimatePresence>
+                <div className="px-6 pt-4 pb-2">
+                    <button
+                        type="button"
+                        onClick={handleOptIn}
+                        disabled={isSubscribing}
+                        className="w-full py-3.5 rounded-xl bg-accent text-accent-foreground font-medium text-sm hover:bg-accent/90 active:bg-accent/80 transition-colors disabled:opacity-60 cursor-pointer"
+                    >
+                        {isSubscribing ? "Turning on…" : "Turn on notifications"}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleDismiss}
+                        className="w-full py-3 text-center font-medium text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                    >
+                        Not now
+                    </button>
+                </div>
+            </div>
+        </div>
     );
 }

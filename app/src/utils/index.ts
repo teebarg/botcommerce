@@ -1,11 +1,4 @@
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-
 import type { Message } from "@/schemas";
-
-export function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
-}
 
 const buildUrl = (baseUrl: string, queryParams: Record<string, string | number | Date | undefined | null>): string => {
     let url = baseUrl;

@@ -1,6 +1,6 @@
 import type React from "react";
 
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Flame, Zap } from "lucide-react";
 

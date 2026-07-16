@@ -1,6 +1,7 @@
 import { ArrowDownLeft, ShoppingBag } from "lucide-react";
-import { cn, currency, formatDate } from "@/utils";
+import { currency, formatDate } from "@/utils";
 import { WalletTxn } from "@/schemas";
+import { cn } from "@/utils/cn";
 
 interface Props {
     txn: WalletTxn;

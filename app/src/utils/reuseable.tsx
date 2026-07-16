@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { User, Send, Paperclip, X, Copy, Smartphone, Twitter, Facebook } from "lucide-react";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";

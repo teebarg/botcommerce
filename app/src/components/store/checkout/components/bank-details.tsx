@@ -1,7 +1,7 @@
 import { Banknote, Copy, Check } from "lucide-react";
 import { useBankDetails } from "@/hooks/useApi";
 import { useState } from "react";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 
 interface Props {
     order_number?: string;

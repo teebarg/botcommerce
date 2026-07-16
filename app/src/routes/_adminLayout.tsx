@@ -1,7 +1,4 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import AdminNavbar from "@/components/admin/layouts/admin-navbar";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AdminSidebar } from "@/components/layout/admin-sidebar";
 import { SignInRedirect } from "@/utils/reuseable";
 
 export const Route = createFileRoute("/_adminLayout")({
@@ -20,19 +17,6 @@ export const Route = createFileRoute("/_adminLayout")({
 
         throw error;
     },
-    component: RouteComponent,
+    ssr: false,
+    component: () => <Outlet />,
 });
-
-function RouteComponent() {
-    return (
-        <SidebarProvider>
-            <AdminSidebar />
-            <main className="flex-1 flex flex-col">
-                <AdminNavbar />
-                <div className="flex-1 flex flex-col">
-                    <Outlet />
-                </div>
-            </main>
-        </SidebarProvider>
-    );
-}

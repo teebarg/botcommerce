@@ -35,7 +35,7 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 import { UserAvatar } from "@/components/generic/user-avatar";
 import LocalizedClientLink from "@/components/ui/link";
 

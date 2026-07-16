@@ -5,7 +5,7 @@ import type { Category } from "@/schemas/product";
 import { Button } from "@/components/ui/button";
 import { CategoryForm } from "@/components/admin/categories/category-form";
 import { useDeleteCategory } from "@/hooks/useCategories";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 

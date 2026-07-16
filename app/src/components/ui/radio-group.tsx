@@ -3,7 +3,7 @@
 import type * as React from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { Circle, Check, Loader2 } from "lucide-react";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 
 const radioVariants = {
     default: {

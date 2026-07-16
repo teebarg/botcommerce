@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn, getInitials } from "@/utils";
+import { getInitials } from "@/utils";
+import { cn } from "@/utils/cn";
 import { useRouteContext } from "@tanstack/react-router";
 
 export function UserAvatar({ className }: { className?: string }) {

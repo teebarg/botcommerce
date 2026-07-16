@@ -1,5 +1,4 @@
-import { cn, currency } from "@/utils";
-import { AnimatePresence, motion } from "framer-motion";
+import { currency } from "@/utils";
 import { Wallet } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -8,6 +7,7 @@ import { meQuery } from "@/queries/user.queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useApplyWalletCredit, useRemoveWalletCredit } from "@/hooks/useCart";
 import { Cart } from "@/schemas";
+import { cn } from "@/utils/cn";
 
 const WalletDeduction: React.FC<{ cart: Cart }> = ({ cart }) => {
     const { data: me } = useSuspenseQuery(meQuery());
@@ -39,14 +39,12 @@ const WalletDeduction: React.FC<{ cart: Cart }> = ({ cart }) => {
                 </div>
                 <Switch checked={useWalletCredit} onCheckedChange={(checked) => onToggleWalletCredit?.(checked)} />
             </div>
-            <AnimatePresence>
+            <div className={cn(
+                "grid transition-[grid-template-rows] duration-300 ease-out",
+                cart.wallet_used > 0 ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+            )}>
                 {cart.wallet_used > 0 && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="overflow-hidden"
-                    >
+                    <div className="min-h-0">
                         <div className="mt-3 pt-3 border-t border-border/50 flex items-center justify-between text-sm">
                             <span className="text-muted-foreground">Credit applied</span>
                             <span className="font-bold text-primary">-{currency(cart.wallet_used)}</span>
@@ -54,9 +52,9 @@ const WalletDeduction: React.FC<{ cart: Cart }> = ({ cart }) => {
                         <p className="text-2xs text-muted-foreground mt-1">
                             Full wallet balance will be applied. Remaining amount charged to your payment method.
                         </p>
-                    </motion.div>
+                    </div>
                 )}
-            </AnimatePresence>
+            </div>
         </div>
     );
 };

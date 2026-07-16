@@ -1,5 +1,6 @@
 import type React from "react";
-import { cn, currency } from "@/utils";
+import { currency } from "@/utils";
+import { cn } from "@/utils/cn";
 
 type PriceInfo = {
     minPrice: number;

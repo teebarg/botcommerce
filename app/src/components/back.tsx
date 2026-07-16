@@ -2,7 +2,7 @@ import type React from "react";
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 import { useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
 
 interface Props {

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute } from "@tanstack/react-router";
 import { ActivityItem } from "@/components/generic/activities/ActivityItem";
 import type { Activity, PaginatedActivities } from "@/schemas";
 import { ActivityIcon } from "lucide-react";
@@ -8,7 +8,7 @@ import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import EmptyState from "@/components/generic/empty";
 import { PageLoader } from "@/components/generic/page-loader";
 
-export const Route = createFileRoute("/_adminLayout/admin/(admin)/activities")({
+export const Route = createLazyFileRoute("/_adminLayout/admin/(admin)/activities")({
     component: RouteComponent,
 });
 
