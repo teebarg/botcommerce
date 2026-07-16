@@ -53,16 +53,17 @@ const config = defineConfig({
                 globDirectory: ".output/public",
                 globPatterns: [
                     "assets/main-*.js",
-                    "assets/vendor-react-*.js",
+                    "assets/vendor-clerk-*.js",
+                    "assets/vendor-stately-*.js",
                     "assets/radix-*.js",
                     "assets/icons-*.js",
-                    "assets/vendor-*.js",
                     "assets/_mainLayout-*.js",
                     "assets/styles-*.css",
                     "assets/*.woff2",
                 ],
                 globIgnores: [
                     "**/node_modules/**/*",
+                    "assets/account*",
                     "assets/_adminLayout*",
                     "assets/admin.*",
                     "**/*.lazy-*.js",
@@ -89,6 +90,8 @@ const config = defineConfig({
                     if (filepath.includes("node_modules")) {
                         if (filepath.includes("lucide-react")) return "icons";
                         if (filepath.includes("@radix-ui")) return "radix";
+                        if (filepath.includes("@clerk/")) return "vendor-clerk";
+                        if (filepath.includes("react-stately")) return "vendor-stately";
                     }
                 },
             },
