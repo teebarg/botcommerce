@@ -22,6 +22,7 @@ export function getRouter() {
         context: {
             queryClient, config: {}
         },
+        defaultPendingMinMs: 0,
         defaultPreload: "intent",
         defaultPreloadDelay: 400,
         defaultPreloadStaleTime: 30_000,
