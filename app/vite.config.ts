@@ -30,7 +30,7 @@ const config = defineConfig({
         }),
         tailwindcss(),
         tanstackStart(),
-        tanstackRouter({ autoCodeSplitting: false }),
+        tanstackRouter({ autoCodeSplitting: true }),
         viteReact(),
         VitePWA({
             strategies: "injectManifest",
@@ -55,7 +55,22 @@ const config = defineConfig({
             },
             injectManifest: {
                 globDirectory: ".output/public",
-                globPatterns: ["**/*.{js,css,html,png,svg,ico,woff2}", "assets/*.css", "_server/assets/*.css"],
+                globPatterns: [
+                    "assets/main-*.js",
+                    "assets/vendor-react-*.js",
+                    "assets/radix-*.js",
+                    "assets/icons-*.js",
+                    "assets/vendor-*.js",
+                    "assets/_mainLayout-*.js",
+                    "assets/styles-*.css",
+                    "assets/*.woff2",
+                ],
+                globIgnores: [
+                    "**/node_modules/**/*",
+                    "assets/_adminLayout*",
+                    "assets/admin.*",
+                    "**/*.lazy-*.js",
+                ],
             },
             devOptions: {
                 enabled: false,
@@ -69,6 +84,7 @@ const config = defineConfig({
         },
     },
     build: {
+        chunkSizeWarningLimit: 600,
         rollupOptions: {
             external: ["node:stream", "node:stream/web", "node:async_hooks"],
             output: {
@@ -76,7 +92,7 @@ const config = defineConfig({
                     if (id.includes("node_modules")) {
                         if (id.includes("lucide-react")) return "icons";
                         if (id.includes("@radix-ui")) return "radix";
-                        if (id.includes("react-dom") || id.includes("/react/") || id.includes("react-router")) return "vendor-react";
+                        if (id.includes("react-dom") || id.includes("/react/") || id.includes("@tanstack/react-router") || id.includes("@tanstack/react-query")) return "vendor-react";
                         return "vendor"; // catch-all for the rest of node_modules
                     }
                 },

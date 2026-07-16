@@ -10,6 +10,13 @@ const OFFLINE_SHELL = "/";
 
 precacheAndRoute(self.__WB_MANIFEST);
 
+registerRoute(
+    ({ request, url }) =>
+        request.destination === "script" &&
+        (url.pathname.includes(".lazy-") || url.pathname.includes("/assets/")),
+    new StaleWhileRevalidate({ cacheName: "route-chunks" })
+);
+
 // Target TanStack Server Functions (Read-Only)
 registerRoute(
     ({ url, request }) => {
