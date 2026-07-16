@@ -3,7 +3,7 @@ import { Edit3, Phone, Trash2 } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import type { Address } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { useDeleteAddress } from "@/hooks/useAddress";

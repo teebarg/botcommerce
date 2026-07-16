@@ -1,5 +1,5 @@
 import { InfiniteScroll } from "@/components/InfiniteScroll";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 
 interface Props<T> {
     items: T[];

@@ -1,7 +1,7 @@
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
-import { useMediaQuery } from "@/hooks/use-media-query";
+import useMediaQuery from "@/hooks/use-media-query";
 
 interface OverlayProps {
     trigger: React.ReactNode;

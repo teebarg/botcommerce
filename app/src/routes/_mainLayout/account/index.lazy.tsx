@@ -1,5 +1,5 @@
 import { Link, createLazyFileRoute } from "@tanstack/react-router";
-import { cn, currency, formatDate } from "@/utils";
+import { currency, formatDate } from "@/utils";
 import { ChevronRight, Clock, Heart, Home, MapPin, Package } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import type { Order } from "@/schemas";
@@ -8,6 +8,7 @@ import OrderDetails from "@/components/store/orders/order-details";
 import { PageLoader } from "@/components/generic/page-loader";
 import EmptyState from "@/components/generic/empty";
 import { useOrders } from "@/hooks/useOrder";
+import { cn } from "@/utils/cn";
 
 const OrderItem: React.FC<{ order: Order; idx: number }> = ({ order, idx }) => {
     const state = useOverlayTriggerState({});

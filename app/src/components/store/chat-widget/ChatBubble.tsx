@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { MessageCircle, Sparkles, X } from "lucide-react";
 import { ChatWidget } from "./ChatWidget";
 import { useConfig } from "@/providers/store-provider";
-import { useMediaQuery } from "@/hooks/use-media-query";
+import useMediaQuery from "@/hooks/use-media-query";
 import { useLocation } from "@tanstack/react-router";
 
 const ChatHeader = ({ onClose }: { onClose: () => void }) => {

@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp, Package, AlertTriangle } from "lucide-react";
 import type { Cart, CartItem } from "@/schemas";
-import { cn, currency } from "@/utils";
+import { currency } from "@/utils";
 import CartSummary from "../../cart/cart-summary";
 import CartItemComponent from "../../cart/cart-item";
+import { cn } from "@/utils/cn";
 
 interface OrderReconciliationProps {
     cart: Cart;

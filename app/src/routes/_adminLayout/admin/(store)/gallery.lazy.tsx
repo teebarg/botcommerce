@@ -6,7 +6,7 @@ import { GalleryCard } from "@/components/admin/product/gallery-card";
 import { ProductBulkActions } from "@/components/admin/product/gallery-bulk-action";
 import { GalleryImagesUpload } from "@/components/admin/product/gallery-images-upload";
 import { useBulkDeleteGalleryImages } from "@/hooks/useGallery";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 import { Button } from "@/components/ui/button";
 import { type PaginatedProductImages, type ProductImage } from "@/schemas";
 import { useWebSocketMessage } from "pulsews";

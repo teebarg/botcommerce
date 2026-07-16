@@ -1,11 +1,12 @@
 import type React from "react";
 import { useEffect } from "react";
 import { Minus, Plus } from "lucide-react";
-import { cn, currency } from "@/utils";
+import { currency } from "@/utils";
 import { Badge } from "@/components/ui/badge";
 import { useProductVariant } from "@/hooks/useProductVariant";
 import type { ProductLite, ProductVariantLite } from "@/schemas/product";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/utils/cn";
 
 interface VariantSelectionProps {
     product: ProductLite;

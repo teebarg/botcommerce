@@ -1,10 +1,11 @@
 import type React from "react";
-import { cn, currency } from "@/utils";
+import { currency } from "@/utils";
 import type { CartItem } from "@/schemas";
 import { Minus, Trash2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useChangeCartQuantity, useDeleteCartItem } from "@/hooks/useCart";
 import ImageLightbox from "@/components/image-lightbox";
+import { cn } from "@/utils/cn";
 
 const CartItemComponent: React.FC<{ item: CartItem }> = ({ item }) => {
     const updateQuantity = useChangeCartQuantity();

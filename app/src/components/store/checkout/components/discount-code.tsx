@@ -1,6 +1,6 @@
 import type React from "react";
 import { useMemo, useState } from "react";
-import { cn, currency } from "@/utils";
+import { currency } from "@/utils";
 import { Check, ChevronDown, Tag } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { useApplyCoupon, useRemoveCoupon } from "@/hooks/useCoupon";
 import { toast } from "sonner";
 import { fireConfetti } from "@/utils/confetti";
 import { PageLoader } from "@/components/generic/page-loader";
+import { cn } from "@/utils/cn";
 
 const DiscountCode: React.FC = () => {
     const { cart, isLoading } = useCart();

@@ -1,4 +1,4 @@
-import { cn, currency } from "@/utils";
+import { currency } from "@/utils";
 import { Wallet } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -7,6 +7,7 @@ import { meQuery } from "@/queries/user.queries";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useApplyWalletCredit, useRemoveWalletCredit } from "@/hooks/useCart";
 import { Cart } from "@/schemas";
+import { cn } from "@/utils/cn";
 
 const WalletDeduction: React.FC<{ cart: Cart }> = ({ cart }) => {
     const { data: me } = useSuspenseQuery(meQuery());

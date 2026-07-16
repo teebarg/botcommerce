@@ -1,8 +1,9 @@
 import { GalleryCardActions } from "./gallery-card-actions";
-import { cn, currency } from "@/utils";
+import { currency } from "@/utils";
 import type { ProductImage } from "@/schemas";
 import ImageLightbox from "@/components/image-lightbox";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/utils/cn";
 
 interface GalleryCardProps {
     image: ProductImage;

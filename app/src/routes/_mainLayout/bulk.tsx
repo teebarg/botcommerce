@@ -13,7 +13,7 @@ import { tryCatch } from "@/utils/try-catch";
 import type { Message } from "@/schemas";
 import { useConfig } from "@/providers/store-provider";
 import { api } from "@/utils/api";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_mainLayout/bulk")({

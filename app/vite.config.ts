@@ -85,6 +85,7 @@ const config = defineConfig({
         rollupOptions: {
             external: ["node:stream", "node:stream/web", "node:async_hooks"],
             output: {
+                experimentalMinChunkSize: 5000,
                 manualChunks(id) {
                     const filepath = id.replace(/\\/g, '/');
                     if (filepath.includes("node_modules")) {
@@ -92,6 +93,10 @@ const config = defineConfig({
                         if (filepath.includes("@radix-ui")) return "radix";
                         if (filepath.includes("@clerk/")) return "vendor-clerk";
                         if (filepath.includes("react-stately")) return "vendor-stately";
+
+                        if (filepath.includes("src/components/ui/")) {
+                            return "shared-ui-primitives";
+                        }
                     }
                 },
             },

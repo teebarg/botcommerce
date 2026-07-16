@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import ImageDisplay from "@/components/image-display";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 
 interface ImageLightboxProps {
     url?: string;

@@ -7,9 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Coupon } from "@/schemas/common";
-import { cn, currency, formatDate } from "@/utils";
+import { currency, formatDate } from "@/utils";
 import { useOverlayTriggerState } from "react-stately";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
+import { cn } from "@/utils/cn";
 
 interface SwipeableCouponCardProps {
     coupon: Coupon;

@@ -4,7 +4,7 @@ import { useProductVariant } from "@/hooks/useProductVariant";
 import type { ProductLite } from "@/schemas/product";
 import { useUserCreateWishlist, useUserDeleteWishlist, useUserWishlist } from "@/hooks/useUser";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 
 interface VariantSelectionProps {
     product: ProductLite;

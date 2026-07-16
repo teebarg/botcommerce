@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { toast } from "sonner";
 import { tryCatch } from "@/utils/try-catch";
 import { Bell, Package, Tag, Truck } from "lucide-react";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 import { api } from "@/utils/api";
 import { Message } from "@/schemas";
 import { track } from "@/lib/analytics";

@@ -1,5 +1,5 @@
 import { SearchX, type LucideIcon } from "lucide-react";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 
 interface EmptyStateProps {
     icon?: LucideIcon;

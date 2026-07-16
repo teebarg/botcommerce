@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const useMediaQuery = () => {
+export default function useMediaQuery() {
     const [device, setDevice] = useState<"mobile" | "sm" | "tablet" | "desktop" | null>(null);
     const [dimensions, setDimensions] = useState<{
         width: number;
@@ -22,12 +22,8 @@ const useMediaQuery = () => {
         };
 
         checkDevice();
-
         window.addEventListener("resize", checkDevice);
-
-        return () => {
-            window.removeEventListener("resize", checkDevice);
-        };
+        return () => window.removeEventListener("resize", checkDevice);
     }, []);
 
     return {
@@ -39,6 +35,4 @@ const useMediaQuery = () => {
         isTablet: device === "tablet",
         isDesktop: device === "desktop",
     };
-};
-
-export { useMediaQuery };
+}

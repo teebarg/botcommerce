@@ -1,7 +1,7 @@
 import React from "react";
 import { Check } from "lucide-react";
 import type { CheckoutStep } from "./checkout-flow";
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 
 interface CheckoutStepIndicatorProps {
     currentStep: CheckoutStep;

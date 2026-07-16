@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 
-import { cn } from "@/utils";
+import { cn } from "@/utils/cn";
 
 export interface RadioProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
