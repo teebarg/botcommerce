@@ -18,7 +18,7 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 @router.get("/")
-@cacheable(key_prefix="reviews", tags=["reviews"], expire=2592000, browser_ttl=300, cdn_ttl=3600, cdn_swr=86400)
+@cacheable(key_prefix="reviews", tags=["reviews"], expire=2592000, cdn_ttl=3600, cdn_swr=86400)
 async def index(
     request: Request,
     product_id: Optional[int] = None,

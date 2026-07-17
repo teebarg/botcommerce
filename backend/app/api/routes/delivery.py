@@ -11,7 +11,7 @@ from app.services.cache import cacheable
 router = APIRouter()
 
 @router.get("/", response_model=List[DeliveryOption])
-@cacheable(key_prefix="delivery", key_builder=False, expire=259200000, browser_ttl=600, cdn_ttl=31536000, cdn_swr=604800)
+@cacheable(key_prefix="delivery", key_builder=False, expire=259200000, cdn_ttl=31536000, cdn_swr=604800)
 async def index(request: Request):
     """Get all delivery options"""
     return await db.deliveryoption.find_many(order={"created_at": "desc"})

@@ -15,7 +15,7 @@ router = APIRouter()
     key_prefix="bank-details",
     tags=["bank-details"],
     expire=2592000,
-    browser_ttl=600, cdn_ttl=31536000, cdn_swr=604800
+    cdn_ttl=31536000, cdn_swr=604800
 )
 async def index(request: Request) -> list[BankDetails]:
     return await db.bankdetails.find_many(order={"created_at": "desc"})

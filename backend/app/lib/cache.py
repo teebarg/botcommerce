@@ -10,25 +10,24 @@ _REFRESH_HEADER = "x-cache-refresh"
 _CACHE_STATUS_HEADER = "X-Cache"
 _CACHE_TTL_HEADER = "X-Cache-TTL"
 _CACHE_CONTROL = "Cache-Control"
+_CDN_CACHE_CONTROL = "CDN-Cache-Control"
 
 def set_public_cache(
     request: Request,
-    browser_ttl: int = 0,
     edge_ttl: int = 3600,
     swr: int = 86400,
     status: str = "HIT",
 ):
+    request.state.cache_control = "no-store"
+    request.state.cdn_cache_control = (
+        f"public, "
+        f"max-age={edge_ttl}, "
+        f"stale-while-revalidate={swr}"
+    )
     set_cache_headers(
         request,
         status=status,
         ttl=edge_ttl,
-        cache_control=(
-            f"public, "
-            f"max-age={browser_ttl}, "
-            f"must-revalidate, "
-            f"s-maxage={edge_ttl}, "
-            f"stale-while-revalidate={swr}"
-        ),
     )
 
 
@@ -75,6 +74,9 @@ async def add_cache_headers(
     if hasattr(request.state, "cache_control"):
         response.headers[_CACHE_CONTROL] = (request.state.cache_control)
         response.headers["Vary"] = "Origin"
+
+    if hasattr(request.state, "cdn_cache_control"):
+        response.headers[_CDN_CACHE_CONTROL] = request.state.cdn_cache_control
 
     return response
 

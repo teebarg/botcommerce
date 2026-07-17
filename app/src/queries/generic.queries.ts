@@ -8,7 +8,7 @@ export const getShopSettingsFn = createServerFn({ method: "GET" }).handler(async
 
     setResponseHeaders(
         new Headers({
-            "Cache-Control": "public, max-age=300",
+            "Cache-Control": "public, max-age=60",
             "Vercel-CDN-Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
             "Vercel-Cache-Tag": "shop-settings",
         }),
