@@ -31,7 +31,7 @@ const CategoryAction: React.FC<Props> = ({ category, index, categoriesLength, on
     };
 
     return (
-        <div className="flex items-center flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
             <SheetDrawer
                 open={editState.isOpen}
                 title={`Edit Category ${category?.name}`}

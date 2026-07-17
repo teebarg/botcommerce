@@ -8,13 +8,9 @@ import { productFeedInfiniteQuery } from "@/queries/user.queries";
 export const Route = createFileRoute("/_mainLayout/collections/")({
     validateSearch: FeedQuerySchema,
     component: RouteComponent,
-    beforeLoad: ({ search }) => {
-        return {
-            search,
-        };
-    },
+    beforeLoad: ({ search }) => ({ search }),
     loader: ({ context: { queryClient, search } }) => {
-        queryClient.fetchInfiniteQuery(
+        return queryClient.fetchInfiniteQuery(
             productFeedInfiniteQuery(search)
         )
     }
@@ -22,7 +18,6 @@ export const Route = createFileRoute("/_mainLayout/collections/")({
 
 function RouteComponent() {
     const search = Route.useSearch();
-
     return (
         <Suspense fallback={<PageLoader variant="grid" />}>
             <ProductFeed params={{ ...search }} />

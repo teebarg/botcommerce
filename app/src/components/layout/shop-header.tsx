@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 import { Link, useRouteContext } from "@tanstack/react-router";
 import { ShoppingBag, Heart, HeartOff, ArrowRight } from "lucide-react";
-import { SearchDialog } from "@/components/store/product-search";
+import { SearchDialog } from "@/components/store/search-dialog";
 import { CartComponent } from "@/components/store/cart/cart-component";
-import { UserDropdown } from "../user-button";
-import { ThemeToggle } from "../theme-toggle";
+import { UserDropdown } from "@/components/user-dropdown";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { BackButton } from "@/components/back";
 import GetApp from "@/components/get-app";
 import LocalizedClientLink from "@/components/ui/link";
@@ -69,7 +69,7 @@ const StoreNavbar = () => {
                             </span>
                         )}
                     </div>
-                    <div className="flex items-center gap-1 shrink-0">
+                    <div className="flex items-center gap-1.5 pr-2 shrink-0">
                         <SearchDialog />
                         <GetApp />
                         <UserDropdown />
@@ -99,25 +99,21 @@ const StoreNavbar = () => {
                     <div className="flex gap-3 items-center">
                         <CartComponent />
                         <ThemeToggle />
-                        <div className="flex">
-                            {isAuthenticated ? (
-                                <LocalizedClientLink
-                                    aria-label="go to wishlist"
-                                    className="flex items-center justify-center rounded-md h-10 w-10 hover:bg-accent text-primary"
-                                    href={"/wishlist"}
-                                >
-                                    <Heart className="h-5 w-5" />
-                                </LocalizedClientLink>
-                            ) : (
-                                <div className="flex items-center justify-center rounded-md h-10 w-10 hover:bg-accent text-muted-foreground">
-                                    <HeartOff className="h-5 w-5" />
-                                </div>
-                            )}
-                        </div>
+                        {isAuthenticated ? (
+                            <LocalizedClientLink
+                                aria-label="go to wishlist"
+                                className="flex items-center justify-center rounded-md h-10 w-10 hover:bg-accent text-primary"
+                                href={"/wishlist"}
+                            >
+                                <Heart className="h-5 w-5" />
+                            </LocalizedClientLink>
+                        ) : (
+                            <div className="flex items-center justify-center rounded-md h-10 w-10 hover:bg-accent text-muted-foreground">
+                                <HeartOff className="h-5 w-5" />
+                            </div>
+                        )}
                         <GetApp />
-                        <div className="flex items-center">
-                            <UserDropdown />
-                        </div>
+                        <UserDropdown />
                     </div>
                 </div>
             </div>

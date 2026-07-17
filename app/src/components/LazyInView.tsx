@@ -3,7 +3,7 @@ import { useState, useRef, useEffect, type ReactNode } from "react";
 interface LazyInViewProps {
     children: ReactNode;
     fallback?: ReactNode;
-    rootMargin?: string
+    rootMargin?: string;
 }
 
 export function LazyInView({ children, fallback = null, rootMargin = "300px" }: LazyInViewProps) {
@@ -11,6 +11,11 @@ export function LazyInView({ children, fallback = null, rootMargin = "300px" }: 
     const ref = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
+        if (typeof window === "undefined" || !("IntersectionObserver" in window)) {
+            setIsIntersected(true);
+            return;
+        }
+
         if (isIntersected) return;
 
         const observer = new IntersectionObserver(
@@ -20,7 +25,7 @@ export function LazyInView({ children, fallback = null, rootMargin = "300px" }: 
                 }
             },
             {
-                rootMargin
+                rootMargin,
             }
         );
 
@@ -29,11 +34,7 @@ export function LazyInView({ children, fallback = null, rootMargin = "300px" }: 
         }
 
         return () => observer.disconnect();
-    }, [isIntersected]);
+    }, [isIntersected, rootMargin]);
 
-    return (
-        <div ref={ref}>
-            {isIntersected ? children : fallback}
-        </div>
-    );
+    return <div ref={ref}>{isIntersected ? children : fallback}</div>;
 }
