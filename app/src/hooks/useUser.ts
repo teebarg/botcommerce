@@ -65,13 +65,11 @@ export const useStopImpersonation = () => {
     });
 };
 
-export const useUserWishlist = () => {
-    return useQuery({
+export const wishlistQueryOptions = () =>
+    queryOptions({
         queryKey: ["products", "wishlist"],
         queryFn: () => api.get<Wishlist>("/users/wishlist"),
     });
-};
-
 
 export const useUserCreateWishlist = () => {
     const queryClient = useQueryClient();

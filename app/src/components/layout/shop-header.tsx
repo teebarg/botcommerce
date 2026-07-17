@@ -70,7 +70,7 @@ const StoreNavbar = () => {
                         )}
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
-                        <SearchDialog />
+                        {/* <SearchDialog /> */}
                         <GetApp />
                         <UserDropdown />
                     </div>
@@ -92,9 +92,9 @@ const StoreNavbar = () => {
                         </LocalizedClientLink>
                     </div>
 
-                    <div className="flex-1 max-w-md mx-auto">
+                    {/* <div className="flex-1 max-w-md mx-auto">
                         <SearchDialog />
-                    </div>
+                    </div> */}
 
                     <div className="flex gap-3 items-center">
                         <CartComponent />

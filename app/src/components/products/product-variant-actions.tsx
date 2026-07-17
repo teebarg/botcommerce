@@ -2,9 +2,10 @@ import type React from "react";
 import { Heart, ShoppingCart } from "lucide-react";
 import { useProductVariant } from "@/hooks/useProductVariant";
 import type { ProductLite } from "@/schemas/product";
-import { useUserCreateWishlist, useUserDeleteWishlist, useUserWishlist } from "@/hooks/useUser";
+import { useUserCreateWishlist, useUserDeleteWishlist, wishlistQueryOptions } from "@/hooks/useUser";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils/cn";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 interface VariantSelectionProps {
     product: ProductLite;
@@ -12,7 +13,7 @@ interface VariantSelectionProps {
 
 export const ProductVariantActions: React.FC<VariantSelectionProps> = ({ product }) => {
     const { isAdded, handleAddToCart, outOfStock, selectedVariant, handleWhatsAppPurchase } = useProductVariant(product);
-    const { data } = useUserWishlist();
+    const { data } = useSuspenseQuery(wishlistQueryOptions());
     const inWishlist = !!data?.wishlists?.find((wishlist) => wishlist.product_id === product.id);
     const { mutate: createWishlist } = useUserCreateWishlist();
     const { mutate: deleteWishlist } = useUserDeleteWishlist();
