@@ -22,7 +22,7 @@ class ShopSettings(BaseModel):
     created_at: datetime
 
 @router.get("/")
-@cacheable(key_prefix="shop-settings", key_builder=False, tags=["shop-settings"], expire=60 * 60 * 24 * 30, browser_ttl=600, cdn_ttl=31536000, cdn_swr=604800)
+@cacheable(key_prefix="shop-settings", key_builder=False, tags=["shop-settings"], expire=2592000, browser_ttl=600, cdn_ttl=31536000, cdn_swr=604800)
 async def index(request: Request) -> list[ShopSettings]:
     """
     Get shop settings with optional filtering

@@ -13,7 +13,7 @@ _CACHE_CONTROL = "Cache-Control"
 
 def set_public_cache(
     request: Request,
-    browser_ttl: int = 60,
+    browser_ttl: int = 0,
     edge_ttl: int = 3600,
     swr: int = 86400,
     status: str = "HIT",
@@ -25,6 +25,7 @@ def set_public_cache(
         cache_control=(
             f"public, "
             f"max-age={browser_ttl}, "
+            f"must-revalidate, "
             f"s-maxage={edge_ttl}, "
             f"stale-while-revalidate={swr}"
         ),

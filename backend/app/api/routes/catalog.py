@@ -45,7 +45,7 @@ async def list_catalogs(
     key_prefix="catalog",
     key_builder=lambda slug, user, limit=20, cursor=None: f"{slug}:{'admin' if user and user.role == 'ADMIN' else 'public'}:{limit}:{cursor or 0}",
     tags=lambda slug: ["catalog", f"catalog:{slug}"],
-    browser_ttl=60, cdn_ttl=600, cdn_swr=60
+    cdn_ttl=600, cdn_swr=60
 )
 async def search(
     request: Request,

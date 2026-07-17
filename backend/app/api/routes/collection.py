@@ -22,7 +22,7 @@ from app.core.dependencies.services import CollectionDep
 router = APIRouter()
 
 @router.get("/")
-@cacheable(key_prefix="collections", key_builder=lambda query: query if query else "all", tags=["collections"], browser_ttl=300, cdn_ttl=604800, cdn_swr=86400)
+@cacheable(key_prefix="collections", key_builder=lambda query: query if query else "all", tags=["collections"], cdn_ttl=604800, cdn_swr=86400)
 async def index(request: Request, query: str = "") -> Optional[list[Collection]]:
     """
     Retrieve collections with Redis caching.
@@ -57,7 +57,7 @@ async def create(create_data: CollectionCreate, srv: CollectionDep, bg_tasks: Ba
 
 
 @router.get("/{slug}")
-@cacheable(key_prefix="collection", key_builder=lambda slug: slug, browser_ttl=300, cdn_ttl=604800, cdn_swr=86400)
+@cacheable(key_prefix="collection", key_builder=lambda slug: slug, cdn_ttl=604800, cdn_swr=86400)
 async def get_by_slug(request: Request, slug: str) -> Collection:
     """
     Get a collection by its slug.

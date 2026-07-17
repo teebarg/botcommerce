@@ -1,18 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { seo } from "@/utils/seo";
-import { CatalogVisitTracker } from "@/components/store/catalog/catalog-visit-tracker";
 import { CatalogQuerySchema } from "@/schemas";
-import { PageLoader } from "@/components/generic/page-loader";
 import { catalogInfiniteQuery } from "@/queries/user.queries";
-import { Suspense } from "react";
-import { CatalogFeed } from "@/components/store/catalog/catalog-feed";
 
 export const Route = createFileRoute("/_mainLayout/catalog/$slug")({
     validateSearch: CatalogQuerySchema,
     loader: async ({ params: { slug }, context: { queryClient } }) => {
-        queryClient.fetchInfiniteQuery(
-            catalogInfiniteQuery(slug)
-        )
+        return queryClient.fetchInfiniteQuery(catalogInfiniteQuery(slug))
     },
     head: ({ params }) => {
         const title = `Catalog: ${params.slug}`;
@@ -29,17 +23,4 @@ export const Route = createFileRoute("/_mainLayout/catalog/$slug")({
             ],
         };
     },
-    component: RouteComponent,
 });
-
-function RouteComponent() {
-    const { slug } = Route.useParams();
-    return (
-        <main className="max-w-sxl mx-auto w-full px-2 py-4">
-            <CatalogVisitTracker slug={slug} />
-            <Suspense fallback={<PageLoader variant="grid" />}>
-                <CatalogFeed slug={slug} />
-            </Suspense>
-        </main>
-    );
-}

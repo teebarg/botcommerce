@@ -1,13 +1,8 @@
 import { createFileRoute, isNotFound, notFound } from "@tanstack/react-router";
-import ReviewsSection from "@/components/products/product-reviews";
-import ProductView from "@/components/store/products/product-view";
 import { seo } from "@/utils/seo";
-import { LazyInView } from "@/components/LazyInView";
 import { productQuery } from "@/queries/user.queries";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import NotFound from "@/components/generic/not-found";
 import ProductPageLoader from "@/components/store/products/product-page-loader";
-import RelatedProducts from "@/components/store/products/related-products";
 
 export const Route = createFileRoute("/_mainLayout/products/$slug")({
     loader: async ({ context: { queryClient }, params: { slug } }) => {
@@ -68,22 +63,4 @@ export const Route = createFileRoute("/_mainLayout/products/$slug")({
         );
     },
     pendingComponent: () => <ProductPageLoader />,
-    component: RouteComponent,
 });
-
-function RouteComponent() {
-    const { slug } = Route.useParams();
-    const { data: product } = useSuspenseQuery(productQuery(slug));
-
-    return (
-        <main className="flex flex-col">
-            <ProductView product={product} />
-            <LazyInView>
-                <RelatedProducts productId={product.id} />
-            </LazyInView>
-            <LazyInView>
-                <ReviewsSection productName={product.name} product_id={product.id} />
-            </LazyInView>
-        </main>
-    );
-}
