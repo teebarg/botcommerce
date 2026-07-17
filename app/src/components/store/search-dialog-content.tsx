@@ -26,13 +26,13 @@ export default function SearchDialogContent({
   const [query, setQuery] = useState<string>("");
   const [debouncedQuery] = useDebounce(query, searchDelay);
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
-        if (typeof window === "undefined") return [];
-        try {
-            return JSON.parse(localStorage.getItem("searchHistory") || "[]");
-        } catch {
-            return [];
-        }
-    });
+    if (typeof window === "undefined") return [];
+    try {
+      return JSON.parse(localStorage.getItem("searchHistory") || "[]");
+    } catch {
+      return [];
+    }
+  });
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { data, isLoading } = useProductSearch({ search: debouncedQuery, limit: 4 }, isOpen && debouncedQuery.trim() !== "");
@@ -42,7 +42,7 @@ export default function SearchDialogContent({
     try {
       const savedHistory = localStorage.getItem("searchHistory");
       if (savedHistory) setRecentSearches(JSON.parse(savedHistory));
-    } catch {}
+    } catch { }
   }, []);
 
   useEffect(() => {
@@ -144,24 +144,24 @@ export default function SearchDialogContent({
             </div>
           )}
           {recentSearches.length > 0 && !query.trim() && (
-                <div className="mb-4 max-w-6xl mx-auto">
-                    <div className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground">
-                        <Clock className="w-4 h-4" />
-                        Recent Searches
-                    </div>
-                    <div className="space-y-1">
-                        {recentSearches.map((search: string, idx: number) => (
-                            <button
-                                type="button"
-                                key={idx}
-                                className="w-full text-left px-3 py-2 rounded-lg hover:bg-muted transition-colors cursor-pointer"
-                                onClick={() => handleSearchSubmit(search)}
-                            >
-                                <span className="text-sm text-foreground">{search}</span>
-                            </button>
-                        ))}
-                    </div>
-                </div>
+            <div className="mb-4 max-w-6xl mx-auto">
+              <div className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground">
+                <Clock className="w-4 h-4" />
+                Recent Searches
+              </div>
+              <div className="space-y-1">
+                {recentSearches.map((search: string, idx: number) => (
+                  <button
+                    type="button"
+                    key={idx}
+                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+                    onClick={() => handleSearchSubmit(search)}
+                  >
+                    <span className="text-sm text-foreground">{search}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       </div>

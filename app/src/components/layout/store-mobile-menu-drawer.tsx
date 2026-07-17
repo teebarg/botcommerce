@@ -8,8 +8,8 @@ import { cn } from "@/utils/cn";
 import type React from "react";
 import { CreditCard, Heart, Home, LayoutGrid, User2, User as UserIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { ThemeToggle } from "../theme-toggle";
-import { UserDropdown } from "../user-button";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { UserDropdown } from "@/components/user-dropdown";
 
 interface NavLinkProp {
     href: string;

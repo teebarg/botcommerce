@@ -3,7 +3,7 @@ import ActivityTray from "@/components/generic/activities/activity-tray";
 import LocalizedClientLink from "@/components/ui/link";
 import MenuComp from "@/components/layout/admin-mobile-menu-drawer";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { UserDropdown } from "@/components/user-button";
+import { UserDropdown } from "@/components/user-dropdown";
 import { GalleryFilters } from "../product/gallery-filters";
 
 const AdminNavbar = () => {

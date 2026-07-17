@@ -19,7 +19,7 @@ import {
 import { useLocation } from "@tanstack/react-router";
 import LocalizedClientLink from "@/components/ui/link";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { UserDropdown } from "@/components/user-button";
+import { UserDropdown } from "@/components/user-dropdown";
 
 const AdminMobileMenu: React.FC = () => {
     const location = useLocation();

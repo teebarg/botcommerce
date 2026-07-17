@@ -44,9 +44,9 @@ export default function UserDropdownContent({ closeMenu }: UserDropdownContentPr
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuItem className="cursor-pointer" onClick={() => navigate({ to: "/account" })}>
-            <User className="mr-2 h-4 w-4" />
-            <span>Account</span>
-        </DropdownMenuItem>
+        <User className="mr-2 h-4 w-4" />
+        <span>Account</span>
+      </DropdownMenuItem>
       {isAdmin && (
         <DropdownMenuItem onClick={() => navigate({ to: "/admin" })}>
           <LayoutDashboard className="mr-2 h-4 w-4" />
@@ -64,16 +64,16 @@ export default function UserDropdownContent({ closeMenu }: UserDropdownContentPr
       <DropdownMenuItem className="cursor-pointer" onClick={() => navigate({ to: "/account/referrals" })}>
         <Gift className="mr-2 h-4 w-4" />
         <span>Referrals</span>
-    </DropdownMenuItem>
-    {!isImpersonating && (
+      </DropdownMenuItem>
+      {!isImpersonating && (
         <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive" onClick={handleSignOut}>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log Out</span>
-            </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive" onClick={handleSignOut}>
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Log Out</span>
+          </DropdownMenuItem>
         </>
-    )}
+      )}
     </DropdownMenuContent>
   );
 }
