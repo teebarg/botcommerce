@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Link, useRouteContext } from "@tanstack/react-router";
 import { ShoppingBag, Heart, HeartOff, ArrowRight } from "lucide-react";
-import { SearchDialog } from "@/components/store/product-search";
+import { SearchDialog } from "@/components/store/search-dialog";
 import { CartComponent } from "@/components/store/cart/cart-component";
 import { UserDropdown } from "../user-button";
 import { ThemeToggle } from "../theme-toggle";
@@ -70,7 +70,7 @@ const StoreNavbar = () => {
                         )}
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
-                        {/* <SearchDialog /> */}
+                        <SearchDialog />
                         <GetApp />
                         <UserDropdown />
                     </div>
@@ -92,9 +92,9 @@ const StoreNavbar = () => {
                         </LocalizedClientLink>
                     </div>
 
-                    {/* <div className="flex-1 max-w-md mx-auto">
+                    <div className="flex-1 max-w-md mx-auto">
                         <SearchDialog />
-                    </div> */}
+                    </div>
 
                     <div className="flex gap-3 items-center">
                         <CartComponent />
