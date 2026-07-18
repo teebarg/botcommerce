@@ -73,7 +73,6 @@ async def add_cache_headers(
 
     if hasattr(request.state, "cache_control"):
         response.headers[_CACHE_CONTROL] = (request.state.cache_control)
-        response.headers["Vary"] = "Origin"
 
     if hasattr(request.state, "cdn_cache_control"):
         response.headers[_CDN_CACHE_CONTROL] = request.state.cdn_cache_control
@@ -110,5 +109,12 @@ async def purge_cdn_urls(*paths: str) -> None:
                 json={"files": urls},
             )
             resp.raise_for_status()
+            data = resp.json()
+            if not data.get("success"):
+                errors = data.get("errors", [])
+                logger.warning(f"Cloudflare API rejected purge request. Errors: {errors}")
+                logger.error(f"CF API Error Details: {errors}")
+            else:
+                print("Cloudflare purge request accepted successfully!")
     except httpx.HTTPError as e:
         logger.warning(f"Cloudflare purge failed for {urls}: {e}")
