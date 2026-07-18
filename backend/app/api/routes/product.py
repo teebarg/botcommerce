@@ -17,8 +17,8 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 @router.get("/google-merchant-feed.xml")
-async def get_google_merchant_feed(request: Request, srv: ProductDep) -> Response:
-    xml_content = await srv.generate_merchant_feed_xml(request=request)
+async def get_google_merchant_feed(request: Request, srv: ProductDep, target: str = "google") -> Response:
+    xml_content = await srv.generate_merchant_feed_xml(request=request, target=target)
     return Response(content=xml_content, media_type="application/xml")
 
 

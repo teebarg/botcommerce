@@ -55,7 +55,7 @@ class ProductService:
         return await self.db.productvariant.update(where={"id": variant_id}, data=update_data)
 
     @cacheable(key_prefix="merchant_feed", key_builder=False)
-    async def generate_merchant_feed_xml(self, request: Request) -> str:
+    async def generate_merchant_feed_xml(self, request: Request, target) -> str:
         """
         Generates Google Merchant Feed.
         Optimized to process 20k+ records in batches to keep memory footprints low.
@@ -69,6 +69,11 @@ class ProductService:
 
         batch_size = 1000
         skip = 0
+
+        availability_map = {
+            "google": {"in": "in_stock", "out": "out_of_stock"},
+            "meta": {"in": "in stock", "out": "out of stock"},
+        }
 
         while True:
             products = await self.db.product.find_many(
@@ -95,9 +100,11 @@ class ProductService:
 
                     main_image = prod.image or (prod.images[0].image if prod.images else f"{settings.FRONTEND_HOST}/placeholder.jpg")
                     ET.SubElement(item, "g:image_link").text = main_image
-                    ET.SubElement(item, "g:availability").text = "in_stock" if variant.inventory > 0 else "out_of_stock"
+                    ET.SubElement(item, "g:availability").text = (
+                        availability_map[target]["in"] if variant.inventory > 0 else availability_map[target]["out"]
+                    )
                     ET.SubElement(item, "g:price").text = f"{variant.price:.2f} NGN"
-                    ET.SubElement(item, "g:condition").text = "new" if prod.is_new else "thrift"
+                    ET.SubElement(item, "g:condition").text = "new" if prod.is_new else "used"
 
                     if variant.size: ET.SubElement(item, "g:size").text = variant.size
                     if variant.color: ET.SubElement(item, "g:color").text = variant.color
@@ -377,7 +384,7 @@ class ProductService:
                 if tasks:
                     await asyncio.gather(*tasks, return_exceptions=True)
                 await self.cache_srv.invalidate(
-                    *vercel_tags, 
+                    *vercel_tags,
                     tags=["products", "catalog", "gallery", "stats-trends"]
                 )
                 logger.debug(f"Successfully targeted indexed {len(documents)} products")
