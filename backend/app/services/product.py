@@ -114,12 +114,7 @@ class ProductService:
                     ET.SubElement(item, "g:id").text = variant.sku
 
                     variant_title = prod.name or ""
-                    if variant.color or variant.size:
-                        variant_title += f" ({' / '.join(filter(None, [variant.color, variant.size]))})"
 
-                    ET.SubElement(item, "g:title").text = variant_title.strip()
-
-                    base_description = prod.description or ""
                     detail_parts = []
                     if variant.size:
                         detail_parts.append(f"Size:{variant.size}")
@@ -129,13 +124,11 @@ class ProductService:
                         detail_parts.append(f"L:{variant.length}cm")
                     if variant.age:
                         detail_parts.append(f"Age:{variant.age}")
-
-                    full_description = base_description
                     if detail_parts:
-                        full_description: str = f"{', '.join(detail_parts)}. {base_description}"
+                        variant_title += f" ({', '.join(detail_parts)})"
 
-                    ET.SubElement(item, "g:description").text = full_description
-                    ET.SubElement(item, "g:description").text = full_description
+                    ET.SubElement(item, "g:title").text = variant_title.strip()
+                    ET.SubElement(item, "g:description").text = prod.description or "No description available."
 
                     ET.SubElement(item, "g:link").text = f"{settings.FRONTEND_HOST}/products/{prod.slug}"
 
