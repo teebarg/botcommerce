@@ -228,7 +228,6 @@ def cacheable(
     key_builder: Optional[Union[str, bool, Callable[..., Any]]] = None,
     expire: int = DEFAULT_EXPIRATION,
     tags: Optional[Union[list[str], Callable[..., list[str]]]] = None,
-    browser_ttl: Optional[int] = None,
     cdn_ttl: Optional[int] = None,
     cdn_swr: int = 3600,
 ):
@@ -257,7 +256,7 @@ def cacheable(
                 raw_key = f"{key_prefix}:{request.url.path}?{request.url.query}"
 
             if cdn_ttl is not None:
-                set_public_cache(request, browser_ttl=browser_ttl or 0, edge_ttl=cdn_ttl, swr=cdn_swr)
+                set_public_cache(request, edge_ttl=cdn_ttl, swr=cdn_swr)
 
             cached_data = await cache.get(raw_key)
             if cached_data is not None:

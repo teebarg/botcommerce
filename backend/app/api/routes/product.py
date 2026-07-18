@@ -49,7 +49,7 @@ async def get_recommendations(
 
 
 @router.get("/feed")
-@cacheable(key_prefix="products:list", tags=["products"], browser_ttl=30, cdn_ttl=600, cdn_swr=60)
+@cacheable(key_prefix="products:list", tags=["products"], cdn_ttl=600, cdn_swr=60)
 async def feed(
     request: Request, srv: ProductDep, search: str = "", sort: str = "id:desc",
     cat_ids: str = Query(default=""), collections: str = Query(default=""),
@@ -67,13 +67,13 @@ async def feed(
 
 
 @router.get("/index-products")
-@cacheable(key_prefix="products", key_builder="collections", tags=["products"], browser_ttl=60, cdn_ttl=600, cdn_swr=60)
+@cacheable(key_prefix="products", key_builder="collections", tags=["products"], cdn_ttl=600, cdn_swr=60)
 async def get_index_products(request: Request, srv: ProductDep) -> IndexProducts:
     return await srv.query_collection_index()
 
 
 @router.get("/")
-@cacheable(key_prefix="products:search", tags=["products"], browser_ttl=60, cdn_ttl=600, cdn_swr=60)
+@cacheable(key_prefix="products:search", tags=["products"], cdn_ttl=600, cdn_swr=60)
 async def search(
     request: Request, srv: ProductDep, search: str = "",
     collections: str = Query(default=""),
@@ -95,7 +95,7 @@ async def search(
 
 @router.get("/{slug}")
 async def read(request: Request, slug: str, srv: ProductDep) -> ProductLite:
-    set_public_cache(request, browser_ttl=60, edge_ttl=86400, swr=600)
+    set_public_cache(request, edge_ttl=86400, swr=600)
     cache_key: str = f"product:{slug}"
     cached = await srv.redis.get(cache_key)
     if cached:

@@ -16,7 +16,7 @@ export const getIndexProductsFn = createServerFn()
         const res = await api.get<IndexProducts>("/product/index-products");
         setResponseHeaders(
             new Headers({
-                "Cache-Control": "public, max-age=30",
+                "Cache-Control": "no-store",
                 "Vercel-CDN-Cache-Control": "public, max-age=30, stale-while-revalidate=300",
                 "Vercel-Cache-Tag": "index-products,products",
             }),
@@ -29,7 +29,7 @@ export const getCategoriesProductsFn = createServerFn()
         const res = await api.get<CategoriesWithProducts[]>("/category/home/products");
         setResponseHeaders(
             new Headers({
-                "Cache-Control": "public, max-age=30",
+                "Cache-Control": "no-store",
                 "Vercel-CDN-Cache-Control": "public, max-age=30, stale-while-revalidate=300",
                 "Vercel-Cache-Tag": "categories-products,products",
             }),
@@ -44,7 +44,7 @@ export const getProductFeedFn = createServerFn()
 
         setResponseHeaders(
             new Headers({
-                "Cache-Control": "public, max-age=30",
+                "Cache-Control": "no-store",
                 "Vercel-CDN-Cache-Control": "public, max-age=30, stale-while-revalidate=300",
                 "Vercel-Cache-Tag": "products-feed,products",
             }),
@@ -60,7 +60,7 @@ export const getProductFn = createServerFn({ method: "GET" })
             const res = await api.get<ProductLite>(`/product/${data}`);
             setResponseHeaders(
                 new Headers({
-                    "Cache-Control": "public, max-age=60",
+                    "Cache-Control": "no-store",
                     "Vercel-CDN-Cache-Control": "public, max-age=300, stale-while-revalidate=3600",
                     "Vercel-Cache-Tag": `product:${data}`,
                 }),
@@ -71,7 +71,7 @@ export const getProductFn = createServerFn({ method: "GET" })
             if (isNotFound(err)) {
                 setResponseHeaders(
                     new Headers({
-                        "Cache-Control": "public, max-age=300",
+                        "Cache-Control": "public, max-age=30",
                         "Vercel-CDN-Cache-Control": "public, max-age=3600",
                         "Vercel-Cache-Tag": `product:${data}`,
                     }),
@@ -92,7 +92,7 @@ export const getCatalogFeedFn = createServerFn()
 
         setResponseHeaders(
             new Headers({
-                "Cache-Control": "public, max-age=30",
+                "Cache-Control": "no-store",
                 "Vercel-CDN-Cache-Control": "public, max-age=30, stale-while-revalidate=300",
                 "Vercel-Cache-Tag": "catalog-feed,products",
             }),
