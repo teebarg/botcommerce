@@ -7,8 +7,6 @@ from app.core.config import settings
 logger = get_logger(__name__)
 
 _REFRESH_HEADER = "x-cache-refresh"
-_CACHE_STATUS_HEADER = "X-Cache"
-_CACHE_TTL_HEADER = "X-Cache-TTL"
 _CACHE_CONTROL = "Cache-Control"
 _CDN_CACHE_CONTROL = "CDN-Cache-Control"
 
@@ -65,12 +63,6 @@ async def add_cache_headers(
     """
     response: Response = await call_next(request)
 
-    if hasattr(request.state, "cache_status"):
-        response.headers[_CACHE_STATUS_HEADER] = request.state.cache_status
-
-    if hasattr(request.state, "cache_ttl"):
-        response.headers[_CACHE_TTL_HEADER] = str(request.state.cache_ttl)
-
     if hasattr(request.state, "cache_control"):
         response.headers[_CACHE_CONTROL] = (request.state.cache_control)
 
@@ -95,26 +87,38 @@ async def purge_vercel_tags(*tags: str) -> None:
         logger.warning(f"Vercel purge failed for tags {tags}: {e}")
 
 async def purge_cdn_urls(*paths: str) -> None:
-    """Purge exact URLs from Cloudflare's edge cache. Use for single-resource
-    routes with deterministic URLs (product/{slug}, shop/settings) — not for
-    paginated/filtered list endpoints, which have unenumerable URL variants."""
-    if not paths or not settings.is_production:
-        return
-    urls: list[str] = [f"{settings.DOMAIN}{p}" for p in paths]
+    """Purge exact URLs from Cloudflare's edge cache, accounting for Vary: Origin."""
+    origins: list[str] = [
+        settings.FRONTEND_HOST,  # Frontend browser
+        settings.DOMAIN    # FastAPI docs / direct api
+    ]
+    
+    # Build the specific cache keys Cloudflare is tracking
+    purge_files = []
+    for p in paths:
+        url: str = f"{settings.DOMAIN}{p}"
+        for origin in origins:
+            purge_files.append({
+                "url": url,
+                "headers": {
+                    "Origin": origin
+                }
+            })
+            
+    print(f"Purging specific cache keys: {purge_files}")
+    
     try:
         async with httpx.AsyncClient(timeout=3.0) as client:
             resp = await client.post(
                 f"https://api.cloudflare.com/client/v4/zones/{settings.CF_ZONE_ID}/purge_cache",
                 headers={"Authorization": f"Bearer {settings.CF_API_TOKEN}"},
-                json={"files": urls},
+                json={"files": purge_files},  # Passing objects with headers instead of strings
             )
             resp.raise_for_status()
             data = resp.json()
             if not data.get("success"):
-                errors = data.get("errors", [])
-                logger.warning(f"Cloudflare API rejected purge request. Errors: {errors}")
-                logger.error(f"CF API Error Details: {errors}")
+                logger.warning(f"Cloudflare API rejected purge request: {data.get('errors')}")
             else:
-                print("Cloudflare purge request accepted successfully!")
+                print("Cloudflare variant-specific purge accepted successfully!")
     except httpx.HTTPError as e:
-        logger.warning(f"Cloudflare purge failed for {urls}: {e}")
+        logger.warning(f"Cloudflare purge failed: {e}")

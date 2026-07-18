@@ -31,6 +31,7 @@ from app.core.notifications.setup import init_notification_service
 from app.core.dependencies.services import SettingsDep
 from app.services.cache import L1Cache, run_l1_invalidation_listener
 from app.lib.cache import add_cache_headers
+from app.core.dependencies.cache import CdnDep
 
 STREAM_NAME = "EVENT_STREAMS"
 GROUP_NAME = "notifications"
@@ -133,7 +134,6 @@ if settings.all_cors_origins:
         allow_methods=["*"],
         allow_headers=["*"],
         max_age=600,
-        expose_headers=["X-Cache", "X-Cache-TTL"],
     )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
@@ -143,6 +143,13 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 async def root():
     return {"message": "This is root"}
 
+class PurgeCdn(BaseModel):
+    key: str
+
+@app.post("/api/purge-cdn")
+async def purge_cdn(cdn_srv: CdnDep, data: PurgeCdn) -> Dict[str, Any]:
+    await cdn_srv.purge_cloudfare(data.key)
+    return {"message": "ok"}
 
 @app.get("/api/health")
 async def health(search_srv: SearchDep) -> Dict[str, Any]:
