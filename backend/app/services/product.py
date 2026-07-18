@@ -152,68 +152,7 @@ class ProductService:
                         ET.SubElement(item, "g:product_type").text = ", ".join(
                             c.name for c in prod.categories
                         )
-
-            skip += batch_size
-            await asyncio.sleep(0.01)  # Yield loop to allow other network requests to process
-
-        xml_str = ET.tostring(rss, encoding="utf-8", method="xml").decode("utf-8")
-        return f'<?xml version="1.0" encoding="utf-8"?>\n{xml_str}'
-
-    @cacheable(key_prefix="merchant_feed", key_builder=False)
-    async def generate_merchant_feed_xml2(self, request: Request, target) -> str:
-        """
-        Generates Google Merchant Feed.
-        Optimized to process 20k+ records in batches to keep memory footprints low.
-        """
-        rss = ET.Element("rss", version="2.0")
-        rss.set("xmlns:g", "http://base.google.com/ns/1.0")
-        channel = ET.SubElement(rss, "channel")
-        ET.SubElement(channel, "title").text = "Thriftbyoba Product Feed"
-        ET.SubElement(channel, "link").text = settings.FRONTEND_HOST
-        ET.SubElement(channel, "description").text = "Automated product sync feed for Google Merchant Center"
-
-        batch_size = 1000
-        skip = 0
-
-        availability_map = {
-            "google": {"in": "in_stock", "out": "out_of_stock"},
-            "meta": {"in": "in stock", "out": "out of stock"},
-        }
-
-        while True:
-            products = await self.db.product.find_many(
-                where={"active": True},
-                include={"variants": True, "images": True},
-                take=batch_size,
-                skip=skip
-            )
-            if not products:
-                break
-
-            for prod in products:
-                for variant in prod.variants:
-                    item = ET.SubElement(channel, "item")
-                    ET.SubElement(item, "g:id").text = variant.sku
-
-                    variant_title = prod.name or ""
-                    if variant.color or variant.size:
-                        variant_title += f" ({' / '.join(filter(None, [variant.color, variant.size]))})"
-
-                    ET.SubElement(item, "g:title").text = variant_title.strip()
-                    ET.SubElement(item, "g:description").text = prod.description or "No description provided."
-                    ET.SubElement(item, "g:link").text = f"{settings.FRONTEND_HOST}/products/{prod.slug}"
-
-                    main_image = prod.image or (prod.images[0].image if prod.images else f"{settings.FRONTEND_HOST}/placeholder.jpg")
-                    ET.SubElement(item, "g:image_link").text = main_image
-                    ET.SubElement(item, "g:availability").text = (
-                        availability_map[target]["in"] if variant.inventory > 0 else availability_map[target]["out"]
-                    )
-                    ET.SubElement(item, "g:price").text = f"{variant.price:.2f} NGN"
-                    ET.SubElement(item, "g:condition").text = "new" if prod.is_new else "used"
-
-                    if variant.size: ET.SubElement(item, "g:size").text = variant.size
-                    if variant.color: ET.SubElement(item, "g:color").text = variant.color
-                    if variant.age: ET.SubElement(item, "g:age_group").text = variant.age
+                    ET.SubElement(item, "g:identifier_exists").text = "no"
 
             skip += batch_size
             await asyncio.sleep(0.01)  # Yield loop to allow other network requests to process
