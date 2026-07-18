@@ -27,6 +27,9 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
         item?.age && `Age: ${item.age}`,
     ].filter(Boolean);
 
+    const categories = product?.categories?.map((item) => item.name) || [];
+    const combined = [...categories, ...attributes];
+
     const totalInventory = variants.reduce((acc, v) => acc + (v.inventory || 0), 0);
     const hasProduct = Boolean(product)
     const isInactive = hasProduct && !product?.active;
@@ -83,7 +86,7 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
                 </div>
             )}
 
-            {(variants.length > 0 || attributes.length > 0) && (
+            {(variants.length > 0 || combined.length > 0) && (
                 <div className="absolute bottom-0 inset-x-0 z-10 pointer-events-none">
                     <div className="bg-gradient-to-t from-black/85 via-black/50 to-transparent pt-8 pb-2 px-2.5">
                         <div className="flex items-end justify-between gap-2">
@@ -99,9 +102,9 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
                                     )}
                                 </div>
                             )}
-                            {attributes.length > 0 && (
+                            {combined.length > 0 && (
                                 <div className="flex flex-wrap justify-end gap-1 max-w-[65%]">
-                                    {attributes.slice(0, 2).map((attr, i) => (
+                                    {combined.slice(0, 3).map((attr, i) => (
                                         <span
                                             key={i}
                                             className="text-[9px] font-medium text-white/90 bg-white/15 px-1.5 py-0.5 rounded-xs"
@@ -109,9 +112,9 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
                                             {attr}
                                         </span>
                                     ))}
-                                    {attributes.length > 2 && (
+                                    {combined.length > 3 && (
                                         <span className="text-[9px] font-medium text-white/70 px-1">
-                                            +{attributes.length - 2}
+                                            +{combined.length - 3}
                                         </span>
                                     )}
                                 </div>

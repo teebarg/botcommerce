@@ -44,8 +44,8 @@ export const ProductBulkActions = ({
                 open={editState.isOpen}
                 title="Bulk Products Update"
                 trigger={
-                    <Button size="sm" variant="ghost" onClick={editState.open}>
-                        <Edit3 className="h-4 w-4 sm:mr-1.5" />
+                    <Button className="rounded-full" size="sm" variant="ghost" onClick={editState.open}>
+                        <Edit3 className="h-4 w-4" />
                         <span className="hidden sm:inline text-xs">Edit</span>
                     </Button>
                 }
@@ -60,8 +60,8 @@ export const ProductBulkActions = ({
                 open={addToSharedState.isOpen}
                 title="Update Catalog"
                 trigger={
-                    <Button size="sm" variant="ghost" disabled={isLoading} onClick={addToSharedState.open}>
-                        <Boxes className="h-4 w-4 sm:mr-1.5" />
+                    <Button className="rounded-full" size="sm" variant="ghost" disabled={isLoading} onClick={addToSharedState.open}>
+                        <Boxes className="h-4 w-4" />
                         <span className="hidden sm:inline text-xs">Catalog</span>
                     </Button>
                 }
@@ -82,12 +82,12 @@ export const ProductBulkActions = ({
                 onOpenChange={deleteState.setOpen}
                 trigger={
                     <Button
-                        className="text-destructive hover:bg-destructive/10"
+                        className="rounded-full text-destructive bg-destructive/10 hover:bg-destructive/15 font-medium"
                         size="sm"
                         variant="ghost"
                         disabled={isLoading}
                     >
-                        <Trash2 className="h-4 w-4 sm:mr-1.5" />
+                        <Trash2 className="h-4 w-4" />
                         <span className="hidden sm:inline text-xs">Delete</span>
                     </Button>
                 }
@@ -98,12 +98,12 @@ export const ProductBulkActions = ({
                 isLoading={isLoading}
             />
 
-            <div className="w-px h-4 bg-border" />
+            <div className="w-px h-5 bg-border mx-1" />
 
             <Button
                 size="icon"
                 variant="ghost"
-                className="text-muted-foreground hover:text-foreground hover:bg-muted"
+                className="rounded-full text-muted-foreground hover:text-foreground hover:bg-muted h-8 w-8"
                 disabled={isLoading}
                 onClick={onClearSelection}
             >

@@ -141,7 +141,7 @@ function RouteComponent() {
             ) : items.length > 0 ? (
                 <InfiniteResourceList
                     className={cn(
-                        "mb-8 w-full grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2",
+                        "mb-8 w-full grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2",
                         viewMode === "grid" ? "" : "grid-cols-1"
                     )}
                     items={items}
