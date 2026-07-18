@@ -103,12 +103,13 @@ const ProductView: React.FC<Props> = ({ product }) => {
             </div>
 
             <div className="py-6 px-4 md:px-0 space-y-5">
-                <div className="flex items-center justify-end">
-                    <ShareButton text="Check out this product!" />
-                </div>
-
                 <div>
-                    <h1 className="text-xl md:text-2xl font-display font-semibold text-foreground">{product.name}</h1>
+                    <div className="flex items-center justify-between gap-2">
+                        <h1 className="text-lg font-display font-semibold text-foreground">{product.name}</h1>
+                        <div className="shrink-0">
+                            <ShareButton text="Check out this product!" />
+                        </div>
+                    </div>
                     {selectedVariant && (
                         <div className="flex items-baseline gap-2 mt-1.5">
                             <span className="text-2xl font-semibold text-foreground">{currency(selectedVariant?.price)}</span>
