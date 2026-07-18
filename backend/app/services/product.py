@@ -77,7 +77,7 @@ class ProductService:
             logger.warning(f"Unrecognized age value in feed: {age_str!r}")
         return mapped
 
-    @cacheable(key_prefix="merchant_feed", key_builder=False)
+    @cacheable(key_prefix="merchant_feed", tags=["products"])
     async def generate_merchant_feed_xml(self, request: Request, target) -> str:
         """
         Generates Google Merchant Feed.
@@ -119,15 +119,22 @@ class ProductService:
 
                     ET.SubElement(item, "g:title").text = variant_title.strip()
 
-                    base_description = prod.description or "No description provided."
-                    dimension_parts = []
+                    base_description = prod.description or ""
+                    detail_parts = []
+                    if variant.size:
+                        detail_parts.append(f"Size:{variant.size}")
                     if variant.width:
-                        dimension_parts.append(f"width {variant.width}cm")
+                        detail_parts.append(f"W:{variant.width}cm")
                     if variant.length:
-                        dimension_parts.append(f"length {variant.length}cm")
+                        detail_parts.append(f"L:{variant.length}cm")
+                    if variant.age:
+                        detail_parts.append(f"Age:{variant.age}")
+
                     full_description = base_description
-                    if dimension_parts:
-                        full_description = f"{base_description} ({', '.join(dimension_parts)})"
+                    if detail_parts:
+                        full_description: str = f"{', '.join(detail_parts)}. {base_description}"
+
+                    ET.SubElement(item, "g:description").text = full_description
                     ET.SubElement(item, "g:description").text = full_description
 
                     ET.SubElement(item, "g:link").text = f"{settings.FRONTEND_HOST}/products/{prod.slug}"
