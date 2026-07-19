@@ -137,8 +137,13 @@ class ProductService:
                     ET.SubElement(item, "g:availability").text = (
                         availability_map[target]["in"] if variant.inventory > 0 else availability_map[target]["out"]
                     )
-                    ET.SubElement(item, "g:price").text = f"{variant.price:.2f} NGN"
                     ET.SubElement(item, "g:condition").text = "new" if prod.is_new else "used"
+                    if variant.old_price and variant.old_price > variant.price:
+                        ET.SubElement(item, "g:price").text = f"{variant.old_price:.2f} NGN"
+                        ET.SubElement(item, "g:sale_price").text = f"{variant.price:.2f} NGN"
+                    else:
+                        ET.SubElement(item, "g:price").text = f"{variant.price:.2f} NGN"
+
 
                     if variant.size: ET.SubElement(item, "g:size").text = variant.size
                     if variant.color: ET.SubElement(item, "g:color").text = variant.color
