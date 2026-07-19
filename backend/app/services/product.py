@@ -275,7 +275,7 @@ class ProductService:
     def _has_active_filters(self, kw) -> bool:
         return any([
             kw.get("search"), kw.get("cat_ids"), kw.get("collections"), kw.get("sizes"),
-            kw.get("colors"), kw.get("ages"), kw.get("width"), kw.get("length"),
+            kw.get("ages"), kw.get("width"), kw.get("length"),
             kw.get("min_price", 1) != 1, kw.get("max_price", 50000) != 50000
         ])
 
@@ -287,8 +287,7 @@ class ProductService:
             filters.append(f"min_variant_price >= {kw['min_price']} AND max_variant_price <= {kw['max_price']}")
         filters.append(f"active = {str(kw.get('active', True)).lower()}")
         if kw.get("sizes"): filters.append(f"sizes IN [{kw['sizes']}]")
-        if kw.get("colors"): filters.append(f"colors IN [{kw['colors']}]")
-        if kw.get("ages"): filters.append(f'ages IN ["{kw["ages"]}"]')
+        if kw.get("ages"): filters.append(f"ages IN {url_to_list(kw['ages'])}")
         if kw.get("width"): filters.append(f"widths IN [{kw['width']}]")
         if kw.get("length"): filters.append(f"lengths IN [{kw['length']}]")
         return filters

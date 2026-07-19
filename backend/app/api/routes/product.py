@@ -54,15 +54,14 @@ async def feed(
     request: Request, srv: ProductDep, search: str = "", sort: str = "id:desc",
     cat_ids: str = Query(default=""), collections: str = Query(default=""),
     max_price: int = Query(default=50000, gt=0), min_price: int = Query(default=1, gt=0),
-    sizes: str = Query(default=""), colors: str = Query(default=""), ages: str = Query(default=""),
+    sizes: str = Query(default=""), ages: str = Query(default=""),
     width: str = Query(default=""), length: str = Query(default=""),
     limit: int = Query(default=40, le=100), active: bool = Query(default=True),
     cursor: Optional[str] = Query(default=None),
 ) -> FeedProducts:
     return await srv.get_discovery_feed(
         search=search, sort=sort, cat_ids=cat_ids, collections=collections,
-        max_price=max_price, min_price=min_price, sizes=sizes, colors=colors,
-        ages=ages, width=width, length=length, limit=limit, active=active, cursor=cursor
+        max_price=max_price, min_price=min_price, sizes=sizes, ages=ages, width=width, length=length, limit=limit, active=active, cursor=cursor
     )
 
 

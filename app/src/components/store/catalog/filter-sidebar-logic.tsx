@@ -11,7 +11,7 @@ import { useCategories } from "@/hooks/useCategories";
 import { useCollections } from "@/hooks/useCollection";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import { currency, debounce } from "@/utils";
-import { AGE_OPTIONS, COLOR_OPTIONS, type ColorOption, DEFAULT_MAX_PRICE, DEFAULT_MIN_PRICE, SIZE_OPTIONS } from "@/utils/constants";
+import { AGE_OPTIONS, DEFAULT_MAX_PRICE, DEFAULT_MIN_PRICE, SIZE_OPTIONS } from "@/utils/constants";
 
 export interface FilterSidebarRef {
     apply: () => void;
@@ -24,7 +24,6 @@ interface Props {
 
 type DraftFilters = {
     sizes: Set<string>;
-    colors: Set<string>;
     ages: Set<string>;
     categories: Set<string>;
     sort: "min_variant_price:asc"| "min_variant_price:desc" | "id:desc" | "created_at:desc";
@@ -37,7 +36,6 @@ type DraftFilters = {
 const DEFAULT_DRAFT = {
     sort: "id:desc",
     sizes: new Set<string>(),
-    colors: new Set<string>(),
     ages: new Set<string>(),
     categories: new Set<string>(),
     minPrice: DEFAULT_MIN_PRICE,
@@ -84,7 +82,6 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
         return {
             sort: search.sort ?? "id:desc",
             sizes: new Set(search.sizes?.toString()?.split(",").filter(Boolean)),
-            colors: new Set(search.colors?.split(",").filter(Boolean)),
             ages: new Set(search.ages?.split(",").filter(Boolean)),
             categories: new Set(search.cat_ids?.split(",").filter(Boolean)),
             minPrice: search.min_price?.toString() ?? `${DEFAULT_MIN_PRICE}`,
@@ -142,7 +139,6 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
     };
 
     const onToggleSize = toggleDraftSet("sizes");
-    const onToggleColor = toggleDraftSet("colors");
     const onToggleAge = toggleDraftSet("ages");
     const onToggleCategory = toggleDraftSet("categories");
 
@@ -174,7 +170,6 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
         updateQuery([
             { key: "sort", value: draft.sort },
             { key: "sizes", value: [...draft.sizes].join(",") },
-            { key: "colors", value: [...draft.colors].join(",") },
             { key: "ages", value: [...draft.ages].join(",") },
             { key: "cat_ids", value: [...draft.categories].join(",") },
             { key: "min_price", value: minPrice },
@@ -189,7 +184,6 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
         setDraft({
             sort: DEFAULT_DRAFT.sort,
             sizes: new Set(),
-            colors: new Set(),
             ages: new Set(),
             categories: new Set(),
             minPrice: DEFAULT_DRAFT.minPrice.toString(),
@@ -377,31 +371,6 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
                                     }`}
                             >
                                 {size}
-                            </button>
-                        ))}
-                    </div>
-                </CollapsibleContent>
-            </Collapsible>
-
-            <Collapsible open={openSections.color} onOpenChange={() => toggleSection("color")}>
-                <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
-                    <span className="font-medium">Colors</span>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${openSections.color ? "rotate-180" : ""}`} />
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                    <div className="flex flex-wrap gap-2 pt-2">
-                        {COLOR_OPTIONS.map((color: ColorOption) => (
-                            <button
-                                key={color.name}
-                                onClick={() => onToggleColor(color.name)}
-                                className={`relative w-8 h-8 rounded-full border-2 ${draft.colors.has(color.name)
-                                        ? "border-primary ring-2 ring-primary ring-offset-2 ring-offset-background"
-                                        : "border-border hover:border-muted-foreground"
-                                    }`}
-                                style={{ backgroundColor: color.value }}
-                                title={color.name}
-                            >
-                                {color.name === "White" && <span className="absolute inset-0 rounded-full border border-border" />}
                             </button>
                         ))}
                     </div>
