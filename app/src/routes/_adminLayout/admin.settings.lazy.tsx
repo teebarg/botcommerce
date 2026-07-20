@@ -15,7 +15,7 @@ function RouteComponent() {
     const { data: settings } = useSuspenseQuery(useSettingsQuery());
 
     return (
-        <div className="py-4 px-2.5 md:px-8 slide-in">
+        <div className="py-4 px-2 max-w-4xl">
             <h1 className="text-2xl font-semibold mb-4">Store Settings</h1>
             <Tabs defaultValue="shop-details">
                 <TabsList className="mb-4">

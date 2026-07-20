@@ -8,8 +8,8 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { states } from "@/components/store/collections/data";
 import { useUpdateCartDetails } from "@/hooks/useCart";
-import type { CartUpdate } from "@/schemas";
-import { addressSchema, formatPhone } from "@/lib/validation";
+import { addressSchema, type CartUpdate } from "@/schemas";
+import { formatPhone } from "@/lib/validation";
 
 type FormValues = z.infer<typeof addressSchema>;
 

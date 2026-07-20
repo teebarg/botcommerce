@@ -9,8 +9,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { states } from "@/components/store/collections/data";
 import { useCreateAddress, useUpdateAddress } from "@/hooks/useAddress";
-import type { Address } from "@/schemas";
-import { addressSchema, formatPhone } from "@/lib/validation";
+import { type Address, addressSchema } from "@/schemas";
+import { formatPhone } from "@/lib/validation";
 
 type AddressFormValues = z.infer<typeof addressSchema>;
 

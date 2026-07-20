@@ -7,15 +7,11 @@ import { Input } from "@/components/ui/input";
 import { useCart } from "@/providers/cart-provider";
 import { useUpdateCartDetails } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
-import { formatPhone, normalizePhone } from "@/lib/validation";
+import { formatPhone } from "@/lib/validation";
+import { phoneSchema } from "@/schemas";
 
 const ContactFormSchema = z.object({
-    phone: z
-        .string()
-        .transform((val) => normalizePhone(val))
-        .refine((val) => /^234[789][01]\d{8}$/.test(val), {
-            message: "Enter a valid mobile number",
-        }),
+    phone: phoneSchema
 });
 
 type ContactFormValues = z.infer<typeof ContactFormSchema>;

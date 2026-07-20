@@ -1,6 +1,3 @@
-import { AddressTypeSchema } from "@/schemas";
-import { z } from "zod";
-
 export const normalizePhone = (value: string) => {
     const digits = value.replace(/\D/g, "");
 
@@ -32,21 +29,4 @@ export const formatPhone = (value: string) => {
     return `+${digits}`;
 };
 
-export const phoneSchema = z
-    .string()
-    .transform((val) => normalizePhone(val))
-    .refine((val) => /^234[789][01]\d{8}$/.test(val), {
-        message: "Enter a valid Nigerian mobile number",
-    });
 
-export const emailSchema = z.string().email("Enter a valid email address").toLowerCase();
-
-export const addressSchema = z.object({
-    address_type: AddressTypeSchema,
-    first_name: z.string().min(1, "First name is required"),
-    last_name: z.string().min(1, "Last name is required"),
-    address_1: z.string().min(1, "Address is required"),
-    address_2: z.string().optional(),
-    state: z.string().min(1, "State is required"),
-    phone: phoneSchema,
-});

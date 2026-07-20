@@ -46,23 +46,32 @@ const StoreNavbar = () => {
                             </div>
                         </Link>
                     </div>
-                    <div className="flex-1 flex justify-center px-2 min-w-0">
+                    <div className="flex-1 flex justify-center min-w-0">
                         {totalItems > 0 ? (
-                            <LocalizedClientLink
-                                href="/checkout"
-                                className="flex items-center gap-0.5 bg-gradient-action rounded-full p-2 max-w-full active:scale-[0.97] transition-transform"
-                            >
-                                <span className="text-xs font-display font-medium text-primary-foreground whitespace-nowrap">
-                                    Checkout
-                                </span>
-                                <span className="w-[3px] h-[3px] rounded-full bg-primary-foreground/40 shrink-0" />
-                                <span className="text-xs font-medium text-primary-foreground/75 whitespace-nowrap">
-                                    {currency(subtotal)}
-                                </span>
-                                <span className="w-6 h-6 rounded-full bg-primary-foreground/15 flex items-center justify-center shrink-0">
-                                    <ArrowRight className="w-3.5 h-3.5 text-primary-foreground" />
-                                </span>
-                            </LocalizedClientLink>
+                            <div className="relative rounded-full p-[1.5px] max-w-full overflow-hidden">
+                                <span
+                                    className="absolute inset-[-50%] animate-border-spin"
+                                    style={{
+                                        background:
+                                            "conic-gradient(from 0deg, transparent 0%, transparent 60%, white 85%, transparent 100%)",
+                                    }}
+                                />
+                                <LocalizedClientLink
+                                    href="/checkout"
+                                    className="relative flex items-center gap-0.5 bg-gradient-action rounded-full p-2 max-w-full active:scale-[0.97] transition-transform"
+                                >
+                                    <span className="text-xs font-display font-medium text-primary-foreground whitespace-nowrap">
+                                        Checkout
+                                    </span>
+                                    <span className="w-[3px] h-[3px] rounded-full bg-primary-foreground/40 shrink-0" />
+                                    <span className="text-xs font-medium text-primary-foreground/75 whitespace-nowrap">
+                                        {currency(subtotal)}
+                                    </span>
+                                    <span className="w-6 h-6 rounded-full bg-primary-foreground/15 flex items-center justify-center shrink-0">
+                                        <ArrowRight className="w-3.5 h-3.5 text-primary-foreground animate-icon-bounce" />
+                                    </span>
+                                </LocalizedClientLink>
+                            </div>
                         ) : (
                             <span className="font-display text-[15px] font-medium tracking-tight text-foreground truncate">
                                 {shop_name}
@@ -102,7 +111,7 @@ const StoreNavbar = () => {
                         {isAuthenticated ? (
                             <LocalizedClientLink
                                 aria-label="go to wishlist"
-                                className="flex items-center justify-center rounded-md h-10 w-10 hover:bg-accent text-primary"
+                                className="flex items-center justify-center rounded-md h-10 w-10"
                                 href={"/wishlist"}
                             >
                                 <Heart className="h-5 w-5" />
