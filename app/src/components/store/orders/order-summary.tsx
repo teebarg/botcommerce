@@ -26,13 +26,13 @@ export default function OrderSummary({ order }: { order: Order }) {
                 {order.discount_amount || 0 > 0 && (
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">Discount</span>
-                        <span className="font-medium text-success">−{currency(order.discount_amount || 0)}</span>
+                        <span className="font-medium text-accent">−{currency(order.discount_amount || 0)}</span>
                     </div>
                 )}
                 {order.wallet_used > 0 && (
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">Wallet used</span>
-                        <span className="font-medium text-success">−{currency(order.wallet_used)}</span>
+                        <span className="font-medium text-accent">−{currency(order.wallet_used)}</span>
                     </div>
                 )}
                 <Separator />
