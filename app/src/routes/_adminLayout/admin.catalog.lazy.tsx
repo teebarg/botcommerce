@@ -26,7 +26,7 @@ function RouteComponent() {
                     open={state.isOpen}
                     title="Add New Catalog"
                     trigger={
-                        <Button onClick={state.open}>
+                        <Button size="sm" onClick={state.open}>
                             <Plus className="w-4 h-4" />
                             Add New
                         </Button>

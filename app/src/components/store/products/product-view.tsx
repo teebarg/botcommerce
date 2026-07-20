@@ -58,7 +58,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
 
     return (
         <div className="max-w-6xl mx-auto w-full md:py-8 md:px-4 md:grid md:grid-cols-2 md:gap-8 md:items-start">
-            <div className="relative aspect-square md:aspect-product md:rounded-2xl md:overflow-hidden md:sticky md:top-16 bg-secondary">
+            <div className="relative aspect-square md:aspect-gallery md:rounded-2xl md:overflow-hidden md:sticky md:top-16 bg-secondary">
                 <img
                     key={currentImageIndex}
                     src={product.images?.[currentImageIndex]?.image || "/placeholder.jpg"}

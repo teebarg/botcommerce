@@ -1,6 +1,5 @@
 import { z } from "zod";
-import { CursorSchema } from "./index";
-import { phoneSchema } from "@/lib/validation";
+import { CursorSchema, phoneSchema } from "./index";
 
 export const UserLiteSchema = z.object({
     id: z.number(),

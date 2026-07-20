@@ -5,9 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import type { User } from "@/schemas";
+import { phoneSchema, type User } from "@/schemas";
 import { useUpdateUser } from "@/hooks/useUser";
-import { phoneSchema } from "@/lib/validation";
 
 interface ReviewFormProps {
     user?: User;

@@ -132,7 +132,7 @@ export const OrderFilters: React.FC = () => {
                             <SlidersHorizontal className="h-4 w-4" />
                             <span className="hidden md:inline">Filters</span>
                             {activeFilterCount > 0 && (
-                                <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground animate-scale-in">
+                                <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
                                     {activeFilterCount}
                                 </span>
                             )}

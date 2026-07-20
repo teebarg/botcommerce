@@ -7,13 +7,12 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import type { Message } from "@/schemas";
+import { phoneSchema, type Message } from "@/schemas";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { tryCatch } from "@/utils/try-catch";
 import { Separator } from "@/components/ui/separator";
 import { api } from "@/utils/api";
 import { getInitials } from "@/utils";
-import { phoneSchema } from "@/lib/validation";
 
 const profileSchema = z.object({
     first_name: z.string().min(1, "First name is required").max(255, "First name is too long"),

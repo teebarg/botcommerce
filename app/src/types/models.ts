@@ -1,10 +1,3 @@
-export type SortOptions = "price_asc" | "price_desc" | "id";
-
-export type IconProps = {
-    color?: string;
-    size?: string | number;
-} & React.SVGAttributes<SVGElement>;
-
 export interface DashboardSummary {
     totalRevenue: number;
     totalOrders: number;

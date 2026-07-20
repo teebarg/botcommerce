@@ -1,4 +1,5 @@
-import { Separator } from "../ui/separator";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type LoaderVariant = "list" | "grid" | "detail" | "inline" | "cart" | "product-list" | "product-section" | "radio" | "box" | "account" | "card";
 
@@ -7,15 +8,6 @@ interface PageLoaderProps {
     rows?: number;
     cols?: number;
     className?: string;
-}
-
-function Skeleton({ className = "", style = {} }: { className?: string; style?: React.CSSProperties }) {
-    return (
-        <div
-            className={`animate-pulse rounded bg-muted ${className}`}
-            style={style}
-        />
-    );
 }
 
 function BoxLoader() {
@@ -79,7 +71,7 @@ function GridLoader({ rows = 4 }: { rows?: number }) {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {Array.from({ length: count }).map((_, i) => (
                 <div key={i} className="rounded-xl border border-border overflow-hidden bg-card">
-                    <Skeleton className="w-full aspect-product" />
+                    <Skeleton className="w-full aspect-gallery" />
                     <div className="p-3 flex flex-col gap-1.5">
                         <Skeleton className="h-3 w-4/5" />
                         <Skeleton className="h-3 w-2/5" />
@@ -169,7 +161,7 @@ function ProductListLoader() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 px-2">
             {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="rounded-xl border border-border overflow-hidden bg-card">
-                    <Skeleton className="w-full aspect-product" />
+                    <Skeleton className="w-full aspect-gallery" />
                     <div className="p-3 flex flex-col gap-1.5">
                         <Skeleton className="h-3 w-4/5" />
                         <Skeleton className="h-3 w-2/5" />

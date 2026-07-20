@@ -1,11 +1,9 @@
-function Skeleton({ className = "" }: { className?: string }) {
-    return <div className={`animate-pulse rounded bg-muted ${className}`} />;
-}
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ProductPageLoader() {
     return (
         <div className="max-w-6xl mx-auto w-full md:py-8 md:px-4 md:grid md:grid-cols-2 md:gap-8 md:items-start">
-            <div className="relative aspect-square md:aspect-product md:rounded-2xl overflow-hidden md:sticky md:top-16">
+            <div className="relative aspect-square md:aspect-gallery md:rounded-2xl overflow-hidden md:sticky md:top-16">
                 <Skeleton className="w-full h-full rounded-none md:rounded-2xl" />
             </div>
 

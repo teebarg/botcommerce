@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ShippingMethodSchema, ShopSettingsTypeSchema } from "./enums";
+import { normalizePhone } from "@/lib/validation";
 
 export const CursorSchema = z.object({
     next_cursor: z.string().optional(),
@@ -78,6 +79,13 @@ export const CouponUsageSchema = z.object({
 export const PaginatedCouponsSchema = CursorSchema.extend({
     items: z.array(CouponSchema),
 });
+
+export const phoneSchema = z
+    .string()
+    .transform((val) => normalizePhone(val))
+    .refine((val) => /^234[789][01]\d{8}$/.test(val), {
+        message: "Enter a valid Nigerian mobile number",
+    });
 
 export type DeliveryOption = z.infer<typeof DeliveryOptionSchema>;
 export type Coupon = z.infer<typeof CouponSchema>;
