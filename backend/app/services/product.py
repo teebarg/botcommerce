@@ -102,6 +102,7 @@ class ProductService:
             products = await self.db.product.find_many(
                 where={"active": True},
                 include={"variants": True, "images": True, "categories": True},
+                order={"created_at": "desc"},
                 take=batch_size,
                 skip=skip
             )
