@@ -6,6 +6,7 @@ import { useProductCardVariant } from "@/hooks/useProductCardVariant";
 import ImageLightbox from "@/components/image-lightbox";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils/cn";
+import { Badge } from "@/components/ui/badge";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -121,6 +122,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
                     <div className="text-white text-xs font-medium truncate drop-shadow-sm pr-4 sr-only">
                         {product.name}
                     </div>
+                    {product?.is_new && (
+                        <Badge variant="accent" className="w-fit uppercase tracking-wider" type="sm">New</Badge>
+                    )}
                     <div className="flex items-baseline gap-1.5">
                         <span className="text-white text-lg font-medium drop-shadow-sm">{currency(minPrice)}</span>
                         {!outOfStock && hasDiscount && (
