@@ -6,7 +6,7 @@ from starlette.middleware.cors import CORSMiddleware
 import app.tools.products
 import app.tools.orders
 
-app_instance = mcp.get_app() 
+app_instance = mcp.http_app()
 app_instance.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

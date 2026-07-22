@@ -36,7 +36,7 @@ update:
 
 .PHONY: update-all
 update-all:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) up -d --force-recreate
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) -profile dev up -d --force-recreate
 
 .PHONY: stop
 stop:

@@ -1,7 +1,7 @@
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    backend_url: str = "http://backend:8000"
+    BACKEND_URL: str = "http://backend:8000"
     DATABASE_URL: str = ""
 
     api_key: str = ""

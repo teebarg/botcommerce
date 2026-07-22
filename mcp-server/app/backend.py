@@ -6,8 +6,9 @@ from app.config import settings
 class BackendClient:
 
     def __init__(self):
+        print(settings.DATABASE_URL)
         self.client = httpx.AsyncClient(
-            base_url=settings.backend_url,
+            base_url=settings.BACKEND_URL,
             timeout=30,
         )
 
