@@ -98,6 +98,9 @@ services:
       - ./agent:/app
       - /app/.venv
       - uva-cache:/root/.cache/uv
+    depends_on:
+      mcp-server:
+        condition: service_healthy
 
   mcp-server:
     build:
@@ -106,7 +109,7 @@ services:
     container_name: mcp
     profiles: ["dev", "backend-only"]
     ports:
-      - "9000:9000"
+      - "8787:8787"
     networks:
       - dev-net
     labels:
@@ -120,11 +123,14 @@ services:
       - traefik.http.routers.mcp-http.entrypoints=http
       - traefik.http.routers.mcp-http.middlewares=redirect-to-https
       - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
-    environment:
-      - BACKEND_URL=http://backend:8000
     env_file:
       - ./mcp-server/.env
     platform: linux/amd64 # Patch for M1 Mac
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8787/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     volumes:
       - ./mcp-server:/app
       - /app/.venv

@@ -118,7 +118,10 @@ bctx:
 actx:
 	@cd agent && npx repomix
 
-ctx-all: fctx bctx actx
+mcptx:
+	@cd mcp-server && npx repomix
+
+ctx-all: fctx bctx actx mcptx
 
 # ==========================================
 # Production Testing

@@ -1,14 +1,12 @@
 import httpx
-
 from app.config import settings
 
 
 class BackendClient:
 
     def __init__(self):
-        print(settings.DATABASE_URL)
         self.client = httpx.AsyncClient(
-            base_url=settings.BACKEND_URL,
+            base_url=f"{settings.BACKEND_URL}/api",
             timeout=30,
         )
 
@@ -32,7 +30,7 @@ class BackendClient:
         order_number: str,
     ):
         r = await self.client.get(
-            f"/orders/{order_number}"
+            f"/order/{order_number}"
         )
 
         r.raise_for_status()

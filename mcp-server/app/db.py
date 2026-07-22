@@ -1,19 +1,26 @@
 import asyncpg
 from app.config import settings
 
-pool: asyncpg.Pool | None = None
+class Database:
+    def __init__(self):
+        self.pool: asyncpg.Pool | None = None
 
-async def init_db():
-    global pool
-    db_url: str = settings.DATABASE_URL
-    pool = await asyncpg.create_pool(dsn=db_url, min_size=5, max_size=20)
+    async def connect(self):
+        if self.pool is None:
+            self.pool = await asyncpg.create_pool(
+                dsn=settings.DATABASE_URL,
+                min_size=5,
+                max_size=20,
+            )
 
-async def close_db():
-    global pool
-    if pool:
-        await pool.close()
+    async def disconnect(self):
+        if self.pool:
+            await self.pool.close()
+            self.pool = None
 
-def get_pool() -> asyncpg.Pool:
-    if pool is None:
-        raise RuntimeError("Database pool is not initialized.")
-    return pool
+    def get_pool(self) -> asyncpg.Pool:
+        if self.pool is None:
+            raise RuntimeError("Database not initialized.")
+        return self.pool
+
+db = Database()

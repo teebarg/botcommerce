@@ -4,9 +4,7 @@ from app.backend import backend
 
 
 @mcp.tool()
-async def get_order(
-    order_number: str,
-):
+async def get_order(order_number: str):
     """
     Retrieve an order.
     """

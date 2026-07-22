@@ -4,11 +4,8 @@ from app.backend import backend
 
 
 @mcp.tool()
-async def search_products(
-    query: str,
-):
+async def search_products(query: str):
     """
     Search store products.
     """
-
     return await backend.search_products(query)

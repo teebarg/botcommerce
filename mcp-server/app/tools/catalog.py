@@ -1,16 +1,16 @@
 import json
 from typing import Optional
-from app.db import get_pool
 from app.server import mcp
+from app.db import db
 
 @mcp.tool()
-async def search_products(
+async def query_products(
     query: Optional[str] = None,
     limit: int = 10,
     only_active: bool = True
 ) -> str:
     """Search and list products with variants using optimized raw SQL."""
-    pool = get_pool()
+    pool = db.get_pool()
 
     # Raw SQL fetch using PostgreSQL JSON aggregation in 1 round trip
     sql = """
@@ -47,7 +47,7 @@ async def search_products(
 
 async def update_variant_inventory(variant_id: int, new_inventory: int) -> str:
     """Update inventory count using raw SQL RETURNING clause."""
-    pool = get_pool()
+    pool = db.get_pool()
     status = "IN_STOCK" if new_inventory > 0 else "OUT_OF_STOCK"
 
     sql = """
