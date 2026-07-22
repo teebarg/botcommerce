@@ -1,11 +1,11 @@
 import asyncpg
-import os
+from app.config import settings
 
 pool: asyncpg.Pool | None = None
 
 async def init_db():
     global pool
-    db_url = os.getenv("DATABASE_URL", "postgresql://user:password@localhost:5432/store")
+    db_url: str = settings.DATABASE_URL
     pool = await asyncpg.create_pool(dsn=db_url, min_size=5, max_size=20)
 
 async def close_db():

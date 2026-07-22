@@ -105,12 +105,14 @@ services:
       dockerfile: Dockerfile
     container_name: mcp
     profiles: ["dev", "backend-only"]
+    ports:
+      - "9000:9000"
     networks:
       - dev-net
     labels:
       - traefik.enable=true
       - traefik.docker.network=dev-net
-      - traefik.http.services.mcp.loadbalancer.server.port=8000
+      - traefik.http.services.mcp.loadbalancer.server.port=9000
       - traefik.http.routers.mcp.rule=Host(`mcp.localhost`)
       - traefik.http.routers.mcp.entrypoints=https
       - traefik.http.routers.mcp.tls=true
