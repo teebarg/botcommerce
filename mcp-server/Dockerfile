@@ -1,11 +1,12 @@
-FROM python:3.12-slim
+FROM beafdocker/fastapi-base:latest
 
 WORKDIR /app
 
-COPY pyproject.toml .
+COPY pyproject.toml uv.lock* ./
 
-RUN pip install .
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-install-project
 
-COPY . .
+EXPOSE 8000
 
-CMD ["python", "-m", "app.main"]
+CMD ["uv", "run", "-m", "app.main"]

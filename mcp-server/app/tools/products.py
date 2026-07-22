@@ -1,6 +1,6 @@
 from app.server import mcp
 
-from app.clients.backend import backend
+from app.backend import backend
 
 
 @mcp.tool()

@@ -99,6 +99,35 @@ services:
       - /app/.venv
       - uva-cache:/root/.cache/uv
 
+  mcp-server:
+    build:
+      context: ./mcp-server
+      dockerfile: Dockerfile
+    container_name: mcp
+    profiles: ["dev", "backend-only"]
+    networks:
+      - dev-net
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dev-net
+      - traefik.http.services.mcp.loadbalancer.server.port=8000
+      - traefik.http.routers.mcp.rule=Host(`mcp.localhost`)
+      - traefik.http.routers.mcp.entrypoints=https
+      - traefik.http.routers.mcp.tls=true
+      - traefik.http.routers.mcp-http.rule=Host(`mcp.localhost`)
+      - traefik.http.routers.mcp-http.entrypoints=http
+      - traefik.http.routers.mcp-http.middlewares=redirect-to-https
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+    environment:
+      - BACKEND_URL=http://backend:8000
+    env_file:
+      - ./mcp-server/.env
+    platform: linux/amd64 # Patch for M1 Mac
+    volumes:
+      - ./mcp-server:/app
+      - /app/.venv
+      - uvmcp-cache:/root/.cache/uv
+
 networks:
   dev-net:
     external: true
@@ -107,3 +136,4 @@ volumes:
   app-node-modules:
   uv-cache:
   uva-cache:
+  uvmcp-cache:

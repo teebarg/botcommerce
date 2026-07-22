@@ -1,5 +1,3 @@
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 
-mcp = FastMCP(
-    "Revoque MCP Server",
-)
+mcp = FastMCP(name="Revoque MCP Server")
