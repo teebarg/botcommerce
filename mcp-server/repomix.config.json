@@ -1,0 +1,20 @@
+{
+    "output": {
+        "filePath": "../mcp-context.md"
+    },
+    "include": [
+        "app/**/*.py"
+    ],
+    "ignore": {
+        "useGitignore": true,
+        "useDefaultPatterns": true,
+        "customPatterns": [
+            ".git",
+            "__pycache__",
+            "venv",
+            ".env",
+            "app/static/**",
+            "app/tests/**"
+        ]
+    }
+}

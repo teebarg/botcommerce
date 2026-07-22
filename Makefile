@@ -36,7 +36,7 @@ update:
 
 .PHONY: update-all
 update-all:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) up -d --force-recreate
+	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) -profile dev up -d --force-recreate
 
 .PHONY: stop
 stop:
@@ -118,7 +118,10 @@ bctx:
 actx:
 	@cd agent && npx repomix
 
-ctx-all: fctx bctx actx
+mcptx:
+	@cd mcp-server && npx repomix
+
+ctx-all: fctx bctx actx mcptx
 
 # ==========================================
 # Production Testing
