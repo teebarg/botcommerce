@@ -11,6 +11,8 @@ GIT_SHA := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 
 # Default service context fallback
 s ?= app
+PROFILE ?= *
+COMPOSE_RUN := $(DOCKER_COMPOSE) -p $(PROJECT_SLUG) --profile $(PROFILE)
 
 # ==========================================
 # Core Docker Compose Engine Rules
@@ -32,11 +34,11 @@ up-backend:
 
 .PHONY: update
 update:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) up -d --force-recreate $(s)
+	$(COMPOSE_RUN) up -d --force-recreate $(s)
 
 .PHONY: update-all
 update-all:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) -profile dev up -d --force-recreate
+	$(COMPOSE_RUN) up -d --force-recreate
 
 .PHONY: stop
 stop:

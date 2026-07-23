@@ -35,41 +35,30 @@ export type Chat = z.infer<typeof ChatSchema>;
 export type PaginatedChats = z.infer<typeof PaginatedChatsSchema>;
 
 export interface ChatOrderItem {
-    product_id: number;
     name: string;
-    image?: string;
-    quantity: number;
-    price: number;
-    subtotal: number;
-}
-
-export interface OrderFinancials {
-    subtotal: number;
-    tax: number;
-    discount: number;
-    wallet_used: number;
-    shipping_fee: number;
-    total: number;
 }
 
 export interface ChatOrder {
     order_number: string;
     status: string;
-    payment_status: string;
-    payment_method?: string;
-    shipping_method?: string;
-    financials: OrderFinancials;
-    items: ChatOrderItem[];
+    total: number;
+    order_items: ChatOrderItem[];
     created_at: string; // ISO string
+}
+
+export interface ChatProductVariant {
+    id: number;
+    price: number;
+    old_price: number;
+    inventory: number;
 }
 
 export interface ChatProduct {
     id: number;
-    variant_id: number;
     name: string;
     sku: string;
-    price: string;
-    image_url: string | null;
+    image: string | null;
+    variants: ChatProductVariant[];
 }
 
 export interface ChatResponse {
@@ -81,7 +70,7 @@ export interface ChatResponse {
     products: ChatProduct[];
     order?: ChatOrder;
     quick_replies?: string[];
-    form?: any;
+    form?: string;
     reaction?: "thumbs-up" | "thumbs-down" | null;
     timestamp: Date;
 }

@@ -16,12 +16,10 @@ Your App
 │   FastAPI (Render 500MB)    │
 │                             │
 │   LangGraph Agent           │
-│   ├── search_products       │──► Qdrant (free cloud)
 │   ├── search_faqs           │──► Qdrant (free cloud)
 │   ├── search_policies       │──► Qdrant (free cloud)
 │   ├── check_order_status    │──► shop API
 │   ├── check_stock           │──► shop API
-│   ├── request_refund        │──► shop API
 │   ├── escalate_to_human     │──► Human Helpdesk
 │   ├── intent classification │──► LLM
 │   ├── form generation       │──► Dynamic UI

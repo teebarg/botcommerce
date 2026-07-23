@@ -74,8 +74,13 @@ export const useSupportChat = () => {
     }, [loading, isTyping, messages]);
 
     useEffect(() => {
-        if (historyLoading) return;
+        if (messages.length > 0) {
+            saveHistory(messages);
+        }
+    }, [messages]);
 
+    useEffect(() => {
+        if (historyLoading || !dbHistory) return;
         if (dbHistory) {
             if (dbHistory.status != ConversationStatus.ACTIVE) {
                 localStorage.removeItem(STORAGE_KEY);
@@ -90,7 +95,7 @@ export const useSupportChat = () => {
             return;
         }
         setMessages(loadLocalHistory());
-    }, [historyLoading]);
+    }, [dbHistory, historyLoading]);
 
     useEffect(() => {
         if (lastWsMessage.type != "chat") return;
@@ -121,7 +126,7 @@ export const useSupportChat = () => {
     const clearHistory = useCallback(() => {
         const conversationUuid = localStorage.getItem("chat_session_id");
         if (!conversationUuid) return
-        closeChat.mutateAsync({conversationUuid, status: ConversationStatus.ABANDONED}).then(() => {
+        closeChat.mutateAsync({ conversationUuid, status: ConversationStatus.ABANDONED }).then(() => {
             localStorage.removeItem(STORAGE_KEY);
             localStorage.removeItem(CHAT_SESSION_KEY);
             setMessages(WELCOME_MESSAGES);
