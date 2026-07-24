@@ -10,11 +10,12 @@ export const useBankDetails = () => {
     });
 };
 
-export const useChat = (uid: string) => {
+export const useChat = (uid: string, props: { enabled: boolean }) => {
     return useQuery({
         queryKey: ["chat", uid],
         queryFn: () => api.get<Chat>(`/chat/${uid}`),
         staleTime: 1000 * 60 * 5,
+        enabled: props.enabled
     });
 };
 

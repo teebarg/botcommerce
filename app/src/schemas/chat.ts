@@ -3,36 +3,6 @@ import { ConversationStatusSchema, MessageSenderSchema } from "./enums";
 import { UserLiteSchema } from "./user";
 import { CursorSchema } from "./common";
 
-export const ChatMessageSchema = z.object({
-    id: z.number(),
-    content: z.string(),
-    sender: MessageSenderSchema,
-    metadata: z.record(z.any()).optional(),
-    timestamp: z.date(),
-});
-
-export const ChatSchema = z.object({
-    id: z.number(),
-    conversation_uuid: z.string(),
-    user_id: z.number().optional(),
-    user: UserLiteSchema.optional(),
-    support_id: z.number().optional(),
-    support_name: z.string().optional(),
-    status: ConversationStatusSchema,
-    messages: z.array(ChatMessageSchema),
-    is_escalated: z.boolean().default(false),
-    human_connected: z.boolean().default(false),
-    started_at: z.string(),
-    last_active: z.string(),
-});
-
-export const PaginatedChatsSchema = CursorSchema.extend({
-    items: z.array(ChatSchema),
-});
-
-export type ChatMessage = z.infer<typeof ChatMessageSchema>;
-export type Chat = z.infer<typeof ChatSchema>;
-export type PaginatedChats = z.infer<typeof PaginatedChatsSchema>;
 
 export interface ChatOrderItem {
     name: string;
@@ -74,3 +44,44 @@ export interface ChatResponse {
     reaction?: "thumbs-up" | "thumbs-down" | null;
     timestamp: Date;
 }
+
+export const ChatMessageMetadataSchema = z.object({
+    products: z.array(z.any()).optional(),
+    order: z.any().optional(),
+    sources: z.array(z.string()).optional(),
+    quick_replies: z.array(z.string()).optional(),
+    form: z.string().optional(),
+    escalated: z.boolean().optional(),
+    complaint_sent: z.boolean().optional(),
+}).optional();
+
+export const ChatMessageSchema = z.object({
+    id: z.number(),
+    content: z.string(),
+    sender: MessageSenderSchema,
+    metadata: ChatMessageMetadataSchema,
+    timestamp: z.coerce.date(),
+});
+
+export const ChatSchema = z.object({
+    id: z.number(),
+    conversation_uuid: z.string(),
+    user_id: z.number().optional(),
+    user: UserLiteSchema.optional(),
+    support_id: z.number().optional(),
+    support_name: z.string().optional(),
+    status: ConversationStatusSchema,
+    messages: z.array(ChatMessageSchema),
+    is_escalated: z.boolean().default(false),
+    human_connected: z.boolean().default(false),
+    started_at: z.string(),
+    last_active: z.string(),
+});
+
+export const PaginatedChatsSchema = CursorSchema.extend({
+    items: z.array(ChatSchema),
+});
+
+export type ChatMessage = z.infer<typeof ChatMessageSchema>;
+export type Chat = z.infer<typeof ChatSchema>;
+export type PaginatedChats = z.infer<typeof PaginatedChatsSchema>;
