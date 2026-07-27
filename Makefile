@@ -1,52 +1,37 @@
 PROJECT_SLUG = shop
-DOCKER_HUB = beafdocker
-DOCKER_COMPOSE = docker compose
+DOCKER_USER ?= beafdocker
+API_IMAGE := $(DOCKER_USER)/shop-api
+AGENT_IMAGE := $(DOCKER_USER)/shop-agent
 
-# Image tags using the unified namespace variables
-API_IMAGE := $(DOCKER_HUB)/shop-api
-AGENT_IMAGE := $(DOCKER_HUB)/shop-agent
+IMAGE_TAG := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 
-VERSION ?= latest
-GIT_SHA := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-
-# Default service context fallback
-s ?= app
-PROFILE ?= *
-COMPOSE_RUN := $(DOCKER_COMPOSE) -p $(PROJECT_SLUG) --profile $(PROFILE)
+DOCKER_COMPOSE = docker compose -p $(PROJECT_SLUG)
 
 # ==========================================
 # Core Docker Compose Engine Rules
 # ==========================================
 .PHONY: build
 build:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) --profile dev build
+	$(DOCKER_COMPOSE) build $(s)
 
 build-no-cache:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) --profile dev build --no-cache
+	$(DOCKER_COMPOSE) build --no-cache $(s)
 
 .PHONY: up
 up:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) --profile dev up
-
-.PHONY: up-backend
-up-backend:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) --profile backend-only up
+	$(DOCKER_COMPOSE) up
 
 .PHONY: update
 update:
-	$(COMPOSE_RUN) up -d --force-recreate $(s)
-
-.PHONY: update-all
-update-all:
-	$(COMPOSE_RUN) up -d --force-recreate
+	$(DOCKER_COMPOSE) up -d --force-recreate $(s)
 
 .PHONY: stop
 stop:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) down
+	$(DOCKER_COMPOSE) down
 
 .PHONY: clean
 clean:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) down -v --remove-orphans
+	$(DOCKER_COMPOSE) down -v --remove-orphans
 
 .PHONY: prune
 prune:
@@ -58,54 +43,54 @@ prune:
 # ==========================================
 .PHONY: logs
 logs:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) logs -f $(s)
+	$(DOCKER_COMPOSE) logs -f $(s)
 
 .PHONY: bash
 bash:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) /bin/bash
+	$(DOCKER_COMPOSE) exec $(s) /bin/bash
 
 .PHONY: install
 install:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) uv pip install $(package)
+	$(DOCKER_COMPOSE) exec $(s) uv pip install $(package)
 
 .PHONY: prep
 prep:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec shop-api ./scripts/prestart.sh
+	$(DOCKER_COMPOSE) exec shop-api ./scripts/prestart.sh
 
 .PHONY: lint-backend
 lint-backend:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) ./scripts/lint.sh
+	$(DOCKER_COMPOSE) exec $(s) ./scripts/lint.sh
 
 .PHONY: test-backend
 test-backend:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) ./scripts/test.sh
+	$(DOCKER_COMPOSE) exec $(s) ./scripts/test.sh
 
 .PHONY: uv-lock
 uv-lock:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec $(s) uv lock --check
+	$(DOCKER_COMPOSE) exec $(s) uv lock --check
 
 # ==========================================
 # Database & Prisma Layer Actions
 # ==========================================
 .PHONY: dpf
 dpf:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec shop-api uv run prisma format
+	$(DOCKER_COMPOSE) exec shop-api uv run prisma format
 
 .PHONY: dpg
 dpg:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec shop-api uv run prisma generate
+	$(DOCKER_COMPOSE) exec shop-api uv run prisma generate
 
 .PHONY: dpm
 dpm:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec shop-api uv run prisma migrate dev
+	$(DOCKER_COMPOSE) exec shop-api uv run prisma migrate dev
 
 .PHONY: db-reset
 db-reset:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec shop-api prisma migrate reset --force
+	$(DOCKER_COMPOSE) exec shop-api prisma migrate reset --force
 
 .PHONY: seed
 seed:
-	$(DOCKER_COMPOSE) -p $(PROJECT_SLUG) exec shop-api uv run python app/seed.py
+	$(DOCKER_COMPOSE) exec shop-api uv run python app/seed.py
 
 # ==========================================
 # Repomix Source Context for AI
@@ -128,10 +113,7 @@ ctx-all: fctx bctx actx mcptx
 # ==========================================
 # Production Testing
 # ==========================================
-.PHONY: test-prod build-all build-api build-agent push-all push-api push-agent
-
-test-prod:
-	$(DOCKER_COMPOSE) -f docker-compose.prod.yml up --build
+.PHONY: build-all build-api build-agent push-all push-api push-agent
 
 # Build APIs
 build-all: build-api build-agent
@@ -140,16 +122,14 @@ build-api:
 	docker build --platform=linux/amd64 \
 		-f backend/Dockerfile \
 		-t $(API_IMAGE):latest \
-		-t $(API_IMAGE):$(VERSION) \
-		-t $(API_IMAGE):$(GIT_SHA) \
+		-t $(API_IMAGE):$(IMAGE_TAG) \
 		./backend
 
 build-agent:
 	docker build --platform=linux/amd64 \
 		-f agent/Dockerfile \
 		-t $(AGENT_IMAGE):latest \
-		-t $(AGENT_IMAGE):$(VERSION) \
-		-t $(AGENT_IMAGE):$(GIT_SHA) \
+		-t $(AGENT_IMAGE):$(IMAGE_TAG) \
 		./agent
 
 # Push Operations
@@ -157,13 +137,32 @@ push-all: push-api push-agent
 
 push-api:
 	docker push $(API_IMAGE):latest
-	docker push $(API_IMAGE):$(VERSION)
-	docker push $(API_IMAGE):$(GIT_SHA)
+	docker push $(API_IMAGE):$(IMAGE_TAG)
 
 push-agent:
 	docker push $(AGENT_IMAGE):latest
-	docker push $(AGENT_IMAGE):$(VERSION)
-	docker push $(AGENT_IMAGE):$(GIT_SHA)
+	docker push $(AGENT_IMAGE):$(IMAGE_TAG)
+
+
+.PHONY: run-api-local
+run-api-local:
+	docker run --rm -it \
+		--platform linux/amd64 \
+		--network dev-net \
+		-p 8000:8000 \
+		--env-file backend/.env \
+		$(API_IMAGE):$(IMAGE_TAG) \
+		uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+.PHONY: run-agent-local
+run-agent-local:
+	docker run --rm -it \
+		--platform linux/amd64 \
+		--network dev-net \
+		-p 8001:8000 \
+		--env-file agent/.env \
+		$(AGENT_IMAGE):$(IMAGE_TAG) \
+		uvicorn app.main:app --host 0.0.0.0 --port 8000
 
 # ==========================================
 # Interactive Systems Help Desk Documentation
