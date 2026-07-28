@@ -22,23 +22,35 @@ RUN uv run prisma generate
 # ==========================================
 # STAGE 2: The Slim Runtime Environment
 # ==========================================
-FROM python:3.11-slim AS runner
+# FROM python:3.11-slim AS runner
 
+# WORKDIR /app
+
+# # Copy the lean UV binary so we can execute scripts seamlessly
+# COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+# # Bring over only the compiled virtual environment from the builder
+# COPY --from=builder /app/.venv /app/.venv
+
+# COPY ./app ./app
+
+# # Set optimization flags for Python production performance
+# ENV PATH="/app/.venv/bin:$PATH" \
+#     PYTHONUNBUFFERED=1 \
+#     PYTHONDONTWRITEBYTECODE=1
+
+# EXPOSE 8000
+
+# CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+
+
+# ---------- STAGE 2: Final Runtime ----------
+FROM python:3.11-slim AS runtime
 WORKDIR /app
 
-# Copy the lean UV binary so we can execute scripts seamlessly
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
-
-# Bring over only the compiled virtual environment from the builder
+# Copy the virtualenv from builder (only compiled packages)
 COPY --from=builder /app/.venv /app/.venv
+ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONPATH=/app
 
-COPY ./app ./app
-
-# Set optimization flags for Python production performance
-ENV PATH="/app/.venv/bin:$PATH" \
-    PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
-
-EXPOSE 8000
-
-CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+COPY ./app /app

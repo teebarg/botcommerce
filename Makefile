@@ -7,19 +7,30 @@ IMAGE_TAG := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 
 DOCKER_COMPOSE = docker compose -p $(PROJECT_SLUG)
 
+SERVICES_CORE := frontend backend
+SERVICES_ALL := frontend backend agent mcp-server
+
+MODE ?= core
+
+ifeq ($(MODE),all)
+SERVICES := frontend backend agent mcp-server
+else
+SERVICES := frontend backend
+endif
+
 # ==========================================
 # Core Docker Compose Engine Rules
 # ==========================================
 .PHONY: build
 build:
-	$(DOCKER_COMPOSE) build $(s)
+	$(DOCKER_COMPOSE) build $(SERVICES)
 
 build-no-cache:
 	$(DOCKER_COMPOSE) build --no-cache $(s)
 
 .PHONY: up
 up:
-	$(DOCKER_COMPOSE) up
+	$(DOCKER_COMPOSE) up $(SERVICES)
 
 .PHONY: update
 update:
@@ -55,7 +66,7 @@ install:
 
 .PHONY: prep
 prep:
-	$(DOCKER_COMPOSE) exec shop-api ./scripts/prestart.sh
+	$(DOCKER_COMPOSE) exec backend ./scripts/prestart.sh
 
 .PHONY: lint-backend
 lint-backend:
@@ -74,23 +85,23 @@ uv-lock:
 # ==========================================
 .PHONY: dpf
 dpf:
-	$(DOCKER_COMPOSE) exec shop-api uv run prisma format
+	$(DOCKER_COMPOSE) exec backend uv run prisma format
 
 .PHONY: dpg
 dpg:
-	$(DOCKER_COMPOSE) exec shop-api uv run prisma generate
+	$(DOCKER_COMPOSE) exec backend uv run prisma generate
 
 .PHONY: dpm
 dpm:
-	$(DOCKER_COMPOSE) exec shop-api uv run prisma migrate dev
+	$(DOCKER_COMPOSE) exec backend uv run prisma migrate dev
 
 .PHONY: db-reset
 db-reset:
-	$(DOCKER_COMPOSE) exec shop-api prisma migrate reset --force
+	$(DOCKER_COMPOSE) exec backend prisma migrate reset --force
 
 .PHONY: seed
 seed:
-	$(DOCKER_COMPOSE) exec shop-api uv run python app/seed.py
+	$(DOCKER_COMPOSE) exec backend uv run python app/seed.py
 
 # ==========================================
 # Repomix Source Context for AI
@@ -201,7 +212,7 @@ help:
 	@echo ""
 	@echo "  -- Production Deployments & Registry Distribution --"
 	@echo "  make test-prod          - Build and execute complete local Multi-Stage deployment run"
-	@echo "  make ss                 - Build and push shop-api backend image to Docker Hub"
+	@echo "  make ss                 - Build and push backend backend image to Docker Hub"
 	@echo "  make dbs                - Build backend Docker image for linux/amd64 platform locally"
 	@echo "  make dps                - Push compiled backend variants to active workspace repository"
 	@echo "  make sa                 - Build and push agent-api image to Docker Hub repository"

@@ -49,10 +49,10 @@ const saveHistory = (messages: ChatMessage[]) => {
 };
 
 function getChatSessionId(): string {
-    if (typeof window === "undefined") return crypto.randomUUID();
+    if (typeof window === "undefined") return getSessionId();
     let id = localStorage.getItem(CHAT_SESSION_KEY);
     if (!id) {
-        id = crypto.randomUUID();
+        id = getSessionId();
         localStorage.setItem(CHAT_SESSION_KEY, id);
     }
     return id;

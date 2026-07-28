@@ -1,22 +1,19 @@
 services:
-  app:
+  frontend:
     build:
       context: ./app
       dockerfile: Dockerfile.dev
-    container_name: shop
     ports:
       - "5100:3000"
     environment:
       - NODE_ENV=development
       - NITRO_DEV_WORKER=false
-    env_file:
-      - app/.env.docker
     volumes:
       - ./app:/app
       - /app/node_modules
       - app-node-modules:/app/node_modules
     depends_on:
-      shop-api:
+      backend:
         condition: service_healthy
     networks:
       - dev-net
@@ -32,9 +29,8 @@ services:
       - traefik.http.routers.shop-http.middlewares=redirect-to-https
       - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
 
-  shop-api:
+  backend:
     image: shop:${TAG-latest}
-    container_name: shop-api
     ports:
       - "5101:8000"
     labels:
@@ -70,12 +66,11 @@ services:
       - /app/.venv
       - uv-cache:/root/.cache/uv
 
-  agent-api:
+  agent:
     image: shop-agent:${TAG-latest}
     build:
       context: ./agent
       dockerfile: Dockerfile.dev
-    container_name: agent-api
     ports:
       - "5102:8000"
     networks:
@@ -94,7 +89,7 @@ services:
     environment:
       - FASTEMBED_CACHE_PATH=/app/models
       - UV_LINK_MODE=copy
-    platform: linux/amd64 # Patch for M1 Mac
+    platform: linux/amd64
     volumes:
       - ./agent:/app
       - /app/.venv
@@ -107,7 +102,6 @@ services:
     build:
       context: ./mcp-server
       dockerfile: Dockerfile
-    container_name: mcp
     ports:
       - "5103:8787"
     networks:
@@ -125,7 +119,7 @@ services:
       - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
     env_file:
       - ./mcp-server/.env
-    platform: linux/amd64 # Patch for M1 Mac
+    platform: linux/amd64
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8787/health"]
       interval: 30s
