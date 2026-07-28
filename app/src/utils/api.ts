@@ -3,7 +3,7 @@ import { notFound, redirect } from "@tanstack/react-router";
 const isServer = typeof window === "undefined";
 
 export const baseURL = isServer
-    ? (process.env.API_URL || "http://shop-api:8000")
+    ? (process.env.API_URL || "http://backend:8000")
     : (import.meta.env.VITE_API_URL || "https://api.shop.localhost");
 
 type RequestOptions = RequestInit & {

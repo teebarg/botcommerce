@@ -10,7 +10,7 @@ If you’re looking for the main project documentation, start at the repo root `
 
 - **Routing**: file-based routes under `app/src/routes/`
 - **Server functions**: TanStack Start server endpoints under `app/src/server/` (e.g. `createServerFn(...)`)
-- **API client**: `app/src/utils/fetch-api.ts` (backend base URL from `process.env.API_URL`)
+- **API client**: `app/src/utils/api.ts` (backend base URL from `process.env.API_URL`)
 
 ---
 
