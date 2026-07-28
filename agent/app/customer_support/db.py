@@ -84,7 +84,7 @@ async def save_message_db(
     session_id: str,
     role: str,
     content: str,
-    metadata: dict = None,
+    metadata: Optional[dict]  = None,
 ):
     """
     Saves a message. If the conversation doesn't exist yet, it creates it automatically.

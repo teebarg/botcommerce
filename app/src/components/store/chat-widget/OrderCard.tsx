@@ -1,6 +1,6 @@
 import { Package, Truck, CheckCircle2, RotateCcw, LucideIcon, XCircle } from "lucide-react";
 import { currency } from "@/utils";
-import { ChatOrder, OrderStatus } from "@/schemas";
+import { ChatOrder, ChatOrderItem, OrderStatus } from "@/schemas";
 
 const statusConfig: Record<OrderStatus, { icon: LucideIcon; label: string; color: string; bg: string; progress: number }> = {
     [OrderStatus.PENDING]: { icon: Package, label: "Pending", color: "text-warning", bg: "bg-warning/10", progress: 15 },
@@ -36,7 +36,7 @@ export const OrderCard = ({ order }: { order: ChatOrder | null }) => {
             </div>
 
             <div className="space-y-1">
-                {order.items.map((item, i) => (
+                {order.order_items.map((item: ChatOrderItem, i: number) => (
                     <p key={i} className="text-sm text-foreground">
                         {item.name}
                     </p>
@@ -44,7 +44,7 @@ export const OrderCard = ({ order }: { order: ChatOrder | null }) => {
             </div>
 
             <div className="flex items-center justify-between pt-2 border-t border-border">
-                <span className="text-sm font-semibold text-foreground">{currency(order.financials.total)}</span>
+                <span className="text-sm font-semibold text-foreground">{currency(order.total)}</span>
             </div>
         </div>
     );

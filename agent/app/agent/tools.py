@@ -1,5 +1,3 @@
-import json
-from app.logging import get_logger
 import jwt
 import time
 import requests
@@ -8,6 +6,8 @@ from urllib3.util.retry import Retry
 from langchain_classic.tools import tool
 from app.rag.qdrant_client import search_collection
 from app.config import settings
+from app.mcp_tools import get_mcp_tools
+from app.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -68,52 +68,6 @@ def _shop_request(method: str, path: str, **kwargs) -> dict:
         logger.error(f"[ShopAPI] Unexpected error: {e}")
         return {"error": str(e)}
 
-
-@tool
-def search_products(query: str) -> str:
-    """
-    Search the product catalog for products.
-    Returns compact product summaries for agent reasoning.
-    """
-    if not query or not query.strip():
-        return "No query provided. Ask the customer what they're looking for."
-        
-    results = search_collection("products", query, top_k=5, score_threshold=0.55)
-    if not results:
-        return "No matching products found. Tell the customer we don't sell that item and offer to help with something else."
-
-    summary_lines: list[str] = []
-    structured = []
-
-    for r in results:
-        summary_lines.append(
-            f"- {r['name']} (SKU: {r.get('sku','N/A')}) | Price: {r['price']} | Category: {r['category']}"
-        )
-        structured.append({
-            "id": r.get("product_id", 0),
-            "variant_id": r.get("variant_id", 0),
-            "name": r["name"],
-            "sku": r.get("sku", ""),
-            "price": str(r["price"]),
-            "image_url": r.get("image") or None
-        })
-
-    output = "Top matching products:\n"
-    output += "\n".join(summary_lines)
-    output += (
-        f"\n\n<!-- AGENT_INSTRUCTION: {len(structured)} product card(s) for '{query}' are displayed in the UI automatically. "
-        "Do NOT repeat product names, SKUs, or prices in your reply. "
-        "Do NOT call search_products again. "
-        "Do NOT ask what the customer is looking for — they already told you. "
-        "Acknowledge specifically what was found, for example: "
-        "'Yes, we carry {query}! Here are some options I found for you 😊 Let me know if anything catches your eye.' "
-        "or 'Found some options for you! Let me know if any catch your eye.' "
-        "Keep it to one or two sentences. -->"
-    )
-    output += f"\n\n<!-- PRODUCTS_JSON:{json.dumps(structured, separators=(',', ':'))} -->"
-    return output
-
-
 @tool
 def search_faqs(query: str) -> str:
     """
@@ -149,121 +103,6 @@ def search_policies(query: str) -> str:
         return "No relevant policy information found."
     return "Here's our relevant policy:\n\n" + "\n\n---\n\n".join(r["text"] for r in results)
 
-@tool
-def check_order_status(order_number: str) -> str:
-    """
-    Look up the real-time status of a customer order.
-
-    Use when the customer asks:
-    - Where is my order?
-    - What is the status of order #XXXXX?
-    - Has my order been delivered?
-    - Is my payment confirmed?
-
-    Input: the order number (e.g. 'ORDFCC4E3EB').
-    """
-    from datetime import datetime
-
-    order_number = order_number.strip().lstrip("#").strip().upper()
-    result = _shop_request("GET", f"/api/order/{order_number}")
-
-    if "error" in result:
-        return f"Could not retrieve order #{order_number}: {result['error']}"
-
-    status = (result.get("status") or "PENDING").upper()
-    payment_status = (result.get("payment_status") or "PENDING").upper()
-    payment_method = (result.get("payment_method") or "").upper()
-    total = result.get("total") or 0
-    created_at = result.get("created_at") or ""
-
-    status_map = {
-        "PENDING": "being processed",
-        "SHIPPED": "on its way",
-        "DELIVERED": "delivered",
-        "CANCELLED": "cancelled",
-    }
-    status_text = status_map.get(status, status.replace("_", " ").lower())
-
-    try:
-        dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
-        formatted_date = dt.strftime("%B %d, %Y")
-    except Exception:
-        formatted_date = created_at
-
-    formatted_total = f"₦{float(total):,.0f}"
-
-    if payment_method == "CASH_ON_DELIVERY":
-        payment_note = "Payment will be collected when you pickup at our store."
-    elif payment_status == "SUCCESS":
-        payment_note = "Payment confirmed ✓"
-    elif payment_status == "PENDING":
-        payment_note = "Payment is still pending."
-    else:
-        payment_note = payment_status.replace("_", " ").title()
-
-    items_payload = [
-        {
-            "product_id": item.get("product_id"),
-            "name": item.get("name"),
-            "image": item.get("image"),
-            "quantity": item.get("quantity", 1),
-            "price": item.get("price"),
-        }
-        for item in result.get("order_items", [])
-    ]
-
-    order_payload = {
-        "order_number": order_number,
-        "status": status,
-        "payment_status": payment_status,
-        "payment_method": payment_method,
-        "shipping_method": result.get("shipping_method"),
-        "financials": {
-            "subtotal": result.get("subtotal"),
-            "tax": result.get("tax"),
-            "discount": result.get("discount_amount"),
-            "wallet_used": result.get("wallet_used"),
-            "shipping_fee": result.get("shipping_fee"),
-            "total": total,
-        },
-        "items": items_payload,
-        "created_at": created_at,
-    }
-
-    human_summary = (
-        f"Here's the update for order **#{order_number}** 😊\n\n"
-        f"**Status:** Your order is currently {status_text}\n"
-        f"**Order value:** {formatted_total}\n"
-        f"**Payment:** {payment_note}\n"
-        f"**Placed on:** {formatted_date}\n\n"
-        f"Is there anything else I can help you with?"
-    )
-
-    agent_note = (
-        f"Order {order_number} found. Status: {status_text}. "
-        f"Value: {formatted_total}. Payment: {payment_note}. "
-        f"Placed: {formatted_date}. "
-        f"The formatted customer reply is in ORDERS_JSON block — extract and return it as-is."
-    )
-
-    formatted_reply = (
-        f"Here's the update for order **#{order_number}** 😊\n\n"
-        f"**Status:** Your order is currently {status_text}\n"
-        f"**Order value:** {formatted_total}\n"
-        f"**Payment:** {payment_note}\n"
-        f"**Placed on:** {formatted_date}\n\n"
-        f"Is there anything else I can help you with?"
-    )
-
-    order_payload["_formatted_reply"] = formatted_reply
-
-    return (
-        agent_note
-        + "\n\n<!-- ORDERS_JSON: "
-        + json.dumps(order_payload)
-        + " -->"
-    )
-
 
 @tool
 def check_stock(product_slug: str) -> str:
@@ -285,31 +124,6 @@ def check_stock(product_slug: str) -> str:
         return f"✅ Slug '{product_slug}' is **in stock** (1 unit available)."
 
     return f"❌ Slug '{product_slug}' is currently **out of stock**."
-
-
-@tool
-def request_refund(order_id: str, reason: str) -> str:
-    """
-    Initiate a refund request for a customer order.
-    Only call this tool after you have:
-    1. Confirmed the order ID with the customer
-    2. Asked for and received the reason for the refund
-    3. Confirmed the customer wants to proceed
-    Input: order_id and reason.
-    """
-    order_id = order_id.strip().lstrip("#").strip()
-    result = _shop_request("POST", "/api/refunds", json={"order_id": order_id, "reason": reason})
-
-    if "error" in result:
-        return f"Could not process refund for order #{order_id}: {result['error']}"
-
-    return (
-        f"✅ Refund submitted!\n"
-        f"Refund ID: {result.get('refund_id', 'N/A')}\n"
-        f"Order: #{order_id}\n"
-        f"Processing time: {result.get('processing_days', '3-5 business days')}\n"
-        f"A confirmation email will be sent to the customer shortly."
-    )
 
 
 @tool
@@ -402,14 +216,7 @@ def shop_guide(topic: str) -> str:
         "or would you like me to connect you with our support team?"
     )
 
-def get_all_tools() -> list:
-    return [
-        search_products,
-        search_faqs,
-        search_policies,
-        check_order_status,
-        check_stock,
-        request_refund,
-        escalate_to_human,
-        shop_guide,
-    ]
+async def get_all_tools() -> list:
+    mcp_tools = await get_mcp_tools()  # search_products, check_order_status, check_stock
+    local_tools = [search_faqs, search_policies, escalate_to_human, shop_guide]
+    return mcp_tools + local_tools

@@ -49,10 +49,10 @@ const saveHistory = (messages: ChatMessage[]) => {
 };
 
 function getChatSessionId(): string {
-    if (typeof window === "undefined") return crypto.randomUUID();
+    if (typeof window === "undefined") return getSessionId();
     let id = localStorage.getItem(CHAT_SESSION_KEY);
     if (!id) {
-        id = crypto.randomUUID();
+        id = getSessionId();
         localStorage.setItem(CHAT_SESSION_KEY, id);
     }
     return id;
@@ -65,7 +65,16 @@ export const useSupportChat = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);
     const [humanConnected, setHumanConnected] = useState<boolean>(false);
-    const { data: dbHistory, isLoading: historyLoading } = useChat(getChatSessionId());
+
+    const [hadExistingSession] = useState<boolean>(
+        () => typeof window !== "undefined" && !!localStorage.getItem(CHAT_SESSION_KEY)
+    );
+    const sessionId = useMemo(() => getChatSessionId(), []);
+
+    const { data: dbHistory, isLoading: historyLoading } = useChat(sessionId, {
+        enabled: hadExistingSession,
+    });
+
     const userSendChat = useChatMutation();
     const closeChat = useChatStatusMutation();
 
@@ -74,6 +83,7 @@ export const useSupportChat = () => {
     }, [loading, isTyping, messages]);
 
     useEffect(() => {
+        if (!hadExistingSession) return;
         if (historyLoading) return;
 
         if (dbHistory) {
@@ -87,13 +97,11 @@ export const useSupportChat = () => {
             setMessages(messagesToSet);
             saveHistory(messagesToSet);
             setHumanConnected(dbHistory.human_connected);
-            return;
         }
-        setMessages(loadLocalHistory());
-    }, [historyLoading]);
+    }, [hadExistingSession, historyLoading, dbHistory]);
 
     useEffect(() => {
-        if (lastWsMessage.type != "chat") return;
+        if (lastWsMessage?.type != "chat") return;
 
         if (lastWsMessage.message == "human-connected") {
             setHumanConnected(true);
@@ -119,14 +127,14 @@ export const useSupportChat = () => {
     }, []);
 
     const clearHistory = useCallback(() => {
-        const conversationUuid = localStorage.getItem("chat_session_id");
-        if (!conversationUuid) return
-        closeChat.mutateAsync({conversationUuid, status: ConversationStatus.ABANDONED}).then(() => {
+        const conversationUuid = localStorage.getItem(CHAT_SESSION_KEY);
+        if (!conversationUuid) return;
+        closeChat.mutateAsync({ conversationUuid, status: ConversationStatus.ABANDONED }).then(() => {
             localStorage.removeItem(STORAGE_KEY);
             localStorage.removeItem(CHAT_SESSION_KEY);
             setMessages(WELCOME_MESSAGES);
-        })
-    }, []);
+        });
+    }, [closeChat]);
 
     const handleSendMessage = async (text: string, _file?: File) => {
         if (humanConnected) {
@@ -147,7 +155,7 @@ export const useSupportChat = () => {
             addMessage(userMsg);
             userSendChat.mutate(text);
         },
-        [addMessage]
+        [addMessage, userSendChat]
     );
 
     const sendMessage = useCallback(
@@ -168,7 +176,7 @@ export const useSupportChat = () => {
                     body: JSON.stringify({
                         type: "message",
                         message: text,
-                        session_id: getChatSessionId(),
+                        session_id: sessionId,
                         customer_id: isAuthenticated ? userId : null,
                         app_session_id: getSessionId(),
                     }),
@@ -189,7 +197,7 @@ export const useSupportChat = () => {
                         complaint_sent: data?.complaint_sent || false,
                         products: data?.products || [],
                         order: data?.order || null,
-                        form: data?.form || null,
+                        form: data?.form,
                         quick_replies: data?.quick_replies || [],
                     },
                 };
@@ -210,63 +218,66 @@ export const useSupportChat = () => {
                 setIsTyping(false);
             }
         },
-        [addMessage]
+        [addMessage, sessionId, isAuthenticated, userId]
     );
 
-    const sendFormSubmission = useCallback(async (formType: string, formData: any) => {
-        const userMsg: ChatMessage = {
-            id: Date.now(),
-            sender: "USER",
-            content: "User provided response",
-            timestamp: now(),
-        };
-        addMessage(userMsg);
-        try {
-            const res = await fetch(`${import.meta.env.VITE_AGENT_API}/chat`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    type: "form_submission",
-                    form_type: formType,
-                    data: formData,
-                    session_id: getChatSessionId(),
-                    customer_id: isAuthenticated ? userId : null,
-                    app_session_id: getSessionId(),
-                }),
-            });
-
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-            const data: ChatResponse = await res.json();
-            const agentMsg: ChatMessage = {
-                id: Date.now() + 1,
-                sender: "BOT",
-                content: data?.reply || "",
+    const sendFormSubmission = useCallback(
+        async (formType: string, formData: any) => {
+            const userMsg: ChatMessage = {
+                id: Date.now(),
+                sender: "USER",
+                content: "User provided response",
                 timestamp: now(),
-                metadata: {
-                    sources: data?.sources || [],
-                    escalated: data?.escalated || false,
-                    complaint_sent: data?.complaint_sent || false,
-                    products: data?.products || [],
-                    form: data?.form || null,
-                    quick_replies: data?.quick_replies || [],
-                },
             };
-            setMessages((prev) => [...prev, agentMsg]);
-        } catch {
-            setMessages((prev) => [
-                ...prev,
-                {
-                    id: Date.now(),
+            addMessage(userMsg);
+            try {
+                const res = await fetch(`${import.meta.env.VITE_AGENT_API}/chat`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        type: "form_submission",
+                        form_type: formType,
+                        data: formData,
+                        session_id: sessionId,
+                        customer_id: isAuthenticated ? userId : null,
+                        app_session_id: getSessionId(),
+                    }),
+                });
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+                const data: ChatResponse = await res.json();
+                const agentMsg: ChatMessage = {
+                    id: Date.now() + 1,
                     sender: "BOT",
-                    content: "Sorry, I couldn't connect. Please try again.",
+                    content: data?.reply || "",
                     timestamp: now(),
-                },
-            ]);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+                    metadata: {
+                        sources: data?.sources || [],
+                        escalated: data?.escalated || false,
+                        complaint_sent: data?.complaint_sent || false,
+                        products: data?.products || [],
+                        form: data?.form,
+                        quick_replies: data?.quick_replies || [],
+                    },
+                };
+                setMessages((prev) => [...prev, agentMsg]);
+            } catch {
+                setMessages((prev) => [
+                    ...prev,
+                    {
+                        id: Date.now(),
+                        sender: "BOT",
+                        content: "Sorry, I couldn't connect. Please try again.",
+                        timestamp: now(),
+                    },
+                ]);
+            } finally {
+                setLoading(false);
+            }
+        },
+        [addMessage, sessionId, isAuthenticated, userId]
+    );
 
     return {
         messages,

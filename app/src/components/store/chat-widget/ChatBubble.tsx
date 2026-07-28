@@ -4,6 +4,7 @@ import { ChatWidget } from "./ChatWidget";
 import { useConfig } from "@/providers/store-provider";
 import useMediaQuery from "@/hooks/use-media-query";
 import { useLocation } from "@tanstack/react-router";
+import { cn } from "@/utils/cn";
 
 const ChatHeader = ({ onClose }: { onClose: () => void }) => {
     return (
@@ -43,23 +44,13 @@ export const ChatBubble = () => {
 
     return (
         <>
-            {isOpen && (
-                <>
-                    {isMobile ? (
-                        <div className="fixed inset-0 z-[60] bg-background flex flex-col">
-                            <ChatHeader onClose={() => setIsOpen(false)} />
-                            <ChatWidget />
-                        </div>
-                    ) : (
-                        <div
-                            className="fixed bottom-24 right-6 z-[60] w-[400px] h-[700px] rounded-3xl border border-border bg-background shadow-2xl overflow-hidden flex flex-col"
-                        >
-                            <ChatHeader onClose={() => setIsOpen(false)} />
-                            <ChatWidget />
-                        </div>
-                    )}
-                </>
-            )}
+            <div
+                className={cn("fixed z-[60] flex flex-col", isMobile ? "inset-0 bg-background" : "bottom-24 right-6 w-[400px] h-[700px] rounded-3xl border border-border bg-background shadow-2xl overflow-hidden")}
+                style={{ display: isOpen ? "flex" : "none" }}
+            >
+                <ChatHeader onClose={() => setIsOpen(false)} />
+                <ChatWidget />
+            </div>
 
             {!isOpen && (
                 <button

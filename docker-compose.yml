@@ -1,23 +1,19 @@
 services:
-  app:
+  frontend:
     build:
       context: ./app
       dockerfile: Dockerfile.dev
-    container_name: shop
-    profiles: ["dev", "frontend-only"]
     ports:
-      - "4444:3000"
+      - "5100:3000"
     environment:
       - NODE_ENV=development
       - NITRO_DEV_WORKER=false
-    env_file:
-      - app/.env.docker
     volumes:
       - ./app:/app
       - /app/node_modules
       - app-node-modules:/app/node_modules
     depends_on:
-      shop-api:
+      backend:
         condition: service_healthy
     networks:
       - dev-net
@@ -33,10 +29,10 @@ services:
       - traefik.http.routers.shop-http.middlewares=redirect-to-https
       - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
 
-  shop-api:
+  backend:
     image: shop:${TAG-latest}
-    container_name: shop-api
-    profiles: ["dev", "backend-only"]
+    ports:
+      - "5101:8000"
     labels:
       - traefik.enable=true
       - traefik.docker.network=dev-net
@@ -70,13 +66,13 @@ services:
       - /app/.venv
       - uv-cache:/root/.cache/uv
 
-  agent-api:
+  agent:
     image: shop-agent:${TAG-latest}
     build:
       context: ./agent
       dockerfile: Dockerfile.dev
-    container_name: agent-api
-    profiles: ["dev", "backend-only"]
+    ports:
+      - "5102:8000"
     networks:
       - dev-net
     labels:
@@ -93,11 +89,46 @@ services:
     environment:
       - FASTEMBED_CACHE_PATH=/app/models
       - UV_LINK_MODE=copy
-    platform: linux/amd64 # Patch for M1 Mac
+    platform: linux/amd64
     volumes:
       - ./agent:/app
       - /app/.venv
       - uva-cache:/root/.cache/uv
+    depends_on:
+      mcp-server:
+        condition: service_healthy
+
+  mcp-server:
+    build:
+      context: ./mcp-server
+      dockerfile: Dockerfile
+    ports:
+      - "5103:8787"
+    networks:
+      - dev-net
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dev-net
+      - traefik.http.services.mcp.loadbalancer.server.port=9000
+      - traefik.http.routers.mcp.rule=Host(`mcp.localhost`)
+      - traefik.http.routers.mcp.entrypoints=https
+      - traefik.http.routers.mcp.tls=true
+      - traefik.http.routers.mcp-http.rule=Host(`mcp.localhost`)
+      - traefik.http.routers.mcp-http.entrypoints=http
+      - traefik.http.routers.mcp-http.middlewares=redirect-to-https
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+    env_file:
+      - ./mcp-server/.env
+    platform: linux/amd64
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8787/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - ./mcp-server:/app
+      - /app/.venv
+      - uvmcp-cache:/root/.cache/uv
 
 networks:
   dev-net:
@@ -107,3 +138,4 @@ volumes:
   app-node-modules:
   uv-cache:
   uva-cache:
+  uvmcp-cache:

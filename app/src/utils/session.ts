@@ -8,6 +8,7 @@ export type AppSession = {
     impersonatedBy?: string | null;
     isAdmin?: boolean
     isAuthenticated?: boolean
+    clerkSessionId?: string;
 };
 
 export function useAppSession() {

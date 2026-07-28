@@ -5,29 +5,13 @@ import uuid
 import re
 
 class ChatOrderItem(BaseModel):
-    product_id: Optional[int] = None
     name: str
-    image: Optional[str]
-    quantity: int
-    price: float
-    subtotal: Optional[float] = 0
-
-class OrderFinancials(BaseModel):
-    subtotal: float
-    tax: float
-    discount: float
-    wallet_used: float
-    shipping_fee: float
-    total: float
 
 class ChatOrder(BaseModel):
     order_number: str
     status: str
-    payment_status: str
-    payment_method: Optional[str]
-    shipping_method: Optional[str]
-    financials: OrderFinancials
-    items: List[ChatOrderItem]
+    total: float
+    order_items: List[ChatOrderItem]
     created_at: str
 
 _SAFE_MESSAGE_RE = re.compile(r"[<>{}\[\]\\]")  # block prompt injection attempts
@@ -93,16 +77,20 @@ class ChatRequest(BaseModel):
         "app_session_id": "app-abc-123",
     }}}
 
-class ChatProduct(BaseModel):
-    """
-    Product model for chat responses
-    """
+class ChatVariant(BaseModel):
     id: int
-    variant_id: int
+    price: float
+    old_price: float
+    inventory: int
+
+class ChatProduct(BaseModel):
+    id: int
     name: str
     sku: str
-    price: str
-    image_url: Optional[str] = None
+    image: str | None = None
+    variants: list[ChatVariant]
+    active: bool = True
+    is_new: bool = False
 
 class ChatResponse(BaseModel):
     reply: str
@@ -113,7 +101,7 @@ class ChatResponse(BaseModel):
     products: list[ChatProduct] = []
     order: ChatOrder | None = None
     quick_replies: list[str] = []
-    form: dict | None = None
+    form: Optional[str] = None
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 

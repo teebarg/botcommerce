@@ -11,6 +11,7 @@ import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { getSessionId } from "@/utils";
 
 const TITLE_LIMIT = 65;
 const BODY_LIMIT = 180;
@@ -34,7 +35,7 @@ const GalleryCampaign: React.FC<Props> = ({ image }) => {
         }
 
         sendPushNotification({
-            notificationId: crypto.randomUUID(),
+            notificationId: getSessionId(),
             title,
             body,
             image,

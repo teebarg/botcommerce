@@ -1,6 +1,7 @@
 """
 LangGraph customer support agent.
 """
+import asyncio
 import time as _time
 from app.logging import get_logger
 from app.observability.tracing import record_llm_generation
@@ -22,7 +23,7 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
-from typing_extensions import TypedDict
+from typing import TypedDict
 
 from app.agent.memory import load_messages_from_redis, save_messages_to_redis
 from app.agent.tools import get_all_tools
@@ -65,12 +66,6 @@ SYSTEM_PROMPT = """You are Seun, a warm and helpful customer support agent for T
   Acknowledge the results naturally in one or two sentences. Vary your phrasing every time.
 - If results clearly don't match what the customer asked for, tell them we don't carry that item and suggest an alternative in one sentence.
 - If the customer asks for something completely unrelated to fashion, do NOT search. Say we are a fashion store and ask if you can help with clothing.
-
-## Orders, Stock & Policies
-- Order status: call check_order_status with the order ID.
-- Stock availability: call check_stock only when the customer explicitly asks.
-- Policy or how-to questions: call search_faqs or search_policies.
-- Refunds: confirm the order ID and reason before calling request_refund.
 
 ## Order Tracking
 - NEVER assume or guess an order number.
@@ -241,42 +236,6 @@ def _log_observations(state: AgentState) -> None:
         logger.debug(f"[Observation] ({msg.name}) {preview}")
 
 
-# Form definitions
-FORMS: dict[str, dict] = {
-    "escalation_details": {
-        "type": "escalation_details",
-        "title": "Before we connect you with an agent",
-        "subtitle": "This helps the support team assist you faster.",
-        "fields": [
-            {"name": "name",    "label": "Your name",          "type": "text",     "required": True,  "placeholder": "e.g. John Doe"},
-            {"name": "phone",   "label": "Phone number",       "type": "tel",      "required": False, "placeholder": "e.g. +234 801 234 5678"},
-            {"name": "summary", "label": "Describe the issue", "type": "textarea", "required": True,  "placeholder": "What is going wrong?"},
-        ],
-    },
-    "complaint": {
-        "type": "complaint",
-        "title": "Submit a Complaint or Feedback",
-        "subtitle": "We will review this and get back to you.",
-        "fields": [
-            {"name": "subject",  "label": "Subject",      "type": "text",     "required": True, "placeholder": "Brief subject line"},
-            {"name": "category", "label": "Category",     "type": "select",   "required": True,
-             "options": ["Wrong item received", "Damaged product", "Late delivery", "Poor service", "Billing issue", "Other"]},
-            {"name": "details",  "label": "Full details", "type": "textarea", "required": True, "placeholder": "Please describe your experience..."},
-        ],
-    },
-    "contact_update": {
-        "type": "contact_update",
-        "title": "Update Contact Information",
-        "subtitle": "We will update your details on file.",
-        "fields": [
-            {"name": "full_name", "label": "Full name",        "type": "text",     "required": False, "placeholder": "Leave blank to keep current"},
-            {"name": "email",     "label": "Email address",    "type": "email",    "required": False, "placeholder": "Leave blank to keep current"},
-            {"name": "phone",     "label": "Phone number",     "type": "tel",      "required": False, "placeholder": "Leave blank to keep current"},
-            {"name": "address",   "label": "Delivery address", "type": "textarea", "required": False, "placeholder": "Leave blank to keep current"},
-        ],
-    },
-}
-
 # Tool Call Repair
 _TOOL_JSON_RE = re.compile(
     r'\{\s*"(?:type"\s*:\s*"function"\s*,\s*)?"name"\s*:\s*"(?P<name>[^"]+)"\s*,\s*"(?:arguments|parameters)"\s*:\s*(?P<args>\{.*\})\s*\}',
@@ -327,9 +286,9 @@ def _sanitize_loaded_history(messages: list[BaseMessage]) -> list[BaseMessage]:
 
 
 # Graph
-def build_graph():
+async def build_graph():
     llm = get_llm()
-    tools = get_all_tools()
+    tools = await get_all_tools()
     llm_with_tools = llm.bind_tools(tools)
 
     async def call_model(state: AgentState) -> dict:
@@ -472,7 +431,6 @@ def build_graph():
         "search_products":    1,  # tool instructs model not to retry
         "check_order_status": 1,  # either found or not
         "check_stock":        1,  # either in stock or not
-        "request_refund":     1,  # never retry a write operation
     }
 
     def should_continue(state: AgentState) -> Literal["tools", "end"]:
@@ -519,28 +477,61 @@ def build_graph():
     return graph.compile()
 
 
-_graph = build_graph()
+_graph = None
+_graph_lock = asyncio.Lock()
 
-# Product extractor
+async def get_graph():
+    global _graph
+    if _graph is None:
+        async with _graph_lock:
+            if _graph is None:  # double-checked, avoids rebuilding under concurrent requests
+                _graph = await build_graph()
+    return _graph
+
+def _mcp_result_to_dict(content) -> dict | None:
+    """
+    langchain-mcp-adapters returns MCP content as a list of blocks:
+    [{'type': 'text', 'text': '<json string>', 'id': ...}, ...]
+    Find the text block(s) and parse the JSON payload.
+    """
+    if isinstance(content, dict):
+        return content  # already unwrapped, e.g. from a local (non-MCP) tool
+
+    if isinstance(content, str):
+        try:
+            return json.loads(content)
+        except Exception:
+            return None
+
+    if isinstance(content, list):
+        for block in content:
+            if isinstance(block, dict) and block.get("type") == "text":
+                try:
+                    return json.loads(block["text"])
+                except Exception:
+                    continue
+        return None
+
+    return None
+
+
 def _extract_products(messages: list) -> list[dict]:
-    pattern = re.compile(r"<!-- PRODUCTS_JSON:(.+?) -->", re.DOTALL)
-
     for msg in reversed(messages):
         if not isinstance(msg, ToolMessage) or msg.name != "search_products":
             continue
-        m = pattern.search(str(msg.content))
-        if m:
-            try:
-                return json.loads(m.group(1))
-            except Exception:
-                pass
+        data = _mcp_result_to_dict(msg.content)
+        if data:
+            return data.get("products", [])
     return []
 
-def _extract_orders(messages):
-    for m in messages:
-        if isinstance(m, ToolMessage) and "ORDERS_JSON:" in m.content:
-            raw = m.content.split("ORDERS_JSON:")[1].split("-->")[0]
-            return json.loads(raw.strip())
+
+def _extract_orders(messages: list) -> dict | None:
+    for msg in reversed(messages):
+        if not isinstance(msg, ToolMessage) or msg.name != "check_order_status":
+            continue
+        data = _mcp_result_to_dict(msg.content)
+        if data:
+            return data.get("order")
     return None
 
 # Quick replies
@@ -633,9 +624,7 @@ async def run_agent(
     if not session_id:
         session_id = str(uuid.uuid4())
 
-    logger.debug(
-        f"[Agent] Session: {session_id} | Customer: {customer_id} | Message: {message[:80] if len(message) > 80 else message}"
-    )
+    logger.debug(f"[Agent] Session: {session_id} | Customer: {customer_id} | Message: {message[:80] if len(message) > 80 else message}")
 
     history: list[BaseMessage] = await load_messages_from_redis(session_id)
     history = _sanitize_loaded_history(history)
@@ -670,21 +659,21 @@ async def run_agent(
         return {
             "reply": "Sure — I’ll connect you with a support agent. First, please provide a few details.",
             "session_id": session_id,
-            "form": FORMS["escalation_details"],
+            "form": "escalation_details",
         }
 
     if intent == MessageIntent.COMPLAINT:
         return {
             "reply": "I'm sorry about your experience. Please provide more details so we can investigate.",
             "session_id": session_id,
-            "form": FORMS["complaint"],
+            "form": "complaint",
         }
 
     if intent == MessageIntent.CONTACT_UPDATE:
         return {
             "reply": "Sure — please provide the updated details below.",
             "session_id": session_id,
-            "form": FORMS["contact_update"],
+            "form": "contact_update",
         }
 
     initial_state: AgentState = {
@@ -696,13 +685,12 @@ async def run_agent(
         "iterations": 0,
         "prompt_tokens": 0,
         "completion_tokens": 0,
+        "complaint_sent": False
     }
 
     try:
-        final_state = await _graph.ainvoke(
-            initial_state,
-            config=RunnableConfig(tags=[session_id]),
-        )
+        graph = await get_graph()
+        final_state = await graph.ainvoke(initial_state, config=RunnableConfig(tags=[session_id]))
 
         reply = ""
         for msg in reversed(final_state["messages"]):
@@ -749,7 +737,7 @@ async def run_agent(
                 return {
                     "reply": "Sure — I'll connect you with a support agent. First, please provide a few details.",
                     "session_id": session_id,
-                    "form": FORMS["escalation_details"],
+                    "form": "escalation_details",
                 }
 
         last_human_idx: int = max(
@@ -762,22 +750,15 @@ async def run_agent(
             isinstance(m, ToolMessage) and m.name == "search_products"
             for m in current_turn_msgs
         )
-        tools_called: list[dict] = _extract_tools_called(current_turn_msgs)
-
         called_check_order_status: bool = any(
             isinstance(m, ToolMessage) and m.name == "check_order_status"
             for m in current_turn_msgs
         )
 
+        tools_called: list[dict] = _extract_tools_called(current_turn_msgs)
+
         products = _extract_products(final_state["messages"]) if called_search else []
         extracted_order = _extract_orders(final_state["messages"]) if called_check_order_status else None
-        if extracted_order:
-            formatted_reply = extracted_order.pop("_formatted_reply", None)
-            if formatted_reply:
-                logger.debug("[Order] Using pre-formatted reply from tool payload")
-                reply = formatted_reply
-            else:
-                logger.warning("[Order] _formatted_reply missing from payload — using LLM reply")
 
         clean_history = _build_persistable_history(
             prev_history=history,

@@ -3,12 +3,64 @@ import { ConversationStatusSchema, MessageSenderSchema } from "./enums";
 import { UserLiteSchema } from "./user";
 import { CursorSchema } from "./common";
 
+
+export interface ChatOrderItem {
+    name: string;
+}
+
+export interface ChatOrder {
+    order_number: string;
+    status: string;
+    total: number;
+    order_items: ChatOrderItem[];
+    created_at: string; // ISO string
+}
+
+export interface ChatProductVariant {
+    id: number;
+    price: number;
+    old_price: number;
+    inventory: number;
+}
+
+export interface ChatProduct {
+    id: number;
+    name: string;
+    sku: string;
+    image: string | null;
+    variants: ChatProductVariant[];
+}
+
+export interface ChatResponse {
+    reply: string;
+    session_id: string;
+    sources: string[];
+    escalated: boolean;
+    complaint_sent: boolean;
+    products: ChatProduct[];
+    order?: ChatOrder;
+    quick_replies?: string[];
+    form?: string;
+    reaction?: "thumbs-up" | "thumbs-down" | null;
+    timestamp: Date;
+}
+
+export const ChatMessageMetadataSchema = z.object({
+    products: z.array(z.any()).optional(),
+    order: z.any().optional(),
+    sources: z.array(z.string()).optional(),
+    quick_replies: z.array(z.string()).optional(),
+    form: z.string().optional(),
+    escalated: z.boolean().optional(),
+    complaint_sent: z.boolean().optional(),
+}).optional();
+
 export const ChatMessageSchema = z.object({
     id: z.number(),
     content: z.string(),
     sender: MessageSenderSchema,
-    metadata: z.record(z.any()).optional(),
-    timestamp: z.date(),
+    metadata: ChatMessageMetadataSchema,
+    timestamp: z.coerce.date(),
 });
 
 export const ChatSchema = z.object({
@@ -33,55 +85,3 @@ export const PaginatedChatsSchema = CursorSchema.extend({
 export type ChatMessage = z.infer<typeof ChatMessageSchema>;
 export type Chat = z.infer<typeof ChatSchema>;
 export type PaginatedChats = z.infer<typeof PaginatedChatsSchema>;
-
-export interface ChatOrderItem {
-    product_id: number;
-    name: string;
-    image?: string;
-    quantity: number;
-    price: number;
-    subtotal: number;
-}
-
-export interface OrderFinancials {
-    subtotal: number;
-    tax: number;
-    discount: number;
-    wallet_used: number;
-    shipping_fee: number;
-    total: number;
-}
-
-export interface ChatOrder {
-    order_number: string;
-    status: string;
-    payment_status: string;
-    payment_method?: string;
-    shipping_method?: string;
-    financials: OrderFinancials;
-    items: ChatOrderItem[];
-    created_at: string; // ISO string
-}
-
-export interface ChatProduct {
-    id: number;
-    variant_id: number;
-    name: string;
-    sku: string;
-    price: string;
-    image_url: string | null;
-}
-
-export interface ChatResponse {
-    reply: string;
-    session_id: string;
-    sources: string[];
-    escalated: boolean;
-    complaint_sent: boolean;
-    products: ChatProduct[];
-    order?: ChatOrder;
-    quick_replies?: string[];
-    form?: any;
-    reaction?: "thumbs-up" | "thumbs-down" | null;
-    timestamp: Date;
-}

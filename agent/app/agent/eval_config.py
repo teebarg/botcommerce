@@ -8,7 +8,6 @@ SUPPORT_EVAL_CONFIG = AgentEvalConfig(
     tool_expectations=[
         (re.compile(r"do you have|looking for|show me|find me|got any", re.I), "search_products"),
         (re.compile(r"order|track|status|delivery", re.I),                     "check_order_status"),
-        (re.compile(r"refund|return|exchange", re.I),                          "request_refund"),
         (re.compile(r"in stock|available|stock", re.I),                        "check_stock"),
         (re.compile(r"policy|return policy|shipping policy", re.I),            "search_policies"),
         (re.compile(r"how do I|faq|help with", re.I),                          "search_faqs"),

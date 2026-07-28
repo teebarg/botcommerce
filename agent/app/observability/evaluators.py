@@ -85,7 +85,6 @@ async def evaluate_response_quality(
 _TOOL_EXPECTATIONS: list[tuple[re.Pattern, str]] = [
     (re.compile(r"do you have|looking for|show me|find me|search for|got any|any.*clothes|any.*tops|any.*shoes", re.I), "search_products"),
     (re.compile(r"order|track|status|delivery", re.I),   "check_order_status"),
-    (re.compile(r"refund|return|exchange",       re.I),   "request_refund"),
     (re.compile(r"in stock|available|stock",     re.I),   "check_stock"),
     (re.compile(r"policy|return policy|shipping policy", re.I), "search_policies"),
     (re.compile(r"how do I|faq|help with",       re.I),   "search_faqs"),

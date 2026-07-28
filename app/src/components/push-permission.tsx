@@ -161,7 +161,7 @@ export default function PushPermission() {
         if (isChecking) return;
         setIsChecking(true);
         try {
-            const registration = await navigator.serviceWorker.ready;
+            const registration = await navigator.serviceWorker?.ready;
             const sub = await registration.pushManager.getSubscription();
 
             if (!sub) {

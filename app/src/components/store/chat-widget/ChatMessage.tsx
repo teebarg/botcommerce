@@ -138,10 +138,10 @@ const ChatMessage = ({ message, index, onSend, onSubmitForm, isLastMessage, isEd
                         {message.metadata?.escalated && <EscalationCard />}
                         {message.metadata?.complaint_sent && <ComplaintCard />}
                         {message.metadata?.order && <OrderCard order={message.metadata.order} />}
-                        {message.metadata?.form?.type === "escalation_details" && (
+                        {message.metadata?.form === "escalation_details" && (
                             <EscalationForm onSubmitForm={onSubmitForm} isLastMessage={isLastMessage} />
                         )}
-                        {message.metadata?.form?.type === "complaint" && <ComplaintForm onSubmitForm={onSubmitForm} isLastMessage={isLastMessage} />}
+                        {message.metadata?.form === "complaint" && <ComplaintForm onSubmitForm={onSubmitForm} isLastMessage={isLastMessage} />}
                         {!!message.metadata?.products?.length && <ProductRecommendation products={message.metadata.products || []} />}
                         {isAgent && <SourceBadges sources={message.metadata?.sources ?? []} />}
                         <div className={`flex items-center gap-1.5 mt-1 ${isAssistant ? "justify-start" : "justify-end"}`}>
