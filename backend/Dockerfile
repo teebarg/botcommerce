@@ -25,7 +25,8 @@ WORKDIR /app
 
 # Copy the virtualenv from builder (only compiled packages)
 COPY --from=builder /app/.venv /app/.venv
+COPY --from=builder /root/.cache/prisma-python /root/.cache/prisma-python
 ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONPATH=/app
 
-COPY ./app /app
+COPY ./app /app/app
