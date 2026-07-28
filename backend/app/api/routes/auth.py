@@ -67,6 +67,7 @@ async def exchange_token(response: Response, cache_srv: CacheDep, cart_srv: Cart
         "roles": payload.get("roles", []),
         "isImpersonating": False,
         "impersonatedBy": None,
+        "clerkSessionId": payload.get("sid"),
     }
 
     await cache_srv.set_session(session_id, session_data)

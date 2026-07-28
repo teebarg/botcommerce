@@ -13,7 +13,6 @@ import type { QueryClient } from "@tanstack/react-query";
 import { InvalidateProvider } from "@/providers/invalidate-provider";
 import PageTransitionLoader from "@/components/generic/page-transition-loader";
 import PWABadge from "@/PWAbadge";
-import { ClerkProvider } from "@clerk/tanstack-react-start";
 import { AppSession } from "@/utils/session";
 import { getSessionId } from "@/utils";
 import { Analytics } from "@vercel/analytics/react";
@@ -144,31 +143,29 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 /> */}
             </head>
             <body className="min-h-screen">
-                <ClerkProvider>
-                    <ThemeProvider>
-                        <StoreProvider config={config}>
-                            <CartProvider>
-                                <div className="relative">
-                                    <Suspense fallback={null}>
-                                        <PushPermission />
-                                    </Suspense>
-                                    {localSessionId && (
-                                        <WebSocketProvider
-                                            url={`${import.meta.env.VITE_WS}/api/ws/?session_id=${localSessionId}`}
-                                            debug={true}
-                                            onOpen={() => console.log("WebSocket connected!")}
-                                            onClose={() => console.log("WebSocket disconnected!")}
-                                        >
-                                            <InvalidateProvider>{children}</InvalidateProvider>
-                                        </WebSocketProvider>
-                                    )}
-                                </div>
-                                <PWABadge />
-                                <ImpersonationBanner />
-                            </CartProvider>
-                        </StoreProvider>
-                    </ThemeProvider>
-                </ClerkProvider>
+                <ThemeProvider>
+                    <StoreProvider config={config}>
+                        <CartProvider>
+                            <div className="relative">
+                                <Suspense fallback={null}>
+                                    <PushPermission />
+                                </Suspense>
+                                {localSessionId && (
+                                    <WebSocketProvider
+                                        url={`${import.meta.env.VITE_WS}/api/ws/?session_id=${localSessionId}`}
+                                        debug={true}
+                                        onOpen={() => console.log("WebSocket connected!")}
+                                        onClose={() => console.log("WebSocket disconnected!")}
+                                    >
+                                        <InvalidateProvider>{children}</InvalidateProvider>
+                                    </WebSocketProvider>
+                                )}
+                            </div>
+                            <PWABadge />
+                            <ImpersonationBanner />
+                        </CartProvider>
+                    </StoreProvider>
+                </ThemeProvider>
                 <Toaster
                     closeButton
                     richColors

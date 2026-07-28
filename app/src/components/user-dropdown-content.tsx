@@ -4,7 +4,6 @@ import { useNavigate, useRouteContext, useRouter } from "@tanstack/react-router"
 import { tryCatch } from "@/utils/try-catch";
 import { logoutFn } from "@/server/users.server";
 import { Message } from "@/schemas";
-import { useAuth } from "@clerk/tanstack-react-start";
 import { api } from "@/utils/api";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -13,11 +12,10 @@ interface UserDropdownContentProps {
 }
 
 export default function UserDropdownContent({ closeMenu }: UserDropdownContentProps) {
-  const { isImpersonating, isAdmin, user, userId } = useRouteContext({ strict: false });
+  const { isImpersonating, isAdmin, user } = useRouteContext({ strict: false });
   const queryClient = useQueryClient();
   const router = useRouter();
   const navigate = useNavigate();
-  const { signOut } = useAuth();
 
   const handleSignOut = async () => {
     const { error } = await tryCatch(api.post<Message>("/auth/logout"));
@@ -25,7 +23,6 @@ export default function UserDropdownContent({ closeMenu }: UserDropdownContentPr
       console.error("Logout failed:", error);
       return;
     }
-    await signOut({ sessionId: userId?.toString() });
     await logoutFn();
     sessionStorage.clear();
     queryClient.setQueryData(["session"], null);

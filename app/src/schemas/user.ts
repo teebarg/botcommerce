@@ -57,6 +57,7 @@ export const SessionSchema = z.object({
     roles: z.array(z.string()),
     isImpersonating: z.boolean().optional(),
     impersonatedBy: z.string().optional(),
+    clerkSessionId: z.string().optional(),
 });
 
 export const UserMiniSchema = z.object({
