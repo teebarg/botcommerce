@@ -129,7 +129,7 @@ function RouteComponent() {
                                     <div className="w-px flex-1 my-1.5 bg-border" />
                                 )}
                             </div>
-                            <div className={`pt-0.5 ${i < steps.length - 1 ? `pb-5` : ``}`}>
+                            <div className={`pt-0.5 ${i < steps.length - 1 ? "pb-5" : ""}`}>
                                 <p className={`text-sm font-medium mb-0.5 ${
                                     status === "completed"
                                         ? "text-success-foreground"
