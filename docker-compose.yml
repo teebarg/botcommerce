@@ -66,6 +66,24 @@ services:
       - /app/.venv
       - uv-cache:/root/.cache/uv
 
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile.dev
+    networks:
+      - dev-net
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - UV_LINK_MODE=copy
+    volumes:
+      - ./worker:/app
+      - uvworker-cache:/root/.cache/uv
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    
   agent:
     image: shop-agent:${TAG-latest}
     build:
@@ -139,3 +157,4 @@ volumes:
   uv-cache:
   uva-cache:
   uvmcp-cache:
+  uvworker-cache:

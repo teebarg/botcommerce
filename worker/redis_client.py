@@ -1,4 +1,4 @@
 import redis.asyncio as redis
-from config import settings
+from app.config import settings
 
-redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True, max_connections=10)
+redis_client = redis.from_url(settings.BROKER_URL, decode_responses=True, max_connections=10)

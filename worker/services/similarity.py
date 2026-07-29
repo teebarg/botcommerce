@@ -1,11 +1,12 @@
 import json
 import numpy as np
 from redis_client import redis_client as r
-from db import database
+from app.db import db
 
 async def compute_similarity():
     products = []
-    async with database.pool.acquire() as conn:
+    pool = db.get_pool()
+    async with pool.acquire() as conn:
         products = await conn.fetch("SELECT id, embedding FROM products WHERE embedding IS NOT NULL")
 
     print("pushing products id to redis")

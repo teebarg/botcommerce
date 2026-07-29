@@ -2,7 +2,7 @@ import asyncio
 import json
 from celery_app import celery_app
 from services.image_enrichment import get_enrichment
-from db import database
+from app.db import db
 
 @celery_app.task(name="tasks.enrich_products.run")
 def enrich_products(limit: int = 10):
@@ -11,7 +11,8 @@ def enrich_products(limit: int = 10):
 
 async def main(limit: int = 1):
     products = []
-    async with database.pool.acquire() as conn:
+    pool = db.get_pool()
+    async with pool.acquire() as conn:
         query = """
           SELECT p.id, p.image, ARRAY_AGG(DISTINCT pi.image) as img
           FROM products p

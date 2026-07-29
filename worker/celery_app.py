@@ -1,10 +1,10 @@
 from celery import Celery
-from config import settings
+from app.config import settings
 
 celery_app = Celery(
     "worker",
-    broker=settings.REDIS_URL,
-    backend=settings.REDIS_URL,
+    broker=settings.BROKER_URL,
+    backend=settings.BROKER_URL,
 )
 
 celery_app.conf.task_routes = {
