@@ -1,4 +1,11 @@
 #!/bin/bash
 
-uv run python health_server.py &
-uv run celery -A app.celery_app worker --loglevel=info --concurrency=1
+# echo '📍 CURRENT DIR:'
+# pwd
+
+# echo '📂 FILES:'
+# find . -maxdepth 3
+
+# printf "Starting health server...\n"
+uv run python app/health_server.py &
+uv run arq app.task.WorkerSettings

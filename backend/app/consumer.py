@@ -97,10 +97,12 @@ class RedisStreamConsumer:
         logger.debug("Redis consumer stopped.")
 
     async def consume(self):
+        consecutive_failures = 0
+        last_error_msg = None
+
         try:
             while not self.shutdown_event.is_set():
                 try:
-                    # 🚀 Resolve dependency stack EXACTLY ONCE per event-loop block cycle
                     services = self.get_services(self.db)
                     cache_srv = services[2]
 
@@ -109,8 +111,11 @@ class RedisStreamConsumer:
                         self.consumer,
                         streams={self.stream: ">"},
                         count=10,
-                        block=60000,  # wait up to 60s
+                        block=60000,
                     )
+
+                    consecutive_failures = 0
+                    last_error_msg = None
 
                     if not events:
                         continue
@@ -120,8 +125,28 @@ class RedisStreamConsumer:
                             await self._process(msg_id, data, services)
 
                 except Exception as e:
-                    logger.error(f"XREADGROUP error: {e}")
-                    await asyncio.sleep(1)
+                    err_msg = str(e)
+                    consecutive_failures += 1
+
+                    # Only log at full volume when the error is new or we're
+                    # still in the first few attempts. After that, log sparsely.
+                    if err_msg != last_error_msg or consecutive_failures <= 3:
+                        logger.error(
+                            f"XREADGROUP error (failure #{consecutive_failures}): {err_msg}"
+                        )
+                    elif consecutive_failures % 30 == 0:
+                        # heartbeat every ~5min-ish (depends on backoff) so it's
+                        # not totally silent, but not spamming either
+                        logger.error(
+                            f"XREADGROUP still failing after {consecutive_failures} attempts: {err_msg}"
+                        )
+
+                    last_error_msg = err_msg
+
+                    # exponential backoff, capped
+                    delay = min(2 ** min(consecutive_failures, 6), 60)
+                    await asyncio.sleep(delay)
+
         except Exception as e:
             logger.exception(f"Consumer error: {e}")
             await asyncio.sleep(1)

@@ -9,12 +9,13 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     GEMINI_MODEL: str = "gemini-2.5-flash"
 
+    SLACK_WEBHOOK_URL: str = ""
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         env_ignore_empty=True,
         extra="ignore",
     )
-
 
 settings = Settings()

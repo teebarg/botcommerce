@@ -7,9 +7,9 @@ dependencies = [
     "pydantic-settings<3.0.0,>=2.2.1",
     "redis==6.4.0",
     "google-genai==1.46.0",
-    "celery==5.5.3",
     "asyncpg>=0.31.0",
-    "numpy>=2.2.6",
+    "arq>=0.25.0",
+    "pillow>=12.3.0",
 ]
 
 [build-system]
@@ -45,3 +45,8 @@ keep-runtime-typing = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["app"]
+
+[dependency-groups]
+dev = [
+    "watchfiles>=1.2.0",
+]

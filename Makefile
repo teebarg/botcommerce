@@ -23,6 +23,10 @@ endif
 build:
 	$(DOCKER_COMPOSE) build $(SERVICES)
 
+.PHONY: build-service
+build-service:
+	$(DOCKER_COMPOSE) build $(s)
+
 build-no-cache:
 	$(DOCKER_COMPOSE) build --no-cache $(s)
 
@@ -32,7 +36,7 @@ up:
 
 .PHONY: update
 update:
-	$(DOCKER_COMPOSE) up -d --force-recreate $(s)
+	$(DOCKER_COMPOSE) up --build -d --force-recreate $(s)
 
 .PHONY: stop
 stop:

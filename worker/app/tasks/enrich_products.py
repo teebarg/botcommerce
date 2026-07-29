@@ -1,43 +1,58 @@
-import asyncio
 import json
-from celery_app import celery_app
-from services.image_enrichment import get_enrichment
-from app.db import db
+from app.services.image_enrichment import get_enrichment
+from app.logger import logger
 
-@celery_app.task(name="tasks.enrich_products.run")
-def enrich_products(limit: int = 10):
-    asyncio.run(main(limit))
-
-
-async def main(limit: int = 1):
-    products = []
-    pool = db.get_pool()
-    async with pool.acquire() as conn:
-        query = """
-          SELECT p.id, p.image, ARRAY_AGG(DISTINCT pi.image) as img
-          FROM products p
-          LEFT JOIN product_images pi ON pi.product_id = p.id
-          WHERE description IS NOT NULL AND description <> ''
-          GROUP BY p.id
-          LIMIT $1
-        """
-        products = await conn.fetch(query, limit)
-        for p in products:
-            images = p["img"]
-            if not images:
-                continue
-            enrichment = get_enrichment(images[0])
-            try:
-              await conn.execute(
-                  """
-                  UPDATE products
-                  SET name = $1, description = $2, features = $3
-                  WHERE id = $4
-                  """,
-                  enrichment['title'],
-                  enrichment['description'],
-                  json.dumps(enrichment['features']),
-                  p["id"]
-              )
-            except Exception as e:
-              print(e)
+async def enrich_products(ctx) -> str:
+    logger.info("⏰ [Automated Cron] Beginning 6-hour database catalog validation sweep...")
+    pool = ctx['db_pool']
+    redis_client = ctx['redis']
+    try:
+        async with pool.acquire() as conn:
+            query = """
+            SELECT
+                p.id,
+                p.image,
+                p.description,
+                ARRAY_AGG(DISTINCT pi.image) FILTER (WHERE pi.image IS NOT NULL) AS img
+            FROM products p
+            LEFT JOIN product_images pi
+                ON pi.product_id = p.id
+            WHERE description IS NULL OR TRIM(description) = ''
+            AND active IS TRUE
+            GROUP BY p.id
+            HAVING COUNT(pi.image) > 0
+            LIMIT $1
+          """
+            products = await conn.fetch(query, 1)
+            for p in products:
+                logger.info(f"Enriching product: {p['id']}")
+                images = p["img"]
+                if not images:
+                    continue
+                try:
+                    enrichment = await get_enrichment(p["img"][0])
+                    # await conn.execute(
+                    #     """
+                    # UPDATE products
+                    # SET name = $1, description = $2, features = $3, slug = $4
+                    # WHERE id = $5
+                    # """,
+                    #     enrichment['title'],
+                    #     enrichment['description'],
+                    #     json.dumps(enrichment['features']),
+                    #     enrichment['slug'],
+                    #     p["id"]
+                    # )
+                    text_for_embedding: str = f"Title: {enrichment['title']}. Description: {enrichment['description']}"
+                    await redis_client.enqueue_job(
+                        "update_product_embeddings", 
+                        product_id=str(p["id"]), 
+                        text_to_embed=text_for_embedding
+                    )
+                    logger.info(f"➡️ Enqueued embedding generation job for product: {p['id']}")
+                except Exception as e:
+                    raise Exception(e)
+        logger.info("✅ [Automated Cron] Database sweep fully executed and synchronized.")
+    except Exception as e:
+        logger.error(f"Inventory synchronization failed: {str(e)}", exc_info=True)
+        raise e

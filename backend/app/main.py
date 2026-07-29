@@ -1,7 +1,7 @@
 from typing import Any, Dict
-import sentry_sdk
 import time
 import asyncio
+import sentry_sdk
 from fastapi import BackgroundTasks, FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
@@ -31,7 +31,7 @@ from app.core.notifications.setup import init_notification_service
 from app.core.dependencies.services import SettingsDep
 from app.services.cache import L1Cache, run_l1_invalidation_listener
 from app.lib.cache import add_cache_headers
-from app.core.dependencies.cache import CdnDep
+from app.core.dependencies.cache import CdnDep, CacheDep
 
 STREAM_NAME = "EVENT_STREAMS"
 GROUP_NAME = "notifications"
@@ -145,6 +145,15 @@ async def root():
 
 class PurgeCdn(BaseModel):
     key: str
+
+@app.post("/api/test-arq")
+async def test_arq(request: Request, cache_srv: CacheDep) -> Dict[str, Any]:
+    await cache_srv.redis.enqueue_job(
+        "generate_invoice_pdf", 
+        order_id="1234567890", 
+        email="test@example.com"
+    )
+    return {"message": "ok"}
 
 @app.post("/api/purge-cdn")
 async def purge_cdn(cdn_srv: CdnDep, data: PurgeCdn) -> Dict[str, Any]:

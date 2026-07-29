@@ -10,4 +10,4 @@ COPY pyproject.toml uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-install-project
 
-CMD ["uv", "run", "celery", "-A", "app.celery_app", "worker", "--loglevel=info", "--concurrency=1"]
+# CMD ["./start_worker.sh"]
