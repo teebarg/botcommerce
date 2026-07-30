@@ -8,6 +8,10 @@ client = genai.Client(api_key=settings.GEMINI_API_KEY)
 MODEL_NAME = "text-embedding-004"
 
 async def update_product_embeddings(ctx, product_id: str, text_to_embed: str) -> dict:
+    if not settings.EMBEDDINGS_ENABLED:
+        logger.warning(f"⚠️ [FEATURE DISABLED] Skipping vector calculations for product {product_id}.")
+        return {"status": "skipped_feature_disabled"}
+        
     logger.info(f"🧬 Starting vector calculation for Product: {product_id}")
     pool = ctx['db_pool']
     redis_client = ctx['redis']  # Fetch arq's running Redis connection instance

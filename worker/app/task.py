@@ -1,13 +1,21 @@
+import asyncio
 from arq import cron
 from arq.connections import RedisSettings
 from app.tasks import all_ecommerce_tasks
 from app.config import settings
 from app.tasks.enrich_products import enrich_products
 from app.db import db
+from app.logger import logger
 
 async def startup(ctx):
     """Runs exactly once when the worker container fires up"""
-    print("🚀 Connecting Worker to Database Pool...")
+    if not settings.WORKER_ENABLED:
+        logger.info("🚨 [SUSPENDED] WORKER_ENABLED is set to False. Suspending background system...")
+        # Keep the container alive so Render's health checks don't crash loop,
+        # but block it entirely from starting the arq job fetching engine.
+        while True:
+            await asyncio.sleep(3600)
+
     await db.connect()
     
     # Inject your instantiated database pool into the arq context dictionary
@@ -33,7 +41,7 @@ class WorkerSettings:
             run_at_startup=True,             # Triggers immediately upon starting up (great for testing)
             keep_result=0  
         )
-    ]
+    ] if settings.CRON_JOBS_ENABLED else []
     
     redis_settings = RedisSettings.from_dsn(settings.BROKER_URL)
     max_jobs = 10

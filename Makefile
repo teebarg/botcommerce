@@ -4,7 +4,7 @@ API_IMAGE := $(DOCKER_USER)/shop-api
 AGENT_IMAGE := $(DOCKER_USER)/shop-agent
 WORKER_IMAGE := $(DOCKER_USER)/shop-worker
 
-IMAGE_TAG := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+IMAGE_TAG := $(if $(shell git rev-parse --short HEAD 2>NUL),$(shell git rev-parse --short HEAD 2>NUL),latest)
 
 DOCKER_COMPOSE = docker compose -p $(PROJECT_SLUG)
 
@@ -25,10 +25,10 @@ build:
 
 .PHONY: build-service
 build-service:
-	$(DOCKER_COMPOSE) build $(s)
+	$(DOCKER_COMPOSE) build $(SERVICES)
 
 build-no-cache:
-	$(DOCKER_COMPOSE) build --no-cache $(s)
+	$(DOCKER_COMPOSE) build --no-cache $(SERVICES)
 
 .PHONY: up
 up:
@@ -197,10 +197,9 @@ run-worker-local:
 	docker run --rm -it \
 		--platform linux/amd64 \
 		--network dev-net \
-		-p 8002:8000 \
+		-p 8002:10000 \
 		--env-file worker/.env \
-		$(WORKER_IMAGE):$(IMAGE_TAG) \
-		python start_worker.py
+		$(WORKER_IMAGE):$(IMAGE_TAG)
 
 .PHONY: build-frontend
 build-frontend:

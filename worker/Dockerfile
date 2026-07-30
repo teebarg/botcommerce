@@ -1,22 +1,21 @@
-FROM python:3.11-slim AS builder
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+FROM beafdocker/fastapi-base:latest AS builder
 
 WORKDIR /app
-ENV UV_COMPILE_BYTECODE=1
 
 COPY pyproject.toml uv.lock ./
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-install-project
 
-# Runtime image
-FROM python:3.11-slim
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-install-project --no-dev
+
+# ---------- STAGE 2: Final Runtime ----------
+FROM python:3.11-slim AS runtime
 WORKDIR /app
+
 COPY --from=builder /app/.venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONPATH=/app
 
-COPY . .
-# RUN chmod +x start_worker.sh
+COPY ./app /app/app
 
 EXPOSE 10000
-# CMD ["./start_worker.sh"]
-CMD ["sh", "-c", "uv run python app/health_server.py & exec uv run arq app.task.WorkerSettings"]
+CMD ["sh", "-c", "python app/health_server.py & exec arq app.task.WorkerSettings"]

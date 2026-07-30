@@ -6,6 +6,10 @@ class Settings(BaseSettings):
     PORT: int = 10000
     ENVIRONMENT: str = "development"
 
+    WORKER_ENABLED: bool = False
+    CRON_JOBS_ENABLED: bool = False
+    EMBEDDINGS_ENABLED: bool = False
+
     GEMINI_API_KEY: str = ""
     GEMINI_MODEL: str = "gemini-2.5-flash"
 
