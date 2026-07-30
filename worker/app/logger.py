@@ -1,10 +1,8 @@
 import logging
 import asyncio
-import os
 import traceback
 import httpx
-
-SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL", "")
+from app.config import settings
 
 class AsyncSlackHandler(logging.Handler):
     """
@@ -13,7 +11,6 @@ class AsyncSlackHandler(logging.Handler):
     def __init__(self, webhook_url: str):
         super().__init__()
         self.webhook_url = webhook_url
-        # Create an async HTTP client pool
         self.client = httpx.AsyncClient(timeout=5.0)
 
     def emit(self, record: logging.LogRecord):
@@ -21,7 +18,6 @@ class AsyncSlackHandler(logging.Handler):
         if record.name == "httpx" or "slack" in record.getMessage().lower():
             return
             
-        # Fire-and-forget the log payload into the running asyncio event loop
         try:
             asyncio.create_task(self._send_to_slack(record))
         except Exception:
@@ -34,7 +30,6 @@ class AsyncSlackHandler(logging.Handler):
 
         log_message = self.format(record)
         
-        # Select diagnostic theme bars based on severity level
         if record.levelno >= logging.CRITICAL:
             color = "#ff0000"  # Dark Red
             emoji = "🚨 *CRITICAL EXCEPTION*"
@@ -56,7 +51,6 @@ class AsyncSlackHandler(logging.Handler):
             # Wrap within code formatting blocks inside Slack markdown layout
             extra_details = f"\n*Traceback:*\n```\n{trace_str[-1000:]}\n```"
 
-        # Construct Slack Block Kit layout payload metrics
         payload = {
             "attachments": [
                 {
@@ -72,7 +66,6 @@ class AsyncSlackHandler(logging.Handler):
         try:
             await self.client.post(self.webhook_url, json=payload)
         except Exception:
-            # Silent fallback to standard system streams if internet connection fails
             pass
 
 def setup_worker_logging():
@@ -83,21 +76,18 @@ def setup_worker_logging():
 
     # Prevent duplicating handlers when watchfiles reloads code blocks
     if not logger.handlers:
-        # 1. Standard Terminal Output Handler
         stream_formatter = logging.Formatter("[%(levelname)s] %(asctime)s - %(message)s")
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(stream_formatter)
         logger.addHandler(console_handler)
 
-        # 2. Slack Notification Integration Handler
-        if SLACK_WEBHOOK_URL:
+        if settings.SLACK_WEBHOOK_URL:
             slack_formatter = logging.Formatter("%(message)s")
-            slack_handler = AsyncSlackHandler(SLACK_WEBHOOK_URL)
+            slack_handler = AsyncSlackHandler(settings.SLACK_WEBHOOK_URL)
             slack_handler.setLevel(logging.WARNING)  # Send only warnings/errors live
             slack_handler.setFormatter(slack_formatter)
             logger.addHandler(slack_handler)
 
     return logger
 
-# Globally accessible logger instance
 logger = setup_worker_logging()

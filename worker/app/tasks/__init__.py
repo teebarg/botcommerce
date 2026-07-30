@@ -6,5 +6,5 @@ from .communications import send_order_email
 all_ecommerce_tasks = [
     generate_invoice_pdf,
     send_order_email,
-    update_product_embeddings
+    update_product_embeddings,
 ]

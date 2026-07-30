@@ -4,6 +4,7 @@ from arq.connections import RedisSettings
 from app.tasks import all_ecommerce_tasks
 from app.config import settings
 from app.tasks.enrich_products import enrich_products
+from app.tasks.products import clean_up_dangling
 from app.db import db
 from app.logger import logger
 
@@ -27,7 +28,6 @@ async def shutdown(ctx):
     await db.disconnect()
 
 class WorkerSettings:
-    # Uses the Python unpacking operator to register every single function automatically
     functions = [*all_ecommerce_tasks]
 
     on_startup = startup
@@ -39,6 +39,13 @@ class WorkerSettings:
             hour={0, 6, 12, 18},             # Targets execution blocks 6 hours apart
             minute=0,                        # Locks it to the top of the hour to prevent continuous looping
             run_at_startup=True,             # Triggers immediately upon starting up (great for testing)
+            keep_result=0  
+        ),
+        cron(
+            'app.task.clean_up_dangling',
+            hour={0, 6, 12, 18},
+            minute=0,
+            run_at_startup=True,
             keep_result=0  
         )
     ] if settings.CRON_JOBS_ENABLED else []

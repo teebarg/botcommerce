@@ -91,3 +91,7 @@ async def update_product_embeddings(ctx, product_id: str, text_to_embed: str) ->
 
     return {"product_id": product_id, "status": "processed"}
 
+
+async def clean_up_dangling(ctx) -> dict:
+    logger.info("[Removing dangling products]")
+    pass
