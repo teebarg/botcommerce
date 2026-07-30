@@ -3,7 +3,7 @@ import { useWebSocket } from "pulsews";
 import { useRouteContext } from "@tanstack/react-router";
 import { useChat, useChatMutation, useChatStatusMutation } from "@/hooks/useApi";
 import { ChatMessage, ChatResponse, ConversationStatus, MessageSender } from "@/schemas";
-import { getSessionId } from "@/utils";
+import { generateUUID, getSessionId } from "@/utils";
 
 const generateId = () => Math.random();
 const STORAGE_KEY = "support-chat-history";
@@ -49,10 +49,10 @@ const saveHistory = (messages: ChatMessage[]) => {
 };
 
 function getChatSessionId(): string {
-    if (typeof window === "undefined") return getSessionId();
+    if (typeof window === "undefined") return generateUUID();
     let id = localStorage.getItem(CHAT_SESSION_KEY);
     if (!id) {
-        id = getSessionId();
+        id = generateUUID();
         localStorage.setItem(CHAT_SESSION_KEY, id);
     }
     return id;

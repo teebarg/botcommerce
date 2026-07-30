@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { meQuery } from "@/queries/user.queries";
-import { SignInRedirect } from "@/utils/reuseable";
+import { SignInRedirect } from "@/components/auth/redirect";
 
 export const Route = createFileRoute("/_auth/checkout")({
     beforeLoad: ({ context }) => {

@@ -36,7 +36,11 @@ up:
 
 .PHONY: update
 update:
-	$(DOCKER_COMPOSE) up --build -d --force-recreate $(s)
+	$(DOCKER_COMPOSE) up --build -d --force-recreate $(SERVICES)
+
+.PHONY: restart
+restart:
+	$(DOCKER_COMPOSE) up -d --force-recreate $(SERVICES)
 
 .PHONY: stop
 stop:
@@ -197,6 +201,17 @@ run-worker-local:
 		--env-file worker/.env \
 		$(WORKER_IMAGE):$(IMAGE_TAG) \
 		python start_worker.py
+
+.PHONY: build-frontend
+build-frontend:
+	@cd app; pnpm build
+
+.PHONY: test-frontend
+test-frontend:
+	@cd app; node --env-file=.env.prod .output/server/index.mjs
+
+.PHONY: run-frontend
+run-frontend: build-frontend test-frontend
 
 # ==========================================
 # Interactive Systems Help Desk Documentation

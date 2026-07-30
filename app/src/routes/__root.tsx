@@ -98,7 +98,6 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-    // const GA_ID = import.meta.env.VITE_GA_ID;
     const [localSessionId, setLocalSessionId] = useState<string | null>(null);
     const loaderData = useLoaderData({ from: Route.id }) as any;
     const config = loaderData?.config ?? {};
@@ -128,19 +127,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                         `,
                     }}
                 />
-                {/* GA Script */}
-                {/* <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
-                <script
-                    dangerouslySetInnerHTML={{
-                        __html: `
-                            window.dataLayer = window.dataLayer || [];
-                            function gtag(){dataLayer.push(arguments);}
-                            window.gtag = gtag;
-                            gtag('js', new Date());
-                            gtag('config', '${GA_ID}');
-                        `,
-                    }}
-                /> */}
             </head>
             <body className="min-h-screen">
                 <ThemeProvider>

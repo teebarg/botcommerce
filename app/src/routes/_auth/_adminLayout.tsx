@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { SignInRedirect } from "@/utils/reuseable";
+import { SignInRedirect } from "@/components/auth/redirect";
 
 export const Route = createFileRoute("/_auth/_adminLayout")({
     beforeLoad: ({ context }) => {

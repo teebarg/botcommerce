@@ -1,4 +1,4 @@
-import { SignInRedirect } from "@/utils/reuseable";
+import { SignInRedirect } from "@/components/auth/redirect";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_auth/_mainLayout/account")({

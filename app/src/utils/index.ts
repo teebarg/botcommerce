@@ -120,7 +120,7 @@ export const initializeAppSession = () => {
     if (typeof window !== "undefined") {
         let id = localStorage.getItem(SESSION_KEY);
         if (!id) {
-            localStorage.setItem(SESSION_KEY, getSessionId());
+            localStorage.setItem(SESSION_KEY, generateUUID());
         }
     }
 };
