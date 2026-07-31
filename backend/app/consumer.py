@@ -135,8 +135,7 @@ class RedisStreamConsumer:
                             f"XREADGROUP error (failure #{consecutive_failures}): {err_msg}"
                         )
                     elif consecutive_failures % 30 == 0:
-                        # heartbeat every ~5min-ish (depends on backoff) so it's
-                        # not totally silent, but not spamming either
+                        # heartbeat every ~5min-ish (depends on backoff)
                         logger.error(
                             f"XREADGROUP still failing after {consecutive_failures} attempts: {err_msg}"
                         )
@@ -234,7 +233,7 @@ class RedisStreamConsumer:
                     "variant": True,
                 },
             )
-            
+
             # Injecting resolved search container seamlessly
             service = PopularProductsService(search_srv=search_srv)
             for item in order_items:

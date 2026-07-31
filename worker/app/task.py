@@ -13,13 +13,11 @@ async def startup(ctx):
     if not settings.WORKER_ENABLED:
         logger.info("🚨 [SUSPENDED] WORKER_ENABLED is set to False. Suspending background system...")
         # Keep the container alive so Render's health checks don't crash loop,
-        # but block it entirely from starting the arq job fetching engine.
         while True:
             await asyncio.sleep(3600)
 
     await db.connect()
 
-    # Inject your instantiated database pool into the arq context dictionary
     ctx['db_pool'] = db.get_pool()
 
 async def shutdown(ctx):
@@ -38,7 +36,7 @@ class WorkerSettings:
             'app.task.enrich_products',
             hour={0, 6, 12, 18},             # Targets execution blocks 6 hours apart
             minute=0,                        # Locks it to the top of the hour to prevent continuous looping
-            run_at_startup=True,             # Triggers immediately upon starting up (great for testing)
+            run_at_startup=True,
             keep_result=0
         ),
         cron(

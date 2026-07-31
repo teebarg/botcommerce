@@ -12,15 +12,13 @@ async def update_product_embeddings(ctx, product_id: str, text_to_embed: str) ->
     if not settings.EMBEDDINGS_ENABLED:
         logger.warning(f"⚠️ [FEATURE DISABLED] Skipping vector calculations for product {product_id}.")
         return {"status": "skipped_feature_disabled"}
-        
+
     logger.info(f"🧬 Starting vector calculation for Product: {product_id}")
     pool = ctx['db_pool']
-    redis_client = ctx['redis']  # Fetch arq's running Redis connection instance
-    
-    # Clean product_id formatting for PostgreSQL numeric keys
+    redis_client = ctx['redis']
+
     p_id = int(product_id) if isinstance(product_id, str) and product_id.isdigit() else product_id
 
-    # 1. GENERATE EMBEDDINGS (Dev Mock vs Production Gemini)
     if settings.ENVIRONMENT == "development":
         logger.info("🛡️ [AI MOCK] Simulating local 768-dim vector array.")
         await asyncio.sleep(0.1)
@@ -37,9 +35,7 @@ async def update_product_embeddings(ctx, product_id: str, text_to_embed: str) ->
             logger.error(f"❌ Gemini Embeddings Pipeline failed: {str(e)}", exc_info=True)
             raise e
 
-    # 2. SAVE EMBEDDING VECTOR TO PRISMA JSONB FIELD
     async with pool.acquire() as conn:
-        # Pass the python list directly; asyncpg auto-encodes lists to json array text strings
         await conn.execute(
             "UPDATE products SET embedding = $1 WHERE id = $2",
             json.dumps(vector_values),
@@ -47,17 +43,15 @@ async def update_product_embeddings(ctx, product_id: str, text_to_embed: str) ->
         )
         logger.info(f"💾 Vector array successfully committed to JsonB column for product {p_id}")
 
-        # 🚀 COMPUTE TOP 10 SIMILARITIES INSTANTLY VIA DATABASE
         # We parse the JsonB string array on the fly and compute Cosine Distance using a math string loop snippet
-        # If your data pool is huge, we filter out self-matches using: p.id != target
         similarity_query = """
             WITH target_vector AS (
                 SELECT embedding FROM products WHERE id = $1
             )
-            SELECT 
+            SELECT
                 p.id,
                 (
-                    SELECT 
+                    SELECT
                         (SELECT SUM(a.val * b.val) FROM UNNEST(ARRAY(SELECT jsonb_array_elements_text(p.embedding)::float)) WITH ORDINALITY AS a(val, idx) JOIN UNNEST(ARRAY(SELECT jsonb_array_elements_text(t.embedding)::float)) WITH ORDINALITY AS b(val, idx) ON a.idx = b.idx)
                         /
                         (
@@ -72,14 +66,14 @@ async def update_product_embeddings(ctx, product_id: str, text_to_embed: str) ->
             ORDER BY similarity DESC
             LIMIT 10;
         """
-        
+
         logger.info(f"🎯 Calculating top 10 neighbors using native database vector layers...")
         top_neighbors = await conn.fetch(similarity_query, p_id)
         top_10_ids = [str(row["id"]) for row in top_neighbors]
 
     if top_10_ids:
-        key = f"product:{p_id}:similar"
-        
+        key: str = f"product:{p_id}:similar"
+
         # Use standard arq pipeline operations asynchronously
         async with redis_client.pipeline(transaction=True) as pipe:
             pipe.delete(key) # Clear out stale listings
@@ -87,7 +81,7 @@ async def update_product_embeddings(ctx, product_id: str, text_to_embed: str) ->
             pipe.ltrim(key, 0, 9)
             pipe.expire(key, 60 * 60 * 24 * 30) # 30 day TTL expiration window
             await pipe.execute()
-            
+
         logger.info(f"🔥 Successfully synced Redis cache key '{key}' with tracking entries: {top_10_ids}")
 
     return {"product_id": product_id, "status": "processed"}

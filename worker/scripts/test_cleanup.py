@@ -1,10 +1,9 @@
-from app.config import settings
 import asyncio
 import json
 import logging
 import asyncpg
-
-from app.tasks.products import clean_up_dangling  # adjust import path to wherever you put it
+from app.config import settings
+from app.tasks.products import clean_up_dangling
 
 logging.basicConfig(level=logging.INFO)
 

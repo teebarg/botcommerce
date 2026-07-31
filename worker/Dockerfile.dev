@@ -10,4 +10,4 @@ COPY pyproject.toml uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-install-project
 
-# CMD ["./start_worker.sh"]
+CMD ["sh", "-c", "uv run python app/health_server.py & uv run watchfiles 'arq app.task.WorkerSettings'"]

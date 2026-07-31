@@ -7,15 +7,13 @@ from google import genai
 from app.config import settings
 from app.logger import logger
 
-# Initialize Gemini Client
 client = genai.Client(api_key=settings.GEMINI_API_KEY)
-MODEL = settings.GEMINI_MODEL
+MODEL: str = settings.GEMINI_MODEL
 
 async def get_enrichment(img_url: str) -> dict:
     """
     Fetches product data from Gemini. Bypasses APIs in development mode.
     """
-    # 🚀 DEV MODE
     if settings.ENVIRONMENT == "development":
         logger.info(f"🛡️ [AI MOCK] Bypassing Gemini API and image download for: {img_url}")
         return {
@@ -29,7 +27,7 @@ async def get_enrichment(img_url: str) -> dict:
     async with httpx.AsyncClient() as httpx_client:
         response = await httpx_client.get(img_url, timeout=10.0)
         response.raise_for_status()
-        
+
     img = Image.open(BytesIO(response.content))
     if img.mode != "RGB":
         img = img.convert("RGB")
@@ -49,10 +47,10 @@ async def get_enrichment(img_url: str) -> dict:
     # Wrap the synchronous Gemini SDK call in asyncio executor so it runs smoothly
     loop = asyncio.get_running_loop()
     resp = await loop.run_in_executor(
-        None, 
+        None,
         lambda: client.models.generate_content(model=MODEL, contents=[prompt, img])
     )
-    
+
     generated_text = resp.text.strip()
 
     if generated_text.startswith("```"):
