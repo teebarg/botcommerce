@@ -212,6 +212,12 @@ test-frontend:
 .PHONY: run-frontend
 run-frontend: build-frontend test-frontend
 
+# test
+.PHONY: test-cleanup
+test-cleanup:
+	$(DOCKER_COMPOSE) exec worker uv run python scripts/test_cleanup.py
+
+
 # ==========================================
 # Interactive Systems Help Desk Documentation
 # ==========================================

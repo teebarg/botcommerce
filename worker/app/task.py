@@ -18,7 +18,7 @@ async def startup(ctx):
             await asyncio.sleep(3600)
 
     await db.connect()
-    
+
     # Inject your instantiated database pool into the arq context dictionary
     ctx['db_pool'] = db.get_pool()
 
@@ -39,17 +39,17 @@ class WorkerSettings:
             hour={0, 6, 12, 18},             # Targets execution blocks 6 hours apart
             minute=0,                        # Locks it to the top of the hour to prevent continuous looping
             run_at_startup=True,             # Triggers immediately upon starting up (great for testing)
-            keep_result=0  
+            keep_result=0
         ),
-        cron(
-            'app.task.clean_up_dangling',
-            hour={0, 6, 12, 18},
-            minute=0,
-            run_at_startup=True,
-            keep_result=0  
-        )
+        # cron(
+        #     'app.task.clean_up_dangling',
+        #     hour={0, 6, 12, 18},
+        #     minute=0,
+        #     run_at_startup=True,
+        #     keep_result=0
+        # )
     ] if settings.CRON_JOBS_ENABLED else []
-    
+
     redis_settings = RedisSettings.from_dsn(settings.BROKER_URL)
     max_jobs = 10
     job_timeout = 3000
