@@ -4,31 +4,17 @@ version = "0.1.0"
 description = "store worker"
 requires-python = ">=3.10,<4.0"
 dependencies = [
-    "fastapi[standard]<1.0.0,>=0.114.2",
-    "pydantic>2.0",
     "pydantic-settings<3.0.0,>=2.2.1",
     "redis==6.4.0",
-    "asyncpg==0.30.0",
     "google-genai==1.46.0",
-    "numpy==2.2.6",
-    "celery==5.5.3",
-    "pillow==12.0.0",
-]
-
-[tool.uv]
-dev-dependencies = [
-    "pytest<8.0.0,>=7.4.3",
-    "mypy<2.0.0,>=1.8.0",
-    "ruff<1.0.0,>=0.2.2",
+    "asyncpg>=0.31.0",
+    "arq>=0.25.0",
+    "pillow>=12.3.0",
 ]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-
-[tool.mypy]
-strict = true
-exclude = ["venv", ".venv"]
 
 [tool.ruff]
 target-version = "py310"
@@ -59,3 +45,8 @@ keep-runtime-typing = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["app"]
+
+[dependency-groups]
+dev = [
+    "watchfiles>=1.2.0",
+]

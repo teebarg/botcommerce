@@ -38,9 +38,8 @@ app/dist-ssr
 
 app/src/routeTree.gen.ts
 
-# ==============================================================================
+
 # Backend
-# ==============================================================================
 backend/.venv/
 backend/.uv/
 backend/__pycache__/
@@ -52,3 +51,12 @@ backend/__pycache__/
 backend/test-results/
 backend/playwright-report/
 backend/.pytest_cache/
+
+# Worker
+worker/.venv/
+worker/.uv/
+worker/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.uv/

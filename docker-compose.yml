@@ -30,7 +30,6 @@ services:
       - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
 
   backend:
-    image: shop:${TAG-latest}
     ports:
       - "5101:8000"
     labels:
@@ -65,6 +64,26 @@ services:
       - ./backend:/app
       - /app/.venv
       - uv-cache:/root/.cache/uv
+
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile.dev
+    platform: linux/amd64
+    environment:
+      - BROKER_URL=redis://redis:6379/0
+      - UV_LINK_MODE=copy
+    volumes:
+      - ./worker:/app
+      - /app/.venv
+      - uvworker-cache:/root/.cache/uv
+    networks:
+      - dev-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   agent:
     image: shop-agent:${TAG-latest}
@@ -139,3 +158,4 @@ volumes:
   uv-cache:
   uva-cache:
   uvmcp-cache:
+  uvworker-cache:

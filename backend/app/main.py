@@ -1,7 +1,7 @@
 from typing import Any, Dict
-import sentry_sdk
 import time
 import asyncio
+import sentry_sdk
 from fastapi import BackgroundTasks, FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
@@ -31,7 +31,7 @@ from app.core.notifications.setup import init_notification_service
 from app.core.dependencies.services import SettingsDep
 from app.services.cache import L1Cache, run_l1_invalidation_listener
 from app.lib.cache import add_cache_headers
-from app.core.dependencies.cache import CdnDep
+from app.core.dependencies.cache import CdnDep, CacheDep
 
 STREAM_NAME = "EVENT_STREAMS"
 GROUP_NAME = "notifications"
@@ -139,6 +139,7 @@ if settings.all_cors_origins:
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 
+@app.head("/")
 @app.get("/")
 async def root():
     return {"message": "This is root"}
@@ -146,11 +147,21 @@ async def root():
 class PurgeCdn(BaseModel):
     key: str
 
+@app.post("/api/test-arq")
+async def test_arq(request: Request, cache_srv: CacheDep) -> Dict[str, Any]:
+    await cache_srv.redis.enqueue_job(
+        "generate_invoice_pdf", 
+        order_id="1234567890", 
+        email="test@example.com"
+    )
+    return {"message": "ok"}
+
 @app.post("/api/purge-cdn")
 async def purge_cdn(cdn_srv: CdnDep, data: PurgeCdn) -> Dict[str, Any]:
     await cdn_srv.purge_cloudfare(data.key)
     return {"message": "ok"}
 
+@app.head("/api/health")
 @app.get("/api/health")
 async def health(search_srv: SearchDep) -> Dict[str, Any]:
     meili_ok = await search_srv.check()
@@ -307,41 +318,6 @@ async def generate_sitemap(request: Request):
     await redis.setex("sitemap", 3600, full_sitemap)
 
     return Response(content=full_sitemap, media_type="application/xml")
-
-
-# @app.post("/api/test-notification")
-# async def update_order():
-#     connection = await aio_pika.connect_robust(settings.RABBITMQ_HOST)
-#     channel = await connection.channel()
-#     message = "order 1 status: 10"
-#     # Declaring queue
-#     queue = await channel.declare_queue("notifications")
-#     await channel.default_exchange.publish(
-#         aio_pika.Message(body=message.encode()), routing_key=queue.name
-#     )
-#     return {"message": "order status update sent"}
-
-# @app.on_event("startup")
-# async def listen_for_notifications():
-#     connection = await aio_pika.connect_robust(settings.RABBITMQ_HOST)
-#     channel = await connection.channel()
-
-#     # Listen to order updates
-#     order_queue = await channel.declare_queue("notifications-1")
-#     asyncio.create_task(process_updates(order_queue))
-
-
-# async def process_updates(queue):
-#     async for message in queue:
-#         async with message.process():
-#             order_data = message.body.decode()
-#             connection = await aio_pika.connect_robust(settings.RABBITMQ_HOST)
-#             channel = await connection.channel()
-#             product_queue = await channel.declare_queue("product_update")
-#             await channel.default_exchange.publish(
-#                 aio_pika.Message(body=order_data.encode()),
-#                 routing_key=product_queue.name,
-#             )
 
 
 @app.on_event("startup")

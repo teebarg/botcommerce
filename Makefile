@@ -2,20 +2,18 @@ PROJECT_SLUG = shop
 DOCKER_USER ?= beafdocker
 API_IMAGE := $(DOCKER_USER)/shop-api
 AGENT_IMAGE := $(DOCKER_USER)/shop-agent
+WORKER_IMAGE := $(DOCKER_USER)/shop-worker
 
-IMAGE_TAG := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+IMAGE_TAG := $(if $(shell git rev-parse --short HEAD 2>NUL),$(shell git rev-parse --short HEAD 2>NUL),latest)
 
 DOCKER_COMPOSE = docker compose -p $(PROJECT_SLUG)
-
-SERVICES_CORE := frontend backend
-SERVICES_ALL := frontend backend agent mcp-server
 
 MODE ?= core
 
 ifeq ($(MODE),all)
-SERVICES := frontend backend agent mcp-server
+SERVICES := frontend backend agent mcp-server worker
 else
-SERVICES := frontend backend
+SERVICES := frontend backend worker
 endif
 
 # ==========================================
@@ -25,8 +23,12 @@ endif
 build:
 	$(DOCKER_COMPOSE) build $(SERVICES)
 
+.PHONY: build-service
+build-service:
+	$(DOCKER_COMPOSE) build $(SERVICES)
+
 build-no-cache:
-	$(DOCKER_COMPOSE) build --no-cache $(s)
+	$(DOCKER_COMPOSE) build --no-cache $(SERVICES)
 
 .PHONY: up
 up:
@@ -34,7 +36,11 @@ up:
 
 .PHONY: update
 update:
-	$(DOCKER_COMPOSE) up -d --force-recreate $(s)
+	$(DOCKER_COMPOSE) up --build -d --force-recreate $(SERVICES)
+
+.PHONY: restart
+restart:
+	$(DOCKER_COMPOSE) up -d --force-recreate $(SERVICES)
 
 .PHONY: stop
 stop:
@@ -143,8 +149,15 @@ build-agent:
 		-t $(AGENT_IMAGE):$(IMAGE_TAG) \
 		./agent
 
+build-worker:
+	docker build --platform=linux/amd64 \
+		-f worker/Dockerfile \
+		-t $(WORKER_IMAGE):latest \
+		-t $(WORKER_IMAGE):$(IMAGE_TAG) \
+		./worker
+
 # Push Operations
-push-all: push-api push-agent
+push-all: push-api push-agent push-worker
 
 push-api:
 	docker push $(API_IMAGE):latest
@@ -153,6 +166,10 @@ push-api:
 push-agent:
 	docker push $(AGENT_IMAGE):latest
 	docker push $(AGENT_IMAGE):$(IMAGE_TAG)
+
+push-worker:
+	docker push $(WORKER_IMAGE):latest
+	docker push $(WORKER_IMAGE):$(IMAGE_TAG)
 
 
 .PHONY: run-api-local
@@ -174,6 +191,32 @@ run-agent-local:
 		--env-file agent/.env \
 		$(AGENT_IMAGE):$(IMAGE_TAG) \
 		uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+.PHONY: run-worker-local
+run-worker-local:
+	docker run --rm -it \
+		--platform linux/amd64 \
+		--network dev-net \
+		-p 8002:10000 \
+		--env-file worker/.env \
+		$(WORKER_IMAGE):$(IMAGE_TAG)
+
+.PHONY: build-frontend
+build-frontend:
+	@cd app; pnpm build
+
+.PHONY: test-frontend
+test-frontend:
+	@cd app; node --env-file=.env.prod .output/server/index.mjs
+
+.PHONY: run-frontend
+run-frontend: build-frontend test-frontend
+
+# test
+.PHONY: test-cleanup
+test-cleanup:
+	$(DOCKER_COMPOSE) exec worker uv run python scripts/test_cleanup.py
+
 
 # ==========================================
 # Interactive Systems Help Desk Documentation

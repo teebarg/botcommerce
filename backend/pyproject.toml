@@ -26,6 +26,7 @@ dependencies = [
     "cloudinary==1.44.1",
     "python-jose[cryptography]==3.3.0",
     "pywebpush==2.3.0",
+    "arq>=0.25.0",
 ]
 
 [dependency-groups]

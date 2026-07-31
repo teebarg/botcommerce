@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { useRouterState } from "@tanstack/react-router";
-import { SignIn } from "@clerk/tanstack-react-start";
 import { useOverlayTriggerState } from "react-stately";
 
 export function renderText(text: string): React.ReactNode {
@@ -246,13 +245,5 @@ export function ShareUI({ trigger, handleNativeShare, targetUrl = "", text = "Ch
                 </div>
             </PopoverContent>
         </Popover>
-    );
-}
-
-export function SignInRedirect(): React.ReactNode {
-    return (
-        <div className="flex items-center justify-center p-12">
-            <SignIn routing="hash" forceRedirectUrl={`/auth/callback?redirect=${typeof window !== "undefined" ? window.location.pathname : ""}`} />
-        </div>
     );
 }

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { wishlistQueryOptions } from "@/hooks/useUser";
-import { SignInRedirect } from "@/utils/reuseable";
+import { SignInRedirect } from "@/components/auth/redirect";
 
 export const Route = createFileRoute("/_auth/_mainLayout/wishlist")({
     beforeLoad: ({ context }) => {

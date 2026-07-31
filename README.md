@@ -110,13 +110,6 @@ cd app
 pnpm dev
 ```
 
-Optional worker:
-
-```sh
-cd worker
-celery -A celery_app.celery_app worker -l info
-```
-
 ### URLs
 
 - Frontend: `http://localhost:5173`

@@ -1,14 +1,13 @@
 from typing import Union, List
 import urllib.parse
 import re
-import cloudinary
-import cloudinary.uploader
 import base64
 import uuid
-
+import cloudinary
+import cloudinary.uploader
 from fastapi import HTTPException
-from app.core.config import settings
 from supabase import create_client, Client
+from app.core.config import settings
 from app.core.logging import get_logger
 from app.models.generic import ImageUpload
 from app.core.logging import logger
@@ -62,54 +61,49 @@ class MediaStorageService:
     def get_public_url(self, bucket: str, filename: str):
         return supabase.storage.from_(bucket).get_public_url(filename, {"download": filename})
 
-    async def remove_images(self, images: Union[str, List[str]]) -> None:
+    async def remove_images(self, images: Union[str, List[str]]) -> list[str]:
+        """Returns list of image URLs that failed to delete from storage."""
         if isinstance(images, str):
             images = [images]
 
-        supabase_paths = []
-        firebase_paths = []
-        cloudinary_ids = []
+        failed: list[str] = []
+        supabase_paths, firebase_paths, cloudinary_map = [], [], {}
 
         for img in images:
             if not img:
                 continue
-
-            # Supabase
             if "/storage/v1/object/public/product-images/" in img:
-                supabase_paths.append(
-                    img.split("/storage/v1/object/public/product-images/")[1]
-                )
-
-            # Firebase / GCS
+                supabase_paths.append(img.split("/storage/v1/object/public/product-images/")[1])
             elif "firebasestorage.googleapis.com" in img or "storage.googleapis.com" in img:
                 try:
                     parts = img.split("/o/")[-1].split("?")[0]
                     firebase_paths.append(urllib.parse.unquote(parts))
                 except Exception as e:
                     logger.error(f"Failed parsing Firebase/GCS URL: {e}")
-
-            # Cloudinary
+                    failed.append(img)
             elif "res.cloudinary.com" in img:
                 match = re.search(r"/upload/[^/]+/(.+)\.[a-zA-Z0-9]+$", img)
                 if match:
-                    cloudinary_ids.append(match.group(1))
+                    cloudinary_map[match.group(1)] = img
                 else:
                     logger.warning(f"Invalid Cloudinary URL: {img}")
+                    failed.append(img)
 
-        # Supabase delete
         if supabase_paths and supabase:
             try:
                 supabase.storage.from_("product-images").remove(supabase_paths)
             except Exception as e:
                 logger.error(f"Supabase delete failed: {e}")
+                failed.extend(supabase_paths)
 
-        # Cloudinary delete
-        for cid in cloudinary_ids:
+        for cid, original_url in cloudinary_map.items():
             try:
                 cloudinary.uploader.destroy(cid)
             except Exception as e:
-                logger.error(f"Cloudinary delete failed: {e}")
+                logger.error(f"Cloudinary delete failed for {cid}: {e}")
+                failed.append(original_url)
 
-        # Firebase is ignored (log only)
         if firebase_paths:
             logger.debug(f"Firebase deletion not implemented: {firebase_paths}")
+
+        return failed
