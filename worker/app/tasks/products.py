@@ -1,4 +1,5 @@
 import asyncio
+import asyncpg
 from google import genai
 import json
 from app.config import settings
@@ -92,6 +93,115 @@ async def update_product_embeddings(ctx, product_id: str, text_to_embed: str) ->
     return {"product_id": product_id, "status": "processed"}
 
 
-async def clean_up_dangling(ctx) -> dict:
-    logger.info("[Removing dangling products]")
-    pass
+BATCH_SIZE = 200
+
+# Products with no images AND never referenced by an order or cart item
+FIND_HARD_DELETE_CANDIDATES = """
+    SELECT p.id
+    FROM products p
+    WHERE NOT EXISTS (
+        SELECT 1 FROM product_images pi WHERE pi.product_id = p.id
+    )
+    AND NOT EXISTS (
+        SELECT 1 FROM product_variants pv
+        JOIN order_items oi ON oi.variant_id = pv.id
+        WHERE pv.product_id = p.id
+    )
+    AND NOT EXISTS (
+        SELECT 1 FROM product_variants pv
+        JOIN cart_items ci ON ci.variant_id = pv.id
+        WHERE pv.product_id = p.id
+    )
+    ORDER BY p.id
+"""
+
+# Products with no images but WITH order/cart history — deactivate, don't delete
+FIND_DEACTIVATE_CANDIDATES = """
+    SELECT p.id
+    FROM products p
+    WHERE p.active = true
+    AND NOT EXISTS (
+        SELECT 1 FROM product_images pi WHERE pi.product_id = p.id
+    )
+    AND (
+        EXISTS (
+            SELECT 1 FROM product_variants pv
+            JOIN order_items oi ON oi.variant_id = pv.id
+            WHERE pv.product_id = p.id
+        )
+        OR EXISTS (
+            SELECT 1 FROM product_variants pv
+            JOIN cart_items ci ON ci.variant_id = pv.id
+            WHERE pv.product_id = p.id
+        )
+    )
+    ORDER BY p.id
+"""
+
+
+async def clean_up_dangling(ctx, dry_run: bool = True) -> dict:
+    """
+    - Hard-deletes imageless products with zero order/cart history.
+    - Deactivates (active=False) imageless products that DO have order/cart
+      history, instead of deleting — preserves audit trail and never touches
+      an active cart.
+    """
+    pool: asyncpg.Pool = ctx["db_pool"]
+    logger.info("[clean_up_dangling] starting sweep for imageless products")
+
+    async with pool.acquire() as conn:
+        delete_ids = [r["id"] for r in await conn.fetch(FIND_HARD_DELETE_CANDIDATES)]
+        deactivate_ids = [r["id"] for r in await conn.fetch(FIND_DEACTIVATE_CANDIDATES)]
+
+    logger.info(
+        f"[clean_up_dangling] candidates — "
+        f"delete={len(delete_ids)} deactivate={len(deactivate_ids)}"
+    )
+
+    deleted, failed_delete = [], []
+    deactivated, failed_deactivate = [], []
+
+    if not dry_run:
+        for i in range(0, len(delete_ids), BATCH_SIZE):
+            batch = delete_ids[i : i + BATCH_SIZE]
+            async with pool.acquire() as conn:
+                try:
+                    async with conn.transaction():
+                        await conn.execute(
+                            "DELETE FROM products WHERE id = ANY($1::int[])", batch
+                        )
+                    deleted.extend(batch)
+                except Exception as e:
+                    failed_delete.extend(batch)
+                    logger.error(f"[clean_up_dangling] batch delete failed: {e}")
+
+        for i in range(0, len(deactivate_ids), BATCH_SIZE):
+            batch = deactivate_ids[i : i + BATCH_SIZE]
+            async with pool.acquire() as conn:
+                try:
+                    await conn.execute(
+                        "UPDATE products SET active = false WHERE id = ANY($1::int[])",
+                        batch,
+                    )
+                    deactivated.extend(batch)
+                except Exception as e:
+                    failed_deactivate.extend(batch)
+                    logger.error(f"[clean_up_dangling] batch deactivate failed: {e}")
+    else:
+        deleted, deactivated = delete_ids, deactivate_ids
+
+    logger.info(
+        f"[clean_up_dangling] done — deleted={len(deleted)} "
+        f"deactivated={len(deactivated)} failed_delete={len(failed_delete)} "
+        f"failed_deactivate={len(failed_deactivate)}"
+    )
+
+    return {
+        "dry_run": dry_run,
+        "deleted_count": len(deleted),
+        "deactivated_count": len(deactivated),
+        "failed_delete_count": len(failed_delete),
+        "failed_deactivate_count": len(failed_deactivate),
+        "deleted_ids": deleted,
+        "deactivated_ids": deactivated,
+    }
