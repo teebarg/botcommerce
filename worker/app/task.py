@@ -41,15 +41,15 @@ class WorkerSettings:
             run_at_startup=True,             # Triggers immediately upon starting up (great for testing)
             keep_result=0
         ),
-        # cron(
-        #     'app.task.clean_up_dangling',
-        #     hour={0, 6, 12, 18},
-        #     minute=0,
-        #     run_at_startup=True,
-        #     keep_result=0
-        # )
+        cron(
+            clean_up_dangling,
+            hour=3, minute=0,       # daily at 03:00 server time
+            name="nightly_dangling_product_cleanup",
+            keep_result=0
+        ),
     ] if settings.CRON_JOBS_ENABLED else []
 
     redis_settings = RedisSettings.from_dsn(settings.BROKER_URL)
     max_jobs = 10
     job_timeout = 3000
+    max_tries = 3
