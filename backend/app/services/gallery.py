@@ -211,6 +211,21 @@ class GalleryService:
             logger.error(e)
             raise HTTPException(status_code=500, detail=str(e))
 
+    async def _get_referenced_image_urls(self, urls: list[str]) -> set[str]:
+        """URLs still referenced by order/cart history — must never be deleted
+        from storage, even if their ProductImage row is being removed."""
+        if not urls:
+            return set()
+
+        order_refs = await self.db.orderitem.find_many(
+            where={"image": {"in": urls}}
+        )
+        cart_refs = await self.db.cartitem.find_many(
+            where={"image": {"in": urls}}
+        )
+        return {r.image for r in order_refs if r.image} | {r.image for r in cart_refs if r.image}
+
+
     async def process_bulk_delete_task(self, payload: ImageBulkDelete, remove_storage_fn, delete_index_fn):
         images = await self.db.productimage.find_many(
             where={"id": {"in": payload.files}}, include={"product": True}
@@ -221,16 +236,36 @@ class GalleryService:
 
         try:
             product_ids = list({img.product_id for img in images if img.product_id})
+            image_urls = [img.image for img in images if img.image]
+
+            referenced = await self._get_referenced_image_urls(image_urls)
+            safe_to_purge = [u for u in image_urls if u not in referenced]
+
+            if referenced:
+                logger.info(
+                    f"Skipping storage deletion for {len(referenced)} image(s) "
+                    f"still referenced by order/cart history: {referenced}"
+                )
+
             await self.db.productimage.delete_many(where={"id": {"in": [img.id for img in images]}})
 
-            results = await asyncio.gather(
-                remove_storage_fn([img.image for img in images]),
+            storage_result, index_result = await asyncio.gather(
+                remove_storage_fn(safe_to_purge),
                 delete_index_fn(product_ids),
                 return_exceptions=True,
             )
-            errors = [r for r in results if isinstance(r, Exception)]
-            if errors:
-                logger.error(f"Some delete tasks failed: {errors}")
+
+            if isinstance(storage_result, BaseException):
+                logger.error(f"Storage cleanup task raised: {storage_result}")
+            elif storage_result:
+                logger.error(
+                    f"{len(storage_result)} images deleted from DB but failed to "
+                    f"remove from storage (now orphaned): {storage_result}"
+                )
+
+            if isinstance(index_result, Exception):
+                logger.error(f"Search index delete failed: {index_result}")
+
             await self.invalidate()
             await self.ws_manager.broadcast_to_all({"status": "completed"}, "bulk_action")
         except Exception as e:
