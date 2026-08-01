@@ -46,8 +46,8 @@ async def enrich_products(ctx) -> str:
                     )
                     text_for_embedding: str = f"Title: {enrichment['title']}. Description: {enrichment['description']}"
                     await redis_client.enqueue_job(
-                        "update_product_embeddings", 
-                        product_id=str(p["id"]), 
+                        "update_product_embeddings",
+                        product_id=str(p["id"]),
                         text_to_embed=text_for_embedding
                     )
                     logger.info(f"➡️ Enqueued embedding generation job for product: {p['id']}")
