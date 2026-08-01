@@ -10,6 +10,7 @@ dependencies = [
     "asyncpg>=0.31.0",
     "arq>=0.25.0",
     "pillow>=12.3.0",
+    "cloudinary==1.44.1",
 ]
 
 [build-system]

@@ -132,8 +132,7 @@ FIND_DEACTIVATE_CANDIDATES = """
     ORDER BY p.id
 """
 
-
-async def clean_up_dangling(ctx, dry_run: bool = True) -> dict:
+async def clean_up_dangling(ctx, dry_run: bool = False) -> dict:
     """
     - Hard-deletes imageless products with zero order/cart history.
     - Deactivates (active=False) imageless products that DO have order/cart

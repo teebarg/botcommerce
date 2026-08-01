@@ -11,6 +11,7 @@ async def enrich_products(ctx) -> str:
             query = """
             SELECT
                 p.id,
+                p.sku,
                 p.image,
                 p.description,
                 ARRAY_AGG(DISTINCT pi.image) FILTER (WHERE pi.image IS NOT NULL) AS img
@@ -23,26 +24,26 @@ async def enrich_products(ctx) -> str:
             HAVING COUNT(pi.image) > 0
             LIMIT $1
           """
-            products = await conn.fetch(query, 1)
+            products = await conn.fetch(query, 10)
             for p in products:
                 logger.info(f"Enriching product: {p['id']}")
                 images = p["img"]
                 if not images:
                     continue
                 try:
-                    enrichment = await get_enrichment(p["img"][0])
-                    # await conn.execute(
-                    #     """
-                    # UPDATE products
-                    # SET name = $1, description = $2, features = $3, slug = $4
-                    # WHERE id = $5
-                    # """,
-                    #     enrichment['title'],
-                    #     enrichment['description'],
-                    #     json.dumps(enrichment['features']),
-                    #     enrichment['slug'],
-                    #     p["id"]
-                    # )
+                    enrichment = await get_enrichment(img_url=p["img"][0], sku=p["sku"])
+                    await conn.execute(
+                        """
+                    UPDATE products
+                    SET name = $1, description = $2, features = $3, slug = $4
+                    WHERE id = $5
+                    """,
+                        enrichment['title'],
+                        enrichment['description'],
+                        json.dumps(enrichment['features']),
+                        enrichment['slug'],
+                        p["id"]
+                    )
                     text_for_embedding: str = f"Title: {enrichment['title']}. Description: {enrichment['description']}"
                     await redis_client.enqueue_job(
                         "update_product_embeddings", 
