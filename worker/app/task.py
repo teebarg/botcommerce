@@ -33,9 +33,10 @@ class WorkerSettings:
 
     cron_jobs = [
         cron(
-            'app.task.enrich_products',
+            enrich_products,
             hour={0, 6, 12, 18},             # Targets execution blocks 6 hours apart
             minute=0,                        # Locks it to the top of the hour to prevent continuous looping
+            name="enrich_products",
             run_at_startup=True,
             keep_result=0
         ),
@@ -43,6 +44,7 @@ class WorkerSettings:
             clean_up_dangling,
             hour=3, minute=0,       # daily at 03:00 server time
             name="nightly_dangling_product_cleanup",
+            run_at_startup=True,
             keep_result=0
         ),
     ] if settings.CRON_JOBS_ENABLED else []

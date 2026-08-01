@@ -217,6 +217,14 @@ run-frontend: build-frontend test-frontend
 test-cleanup:
 	$(DOCKER_COMPOSE) exec worker uv run python scripts/test_cleanup.py
 
+.PHONY: test-cloudinary-reconcile
+test-cloudinary-reconcile:
+	$(DOCKER_COMPOSE) exec worker uv run python scripts/test_cloudinary_reconcile.py
+
+.PHONY: test-standalone
+test-standalone:
+	$(DOCKER_COMPOSE) exec worker uv run python scripts/test_standalone.py
+
 
 # ==========================================
 # Interactive Systems Help Desk Documentation

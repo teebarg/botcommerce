@@ -1,21 +1,6 @@
 """
 Reconciliation job: find Cloudinary assets that no longer have ANY reference
 in the database, across every table that can hold an image URL.
-
-This is intentionally read-only / report-first. It does NOT delete anything
-by default — orphaned storage is a cost problem, not an urgent one, and a
-false positive here means permanently destroying a real asset (e.g. if a
-column holding image URLs gets added later and this job isn't updated to
-scan it). Always dry_run=True until you've eyeballed a report or two.
-
-Folder scope: uploads are NOT organized into Cloudinary folders (flat
-auto-generated public_ids, e.g. "tnmbfuqnrsd5gd7gp2bg"), so this scans the
-entire account. That means IMAGE_SOURCES below must cover every table that
-can hold a Cloudinary URL for ANYTHING on the site, not just products —
-otherwise a non-product asset (e.g. a user avatar, a blog image, anything
-else uploaded to the same Cloudinary account) will be misreported as
-orphaned. Double-check the list against your schema before ever running
-dry_run=False.
 """
 
 import logging
@@ -32,15 +17,12 @@ CLOUDINARY_FOLDER_PREFIX: Optional[str] = None  # no folder scoping — scans wh
 PAGE_SIZE = 500
 
 # Every DB column that can hold an image URL pointing at Cloudinary.
-# Extend this list if you add more image-bearing columns later —
-# forgetting one here is exactly how a false-positive delete happens.
 IMAGE_SOURCES = [
     ("product_images", "image"),
     ("products", "image"),
     ("order_items", "image"),
     ("cart_items", "image"),
     ("categories", "image"),
-    ("carousel_banners", "image"),
 ]
 
 CLOUDINARY_URL_RE = re.compile(r"/upload/[^/]+/(.+)\.[a-zA-Z0-9]+$")
@@ -100,6 +82,12 @@ def _get_all_cloudinary_public_ids() -> list[dict]:
     return assets
 
 
+EXCLUDE_PUBLIC_ID_PREFIXES = ("samples/", "sample", "cld-sample", "main-sample")
+
+def _is_cloudinary_demo_asset(public_id: str) -> bool:
+    return any(public_id.startswith(p) for p in EXCLUDE_PUBLIC_ID_PREFIXES)
+
+
 async def find_orphaned_cloudinary_assets(ctx, dry_run: bool = True) -> dict:
     """
     Diffs Cloudinary storage against every DB reference and reports (or, if
@@ -114,7 +102,11 @@ async def find_orphaned_cloudinary_assets(ctx, dry_run: bool = True) -> dict:
     all_assets = _get_all_cloudinary_public_ids()
     logger.info(f"[cloudinary_reconcile] {len(all_assets)} assets found in Cloudinary")
 
-    orphans = [a for a in all_assets if a["public_id"] not in referenced_ids]
+    orphans = [
+        a for a in all_assets
+        if a["public_id"] not in referenced_ids
+        and not _is_cloudinary_demo_asset(a["public_id"])
+    ]
     orphan_bytes = sum(a["bytes"] for a in orphans)
     orphan_mb = orphan_bytes / (1024 * 1024)
 

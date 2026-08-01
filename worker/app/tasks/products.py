@@ -1,12 +1,14 @@
 import asyncio
 import asyncpg
 from google import genai
+from google.genai import types
 import json
 from app.config import settings
 from app.logger import logger
 
 client = genai.Client(api_key=settings.GEMINI_API_KEY)
-MODEL_NAME = "text-embedding-004"
+MODEL_NAME = "gemini-embedding-2"
+EMBEDDING_DIMENSIONS = 768
 
 async def update_product_embeddings(ctx, product_id: str, text_to_embed: str) -> dict:
     if not settings.EMBEDDINGS_ENABLED:
@@ -28,9 +30,16 @@ async def update_product_embeddings(ctx, product_id: str, text_to_embed: str) ->
             loop = asyncio.get_running_loop()
             resp = await loop.run_in_executor(
                 None,
-                lambda: client.models.embed_content(model=MODEL_NAME, contents=text_to_embed)
+                lambda: client.models.embed_content(
+                    model=MODEL_NAME,
+                    contents=text_to_embed,
+                    config=types.EmbedContentConfig(
+                        output_dimensionality=EMBEDDING_DIMENSIONS,
+                    ),
+                )
             )
-            vector_values = resp.embedding.values
+
+            vector_values = resp.embeddings[0].values
         except Exception as e:
             logger.error(f"❌ Gemini Embeddings Pipeline failed: {str(e)}", exc_info=True)
             raise e
@@ -132,8 +141,7 @@ FIND_DEACTIVATE_CANDIDATES = """
     ORDER BY p.id
 """
 
-
-async def clean_up_dangling(ctx, dry_run: bool = True) -> dict:
+async def clean_up_dangling(ctx, dry_run: bool = False) -> dict:
     """
     - Hard-deletes imageless products with zero order/cart history.
     - Deactivates (active=False) imageless products that DO have order/cart
