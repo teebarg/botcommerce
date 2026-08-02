@@ -189,8 +189,6 @@ class RedisStreamConsumer:
             await self.handle_order_created(event, services)
         elif event_type == "ORDER_PAID":
             await self.handle_order_paid(event, services)
-        elif event_type == "PAYMENT_SUCCESS":
-            await self.handle_payment_success(event, services)
         elif event_type == "RECENTLY_VIEWED":
             await self.handle_recently_viewed(event, services)
 
@@ -248,24 +246,6 @@ class RedisStreamConsumer:
             id=int(event["order_id"]), user_id=int(event["user_id"]), services=services
         )
         await cache_srv.invalidate(tags=["users"])
-
-    async def handle_payment_success(self, event: dict, services: tuple):
-        try:
-            await self.db.payment.create(
-                data={
-                    "order": {"connect": {"id": int(event["order_id"])}},
-                    "amount": float(event["amount"]),
-                    "reference": event["reference"],
-                    "transaction_id": event["transaction_id"],
-                    "status": PaymentStatus.SUCCESS,
-                    "payment_method": PaymentMethod.PAYSTACK,
-                }
-            )
-        except Exception as e:
-            logger.error(
-                f"Failed to create order in handle_payment_success: {str(e)}"
-            )
-            raise Exception(f"Database error: {str(e)}")
 
     async def handle_recently_viewed(self, event: dict, services: tuple):
         order_srv, search_srv, cache_srv, setting_srv, notification_srv = services

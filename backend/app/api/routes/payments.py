@@ -1,5 +1,7 @@
+import hashlib
+import hmac
 import httpx
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends, Response
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends, Response, Request, Header
 from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
 from app.core.config import settings
 from app.schemas.payment import PaymentInitialize, PaymentCreate
@@ -72,15 +74,70 @@ async def create_payment(
 
     return await initialize_payment(cart, current_user)
 
+# @router.get("/verify/{reference}")
+# async def verify_payment(response: Response, srv: OrderDep, reference: str, user: CurrentUser) -> Order:
+#     """Verify a payment"""
+#     async with httpx.AsyncClient() as client:
+#         res = await client.get(
+#             f"{PAYSTACK_BASE_URL}/transaction/verify/{reference}",
+#             headers={
+#                 "Authorization": f"Bearer {PAYSTACK_SECRET_KEY}",
+#             }
+#         )
+
+#         if res.status_code != 200:
+#             raise HTTPException(status_code=400, detail="Failed to verify payment")
+
+#         data = res.json()
+
+#         order_in = OrderCreate(status=OrderStatus.PENDING, payment_status=PaymentStatus.SUCCESS)
+
+#         if data["data"]["status"] == "success":
+#             cart_number = data["data"]["metadata"]["cart_number"]
+
+#             order = await srv.create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cart_number)
+
+#             event = {
+#                 "type": "PAYMENT_SUCCESS",
+#                 "order_id": order.id,
+#                 "amount": data["data"]["amount"] / 100,
+#                 "reference": data["data"]["reference"],
+#                 "transaction_id": data["data"]["reference"],
+#                 "status": PaymentStatus.SUCCESS,
+#                 "payment_method": PaymentMethod.PAYSTACK,
+#             }
+#             await srv.event_bus.publish(event=event)
+
+#             response.delete_cookie(
+#                 key="_cart_id",
+#                 path="/",
+#                 httponly=True,
+#                 samesite="none",
+#                 secure=True,
+#                 domain=settings.COOKIE_DOMAIN,
+#             )
+
+#             return order
+#         else:
+#             event = {
+#                 "type": "PAYMENT_FAILED",
+#                 "order_id": order.id,
+#                 "amount": data["data"]["amount"] / 100,
+#                 "reference": data["data"]["reference"],
+#                 "transaction_id": data["data"]["reference"],
+#                 "status": PaymentStatus.FAILED,
+#                 "payment_method": PaymentMethod.PAYSTACK,
+#             }
+#             await srv.event_bus.publish(event=event)
+#             raise HTTPException(status_code=500, detail="payment verification failed")
+
+
 @router.get("/verify/{reference}")
 async def verify_payment(response: Response, srv: OrderDep, reference: str, user: CurrentUser) -> Order:
-    """Verify a payment"""
     async with httpx.AsyncClient() as client:
         res = await client.get(
             f"{PAYSTACK_BASE_URL}/transaction/verify/{reference}",
-            headers={
-                "Authorization": f"Bearer {PAYSTACK_SECRET_KEY}",
-            }
+            headers={"Authorization": f"Bearer {PAYSTACK_SECRET_KEY}"},
         )
 
         if res.status_code != 200:
@@ -88,47 +145,41 @@ async def verify_payment(response: Response, srv: OrderDep, reference: str, user
 
         data = res.json()
 
-        order_in = OrderCreate(status=OrderStatus.PENDING, payment_status=PaymentStatus.SUCCESS)
+        if data["data"]["status"] != "success":
+            raise HTTPException(status_code=400, detail="Payment verification failed")
 
-        if data["data"]["status"] == "success":
-            cart_number = data["data"]["metadata"]["cart_number"]
+        order = await srv.record_payment_success(
+            reference=data["data"]["reference"],
+            amount=data["data"]["amount"] / 100,
+            cart_number=data["data"]["metadata"]["cart_number"],
+            user_id=data["data"]["metadata"]["user_id"],
+        )
 
-            order = await srv.create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=cart_number)
+        response.delete_cookie(
+            key="_cart_id", path="/", httponly=True, samesite="none",
+            secure=True, domain=settings.COOKIE_DOMAIN,
+        )
+        return order
 
-            event = {
-                "type": "PAYMENT_SUCCESS",
-                "order_id": order.id,
-                "amount": data["data"]["amount"] / 100,
-                "reference": data["data"]["reference"],
-                "transaction_id": data["data"]["reference"],
-                "status": PaymentStatus.SUCCESS,
-                "payment_method": PaymentMethod.PAYSTACK,
-            }
-            await srv.event_bus.publish(event=event)
 
-            response.delete_cookie(
-                key="_cart_id",
-                path="/",
-                httponly=True,
-                samesite="none",
-                secure=True,
-                domain=settings.COOKIE_DOMAIN,
-            )
+@router.post("/webhooks/paystack")
+async def paystack_webhook(request: Request, srv: OrderDep, x_paystack_signature: str = Header(...)):
+    body = await request.body()
+    computed_sig = hmac.new(PAYSTACK_SECRET_KEY.encode(), body, hashlib.sha512).hexdigest()
+    if not hmac.compare_digest(computed_sig, x_paystack_signature):
+        raise HTTPException(status_code=403, detail="Invalid signature")
 
-            return order
-        else:
-            event = {
-                "type": "PAYMENT_FAILED",
-                "order_id": order.id,
-                "amount": data["data"]["amount"] / 100,
-                "reference": data["data"]["reference"],
-                "transaction_id": data["data"]["reference"],
-                "status": PaymentStatus.FAILED,
-                "payment_method": PaymentMethod.PAYSTACK,
-            }
-            await srv.event_bus.publish(event=event)
-            raise HTTPException(status_code=500, detail="payment verification failed")
+    payload = await request.json()
+    if payload["event"] == "charge.success":
+        data = payload["data"]
+        await srv.record_payment_success(
+            reference=data["reference"],
+            amount=data["amount"] / 100,
+            cart_number=data["metadata"]["cart_number"],
+            user_id=data["metadata"]["user_id"],
+        )
 
+    return {"status": "received"}
 
 @router.post("/", dependencies=[Depends(require_user)])
 async def create(srv: OrderDep, create: PaymentCreate, background_tasks: BackgroundTasks):

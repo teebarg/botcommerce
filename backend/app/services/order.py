@@ -2,6 +2,8 @@ import uuid
 from typing import Optional, Any, Dict
 from fastapi import HTTPException, BackgroundTasks
 from prisma import Prisma
+from prisma.errors import UniqueViolationError
+from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
 from app.models.order import OrderCreate
 from app.core.logging import logger
 from app.services.invoice import invoice_service
@@ -450,3 +452,50 @@ class OrderService:
             logger.debug(f"Referral cashback email sent to user: {coupon_owner.id}")
         except Exception as e:
             logger.error(f"Failed to generate referral cashback email: {e}")
+
+    async def record_payment_success(
+        self, reference: str, amount: float, cart_number: str, user_id: int
+    ) -> Order:
+        """
+        Idempotency is enforced two ways:
+        1. Reuse an already-converted cart's order, rather than creating a
+        duplicate, if a previous attempt got that far.
+        2. Catch a unique constraint violation on Payment.order_id as the
+        final safety net for a race between near-simultaneous deliveries
+        (webhook + client verify arriving at nearly the same time).
+        """
+        cart = await self.db.cart.find_unique(
+            where={"cart_number": cart_number}, include={"order": True}
+        )
+        if not cart:
+            raise Exception(f"Cart not found for cart_number {cart_number}")
+
+        if cart.order:
+            order = cart.order
+        else:
+            order = await self.create_order_from_cart(
+                order_in=OrderCreate(status=OrderStatus.PENDING, payment_status=PaymentStatus.SUCCESS),
+                user_id=user_id,
+                cart_number=cart_number,
+            )
+
+        try:
+            await self.db.payment.create(
+                data={
+                    "order": {"connect": {"id": order.id}},
+                    "amount": amount,
+                    "reference": reference,
+                    "transaction_id": reference,
+                    "status": PaymentStatus.SUCCESS,
+                    "payment_method": PaymentMethod.PAYSTACK,
+                }
+            )
+        except UniqueViolationError:
+            logger.debug(f"Payment already recorded for order {order.id}, skipping (race-safe no-op)")
+            return order
+
+        logger.info(f"Payment recorded for order {order.id}, reference {reference}")
+
+        await self.event_bus.publish({"type": "ORDER_PAID", "order_id": order.id})
+
+        return order
