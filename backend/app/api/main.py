@@ -12,6 +12,7 @@ from app.api.routes import (
     delivery,
     faq,
     chat,
+    internal,
     order,
     gallery,
     payments,
@@ -54,3 +55,4 @@ api_router.include_router(user_interaction.router, prefix="/user-interactions", 
 api_router.include_router(catalog.router, prefix="/catalog", tags=["catalog"])
 api_router.include_router(coupon.router, prefix="/coupon", tags=["coupon"])
 api_router.include_router(wallet.router, prefix="/wallet", tags=["wallet"])
+api_router.include_router(internal.router, prefix="/internal", tags=["internal"])
