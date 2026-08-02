@@ -193,8 +193,6 @@ class RedisStreamConsumer:
             await self.handle_payment_success(event, services)
         elif event_type == "RECENTLY_VIEWED":
             await self.handle_recently_viewed(event, services)
-        elif event_type == "USER_REGISTERED":
-            await self.handle_user_registered(event, services)
 
     async def handle_order_paid(self, event: dict, services: tuple):
         order_srv = services[0]
@@ -331,45 +329,6 @@ class RedisStreamConsumer:
         await recent_service.track_product_interaction(
             product_id=product_id, interaction_type=interaction_type
         )
-
-    async def handle_user_registered(self, event: dict, services: tuple) -> None:
-        order_srv, search_srv, cache_srv, setting_srv, notification_srv = services
-        try:
-            code: str = (
-                f"{event['first_name'][:4]}{uuid.uuid4().hex[:4]}".upper()
-            )
-            coupon = await self.db.coupon.create(
-                data={
-                    "code": code,
-                    "discount_type": "PERCENTAGE",
-                    "discount_value": 10,
-                    "min_cart_value": 5000,
-                    "max_uses": 1000,
-                    "valid_from": datetime.now(),
-                    "valid_until": datetime.now() + timedelta(weeks=500),
-                    "users": {"connect": [{"id": int(event["id"])}]},
-                }
-            )
-
-            await self.db.user.update(
-                where={"id": int(event["id"])}, data={"referral_code": code}
-            )
-            welcome_email = await generate_welcome_email(
-                email_to=event["email"],
-                first_name=event["first_name"],
-                coupon=coupon,
-                shop_settings=setting_srv,
-            )
-            await notification_srv.send(
-                channel_name="email",
-                recipient=event["email"],
-                subject=welcome_email.subject,
-                message=welcome_email.html_content,
-            )
-            await cache_srv.invalidate(tags=["coupons", "users"])
-        except Exception as e:
-            logger.error(f"Failed to send welcome email: {str(e)}")
-            raise Exception(f"Email error: {str(e)}")
 
     async def send_order_notification(self, id: int, user_id: int, services: tuple):
         order_srv, search_srv, cache_srv, setting_srv, notification_srv = services

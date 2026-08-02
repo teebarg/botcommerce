@@ -153,6 +153,10 @@ async def create(srv: OrderDep, create: PaymentCreate, background_tasks: Backgro
                 "payment_method": PaymentMethod.PAYSTACK,
             }
         )
+    await srv.cache_srv.redis.enqueue_job(
+        "generate_and_send_invoice",
+        order_number=order.order_number,
+    )
     background_tasks.add_task(srv.process_order_payment, order_id=create.order_id)
     return payment
 

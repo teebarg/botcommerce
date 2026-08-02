@@ -16,23 +16,6 @@ class EventBus:
         except Exception as e:
             logger.error(f"Failed to publish event: {e}", exc_info=True)
 
-    async def publish_user_registered(self, user, source: str, created_at: Optional[Any] = None):
-        payload = {
-            "type": "USER_REGISTERED",
-            "id": user.id,
-            "email": user.email,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "status": user.status,
-            "role": user.role,
-            "source": source,
-        }
-
-        if created_at:
-            payload["created_at"] = created_at.isoformat()
-
-        await self.publish(payload)
-
     async def publish_order_event(self, order, event_type: str):
         payload = {
             "type": event_type,

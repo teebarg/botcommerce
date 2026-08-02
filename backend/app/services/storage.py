@@ -58,6 +58,9 @@ class MediaStorageService:
     def upload_file(self, bucket: str, filename: str, bytes, content_type: str):
         return supabase.storage.from_(bucket).upload(filename, bytes, {"contentType": content_type})
 
+    def delete_file(self, bucket: str, filename: str):
+        return supabase.storage.from_(bucket).remove([filename])
+
     def get_public_url(self, bucket: str, filename: str):
         return supabase.storage.from_(bucket).get_public_url(filename, {"download": filename})
 

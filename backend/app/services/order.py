@@ -187,6 +187,10 @@ class OrderService:
 
         if order_in.payment_status == "SUCCESS":
             await self.event_bus.publish_order_event(order=new_order, event_type="ORDER_PAID")
+            await self.cache_srv.redis.enqueue_job(
+                "generate_and_send_invoice",
+                order_number=new_order.order_number,
+            )
 
         await self.cache_srv.invalidate(tags=["orders", "stats-trends"])
 
@@ -221,7 +225,7 @@ class OrderService:
         except Exception as e:
             logger.error(f"Failed to send confirmation notification: {e}")
 
-    async def create_invoice(self, order_id: int) -> str:
+    async def create_invoice(self, order_id: int, force: bool = False) -> str:
         try:
             order = await self.db.order.find_unique(
                 where={"id": order_id},
@@ -231,6 +235,11 @@ class OrderService:
                 logger.error(f"Order not found for ID: {order_id}")
                 raise Exception("Order not found")
 
+            if order.invoice_url and not force:
+                logger.debug(f"Invoice already exists for order {order_id}, skipping regeneration")
+                return order.invoice_url
+
+            old_url = order.invoice_url if force else None
             shop_settings = await self.db.shopsettings.find_many()
             settings_dict = {setting.key: setting.value for setting in shop_settings}
 
@@ -245,6 +254,14 @@ class OrderService:
             public_url = self.storage_srv.get_public_url(bucket="invoices", filename=filename)
             await self.db.order.update(where={"id": order_id}, data={"invoice_url": public_url})
             await self.cache_srv.invalidate(f"order:{order_id}", tags=["orders"])
+
+            if old_url:
+                try:
+                    old_filename = old_url.rsplit("/", 1)[-1]
+                    self.storage_srv.delete_file(bucket="invoices", filename=old_filename)
+                    logger.info(f"Removed superseded invoice file for order {order_id}: {old_filename}")
+                except Exception as e:
+                    logger.error(f"Failed to remove old invoice file for order {order_id}: {e}")
             return public_url
         except Exception as e:
             raise Exception(str(e))
@@ -310,16 +327,6 @@ class OrderService:
         if not order:
             logger.error(f"Order not found for ID: {order_id}")
             raise Exception("Order not found")
-
-        try:
-            await self.create_invoice(order_id)
-        except Exception as e:
-            logger.error(f"Failed to create invoice for order {order_id}: {e}")
-
-        try:
-             await self.send_payment_receipt(order=order)
-        except Exception as e:
-            logger.error(f"Failed to send payment receipt for order {order_id}: {e}")
 
         try:
             await self.decrement_variant_inventory_for_order(order=order)
