@@ -2,7 +2,7 @@ import uuid
 from typing import Optional, Any, Dict
 from fastapi import HTTPException, BackgroundTasks
 from prisma import Prisma
-from prisma.errors import UniqueViolationError
+from prisma.errors import UniqueViolationError, DataError
 from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
 from app.models.order import OrderCreate
 from app.core.logging import logger
@@ -270,10 +270,18 @@ class OrderService:
 
     async def decrement_variant_inventory_for_order(self, order: Any) -> None:
         out_of_stock_variants = []
-        try:
-            for item in order.order_items:
+        for item in order.order_items:
+            try:
                 variant_id = item.variant_id
                 quantity = item.quantity
+
+                if variant_id is None:
+                    logger.warning(
+                        f"OrderItem {item.id} on order {order.id} has no variant "
+                        f"(deleted since order was placed) — skipping inventory decrement"
+                    )
+                    continue
+
                 variant = await self.db.productvariant.find_unique(where={"id": variant_id})
                 if not variant:
                     logger.warning(f"Variant {variant_id} not found for order {order.id}")
@@ -292,10 +300,15 @@ class OrderService:
                 if out_of_stock:
                     out_of_stock_variants.append(variant)
 
+            except Exception as e:
+                logger.error(
+                    f"Failed to decrement inventory for item {item.id} on order {order.id}: {e}"
+                )
+
+        try:
             await self.cache_srv.invalidate(tags=["gallery"])
         except Exception as e:
-            logger.error(f"Failed to decrement variant inventory for order {order.id}: {e}")
-            raise Exception("Failed to decrement variant inventory for order")
+            logger.error(f"Failed to invalidate gallery cache for order {order.id}: {e}")
 
         if out_of_stock_variants and self.notification_srv:
             try:
@@ -424,6 +437,20 @@ class OrderService:
         if not coupon_owner:
             return
 
+        # Self-referral guard
+        if coupon_owner.id == order.user_id:
+            logger.debug(
+                f"Order {order.order_number} used owner's own referral code — no cashback issued"
+            )
+            return
+
+        existing = await self.db.wallettransaction.find_first(
+            where={"reference_id": order.order_number, "type": "CASHBACK"}
+        )
+        if existing:
+            logger.debug(f"Referral cashback already issued for order {order.order_number}, skipping")
+            return
+
         async with self.db.tx() as tx:
             await tx.wallettransaction.create(
                 data={
@@ -465,13 +492,17 @@ class OrderService:
         (webhook + client verify arriving at nearly the same time).
         """
         cart = await self.db.cart.find_unique(
-            where={"cart_number": cart_number}, include={"order": True}
+            where={"cart_number": cart_number},
+            include={"order": {"include": {"payment": True}}},
         )
         if not cart:
             raise Exception(f"Cart not found for cart_number {cart_number}")
 
         if cart.order:
             order = cart.order
+            if order.payment:
+                logger.debug(f"Payment already recorded for order {order.id}, skipping")
+                return order
         else:
             order = await self.create_order_from_cart(
                 order_in=OrderCreate(status=OrderStatus.PENDING, payment_status=PaymentStatus.SUCCESS),
@@ -490,6 +521,11 @@ class OrderService:
                     "payment_method": PaymentMethod.PAYSTACK,
                 }
             )
+        except DataError as e:
+            if "OrderToPayment" in str(e):
+                logger.debug(f"Payment already recorded for order {order.id} (race), skipping")
+                return order
+            raise  # a different DataError — don't silently swallow unrelated failures
         except UniqueViolationError:
             logger.debug(f"Payment already recorded for order {order.id}, skipping (race-safe no-op)")
             return order

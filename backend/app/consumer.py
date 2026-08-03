@@ -230,7 +230,6 @@ class RedisStreamConsumer:
                 },
             )
 
-            # Injecting resolved search container seamlessly
             service = PopularProductsService(search_srv=search_srv)
             for item in order_items:
                 await service.track_product_interaction(
