@@ -4,14 +4,13 @@ from fastapi import HTTPException, BackgroundTasks
 from prisma import Prisma
 from prisma.errors import UniqueViolationError, DataError
 from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
-from app.models.order import OrderCreate
 from app.core.logging import logger
 from app.services.invoice import invoice_service
+from app.core.dependencies.services import get_shop_settings_service
 from datetime import datetime
 from app.core.deps import Notification
 from app.services.product import ProductService
 from app.core.config import settings
-from app.services.events import EventBus
 from app.services.shop_settings import ShopSettingsService
 from app.services.cart import CartService
 from app.services.coupon import CouponService
@@ -30,7 +29,6 @@ class OrderService:
         coupon_srv: CouponService,
         settings_srv: ShopSettingsService,
         notification_dispatcher: Notification,
-        event_bus: EventBus,
         cache_srv: CacheService,
         storage_srv: MediaStorageService
     ):
@@ -40,7 +38,6 @@ class OrderService:
         self.coupon_srv = coupon_srv
         self.settings_srv = settings_srv
         self.notification_srv = notification_dispatcher
-        self.event_bus = event_bus
         self.cache_srv = cache_srv
         self.storage_srv = storage_srv
 
@@ -118,7 +115,7 @@ class OrderService:
             "limit": limit
         }
 
-    async def create_order_from_cart(self, order_in: OrderCreate, user_id: int, cart_number: str) -> Any:
+    async def create_order_from_cart(self, user_id: int, cart_number: str) -> Any:
         order_number: str = f"ORD{uuid.uuid4().hex[:8].upper()}"
         cart = await self.cart.get_active_cart(cart_number=cart_number, user_id=user_id, include_relations=True)
         if not cart:
@@ -148,8 +145,8 @@ class OrderService:
             "shipping_fee": cart.shipping_fee,
             "discount_amount": cart.discount_amount,
             "wallet_used": cart.wallet_used,
-            "status": order_in.status,
-            "payment_status": order_in.payment_status,
+            "status": OrderStatus.PENDING,
+            "payment_status": PaymentStatus.PENDING,
             "shipping_method": cart.shipping_method,
             "payment_method": cart.payment_method,
             "cart": {"connect": {"id": cart.id}},
@@ -185,17 +182,17 @@ class OrderService:
             logger.error(f"Failed to create order: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
-        await self.event_bus.publish_order_event(order=new_order, event_type="ORDER_CREATED")
+        await self.cache_srv.redis.enqueue_job("order_created", order_id=new_order.id)
 
-        if order_in.payment_status == "SUCCESS":
-            await self.event_bus.publish_order_event(order=new_order, event_type="ORDER_PAID")
-            await self.cache_srv.redis.enqueue_job(
-                "generate_and_send_invoice",
-                order_number=new_order.order_number,
+        if cart.payment_method == "WALLET" and (cart.total or 0) <= 0:
+            new_order = await self._finalize_paid_order(
+                order=new_order,
+                amount=cart.wallet_used or 0.0,
+                reference=f"{cart.cart_number}-WALLET",
+                payment_method=PaymentMethod.WALLET,
             )
 
         await self.cache_srv.invalidate(tags=["orders", "stats-trends"])
-
         return new_order
 
     async def send_confirmation_notification(self, id: int, user_id: int) -> None:
@@ -333,26 +330,6 @@ class OrderService:
         except Exception as e:
             logger.error(f"Failed to generate invoice email: {e}")
 
-    async def process_order_payment(self, order_id: int) -> None:
-        """Invoked by both API layer and internal Redis Stream Consumer tasks safely."""
-        order = await self.db.order.find_unique(
-            where={"id": order_id},
-            include={"order_items": {"include": {"variant": True}}, "user": True}
-        )
-        if not order:
-            logger.error(f"Order not found for ID: {order_id}")
-            raise Exception("Order not found")
-
-        try:
-            await self.decrement_variant_inventory_for_order(order=order)
-        except Exception as e:
-            logger.error(f"Failed to decrement variant inventory for order {order_id}: {e}")
-
-        try:
-            await self.process_referral(order=order)
-        except Exception as e:
-            logger.error(f"An error occurred while processing referral for order {order_id}: {e}")
-
     async def return_order_item(self, order_id: int, item_id: int, background_tasks: BackgroundTasks) -> Dict[str, str]:
         """
         Return an item from an order:
@@ -431,6 +408,9 @@ class OrderService:
 
     async def process_referral(self, order: Order) -> None:
         if not order.coupon_code:
+            logger.debug(
+                f"[process_referral] Order {order.order_number} has no coupon code, skipping"
+            )
             return
 
         coupon_owner = await self.db.user.find_unique(where={"referral_code": order.coupon_code})
@@ -439,6 +419,7 @@ class OrderService:
 
         # Self-referral guard
         if coupon_owner.id == order.user_id:
+            print(f"Order {order.order_number} used owner's own referral code — no cashback issued")
             logger.debug(
                 f"Order {order.order_number} used owner's own referral code — no cashback issued"
             )
@@ -451,7 +432,7 @@ class OrderService:
             logger.debug(f"Referral cashback already issued for order {order.order_number}, skipping")
             return
 
-        async with self.db.tx() as tx:
+        async with self.db.tx(timeout=15000) as tx:
             await tx.wallettransaction.create(
                 data={
                     "user": {"connect": {"id": coupon_owner.id}},
@@ -462,6 +443,7 @@ class OrderService:
                 }
             )
             await tx.user.update(where={"id": coupon_owner.id}, data={"wallet_balance": {"increment": order.discount_amount}})
+            await self.cache_srv.invalidate(tags=[f"wallet:{coupon_owner.id}"])
 
         try:
             from app.core.utils import generate_referral_cashback_email
@@ -505,10 +487,27 @@ class OrderService:
                 return order
         else:
             order = await self.create_order_from_cart(
-                order_in=OrderCreate(status=OrderStatus.PENDING, payment_status=PaymentStatus.SUCCESS),
                 user_id=user_id,
                 cart_number=cart_number,
             )
+
+        return await self._finalize_paid_order(
+            order=order, amount=amount, reference=reference, payment_method=PaymentMethod.PAYSTACK
+        )
+
+    async def _finalize_paid_order(
+        self, order: Any, amount: float, reference: str, payment_method: PaymentMethod
+    ) -> Any:
+        """
+        Single source of truth for marking an order paid — records the Payment 1-1 relation check + DataError
+        backstop for a race between concurrent callers.
+        """
+        order_with_payment = await self.db.order.find_unique(
+            where={"id": order.id}, include={"payment": True, "order_items": {"include": {"variant": True}}}
+        )
+        if order_with_payment.payment:
+            logger.debug(f"Payment already recorded for order {order.id}, skipping")
+            return order_with_payment
 
         try:
             await self.db.payment.create(
@@ -518,20 +517,73 @@ class OrderService:
                     "reference": reference,
                     "transaction_id": reference,
                     "status": PaymentStatus.SUCCESS,
-                    "payment_method": PaymentMethod.PAYSTACK,
+                    "payment_method": payment_method,
                 }
             )
         except DataError as e:
             if "OrderToPayment" in str(e):
                 logger.debug(f"Payment already recorded for order {order.id} (race), skipping")
-                return order
-            raise  # a different DataError — don't silently swallow unrelated failures
+                return await self.db.order.find_unique(where={"id": order.id})
+            raise
         except UniqueViolationError:
             logger.debug(f"Payment already recorded for order {order.id}, skipping (race-safe no-op)")
-            return order
+            return await self.db.order.find_unique(where={"id": order.id})
 
+        updated_order = await self.db.order.update(
+            where={"id": order.id}, data={"payment_status": PaymentStatus.SUCCESS}
+        )
         logger.info(f"Payment recorded for order {order.id}, reference {reference}")
 
-        await self.event_bus.publish({"type": "ORDER_PAID", "order_id": order.id})
+        try:
+            await self.decrement_variant_inventory_for_order(order=order_with_payment)
+        except Exception as e:
+            logger.error(f"Failed to decrement variant inventory for order {order.id}: {e}")
 
-        return order
+        await self.cache_srv.redis.enqueue_job("process_referral", order_id=order.id)
+        await self.cache_srv.redis.enqueue_job("generate_and_send_invoice", order_number=order.order_number)
+
+        return updated_order
+
+    async def send_order_notification(self, id: int):
+        setting_srv = get_shop_settings_service()
+        try:
+            order = await self.db.order.find_unique(
+                where={"id": id},
+                include={
+                    "order_items": {"include": {"variant": True}},
+                    "user": True,
+                    "shipping_address": True,
+                },
+            )
+
+            user = await self.db.user.find_unique(where={"id": order.user.id})
+            if not user:
+                logger.error(f"User not found for Order: {order.order_number}")
+                return
+
+            shop_email = await setting_srv.get("shop_email")
+            cc_list = [shop_email] if shop_email else []
+
+            order_link: str = f"{settings.FRONTEND_HOST}/order/confirmed/{order.order_number}"
+            items_overview: str = (
+                "\n".join(
+                    [
+                        f"• {it.name} x{it.quantity} - {it.price}"
+                        for it in (order.order_items or [])
+                    ]
+                )
+                if order.order_items
+                else "No items found"
+            )
+
+            await self.notification_srv.dispatch(
+                OrderConfirmedEvent(
+                    order=order,
+                    user=user,
+                    order_link=order_link,
+                    items_overview=items_overview,
+                    cc_list=cc_list,
+                )
+            )
+        except Exception as e:
+            logger.error(f"Failed to send notification: {e}")

@@ -2,7 +2,6 @@ from typing import Annotated
 from fastapi import Depends
 from app.services.chat import ConversationService
 from app.services.coupon import CouponService
-from app.services.events import EventBus
 from app.services.storage import MediaStorageService
 from app.services.user_interaction import InteractionService
 from app.core.dependencies.cache import CacheDep, CdnDep
@@ -31,11 +30,8 @@ def get_catalog_service(cache_srv: CacheDep) -> CatalogService:
 def get_conversation_service():
     return ConversationService()
 
-def get_event_bus() -> EventBus:
-    return EventBus(redis=redis_client)
-
-def get_interaction_service(evt_bus: EventBus = Depends(get_event_bus)) -> InteractionService:
-    return InteractionService(event_bus=evt_bus)
+def get_interaction_service(cache_srv: CacheDep) -> InteractionService:
+    return InteractionService(cache_srv=cache_srv)
 
 def get_category_service(cache_srv: CacheDep, cdn_srv: CdnDep) -> CategoryService:
     return CategoryService(cache_srv=cache_srv, cdn_srv=cdn_srv)

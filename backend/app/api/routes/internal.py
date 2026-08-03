@@ -5,6 +5,7 @@ from fastapi import (
     Depends,
     HTTPException,
 )
+from prisma.enums import CartStatus, OrderStatus
 from app.prisma_client import prisma as db
 from app.core.dependencies.services import SettingsDep
 from app.core.logging import get_logger
@@ -44,8 +45,60 @@ async def internal_generate_invoice(order_number: str, order_srv: OrderDep, forc
 
 
 @router.post(
+    "/orders/{order_id}/process-created",
+    include_in_schema=False,
+    dependencies=[Depends(verify_internal_signature)],
+)
+async def internal_order_creation(order_id: int, cache_srv: CacheDep, order_srv: OrderDep):
+    order = await order_srv.db.order.find_unique(where={"id": order_id})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    try:
+        async with db.tx() as tx:
+            await tx.ordertimeline.upsert(
+                where={"id": order.id, "from_status": OrderStatus.PENDING},
+                data={
+                    "create": {
+                        "order": {"connect": {"id": order.id}},
+                        "message": f'order {order.order_number} created',
+                        "from_status": OrderStatus.PENDING,
+                        "to_status": OrderStatus.PENDING,
+                    },
+                    "update": {
+                    }
+                }
+            )
+            await tx.cart.update(
+                where={"id": order.cart_id},
+                data={
+                    "status": CartStatus.CONVERTED,
+                },
+            )
+    except Exception as e:
+        logger.error(f"[internal_order_creation]: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
+
+    await cache_srv.invalidate(tags=["users"])
+    await order_srv.send_order_notification(id=order.id)
+    
+    return {"status": "ok", "invoice_url": order.invoice_url}
+
+@router.post(
+    "/orders/{order_id}/process-referral",
+    include_in_schema=False,
+    dependencies=[Depends(verify_internal_signature)],
+)
+async def internal_process_referral(order_id: int, srv: OrderDep):
+    order = await srv.db.order.find_unique(where={"id": order_id})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    await srv.process_referral(order=order)
+    return {"status": "ok", "order_id": order_id}
+
+
+@router.post(
     "/user/{user_id}/welcome",
-    include_in_schema=True,
+    include_in_schema=False,
     dependencies=[Depends(verify_internal_signature)],
 )
 async def internal_user_signup(

@@ -2,7 +2,7 @@ from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, BackgroundTasks, Cookie, Response
 from prisma.enums import OrderStatus
 from app.prisma_client import prisma as db
-from app.models.order import Order, OrderCreate, OrderTimelineEntry, PaginatedOrders, OrderNotesUpdate, ReturnItemPayload
+from app.models.order import Order, OrderTimelineEntry, PaginatedOrders, OrderNotesUpdate, ReturnItemPayload
 from app.core.logging import get_logger
 from app.models.generic import Message
 from app.core.permissions import require_admin
@@ -27,14 +27,13 @@ def orders_cache_key(user, request: Request):
 async def create_order(
     response: Response,
     srv: OrderDep,
-    order_in: OrderCreate,
     user: CurrentUser,
     _cart_id: Annotated[str | None, Cookie()] = None
 ) -> Order:
     if _cart_id is None:
         raise HTTPException(status_code=400, detail="Please provide cart number")
     try:
-        order = await srv.create_order_from_cart(order_in=order_in, user_id=user.id, cart_number=_cart_id)
+        order = await srv.create_order_from_cart(user_id=user.id, cart_number=_cart_id)
         response.delete_cookie(
             key="_cart_id", path="/", httponly=True, samesite="none", secure=True, domain=settings.COOKIE_DOMAIN,
         )

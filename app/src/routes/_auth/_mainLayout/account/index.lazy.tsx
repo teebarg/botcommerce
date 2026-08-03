@@ -22,7 +22,7 @@ const OrderItem: React.FC<{ order: Order; idx: number }> = ({ order, idx }) => {
                     className="bg-card rounded-2xl p-4 border border-border flex items-center gap-4"
                     style={{ animationDelay: `${250 + idx * 50}ms` }}
                 >
-                    <img src={order.order_items[0].image} alt="Order item" className="w-14 h-14 rounded-xl object-cover" />
+                    <img src={order.order_items?.[0].image} alt="Order item" className="w-14 h-14 rounded-xl object-cover" />
                     <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm">{order.order_number}</p>
                         <p className="text-xs text-muted-foreground flex items-center gap-1">

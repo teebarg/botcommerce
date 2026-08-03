@@ -28,17 +28,6 @@ class RecentlyViewedService:
 
         await self.cache_srv.invalidate(f"products:recently-viewed:{user_id}")
 
-    async def remove_product_from_all(self, product_id: int):
-        """Remove a product from all users' recently viewed list"""
-        keys = await redis_client.keys("recently_viewed:*")
-        try:
-            for key in keys:
-                await redis_client.zrem(key, str(product_id))
-
-            await self.cache_srv.invalidate(tags=["products:recently-viewed"])
-        except Exception as e:
-            logger.error(f"Error removing product from recently viewed list: {str(e)}")
-
     async def get_recently_viewed(self, user_id: int, limit: int = 10) -> List[dict]:
         """Get user's recently viewed products"""
         key: str = await self.get_key(user_id)

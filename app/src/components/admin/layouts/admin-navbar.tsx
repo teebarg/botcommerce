@@ -14,7 +14,7 @@ const AdminNavbar = () => {
 
         const observer = new ResizeObserver((entries) => {
             for (let entry of entries) {
-                const height = entry.borderBoxSize[0].blockSize;
+                const height = entry.borderBoxSize?.[0].blockSize;
                 document.documentElement.style.setProperty("--admin-nav-height", `${height}px`);
             }
         });

@@ -22,11 +22,6 @@ class OrderItemCreate(BaseModel):
     quantity: int
     price: float
 
-class OrderCreate(BaseModel):
-    status: Optional[OrderStatus] = OrderStatus.PENDING
-    payment_status: Optional[PaymentStatus] = PaymentStatus.PENDING
-    coupon_id: Optional[int] = None
-
 class Order(BaseModel):
     id: int
     email: Optional[EmailStr] = None

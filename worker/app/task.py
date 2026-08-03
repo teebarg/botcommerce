@@ -17,13 +17,39 @@ async def startup(ctx):
             await asyncio.sleep(3600)
 
     await db.connect()
-
     ctx['db_pool'] = db.get_pool()
 
 async def shutdown(ctx):
     """Runs exactly once when the worker gracefully shuts down"""
-    print("🛑 Disconnecting Worker Database Pool...")
+    logger.debug("🛑 Disconnecting Worker Database Pool...")
     await db.disconnect()
+
+async def on_job_success(ctx):
+    """
+    Fires on after_job_end. Accepts ONLY 'ctx' as an argument.
+    """
+    job_id = ctx.get('job_id')
+    job_result = ctx.get('job_result')
+    duration = job_result.execution_duration if job_result else 0.0
+    
+    logger.info(
+        f"✅ *Job Completed Successfully*\n"
+        f"• *ID*: `{job_id}`\n"
+        f"• *Duration*: `{duration:.2f}s`"
+    )
+
+async def on_job_failure(ctx):
+    """
+    Fires on on_job_error. Accepts ONLY 'ctx' as an argument.
+    """
+    job_id = ctx.get('job_id')
+    exception = ctx.get('job_error', 'Unknown Error')
+    
+    logger.error(
+        f"🚨 *Job Permanently Failed*\n"
+        f"• *ID*: `{job_id}`\n"
+        f"• *Error Reason*: `{str(exception)}`"
+    )
 
 class WorkerSettings:
     functions = [*all_ecommerce_tasks]
@@ -31,10 +57,13 @@ class WorkerSettings:
     on_startup = startup
     on_shutdown = shutdown
 
+    after_job_end = on_job_success
+    on_job_error = on_job_failure
+
     cron_jobs = [
         cron(
             enrich_products,
-            hour={0, 6, 12, 18},             # Targets execution blocks 6 hours apart
+            hour={0, 3, 6, 9, 12, 15, 18, 21},  # Targets execution blocks 3 hours apart
             minute=0,                        # Locks it to the top of the hour to prevent continuous looping
             name="enrich_products",
             run_at_startup=True,
@@ -52,4 +81,4 @@ class WorkerSettings:
     redis_settings = RedisSettings.from_dsn(settings.BROKER_URL)
     max_jobs = 10
     job_timeout = 3000
-    max_tries = 3
+    max_tries = 5

@@ -23,19 +23,13 @@ from app.prisma_client import prisma as db
 from app.services.websocket import manager
 from app.redis_client import redis_client
 from app.core.logging import get_logger
-from app.consumer import RedisStreamConsumer
 from app.core.deps import Notification
-from app.core.dependencies.consumer_factory import consumer_factory
 from app.core.dependencies.product import SearchDep
 from app.core.notifications.setup import init_notification_service
 from app.core.dependencies.services import SettingsDep
 from app.services.cache import L1Cache, run_l1_invalidation_listener
 from app.lib.cache import add_cache_headers
 from app.core.dependencies.cache import CdnDep, CacheDep
-
-STREAM_NAME = "EVENT_STREAMS"
-GROUP_NAME = "notifications"
-CONSUMER_NAME = "notif-api-worker"
 
 logger = get_logger(__name__)
 
@@ -47,19 +41,7 @@ async def lifespan(app: FastAPI):
     app.state.redis = redis_client
     app.state.l1_cache = L1Cache(max_size=5000, ttl=60.0)
 
-    # try:
-    #     logger.debug("Creating Redis stream and group")
-    #     await redis_client.xgroup_create(STREAM_NAME, GROUP_NAME, id="$", mkstream=True)
-    # except Exception as e:
-    #     logger.error(f"Failed to create Redis stream and group: {e}")
-    #     if "BUSYGROUP" in str(e):
-    #         pass  # group already exists
-
     init_notification_service()
-    consumer = RedisStreamConsumer(stream=STREAM_NAME, group=GROUP_NAME, consumer=CONSUMER_NAME, db_client=db, service_factory=consumer_factory)
-
-    app.state.consumer = consumer
-    await consumer.start()
     await manager.start()
 
     listener_task = asyncio.create_task(
@@ -70,7 +52,6 @@ async def lifespan(app: FastAPI):
 
     if manager.cleanup_task:
         manager.cleanup_task.cancel()
-    await consumer.stop()
     await db.disconnect()
 
     listener_task.cancel()
@@ -153,10 +134,10 @@ async def test_arq(request: Request, cache_srv: CacheDep) -> Dict[str, Any]:
     #     "generate_and_send_invoice",
     #     order_number="ORDE1612788",
     # )
-    await cache_srv.redis.enqueue_job(
-        "user_register",
-        user_id=1,
-    )
+    # await cache_srv.redis.enqueue_job(
+    #     "user_register",
+    #     user_id=1,
+    # )
     return {"message": "ok"}
 
 @app.post("/api/purge-cdn")
@@ -321,15 +302,3 @@ async def generate_sitemap(request: Request):
     await redis.setex("sitemap", 3600, full_sitemap)
 
     return Response(content=full_sitemap, media_type="application/xml")
-
-
-@app.on_event("startup")
-async def start_websocket_manager():
-    await manager.start()
-
-
-@app.post("/api/process-stale-messages")
-async def process_stale_messages(request: Request, background_tasks: BackgroundTasks):
-    consumer = request.app.state.consumer
-    background_tasks.add_task(consumer.claim_stale_messages)
-    return {"message": "success"}

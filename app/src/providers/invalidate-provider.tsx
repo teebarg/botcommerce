@@ -44,7 +44,7 @@ function InvalidateProviderInner({ children }: { children: React.ReactNode }) {
     useWebSocketMessage((message) => {
         if (message.type !== "invalidate") return;
         const handleInvalidation = (keySegments: string[]) => {
-            if (keySegments[0] === "cart" && keySegments[1]) {
+            if (keySegments?.[0] === "cart" && keySegments[1]) {
                 const incomingCartId = keySegments[1];
                 if (incomingCartId === cart?.cart_number) {
                     queryClient.invalidateQueries({ queryKey: ["cart"] });

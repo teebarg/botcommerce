@@ -15,7 +15,7 @@ export const ProductCard = ({ product }: { product: ChatProduct }) => {
     const loading = creating || updating;
 
     const variantInCart = useMemo(() => {
-        return cart?.items?.find((item: CartItem) => item.variant_id == product.variants[0].id);
+        return cart?.items?.find((item: CartItem) => item.variant_id == product.variants?.[0].id);
     }, [cart, product.id]);
 
     const handleAddToCart = async () => {
@@ -28,7 +28,7 @@ export const ProductCard = ({ product }: { product: ChatProduct }) => {
             return;
         }
         addToCart({
-            variant_id: product.variants[0].id,
+            variant_id: product.variants?.[0].id,
             quantity: 1,
         }).then(() => {
             track("product_added_to_cart", { variant_id: product.id })
@@ -39,7 +39,7 @@ export const ProductCard = ({ product }: { product: ChatProduct }) => {
             <div className="relative h-28 overflow-hidden">
                 <img src={product.image || "/placeholder.jpg"} alt={product.name} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <span className="absolute bottom-2 left-2 text-xs font-semibold text-foreground">{currency(product.variants[0].price)}</span>
+                <span className="absolute bottom-2 left-2 text-xs font-semibold text-foreground">{currency(product.variants?.[0].price)}</span>
             </div>
             <div className="p-3 space-y-2">
                 <p className="text-xs font-medium text-foreground truncate">{product.name}</p>
