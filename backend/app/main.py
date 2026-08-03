@@ -131,10 +131,6 @@ class PurgeCdn(BaseModel):
 @app.post("/api/test-arq")
 async def test_arq(request: Request, cache_srv: CacheDep) -> Dict[str, Any]:
     # await cache_srv.redis.enqueue_job(
-    #     "generate_and_send_invoice",
-    #     order_number="ORDE1612788",
-    # )
-    # await cache_srv.redis.enqueue_job(
     #     "user_register",
     #     user_id=1,
     # )

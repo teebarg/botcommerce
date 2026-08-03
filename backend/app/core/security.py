@@ -2,11 +2,11 @@
 import hashlib
 import hmac
 import time
-from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from fastapi import Header, HTTPException, Request
 from passlib.context import CryptContext
 
 from app.core.config import settings
-from app.core.logging import logger  # your Slack-wired logger
+from app.core.logging import logger
 
 MAX_CLOCK_SKEW_SECONDS = 60
 
@@ -42,8 +42,8 @@ def verify_request(secret: str, method: str, path: str, body: bytes, timestamp: 
     if abs(time.time() - ts) > MAX_CLOCK_SKEW_SECONDS:
         return False  # too old — likely a replay, or wildly wrong clock
 
-    expected = sign_request(secret, method, path, body, timestamp)
-    return hmac.compare_digest(expected, signature)  # constant-time, avoids timing attacks
+    expected: str = sign_request(secret, method, path, body, timestamp)
+    return hmac.compare_digest(expected, signature)
 
 
 async def verify_internal_signature(

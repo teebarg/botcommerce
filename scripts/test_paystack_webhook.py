@@ -9,7 +9,7 @@ WEBHOOK_URL = "http://localhost:5101/api/payment/webhooks/paystack"
 payload = {
     "event": "charge.success",
     "data": {
-        "reference": "CART-1-1785500706.0",  # match a real cart_number format
+        "reference": "CART-1-1785500706.0",
         "amount": 500000,  # kobo — 5000.00
         "metadata": {
             "cart_number": "cart_EY4U211LA5X19XD77ALUJVTSF",
