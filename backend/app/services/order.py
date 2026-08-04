@@ -462,9 +462,7 @@ class OrderService:
         except Exception as e:
             logger.error(f"Failed to generate referral cashback email: {e}")
 
-    async def record_payment_success(
-        self, reference: str, amount: float, cart_number: str, user_id: int
-    ) -> Order:
+    async def record_payment_success(self, reference: str, amount: float, cart_number: str, user_id: int):
         """
         Idempotency is enforced two ways:
         1. Reuse an already-converted cart's order, rather than creating a

@@ -31,7 +31,7 @@ async def on_job_success(ctx):
     job_id = ctx.get('job_id')
     job_result = ctx.get('job_result')
     duration = job_result.execution_duration if job_result else 0.0
-    
+
     logger.info(
         f"✅ *Job Completed Successfully*\n"
         f"• *ID*: `{job_id}`\n"
@@ -44,7 +44,7 @@ async def on_job_failure(ctx):
     """
     job_id = ctx.get('job_id')
     exception = ctx.get('job_error', 'Unknown Error')
-    
+
     logger.error(
         f"🚨 *Job Permanently Failed*\n"
         f"• *ID*: `{job_id}`\n"
@@ -64,7 +64,7 @@ class WorkerSettings:
         cron(
             enrich_products,
             hour={0, 3, 6, 9, 12, 15, 18, 21},  # Targets execution blocks 3 hours apart
-            minute=0,                        # Locks it to the top of the hour to prevent continuous looping
+            minute=0,
             name="enrich_products",
             run_at_startup=True,
             keep_result=0
