@@ -53,6 +53,10 @@ async def exchange_token(response: Response, cache_srv: CacheDep, cart_srv: Cart
                 "update": {"clerk_id": clerk_id},
             },
         )
+        await cache_srv.redis.enqueue_job(
+            "user_register",
+            user_id=user.id,
+        )
         await cache_srv.invalidate(tags=["stats-trends", "users"])
 
     session_data = {

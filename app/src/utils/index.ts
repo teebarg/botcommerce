@@ -68,7 +68,7 @@ const formatDate = (dateString?: string) => {
 export const getInitials = (name: string) => {
     return name
         ?.split(" ")
-        ?.map((n: string) => n[0])
+        ?.map((n: string) => n?.[0])
         ?.join("")
         ?.toUpperCase()
         ?.slice(0, 2);

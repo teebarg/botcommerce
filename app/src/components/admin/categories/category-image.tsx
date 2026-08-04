@@ -45,7 +45,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
         },
         maxSize: 5 * 1024 * 1024, // 5MB
         onDrop: (acceptedFiles: File[]) => {
-            const file = acceptedFiles[0];
+            const file = acceptedFiles?.[0];
 
             if (!file) return;
 

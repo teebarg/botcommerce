@@ -1,14 +1,14 @@
 from typing import Optional, Any
-from app.services.events import EventBus
 from fastapi import HTTPException
 from app.core.logging import get_logger
+from app.core.dependencies.cache import CacheDep
 
 logger = get_logger(__name__)
 
 class InteractionService:
 
-    def __init__(self, event_bus: EventBus):
-        self.event_bus = event_bus
+    def __init__(self, cache_srv: CacheDep):
+        self.cache_srv = cache_srv
 
     async def log_user_interaction(
         self,
@@ -19,15 +19,13 @@ class InteractionService:
     ):
         metadata = metadata or {}
         try:
-            event = {
-                "type": "RECENTLY_VIEWED",
-                "view_type": type,
-                "user_id": user_id,
-                "product_id": product_id,
-                "source": metadata.get("source", ""),
-                "time_spent": metadata.get("timeSpent", 0),
-            }
-            await self.event_bus.publish(event)
+            await self.cache_srv.redis.enqueue_job(
+                "recently_viewed",
+                view_type=type,
+                user_id=user_id,
+                product_id=product_id,
+                metadata=metadata,
+            )
         except Exception as e:
             logger.error(f"Interaction logging failed: {e}")
             raise HTTPException(status_code=400, detail=str(e))

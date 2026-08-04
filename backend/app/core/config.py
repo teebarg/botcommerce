@@ -113,6 +113,8 @@ class Settings(BaseSettings):
     CF_API_TOKEN: str = ""
     CF_ZONE_ID: str = ""
 
+    INTERNAL_WORKER_SECRET: str = ""
+
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)
         env_file=".env",

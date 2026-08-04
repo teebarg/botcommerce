@@ -28,7 +28,7 @@ function RouteComponent() {
     }
 
     if (error) {
-        toast.error(error.message);
+        toast.error("your card was declined, try another payment method");
         navigate({ to: "/checkout" });
     }
 

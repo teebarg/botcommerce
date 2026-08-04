@@ -93,11 +93,11 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
                             {variants.length > 0 && (
                                 <div className="flex gap-1">
                                     <span className="text-sm font-semibold text-white drop-shadow-sm">
-                                        {currency(variants[0]?.price || 0)}
+                                        {currency(variants?.[0]?.price || 0)}
                                     </span>
-                                    {variants[0]?.old_price > 0 && (
+                                    {variants?.[0]?.old_price > 0 && (
                                         <span className="text-xs text-white line-through">
-                                            {currency(variants[0]?.old_price || 0)}
+                                            {currency(variants?.[0]?.old_price || 0)}
                                         </span>
                                     )}
                                 </div>
