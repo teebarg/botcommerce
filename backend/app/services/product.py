@@ -43,6 +43,9 @@ class ProductService:
             "12+ years": "teenager",
         }
 
+    async def get(self, id: int):
+        return await self.db.product.find_unique(where={"id": id})
+
     async def get_by_slug(self, slug: str):
         return await self.db.product.find_unique(
             where={"slug": slug},

@@ -1,6 +1,6 @@
-from app.models.product import Product
+from typing import List, Optional, Any
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from app.models.product import Product
 
 class ProductImageResponse(BaseModel):
     id: int
@@ -27,8 +27,24 @@ class ProductImage(BaseModel):
     class Config:
         from_attributes = True
 
+class GalleryImage(BaseModel):
+    id: int
+    image: Optional[str] = None
+    images: Optional[ProductImage] = []
+    order: int
+    product_id: Optional[int] = None
+    product: Optional[Product] = None
+
+    class Config:
+        from_attributes = True
+
 class PaginatedProductImages(BaseModel):
     items: list[ProductImage]
+    next_cursor: int | None
+    limit: int
+
+class PaginatedGalleryImages(BaseModel):
+    items: list[GalleryImage]
     next_cursor: int | None
     limit: int
 

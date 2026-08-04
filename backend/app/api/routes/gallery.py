@@ -6,7 +6,7 @@ from app.models.product import (
     ImagesBulkUpdate,
     ProductImageBulkUrls,
 )
-from app.models.gallery import PaginatedProductImages
+from app.models.gallery import PaginatedProductImages, PaginatedGalleryImages
 from app.core.permissions import require_admin
 from app.prisma_client import prisma as db
 from app.services.cache import cacheable
@@ -29,13 +29,13 @@ async def image_gallery(
     name: Optional[str] = Query(default=None),
     start_date: Optional[str] = Query(default=None),
     end_date: Optional[str] = Query(default=None),
-) -> PaginatedProductImages:
+) -> PaginatedGalleryImages:
     """Image gallery endpoint using cursor-based pagination."""
     items = await srv.get_gallery_items(
         cursor=cursor, limit=limit, sort=sort, active=active, inventory=inventory,
         category_slug=category_slug, name=name, start_date=start_date, end_date=end_date,
     )
-    return PaginatedProductImages.validate(items)
+    return PaginatedGalleryImages.validate(items)
 
 
 @router.delete("/{image_id}", dependencies=[Depends(require_admin)])

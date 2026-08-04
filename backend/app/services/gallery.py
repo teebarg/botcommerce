@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from app.core.logging import get_logger
 from app.core.utils import slugify, generate_sku
 from app.prisma_client import Prisma
-from app.models.gallery import PaginatedProductImages
+from app.models.gallery import PaginatedProductImages, PaginatedGalleryImages
 from app.models.generic import ImageBulkDelete
 from app.models.product import (
     ProductImageMetadata,
@@ -110,16 +110,27 @@ class GalleryService:
 
         extra_filters_sql = "\n".join(extra_filters)
 
-        query = f"""
+        query: str = f"""
             SELECT
                 pi.id, pi.image, pi."order", pi.product_id,
                 p.id AS p_id, p.sku AS p_sku, p.name AS p_name,
                 p.description AS p_description, p.slug AS p_slug,
                 p.active AS p_active, p.is_new AS p_is_new,
+                COALESCE(
+                    JSON_AGG(
+                        DISTINCT JSONB_BUILD_OBJECT(
+                            'id', pi2.id,
+                            'image', pi2.image,
+                            'order', pi2."order"
+                        )
+                    ) FILTER (WHERE pi2.id IS NOT NULL),
+                    '[]'
+                ) AS images,
                 COALESCE(JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('id', pv.id, 'sku', pv.sku, 'product_id', pv.product_id, 'price', pv.price, 'old_price', pv.old_price, 'inventory', pv.inventory, 'status', pv.status, 'size', pv.size, 'color', pv.color, 'width', pv.width, 'length', pv.length, 'age', pv.age)) FILTER (WHERE pv.id IS NOT NULL), '[]') AS variants,
                 COALESCE(JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('id', pc.id, 'name', pc.name, 'slug', pc.slug)) FILTER (WHERE pc.id IS NOT NULL), '[]') AS categories,
                 COALESCE(JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('id', col.id, 'name', col.name, 'slug', col.slug)) FILTER (WHERE col.id IS NOT NULL), '[]') AS collections
             FROM "product_images" pi
+            LEFT JOIN "product_images" pi2 ON pi2.product_id = pi.product_id
             LEFT JOIN "products" p ON p.id = pi.product_id
             LEFT JOIN "product_variants" pv ON pv.product_id = p.id
             LEFT JOIN "_ProductCategories" cp ON cp."B" = p.id
@@ -131,7 +142,7 @@ class GalleryService:
         """
         return await self.db.query_raw(query, *args)
 
-    async def get_gallery_items(self, **kwargs) -> PaginatedProductImages:
+    async def get_gallery_items(self, **kwargs) -> PaginatedGalleryImages:
         limit = kwargs.get("limit", 40)
         try:
             images = await self.get_paginated_gallery(**kwargs)
@@ -146,6 +157,7 @@ class GalleryService:
             {
                 "id": img["id"],
                 "image": img["image"],
+                "images": img["images"],
                 "order": img["order"],
                 "product_id": img["product_id"],
                 "product": {
