@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from app.core.logging import get_logger
 from app.core.utils import slugify, generate_sku
 from app.prisma_client import Prisma
-from app.models.gallery import PaginatedProductImages, PaginatedGalleryImages
+from app.models.gallery import PaginatedGalleryImages
 from app.models.generic import ImageBulkDelete
 from app.models.product import (
     ProductImageMetadata,

@@ -6,7 +6,7 @@ from app.models.product import (
     ImagesBulkUpdate,
     ProductImageBulkUrls,
 )
-from app.models.gallery import PaginatedProductImages, PaginatedGalleryImages
+from app.models.gallery import PaginatedGalleryImages
 from app.core.permissions import require_admin
 from app.prisma_client import prisma as db
 from app.services.cache import cacheable

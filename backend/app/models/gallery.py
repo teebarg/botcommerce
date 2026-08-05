@@ -27,21 +27,21 @@ class ProductImage(BaseModel):
     class Config:
         from_attributes = True
 
+class ImageLite(BaseModel):
+    id: int
+    image: Optional[str] = None
+    order: int
+
 class GalleryImage(BaseModel):
     id: int
     image: Optional[str] = None
-    images: Optional[ProductImage] = []
+    images: Optional[List[ImageLite]] = []
     order: int
     product_id: Optional[int] = None
     product: Optional[Product] = None
 
     class Config:
         from_attributes = True
-
-class PaginatedProductImages(BaseModel):
-    items: list[ProductImage]
-    next_cursor: int | None
-    limit: int
 
 class PaginatedGalleryImages(BaseModel):
     items: list[GalleryImage]

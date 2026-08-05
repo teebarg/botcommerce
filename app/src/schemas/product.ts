@@ -109,6 +109,25 @@ export const ProductImageSchema = z.object({
     product_id: z.number().optional(),
 });
 
+export const ImageLiteSchema = z.object({
+    id: z.number(),
+    image: z.string(),
+    order: z.number()
+});
+
+export const GalleryImageSchema = z.object({
+    id: z.number(),
+    image: z.string(),
+    images: z.array(ImageLiteSchema),
+    order: z.number(),
+    product_id: z.number().optional(),
+    product: ProductSchema.optional(),
+});
+
+export const PaginatedGalleryImagesSchema = CursorSchema.extend({
+    items: z.array(GalleryImageSchema),
+});
+
 export const SearchVariantSchema = z.object({
     id: z.number(),
     sku: z.string(),
@@ -265,9 +284,11 @@ export type WishItem = z.infer<typeof WishItemSchema>;
 export type Wishlist = z.infer<typeof WishlistSchema>;
 
 export type ProductImage = z.infer<typeof ProductImageSchema>;
-export type PaginatedProductImages = z.infer<typeof PaginatedProductImagesSchema>;
 export type ProductVariant = z.infer<typeof ProductVariantSchema>;
 export type ProductVariantLite = z.infer<typeof ProductVariantLiteSchema>;
+export type ImageLite = z.infer<typeof ImageLiteSchema>;
+export type GalleryImage = z.infer<typeof GalleryImageSchema>;
+export type PaginatedGalleryImages = z.infer<typeof PaginatedGalleryImagesSchema>;
 
 export type Catalog = z.infer<typeof CatalogSchema>;
 export type SearchCatalog = z.infer<typeof SearchCatalogSchema>;

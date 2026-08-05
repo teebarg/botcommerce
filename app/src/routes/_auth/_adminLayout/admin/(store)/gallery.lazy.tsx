@@ -8,13 +8,14 @@ import { GalleryImagesUpload } from "@/components/admin/product/gallery-images-u
 import { useBulkDeleteGalleryImages } from "@/hooks/useGallery";
 import { cn } from "@/utils/cn";
 import { Button } from "@/components/ui/button";
-import { type PaginatedProductImages, type ProductImage } from "@/schemas";
+import { type GalleryImage, PaginatedGalleryImages } from "@/schemas";
 import { useWebSocketMessage } from "pulsews";
 import { InfiniteResourceList } from "@/components/InfiniteResourceList";
 import { useInfiniteResource } from "@/hooks/useInfiniteResource";
 import { api } from "@/utils/api";
 import { PageLoader } from "@/components/generic/page-loader";
 import EmptyState from "@/components/generic/empty";
+import { ImageLightbox, useLightbox } from "@/components/image-lightbox-revamp";
 
 export const Route = createLazyFileRoute("/_auth/_adminLayout/admin/(store)/gallery")({
     component: RouteComponent,
@@ -22,16 +23,18 @@ export const Route = createLazyFileRoute("/_auth/_adminLayout/admin/(store)/gall
 
 function RouteComponent() {
     const params = Route.useSearch();
+    const { open, setOpen, initialIndex, openAt } = useLightbox();
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
+    const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { mutateAsync: bulkDeleteImages, isPending: isDeleting } = useBulkDeleteGalleryImages();
     const BULK_ACTION_TOAST_ID = "bulk-action-toast";
 
-    const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedProductImages, ProductImage>({
+    const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedGalleryImages, GalleryImage>({
         queryKey: ["gallery", params],
-        queryFn: (cursor) => api.get<PaginatedProductImages>("/gallery/", { params: { cursor, ...params } }),
+        queryFn: (cursor) => api.get<PaginatedGalleryImages>("/gallery/", { params: { cursor, ...params } }),
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
     });
@@ -85,6 +88,11 @@ function RouteComponent() {
 
             return newSet;
         });
+    };
+
+     const onSelection = (image: GalleryImage) => {
+        setSelectedImage(image)
+        setOpen(true)
     };
 
     const handleBulkDelete = async () => {
@@ -148,13 +156,14 @@ function RouteComponent() {
                     onLoadMore={fetchNextPage}
                     hasMore={hasNextPage}
                     isLoading={isFetchingNextPage}
-                    renderItem={(item: ProductImage, idx: number) => (
+                    renderItem={(item: GalleryImage, idx: number) => (
                         <GalleryCard
                             key={idx}
                             image={item}
                             isSelected={selectedImages.has(item?.id)}
                             selectionMode={selectionMode}
                             onSelectionChange={handleSelectionChange}
+                            onSelection={onSelection}
                         />
                     )}
                     loader={<PageLoader variant="grid" />}
@@ -172,6 +181,12 @@ function RouteComponent() {
                     onDelete={handleBulkDelete}
                 />
             )}
+            <ImageLightbox
+                images={selectedImage?.images || []}
+                initialIndex={initialIndex}
+                open={open}
+                onOpenChange={setOpen}
+            />
         </div>
     );
 }

@@ -1,18 +1,22 @@
 import { GalleryCardActions } from "./gallery-card-actions";
 import { currency } from "@/utils";
-import type { ProductImage } from "@/schemas";
-import ImageLightbox from "@/components/image-lightbox";
+import type { GalleryImage } from "@/schemas";
+// import ImageLightbox from "@/components/image-lightbox";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/utils/cn";
+import ImageDisplay from "@/components/image-display";
 
 interface GalleryCardProps {
-    image: ProductImage;
+    image: GalleryImage;
     isSelected?: boolean;
     onSelectionChange?: (imageId: number, selected: boolean) => void;
+    onSelection?: (image: GalleryImage) => void;
     selectionMode?: boolean;
 }
 
-export function GalleryCard({ image, isSelected = false, onSelectionChange, selectionMode = false }: GalleryCardProps) {
+export function GalleryCard({ image, isSelected = false, onSelectionChange, onSelection, selectionMode = false }: GalleryCardProps) {
+    console.log(image)
+    console.log(image.images)
     if (!image) return null;
 
     const product = image.product;
@@ -42,15 +46,16 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
                 selectionMode ? "cursor-pointer" : "cursor-default",
                 isSelected ? "ring-2 ring-primary ring-offset-1" : ""
             )}
-            onClick={() => selectionMode && onSelectionChange?.(image.id, !isSelected)}
+            onClick={() => selectionMode ? onSelectionChange?.(image.id, !isSelected) : onSelection?.(image)}
         >
-            <ImageLightbox
+            <ImageDisplay url={image?.image} alt={product?.name || ""} className={cn(isInactive || isOutOfStock ? "grayscale opacity-60" : "")} />
+            {/* <ImageLightbox
                 url={image?.image}
                 alt={product?.name || ""}
                 className="absolute inset-0 w-full h-full"
                 imgClassName={cn(isInactive || isOutOfStock ? "grayscale opacity-60" : "")}
                 disabled={selectionMode}
-            />
+            /> */}
 
             {/* Top status overlays */}
             <div className="absolute top-2 left-2 grid gap-1.5 z-10 pointer-events-none">

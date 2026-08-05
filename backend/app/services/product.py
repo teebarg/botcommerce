@@ -329,6 +329,7 @@ class ProductService:
 
         images = [img.image for img in sorted((product.images or []), key=lambda img: img.order)]
         product_dict["image"] = images[0] if images else None
+        product_dict["images"] = images if images else []
 
         variants = [
             {
