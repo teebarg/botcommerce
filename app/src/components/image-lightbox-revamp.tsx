@@ -4,28 +4,39 @@ import * as React from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { ImageLite } from "@/schemas";
-import { Link } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
 
-export interface GalleryImage {
-    src: string;
-    alt: string;
-    caption?: string;
+function openGemini(imageUrl: string, productId: number) {
+    const params = new URLSearchParams({
+        prompt:
+            "Convert this mannequin image into a real human model. Keep the clothes identical and completely unchanged",
+        admin_image_url: imageUrl,
+        product_id: productId.toString()
+    });
+
+    const url = `https://gemini.google.com/app?${params.toString()}`;
+
+    window.open(url, "_blank", "noopener,noreferrer");
 }
 
 interface ImageLightboxProps {
     images: ImageLite[];
-    initialIndex: number;
+    initialIndex?: number;
     open: boolean;
     onOpenChange: (open: boolean) => void;
     size?: string | null;
+    productId?: number;
+    defaultImage?: string;
 }
 
 export function ImageLightbox({
     images,
-    initialIndex,
+    initialIndex = 0,
     open,
     onOpenChange,
     size,
+    productId,
+    defaultImage
 }: ImageLightboxProps) {
     const [currentIndex, setCurrentIndex] = React.useState(initialIndex);
     const containerRef = React.useRef<HTMLDivElement>(null);
@@ -137,16 +148,21 @@ export function ImageLightbox({
                 </div>
             )}
 
-            <div className="absolute top-8 right-4">
-                <Link to="/about" target="_blank"  className="bg-primary text-popover-foreground p-2 rounded-md test-xs" rel="noreferrer">Model Image</Link>
-            </div>
-
-            {/* Caption */}
-            {/* {currentImage.caption && (
-                <div className="px-4 py-2 text-center text-sm text-white/70 sm:text-base">
-                    {currentImage.caption}
+            {productId && defaultImage && (
+                <div className="absolute top-12 right-8">
+                    <Button
+                        size="xs"
+                        onClick={() =>
+                            openGemini(
+                                defaultImage,
+                                productId
+                            )
+                        }
+                    >
+                        Open Gemini
+                    </Button>
                 </div>
-            )} */}
+            )}
 
             {/* Thumbnail strip */}
             <div className="border-t border-white/10 bg-black/60 px-4 py-4">
@@ -167,9 +183,7 @@ export function ImageLightbox({
                             <img
                                 src={image.image}
                                 alt={image.image}
-                                width={96}
-                                height={64}
-                                className="h-14 w-20 object-cover sm:h-16 sm:w-24"
+                                className="h-26 w-20 object-cover sm:h-32 sm:w-24"
                                 loading="lazy"
                             />
                         </button>
@@ -189,12 +203,6 @@ export function ImageLightbox({
 
 export function useLightbox() {
     const [open, setOpen] = React.useState(false);
-    const [initialIndex, setInitialIndex] = React.useState(0);
 
-    const openAt = React.useCallback((index: number) => {
-        setInitialIndex(index);
-        setOpen(true);
-    }, []);
-
-    return { open, setOpen, initialIndex, openAt };
+    return { open, setOpen };
 }

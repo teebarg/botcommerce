@@ -23,7 +23,7 @@ export const Route = createLazyFileRoute("/_auth/_adminLayout/admin/(store)/gall
 
 function RouteComponent() {
     const params = Route.useSearch();
-    const { open, setOpen, initialIndex, openAt } = useLightbox();
+    const { open, setOpen } = useLightbox();
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
@@ -183,9 +183,10 @@ function RouteComponent() {
             )}
             <ImageLightbox
                 images={selectedImage?.images || []}
-                initialIndex={initialIndex}
                 open={open}
                 onOpenChange={setOpen}
+                productId={selectedImage?.product_id}
+                defaultImage={selectedImage?.image}
             />
         </div>
     );
