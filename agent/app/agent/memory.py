@@ -7,7 +7,7 @@ from langchain_core.messages import (
     SystemMessage,
     ToolMessage,
 )
-from app.redis_client import redis_client
+from redis.asyncio import Redis
 
 logger = get_logger(__name__)
 
@@ -91,10 +91,10 @@ def _deserialise(raw: str) -> list[BaseMessage]:
     return messages
 
 
-async def load_messages_from_redis(session_id: str) -> list[BaseMessage]:
+async def load_messages_from_redis(redis: Redis, session_id: str) -> list[BaseMessage]:
     """Return the stored message history for a session, or [] if none."""
     try:
-        raw = await redis_client.get(f"chat:{session_id}:messages")
+        raw = await redis.get(f"chat:{session_id}:messages")
         if not raw:
             return []
         messages = _deserialise(raw)
@@ -109,6 +109,7 @@ async def load_messages_from_redis(session_id: str) -> list[BaseMessage]:
 
 
 async def save_messages_to_redis(
+    redis: Redis,
     session_id: str,
     messages: list[BaseMessage],
     ttl_seconds: int = 3600,
@@ -120,15 +121,15 @@ async def save_messages_to_redis(
             if not isinstance(m, ToolMessage)
             and not (isinstance(m, AIMessage) and m.tool_calls)
         ]
-        await redis_client.setex(f"chat:{session_id}:messages", ttl_seconds, _serialise(clean))
+        await redis.setex(f"chat:{session_id}:messages", ttl_seconds, _serialise(clean))
     except Exception as e:
         logger.warning(f"[Memory] Could not save messages for {session_id}: {e}")
 
 
-async def clear_session(session_id: str) -> None:
+async def clear_session(redis: Redis, session_id: str) -> None:
     """Delete all stored messages for a session."""
     try:
-        await redis_client.delete(f"chat:{session_id}:messages")
+        await redis.delete(f"chat:{session_id}:messages")
         logger.debug(f"[Memory] Cleared session {session_id}")
     except Exception as e:
         logger.warning(f"[Memory] Could not clear session {session_id}: {e}")

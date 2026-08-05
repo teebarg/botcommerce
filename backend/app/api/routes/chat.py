@@ -5,7 +5,6 @@ from typing import Optional
 from app.models.chat import ChatCloseRequest, PaginatedChats, Chat, ChatRequest, ChatHandoffRequest
 from app.models.generic import Message
 from app.services.websocket import manager
-from app.redis_client import redis_client
 from app.core.deps import CurrentUser
 from datetime import datetime
 from app.core.permissions import require_admin
@@ -38,7 +37,7 @@ async def admin_chat(payload: ChatRequest, cache: CacheDep, srv: ConversationDep
         logger.error(f"Failed to send message: {e}")
         raise HTTPException(status_code=400, detail="Failed to send message")
 
-    customer = await redis_client.get(f"chat_user:{payload.conversation_uuid}")
+    customer = await cache.get(f"chat_user:{payload.conversation_uuid}")
     if not customer:
         logger.warning(f"No customer connected for conversation {payload.conversation_uuid}")
         return Message(message="message sent successfully")
@@ -86,7 +85,7 @@ async def handoff(payload: ChatHandoffRequest, cache: CacheDep, user: CurrentUse
     if conversation.human_connected:
         raise HTTPException(status_code=400, detail="conversation already connected to human")
 
-    customer = await redis_client.get(f"chat_user:{payload.conversation_uuid}")
+    customer = await cache.get(f"chat_user:{payload.conversation_uuid}")
 
     await db.conversation.update(
         where={"id": conversation.id},

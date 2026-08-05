@@ -5,7 +5,7 @@ from app.logger import logger
 async def enrich_products(ctx) -> str:
     logger.info("⏰ [Automated Cron] Beginning 6-hour database catalog validation sweep...")
     pool = ctx['db_pool']
-    redis_client = ctx['redis']
+    redis = ctx['redis']
     try:
         async with pool.acquire() as conn:
             query = """
@@ -45,7 +45,7 @@ async def enrich_products(ctx) -> str:
                         p["id"]
                     )
                     text_for_embedding: str = f"Title: {enrichment['title']}. Description: {enrichment['description']}"
-                    await redis_client.enqueue_job(
+                    await redis.enqueue_job(
                         "update_product_embeddings",
                         product_id=str(p["id"]),
                         text_to_embed=text_for_embedding

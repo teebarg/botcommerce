@@ -4,9 +4,8 @@ from app.services.chat import ConversationService
 from app.services.coupon import CouponService
 from app.services.storage import MediaStorageService
 from app.services.user_interaction import InteractionService
-from app.core.dependencies.cache import CacheDep, CdnDep
+from app.core.dependencies.cache import ArqDep, CacheDep, CdnDep, RedisDep
 from app.prisma_client import prisma as db
-from app.redis_client import redis_client
 from app.services.bank_details import BankDetailsService
 from app.services.shop_settings import ShopSettingsService
 from app.services.catalog import CatalogService
@@ -21,8 +20,8 @@ def get_coupon_service() -> CouponService:
 def get_storage_service() -> MediaStorageService:
     return MediaStorageService()
 
-def get_shop_settings_service() -> ShopSettingsService:
-    return ShopSettingsService(redis=redis_client, db=db)
+def get_shop_settings_service(redis: RedisDep) -> ShopSettingsService:
+    return ShopSettingsService(redis=redis, db=db)
 
 def get_catalog_service(cache_srv: CacheDep) -> CatalogService:
     return CatalogService(db=db, cache_srv=cache_srv)
@@ -30,8 +29,8 @@ def get_catalog_service(cache_srv: CacheDep) -> CatalogService:
 def get_conversation_service():
     return ConversationService()
 
-def get_interaction_service(cache_srv: CacheDep) -> InteractionService:
-    return InteractionService(cache_srv=cache_srv)
+def get_interaction_service(queue: ArqDep) -> InteractionService:
+    return InteractionService(queue=queue)
 
 def get_category_service(cache_srv: CacheDep, cdn_srv: CdnDep) -> CategoryService:
     return CategoryService(cache_srv=cache_srv, cdn_srv=cdn_srv)

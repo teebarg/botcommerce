@@ -9,7 +9,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 from pydantic import BaseModel
-
+from arq.connections import ArqRedis
+import redis.asyncio as redis
 from contextlib import asynccontextmanager
 from xml.etree.ElementTree import Element, SubElement, tostring
 
@@ -21,7 +22,6 @@ from app.core.utils import (generate_contact_form_email,
 from app.models.generic import ContactFormCreate, NewsletterCreate, BulkPurchaseCreate
 from app.prisma_client import prisma as db
 from app.services.websocket import manager
-from app.redis_client import redis_client
 from app.core.logging import get_logger
 from app.core.deps import Notification
 from app.core.dependencies.product import SearchDep
@@ -29,7 +29,7 @@ from app.core.notifications.setup import init_notification_service
 from app.core.dependencies.services import SettingsDep
 from app.services.cache import L1Cache, run_l1_invalidation_listener
 from app.lib.cache import add_cache_headers
-from app.core.dependencies.cache import CdnDep, CacheDep
+from app.core.dependencies.cache import ArqDep, CdnDep
 
 logger = get_logger(__name__)
 
@@ -38,7 +38,7 @@ async def lifespan(app: FastAPI):
     logger.debug("🚀starting servers......:")
     await db.connect()
 
-    app.state.redis = redis_client
+    app.state.redis = redis.from_url(settings.REDIS_URL, decode_responses=True, max_connections=10)
     app.state.l1_cache = L1Cache(max_size=5000, ttl=60.0)
 
     init_notification_service()
@@ -46,6 +46,12 @@ async def lifespan(app: FastAPI):
 
     listener_task = asyncio.create_task(
         run_l1_invalidation_listener(app.state.redis, app.state.l1_cache)
+    )
+
+    app.state.arq_pool = ArqRedis.from_url(
+        settings.BROKER_URL,
+        decode_responses=True,
+        max_connections=10,
     )
 
     yield
@@ -129,8 +135,8 @@ class PurgeCdn(BaseModel):
     key: str
 
 @app.post("/api/test-arq")
-async def test_arq(request: Request, cache_srv: CacheDep) -> Dict[str, Any]:
-    # await cache_srv.redis.enqueue_job(
+async def test_arq(queue: ArqDep) -> Dict[str, Any]:
+    # await queue.enqueue_job(
     #     "user_register",
     #     user_id=1,
     # )

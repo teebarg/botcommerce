@@ -4,6 +4,7 @@ from fastapi import HTTPException, BackgroundTasks
 from prisma import Prisma
 from prisma.errors import UniqueViolationError, DataError
 from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
+from arq.connections import ArqRedis
 from app.core.logging import logger
 from app.services.invoice import invoice_service
 from app.core.dependencies.services import get_shop_settings_service
@@ -29,6 +30,7 @@ class OrderService:
         coupon_srv: CouponService,
         settings_srv: ShopSettingsService,
         notification_dispatcher: Notification,
+        queue: ArqRedis,
         cache_srv: CacheService,
         storage_srv: MediaStorageService
     ):
@@ -39,6 +41,7 @@ class OrderService:
         self.settings_srv = settings_srv
         self.notification_srv = notification_dispatcher
         self.cache_srv = cache_srv
+        self.queue = queue
         self.storage_srv = storage_srv
 
     async def get_by_number(self, order_number: str, include_relations: bool = True) -> Any:
@@ -182,7 +185,7 @@ class OrderService:
             logger.error(f"Failed to create order: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
-        await self.cache_srv.redis.enqueue_job("order_created", order_id=new_order.id)
+        await self.queue.enqueue_job("order_created", order_id=new_order.id)
 
         if cart.payment_method == "WALLET" and (cart.total or 0) <= 0:
             new_order = await self._finalize_paid_order(
@@ -537,8 +540,8 @@ class OrderService:
         except Exception as e:
             logger.error(f"Failed to decrement variant inventory for order {order.id}: {e}")
 
-        await self.cache_srv.redis.enqueue_job("process_referral", order_id=order.id)
-        await self.cache_srv.redis.enqueue_job("generate_and_send_invoice", order_number=order.order_number)
+        await self.queue.enqueue_job("process_referral", order_id=order.id)
+        await self.queue.enqueue_job("generate_and_send_invoice", order_number=order.order_number)
 
         return updated_order
 
