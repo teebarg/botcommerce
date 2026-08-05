@@ -131,7 +131,7 @@ export const useCompleteCart = () => {
     return useMutation({
         mutationFn: async (complete: CartComplete) => await api.post<Order>("/order/", complete),
         onSuccess: async (data) => {
-            navigate({ to: `/order/confirmed/${data?.order_number}`, replace: true });
+            window.location.href = `/order/confirmed/${data?.order_number}`;
             queryClient.invalidateQueries({ queryKey: ["cart"] });
         },
         onError: (error: any) => {

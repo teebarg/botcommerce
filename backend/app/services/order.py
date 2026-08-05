@@ -4,9 +4,9 @@ from fastapi import HTTPException, BackgroundTasks
 from prisma import Prisma
 from prisma.errors import UniqueViolationError, DataError
 from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
+from arq.connections import ArqRedis
 from app.core.logging import logger
 from app.services.invoice import invoice_service
-from app.core.dependencies.services import get_shop_settings_service
 from datetime import datetime
 from app.core.deps import Notification
 from app.services.product import ProductService
@@ -18,6 +18,7 @@ from app.core.notifications.events import SendInvoiceEvent, OrderConfirmedEvent
 from app.services.cache import CacheService
 from app.services.storage import MediaStorageService
 from app.models.order import Order, PaginatedOrders
+from app.utils.emails import generate_referral_cashback_email
 
 
 class OrderService:
@@ -29,6 +30,7 @@ class OrderService:
         coupon_srv: CouponService,
         settings_srv: ShopSettingsService,
         notification_dispatcher: Notification,
+        queue: ArqRedis,
         cache_srv: CacheService,
         storage_srv: MediaStorageService
     ):
@@ -39,6 +41,7 @@ class OrderService:
         self.settings_srv = settings_srv
         self.notification_srv = notification_dispatcher
         self.cache_srv = cache_srv
+        self.queue = queue
         self.storage_srv = storage_srv
 
     async def get_by_number(self, order_number: str, include_relations: bool = True) -> Any:
@@ -182,7 +185,7 @@ class OrderService:
             logger.error(f"Failed to create order: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
-        await self.cache_srv.redis.enqueue_job("order_created", order_id=new_order.id)
+        await self.queue.enqueue_job("order_created", order_id=new_order.id)
 
         if cart.payment_method == "WALLET" and (cart.total or 0) <= 0:
             new_order = await self._finalize_paid_order(
@@ -192,7 +195,7 @@ class OrderService:
                 payment_method=PaymentMethod.WALLET,
             )
 
-        await self.cache_srv.invalidate(tags=["orders", "stats-trends"])
+        await self.cache_srv.invalidate(tags=["orders", "stats-trends", f"cart:{cart.cart_number}"])
         return new_order
 
     async def send_confirmation_notification(self, id: int, user_id: int) -> None:
@@ -446,8 +449,7 @@ class OrderService:
             await self.cache_srv.invalidate(tags=[f"wallet:{coupon_owner.id}"])
 
         try:
-            from app.core.utils import generate_referral_cashback_email
-            email_data = await generate_referral_cashback_email(order=order, coupon_owner=coupon_owner)
+            email_data = await generate_referral_cashback_email(order=order, coupon_owner=coupon_owner, service=self.settings_srv)
             shop_email = await self.settings_srv.get("shop_email")
             cc_list = [shop_email] if shop_email else []
 
@@ -537,13 +539,13 @@ class OrderService:
         except Exception as e:
             logger.error(f"Failed to decrement variant inventory for order {order.id}: {e}")
 
-        await self.cache_srv.redis.enqueue_job("process_referral", order_id=order.id)
-        await self.cache_srv.redis.enqueue_job("generate_and_send_invoice", order_number=order.order_number)
+        await self.queue.enqueue_job("process_referral", order_id=order.id)
+        await self.queue.enqueue_job("generate_and_send_invoice", order_number=order.order_number)
 
         return updated_order
 
     async def send_order_notification(self, id: int):
-        setting_srv = get_shop_settings_service()
+        setting_srv = ShopSettingsService(redis=self.cache_srv.redis, db=self.db)
         try:
             order = await self.db.order.find_unique(
                 where={"id": id},

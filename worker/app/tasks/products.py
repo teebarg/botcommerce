@@ -17,7 +17,7 @@ async def update_product_embeddings(ctx, product_id: str, text_to_embed: str) ->
 
     logger.info(f"🧬 Starting vector calculation for Product: {product_id}")
     pool = ctx['db_pool']
-    redis_client = ctx['redis']
+    redis = ctx['redis']
 
     p_id = int(product_id) if isinstance(product_id, str) and product_id.isdigit() else product_id
 
@@ -84,7 +84,7 @@ async def update_product_embeddings(ctx, product_id: str, text_to_embed: str) ->
         key: str = f"product:{p_id}:similar"
 
         # Use standard arq pipeline operations asynchronously
-        async with redis_client.pipeline(transaction=True) as pipe:
+        async with redis.pipeline(transaction=True) as pipe:
             pipe.delete(key) # Clear out stale listings
             pipe.lpush(key, *reversed(top_10_ids))
             pipe.ltrim(key, 0, 9)

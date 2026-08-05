@@ -4,15 +4,13 @@ import string
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import emails  # type: ignore
 from fastapi import Request
-from jinja2 import Environment, FileSystemLoader, Template
+from jinja2 import Environment, FileSystemLoader
 from app.core.config import settings
 from app.core.logging import logger
-from app.models.order import Order
-from app.models.user import User
 from app.models.coupon import Coupon
 
 
@@ -79,27 +77,6 @@ def slugify(text) -> str:
 
     return slug
 
-async def merge_metadata(metadata: Optional[dict[str, Any]] = {}) -> dict[str, Any]:
-    from app.core.dependencies.services import get_shop_settings_service
-    service = get_shop_settings_service()
-    shop_name = await service.get("shop_name")
-    shop_address = await service.get("address")
-    shop_phone = await service.get("contact_phone")
-
-    return {
-        "project_name": shop_name,
-        "address": shop_address,
-        "phone": shop_phone,
-        "description": "Exclusive offers just for you",
-        "frontend_host": settings.FRONTEND_HOST,
-        "facebook": await service.get("facebook"),
-        "instagram": await service.get("instagram"),
-        "tiktok": await service.get("tiktok"),
-        "support_email": await service.get("shop_email"),
-        "current_year": datetime.now().year,
-        **metadata
-    }
-
 
 def render_email_template(*, template_name: str, context: dict[str, Any]) -> str:
     template_path = Path(__file__).parent.parent / "email-templates" / "build"
@@ -112,14 +89,6 @@ def render_email_template(*, template_name: str, context: dict[str, Any]) -> str
     # Load and render the template
     template = env.get_template(template_name)
     return template.render(context)
-
-
-def render_email_template2(*, template_name: str, context: dict[str, Any]) -> str:
-    template_str: str = (
-        Path(__file__).parent.parent / "email-templates" / "build" / template_name
-    ).read_text()
-    html_content = Template(template_str).render(context)
-    return html_content
 
 
 async def send_email_smtp(
@@ -255,137 +224,6 @@ async def send_email_brevo(
         raise Exception(f"Brevo email sending failed: {str(e)}")
 
 
-async def generate_invoice_email(order: Order, user: User) -> EmailData:
-    from app.core.dependencies.services import get_shop_settings_service
-    service = get_shop_settings_service()
-    header_title = "Your order has been processed successfully"
-    template_name = "paid_invoice.html"
-    description = "Your order has been processed"
-    bank_details = None
-    if order.payment_method == "CASH_ON_DELIVERY":
-        template_name = "pickup_invoice.html"
-        header_title = "Your order has been processed"
-        description = "Your order has been processed"
-        bank_details = await service.get_bank_details()
-    elif order.payment_status == "PENDING":
-        header_title = "Your order is pending payment"
-        template_name = "pending_invoice.html"
-        description = "Your order is pending payment"
-        bank_details = await service.get_bank_details()
-    elif order.payment_status == "FAILED":
-        header_title = "Your order payment failed"
-        template_name = "failed_invoice.html"
-        description = "Your order payment failed"
-
-    html_content = render_email_template(
-        template_name=template_name,
-        context={
-            "order": order,
-            "user": user,
-            "current_year": datetime.now().year,
-            "header_title": header_title,
-            "cta_url": f"order/confirmed/{order.order_number}",
-            "cta_text": "View Order",
-            "bank_details": bank_details,
-            **(await merge_metadata({"description": description}))
-        },
-    )
-    return EmailData(html_content=html_content, subject=f"Order Confirmation for {order.order_number}")
-
-
-async def generate_payment_receipt(order: Order, user: User) -> EmailData:
-    html_content = render_email_template(
-        template_name="payment_receipt.html",
-        context={
-            "order": order,
-            "user": user,
-            "current_year": datetime.now().year,
-            **(await merge_metadata({"description": ""}))
-        },
-    )
-    return EmailData(html_content=html_content, subject="Payment Receipt")
-
-
-async def generate_data_export_email(download_link: str) -> EmailData:
-    html_content = render_email_template(
-        template_name="data_export.html",
-        context={
-            "download_link": download_link,
-            **(await merge_metadata({"description": ""}))
-        },
-    )
-    return EmailData(html_content=html_content, subject="Your Data Export is Ready")
-
-
-async def generate_contact_form_email(
-    name: str, email: str, phone: str, message: str
-) -> EmailData:
-    html_content = render_email_template(
-        template_name="contact_form.html",
-        context={
-            "name": name,
-            "email": email,
-            "phone": phone,
-            "message": message,
-            "current_year": datetime.now().year,
-            **(await merge_metadata({"description": "New Contact Email"}))
-        },
-    )
-    return EmailData(html_content=html_content, subject="New Contact Email")
-
-
-async def generate_bulk_purchase_email(name: str, email: str, phone: str, bulkType: str, quantity: str | None = None, message: str | None = None) -> EmailData:
-    html_content = render_email_template(
-        template_name="bulk_purchase.html",
-        context={
-            "name": name,
-            "email": email,
-            "phone": phone,
-            "bulkType": bulkType,
-            "quantity": quantity or "Not specified",
-            "message": message or "No additional details provided",
-            "current_year": datetime.now().year,
-            **(await merge_metadata({"description": "New Bulk Purchase Inquiry"}))
-        },
-    )
-    return EmailData(html_content=html_content, subject="New Bulk Purchase Inquiry")
-
-
-async def generate_newsletter_email(email: str) -> EmailData:
-    html_content = render_email_template(
-        template_name="newsletter.html",
-        context={
-            "email": email,
-            "unsubscribe_link": "",
-            "current_year": datetime.now().year,
-            **(await merge_metadata({"description": "Welcome to our newsletter"}))
-        },
-    )
-    return EmailData(html_content=html_content, subject="Welcome to our newsletter")
-
-
-async def generate_referral_cashback_email(order: Order, coupon_owner: User) -> EmailData:
-    header_title = "You just got paid!"
-    description = "Your order has been processed"
-
-    html_content = render_email_template(
-        template_name="referral_cashback_email.html",
-        context={
-            "referral": coupon_owner.first_name,
-            "cash_back": order.discount_amount,
-            "order_value": order.subtotal,
-            "referred": order.user.first_name if order.user else "",
-            "created_at": order.created_at,
-            "current_year": datetime.now().year,
-            "header_title": header_title,
-            "cta_url": "account/referrals",
-            "cta_text": "View My Wallet",
-            **(await merge_metadata({"description": description}))
-        },
-    )
-    return EmailData(html_content=html_content, subject=f"You just got paid!")
-
-
 def generate_sku(prefix: str = "PRD") -> str:
     """
     Generate a unique product SKU.
@@ -406,69 +244,6 @@ def generate_id(prefix="cart_", length=25):
     chars = string.ascii_uppercase + string.digits
     unique_part = "".join(random.choice(chars) for _ in range(length))
     return prefix + unique_part
-
-
-async def generate_magic_link_email(email_to: str, magic_link: str, first_name: str) -> EmailData:
-    html_content = render_email_template(
-        template_name="magic_link.html",
-        context={
-            "email": email_to,
-            "magic_link": magic_link,
-            "first_name": first_name,
-            **(await merge_metadata({"description": "Magic Link to sign in to your account"}))
-        },
-    )
-    return EmailData(html_content=html_content, subject="Sign in to your account")
-
-
-async def generate_welcome_email(email_to: str, first_name: str, coupon: Coupon, shop_settings) -> EmailData:
-    shop_name: str | None = await shop_settings.get("shop_name")
-
-    html_content: str = render_email_template(
-        template_name="welcome.html",
-        context={
-            "first_name": first_name,
-            "email": email_to,
-            "current_year": datetime.now().year,
-            "coupon": coupon,
-            "header_title": "Welcome Gift Inside! 🎁",
-            "header_subtitle": f"We're excited to have you here, {first_name}!!",
-            "cta_url": "collections",
-            "cta_text": "Start Shopping",
-            **(await merge_metadata({"description": ""}))
-        },
-    )
-    return EmailData(html_content=html_content, subject=f"Welcome to {shop_name}")
-
-
-async def generate_verification_email(email_to: str, first_name: str, verification_link: str) -> EmailData:
-    html_content = render_email_template(
-        template_name="verify_email.html",
-        context={
-            "first_name": first_name,
-            "email": email_to,
-            "verification_link": verification_link,
-            "current_year": datetime.now().year,
-            **(await merge_metadata({}))
-        },
-    )
-    return EmailData(html_content=html_content, subject="Verify Your Email")
-
-
-async def generate_abandoned_cart_email(cart_data: dict, user_email: str, user_name: Optional[str] = None) -> EmailData:
-    """Generate abandoned cart reminder email"""
-    html_content = render_email_template(
-        template_name="abandoned_cart.html",
-        context={
-            "user_name": user_name or "Customer",
-            "user_email": user_email,
-            "cart": cart_data,
-            "cart_link": f"{settings.FRONTEND_HOST}/cart",
-            "current_year": datetime.now().year,
-            **(await merge_metadata({"description": "Complete your purchase"}))
-        },
-    )
-    return EmailData(html_content=html_content, subject="Don't forget your items!")
 
 def get_client_ip(request: Request) -> str:
     forwarded = request.headers.get("x-forwarded-for")

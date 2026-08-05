@@ -1,9 +1,8 @@
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, status
 from app.core.logging import logger
 import json, time
 from app.services.websocket import manager
-from app.redis_client import redis_client
 
 router = APIRouter()
 
@@ -30,6 +29,13 @@ async def websocket(ws: WebSocket) -> None:
     }):
         return
 
+    try:
+        redis = ws.app.state.redis
+    except AttributeError as err:
+        logger.error(f"Redis client not found in app.state. Check lifespan setup. {err}")
+        await ws.close(code=status.WS_1011_INTERNAL_ERROR)
+        return
+
     await manager.broadcast_sessions()
 
     try:
@@ -51,10 +57,10 @@ async def websocket(ws: WebSocket) -> None:
                             "path": "/",
                             "updated_at": str(int(time.time()))
                         }):
-                            session_id = await redis_client.get(f"chat_session:{app_session_id}")
+                            session_id = await redis.get(f"chat_session:{app_session_id}")
                             if session_id:
-                                await redis_client.set(f"chat_user:{session_id}", user_id)
-                                await redis_client.delete(f"chat_session:{app_session_id}")
+                                await redis.set(f"chat_user:{session_id}", user_id)
+                                await redis.delete(f"chat_session:{app_session_id}")
                                 logger.debug(f"Updated chat mapping {session_id} → {user_id}")
                         else:
                             await manager.register(user_id=user_id, websocket=ws)

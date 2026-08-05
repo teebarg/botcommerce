@@ -5,8 +5,6 @@ from pydantic import (
     BeforeValidator,
     EmailStr,
     HttpUrl,
-    PostgresDsn,
-    ValidationInfo,
     computed_field,
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -56,6 +54,7 @@ class Settings(BaseSettings):
     VAPID_PRIVATE_KEY: str = ""
 
     REDIS_URL: str = "redis://localhost:6379/0"
+    BROKER_URL: str = "redis://localhost:6379/0"
     SENTRY_DSN: HttpUrl | None = None
 
     SMTP_TLS: bool = True
