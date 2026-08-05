@@ -18,7 +18,7 @@ from app.services.cdn import CdnService
 
 logger = get_logger(__name__)
 
-PRODUCT_ATTRIBUTES: list[str] = ["id", "name", "sku", "image", "slug", "active", "is_new", "status", "variants"]
+PRODUCT_ATTRIBUTES: list[str] = ["id", "name", "sku", "image", "images", "slug", "active", "is_new", "status", "variants"]
 
 class ProductService:
     def __init__(self, db, search_srv: SearchService, cache_srv: CacheService, cdn_srv: CdnService):

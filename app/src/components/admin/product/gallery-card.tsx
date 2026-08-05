@@ -1,10 +1,9 @@
 import { GalleryCardActions } from "./gallery-card-actions";
 import { currency } from "@/utils";
 import type { GalleryImage } from "@/schemas";
-// import ImageLightbox from "@/components/image-lightbox";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/utils/cn";
-import ImageDisplay from "@/components/image-display";
+import { useState } from "react";
 
 interface GalleryCardProps {
     image: GalleryImage;
@@ -15,8 +14,6 @@ interface GalleryCardProps {
 }
 
 export function GalleryCard({ image, isSelected = false, onSelectionChange, onSelection, selectionMode = false }: GalleryCardProps) {
-    console.log(image)
-    console.log(image.images)
     if (!image) return null;
 
     const product = image.product;
@@ -31,6 +28,7 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, onSe
         item?.age && `Age: ${item.age}`,
     ].filter(Boolean);
 
+    const [mediaLoaded, setMediaLoaded] = useState<boolean>(false);
     const categories = product?.categories?.map((item) => item.name) || [];
     const combined = [...categories, ...attributes];
 
@@ -48,14 +46,21 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, onSe
             )}
             onClick={() => selectionMode ? onSelectionChange?.(image.id, !isSelected) : onSelection?.(image)}
         >
-            <ImageDisplay url={image?.image} alt={product?.name || ""} className={cn(isInactive || isOutOfStock ? "grayscale opacity-60" : "")} />
-            {/* <ImageLightbox
-                url={image?.image}
-                alt={product?.name || ""}
-                className="absolute inset-0 w-full h-full"
-                imgClassName={cn(isInactive || isOutOfStock ? "grayscale opacity-60" : "")}
-                disabled={selectionMode}
-            /> */}
+            <div className="absolute inset-0 w-full h-full overflow-hidden bg-muted">
+                {!mediaLoaded && <img src="/placeholder.jpg" alt="placeholder" className="absolute inset-0 w-full h-full object-cover" />}
+                <img
+                    alt={product?.name || ""}
+                    src={image?.image}
+                    onLoad={() => setMediaLoaded(true)}
+                    loading="lazy"
+                    decoding="async"
+                    className={cn(
+                        "w-full h-full object-cover transition-opacity duration-500",
+                        mediaLoaded ? "opacity-100" : "opacity-0",
+                        isInactive || isOutOfStock ? "grayscale opacity-60" : ""
+                    )}
+                />
+            </div>
 
             {/* Top status overlays */}
             <div className="absolute top-2 left-2 grid gap-1.5 z-10 pointer-events-none">

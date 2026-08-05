@@ -16,7 +16,7 @@ interface ImageLightboxProps {
 }
 
 export default function ImageLightbox({ url, alt, className, imgClassName, size, disabled = false }: ImageLightboxProps) {
-        const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false);
 
     const close = useCallback((e: React.MouseEvent) => {
         e.stopPropagation();

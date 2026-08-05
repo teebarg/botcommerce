@@ -162,6 +162,7 @@ export const ProductSearchSchema = z.object({
     slug: z.string(),
     sku: z.string(),
     image: z.string(),
+    images: z.array(z.string()),
     status: ProductStatusSchema,
     variants: z.array(SearchVariantSchema).nullable(),
     active: z.boolean(),

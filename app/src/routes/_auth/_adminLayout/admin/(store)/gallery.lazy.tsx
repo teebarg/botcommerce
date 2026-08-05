@@ -182,7 +182,7 @@ function RouteComponent() {
                 />
             )}
             <ImageLightbox
-                images={selectedImage?.images || []}
+                images={selectedImage?.images.map((i) => i.image) || []}
                 open={open}
                 onOpenChange={setOpen}
                 productId={selectedImage?.product_id}

@@ -3,7 +3,6 @@
 import * as React from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/utils/cn";
-import { ImageLite } from "@/schemas";
 import { Button } from "@/components/ui/button";
 
 function openGemini(imageUrl: string, productId: number) {
@@ -20,7 +19,7 @@ function openGemini(imageUrl: string, productId: number) {
 }
 
 interface ImageLightboxProps {
-    images: ImageLite[];
+    images: string[];
     initialIndex?: number;
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -97,7 +96,6 @@ export function ImageLightbox({
             aria-modal="true"
             aria-label="Image lightbox"
         >
-            {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 sm:px-6">
                 <div className="text-sm font-medium text-white/80">
                     {currentIndex + 1} / {images.length}
@@ -111,7 +109,6 @@ export function ImageLightbox({
                 </button>
             </div>
 
-            {/* Main stage */}
             <div className="relative flex flex-1 items-center justify-center overflow-hidden px-4 sm:px-12">
                 <button
                     onClick={goToPrevious}
@@ -123,8 +120,8 @@ export function ImageLightbox({
 
                 <div className="relative flex h-full max-h-[calc(100vh-12rem)] w-full max-w-5xl items-center justify-center">
                     <img
-                        src={currentImage.image}
-                        alt={currentImage.image}
+                        src={currentImage}
+                        alt={currentImage}
                         className="max-h-full max-w-full rounded-lg object-contain shadow-2xl"
                         loading="eager"
                         onClick={() => onOpenChange(false)}
@@ -166,32 +163,30 @@ export function ImageLightbox({
 
             {/* Thumbnail strip */}
             <div className="border-t border-white/10 bg-black/60 px-4 py-4">
-                <div className="mx-auto flex max-w-5xl gap-2 overflow-x-auto pb-2 sm:gap-3">
+                <div className="mx-auto flex max-w-5xl gap-2 overflow-x-auto p-2">
                     {images.map((image, index) => (
                         <button
-                            key={`${image.image}-${index}`}
+                            key={`${image}-${index}`}
                             onClick={() => setCurrentIndex(index)}
                             className={cn(
-                                "relative shrink-0 overflow-hidden rounded-md transition-all focus:outline-none focus:ring-2 focus:ring-white/50",
+                                "relative shrink-0 overflow-hidden rounded-md transition-all focus:outline-none focus:ring-2",
                                 index === currentIndex
-                                    ? "ring-2 ring-white/80"
+                                    ? "ring-2 ring-accent"
                                     : "opacity-60 hover:opacity-100"
                             )}
                             aria-label={`Go to image ${index + 1}`}
                             aria-current={index === currentIndex ? "true" : undefined}
                         >
                             <img
-                                src={image.image}
-                                alt={image.image}
-                                className="h-26 w-20 object-cover sm:h-32 sm:w-24"
+                                src={image}
+                                alt={image}
+                                className="h-26 w-20 object-cover"
                                 loading="lazy"
                             />
                         </button>
                     ))}
                 </div>
             </div>
-
-            {/* Click backdrop to close */}
             <div
                 className="absolute inset-0 -z-10"
                 onClick={() => onOpenChange(false)}

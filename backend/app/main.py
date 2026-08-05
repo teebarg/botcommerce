@@ -115,7 +115,7 @@ app.middleware("http")(add_cache_headers)
 if settings.all_cors_origins:
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.all_cors_origins + ["chrome-extension://dflkeclajcfjgfddldgdoekmchnmkllj"],
+        allow_origins=settings.all_cors_origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

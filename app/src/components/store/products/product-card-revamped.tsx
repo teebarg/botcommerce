@@ -3,14 +3,15 @@ import type { ProductSearch } from "@/schemas/product";
 import { Link } from "@tanstack/react-router";
 import { currency } from "@/utils";
 import { useProductCardVariant } from "@/hooks/useProductCardVariant";
-import ImageLightbox from "@/components/image-lightbox";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils/cn";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 
 interface ProductCardProps {
     product: ProductSearch;
     className?: string
+    onClick?: () => void
 }
 
 const WhatsAppIcon = ({ className }: { className?: string }) => (
@@ -26,7 +27,8 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
     </svg>
 );
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick }) => {
+    const [mediaLoaded, setMediaLoaded] = useState<boolean>(false);
     const { priceInfo, handleAddToCart, handleWhatsAppPurchase, outOfStock, loading } = useProductCardVariant(product);
     const { minPrice, maxCompareAtPrice, hasDiscount, maxDiscountPercent } = priceInfo;
     // const { mutate: createWishlist } = useUserCreateWishlist();
@@ -66,13 +68,30 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
             className={cn("block w-full rounded-xl overflow-hidden border border-border group", className)}
             preload={false}
         >
+
             <div className="relative aspect-gallery">
-                <ImageLightbox
-                    url={product.image}
-                    alt={product.name}
-                    size={product.variants?.[0]?.size}
-                    imgClassName="group-hover:scale-105"
-                />
+                <div
+                    onClick={(e) => {
+                        if (outOfStock) return;
+                        e.stopPropagation();
+                        e.preventDefault();
+                        onClick?.();
+                    }}
+                    className="relative w-full h-full overflow-hidden bg-muted"
+                >
+                    {!mediaLoaded && <img src="/placeholder.jpg" alt="placeholder" className="absolute inset-0 w-full h-full object-cover" />}
+                    <img
+                        alt={product?.name || ""}
+                        src={product?.image}
+                        onLoad={() => setMediaLoaded(true)}
+                        loading="lazy"
+                        decoding="async"
+                        className={cn(
+                            "w-full h-full object-cover transition-opacity duration-500 group-hover:scale-105",
+                            mediaLoaded ? "opacity-100" : "opacity-0",
+                        )}
+                    />
+                </div>
 
                 {!outOfStock && hasDiscount && (
                     <span className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-2xs font-medium px-2 py-1 rounded-full">
