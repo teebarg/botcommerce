@@ -13,7 +13,7 @@ from app.core.dependencies.cache import CacheDep
 from app.core.dependencies.order import OrderDep
 from app.core.security import verify_internal_signature
 from app.core.notifications.setup import get_notification_service
-from app.core.utils import generate_welcome_email
+from app.utils.emails import generate_welcome_email
 
 logger = get_logger(__name__)
 
@@ -134,7 +134,7 @@ async def internal_user_signup(
         email_to=user.email,
         first_name=user.first_name,
         coupon=coupon,
-        shop_settings=setting_srv,
+        service=setting_srv,
     )
     notification_srv = get_notification_service()
     await notification_srv.send(

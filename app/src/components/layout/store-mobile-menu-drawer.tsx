@@ -65,7 +65,7 @@ const StoreMenuComp: React.FC = () => {
 
                     <div className="space-y-3">
                         <NavLink href="/about" title="About" />
-                        <NavLink href="/support" title="Contact Us" />
+                        <NavLink href="/contact-us" title="Contact Us" />
                     </div>
                     <div className="mt-8">
                         <ThemeToggle />

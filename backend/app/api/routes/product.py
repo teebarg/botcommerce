@@ -96,7 +96,7 @@ async def search(
 async def read(request: Request, slug: str, srv: ProductDep) -> ProductLite:
     set_public_cache(request, edge_ttl=86400, swr=600)
     cache_key: str = f"product:{slug}"
-    cached = await srv.redis.get(cache_key)
+    cached = await srv.cache_srv.redis.get(cache_key)
     if cached:
         return json.loads(cached)
 

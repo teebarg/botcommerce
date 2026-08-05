@@ -17,8 +17,6 @@ from xml.etree.ElementTree import Element, SubElement, tostring
 from app.api.main import api_router
 from app.core.config import settings
 from app.core.decorators import limit
-from app.core.utils import (generate_contact_form_email,
-                            generate_newsletter_email, generate_bulk_purchase_email)
 from app.models.generic import ContactFormCreate, NewsletterCreate, BulkPurchaseCreate
 from app.prisma_client import prisma as db
 from app.services.websocket import manager
@@ -30,6 +28,7 @@ from app.core.dependencies.services import SettingsDep
 from app.services.cache import L1Cache, run_l1_invalidation_listener
 from app.lib.cache import add_cache_headers
 from app.core.dependencies.cache import ArqDep, CdnDep
+from app.utils.emails import generate_contact_form_email, generate_newsletter_email, generate_bulk_purchase_email
 
 logger = get_logger(__name__)
 
@@ -41,7 +40,7 @@ async def lifespan(app: FastAPI):
     app.state.redis = redis.from_url(settings.REDIS_URL, decode_responses=True, max_connections=10)
     app.state.l1_cache = L1Cache(max_size=5000, ttl=60.0)
 
-    init_notification_service()
+    init_notification_service(redis=app.state.redis)
     await manager.start()
 
     listener_task = asyncio.create_task(
@@ -169,7 +168,7 @@ async def health(search_srv: SearchDep) -> Dict[str, Any]:
 async def contact_form(background_tasks: BackgroundTasks, settings_srv: SettingsDep, notification_srv: Notification, data: ContactFormCreate):
     async def send_email_task():
         email_data = await generate_contact_form_email(
-            name=data.name, email=data.email, phone=data.phone or "", message=data.message
+            name=data.name, email=data.email, phone=data.phone or "", message=data.message, service=settings_srv
         )
 
         shop_email = await settings_srv.get("shop_email")
@@ -193,6 +192,7 @@ async def newsletter(background_tasks: BackgroundTasks, settings_srv: SettingsDe
         try:
             email_data = await generate_newsletter_email(
                 email=data.email,
+                service=settings_srv
             )
             shop_email = await settings_srv.get("shop_email")
             if not shop_email:
@@ -220,6 +220,7 @@ async def bulk_purchase(background_tasks: BackgroundTasks, settings_srv: Setting
                 bulkType=data.bulkType,
                 quantity=data.quantity,
                 message=data.message,
+                service=settings_srv
             )
             shop_email = await settings_srv.get("shop_email")
             if not shop_email:

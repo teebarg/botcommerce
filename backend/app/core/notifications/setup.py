@@ -2,6 +2,7 @@ from app.core.config import settings
 from app.core.notifications.service import NotificationService
 from app.core.notifications.channels import EmailChannel, PushChannel, SlackChannel, WhatsAppChannel
 from app.core.notifications.templates import TemplateEngine
+from redis.asyncio import Redis
 
 _notification_service: NotificationService | None = None
 
@@ -12,10 +13,10 @@ def get_notification_service() -> NotificationService:
     return _notification_service
 
 
-def init_notification_service() -> NotificationService:
+def init_notification_service(redis: Redis) -> NotificationService:
     global _notification_service
 
-    service = NotificationService(template_engine=TemplateEngine())
+    service = NotificationService(template_engine=TemplateEngine(redis=redis))
 
     service.register_channel("email", EmailChannel(
         smtp_host=settings.SMTP_HOST,

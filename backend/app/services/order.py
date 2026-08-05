@@ -7,7 +7,6 @@ from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
 from arq.connections import ArqRedis
 from app.core.logging import logger
 from app.services.invoice import invoice_service
-from app.core.dependencies.services import get_shop_settings_service
 from datetime import datetime
 from app.core.deps import Notification
 from app.services.product import ProductService
@@ -19,6 +18,7 @@ from app.core.notifications.events import SendInvoiceEvent, OrderConfirmedEvent
 from app.services.cache import CacheService
 from app.services.storage import MediaStorageService
 from app.models.order import Order, PaginatedOrders
+from app.utils.emails import generate_referral_cashback_email
 
 
 class OrderService:
@@ -195,7 +195,7 @@ class OrderService:
                 payment_method=PaymentMethod.WALLET,
             )
 
-        await self.cache_srv.invalidate(tags=["orders", "stats-trends"])
+        await self.cache_srv.invalidate(tags=["orders", "stats-trends", f"cart:{cart.cart_number}"])
         return new_order
 
     async def send_confirmation_notification(self, id: int, user_id: int) -> None:
@@ -449,8 +449,7 @@ class OrderService:
             await self.cache_srv.invalidate(tags=[f"wallet:{coupon_owner.id}"])
 
         try:
-            from app.core.utils import generate_referral_cashback_email
-            email_data = await generate_referral_cashback_email(order=order, coupon_owner=coupon_owner)
+            email_data = await generate_referral_cashback_email(order=order, coupon_owner=coupon_owner, service=self.settings_srv)
             shop_email = await self.settings_srv.get("shop_email")
             cc_list = [shop_email] if shop_email else []
 
@@ -546,7 +545,7 @@ class OrderService:
         return updated_order
 
     async def send_order_notification(self, id: int):
-        setting_srv = get_shop_settings_service()
+        setting_srv = ShopSettingsService(redis=self.cache_srv.redis, db=self.db)
         try:
             order = await self.db.order.find_unique(
                 where={"id": id},
