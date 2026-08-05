@@ -60,20 +60,22 @@ class WorkerSettings:
     after_job_end = on_job_success
     on_job_error = on_job_failure
 
+    poll_delay = 5
+
     cron_jobs = [
         cron(
             enrich_products,
-            hour={0, 3, 6, 9, 12, 15, 18, 21},  # Targets execution blocks 3 hours apart
+            hour={0, 6, 12, 18},  # Targets execution blocks 3 hours apart
             minute=0,
             name="enrich_products",
-            run_at_startup=True,
+            run_at_startup=False,
             keep_result=0
         ),
         cron(
             clean_up_dangling,
             hour=3, minute=0,       # daily at 03:00 server time
             name="nightly_dangling_product_cleanup",
-            run_at_startup=True,
+            run_at_startup=False,
             keep_result=0
         ),
     ] if settings.CRON_JOBS_ENABLED else []

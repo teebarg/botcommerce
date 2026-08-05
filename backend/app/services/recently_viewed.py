@@ -2,7 +2,6 @@ from app.services.search import SearchService
 from typing import List
 from datetime import datetime
 from app.core.logging import get_logger
-from app.redis_client import redis_client
 from app.services.cache import CacheService
 
 logger = get_logger(__name__)
@@ -18,21 +17,19 @@ class RecentlyViewedService:
 
     async def add_product(self, user_id: int, product_id: int):
         """Add a product to user's recently viewed list"""
-        key = await self.get_key(user_id)
+        key: str = await self.get_key(user_id)
         timestamp = datetime.now().timestamp()
 
         # Add to sorted set with timestamp as score
-        await redis_client.zadd(key, {str(product_id): timestamp})
-
-        await redis_client.zremrangebyrank(key, 0, -(self.max_items + 1))
-
+        await self.cache_srv.redis.zadd(key, {str(product_id): timestamp})
+        await self.cache_srv.redis.zremrangebyrank(key, 0, -(self.max_items + 1))
         await self.cache_srv.invalidate(f"products:recently-viewed:{user_id}")
 
     async def get_recently_viewed(self, user_id: int, limit: int = 10) -> List[dict]:
         """Get user's recently viewed products"""
         key: str = await self.get_key(user_id)
 
-        product_ids = await redis_client.zrevrange(key, 0, limit - 1)
+        product_ids = await self.cache_srv.redis.zrevrange(key, 0, limit - 1)
 
         products = []
         for pid in product_ids:

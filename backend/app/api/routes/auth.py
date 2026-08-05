@@ -8,7 +8,7 @@ from app.prisma_client import prisma as db
 from app.core.logging import get_logger
 from app.core.deps import verify_clerk_token
 from app.core.dependencies.cart import CartDep
-from app.core.dependencies.cache import CacheDep
+from app.core.dependencies.cache import ArqDep, CacheDep
 
 logger = get_logger(__name__)
 
@@ -40,7 +40,7 @@ async def logout(request: Request, response: Response, cache_srv: CacheDep):
 
 
 @router.post("/exchange")
-async def exchange_token(response: Response, cache_srv: CacheDep, cart_srv: CartDep, payload=Depends(verify_clerk_token), _cart_id: Annotated[str | None, Cookie()] = None):
+async def exchange_token(response: Response, queue: ArqDep, cache_srv: CacheDep, cart_srv: CartDep, payload=Depends(verify_clerk_token), _cart_id: Annotated[str | None, Cookie()] = None):
     session_id = str(uuid.uuid4())
     clerk_id = payload["sub"]
 
@@ -53,7 +53,7 @@ async def exchange_token(response: Response, cache_srv: CacheDep, cart_srv: Cart
                 "update": {"clerk_id": clerk_id},
             },
         )
-        await cache_srv.redis.enqueue_job(
+        await queue.enqueue_job(
             "user_register",
             user_id=user.id,
         )

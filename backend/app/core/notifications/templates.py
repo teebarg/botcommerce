@@ -1,8 +1,14 @@
 from typing import Any
-from app.core.utils import generate_abandoned_cart_email, generate_invoice_email, generate_payment_receipt
+from redis.asyncio import Redis
+from app.core.dependencies.services import get_shop_settings_service
+from app.utils.emails import generate_invoice_email, generate_payment_receipt, generate_abandoned_cart_email
 
 
 class TemplateEngine:
+    def __init__(self, redis: Redis):
+        self.redis = redis
+        self.settings_srv = get_shop_settings_service(redis)
+
     async def render(self, channel: str, event_name: str, context: dict[str, Any]) -> Any:
         method = f"_{event_name}"
         if not hasattr(self, method):
@@ -15,7 +21,7 @@ class TemplateEngine:
         order = ctx.get("order")
         user = ctx.get("user")
         email = user.email
-        email_data = await generate_invoice_email(order=order, user=user)
+        email_data = await generate_invoice_email(order=order, user=user, service=self.settings_srv)
 
         items_raw = ctx.get('items_overview', 'No items specified')
         
@@ -84,7 +90,8 @@ class TemplateEngine:
         email_data = await generate_abandoned_cart_email(
             cart_data=cart,
             user_email=email,
-            user_name=ctx.get("user_name")
+            user_name=ctx.get("user_name"),
+            service=self.settings_srv
         )
         dict_data = {
             "subject": email_data.subject,
@@ -108,7 +115,7 @@ class TemplateEngine:
 
     async def _send_invoice(self, ctx: dict) -> tuple[str, dict]:
         order = ctx.get("order")
-        email_data = await generate_payment_receipt(order=order, user=order.user)
+        email_data = await generate_payment_receipt(order=order, user=order.user, service=self.settings_srv)
         dict_data = {
             "subject": email_data.subject,
             "recipient": order.user.email if order.user else "",

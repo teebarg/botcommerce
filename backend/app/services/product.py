@@ -21,9 +21,8 @@ logger = get_logger(__name__)
 PRODUCT_ATTRIBUTES: list[str] = ["id", "name", "sku", "image", "slug", "active", "is_new", "status", "variants"]
 
 class ProductService:
-    def __init__(self, db, redis, search_srv: SearchService, cache_srv: CacheService, cdn_srv: CdnService):
+    def __init__(self, db, search_srv: SearchService, cache_srv: CacheService, cdn_srv: CdnService):
         self.db = db
-        self.redis = redis
         self.search_srv = search_srv
         self.cache_srv = cache_srv
         self.cdn_srv = cdn_srv
@@ -171,7 +170,7 @@ class ProductService:
 
     async def get_similar_products(self, product_id: int, limit: int) -> list:
         key: str = f"product:{product_id}:similar"
-        ids = await self.redis.lrange(key, 0, -1)
+        ids = await self.cache_srv.redis.lrange(key, 0, -1)
         if not ids:
             return []
 
@@ -190,7 +189,7 @@ class ProductService:
         return documents
 
     async def get_personalized_recommendations(self, user_id: int, limit: int) -> list:
-        product_ids = await self.redis.lrange(f"user:{user_id}:history", 0, 4)
+        product_ids = await self.cache_srv.redis.lrange(f"user:{user_id}:history", 0, 4)
         if not product_ids:
             return []
 
@@ -198,7 +197,7 @@ class ProductService:
         seen = set(product_ids)
 
         for pid in product_ids:
-            similar_ids = await self.redis.lrange(f"product:{pid}:similar", 0, -1)
+            similar_ids = await self.cache_srv.redis.lrange(f"product:{pid}:similar", 0, -1)
             for sid in similar_ids:
                 if sid not in seen:
                     recommendation_scores[sid] += 1

@@ -23,6 +23,7 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
+from redis.asyncio import Redis
 from typing import TypedDict
 
 from app.agent.memory import load_messages_from_redis, save_messages_to_redis
@@ -616,6 +617,7 @@ def _extract_text_content(content) -> str:
 
 
 async def run_agent(
+    redis: Redis,
     message: str,
     session_id: str | None = None,
     customer_id: int | None = None,
@@ -626,7 +628,7 @@ async def run_agent(
 
     logger.debug(f"[Agent] Session: {session_id} | Customer: {customer_id} | Message: {message[:80] if len(message) > 80 else message}")
 
-    history: list[BaseMessage] = await load_messages_from_redis(session_id)
+    history: list[BaseMessage] = await load_messages_from_redis(redis=redis, session_id=session_id)
     history = _sanitize_loaded_history(history)
 
     intent: str = await _classify_message(message)
@@ -641,8 +643,9 @@ async def run_agent(
 
         reply: str = _extract_text_content(resp.content).strip()
         await save_messages_to_redis(
-            session_id,
-            history + [HumanMessage(content=message), AIMessage(content=reply)],
+            redis=redis,
+            session_id=session_id,
+            messages=history + [HumanMessage(content=message), AIMessage(content=reply)],
         )
         quick_replies: list[str] = _get_quick_replies(
             user_message=message,
@@ -766,7 +769,7 @@ async def run_agent(
             final_reply=reply,
             called_search=called_search,
         )
-        await save_messages_to_redis(session_id, clean_history)
+        await save_messages_to_redis(redis=redis, session_id=session_id, messages=clean_history)
 
         sources = final_state.get("sources", [])
         escalated = final_state.get("escalated", False)

@@ -150,7 +150,6 @@ agent/
 │   │   ├── db.py           # Evaluation database
 │   │   └── langfuse_client.py # Langfuse client setup
 │   ├── utils.py             # Utility functions (Slack, etc.)
-│   └── redis_client.py      # Redis connection management
 ├── models/                   # Local embedding models
 ├── scripts/                  # Utility scripts
 ├── pyproject.toml           # UV-based dependency management

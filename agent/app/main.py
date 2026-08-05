@@ -2,8 +2,10 @@ import dataclasses
 import time
 from app.logging import get_logger
 from app.agent.eval_config import SUPPORT_EVAL_CONFIG
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, Request
+from fastapi import FastAPI, BackgroundTasks, Request
 from fastapi.middleware.cors import CORSMiddleware
+import redis.asyncio as redis
+from redis.asyncio import Redis
 from contextlib import asynccontextmanager
 
 from app.schemas.models import ChatRequest, ChatResponse, IngestRequest, HealthResponse
@@ -11,13 +13,13 @@ from app.agent.agent_graph import run_agent
 from app.config import get_model_name, get_llm, settings
 from app.utils import _notify_slack_escalation
 from app.customer_support.db import is_human_connected, save_message_db, mark_escalated, ensure_conversation_exists
-from app.redis_client import redis_client
 from app.agent.memory import save_messages_to_redis, load_messages_from_redis, clear_session
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 
 from app.observability.tracing import start_turn_trace, end_turn_trace
 from app.observability.eval_runner import run_eval_pipeline
 from app.observability.langfuse_client import flush_langfuse
+from app.deps import RedisDep
 
 logger = get_logger(__name__)
 
@@ -28,7 +30,7 @@ async def lifespan(app: FastAPI):
     Runs on startup: pre-load the embedding model so the first request isn't slow.
     """
     logger.debug("🚀 Pre-loading embedding model...")
-
+    app.state.redis = redis.from_url(settings.REDIS_URL, decode_responses=True, max_connections=10)
     try:
         from app.rag.qdrant_client import get_embedding_model
         get_embedding_model()  # loads and caches the model
@@ -38,6 +40,7 @@ async def lifespan(app: FastAPI):
 
     yield
     flush_langfuse()
+    await app.state.redis.close()
 
     logger.debug("Shutting down...")
 
@@ -68,7 +71,7 @@ async def persist_turn_to_db(session_id: str, user_msg: str, ai_msg: str, user_m
 
 
 @app.post("/chat", tags=["Chat"])
-async def chat(request: Request, payload: ChatRequest, background_tasks: BackgroundTasks) -> ChatResponse:
+async def chat(request: Request, redis: RedisDep, payload: ChatRequest, background_tasks: BackgroundTasks) -> ChatResponse:
     """
     Main chat endpoint.
 
@@ -83,10 +86,10 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
         return ChatResponse(reply="Your message is too long. Please keep it under 1000 characters.", session_id=payload.session_id)
 
     connection_key = payload.customer_id or payload.app_session_id
-    await redis_client.set(f"chat_user:{payload.session_id}", str(connection_key))
+    await redis.set(f"chat_user:{payload.session_id}", str(connection_key))
 
     if payload.customer_id is None:
-        await redis_client.set(f"chat_session:{connection_key}", payload.session_id)
+        await redis.set(f"chat_session:{connection_key}", payload.session_id)
 
     await ensure_conversation_exists(conversation_uuid=payload.session_id, customer_id=payload.customer_id)
 
@@ -149,8 +152,9 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
                 "If you'd like, I can still help with anything else in the meantime."
             )
 
-            history: list[BaseMessage] = await load_messages_from_redis(payload.session_id)
+            history: list[BaseMessage] = await load_messages_from_redis(redis=redis, session_id=payload.session_id)
             await save_messages_to_redis(
+                redis=redis,
                 session_id=payload.session_id,
                 messages=history + [HumanMessage(content=user_msg), AIMessage(content="Complaint request received and sent to support team")],
             )
@@ -185,13 +189,14 @@ async def chat(request: Request, payload: ChatRequest, background_tasks: Backgro
     )
 
     # rate limiting:
-    turn_count = await redis_client.incr(f"rate:{payload.session_id}")
-    await redis_client.expire(f"rate:{payload.session_id}", 60)
+    turn_count = await redis.incr(f"rate:{payload.session_id}")
+    await redis.expire(f"rate:{payload.session_id}", 60)
     if turn_count > 10:  # 10 messages per minute per session
         return ChatResponse(reply="Please slow down — try again in a moment.", session_id=payload.session_id)
 
     try:
         result = await run_agent(
+            redis=redis,
             message=payload.message or "",
             session_id=payload.session_id,
             customer_id=payload.customer_id,
@@ -274,7 +279,7 @@ async def ingest_data(payload: IngestRequest, background_tasks: BackgroundTasks)
 
 
 @app.get("/health", tags=["System"])
-async def health_check() -> HealthResponse:
+async def health_check(redis: RedisDep) -> HealthResponse:
     """
     Health check endpoint.
     """
@@ -290,7 +295,7 @@ async def health_check() -> HealthResponse:
         logger.error(f"error: {str(e)[:50]}")
 
     try:
-        redis_client.ping()
+        redis.ping()
         checks["redis"] = "ok"
     except Exception as e:
         checks["redis"] = "error"
@@ -303,7 +308,7 @@ async def health_check() -> HealthResponse:
 @app.delete("/session/{session_id}", tags=["Admin"])
 async def delete_session(session_id: str):
     """Clear a session's conversation memory."""
-    await clear_session(session_id)
+    await clear_session(redis=redis, session_id=session_id)
     return {"status": "cleared", "session_id": session_id}
 
 

@@ -68,13 +68,13 @@ class L1Cache:
         self._store.clear()
 
 
-async def run_l1_invalidation_listener(redis_client: Redis, l1: L1Cache) -> None:
+async def run_l1_invalidation_listener(redis: Redis, l1: L1Cache) -> None:
     """Background task — one per worker process. Subscribes to the
     invalidation channel and evicts matching keys from this process's L1.
     Redis DEL only clears the shared store; this is what keeps every
     sibling worker's local cache in sync with it. Must be started in
     every worker, not just one."""
-    pubsub = redis_client.pubsub()
+    pubsub = redis.pubsub()
     await pubsub.subscribe(L1_INVALIDATE_CHANNEL)
     try:
         async for message in pubsub.listen():
@@ -94,8 +94,8 @@ async def run_l1_invalidation_listener(redis_client: Redis, l1: L1Cache) -> None
 
 
 class CacheService:
-    def __init__(self, redis_client: Redis, l1: Optional[L1Cache] = None) -> None:
-        self.redis = redis_client
+    def __init__(self, redis: Redis, l1: Optional[L1Cache] = None) -> None:
+        self.redis = redis
         self.l1 = l1  # None disables L1 for this call site (e.g. sessions)
 
     async def clear_cache(self) -> None:
