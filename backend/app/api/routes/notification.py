@@ -10,7 +10,7 @@ from app.core.logging import get_logger
 from app.prisma_client import prisma as db
 from app.core.deps import Notification, UserDep
 from app.core.notifications.events import SendPushNotificationEvent
-from app.core.dependencies.cache import CacheDep
+from app.core.dependencies.cache import ArqDep
 
 class PushEventSchema(BaseModel):
     notificationId: str
@@ -38,16 +38,24 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 @router.post("/push-event")
-async def create_push_event(cache_srv: CacheDep, data: PushEventSchema) -> Message:
+async def create_push_event(queue: ArqDep, data: PushEventSchema) -> Message:
     try:
-        await cache_srv.redis.xadd("PUSH_EVENT", jsonable_encoder(data, exclude_none=True))
+        await queue.enqueue_job(
+            "push_event_analytics",
+            data= jsonable_encoder(data, exclude_none=True)
+        )
     except Exception as e:
         logger.error(f"Error creating push event: {e}")
     return Message(message="success")
 
 @router.post("/push-fcm")
-async def push_fcm(cache_srv: CacheDep, data: FCMIn, user: UserDep) -> Message:
-    await cache_srv.redis.xadd("FCM", jsonable_encoder(data, exclude_none=True))
+async def push_fcm(queue: ArqDep, data: FCMIn, user: UserDep) -> Message:
+    await queue.enqueue_job(
+        "fcm",
+        endpoint=data.endpoint,
+        p256dh=data.p256dh,
+        auth=data.auth,
+    )
     try:
         await db.pushsubscription.upsert(
             where={
@@ -82,4 +90,3 @@ async def send_push_notification(data: PushMessageSchema, background_tasks: Back
     except Exception as e:
         logger.error(f"Failed to send push notifications: {str(e)}")
         return Message(message="failed")
-
