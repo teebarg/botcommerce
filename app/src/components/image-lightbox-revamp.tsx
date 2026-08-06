@@ -2,15 +2,11 @@
 
 import * as React from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import { cn } from "@/utils/cn";
 import { Button } from "@/components/ui/button";
-import { useOverlayTriggerState } from "react-stately";
-import { ConfirmDrawer } from "./generic/confirm-drawer";
+import { GalleryThumbnail } from "./image-thumbnail";
 
 function openGemini(imageUrl: string, productId: number) {
     const params = new URLSearchParams({
-        prompt:
-            "Convert this mannequin image into a real human model. Keep the clothes identical and completely unchanged",
         admin_image_url: imageUrl,
         product_id: productId.toString()
     });
@@ -47,7 +43,6 @@ export function ImageLightbox({
     productId,
     defaultImage
 }: ImageLightboxProps) {
-    const state = useOverlayTriggerState({});
     const [currentIndex, setCurrentIndex] = React.useState(initialIndex);
     const containerRef = React.useRef<HTMLDivElement>(null);
     const shouldShow = open && images.length > 0;
@@ -168,56 +163,17 @@ export function ImageLightbox({
                 </div>
             )}
 
-            {/* Thumbnail strip */}
             <div className="border-t border-white/10 bg-black/60 px-4 py-4">
                 <div className="mx-auto flex max-w-5xl gap-2 overflow-x-auto p-2">
                     {images.map((image, index) => (
-                        <div
-                            key={`${image}-${index}`}
-                            className={cn(
-                                "group/thumb relative shrink-0 overflow-hidden rounded-md transition-all",
-                                index === safeIndex
-                                    ? "ring-2 ring-white/80"
-                                    : "opacity-60 hover:opacity-100"
-                            )}
-                        >
-                            <button
-                                onClick={() => setCurrentIndex(index)}
-                                className="block focus:outline-none focus:ring-2 focus:ring-white/50"
-                                aria-label={`Go to image ${index + 1}`}
-                                aria-current={index === safeIndex ? "true" : undefined}
-                            >
-                                <img
-                                    src={image.image}
-                                    alt={image.image}
-                                    className="h-26 w-20 object-cover"
-                                    loading="lazy"
-                                />
-                            </button>
-                            {onRemoveImage && (
-                                <ConfirmDrawer
-                                    open={state.isOpen}
-                                    onOpenChange={state.setOpen}
-                                    trigger={
-                                        <button
-                                            className="absolute right-1 top-1 rounded-full bg-black/70 p-1 text-white/80 opacity-0 transition-opacity hover:bg-black/90 hover:text-white focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-white/50 group-hover/thumb:opacity-100"
-                                            aria-label={`Remove image ${index + 1}`}
-                                        >
-                                            <X className="h-3 w-3" />
-                                        </button>
-                                    }
-                                    onConfirm={() => {
-                                        onRemoveImage(image.id);
-                                        setCurrentIndex((i) =>
-                                            index < i ? i - 1 : Math.min(i, images.length - 2)
-                                        );
-                                        state.close()
-                                    }}
-                                    title="Delete Image?"
-                                    description="This action cannot be reversed"
-                                />
-                            )}
-                        </div>
+                        <GalleryThumbnail
+                            key={image.id}
+                            image={image}
+                            index={index}
+                            isActive={index === safeIndex}
+                            onSelect={() => setCurrentIndex(index)}
+                            onRemoveImage={onRemoveImage}
+                        />
                     ))}
                 </div>
             </div>
