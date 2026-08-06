@@ -113,6 +113,7 @@ class Settings(BaseSettings):
     CF_ZONE_ID: str = ""
 
     INTERNAL_WORKER_SECRET: str = ""
+    EXTENSION_SECRET_KEY: str = "secret"
 
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)

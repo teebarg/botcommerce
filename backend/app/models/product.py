@@ -112,6 +112,7 @@ class ProductSearch(BaseModel):
     sku: Optional[str] = None
     slug: str
     image: Optional[str] = None
+    images: Optional[List[str]] = []
     status: Literal["IN STOCK", "OUT OF STOCK"] = "IN STOCK"
     variants: Optional[List[SearchVariant]] = []
     active: Optional[bool] = True

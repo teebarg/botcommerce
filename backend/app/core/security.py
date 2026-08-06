@@ -52,7 +52,7 @@ async def verify_internal_signature(
     x_timestamp: str = Header(...),
 ):
     body = await request.body()
-    valid = verify_request(
+    valid: bool = verify_request(
         secret=settings.INTERNAL_WORKER_SECRET,
         method=request.method,
         path=request.url.path,
@@ -66,3 +66,10 @@ async def verify_internal_signature(
             f"from {request.client.host} on {request.url.path}"
         )
         raise HTTPException(status_code=403, detail="Forbidden")
+
+def verify_extension_secret(x_extension_secret: str = Header(..., alias="X-Extension-Secret")):
+    if x_extension_secret != settings.EXTENSION_SECRET_KEY:
+        raise HTTPException(
+            status_code=403, 
+            detail="Forbidden: Invalid or missing extension header"
+        )

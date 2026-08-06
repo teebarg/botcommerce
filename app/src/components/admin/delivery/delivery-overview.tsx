@@ -107,7 +107,6 @@ const DeliveryOverview: React.FC = () => {
     const addState = useOverlayTriggerState({});
 
     const { data: deliveryOptions, isLoading, error } = useDeliveryOptions();
-    console.log(isLoading)
 
     if (error) {
         return <ServerError error={error.message} scenario="delivery" stack={error.stack} />;

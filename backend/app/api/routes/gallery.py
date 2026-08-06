@@ -6,7 +6,7 @@ from app.models.product import (
     ImagesBulkUpdate,
     ProductImageBulkUrls,
 )
-from app.models.gallery import PaginatedProductImages
+from app.models.gallery import PaginatedGalleryImages
 from app.core.permissions import require_admin
 from app.prisma_client import prisma as db
 from app.services.cache import cacheable
@@ -29,32 +29,13 @@ async def image_gallery(
     name: Optional[str] = Query(default=None),
     start_date: Optional[str] = Query(default=None),
     end_date: Optional[str] = Query(default=None),
-) -> PaginatedProductImages:
+) -> PaginatedGalleryImages:
     """Image gallery endpoint using cursor-based pagination."""
     items = await srv.get_gallery_items(
         cursor=cursor, limit=limit, sort=sort, active=active, inventory=inventory,
         category_slug=category_slug, name=name, start_date=start_date, end_date=end_date,
     )
-    return PaginatedProductImages.validate(items)
-
-
-@router.delete("/{image_id}", dependencies=[Depends(require_admin)])
-async def delete_gallery_image(
-    image_id: int,
-    srv: GalleryDep,
-    product_srv: ProductDep,
-    background_tasks: BackgroundTasks,
-) -> Message:
-    product_id, image_urls = await srv.delete_image(image_id)
-
-    if not product_id:
-        background_tasks.add_task(srv.storage.remove_images, image_urls[0])
-        return Message(message="Image deleted successfully")
-
-    background_tasks.add_task(product_srv.delete_product_index, product_ids=[product_id])
-    background_tasks.add_task(srv.storage.remove_images, image_urls)
-    return Message(message="Image and all related data deleted successfully")
-
+    return PaginatedGalleryImages.validate(items)
 
 @router.post("/bulk-upload", dependencies=[Depends(require_admin)])
 async def bulk_save_image_urls(

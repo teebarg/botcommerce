@@ -18,7 +18,7 @@ from app.services.cdn import CdnService
 
 logger = get_logger(__name__)
 
-PRODUCT_ATTRIBUTES: list[str] = ["id", "name", "sku", "image", "slug", "active", "is_new", "status", "variants"]
+PRODUCT_ATTRIBUTES: list[str] = ["id", "name", "sku", "image", "images", "slug", "active", "is_new", "status", "variants"]
 
 class ProductService:
     def __init__(self, db, search_srv: SearchService, cache_srv: CacheService, cdn_srv: CdnService):
@@ -41,6 +41,9 @@ class ProductService:
             "10-12 years": "kids",
             "12+ years": "teenager",
         }
+
+    async def get(self, id: int):
+        return await self.db.product.find_unique(where={"id": id})
 
     async def get_by_slug(self, slug: str):
         return await self.db.product.find_unique(
@@ -325,6 +328,7 @@ class ProductService:
 
         images = [img.image for img in sorted((product.images or []), key=lambda img: img.order)]
         product_dict["image"] = images[0] if images else None
+        product_dict["images"] = images if images else []
 
         variants = [
             {
@@ -391,7 +395,7 @@ class ProductService:
                 self.cdn_srv.purge_vercel(f"product:{product.slug}", "products"),
                 return_exceptions=True
             )
-            await self.cache_srv.invalidate(f"product:{product.slug}", tags=["products", "catalog"])
+            await self.cache_srv.invalidate(f"product:{product.slug}", tags=["products", "catalog", "gallery"])
         except Exception as e:
             logger.error(f"Error re-indexing product {id}: {e}")
 

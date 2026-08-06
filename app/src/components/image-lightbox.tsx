@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import ImageDisplay from "@/components/image-display";
 import { cn } from "@/utils/cn";
+import { ImageLite } from "@/schemas";
 
 interface ImageLightboxProps {
     url?: string;
@@ -11,10 +12,11 @@ interface ImageLightboxProps {
     imgClassName?: string;
     disabled?: boolean;
     size?: string | null;
+    images?: ImageLite[]
 }
 
 export default function ImageLightbox({ url, alt, className, imgClassName, size, disabled = false }: ImageLightboxProps) {
-        const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false);
 
     const close = useCallback((e: React.MouseEvent) => {
         e.stopPropagation();

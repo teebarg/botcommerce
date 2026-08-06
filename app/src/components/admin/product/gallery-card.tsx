@@ -1,18 +1,19 @@
 import { GalleryCardActions } from "./gallery-card-actions";
 import { currency } from "@/utils";
-import type { ProductImage } from "@/schemas";
-import ImageLightbox from "@/components/image-lightbox";
+import type { GalleryImage } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/utils/cn";
+import { useState } from "react";
 
 interface GalleryCardProps {
-    image: ProductImage;
+    image: GalleryImage;
     isSelected?: boolean;
     onSelectionChange?: (imageId: number, selected: boolean) => void;
+    onSelection?: (image: GalleryImage) => void;
     selectionMode?: boolean;
 }
 
-export function GalleryCard({ image, isSelected = false, onSelectionChange, selectionMode = false }: GalleryCardProps) {
+export function GalleryCard({ image, isSelected = false, onSelectionChange, onSelection, selectionMode = false }: GalleryCardProps) {
     if (!image) return null;
 
     const product = image.product;
@@ -27,6 +28,7 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
         item?.age && `Age: ${item.age}`,
     ].filter(Boolean);
 
+    const [mediaLoaded, setMediaLoaded] = useState<boolean>(false);
     const categories = product?.categories?.map((item) => item.name) || [];
     const combined = [...categories, ...attributes];
 
@@ -42,15 +44,23 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, sele
                 selectionMode ? "cursor-pointer" : "cursor-default",
                 isSelected ? "ring-2 ring-primary ring-offset-1" : ""
             )}
-            onClick={() => selectionMode && onSelectionChange?.(image.id, !isSelected)}
+            onClick={() => selectionMode ? onSelectionChange?.(image.id, !isSelected) : onSelection?.(image)}
         >
-            <ImageLightbox
-                url={image?.image}
-                alt={product?.name || ""}
-                className="absolute inset-0 w-full h-full"
-                imgClassName={cn(isInactive || isOutOfStock ? "grayscale opacity-60" : "")}
-                disabled={selectionMode}
-            />
+            <div className="absolute inset-0 w-full h-full overflow-hidden bg-muted">
+                {!mediaLoaded && <img src="/placeholder.jpg" alt="placeholder" className="absolute inset-0 w-full h-full object-cover" />}
+                <img
+                    alt={product?.name || ""}
+                    src={image?.image}
+                    onLoad={() => setMediaLoaded(true)}
+                    loading="lazy"
+                    decoding="async"
+                    className={cn(
+                        "w-full h-full object-cover transition-opacity duration-500",
+                        mediaLoaded ? "opacity-100" : "opacity-0",
+                        isInactive || isOutOfStock ? "grayscale opacity-60" : ""
+                    )}
+                />
+            </div>
 
             {/* Top status overlays */}
             <div className="absolute top-2 left-2 grid gap-1.5 z-10 pointer-events-none">
