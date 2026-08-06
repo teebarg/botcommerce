@@ -7,8 +7,7 @@ from pydantic import BaseModel
 
 from app.models.generic import Message
 from app.core.logging import get_logger
-from app.prisma_client import prisma as db
-from app.core.deps import Notification, UserDep
+from app.core.deps import Notification, UserDep, DbDep
 from app.core.notifications.events import SendPushNotificationEvent
 from app.core.dependencies.cache import ArqDep
 
@@ -49,7 +48,7 @@ async def create_push_event(queue: ArqDep, data: PushEventSchema) -> Message:
     return Message(message="success")
 
 @router.post("/push-fcm")
-async def push_fcm(queue: ArqDep, data: FCMIn, user: UserDep) -> Message:
+async def push_fcm(queue: ArqDep, db: DbDep, data: FCMIn, user: UserDep) -> Message:
     await queue.enqueue_job(
         "fcm",
         endpoint=data.endpoint,
@@ -82,7 +81,7 @@ async def push_fcm(queue: ArqDep, data: FCMIn, user: UserDep) -> Message:
 
 
 @router.post("/push")
-async def send_push_notification(data: PushMessageSchema, background_tasks: BackgroundTasks, notification: Notification) -> Message:
+async def send_push_notification(db: DbDep, data: PushMessageSchema, background_tasks: BackgroundTasks, notification: Notification) -> Message:
     try:
         subscriptions = await db.pushsubscription.find_many()
         background_tasks.add_task(notification.dispatch, SendPushNotificationEvent(subscriptions=[subscription.model_dump() for subscription in subscriptions], notification=data.model_dump()))

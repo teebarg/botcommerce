@@ -5,10 +5,10 @@ from pydantic import BaseModel
 from app.core.dependencies.services import SettingsDep
 from app.core.dependencies.cache import CacheDep, CdnDep
 from app.services.cache import cacheable
-from app.prisma_client import prisma as db
 from app.core.logging import get_logger
 from datetime import datetime
 from app.core.permissions import require_admin
+from app.core.deps import DbDep
 
 logger = get_logger(__name__)
 
@@ -23,7 +23,7 @@ class ShopSettings(BaseModel):
 
 @router.get("/")
 @cacheable(key_prefix="shop-settings", key_builder=False, tags=["shop-settings"], expire=2592000, cdn_ttl=31536000, cdn_swr=604800)
-async def index(request: Request) -> list[ShopSettings]:
+async def index(request: Request, db: DbDep) -> list[ShopSettings]:
     """
     Get shop settings with optional filtering
     """

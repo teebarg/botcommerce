@@ -3,13 +3,14 @@ from fastapi import Depends
 from app.core.dependencies.cache import ArqDep, CacheDep
 from app.core.dependencies.cart import CartDep
 from app.core.dependencies.product import ProductDep
-from app.prisma_client import prisma as db
 from app.services.order import OrderService
 from app.core.notifications.setup import get_notification_service
 from app.core.dependencies.services import CouponDep, SettingsDep, StorageDep
+from app.core.deps import DbDep
 
 def get_order_service(
     queue: ArqDep,
+    db: DbDep,
     cache_srv: CacheDep,
     cart_srv: CartDep,
     coupon_srv: CouponDep,

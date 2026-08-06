@@ -8,10 +8,10 @@ from app.models.product import (
 )
 from app.models.gallery import PaginatedGalleryImages
 from app.core.permissions import require_admin
-from app.prisma_client import prisma as db
 from app.services.cache import cacheable
 from app.core.dependencies.product import ProductDep
 from app.core.dependencies.gallery import GalleryDep
+from app.core.deps import DbDep
 
 router = APIRouter()
 
@@ -47,6 +47,7 @@ async def bulk_save_image_urls(
 
 @router.post("/bulk-delete", dependencies=[Depends(require_admin)])
 async def bulk_delete_gallery_images(
+    db: DbDep,
     srv: GalleryDep,
     Product_srv: ProductDep,
     payload: ImageBulkDelete,
@@ -97,6 +98,7 @@ async def update_image_metadata(
 
 @router.patch("/bulk-update", dependencies=[Depends(require_admin)])
 async def bulk_update_products(
+    db: DbDep,
     srv: GalleryDep,
     product_srv: ProductDep,
     payload: ImagesBulkUpdate,

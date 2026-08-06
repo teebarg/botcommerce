@@ -8,7 +8,7 @@ from app.services.cache import CacheService, cacheable
 from fastapi import HTTPException, Request
 from prisma.enums import PaymentStatus
 from meilisearch.errors import MeilisearchApiError
-from app.prisma_client import prisma as db
+from prisma import Prisma
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.core.utils import url_to_list
@@ -21,7 +21,7 @@ logger = get_logger(__name__)
 PRODUCT_ATTRIBUTES: list[str] = ["id", "name", "sku", "image", "images", "slug", "active", "is_new", "status", "variants"]
 
 class ProductService:
-    def __init__(self, db, search_srv: SearchService, cache_srv: CacheService, cdn_srv: CdnService):
+    def __init__(self, db: Prisma, search_srv: SearchService, cache_srv: CacheService, cdn_srv: CdnService):
         self.db = db
         self.search_srv = search_srv
         self.cache_srv = cache_srv
@@ -373,7 +373,7 @@ class ProductService:
 
     async def invalidate(self, id: int) -> None:
         try:
-            product = await db.product.find_unique(
+            product = await self.db.product.find_unique(
                 where={"id": id},
                 include={
                     "categories": True,
@@ -407,7 +407,7 @@ class ProductService:
         try:
             logger.debug("Starting re-indexing process...")
             if product_ids:
-                products = await db.product.find_many(
+                products = await self.db.product.find_many(
                     where={"id": {"in": product_ids}},
                     include={
                         "categories": True,
@@ -451,7 +451,7 @@ class ProductService:
             total_processed = 0
 
             while True:
-                products_batch = await db.product.find_many(
+                products_batch = await self.db.product.find_many(
                     include={
                         "categories": True,
                         "collections": True,

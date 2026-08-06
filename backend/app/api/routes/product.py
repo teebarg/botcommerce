@@ -1,20 +1,17 @@
 import json
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks, Response, Request
-from app.prisma_client import prisma as db
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.core.dependencies.product import ProductDep, SearchDep
-from app.services.cache import cacheable
-from app.core.deps import CurrentUser, UserDep
-from app.models.generic import Message
+from app.services.cache import cacheable, DEFAULT_EXPIRATION
+from app.core.deps import CurrentUser, UserDep, DbDep
+from app.models.generic import Message, ImageUpload
 from app.models.product import ProductLite, VariantWithStatus, SearchProducts, FeedProducts, IndexProducts, ReviewStatus
 from app.core.permissions import require_admin
-from app.services.cache import DEFAULT_EXPIRATION
 from app.lib.cache import set_public_cache
 from app.core.dependencies.services import StorageDep
 from app.core.security import verify_extension_secret
-from app.models.generic import ImageUpload
 
 logger = get_logger(__name__)
 
@@ -183,12 +180,12 @@ async def reindex_products(srv: ProductDep, background_tasks: BackgroundTasks) -
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/{id}/image-upload", dependencies=[Depends(verify_extension_secret)])
-async def upload_image(id: int, image_data: ImageUpload, srv: ProductDep, storage_srv: StorageDep, background_tasks: BackgroundTasks) -> Message:
+async def upload_image(id: int, db: DbDep, image_data: ImageUpload, srv: ProductDep, storage_srv: StorageDep, background_tasks: BackgroundTasks) -> Message:
     try:
         product = await srv.get(id=id)
         if not product:
             raise HTTPException(status_code=404, detail="Product not found")
-        
+
         image_url: str = storage_srv.upload(bucket="images", data=image_data)
         await db.productimage.create(
             data={"image": image_url, "product_id": id}

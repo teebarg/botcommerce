@@ -3,8 +3,7 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, Request, Query
 from pydantic import BaseModel
 from prisma.enums import WalletTransactionType
-from app.prisma_client import prisma as db
-from app.core.deps import  CurrentUser
+from app.core.deps import  CurrentUser, DbDep
 from app.core.permissions import require_admin
 from app.services.cache import cacheable
 
@@ -27,6 +26,7 @@ router = APIRouter()
 @cacheable(key_prefix="wallets", tags=["wallets"])
 async def index(
     request: Request,
+    db: DbDep,
     query: str = "",
     cursor: str | None = None,
     limit: int = Query(default=20, le=100),
@@ -65,6 +65,7 @@ async def index(
 @cacheable(key_prefix="wallet", tags=lambda user: [f"wallet:{user.id}"])
 async def self_txns(
     request: Request,
+    db: DbDep,
     user: CurrentUser,
     cursor: str | None = None,
     limit: int = Query(default=20, le=100),

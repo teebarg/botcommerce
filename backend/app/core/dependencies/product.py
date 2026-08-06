@@ -1,14 +1,15 @@
 from typing import Annotated
 from fastapi import Depends
-from app.prisma_client import prisma as db
 from app.services.product import ProductService
 from app.core.dependencies.cache import CacheDep, CdnDep
 from app.services.search import SearchService
+from app.core.deps import DbDep
 
 def get_search_service() -> SearchService:
     return SearchService()
 
 def get_product_service(
+    db: DbDep,
     cache_srv: CacheDep,
     cdn_srv: CdnDep,
     search_srv: SearchService = Depends(get_search_service)
