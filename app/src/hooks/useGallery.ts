@@ -31,18 +31,6 @@ export const useUpdateImageMetadata = () => {
     });
 };
 
-export const useDeleteGalleryImage = () => {
-    return useMutation({
-        mutationFn: async ({ id }: { id: number }) => await api.delete<Message>(`/gallery/${id}`),
-        onSuccess: () => {
-            toast.success("Image deleted successfully");
-        },
-        onError: (error: any) => {
-            toast.error(error.message || "Failed to delete image");
-        },
-    });
-};
-
 export const useBulkDeleteGalleryImages = () => {
     return useMutation({
         mutationFn: async ({ imageIds }: { imageIds: number[] }) => await api.post<Message>(`/gallery/bulk-delete`, { files: imageIds }),

@@ -181,35 +181,6 @@ class GalleryService:
             "limit": limit,
         }
 
-    async def delete_image(self, image_id: int) -> tuple[Optional[int], list[str]]:
-        """Deletes an image or its parent product synchronously within transactional bounds."""
-        image = await self.db.productimage.find_unique(where={"id": image_id})
-        if not image:
-            raise HTTPException(status_code=404, detail="Image not found")
-
-        if not image.product_id:
-            await self.db.productimage.delete(where={"id": image_id})
-            return None, [image.image]
-
-        product_id = image.product_id
-        try:
-            async with self.db.tx() as tx:
-                images = await tx.productimage.find_many(where={"product_id": product_id})
-                image_urls = [img.image for img in images]
-
-                await asyncio.gather(
-                    tx.productimage.delete_many(where={"product_id": product_id}),
-                    tx.review.delete_many(where={"product_id": product_id}),
-                    tx.productvariant.delete_many(where={"product_id": product_id}),
-                )
-                await tx.product.delete(where={"id": product_id})
-            await self.invalidate(tags=["stats-trends"])
-        except Exception as e:
-            logger.error(f"Error deleting product {product_id}: {e}")
-            raise HTTPException(status_code=500, detail="Failed to delete product")
-
-        return product_id, image_urls
-
     async def bulk_save_urls(self, payload: ProductImageBulkUrls) -> dict:
         if not payload.urls:
             raise HTTPException(status_code=400, detail="No images provided")

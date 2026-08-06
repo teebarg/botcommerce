@@ -27,9 +27,9 @@ function RouteComponent() {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectionMode, setSelectionMode] = useState<boolean>(false);
     const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
-    const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { mutateAsync: bulkDeleteImages, isPending: isDeleting } = useBulkDeleteGalleryImages();
+    const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
     const BULK_ACTION_TOAST_ID = "bulk-action-toast";
 
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedGalleryImages, GalleryImage>({
@@ -38,6 +38,11 @@ function RouteComponent() {
         getItems: (page) => page.items,
         getNextCursor: (page) => page.next_cursor,
     });
+
+    const selectedImage = useMemo(
+        () => (selectedImageId != null ? items.find((img) => img.id === selectedImageId) ?? null : null),
+        [items, selectedImageId]
+    );
 
     const selectedProductIds = useMemo(() => {
         const ids = new Set<number>();
@@ -90,8 +95,8 @@ function RouteComponent() {
         });
     };
 
-     const onSelection = (image: GalleryImage) => {
-        setSelectedImage(image)
+    const onSelection = (image: GalleryImage) => {
+        setSelectedImageId(image.id)
         setOpen(true)
     };
 
@@ -100,6 +105,14 @@ function RouteComponent() {
 
         try {
             await bulkDeleteImages({ imageIds: Array.from(selectedImages) });
+        } catch (error) {
+            toast.error("Failed to delete images", { description: "Failed to delete images, contact support" });
+        }
+    };
+
+    const handleDelete = async (id: number) => {
+        try {
+            await bulkDeleteImages({ imageIds: [id] });
         } catch (error) {
             toast.error("Failed to delete images", { description: "Failed to delete images, contact support" });
         }
@@ -182,9 +195,10 @@ function RouteComponent() {
                 />
             )}
             <ImageLightbox
-                images={selectedImage?.images.map((i) => i.image) || []}
+                images={selectedImage?.images || []}
                 open={open}
                 onOpenChange={setOpen}
+                onRemoveImage={handleDelete}
                 productId={selectedImage?.product_id}
                 defaultImage={selectedImage?.image}
             />

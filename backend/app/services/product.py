@@ -395,7 +395,7 @@ class ProductService:
                 self.cdn_srv.purge_vercel(f"product:{product.slug}", "products"),
                 return_exceptions=True
             )
-            await self.cache_srv.invalidate(f"product:{product.slug}", tags=["products", "catalog"])
+            await self.cache_srv.invalidate(f"product:{product.slug}", tags=["products", "catalog", "gallery"])
         except Exception as e:
             logger.error(f"Error re-indexing product {id}: {e}")
 

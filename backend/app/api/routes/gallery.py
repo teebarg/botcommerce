@@ -37,25 +37,6 @@ async def image_gallery(
     )
     return PaginatedGalleryImages.validate(items)
 
-
-@router.delete("/{image_id}", dependencies=[Depends(require_admin)])
-async def delete_gallery_image(
-    image_id: int,
-    srv: GalleryDep,
-    product_srv: ProductDep,
-    background_tasks: BackgroundTasks,
-) -> Message:
-    product_id, image_urls = await srv.delete_image(image_id)
-
-    if not product_id:
-        background_tasks.add_task(srv.storage.remove_images, image_urls[0])
-        return Message(message="Image deleted successfully")
-
-    background_tasks.add_task(product_srv.delete_product_index, product_ids=[product_id])
-    background_tasks.add_task(srv.storage.remove_images, image_urls)
-    return Message(message="Image and all related data deleted successfully")
-
-
 @router.post("/bulk-upload", dependencies=[Depends(require_admin)])
 async def bulk_save_image_urls(
     srv: GalleryDep,

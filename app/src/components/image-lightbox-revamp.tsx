@@ -4,6 +4,8 @@ import * as React from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { Button } from "@/components/ui/button";
+import { useOverlayTriggerState } from "react-stately";
+import { ConfirmDrawer } from "./generic/confirm-drawer";
 
 function openGemini(imageUrl: string, productId: number) {
     const params = new URLSearchParams({
@@ -18,11 +20,18 @@ function openGemini(imageUrl: string, productId: number) {
     window.open(url, "_blank", "noopener,noreferrer");
 }
 
+interface Image {
+    id: number;
+    image: string;
+    order?: number;
+}
+
 interface ImageLightboxProps {
-    images: string[];
+    images: Image[];
     initialIndex?: number;
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    onRemoveImage?: (id: number) => void;
     size?: string | null;
     productId?: number;
     defaultImage?: string;
@@ -33,10 +42,12 @@ export function ImageLightbox({
     initialIndex = 0,
     open,
     onOpenChange,
+    onRemoveImage,
     size,
     productId,
     defaultImage
 }: ImageLightboxProps) {
+    const state = useOverlayTriggerState({});
     const [currentIndex, setCurrentIndex] = React.useState(initialIndex);
     const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -83,8 +94,8 @@ export function ImageLightbox({
     }, [images.length]);
 
     if (!open || images.length === 0) return null;
-
-    const currentImage = images[currentIndex];
+    const safeIndex = Math.min(currentIndex, images.length - 1);
+    const currentImage = images[safeIndex];
 
     if (!currentImage) return null;
 
@@ -98,7 +109,7 @@ export function ImageLightbox({
         >
             <div className="flex items-center justify-between px-4 py-3 sm:px-6">
                 <div className="text-sm font-medium text-white/80">
-                    {currentIndex + 1} / {images.length}
+                    {safeIndex + 1} / {images.length}
                 </div>
                 <button
                     onClick={() => onOpenChange(false)}
@@ -120,8 +131,8 @@ export function ImageLightbox({
 
                 <div className="relative flex h-full max-h-[calc(100vh-12rem)] w-full max-w-5xl items-center justify-center">
                     <img
-                        src={currentImage}
-                        alt={currentImage}
+                        src={currentImage.image}
+                        alt={currentImage.image}
                         className="max-h-full max-w-full rounded-lg object-contain shadow-2xl"
                         loading="eager"
                         onClick={() => onOpenChange(false)}
@@ -146,15 +157,10 @@ export function ImageLightbox({
             )}
 
             {productId && defaultImage && (
-                <div className="absolute top-12 right-8">
+                <div className="absolute top-4 right-16">
                     <Button
                         size="xs"
-                        onClick={() =>
-                            openGemini(
-                                defaultImage,
-                                productId
-                            )
-                        }
+                        onClick={() => openGemini(defaultImage, productId)}
                     >
                         Open Gemini
                     </Button>
@@ -165,25 +171,52 @@ export function ImageLightbox({
             <div className="border-t border-white/10 bg-black/60 px-4 py-4">
                 <div className="mx-auto flex max-w-5xl gap-2 overflow-x-auto p-2">
                     {images.map((image, index) => (
-                        <button
+                        <div
                             key={`${image}-${index}`}
-                            onClick={() => setCurrentIndex(index)}
                             className={cn(
-                                "relative shrink-0 overflow-hidden rounded-md transition-all focus:outline-none focus:ring-2",
-                                index === currentIndex
-                                    ? "ring-2 ring-accent"
+                                "group/thumb relative shrink-0 overflow-hidden rounded-md transition-all",
+                                index === safeIndex
+                                    ? "ring-2 ring-white/80"
                                     : "opacity-60 hover:opacity-100"
                             )}
-                            aria-label={`Go to image ${index + 1}`}
-                            aria-current={index === currentIndex ? "true" : undefined}
                         >
-                            <img
-                                src={image}
-                                alt={image}
-                                className="h-26 w-20 object-cover"
-                                loading="lazy"
-                            />
-                        </button>
+                            <button
+                                onClick={() => setCurrentIndex(index)}
+                                className="block focus:outline-none focus:ring-2 focus:ring-white/50"
+                                aria-label={`Go to image ${index + 1}`}
+                                aria-current={index === safeIndex ? "true" : undefined}
+                            >
+                                <img
+                                    src={image.image}
+                                    alt={image.image}
+                                    className="h-26 w-20 object-cover"
+                                    loading="lazy"
+                                />
+                            </button>
+                            {onRemoveImage && (
+                                <ConfirmDrawer
+                                    open={state.isOpen}
+                                    onOpenChange={state.setOpen}
+                                    trigger={
+                                        <button
+                                            className="absolute right-1 top-1 rounded-full bg-black/70 p-1 text-white/80 opacity-0 transition-opacity hover:bg-black/90 hover:text-white focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-white/50 group-hover/thumb:opacity-100"
+                                            aria-label={`Remove image ${index + 1}`}
+                                        >
+                                            <X className="h-3 w-3" />
+                                        </button>
+                                    }
+                                    onConfirm={() => {
+                                        onRemoveImage(image.id);
+                                        setCurrentIndex((i) =>
+                                            index < i ? i - 1 : Math.min(i, images.length - 2)
+                                        );
+                                        state.close()
+                                    }}
+                                    title="Delete Image?"
+                                    description="This action cannot be reversed"
+                                />
+                            )}
+                        </div>
                     ))}
                 </div>
             </div>

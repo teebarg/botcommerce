@@ -41,7 +41,7 @@ export function CatalogFeed({ slug }: Props) {
                 </div>
             </InfiniteList>
             <ImageLightbox
-                images={selectedProduct?.images || []}
+                images={selectedProduct?.images?.map((i: string, idx: number) => ({ id: idx, image: i })) || []}
                 open={open}
                 onOpenChange={setOpen}
                 size={selectedProduct?.variants?.[0]?.size}
