@@ -89,6 +89,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick }
                         className={cn(
                             "w-full h-full object-cover transition-opacity duration-500 group-hover:scale-105",
                             mediaLoaded ? "opacity-100" : "opacity-0",
+                            outOfStock ? "cursor-pointer" : "cursor-zoom-in"
                         )}
                     />
                 </div>

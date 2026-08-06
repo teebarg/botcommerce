@@ -95,8 +95,8 @@ function RouteComponent() {
         });
     };
 
-    const onSelection = (image: GalleryImage) => {
-        setSelectedImageId(image.id)
+    const handleClick = (id: number) => {
+        setSelectedImageId(id)
         setOpen(true)
     };
 
@@ -176,7 +176,7 @@ function RouteComponent() {
                             isSelected={selectedImages.has(item?.id)}
                             selectionMode={selectionMode}
                             onSelectionChange={handleSelectionChange}
-                            onSelection={onSelection}
+                            onClick={handleClick}
                         />
                     )}
                     loader={<PageLoader variant="grid" />}

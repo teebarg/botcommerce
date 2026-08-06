@@ -9,11 +9,11 @@ interface GalleryCardProps {
     image: GalleryImage;
     isSelected?: boolean;
     onSelectionChange?: (imageId: number, selected: boolean) => void;
-    onSelection?: (image: GalleryImage) => void;
+    onClick?: (id: number) => void;
     selectionMode?: boolean;
 }
 
-export function GalleryCard({ image, isSelected = false, onSelectionChange, onSelection, selectionMode = false }: GalleryCardProps) {
+export function GalleryCard({ image, isSelected = false, onSelectionChange, onClick, selectionMode = false }: GalleryCardProps) {
     if (!image) return null;
 
     const product = image.product;
@@ -44,7 +44,7 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, onSe
                 selectionMode ? "cursor-pointer" : "cursor-default",
                 isSelected ? "ring-2 ring-primary ring-offset-1" : ""
             )}
-            onClick={() => selectionMode ? onSelectionChange?.(image.id, !isSelected) : onSelection?.(image)}
+            onClick={() => selectionMode ? onSelectionChange?.(image.id, !isSelected) : onClick?.(image.id)}
         >
             <div className="absolute inset-0 w-full h-full overflow-hidden bg-muted">
                 {!mediaLoaded && <img src="/placeholder.jpg" alt="placeholder" className="absolute inset-0 w-full h-full object-cover" />}
