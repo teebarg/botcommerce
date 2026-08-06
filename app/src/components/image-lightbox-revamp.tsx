@@ -50,6 +50,7 @@ export function ImageLightbox({
     const state = useOverlayTriggerState({});
     const [currentIndex, setCurrentIndex] = React.useState(initialIndex);
     const containerRef = React.useRef<HTMLDivElement>(null);
+    const shouldShow = open && images.length > 0;
 
     React.useEffect(() => {
         if (open) {
@@ -58,7 +59,7 @@ export function ImageLightbox({
     }, [open, initialIndex]);
 
     React.useEffect(() => {
-        if (!open) return;
+        if (!shouldShow) return;
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "Escape") {
@@ -72,10 +73,10 @@ export function ImageLightbox({
 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [open, images.length, onOpenChange]);
+    }, [shouldShow, images.length, onOpenChange]);
 
     React.useEffect(() => {
-        if (open) {
+        if (shouldShow) {
             document.body.style.overflow = "hidden";
         } else {
             document.body.style.overflow = "";
@@ -83,7 +84,7 @@ export function ImageLightbox({
         return () => {
             document.body.style.overflow = "";
         };
-    }, [open]);
+    }, [shouldShow]);
 
     const goToPrevious = React.useCallback(() => {
         setCurrentIndex((i) => (i > 0 ? i - 1 : images.length - 1));
@@ -93,7 +94,7 @@ export function ImageLightbox({
         setCurrentIndex((i) => (i < images.length - 1 ? i + 1 : 0));
     }, [images.length]);
 
-    if (!open || images.length === 0) return null;
+    if (!shouldShow) return null;
     const safeIndex = Math.min(currentIndex, images.length - 1);
     const currentImage = images[safeIndex];
 
@@ -106,6 +107,7 @@ export function ImageLightbox({
             role="dialog"
             aria-modal="true"
             aria-label="Image lightbox"
+            onClick={() => onOpenChange(false)}
         >
             <div className="flex items-center justify-between px-4 py-3 sm:px-6">
                 <div className="text-sm font-medium text-white/80">
@@ -149,7 +151,7 @@ export function ImageLightbox({
             </div>
 
             {size && (
-                <div className="absolute top-12 left-8 bg-white text-black px-3 py-1">
+                <div className="absolute top-14 left-4 bg-white text-black px-3 py-1">
                     <span className="text-lg font-medium">
                         Size: {size}
                     </span>
