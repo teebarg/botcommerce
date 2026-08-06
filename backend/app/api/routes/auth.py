@@ -4,9 +4,8 @@ from fastapi.exceptions import HTTPException
 from fastapi import APIRouter, Request, Cookie, Response, Depends
 from app.core.permissions import require_admin
 from app.core.config import settings
-from app.prisma_client import prisma as db
 from app.core.logging import get_logger
-from app.core.deps import verify_clerk_token
+from app.core.deps import verify_clerk_token, DbDep
 from app.core.dependencies.cart import CartDep
 from app.core.dependencies.cache import ArqDep, CacheDep
 
@@ -40,7 +39,7 @@ async def logout(request: Request, response: Response, cache_srv: CacheDep):
 
 
 @router.post("/exchange")
-async def exchange_token(response: Response, queue: ArqDep, cache_srv: CacheDep, cart_srv: CartDep, payload=Depends(verify_clerk_token), _cart_id: Annotated[str | None, Cookie()] = None):
+async def exchange_token(response: Response, db: DbDep, queue: ArqDep, cache_srv: CacheDep, cart_srv: CartDep, payload=Depends(verify_clerk_token), _cart_id: Annotated[str | None, Cookie()] = None):
     session_id = str(uuid.uuid4())
     clerk_id = payload["sub"]
 
@@ -84,6 +83,7 @@ async def exchange_token(response: Response, queue: ArqDep, cache_srv: CacheDep,
 @router.post("/impersonate/{user_id}")
 async def impersonate(
     user_id: int,
+    db: DbDep,
     response: Response,
     cache_srv: CacheDep,
     current_user=Depends(require_admin),
@@ -119,7 +119,7 @@ async def impersonate(
 
 
 @router.post("/stop-impersonation")
-async def stop_impersonation(request: Request, response: Response, cache_srv: CacheDep):
+async def stop_impersonation(request: Request, response: Response, db: DbDep, cache_srv: CacheDep):
     session_id = request.cookies.get("session_id")
     session = await cache_srv.get_session(session_id)
     admin_id = session.get("impersonatedBy")

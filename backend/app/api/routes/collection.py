@@ -13,17 +13,17 @@ from app.models.collection import (
     CollectionUpdate,
 )
 from app.models.generic import Message
-from app.prisma_client import prisma as db
 from app.core.utils import slugify
 from app.core.permissions import require_admin
 from app.services.cache import cacheable
 from app.core.dependencies.services import CollectionDep
+from app.core.deps import DbDep
 
 router = APIRouter()
 
 @router.get("/")
 @cacheable(key_prefix="collections", key_builder=lambda query: query if query else "all", tags=["collections"], cdn_ttl=604800, cdn_swr=86400)
-async def index(request: Request, query: str = "") -> Optional[list[Collection]]:
+async def index(request: Request, db: DbDep, query: str = "") -> Optional[list[Collection]]:
     """
     Retrieve collections with Redis caching.
     """
@@ -39,7 +39,7 @@ async def index(request: Request, query: str = "") -> Optional[list[Collection]]
 
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create(create_data: CollectionCreate, srv: CollectionDep, bg_tasks: BackgroundTasks) -> Collection:
+async def create(create_data: CollectionCreate, db: DbDep, srv: CollectionDep, bg_tasks: BackgroundTasks) -> Collection:
     """
     Create new collection.
     """
@@ -58,7 +58,7 @@ async def create(create_data: CollectionCreate, srv: CollectionDep, bg_tasks: Ba
 
 @router.get("/{slug}")
 @cacheable(key_prefix="collection", key_builder=lambda slug: slug, cdn_ttl=604800, cdn_swr=86400)
-async def get_by_slug(request: Request, slug: str) -> Collection:
+async def get_by_slug(request: Request, db: DbDep, slug: str) -> Collection:
     """
     Get a collection by its slug.
     """
@@ -74,6 +74,7 @@ async def get_by_slug(request: Request, slug: str) -> Collection:
 @router.patch("/{id}", dependencies=[Depends(require_admin)])
 async def update(
     id: int,
+    db: DbDep,
     srv: CollectionDep,
     update_data: CollectionUpdate,
     bg_tasks: BackgroundTasks
@@ -99,7 +100,7 @@ async def update(
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete(id: int, srv: CollectionDep, bg_tasks: BackgroundTasks) -> Message:
+async def delete(id: int, db: DbDep, srv: CollectionDep, bg_tasks: BackgroundTasks) -> Message:
     """
     Delete a collection.
     """

@@ -5,13 +5,12 @@ from app.models.category import Category, CategoryCreate, CategoryUpdate, BulkOr
 from app.models.product import CategoryWithProducts
 from app.models.generic import Message, ImageUpload
 from app.core.utils import slugify
-from app.prisma_client import prisma as db
 from app.core.logging import get_logger
 from app.core.permissions import require_admin
 from app.services.cache import cacheable
 from app.core.dependencies.product import ProductDep
-from app.core.dependencies.services import StorageDep
-from app.core.dependencies.services import CategoryDep
+from app.core.dependencies.services import CategoryDep, StorageDep
+from app.core.deps import DbDep
 
 logger = get_logger(__name__)
 
@@ -23,7 +22,7 @@ router = APIRouter()
     tags=["products", "catalog"],
     cdn_ttl=600, cdn_swr=60
 )
-async def get_home_categories_products(request: Request, product_srv: ProductDep) -> list[CategoryWithProducts]:
+async def get_home_categories_products(request: Request, db: DbDep, product_srv: ProductDep) -> list[CategoryWithProducts]:
     categories = await db.category.find_many(
         where={"is_active": True},
         order={"display_order": "asc"},
@@ -38,7 +37,7 @@ async def get_home_categories_products(request: Request, product_srv: ProductDep
 
 @router.get("/")
 @cacheable(key_prefix="categories", key_builder=lambda query: query if query else "all", tags=["categories"], cdn_ttl=604800, cdn_swr=86400)
-async def index(request: Request, query: str = "") -> Optional[list[Category]]:
+async def index(request: Request, db: DbDep, query: str = "") -> Optional[list[Category]]:
     """
     Retrieve all categories.
     """
@@ -56,7 +55,7 @@ async def index(request: Request, query: str = "") -> Optional[list[Category]]:
     )
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create(data: CategoryCreate, srv: CategoryDep, bg_tasks: BackgroundTasks) -> Category:
+async def create(data: CategoryCreate, db: DbDep, srv: CategoryDep, bg_tasks: BackgroundTasks) -> Category:
     """
     Create new category.
     """
@@ -71,7 +70,7 @@ async def create(data: CategoryCreate, srv: CategoryDep, bg_tasks: BackgroundTas
 
 
 @router.patch("/reorder", dependencies=[Depends(require_admin)])
-async def reorder_categories(data: BulkOrderUpdate, srv: CategoryDep, bg_tasks: BackgroundTasks) -> Message:
+async def reorder_categories(data: BulkOrderUpdate, db: DbDep, srv: CategoryDep, bg_tasks: BackgroundTasks) -> Message:
     """Update display order for categories"""
     async with db.tx() as tx:
         try:
@@ -93,6 +92,7 @@ async def reorder_categories(data: BulkOrderUpdate, srv: CategoryDep, bg_tasks: 
 async def update(
     id: int,
     update_data: CategoryUpdate,
+    db: DbDep,
     srv: CategoryDep, 
     bg_tasks: BackgroundTasks
 ) -> Category:
@@ -116,7 +116,7 @@ async def update(
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete(id: int, srv: CategoryDep, bg_tasks: BackgroundTasks) -> Message:
+async def delete(id: int, db: DbDep, srv: CategoryDep, bg_tasks: BackgroundTasks) -> Message:
     """
     Delete a category.
     """
@@ -136,7 +136,7 @@ async def delete(id: int, srv: CategoryDep, bg_tasks: BackgroundTasks) -> Messag
 
 
 @router.patch("/{id}/image", dependencies=[Depends(require_admin)])
-async def add_image(id: int, srv: CategoryDep, image_data: ImageUpload, storage_srv: StorageDep, bg_tasks: BackgroundTasks) -> Category:
+async def add_image(id: int, db: DbDep, srv: CategoryDep, image_data: ImageUpload, storage_srv: StorageDep, bg_tasks: BackgroundTasks) -> Category:
     """
     Add an image to a category.
     """
@@ -165,7 +165,7 @@ async def add_image(id: int, srv: CategoryDep, image_data: ImageUpload, storage_
 
 
 @router.delete("/{id}/image", dependencies=[Depends(require_admin)])
-async def delete_image(id: int, srv: CategoryDep, storage_srv: StorageDep, bg_tasks: BackgroundTasks) -> Message:
+async def delete_image(id: int, db: DbDep, srv: CategoryDep, storage_srv: StorageDep, bg_tasks: BackgroundTasks) -> Message:
     """
     Delete the image of a category.
     """

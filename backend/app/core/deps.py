@@ -1,4 +1,4 @@
-from typing import Annotated, Literal, Optional
+from typing import Annotated, AsyncGenerator, Literal, Optional
 import time
 import httpx
 import jwt
@@ -6,9 +6,10 @@ from fastapi import Depends, HTTPException, status, Cookie
 from fastapi.security import APIKeyHeader, OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from jose import jwt as jose_jwt
+from prisma import Prisma
+from app.prisma_client import prisma
 from app.core import security
 from app.core.config import settings
-from app.prisma_client import prisma
 from app.models.user import UserInternal as User
 from app.core.logging import get_logger
 from app.core.notifications.service import NotificationService
@@ -160,6 +161,15 @@ async def get_principal(
         type="user",
         user_id=user.id,
     )
+
+# async def get_db() -> Prisma:
+#     return db
+
+async def get_db() -> AsyncGenerator[Prisma, None]:
+    """Dependency provider for route operations."""
+    yield prisma
+
+DbDep = Annotated[Prisma, Depends(get_db)]
 
 PrincipalDep = Annotated[Principal, Depends(get_principal)]
 

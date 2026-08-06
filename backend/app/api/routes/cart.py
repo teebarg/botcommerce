@@ -1,10 +1,11 @@
+from app.core.deps import DbDep
 from typing import Any, Dict, Optional, Annotated
 from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, HTTPException, Request, BackgroundTasks, Depends, Cookie, Response
 from fastapi.responses import JSONResponse
 from prisma.enums import CartStatus
+from prisma import Prisma
 from app.services.cache import cacheable
-from app.prisma_client import prisma as db
 from app.core.deps import Notification, UserDep, CurrentUser
 from app.core.logging import get_logger
 from app.core.permissions import require_admin
@@ -34,6 +35,7 @@ def _set_cart_cookie(response: Response, token: str | None) -> None:
 async def add_item_to_cart(
     response: Response,
     item_in: CartItemCreate,
+    db: DbDep,
     srv: CartDep,
     user: UserDep,
     background_tasks: BackgroundTasks,
@@ -67,6 +69,7 @@ async def get_cart_index(
 @router.delete("/items/{item_id}")
 async def delete_cart_item(
     item_id: int,
+    db: DbDep,
     user: UserDep,
     srv: CartDep,
     background_tasks: BackgroundTasks,
@@ -89,6 +92,7 @@ async def delete_cart_item(
 async def update_cart_item(
     item_id: int,
     quantity: int,
+    db: DbDep,
     user: UserDep,
     srv: CartDep,
     background_tasks: BackgroundTasks,
@@ -113,6 +117,7 @@ async def update_cart_item(
 @router.put("/")
 async def update_cart(
     cart_update: CartUpdate,
+    db: DbDep,
     user: UserDep,
     srv: CartDep,
     background_tasks: BackgroundTasks,
@@ -188,6 +193,7 @@ async def update_cart(
 
 @router.post("/apply-wallet")
 async def apply_wallet(
+    db: DbDep,
     user: CurrentUser,
     srv: CartDep,
     _cart_id: Annotated[str | None, Cookie()] = None
@@ -224,6 +230,7 @@ async def remove_wallet(
 @cacheable(key_prefix="abandoned-carts", tags=["abandoned-carts"])
 async def get_admin_abandoned_carts(
     request: Request,
+    db: DbDep,
     search: Optional[str] = None,
     hours_threshold: int = 24,
     cursor: int | None = None,
@@ -261,7 +268,7 @@ async def get_admin_abandoned_carts(
 
 @router.get("/abandoned-carts/stats", dependencies=[Depends(require_admin)])
 @cacheable(key_prefix="abandoned-carts:stats", tags=["abandoned-carts"])
-async def get_abandoned_carts_stats(request: Request, hours_threshold: int = 24):
+async def get_abandoned_carts_stats(request: Request, db: DbDep, hours_threshold: int = 24):
     """Aggregates recovery metrics and potential revenue."""
     threshold_time = datetime.now(timezone.utc) - timedelta(hours=hours_threshold)
 
@@ -287,6 +294,7 @@ async def get_abandoned_carts_stats(request: Request, hours_threshold: int = 24)
 @router.post("/abandoned-carts/send-reminders", dependencies=[Depends(require_admin)])
 async def send_batch_reminders(
     data: SendAbandonedCartReminders,
+    db: DbDep,
     background_tasks: BackgroundTasks,
     notification: Notification
 ):
@@ -304,7 +312,7 @@ async def send_batch_reminders(
     )
 
     for cart in carts:
-        background_tasks.add_task(send_abandoned_cart_reminder, cart.id, notification)
+        background_tasks.add_task(send_abandoned_cart_reminder, db=db, cart_id=cart.id, notification=notification)
 
     return {"message": "Abandoned reminders queued", "carts_processed": len(carts)}
 
@@ -312,6 +320,7 @@ async def send_batch_reminders(
 @router.post("/abandoned-carts/{cart_id}/send-reminder", dependencies=[Depends(require_admin)])
 async def send_single_reminder(
     cart_id: int,
+    db: DbDep,
     background_tasks: BackgroundTasks,
     notification: Notification
 ):
@@ -320,11 +329,11 @@ async def send_single_reminder(
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
 
-    background_tasks.add_task(send_abandoned_cart_reminder, cart.id, notification)
+    background_tasks.add_task(send_abandoned_cart_reminder, db=db, cart_id=cart.id, notification=notification)
     return {"message": f"Reminder successfully queued for cart {cart.cart_number}", "cart_id": cart_id}
 
 
-async def send_abandoned_cart_reminder(cart_id: int, notification: Notification):
+async def send_abandoned_cart_reminder(db: Prisma, cart_id: int, notification: Notification):
     """Background task to send abandoned cart reminder email"""
     try:
         cart = await db.cart.find_unique(
