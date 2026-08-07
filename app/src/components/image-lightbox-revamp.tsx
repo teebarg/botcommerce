@@ -32,7 +32,8 @@ interface ImageLightboxProps {
     onRemoveImage?: (id: number) => void;
     size?: string | null;
     productId?: number;
-    defaultImage?: string;
+    defaultImage?: Image;
+    isAdmin?: boolean;
 }
 
 export function ImageLightbox({
@@ -43,12 +44,13 @@ export function ImageLightbox({
     onRemoveImage,
     size,
     productId,
-    defaultImage
+    defaultImage,
+    isAdmin = false
 }: ImageLightboxProps) {
     const [mediaLoaded, setMediaLoaded] = React.useState<boolean>(false);
     const [currentIndex, setCurrentIndex] = React.useState(initialIndex);
     const containerRef = React.useRef<HTMLDivElement>(null);
-    const shouldShow = open && images.length > 0;
+    const shouldShow = open;
 
     React.useEffect(() => {
         if (open) {
@@ -94,7 +96,7 @@ export function ImageLightbox({
 
     if (!shouldShow) return null;
     const safeIndex = Math.min(currentIndex, images.length - 1);
-    const currentImage = images[safeIndex];
+    const currentImage = images[safeIndex] || defaultImage;
 
     if (!currentImage) return null;
 
@@ -139,7 +141,7 @@ export function ImageLightbox({
                             mediaLoaded ? "opacity-100" : "opacity-0",
                         )}
                         loading="eager"
-                        decoding="async" 
+                        decoding="async"
                         onClick={() => onOpenChange(false)}
                     />
                 </div>
@@ -161,18 +163,18 @@ export function ImageLightbox({
                 </div>
             )}
 
-            {productId && defaultImage && (
+            {productId && defaultImage?.image && (
                 <div className="absolute top-4 right-16">
                     <Button
                         size="xs"
-                        onClick={() => openGemini(defaultImage, productId)}
+                        onClick={() => openGemini(defaultImage.image, productId)}
                     >
                         Open Gemini
                     </Button>
                 </div>
             )}
 
-            <div className="border-t border-white/10 bg-black/60 px-4 py-4">
+            <div className="border-t border-white/10 bg-black/60 px-4 py-4 space-y-2">
                 <div className="mx-auto flex max-w-5xl gap-2 overflow-x-auto p-2">
                     {images.map((image, index) => (
                         <GalleryThumbnail
@@ -187,7 +189,9 @@ export function ImageLightbox({
                         />
                     ))}
                 </div>
-                <ProductImageUploader productId={productId} />
+                {isAdmin && (
+                    <ProductImageUploader productId={productId} />
+                )}
             </div>
             <div
                 className="absolute inset-0 -z-10"

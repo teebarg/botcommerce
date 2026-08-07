@@ -200,7 +200,8 @@ function RouteComponent() {
                 onOpenChange={setOpen}
                 onRemoveImage={handleDelete}
                 productId={selectedImage?.product_id}
-                defaultImage={selectedImage?.image}
+                defaultImage={selectedImage || undefined}
+                isAdmin={true}
             />
         </div>
     );

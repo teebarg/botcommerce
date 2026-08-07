@@ -18,14 +18,6 @@ interface ProductImageUploaderProps {
     maxSizeMb?: number;
 }
 
-interface PendingUpload {
-    localId: string;
-    file: File;
-    previewUrl: string;
-    progress: number;
-    error?: string;
-}
-
 export function ProductImageUploader({
     productId,
     onComplete,
@@ -33,33 +25,64 @@ export function ProductImageUploader({
     maxSizeMb = 5,
 }: ProductImageUploaderProps) {
 
+    const uploadFiles = useCallback(
+        async (files: File[]) => {
+            if (files.length === 0) return;
+
+            const formData = new FormData();
+            files.forEach((file) => formData.append("files", file));
+
+            const uploadUrl = productId
+                ? `${baseURL}/api/product/${productId}/images`
+                : `${baseURL}/api/gallery/bulk-upload-images`;
+
+            const toastId = toast.loading(
+                files.length > 1 ? `Uploading ${files.length} images...` : "Uploading image..."
+            );
+
+            try {
+                const res = await fetch(uploadUrl, {
+                    method: "POST",
+                    body: formData,
+                });
+
+                if (!res.ok) {
+                    const body = await res.json().catch(() => null);
+                    throw new Error(body?.detail ?? "Upload failed");
+                }
+
+                toast.success(
+                    files.length > 1 ? "Images uploaded successfully" : "Image uploaded successfully",
+                    { id: toastId }
+                );
+                onComplete?.();
+            } catch (err) {
+                toast.error("An error occurred", {
+                    id: toastId,
+                    description: err instanceof Error ? err.message : "Upload failed",
+                });
+            }
+        },
+        [productId, onComplete]
+    );
+
     const onDrop = useCallback(
         (acceptedFiles: File[], fileRejections: FileRejection[]) => {
-            const accepted: PendingUpload[] = acceptedFiles
-                .slice(0, Math.max(maxFiles, 0))
-                .map((file) => ({
-                    localId: crypto.randomUUID(),
-                    file,
-                    previewUrl: URL.createObjectURL(file),
-                    progress: 0,
-                }));
+            const accepted = acceptedFiles.slice(0, Math.max(maxFiles, 0));
 
-            const rejected: PendingUpload[] = fileRejections.map(({ file, errors }) => ({
-                localId: crypto.randomUUID(),
-                file,
-                previewUrl: URL.createObjectURL(file),
-                progress: 0,
-                error:
+            fileRejections.forEach(({ file, errors }) => {
+                const message =
                     errors[0]?.code === "file-too-large"
                         ? `Too large. Max ${maxSizeMb}MB.`
                         : errors[0]?.code === "file-invalid-type"
                             ? "Unsupported format. Use JPG, PNG, WEBP, or GIF."
-                            : errors[0]?.message ?? "Rejected",
-            }));
-            accepted.forEach((p) => uploadFile(p));
-            console.log(rejected)
+                            : errors[0]?.message ?? "Rejected";
+                toast.error(`${file.name}: ${message}`);
+            });
+
+            uploadFiles(accepted);
         },
-        [maxFiles, productId]
+        [maxFiles, maxSizeMb, uploadFiles]
     );
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -75,29 +98,6 @@ export function ProductImageUploader({
         disabled: maxFiles <= 0,
         noClick: false,
     });
-
-    const uploadFile = async (item: PendingUpload) => {
-        const formData = new FormData();
-        formData.append("files", item.file);
-        const uploadUrl = productId ? `${baseURL}/api/product/${productId}/images` : `${baseURL}/api/gallery/bulk-upload-images`
-        const toastId = toast.loading("Uploading Image...");
-        try {
-            const res = await fetch(uploadUrl, {
-                method: "POST",
-                body: formData,
-            });
-
-            if (!res.ok) {
-                const body = await res.json().catch(() => null);
-                throw new Error(body?.detail ?? "Upload failed");
-            }
-            toast.success("Images upload successfully", { id: toastId });
-            URL.revokeObjectURL(item.previewUrl);
-            onComplete?.()
-        } catch (err) {
-            toast.success("An error occurred", { id: toastId, description: err instanceof Error ? err.message : "Upload failed" });
-        }
-    };
 
     return (
         <div

@@ -88,7 +88,9 @@ export function GalleryImagesUpload() {
                 }
                 onOpenChange={editState.setOpen}
             >
-                <ProductImageUploader onComplete={editState.close} />
+                <div className="pt-6 pb-12 px-2">
+                    <ProductImageUploader onComplete={editState.close} />
+                </div>
             </SheetDrawer>
             {imageUrls.length > 0 && (
                 <Button
