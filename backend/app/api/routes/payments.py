@@ -6,13 +6,14 @@ from prisma.enums import PaymentStatus, PaymentMethod
 from app.core.config import settings
 from app.schemas.payment import PaymentInitialize
 from app.models.order import Order
-from app.core.deps import CurrentUser, DbDep
+from app.core.deps import CurrentUser
 from app.models.user import User
 from datetime import datetime
 from app.core.logging import get_logger
 from app.models.cart import Cart
 from app.core.permissions import require_admin
 from app.core.dependencies.order import OrderDep
+from app.prisma_client import DbDep
 
 logger = get_logger(__name__)
 

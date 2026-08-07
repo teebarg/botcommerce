@@ -4,6 +4,8 @@ import * as React from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GalleryThumbnail } from "./image-thumbnail";
+import { ProductImageUploader } from "./admin/product/product-image-uploader";
+import { cn } from "@/utils/cn";
 
 function openGemini(imageUrl: string, productId: number) {
     const params = new URLSearchParams({
@@ -43,6 +45,7 @@ export function ImageLightbox({
     productId,
     defaultImage
 }: ImageLightboxProps) {
+    const [mediaLoaded, setMediaLoaded] = React.useState<boolean>(false);
     const [currentIndex, setCurrentIndex] = React.useState(initialIndex);
     const containerRef = React.useRef<HTMLDivElement>(null);
     const shouldShow = open && images.length > 0;
@@ -126,11 +129,17 @@ export function ImageLightbox({
                 </button>
 
                 <div className="relative flex h-full max-h-[calc(100vh-12rem)] w-full max-w-5xl items-center justify-center">
+                    {!mediaLoaded && <img src="/placeholder.jpg" alt="placeholder" className="absolute inset-0 w-full h-full object-cover" />}
                     <img
+                        onLoad={() => setMediaLoaded(true)}
                         src={currentImage.image}
                         alt={currentImage.image}
-                        className="max-h-full max-w-full rounded-lg object-contain shadow-2xl"
+                        className={cn(
+                            "w-full h-full object-cover transition-opacity duration-500",
+                            mediaLoaded ? "opacity-100" : "opacity-0",
+                        )}
                         loading="eager"
+                        decoding="async" 
                         onClick={() => onOpenChange(false)}
                     />
                 </div>
@@ -169,13 +178,16 @@ export function ImageLightbox({
                         <GalleryThumbnail
                             key={image.id}
                             image={image}
+                            images={images}
                             index={index}
+                            productId={productId}
                             isActive={index === safeIndex}
                             onSelect={() => setCurrentIndex(index)}
                             onRemoveImage={onRemoveImage}
                         />
                     ))}
                 </div>
+                <ProductImageUploader productId={productId} />
             </div>
             <div
                 className="absolute inset-0 -z-10"

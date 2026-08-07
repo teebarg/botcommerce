@@ -4,7 +4,7 @@ from app.services.gallery import GalleryService
 from app.services.websocket import manager as ws_manager
 from app.core.dependencies.services import StorageDep
 from app.core.dependencies.cache import CacheDep
-from app.core.deps import DbDep
+from app.prisma_client import DbDep
 
 def get_gallery_service(cache_srv: CacheDep, db: DbDep, storage_srv: StorageDep) -> GalleryService:
     return GalleryService(

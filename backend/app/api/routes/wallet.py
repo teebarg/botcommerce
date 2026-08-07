@@ -3,7 +3,8 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, Request, Query
 from pydantic import BaseModel
 from prisma.enums import WalletTransactionType
-from app.core.deps import  CurrentUser, DbDep
+from app.core.deps import  CurrentUser
+from app.prisma_client import DbDep
 from app.core.permissions import require_admin
 from app.services.cache import cacheable
 

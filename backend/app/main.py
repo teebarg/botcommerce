@@ -18,10 +18,10 @@ from app.api.main import api_router
 from app.core.config import settings
 from app.core.decorators import limit
 from app.models.generic import ContactFormCreate, NewsletterCreate, BulkPurchaseCreate
-from app.prisma_client import prisma
+from app.prisma_client import prisma, DbDep
 from app.services.websocket import manager
 from app.core.logging import get_logger
-from app.core.deps import Notification, DbDep
+from app.core.deps import Notification
 from app.core.dependencies.product import SearchDep
 from app.core.notifications.setup import init_notification_service
 from app.core.dependencies.services import SettingsDep
@@ -40,7 +40,7 @@ async def lifespan(app: FastAPI):
     app.state.redis = redis.from_url(settings.REDIS_URL, decode_responses=True, max_connections=10)
     app.state.l1_cache = L1Cache(max_size=5000, ttl=60.0)
 
-    init_notification_service(redis=app.state.redis)
+    init_notification_service(redis=app.state.redis, db=prisma)
     await manager.start()
 
     listener_task = asyncio.create_task(

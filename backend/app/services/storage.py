@@ -25,28 +25,51 @@ cloudinary.config(
 
 supabase: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
 
-# R2 is S3-compatible: same boto3 client, different endpoint_url.
-r2_client = boto3.client(
-    "s3",
-    endpoint_url=f"https://{settings.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com",
-    aws_access_key_id=settings.CLOUDFLARE_R2_ACCESS_KEY_ID,
-    aws_secret_access_key=settings.CLOUDFLARE_R2_SECRET_ACCESS_KEY,
-    config=BotoConfig(signature_version="s3v4"),
-    region_name="auto",
-)
-
 StorageProvider = Literal["supabase", "r2"]
 
-# Change this (or drive it from settings.DEFAULT_STORAGE_PROVIDER) to flip
-# where new uploads land without touching call sites.
 DEFAULT_PROVIDER: StorageProvider = getattr(settings, "DEFAULT_STORAGE_PROVIDER", "supabase")
+STORAGE_BUCKET: str = settings.STORAGE_BUCKET
+
+# Lazily built + cached — avoids crashing at import time if R2 env vars aren't set.
+_r2_client = None
+_r2_configured: Optional[bool] = None
+
+
+def _r2_is_configured() -> bool:
+    global _r2_configured
+    if _r2_configured is None:
+        _r2_configured = bool(
+            getattr(settings, "CLOUDFLARE_ACCOUNT_ID", None)
+            and getattr(settings, "CLOUDFLARE_R2_ACCESS_KEY_ID", None)
+            and getattr(settings, "CLOUDFLARE_R2_SECRET_ACCESS_KEY", None)
+        )
+        if not _r2_configured:
+            logger.warning(
+                "Cloudflare R2 credentials not configured — R2 storage disabled.")
+    return _r2_configured
+
+
+def _get_r2_client():
+    global _r2_client
+    if not _r2_is_configured():
+        raise HTTPException(
+            status_code=503, detail="Cloudflare R2 is not configured on this server")
+    if _r2_client is None:
+        _r2_client = boto3.client(
+            "s3",
+            endpoint_url=f"https://{settings.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com",
+            aws_access_key_id=settings.CLOUDFLARE_R2_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.CLOUDFLARE_R2_SECRET_ACCESS_KEY,
+            config=BotoConfig(signature_version="s3v4"),
+            region_name="auto",
+        )
+    return _r2_client
 
 
 class MediaStorageService:
 
     # ------------------------------------------------------------------
     # Generic entrypoints — call these from the rest of the app.
-    # They route to the right provider based on `provider` (or the default).
     # ------------------------------------------------------------------
 
     def upload(self, bucket: str, data: ImageUpload, provider: Optional[StorageProvider] = None) -> str:
@@ -62,13 +85,13 @@ class MediaStorageService:
         bytes_data: bytes,
         content_type: str,
         provider: Optional[StorageProvider] = None,
-    ):
+    ) -> str:
         provider = provider or DEFAULT_PROVIDER
         if provider == "r2":
             return self.upload_file_r2(bucket, filename, bytes_data, content_type)
         return self._upload_file_supabase(bucket, filename, bytes_data, content_type)
 
-    def delete_file(self, bucket: str, filename: str, provider: Optional[StorageProvider] = None):
+    def delete_file(self, bucket: str, filename: str, provider: Optional[StorageProvider] = None) -> bool:
         provider = provider or DEFAULT_PROVIDER
         if provider == "r2":
             return self.delete_file_r2(bucket, filename)
@@ -81,8 +104,7 @@ class MediaStorageService:
         return self._get_public_url_supabase(bucket, filename)
 
     # ------------------------------------------------------------------
-    # Supabase (provider-specific, prefixed with _ since callers should
-    # normally go through the generic methods above)
+    # Supabase
     # ------------------------------------------------------------------
 
     def _upload_supabase(self, bucket: str, data: ImageUpload) -> str:
@@ -112,13 +134,36 @@ class MediaStorageService:
         if not result:
             raise Exception("Error deleting to supabase")
 
-    def _upload_file_supabase(self, bucket: str, filename: str, bytes_data: bytes, content_type: str):
-        return supabase.storage.from_(bucket).upload(filename, bytes_data, {"contentType": content_type})
+    def _upload_file_supabase(self, bucket: str, filename: str, bytes_data: bytes, content_type: str) -> str:
+        """
+        Uploads then returns the PUBLIC URL string — never the raw SDK response object.
+        storage3.types.UploadResponse (or similar) is not JSON-serializable, and returning
+        it directly caused failures wherever the result got assigned straight to a Prisma
+        field or serialized in a response body.
+        """
+        try:
+            result = supabase.storage.from_(bucket).upload(
+                filename, bytes_data, {"contentType": content_type}
+            )
+            if not result:
+                raise Exception("Error uploading to supabase")
 
-    def _delete_file_supabase(self, bucket: str, filename: str):
-        return supabase.storage.from_(bucket).remove([filename])
+            return supabase.storage.from_(bucket).get_public_url(filename)
+        except Exception as e:
+            logger.error(f"Error uploading file to supabase: {str(e)}")
+            raise HTTPException(status_code=400, detail=str(e)) from e
 
-    def _get_public_url_supabase(self, bucket: str, filename: str):
+    def _delete_file_supabase(self, bucket: str, filename: str) -> bool:
+        """Returns True/False instead of the raw SDK response, for a consistent
+        return type with delete_file_r2."""
+        try:
+            result = supabase.storage.from_(bucket).remove([filename])
+            return bool(result)
+        except Exception as e:
+            logger.error(f"Error deleting file from supabase: {str(e)}")
+            raise HTTPException(status_code=400, detail=str(e)) from e
+
+    def _get_public_url_supabase(self, bucket: str, filename: str) -> str:
         return supabase.storage.from_(bucket).get_public_url(filename, {"download": filename})
 
     # ------------------------------------------------------------------
@@ -126,13 +171,13 @@ class MediaStorageService:
     # ------------------------------------------------------------------
 
     def upload_r2(self, bucket: str, data: ImageUpload) -> str:
-        """Upload an ImageUpload (base64 payload) to R2, mirroring the Supabase upload."""
+        client = _get_r2_client()
         try:
             file_bytes = base64.b64decode(data.file)
             file_extension: str = data.file_name.split('.')[-1]
             unique_filename: str = f"{uuid.uuid4()}.{file_extension}"
 
-            r2_client.put_object(
+            client.put_object(
                 Bucket=bucket,
                 Key=unique_filename,
                 Body=file_bytes,
@@ -145,8 +190,9 @@ class MediaStorageService:
             raise HTTPException(status_code=400, detail=str(e)) from e
 
     def upload_file_r2(self, bucket: str, filename: str, bytes_data: bytes, content_type: str) -> str:
+        client = _get_r2_client()
         try:
-            r2_client.put_object(
+            client.put_object(
                 Bucket=bucket,
                 Key=filename,
                 Body=bytes_data,
@@ -157,19 +203,19 @@ class MediaStorageService:
             logger.error(f"Error uploading file to R2: {str(e)}")
             raise HTTPException(status_code=400, detail=str(e)) from e
 
-    def delete_file_r2(self, bucket: str, filename: str):
+    def delete_file_r2(self, bucket: str, filename: str) -> bool:
+        client = _get_r2_client()
         try:
-            r2_client.delete_object(Bucket=bucket, Key=filename)
+            client.delete_object(Bucket=bucket, Key=filename)
+            return True
         except ClientError as e:
             logger.error(f"Error deleting from R2: {str(e)}")
             raise HTTPException(status_code=400, detail=str(e)) from e
 
     def get_public_url_r2(self, bucket: str, filename: str) -> str:
-        """
-        R2 objects aren't public by default. Point CLOUDFLARE_R2_PUBLIC_URL at either
-        a custom domain mapped to the bucket (recommended for prod) or the bucket's
-        r2.dev public URL (fine for dev/testing). No trailing slash.
-        """
+        if not getattr(settings, "CLOUDFLARE_R2_PUBLIC_URL", None):
+            raise HTTPException(
+                status_code=503, detail="CLOUDFLARE_R2_PUBLIC_URL is not configured")
         return f"{settings.CLOUDFLARE_R2_PUBLIC_URL}/{filename}"
 
     # ------------------------------------------------------------------
@@ -182,11 +228,14 @@ class MediaStorageService:
         failed: list[str] = []
         supabase_paths, firebase_paths, cloudinary_map, r2_keys = [], [], {}, []
 
+        r2_public_url = getattr(settings, "CLOUDFLARE_R2_PUBLIC_URL", None)
+
         for img in images:
             if not img:
                 continue
-            if "/storage/v1/object/public/product-images/" in img:
-                supabase_paths.append(img.split("/storage/v1/object/public/product-images/")[1])
+            if f"/storage/v1/object/public/{STORAGE_BUCKET}/" in img:
+                supabase_paths.append(
+                    img.split(f"/storage/v1/object/public/{STORAGE_BUCKET}/")[1])
             elif "firebasestorage.googleapis.com" in img or "storage.googleapis.com" in img:
                 try:
                     parts = img.split("/o/")[-1].split("?")[0]
@@ -201,12 +250,12 @@ class MediaStorageService:
                 else:
                     logger.warning(f"Invalid Cloudinary URL: {img}")
                     failed.append(img)
-            elif settings.CLOUDFLARE_R2_PUBLIC_URL and img.startswith(settings.CLOUDFLARE_R2_PUBLIC_URL):
-                r2_keys.append(img[len(settings.CLOUDFLARE_R2_PUBLIC_URL):].lstrip("/"))
+            elif r2_public_url and img.startswith(r2_public_url):
+                r2_keys.append(img[len(r2_public_url):].lstrip("/"))
 
         if supabase_paths and supabase:
             try:
-                supabase.storage.from_("product-images").remove(supabase_paths)
+                supabase.storage.from_(STORAGE_BUCKET).remove(supabase_paths)
             except Exception as e:
                 logger.error(f"Supabase delete failed: {e}")
                 failed.extend(supabase_paths)
@@ -219,16 +268,22 @@ class MediaStorageService:
                 failed.append(original_url)
 
         if r2_keys:
-            try:
-                r2_client.delete_objects(
-                    Bucket=settings.CLOUDFLARE_R2_BUCKET_NAME,
-                    Delete={"Objects": [{"Key": k} for k in r2_keys]},
-                )
-            except ClientError as e:
-                logger.error(f"R2 delete failed: {e}")
-                failed.extend([f"{settings.CLOUDFLARE_R2_PUBLIC_URL}/{k}" for k in r2_keys])
+            if not _r2_is_configured():
+                logger.error(
+                    "R2 keys found for deletion but R2 is not configured; skipping.")
+                failed.extend([f"{r2_public_url}/{k}" for k in r2_keys])
+            else:
+                try:
+                    _get_r2_client().delete_objects(
+                        Bucket=settings.STORAGE_BUCKET,
+                        Delete={"Objects": [{"Key": k} for k in r2_keys]},
+                    )
+                except ClientError as e:
+                    logger.error(f"R2 delete failed: {e}")
+                    failed.extend([f"{r2_public_url}/{k}" for k in r2_keys])
 
         if firebase_paths:
-            logger.debug(f"Firebase deletion not implemented: {firebase_paths}")
+            logger.debug(
+                f"Firebase deletion not implemented: {firebase_paths}")
 
         return failed

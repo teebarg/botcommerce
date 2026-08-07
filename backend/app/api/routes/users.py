@@ -9,7 +9,8 @@ from app.models.generic import Message
 from app.models.user import User, UserSelf, UserAdmin, UserUpdateMe, UserUpdate, PaginatedUsers, GuestUserCreate
 from app.core.security import get_password_hash
 from app.core.permissions import require_admin
-from app.core.deps import UserDep, DbDep, CurrentUser
+from app.core.deps import UserDep, CurrentUser
+from app.prisma_client import DbDep
 
 router = APIRouter()
 

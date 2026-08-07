@@ -4,12 +4,13 @@ from typing import Optional
 from app.models.chat import ChatCloseRequest, PaginatedChats, Chat, ChatRequest, ChatHandoffRequest
 from app.models.generic import Message
 from app.services.websocket import manager
-from app.core.deps import CurrentUser, DbDep
+from app.core.deps import CurrentUser
 from datetime import datetime
 from app.core.permissions import require_admin
 from app.core.dependencies.services import ConversationDep
 from app.services.cache import cacheable
 from app.core.dependencies.cache import CacheDep
+from app.prisma_client import DbDep
 from app.core.logging import get_logger
 
 logger = get_logger(__name__)

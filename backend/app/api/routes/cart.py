@@ -1,4 +1,3 @@
-from app.core.deps import DbDep
 from typing import Any, Dict, Optional, Annotated
 from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, HTTPException, Request, BackgroundTasks, Depends, Cookie, Response
@@ -18,6 +17,7 @@ from app.models.cart import (
 from app.models.abandoned_cart import PaginatedAbandonedCarts
 from app.core.notifications.events import SendAbandonedCartEvent
 from app.core.dependencies.cart import CartDep
+from app.prisma_client import DbDep
 
 logger = get_logger(__name__)
 

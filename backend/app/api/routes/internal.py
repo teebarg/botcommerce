@@ -13,7 +13,7 @@ from app.core.dependencies.order import OrderDep
 from app.core.security import verify_internal_signature
 from app.core.notifications.setup import get_notification_service
 from app.utils.emails import generate_welcome_email
-from app.core.deps import DbDep
+from app.prisma_client import DbDep
 
 logger = get_logger(__name__)
 

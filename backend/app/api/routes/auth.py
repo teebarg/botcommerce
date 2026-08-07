@@ -5,9 +5,10 @@ from fastapi import APIRouter, Request, Cookie, Response, Depends
 from app.core.permissions import require_admin
 from app.core.config import settings
 from app.core.logging import get_logger
-from app.core.deps import verify_clerk_token, DbDep
+from app.core.deps import verify_clerk_token
 from app.core.dependencies.cart import CartDep
 from app.core.dependencies.cache import ArqDep, CacheDep
+from app.prisma_client import DbDep
 
 logger = get_logger(__name__)
 

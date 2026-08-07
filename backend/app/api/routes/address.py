@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request
 from prisma.errors import PrismaError
-from app.core.deps import CurrentUser, DbDep
+from app.core.deps import CurrentUser
 from app.models.address import (
     Address,
     Addresses,
@@ -11,6 +11,7 @@ from app.models.generic import Message
 from app.core.logging import get_logger
 from app.services.cache import cacheable
 from app.core.dependencies.cache import CacheDep
+from app.prisma_client import DbDep
 
 logger = get_logger(__name__)
 

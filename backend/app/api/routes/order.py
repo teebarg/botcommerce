@@ -6,8 +6,9 @@ from app.core.logging import get_logger
 from app.models.generic import Message
 from app.core.permissions import require_admin
 from app.core.config import settings
-from app.core.deps import CurrentUser, PrincipalDep, DbDep
+from app.core.deps import CurrentUser, PrincipalDep
 from app.core.dependencies.order import OrderDep
+from app.prisma_client import DbDep
 from app.services.cache import cacheable
 
 logger = get_logger(__name__)

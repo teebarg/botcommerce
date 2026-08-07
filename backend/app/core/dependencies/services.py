@@ -12,7 +12,7 @@ from app.services.categories import CategoryService
 from app.services.collections import CollectionService
 from app.services.delivery import DeliveryService
 from app.services.review import ReviewService
-from app.core.deps import DbDep
+from app.prisma_client import DbDep
 
 def get_coupon_service(db: DbDep) -> CouponService:
     return CouponService(db=db)

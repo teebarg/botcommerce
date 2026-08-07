@@ -17,7 +17,7 @@ from app.core.utils import slugify
 from app.core.permissions import require_admin
 from app.services.cache import cacheable
 from app.core.dependencies.services import CollectionDep
-from app.core.deps import DbDep
+from app.prisma_client import DbDep
 
 router = APIRouter()
 

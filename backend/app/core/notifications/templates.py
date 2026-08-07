@@ -1,13 +1,15 @@
 from typing import Any
 from redis.asyncio import Redis
+from prisma import Prisma
 from app.core.dependencies.services import get_shop_settings_service
 from app.utils.emails import generate_invoice_email, generate_payment_receipt, generate_abandoned_cart_email
 
 
 class TemplateEngine:
-    def __init__(self, redis: Redis):
+    def __init__(self, db: Prisma, redis: Redis):
+        self.db = db
         self.redis = redis
-        self.settings_srv = get_shop_settings_service(redis)
+        self.settings_srv = get_shop_settings_service(redis=redis, db=db)
 
     async def render(self, channel: str, event_name: str, context: dict[str, Any]) -> Any:
         method = f"_{event_name}"

@@ -3,13 +3,14 @@ import asyncio
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Depends, HTTPException, Query, BackgroundTasks, Request
 from prisma.errors import PrismaError
-from app.core.deps import CurrentUser, DbDep
+from app.core.deps import CurrentUser
 from app.models.generic import Message
 from app.core.permissions import require_admin
 from base64 import b64encode, b64decode
 from app.models.reviews import Review, Reviews, ReviewCreate, ReviewUpdate
 from app.core.logging import get_logger
 from app.core.dependencies.services import ReviewDep
+from app.prisma_client import DbDep
 from app.services.cache import cacheable
 
 logger = get_logger(__name__)

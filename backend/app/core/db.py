@@ -1,8 +1,7 @@
 from typing import Annotated, AsyncGenerator
 from fastapi import Depends
 from prisma import Prisma
-
-prisma = Prisma(auto_register=True)
+from app.prisma_client import prisma
 
 async def get_db() -> AsyncGenerator[Prisma, None]:
     """Dependency provider for route operations."""

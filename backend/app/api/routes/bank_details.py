@@ -4,7 +4,7 @@ from app.core.permissions import require_admin
 from app.services.cache import cacheable
 from app.core.logging import get_logger
 from app.core.dependencies.services import BankDetailsDep
-from app.core.deps import DbDep
+from app.prisma_client import DbDep
 
 logger = get_logger(__name__)
 

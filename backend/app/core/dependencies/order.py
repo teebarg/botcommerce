@@ -6,7 +6,7 @@ from app.core.dependencies.product import ProductDep
 from app.services.order import OrderService
 from app.core.notifications.setup import get_notification_service
 from app.core.dependencies.services import CouponDep, SettingsDep, StorageDep
-from app.core.deps import DbDep
+from app.prisma_client import DbDep
 
 def get_order_service(
     queue: ArqDep,

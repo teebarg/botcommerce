@@ -74,7 +74,7 @@ class WorkerSettings:
         cron(
             clean_up_dangling,
             hour=3, minute=0,       # daily at 03:00 server time
-            name="nightly_dangling_product_cleanup",
+            name="dangling_product_cleanup",
             run_at_startup=False,
             keep_result=0
         ),

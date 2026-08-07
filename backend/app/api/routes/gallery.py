@@ -1,17 +1,20 @@
-from typing import Optional
-from fastapi import APIRouter, HTTPException, Query, BackgroundTasks, Request, Depends
+import uuid
+from typing import Optional, List
+from fastapi import APIRouter, HTTPException, Query, BackgroundTasks, Request, Depends, UploadFile, File
 from app.models.generic import Message, ImageBulkDelete
-from app.models.product import (
-    ProductImageMetadata,
-    ImagesBulkUpdate,
-    ProductImageBulkUrls,
-)
+from app.models.product import ProductImageMetadata, ImagesBulkUpdate, ProductImageBulkUrls
 from app.models.gallery import PaginatedGalleryImages
 from app.core.permissions import require_admin
-from app.services.cache import cacheable
 from app.core.dependencies.product import ProductDep
 from app.core.dependencies.gallery import GalleryDep
-from app.core.deps import DbDep
+from app.core.dependencies.services import StorageDep
+from app.prisma_client import DbDep
+from app.services.cache import cacheable
+from app.services.storage import StorageProvider
+from app.core.config import settings
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 
@@ -43,6 +46,81 @@ async def bulk_save_image_urls(
     payload: ProductImageBulkUrls,
 ):
     return await srv.bulk_save_urls(payload)
+
+ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
+MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024  # 5MB per image
+
+@router.post("/bulk-upload-images")
+async def upload_gallery_images(
+    db: DbDep,
+    srv: GalleryDep,
+    storage: StorageDep,
+    files: List[UploadFile] = File(...),
+    provider: Optional[StorageProvider] = Query(default=None, description="Storage provider override: 'supabase' or 'r2'"),
+):
+
+    if not files:
+        raise HTTPException(status_code=400, detail="No files provided")
+
+    created_images = []
+    uploaded_for_rollback: List[tuple[str, str]] = []  # (bucket, filename) in case we need to clean up
+
+    try:
+        for _, upload in enumerate(files):
+            if upload.content_type not in ALLOWED_CONTENT_TYPES:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Unsupported file type: {upload.content_type} ({upload.filename})",
+                )
+
+            file_bytes = await upload.read()
+
+            if len(file_bytes) > MAX_FILE_SIZE_BYTES:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"File too large: {upload.filename} (max {MAX_FILE_SIZE_BYTES // (1024 * 1024)}MB)",
+                )
+
+            unique_suffix = uuid.uuid4().hex[:8]
+            file_extension = (upload.filename or "").split(".")[-1] or "jpg"
+            unique_filename = f"products/{unique_suffix}.{file_extension}"
+
+            image_url = storage.upload_file(
+                bucket=settings.STORAGE_BUCKET,
+                filename=unique_filename,
+                bytes_data=file_bytes,
+                content_type=upload.content_type,
+                provider=provider,
+            )
+            uploaded_for_rollback.append((settings.STORAGE_BUCKET, unique_filename))
+
+            record = await db.productimage.create(
+                data={
+                    "image": image_url,
+                    "order": 0,
+                }
+            )
+            created_images.append(record)
+
+        await srv.invalidate()
+
+        return {"images": created_images}
+
+    except HTTPException:
+        for bucket, filename in uploaded_for_rollback:
+            try:
+                storage.delete_file(bucket, filename, provider=provider)
+            except Exception as cleanup_err:
+                logger.error(f"Rollback cleanup failed for {filename}: {cleanup_err}")
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error uploading product images: {e}")
+        for bucket, filename in uploaded_for_rollback:
+            try:
+                storage.delete_file(bucket, filename, provider=provider)
+            except Exception as cleanup_err:
+                logger.error(f"Rollback cleanup failed for {filename}: {cleanup_err}")
+        raise HTTPException(status_code=500, detail="Failed to upload product images") from e
 
 
 @router.post("/bulk-delete", dependencies=[Depends(require_admin)])
@@ -126,3 +204,5 @@ async def bulk_update_products(
     )
 
     return {"message": f"Updating {len(images)} products..."}
+
+

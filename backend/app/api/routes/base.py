@@ -5,7 +5,7 @@ from datetime import timedelta, datetime
 from app.core.permissions import require_admin
 from app.core.dependencies.cache import CacheDep
 from app.services.cache import cacheable
-from app.core.deps import DbDep
+from app.prisma_client import DbDep
 
 router = APIRouter()
 

@@ -2,12 +2,16 @@ import { useState, useEffect, useRef } from "react";
 import { ImagePlus, Video, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useBulkUploadImages } from "@/hooks/useGallery";
+import SheetDrawer from "@/components/sheet-drawer";
+import { ProductImageUploader } from "./product-image-uploader";
+import { useOverlayTriggerState } from "react-stately";
 
 declare global {
     interface Window { cloudinary: any; }
 }
 
 export function GalleryImagesUpload() {
+    const editState = useOverlayTriggerState({});
     const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [isCloudinaryLoaded, setIsCloudinaryLoaded] = useState(false);
     const [openingType, setOpeningType] = useState<"image" | "video" | null>(null);
@@ -68,6 +72,24 @@ export function GalleryImagesUpload() {
                 <Video className="h-4 w-4" />
                 {openingType === "video" ? "Opening..." : "Videos"}
             </Button>
+            <SheetDrawer
+                open={editState.isOpen}
+                title="Upload Images"
+                trigger={
+                    <Button
+                        size="sm"
+                        variant="ghost"
+                        className="border border-border text-muted-foreground hover:text-foreground gap-1.5"
+                        disabled={!isCloudinaryLoaded || openingType === "image"}
+                    >
+                        <ImagePlus className="h-4 w-4" />
+                        {openingType === "image" ? "Opening..." : "Images"}
+                    </Button>
+                }
+                onOpenChange={editState.setOpen}
+            >
+                <ProductImageUploader onComplete={editState.close} />
+            </SheetDrawer>
             {imageUrls.length > 0 && (
                 <Button
                     size="sm"

@@ -3,7 +3,7 @@ from fastapi import Depends
 from app.services.product import ProductService
 from app.core.dependencies.cache import CacheDep, CdnDep
 from app.services.search import SearchService
-from app.core.deps import DbDep
+from app.prisma_client import DbDep
 
 def get_search_service() -> SearchService:
     return SearchService()

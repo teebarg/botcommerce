@@ -3,7 +3,7 @@ from fastapi import Depends
 from app.services.cart import CartService
 from app.core.dependencies.services import CouponDep, SettingsDep
 from app.core.dependencies.cache import CacheDep
-from app.core.deps import DbDep
+from app.prisma_client import DbDep
 
 def get_cart_service(cache_srv: CacheDep, db: DbDep, coupon_srv: CouponDep, settings_srv: SettingsDep) -> CartService:
     return CartService(

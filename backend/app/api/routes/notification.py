@@ -7,9 +7,10 @@ from pydantic import BaseModel
 
 from app.models.generic import Message
 from app.core.logging import get_logger
-from app.core.deps import Notification, UserDep, DbDep
+from app.core.deps import Notification, UserDep
 from app.core.notifications.events import SendPushNotificationEvent
 from app.core.dependencies.cache import ArqDep
+from app.prisma_client import DbDep
 
 class PushEventSchema(BaseModel):
     notificationId: str

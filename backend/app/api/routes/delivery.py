@@ -6,7 +6,7 @@ from app.models.generic import Message
 from app.core.permissions import require_admin
 from app.core.dependencies.services import DeliveryDep
 from app.services.cache import cacheable
-from app.core.deps import DbDep
+from app.prisma_client import DbDep
 
 router = APIRouter()
 

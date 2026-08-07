@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query, Request, Depends
 from typing import List, Optional
 from app.core.dependencies.services import CatalogDep
-from app.core.deps import UserDep, DbDep
+from app.core.deps import UserDep
 from app.models.generic import Message
 from app.core.logging import get_logger
 from app.core.utils import slugify, get_client_ip
@@ -10,6 +10,7 @@ from app.models.catalog import Catalog, Catalogs, CatalogView, CursorPaginatedCa
 from app.core.permissions import require_admin
 from app.services.cache import cacheable
 from app.models.product import ProductSearch, SearchVariant
+from app.prisma_client import DbDep
 
 logger = get_logger(__name__)
 
