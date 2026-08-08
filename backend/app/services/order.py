@@ -247,9 +247,13 @@ class OrderService:
 
             pdf_bytes = invoice_service.generate_invoice_pdf(order=order, company_info=settings_dict)
             timestamp: str = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename: str = f"invoice_{order.order_number}_{timestamp}_{uuid.uuid4().hex[:8]}.pdf"
+            filename: str = f"invoices/invoice_{order.order_number}_{timestamp}_{uuid.uuid4().hex[:8]}.pdf"
 
-            result = self.storage_srv.upload_file(bucket="invoices", filename=filename, bytes=pdf_bytes, content_type="application/pdf")
+            result = self.storage_srv.upload_file(
+                filename=filename, 
+                bytes_data=pdf_bytes, 
+                content_type="application/pdf"
+            )
             if not result:
                 raise Exception("Failed to upload invoice to storage")
 

@@ -8,6 +8,7 @@ from app.core.permissions import require_admin
 from app.core.dependencies.product import ProductDep
 from app.core.dependencies.gallery import GalleryDep
 from app.core.dependencies.services import StorageDep
+from app.core.dependencies.cache import ArqDep
 from app.prisma_client import DbDep
 from app.services.cache import cacheable
 from app.services.storage import StorageProvider, ALLOWED_CONTENT_TYPES, MAX_FILE_SIZE_BYTES
@@ -53,6 +54,7 @@ async def upload_gallery_images(
     db: DbDep,
     srv: GalleryDep,
     storage: StorageDep,
+    queue: ArqDep,
     files: List[UploadFile] = File(...),
     provider: Optional[StorageProvider] = Query(default=None, description="Storage provider override: 'supabase' or 'r2'"),
 ):
@@ -83,7 +85,7 @@ async def upload_gallery_images(
             file_extension = (upload.filename or "").split(".")[-1] or "jpg"
             unique_filename = f"products/{unique_suffix}.{file_extension}"
 
-            image_url = storage.upload_file(
+            image_url: str = storage.upload_file(
                 bucket=settings.STORAGE_BUCKET,
                 filename=unique_filename,
                 bytes_data=file_bytes,
@@ -99,6 +101,13 @@ async def upload_gallery_images(
                 }
             )
             created_images.append(record)
+            await queue.enqueue_job(
+                "optimize_product_image",
+                image_id=record.id,
+                image_url=image_url,
+                bucket=settings.STORAGE_BUCKET,
+                provider=settings.DEFAULT_STORAGE_PROVIDER,
+            )
 
         await srv.invalidate()
 

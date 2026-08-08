@@ -4,13 +4,14 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Query, BackgroundTasks, Response, Request
 from app.core.config import settings
 from app.core.logging import get_logger
-from app.core.dependencies.product import ProductDep, SearchDep
 from app.services.cache import cacheable, DEFAULT_EXPIRATION
 from app.core.deps import CurrentUser, UserDep
 from app.models.generic import Message, ImageUpload
 from app.models.product import ProductLite, VariantWithStatus, SearchProducts, FeedProducts, IndexProducts, ReviewStatus
 from app.core.permissions import require_admin
 from app.lib.cache import set_public_cache
+from app.core.dependencies.product import ProductDep, SearchDep
+from app.core.dependencies.cache import ArqDep
 from app.core.dependencies.services import StorageDep
 from app.prisma_client import DbDep
 from app.core.security import verify_extension_secret
@@ -205,6 +206,7 @@ async def upload_product_images(
     db: DbDep,
     srv: ProductDep,
     storage: StorageDep,
+    queue: ArqDep,
     product_id: int,
     files: List[UploadFile] = File(...),
     provider: Optional[StorageProvider] = Query(
@@ -262,6 +264,13 @@ async def upload_product_images(
                 }
             )
             created_images.append(record)
+            await queue.enqueue_job(
+                "optimize_product_image",
+                image_id=record.id,
+                image_url=image_url,
+                bucket=settings.STORAGE_BUCKET,
+                provider=settings.DEFAULT_STORAGE_PROVIDER,
+            )
 
         await srv.invalidate(id=product_id)
 
