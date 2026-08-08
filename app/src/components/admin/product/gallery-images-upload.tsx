@@ -11,7 +11,7 @@ declare global {
 }
 
 export function GalleryImagesUpload() {
-    const editState = useOverlayTriggerState({});
+    const uploadState = useOverlayTriggerState({});
     const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [isCloudinaryLoaded, setIsCloudinaryLoaded] = useState(false);
     const [openingType, setOpeningType] = useState<"image" | "video" | null>(null);
@@ -73,7 +73,7 @@ export function GalleryImagesUpload() {
                 {openingType === "video" ? "Opening..." : "Videos"}
             </Button>
             <SheetDrawer
-                open={editState.isOpen}
+                open={uploadState.isOpen}
                 title="Upload Images"
                 trigger={
                     <Button
@@ -86,10 +86,10 @@ export function GalleryImagesUpload() {
                         New Images
                     </Button>
                 }
-                onOpenChange={editState.setOpen}
+                onOpenChange={uploadState.setOpen}
             >
                 <div className="pt-6 pb-12 px-2">
-                    <ProductImageUploader onComplete={editState.close} />
+                    <ProductImageUploader onComplete={uploadState.close} />
                 </div>
             </SheetDrawer>
             {imageUrls.length > 0 && (

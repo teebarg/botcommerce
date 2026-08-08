@@ -29,6 +29,8 @@ StorageProvider = Literal["supabase", "r2"]
 
 DEFAULT_PROVIDER: StorageProvider = getattr(settings, "DEFAULT_STORAGE_PROVIDER", "supabase")
 STORAGE_BUCKET: str = settings.STORAGE_BUCKET
+ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
+MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024  # 5MB per image
 
 # Lazily built + cached — avoids crashing at import time if R2 env vars aren't set.
 _r2_client = None
@@ -136,10 +138,7 @@ class MediaStorageService:
 
     def _upload_file_supabase(self, bucket: str, filename: str, bytes_data: bytes, content_type: str) -> str:
         """
-        Uploads then returns the PUBLIC URL string — never the raw SDK response object.
-        storage3.types.UploadResponse (or similar) is not JSON-serializable, and returning
-        it directly caused failures wherever the result got assigned straight to a Prisma
-        field or serialized in a response body.
+        Uploads then returns the PUBLIC URL string.
         """
         try:
             result = supabase.storage.from_(bucket).upload(
@@ -154,8 +153,9 @@ class MediaStorageService:
             raise HTTPException(status_code=400, detail=str(e)) from e
 
     def _delete_file_supabase(self, bucket: str, filename: str) -> bool:
-        """Returns True/False instead of the raw SDK response, for a consistent
-        return type with delete_file_r2."""
+        """
+        Returns True/False
+        """
         try:
             result = supabase.storage.from_(bucket).remove([filename])
             return bool(result)

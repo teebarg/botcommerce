@@ -14,7 +14,7 @@ from app.lib.cache import set_public_cache
 from app.core.dependencies.services import StorageDep
 from app.prisma_client import DbDep
 from app.core.security import verify_extension_secret
-from app.services.storage import MediaStorageService, StorageProvider
+from app.services.storage import StorageProvider, ALLOWED_CONTENT_TYPES, MAX_FILE_SIZE_BYTES
 
 logger = get_logger(__name__)
 
@@ -198,9 +198,6 @@ async def upload_image(id: int, db: DbDep, image_data: ImageUpload, srv: Product
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=500, detail=str(e))
-
-ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
-MAX_FILE_SIZE_BYTES = 8 * 1024 * 1024  # 8MB per image
 
 
 @router.post("/{product_id}/images")

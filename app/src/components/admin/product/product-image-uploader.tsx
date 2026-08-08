@@ -4,13 +4,6 @@ import { ImagePlus } from "lucide-react";
 import { baseURL } from "@/utils/api";
 import { toast } from "sonner";
 
-export interface ProductImage {
-    id: number;
-    image: string;
-    order: number;
-    product_id: number;
-}
-
 interface ProductImageUploaderProps {
     productId?: number;
     onComplete?: () => void;

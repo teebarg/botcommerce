@@ -3,6 +3,7 @@ import { ConfirmDrawer } from "./generic/confirm-drawer";
 import { cn } from "@/utils/cn";
 import { GripVertical, X } from "lucide-react";
 import { useState } from "react";
+import { baseURL } from "@/utils/api";
 
 interface Image {
     id: number;
@@ -49,7 +50,7 @@ export function GalleryThumbnail({
         setDraggedImageId(null);
 
         try {
-            await fetch(`/api/products/${productId}/images/reorder`, {
+            await fetch(`${baseURL}/api/products/${productId}/images/reorder`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

@@ -10,7 +10,7 @@ from app.core.dependencies.gallery import GalleryDep
 from app.core.dependencies.services import StorageDep
 from app.prisma_client import DbDep
 from app.services.cache import cacheable
-from app.services.storage import StorageProvider
+from app.services.storage import StorageProvider, ALLOWED_CONTENT_TYPES, MAX_FILE_SIZE_BYTES
 from app.core.config import settings
 from app.core.logging import get_logger
 
@@ -47,8 +47,6 @@ async def bulk_save_image_urls(
 ):
     return await srv.bulk_save_urls(payload)
 
-ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
-MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024  # 5MB per image
 
 @router.post("/bulk-upload-images")
 async def upload_gallery_images(
@@ -204,5 +202,3 @@ async def bulk_update_products(
     )
 
     return {"message": f"Updating {len(images)} products..."}
-
-
