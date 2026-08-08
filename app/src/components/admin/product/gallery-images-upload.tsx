@@ -83,7 +83,7 @@ export function GalleryImagesUpload() {
                         disabled={!isCloudinaryLoaded || openingType === "image"}
                     >
                         <ImagePlus className="h-4 w-4" />
-                        {openingType === "image" ? "Opening..." : "Images"}
+                        New Images
                     </Button>
                 }
                 onOpenChange={editState.setOpen}

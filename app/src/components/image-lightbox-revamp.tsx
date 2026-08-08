@@ -189,7 +189,7 @@ export function ImageLightbox({
                         />
                     ))}
                 </div>
-                {isAdmin && (
+                {isAdmin && productId && (
                     <ProductImageUploader productId={productId} />
                 )}
             </div>
