@@ -18,7 +18,7 @@ from app.api.main import api_router
 from app.core.config import settings
 from app.core.decorators import limit
 from app.models.generic import ContactFormCreate, NewsletterCreate, BulkPurchaseCreate
-from app.prisma_client import prisma as db
+from app.prisma_client import prisma, DbDep
 from app.services.websocket import manager
 from app.core.logging import get_logger
 from app.core.deps import Notification
@@ -35,12 +35,12 @@ logger = get_logger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.debug("🚀starting servers......:")
-    await db.connect()
+    await prisma.connect()
 
     app.state.redis = redis.from_url(settings.REDIS_URL, decode_responses=True, max_connections=10)
     app.state.l1_cache = L1Cache(max_size=5000, ttl=60.0)
 
-    init_notification_service(redis=app.state.redis)
+    init_notification_service(redis=app.state.redis, db=prisma)
     await manager.start()
 
     listener_task = asyncio.create_task(
@@ -57,7 +57,7 @@ async def lifespan(app: FastAPI):
 
     if manager.cleanup_task:
         manager.cleanup_task.cancel()
-    await db.disconnect()
+    await prisma.disconnect()
 
     listener_task.cancel()
     await app.state.redis.close()
@@ -148,7 +148,7 @@ async def purge_cdn(cdn_srv: CdnDep, data: PurgeCdn) -> Dict[str, Any]:
 
 @app.head("/api/health")
 @app.get("/api/health")
-async def health(search_srv: SearchDep) -> Dict[str, Any]:
+async def health(db: DbDep, search_srv: SearchDep) -> Dict[str, Any]:
     meili_ok = await search_srv.check()
     postgres_ok = await db.execute_raw("SELECT 1;")
     redis_ok = True
@@ -263,7 +263,7 @@ async def log_error(payload: ErrorPayload, request: Request, background_tasks: B
 
 
 @app.get("/api/sitemap.xml", response_class=Response)
-async def generate_sitemap(request: Request):
+async def generate_sitemap(request: Request, db: DbDep):
     redis = request.app.state.redis
     base_url: str = settings.FRONTEND_HOST.rstrip("/")
 

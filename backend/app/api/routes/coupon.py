@@ -8,7 +8,6 @@ from app.models.coupon import (
     Coupon,
     PaginatedCoupons, CouponScope, CouponAnalytics
 )
-from app.prisma_client import prisma as db
 from app.core.logging import get_logger
 from datetime import datetime, date
 from app.core.permissions import require_admin
@@ -17,6 +16,7 @@ from app.services.cache import cacheable
 from app.core.dependencies.cache import CacheDep
 from app.core.dependencies.cart import CartDep
 from app.core.dependencies.services import CouponDep
+from app.prisma_client import DbDep
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -26,6 +26,7 @@ router = APIRouter()
 @cacheable(key_prefix="coupons", tags=["coupons"], expire=2592000)
 async def get_coupons(
     request: Request,
+    db: DbDep,
     query: Optional[str] = Query(""),
     is_active: Optional[bool] = None,
     cursor: int | None = None,
@@ -60,7 +61,7 @@ async def get_coupons(
 
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create_coupon(srv: CouponDep, coupon_data: CouponCreate, cache: CacheDep) -> Coupon:
+async def create_coupon(srv: CouponDep, coupon_data: CouponCreate, db: DbDep, cache: CacheDep) -> Coupon:
     """
     Create a new coupon.
     """
@@ -82,7 +83,7 @@ async def create_coupon(srv: CouponDep, coupon_data: CouponCreate, cache: CacheD
 
 
 @router.patch("/{id}", dependencies=[Depends(require_admin)])
-async def update_coupon(id: int, srv: CouponDep, coupon_data: CouponUpdate, cache: CacheDep) -> Coupon:
+async def update_coupon(id: int, srv: CouponDep, coupon_data: CouponUpdate, db: DbDep, cache: CacheDep) -> Coupon:
     """
     Update a coupon.
     """
@@ -116,7 +117,7 @@ async def update_coupon(id: int, srv: CouponDep, coupon_data: CouponUpdate, cach
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete_coupon(id: int, srv: CouponDep, cache: CacheDep):
+async def delete_coupon(id: int, srv: CouponDep, db: DbDep, cache: CacheDep):
     """
     Delete a coupon.
     """
@@ -187,7 +188,7 @@ async def remove_coupon(
 
 
 @router.post("/{id}/assign", dependencies=[Depends(require_admin)])
-async def assign_coupon(id: int, srv: CouponDep, cache: CacheDep, user_ids: List[int]):
+async def assign_coupon(id: int, srv: CouponDep, db: DbDep, cache: CacheDep, user_ids: List[int]):
     """
     Share a coupon with specific users.
 
@@ -210,7 +211,7 @@ async def assign_coupon(id: int, srv: CouponDep, cache: CacheDep, user_ids: List
 
 
 @router.patch("/{id}/toggle-status", dependencies=[Depends(require_admin)])
-async def toggle_coupon_status(id: int, srv: CouponDep, cache: CacheDep) -> Coupon:
+async def toggle_coupon_status(id: int, db: DbDep, srv: CouponDep, cache: CacheDep) -> Coupon:
     """
     Toggle coupon active status.
     """
@@ -233,6 +234,7 @@ async def toggle_coupon_status(id: int, srv: CouponDep, cache: CacheDep) -> Coup
 
 @router.get("/analytics")
 async def get_coupon_analytics(
+    db: DbDep,
     start_date: Optional[date] = Query(None, description="Filter coupons created from this date"),
     end_date: Optional[date] = Query(None, description="Filter coupons created until this date")
 ) -> CouponAnalytics:
@@ -315,6 +317,7 @@ async def get_coupon_analytics(
 
 @router.get("/detailed")
 async def get_detailed_coupon_analytics(
+    db: DbDep,
     start_date: Optional[date] = Query(None),
     end_date: Optional[date] = Query(None)
 ):

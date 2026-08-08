@@ -1,11 +1,11 @@
 from fastapi import APIRouter, HTTPException, Query, Depends, Request
-from app.prisma_client import prisma as db
 from app.models.faq import FAQ, FAQCreate, FAQUpdate
 from typing import Optional, List
 from app.models.generic import Message
 from app.core.permissions import require_admin
 from app.core.dependencies.cache import CacheDep
 from app.services.cache import cacheable
+from app.prisma_client import DbDep
 
 router = APIRouter()
 
@@ -13,6 +13,7 @@ router = APIRouter()
 @cacheable(key_prefix="faqs", tags=["faqs"], expire=259200000)
 async def list_faqs(
     request: Request,
+    db: DbDep,
     query: Optional[str] = Query(None, min_length=1, description="Search query for FAQ questions"),
     category: Optional[str] = Query(None, description="Filter by category"),
     is_active: Optional[bool] = Query(None, description="Filter by active status")
@@ -30,7 +31,7 @@ async def list_faqs(
     return faqs
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create_faq(cache: CacheDep, faq: FAQCreate)-> FAQ:
+async def create_faq(db: DbDep, cache: CacheDep, faq: FAQCreate)-> FAQ:
     """Create a new FAQ entry"""
     try:
         new_faq = await db.faq.create(
@@ -50,7 +51,7 @@ async def create_faq(cache: CacheDep, faq: FAQCreate)-> FAQ:
 
 
 @router.patch("/{id}", dependencies=[Depends(require_admin)])
-async def update_faq(cache: CacheDep, faq_update: FAQUpdate, id: int)-> FAQ:
+async def update_faq(db: DbDep, cache: CacheDep, faq_update: FAQUpdate, id: int)-> FAQ:
     """Update a FAQ entry"""
     existing_faq = await db.faq.find_unique(where={"id": id})
     if not existing_faq:
@@ -79,7 +80,7 @@ async def update_faq(cache: CacheDep, faq_update: FAQUpdate, id: int)-> FAQ:
         raise
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete_faq(cache: CacheDep, id: int)-> Message:
+async def delete_faq(db: DbDep, cache: CacheDep, id: int)-> Message:
     """Delete a FAQ entry"""
     existing_faq = await db.faq.find_unique(where={"id": id})
     if not existing_faq:

@@ -9,11 +9,11 @@ from app.models.order import Order
 from app.core.deps import CurrentUser
 from app.models.user import User
 from datetime import datetime
-from app.prisma_client import prisma as db
 from app.core.logging import get_logger
 from app.models.cart import Cart
 from app.core.permissions import require_admin
 from app.core.dependencies.order import OrderDep
+from app.prisma_client import DbDep
 
 logger = get_logger(__name__)
 
@@ -61,6 +61,7 @@ async def initialize_payment(cart: Cart, user: User) -> PaymentInitialize:
 @router.post("/initialize/{cart_number}", response_model=PaymentInitialize)
 async def create_payment(
     cart_number: str,
+    db: DbDep,
     current_user: CurrentUser
 ):
     """Initialize a new payment"""
@@ -122,7 +123,7 @@ async def paystack_webhook(request: Request, srv: OrderDep, x_paystack_signature
 
 
 @router.patch("/{id}/status", dependencies=[Depends(require_admin)])
-async def payment_status(srv: OrderDep, id: int, status: PaymentStatus) -> Order:
+async def payment_status(db: DbDep, srv: OrderDep, id: int, status: PaymentStatus) -> Order:
     """Change payment status"""
     order = await db.order.find_unique(where={"id": id}, include={"order_items": {"include": {"variant": True}}})
     if not order:

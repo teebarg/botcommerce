@@ -1,8 +1,5 @@
-from fastapi import (
-    APIRouter,
-    HTTPException,
-    Request,
-)
+from fastapi import APIRouter, HTTPException, Request
+from prisma.errors import PrismaError
 from app.core.deps import CurrentUser
 from app.models.address import (
     Address,
@@ -11,11 +8,10 @@ from app.models.address import (
     AddressUpdate,
 )
 from app.models.generic import Message
-from app.prisma_client import prisma as db
-from prisma.errors import PrismaError
 from app.core.logging import get_logger
 from app.services.cache import cacheable
 from app.core.dependencies.cache import CacheDep
+from app.prisma_client import DbDep
 
 logger = get_logger(__name__)
 
@@ -24,7 +20,7 @@ router = APIRouter()
 
 @router.get("/")
 @cacheable(key_prefix="addresses", key_builder=lambda user: user.id, tags=lambda user: [f"addresses:{user.id}"])
-async def index(request: Request, user: CurrentUser) -> Addresses:
+async def index(request: Request, db: DbDep, user: CurrentUser) -> Addresses:
     """Get current user addresses."""
     addresses = await db.address.find_many(
         where={"user_id": user.id},
@@ -34,6 +30,7 @@ async def index(request: Request, user: CurrentUser) -> Addresses:
 
 @router.post("/")
 async def create(
+    db: DbDep,
     user: CurrentUser,
     create_data: AddressCreate,
     cache: CacheDep
@@ -62,6 +59,7 @@ async def create(
 @router.patch("/{id}")
 async def update(
     id: int,
+    db: DbDep,
     user: CurrentUser,
     update_data: AddressUpdate,
     cache: CacheDep
@@ -106,7 +104,7 @@ async def update(
 
 
 @router.delete("/{id}")
-async def delete(id: int, user: CurrentUser, cache: CacheDep) -> Message:
+async def delete(id: int, db: DbDep, user: CurrentUser, cache: CacheDep) -> Message:
     """
     Delete a address.
     """

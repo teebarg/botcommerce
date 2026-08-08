@@ -5,7 +5,6 @@ from app.agent.eval_config import SUPPORT_EVAL_CONFIG
 from fastapi import FastAPI, BackgroundTasks, Request
 from fastapi.middleware.cors import CORSMiddleware
 import redis.asyncio as redis
-from redis.asyncio import Redis
 from contextlib import asynccontextmanager
 
 from app.schemas.models import ChatRequest, ChatResponse, IngestRequest, HealthResponse

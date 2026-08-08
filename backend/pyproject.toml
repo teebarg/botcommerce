@@ -27,6 +27,7 @@ dependencies = [
     "python-jose[cryptography]==3.3.0",
     "pywebpush==2.3.0",
     "arq>=0.25.0",
+    "boto3>=1.43.66",
 ]
 
 [dependency-groups]

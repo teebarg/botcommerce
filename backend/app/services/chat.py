@@ -1,10 +1,12 @@
 from fastapi import HTTPException
-from app.prisma_client import prisma as db
+from prisma import Prisma
 
 class ConversationService:
+    def __init__(self, db: Prisma):
+        self.db = db
 
     async def get_conversation(self, uuid: str):
-        conversation = await db.conversation.find_unique(
+        conversation = await self.db.conversation.find_unique(
             where={"conversation_uuid": uuid}
         )
 

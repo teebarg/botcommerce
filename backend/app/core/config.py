@@ -85,9 +85,6 @@ class Settings(BaseSettings):
     MEILI_HOST: str = "http://meilisearch:7700"
     MEILI_PRODUCTS_INDEX: str = ""
 
-    SUPABASE_URL: str = ""
-    SUPABASE_KEY: str = ""
-
     SLACK_ALERTS: str = "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
     SLACK_ORDERS: str = "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
 
@@ -98,12 +95,20 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     GEMINI_MODEL: str = "gemini-2.5-flash"
 
-    GOOGLE_SPREADSHEET_ID: str = ""
-    GOOGLE_GID: str = ""
+    DEFAULT_STORAGE_PROVIDER: Literal["supabase", "r2"] = "supabase"
+    STORAGE_BUCKET: str = "images-dev"
+
+    SUPABASE_URL: str = ""
+    SUPABASE_KEY: str = ""
 
     CLOUDINARY_NAME: str = ""
     CLOUDINARY_API_KEY: str = ""
     CLOUDINARY_API_SECRET: str = ""
+
+    CLOUDFLARE_ACCOUNT_ID: str = ""
+    CLOUDFLARE_R2_ACCESS_KEY_ID: str = ""
+    CLOUDFLARE_R2_SECRET_ACCESS_KEY: str = ""
+    CLOUDFLARE_R2_PUBLIC_URL: str = ""
 
     BREVO_API_KEY: str = "key"
     VERCEL_API_TOKEN: str = ""

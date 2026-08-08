@@ -4,6 +4,8 @@ import * as React from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GalleryThumbnail } from "./image-thumbnail";
+import { ProductImageUploader } from "./admin/product/product-image-uploader";
+import { cn } from "@/utils/cn";
 
 function openGemini(imageUrl: string, productId: number) {
     const params = new URLSearchParams({
@@ -30,7 +32,8 @@ interface ImageLightboxProps {
     onRemoveImage?: (id: number) => void;
     size?: string | null;
     productId?: number;
-    defaultImage?: string;
+    defaultImage?: Image;
+    isAdmin?: boolean;
 }
 
 export function ImageLightbox({
@@ -41,11 +44,13 @@ export function ImageLightbox({
     onRemoveImage,
     size,
     productId,
-    defaultImage
+    defaultImage,
+    isAdmin = false
 }: ImageLightboxProps) {
+    const [mediaLoaded, setMediaLoaded] = React.useState<boolean>(false);
     const [currentIndex, setCurrentIndex] = React.useState(initialIndex);
     const containerRef = React.useRef<HTMLDivElement>(null);
-    const shouldShow = open && images.length > 0;
+    const shouldShow = open;
 
     React.useEffect(() => {
         if (open) {
@@ -91,7 +96,7 @@ export function ImageLightbox({
 
     if (!shouldShow) return null;
     const safeIndex = Math.min(currentIndex, images.length - 1);
-    const currentImage = images[safeIndex];
+    const currentImage = images[safeIndex] || defaultImage;
 
     if (!currentImage) return null;
 
@@ -126,11 +131,17 @@ export function ImageLightbox({
                 </button>
 
                 <div className="relative flex h-full max-h-[calc(100vh-12rem)] w-full max-w-5xl items-center justify-center">
+                    {!mediaLoaded && <img src="/placeholder.jpg" alt="placeholder" className="absolute inset-0 w-full h-full object-cover" />}
                     <img
+                        onLoad={() => setMediaLoaded(true)}
                         src={currentImage.image}
                         alt={currentImage.image}
-                        className="max-h-full max-w-full rounded-lg object-contain shadow-2xl"
+                        className={cn(
+                            "w-full h-full object-cover transition-opacity duration-500",
+                            mediaLoaded ? "opacity-100" : "opacity-0",
+                        )}
                         loading="eager"
+                        decoding="async"
                         onClick={() => onOpenChange(false)}
                     />
                 </div>
@@ -152,30 +163,35 @@ export function ImageLightbox({
                 </div>
             )}
 
-            {productId && defaultImage && (
+            {productId && defaultImage?.image && (
                 <div className="absolute top-4 right-16">
                     <Button
                         size="xs"
-                        onClick={() => openGemini(defaultImage, productId)}
+                        onClick={() => openGemini(defaultImage.image, productId)}
                     >
                         Open Gemini
                     </Button>
                 </div>
             )}
 
-            <div className="border-t border-white/10 bg-black/60 px-4 py-4">
+            <div className="border-t border-white/10 bg-black/60 px-4 py-4 space-y-2">
                 <div className="mx-auto flex max-w-5xl gap-2 overflow-x-auto p-2">
                     {images.map((image, index) => (
                         <GalleryThumbnail
                             key={image.id}
                             image={image}
+                            images={images}
                             index={index}
+                            productId={productId}
                             isActive={index === safeIndex}
                             onSelect={() => setCurrentIndex(index)}
                             onRemoveImage={onRemoveImage}
                         />
                     ))}
                 </div>
+                {isAdmin && productId && (
+                    <ProductImageUploader productId={productId} />
+                )}
             </div>
             <div
                 className="absolute inset-0 -z-10"

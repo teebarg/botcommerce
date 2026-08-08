@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query, Request, Depends
 from typing import List, Optional
-from app.prisma_client import prisma as db
 from app.core.dependencies.services import CatalogDep
 from app.core.deps import UserDep
 from app.models.generic import Message
@@ -11,6 +10,7 @@ from app.models.catalog import Catalog, Catalogs, CatalogView, CursorPaginatedCa
 from app.core.permissions import require_admin
 from app.services.cache import cacheable
 from app.models.product import ProductSearch, SearchVariant
+from app.prisma_client import DbDep
 
 logger = get_logger(__name__)
 
@@ -18,7 +18,7 @@ router = APIRouter()
 
 
 @router.get("/views")
-async def list_catalogs_views() -> List[CatalogView]:
+async def list_catalogs_views(db: DbDep) -> List[CatalogView]:
     return await db.sharedcollectionview.find_many()
 
 
@@ -50,6 +50,7 @@ async def list_catalogs(
 async def search(
     request: Request,
     slug: str,
+    db: DbDep,
     user: UserDep,
     limit: int = Query(default=20, le=100),
     cursor: Optional[int] = Query(default=None),
@@ -140,6 +141,7 @@ async def search(
 @router.post("/{slug}/track-visit")
 async def track_catalog_visit(
     request: Request,
+    db: DbDep,
     srv: CatalogDep,
     slug: str,
     user: UserDep,
@@ -167,7 +169,7 @@ async def track_catalog_visit(
 
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create_catalog(srv: CatalogDep, data: CatalogCreate) -> Catalog:
+async def create_catalog(db: DbDep, srv: CatalogDep, data: CatalogCreate) -> Catalog:
     create_data = data.model_dump(exclude_unset=True)
     create_data["slug"] = slugify(data.title)
     res = await db.sharedcollection.create(data=create_data)
@@ -176,7 +178,7 @@ async def create_catalog(srv: CatalogDep, data: CatalogCreate) -> Catalog:
 
 
 @router.patch("/{id}", dependencies=[Depends(require_admin)])
-async def update_catalog(srv: CatalogDep, id: int, data: CatalogUpdate) -> Catalog:
+async def update_catalog(db: DbDep, srv: CatalogDep, id: int, data: CatalogUpdate) -> Catalog:
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:
         raise HTTPException(status_code=404, detail="Catalog not found")
@@ -189,7 +191,7 @@ async def update_catalog(srv: CatalogDep, id: int, data: CatalogUpdate) -> Catal
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete_catalog(id: int, srv: CatalogDep) -> Message:
+async def delete_catalog(id: int, db: DbDep, srv: CatalogDep) -> Message:
     obj = await db.sharedcollection.find_unique(where={"id": id})
     if not obj:
         raise HTTPException(status_code=404, detail="Catalog not found")
@@ -200,7 +202,7 @@ async def delete_catalog(id: int, srv: CatalogDep) -> Message:
 
 
 @router.post("/{id}/add-products", dependencies=[Depends(require_admin)])
-async def bulk_add_products_to_catalog(id: int, srv: CatalogDep, data: CatalogBulkAdd) -> Message:
+async def bulk_add_products_to_catalog(id: int, db: DbDep, srv: CatalogDep, data: CatalogBulkAdd) -> Message:
     """Bulk add products to a catalog"""
     catalog = await db.sharedcollection.find_unique(where={"id": id})
     if not catalog:
@@ -220,7 +222,7 @@ async def bulk_add_products_to_catalog(id: int, srv: CatalogDep, data: CatalogBu
 
 
 @router.post("/{id}/remove-products", dependencies=[Depends(require_admin)])
-async def bulk_remove_products_from_catalog(id: int, srv: CatalogDep, data: CatalogBulkAdd) -> Message:
+async def bulk_remove_products_from_catalog(id: int, db: DbDep, srv: CatalogDep, data: CatalogBulkAdd) -> Message:
     """Bulk remove products from a catalog"""
     catalog = await db.sharedcollection.find_unique(where={"id": id})
     if not catalog:

@@ -5,7 +5,6 @@ from app.services.coupon import CouponService
 from app.services.storage import MediaStorageService
 from app.services.user_interaction import InteractionService
 from app.core.dependencies.cache import ArqDep, CacheDep, CdnDep, RedisDep
-from app.prisma_client import prisma as db
 from app.services.bank_details import BankDetailsService
 from app.services.shop_settings import ShopSettingsService
 from app.services.catalog import CatalogService
@@ -13,21 +12,22 @@ from app.services.categories import CategoryService
 from app.services.collections import CollectionService
 from app.services.delivery import DeliveryService
 from app.services.review import ReviewService
+from app.prisma_client import DbDep
 
-def get_coupon_service() -> CouponService:
+def get_coupon_service(db: DbDep) -> CouponService:
     return CouponService(db=db)
 
 def get_storage_service() -> MediaStorageService:
     return MediaStorageService()
 
-def get_shop_settings_service(redis: RedisDep) -> ShopSettingsService:
+def get_shop_settings_service(db: DbDep, redis: RedisDep) -> ShopSettingsService:
     return ShopSettingsService(redis=redis, db=db)
 
-def get_catalog_service(cache_srv: CacheDep) -> CatalogService:
+def get_catalog_service(cache_srv: CacheDep, db: DbDep) -> CatalogService:
     return CatalogService(db=db, cache_srv=cache_srv)
 
-def get_conversation_service():
-    return ConversationService()
+def get_conversation_service(db: DbDep):
+    return ConversationService(db=db)
 
 def get_interaction_service(queue: ArqDep) -> InteractionService:
     return InteractionService(queue=queue)

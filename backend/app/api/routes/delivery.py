@@ -2,23 +2,23 @@ from typing import List
 from prisma.errors import PrismaError
 from fastapi import APIRouter, Depends, HTTPException, status, Request, BackgroundTasks
 from app.models.delivery import DeliveryOption, DeliveryOptionCreate, DeliveryOptionUpdate
-from app.prisma_client import prisma as db
 from app.models.generic import Message
 from app.core.permissions import require_admin
 from app.core.dependencies.services import DeliveryDep
 from app.services.cache import cacheable
+from app.prisma_client import DbDep
 
 router = APIRouter()
 
 @router.get("/", response_model=List[DeliveryOption])
 @cacheable(key_prefix="delivery", key_builder=False, expire=259200000, cdn_ttl=31536000, cdn_swr=604800)
-async def index(request: Request):
+async def index(request: Request, db: DbDep):
     """Get all delivery options"""
     return await db.deliveryoption.find_many(order={"created_at": "desc"})
 
 @router.post("/", dependencies=[Depends(require_admin)])
 async def create(
-    delivery_option: DeliveryOptionCreate,
+    delivery_option: DeliveryOptionCreate, db: DbDep,
     srv: DeliveryDep, bg_tasks: BackgroundTasks
 ) -> DeliveryOption:
     """Create a new delivery option"""
@@ -35,6 +35,7 @@ async def create(
 
 @router.patch("/{id}", dependencies=[Depends(require_admin)])
 async def update(
+    db: DbDep,
     srv: DeliveryDep,
     id: int,
     delivery_update: DeliveryOptionUpdate,
@@ -60,7 +61,7 @@ async def update(
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete(srv: DeliveryDep, id: int, bg_tasks: BackgroundTasks) -> Message:
+async def delete(db: DbDep, srv: DeliveryDep, id: int, bg_tasks: BackgroundTasks) -> Message:
     """Delete a delivery option"""
     existing = await db.deliveryoption.find_unique(where={"id": id})
     if not existing:

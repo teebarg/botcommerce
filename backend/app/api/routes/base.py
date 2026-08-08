@@ -1,16 +1,16 @@
 from typing import Literal, Optional
 from fastapi import APIRouter, Depends, Query, Request
 from prisma.enums import Role
-from app.prisma_client import prisma as db
 from datetime import timedelta, datetime
 from app.core.permissions import require_admin
 from app.core.dependencies.cache import CacheDep
 from app.services.cache import cacheable
+from app.prisma_client import DbDep
 
 router = APIRouter()
 
 @router.get("/stats", dependencies=[Depends(require_admin)])
-async def admin_dashboard_stats():
+async def admin_dashboard_stats(db: DbDep):
     """Get admin dashboard stats"""
     orders_count = await db.order.count()
 
@@ -33,6 +33,7 @@ async def admin_dashboard_stats():
 @cacheable(key_prefix="stats-trends", tags=["stats-trends"])
 async def stats_trends(
     request: Request,
+    db: DbDep,
     range: Literal["day", "week", "month"] = Query("day"),
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,

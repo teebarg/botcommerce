@@ -5,12 +5,12 @@ from fastapi import APIRouter, HTTPException, Depends, HTTPException, Query, Bac
 from prisma.errors import PrismaError
 from app.core.deps import CurrentUser
 from app.models.generic import Message
-from app.prisma_client import prisma as db
 from app.core.permissions import require_admin
 from base64 import b64encode, b64decode
 from app.models.reviews import Review, Reviews, ReviewCreate, ReviewUpdate
 from app.core.logging import get_logger
 from app.core.dependencies.services import ReviewDep
+from app.prisma_client import DbDep
 from app.services.cache import cacheable
 
 logger = get_logger(__name__)
@@ -21,6 +21,7 @@ router = APIRouter()
 @cacheable(key_prefix="reviews", tags=["reviews"], expire=2592000, cdn_ttl=3600, cdn_swr=86400)
 async def index(
     request: Request,
+    db: DbDep,
     product_id: Optional[int] = None,
     cursor: str = Query(default=None, description="cursor from previous response"),
     limit: int = Query(default=20, le=100, ge=1),
@@ -134,7 +135,7 @@ async def index(
     }
 
 @router.post("/")
-async def create(srv: ReviewDep, review: ReviewCreate, user: CurrentUser, bg_tasks: BackgroundTasks) -> Review:
+async def create(db: DbDep, srv: ReviewDep, review: ReviewCreate, user: CurrentUser, bg_tasks: BackgroundTasks) -> Review:
     existing_review = await db.review.find_first(
         where={"user_id": user.id, "product_id": review.product_id}
     )
@@ -168,6 +169,7 @@ async def create(srv: ReviewDep, review: ReviewCreate, user: CurrentUser, bg_tas
 
 @router.patch("/{id}", dependencies=[Depends(require_admin)])
 async def update(
+    db: DbDep,
     srv: ReviewDep,
     id: int,
     update_data: ReviewUpdate,
@@ -194,7 +196,7 @@ async def update(
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete(id: int, srv: ReviewDep, bg_tasks: BackgroundTasks) -> Message:
+async def delete(id: int, db: DbDep, srv: ReviewDep, bg_tasks: BackgroundTasks) -> Message:
     existing = await db.review.find_unique(
         where={"id": id}
     )

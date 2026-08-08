@@ -6,7 +6,6 @@ from fastapi import (
     HTTPException,
 )
 from prisma.enums import CartStatus, OrderStatus
-from app.prisma_client import prisma as db
 from app.core.dependencies.services import SettingsDep
 from app.core.logging import get_logger
 from app.core.dependencies.cache import CacheDep
@@ -14,6 +13,7 @@ from app.core.dependencies.order import OrderDep
 from app.core.security import verify_internal_signature
 from app.core.notifications.setup import get_notification_service
 from app.utils.emails import generate_welcome_email
+from app.prisma_client import DbDep
 
 logger = get_logger(__name__)
 
@@ -49,7 +49,7 @@ async def internal_generate_invoice(order_number: str, order_srv: OrderDep, forc
     include_in_schema=False,
     dependencies=[Depends(verify_internal_signature)],
 )
-async def internal_order_creation(order_id: int, cache_srv: CacheDep, order_srv: OrderDep):
+async def internal_order_creation(order_id: int, db: DbDep, cache_srv: CacheDep, order_srv: OrderDep):
     order = await order_srv.db.order.find_unique(where={"id": order_id})
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
@@ -80,7 +80,7 @@ async def internal_order_creation(order_id: int, cache_srv: CacheDep, order_srv:
 
     await cache_srv.invalidate(tags=["users"])
     await order_srv.send_order_notification(id=order.id)
-    
+
     return {"status": "ok", "invoice_url": order.invoice_url}
 
 @router.post(

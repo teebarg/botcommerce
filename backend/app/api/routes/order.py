@@ -1,7 +1,6 @@
 from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, BackgroundTasks, Cookie, Response
 from prisma.enums import OrderStatus
-from app.prisma_client import prisma as db
 from app.models.order import Order, OrderTimelineEntry, PaginatedOrders, OrderNotesUpdate, ReturnItemPayload
 from app.core.logging import get_logger
 from app.models.generic import Message
@@ -9,6 +8,7 @@ from app.core.permissions import require_admin
 from app.core.config import settings
 from app.core.deps import CurrentUser, PrincipalDep
 from app.core.dependencies.order import OrderDep
+from app.prisma_client import DbDep
 from app.services.cache import cacheable
 
 logger = get_logger(__name__)
@@ -96,7 +96,7 @@ async def get_orders(
 
 
 @router.delete("/{order_id}", dependencies=[Depends(require_admin)])
-async def delete_order(srv: OrderDep, order_id: int):
+async def delete_order(db: DbDep, srv: OrderDep, order_id: int):
     order = await srv.get_by_id(order_id=order_id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
@@ -107,7 +107,7 @@ async def delete_order(srv: OrderDep, order_id: int):
 
 
 @router.patch("/{id}/status", dependencies=[Depends(require_admin)])
-async def order_status(srv: OrderDep, id: int, status: OrderStatus) -> Order:
+async def order_status(db: DbDep, srv: OrderDep, id: int, status: OrderStatus) -> Order:
     order = await srv.get_by_id(order_id=id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
@@ -145,7 +145,7 @@ async def update_order_notes(
 
 
 @router.get("/{order_id}/timeline", dependencies=[Depends(require_admin)], response_model=list[OrderTimelineEntry])
-async def get_order_timeline(srv: OrderDep, order_id: int):
+async def get_order_timeline(db: DbDep, srv: OrderDep, order_id: int):
     order = await srv.get_by_id(order_id=order_id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")

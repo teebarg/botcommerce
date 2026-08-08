@@ -4,14 +4,13 @@ from app.services.cache import cacheable
 from fastapi import APIRouter, HTTPException, Query, Depends, Request
 from prisma.errors import PrismaError
 from prisma.enums import Role, Status
-from app.core.deps import CurrentUser
 from app.models.wishlist import Wishlists, WishlistCreate
 from app.models.generic import Message
-from app.prisma_client import prisma as db
 from app.models.user import User, UserSelf, UserAdmin, UserUpdateMe, UserUpdate, PaginatedUsers, GuestUserCreate
 from app.core.security import get_password_hash
 from app.core.permissions import require_admin
-from app.core.deps import UserDep
+from app.core.deps import UserDep, CurrentUser
+from app.prisma_client import DbDep
 
 router = APIRouter()
 
@@ -27,6 +26,7 @@ async def read_user_me(
 async def update_user_me(
     user_in: UserUpdateMe,
     user: CurrentUser,
+    db: DbDep,
     cache_srv: CacheDep
 ) -> User:
     """
@@ -58,6 +58,7 @@ async def update_user_me(
 @cacheable(key_prefix="users", tags=["users"])
 async def index(
     request: Request,
+    db: DbDep,
     query: str = "",
     role: Optional[Role] = None,
     status: Optional[Status] = None,
@@ -100,7 +101,7 @@ async def index(
 
 
 @router.post("/create-guest", dependencies=[Depends(require_admin)])
-async def create_guest_user(payload: GuestUserCreate, cache_srv: CacheDep) -> User:
+async def create_guest_user(payload: GuestUserCreate, db: DbDep, cache_srv: CacheDep) -> User:
     """
     Admin-only: Create a new user with an email in the guest.com domain.
     """
@@ -137,6 +138,7 @@ async def create_guest_user(payload: GuestUserCreate, cache_srv: CacheDep) -> Us
 @router.patch("/{id}", dependencies=[Depends(require_admin)])
 async def update(
     id: int,
+    db: DbDep,
     update_data: UserUpdate,
     cache_srv: CacheDep
 ) -> UserAdmin:
@@ -161,7 +163,7 @@ async def update(
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete(id: int, cache_srv: CacheDep) -> Message:
+async def delete(id: int, db: DbDep, cache_srv: CacheDep) -> Message:
     """
     Delete a user.
     """
@@ -183,7 +185,7 @@ async def delete(id: int, cache_srv: CacheDep) -> Message:
 
 @router.get("/wishlist")
 @cacheable(key_prefix="wishlist", tags=lambda user: [f"wishlist:{user.id if user else 'None'}", "products"])
-async def read_wishlist(request: Request, user: UserDep) -> Wishlists:
+async def read_wishlist(request: Request, db: DbDep, user: UserDep) -> Wishlists:
     if not user:
         return {"wishlists": []}
     items = await db.favorite.find_many(
@@ -195,7 +197,7 @@ async def read_wishlist(request: Request, user: UserDep) -> Wishlists:
 
 
 @router.post("/wishlist")
-async def create_user_wishlist_item(item: WishlistCreate, user: CurrentUser, cache: CacheDep) -> Message:
+async def create_user_wishlist_item(item: WishlistCreate, db: DbDep, user: CurrentUser, cache: CacheDep) -> Message:
     try:
         await db.favorite.create(
             data={
@@ -210,7 +212,7 @@ async def create_user_wishlist_item(item: WishlistCreate, user: CurrentUser, cac
 
 
 @router.delete("/wishlist/{product_id}")
-async def remove_wishlist_item(product_id: int, user: CurrentUser, cache: CacheDep) -> Message:
+async def remove_wishlist_item(product_id: int, db: DbDep, user: CurrentUser, cache: CacheDep) -> Message:
     existing = await db.favorite.find_unique(
         where={
             'user_id_product_id': {
