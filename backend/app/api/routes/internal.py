@@ -5,11 +5,13 @@ from fastapi import (
     Depends,
     HTTPException,
 )
+from pydantic import BaseModel
 from prisma.enums import CartStatus, OrderStatus
 from app.core.dependencies.services import SettingsDep
 from app.core.logging import get_logger
 from app.core.dependencies.cache import CacheDep
 from app.core.dependencies.order import OrderDep
+from app.core.dependencies.product import ProductDep
 from app.core.security import verify_internal_signature
 from app.core.notifications.setup import get_notification_service
 from app.utils.emails import generate_welcome_email
@@ -103,6 +105,7 @@ async def internal_process_referral(order_id: int, srv: OrderDep):
 )
 async def internal_user_signup(
     user_id: int,
+    db: DbDep,
     cache_srv: CacheDep,
     setting_srv: SettingsDep,
 ):
@@ -146,3 +149,31 @@ async def internal_user_signup(
     await cache_srv.invalidate(tags=["coupons", "users"])
 
     return {"status": "ok", "referral_code": code}
+
+class SwapImageRequest(BaseModel):
+    image_id: int
+    image: str
+ 
+@router.patch("/product-images/{image_id}", dependencies=[Depends(verify_internal_signature)],)
+async def swap_product_image_url(
+    db: DbDep,
+    srv: ProductDep,
+    image_id: int,
+    payload: SwapImageRequest,
+): 
+    if payload.image_id != image_id:
+        raise HTTPException(status_code=400, detail="image_id mismatch")
+ 
+    existing = await db.productimage.find_unique(where={"id": image_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="ProductImage not found")
+ 
+    updated = await db.productimage.update(
+        where={"id": image_id},
+        data={"image": payload.image},
+    )
+ 
+    if existing.product_id:
+        await srv.invalidate(id=existing.product_id)
+ 
+    return {"id": updated.id, "image": updated.image}

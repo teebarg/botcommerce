@@ -10,10 +10,9 @@ from botocore.config import Config as BotoConfig
 from botocore.exceptions import ClientError
 from fastapi import HTTPException
 from supabase import create_client, Client
-from app.core.config import settings
-from app.core.logging import get_logger
-from app.models.generic import ImageUpload
-from app.core.logging import logger
+from core.config import settings
+from core.logging import get_logger
+from models.generic import ImageUpload
 
 logger = get_logger(__name__)
 
@@ -82,13 +81,12 @@ class MediaStorageService:
 
     def upload_file(
         self,
+        bucket: str,
         filename: str,
         bytes_data: bytes,
         content_type: str,
-        bucket: Optional[str] = settings.STORAGE_BUCKET,
         provider: Optional[StorageProvider] = None,
     ) -> str:
-        bucket = bucket or STORAGE_BUCKET
         provider = provider or DEFAULT_PROVIDER
         if provider == "r2":
             return self.upload_file_r2(bucket, filename, bytes_data, content_type)
