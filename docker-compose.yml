@@ -67,14 +67,16 @@ services:
 
   worker:
     build:
-      context: ./worker
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: worker/Dockerfile.dev
     platform: linux/amd64
     environment:
       - BROKER_URL=redis://redis:6379/0
       - UV_LINK_MODE=copy
+      - PYTHONPATH=/app
     volumes:
-      - ./worker:/app
+      - ./worker/app:/app/app
+      - ./core:/app/core
       - /app/.venv
       - uvworker-cache:/root/.cache/uv
     networks:

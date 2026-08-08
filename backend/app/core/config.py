@@ -92,9 +92,6 @@ class Settings(BaseSettings):
     WHATSAPP_TOKEN: str | None = None
     WHATSAPP_PHONE_NUMBER_ID: str | None = None
 
-    GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-2.5-flash"
-
     DEFAULT_STORAGE_PROVIDER: Literal["supabase", "r2"] = "supabase"
     STORAGE_BUCKET: str = "images-dev"
 

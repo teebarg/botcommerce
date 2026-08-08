@@ -8,11 +8,11 @@ import cloudinary.uploader
 import boto3
 from botocore.config import Config as BotoConfig
 from botocore.exceptions import ClientError
-from fastapi import HTTPException
 from supabase import create_client, Client
 from core.config import settings
 from core.logging import get_logger
-from models.generic import ImageUpload
+from core.models.generic import ImageUpload
+from core.logging import logger
 
 logger = get_logger(__name__)
 
@@ -53,8 +53,7 @@ def _r2_is_configured() -> bool:
 def _get_r2_client():
     global _r2_client
     if not _r2_is_configured():
-        raise HTTPException(
-            status_code=503, detail="Cloudflare R2 is not configured on this server")
+        raise Exception("Cloudflare R2 is not configured on this server")
     if _r2_client is None:
         _r2_client = boto3.client(
             "s3",
@@ -73,36 +72,30 @@ class MediaStorageService:
     # Generic entrypoints — call these from the rest of the app.
     # ------------------------------------------------------------------
 
-    def upload(self, bucket: str, data: ImageUpload, provider: Optional[StorageProvider] = None) -> str:
-        provider = provider or DEFAULT_PROVIDER
-        if provider == "r2":
-            return self.upload_r2(bucket, data)
-        return self._upload_supabase(bucket, data)
+    def upload(self, data: ImageUpload) -> str:
+        if DEFAULT_PROVIDER == "r2":
+            return self.upload_r2(STORAGE_BUCKET, data)
+        return self._upload_supabase(STORAGE_BUCKET, data)
 
     def upload_file(
         self,
-        bucket: str,
         filename: str,
         bytes_data: bytes,
         content_type: str,
-        provider: Optional[StorageProvider] = None,
     ) -> str:
-        provider = provider or DEFAULT_PROVIDER
-        if provider == "r2":
-            return self.upload_file_r2(bucket, filename, bytes_data, content_type)
-        return self._upload_file_supabase(bucket, filename, bytes_data, content_type)
+        if DEFAULT_PROVIDER == "r2":
+            return self.upload_file_r2(STORAGE_BUCKET, filename, bytes_data, content_type)
+        return self._upload_file_supabase(STORAGE_BUCKET, filename, bytes_data, content_type)
 
-    def delete_file(self, bucket: str, filename: str, provider: Optional[StorageProvider] = None) -> bool:
-        provider = provider or DEFAULT_PROVIDER
-        if provider == "r2":
-            return self.delete_file_r2(bucket, filename)
-        return self._delete_file_supabase(bucket, filename)
+    def delete_file(self, filename: str) -> bool:
+        if DEFAULT_PROVIDER == "r2":
+            return self.delete_file_r2(STORAGE_BUCKET, filename)
+        return self._delete_file_supabase(STORAGE_BUCKET, filename)
 
-    def get_public_url(self, bucket: str, filename: str, provider: Optional[StorageProvider] = None) -> str:
-        provider = provider or DEFAULT_PROVIDER
-        if provider == "r2":
-            return self.get_public_url_r2(bucket, filename)
-        return self._get_public_url_supabase(bucket, filename)
+    def get_public_url(self, filename: str) -> str:
+        if DEFAULT_PROVIDER == "r2":
+            return self.get_public_url_r2(STORAGE_BUCKET, filename)
+        return self._get_public_url_supabase(STORAGE_BUCKET, filename)
 
     # ------------------------------------------------------------------
     # Supabase
@@ -127,7 +120,7 @@ class MediaStorageService:
             return supabase.storage.from_(bucket).get_public_url(unique_filename)
         except Exception as e:
             logger.error(f"Error uploading to supabase: {str(e)}")
-            raise HTTPException(status_code=400, detail=str(e)) from e
+            raise Exception(str(e)) from e
 
     def delete_image(self, bucket: str, file_path: str):
         result = supabase.storage.from_(bucket).remove([file_path])
@@ -149,7 +142,7 @@ class MediaStorageService:
             return supabase.storage.from_(bucket).get_public_url(filename)
         except Exception as e:
             logger.error(f"Error uploading file to supabase: {str(e)}")
-            raise HTTPException(status_code=400, detail=str(e)) from e
+            raise Exception(str(e)) from e
 
     def _delete_file_supabase(self, bucket: str, filename: str) -> bool:
         """
@@ -160,7 +153,7 @@ class MediaStorageService:
             return bool(result)
         except Exception as e:
             logger.error(f"Error deleting file from supabase: {str(e)}")
-            raise HTTPException(status_code=400, detail=str(e)) from e
+            raise Exception(str(e)) from e
 
     def _get_public_url_supabase(self, bucket: str, filename: str) -> str:
         return supabase.storage.from_(bucket).get_public_url(filename, {"download": filename})
@@ -186,7 +179,7 @@ class MediaStorageService:
             return self.get_public_url_r2(bucket, unique_filename)
         except ClientError as e:
             logger.error(f"Error uploading to R2: {str(e)}")
-            raise HTTPException(status_code=400, detail=str(e)) from e
+            raise Exception(str(e)) from e
 
     def upload_file_r2(self, bucket: str, filename: str, bytes_data: bytes, content_type: str) -> str:
         client = _get_r2_client()
@@ -200,7 +193,7 @@ class MediaStorageService:
             return self.get_public_url_r2(bucket, filename)
         except ClientError as e:
             logger.error(f"Error uploading file to R2: {str(e)}")
-            raise HTTPException(status_code=400, detail=str(e)) from e
+            raise Exception(str(e)) from e
 
     def delete_file_r2(self, bucket: str, filename: str) -> bool:
         client = _get_r2_client()
@@ -209,12 +202,11 @@ class MediaStorageService:
             return True
         except ClientError as e:
             logger.error(f"Error deleting from R2: {str(e)}")
-            raise HTTPException(status_code=400, detail=str(e)) from e
+            raise Exception(str(e)) from e
 
     def get_public_url_r2(self, bucket: str, filename: str) -> str:
         if not getattr(settings, "CLOUDFLARE_R2_PUBLIC_URL", None):
-            raise HTTPException(
-                status_code=503, detail="CLOUDFLARE_R2_PUBLIC_URL is not configured")
+            raise Exception("CLOUDFLARE_R2_PUBLIC_URL is not configured")
         return f"{settings.CLOUDFLARE_R2_PUBLIC_URL}/{filename}"
 
     # ------------------------------------------------------------------

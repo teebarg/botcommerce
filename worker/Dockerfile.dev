@@ -4,10 +4,14 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
 
 # Mount cache for faster rebuilds
-COPY pyproject.toml uv.lock ./
+COPY worker/pyproject.toml worker/uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-install-project
+
+COPY core/ /app/core/
+COPY worker/ /app/
 
 CMD ["sh", "-c", "uv run python app/health_server.py & uv run watchfiles 'arq app.task.WorkerSettings'"]

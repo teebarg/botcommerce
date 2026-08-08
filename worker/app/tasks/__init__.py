@@ -1,3 +1,4 @@
+from app.tasks.product_images import optimize_product_image
 from app.tasks.orders import order_created, process_referral, generate_and_send_invoice
 from app.tasks.user_register import user_register
 from app.tasks.products import update_product_embeddings
@@ -7,5 +8,6 @@ all_ecommerce_tasks = [
     update_product_embeddings,
     user_register,
     process_referral,
-    order_created
+    order_created,
+    optimize_product_image
 ]

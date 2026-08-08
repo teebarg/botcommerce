@@ -268,8 +268,8 @@ async def upload_product_images(
                 "optimize_product_image",
                 image_id=record.id,
                 image_url=image_url,
-                bucket=settings.STORAGE_BUCKET,
-                provider=settings.DEFAULT_STORAGE_PROVIDER,
+                content_type=upload.content_type,
+                storage_key=unique_filename,
             )
 
         await srv.invalidate(id=product_id)

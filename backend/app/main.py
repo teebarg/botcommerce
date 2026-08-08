@@ -37,7 +37,8 @@ async def lifespan(app: FastAPI):
     logger.debug("🚀starting servers......:")
     await prisma.connect()
 
-    app.state.redis = redis.from_url(settings.REDIS_URL, decode_responses=True, max_connections=10)
+    app.state.redis = redis.from_url(
+        settings.REDIS_URL, decode_responses=True, max_connections=10)
     app.state.l1_cache = L1Cache(max_size=5000, ttl=60.0)
 
     init_notification_service(redis=app.state.redis, db=prisma)
@@ -65,7 +66,9 @@ async def lifespan(app: FastAPI):
 if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
     sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
 
-app = FastAPI(title="Botcommerce", redirect_slashes=False, openapi_url="/api/openapi.json", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="Botcommerce", redirect_slashes=False,
+              openapi_url="/api/openapi.json", version="0.1.0", lifespan=lifespan)
+
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -130,8 +133,10 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 async def root():
     return {"message": "This is root"}
 
+
 class PurgeCdn(BaseModel):
     key: str
+
 
 @app.post("/api/test-arq")
 async def test_arq(queue: ArqDep) -> Dict[str, Any]:
@@ -139,12 +144,21 @@ async def test_arq(queue: ArqDep) -> Dict[str, Any]:
     #     "user_register",
     #     user_id=1,
     # )
+    await queue.enqueue_job(
+        "optimize_product_image",
+        image_id=706,
+        image_url="https://qiwsrjlaverrjwfqqsvg.supabase.co/storage/v1/object/public/images-dev/products/968ed280.jpg?",
+        storage_key="products/968ed280.jpg",
+        content_type="image/jpeg",
+    )
     return {"message": "ok"}
+
 
 @app.post("/api/purge-cdn")
 async def purge_cdn(cdn_srv: CdnDep, data: PurgeCdn) -> Dict[str, Any]:
     await cdn_srv.purge_cloudfare(data.key)
     return {"message": "ok"}
+
 
 @app.head("/api/health")
 @app.get("/api/health")
@@ -236,6 +250,7 @@ async def bulk_purchase(background_tasks: BackgroundTasks, settings_srv: Setting
     background_tasks.add_task(send_email_task)
     return {"message": "Bulk purchase inquiry submitted successfully"}
 
+
 class ErrorPayload(BaseModel):
     message: str
     source: str | None = None
@@ -256,6 +271,7 @@ async def log_error(payload: ErrorPayload, request: Request, background_tasks: B
         f"*Scenario:* {payload.scenario or 'N/A'}\n"
         f"*Client:* {client_ip} ({user_agent})\n"
     )
+
     async def send_slack_task():
         logger.critical(slack_message)
     background_tasks.add_task(send_slack_task)
@@ -281,18 +297,21 @@ async def generate_sitemap(request: Request, db: DbDep):
         'SELECT slug FROM "collections"'
     )
 
-    urlset = Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
+    urlset = Element(
+        "urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
 
     home = SubElement(urlset, "url")
     SubElement(home, "loc").text = f"{base_url}/"
 
     for collection in collections:
         url = SubElement(urlset, "url")
-        SubElement(url, "loc").text = f"{base_url}/collections/{collection['slug']}"
+        SubElement(
+            url, "loc").text = f"{base_url}/collections/{collection['slug']}"
 
     for category in categories:
         url = SubElement(urlset, "url")
-        SubElement(url, "loc").text = f"{base_url}/collections?cat_ids={category['slug']}"
+        SubElement(
+            url, "loc").text = f"{base_url}/collections?cat_ids={category['slug']}"
 
     for product in products:
         url = SubElement(urlset, "url")

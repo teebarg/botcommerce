@@ -1,24 +1,4 @@
 from pydantic import BaseModel
-from app.lib.validation import PhoneNumber
-
-class ContactFormCreate(BaseModel):
-    name: str
-    email: str
-    phone: PhoneNumber = None
-    message: str = "bearer"
-
-
-class BulkPurchaseCreate(BaseModel):
-    name: str
-    email: str
-    phone: str
-    bulkType: str
-    quantity: str | None = None
-    message: str | None = None
-
-
-class NewsletterCreate(BaseModel):
-    email: str
 
 
 class UploadStatus(BaseModel):
@@ -33,10 +13,6 @@ class TokenPayload(BaseModel):
 
 class Message(BaseModel):
     message: str
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
 
 
 class ImageUpload(BaseModel):

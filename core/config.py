@@ -20,10 +20,6 @@ class BaseAppSettings(BaseSettings):
     BROKER_URL: str = "redis://localhost:6379/0"
     INTERNAL_WORKER_SECRET: str = "secret"
 
-    # AI & Search
-    GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-2.5-flash"
-
     # Storage
     DEFAULT_STORAGE_PROVIDER: Literal["supabase", "r2"] = "supabase"
     STORAGE_BUCKET: str = "images-dev"
@@ -46,3 +42,6 @@ class BaseAppSettings(BaseSettings):
         env_ignore_empty=True,
         extra="ignore",
     )
+
+
+settings = BaseAppSettings()

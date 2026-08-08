@@ -34,10 +34,6 @@ class TokenPayload(BaseModel):
 class Message(BaseModel):
     message: str
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
-
 
 class ImageUpload(BaseModel):
     file: str  # Base64 encoded file
