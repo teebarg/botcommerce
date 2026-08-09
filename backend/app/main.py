@@ -144,13 +144,6 @@ async def test_arq(queue: ArqDep) -> Dict[str, Any]:
     #     "user_register",
     #     user_id=1,
     # )
-    await queue.enqueue_job(
-        "optimize_product_image",
-        image_id=706,
-        image_url="https://qiwsrjlaverrjwfqqsvg.supabase.co/storage/v1/object/public/images-dev/products/968ed280.jpg?",
-        storage_key="products/968ed280.jpg",
-        content_type="image/jpeg",
-    )
     return {"message": "ok"}
 
 
