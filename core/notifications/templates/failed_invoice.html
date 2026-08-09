@@ -1,0 +1,28 @@
+{% extends "partials/layout.html" %}
+
+{% block content %}
+<tr>
+    <td style="padding: 40px 30px; background-color: #ffffff;" class="mobile-padding">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+                <td
+                    style="color: #333333; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 16px; line-height: 1.6; padding-bottom: 30px;">
+                    <p>Dear {{user.first_name}},</p>
+                    <p style="margin-top: 0px;">We regret to inform you that your order could not be processed
+                        successfully.</p>
+                    <p style="margin-top: 0px;">Please try again or contact our support team for assistance.</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    {% include "partials/order-details.html" %}
+                    {% include "partials/order-extra.html" %}
+                </td>
+            </tr>
+
+            {% include 'partials/cta_button.html' %}
+        </table>
+    </td>
+</tr>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% include "partials/header.html" %}
+<tr>
+    <td style="padding: 20px">
+        <table>
+            <tr>
+                <td>
+                    <h2 style="margin: 0; color: #1e293b; font-size: 18px; font-weight: 600">Hello {{first_name}},</h2>
+
+                    <p style="margin: 0 0 10px 0; color: #475569; font-size: 16px; line-height: 1.6">
+                        You requested a secure login link for your {{project_name}} account. Click the button below to sign in immediately — no password
+                        needed!
+                    </p>
+
+                    <p style="margin: 0 0 20px 0; color: #475569; font-size: 16px; line-height: 1.6">
+                        This link will expire in <strong>10 minutes</strong> and can only be used once.
+                    </p>
+
+                    <!-- Magic Link Button -->
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 30px 0">
+                        <tr>
+                            <td align="center">
+                                <table cellpadding="0" cellspacing="0" border="0">
+                                    <tr>
+                                        <td style="background-color: #4a6cf7; border-radius: 8px; padding: 2px">
+                                            <a
+                                                href="{{magic_link}}"
+                                                target="_blank"
+                                                style="
+                                                    display: inline-block;
+                                                    min-width: 160px;
+                                                    font-family: Arial, sans-serif;
+                                                    font-size: 16px;
+                                                    font-weight: 600;
+                                                    color: #ffffff;
+                                                    text-align: center;
+                                                    text-decoration: none;
+                                                    background-color: #4a6cf7;
+                                                    border-radius: 6px;
+                                                    padding: 12px 30px;
+                                                    border: 2px solid #4a6cf7;
+                                                "
+                                                >Sign In Securely</a
+                                            >
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Alternative Link -->
+                    <p style="margin: 30px 0 15px 0; color: #475569; font-size: 15px; line-height: 1.6">
+                        If the button doesn't work, copy and paste this link into your browser:
+                    </p>
+
+                    <p
+                        style="
+                            margin: 0 0 30px 0;
+                            padding: 12px 15px;
+                            background-color: #f1f5f9;
+                            border-radius: 6px;
+                            word-break: break-all;
+                            font-size: 14px;
+                            color: #6b7280;
+                            line-height: 1.4;
+                            font-family: monospace;
+                        "
+                    >
+                        {{magic_link}}
+                    </p>
+
+                    <p style="margin: 0 0 10px 0; color: #475569; font-size: 16px; line-height: 1.6">
+                        Not expecting this email? You can safely ignore it. Someone may have entered your email address by mistake.
+                    </p>
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+{% include "partials/footer.html" %}
