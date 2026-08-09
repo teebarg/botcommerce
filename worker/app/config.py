@@ -1,4 +1,3 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from core.config import BaseAppSettings
 
 class Settings(BaseAppSettings):
@@ -15,4 +14,3 @@ class Settings(BaseAppSettings):
     SLACK_WEBHOOK_URL: str = ""
 
 settings = Settings()
-print("🚀 ~ settings:", settings)

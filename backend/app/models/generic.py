@@ -26,10 +26,6 @@ class UploadStatus(BaseModel):
     processed_rows: int
     status: str
 
-# Contents of JWT token
-class TokenPayload(BaseModel):
-    sub: str | None = None
-
 
 class Message(BaseModel):
     message: str

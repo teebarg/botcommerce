@@ -1,14 +1,9 @@
 from pydantic import BaseModel
 
-
 class UploadStatus(BaseModel):
     total_rows: int
     processed_rows: int
     status: str
-
-# Contents of JWT token
-class TokenPayload(BaseModel):
-    sub: str | None = None
 
 
 class Message(BaseModel):

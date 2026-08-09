@@ -154,7 +154,7 @@ build-worker:
 		-f worker/Dockerfile \
 		-t $(WORKER_IMAGE):latest \
 		-t $(WORKER_IMAGE):$(IMAGE_TAG) \
-		./worker
+		.
 
 # Push Operations
 push-all: push-api push-agent push-worker
