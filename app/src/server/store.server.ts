@@ -10,7 +10,7 @@ export const getCollectionFn = createServerFn()
 
         setResponseHeaders(
             new Headers({
-                "Cache-Control": "no-store",
+                "Cache-Control": "private, no-cache, no-store, max-age=0", 
                 "Vercel-CDN-Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
                 "Vercel-Cache-Tag": `collection:${data}`,
             }),

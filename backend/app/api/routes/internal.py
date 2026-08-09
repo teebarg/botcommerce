@@ -150,30 +150,14 @@ async def internal_user_signup(
 
     return {"status": "ok", "referral_code": code}
 
-class SwapImageRequest(BaseModel):
-    image_id: int
-    image: str
- 
-@router.patch("/product-images/{image_id}", dependencies=[Depends(verify_internal_signature)],)
-async def swap_product_image_url(
-    db: DbDep,
-    srv: ProductDep,
-    image_id: int,
-    payload: SwapImageRequest,
+class TagsRequest(BaseModel):
+    tags: list[str]
+
+@router.post("/invalidate", dependencies=[Depends(verify_internal_signature)],)
+async def invalidate_tags(
+    srv: CacheDep,
+    payload: TagsRequest,
 ): 
-    if payload.image_id != image_id:
-        raise HTTPException(status_code=400, detail="image_id mismatch")
+    await srv.invalidate(tags=payload.tags)
  
-    existing = await db.productimage.find_unique(where={"id": image_id})
-    if not existing:
-        raise HTTPException(status_code=404, detail="ProductImage not found")
- 
-    updated = await db.productimage.update(
-        where={"id": image_id},
-        data={"image": payload.image},
-    )
- 
-    if existing.product_id:
-        await srv.invalidate(id=existing.product_id)
- 
-    return {"id": updated.id, "image": updated.image}
+    return {"status": "ok"}

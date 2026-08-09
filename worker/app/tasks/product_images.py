@@ -5,12 +5,15 @@ import httpx
 from PIL import Image, ImageOps
 from core.logging import get_logger
 from core.storage import MediaStorageService
+from core.repositories.product_image import ProductImageRepository
+from core.cache.service import CacheInvalidationService
 from app.security import call_internal_backend
+from app.db import session_factory
 
 logger = get_logger(__name__)
 
 MAX_DIMENSION = 2000
-WEBP_QUALITY = 82
+WEBP_QUALITY = 85
 
 storage = MediaStorageService()
 
@@ -80,12 +83,22 @@ async def optimize_product_image(
         content_type=final_content_type,
     )
 
-    # Tell the backend to swap ProductImage.image to the new URL
+    async with session_factory() as session:
+        repo = ProductImageRepository(session)
+        await repo.update(
+            image_id,
+            data={"image": new_image_url},
+        )
+        await session.commit()
+
+    cdn = CacheInvalidationService()
+    await cdn.purge_vercel("products")
+    # cdn.purge_cloudflare()
+
     await call_internal_backend(
-        path=f"/internal/product-images/{image_id}",
-        label=f"Image optimization",
-        json_body={"image_id": image_id, "image": new_image_url},
-        method="PATCH"
+        path=f"/internal/invalidate",
+        label="Invalidate",
+        json_body={"tags": ["products", "catalog", "gallery"]},
     )
 
     # Now that the swap is confirmed, delete the original raw file.

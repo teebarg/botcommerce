@@ -13,6 +13,7 @@ dependencies = [
     "cloudinary==1.44.1",
     "boto3>=1.43.67",
     "supabase>=2.31.0",
+    "sqlalchemy>=2.0.51",
 ]
 
 [build-system]

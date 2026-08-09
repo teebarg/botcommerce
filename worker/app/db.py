@@ -1,4 +1,6 @@
 import asyncpg
+from core.db.engine import create_engine
+from core.db.session import create_session_factory
 from app.config import settings
 
 class Database:
@@ -24,3 +26,6 @@ class Database:
         return self.pool
 
 db = Database()
+
+engine = create_engine(settings.DATABASE_URL)
+session_factory = create_session_factory(engine)
