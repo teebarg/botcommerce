@@ -11,7 +11,7 @@ from botocore.exceptions import ClientError
 from supabase import create_client, Client
 from core.config import settings
 from core.logging import get_logger
-from core.models.generic import ImageUpload
+from core.db.models.generic import ImageUpload
 from core.logging import logger
 
 logger = get_logger(__name__)

@@ -1,3 +1,4 @@
+from app.tasks.test import test_email
 from app.tasks.product_images import optimize_product_image
 from app.tasks.orders import order_created, process_referral, generate_and_send_invoice
 from app.tasks.user_register import user_register
@@ -9,5 +10,6 @@ all_ecommerce_tasks = [
     user_register,
     process_referral,
     order_created,
-    optimize_product_image
+    optimize_product_image,
+    test_email
 ]

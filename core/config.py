@@ -36,6 +36,20 @@ class BaseAppSettings(BaseSettings):
     CLOUDFLARE_R2_SECRET_ACCESS_KEY: str = ""
     CLOUDFLARE_R2_PUBLIC_URL: str = ""
 
+    # Notification
+    SMTP_TLS: bool = True
+    SMTP_SSL: bool = False
+    SMTP_PORT: int = 587
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_USER: str = "your-email@gmail.com"
+    SMTP_PASSWORD: str = "your-password"
+
+    EMAILS_FROM_EMAIL: str | None = None
+    EMAILS_FROM_NAME: str | None = None
+    EMAILS_ENABLED: bool = False
+
+    SLACK_WEBHOOK_URL: str = ""
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

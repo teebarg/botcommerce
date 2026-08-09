@@ -3,7 +3,7 @@ from typing import Any
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.models.product_image import ProductImage
+from core.db.models.product_image import ProductImage
 
 
 class ProductImageRepository:
