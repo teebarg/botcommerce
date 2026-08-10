@@ -12,7 +12,8 @@ from core.notifications.service import (
 
 from core.notifications.events import (
     OrderCreated,
-    TestCreated
+    TestCreated,
+    Welcome
 )
 
 __all__ = [
@@ -23,5 +24,6 @@ __all__ = [
     "WhatsAppMessage",
     "NotificationService",
     "OrderCreated",
-    "TestCreated"
+    "TestCreated",
+    "Welcome"
 ]

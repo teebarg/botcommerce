@@ -157,7 +157,7 @@ class TagsRequest(BaseModel):
 async def invalidate_tags(
     srv: CacheDep,
     payload: TagsRequest,
-): 
+):
     await srv.invalidate(tags=payload.tags)
- 
+
     return {"status": "ok"}
