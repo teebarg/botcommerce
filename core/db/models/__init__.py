@@ -1,5 +1,5 @@
 # from core.db.models.order_model import Order
-from core.db.models import (
+from core.db.models.base import (
     Base,
     Address,
     Brand,

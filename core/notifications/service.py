@@ -15,6 +15,7 @@ from core.notifications.channels import (
     WhatsAppChannel,
 )
 from core.logging import get_logger
+from core.config import settings
 
 
 logger = get_logger(__name__)
@@ -27,10 +28,12 @@ class NotificationService:
         email: EmailChannel,
         slack: SlackChannel,
         # whatsapp: Optional[WhatsAppChannel],
+        shop_settings: dict[str, str],
     ):
         self.email = email
         self.slack = slack
         # self.whatsapp = whatsapp
+        self.shop_settings = shop_settings
 
     async def send(
         self,
@@ -42,11 +45,17 @@ class NotificationService:
         for channel in channels:
             match channel:
                 case Channel.EMAIL:
-                    tasks.append(
-                        self.email.send(
-                            notification.to_email()
+                    mail = notification.to_email()
+
+                    if mail:
+                        mail.data = {
+                            "shop": self.shop_settings,
+                            **mail.data,
+                        }
+
+                        tasks.append(
+                            self.email.send(mail)
                         )
-                    )
 
                 case Channel.SLACK:
                     tasks.append(

@@ -9,7 +9,7 @@ from core.notifications.service import NotificationService
 from core.config import settings
 
 
-def create_notification_service() -> NotificationService:
+def create_notification_service(shop_settings) -> NotificationService:
     template_dir = (
         Path(__file__).resolve().parent / "templates"
     )
@@ -31,4 +31,5 @@ def create_notification_service() -> NotificationService:
         #     phone_number_id=settings.WHATSAPP_PHONE_NUMBER_ID,
         #     api_version=settings.WHATSAPP_API_VERSION,
         # ),
+        shop_settings=shop_settings
     )

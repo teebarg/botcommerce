@@ -1,7 +1,11 @@
+from core.notifications.filters import normalize_image
+from core.notifications.filters import format_naira
+from core.notifications.filters import format_date
 from pathlib import Path
 
 import aiosmtplib
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from core.notifications.filters import discount
 from email.message import EmailMessage
 from core.notifications.base import Mail
 from core.logging import get_logger
@@ -32,6 +36,13 @@ class EmailChannel:
             loader=FileSystemLoader(str(template_dir)),
             autoescape=select_autoescape(["html", "xml"]),
         )
+
+        self.templates.filters.update({
+            "date": format_date,
+            "discount": discount,
+            "naira": format_naira,
+            "image": normalize_image,
+        })
 
     async def send(self, mail: Mail) -> None:
         template = self.templates.get_template(mail.template)

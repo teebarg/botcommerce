@@ -9,6 +9,7 @@ from sqlalchemy import (
     BigInteger,
     Boolean,
     DateTime,
+    Enum,
     Enum as SAEnum,
     Float,
     ForeignKey,
@@ -24,6 +25,10 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
+from core.db.models.enums import ShopSettingsType
+
+
 
 
 # ============================================================
@@ -266,8 +271,23 @@ shared_collection_products = Table(
 )
 
 
-coupon_allowed_users = Table(
-    "CouponAllowedUser",
+# coupon_allowed_users = Table(
+#     "CouponAllowedUser",
+#     Base.metadata,
+#     Column(
+#         "A",
+#         ForeignKey("coupons.id", ondelete="CASCADE"),
+#         primary_key=True,
+#     ),
+#     Column(
+#         "B",
+#         ForeignKey("users.id", ondelete="CASCADE"),
+#         primary_key=True,
+#     ),
+# )
+
+coupon_allowed_user = Table(
+    "_CouponAllowedUser",
     Base.metadata,
     Column(
         "A",
@@ -280,6 +300,48 @@ coupon_allowed_users = Table(
         primary_key=True,
     ),
 )
+
+
+class ShopSettings(Base):
+    __tablename__ = "shop_settings"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True,
+        autoincrement=True,
+    )
+
+    key: Mapped[str] = mapped_column(
+        String(255),
+        unique=True,
+        nullable=False,
+    )
+
+    value: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    type: Mapped[ShopSettingsType] = mapped_column(
+        Enum(
+            ShopSettingsType,
+            name="ShopSettingsType",
+        ),
+        nullable=False,
+        default=ShopSettingsType.FEATURE,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        server_default=func.now(),
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
 
 
 # ============================================================
@@ -317,16 +379,40 @@ class User(Base):
     first_name: Mapped[str | None] = mapped_column(String)
     last_name: Mapped[str | None] = mapped_column(String)
 
+    # status: Mapped[Status] = mapped_column(
+    #     status_enum,
+    #     nullable=False,
+    #     server_default=text("'pending'"),
+    # )
+
     status: Mapped[Status] = mapped_column(
-        status_enum,
+        SAEnum(
+            Status,
+            name="statuses",
+            values_callable=lambda enum_cls: [
+                member.value for member in enum_cls
+            ],
+        ),
+        default=Status.PENDING,
         nullable=False,
-        server_default=text("'pending'"),
     )
 
+    # role: Mapped[Role] = mapped_column(
+    #     role_enum,
+    #     nullable=False,
+    #     server_default=text("'customer'"),
+    # )
+
     role: Mapped[Role] = mapped_column(
-        role_enum,
+        SAEnum(
+            Role,
+            name="roles",
+            values_callable=lambda enum_cls: [
+                member.value for member in enum_cls
+            ],
+        ),
+        default=Role.CUSTOMER,
         nullable=False,
-        server_default=text("'customer'"),
     )
 
     image: Mapped[str | None] = mapped_column(String)
@@ -352,14 +438,17 @@ class User(Base):
         server_default="0",
     )
 
-    created_at: Mapped[datetime | None] = mapped_column(
+    created_at: Mapped[datetime] = mapped_column(
         DateTime,
-        server_default=func.now(),
+        default=datetime.utcnow,
+        nullable=False,
     )
 
-    updated_at: Mapped[datetime | None] = mapped_column(
+    updated_at: Mapped[datetime] = mapped_column(
         DateTime,
-        onupdate=func.now(),
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
     )
 
     orders: Mapped[list["Order"]] = relationship(
@@ -384,8 +473,14 @@ class User(Base):
         back_populates="user",
     )
 
-    coupons: Mapped[list["Coupon"]] = relationship(
-        secondary=coupon_allowed_users,
+    # coupons: Mapped[list["Coupon"]] = relationship(
+    #     secondary=coupon_allowed_users,
+    #     back_populates="users",
+    # )
+
+    allowed_coupons = relationship(
+        "Coupon",
+        secondary=coupon_allowed_user,
         back_populates="users",
     )
 
@@ -1462,6 +1557,22 @@ class Payment(Base):
 # ============================================================
 
 
+# coupon_allowed_user = Table(
+#     "_CouponAllowedUser",
+#     Base.metadata,
+#     Column(
+#         "A",
+#         ForeignKey("coupons.id", ondelete="CASCADE"),
+#         primary_key=True,
+#     ),
+#     Column(
+#         "B",
+#         ForeignKey("users.id", ondelete="CASCADE"),
+#         primary_key=True,
+#     ),
+# )
+
+
 class Coupon(Base):
     __tablename__ = "coupons"
 
@@ -1534,10 +1645,17 @@ class Coupon(Base):
         nullable=False,
     )
 
+    # updated_at: Mapped[datetime] = mapped_column(
+    #     DateTime,
+    #     server_default=func.now(),
+    #     onupdate=func.now(),
+    #     nullable=False,
+    # )
+
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
-        server_default=func.now(),
-        onupdate=func.now(),
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
         nullable=False,
     )
 
@@ -1554,9 +1672,16 @@ class Coupon(Base):
         back_populates="coupon",
     )
 
-    users: Mapped[list["User"]] = relationship(
-        secondary=coupon_allowed_users,
-        back_populates="coupons",
+    # users: Mapped[list["User"]] = relationship(
+    #     secondary=coupon_allowed_users,
+    #     back_populates="coupons",
+    # )
+
+    # Coupon
+    users = relationship(
+        "User",
+        secondary=coupon_allowed_user,
+        back_populates="allowed_coupons",
     )
 
     __table_args__ = (

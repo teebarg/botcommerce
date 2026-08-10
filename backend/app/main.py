@@ -145,7 +145,8 @@ async def test_arq(queue: ArqDep) -> Dict[str, Any]:
     #     user_id=1,
     # )
     await queue.enqueue_job(
-        "test_email",
+        "test_welcome",
+        id=1
     )
     return {"message": "ok"}
 

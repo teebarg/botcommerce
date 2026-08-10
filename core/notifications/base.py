@@ -12,7 +12,7 @@ class Channel(StrEnum):
     WHATSAPP = "whatsapp"
 
 
-@dataclass(frozen=True)
+@dataclass
 class Mail:
     to: str
     subject: str
@@ -36,10 +36,8 @@ class Notification(ABC):
     def to_email(self) -> Mail:
         raise NotImplementedError
 
-    @abstractmethod
-    def to_slack(self) -> SlackMessage:
-        raise NotImplementedError
+    def to_slack(self) -> SlackMessage | None:
+        raise None
 
-    @abstractmethod
-    def to_whatsapp(self) -> WhatsAppMessage:
-        raise NotImplementedError
+    def to_whatsapp(self) -> WhatsAppMessage | None:
+        raise None

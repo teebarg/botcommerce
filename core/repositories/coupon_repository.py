@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.db.models import Coupon, User
+from core.db.models.base import Coupon, User
 
 
 class CouponRepository:
