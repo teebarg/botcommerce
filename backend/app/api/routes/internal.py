@@ -21,6 +21,7 @@ logger = get_logger(__name__)
 
 router = APIRouter()
 
+
 @router.post(
     "/orders/{order_number}/generate-invoice",
     include_in_schema=False,
@@ -38,7 +39,8 @@ async def internal_generate_invoice(order_number: str, order_srv: OrderDep, forc
         await order_srv.create_invoice(order.id, force=force)
         order = await order_srv.db.order.find_unique(
             where={"order_number": order_number},
-            include={"order_items": {"include": {"variant": True}}, "user": True},
+            include={"order_items": {"include": {
+                "variant": True}}, "user": True},
         )
 
     await order_srv.send_payment_receipt(order=order)
@@ -84,6 +86,7 @@ async def internal_order_creation(order_id: int, db: DbDep, cache_srv: CacheDep,
     await order_srv.send_order_notification(id=order.id)
 
     return {"status": "ok", "invoice_url": order.invoice_url}
+
 
 @router.post(
     "/orders/{order_id}/process-referral",
@@ -152,6 +155,7 @@ async def internal_process_referral(order_id: int, srv: OrderDep):
 
 class TagsRequest(BaseModel):
     tags: list[str]
+
 
 @router.post("/invalidate", dependencies=[Depends(verify_internal_signature)],)
 async def invalidate_tags(
