@@ -1,3 +1,4 @@
+from email.utils import formataddr
 from pathlib import Path
 
 from core.notifications.channels import (
@@ -20,8 +21,9 @@ def create_notification_service(shop_settings) -> NotificationService:
             port=settings.SMTP_PORT,
             username=settings.SMTP_USER,
             password=settings.SMTP_PASSWORD,
-            sender=settings.EMAILS_FROM_EMAIL,
+            sender=formataddr((settings.EMAILS_FROM_NAME, settings.EMAILS_FROM_EMAIL)),
             template_dir=template_dir,
+            start_tls=settings.SMTP_TLS
         ),
         slack=SlackChannel(
             webhook_url=settings.SLACK_WEBHOOK_URL,

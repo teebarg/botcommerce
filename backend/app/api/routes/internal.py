@@ -98,57 +98,57 @@ async def internal_process_referral(order_id: int, srv: OrderDep):
     return {"status": "ok", "order_id": order_id}
 
 
-@router.post(
-    "/user/{user_id}/welcome",
-    include_in_schema=False,
-    dependencies=[Depends(verify_internal_signature)],
-)
-async def internal_user_signup(
-    user_id: int,
-    db: DbDep,
-    cache_srv: CacheDep,
-    setting_srv: SettingsDep,
-):
-    user = await db.user.find_unique(where={"id": user_id})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+# @router.post(
+#     "/user/{user_id}/welcome",
+#     include_in_schema=False,
+#     dependencies=[Depends(verify_internal_signature)],
+# )
+# async def internal_user_signup(
+#     user_id: int,
+#     db: DbDep,
+#     cache_srv: CacheDep,
+#     setting_srv: SettingsDep,
+# ):
+#     user = await db.user.find_unique(where={"id": user_id})
+#     if not user:
+#         raise HTTPException(status_code=404, detail="User not found")
 
-    if user.referral_code:
-        logger.debug(f"User {user_id} already has referral code, skipping welcome pipeline")
-        return {"status": "already_processed", "referral_code": user.referral_code}
+#     if user.referral_code:
+#         logger.debug(f"User {user_id} already has referral code, skipping welcome pipeline")
+#         return {"status": "already_processed", "referral_code": user.referral_code}
 
-    code: str = f"{user.first_name[:4]}{uuid.uuid4().hex[:4]}".upper()
-    coupon = await db.coupon.create(
-        data={
-            "code": code,
-            "discount_type": "PERCENTAGE",
-            "discount_value": 10,
-            "min_cart_value": 5000,
-            "max_uses": 1000,
-            "valid_from": datetime.now(),
-            "valid_until": datetime.now() + timedelta(weeks=500),
-            "users": {"connect": [{"id": user_id}]},
-        }
-    )
+#     code: str = f"{user.first_name[:4]}{uuid.uuid4().hex[:4]}".upper()
+#     coupon = await db.coupon.create(
+#         data={
+#             "code": code,
+#             "discount_type": "PERCENTAGE",
+#             "discount_value": 10,
+#             "min_cart_value": 5000,
+#             "max_uses": 1000,
+#             "valid_from": datetime.now(),
+#             "valid_until": datetime.now() + timedelta(weeks=500),
+#             "users": {"connect": [{"id": user_id}]},
+#         }
+#     )
 
-    await db.user.update(where={"id": user_id}, data={"referral_code": code})
+#     await db.user.update(where={"id": user_id}, data={"referral_code": code})
 
-    welcome_email = await generate_welcome_email(
-        email_to=user.email,
-        first_name=user.first_name,
-        coupon=coupon,
-        service=setting_srv,
-    )
-    notification_srv = get_notification_service()
-    await notification_srv.send(
-        channel_name="email",
-        recipient=user.email,
-        subject=welcome_email.subject,
-        message=welcome_email.html_content,
-    )
-    await cache_srv.invalidate(tags=["coupons", "users"])
+#     welcome_email = await generate_welcome_email(
+#         email_to=user.email,
+#         first_name=user.first_name,
+#         coupon=coupon,
+#         service=setting_srv,
+#     )
+#     notification_srv = get_notification_service()
+#     await notification_srv.send(
+#         channel_name="email",
+#         recipient=user.email,
+#         subject=welcome_email.subject,
+#         message=welcome_email.html_content,
+#     )
+#     await cache_srv.invalidate(tags=["coupons", "users"])
 
-    return {"status": "ok", "referral_code": code}
+#     return {"status": "ok", "referral_code": code}
 
 class TagsRequest(BaseModel):
     tags: list[str]

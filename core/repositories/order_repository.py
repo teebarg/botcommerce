@@ -8,7 +8,7 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from core.db.models.order_model import Order
+from core.db.models.base import Order, OrderItem
 
 
 class OrderRepository:
@@ -30,7 +30,8 @@ class OrderRepository:
 
         if include_items:
             stmt = stmt.options(
-                selectinload(Order.order_items),
+                selectinload(Order.order_items)
+                .selectinload(OrderItem.variant)
             )
 
         if include_user:
@@ -56,10 +57,65 @@ class OrderRepository:
         self,
         order_number: str,
         *,
+        include: dict | None = None,
+    ) -> Order | None:
+        stmt = select(Order).where(
+            Order.order_number == order_number
+        )
+
+        include = include or {}
+
+        if include.get("order_items"):
+            items_loader = selectinload(Order.order_items)
+
+            if isinstance(include["order_items"], dict):
+                nested = include["order_items"].get("include", {})
+
+                if nested.get("variant"):
+                    items_loader = items_loader.selectinload(
+                        OrderItem.variant
+                    )
+
+            stmt = stmt.options(items_loader)
+
+        if include.get("user"):
+            stmt = stmt.options(
+                selectinload(Order.user)
+            )
+
+        if include.get("payment"):
+            stmt = stmt.options(
+                selectinload(Order.payment)
+            )
+
+        if include.get("order_timeline"):
+            stmt = stmt.options(
+                selectinload(Order.order_timeline)
+            )
+
+        if include.get("shipping_address"):
+            stmt = stmt.options(
+                selectinload(Order.shipping_address)
+            )
+
+        if include.get("billing_address"):
+            stmt = stmt.options(
+                selectinload(Order.billing_address)
+            )
+
+        result = await self.session.execute(stmt)
+
+        return result.scalar_one_or_none()
+
+    async def get_by_order_number2(
+        self,
+        order_number: str,
+        *,
         include_items: bool = False,
         include_user: bool = False,
         include_payment: bool = False,
         include_timeline: bool = False,
+        include_address: bool = False,
     ) -> Order | None:
         stmt = select(Order).where(
             Order.order_number == order_number,
@@ -83,6 +139,11 @@ class OrderRepository:
         if include_timeline:
             stmt = stmt.options(
                 selectinload(Order.order_timeline),
+            )
+
+        if include_address:
+            stmt = stmt.options(
+                selectinload(Order.shipping_address),
             )
 
         result = await self.session.execute(stmt)

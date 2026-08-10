@@ -41,7 +41,7 @@ class EmailChannel:
             "date": format_date,
             "discount": discount,
             "naira": format_naira,
-            "image": normalize_image,
+            "normalize_image": normalize_image,
         })
 
     async def send(self, mail: Mail) -> None:
@@ -67,11 +67,14 @@ class EmailChannel:
             logger.debug("Skipping email send to guest.com address: %s", mail.to)
             return
 
-        await aiosmtplib.send(
-            message,
+        kwargs = dict(
             hostname=self.host,
             port=self.port,
-            username=self.username,
-            password=self.password,
             start_tls=self.start_tls,
         )
+
+        if self.username and self.password:
+            kwargs["username"] = self.username
+            kwargs["password"] = self.password
+
+        await aiosmtplib.send(message, **kwargs)

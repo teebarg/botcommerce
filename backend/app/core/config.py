@@ -61,8 +61,8 @@ class Settings(BaseSettings):
     SMTP_SSL: bool = False
     SMTP_PORT: int = 587
     SMTP_HOST: str = "smtp.gmail.com"
-    SMTP_USER: str = "your-email@gmail.com"
-    SMTP_PASSWORD: str = "your-password"
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
 
     EMAILS_FROM_EMAIL: EmailStr | None = None
     EMAILS_FROM_NAME: str | None = None

@@ -189,12 +189,6 @@ role_enum = SAEnum(
     native_enum=True,
 )
 
-status_enum = SAEnum(
-    Status,
-    name="statuses",
-    native_enum=True,
-)
-
 wallet_transaction_type_enum = SAEnum(
     WalletTransactionType,
     name="WalletTransactionType",
@@ -269,22 +263,6 @@ shared_collection_products = Table(
         primary_key=True,
     ),
 )
-
-
-# coupon_allowed_users = Table(
-#     "CouponAllowedUser",
-#     Base.metadata,
-#     Column(
-#         "A",
-#         ForeignKey("coupons.id", ondelete="CASCADE"),
-#         primary_key=True,
-#     ),
-#     Column(
-#         "B",
-#         ForeignKey("users.id", ondelete="CASCADE"),
-#         primary_key=True,
-#     ),
-# )
 
 coupon_allowed_user = Table(
     "_CouponAllowedUser",
@@ -379,12 +357,6 @@ class User(Base):
     first_name: Mapped[str | None] = mapped_column(String)
     last_name: Mapped[str | None] = mapped_column(String)
 
-    # status: Mapped[Status] = mapped_column(
-    #     status_enum,
-    #     nullable=False,
-    #     server_default=text("'pending'"),
-    # )
-
     status: Mapped[Status] = mapped_column(
         SAEnum(
             Status,
@@ -396,12 +368,6 @@ class User(Base):
         default=Status.PENDING,
         nullable=False,
     )
-
-    # role: Mapped[Role] = mapped_column(
-    #     role_enum,
-    #     nullable=False,
-    #     server_default=text("'customer'"),
-    # )
 
     role: Mapped[Role] = mapped_column(
         SAEnum(
@@ -472,11 +438,6 @@ class User(Base):
     carts: Mapped[list["Cart"]] = relationship(
         back_populates="user",
     )
-
-    # coupons: Mapped[list["Coupon"]] = relationship(
-    #     secondary=coupon_allowed_users,
-    #     back_populates="users",
-    # )
 
     allowed_coupons = relationship(
         "Coupon",
@@ -1294,6 +1255,7 @@ class Order(Base):
     )
 
     user: Mapped["User"] = relationship(
+        "User",
         back_populates="orders",
     )
 
@@ -1557,22 +1519,6 @@ class Payment(Base):
 # ============================================================
 
 
-# coupon_allowed_user = Table(
-#     "_CouponAllowedUser",
-#     Base.metadata,
-#     Column(
-#         "A",
-#         ForeignKey("coupons.id", ondelete="CASCADE"),
-#         primary_key=True,
-#     ),
-#     Column(
-#         "B",
-#         ForeignKey("users.id", ondelete="CASCADE"),
-#         primary_key=True,
-#     ),
-# )
-
-
 class Coupon(Base):
     __tablename__ = "coupons"
 
@@ -1671,11 +1617,6 @@ class Coupon(Base):
     carts: Mapped[list["Cart"]] = relationship(
         back_populates="coupon",
     )
-
-    # users: Mapped[list["User"]] = relationship(
-    #     secondary=coupon_allowed_users,
-    #     back_populates="coupons",
-    # )
 
     # Coupon
     users = relationship(

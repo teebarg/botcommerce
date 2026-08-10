@@ -12,7 +12,7 @@ def parse_cors(v: Any) -> list[str] | str:
 
 class BaseAppSettings(BaseSettings):
     """Shared settings used across both API and Worker services."""
-    
+
     # Environment & System
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
     DATABASE_URL: str = ""
@@ -41,12 +41,11 @@ class BaseAppSettings(BaseSettings):
     SMTP_SSL: bool = False
     SMTP_PORT: int = 587
     SMTP_HOST: str = "smtp.gmail.com"
-    SMTP_USER: str = "your-email@gmail.com"
-    SMTP_PASSWORD: str = "your-password"
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
 
     EMAILS_FROM_EMAIL: str | None = None
     EMAILS_FROM_NAME: str | None = None
-    EMAILS_ENABLED: bool = False
 
     SLACK_WEBHOOK_URL: str = ""
 

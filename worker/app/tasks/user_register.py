@@ -9,29 +9,17 @@ from app.db import session_factory
 
 logger = get_logger(__name__)
 
-
-async def user_register(ctx, user_id: int) -> dict:
-    """
-    arq job: delegates the welcome pipeline (coupon issuance + welcome email).
-    """
-    return await call_internal_backend(
-        path=f"/internal/user/{user_id}/welcome",
-        label=f"Welcome pipeline for user {user_id}",
-    )
-
-
 async def user_register(ctx, user_id: int):
     """
     arq job: delegates the welcome pipeline (coupon issuance + welcome email).
     """
     notification_srv = ctx["notification_srv"]
-
     async with session_factory() as session:
         user_repo = UserRepository(session)
-        user = await user_repo.get(id)
+        user = await user_repo.get(id=user_id)
 
         if not user:
-            logger.error("User not found: %s", id)
+            logger.error("User not found: %s", user_id)
             raise Exception("User not found")
 
         if user.referral_code:
@@ -71,6 +59,12 @@ async def user_register(ctx, user_id: int):
             coupon=coupon,
         ),
         channels=[Channel.EMAIL],
+    )
+
+    await call_internal_backend(
+        path=f"/internal/invalidate",
+        label="Invalidate",
+        json_body={"tags": ["coupons", "users"]},
     )
 
     return {
