@@ -5,11 +5,13 @@ from core.notifications.events.test_created import TestCreated
 from core.notifications.events.welcome import Welcome
 from core.notifications.events.payment_receipt import PaymentReceipt
 from core.notifications.events.referral_cashback import ReferralCashback
+from core.notifications.events.contact_form import ContactForm
 
 __all__ = [
     "OrderCreated",
     "TestCreated",
     "Welcome",
-    'PaymentReceipt'
-    'ReferralCashback'
+    'PaymentReceipt',
+    'ReferralCashback',
+    "ContactForm"
 ]

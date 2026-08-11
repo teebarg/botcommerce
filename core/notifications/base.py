@@ -18,6 +18,7 @@ class Mail:
     subject: str
     template: str
     data: dict[str, Any] = field(default_factory=dict)
+    cc: str | list[str] | None = None
 
 
 @dataclass(frozen=True)

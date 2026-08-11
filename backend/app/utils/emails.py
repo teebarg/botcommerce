@@ -10,8 +10,8 @@ from app.models.coupon import Coupon
 
 
 async def generate_invoice_email(
-    order: Order, 
-    user: User, 
+    order: Order,
+    user: User,
     service: ShopSettingsService
 ) -> EmailData:
     header_title = "Your order has been processed successfully"
@@ -24,13 +24,13 @@ async def generate_invoice_email(
         header_title = "Your order has been processed"
         description = "Your order has been processed"
         bank_details = await service.get_bank_details()
-        
+
     elif order.payment_status == "PENDING":
         header_title = "Your order is pending payment"
         template_name = "pending_invoice.html"
         description = "Your order is pending payment"
         bank_details = await service.get_bank_details()
-        
+
     elif order.payment_status == "FAILED":
         header_title = "Your order payment failed"
         template_name = "failed_invoice.html"
@@ -55,12 +55,12 @@ async def generate_invoice_email(
 
 
 async def generate_payment_receipt(
-    order: Order, 
-    user: User, 
+    order: Order,
+    user: User,
     service: ShopSettingsService
 ) -> EmailData:
     metadata_context = await merge_metadata(service, {"description": ""})
-    
+
     html_content = render_email_template(
         template_name="payment_receipt.html",
         context={
@@ -72,41 +72,17 @@ async def generate_payment_receipt(
     )
     return EmailData(html_content=html_content, subject="Payment Receipt")
 
-
-async def generate_contact_form_email(
-    name: str, 
-    email: str, 
-    phone: str, 
-    message: str, 
-    service: ShopSettingsService
-) -> EmailData:
-    metadata_context = await merge_metadata(service, {"description": "New Contact Email"})
-    
-    html_content = render_email_template(
-        template_name="contact_form.html",
-        context={
-            "name": name,
-            "email": email,
-            "phone": phone,
-            "message": message,
-            "current_year": datetime.now().year,
-            **metadata_context
-        },
-    )
-    return EmailData(html_content=html_content, subject="New Contact Email")
-
-
 async def generate_bulk_purchase_email(
-    name: str, 
-    email: str, 
-    phone: str, 
-    bulkType: str, 
+    name: str,
+    email: str,
+    phone: str,
+    bulkType: str,
     service: ShopSettingsService,
-    quantity: Optional[str] = None, 
+    quantity: Optional[str] = None,
     message: Optional[str] = None
 ) -> EmailData:
     metadata_context = await merge_metadata(service, {"description": "New Bulk Purchase Inquiry"})
-    
+
     html_content = render_email_template(
         template_name="bulk_purchase.html",
         context={
@@ -124,11 +100,11 @@ async def generate_bulk_purchase_email(
 
 
 async def generate_newsletter_email(
-    email: str, 
+    email: str,
     service: ShopSettingsService
 ) -> EmailData:
     metadata_context = await merge_metadata(service, {"description": "Welcome to our newsletter"})
-    
+
     html_content = render_email_template(
         template_name="newsletter.html",
         context={
@@ -142,9 +118,9 @@ async def generate_newsletter_email(
 
 
 async def generate_welcome_email(
-    email_to: str, 
-    first_name: str, 
-    coupon: Coupon, 
+    email_to: str,
+    first_name: str,
+    coupon: Coupon,
     service: ShopSettingsService
 ) -> EmailData:
     shop_name: Optional[str] = await service.get("shop_name")
@@ -168,13 +144,13 @@ async def generate_welcome_email(
 
 
 async def generate_abandoned_cart_email(
-    cart_data: dict, 
-    user_email: str, 
+    cart_data: dict,
+    user_email: str,
     service: ShopSettingsService,
     user_name: Optional[str] = None
 ) -> EmailData:
     metadata_context = await merge_metadata(service, {"description": "Complete your purchase"})
-    
+
     html_content = render_email_template(
         template_name="abandoned_cart.html",
         context={

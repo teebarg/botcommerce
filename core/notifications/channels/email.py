@@ -54,14 +54,15 @@ class EmailChannel:
         message["To"] = mail.to
         message["Subject"] = mail.subject
 
+        if mail.cc:
+            cc_list = mail.cc if isinstance(mail.cc, list) else [mail.cc]
+            message["Cc"] = ", ".join(cc_list)
+
         message.set_content(
             "This email requires an HTML-compatible email client."
         )
 
-        message.add_alternative(
-            html,
-            subtype="html",
-        )
+        message.add_alternative(html, subtype="html")
 
         if mail.to.lower().endswith("@guest.com"):
             logger.debug("Skipping email send to guest.com address: %s", mail.to)
@@ -77,4 +78,4 @@ class EmailChannel:
             kwargs["username"] = self.username
             kwargs["password"] = self.password
 
-        await aiosmtplib.send(message, **kwargs)
+        res = await aiosmtplib.send(message, **kwargs)

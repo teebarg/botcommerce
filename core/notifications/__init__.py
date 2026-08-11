@@ -15,7 +15,8 @@ from core.notifications.events import (
     TestCreated,
     Welcome,
     PaymentReceipt,
-    ReferralCashback
+    ReferralCashback,
+    ContactForm
 )
 
 __all__ = [
@@ -29,5 +30,6 @@ __all__ = [
     "TestCreated",
     "Welcome",
     "PaymentReceipt",
-    "ReferralCashback"
+    "ReferralCashback",
+    "ContactForm"
 ]

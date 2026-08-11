@@ -28,7 +28,7 @@ from app.core.dependencies.services import SettingsDep
 from app.services.cache import L1Cache, run_l1_invalidation_listener
 from app.lib.cache import add_cache_headers
 from app.core.dependencies.cache import ArqDep, CdnDep
-from app.utils.emails import generate_contact_form_email, generate_newsletter_email, generate_bulk_purchase_email
+from app.utils.emails import generate_newsletter_email, generate_bulk_purchase_email
 
 logger = get_logger(__name__)
 
@@ -172,24 +172,11 @@ async def health(db: DbDep, search_srv: SearchDep) -> Dict[str, Any]:
 
 
 @app.post("/api/contact-form")
-async def contact_form(background_tasks: BackgroundTasks, settings_srv: SettingsDep, notification_srv: Notification, data: ContactFormCreate):
-    async def send_email_task():
-        email_data = await generate_contact_form_email(
-            name=data.name, email=data.email, phone=data.phone or "", message=data.message, service=settings_srv
-        )
-
-        shop_email = await settings_srv.get("shop_email")
-        if not shop_email:
-            logger.error("Shop email not found")
-            return
-        await notification_srv.send(
-            channel_name="email",
-            recipient=shop_email,
-            subject=email_data.subject,
-            message=email_data.html_content,
-        )
-
-    background_tasks.add_task(send_email_task)
+async def contact_form(queue: ArqDep, data: ContactFormCreate):
+    await queue.enqueue_job(
+        "contact_form",
+        name=data.name, email=data.email, phone=data.phone or "", message=data.message
+    )
     return {"message": "Message sent successfully"}
 
 

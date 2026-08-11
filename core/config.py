@@ -20,6 +20,8 @@ class BaseAppSettings(BaseSettings):
     BROKER_URL: str = "redis://localhost:6379/0"
     INTERNAL_WORKER_SECRET: str = "secret"
 
+    CONTACT_EMAIL: str = "teebarg01@gmail.com"
+
     @property
     def is_production(self) -> bool:
         return self.ENVIRONMENT.lower() in ["prod", "production"]
@@ -42,7 +44,6 @@ class BaseAppSettings(BaseSettings):
 
     # Notification
     SMTP_TLS: bool = True
-    SMTP_SSL: bool = False
     SMTP_PORT: int = 587
     SMTP_HOST: str = "smtp.gmail.com"
     SMTP_USER: str = ""
