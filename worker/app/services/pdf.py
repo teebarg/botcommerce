@@ -1,14 +1,28 @@
 import os
+
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
+from core.logging import get_logger
+
+logger = get_logger(__name__)
+
+FONT_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "fonts")
+
+try:
+    pdfmetrics.registerFont(TTFont("DejaVuSans", os.path.join(FONT_DIR, "DejaVuSans.ttf")))
+    pdfmetrics.registerFont(TTFont("DejaVuSans-Bold", os.path.join(FONT_DIR, "DejaVuSans-Bold.ttf")))
+except Exception:
+    logger.error("Failed to load DejaVu fonts — invoice PDFs will fall back to Helvetica")
 
 def generate_pdf_invoice(order_data, output_filename):
     """
     Generates a beautifully structured PDF invoice for an API backend.
     """
-    # 1. Page Configuration & Margins
     doc = SimpleDocTemplate(
         output_filename,
         pagesize=letter,
@@ -16,7 +30,6 @@ def generate_pdf_invoice(order_data, output_filename):
         title=f"Invoice {order_data['invoice_no']}"
     )
 
-    # 2. Modern 2026 Brand Design Palette
     PRIMARY_COLOR = colors.HexColor("#1A1A24")  # Deep Charcoal
     ACCENT_COLOR = colors.HexColor("#2563EB")   # Electric Blue
     TEXT_DARK = colors.HexColor("#374151")      # Slate Gray
@@ -25,15 +38,14 @@ def generate_pdf_invoice(order_data, output_filename):
 
     styles = getSampleStyleSheet()
 
-    # 3. Clean Scannable Typography
-    style_logo = ParagraphStyle('Logo', parent=styles['Normal'], fontName='Helvetica-Bold', fontSize=24, leading=28, textColor=PRIMARY_COLOR)
-    style_inv_title = ParagraphStyle('InvTitle', parent=styles['Normal'], fontName='Helvetica-Bold', fontSize=20, leading=24, alignment=2, textColor=ACCENT_COLOR)
-    style_body = ParagraphStyle('Body', parent=styles['Normal'], fontName='Helvetica', fontSize=10, leading=14, textColor=TEXT_DARK)
-    style_th = ParagraphStyle('TH', parent=styles['Normal'], fontName='Helvetica-Bold', fontSize=10, leading=12, textColor=colors.white)
+    style_logo = ParagraphStyle('Logo', parent=styles['Normal'], fontName='DejaVuSans-Bold', fontSize=24, leading=28, textColor=PRIMARY_COLOR)
+    style_inv_title = ParagraphStyle('InvTitle', parent=styles['Normal'], fontName='DejaVuSans-Bold', fontSize=20, leading=24, alignment=2, textColor=ACCENT_COLOR)
+    style_body = ParagraphStyle('Body', parent=styles['Normal'], fontName='DejaVuSans', fontSize=10, leading=14, textColor=TEXT_DARK)
+    style_th = ParagraphStyle('TH', parent=styles['Normal'], fontName='DejaVuSans-Bold', fontSize=10, leading=12, textColor=colors.white)
     style_th_right = ParagraphStyle('THRight', parent=style_th, alignment=2)
-    style_td = ParagraphStyle('TD', parent=styles['Normal'], fontName='Helvetica', fontSize=10, leading=14, textColor=TEXT_DARK)
+    style_td = ParagraphStyle('TD', parent=styles['Normal'], fontName='DejaVuSans', fontSize=10, leading=14, textColor=TEXT_DARK)
     style_td_right = ParagraphStyle('TDRight', parent=style_td, alignment=2)
-    style_total_lbl = ParagraphStyle('TotalLbl', parent=styles['Normal'], fontName='Helvetica-Bold', fontSize=11, leading=14, alignment=2, textColor=PRIMARY_COLOR)
+    style_total_lbl = ParagraphStyle('TotalLbl', parent=styles['Normal'], fontName='DejaVuSans-Bold', fontSize=11, leading=14, alignment=2, textColor=PRIMARY_COLOR)
 
     story = []
 
@@ -101,45 +113,35 @@ def generate_pdf_invoice(order_data, output_filename):
     # --- TOTALS SUMMARY ---
     summary_data = [
         ["", Paragraph("Subtotal:", style_total_lbl), Paragraph(order_data['subtotal'], style_td_right)],
-        ["", Paragraph("Tax:", style_total_lbl), Paragraph(f"{order_data['tax']}", style_td_right)],
-        ["", Paragraph("Grand Total:", style_total_lbl), Paragraph(f"₦{order_data['total']}", style_td_right)]
     ]
+    if order_data.get('discount'):
+        summary_data.append(
+            ["", Paragraph("Discount:", style_total_lbl), Paragraph(f"- {order_data['discount']}", style_td_right)]
+        )
+    if order_data.get('shipping_fee'):
+        summary_data.append(
+            ["", Paragraph("Delivery Fee:", style_total_lbl), Paragraph(order_data['shipping_fee'], style_td_right)]
+        )
+    summary_data.append(
+        ["", Paragraph("Tax:", style_total_lbl), Paragraph(order_data['tax'], style_td_right)]
+    )
+    summary_data.append(
+        ["", Paragraph("Grand Total:", style_total_lbl), Paragraph(order_data['total'], style_td_right)]
+    )
+    total_row_index = len(summary_data) - 1  # Grand Total is always the last row
     summary_table = Table(summary_data, colWidths=[240, 200, 100])
     summary_table.setStyle(TableStyle([
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('TOPPADDING', (0,0), (-1,-1), 4),
         ('BOTTOMPADDING', (0,0), (-1,-1), 4),
-        ('LINEABOVE', (1,2), (2,2), 1.5, PRIMARY_COLOR),
+        ('LINEABOVE', (1, total_row_index), (2, total_row_index), 1.5, PRIMARY_COLOR),
     ]))
     story.append(summary_table)
     story.append(Spacer(1, 40))
 
-    # --- FOOTER ---
     footer_text = "Thank you for your patronage! If you have queries regarding this statement, please contact support.<br/><i>This is a system-generated invoice. No signature required.</i>"
     footer_table = Table([[Paragraph(footer_text, style_body)]], colWidths=[540])
     footer_table.setStyle(TableStyle([('ALIGN', (0,0), (-1,-1), 'CENTER')]))
     story.append(footer_table)
 
-    # Build Document PDF
     doc.build(story)
-
-# --- Example Payload from your E-commerce API DB Query ---
-sample_payload = {
-    "company_name": "SHOPCORE INC.",
-    "company_address": "ShopCore Fulfillment Ltd<br/>100 Tech Runway, Suite 400<br/>Austin, TX 78701",
-    "invoice_no": "INV-2026-89421",
-    "date": "August 10, 2026",
-    "order_id": "#ORD-99210",
-    "customer_name": "Jane Doe",
-    "customer_address": "452 Cypress Avenue<br/>Lagos, Nigeria",
-    "items": [
-        {"name": "Quantum Wireless Earbuds (Gen 3)", "qty": 1, "price": 129.99},
-        {"name": "Ultra-Thin MagSafe Power Bank 10k", "qty": 2, "price": 45.00},
-        {"name": "Braided USB-C Fast Charging Cable (2m)", "qty": 1, "price": 19.99}
-    ],
-    "subtotal": 239.98,
-    "tax": 18.00,
-    "total": 257.98
-}
-
-# generate_pdf_invoice(sample_payload, "invoice.pdf")

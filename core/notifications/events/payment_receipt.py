@@ -12,6 +12,7 @@ from core.notifications.base import (
 @dataclass(frozen=True)
 class PaymentReceipt(Notification):
     order: Any
+    first_name: str
     customer_email: str
 
     def to_email(self) -> Mail:
@@ -21,6 +22,9 @@ class PaymentReceipt(Notification):
             template="payment_receipt.html",
             data={
                 "order": self.order,
+                "first_name": self.first_name,
+                "header_title": "Order Invoice",
+                "cta_url": "/collections",
                 "current_year": datetime.now().year,
             },
         )

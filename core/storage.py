@@ -155,7 +155,8 @@ class MediaStorageService:
             raise Exception(str(e)) from e
 
     def _get_public_url_supabase(self, bucket: str, filename: str) -> str:
-        return supabase.storage.from_(bucket).get_public_url(filename, {"download": filename})
+        download_name = filename.rsplit("/", 1)[-1]
+        return supabase.storage.from_(bucket).get_public_url(filename, {"download": download_name})
 
     # ------------------------------------------------------------------
     # Cloudflare R2
