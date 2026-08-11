@@ -18,7 +18,6 @@ from app.core.notifications.events import SendInvoiceEvent, OrderConfirmedEvent
 from app.services.cache import CacheService
 from app.services.storage import MediaStorageService
 from app.models.order import Order, PaginatedOrders
-from app.utils.emails import generate_referral_cashback_email
 
 
 class OrderService:
@@ -413,61 +412,6 @@ class OrderService:
         background_tasks.add_task(invalidate_caches)
         return {"message": "Item returned successfully"}
 
-    async def process_referral(self, order: Order) -> None:
-        if not order.coupon_code:
-            logger.debug(
-                f"[process_referral] Order {order.order_number} has no coupon code, skipping"
-            )
-            return
-
-        coupon_owner = await self.db.user.find_unique(where={"referral_code": order.coupon_code})
-        if not coupon_owner:
-            return
-
-        # Self-referral guard
-        if coupon_owner.id == order.user_id:
-            print(f"Order {order.order_number} used owner's own referral code — no cashback issued")
-            logger.debug(
-                f"Order {order.order_number} used owner's own referral code — no cashback issued"
-            )
-            return
-
-        existing = await self.db.wallettransaction.find_first(
-            where={"reference_id": order.order_number, "type": "CASHBACK"}
-        )
-        if existing:
-            logger.debug(f"Referral cashback already issued for order {order.order_number}, skipping")
-            return
-
-        async with self.db.tx(timeout=15000) as tx:
-            await tx.wallettransaction.create(
-                data={
-                    "user": {"connect": {"id": coupon_owner.id}},
-                    "amount": order.discount_amount,
-                    "reference_code": order.coupon_code,
-                    "type": "CASHBACK",
-                    "reference_id": order.order_number,
-                }
-            )
-            await tx.user.update(where={"id": coupon_owner.id}, data={"wallet_balance": {"increment": order.discount_amount}})
-            await self.cache_srv.invalidate(tags=[f"wallet:{coupon_owner.id}"])
-
-        try:
-            email_data = await generate_referral_cashback_email(order=order, coupon_owner=coupon_owner, service=self.settings_srv)
-            shop_email = await self.settings_srv.get("shop_email")
-            cc_list = [shop_email] if shop_email else []
-
-            await self.notification_srv.send(
-                channel_name="email",
-                recipient=coupon_owner.email,
-                subject=email_data.subject,
-                message=email_data.html_content,
-                cc_list=cc_list,
-            )
-            logger.debug(f"Referral cashback email sent to user: {coupon_owner.id}")
-        except Exception as e:
-            logger.error(f"Failed to generate referral cashback email: {e}")
-
     async def record_payment_success(self, reference: str, amount: float, cart_number: str, user_id: int):
         """
         Idempotency is enforced two ways:
@@ -544,7 +488,7 @@ class OrderService:
             logger.error(f"Failed to decrement variant inventory for order {order.id}: {e}")
 
         await self.queue.enqueue_job("process_referral", order_id=order.id)
-        await self.queue.enqueue_job("generate_and_send_invoice", order_number=order.order_number)
+        await self.queue.enqueue_job("generate_and_send_invoice", order_id=order.id)
 
         return updated_order
 

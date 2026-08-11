@@ -144,10 +144,6 @@ async def test_arq(queue: ArqDep) -> Dict[str, Any]:
     #     "user_register",
     #     user_id=1,
     # )
-    await queue.enqueue_job(
-        "process_referral",
-        order_id=20
-    )
     return {"message": "ok"}
 
 

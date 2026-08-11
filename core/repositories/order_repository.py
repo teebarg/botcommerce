@@ -166,26 +166,3 @@ class OrderRepository(BaseRepository[Order]):
         result = await self.session.execute(stmt)
 
         return result.scalars().all()
-
-    async def update2(
-        self,
-        order_id: int,
-        *,
-        data: dict,
-    ) -> Order | None:
-        order = await self.get_by_id(order_id)
-
-        if order is None:
-            return None
-
-        for field, value in data.items():
-            if not hasattr(order, field):
-                raise ValueError(
-                    f"Invalid Order field: {field}"
-                )
-
-            setattr(order, field, value)
-
-        await self.session.flush()
-
-        return order

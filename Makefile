@@ -3,6 +3,7 @@ DOCKER_USER ?= beafdocker
 API_IMAGE := $(DOCKER_USER)/shop-api
 AGENT_IMAGE := $(DOCKER_USER)/shop-agent
 WORKER_IMAGE := $(DOCKER_USER)/shop-worker
+MCP_IMAGE := $(DOCKER_USER)/mcp-server
 
 IMAGE_TAG := $(if $(shell git rev-parse --short HEAD 2>NUL),$(shell git rev-parse --short HEAD 2>NUL),latest)
 
@@ -156,6 +157,13 @@ build-worker:
 		-t $(WORKER_IMAGE):$(IMAGE_TAG) \
 		.
 
+build-mcp:
+	docker build --platform=linux/amd64 \
+		-f mcp-server/Dockerfile \
+		-t $(MCP_IMAGE):latest \
+		-t $(MCP_IMAGE):$(IMAGE_TAG) \
+		.
+
 # Push Operations
 push-all: push-api push-agent push-worker
 
@@ -170,6 +178,10 @@ push-agent:
 push-worker:
 	docker push $(WORKER_IMAGE):latest
 	docker push $(WORKER_IMAGE):$(IMAGE_TAG)
+
+push-mcp:
+	docker push $(MCP_IMAGE):latest
+	docker push $(MCP_IMAGE):$(IMAGE_TAG)
 
 
 .PHONY: run-api-local
@@ -200,6 +212,15 @@ run-worker-local:
 		-p 8002:10000 \
 		--env-file worker/.env \
 		$(WORKER_IMAGE):$(IMAGE_TAG)
+
+.PHONY: run-mcp-local
+run-mcp-local:
+	docker run --rm -it \
+		--platform linux/amd64 \
+		--network dev-net \
+		-p 8003:8787 \
+		--env-file mcp-server/.env \
+		$(MCP_IMAGE):$(IMAGE_TAG)
 
 .PHONY: build-frontend
 build-frontend:

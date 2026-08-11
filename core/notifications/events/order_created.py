@@ -20,7 +20,7 @@ class OrderCreated(Notification):
     total: Decimal
 
     def to_email(self) -> Mail:
-        header_title = "Your order has been processed successfully"
+        header_title = "Your order has been created successfully"
         template_name = "paid_invoice.html"
 
         if self.order.payment_method == "CASH_ON_DELIVERY":

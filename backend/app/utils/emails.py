@@ -141,32 +141,6 @@ async def generate_newsletter_email(
     return EmailData(html_content=html_content, subject="Welcome to our newsletter")
 
 
-async def generate_referral_cashback_email(
-    order: Order, 
-    coupon_owner: User, 
-    service: ShopSettingsService
-) -> EmailData:
-    header_title = "You just got paid!"
-    metadata_context = await merge_metadata(service, {"description": "Your referral code just earned you some money"})
-
-    html_content = render_email_template(
-        template_name="referral_cashback_email.html",
-        context={
-            "referral": coupon_owner.first_name,
-            "cash_back": order.discount_amount,
-            "order_value": order.subtotal,
-            "referred": order.user.first_name if order.user else "",
-            "created_at": order.created_at,
-            "current_year": datetime.now().year,
-            "header_title": header_title,
-            "cta_url": "account/referrals",
-            "cta_text": "View My Wallet",
-            **metadata_context
-        },
-    )
-    return EmailData(html_content=html_content, subject="You just got paid!")
-
-
 async def generate_welcome_email(
     email_to: str, 
     first_name: str, 

@@ -1,5 +1,3 @@
-# core/notifications/events/test_created.py
-
 from dataclasses import dataclass
 
 from core.notifications.base import (

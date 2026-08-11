@@ -20,6 +20,10 @@ class BaseAppSettings(BaseSettings):
     BROKER_URL: str = "redis://localhost:6379/0"
     INTERNAL_WORKER_SECRET: str = "secret"
 
+    @property
+    def is_production(self) -> bool:
+        return self.ENVIRONMENT.lower() in ["prod", "production"]
+
     # Storage
     DEFAULT_STORAGE_PROVIDER: Literal["supabase", "r2"] = "supabase"
     STORAGE_BUCKET: str = "images-dev"

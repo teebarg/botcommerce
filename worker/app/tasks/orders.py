@@ -100,6 +100,7 @@ async def process_referral(ctx, order_id: int) -> dict:
         ),
         channels=[Channel.EMAIL],
     )
+    return {"status": "ok"}
 
 
 async def order_created(ctx, order_id: int) -> dict:
@@ -150,6 +151,7 @@ async def order_created(ctx, order_id: int) -> dict:
             Channel.SLACK
         ],
     )
+    return {"status": "ok"}
 
 
 async def generate_and_send_invoice(ctx, order_id: int) -> dict:
@@ -188,3 +190,4 @@ async def generate_and_send_invoice(ctx, order_id: int) -> dict:
         ),
         channels=[Channel.EMAIL],
     )
+    return {"status": "ok"}

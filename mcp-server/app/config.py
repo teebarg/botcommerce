@@ -1,12 +1,8 @@
-from pydantic_settings import BaseSettings
+from core.config import BaseAppSettings
 
-class Settings(BaseSettings):
-    BACKEND_URL: str = "http://backend:8000"
-    DATABASE_URL: str = ""
+class Settings(BaseAppSettings):
+    API_BASE_URL: str = "http://backend:8000"
     SECRET_KEY: str ="specialsecret"
-
-    class Config:
-        env_file = ".env"
 
 
 settings = Settings()

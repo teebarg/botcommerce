@@ -11,6 +11,4 @@ class Settings(BaseAppSettings):
     GEMINI_API_KEY: str = ""
     GEMINI_MODEL: str = "gemini-2.5-flash"
 
-    # SLACK_WEBHOOK_URL: str = ""
-
 settings = Settings()

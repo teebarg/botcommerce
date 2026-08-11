@@ -16,7 +16,6 @@ ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONPATH=/app
 
 COPY core/ /app/core/
-# COPY ./app /app/app
 COPY worker/app /app/app
 
 EXPOSE 10000

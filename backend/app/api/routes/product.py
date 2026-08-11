@@ -6,7 +6,7 @@ from app.core.config import settings
 from app.core.logging import get_logger
 from app.services.cache import cacheable, DEFAULT_EXPIRATION
 from app.core.deps import CurrentUser, UserDep
-from app.models.generic import Message, ImageUpload
+from app.models.generic import Message
 from app.models.product import ProductLite, VariantWithStatus, SearchProducts, FeedProducts, IndexProducts, ReviewStatus
 from app.core.permissions import require_admin
 from app.lib.cache import set_public_cache
@@ -14,8 +14,7 @@ from app.core.dependencies.product import ProductDep, SearchDep
 from app.core.dependencies.cache import ArqDep
 from app.core.dependencies.services import StorageDep
 from app.prisma_client import DbDep
-from app.core.security import verify_extension_secret
-from app.services.storage import StorageProvider, ALLOWED_CONTENT_TYPES, MAX_FILE_SIZE_BYTES
+from app.services.storage import ALLOWED_CONTENT_TYPES, MAX_FILE_SIZE_BYTES
 
 logger = get_logger(__name__)
 
@@ -183,22 +182,19 @@ async def reindex_products(srv: ProductDep, background_tasks: BackgroundTasks) -
         logger.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/{id}/image-upload", dependencies=[Depends(verify_extension_secret)])
-async def upload_image(id: int, db: DbDep, image_data: ImageUpload, srv: ProductDep, storage_srv: StorageDep, background_tasks: BackgroundTasks) -> Message:
-    try:
-        product = await srv.get(id=id)
-        if not product:
-            raise HTTPException(status_code=404, detail="Product not found")
+# @router.post("/{id}/image-upload", dependencies=[Depends(verify_extension_secret)])
+# async def upload_image(id: int, image_data: ImageUpload, srv: ProductDep, storage_srv: StorageDep, background_tasks: BackgroundTasks) -> Message:
+#     try:
+#         product = await srv.get(id=id)
+#         if not product:
+#             raise HTTPException(status_code=404, detail="Product not found")
 
-        image_url: str = storage_srv.upload(bucket="images", data=image_data)
-        await db.productimage.create(
-            data={"image": image_url, "product_id": id}
-        )
-        background_tasks.add_task(srv.invalidate, id=id)
-        return Message(message="Image uploaded")
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
+#         storage_srv.upload(bucket="images", data=image_data)
+#         background_tasks.add_task(srv.invalidate, id=id)
+#         return Message(message="Image uploaded")
+#     except Exception as e:
+#         logger.error(e)
+#         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/{product_id}/images")
@@ -209,9 +205,6 @@ async def upload_product_images(
     queue: ArqDep,
     product_id: int,
     files: List[UploadFile] = File(...),
-    provider: Optional[StorageProvider] = Query(
-        default=None, description="Storage provider override: 'supabase' or 'r2'"
-    ),
 ):
     product = await srv.get(id=product_id)
     if not product:
@@ -220,7 +213,6 @@ async def upload_product_images(
     if not files:
         raise HTTPException(status_code=400, detail="No files provided")
 
-    # Continue ordering after whatever images already exist for this product.
     existing_count = await db.productimage.count(where={"product_id": product_id})
     next_order = existing_count + 1
 
@@ -252,7 +244,6 @@ async def upload_product_images(
                 filename=unique_filename,
                 bytes_data=file_bytes,
                 content_type=upload.content_type,
-                provider=provider,
             )
             uploaded_for_rollback.append((settings.STORAGE_BUCKET, unique_filename))
 
@@ -279,7 +270,7 @@ async def upload_product_images(
     except HTTPException:
         for bucket, filename in uploaded_for_rollback:
             try:
-                storage.delete_file(bucket, filename, provider=provider)
+                storage.delete_file(bucket, filename)
             except Exception as cleanup_err:
                 logger.error(f"Rollback cleanup failed for {filename}: {cleanup_err}")
         raise
@@ -287,7 +278,7 @@ async def upload_product_images(
         logger.error(f"Unexpected error uploading product images: {e}")
         for bucket, filename in uploaded_for_rollback:
             try:
-                storage.delete_file(bucket, filename, provider=provider)
+                storage.delete_file(bucket, filename)
             except Exception as cleanup_err:
                 logger.error(f"Rollback cleanup failed for {filename}: {cleanup_err}")
         raise HTTPException(status_code=500, detail="Failed to upload product images") from e

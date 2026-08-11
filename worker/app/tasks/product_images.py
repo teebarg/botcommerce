@@ -25,7 +25,8 @@ def optimize_image(file_bytes: bytes, content_type: str) -> tuple[bytes, str, st
 
         if image.mode in ("RGBA", "LA", "P"):
             has_alpha = image.mode in ("RGBA", "LA") or (
-                image.mode == "P" and image.info.get("transparency") is not None
+                image.mode == "P" and image.info.get(
+                    "transparency") is not None
             )
             if content_type == "image/png" and has_alpha:
                 image = image.convert("RGBA")
@@ -67,10 +68,12 @@ async def optimize_product_image(
         resp.raise_for_status()
         raw_bytes = resp.content
 
-    optimized_bytes, final_content_type, extension = optimize_image(raw_bytes, content_type)
+    optimized_bytes, final_content_type, extension = optimize_image(
+        raw_bytes, content_type)
 
     if optimized_bytes == raw_bytes:
-        logger.info(f"Image {image_id} unchanged by optimization, skipping swap.")
+        logger.info(
+            f"Image {image_id} unchanged by optimization, skipping swap.")
         return {"image_id": image_id, "swapped": False}
 
     unique_suffix = uuid.uuid4().hex[:8]
@@ -93,7 +96,6 @@ async def optimize_product_image(
 
     cdn = CacheInvalidationService()
     await cdn.purge_vercel("products")
-    # cdn.purge_cloudflare()
 
     await call_internal_backend(
         path=f"/internal/invalidate",
@@ -101,7 +103,6 @@ async def optimize_product_image(
         json_body={"tags": ["products", "catalog", "gallery"]},
     )
 
-    # Now that the swap is confirmed, delete the original raw file.
     _delete_with_retry(storage=storage, key=storage_key)
 
     return {"image_id": image_id, "swapped": True, "image": new_image_url}
