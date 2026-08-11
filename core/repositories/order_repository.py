@@ -8,12 +8,12 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from core.repositories.base_repository import BaseRepository
 from core.db.models.base import Order, OrderItem
 
 
-class OrderRepository:
-    def __init__(self, session: AsyncSession):
-        self.session = session
+class OrderRepository(BaseRepository[Order]):
+    model = Order
 
     async def get_by_id(
         self,
@@ -167,7 +167,7 @@ class OrderRepository:
 
         return result.scalars().all()
 
-    async def update(
+    async def update2(
         self,
         order_id: int,
         *,

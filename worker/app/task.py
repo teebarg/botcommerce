@@ -1,3 +1,4 @@
+from core.storage import MediaStorageService
 import asyncio
 from arq import cron
 from arq.connections import RedisSettings
@@ -24,7 +25,9 @@ async def startup(ctx):
     async with session_factory() as session:
         repo = ShopSettingsRepository(session)
         shop_settings = await repo.get_all()
+    ctx["settings"] = shop_settings
     ctx["notification_srv"] = create_notification_service(shop_settings=shop_settings)
+    ctx["storage"] = MediaStorageService()
 
 async def shutdown(ctx):
     """Runs exactly once when the worker gracefully shuts down"""

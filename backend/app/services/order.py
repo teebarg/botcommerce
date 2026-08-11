@@ -250,8 +250,8 @@ class OrderService:
             filename: str = f"invoices/invoice_{order.order_number}_{timestamp}_{uuid.uuid4().hex[:8]}.pdf"
 
             result = self.storage_srv.upload_file(
-                filename=filename, 
-                bytes_data=pdf_bytes, 
+                filename=filename,
+                bytes_data=pdf_bytes,
                 content_type="application/pdf"
             )
             if not result:
