@@ -147,8 +147,7 @@ async def generate_referral_cashback_email(
     service: ShopSettingsService
 ) -> EmailData:
     header_title = "You just got paid!"
-    description = "Your order has been processed"
-    metadata_context = await merge_metadata(service, {"description": description})
+    metadata_context = await merge_metadata(service, {"description": "Your referral code just earned you some money"})
 
     html_content = render_email_template(
         template_name="referral_cashback_email.html",

@@ -5,27 +5,13 @@ from collections.abc import Sequence
 from typing import Any
 
 from sqlalchemy import select, update
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
+from core.repositories.base_repository import BaseRepository
 from core.db.models import User
 
 
-class UserRepository:
-    def __init__(self, session: AsyncSession):
-        self.session = session
-
-    async def get(
-        self,
-        id: int,
-    ) -> User | None:
-        stmt = select(User).where(
-            User.id == id,
-        )
-
-        result = await self.session.execute(stmt)
-
-        return result.scalar_one_or_none()
+class UserRepository(BaseRepository[User]):
+    model = User
 
     async def update(
         self,
@@ -42,3 +28,12 @@ class UserRepository:
         result = await self.session.execute(stmt)
 
         return result.scalar_one_or_none()
+
+    async def find_by_referral_code(self, code: str) -> User | None:
+        return await self.get_one(referral_code=code)
+
+    async def increment_wallet_balance(self, user_id: int, amount: float) -> User | None:
+        return await self.update(
+            user_id,
+            {"wallet_balance": User.wallet_balance + amount},
+        )
