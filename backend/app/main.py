@@ -21,14 +21,11 @@ from app.models.generic import ContactFormCreate, NewsletterCreate, BulkPurchase
 from app.prisma_client import prisma, DbDep
 from app.services.websocket import manager
 from app.core.logging import get_logger
-from app.core.deps import Notification
 from app.core.dependencies.product import SearchDep
 from app.core.notifications.setup import init_notification_service
-from app.core.dependencies.services import SettingsDep
 from app.services.cache import L1Cache, run_l1_invalidation_listener
 from app.lib.cache import add_cache_headers
 from app.core.dependencies.cache import ArqDep, CdnDep
-from app.utils.emails import generate_newsletter_email, generate_bulk_purchase_email
 
 logger = get_logger(__name__)
 
@@ -181,53 +178,17 @@ async def contact_form(queue: ArqDep, data: ContactFormCreate):
 
 
 @app.post("/api/newsletter")
-async def newsletter(background_tasks: BackgroundTasks, settings_srv: SettingsDep, notification_srv: Notification, data: NewsletterCreate):
-    async def send_email_task():
-        try:
-            email_data = await generate_newsletter_email(
-                email=data.email,
-                service=settings_srv
-            )
-            shop_email = await settings_srv.get("shop_email")
-            if not shop_email:
-                logger.error("Shop email not found")
-                return
-            await notification_srv.send(
-                recipient=data.email,
-                subject=email_data.subject,
-                message=email_data.html_content,
-            )
-        except Exception as e:
-            logger.error(f"Failed to send newsletter email: {e}")
-    background_tasks.add_task(send_email_task)
+async def newsletter(queue: ArqDep, data: NewsletterCreate):
+    await queue.enqueue_job("process_newsletter", email=data.email)
     return {"message": "Email sent successfully"}
 
 
 @app.post("/api/bulk-purchase")
-async def bulk_purchase(background_tasks: BackgroundTasks, settings_srv: SettingsDep, notification_srv: Notification, data: BulkPurchaseCreate):
-    async def send_email_task():
-        try:
-            email_data = await generate_bulk_purchase_email(
-                name=data.name,
-                email=data.email,
-                phone=data.phone,
-                bulkType=data.bulkType,
-                quantity=data.quantity,
-                message=data.message,
-                service=settings_srv
-            )
-            shop_email = await settings_srv.get("shop_email")
-            if not shop_email:
-                logger.error("Shop email not found")
-                return
-            await notification_srv.send(
-                recipient=shop_email,
-                subject=email_data.subject,
-                message=email_data.html_content,
-            )
-        except Exception as e:
-            logger.error(f"Failed to send bulk purchase email: {e}")
-    background_tasks.add_task(send_email_task)
+async def bulk_purchase(queue: ArqDep, data: BulkPurchaseCreate):
+    await queue.enqueue_job(
+        "process_bulk_purchase",
+        name=data.name, email=data.email, phone=data.phone or "", message=data.message, bulkType=data.bulkType, quantity=data.quantity,
+    )
     return {"message": "Bulk purchase inquiry submitted successfully"}
 
 

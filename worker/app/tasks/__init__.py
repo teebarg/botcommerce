@@ -1,4 +1,4 @@
-from app.tasks.generic import contact_form
+from app.tasks.generic import contact_form, process_newsletter, process_bulk_purchase
 from app.tasks.test import test_email
 from app.tasks.product_images import optimize_product_image
 from app.tasks.orders import order_created, process_referral, generate_and_send_invoice
@@ -13,5 +13,7 @@ all_ecommerce_tasks = [
     order_created,
     optimize_product_image,
     test_email,
-    contact_form
+    contact_form,
+    process_newsletter,
+    process_bulk_purchase
 ]
