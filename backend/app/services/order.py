@@ -14,7 +14,7 @@ from app.core.config import settings
 from app.services.shop_settings import ShopSettingsService
 from app.services.cart import CartService
 from app.services.coupon import CouponService
-from app.core.notifications.events import SendInvoiceEvent, OrderConfirmedEvent
+from app.core.notifications.events import  OrderConfirmedEvent
 from app.services.cache import CacheService
 from app.services.storage import MediaStorageService
 from app.models.order import Order, PaginatedOrders
@@ -325,16 +325,6 @@ class OrderService:
                 await self.cache_srv.invalidate(tags=["orders"])
             except Exception as e:
                 logger.error(f"Failed to send out-of-stock slack: {e}")
-
-    async def send_payment_receipt(self, order: Order) -> None:
-        try:
-            shop_email: str | None = await self.settings_srv.get("shop_email")
-            cc_list = [shop_email] if shop_email else []
-
-            await self.notification_srv.dispatch(SendInvoiceEvent(order=order, cc_list=cc_list))
-            logger.debug(f"Invoice email sent to user: {order.user_id}")
-        except Exception as e:
-            logger.error(f"Failed to generate invoice email: {e}")
 
     async def return_order_item(self, order_id: int, item_id: int, background_tasks: BackgroundTasks) -> Dict[str, str]:
         """

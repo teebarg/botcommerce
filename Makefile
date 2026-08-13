@@ -24,10 +24,6 @@ endif
 build:
 	$(DOCKER_COMPOSE) build $(SERVICES)
 
-.PHONY: build-service
-build-service:
-	$(DOCKER_COMPOSE) build $(SERVICES)
-
 build-no-cache:
 	$(DOCKER_COMPOSE) build --no-cache $(SERVICES)
 

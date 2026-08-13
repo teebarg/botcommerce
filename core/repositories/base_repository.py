@@ -8,6 +8,7 @@ from sqlalchemy import update as sa_update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm.strategy_options import _AbstractLoad
 
 ModelT = TypeVar("ModelT", bound=DeclarativeBase)
 
@@ -29,8 +30,20 @@ class BaseRepository(Generic[ModelT]):
 
     # ---- reads ----
 
-    async def get_by_id(self, id: Any) -> ModelT | None:
-        return await self.session.get(self.model, id)
+    # async def get_by_id(self, id: Any) -> ModelT | None:
+    #     return await self.session.get(self.model, id)
+
+    async def get_by_id(
+        self,
+        id: Any,
+        *,
+        options: Sequence[_AbstractLoad] | None = None,
+    ) -> ModelT | None:
+        stmt = select(self.model).where(self.model.id == id)
+        if options:
+            stmt = stmt.options(*options)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
 
     async def get_one(self, **filters: Any) -> ModelT | None:
         stmt = select(self.model).filter_by(**filters)

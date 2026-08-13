@@ -1,4 +1,6 @@
-{% include "partials/header.html" %}
+{% extends "partials/layout.html" %}
+
+{% block content %}
 <tr>
     <td style="padding: 20px">
         <div>
@@ -53,7 +55,7 @@
             <p style="margin-top: 8px;">Complete your purchase now and don't miss out on these great items!</p>
 
             <div style="text-align: center; margin-top: 20px; margin-bottom: 20px">
-                <a href="{{ cart_link }}" class="button" style="color: white !important">Complete Your Purchase</a>
+                <a href="{{ shop.frontend_host }}/cart" class="button" style="color: white !important">Complete Your Purchase</a>
             </div>
 
             <p style="margin-top: 8px; font-size: 14px; color: #6b7280;">This cart will be saved for a limited time. If you have any questions or need assistance, our customer support team is here to help!</p>
@@ -62,4 +64,4 @@
         </div>
     </td>
 </tr>
-{% include "partials/footer.html" %}
+{% endblock %}

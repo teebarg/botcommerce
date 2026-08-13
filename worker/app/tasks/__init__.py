@@ -1,3 +1,4 @@
+from app.tasks.carts import process_abandoned_carts
 from app.tasks.generic import contact_form, process_newsletter, process_bulk_purchase
 from app.tasks.test import test_email
 from app.tasks.product_images import optimize_product_image
@@ -15,5 +16,6 @@ all_ecommerce_tasks = [
     test_email,
     contact_form,
     process_newsletter,
-    process_bulk_purchase
+    process_bulk_purchase,
+    process_abandoned_carts
 ]
