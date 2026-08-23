@@ -82,12 +82,13 @@ class MediaStorageService:
 
     def upload_file(
         self,
-        bucket: str,
         filename: str,
         bytes_data: bytes,
         content_type: str,
+        bucket: Optional[str] = settings.STORAGE_BUCKET,
         provider: Optional[StorageProvider] = None,
     ) -> str:
+        bucket = bucket or STORAGE_BUCKET
         provider = provider or DEFAULT_PROVIDER
         if provider == "r2":
             return self.upload_file_r2(bucket, filename, bytes_data, content_type)

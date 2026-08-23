@@ -5,9 +5,7 @@ from app.core.logging import logger
 from app.core.notifications.channels import NotificationChannel
 from app.core.notifications.events import (
     BaseNotificationEvent,
-    SendInvoiceEvent,
     OrderConfirmedEvent,
-    SendAbandonedCartEvent,
     SendPushNotificationEvent,
 )
 from app.core.notifications.templates import TemplateEngine
@@ -25,18 +23,10 @@ class NotificationService:
                 "template": "order_confirmed",
                 "channels": ["email", "slack"]
             },
-            SendAbandonedCartEvent: {
-                "template": "send_abandoned_cart",
-                "channels": ["email", "push"]
-            },
             SendPushNotificationEvent: {
                 "template": "send_push_notification",
                 "channels": ["push"]
             },
-            SendInvoiceEvent: {
-                "template": "send_invoice",
-                "channels": ["email"]
-            }
         }
 
     def register_channel(self, name: str, channel: NotificationChannel):

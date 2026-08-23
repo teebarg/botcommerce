@@ -1,13 +1,8 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from core.config import BaseAppSettings
 
-class Settings(BaseSettings):
+class Settings(BaseAppSettings):
     API_BASE_URL: str = "http://backend:8000"
-    INTERNAL_WORKER_SECRET: str = "secret"
-
-    DATABASE_URL: str = ""
-    BROKER_URL: str = "redis://localhost:6379/0"
     PORT: int = 10000
-    ENVIRONMENT: str = "development"
 
     WORKER_ENABLED: bool = False
     CRON_JOBS_ENABLED: bool = False
@@ -15,18 +10,5 @@ class Settings(BaseSettings):
 
     GEMINI_API_KEY: str = ""
     GEMINI_MODEL: str = "gemini-2.5-flash"
-
-    SLACK_WEBHOOK_URL: str = ""
-
-    CLOUDINARY_NAME: str = ""
-    CLOUDINARY_API_KEY: str = ""
-    CLOUDINARY_API_SECRET: str = ""
-
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        env_ignore_empty=True,
-        extra="ignore",
-    )
 
 settings = Settings()

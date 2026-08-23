@@ -1,3 +1,4 @@
+from core.storage import MediaStorageService
 import asyncio
 from arq import cron
 from arq.connections import RedisSettings
@@ -7,6 +8,9 @@ from app.tasks.enrich_products import enrich_products
 from app.tasks.products import clean_up_dangling
 from app.db import db
 from app.logger import logger
+from app.db import session_factory
+from core.notifications.setup import create_notification_service
+from core.repositories.shop_settings_repository import ShopSettingsRepository
 
 async def startup(ctx):
     """Runs exactly once when the worker container fires up"""
@@ -18,6 +22,12 @@ async def startup(ctx):
 
     await db.connect()
     ctx['db_pool'] = db.get_pool()
+    async with session_factory() as session:
+        repo = ShopSettingsRepository(session)
+        shop_settings = await repo.get_all()
+    ctx["settings"] = shop_settings
+    ctx["notification_srv"] = create_notification_service(shop_settings=shop_settings)
+    ctx["storage"] = MediaStorageService()
 
 async def shutdown(ctx):
     """Runs exactly once when the worker gracefully shuts down"""

@@ -67,14 +67,16 @@ services:
 
   worker:
     build:
-      context: ./worker
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: worker/Dockerfile.dev
     platform: linux/amd64
     environment:
       - BROKER_URL=redis://redis:6379/0
       - UV_LINK_MODE=copy
+      - PYTHONPATH=/app
     volumes:
-      - ./worker:/app
+      - ./worker/app:/app/app
+      - ./core:/app/core
       - /app/.venv
       - uvworker-cache:/root/.cache/uv
     networks:
@@ -119,8 +121,8 @@ services:
 
   mcp-server:
     build:
-      context: ./mcp-server
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: mcp-server/Dockerfile.dev
     ports:
       - "5103:8787"
     networks:
@@ -136,8 +138,6 @@ services:
       - traefik.http.routers.mcp-http.entrypoints=http
       - traefik.http.routers.mcp-http.middlewares=redirect-to-https
       - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
-    env_file:
-      - ./mcp-server/.env
     platform: linux/amd64
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8787/health"]
@@ -145,7 +145,8 @@ services:
       timeout: 5s
       retries: 3
     volumes:
-      - ./mcp-server:/app
+      - ./mcp-server/app:/app/app
+      - ./core:/app/core
       - /app/.venv
       - uvmcp-cache:/root/.cache/uv
 

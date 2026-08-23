@@ -3,9 +3,8 @@ from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, HTTPException, Request, BackgroundTasks, Depends, Cookie, Response
 from fastapi.responses import JSONResponse
 from prisma.enums import CartStatus
-from prisma import Prisma
 from app.services.cache import cacheable
-from app.core.deps import Notification, UserDep, CurrentUser
+from app.core.deps import UserDep, CurrentUser
 from app.core.logging import get_logger
 from app.core.permissions import require_admin
 from app.core.config import settings
@@ -15,8 +14,8 @@ from app.models.cart import (
     SendAbandonedCartReminders
 )
 from app.models.abandoned_cart import PaginatedAbandonedCarts
-from app.core.notifications.events import SendAbandonedCartEvent
 from app.core.dependencies.cart import CartDep
+from app.core.dependencies.cache import ArqDep
 from app.prisma_client import DbDep
 
 logger = get_logger(__name__)
@@ -293,10 +292,9 @@ async def get_abandoned_carts_stats(request: Request, db: DbDep, hours_threshold
 
 @router.post("/abandoned-carts/send-reminders", dependencies=[Depends(require_admin)])
 async def send_batch_reminders(
+    queue: ArqDep,
     data: SendAbandonedCartReminders,
     db: DbDep,
-    background_tasks: BackgroundTasks,
-    notification: Notification
 ):
     """Queues background reminders for a batch of abandoned carts."""
     threshold_time = datetime.now(timezone.utc) - timedelta(hours=data.hours_threshold)
@@ -312,7 +310,7 @@ async def send_batch_reminders(
     )
 
     for cart in carts:
-        background_tasks.add_task(send_abandoned_cart_reminder, db=db, cart_id=cart.id, notification=notification)
+        await queue.enqueue_job("process_abandoned_carts", cart_id=cart.id)
 
     return {"message": "Abandoned reminders queued", "carts_processed": len(carts)}
 
@@ -320,85 +318,8 @@ async def send_batch_reminders(
 @router.post("/abandoned-carts/{cart_id}/send-reminder", dependencies=[Depends(require_admin)])
 async def send_single_reminder(
     cart_id: int,
-    db: DbDep,
-    background_tasks: BackgroundTasks,
-    notification: Notification
+    queue: ArqDep,
 ):
     """Manually triggers a reminder for a specific cart session."""
-    cart = await db.cart.find_unique(where={"id": cart_id})
-    if not cart:
-        raise HTTPException(status_code=404, detail="Cart not found")
-
-    background_tasks.add_task(send_abandoned_cart_reminder, db=db, cart_id=cart.id, notification=notification)
-    return {"message": f"Reminder successfully queued for cart {cart.cart_number}", "cart_id": cart_id}
-
-
-async def send_abandoned_cart_reminder(db: Prisma, cart_id: int, notification: Notification):
-    """Background task to send abandoned cart reminder email"""
-    try:
-        cart = await db.cart.find_unique(
-            where={"id": cart_id},
-            include={
-                "user": True,
-                "items": {
-                    "include": {
-                        "variant": {
-                            "include": {
-                                "product": {
-                                    "include": {"images": True}
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        )
-
-        if not cart:
-            logger.error(f"cart with ID {cart_id} not found")
-            return
-
-        if not cart.user:
-            logger.warning(f"cart {cart_id} has no associated user, skipping notification")
-            return
-
-        if not cart.email and not cart.user.email:
-            logger.warning(f"cart {cart_id} has no email address, skipping notification")
-            return
-
-        cart_data = {
-            "id": cart.id,
-            "cart_number": cart.cart_number,
-            "email": cart.email or cart.user.email,
-            "total": cart.total,
-            "subtotal": cart.subtotal,
-            "tax": cart.tax,
-            "shipping_fee": cart.shipping_fee,
-            "cart_items": [
-                {
-                    "name": item.name,
-                    "quantity": item.quantity,
-                    "price": item.price,
-                    "image": item.image,
-                    "slug": item.slug
-                }
-                for item in cart.items
-            ],
-            "updated_at": cart.updated_at
-        }
-
-        subscriptions = await db.pushsubscription.find_many(
-            where={"userId": cart.user_id}
-        )
-
-        await notification.dispatch(SendAbandonedCartEvent(
-            cart=cart_data,
-            user_email=cart.email or cart.user.email,
-            user_name=cart.user.first_name or cart.user.username,
-            subscriptions=[subscription.model_dump() for subscription in subscriptions]
-        ))
-
-        logger.debug(f"Abandoned cart reminder sent to {cart.email or cart.user.email} for cart {cart.cart_number}")
-
-    except Exception as e:
-        logger.error(f"Failed to send abandoned cart reminder for cart {cart_id}: {str(e)}")
+    await queue.enqueue_job("process_abandoned_carts", cart_id=cart_id)
+    return {"message": f"Reminder successfully queued for cart {cart_id}", "cart_id": cart_id}
