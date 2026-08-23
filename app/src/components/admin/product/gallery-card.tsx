@@ -13,6 +13,8 @@ interface GalleryCardProps {
     selectionMode?: boolean;
 }
 
+type FitMode = "cover" | "contain";
+
 export function GalleryCard({ image, isSelected = false, onSelectionChange, onClick, selectionMode = false }: GalleryCardProps) {
     if (!image) return null;
 
@@ -29,13 +31,23 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, onCl
     ].filter(Boolean);
 
     const [mediaLoaded, setMediaLoaded] = useState<boolean>(false);
+    const [fitMode, setFitMode] = useState<FitMode>("cover");
     const categories = product?.categories?.map((item) => item.name) || [];
     const combined = [...categories, ...attributes];
 
     const totalInventory = variants.reduce((acc, v) => acc + (v.inventory || 0), 0);
-    const hasProduct = Boolean(product)
+    const hasProduct = Boolean(product);
     const isInactive = hasProduct && !product?.active;
     const isOutOfStock = hasProduct && totalInventory <= 0;
+
+    const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+        const { naturalWidth, naturalHeight } = e.currentTarget;
+        if (naturalWidth && naturalHeight) {
+            const isLandscape = naturalWidth > naturalHeight;
+            setFitMode(isLandscape ? "contain" : "cover");
+        }
+        setMediaLoaded(true);
+    };
 
     return (
         <div
@@ -44,18 +56,19 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, onCl
                 selectionMode ? "cursor-pointer" : "cursor-default",
                 isSelected ? "ring-2 ring-primary ring-offset-1" : ""
             )}
-            onClick={() => selectionMode ? onSelectionChange?.(image.id, !isSelected) : onClick?.(image.id)}
+            onClick={() => (selectionMode ? onSelectionChange?.(image.id, !isSelected) : onClick?.(image.id))}
         >
             <div className="absolute inset-0 w-full h-full overflow-hidden bg-muted">
                 {!mediaLoaded && <img src="/placeholder.jpg" alt="placeholder" className="absolute inset-0 w-full h-full object-cover" />}
                 <img
                     alt={product?.name || ""}
                     src={image?.image}
-                    onLoad={() => setMediaLoaded(true)}
+                    onLoad={handleImageLoad}
                     loading="lazy"
                     decoding="async"
                     className={cn(
-                        "w-full h-full object-cover transition-opacity duration-500",
+                        "w-full h-full transition-opacity duration-500",
+                        fitMode === "cover" ? "object-cover" : "object-contain",
                         mediaLoaded ? "opacity-100" : "opacity-0",
                         isInactive || isOutOfStock ? "grayscale opacity-60" : ""
                     )}
@@ -65,21 +78,29 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, onCl
             {/* Top status overlays */}
             <div className="absolute top-2 left-2 grid gap-1.5 z-10 pointer-events-none">
                 {isOutOfStock && (
-                    <Badge variant="destructive" type="sm">Out of stock</Badge>
+                    <Badge variant="destructive" type="sm">
+                        Out of stock
+                    </Badge>
                 )}
                 {isInactive && (
-                    <Badge variant="ghost" type="sm">Not in store</Badge>
+                    <Badge variant="ghost" type="sm">
+                        Not in store
+                    </Badge>
                 )}
                 {product?.is_new && (
-                    <Badge variant="accent" className="w-fit uppercase tracking-wider" type="sm">New</Badge>
+                    <Badge variant="accent" className="w-fit uppercase tracking-wider" type="sm">
+                        New
+                    </Badge>
                 )}
             </div>
 
             {selectionMode && (
-                <div className={cn(
-                    "absolute top-2 right-2 w-5 h-5 rounded-full border flex items-center justify-center z-10 shadow-sm pointer-events-none",
-                    isSelected ? "bg-primary border-primary" : "bg-white/90 border-neutral-300"
-                )}>
+                <div
+                    className={cn(
+                        "absolute top-2 right-2 w-5 h-5 rounded-full border flex items-center justify-center z-10 shadow-sm pointer-events-none",
+                        isSelected ? "bg-primary border-primary" : "bg-white/90 border-neutral-300"
+                    )}
+                >
                     {isSelected && (
                         <svg className="w-3 h-3 text-primary-foreground" viewBox="0 0 12 12" fill="none">
                             <path d="M2.5 6l2.5 2.5 4.5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -102,31 +123,20 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, onCl
                         <div className="flex items-end justify-between gap-2">
                             {variants.length > 0 && (
                                 <div className="flex gap-1">
-                                    <span className="text-sm font-semibold text-white drop-shadow-sm">
-                                        {currency(variants?.[0]?.price || 0)}
-                                    </span>
+                                    <span className="text-sm font-semibold text-white drop-shadow-sm">{currency(variants?.[0]?.price || 0)}</span>
                                     {variants?.[0]?.old_price > 0 && (
-                                        <span className="text-xs text-white line-through">
-                                            {currency(variants?.[0]?.old_price || 0)}
-                                        </span>
+                                        <span className="text-xs text-white line-through">{currency(variants?.[0]?.old_price || 0)}</span>
                                     )}
                                 </div>
                             )}
                             {combined.length > 0 && (
                                 <div className="flex flex-wrap justify-end gap-1 max-w-[65%]">
                                     {combined.slice(0, 3).map((attr, i) => (
-                                        <span
-                                            key={i}
-                                            className="text-[9px] font-medium text-white/90 bg-white/15 px-1.5 py-0.5 rounded-xs"
-                                        >
+                                        <span key={i} className="text-[9px] font-medium text-white/90 bg-white/15 px-1.5 py-0.5 rounded-xs">
                                             {attr}
                                         </span>
                                     ))}
-                                    {combined.length > 3 && (
-                                        <span className="text-[9px] font-medium text-white/70 px-1">
-                                            +{combined.length - 3}
-                                        </span>
-                                    )}
+                                    {combined.length > 3 && <span className="text-[9px] font-medium text-white/70 px-1">+{combined.length - 3}</span>}
                                 </div>
                             )}
                         </div>

@@ -27,10 +27,22 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
     </svg>
 );
 
+type FitMode = "cover" | "contain";
+
 const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick }) => {
+    const [fitMode, setFitMode] = useState<FitMode>("cover");
     const [mediaLoaded, setMediaLoaded] = useState<boolean>(false);
     const { priceInfo, handleAddToCart, handleWhatsAppPurchase, outOfStock, loading } = useProductCardVariant(product);
     const { minPrice, maxCompareAtPrice, hasDiscount, maxDiscountPercent } = priceInfo;
+
+    const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+        const { naturalWidth, naturalHeight } = e.currentTarget;
+        if (naturalWidth && naturalHeight) {
+            const isLandscape = naturalWidth > naturalHeight;
+            setFitMode(isLandscape ? "contain" : "cover");
+        }
+        setMediaLoaded(true);
+    };
     // const { mutate: createWishlist } = useUserCreateWishlist();
     // const { mutate: deleteWishlist } = useUserDeleteWishlist();
 
@@ -68,7 +80,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick }
             className={cn("block w-full rounded-xl overflow-hidden border border-border group", className)}
             preload={false}
         >
-
             <div className="relative aspect-gallery">
                 <div
                     onClick={(e) => {
@@ -83,11 +94,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick }
                     <img
                         alt={product?.name || ""}
                         src={product?.image}
-                        onLoad={() => setMediaLoaded(true)}
+                        onLoad={handleImageLoad}
                         loading="lazy"
                         decoding="async"
                         className={cn(
-                            "w-full h-full object-cover transition-opacity duration-500 group-hover:scale-105",
+                            "w-full h-full transition-opacity duration-500",
+                            fitMode === "cover" ? "object-cover" : "object-contain",
                             mediaLoaded ? "opacity-100" : "opacity-0",
                             outOfStock ? "cursor-pointer" : "cursor-zoom-in"
                         )}
@@ -100,13 +112,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick }
                     </span>
                 )}
                 {!outOfStock && !hasDiscount && product.is_new && (
-                    <span className="absolute top-2 left-2 bg-emerald-500 text-white text-2xs font-medium px-2 py-1 rounded-full">
-                        New
-                    </span>
+                    <span className="absolute top-2 left-2 bg-emerald-500 text-white text-2xs font-medium px-2 py-1 rounded-full">New</span>
                 )}
 
-
-                {(attributes.length > 0) && (
+                {attributes.length > 0 && (
                     <span className="absolute top-2 right-2 text-2xs font-medium text-white bg-indigo-700 px-2 py-1 rounded-lg">
                         {attributes.join(", ")}
                     </span>
@@ -139,17 +148,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick }
                         outOfStock ? "from-black/40 to-transparent" : "from-black/80 via-black/40 to-transparent"
                     )}
                 >
-                    <div className="text-white text-xs font-medium truncate drop-shadow-sm pr-4 sr-only">
-                        {product.name}
-                    </div>
+                    <div className="text-white text-xs font-medium truncate drop-shadow-sm pr-4 sr-only">{product.name}</div>
                     {product?.is_new && (
-                        <Badge variant="accent" className="w-fit uppercase tracking-wider" type="sm">New</Badge>
+                        <Badge variant="accent" className="w-fit uppercase tracking-wider" type="sm">
+                            New
+                        </Badge>
                     )}
                     <div className="flex items-baseline gap-1.5">
                         <span className="text-white text-lg font-medium drop-shadow-sm">{currency(minPrice)}</span>
-                        {!outOfStock && hasDiscount && (
-                            <span className="text-white/55 text-sm line-through">{currency(maxCompareAtPrice)}</span>
-                        )}
+                        {!outOfStock && hasDiscount && <span className="text-white/55 text-sm line-through">{currency(maxCompareAtPrice)}</span>}
                     </div>
                 </div>
             </div>
