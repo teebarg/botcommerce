@@ -65,7 +65,7 @@
     --background-image-gradient-primary: var(--gradient-primary);
     --background-image-gradient-action: var(--gradient-action);
 
-    --aspect-gallery: 4 / 5.9;
+    --aspect-gallery: 4 / 5;
 
     --container-8xl: 88rem;
     --container-sxl: 82rem;
@@ -233,15 +233,15 @@
     }
 
     input:-webkit-autofill,
-    input:-webkit-autofill:hover, 
-    input:-webkit-autofill:focus, 
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
     input:-webkit-autofill:active {
         /* Matches your --input CSS variable dynamically */
         -webkit-box-shadow: 0 0 0 1000px hsl(var(--background)) inset !important;
-        
+
         /* Matches your text color dynamically */
         -webkit-text-fill-color: hsl(var(--foreground)) !important;
-        
+
         /* Ensures the text font family mirrors your theme */
         font-family: inherit !important;
     }
