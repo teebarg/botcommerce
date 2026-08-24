@@ -10,7 +10,7 @@ import { cn } from "@/utils/cn";
 function openGemini(imageUrl: string, productId: number) {
     const params = new URLSearchParams({
         admin_image_url: imageUrl,
-        product_id: productId.toString()
+        product_id: productId.toString(),
     });
 
     const url = `https://gemini.google.com/app?${params.toString()}`;
@@ -45,7 +45,7 @@ export function ImageLightbox({
     size,
     productId,
     defaultImage,
-    isAdmin = false
+    isAdmin = false,
 }: ImageLightboxProps) {
     const [mediaLoaded, setMediaLoaded] = React.useState<boolean>(false);
     const [currentIndex, setCurrentIndex] = React.useState(initialIndex);
@@ -136,10 +136,7 @@ export function ImageLightbox({
                         onLoad={() => setMediaLoaded(true)}
                         src={currentImage.image}
                         alt={currentImage.image}
-                        className={cn(
-                            "w-full h-full object-cover transition-opacity duration-500",
-                            mediaLoaded ? "opacity-100" : "opacity-0",
-                        )}
+                        className={cn("w-full h-full object-contain transition-opacity duration-500", mediaLoaded ? "opacity-100" : "opacity-0")}
                         loading="eager"
                         decoding="async"
                         onClick={() => onOpenChange(false)}
@@ -157,18 +154,13 @@ export function ImageLightbox({
 
             {size && (
                 <div className="absolute top-14 left-4 bg-white text-black px-3 py-1">
-                    <span className="text-lg font-medium">
-                        Size: {size}
-                    </span>
+                    <span className="text-lg font-medium">Size: {size}</span>
                 </div>
             )}
 
             {productId && defaultImage?.image && (
                 <div className="absolute top-4 right-16">
-                    <Button
-                        size="xs"
-                        onClick={() => openGemini(defaultImage.image, productId)}
-                    >
+                    <Button size="xs" onClick={() => openGemini(defaultImage.image, productId)}>
                         Open Gemini
                     </Button>
                 </div>
@@ -189,15 +181,9 @@ export function ImageLightbox({
                         />
                     ))}
                 </div>
-                {isAdmin && productId && (
-                    <ProductImageUploader productId={productId} />
-                )}
+                {isAdmin && productId && <ProductImageUploader productId={productId} />}
             </div>
-            <div
-                className="absolute inset-0 -z-10"
-                onClick={() => onOpenChange(false)}
-                aria-hidden="true"
-            />
+            <div className="absolute inset-0 -z-10" onClick={() => onOpenChange(false)} aria-hidden="true" />
         </div>
     );
 }
