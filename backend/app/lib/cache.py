@@ -1,14 +1,17 @@
 from typing import Callable
+
 import httpx
-from fastapi import Response, Request
-from app.core.logging import get_logger
+from fastapi import Request, Response
+
 from app.core.config import settings
+from app.core.logging import get_logger
 
 logger = get_logger(__name__)
 
 _REFRESH_HEADER = "x-cache-refresh"
 _CACHE_CONTROL = "Cache-Control"
 _CDN_CACHE_CONTROL = "CDN-Cache-Control"
+
 
 def set_public_cache(
     request: Request,
@@ -18,9 +21,7 @@ def set_public_cache(
 ):
     request.state.cache_control = "no-store"
     request.state.cdn_cache_control = (
-        f"public, "
-        f"max-age={edge_ttl}, "
-        f"stale-while-revalidate={swr}"
+        f"public, max-age={edge_ttl}, stale-while-revalidate={swr}"
     )
     set_cache_headers(
         request,
@@ -49,6 +50,7 @@ def set_cache_headers(
     if cache_control:
         request.state.cache_control = cache_control
 
+
 # Response middleware helper
 async def add_cache_headers(
     request: Request,
@@ -64,60 +66,44 @@ async def add_cache_headers(
     response: Response = await call_next(request)
 
     if hasattr(request.state, "cache_control"):
-        response.headers[_CACHE_CONTROL] = (request.state.cache_control)
+        response.headers[_CACHE_CONTROL] = request.state.cache_control
 
     if hasattr(request.state, "cdn_cache_control"):
         response.headers[_CDN_CACHE_CONTROL] = request.state.cdn_cache_control
 
     return response
 
-async def purge_vercel_tags(*tags: str) -> None:
-    if not tags or not settings.is_production:
-        return
-    try:
-        async with httpx.AsyncClient(timeout=3.0) as client:
-            resp = await client.post(
-                "https://api.vercel.com/v1/edge-cache/invalidate-by-tags",
-                params={"projectIdOrName": settings.VERCEL_PROJECT_ID},
-                headers={"Authorization": f"Bearer {settings.VERCEL_API_TOKEN}"},
-                json={"tags": list(tags), "target": "production"},
-            )
-            resp.raise_for_status()
-    except httpx.HTTPError as e:
-        logger.warning(f"Vercel purge failed for tags {tags}: {e}")
-
 async def purge_cdn_urls(*paths: str) -> None:
     """Purge exact URLs from Cloudflare's edge cache, accounting for Vary: Origin."""
     origins: list[str] = [
         settings.FRONTEND_HOST,  # Frontend browser
-        settings.DOMAIN    # FastAPI docs / direct api
+        settings.DOMAIN,  # FastAPI docs / direct api
     ]
-    
+
     # Build the specific cache keys Cloudflare is tracking
     purge_files = []
     for p in paths:
         url: str = f"{settings.DOMAIN}{p}"
         for origin in origins:
-            purge_files.append({
-                "url": url,
-                "headers": {
-                    "Origin": origin
-                }
-            })
-            
+            purge_files.append({"url": url, "headers": {"Origin": origin}})
+
     print(f"Purging specific cache keys: {purge_files}")
-    
+
     try:
         async with httpx.AsyncClient(timeout=3.0) as client:
             resp = await client.post(
                 f"https://api.cloudflare.com/client/v4/zones/{settings.CF_ZONE_ID}/purge_cache",
                 headers={"Authorization": f"Bearer {settings.CF_API_TOKEN}"},
-                json={"files": purge_files},  # Passing objects with headers instead of strings
+                json={
+                    "files": purge_files
+                },  # Passing objects with headers instead of strings
             )
             resp.raise_for_status()
             data = resp.json()
             if not data.get("success"):
-                logger.warning(f"Cloudflare API rejected purge request: {data.get('errors')}")
+                logger.warning(
+                    f"Cloudflare API rejected purge request: {data.get('errors')}"
+                )
             else:
                 print("Cloudflare variant-specific purge accepted successfully!")
     except httpx.HTTPError as e:

@@ -18,23 +18,20 @@ const ConfigTypeSchema = z.object({
     tax_rate: z.string().optional(),
     feature_reviews: z.string().optional(),
     feature_chatbot: z.string().optional(),
-    feature_wishlist: z.string().optional(),
     payment_bank: z.string().optional(),
-    payment_card: z.string().optional(),
     payment_cash: z.string().optional(),
     payment_paystack: z.string().optional(),
-})
+    bank_name: z.string().optional(),
+    account_name: z.string().optional(),
+    account_number: z.string().optional(),
+});
 
-type ConfigType = z.infer<typeof ConfigTypeSchema>
+type ConfigType = z.infer<typeof ConfigTypeSchema>;
 
 const StoreContext = createContext<ConfigType | undefined>(undefined);
 
 export const StoreProvider = ({ config, children }: { config: ConfigType | undefined; children: React.ReactNode }) => {
-    return (
-        <StoreContext.Provider value={config}>
-            {children}
-        </StoreContext.Provider>
-    );
+    return <StoreContext.Provider value={config}>{children}</StoreContext.Provider>;
 };
 
 export const useConfig = () => {

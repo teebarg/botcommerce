@@ -1,18 +1,20 @@
 from typing import Annotated
+
 from fastapi import Depends
-from app.services.chat import ConversationService
-from app.services.coupon import CouponService
-from app.services.storage import MediaStorageService
-from app.services.user_interaction import InteractionService
-from app.core.dependencies.cache import ArqDep, CacheDep, CdnDep, RedisDep
-from app.services.bank_details import BankDetailsService
-from app.services.shop_settings import ShopSettingsService
+
+from app.core.dependencies.cache import ArqDep, CacheDep, CdnDep
+from app.prisma_client import DbDep
 from app.services.catalog import CatalogService
 from app.services.categories import CategoryService
+from app.services.chat import ConversationService
 from app.services.collections import CollectionService
+from app.services.coupon import CouponService
 from app.services.delivery import DeliveryService
 from app.services.review import ReviewService
-from app.prisma_client import DbDep
+from app.services.shop_settings import ShopSettingsService
+from app.services.storage import MediaStorageService
+from app.services.user_interaction import InteractionService
+
 
 def get_coupon_service(db: DbDep) -> CouponService:
     return CouponService(db=db)
@@ -20,8 +22,8 @@ def get_coupon_service(db: DbDep) -> CouponService:
 def get_storage_service() -> MediaStorageService:
     return MediaStorageService()
 
-def get_shop_settings_service(db: DbDep, redis: RedisDep) -> ShopSettingsService:
-    return ShopSettingsService(redis=redis, db=db)
+def get_shop_settings_service(db: DbDep, cache_srv: CacheDep, cdn_srv: CdnDep) -> ShopSettingsService:
+    return ShopSettingsService(db=db, cache_srv=cache_srv, cdn_srv=cdn_srv)
 
 def get_catalog_service(cache_srv: CacheDep, db: DbDep) -> CatalogService:
     return CatalogService(db=db, cache_srv=cache_srv)
@@ -38,9 +40,6 @@ def get_category_service(cache_srv: CacheDep, cdn_srv: CdnDep) -> CategoryServic
 def get_collection_service(cache_srv: CacheDep, cdn_srv: CdnDep) -> CollectionService:
     return CollectionService(cache_srv=cache_srv, cdn_srv=cdn_srv)
 
-def get_bank_details_service(cache_srv: CacheDep, cdn_srv: CdnDep) -> BankDetailsService:
-    return BankDetailsService(cache_srv=cache_srv, cdn_srv=cdn_srv)
-
 def get_delivery_service(cache_srv: CacheDep, cdn_srv: CdnDep) -> DeliveryService:
     return DeliveryService(cache_srv=cache_srv, cdn_srv=cdn_srv)
 
@@ -54,6 +53,5 @@ StorageDep = Annotated[MediaStorageService, Depends(get_storage_service)]
 CouponDep = Annotated[CouponService, Depends(get_coupon_service)]
 CategoryDep = Annotated[CategoryService, Depends(get_category_service)]
 CollectionDep = Annotated[CollectionService, Depends(get_collection_service)]
-BankDetailsDep = Annotated[BankDetailsService, Depends(get_bank_details_service)]
 DeliveryDep = Annotated[DeliveryService, Depends(get_delivery_service)]
 ReviewDep = Annotated[ReviewService, Depends(get_review_service)]

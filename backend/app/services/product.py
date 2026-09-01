@@ -392,7 +392,6 @@ class ProductService:
             await self.search_srv.update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
             await asyncio.gather(
                 self.cdn_srv.purge_cloudfare(f"/api/product/{product.slug}"),
-                self.cdn_srv.purge_vercel(f"product:{product.slug}", "products"),
                 return_exceptions=True
             )
             await self.cache_srv.invalidate(f"product:{product.slug}", tags=["products", "catalog", "gallery"])
@@ -426,17 +425,15 @@ class ProductService:
 
                 existing_set = set(existing_product_ids or [])
                 cloudfare_paths = [f"/api/product/{p.slug}" for p in products if p.id in existing_set]
-                vercel_tags = [f"product:{p.slug}" for p in products if p.id in existing_set]
+                slug_tags = [f"product:{p.slug}" for p in products if p.id in existing_set]
 
                 tasks = []
                 if cloudfare_paths:
                     tasks.append(self.cdn_srv.purge_cloudfare(*cloudfare_paths))
-                if vercel_tags:
-                    tasks.append(self.cdn_srv.purge_vercel(*vercel_tags, "products"))
                 if tasks:
                     await asyncio.gather(*tasks, return_exceptions=True)
                 await self.cache_srv.invalidate(
-                    *vercel_tags,
+                    *slug_tags,
                     tags=["products", "catalog", "gallery", "stats-trends"]
                 )
                 logger.debug(f"Successfully targeted indexed {len(documents)} products")
@@ -483,7 +480,6 @@ class ProductService:
                 skip += BATCH_SIZE
                 await asyncio.sleep(0.05)  # Yield block back to application loop thread
 
-            await self.cdn_srv.purge_vercel("products")
             await self.cache_srv.invalidate(tags=["products", "catalog"])
             logger.debug(f"Successfully batch indexed total of {total_processed} products")
 
@@ -500,7 +496,6 @@ class ProductService:
                 for pid in product_ids
             ])
             keys: list[str] = [f"product:{id}" for id in product_ids]
-            await self.cdn_srv.purge_vercel("products")
             await self.cache_srv.invalidate(tags=["products", "catalog", "stats-trends"] + keys)
         except Exception as e:
             logger.error(f"Error deleting products {product_ids} from index: {e}")

@@ -16,7 +16,6 @@ import PWABadge from "@/PWAbadge";
 import { AppSession } from "@/utils/session";
 import { getSessionId } from "@/utils";
 import { Analytics } from "@vercel/analytics/react";
-import { ShopSettings } from "@/schemas";
 import { useSettingsQuery } from "@/hooks/useGeneric";
 import { lazy, Suspense, useEffect, useState } from "react";
 import ImpersonationBanner from "@/components/impersonation-banner";
@@ -26,7 +25,7 @@ const PushPermission = lazy(() => import("@/components/push-permission"));
 
 interface RouterContext extends AppSession {
     queryClient: QueryClient;
-    config: any;
+    config: Record<string, string>;
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
@@ -39,11 +38,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
             queryClient.ensureQueryData(useSettingsQuery()),
         ]);
 
-        const config = Object.fromEntries(
-            settings.map((setting: ShopSettings) => [setting.key, setting.value])
-        );
-
-        return { ...session, config };
+        return { ...session, config: settings };
     },
     loader: async ({ context }) => {
         return {

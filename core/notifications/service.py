@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import asyncio
-import logging
-from typing import Optional
 from collections.abc import Sequence
 
+from core.logging import get_logger
 from core.notifications.base import (
     Channel,
     Notification,
@@ -12,11 +11,7 @@ from core.notifications.base import (
 from core.notifications.channels import (
     EmailChannel,
     SlackChannel,
-    WhatsAppChannel,
 )
-from core.logging import get_logger
-from core.config import settings
-
 
 logger = get_logger(__name__)
 

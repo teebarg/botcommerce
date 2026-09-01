@@ -1,31 +1,31 @@
-from typing import Any, Dict
-import time
 import asyncio
+import time
+from contextlib import asynccontextmanager
+from typing import Any
+from xml.etree.ElementTree import Element, SubElement, tostring
+
+import redis.asyncio as redis
 import sentry_sdk
+from arq.connections import ArqRedis
 from fastapi import BackgroundTasks, FastAPI, Request, Response
-from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
-from pydantic import BaseModel
-from arq.connections import ArqRedis
-import redis.asyncio as redis
-from contextlib import asynccontextmanager
-from xml.etree.ElementTree import Element, SubElement, tostring
 
 from app.api.main import api_router
 from app.core.config import settings
 from app.core.decorators import limit
-from app.models.generic import ContactFormCreate, NewsletterCreate, BulkPurchaseCreate
-from app.prisma_client import prisma, DbDep
-from app.services.websocket import manager
-from app.core.logging import get_logger
-from app.core.dependencies.product import SearchDep
-from app.core.notifications.setup import init_notification_service
-from app.services.cache import L1Cache, run_l1_invalidation_listener
-from app.lib.cache import add_cache_headers
 from app.core.dependencies.cache import ArqDep, CdnDep
+from app.core.dependencies.product import SearchDep
+from app.core.logging import get_logger
+from app.lib.cache import add_cache_headers
+from app.models.generic import BulkPurchaseCreate, ContactFormCreate, NewsletterCreate
+from app.prisma_client import DbDep, prisma
+from app.services.cache import L1Cache, run_l1_invalidation_listener
+from app.services.websocket import manager
 
 logger = get_logger(__name__)
 
@@ -38,7 +38,6 @@ async def lifespan(app: FastAPI):
         settings.REDIS_URL, decode_responses=True, max_connections=10)
     app.state.l1_cache = L1Cache(max_size=5000, ttl=60.0)
 
-    init_notification_service(redis=app.state.redis, db=prisma)
     await manager.start()
 
     listener_task = asyncio.create_task(
@@ -136,7 +135,7 @@ class PurgeCdn(BaseModel):
 
 
 @app.post("/api/test-arq")
-async def test_arq(queue: ArqDep) -> Dict[str, Any]:
+async def test_arq(queue: ArqDep) -> dict[str, Any]:
     # await queue.enqueue_job(
     #     "user_register",
     #     user_id=1,
@@ -145,14 +144,14 @@ async def test_arq(queue: ArqDep) -> Dict[str, Any]:
 
 
 @app.post("/api/purge-cdn")
-async def purge_cdn(cdn_srv: CdnDep, data: PurgeCdn) -> Dict[str, Any]:
+async def purge_cdn(cdn_srv: CdnDep, data: PurgeCdn) -> dict[str, Any]:
     await cdn_srv.purge_cloudfare(data.key)
     return {"message": "ok"}
 
 
 @app.head("/api/health")
 @app.get("/api/health")
-async def health(db: DbDep, search_srv: SearchDep) -> Dict[str, Any]:
+async def health(db: DbDep, search_srv: SearchDep) -> dict[str, Any]:
     meili_ok = await search_srv.check()
     postgres_ok = await db.execute_raw("SELECT 1;")
     redis_ok = True

@@ -1,13 +1,11 @@
-from datetime import datetime
 from dataclasses import dataclass
-from decimal import Decimal
+from datetime import datetime
 from typing import Any
 
 from core.notifications.base import (
     Mail,
     Notification,
     SlackMessage,
-    WhatsAppMessage,
 )
 
 
@@ -17,7 +15,7 @@ class OrderCreated(Notification):
     first_name: str
     last_name: str
     customer_email: str
-    total: Decimal
+    total: float
 
     def to_email(self) -> Mail:
         header_title = "Your order has been created successfully"

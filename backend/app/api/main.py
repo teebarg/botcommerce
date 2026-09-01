@@ -1,32 +1,31 @@
 from fastapi import APIRouter
 
 from app.api.routes import (
-    auth,
     activities,
-    analytics,
     address,
-    bank_details,
+    analytics,
+    auth,
+    base,
     cart,
+    catalog,
     category,
+    chat,
     collection,
+    coupon,
     delivery,
     faq,
-    chat,
-    internal,
-    order,
     gallery,
+    internal,
+    notification,
+    order,
     payments,
     product,
-    users,
     reviews,
-    websocket,
     shop_settings,
-    base,
     user_interaction,
-    catalog,
-    notification,
-    coupon,
-    wallet
+    users,
+    wallet,
+    websocket,
 )
 
 api_router = APIRouter()
@@ -34,7 +33,6 @@ api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 api_router.include_router(activities.router, prefix="/activities", tags=["activities"])
 api_router.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
 api_router.include_router(address.router, prefix="/address", tags=["address"])
-api_router.include_router(bank_details.router, prefix="/bank-details", tags=["bank-details"])
 api_router.include_router(base.router, prefix="", tags=["base"])
 api_router.include_router(cart.router, prefix="/cart", tags=["cart"])
 api_router.include_router(category.router, prefix="/category", tags=["category"])
