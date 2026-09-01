@@ -1,51 +1,58 @@
-import asyncio
 from typing import Any
-from fastapi import APIRouter, HTTPException, Request, Depends
-from pydantic import BaseModel
+
+from fastapi import APIRouter, Depends, HTTPException, Request
+
 from app.core.dependencies.services import SettingsDep
-from app.core.dependencies.cache import CacheDep, CdnDep
-from app.services.cache import cacheable
 from app.core.logging import get_logger
-from datetime import datetime
 from app.core.permissions import require_admin
 from app.prisma_client import DbDep
+from app.schemas.shop_settings import ShopSettingCreate, ShopSettingUpdate
+from app.services.cache import cacheable
 
 logger = get_logger(__name__)
 
 router = APIRouter()
 
-class ShopSettings(BaseModel):
-    id: int
-    key: str
-    value: str
-    type: str
-    created_at: datetime
-
 @router.get("/")
-@cacheable(key_prefix="shop-settings", key_builder=False, tags=["shop-settings"], expire=2592000, cdn_ttl=31536000, cdn_swr=604800)
-async def index(request: Request, db: DbDep) -> list[ShopSettings]:
+@cacheable(key_prefix="shop-settings", key_builder="config", tags=["shop-settings"], expire=2592000, cdn_ttl=31536000, cdn_swr=604800)
+async def index(request: Request, db: DbDep) -> dict[str, Any]:
     """
     Get shop settings with optional filtering
     """
-    return await db.shopsettings.find_many()
+    settings = await db.shopsettings.find_many()
+
+    return {
+        setting.key: setting.value
+        for setting in settings
+    }
+
+@router.get("/all")
+async def list_settings(srv: SettingsDep):
+    return await srv.get_all()
+
+@router.post("/", dependencies=[Depends(require_admin)], status_code=201)
+async def create_setting(
+    payload: ShopSettingCreate, srv: SettingsDep
+):
+    existing = await srv.get_by_key(payload.key)
+    if existing:
+        raise HTTPException(status_code=409, detail="Key already exists")
+    return await srv.create(payload.key, payload.value)
 
 
-@router.patch("/", dependencies=[Depends(require_admin)])
-async def update(form_data: dict[str, Any], cdn_srv: CdnDep, cache: CacheDep, srv: SettingsDep):
-    """
-    Sync shop details
-    """
-    try:
-        for key, value in form_data.items():
-            if not value:
-                continue
-            await srv.set(key, str(value), type_="SHOP_DETAIL")
-        await asyncio.gather(
-            cdn_srv.purge_cloudfare("/api/shop-settings/"),
-            cdn_srv.purge_vercel("shop-settings"),
-            return_exceptions=True
-        )
-        await cache.invalidate(tags=["shop-settings"])
-        return {"message": "Shop details updated successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+@router.patch("/{id}", dependencies=[Depends(require_admin)])
+async def update_setting(
+    id: int, payload: ShopSettingUpdate, srv: SettingsDep
+):
+    existing = await srv.get_by_id(id)
+    if not existing:
+        raise HTTPException(status_code=404, detail="Setting not found")
+    return await srv.update(id, payload.value)
+
+
+@router.delete("/{id}", dependencies=[Depends(require_admin)], status_code=204)
+async def delete_setting(id: int, srv: SettingsDep):
+    existing = await srv.get_by_id(id)
+    if not existing:
+        raise HTTPException(status_code=404, detail="Setting not found")
+    await srv.delete(id)

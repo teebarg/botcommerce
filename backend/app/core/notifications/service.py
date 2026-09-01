@@ -10,7 +10,6 @@ from app.core.notifications.events import (
 )
 from app.core.notifications.templates import TemplateEngine
 
-
 ChannelRouting = list[dict]
 
 

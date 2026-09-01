@@ -1,23 +1,22 @@
 import uuid
-from typing import Optional, Any, Dict
-from fastapi import HTTPException, BackgroundTasks
-from prisma import Prisma
-from prisma.errors import UniqueViolationError, DataError
-from prisma.enums import PaymentStatus, PaymentMethod, OrderStatus
-from arq.connections import ArqRedis
-from app.core.logging import logger
-from app.services.invoice import invoice_service
 from datetime import datetime
-from app.core.deps import Notification
-from app.services.product import ProductService
-from app.core.config import settings
-from app.services.shop_settings import ShopSettingsService
+from typing import Any, Optional
+
+from arq.connections import ArqRedis
+from fastapi import BackgroundTasks, HTTPException
+from prisma.enums import OrderStatus, PaymentMethod, PaymentStatus
+from prisma.errors import DataError, UniqueViolationError
+
+from app.core.logging import logger
+from app.models.order import PaginatedOrders
+from app.services.cache import CacheService
 from app.services.cart import CartService
 from app.services.coupon import CouponService
-from app.core.notifications.events import  OrderConfirmedEvent
-from app.services.cache import CacheService
+from app.services.invoice import invoice_service
+from app.services.product import ProductService
+from app.services.shop_settings import ShopSettingsService
 from app.services.storage import MediaStorageService
-from app.models.order import Order, PaginatedOrders
+from prisma import Prisma
 
 
 class OrderService:
@@ -28,7 +27,6 @@ class OrderService:
         product_srv: ProductService,
         coupon_srv: CouponService,
         settings_srv: ShopSettingsService,
-        notification_dispatcher: Notification,
         queue: ArqRedis,
         cache_srv: CacheService,
         storage_srv: MediaStorageService
@@ -38,7 +36,6 @@ class OrderService:
         self.product_srv = product_srv
         self.coupon_srv = coupon_srv
         self.settings_srv = settings_srv
-        self.notification_srv = notification_dispatcher
         self.cache_srv = cache_srv
         self.queue = queue
         self.storage_srv = storage_srv
@@ -78,7 +75,7 @@ class OrderService:
         user_role: str = "CUSTOMER",
         sort: str = "desc"
     ) -> PaginatedOrders:
-        where: Dict[str, Any] = {}
+        where: dict[str, Any] = {}
         if status:
             where["status"] = status
         if customer_id:
@@ -137,7 +134,7 @@ class OrderService:
                 detail=f"Some items in your cart are out of stock and must be removed before checkout: {names}",
             )
 
-        data: Dict[str, Any] = {
+        data: dict[str, Any] = {
             "order_number": order_number,
             "email": cart.email,
             "phone": cart.phone,
@@ -196,35 +193,6 @@ class OrderService:
 
         await self.cache_srv.invalidate(tags=["orders", "stats-trends", f"cart:{cart.cart_number}"])
         return new_order
-
-    async def send_confirmation_notification(self, id: int, user_id: int) -> None:
-        try:
-            user = await self.db.user.find_unique(where={"id": user_id})
-            if not user:
-                logger.error(f"User not found for ID: {user_id}")
-                return
-
-            order = await self.db.order.find_unique(
-                where={"id": id},
-                include={"order_items": {"include": {"variant": True}}, "user": True, "shipping_address": True}
-            )
-
-            shop_email = await self.settings_srv.get("shop_email")
-            cc_list = [shop_email] if shop_email else []
-            order_link: str = f"{settings.FRONTEND_HOST}/order/confirmed/{order.order_number}"
-            items_overview: str = "\n".join(
-                [f"• {it.name} x{it.quantity} - {it.price}" for it in (order.order_items or [])]
-            ) or "No items found"
-
-            await self.notification_srv.dispatch(OrderConfirmedEvent(
-                order=order,
-                user=user,
-                order_link=order_link,
-                items_overview=items_overview,
-                cc_list=cc_list
-            ))
-        except Exception as e:
-            logger.error(f"Failed to send confirmation notification: {e}")
 
     async def create_invoice(self, order_id: int, force: bool = False) -> str:
         try:
@@ -291,7 +259,7 @@ class OrderService:
                     continue
 
                 new_inventory = max(0, variant.inventory - quantity)
-                update_data: Dict[str, Any] = {"inventory": new_inventory}
+                update_data: dict[str, Any] = {"inventory": new_inventory}
                 out_of_stock = False
 
                 if new_inventory == 0 and variant.status != "OUT_OF_STOCK":
@@ -313,20 +281,7 @@ class OrderService:
         except Exception as e:
             logger.error(f"Failed to invalidate gallery cache for order {order.id}: {e}")
 
-        if out_of_stock_variants and self.notification_srv:
-            try:
-                slack_text: str = f"🚨 *OUT OF STOCK* 🚨\nOrder ID: {order.id}\n" + "\n".join([
-                    f"• SKU: {v.sku}, Product ID: {v.product_id}" for v in out_of_stock_variants
-                ])
-                await self.notification_srv.send(
-                    channel_name="slack",
-                    slack_message={"text": slack_text}
-                )
-                await self.cache_srv.invalidate(tags=["orders"])
-            except Exception as e:
-                logger.error(f"Failed to send out-of-stock slack: {e}")
-
-    async def return_order_item(self, order_id: int, item_id: int, background_tasks: BackgroundTasks) -> Dict[str, str]:
+    async def return_order_item(self, order_id: int, item_id: int, background_tasks: BackgroundTasks) -> dict[str, str]:
         """
         Return an item from an order:
         - Remove the order item
@@ -481,47 +436,3 @@ class OrderService:
         await self.queue.enqueue_job("generate_and_send_invoice", order_id=order.id)
 
         return updated_order
-
-    async def send_order_notification(self, id: int):
-        setting_srv = ShopSettingsService(redis=self.cache_srv.redis, db=self.db)
-        try:
-            order = await self.db.order.find_unique(
-                where={"id": id},
-                include={
-                    "order_items": {"include": {"variant": True}},
-                    "user": True,
-                    "shipping_address": True,
-                },
-            )
-
-            user = await self.db.user.find_unique(where={"id": order.user.id})
-            if not user:
-                logger.error(f"User not found for Order: {order.order_number}")
-                return
-
-            shop_email = await setting_srv.get("shop_email")
-            cc_list = [shop_email] if shop_email else []
-
-            order_link: str = f"{settings.FRONTEND_HOST}/order/confirmed/{order.order_number}"
-            items_overview: str = (
-                "\n".join(
-                    [
-                        f"• {it.name} x{it.quantity} - {it.price}"
-                        for it in (order.order_items or [])
-                    ]
-                )
-                if order.order_items
-                else "No items found"
-            )
-
-            await self.notification_srv.dispatch(
-                OrderConfirmedEvent(
-                    order=order,
-                    user=user,
-                    order_link=order_link,
-                    items_overview=items_overview,
-                    cc_list=cc_list,
-                )
-            )
-        except Exception as e:
-            logger.error(f"Failed to send notification: {e}")

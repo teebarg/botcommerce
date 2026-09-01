@@ -1,14 +1,15 @@
 from typing import Any
+
 from redis.asyncio import Redis
+
 from prisma import Prisma
-from app.core.dependencies.services import get_shop_settings_service
 
 
 class TemplateEngine:
     def __init__(self, db: Prisma, redis: Redis):
         self.db = db
         self.redis = redis
-        self.settings_srv = get_shop_settings_service(redis=redis, db=db)
+        self.settings_srv = None
 
     async def render(self, channel: str, event_name: str, context: dict[str, Any]) -> Any:
         method = f"_{event_name}"

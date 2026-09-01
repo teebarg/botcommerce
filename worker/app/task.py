@@ -1,16 +1,18 @@
-from core.storage import MediaStorageService
 import asyncio
+
 from arq import cron
 from arq.connections import RedisSettings
-from app.tasks import all_ecommerce_tasks
-from app.config import settings
-from app.tasks.enrich_products import enrich_products
-from app.tasks.products import clean_up_dangling
-from app.db import db
-from app.logger import logger
-from app.db import session_factory
 from core.notifications.setup import create_notification_service
 from core.repositories.shop_settings_repository import ShopSettingsRepository
+from core.storage import MediaStorageService
+
+from app.config import settings
+from app.db import db, session_factory
+from app.logger import logger
+from app.tasks import all_ecommerce_tasks
+from app.tasks.enrich_products import enrich_products
+from app.tasks.products import clean_up_dangling
+
 
 async def startup(ctx):
     """Runs exactly once when the worker container fires up"""

@@ -19,14 +19,6 @@ export const ShopSettingsSchema = z.object({
     type: ShopSettingsTypeSchema,
 });
 
-export const BankDetailsSchema = z.object({
-    id: z.number(),
-    bank_name: z.string(),
-    account_name: z.string(),
-    account_number: z.string(),
-    is_active: z.boolean(),
-});
-
 export const FAQSchema = z.object({
     id: z.number(),
     question: z.string(),
@@ -89,10 +81,9 @@ export const phoneSchema = z
 
 export type DeliveryOption = z.infer<typeof DeliveryOptionSchema>;
 export type Coupon = z.infer<typeof CouponSchema>;
-export type PaginatedCoupons = z.infer<typeof PaginatedCouponsSchema>
+export type PaginatedCoupons = z.infer<typeof PaginatedCouponsSchema>;
 export type CouponUsage = z.infer<typeof CouponUsageSchema>;
 
 export type Message = z.infer<typeof MessageSchema>;
 export type ShopSettings = z.infer<typeof ShopSettingsSchema>;
-export type BankDetails = z.infer<typeof BankDetailsSchema>;
 export type FAQ = z.infer<typeof FAQSchema>;

@@ -230,18 +230,6 @@ async def seed_delivery_options():
         )
 
 
-async def seed_bank_details():
-    logger.info("Seeding bank details...")
-    await db.bankdetails.delete_many()
-    await db.bankdetails.create(
-        {
-            "bank_name": "Citi Bank",
-            "account_name": "John Doe",
-            "account_number": "0123456789",
-        }
-    )
-
-
 async def seed_coupons():
     logger.info("Seeding coupons...")
     for coupon in [
@@ -435,7 +423,6 @@ async def seed():
     products = await seed_products()
     await seed_shop_settings()
     await seed_delivery_options()
-    await seed_bank_details()
     await seed_coupons()
     await seed_carousel_banners()
     await seed_faqs()

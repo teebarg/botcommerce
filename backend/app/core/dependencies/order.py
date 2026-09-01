@@ -1,12 +1,14 @@
 from typing import Annotated
+
 from fastapi import Depends
+
 from app.core.dependencies.cache import ArqDep, CacheDep
 from app.core.dependencies.cart import CartDep
 from app.core.dependencies.product import ProductDep
-from app.services.order import OrderService
-from app.core.notifications.setup import get_notification_service
 from app.core.dependencies.services import CouponDep, SettingsDep, StorageDep
 from app.prisma_client import DbDep
+from app.services.order import OrderService
+
 
 def get_order_service(
     queue: ArqDep,
@@ -23,7 +25,6 @@ def get_order_service(
         product_srv=product_srv,
         coupon_srv=coupon_srv,
         settings_srv=settings_srv,
-        notification_dispatcher=get_notification_service(),
         cache_srv=cache_srv,
         queue=queue,
         storage_srv=storage_srv

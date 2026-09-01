@@ -1,21 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { api } from "@/utils/api";
-import { BankDetails, Chat, ConversationStatus, DeliveryOption, Message } from "@/schemas";
-
-export const useBankDetails = () => {
-    return useQuery({
-        queryKey: ["bank-details"],
-        queryFn: () => api.get<BankDetails[]>("/bank-details/"),
-    });
-};
+import { Chat, ConversationStatus, DeliveryOption, Message } from "@/schemas";
 
 export const useChat = (uid: string, props: { enabled: boolean }) => {
     return useQuery({
         queryKey: ["chat", uid],
         queryFn: () => api.get<Chat>(`/chat/${uid}`),
         staleTime: 1000 * 60 * 5,
-        enabled: props.enabled
+        enabled: props.enabled,
     });
 };
 
@@ -33,7 +26,6 @@ export const useChatMutation = () => {
         },
     });
 };
-
 
 export const useChatStatusMutation = () => {
     return useMutation({
@@ -134,4 +126,3 @@ export const useDeliveryOptions = () => {
         staleTime: Infinity,
     });
 };
-

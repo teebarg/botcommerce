@@ -1,8 +1,14 @@
-from app.core.config import settings
-from app.core.notifications.service import NotificationService
-from app.core.notifications.channels import EmailChannel, PushChannel, SlackChannel, WhatsAppChannel
-from app.core.notifications.templates import TemplateEngine
 from redis.asyncio import Redis
+
+from app.core.config import settings
+from app.core.notifications.channels import (
+    EmailChannel,
+    PushChannel,
+    SlackChannel,
+    WhatsAppChannel,
+)
+from app.core.notifications.service import NotificationService
+from app.core.notifications.templates import TemplateEngine
 from prisma import Prisma
 
 _notification_service: NotificationService | None = None
