@@ -1,16 +1,16 @@
-from typing import Optional, Literal
 from datetime import datetime
+from typing import Literal, Optional
 
-from fastapi import APIRouter, BackgroundTasks
+from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 
-from app.models.generic import Message
-from app.core.logging import get_logger
-from app.core.deps import Notification, UserDep
-from app.core.notifications.events import SendPushNotificationEvent
 from app.core.dependencies.cache import ArqDep
+from app.core.deps import UserDep
+from app.core.logging import get_logger
+from app.models.generic import Message
 from app.prisma_client import DbDep
+
 
 class PushEventSchema(BaseModel):
     notificationId: str
@@ -21,6 +21,7 @@ class PushEventSchema(BaseModel):
     title: Optional[str] = None
     body: Optional[str] = None
 
+
 class PushMessageSchema(BaseModel):
     notificationId: str
     title: str
@@ -28,25 +29,28 @@ class PushMessageSchema(BaseModel):
     image: Optional[str] = None
     path: Optional[str] = None
 
+
 class FCMIn(BaseModel):
     endpoint: str
     p256dh: str
     auth: str
 
+
 logger = get_logger(__name__)
 
 router = APIRouter()
+
 
 @router.post("/push-event")
 async def create_push_event(queue: ArqDep, data: PushEventSchema) -> Message:
     try:
         await queue.enqueue_job(
-            "push_event_analytics",
-            data= jsonable_encoder(data, exclude_none=True)
+            "push_event_analytics", data=jsonable_encoder(data, exclude_none=True)
         )
     except Exception as e:
         logger.error(f"Error creating push event: {e}")
     return Message(message="success")
+
 
 @router.post("/push-fcm")
 async def push_fcm(queue: ArqDep, db: DbDep, data: FCMIn, user: UserDep) -> Message:
@@ -58,22 +62,20 @@ async def push_fcm(queue: ArqDep, db: DbDep, data: FCMIn, user: UserDep) -> Mess
     )
     try:
         await db.pushsubscription.upsert(
-            where={
-                'endpoint': data.endpoint
-            },
+            where={"endpoint": data.endpoint},
             data={
                 "create": {
-                    'p256dh': data.p256dh,
-                    'auth': data.auth,
-                    'endpoint': data.endpoint,
-                    'userId': user.id if user else None
+                    "p256dh": data.p256dh,
+                    "auth": data.auth,
+                    "endpoint": data.endpoint,
+                    "userId": user.id if user else None,
                 },
                 "update": {
-                    'p256dh': data.p256dh,
-                    'auth': data.auth,
-                    'userId': user.id if user else None
-                }
-            }
+                    "p256dh": data.p256dh,
+                    "auth": data.auth,
+                    "userId": user.id if user else None,
+                },
+            },
         )
     except Exception as e:
         logger.error(f"Failed to create subs: {str(e)}")
@@ -82,10 +84,10 @@ async def push_fcm(queue: ArqDep, db: DbDep, data: FCMIn, user: UserDep) -> Mess
 
 
 @router.post("/push")
-async def send_push_notification(db: DbDep, data: PushMessageSchema, background_tasks: BackgroundTasks, notification: Notification) -> Message:
+async def send_push_notification(queue: ArqDep, payload: PushMessageSchema) -> Message:
     try:
-        subscriptions = await db.pushsubscription.find_many()
-        background_tasks.add_task(notification.dispatch, SendPushNotificationEvent(subscriptions=[subscription.model_dump() for subscription in subscriptions], notification=data.model_dump()))
+        # subscriptions = await db.pushsubscription.find_many()
+        await queue.enqueue_job("push_notification", payload=payload)
         return Message(message="success")
     except Exception as e:
         logger.error(f"Failed to send push notifications: {str(e)}")

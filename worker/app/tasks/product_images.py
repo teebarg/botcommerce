@@ -94,11 +94,8 @@ async def optimize_product_image(
         )
         await session.commit()
 
-    cdn = CacheInvalidationService()
-    await cdn.purge_vercel("products")
-
     await call_internal_backend(
-        path=f"/internal/invalidate",
+        path="/internal/invalidate",
         label="Invalidate",
         json_body={"tags": ["products", "catalog", "gallery"]},
     )

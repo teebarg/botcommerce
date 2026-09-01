@@ -1,19 +1,24 @@
-from typing import Annotated, Literal, Optional
 import time
+from typing import Annotated, Literal, Optional
+
 import httpx
 import jwt
-from fastapi import Depends, HTTPException, status, Cookie
-from fastapi.security import APIKeyHeader, OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel
+from fastapi import Cookie, Depends, HTTPException, status
+from fastapi.security import (
+    APIKeyHeader,
+    HTTPAuthorizationCredentials,
+    HTTPBearer,
+    OAuth2PasswordBearer,
+)
 from jose import jwt as jose_jwt
-from app.prisma_client import prisma
+from pydantic import BaseModel
+
 from app.core import security
 from app.core.config import settings
-from app.models.user import UserInternal as User
-from app.core.logging import get_logger
-from app.core.notifications.service import NotificationService
-from app.core.notifications.setup import get_notification_service
 from app.core.dependencies.cache import CacheDep
+from app.core.logging import get_logger
+from app.models.user import UserInternal as User
+from app.prisma_client import prisma
 
 logger = get_logger(__name__)
 
@@ -162,4 +167,3 @@ async def get_principal(
     )
 
 PrincipalDep = Annotated[Principal, Depends(get_principal)]
-Notification = Annotated[NotificationService, Depends(get_notification_service)]

@@ -2,9 +2,5 @@ import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_mainLayoutPublic/_static")({
     preload: false,
-    headers: () => ({
-        "Vercel-CDN-Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
-        "Vercel-Cache-Tag": "shop-settings",
-    }),
     component: () => <Outlet />,
 });

@@ -11,6 +11,7 @@ A comprehensive, modern e-commerce backend built with **FastAPI**, **Prisma**, a
 ## 🚀 Features
 
 ### Core E-commerce
+
 - **Product Management**: Catalog, categories, brands, collections, variants
 - **Order Processing**: Cart management, checkout, order tracking, status updates
 - **User Management**: Authentication, profiles, addresses, wallet system
@@ -18,6 +19,7 @@ A comprehensive, modern e-commerce backend built with **FastAPI**, **Prisma**, a
 - **Reviews & Ratings**: Customer feedback, product reviews
 
 ### Advanced Features
+
 - **Real-time Notifications**: WebSockets, push notifications, email alerts
 - **Search & Discovery**: MeiliSearch integration, advanced filtering
 - **Content Management**: CMS, galleries, FAQs
@@ -26,6 +28,7 @@ A comprehensive, modern e-commerce backend built with **FastAPI**, **Prisma**, a
 - **Coupon System**: Discount codes, promotions, loyalty programs
 
 ### Technical Features
+
 - **FastAPI**: Modern async API with automatic validation & documentation
 - **Prisma ORM**: Type-safe database operations with PostgreSQL
 - **JWT Authentication**: Secure user authentication & authorization
@@ -50,12 +53,14 @@ A comprehensive, modern e-commerce backend built with **FastAPI**, **Prisma**, a
 ## ⚡ Quick Start
 
 ### Prerequisites
+
 - Python 3.10+
 - PostgreSQL database
 - Redis server
 - UV (recommended package manager)
 
 ### 1. Clone & Install
+
 ```bash
 git clone https://github.com/teebarg/botcommerce
 cd backend
@@ -63,12 +68,14 @@ uv sync
 ```
 
 ### 2. Set Up Environment
+
 ```bash
 cp .env.example .env
 # Edit .env with your database URLs and API keys
 ```
 
 ### 3. Database Setup
+
 ```bash
 # Generate Prisma client
 uv run prisma generate
@@ -81,6 +88,7 @@ uv run prisma db seed
 ```
 
 ### 4. Start the Application
+
 ```bash
 # Development mode with hot reload
 uv run uvicorn app.api.main:app --reload --host 0.0.0.0 --port 4030
@@ -114,7 +122,7 @@ backend/
 │   │       ├── order.py         # Order management
 │   │       ├── payment.py       # Payment processing
 │   │       ├── reviews.py       # Product reviews
-│   │       ├── notification.py  # Notification system
+│   │       ├── notification.py
 │   │       ├── websocket.py     # WebSocket handlers
 │   │       └── ...              # 25+ route modules
 │   ├── core/

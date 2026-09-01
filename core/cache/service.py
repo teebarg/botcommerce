@@ -1,25 +1,11 @@
 import httpx
-from core.logging import get_logger
+
 from core.config import settings
+from core.logging import get_logger
 
 logger = get_logger(__name__)
 
 class CacheInvalidationService:
-    async def purge_vercel(self, *tags: str) -> None:
-        if not tags or not settings.is_production:
-            return
-        try:
-            async with httpx.AsyncClient(timeout=3.0) as client:
-                resp = await client.post(
-                    "https://api.vercel.com/v1/edge-cache/invalidate-by-tags",
-                    params={"projectIdOrName": settings.VERCEL_PROJECT_ID},
-                    headers={"Authorization": f"Bearer {settings.VERCEL_API_TOKEN}"},
-                    json={"tags": list(tags), "target": "production"},
-                )
-                resp.raise_for_status()
-        except httpx.HTTPError as e:
-            logger.warning(f"Vercel purge failed for tags {tags}: {e}")
-
     async def purge_cloudflare(self, *paths: str) -> None:
         """Purge exact URLs from Cloudflare's edge cache, accounting for Vary: Origin."""
         origins: list[str] = [
