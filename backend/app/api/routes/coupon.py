@@ -1,22 +1,26 @@
-from typing import Annotated, Optional, List
-from fastapi import APIRouter, Depends, HTTPException, Cookie, Query, Request
+from datetime import date, datetime
+from typing import Annotated, List, Optional
+
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Request
 from prisma.errors import PrismaError
-from app.core.deps import UserDep, CurrentUser
-from app.models.coupon import (
-    CouponCreate,
-    CouponUpdate,
-    Coupon,
-    PaginatedCoupons, CouponScope, CouponAnalytics
-)
-from app.core.logging import get_logger
-from datetime import datetime, date
-from app.core.permissions import require_admin
-from app.models.generic import Message
-from app.services.cache import cacheable
+
 from app.core.dependencies.cache import CacheDep
 from app.core.dependencies.cart import CartDep
 from app.core.dependencies.services import CouponDep
+from app.core.deps import CurrentUser, UserDep
+from app.core.logging import get_logger
+from app.core.permissions import require_admin
+from app.models.coupon import (
+    Coupon,
+    CouponAnalytics,
+    CouponCreate,
+    CouponScope,
+    CouponUpdate,
+    PaginatedCoupons,
+)
+from app.models.generic import Message
 from app.prisma_client import DbDep
+from app.services.cache import cacheable
 
 logger = get_logger(__name__)
 router = APIRouter()

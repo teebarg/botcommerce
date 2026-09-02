@@ -20,11 +20,6 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ cart }) => {
         if (cart.shipping_method) {
             completed.push("delivery");
         }
-
-        if (cart.status == "CONVERTED") {
-            completed.push("payment");
-        }
-
         return completed;
     };
 
@@ -37,19 +32,9 @@ const CheckoutFlow: React.FC<CheckoutFlowProps> = ({ cart }) => {
 
         switch (stepToRender) {
             case "delivery":
-                return (
-                    <DeliveryStep
-                        cart={cart}
-                        onComplete={() => setCurrentStep("payment")}
-                    />
-                );
+                return <DeliveryStep cart={cart} onComplete={() => setCurrentStep("payment")} />;
             case "payment":
-                return (
-                    <PaymentStep
-                        cart={cart}
-                        onBack={() => setCurrentStep("delivery")}
-                    />
-                );
+                return <PaymentStep cart={cart} onBack={() => setCurrentStep("delivery")} />;
             default:
                 return null;
         }

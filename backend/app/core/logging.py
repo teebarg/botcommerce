@@ -1,7 +1,9 @@
+import asyncio
 import logging
 import logging.config
+
 import httpx
-import asyncio
+
 from app.core.config import settings
 
 SUCCESS_LEVEL_NUM = 25

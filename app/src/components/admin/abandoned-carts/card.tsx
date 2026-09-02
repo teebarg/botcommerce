@@ -1,13 +1,13 @@
-import { Clock, Mail, Package, MapPin } from "lucide-react";
+import { Clock, Mail, Package } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { AbandonedCartDetailsDialog } from "./details";
 import { ReminderButton } from "./reminder-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { AbandonedCart, CartItem } from "@/schemas";
-import { currency } from "@/utils";
+import { currency, timeAgo } from "@/utils";
 import { useSendCartReminder } from "@/hooks/useAbandonedCart";
 import ImageDisplay from "@/components/image-display";
+import { AbandonedCart, CartItem } from "@/schemas/abandoned-cart";
 
 interface AbandonedCartCardProps {
     cart: AbandonedCart;
@@ -15,18 +15,7 @@ interface AbandonedCartCardProps {
 
 export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
     const sendReminderMutation = useSendCartReminder();
-    const email = cart.email || cart.user?.email
-
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case "ABANDONED":
-                return "bg-amber-500/10 text-amber-500 border-amber-500/20";
-            case "ACTIVE":
-                return "bg-green-500/10 text-green-500 border-green-500/20";
-            default:
-                return "bg-muted text-muted-foreground border-border";
-        }
-    };
+    const email = cart.email || cart.user?.email;
 
     const handleSendReminder = () => {
         sendReminderMutation.mutate(cart.id);
@@ -43,9 +32,7 @@ export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
                                     <h3 className="font-semibold text-lg">
                                         {cart.user?.first_name ? `${cart.user?.first_name} ${cart.user?.last_name}` : "Guest User"}
                                     </h3>
-                                    <Badge className={getStatusColor(cart.status!)}>
-                                        {cart.status!.charAt(0).toUpperCase() + cart.status!.slice(1)}
-                                    </Badge>
+                                    {cart.updated_at && <p className="text-xs text-muted-foreground">{timeAgo(cart.updated_at)}</p>}
                                 </div>
                                 <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                                     {email && (
@@ -71,10 +58,7 @@ export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
                                     {cart.items.slice(0, 3).map((item: CartItem) => (
                                         <div key={item.id} className="group relative">
                                             <div className="w-20 h-20 rounded-lg overflow-hidden border bg-muted">
-                                                <ImageDisplay
-                                                    alt={item.name}
-                                                    url={item.image}
-                                                />
+                                                <ImageDisplay alt={item.name || "image"} url={item.image || ""} />
                                             </div>
                                             {item.quantity > 1 && (
                                                 <Badge className="absolute top-0 -right-3 h-5 w-5 p-0 justify-center" variant="accent">
@@ -105,7 +89,7 @@ export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
                         </div>
 
                         <div className="flex flex-col gap-2 w-full">
-                            {cart.status !== "CONVERTED" && !!cart.user && <ReminderButton id={cart.id} />}
+                            {!!cart.user && <ReminderButton id={cart.id} />}
                             <AbandonedCartDetailsDialog cart={cart} />
                         </div>
                     </div>

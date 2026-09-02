@@ -54,9 +54,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                         </div>
                         <div>
                             <p className="text-sm font-medium">Your cart is empty</p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                                Add items to your cart before continuing to payment.
-                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">Add items to your cart before continuing to payment.</p>
                         </div>
                         <Link
                             to="/collections"
@@ -69,7 +67,6 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
 
                 {!isCartEmpty && (
                     <>
-
                         <DiscountCode />
 
                         <WalletDeduction cart={cart!} />
@@ -130,7 +127,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ cart }) => {
                 )}
             </div>
             {!hasOutOfStock && !isCartEmpty && cart?.payment_method === PaymentMethod.PAYSTACK && (
-                <PaystackPayment amount={cart.total} cartNumber={cart.cart_number} canContinue={canContinue} />
+                <PaystackPayment amount={cart.total} canContinue={canContinue} />
             )}
             {!hasOutOfStock && !isCartEmpty && cart?.payment_method === PaymentMethod.BANK_TRANSFER && (
                 <BankTransfer amount={cart.total} canContinue={canContinue} />

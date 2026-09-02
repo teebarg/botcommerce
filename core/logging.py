@@ -1,7 +1,9 @@
+import asyncio
 import logging
 import logging.config
+
 import httpx
-import asyncio
+
 from core.config import settings
 
 SUCCESS_LEVEL_NUM = 25
@@ -14,8 +16,8 @@ def success(self, message, *args, **kwargs):
 logging.Logger.success = success
 
 
-async def send_slack_message(text, level="info", channel: str = "alerts", webhook_url: str = None):
-    channel_map = {"alerts": settings.SLACK_ALERTS, "orders": settings.SLACK_ORDERS}
+async def send_slack_message(text, level="info", channel: str = "alerts", webhook_url: str | None = None):
+    channel_map = {"alerts": settings.SLACK_WEBHOOK_URL, "orders": settings.SLACK_WEBHOOK_URL}
     title_map = {"info": "INFO", "warning": "WARNING", "error": "ERROR",
                  "critical": "CRITICAL", "debug": "DEBUG", "success": "SUCCESS"}
     emoji_map = {"info": "ℹ️", "warning": "⚠️", "error": "⚠️",

@@ -1,18 +1,19 @@
-from typing import Any, Optional, List, Dict
-import random
 import asyncio
-from app.services.storage import MediaStorageService
+import random
+from typing import Any, Dict, List, Optional
+
 from fastapi import HTTPException
+
 from app.core.logging import get_logger
-from app.core.utils import slugify, generate_sku
-from app.prisma_client import Prisma
+from app.core.utils import generate_sku, slugify
 from app.models.gallery import PaginatedGalleryImages
 from app.models.generic import ImageBulkDelete
 from app.models.product import (
-    ProductImageMetadata,
     ImagesBulkUpdate,
     ProductImageBulkUrls,
+    ProductImageMetadata,
 )
+from app.prisma_client import Prisma
 from app.services.cache import CacheService
 
 logger = get_logger(__name__)
@@ -20,10 +21,9 @@ logger = get_logger(__name__)
 
 class GalleryService:
     """Coordinates Business Domain Logics."""
-    def __init__(self, db: Prisma, websocket_manager, storage_srv: MediaStorageService, cache_srv: CacheService):
+    def __init__(self, db: Prisma, websocket_manager, cache_srv: CacheService):
         self.db = db
         self.ws_manager = websocket_manager
-        self.storage = storage_srv
         self.cache_srv = cache_srv
 
     @staticmethod

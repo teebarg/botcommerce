@@ -1,11 +1,32 @@
-import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { api } from "@/utils/api";
 import { Message } from "@/schemas";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { AbandonedCart, AbandonedCartListResponse } from "@/schemas/abandoned-cart";
+
+const PAGE_SIZE = 20;
+
+export function useAbandonedCarts(search: string) {
+    return useInfiniteQuery({
+        queryKey: ["abandoned-carts", { search }],
+        queryFn: ({ pageParam = 0 }) =>
+            api.get<AbandonedCartListResponse>("/abandoned-carts/", { params: { skip: pageParam, limit: PAGE_SIZE, search: search || undefined } }),
+        initialPageParam: 0,
+        getNextPageParam: (lastPage) => (lastPage.has_more ? lastPage.skip + lastPage.limit : undefined),
+    });
+}
+
+export function useDeleteAbandonedCart() {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: (id: number) => api.delete<AbandonedCart>(`/abandoned-carts/${id}`),
+        onSuccess: () => qc.invalidateQueries({ queryKey: ["abandoned-carts"] }),
+    });
+}
 
 export const useSendCartReminder = () => {
     return useMutation({
-        mutationFn: async (cartId: number) => await api.post<Message>(`/cart/abandoned-carts/${cartId}/send-reminder`),
+        mutationFn: async (cartId: number) => await api.post<Message>(`/abandoned-carts/${cartId}/send-reminder`),
         onSuccess: () => {
             toast.success("Recovery email sent");
         },
@@ -17,10 +38,9 @@ export const useSendCartReminder = () => {
 
 export const useSendCartReminders = () => {
     return useMutation({
-        mutationFn: async ({ hours_threshold, limit = 20 }: { hours_threshold: number; limit?: number }) =>
-            await api.post<Message>("/cart/abandoned-carts/send-reminders", {
+        mutationFn: async ({ hours_threshold }: { hours_threshold: number }) =>
+            await api.post<Message>("/abandoned-carts/send-reminders", {
                 hours_threshold,
-                limit,
             }),
         onSuccess: () => {
             toast.success("Recovery email sent");

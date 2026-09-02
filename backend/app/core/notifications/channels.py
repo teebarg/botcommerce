@@ -1,45 +1,15 @@
-import httpx
 from abc import ABC, abstractmethod
+
+import httpx
+
 from app.core.logging import logger
 from app.core.notifications.utils.push import send_notifications_to_subscribers
-from app.core.config import settings
-from app.core.utils import send_email_brevo
-from app.core.utils import send_email_smtp
 
 
 class NotificationChannel(ABC):
     @abstractmethod
     async def send(self, recipient: str, message: str, **kwargs) -> bool:
         pass
-
-
-class EmailChannel(NotificationChannel):
-    def __init__(self, smtp_host: str, smtp_port: int, username: str, password: str):
-        self.smtp_host = smtp_host
-        self.smtp_port = smtp_port
-        self.username = username
-        self.password = password
-
-    async def send(self, recipient: str, message: str, **kwargs) -> bool:
-        try:
-            if settings.ENVIRONMENT == "local":
-                await send_email_smtp(
-                    email_to=recipient,
-                    subject=kwargs.get("subject", "Notification"),
-                    html_content=message,
-                    cc_list=kwargs.get("cc_list", [])
-                )
-            else:
-                await send_email_brevo(
-                    email_to=recipient,
-                    subject=kwargs.get("subject", "Notification"),
-                    html_content=message,
-                    cc_list=kwargs.get("cc_list", [])
-            )
-            return True
-        except Exception as e:
-            logger.error(f"Email sending failed: {str(e)}")
-            raise Exception(f"Email sending failed: {str(e)}")
 
 
 class SlackChannel(NotificationChannel):

@@ -129,30 +129,13 @@ export const useDeleteCartItem = () => {
     });
 };
 
-export const useCompleteCart = () => {
-    const navigate = useNavigate();
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: async (complete: CartComplete) => await api.post<Order>("/order/", complete),
-        onSuccess: async (data) => {
-            console.log("🚀 ~ useCompleteCart ~ data:", data);
-            window.location.href = `/order/confirmed/${data?.order_number}`;
-            queryClient.invalidateQueries({ queryKey: ["cart"] });
-        },
-        onError: (error: any) => {
-            navigate({ to: "/cart" }); // send them back
-            toast.error(error.message || "Failed to place order");
-        },
-    });
-};
-
 export const usePlaceOrder = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (complete: CartComplete) => await api.post<Order>("/order/checkout", complete),
+        mutationFn: async () => await api.post<Order>("/order/"),
         onSuccess: async (data) => {
+            console.log("🚀 ~ usePlaceOrder ~ data:", data);
             queryClient.invalidateQueries({ queryKey: ["cart"] });
             if (data.payment_method == "BANK_TRANSFER") {
                 window.location.href = `/order/confirmed/${data?.order_number}`;

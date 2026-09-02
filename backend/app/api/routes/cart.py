@@ -1,36 +1,26 @@
-from datetime import datetime, timedelta, timezone
-from typing import Annotated, Any, Optional
+from typing import Annotated, Any
 
 from fastapi import (
     APIRouter,
     BackgroundTasks,
     Cookie,
-    Depends,
     HTTPException,
-    Request,
     Response,
 )
 from fastapi.responses import JSONResponse
-from prisma.enums import CartStatus
 
 from app.core.config import settings
-from app.core.dependencies.cache import ArqDep
 from app.core.dependencies.cart import CartDep
 from app.core.deps import CurrentUser, UserDep
 from app.core.logging import get_logger
-from app.core.permissions import require_admin
-from app.models.abandoned_cart import PaginatedAbandonedCarts
 from app.models.cart import (
-    Cart,
     CartItem,
     CartItemCreate,
     CartLite,
     CartUpdate,
-    SendAbandonedCartReminders,
 )
 from app.models.generic import Message
 from app.prisma_client import DbDep
-from app.services.cache import cacheable
 
 logger = get_logger(__name__)
 
@@ -222,107 +212,3 @@ async def remove_wallet(
 
     await srv.remove_wallet_balance(cart=cart, user=user)
     return Message(message="Wallet usage removed from cart session")
-
-
-# =====================================================================
-# ABANDONED CART
-# =====================================================================
-
-@router.get("/abandoned-carts", dependencies=[Depends(require_admin)])
-@cacheable(key_prefix="abandoned-carts", tags=["abandoned-carts"])
-async def get_admin_abandoned_carts(
-    request: Request,
-    db: DbDep,
-    search: Optional[str] = None,
-    hours_threshold: int = 24,
-    cursor: int | None = None,
-    limit: int = 20
-) -> PaginatedAbandonedCarts:
-    """Retrieves paginated list of abandoned carts for admin dashboard."""
-    threshold_time = datetime.now(timezone.utc) - timedelta(hours=hours_threshold)
-
-    where_clause: dict[str, Any] = {
-        "status": {"in": [CartStatus.ACTIVE, CartStatus.ABANDONED]},
-        "items": {"some": {}},
-        "updated_at": {"gt": threshold_time}
-    }
-
-    if search:
-        where_clause["OR"] = [
-            {"email": {"contains": search, "mode": "insensitive"}},
-            {"user": {"is": {"OR": [
-                {"first_name": {"contains": search, "mode": "insensitive"}},
-                {"last_name": {"contains": search, "mode": "insensitive"}},
-                {"email": {"contains": search, "mode": "insensitive"}}
-            ]}}}
-        ]
-
-    carts = await db.cart.find_many(
-        where=where_clause,
-        skip=1 if cursor else 0,
-        take=limit + 1,
-        cursor={"id": cursor} if cursor else None,
-        order={"updated_at": "desc"},
-        include={"user": True, "items": {"include": {"variant": {"include": {"product": {"include": {"images": True}}}}}}}
-    )
-
-    return PaginatedAbandonedCarts.validate({"items" : carts[:limit], "next_cursor" : carts[-1].id if len(carts) > limit else None, "limit" : limit})
-
-@router.get("/abandoned-carts/stats", dependencies=[Depends(require_admin)])
-@cacheable(key_prefix="abandoned-carts:stats", tags=["abandoned-carts"])
-async def get_abandoned_carts_stats(request: Request, db: DbDep, hours_threshold: int = 24):
-    """Aggregates recovery metrics and potential revenue."""
-    threshold_time = datetime.now(timezone.utc) - timedelta(hours=hours_threshold)
-
-    base_filter = {"items": {"some": {}}, "updated_at": {"gt": threshold_time}}
-
-    active = await db.cart.count(where={**base_filter, "status": CartStatus.ACTIVE})
-    abandoned = await db.cart.count(where={**base_filter, "status": CartStatus.ABANDONED})
-    converted = await db.cart.count(where={**base_filter, "status": CartStatus.CONVERTED})
-
-    non_converted = await db.cart.find_many(
-        where={**base_filter, "status": {"in": [CartStatus.ACTIVE, CartStatus.ABANDONED]}}
-    )
-    potential_revenue = sum(c.total or 0 for c in non_converted)
-
-    return {
-        "active_count": active,
-        "abandoned_count": abandoned,
-        "converted_count": converted,
-        "potential_revenue": potential_revenue
-    }
-
-
-@router.post("/abandoned-carts/send-reminders", dependencies=[Depends(require_admin)])
-async def send_batch_reminders(
-    queue: ArqDep,
-    data: SendAbandonedCartReminders,
-    db: DbDep,
-):
-    """Queues background reminders for a batch of abandoned carts."""
-    threshold_time = datetime.now(timezone.utc) - timedelta(hours=data.hours_threshold)
-
-    carts = await db.cart.find_many(
-        where={
-            "status": {"in": [CartStatus.ACTIVE, CartStatus.ABANDONED]},
-            "updated_at": {"gt": threshold_time},
-            "user_id": {"not": None}
-        },
-        take=data.limit,
-        order={"updated_at": "asc"}
-    )
-
-    for cart in carts:
-        await queue.enqueue_job("process_abandoned_carts", cart_id=cart.id)
-
-    return {"message": "Abandoned reminders queued", "carts_processed": len(carts)}
-
-
-@router.post("/abandoned-carts/{cart_id}/send-reminder", dependencies=[Depends(require_admin)])
-async def send_single_reminder(
-    cart_id: int,
-    queue: ArqDep,
-):
-    """Manually triggers a reminder for a specific cart session."""
-    await queue.enqueue_job("process_abandoned_carts", cart_id=cart_id)
-    return {"message": f"Reminder successfully queued for cart {cart_id}", "cart_id": cart_id}

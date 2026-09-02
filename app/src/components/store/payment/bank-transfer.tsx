@@ -1,7 +1,7 @@
 import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { currency } from "@/utils";
-import { useCompleteCart } from "@/hooks/useCart";
+import { usePlaceOrder } from "@/hooks/useCart";
 import BankDetails from "../checkout/components/bank-details";
 
 interface BankTransferProps {
@@ -11,13 +11,10 @@ interface BankTransferProps {
 }
 
 const BankTransfer: React.FC<BankTransferProps> = ({ amount, canContinue }) => {
-    const completeCart = useCompleteCart();
+    const completeCart = usePlaceOrder();
 
     const onPaymentCompleted = async () => {
-        completeCart.mutate({
-            payment_status: "PENDING",
-            status: "PENDING",
-        });
+        completeCart.mutate();
     };
 
     return (
