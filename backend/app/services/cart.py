@@ -50,6 +50,7 @@ class CartService:
             tax=cart_totals["tax"],
             discount_amount=cart_totals["discount_amount"],
             total=cart_totals["total"],
+            payment_method=cart.payment_method,
             shipping_method=cart.shipping_method,
             shipping_fee=cart.shipping_fee,
             shipping_address_id=cart.shipping_address_id,
@@ -198,13 +199,11 @@ class CartService:
 
             wallet_used = cart.wallet_used or 0.0
             discount_subtotal = max(0.0, subtotal - discount_amount)
-            # new_subtotal = max(subtotal - discount_amount, 0.0)
-            # tax = new_subtotal * (tax_rate / 100)
-            computed_tax = discount_subtotal * (tax_rate / 100)
+            computed_tax = round(discount_subtotal * (tax_rate / 100), 2)
             shipping_fee = cart.shipping_fee or 0.0
 
             total = discount_subtotal + computed_tax + shipping_fee
-            total_after_wallet = max(total - wallet_used, 0.0)
+            total_after_wallet = round(max(total - wallet_used, 0.0))
 
             data: dict[str, float] = {
                 "subtotal": subtotal,
@@ -216,10 +215,6 @@ class CartService:
             if total_after_wallet <= 0:
                 data["payment_method"] = "WALLET"
 
-            # await self.db.cart.update(where={"id": cart.id}, data=data)
-            # await self.cache_srv.invalidate(
-            #     tags=["abandoned-carts", f"cart:{cart.cart_number}"]
-            # )
             return data
         except Exception as e:
             logger.error(f"Error calculating cart totals: {e}", exc_info=True)

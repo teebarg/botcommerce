@@ -42,7 +42,6 @@ def orders_cache_key(user, request: Request):
 
 @router.post("/")
 async def create_order(
-    response: Response,
     srv: OrderDep,
     user: CurrentUser,
     _cart_id: Annotated[str | None, Cookie()] = None
@@ -50,7 +49,7 @@ async def create_order(
     if _cart_id is None:
         raise HTTPException(status_code=400, detail="Please provide cart number")
     try:
-        order = await srv.create_order_from_cart(user_id=user.id, cart_number=_cart_id)
+        order = await srv.place_order_from_cart(user_id=user.id, cart_number=_cart_id)
         # response.delete_cookie(
         #     key="_cart_id", path="/", httponly=True, samesite="none", secure=True, domain=settings.COOKIE_DOMAIN,
         # )

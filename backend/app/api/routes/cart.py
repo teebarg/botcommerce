@@ -44,7 +44,7 @@ def _set_cart_cookie(response: Response, token: str | None) -> None:
         httponly=True, secure=True, samesite="none", domain=settings.COOKIE_DOMAIN,
     )
 
-@router.get("/", response_model=Optional[Cart])
+@router.get("/")
 async def get_cart_index(
     response: Response,
     user: UserDep,
@@ -174,13 +174,13 @@ async def update_cart(
         if cart_update.payment_method is not None:
             update_data["payment_method"] = cart_update.payment_method
         if cart_update.shipping_method is not None:
-            update_data["shipping_method"] = cart_update.shipping_method
-            shM = await tx.delivery_option.find_unique(
-                where={"method": cart_update.shipping_method}
+            shM = await tx.deliveryoption.find_unique(
+                where={"id": cart_update.shipping_method}
             )
             if not shM:
                 raise HTTPException(status_code=404, detail="Shipping method not found")
             update_data["shipping_fee"] = shM.amount
+            update_data["shipping_method"] = shM.method
 
         # if user:
         #     update_data["user"] = {"connect": {"id": user.id}}

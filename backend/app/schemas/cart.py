@@ -1,7 +1,7 @@
 from datetime import datetime
-from typing import Any, Optional
+from typing import Optional
 
-from prisma.enums import ShippingMethod
+from prisma.enums import PaymentMethod, ShippingMethod
 from pydantic import BaseModel, ConfigDict
 
 from app.lib.validation import PhoneNumber
@@ -52,7 +52,6 @@ class CartItemResponse(BaseModel):
     name: str | None = None
     slug: str | None = None
     image: str | None = None
-    price: float
     quantity: int
     variant: ProductVariantModel | None = None
 
@@ -71,6 +70,7 @@ class CartResponse(BaseModel):
     subtotal: float
     tax: float
     wallet_used: float
+    payment_method: Optional[PaymentMethod] = None
     shipping_method: Optional[ShippingMethod] = None
     shipping_fee: float
     shipping_address_id: Optional[int] = None

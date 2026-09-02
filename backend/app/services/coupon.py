@@ -79,7 +79,7 @@ class CouponService:
                 where={"cart_id": cart.id}
             )
 
-            current_subtotal = sum(item.price * item.quantity for item in cart_items)
+            current_subtotal = sum(item.variant.price * item.quantity for item in cart_items)
 
             if coupon.min_cart_value:
                 if current_subtotal < coupon.min_cart_value:

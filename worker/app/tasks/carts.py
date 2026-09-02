@@ -1,10 +1,9 @@
-from app.db import session_factory
-
-from core.notifications import Channel
-from core.repositories.cart_repository import CartRepository
-from core.notifications.events import AbandonedCartEvent
-
 from core.logging import get_logger
+from core.notifications import Channel
+from core.notifications.events import AbandonedCartEvent
+from core.repositories.cart_repository import CartRepository
+
+from app.db import session_factory
 
 logger = get_logger(__name__)
 
@@ -41,7 +40,7 @@ async def process_abandoned_carts(ctx, cart_id: int) -> dict:
                     {
                         "name": item.name,
                         "quantity": item.quantity,
-                        "price": item.price,
+                        "price": item.variant.price,
                         "image": item.image,
                         "slug": item.slug
                     }

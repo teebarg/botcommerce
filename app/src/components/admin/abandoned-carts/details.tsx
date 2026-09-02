@@ -42,11 +42,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
             open={state.isOpen}
             sheetClassName="min-w-[30vw]"
             title={<div className="py-1.5">{cart.status !== "CONVERTED" && <ReminderButton id={cart.id} />}</div>}
-            trigger={
-                <Button onClick={state.open}>
-                    View Details
-                </Button>
-            }
+            trigger={<Button onClick={state.open}>View Details</Button>}
             onOpenChange={state.setOpen}
         >
             <div className="flex-1 flex flex-col overflow-hidden">
@@ -103,7 +99,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                                     <div className="flex-1 min-w-0">
                                         <h4 className="font-medium mb-1 text-sm truncate">{item.name}</h4>
                                         <p className="text-xs text-muted-foreground mt-0.5">
-                                            {item.quantity} × {currency(item.price)}
+                                            {item.quantity} × {currency(item.variant.price)}
                                         </p>
                                     </div>
                                 </div>

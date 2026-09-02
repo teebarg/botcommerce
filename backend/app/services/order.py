@@ -29,7 +29,7 @@ class OrderService:
         settings_srv: ShopSettingsService,
         queue: ArqRedis,
         cache_srv: CacheService,
-        storage_srv: MediaStorageService
+        storage_srv: MediaStorageService,
     ):
         self.db = db
         self.cart = cart_srv
@@ -40,7 +40,9 @@ class OrderService:
         self.queue = queue
         self.storage_srv = storage_srv
 
-    async def get_by_number(self, order_number: str, include_relations: bool = True) -> Any:
+    async def get_by_number(
+        self, order_number: str, include_relations: bool = True
+    ) -> Any:
         if not include_relations:
             return await self.db.order.find_unique(where={"order_number": order_number})
 
@@ -49,18 +51,24 @@ class OrderService:
             include={
                 "order_items": {"include": {"variant": True}},
                 "user": True,
-                "shipping_address": True
-            }
+                "shipping_address": True,
+            },
         )
 
     async def get_by_id(self, order_id: int, include_relations: bool = False) -> Any:
-        include_clause = {
-            "order_items": {"include": {"variant": True}},
-            "user": True,
-            "shipping_address": True
-        } if include_relations else None
+        include_clause = (
+            {
+                "order_items": {"include": {"variant": True}},
+                "user": True,
+                "shipping_address": True,
+            }
+            if include_relations
+            else None
+        )
 
-        return await self.db.order.find_unique(where={"id": order_id}, include=include_clause)
+        return await self.db.order.find_unique(
+            where={"id": order_id}, include=include_clause
+        )
 
     async def list_paginated(
         self,
@@ -73,7 +81,7 @@ class OrderService:
         end_date: Optional[str] = None,
         customer_id: Optional[int] = None,
         user_role: str = "CUSTOMER",
-        sort: str = "desc"
+        sort: str = "desc",
     ) -> PaginatedOrders:
         where: dict[str, Any] = {}
         if status:
@@ -102,21 +110,18 @@ class OrderService:
                 "user": True,
                 "shipping_address": True,
                 "coupon": True,
-            }
+            },
         )
 
         items = orders[:limit]
         next_cursor = items[-1].id if len(orders) > limit else None
 
-        return {
-            "items": items,
-            "next_cursor": next_cursor,
-            "limit": limit
-        }
+        return {"items": items, "next_cursor": next_cursor, "limit": limit}
 
-    async def create_order_from_cart(self, user_id: int, cart_number: str) -> Any:
-        order_number: str = f"ORD{uuid.uuid4().hex[:8].upper()}"
-        cart = await self.cart.get_active_cart(cart_number=cart_number, user_id=user_id, include_relations=True)
+    async def place_order_from_cart(self, user_id: int, cart_number: str) -> Any:
+        cart = await self.cart.get_active_cart(
+            cart_number=cart_number, user_id=user_id, include_relations=True
+        )
         if not cart:
             raise HTTPException(status_code=404, detail="Cart not found")
 
@@ -124,117 +129,166 @@ class OrderService:
             raise HTTPException(status_code=400, detail="Your cart is empty")
 
         out_of_stock_items = [
-            item for item in cart.items
+            item
+            for item in cart.items
             if getattr(item.variant, "status", None) == "OUT_OF_STOCK"
         ]
         if out_of_stock_items:
-            names = ", ".join(item.name or "Unnamed item" for item in out_of_stock_items)
+            names = ", ".join(
+                item.name or "Unnamed item" for item in out_of_stock_items
+            )
             raise HTTPException(
                 status_code=400,
                 detail=f"Some items in your cart are out of stock and must be removed before checkout: {names}",
             )
 
-        data: dict[str, Any] = {
-            "order_number": order_number,
-            "email": cart.email,
-            "phone": cart.phone,
-            "total": cart.total,
-            "subtotal": cart.subtotal,
-            "tax": cart.tax,
-            "shipping_fee": cart.shipping_fee,
-            "discount_amount": cart.discount_amount,
-            "wallet_used": cart.wallet_used,
-            "status": OrderStatus.PENDING,
-            "payment_status": PaymentStatus.PENDING,
-            "shipping_method": cart.shipping_method,
-            "payment_method": cart.payment_method,
-            "cart": {"connect": {"id": cart.id}},
-            "user": {"connect": {"id": user_id}},
-            "order_items": {
-                "create": [
-                    {
-                        "name": item.name,
-                        "image": item.image,
-                        "variant": {"connect": {"id": item.variant_id}},
-                        "quantity": item.quantity,
-                        "price": item.price
-                    } for item in cart.items or []
-                ]
+        cart_totals = await self.cart_srv.calculate_totals(cart=cart)
+        async with self.db.tx() as tx:
+            data: dict[str, Any] = {
+                "order_number": f"ORD{uuid.uuid4().hex[:10].upper()}",
+                "email": cart.email,
+                "phone": cart.phone,
+                "shipping_fee": cart.shipping_fee,
+                "subtotal": cart_totals["subtotal"],
+                "tax": cart_totals["tax"],
+                "discount_amount": cart_totals["discount_amount"],
+                "total": cart_totals["total"],
+                "wallet_used": cart.wallet_used,
+                "status": OrderStatus.PENDING,
+                "payment_status": PaymentStatus.PENDING,
+                "shipping_method": cart.shipping_method,
+                "payment_method": cart.payment_method,
+                "cart": {"connect": {"id": cart.id}},
+                "user": {"connect": {"id": user_id}},
+                "order_items": {
+                    "create": [
+                        {
+                            "name": item.name,
+                            "image": item.image,
+                            "variant": {"connect": {"id": item.variant_id}},
+                            "quantity": item.quantity,
+                            "price": item.variant.price,
+                        }
+                        for item in cart.items or []
+                    ]
+                },
             }
-        }
 
-        if cart.coupon_id:
-            data["coupon"] = {"connect": {"id": cart.coupon_id}}
-            data["coupon_code"] = cart.coupon_code
-            await self.coupon_srv.increment_coupon_usage(
-                coupon_id=cart.coupon_id,
-                user_id=user_id,
-                discount_amount=cart.discount_amount
+            if cart.coupon_id:
+                data["coupon"] = {"connect": {"id": cart.coupon_id}}
+                data["coupon_code"] = cart.coupon_code
+                await self.coupon_srv.increment_coupon_usage(
+                    coupon_id=cart.coupon_id,
+                    user_id=user_id,
+                    discount_amount=cart.discount_amount,
+                )
+
+            if cart.shipping_address_id:
+                data["shipping_address"] = {"connect": {"id": cart.shipping_address_id}}
+
+            try:
+                new_order = await tx.order.create(data=data)
+            except Exception as e:
+                logger.error(f"Failed to create order: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+            await tx.ordertimeline.create(
+                data={
+                    "order_id": new_order.id,
+                    "from_status": "PENDING",
+                    "to_status": "PENDING",
+                    "message": "Order placed",
+                }
             )
 
-        if cart.shipping_address_id:
-            data["shipping_address"] = {"connect": {"id": cart.shipping_address_id}}
-
-        try:
-            new_order = await self.db.order.create(data=data)
-        except Exception as e:
-            logger.error(f"Failed to create order: {str(e)}")
-            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-
-        await self.queue.enqueue_job("order_created", order_id=new_order.id)
-
-        if cart.payment_method == "WALLET" and (cart.total or 0) <= 0:
-            new_order = await self._finalize_paid_order(
-                order=new_order,
-                amount=cart.wallet_used or 0.0,
-                reference=f"{cart.cart_number}-WALLET",
-                payment_method=PaymentMethod.WALLET,
+            await tx.cartitem.delete_many(where={"cart_id": cart.id})
+            await tx.cart.update(
+                where={"id": cart.id},
+                data={
+                    "coupon_id": None,
+                    "coupon_code": None,
+                    "shipping_fee": 0,
+                    "discount_amount": 0,
+                },
+            )
+            await tx.payment.create(
+                data={
+                    "order": {"connect": {"id": new_order.id}},
+                    "reference": f"{data.payment_method}-{new_order.order_number}",
+                    "amount": new_order.total,
+                    "provider": data.payment_method,
+                    "status": "PENDING",
+                }
             )
 
-        await self.cache_srv.invalidate(tags=["orders", "stats-trends", f"cart:{cart.cart_number}"])
-        return new_order
+            await self.queue.enqueue_job("order_created", order_id=new_order.id)
+
+            if cart.payment_method == "WALLET" and (cart.total or 0) <= 0:
+                new_order = await self._finalize_paid_order(
+                    order=new_order,
+                    amount=cart.wallet_used or 0.0,
+                    reference=f"{cart.cart_number}-WALLET",
+                    payment_method=PaymentMethod.WALLET,
+                )
+
+            await self.cache_srv.invalidate(
+                tags=["orders", "stats-trends", f"cart:{cart.cart_number}"]
+            )
+            return new_order
 
     async def create_invoice(self, order_id: int, force: bool = False) -> str:
         try:
             order = await self.db.order.find_unique(
                 where={"id": order_id},
-                include={"order_items": True, "user": True, "shipping_address": True}
+                include={"order_items": True, "user": True, "shipping_address": True},
             )
             if not order:
                 logger.error(f"Order not found for ID: {order_id}")
                 raise Exception("Order not found")
 
             if order.invoice_url and not force:
-                logger.debug(f"Invoice already exists for order {order_id}, skipping regeneration")
+                logger.debug(
+                    f"Invoice already exists for order {order_id}, skipping regeneration"
+                )
                 return order.invoice_url
 
             old_url = order.invoice_url if force else None
             shop_settings = await self.db.shopsettings.find_many()
             settings_dict = {setting.key: setting.value for setting in shop_settings}
 
-            pdf_bytes = invoice_service.generate_invoice_pdf(order=order, company_info=settings_dict)
+            pdf_bytes = invoice_service.generate_invoice_pdf(
+                order=order, company_info=settings_dict
+            )
             timestamp: str = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename: str = f"invoices/invoice_{order.order_number}_{timestamp}_{uuid.uuid4().hex[:8]}.pdf"
 
             result = self.storage_srv.upload_file(
-                filename=filename,
-                bytes_data=pdf_bytes,
-                content_type="application/pdf"
+                filename=filename, bytes_data=pdf_bytes, content_type="application/pdf"
             )
             if not result:
                 raise Exception("Failed to upload invoice to storage")
 
-            public_url = self.storage_srv.get_public_url(bucket="invoices", filename=filename)
-            await self.db.order.update(where={"id": order_id}, data={"invoice_url": public_url})
+            public_url = self.storage_srv.get_public_url(
+                bucket="invoices", filename=filename
+            )
+            await self.db.order.update(
+                where={"id": order_id}, data={"invoice_url": public_url}
+            )
             await self.cache_srv.invalidate(f"order:{order_id}", tags=["orders"])
 
             if old_url:
                 try:
                     old_filename = old_url.rsplit("/", 1)[-1]
-                    self.storage_srv.delete_file(bucket="invoices", filename=old_filename)
-                    logger.info(f"Removed superseded invoice file for order {order_id}: {old_filename}")
+                    self.storage_srv.delete_file(
+                        bucket="invoices", filename=old_filename
+                    )
+                    logger.info(
+                        f"Removed superseded invoice file for order {order_id}: {old_filename}"
+                    )
                 except Exception as e:
-                    logger.error(f"Failed to remove old invoice file for order {order_id}: {e}")
+                    logger.error(
+                        f"Failed to remove old invoice file for order {order_id}: {e}"
+                    )
             return public_url
         except Exception as e:
             raise Exception(str(e))
@@ -253,9 +307,13 @@ class OrderService:
                     )
                     continue
 
-                variant = await self.db.productvariant.find_unique(where={"id": variant_id})
+                variant = await self.db.productvariant.find_unique(
+                    where={"id": variant_id}
+                )
                 if not variant:
-                    logger.warning(f"Variant {variant_id} not found for order {order.id}")
+                    logger.warning(
+                        f"Variant {variant_id} not found for order {order.id}"
+                    )
                     continue
 
                 new_inventory = max(0, variant.inventory - quantity)
@@ -266,7 +324,9 @@ class OrderService:
                     update_data["status"] = "OUT_OF_STOCK"
                     out_of_stock = True
 
-                await self.db.productvariant.update(where={"id": variant_id}, data=update_data)
+                await self.db.productvariant.update(
+                    where={"id": variant_id}, data=update_data
+                )
                 await self.product_srv.invalidate(id=variant.product_id)
                 if out_of_stock:
                     out_of_stock_variants.append(variant)
@@ -279,9 +339,13 @@ class OrderService:
         try:
             await self.cache_srv.invalidate(tags=["gallery"])
         except Exception as e:
-            logger.error(f"Failed to invalidate gallery cache for order {order.id}: {e}")
+            logger.error(
+                f"Failed to invalidate gallery cache for order {order.id}: {e}"
+            )
 
-    async def return_order_item(self, order_id: int, item_id: int, background_tasks: BackgroundTasks) -> dict[str, str]:
+    async def return_order_item(
+        self, order_id: int, item_id: int, background_tasks: BackgroundTasks
+    ) -> dict[str, str]:
         """
         Return an item from an order:
         - Remove the order item
@@ -310,7 +374,9 @@ class OrderService:
                         where={"id": variant_id},
                         data={
                             "inventory": new_inventory,
-                            "status": "IN_STOCK" if new_inventory > 0 else variant.status,
+                            "status": "IN_STOCK"
+                            if new_inventory > 0
+                            else variant.status,
                         },
                     )
 
@@ -348,7 +414,11 @@ class OrderService:
 
         async def invalidate_caches() -> None:
             try:
-                await self.cache_srv.invalidate(f"order:{order_id}", f"order-timeline:{order_id}", tags=["orders", f"wallet:{order.user.id}"])
+                await self.cache_srv.invalidate(
+                    f"order:{order_id}",
+                    f"order-timeline:{order_id}",
+                    tags=["orders", f"wallet:{order.user.id}"],
+                )
                 if order_item.variant and order_item.variant.product_id:
                     await self.product_srv.invalidate(id=order_item.variant.product_id)
             except Exception as e:
@@ -357,7 +427,9 @@ class OrderService:
         background_tasks.add_task(invalidate_caches)
         return {"message": "Item returned successfully"}
 
-    async def record_payment_success(self, reference: str, amount: float, cart_number: str, user_id: int):
+    async def record_payment_success(
+        self, reference: str, amount: float, cart_number: str, user_id: int
+    ):
         """
         Idempotency is enforced two ways:
         1. Reuse an already-converted cart's order, rather than creating a
@@ -379,13 +451,16 @@ class OrderService:
                 logger.debug(f"Payment already recorded for order {order.id}, skipping")
                 return order
         else:
-            order = await self.create_order_from_cart(
+            order = await self.place_order_from_cart(
                 user_id=user_id,
                 cart_number=cart_number,
             )
 
         return await self._finalize_paid_order(
-            order=order, amount=amount, reference=reference, payment_method=PaymentMethod.PAYSTACK
+            order=order,
+            amount=amount,
+            reference=reference,
+            payment_method=PaymentMethod.PAYSTACK,
         )
 
     async def _finalize_paid_order(
@@ -396,7 +471,8 @@ class OrderService:
         backstop for a race between concurrent callers.
         """
         order_with_payment = await self.db.order.find_unique(
-            where={"id": order.id}, include={"payment": True, "order_items": {"include": {"variant": True}}}
+            where={"id": order.id},
+            include={"payment": True, "order_items": {"include": {"variant": True}}},
         )
         if order_with_payment.payment:
             logger.debug(f"Payment already recorded for order {order.id}, skipping")
@@ -415,11 +491,15 @@ class OrderService:
             )
         except DataError as e:
             if "OrderToPayment" in str(e):
-                logger.debug(f"Payment already recorded for order {order.id} (race), skipping")
+                logger.debug(
+                    f"Payment already recorded for order {order.id} (race), skipping"
+                )
                 return await self.db.order.find_unique(where={"id": order.id})
             raise
         except UniqueViolationError:
-            logger.debug(f"Payment already recorded for order {order.id}, skipping (race-safe no-op)")
+            logger.debug(
+                f"Payment already recorded for order {order.id}, skipping (race-safe no-op)"
+            )
             return await self.db.order.find_unique(where={"id": order.id})
 
         updated_order = await self.db.order.update(
@@ -430,7 +510,9 @@ class OrderService:
         try:
             await self.decrement_variant_inventory_for_order(order=order_with_payment)
         except Exception as e:
-            logger.error(f"Failed to decrement variant inventory for order {order.id}: {e}")
+            logger.error(
+                f"Failed to decrement variant inventory for order {order.id}: {e}"
+            )
 
         await self.queue.enqueue_job("process_referral", order_id=order.id)
         await self.queue.enqueue_job("generate_and_send_invoice", order_id=order.id)

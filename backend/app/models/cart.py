@@ -1,4 +1,3 @@
-import re
 from datetime import datetime
 from enum import Enum
 from typing import Optional
@@ -36,7 +35,7 @@ class CartUpdate(BaseModel):
     billing_address: Optional[CartAddress] = None
     email: Optional[EmailStr] = None
     phone: PhoneNumber = None
-    shipping_method: Optional[ShippingMethod] = None
+    shipping_method: Optional[int] = None
     payment_method: Optional[PaymentMethod] = None
     status: Optional[CartStatus] = None
 

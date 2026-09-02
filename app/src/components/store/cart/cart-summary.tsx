@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/utils/cn";
 import { useCart } from "@/providers/cart-provider";
 
-const CartSummary: React.FC<{ className?: string, showSecured?: boolean }> = ({ className, showSecured = false }) => {
+const CartSummary: React.FC<{ className?: string; showSecured?: boolean }> = ({ className, showSecured = false }) => {
     const router = useRouter();
     const routerState = useRouterState();
     const { cart } = useCart();
@@ -27,16 +27,16 @@ const CartSummary: React.FC<{ className?: string, showSecured?: boolean }> = ({ 
                     <span className="text-muted-foreground">Tax</span>
                     <span className="font-medium">{currency(cart?.tax || 0)}</span>
                 </div>
-                {cart?.discount_amount && cart?.discount_amount > 0 && (
+                {Boolean(cart?.discount_amount) && (
                     <div className="flex justify-between text-sm">
                         <span className="text-destructive">Sale discount</span>
                         <span className="font-medium text-destructive">−{currency(cart?.discount_amount || 0)}</span>
                     </div>
                 )}
-                {cart?.wallet_used && cart?.wallet_used > 0 && (
+                {Boolean(cart?.wallet_used) && (
                     <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Wallet Used</span>
-                        <span className="font-medium text-primary">-{currency(cart?.wallet_used)}</span>
+                        <span className="font-medium text-primary">-{currency(cart?.wallet_used || 0)}</span>
                     </div>
                 )}
                 <Separator />
@@ -47,7 +47,10 @@ const CartSummary: React.FC<{ className?: string, showSecured?: boolean }> = ({ 
             </div>
 
             {path !== "/checkout" && (
-                <button onClick={() => router.navigate({ to: "/checkout" })} className="w-full flex items-center justify-center gap-2 py-3 bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer">
+                <button
+                    onClick={() => router.navigate({ to: "/checkout" })}
+                    className="w-full flex items-center justify-center gap-2 py-3 bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer"
+                >
                     Proceed to checkout
                     <ArrowRight className="w-4 h-4" />
                 </button>
@@ -59,10 +62,7 @@ const CartSummary: React.FC<{ className?: string, showSecured?: boolean }> = ({ 
                     <span className="text-xs text-muted-foreground">Secure checkout</span>
                     <div className="flex gap-1.5 ml-auto">
                         {["Safe payments", "Privacy protected"].map((label) => (
-                            <span
-                                key={label}
-                                className="text-[11px] text-muted-foreground border rounded-full px-2 py-0.5 bg-muted/40"
-                            >
+                            <span key={label} className="text-[11px] text-muted-foreground border rounded-full px-2 py-0.5 bg-muted/40">
                                 {label}
                             </span>
                         ))}
