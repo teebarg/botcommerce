@@ -95,10 +95,10 @@ async def verify_payment(response: Response, srv: OrderDep, reference: str, user
             user_id=int(data["data"]["metadata"]["user_id"]),
         )
 
-        response.delete_cookie(
-            key="_cart_id", path="/", httponly=True, samesite="none",
-            secure=True, domain=settings.COOKIE_DOMAIN,
-        )
+        # response.delete_cookie(
+        #     key="_cart_id", path="/", httponly=True, samesite="none",
+        #     secure=True, domain=settings.COOKIE_DOMAIN,
+        # )
         return order
 
 

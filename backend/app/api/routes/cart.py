@@ -1,54 +1,48 @@
-from typing import Any, Dict, Optional, Annotated
 from datetime import datetime, timedelta, timezone
-from fastapi import APIRouter, HTTPException, Request, BackgroundTasks, Depends, Cookie, Response
+from typing import Annotated, Any, Optional
+
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Cookie,
+    Depends,
+    HTTPException,
+    Request,
+    Response,
+)
 from fastapi.responses import JSONResponse
 from prisma.enums import CartStatus
-from app.services.cache import cacheable
-from app.core.deps import UserDep, CurrentUser
+
+from app.core.config import settings
+from app.core.dependencies.cache import ArqDep
+from app.core.dependencies.cart import CartDep
+from app.core.deps import CurrentUser, UserDep
 from app.core.logging import get_logger
 from app.core.permissions import require_admin
-from app.core.config import settings
-from app.models.generic import Message
-from app.models.cart import (
-    CartUpdate, CartItemCreate, CartItem, Cart, CartLite,
-    SendAbandonedCartReminders
-)
 from app.models.abandoned_cart import PaginatedAbandonedCarts
-from app.core.dependencies.cart import CartDep
-from app.core.dependencies.cache import ArqDep
+from app.models.cart import (
+    Cart,
+    CartItem,
+    CartItemCreate,
+    CartLite,
+    CartUpdate,
+    SendAbandonedCartReminders,
+)
+from app.models.generic import Message
 from app.prisma_client import DbDep
+from app.services.cache import cacheable
 
 logger = get_logger(__name__)
 
 router = APIRouter()
 
-MAX_AGE_SECONDS = 365 * 24 * 60 * 60  # 1 year
+MAX_AGE_SECONDS = 365 * 24 * 60 * 60 * 10  # 1 year
 
 def _set_cart_cookie(response: Response, token: str | None) -> None:
     response.set_cookie(
         key="_cart_id", value=token, max_age=MAX_AGE_SECONDS, path="/",
         httponly=True, secure=True, samesite="none", domain=settings.COOKIE_DOMAIN,
     )
-
-@router.post("/items", response_model=CartItem)
-async def add_item_to_cart(
-    response: Response,
-    item_in: CartItemCreate,
-    db: DbDep,
-    srv: CartDep,
-    user: UserDep,
-    background_tasks: BackgroundTasks,
-    _cart_id: Annotated[str | None, Cookie()] = None
-):
-    cart = await srv.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
-    if not cart:
-        cart = await srv.create_empty_cart(user_id=user.id if user else None)
-
-    item = await srv.add_item(cart=cart, variant_id=item_in.variant_id, quantity=item_in.quantity)
-    background_tasks.add_task(srv.calculate_totals, cart_id=cart.id)
-    _set_cart_cookie(response, cart.cart_number)
-    return item
-
 
 @router.get("/", response_model=Optional[Cart])
 async def get_cart_index(
@@ -62,8 +56,24 @@ async def get_cart_index(
         cart = await srv.create_empty_cart(user_id=user.id if user else None, include_relations=True)
 
     _set_cart_cookie(response, cart.cart_number)
-    return cart
+    return await srv._with_computed_totals(cart=cart)
 
+@router.post("/items", response_model=CartItem)
+async def add_item_to_cart(
+    response: Response,
+    payload: CartItemCreate,
+    srv: CartDep,
+    user: UserDep,
+    _cart_id: Annotated[str | None, Cookie()] = None
+):
+    cart = await srv.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    if not cart:
+        cart = await srv.create_empty_cart(user_id=user.id if user else None)
+
+    item = await srv.add_item(cart=cart, variant_id=payload.variant_id, quantity=payload.quantity)
+    await srv.touch(cart_id=cart.id)
+    _set_cart_cookie(response, cart.cart_number)
+    return item
 
 @router.delete("/items/{item_id}")
 async def delete_cart_item(
@@ -71,7 +81,6 @@ async def delete_cart_item(
     db: DbDep,
     user: UserDep,
     srv: CartDep,
-    background_tasks: BackgroundTasks,
     _cart_id: Annotated[str | None, Cookie()] = None
 ):
     cart = await srv.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
@@ -83,7 +92,7 @@ async def delete_cart_item(
         raise HTTPException(status_code=404, detail="Cart item relation mismatch")
 
     await db.cartitem.delete(where={"id": item_id})
-    background_tasks.add_task(srv.calculate_totals, cart_id=cart.id)
+    await srv.touch(cart_id=cart.id)
     return {"message": "Item removed from cart successfully"}
 
 
@@ -94,7 +103,6 @@ async def update_cart_item(
     db: DbDep,
     user: UserDep,
     srv: CartDep,
-    background_tasks: BackgroundTasks,
     _cart_id: Annotated[str | None, Cookie()] = None
 ):
     cart = await srv.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
@@ -109,7 +117,7 @@ async def update_cart_item(
         raise HTTPException(status_code=400, detail=f"Not enough inventory. Only {cart_item.variant.inventory} items available.")
 
     updated_item = await db.cartitem.update(where={"id": item_id}, data={"quantity": quantity})
-    background_tasks.add_task(srv.calculate_totals, cart_id=cart.id)
+    await srv.touch(cart_id=cart.id)
     return updated_item
 
 
@@ -167,24 +175,21 @@ async def update_cart(
             update_data["payment_method"] = cart_update.payment_method
         if cart_update.shipping_method is not None:
             update_data["shipping_method"] = cart_update.shipping_method
-
-        if cart_update.shipping_fee is not None:
-            update_data["shipping_fee"] = cart_update.shipping_fee
-            # Defensive inline projection before full service sync
-            update_data["total"] = max(
-                (cart.subtotal or 0) + (cart.tax or 0) + cart_update.shipping_fee - (cart.discount_amount or 0) - (cart.wallet_used or 0),
-                0
+            shM = await tx.delivery_option.find_unique(
+                where={"method": cart_update.shipping_method}
             )
+            if not shM:
+                raise HTTPException(status_code=404, detail="Shipping method not found")
+            update_data["shipping_fee"] = shM.amount
 
-        if user:
-            update_data["user"] = {"connect": {"id": user.id}}
+        # if user:
+        #     update_data["user"] = {"connect": {"id": user.id}}
 
         updated_cart = await tx.cart.update(
             where={"cart_number": cart.cart_number},
             data=update_data
         )
 
-    await srv.calculate_totals(cart_id=cart.id)
     await srv.cache_srv.invalidate(tags=["abandoned-carts"])
 
     return updated_cart
@@ -202,7 +207,6 @@ async def apply_wallet(
         return JSONResponse(status_code=400, content={"detail": "Your cart is currently empty"})
 
     await srv.apply_wallet_balance(cart=cart, user=user)
-    await srv.calculate_totals(cart_id=cart.id)
     return Message(message="Wallet balance applied successfully")
 
 
@@ -217,7 +221,6 @@ async def remove_wallet(
         raise HTTPException(status_code=404, detail="Cart not found")
 
     await srv.remove_wallet_balance(cart=cart, user=user)
-    await srv.calculate_totals(cart_id=cart.id)
     return Message(message="Wallet usage removed from cart session")
 
 
@@ -238,7 +241,7 @@ async def get_admin_abandoned_carts(
     """Retrieves paginated list of abandoned carts for admin dashboard."""
     threshold_time = datetime.now(timezone.utc) - timedelta(hours=hours_threshold)
 
-    where_clause: Dict[str, Any] = {
+    where_clause: dict[str, Any] = {
         "status": {"in": [CartStatus.ACTIVE, CartStatus.ABANDONED]},
         "items": {"some": {}},
         "updated_at": {"gt": threshold_time}

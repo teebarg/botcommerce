@@ -7,7 +7,7 @@ import CartSummary from "@/components/store/cart/cart-summary";
 import CartItemComponent from "@/components/store/cart/cart-item";
 import EmptyState from "@/components/generic/empty";
 import { BtnLink } from "@/components/ui/btnLink";
-import { useCartSummary } from "@/hooks/useCartSummary";
+import { useCart } from "@/providers/cart-provider";
 
 export const Route = createLazyFileRoute("/_mainLayoutPublic/cart")({
     component: RouteComponent,
@@ -26,7 +26,7 @@ function PromoBanner() {
 }
 
 function RouteComponent() {
-    const { cart, isLoading, error, totalItems } = useCartSummary();
+    const { cart, isLoading, error, cartCount } = useCart();
 
     if (isLoading) return <PageLoader variant="cart" className="max-w-5xl mx-auto px-4 py-6" />;
     if (error) return <ServerError stack={error} scenario="cart page" />;
@@ -49,7 +49,7 @@ function RouteComponent() {
             <div className="flex flex-col lg:flex-row lg:items-start gap-6">
                 <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-3">
-                        Your cart ({totalItems} {totalItems === 1 ? "item" : "items"})
+                        Your cart ({cartCount} {cartCount === 1 ? "item" : "items"})
                     </p>
                     <div className="rounded-xl border bg-card overflow-hidden">
                         {cart?.items.map((item: CartItem) => (
@@ -60,7 +60,7 @@ function RouteComponent() {
 
                 <div className="lg:w-80 lg:sticky lg:top-6 space-y-4 shrink-0">
                     <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground">Cart summary</p>
-                    <CartSummary cart={cart} />
+                    <CartSummary />
                 </div>
             </div>
         </div>

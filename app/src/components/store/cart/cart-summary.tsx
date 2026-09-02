@@ -1,16 +1,15 @@
 import type React from "react";
 import { currency } from "@/utils";
-import type { Cart } from "@/schemas";
 import { ArrowRight, Shield } from "lucide-react";
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { Separator } from "@/components/ui/separator";
-import { useCartSummary } from "@/hooks/useCartSummary";
 import { cn } from "@/utils/cn";
+import { useCart } from "@/providers/cart-provider";
 
-const CartSummary: React.FC<{ cart: Cart, className?: string, showSecured?: boolean }> = ({ cart, className, showSecured = false }) => {
+const CartSummary: React.FC<{ className?: string, showSecured?: boolean }> = ({ className, showSecured = false }) => {
     const router = useRouter();
     const routerState = useRouterState();
-    const { subtotal, discountAmount } = useCartSummary();
+    const { cart } = useCart();
     const path = routerState.location.pathname;
 
     return (
@@ -18,7 +17,7 @@ const CartSummary: React.FC<{ cart: Cart, className?: string, showSecured?: bool
             <div className="px-4 py-4 space-y-3">
                 <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span className="font-medium">{currency(subtotal)}</span>
+                    <span className="font-medium">{currency(cart?.subtotal || 0)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Shipping</span>
@@ -28,13 +27,13 @@ const CartSummary: React.FC<{ cart: Cart, className?: string, showSecured?: bool
                     <span className="text-muted-foreground">Tax</span>
                     <span className="font-medium">{currency(cart?.tax || 0)}</span>
                 </div>
-                {discountAmount > 0 && (
+                {cart?.discount_amount && cart?.discount_amount > 0 && (
                     <div className="flex justify-between text-sm">
                         <span className="text-destructive">Sale discount</span>
-                        <span className="font-medium text-destructive">−{currency(discountAmount)}</span>
+                        <span className="font-medium text-destructive">−{currency(cart?.discount_amount || 0)}</span>
                     </div>
                 )}
-                {cart?.wallet_used > 0 && (
+                {cart?.wallet_used && cart?.wallet_used > 0 && (
                     <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Wallet Used</span>
                         <span className="font-medium text-primary">-{currency(cart?.wallet_used)}</span>

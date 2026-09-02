@@ -1,11 +1,14 @@
 import re
-from pydantic import BaseModel, EmailStr
-from prisma.enums import PaymentMethod, ShippingMethod
-from typing import Optional
-from enum import Enum
 from datetime import datetime
-from app.models.product import ProductVariant
+from enum import Enum
+from typing import Optional
+
+from prisma.enums import PaymentMethod, ShippingMethod
+from pydantic import BaseModel, EmailStr
+
 from app.lib.validation import PhoneNumber
+from app.models.product import ProductVariant
+
 
 class CartStatus(str, Enum):
     ACTIVE = "ACTIVE"

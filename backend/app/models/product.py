@@ -1,8 +1,11 @@
-from typing import List, Optional, Literal
-from pydantic import BaseModel, Field
+from typing import List, Literal, Optional
+
 from prisma.enums import ProductStatus
-from app.models.collection import Collection
+from pydantic import BaseModel, Field
+
 from app.models.category import Category
+from app.models.collection import Collection
+
 
 class ProductImage(BaseModel):
     id: int

@@ -1,13 +1,30 @@
 from typing import Annotated, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, BackgroundTasks, Cookie, Response
+
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Cookie,
+    Depends,
+    HTTPException,
+    Query,
+    Request,
+    Response,
+)
 from prisma.enums import OrderStatus
-from app.models.order import Order, OrderTimelineEntry, PaginatedOrders, OrderNotesUpdate, ReturnItemPayload
-from app.core.logging import get_logger
-from app.models.generic import Message
-from app.core.permissions import require_admin
+
 from app.core.config import settings
-from app.core.deps import CurrentUser, PrincipalDep
 from app.core.dependencies.order import OrderDep
+from app.core.deps import CurrentUser, PrincipalDep
+from app.core.logging import get_logger
+from app.core.permissions import require_admin
+from app.models.generic import Message
+from app.models.order import (
+    Order,
+    OrderNotesUpdate,
+    OrderTimelineEntry,
+    PaginatedOrders,
+    ReturnItemPayload,
+)
 from app.prisma_client import DbDep
 from app.services.cache import cacheable
 
@@ -34,9 +51,9 @@ async def create_order(
         raise HTTPException(status_code=400, detail="Please provide cart number")
     try:
         order = await srv.create_order_from_cart(user_id=user.id, cart_number=_cart_id)
-        response.delete_cookie(
-            key="_cart_id", path="/", httponly=True, samesite="none", secure=True, domain=settings.COOKIE_DOMAIN,
-        )
+        # response.delete_cookie(
+        #     key="_cart_id", path="/", httponly=True, samesite="none", secure=True, domain=settings.COOKIE_DOMAIN,
+        # )
         return order
     except Exception as e:
         logger.error(f"Failed to create order in create_order: {str(e)}")
@@ -130,6 +147,7 @@ async def order_status(db: DbDep, srv: OrderDep, id: int, status: OrderStatus) -
 
 @router.patch("/{order_id}/notes")
 async def update_order_notes(
+    db: DbDep,
     srv: OrderDep,
     order_id: int,
     notes_update: OrderNotesUpdate,
