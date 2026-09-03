@@ -135,7 +135,6 @@ export const usePlaceOrder = () => {
     return useMutation({
         mutationFn: async () => await api.post<Order>("/order/"),
         onSuccess: async (data) => {
-            console.log("🚀 ~ usePlaceOrder ~ data:", data);
             queryClient.invalidateQueries({ queryKey: ["cart"] });
             if (data.payment_method == "BANK_TRANSFER") {
                 window.location.href = `/order/confirmed/${data?.order_number}`;

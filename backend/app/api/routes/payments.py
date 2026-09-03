@@ -80,7 +80,6 @@ async def change_payment_status(db: DbDep, srv: OrderDep, id: int, status: Payme
         await payment_srv.record_success(
             reference=f"{order.payment_method}-{order.order_number}",
         )
-        await srv.cache_srv.invalidate(f"order:{id}", f"order-timeline:{id}", tags=["orders"])
         return order
 
     # Any other status transition (e.g. FAILED, PENDING)

@@ -223,9 +223,7 @@ class OrderService:
                     discount_amount=cart.discount_amount,
                 )
 
-            await self.cache_srv.invalidate(
-                tags=["orders", "stats-trends", f"cart:{cart.cart_number}"]
-            )
+            await self.cache_srv.invalidate(tags=["orders", "stats-trends"])
             return new_order
 
     async def decrement_variant_inventory_for_order(self, order_id: int) -> None:

@@ -11,8 +11,8 @@ from app.services.order import OrderService
 from app.services.payment import PaymentService
 
 
-def get_payment_service(db: DbDep, queue: ArqDep) -> PaymentService:
-    return PaymentService(db=db, queue=queue)
+def get_payment_service(db: DbDep, queue: ArqDep, cache_srv: CacheDep, product_srv: ProductDep) -> PaymentService:
+    return PaymentService(db=db, queue=queue, cache_srv=cache_srv, product_srv=product_srv)
 
 PaymentDep = Annotated[PaymentService, Depends(get_payment_service)]
 

@@ -7,6 +7,8 @@ from prisma.models import Order
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.schemas.payment import PaymentInitialize
+from app.services.cache import CacheService
+from app.services.product import ProductService
 from prisma import Prisma
 
 logger = get_logger(__name__)
@@ -15,9 +17,11 @@ PAYSTACK_BASE_URL = "https://api.paystack.co"
 
 
 class PaymentService:
-    def __init__(self, db: Prisma, queue: ArqRedis):
+    def __init__(self, db: Prisma, queue: ArqRedis, cache_srv: CacheService, product_srv: ProductService):
         self.db = db
         self.queue = queue
+        self.cache_srv = cache_srv
+        self.product_srv = product_srv
 
     async def initialize_paystack(
         self,
@@ -86,7 +90,7 @@ class PaymentService:
 
         return await self.record_success(reference=data["reference"])
 
-    async def record_success(self, reference: str, amount: float | None = None):
+    async def record_success(self, reference: str):
         payment = await self.db.payment.find_first(
             where={"reference": reference},
             include={"order": True},
@@ -145,5 +149,7 @@ class PaymentService:
                 where={"id": item.variant_id},
                 data={"inventory": {"decrement": item.quantity}},
             )
+        await self.product_srv.invalidate(id=order_id)
+        # await self.cache_srv.invalidate(f"order:{order_id}", f"order-timeline:{order_id}", tags=["gallery", "products", "orders", "catalog"])
         await self.queue.enqueue_job("process_referral", order_id=order_id)
         await self.queue.enqueue_job("generate_and_send_invoice", order_id=order_id)

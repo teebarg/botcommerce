@@ -62,7 +62,7 @@ async def user_register(ctx, user_id: int):
     )
 
     await call_internal_backend(
-        path=f"/internal/invalidate",
+        path="/internal/invalidate",
         label="Invalidate",
         json_body={"tags": ["coupons", "users"]},
     )

@@ -25,7 +25,7 @@ class CacheInvalidationService:
                     }
                 })
                 
-        print(f"Purging specific cache keys: {purge_files}")
+        logger.debug(f"Purging specific cache keys: {purge_files}")
         
         try:
             async with httpx.AsyncClient(timeout=3.0) as client:

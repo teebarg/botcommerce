@@ -1,14 +1,15 @@
 import io
 import time
 import uuid
+
 import httpx
-from PIL import Image, ImageOps
 from core.logging import get_logger
-from core.storage import MediaStorageService
 from core.repositories.product_image import ProductImageRepository
-from core.cache.service import CacheInvalidationService
-from app.security import call_internal_backend
+from core.storage import MediaStorageService
+from PIL import Image, ImageOps
+
 from app.db import session_factory
+from app.security import call_internal_backend
 
 logger = get_logger(__name__)
 

@@ -27,13 +27,6 @@ function RouteComponent() {
     const { updateQuery } = useUpdateQuery(200);
     const { value: searchValue, onChange: onSearchChange } = useDebouncedSearch("search", params.search);
 
-    // const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteResource<PaginatedAbandonedCarts, Cart>({
-    //     queryKey: ["abandoned-carts", "infinite", params],
-    //     queryFn: (cursor) => api.get<PaginatedAbandonedCarts>("/cart/abandoned-carts", { params: { cursor, ...params } }),
-    //     getItems: (page) => page.items,
-    //     getNextCursor: (page) => page.next_cursor,
-    // });
-
     const [search, setSearch] = useState("");
     const deferredSearch = useDeferredValue(search);
     const { data, isPending, isFetchingNextPage, hasNextPage, fetchNextPage } = useAbandonedCarts(deferredSearch);

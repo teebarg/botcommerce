@@ -1,19 +1,38 @@
-import uuid
 import json
+import uuid
 from typing import List, Optional
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Query, BackgroundTasks, Response, Request
+
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    File,
+    HTTPException,
+    Query,
+    Request,
+    Response,
+    UploadFile,
+)
+
 from app.core.config import settings
-from app.core.logging import get_logger
-from app.services.cache import cacheable, DEFAULT_EXPIRATION
+from app.core.dependencies.cache import ArqDep
+from app.core.dependencies.product import ProductDep, SearchDep
+from app.core.dependencies.services import StorageDep
 from app.core.deps import CurrentUser, UserDep
-from app.models.generic import Message
-from app.models.product import ProductLite, VariantWithStatus, SearchProducts, FeedProducts, IndexProducts, ReviewStatus
+from app.core.logging import get_logger
 from app.core.permissions import require_admin
 from app.lib.cache import set_public_cache
-from app.core.dependencies.product import ProductDep, SearchDep
-from app.core.dependencies.cache import ArqDep
-from app.core.dependencies.services import StorageDep
+from app.models.generic import Message
+from app.models.product import (
+    FeedProducts,
+    IndexProducts,
+    ProductLite,
+    ReviewStatus,
+    SearchProducts,
+    VariantWithStatus,
+)
 from app.prisma_client import DbDep
+from app.services.cache import DEFAULT_EXPIRATION, cacheable
 from app.services.storage import ALLOWED_CONTENT_TYPES, MAX_FILE_SIZE_BYTES
 
 logger = get_logger(__name__)
@@ -144,9 +163,10 @@ async def update_variant(
 
 
 @router.post("/configure-filterable-attributes")
-async def configure_filterable_attributes(search_srv: SearchDep) -> Message:
+async def configure_filterable_attributes(srv: ProductDep) -> Message:
     try:
-        search_srv.update_settings()
+        # search_srv.update_settings()
+        await srv.search_engine.configure_index()
         return Message(message="Filterable attributes updated successfully.")
     except Exception as e:
         logger.error(f"Error updating attributes: {e}")

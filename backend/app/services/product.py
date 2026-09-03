@@ -2,28 +2,52 @@ import asyncio
 import base64
 import random
 import xml.etree.ElementTree as ET
-from typing import List, Optional, Any, Dict
 from collections import Counter
-from app.services.cache import CacheService, cacheable
+from collections.abc import AsyncIterator, Sequence
+from typing import Any, Dict, List, Optional
+
 from fastapi import HTTPException, Request
-from prisma.enums import PaymentStatus
 from meilisearch.errors import MeilisearchApiError
-from prisma import Prisma
+from prisma.enums import PaymentStatus
+
 from app.core.config import settings
 from app.core.logging import get_logger
+from app.core.search.meilisearch import MeilisearchEngine
 from app.core.utils import url_to_list
 from app.models.product import Product
-from app.services.search import SearchService
+from app.services.cache import CacheService, cacheable
 from app.services.cdn import CdnService
+from app.services.search import SearchService
+from prisma import Prisma
 
 logger = get_logger(__name__)
 
-PRODUCT_ATTRIBUTES: list[str] = ["id", "name", "sku", "image", "images", "slug", "active", "is_new", "status", "variants"]
+PRODUCT_ATTRIBUTES: list[str] = [
+    "id",
+    "name",
+    "sku",
+    "image",
+    "images",
+    "slug",
+    "active",
+    "is_new",
+    "status",
+    "variants",
+]
+
 
 class ProductService:
-    def __init__(self, db: Prisma, search_srv: SearchService, cache_srv: CacheService, cdn_srv: CdnService):
+    def __init__(
+        self,
+        db: Prisma,
+        search_srv: SearchService,
+        search_engine: MeilisearchEngine,
+        cache_srv: CacheService,
+        cdn_srv: CdnService,
+    ):
         self.db = db
         self.search_srv = search_srv
+        self.search_engine = search_engine
         self.cache_srv = cache_srv
         self.cdn_srv = cdn_srv
         self.AGE_GROUP_MAP = {
@@ -47,29 +71,34 @@ class ProductService:
 
     async def get_by_slug(self, slug: str):
         return await self.db.product.find_unique(
-            where={"slug": slug},
-            include={"variants": True, "images": True}
+            where={"slug": slug}, include={"variants": True, "images": True}
         )
 
-    async def check_review_status(self, user_id: int, product_id: int) -> tuple[bool, bool]:
+    async def check_review_status(
+        self, user_id: int, product_id: int
+    ) -> tuple[bool, bool]:
         purchase_count_task = self.db.order.count(
             where={
                 "user_id": user_id,
                 "payment_status": PaymentStatus.SUCCESS,
-                "order_items": {"some": {"variant": {"product_id": product_id}}}
+                "order_items": {"some": {"variant": {"product_id": product_id}}},
             }
         )
         review_count_task = self.db.review.count(
             where={"user_id": user_id, "product_id": product_id}
         )
-        purchase_count, review_count = await asyncio.gather(purchase_count_task, review_count_task)
+        purchase_count, review_count = await asyncio.gather(
+            purchase_count_task, review_count_task
+        )
         return purchase_count > 0, review_count > 0
 
     async def get_variant(self, variant_id: int):
         return await self.db.productvariant.find_unique(where={"id": variant_id})
 
     async def update_variant(self, variant_id: int, update_data: Any):
-        return await self.db.productvariant.update(where={"id": variant_id}, data=update_data)
+        return await self.db.productvariant.update(
+            where={"id": variant_id}, data=update_data
+        )
 
     def map_age_group(self, age_str: str | None) -> str | None:
         if not age_str:
@@ -90,7 +119,9 @@ class ProductService:
         channel = ET.SubElement(rss, "channel")
         ET.SubElement(channel, "title").text = "Revoque Product Feed"
         ET.SubElement(channel, "link").text = settings.FRONTEND_HOST
-        ET.SubElement(channel, "description").text = "Automated product sync feed for Google Merchant Center"
+        ET.SubElement(
+            channel, "description"
+        ).text = "Automated product sync feed for Google Merchant Center"
 
         batch_size = 1000
         skip = 0
@@ -106,7 +137,7 @@ class ProductService:
                 include={"variants": True, "images": True, "categories": True},
                 order={"created_at": "desc"},
                 take=batch_size,
-                skip=skip
+                skip=skip,
             )
             if not products:
                 break
@@ -131,25 +162,42 @@ class ProductService:
                         variant_title += f" ({', '.join(detail_parts)})"
 
                     ET.SubElement(item, "g:title").text = variant_title.strip()
-                    ET.SubElement(item, "g:description").text = prod.description or "No description available."
+                    ET.SubElement(item, "g:description").text = (
+                        prod.description or "No description available."
+                    )
 
-                    ET.SubElement(item, "g:link").text = f"{settings.FRONTEND_HOST}/products/{prod.slug}"
+                    ET.SubElement(
+                        item, "g:link"
+                    ).text = f"{settings.FRONTEND_HOST}/products/{prod.slug}"
 
-                    main_image = prod.image or (prod.images[0].image if prod.images else f"{settings.FRONTEND_HOST}/placeholder.jpg")
+                    main_image = prod.image or (
+                        prod.images[0].image
+                        if prod.images
+                        else f"{settings.FRONTEND_HOST}/placeholder.jpg"
+                    )
                     ET.SubElement(item, "g:image_link").text = main_image
                     ET.SubElement(item, "g:availability").text = (
-                        availability_map[target]["in"] if variant.inventory > 0 else availability_map[target]["out"]
+                        availability_map[target]["in"]
+                        if variant.inventory > 0
+                        else availability_map[target]["out"]
                     )
-                    ET.SubElement(item, "g:condition").text = "new" if prod.is_new else "used"
+                    ET.SubElement(item, "g:condition").text = (
+                        "new" if prod.is_new else "used"
+                    )
                     if variant.old_price and variant.old_price > variant.price:
-                        ET.SubElement(item, "g:price").text = f"{variant.old_price:.2f} NGN"
-                        ET.SubElement(item, "g:sale_price").text = f"{variant.price:.2f} NGN"
+                        ET.SubElement(
+                            item, "g:price"
+                        ).text = f"{variant.old_price:.2f} NGN"
+                        ET.SubElement(
+                            item, "g:sale_price"
+                        ).text = f"{variant.price:.2f} NGN"
                     else:
                         ET.SubElement(item, "g:price").text = f"{variant.price:.2f} NGN"
 
-
-                    if variant.size: ET.SubElement(item, "g:size").text = variant.size
-                    if variant.color: ET.SubElement(item, "g:color").text = variant.color
+                    if variant.size:
+                        ET.SubElement(item, "g:size").text = variant.size
+                    if variant.color:
+                        ET.SubElement(item, "g:color").text = variant.color
 
                     if variant.age:
                         mapped_age = self.map_age_group(variant.age)
@@ -163,7 +211,9 @@ class ProductService:
                     ET.SubElement(item, "g:identifier_exists").text = "no"
 
             skip += batch_size
-            await asyncio.sleep(0.01)  # Yield loop to allow other network requests to process
+            await asyncio.sleep(
+                0.01
+            )  # Yield loop to allow other network requests to process
 
         xml_str = ET.tostring(rss, encoding="utf-8", method="xml").decode("utf-8")
         return f'<?xml version="1.0" encoding="utf-8"?>\n{xml_str}'
@@ -197,7 +247,9 @@ class ProductService:
         seen = set(product_ids)
 
         for pid in product_ids:
-            similar_ids = await self.cache_srv.redis.lrange(f"product:{pid}:similar", 0, -1)
+            similar_ids = await self.cache_srv.redis.lrange(
+                f"product:{pid}:similar", 0, -1
+            )
             for sid in similar_ids:
                 if sid not in seen:
                     recommendation_scores[sid] += 1
@@ -208,7 +260,14 @@ class ProductService:
         top_ids = [pid for pid, _ in recommendation_scores.most_common(10)]
         filter_str = " OR ".join([f"id = {pid}" for pid in top_ids])
 
-        results = await self.search_srv.search_index("", {"filter": filter_str, "limit": limit, "attributesToRetrieve": PRODUCT_ATTRIBUTES})
+        results = await self.search_srv.search_index(
+            "",
+            {
+                "filter": filter_str,
+                "limit": limit,
+                "attributesToRetrieve": PRODUCT_ATTRIBUTES,
+            },
+        )
         return results["hits"]
 
     async def get_discovery_feed(self, **kwargs) -> Dict[str, Any]:
@@ -227,14 +286,20 @@ class ProductService:
         base_filters: list[str] = self._build_search_filters_list(kwargs)
         disable_random_feed: bool = self._has_active_filters(kwargs) or bool(search)
 
-        search_params: Dict[str, Any] = {"limit": limit, "offset": offset, "attributesToRetrieve": PRODUCT_ATTRIBUTES}
+        search_params: Dict[str, Any] = {
+            "limit": limit,
+            "offset": offset,
+            "attributesToRetrieve": PRODUCT_ATTRIBUTES,
+        }
         if base_filters:
             search_params["filter"] = " AND ".join(base_filters)
 
         search_params["sort"] = [sort] if disable_random_feed else ["random_score:asc"]
 
         try:
-            res = await self.search_srv.search_index(search if disable_random_feed else "", search_params)
+            res = await self.search_srv.search_index(
+                search if disable_random_feed else "", search_params
+            )
             hits = res["hits"]
             total_count = res["estimatedTotalHits"]
         except Exception as e:
@@ -261,16 +326,21 @@ class ProductService:
                 "limit": 6 if col == "trending" else 8,
                 "sort": ["id:desc"],
                 "filter": f'active = true AND collection_slugs = "{col}"',
-                "attributesToRetrieve": PRODUCT_ATTRIBUTES
+                "attributesToRetrieve": PRODUCT_ATTRIBUTES,
             }
             try:
                 res = await self.search_srv.search_index("", search_params)
             except MeilisearchApiError as e:
-                if getattr(e, "code", None) in {"invalid_search_filter", "invalid_search_sort"}:
+                if getattr(e, "code", None) in {
+                    "invalid_search_filter",
+                    "invalid_search_sort",
+                }:
                     await self.search_srv.ensure_index_ready()
                     res = await self.search_srv.search_index("", search_params)
                 else:
-                    raise HTTPException(status_code=502, detail="Search service communication error")
+                    raise HTTPException(
+                        status_code=502, detail="Search service communication error"
+                    )
 
             key_name: str = "arrival" if col == "new-arrivals" else col
             return key_name, res.get("hits", [])
@@ -278,26 +348,42 @@ class ProductService:
         tasks = [fetch_collection(col) for col in collections]
         completed_tasks = await asyncio.gather(*tasks)
 
-        return {key: hits for key, hits in completed_tasks}
+        return dict(completed_tasks)
 
     def _has_active_filters(self, kw) -> bool:
-        return any([
-            kw.get("search"), kw.get("cat_ids"), kw.get("collections"), kw.get("sizes"),
-            kw.get("ages"), kw.get("width"), kw.get("length"),
-            kw.get("min_price", 1) != 1, kw.get("max_price", 50000) != 50000
-        ])
+        return any(
+            [
+                kw.get("search"),
+                kw.get("cat_ids"),
+                kw.get("collections"),
+                kw.get("sizes"),
+                kw.get("ages"),
+                kw.get("width"),
+                kw.get("length"),
+                kw.get("min_price", 1) != 1,
+                kw.get("max_price", 50000) != 50000,
+            ]
+        )
 
     def _build_search_filters_list(self, kw) -> list[str]:
         filters = []
-        if kw.get("cat_ids"): filters.append(f"category_slugs IN {url_to_list(kw['cat_ids'])}")
-        if kw.get("collections"): filters.append(f"collection_slugs IN [{kw['collections']}]")
+        if kw.get("cat_ids"):
+            filters.append(f"category_slugs IN {url_to_list(kw['cat_ids'])}")
+        if kw.get("collections"):
+            filters.append(f"collection_slugs IN [{kw['collections']}]")
         if kw.get("min_price") and kw.get("max_price"):
-            filters.append(f"min_variant_price >= {kw['min_price']} AND max_variant_price <= {kw['max_price']}")
+            filters.append(
+                f"min_variant_price >= {kw['min_price']} AND max_variant_price <= {kw['max_price']}"
+            )
         filters.append(f"active = {str(kw.get('active', True)).lower()}")
-        if kw.get("sizes"): filters.append(f"sizes IN [{kw['sizes']}]")
-        if kw.get("ages"): filters.append(f"ages IN {url_to_list(kw['ages'])}")
-        if kw.get("width"): filters.append(f"widths IN [{kw['width']}]")
-        if kw.get("length"): filters.append(f"lengths IN [{kw['length']}]")
+        if kw.get("sizes"):
+            filters.append(f"sizes IN [{kw['sizes']}]")
+        if kw.get("ages"):
+            filters.append(f"ages IN {url_to_list(kw['ages'])}")
+        if kw.get("width"):
+            filters.append(f"widths IN [{kw['width']}]")
+        if kw.get("length"):
+            filters.append(f"lengths IN [{kw['length']}]")
         return filters
 
     def _encode_cursor(self, value: str) -> str:
@@ -310,6 +396,58 @@ class ProductService:
             return base64.urlsafe_b64decode(cursor.encode()).decode()
         except Exception:
             return "0"
+
+    async def get_for_search_many(
+        self,
+        product_ids: Sequence[int],
+    ):
+        if not product_ids:
+            return []
+
+        return await self.db.product.find_many(
+            where={
+                "id": {
+                    "in": list(product_ids),
+                },
+            },
+            include={
+                "categories": True,
+                "collections": True,
+                "images": True,
+                "variants": True,
+                "shared_collections": True,
+            },
+        )
+
+    async def iter_for_search(
+        self,
+        batch_size: int = 500,
+    ) -> AsyncIterator[list]:
+        offset = 0
+
+        while True:
+            products = await self.db.product.find_many(
+                skip=offset,
+                take=batch_size,
+                order={"id": "asc"},
+                include={
+                    "categories": True,
+                    "collections": True,
+                    "images": True,
+                    "variants": True,
+                    "shared_collections": True,
+                },
+            )
+
+            if not products:
+                break
+
+            yield products
+
+            offset += len(products)
+
+            if len(products) < batch_size:
+                break
 
     def _prepare_product_data_for_indexing(self, product: Product) -> dict:
         product_dict: dict = {
@@ -326,7 +464,10 @@ class ProductService:
         product_dict["collection_slugs"] = [c.slug for c in (product.collections or [])]
         product_dict["category_slugs"] = [c.slug for c in (product.categories or [])]
 
-        images = [img.image for img in sorted((product.images or []), key=lambda img: img.order)]
+        images = [
+            img.image
+            for img in sorted((product.images or []), key=lambda img: img.order)
+        ]
         product_dict["image"] = images[0] if images else None
         product_dict["images"] = images if images else []
 
@@ -349,11 +490,16 @@ class ProductService:
 
         sizes, colors, ages, widths, lengths = [], [], [], [], []
         for v in variants:
-            if v.get("size"):   sizes.append(v["size"])
-            if v.get("color"):  colors.append(v["color"])
-            if v.get("age"):    ages.append(v["age"])
-            if v.get("width"):  widths.append(v["width"])
-            if v.get("length"): lengths.append(v["length"])
+            if v.get("size"):
+                sizes.append(v["size"])
+            if v.get("color"):
+                colors.append(v["color"])
+            if v.get("age"):
+                ages.append(v["age"])
+            if v.get("width"):
+                widths.append(v["width"])
+            if v.get("length"):
+                lengths.append(v["length"])
 
         product_dict["sizes"] = sizes
         product_dict["colors"] = colors
@@ -381,7 +527,7 @@ class ProductService:
                     "variants": True,
                     "images": True,
                     "shared_collections": True,
-                }
+                },
             )
 
             if not product:
@@ -389,17 +535,22 @@ class ProductService:
                 return
 
             product_data = self._prepare_product_data_for_indexing(product=product)
-            await self.search_srv.update_document(index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data)
-            await asyncio.gather(
-                self.cdn_srv.purge_cloudfare(f"/api/product/{product.slug}"),
-                return_exceptions=True
+            print("🚀 ~ ProductService ~ invalidate ~ product_data:", product_data)
+            await self.search_srv.update_document(
+                index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data
             )
-            await self.cache_srv.invalidate(f"product:{product.slug}", tags=["products", "catalog", "gallery"])
+            await self.cdn_srv.purge_cloudfare(f"/api/product/{product.slug}")
+            await self.cache_srv.invalidate(
+                f"product:{product.slug}", tags=["products", "catalog", "gallery"]
+            )
         except Exception as e:
             logger.error(f"Error re-indexing product {id}: {e}")
 
-
-    async def invalidate_all(self, product_ids: Optional[List[int]] = None, existing_product_ids: Optional[List[int]] = None):
+    async def invalidate_all(
+        self,
+        product_ids: Optional[List[int]] = None,
+        existing_product_ids: Optional[List[int]] = None,
+    ):
         """
         Re-indexes database products.
         """
@@ -414,27 +565,32 @@ class ProductService:
                         "variants": True,
                         "images": True,
                         "shared_collections": True,
-                    }
+                    },
                 )
                 if not products:
-                    logger.warning(f"Products with ids {product_ids} not found for re-indexing.")
+                    logger.warning(
+                        f"Products with ids {product_ids} not found for re-indexing."
+                    )
                     return
 
-                documents = [self._prepare_product_data_for_indexing(p) for p in products]
-                await self.search_srv.add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
+                documents = [
+                    self._prepare_product_data_for_indexing(p) for p in products
+                ]
+                await self.search_srv.add_documents_to_index(
+                    index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents
+                )
 
                 existing_set = set(existing_product_ids or [])
-                cloudfare_paths = [f"/api/product/{p.slug}" for p in products if p.id in existing_set]
-                slug_tags = [f"product:{p.slug}" for p in products if p.id in existing_set]
+                cloudfare_paths = [
+                    f"/api/product/{p.slug}" for p in products if p.id in existing_set
+                ]
+                slug_tags = [
+                    f"product:{p.slug}" for p in products if p.id in existing_set
+                ]
 
-                tasks = []
-                if cloudfare_paths:
-                    tasks.append(self.cdn_srv.purge_cloudfare(*cloudfare_paths))
-                if tasks:
-                    await asyncio.gather(*tasks, return_exceptions=True)
+                await self.cdn_srv.purge_cloudfare(*cloudfare_paths)
                 await self.cache_srv.invalidate(
-                    *slug_tags,
-                    tags=["products", "catalog", "gallery", "stats-trends"]
+                    *slug_tags, tags=["products", "catalog", "gallery", "stats-trends"]
                 )
                 logger.debug(f"Successfully targeted indexed {len(documents)} products")
                 return
@@ -458,7 +614,7 @@ class ProductService:
                     },
                     where={"active": True},
                     take=BATCH_SIZE,
-                    skip=skip
+                    skip=skip,
                 )
                 if not products_batch:
                     break
@@ -472,30 +628,98 @@ class ProductService:
                         logger.error(f"Error preparing product model {product.id}: {e}")
 
                 if documents:
-                    await self.search_srv.add_documents_to_index(index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents)
+                    await self.search_srv.add_documents_to_index(
+                        index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents
+                    )
 
                 total_processed += len(documents)
-                logger.debug(f"Indexed batch chunk: {skip // BATCH_SIZE + 1} ({len(documents)} records added)")
+                logger.debug(
+                    f"Indexed batch chunk: {skip // BATCH_SIZE + 1} ({len(documents)} records added)"
+                )
 
                 skip += BATCH_SIZE
                 await asyncio.sleep(0.05)  # Yield block back to application loop thread
 
             await self.cache_srv.invalidate(tags=["products", "catalog"])
-            logger.debug(f"Successfully batch indexed total of {total_processed} products")
+            logger.debug(
+                f"Successfully batch indexed total of {total_processed} products"
+            )
 
         except Exception as e:
             logger.error(f"Critical error during product re-indexing: {e}")
-
 
     async def delete_product_index(self, product_ids: List[int]) -> None:
         try:
             if len(product_ids) == 0:
                 return
-            await asyncio.gather(*[
-                self.search_srv.delete_document(index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(pid))
-                for pid in product_ids
-            ])
+            await asyncio.gather(
+                *[
+                    self.search_srv.delete_document(
+                        index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(pid)
+                    )
+                    for pid in product_ids
+                ]
+            )
             keys: list[str] = [f"product:{id}" for id in product_ids]
-            await self.cache_srv.invalidate(tags=["products", "catalog", "stats-trends"] + keys)
+            await self.cache_srv.invalidate(
+                tags=["products", "catalog", "stats-trends"] + keys
+            )
         except Exception as e:
             logger.error(f"Error deleting products {product_ids} from index: {e}")
+
+    async def index_product(self, product_id: int):
+        await self.index_products([product_id])
+
+    async def index_products(self, product_ids: list[int]):
+        if not product_ids:
+            return
+        try:
+            products = await self.get_for_search_many(product_ids)
+
+            if not products:
+                return
+
+            documents = [
+                self._prepare_product_data_for_indexing(product) for product in products
+            ]
+            print("🚀 ~ ProductService ~ index_products ~ documents:", documents)
+
+            await self.search_engine.index(documents)
+
+            cloudfare_paths = [f"/api/product/{p.slug}" for p in products]
+            print("🚀 ~ ProductService ~ index_products ~ cloudfare_paths:", cloudfare_paths)
+            slug_tags = [f"product:{p.slug}" for p in products]
+            print("🚀 ~ ProductService ~ index_products ~ slug_tags:", slug_tags)
+
+            await self.cdn_srv.purge_cloudfare(*cloudfare_paths)
+            await self.cache_srv.invalidate(*slug_tags, tags=["products", "catalog"])
+        except Exception as e:
+            logger.error(str(e))
+
+    async def index_all_products(self):
+        cloudfare_paths = []
+        slug_tags = []
+        async for products in self.products.iter_for_search(
+            batch_size=500,
+        ):
+            documents = [
+                self._prepare_product_data_for_indexing(product) for product in products
+            ]
+            cloudfare_paths.extend([f"/api/product/{p.slug}" for p in products])
+            slug_tags.extend([f"product:{p.slug}" for p in products])
+
+            await self.search_engine.index(documents)
+        await self.cdn_srv.purge_cloudfare(*cloudfare_paths)
+        await self.cache_srv.invalidate(*slug_tags, tags=["products", "catalog"])
+
+    async def delete_product(
+        self,
+        product_id: int,
+    ):
+        await self.search_engine.delete([product_id])
+
+    async def delete_products(self, product_ids: list[int]):
+        if not product_ids:
+            return
+
+        await self.search_engine.delete(product_ids)

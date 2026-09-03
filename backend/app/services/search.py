@@ -1,19 +1,39 @@
 import asyncio
 from datetime import datetime
-from typing import Any, Optional
-from meilisearch import Client
-from meilisearch.errors import MeilisearchApiError
-from anyio import to_thread
-from app.core.config import settings
-from app.core.logging import get_logger
 from json import JSONEncoder
+from typing import Any, Optional
 from uuid import UUID
 
+from anyio import to_thread
+from meilisearch import Client
+from meilisearch.errors import MeilisearchApiError
+
+from app.core.config import settings
+from app.core.logging import get_logger
 
 client = Client(settings.MEILI_HOST, settings.MEILI_MASTER_KEY)
 
-REQUIRED_FILTERABLES: list[str] = ["id", "category_slugs", "collection_slugs", "name", "max_variant_price", "min_variant_price", "active", "sizes", "colors", "ages", "widths", "lengths"]
-REQUIRED_SORTABLES: list[str] = ["id", "random_score", "created_at", "max_variant_price", "min_variant_price"]
+REQUIRED_FILTERABLES: list[str] = [
+    "id",
+    "category_slugs",
+    "collection_slugs",
+    "name",
+    "max_variant_price",
+    "min_variant_price",
+    "active",
+    "sizes",
+    "colors",
+    "ages",
+    "widths",
+    "lengths",
+]
+REQUIRED_SORTABLES: list[str] = [
+    "id",
+    "random_score",
+    "created_at",
+    "max_variant_price",
+    "min_variant_price",
+]
 
 logger = get_logger(__name__)
 
@@ -23,6 +43,7 @@ class CustomEncoder(JSONEncoder):
         if isinstance(o, (UUID, datetime)):
             return str(o)
         return super().default(o)
+
 
 def get_or_create_index(index_name: str) -> Optional[Any]:
     """
@@ -46,10 +67,14 @@ def get_or_create_index(index_name: str) -> Optional[Any]:
                 index.wait_for_task(sort_task.task_uid)
                 return index
             except Exception as inner_e:
-                logger.error(f"Failed to create and configure index {index_name}: {inner_e}")
+                logger.error(
+                    f"Failed to create and configure index {index_name}: {inner_e}"
+                )
                 return None
     except Exception as e:
-        logger.warning(f"Meilisearch instance unreachable or returning invalid response for {index_name}: {e}")
+        logger.warning(
+            f"Meilisearch instance unreachable or returning invalid response for {index_name}: {e}"
+        )
         try:
             client.create_index(index_name)
             return client.index(index_name)
@@ -74,11 +99,19 @@ class SearchService:
     async def search_index(self, query: str, options: dict) -> dict:
         if not self.index:
             logger.warning("Search dropped: Meilisearch index is unavailable.")
-            return {"hits": [], "nbHits": 0, "exhaustiveNbHits": False, "query": query, "limit": 0, "offset": 0, "processingTimeMs": 0}
+            return {
+                "hits": [],
+                "nbHits": 0,
+                "exhaustiveNbHits": False,
+                "query": query,
+                "limit": 0,
+                "offset": 0,
+                "processingTimeMs": 0,
+            }
 
         def _search():
             return self.index.search(query, options)
-            
+
         try:
             return await to_thread.run_sync(_search)
         except Exception as e:
@@ -88,6 +121,7 @@ class SearchService:
     async def ensure_index_ready(self):
         if not self.index:
             return
+
         def _configure():
             filter_task = self.index.update_filterable_attributes(REQUIRED_FILTERABLES)
             self.index.wait_for_task(filter_task.task_uid)
@@ -99,7 +133,6 @@ class SearchService:
             await to_thread.run_sync(_configure)
         except Exception as e:
             logger.error(f"Failed to run ensure_index_ready: {e}")
-
 
     def get_document_by_id(self, doc_id: str):
         if not self.index:
@@ -125,6 +158,7 @@ class SearchService:
         if not self.index:
             logger.warning("Skipping document update: Meilisearch unavailable.")
             return
+
         def _update():
             task = self.index.update_documents([document], serializer=CustomEncoder)
             self.index.wait_for_task(task.task_uid, timeout_in_ms=30000)
@@ -132,7 +166,9 @@ class SearchService:
 
         try:
             task = await to_thread.run_sync(_update)
-            logger.debug(f"Updated document {document['id']} in index {index_name}, task: {task.task_uid}")
+            logger.debug(
+                f"Updated document {document['id']} in index {index_name}, task: {task.task_uid}"
+            )
         except Exception as e:
             logger.error(f"Failed to update document: {e}")
 
@@ -140,20 +176,26 @@ class SearchService:
         if not self.index:
             logger.warning("Skipping add documents: Meilisearch unavailable.")
             return
+
         def _add():
-            task = self.index.add_documents(documents, primary_key="id", serializer=CustomEncoder)
+            task = self.index.add_documents(
+                documents, primary_key="id", serializer=CustomEncoder
+            )
             self.index.wait_for_task(task.task_uid, timeout_in_ms=30000)
             return task
 
         try:
             task = await to_thread.run_sync(_add)
-            logger.debug(f"Added {len(documents)} documents to index {index_name}, task: {task.task_uid}")
+            logger.debug(
+                f"Added {len(documents)} documents to index {index_name}, task: {task.task_uid}"
+            )
         except Exception as e:
             logger.error(f"Failed to add documents: {e}")
 
     async def delete_document(self, index_name: str, document_id: str) -> None:
         if not self.index:
             return
+
         def _delete():
             task = self.index.delete_document(document_id)
             self.index.wait_for_task(task.task_uid, timeout_in_ms=30000)
@@ -161,13 +203,16 @@ class SearchService:
 
         try:
             task = await to_thread.run_sync(_delete)
-            logger.debug(f"Deleted document {document_id} from index {index_name}, task: {task.task_uid}")
+            logger.debug(
+                f"Deleted document {document_id} from index {index_name}, task: {task.task_uid}"
+            )
         except Exception as e:
             logger.error(f"Failed to delete document: {e}")
 
     async def clear_index(self, index_name: str) -> None:
         if not self.index:
             return
+
         def _clear():
             task = self.index.delete_all_documents()
             self.index.wait_for_task(task.task_uid, timeout_in_ms=30000)
@@ -192,6 +237,7 @@ class SearchService:
         """
         Directly checks Meilisearch instance status.
         """
+
         def _check_health() -> bool:
             try:
                 # Fallback to direct client call if index hasn't initialized
@@ -203,8 +249,7 @@ class SearchService:
 
         try:
             return await asyncio.wait_for(
-                to_thread.run_sync(_check_health),
-                timeout=2.0
+                to_thread.run_sync(_check_health), timeout=2.0
             )
         except Exception:
             return False
