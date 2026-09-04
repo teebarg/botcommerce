@@ -1,13 +1,14 @@
-from app.services.search import SearchService
-from typing import List
 from datetime import datetime
+from typing import List
+
 from app.core.logging import get_logger
+from app.core.search.meilisearch import MeilisearchEngine
 from app.services.cache import CacheService
 
 logger = get_logger(__name__)
 
 class RecentlyViewedService:
-    def __init__(self, cache_srv: CacheService, search_srv: SearchService):
+    def __init__(self, cache_srv: CacheService, search_srv: MeilisearchEngine):
         self.max_items = 12
         self.cache_srv = cache_srv
         self.search_srv = search_srv

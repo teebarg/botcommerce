@@ -131,6 +131,7 @@ class PaymentService:
                 }
             )
 
+        await self.cache_srv.invalidate(f"order:{payment.order_id}", f"order-timeline:{payment.order_id}", tags=["orders"])
         await self._finalize_paid_order(order_id=payment.order_id)
         return order
 
@@ -155,8 +156,7 @@ class PaymentService:
                 data={"inventory": {"decrement": item.quantity}},
             )
             product_ids.append(item.variant.product_id)
-        print("🚀 ~ PaymentService ~ _finalize_paid_order ~ product_ids:", product_ids)
+
         await self.product_srv.index_products(product_ids=product_ids)
-        await self.cache_srv.invalidate(f"order:{order_id}", f"order-timeline:{order_id}", tags=["gallery", "orders"])
         await self.queue.enqueue_job("process_referral", order_id=order_id)
         await self.queue.enqueue_job("generate_and_send_invoice", order_id=order_id)

@@ -36,7 +36,6 @@ type UpdateVariantInput = {
     price?: number;
     old_price?: number;
     inventory?: number;
-    status?: "IN_STOCK" | "OUT_OF_STOCK";
     size?: string;
     color?: string;
     width?: number;

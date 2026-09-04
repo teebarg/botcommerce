@@ -249,7 +249,6 @@ class GalleryService:
             if isinstance(index_result, Exception):
                 logger.error(f"Search index delete failed: {index_result}")
 
-            await self.invalidate()
             await self.ws_manager.broadcast_to_all({"status": "completed"}, "bulk_action")
         except Exception as e:
             logger.error(f"Error processing bulk delete: {str(e)}")
@@ -295,7 +294,7 @@ class GalleryService:
                             "size": v.size, "color": v.color, "width": v.width, "length": v.length, "age": v.age,
                         })
                     await asyncio.gather(*[_create_variant(v) for v in payload.variants])
-                await self.invalidate(tags=["stats-trends"])
+                await self.cache_srv.invalidate(tags=["stats-trends"])
                 return product.id
         except HTTPException:
             raise
@@ -349,7 +348,6 @@ class GalleryService:
                                 "sku": generate_sku(), "image": existing_image.image
                             })
                     await asyncio.gather(*[_upsert_variant(v) for v in payload.variants])
-                await self.invalidate()
                 return existing_image.product_id
         except HTTPException:
             raise
@@ -403,7 +401,7 @@ class GalleryService:
                     if v_data and first_variant_id:
                         await tx.productvariant.update(where={"id": first_variant_id}, data=v_data)
 
-        await self.invalidate(tags=["stats-trends"])
+        await self.cache_srv.invalidate(tags=["stats-trends"])
 
     async def handle_bulk_update_images(self, payload: ImagesBulkUpdate, images, index_products_fn) -> None:
         failed_ids = []

@@ -79,18 +79,14 @@ function RouteComponent() {
                     <p className="text-2xl font-bold">{isPending ? "..." : data?.items?.length}</p>
                     <p className="text-xs text-muted-foreground">Total Orders</p>
                 </div>
-                <div
-                    className="bg-card rounded-2xl p-4 text-center border border-border"
-                >
+                <div className="bg-card rounded-2xl p-4 text-center border border-border">
                     <div className="w-10 h-10 mx-auto rounded-xl bg-primary flex items-center justify-center mb-2">
                         <MapPin className="w-5 h-5 text-white" />
                     </div>
                     <p className="text-2xl font-bold">0</p>
                     <p className="text-xs text-muted-foreground">Wishlist Items</p>
                 </div>
-                <div
-                    className="bg-card rounded-2xl p-4 text-center border border-border"
-                >
+                <div className="bg-card rounded-2xl p-4 text-center border border-border">
                     <div className="w-10 h-10 mx-auto rounded-xl bg-primary flex items-center justify-center mb-2">
                         <Home className="w-5 h-5 text-white" />
                     </div>
@@ -110,14 +106,10 @@ function RouteComponent() {
                     {isPending ? (
                         <PageLoader variant="list" />
                     ) : data?.items?.length == 0 ? (
-                        <EmptyState
-                            title="No orders found"
-                            description="You currently don't have no orders"
-                            icon={Package}
-                        />
-                    ) : data?.items?.slice(0, 5)?.map((order: Order, idx: number) => (
-                        <OrderItem key={idx} order={order} idx={idx} />
-                    ))}
+                        <EmptyState title="No orders found" description="You currently don't have no orders" icon={Package} />
+                    ) : (
+                        data?.items?.slice(0, 5)?.map((order: Order, idx: number) => <OrderItem key={idx} order={order} idx={idx} />)
+                    )}
                 </div>
             </div>
         </div>

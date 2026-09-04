@@ -226,34 +226,6 @@ class OrderService:
             await self.cache_srv.invalidate(tags=["orders", "stats-trends"])
             return new_order
 
-    async def decrement_variant_inventory_for_order(self, order_id: int) -> None:
-        order = await self.get_by_id(order_id=order_id, include_relations=True)
-        if not order:
-            logger.error(f"Order not found for ID: {order_id}")
-            raise Exception("Order not found")
-
-        for item in order.order_items:
-            try:
-                variant_id = item.variant_id
-                quantity = item.quantity
-
-                new_inventory = max(0, item.variant.inventory - quantity)
-                update_data: dict[str, Any] = {"inventory": new_inventory}
-
-                if new_inventory == 0 and item.variant.status != "OUT_OF_STOCK":
-                    update_data["status"] = "OUT_OF_STOCK"
-
-                await self.db.productvariant.update(
-                    where={"id": variant_id}, data=update_data
-                )
-                await self.product_srv.index_product(product_id=item.variant.product_id)
-
-            except Exception as e:
-                logger.error(
-                    f"Failed to decrement inventory for item {item.id} on order {order.id}: {e}"
-                )
-        await self.cache_srv.invalidate(tags=["gallery"])
-
     async def return_order_item(
         self, order_id: int, item_id: int, background_tasks: BackgroundTasks
     ) -> dict[str, str]:

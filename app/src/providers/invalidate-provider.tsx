@@ -41,27 +41,30 @@ function InvalidateProviderInner({ children }: { children: React.ReactNode }) {
     const prevConnectedRef = useRef<boolean>(false);
     const hasConnectedBeforeRef = useRef<boolean>(false);
 
-    useWebSocketMessage((message) => {
-        if (message.type !== "invalidate") return;
-        const handleInvalidation = (keySegments: string[]) => {
-            if (keySegments?.[0] === "cart" && keySegments[1]) {
-                const incomingCartId = keySegments[1];
-                if (incomingCartId === cart?.cart_number) {
-                    queryClient.invalidateQueries({ queryKey: ["cart"] });
+    useWebSocketMessage(
+        (message) => {
+            if (message.type !== "invalidate") return;
+            const handleInvalidation = (keySegments: string[]) => {
+                if (keySegments?.[0] === "cart" && keySegments[1]) {
+                    const incomingCartId = keySegments[1];
+                    if (incomingCartId === cart?.cart_number) {
+                        queryClient.invalidateQueries({ queryKey: ["cart"] });
+                    }
+                    return;
                 }
-                return;
+                queryClient.invalidateQueries({ queryKey: keySegments });
+            };
+
+            if (message.key) {
+                handleInvalidation(parseEventKey(message.key));
             }
-            queryClient.invalidateQueries({ queryKey: keySegments });
-        };
 
-        if (message.key) {
-            handleInvalidation(parseEventKey(message.key));
-        }
-
-        if (message.keys) {
-            parseEventKeys(message.keys).forEach(handleInvalidation);
-        }
-    }, [queryClient]);
+            if (message.keys) {
+                parseEventKeys(message.keys).forEach(handleInvalidation);
+            }
+        },
+        [queryClient]
+    );
 
     useEffect(() => {
         if (isAuthenticated && isConnected && !prevConnectedRef.current) {
@@ -77,7 +80,7 @@ function InvalidateProviderInner({ children }: { children: React.ReactNode }) {
                 queryClient.invalidateQueries({ queryKey: ["products"] });
                 queryClient.invalidateQueries({ queryKey: ["gallery"] });
             }
-    
+
             hasConnectedBeforeRef.current = true;
         }
         prevConnectedRef.current = isConnected;

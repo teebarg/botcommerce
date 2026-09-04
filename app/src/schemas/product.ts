@@ -22,24 +22,22 @@ export const DBCatalogSchema = z.object({
     created_at: z.string().optional(),
 });
 
-export const CategorySchema = z
-    .object({
-        id: z.number(),
-        name: z.string(),
-        slug: z.string(),
-        image: z.string().optional(),
-        is_active: z.boolean(),
-        display_order: z.number().default(0),
-    });
+export const CategorySchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    slug: z.string(),
+    image: z.string().optional(),
+    is_active: z.boolean(),
+    display_order: z.number().default(0),
+});
 
-export const CollectionSchema = z
-    .object({
-        id: z.number(),
-        name: z.string(),
-        slug: z.string(),
-        is_active: z.boolean(),
-        created_at: z.string().optional()
-    });
+export const CollectionSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    slug: z.string(),
+    is_active: z.boolean(),
+    created_at: z.string().optional(),
+});
 
 export const ProductVariantLiteSchema = z.object({
     id: z.number(),
@@ -59,7 +57,7 @@ export const ProductVariantLiteSchema = z.object({
 export const ProductImageLiteSchema = z.object({
     id: z.number(),
     image: z.string(),
-    order: z.number()
+    order: z.number(),
 });
 
 export const ProductLiteSchema = z.object({
@@ -88,19 +86,18 @@ export const ProductVariantSchema = z.object({
     age: z.string().nullable().optional(),
 });
 
-export const ProductSchema = z
-    .object({
-        id: z.number(),
-        name: z.string(),
-        slug: z.string(),
-        sku: z.string(),
-        description: z.string(),
-        variants: z.array(ProductVariantLiteSchema).optional(),
-        categories: z.array(CategorySchema),
-        collections: z.array(CollectionSchema),
-        active: z.boolean(),
-        is_new: z.boolean(),
-    });
+export const ProductSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    slug: z.string(),
+    sku: z.string(),
+    description: z.string(),
+    variants: z.array(ProductVariantLiteSchema).optional(),
+    categories: z.array(CategorySchema),
+    collections: z.array(CollectionSchema),
+    active: z.boolean(),
+    is_new: z.boolean(),
+});
 
 export const ProductImageSchema = z.object({
     id: z.number(),
@@ -112,7 +109,7 @@ export const ProductImageSchema = z.object({
 export const ImageLiteSchema = z.object({
     id: z.number(),
     image: z.string(),
-    order: z.number()
+    order: z.number(),
 });
 
 export const GalleryImageSchema = z.object({
@@ -163,24 +160,23 @@ export const ProductSearchSchema = z.object({
     sku: z.string(),
     image: z.string(),
     images: z.array(z.string()),
-    status: ProductStatusSchema,
     variants: z.array(SearchVariantSchema).nullable(),
     active: z.boolean(),
     is_new: z.boolean().optional(),
+    in_stock: z.boolean(),
 });
 
-export const CatalogSchema = z
-    .object({
-        id: z.number(),
-        title: z.string(),
-        slug: z.string(),
-        description: z.string().optional(),
-        products: z.array(ProductSearchSchema),
-        products_count: z.number(),
-        view_count: z.number(),
-        is_active: z.boolean(),
-        created_at: z.string(),
-    });
+export const CatalogSchema = z.object({
+    id: z.number(),
+    title: z.string(),
+    slug: z.string(),
+    description: z.string().optional(),
+    products: z.array(ProductSearchSchema),
+    products_count: z.number(),
+    view_count: z.number(),
+    is_active: z.boolean(),
+    created_at: z.string(),
+});
 
 export const PaginatedCatalogSchema = PagSchema.extend({
     catalogs: z.array(CatalogSchema),
@@ -240,7 +236,7 @@ export const CatalogQuerySchema = z.object({
 
 export const FeedQuerySchema = z.object({
     search: z.string().optional(),
-    sort: z.enum(["min_variant_price:asc", "min_variant_price:desc", "id:desc", "created_at:desc"]).optional(),
+    sort: z.enum(["min_price:asc", "min_price:desc", "id:desc"]).optional(),
     cat_ids: z.string().optional(),
     sizes: z.string().optional(),
     ages: z.string().optional(),

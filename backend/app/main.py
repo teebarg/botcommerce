@@ -19,7 +19,6 @@ from app.api.main import api_router
 from app.core.config import settings
 from app.core.decorators import limit
 from app.core.dependencies.cache import ArqDep, CdnDep
-from app.core.dependencies.product import SearchDep
 from app.core.logging import get_logger
 from app.lib.cache import add_cache_headers
 from app.models.generic import BulkPurchaseCreate, ContactFormCreate, NewsletterCreate
@@ -151,17 +150,15 @@ async def purge_cdn(cdn_srv: CdnDep, data: PurgeCdn) -> dict[str, Any]:
 
 @app.head("/api/health")
 @app.get("/api/health")
-async def health(db: DbDep, search_srv: SearchDep) -> dict[str, Any]:
-    meili_ok = await search_srv.check()
+async def health(db: DbDep) -> dict[str, Any]:
     postgres_ok = await db.execute_raw("SELECT 1;")
     redis_ok = True
-    is_healthy = postgres_ok and redis_ok and meili_ok
+    is_healthy = postgres_ok and redis_ok
     payload = {
         "status": "healthy" if is_healthy else "unhealthy",
         "infrastructure": {
             "postgres": "connected" if postgres_ok else "disconnected",
             "redis": "connected" if redis_ok else "disconnected",
-            "meilisearch": "connected" if meili_ok else "disconnected"
         }
     }
     return payload

@@ -1,6 +1,5 @@
-from typing import List, Literal, Optional
+from typing import List, Optional
 
-from prisma.enums import ProductStatus
 from pydantic import BaseModel, Field
 
 from app.models.category import Category
@@ -18,7 +17,6 @@ class ProductImage(BaseModel):
 class ProductVariant(BaseModel):
     id: int
     sku: str
-    status: ProductStatus
     price: float
     old_price: Optional[float] = 0.0
     inventory: int
@@ -116,7 +114,7 @@ class ProductSearch(BaseModel):
     slug: str
     image: Optional[str] = None
     images: Optional[List[str]] = []
-    status: Literal["IN STOCK", "OUT OF STOCK"] = "IN STOCK"
+    in_stock: bool = True
     variants: Optional[List[SearchVariant]] = []
     active: Optional[bool] = True
     is_new: Optional[bool] = False

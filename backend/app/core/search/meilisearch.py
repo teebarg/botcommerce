@@ -9,38 +9,27 @@ logger = get_logger(__name__)
 
 REQUIRED_FILTERABLES: list[str] = [
     "id",
-    "category_slugs",
-    "collection_slugs",
+    "categories.id",
+    "categories.slug",
+    "collections.id",
+    "collections.slug",
     "name",
-    "max_variant_price",
-    "min_variant_price",
+    "max_price",
+    "min_price",
     "active",
     "sizes",
     "colors",
     "ages",
     "widths",
     "lengths",
+    "in_stock",
 ]
 REQUIRED_SORTABLES: list[str] = [
     "id",
     "random_score",
     "created_at",
-    "max_variant_price",
-    "min_variant_price",
-]
-PRODUCT_ATTRIBUTES: list[str] = [
-    "id",
-    "name",
-    "sku",
-    "slug",
-    "active",
-    "is_new",
-    "status",
-    "image",
-    "images",
-    "variants",
-    "min_variant_price",
-    "max_variant_price",
+    "max_price",
+    "min_price",
 ]
 
 
@@ -64,7 +53,29 @@ class MeilisearchEngine:
 
         meili_index.update_filterable_attributes(REQUIRED_FILTERABLES)
         meili_index.update_sortable_attributes(REQUIRED_SORTABLES)
-        meili_index.update_displayed_attributes(PRODUCT_ATTRIBUTES)
+        meili_index.update_displayed_attributes(None)
+
+    def get_document_by_id(self, doc_id: str):
+        meili_index = self.client.index(self.index_name)
+        if not meili_index:
+            return None
+        try:
+            doc = meili_index.get_document(doc_id)
+            return dict(doc)
+        except Exception as e:
+            logger.error(f"Error fetching document by ID: {e}")
+            return None
+
+    def get_documents_by_filter(self, filter_str: str, limit: int) -> list:
+        meili_index = self.client.index(self.index_name)
+        if not meili_index:
+            return []
+        try:
+            results = meili_index.get_documents({"filter": filter_str, "limit": limit})
+            return results.results
+        except Exception as e:
+            logger.error(f"Error fetching documents by filter: {e}")
+            return []
 
     async def get_document(
         self,
@@ -72,6 +83,26 @@ class MeilisearchEngine:
     ) -> dict:
         document = self.client.index(self.index_name).get_document(str(document_id))
         return dict(document)
+
+    async def search_index(self, query: str, options: dict) -> dict:
+        meili_index = self.client.index(self.index_name)
+        if not meili_index:
+            logger.warning("Search dropped: Meilisearch index is unavailable.")
+            return {
+                "hits": [],
+                "nbHits": 0,
+                "exhaustiveNbHits": False,
+                "query": query,
+                "limit": 0,
+                "offset": 0,
+                "processingTimeMs": 0,
+            }
+
+        try:
+            return meili_index.search(query, options)
+        except Exception as e:
+            logger.error(f"Error during search query: {e}")
+            return {"hits": [], "nbHits": 0}
 
     async def search(
         self,

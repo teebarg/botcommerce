@@ -1,23 +1,19 @@
 from typing import Optional
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    Request,
-    BackgroundTasks
-)
+
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from prisma.errors import PrismaError
+
+from app.core.dependencies.services import CollectionDep
+from app.core.permissions import require_admin
+from app.core.utils import slugify
 from app.models.collection import (
-    CollectionCreate,
     Collection,
+    CollectionCreate,
     CollectionUpdate,
 )
 from app.models.generic import Message
-from app.core.utils import slugify
-from app.core.permissions import require_admin
-from app.services.cache import cacheable
-from app.core.dependencies.services import CollectionDep
 from app.prisma_client import DbDep
+from app.services.cache import cacheable
 
 router = APIRouter()
 

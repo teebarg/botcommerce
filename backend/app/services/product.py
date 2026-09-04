@@ -4,10 +4,9 @@ import random
 import xml.etree.ElementTree as ET
 from collections import Counter
 from collections.abc import AsyncIterator, Sequence
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from fastapi import HTTPException, Request
-from meilisearch.errors import MeilisearchApiError
 from prisma.enums import PaymentStatus
 
 from app.core.config import settings
@@ -17,7 +16,6 @@ from app.core.utils import url_to_list
 from app.models.product import Product
 from app.services.cache import CacheService, cacheable
 from app.services.cdn import CdnService
-from app.services.search import SearchService
 from prisma import Prisma
 
 logger = get_logger(__name__)
@@ -33,6 +31,7 @@ PRODUCT_ATTRIBUTES: list[str] = [
     "is_new",
     "status",
     "variants",
+    "in_stock"
 ]
 
 
@@ -40,13 +39,11 @@ class ProductService:
     def __init__(
         self,
         db: Prisma,
-        search_srv: SearchService,
         search_engine: MeilisearchEngine,
         cache_srv: CacheService,
         cdn_srv: CdnService,
     ):
         self.db = db
-        self.search_srv = search_srv
         self.search_engine = search_engine
         self.cache_srv = cache_srv
         self.cdn_srv = cdn_srv
@@ -226,7 +223,7 @@ class ProductService:
 
         ids = ids[:limit]
 
-        documents = self.search_srv.get_documents_by_filter(
+        documents = self.search_engine.get_documents_by_filter(
             f"id IN [{','.join(ids)}]", limit
         )
 
@@ -260,7 +257,7 @@ class ProductService:
         top_ids = [pid for pid, _ in recommendation_scores.most_common(10)]
         filter_str = " OR ".join([f"id = {pid}" for pid in top_ids])
 
-        results = await self.search_srv.search_index(
+        results = await self.search_engine.search_index(
             "",
             {
                 "filter": filter_str,
@@ -294,10 +291,12 @@ class ProductService:
         if base_filters:
             search_params["filter"] = " AND ".join(base_filters)
 
-        search_params["sort"] = [sort] if disable_random_feed else ["random_score:asc"]
+        search_params["sort"] = (
+            [sort or "id:desc"] if disable_random_feed else ["random_score:asc"]
+        )
 
         try:
-            res = await self.search_srv.search_index(
+            res = await self.search_engine.search_index(
                 search if disable_random_feed else "", search_params
             )
             hits = res["hits"]
@@ -325,22 +324,10 @@ class ProductService:
             search_params = {
                 "limit": 6 if col == "trending" else 8,
                 "sort": ["id:desc"],
-                "filter": f'active = true AND collection_slugs = "{col}"',
+                "filter": f'active = true AND collections.slug = "{col}"',
                 "attributesToRetrieve": PRODUCT_ATTRIBUTES,
             }
-            try:
-                res = await self.search_srv.search_index("", search_params)
-            except MeilisearchApiError as e:
-                if getattr(e, "code", None) in {
-                    "invalid_search_filter",
-                    "invalid_search_sort",
-                }:
-                    await self.search_srv.ensure_index_ready()
-                    res = await self.search_srv.search_index("", search_params)
-                else:
-                    raise HTTPException(
-                        status_code=502, detail="Search service communication error"
-                    )
+            res = await self.search_engine.search_index("", search_params)
 
             key_name: str = "arrival" if col == "new-arrivals" else col
             return key_name, res.get("hits", [])
@@ -360,6 +347,7 @@ class ProductService:
                 kw.get("ages"),
                 kw.get("width"),
                 kw.get("length"),
+                kw.get("sort"),
                 kw.get("min_price", 1) != 1,
                 kw.get("max_price", 50000) != 50000,
             ]
@@ -368,13 +356,13 @@ class ProductService:
     def _build_search_filters_list(self, kw) -> list[str]:
         filters = []
         if kw.get("cat_ids"):
-            filters.append(f"category_slugs IN {url_to_list(kw['cat_ids'])}")
+            filters.append(f"categories.slug IN {url_to_list(kw['cat_ids'])}")
         if kw.get("collections"):
-            filters.append(f"collection_slugs IN [{kw['collections']}]")
-        if kw.get("min_price") and kw.get("max_price"):
-            filters.append(
-                f"min_variant_price >= {kw['min_price']} AND max_variant_price <= {kw['max_price']}"
-            )
+            filters.append(f"collections.slug IN [{kw['collections']}]")
+        if kw.get("min_price") is not None:
+            filters.append(f"min_price >= {kw['min_price']}")
+        if kw.get("max_price") is not None:
+            filters.append(f"max_price <= {kw['max_price']}")
         filters.append(f"active = {str(kw.get('active', True)).lower()}")
         if kw.get("sizes"):
             filters.append(f"sizes IN [{kw['sizes']}]")
@@ -449,7 +437,7 @@ class ProductService:
             if len(products) < batch_size:
                 break
 
-    def _prepare_product_data_for_indexing(self, product: Product) -> dict:
+    def product_to_search_document(self, product: Product) -> dict:
         product_dict: dict = {
             "id": product.id,
             "name": product.name,
@@ -461,8 +449,27 @@ class ProductService:
             "random_score": random.random(),
         }
 
-        product_dict["collection_slugs"] = [c.slug for c in (product.collections or [])]
-        product_dict["category_slugs"] = [c.slug for c in (product.categories or [])]
+        product_dict["categories"] = (
+            [
+                {
+                    "id": category.id,
+                    "name": category.name,
+                    "slug": category.slug,
+                }
+                for category in product.categories or  []
+            ],
+        )
+
+        product_dict["collections"] = (
+            [
+                {
+                    "id": collection.id,
+                    "name": collection.name,
+                    "slug": collection.slug,
+                }
+                for collection in product.collections or []
+            ],
+        )
 
         images = [
             img.image
@@ -508,12 +515,10 @@ class ProductService:
         product_dict["lengths"] = lengths
 
         variant_prices = [v["price"] for v in variants if v.get("price") is not None]
-        product_dict["min_variant_price"] = min(variant_prices) if variant_prices else 0
-        product_dict["max_variant_price"] = max(variant_prices) if variant_prices else 0
+        product_dict["min_price"] = min(variant_prices) if variant_prices else 0
+        product_dict["max_price"] = max(variant_prices) if variant_prices else 0
 
-        product_dict["status"] = (
-            "IN STOCK" if any(v["inventory"] > 0 for v in variants) else "OUT OF STOCK"
-        )
+        product_dict["in_stock"] = any(v["inventory"] > 0 for v in variants)
 
         return product_dict
 
@@ -524,7 +529,7 @@ class ProductService:
             await self.search_engine.delete(document_ids=product_ids)
             keys: list[str] = [f"product:{id}" for id in product_ids]
             await self.cache_srv.invalidate(
-                tags=["products", "catalog", "stats-trends"] + keys
+                tags=["products", "catalog", "stats-trends", "gallery"] + keys
             )
         except Exception as e:
             logger.error(f"Error deleting products {product_ids} from index: {e}")
@@ -542,7 +547,7 @@ class ProductService:
                 return
 
             documents = [
-                self._prepare_product_data_for_indexing(product) for product in products
+                self.product_to_search_document(product) for product in products
             ]
 
             await self.search_engine.index(documents)
@@ -551,7 +556,9 @@ class ProductService:
             slug_tags = [f"product:{p.slug}" for p in products]
 
             await self.cdn_srv.purge_cloudfare(*cloudfare_paths)
-            await self.cache_srv.invalidate(*slug_tags, tags=["products", "catalog"])
+            await self.cache_srv.invalidate(
+                *slug_tags, tags=["products", "catalog", "gallery"]
+            )
         except Exception as e:
             logger.error(str(e))
 
@@ -563,14 +570,17 @@ class ProductService:
                 batch_size=500,
             ):
                 documents = [
-                    self._prepare_product_data_for_indexing(product) for product in products
+                    self.product_to_search_document(product)
+                    for product in products
                 ]
                 cloudfare_paths.extend([f"/api/product/{p.slug}" for p in products])
                 slug_tags.extend([f"product:{p.slug}" for p in products])
 
                 await self.search_engine.index(documents)
             await self.cdn_srv.purge_cloudfare(*cloudfare_paths)
-            await self.cache_srv.invalidate(*slug_tags, tags=["products", "catalog"])
+            await self.cache_srv.invalidate(
+                *slug_tags, tags=["products", "catalog", "gallery"]
+            )
         except Exception as e:
             logger.error(str(e))
 

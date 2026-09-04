@@ -14,7 +14,6 @@ interface VariantSelectionProps {
     onVariantChange: (variant: ProductVariantLite | undefined) => void;
 }
 
-
 function OptionGroup({
     label,
     options,
@@ -47,8 +46,8 @@ function OptionGroup({
                                 isSelected
                                     ? "bg-foreground text-background border-foreground"
                                     : available
-                                        ? "bg-background border-border hover:bg-muted"
-                                        : "bg-muted text-muted-foreground border-border cursor-not-allowed opacity-50"
+                                      ? "bg-background border-border hover:bg-muted"
+                                      : "bg-muted text-muted-foreground border-border cursor-not-allowed opacity-50"
                             )}
                         >
                             {opt}
@@ -108,10 +107,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                             <button
                                 key={idx}
                                 onClick={() => isOptionAvailable("color", color) && toggleColorSelect(color)}
-                                className={cn(
-                                    "w-9 h-9 rounded-full border-2",
-                                    selectedColor === color ? "border-foreground" : "border-border"
-                                )}
+                                className={cn("w-9 h-9 rounded-full border-2", selectedColor === color ? "border-foreground" : "border-border")}
                                 style={{ backgroundColor: color.toLowerCase() }}
                                 title={color}
                             />
@@ -165,8 +161,8 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                         </div>
                     </div>
                     <div className="mt-3 flex justify-between items-center">
-                        <Badge variant={selectedVariant.status === "IN_STOCK" ? "success" : "destructive"}>
-                            {selectedVariant.status === "IN_STOCK" ? "In stock" : "Out of stock"}
+                        <Badge variant={selectedVariant.inventory > 0 ? "success" : "destructive"}>
+                            {selectedVariant.inventory > 0 ? "In stock" : "Out of stock"}
                         </Badge>
                         <span className="text-xs text-muted-foreground">{selectedVariant.inventory} available</span>
                     </div>
@@ -185,12 +181,7 @@ export const ProductVariantSelection: React.FC<VariantSelectionProps> = ({ produ
                         <Minus className="w-4 h-4" />
                     </Button>
                     <span className="w-6 text-center text-sm font-medium">{quantity}</span>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setQuantity(quantity + 1)}
-                        className="rounded-full hover:bg-background"
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => setQuantity(quantity + 1)} className="rounded-full hover:bg-background">
                         <Plus className="w-4 h-4" />
                     </Button>
                 </div>

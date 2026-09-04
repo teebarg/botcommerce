@@ -38,8 +38,7 @@ async def get_home_categories_products(request: Request, db: DbDep, product_srv:
     )
 
     for category in categories:
-        category.products = [product_srv._prepare_product_data_for_indexing(product) for product in category.products]
-
+        category.products = [product_srv.product_to_search_document(product) for product in category.products]
     return categories
 
 @router.get("/")

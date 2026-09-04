@@ -110,5 +110,5 @@ async def change_payment_status(
     updated_order = await db.order.update(
         where={"id": id}, data={"payment_status": status}
     )
-    await srv.cache_srv.invalidate(f"order:{id}", tags=["orders"])
+    await srv.cache_srv.invalidate(f"order:{id}", f"order-timeline:{id}", tags=["orders"])
     return updated_order

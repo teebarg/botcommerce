@@ -228,8 +228,6 @@ class CartService:
             raise HTTPException(
                 status_code=400, detail="Product variant does not exist"
             )
-        if variant.status != "IN_STOCK":
-            raise HTTPException(status_code=400, detail="Product is out of stock")
         if quantity > variant.inventory:
             raise HTTPException(
                 status_code=400,

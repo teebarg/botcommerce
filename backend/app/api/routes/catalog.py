@@ -108,11 +108,6 @@ async def search(
             for v in p.variants
         ]
 
-        # Determine overall product stock status based on variant availability
-        product_status = "OUT OF STOCK"
-        if any(v.status == "IN_STOCK" and v.inventory > 0 for v in p.variants):
-            product_status = "IN STOCK"
-
         formatted_products.append(
             ProductSearch(
                 id=p.id,
@@ -120,7 +115,7 @@ async def search(
                 sku=p.sku,
                 slug=p.slug,
                 image=p.images[0].image if len(p.images) > 0 else p.image,
-                status=product_status,
+                in_stock=any(v.inventory > 0 for v in p.variants),
                 variants=variant_list,
                 active=p.active,
                 is_new=p.is_new

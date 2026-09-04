@@ -183,7 +183,7 @@ async def create_image_metadata(
     background_tasks: BackgroundTasks,
 ):
     product_id = await srv.create_metadata(image_id, payload)
-    background_tasks.add_task(product_srv.invalidate, id=product_id)
+    background_tasks.add_task(product_srv.index_product, id=product_id)
     return {"success": True}
 
 
@@ -196,7 +196,6 @@ async def update_image_metadata(
     background_tasks: BackgroundTasks,
 ):
     product_id = await srv.update_metadata(image_id, payload)
-    # background_tasks.add_task(product_srv.invalidate, id=product_id)
     background_tasks.add_task(product_srv.index_product, product_id=product_id)
     return {"success": True}
 
