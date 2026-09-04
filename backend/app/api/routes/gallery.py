@@ -153,7 +153,7 @@ async def upload_gallery_images(
 async def bulk_delete_gallery_images(
     db: DbDep,
     srv: GalleryDep,
-    Product_srv: ProductDep,
+    product_srv: ProductDep,
     payload: ImageBulkDelete,
     background_tasks: BackgroundTasks,
 ):
@@ -168,7 +168,7 @@ async def bulk_delete_gallery_images(
         srv.process_bulk_delete_task,
         payload=payload,
         remove_storage_fn=srv.storage.remove_images,
-        delete_index_fn=Product_srv.delete_product_index
+        delete_index_fn=product_srv.delete_product_index
     )
     await srv.ws_manager.broadcast_to_all({"status": "processing"}, "bulk_action")
     return {"success": True, "message": f"Deleting {len(images)} images..."}
@@ -227,7 +227,7 @@ async def bulk_update_products(
         srv.handle_bulk_update_images,
         payload=payload,
         images=images,
-        index_products_fn=product_srv.invalidate_all
+        index_products_fn=product_srv.index_products
     )
 
     return {"message": f"Updating {len(images)} products..."}

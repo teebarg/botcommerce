@@ -403,21 +403,20 @@ class GalleryService:
                     if v_data and first_variant_id:
                         await tx.productvariant.update(where={"id": first_variant_id}, data=v_data)
 
+        await self.invalidate(tags=["stats-trends"])
+
     async def handle_bulk_update_images(self, payload: ImagesBulkUpdate, images, index_products_fn) -> None:
         failed_ids = []
         product_ids = []
-        existing_product_ids = []
 
         for image in images:
             try:
                 await self._process_single_image(image, payload, product_ids)
-                if image.product_id is not None:
-                    existing_product_ids.append(image.product_id)
             except Exception as e:
                 logger.error(f"Error processing image {image.id}: {e}")
                 failed_ids.append(image.id)
 
-        await index_products_fn(product_ids=product_ids, existing_product_ids=existing_product_ids)
+        await index_products_fn(product_ids=product_ids)
         status = "completed" if not failed_ids else "partial"
         await self.ws_manager.broadcast_to_all({
             "status": status, "failed_ids": failed_ids, "success_count": len(images) - len(failed_ids)

@@ -517,149 +517,11 @@ class ProductService:
 
         return product_dict
 
-    async def invalidate(self, id: int) -> None:
-        try:
-            product = await self.db.product.find_unique(
-                where={"id": id},
-                include={
-                    "categories": True,
-                    "collections": True,
-                    "variants": True,
-                    "images": True,
-                    "shared_collections": True,
-                },
-            )
-
-            if not product:
-                logger.warning(f"Product with id {id} not found for re-indexing.")
-                return
-
-            product_data = self._prepare_product_data_for_indexing(product=product)
-            print("🚀 ~ ProductService ~ invalidate ~ product_data:", product_data)
-            await self.search_srv.update_document(
-                index_name=settings.MEILI_PRODUCTS_INDEX, document=product_data
-            )
-            await self.cdn_srv.purge_cloudfare(f"/api/product/{product.slug}")
-            await self.cache_srv.invalidate(
-                f"product:{product.slug}", tags=["products", "catalog", "gallery"]
-            )
-        except Exception as e:
-            logger.error(f"Error re-indexing product {id}: {e}")
-
-    async def invalidate_all(
-        self,
-        product_ids: Optional[List[int]] = None,
-        existing_product_ids: Optional[List[int]] = None,
-    ):
-        """
-        Re-indexes database products.
-        """
-        try:
-            logger.debug("Starting re-indexing process...")
-            if product_ids:
-                products = await self.db.product.find_many(
-                    where={"id": {"in": product_ids}},
-                    include={
-                        "categories": True,
-                        "collections": True,
-                        "variants": True,
-                        "images": True,
-                        "shared_collections": True,
-                    },
-                )
-                if not products:
-                    logger.warning(
-                        f"Products with ids {product_ids} not found for re-indexing."
-                    )
-                    return
-
-                documents = [
-                    self._prepare_product_data_for_indexing(p) for p in products
-                ]
-                await self.search_srv.add_documents_to_index(
-                    index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents
-                )
-
-                existing_set = set(existing_product_ids or [])
-                cloudfare_paths = [
-                    f"/api/product/{p.slug}" for p in products if p.id in existing_set
-                ]
-                slug_tags = [
-                    f"product:{p.slug}" for p in products if p.id in existing_set
-                ]
-
-                await self.cdn_srv.purge_cloudfare(*cloudfare_paths)
-                await self.cache_srv.invalidate(
-                    *slug_tags, tags=["products", "catalog", "gallery", "stats-trends"]
-                )
-                logger.debug(f"Successfully targeted indexed {len(documents)} products")
-                return
-
-            # Full Index Rebuild in Chunks
-            logger.debug("Clearing search index for clean sync...")
-            await self.search_srv.clear_index(index_name=settings.MEILI_PRODUCTS_INDEX)
-
-            BATCH_SIZE = 500
-            skip = 0
-            total_processed = 0
-
-            while True:
-                products_batch = await self.db.product.find_many(
-                    include={
-                        "categories": True,
-                        "collections": True,
-                        "variants": True,
-                        "images": True,
-                        "shared_collections": True,
-                    },
-                    where={"active": True},
-                    take=BATCH_SIZE,
-                    skip=skip,
-                )
-                if not products_batch:
-                    break
-
-                documents = []
-                for product in products_batch:
-                    try:
-                        product_data = self._prepare_product_data_for_indexing(product)
-                        documents.append(product_data)
-                    except Exception as e:
-                        logger.error(f"Error preparing product model {product.id}: {e}")
-
-                if documents:
-                    await self.search_srv.add_documents_to_index(
-                        index_name=settings.MEILI_PRODUCTS_INDEX, documents=documents
-                    )
-
-                total_processed += len(documents)
-                logger.debug(
-                    f"Indexed batch chunk: {skip // BATCH_SIZE + 1} ({len(documents)} records added)"
-                )
-
-                skip += BATCH_SIZE
-                await asyncio.sleep(0.05)  # Yield block back to application loop thread
-
-            await self.cache_srv.invalidate(tags=["products", "catalog"])
-            logger.debug(
-                f"Successfully batch indexed total of {total_processed} products"
-            )
-
-        except Exception as e:
-            logger.error(f"Critical error during product re-indexing: {e}")
-
     async def delete_product_index(self, product_ids: List[int]) -> None:
         try:
             if len(product_ids) == 0:
                 return
-            await asyncio.gather(
-                *[
-                    self.search_srv.delete_document(
-                        index_name=settings.MEILI_PRODUCTS_INDEX, document_id=str(pid)
-                    )
-                    for pid in product_ids
-                ]
-            )
+            await self.search_engine.delete(document_ids=product_ids)
             keys: list[str] = [f"product:{id}" for id in product_ids]
             await self.cache_srv.invalidate(
                 tags=["products", "catalog", "stats-trends"] + keys
@@ -682,14 +544,11 @@ class ProductService:
             documents = [
                 self._prepare_product_data_for_indexing(product) for product in products
             ]
-            print("🚀 ~ ProductService ~ index_products ~ documents:", documents)
 
             await self.search_engine.index(documents)
 
             cloudfare_paths = [f"/api/product/{p.slug}" for p in products]
-            print("🚀 ~ ProductService ~ index_products ~ cloudfare_paths:", cloudfare_paths)
             slug_tags = [f"product:{p.slug}" for p in products]
-            print("🚀 ~ ProductService ~ index_products ~ slug_tags:", slug_tags)
 
             await self.cdn_srv.purge_cloudfare(*cloudfare_paths)
             await self.cache_srv.invalidate(*slug_tags, tags=["products", "catalog"])
@@ -699,18 +558,21 @@ class ProductService:
     async def index_all_products(self):
         cloudfare_paths = []
         slug_tags = []
-        async for products in self.products.iter_for_search(
-            batch_size=500,
-        ):
-            documents = [
-                self._prepare_product_data_for_indexing(product) for product in products
-            ]
-            cloudfare_paths.extend([f"/api/product/{p.slug}" for p in products])
-            slug_tags.extend([f"product:{p.slug}" for p in products])
+        try:
+            async for products in self.iter_for_search(
+                batch_size=500,
+            ):
+                documents = [
+                    self._prepare_product_data_for_indexing(product) for product in products
+                ]
+                cloudfare_paths.extend([f"/api/product/{p.slug}" for p in products])
+                slug_tags.extend([f"product:{p.slug}" for p in products])
 
-            await self.search_engine.index(documents)
-        await self.cdn_srv.purge_cloudfare(*cloudfare_paths)
-        await self.cache_srv.invalidate(*slug_tags, tags=["products", "catalog"])
+                await self.search_engine.index(documents)
+            await self.cdn_srv.purge_cloudfare(*cloudfare_paths)
+            await self.cache_srv.invalidate(*slug_tags, tags=["products", "catalog"])
+        except Exception as e:
+            logger.error(str(e))
 
     async def delete_product(
         self,

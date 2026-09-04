@@ -7,15 +7,47 @@ from app.core.logging import get_logger
 
 logger = get_logger(__name__)
 
-REQUIRED_FILTERABLES: list[str] = ["id", "category_slugs", "collection_slugs", "name", "max_variant_price", "min_variant_price", "active", "sizes", "colors", "ages", "widths", "lengths"]
-REQUIRED_SORTABLES: list[str] = ["id", "random_score", "created_at", "max_variant_price", "min_variant_price"]
+REQUIRED_FILTERABLES: list[str] = [
+    "id",
+    "category_slugs",
+    "collection_slugs",
+    "name",
+    "max_variant_price",
+    "min_variant_price",
+    "active",
+    "sizes",
+    "colors",
+    "ages",
+    "widths",
+    "lengths",
+]
+REQUIRED_SORTABLES: list[str] = [
+    "id",
+    "random_score",
+    "created_at",
+    "max_variant_price",
+    "min_variant_price",
+]
+PRODUCT_ATTRIBUTES: list[str] = [
+    "id",
+    "name",
+    "sku",
+    "slug",
+    "active",
+    "is_new",
+    "status",
+    "image",
+    "images",
+    "variants",
+    "min_variant_price",
+    "max_variant_price",
+]
 
 
 class MeilisearchEngine:
     def __init__(self):
         self.index_name = settings.MEILI_PRODUCTS_INDEX
         self.client = meilisearch.Client(settings.MEILI_HOST, settings.MEILI_MASTER_KEY)
-
 
     async def configure_index(self):
         meili_index = self.client.index(self.index_name)
@@ -31,26 +63,8 @@ class MeilisearchEngine:
         )
 
         meili_index.update_filterable_attributes(REQUIRED_FILTERABLES)
-
-        meili_index.update_sortable_attributes(REQUIRED_SORTABLES
-        )
-
-        meili_index.update_displayed_attributes(
-            [
-                "id",
-                "name",
-                "status",
-                "slug",
-                "description",
-                "categories",
-                "collections",
-                "images",
-                "variants",
-                "min_variant_price",
-                "max_variant_price",
-                "in_stock",
-            ]
-        )
+        meili_index.update_sortable_attributes(REQUIRED_SORTABLES)
+        meili_index.update_displayed_attributes(PRODUCT_ATTRIBUTES)
 
     async def get_document(
         self,

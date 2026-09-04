@@ -246,7 +246,7 @@ class OrderService:
                 await self.db.productvariant.update(
                     where={"id": variant_id}, data=update_data
                 )
-                await self.product_srv.invalidate(id=item.variant.product_id)
+                await self.product_srv.index_product(product_id=item.variant.product_id)
 
             except Exception as e:
                 logger.error(
@@ -331,7 +331,7 @@ class OrderService:
                     tags=["orders", f"wallet:{order.user.id}"],
                 )
                 if order_item.variant and order_item.variant.product_id:
-                    await self.product_srv.invalidate(id=order_item.variant.product_id)
+                    await self.product_srv.index_product(product_id=order_item.variant.product_id)
             except Exception as e:
                 logger.error(f"Failed to invalidate caches/reindex after return: {e}")
 

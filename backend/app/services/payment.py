@@ -91,6 +91,7 @@ class PaymentService:
         return await self.record_success(reference=data["reference"])
 
     async def record_success(self, reference: str):
+        print("🚀 ~ PaymentService ~ record_success ~ reference:", reference)
         payment = await self.db.payment.find_first(
             where={"reference": reference},
             include={"order": True},
@@ -138,18 +139,24 @@ class PaymentService:
         Single source of truth for marking an order paid — records the Payment 1-1 relation check
         """
         order = await self.db.order.find_unique(
-            where={"id": order_id}, include={"order_items": True}
+            where={"id": order_id},
+            include={
+                "order_items": {"include": {"variant": True}},
+            },
         )
         if not order:
             logger.error(f"Order not found for ID: {order_id}")
             raise Exception("Order not found")
 
+        product_ids = []
         for item in order.order_items:
             await self.db.productvariant.update(
                 where={"id": item.variant_id},
                 data={"inventory": {"decrement": item.quantity}},
             )
-        await self.product_srv.invalidate(id=order_id)
-        # await self.cache_srv.invalidate(f"order:{order_id}", f"order-timeline:{order_id}", tags=["gallery", "products", "orders", "catalog"])
+            product_ids.append(item.variant.product_id)
+        print("🚀 ~ PaymentService ~ _finalize_paid_order ~ product_ids:", product_ids)
+        await self.product_srv.index_products(product_ids=product_ids)
+        await self.cache_srv.invalidate(f"order:{order_id}", f"order-timeline:{order_id}", tags=["gallery", "orders"])
         await self.queue.enqueue_job("process_referral", order_id=order_id)
         await self.queue.enqueue_job("generate_and_send_invoice", order_id=order_id)

@@ -16,7 +16,7 @@ from fastapi import (
 
 from app.core.config import settings
 from app.core.dependencies.cache import ArqDep
-from app.core.dependencies.product import ProductDep, SearchDep
+from app.core.dependencies.product import ProductDep
 from app.core.dependencies.services import StorageDep
 from app.core.deps import CurrentUser, UserDep
 from app.core.logging import get_logger
@@ -165,29 +165,18 @@ async def update_variant(
 @router.post("/configure-filterable-attributes")
 async def configure_filterable_attributes(srv: ProductDep) -> Message:
     try:
-        # search_srv.update_settings()
         await srv.search_engine.configure_index()
-        return Message(message="Filterable attributes updated successfully.")
+        return Message(message="Filterable attributes updated.")
     except Exception as e:
         logger.error(f"Error updating attributes: {e}")
         raise HTTPException(status_code=500, detail="Configuration task error.")
 
 
-@router.get("/search/clear-index", dependencies=[Depends(require_admin)])
-async def config_clear_index(search_srv: SearchDep):
+@router.get("/search/clear-index")
+async def config_clear_index(srv: ProductDep):
     try:
-        await search_srv.clear_index(settings.MEILI_PRODUCTS_INDEX)
+        await srv.search_engine.clear()
         return {"message": "Index cleared"}
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.post("/search/delete-index", dependencies=[Depends(require_admin)])
-async def config_delete_index(index_name: str, search_srv: SearchDep):
-    try:
-        search_srv.delete_index(index_name)
-        return {"message": "Index dropped"}
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=500, detail=str(e))
@@ -196,7 +185,7 @@ async def config_delete_index(index_name: str, search_srv: SearchDep):
 @router.post("/reindex")
 async def reindex_products(srv: ProductDep, background_tasks: BackgroundTasks) -> Message:
     try:
-        background_tasks.add_task(srv.invalidate_all)
+        background_tasks.add_task(srv.index_all_products)
         return Message(message="Re-indexing task enqueued...........")
     except Exception as e:
         logger.error(e)
