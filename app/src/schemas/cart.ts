@@ -8,7 +8,7 @@ import {
     type PaymentStatus,
     CartStatusSchema,
 } from "./enums";
-import { ProductVariantLiteSchema } from "./product";
+import { ProductVariantSchema } from "./product";
 import { type Address, AddressSchema } from "./address";
 import { CursorSchema } from "./common";
 import { UserMiniSchema } from "./user";
@@ -18,7 +18,7 @@ export const CartItemSchema = z.object({
     name: z.string(),
     slug: z.string(),
     variant_id: z.number(),
-    variant: ProductVariantLiteSchema,
+    variant: ProductVariantSchema,
     image: z.string().optional(),
     quantity: z.number(),
 });

@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useCollections } from "@/hooks/useCollection";
 import { useCategories } from "@/hooks/useCategories";
 import MultiSelect, { type SelectOption } from "@/components/ui/multi-select";
-import type { Product, ProductVariantLite } from "@/schemas";
+import type { Product, ProductVariant } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useCreateImageMetadata, useUpdateImageMetadata } from "@/hooks/useGallery";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,7 +19,7 @@ import { Separator } from "@/components/ui/separator";
 type FormProduct = Omit<Partial<Product>, "images" | "variants" | "categories" | "collections"> & {
     categories: { value: number; label: string }[];
     collections: { value: number; label: string }[];
-    variants: ProductVariantLite[];
+    variants: ProductVariant[];
 };
 
 interface ProductSheetFormProps {
@@ -56,7 +56,7 @@ export function ImageSheetForm({ onClose, imageId, currentProduct }: ProductShee
         }
     };
 
-    const [newVariant, setNewVariant] = useState<Partial<ProductVariantLite>>({
+    const [newVariant, setNewVariant] = useState<Partial<ProductVariant>>({
         id: currentProduct?.variants?.[0]?.id ?? undefined,
         size: currentProduct?.variants?.[0]?.size ?? "",
         color: currentProduct?.variants?.[0]?.color ?? "",

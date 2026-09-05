@@ -39,7 +39,13 @@ export const CollectionSchema = z.object({
     created_at: z.string().optional(),
 });
 
-export const ProductVariantLiteSchema = z.object({
+export const ImageLiteSchema = z.object({
+    id: z.number(),
+    image: z.string(),
+    order: z.number(),
+});
+
+export const ProductVariantSchema = z.object({
     id: z.number(),
     sku: z.string(),
     product_id: z.number(),
@@ -52,39 +58,7 @@ export const ProductVariantLiteSchema = z.object({
     width: z.number().nullable().optional(),
     length: z.number().nullable().optional(),
     age: z.string().nullable().optional(),
-});
-
-export const ProductImageLiteSchema = z.object({
-    id: z.number(),
-    image: z.string(),
-    order: z.number(),
-});
-
-export const ProductLiteSchema = z.object({
-    id: z.number(),
-    name: z.string(),
-    slug: z.string(),
-    sku: z.string(),
-    description: z.string(),
-    images: z.array(ProductImageLiteSchema),
-    variants: z.array(ProductVariantLiteSchema).optional(),
-    active: z.boolean(),
     is_new: z.boolean().optional(),
-    in_stock: z.boolean()
-});
-
-export const ProductVariantSchema = z.object({
-    id: z.number(),
-    sku: z.string(),
-    status: ProductStatusSchema,
-    price: z.number(),
-    old_price: z.number(),
-    inventory: z.number(),
-    size: z.string().nullable().optional(),
-    color: z.string().nullable().optional(),
-    width: z.number().nullable().optional(),
-    length: z.number().nullable().optional(),
-    age: z.string().nullable().optional(),
 });
 
 export const ProductSchema = z.object({
@@ -93,11 +67,13 @@ export const ProductSchema = z.object({
     slug: z.string(),
     sku: z.string(),
     description: z.string(),
-    variants: z.array(ProductVariantLiteSchema).optional(),
+    images: z.array(ImageLiteSchema),
+    variants: z.array(ProductVariantSchema).optional(),
     categories: z.array(CategorySchema),
     collections: z.array(CollectionSchema),
     active: z.boolean(),
     is_new: z.boolean(),
+    in_stock: z.boolean(),
 });
 
 export const ProductImageSchema = z.object({
@@ -105,12 +81,6 @@ export const ProductImageSchema = z.object({
     image: z.string(),
     product: ProductSchema.optional(),
     product_id: z.number().optional(),
-});
-
-export const ImageLiteSchema = z.object({
-    id: z.number(),
-    image: z.string(),
-    order: z.number(),
 });
 
 export const GalleryImageSchema = z.object({
@@ -124,22 +94,6 @@ export const GalleryImageSchema = z.object({
 
 export const PaginatedGalleryImagesSchema = CursorSchema.extend({
     items: z.array(GalleryImageSchema),
-});
-
-export const SearchVariantSchema = z.object({
-    id: z.number(),
-    sku: z.string(),
-    product_id: z.number(),
-    status: ProductStatusSchema,
-    price: z.number(),
-    old_price: z.number(),
-    inventory: z.number(),
-    size: z.string().nullable().optional(),
-    color: z.string().nullable().optional(),
-    width: z.number().nullable().optional(),
-    length: z.number().nullable().optional(),
-    age: z.string().nullable().optional(),
-    is_new: z.boolean().optional(),
 });
 
 export const SearchCollectionSchema = z.object({
@@ -161,7 +115,7 @@ export const ProductSearchSchema = z.object({
     sku: z.string(),
     image: z.string(),
     images: z.array(z.string()),
-    variants: z.array(SearchVariantSchema).nullable(),
+    variants: z.array(ProductVariantSchema).nullable(),
     active: z.boolean(),
     is_new: z.boolean().optional(),
     in_stock: z.boolean(),
@@ -197,11 +151,7 @@ export const ProductFeedSchema = z.object({
 export const WishItemSchema = z.object({
     id: z.number(),
     product_id: z.number(),
-    product: ProductLiteSchema,
-});
-
-export const WishlistSchema = z.object({
-    wishlists: z.array(WishItemSchema),
+    product: ProductSchema,
 });
 
 export const SearchCatalogSchema = z.object({
@@ -266,11 +216,9 @@ export type CategoriesWithProducts = z.infer<typeof CategoriesProductsSchema>;
 
 export type SearchCategory = z.infer<typeof SearchCategorySchema>;
 export type SearchCollection = z.infer<typeof SearchCollectionSchema>;
-export type SearchVariant = z.infer<typeof SearchVariantSchema>;
 export type DBCatalog = z.infer<typeof DBCatalogSchema>;
 
 export type Product = z.infer<typeof ProductSchema>;
-export type ProductLite = z.infer<typeof ProductLiteSchema>;
 export type ProductSearch = z.infer<typeof ProductSearchSchema>;
 export type PaginatedProductSearch = z.infer<typeof PaginatedProductSearchSchema>;
 export type ProductFeed = z.infer<typeof ProductFeedSchema>;
@@ -279,11 +227,10 @@ export type Category = z.infer<typeof CategorySchema>;
 export type Collection = z.infer<typeof CollectionSchema>;
 
 export type WishItem = z.infer<typeof WishItemSchema>;
-export type Wishlist = z.infer<typeof WishlistSchema>;
+export type Wishlist = WishItem[];
 
 export type ProductImage = z.infer<typeof ProductImageSchema>;
 export type ProductVariant = z.infer<typeof ProductVariantSchema>;
-export type ProductVariantLite = z.infer<typeof ProductVariantLiteSchema>;
 export type ImageLite = z.infer<typeof ImageLiteSchema>;
 export type GalleryImage = z.infer<typeof GalleryImageSchema>;
 export type PaginatedGalleryImages = z.infer<typeof PaginatedGalleryImagesSchema>;

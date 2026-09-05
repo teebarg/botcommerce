@@ -26,7 +26,7 @@ from app.models.generic import Message
 from app.models.product import (
     FeedProducts,
     IndexProducts,
-    ProductLite,
+    Product,
     ReviewStatus,
     SearchProducts,
     VariantWithStatus,
@@ -116,7 +116,7 @@ async def search(
 
 
 @router.get("/{slug}")
-async def read(request: Request, slug: str, srv: ProductDep) -> ProductLite:
+async def read(request: Request, slug: str, srv: ProductDep) -> Product:
     set_public_cache(request, edge_ttl=86400, swr=600)
     cache_key: str = f"product:{slug}"
     cached = await srv.cache_srv.redis.get(cache_key)
@@ -127,7 +127,7 @@ async def read(request: Request, slug: str, srv: ProductDep) -> ProductLite:
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    new_product = ProductLite.validate(product)
+    new_product = Product.validate(product)
     await srv.cache_srv.set_with_tags(
         key=cache_key,
         value=new_product,

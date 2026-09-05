@@ -28,42 +28,81 @@ router = APIRouter()
 
 MAX_AGE_SECONDS = 365 * 24 * 60 * 60 * 10  # 1 year
 
+
 def _set_cart_cookie(response: Response, token: str | None) -> None:
     response.set_cookie(
-        key="_cart_id", value=token, max_age=MAX_AGE_SECONDS, path="/",
-        httponly=True, secure=True, samesite="none", domain=settings.COOKIE_DOMAIN,
+        key="_cart_id",
+        value=token,
+        max_age=MAX_AGE_SECONDS,
+        path="/",
+        httponly=True,
+        secure=True,
+        samesite="none",
+        domain=settings.COOKIE_DOMAIN,
     )
+
 
 @router.get("/")
 async def get_cart_index(
     response: Response,
     user: UserDep,
     srv: CartDep,
-    _cart_id: Annotated[str | None, Cookie()] = None
+    _cart_id: Annotated[str | None, Cookie()] = None,
 ):
-    cart = await srv.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None, include_relations=True)
+    cart = await srv.get_active_cart(
+        cart_number=_cart_id, user_id=user.id if user else None, include_relations=True
+    )
     if not cart:
-        cart = await srv.create_empty_cart(user_id=user.id if user else None, include_relations=True)
+        cart = await srv.create_empty_cart(
+            user_id=user.id if user else None, include_relations=True
+        )
 
     _set_cart_cookie(response, cart.cart_number)
     return await srv._with_computed_totals(cart=cart)
+
 
 @router.post("/items", response_model=CartItem)
 async def add_item_to_cart(
     response: Response,
     payload: CartItemCreate,
+    db: DbDep,
     srv: CartDep,
     user: UserDep,
-    _cart_id: Annotated[str | None, Cookie()] = None
+    _cart_id: Annotated[str | None, Cookie()] = None,
 ):
-    cart = await srv.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    cart = await srv.get_active_cart(
+        cart_number=_cart_id, user_id=user.id if user else None
+    )
     if not cart:
         cart = await srv.create_empty_cart(user_id=user.id if user else None)
+        _set_cart_cookie(response, cart.cart_number)
 
-    item = await srv.add_item(cart=cart, variant_id=payload.variant_id, quantity=payload.quantity)
+    cart_item = await db.cartitem.find_first(
+        where={"cart_id": cart.id, "variant_id": payload.variant_id},
+        include={"variant": True},
+    )
+
+    if not cart_item:
+        item = await srv.add_item(
+            cart=cart, variant_id=payload.variant_id, quantity=payload.quantity
+        )
+        await srv.touch(cart_id=cart.id)
+        return item
+
+    new_quantity = cart_item.quantity + payload.quantity
+
+    if new_quantity > cart_item.variant.inventory:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Not enough inventory. Only {cart_item.variant.inventory} items available.",
+        )
+
+    updated_item = await db.cartitem.update(
+        where={"id": cart_item.id}, data={"quantity": new_quantity}
+    )
     await srv.touch(cart_id=cart.id)
-    _set_cart_cookie(response, cart.cart_number)
-    return item
+    return updated_item
+
 
 @router.delete("/items/{item_id}")
 async def delete_cart_item(
@@ -71,9 +110,11 @@ async def delete_cart_item(
     db: DbDep,
     user: UserDep,
     srv: CartDep,
-    _cart_id: Annotated[str | None, Cookie()] = None
+    _cart_id: Annotated[str | None, Cookie()] = None,
 ):
-    cart = await srv.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    cart = await srv.get_active_cart(
+        cart_number=_cart_id, user_id=user.id if user else None
+    )
     if not cart:
         raise HTTPException(status_code=404, detail="Cart session not found")
 
@@ -93,20 +134,29 @@ async def update_cart_item(
     db: DbDep,
     user: UserDep,
     srv: CartDep,
-    _cart_id: Annotated[str | None, Cookie()] = None
+    _cart_id: Annotated[str | None, Cookie()] = None,
 ):
-    cart = await srv.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    cart = await srv.get_active_cart(
+        cart_number=_cart_id, user_id=user.id if user else None
+    )
     if not cart:
         raise HTTPException(status_code=404, detail="Cart sequence missing")
 
-    cart_item = await db.cartitem.find_unique(where={"id": item_id}, include={"variant": True})
+    cart_item = await db.cartitem.find_unique(
+        where={"id": item_id}, include={"variant": True}
+    )
     if not cart_item or cart_item.cart_number != cart.cart_number:
         raise HTTPException(status_code=404, detail="Cart item tracking mismatch")
 
     if quantity > cart_item.variant.inventory:
-        raise HTTPException(status_code=400, detail=f"Not enough inventory. Only {cart_item.variant.inventory} items available.")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Not enough inventory. Only {cart_item.variant.inventory} items available.",
+        )
 
-    updated_item = await db.cartitem.update(where={"id": item_id}, data={"quantity": quantity})
+    updated_item = await db.cartitem.update(
+        where={"id": item_id}, data={"quantity": quantity}
+    )
     await srv.touch(cart_id=cart.id)
     return updated_item
 
@@ -118,9 +168,11 @@ async def update_cart(
     user: UserDep,
     srv: CartDep,
     background_tasks: BackgroundTasks,
-    _cart_id: Annotated[str | None, Cookie()] = None
+    _cart_id: Annotated[str | None, Cookie()] = None,
 ) -> CartLite:
-    cart = await srv.get_active_cart(cart_number=_cart_id, user_id=user.id if user else None)
+    cart = await srv.get_active_cart(
+        cart_number=_cart_id, user_id=user.id if user else None
+    )
     if not cart:
         cart = await srv.create_empty_cart(user_id=user.id if user else None)
 
@@ -133,25 +185,29 @@ async def update_cart(
                     data={
                         "create": {
                             **cart_update.shipping_address.model_dump(exclude={"id"}),
-                            "user_id": user.id if user else None
+                            "user_id": user.id if user else None,
                         },
                         "update": {
-                            **cart_update.shipping_address.model_dump(exclude={"id", "user_id"}),
-                        }
-                    }
+                            **cart_update.shipping_address.model_dump(
+                                exclude={"id", "user_id"}
+                            ),
+                        },
+                    },
                 )
             else:
                 address = await tx.address.create(
                     data={
                         **cart_update.shipping_address.model_dump(exclude={"id"}),
-                        "user_id": user.id if user else None
+                        "user_id": user.id if user else None,
                     }
                 )
 
             update_data["shipping_address"] = {"connect": {"id": address.id}}
             update_data["billing_address"] = {"connect": {"id": address.id}}
 
-            await srv.cache_srv.invalidate(tags=[f"addresses:{user.id if user else 'guest'}"])
+            await srv.cache_srv.invalidate(
+                tags=[f"addresses:{user.id if user else 'guest'}"]
+            )
 
         if cart_update.status is not None:
             update_data["status"] = cart_update.status
@@ -160,7 +216,9 @@ async def update_cart(
         if cart_update.phone is not None:
             update_data["phone"] = cart_update.phone
             if user:
-                background_tasks.add_task(srv.update_contact, user_id=user.id, phone=cart_update.phone)
+                background_tasks.add_task(
+                    srv.update_contact, user_id=user.id, phone=cart_update.phone
+                )
         if cart_update.payment_method is not None:
             update_data["payment_method"] = cart_update.payment_method
         if cart_update.shipping_method is not None:
@@ -176,8 +234,7 @@ async def update_cart(
         #     update_data["user"] = {"connect": {"id": user.id}}
 
         updated_cart = await tx.cart.update(
-            where={"cart_number": cart.cart_number},
-            data=update_data
+            where={"cart_number": cart.cart_number}, data=update_data
         )
 
     await srv.cache_srv.invalidate(tags=["abandoned-carts"])
@@ -190,11 +247,13 @@ async def apply_wallet(
     db: DbDep,
     user: CurrentUser,
     srv: CartDep,
-    _cart_id: Annotated[str | None, Cookie()] = None
+    _cart_id: Annotated[str | None, Cookie()] = None,
 ) -> Message:
     cart = await srv.get_active_cart(cart_number=_cart_id, user_id=user.id)
     if not cart or (await db.cartitem.count(where={"cart_id": cart.id})) == 0:
-        return JSONResponse(status_code=400, content={"detail": "Your cart is currently empty"})
+        return JSONResponse(
+            status_code=400, content={"detail": "Your cart is currently empty"}
+        )
 
     await srv.apply_wallet_balance(cart=cart, user=user)
     return Message(message="Wallet balance applied successfully")
@@ -202,9 +261,7 @@ async def apply_wallet(
 
 @router.post("/remove-wallet")
 async def remove_wallet(
-    user: CurrentUser,
-    srv: CartDep,
-    _cart_id: Annotated[str | None, Cookie()] = None
+    user: CurrentUser, srv: CartDep, _cart_id: Annotated[str | None, Cookie()] = None
 ) -> Message:
     cart = await srv.get_active_cart(cart_number=_cart_id, user_id=user.id)
     if not cart:

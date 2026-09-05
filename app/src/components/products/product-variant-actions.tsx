@@ -1,48 +1,33 @@
 import type React from "react";
-import { Heart, ShoppingCart } from "lucide-react";
-import { useProductVariant } from "@/hooks/useProductVariant";
-import type { ProductLite } from "@/schemas/product";
-import { useUserCreateWishlist, useUserDeleteWishlist, wishlistQueryOptions } from "@/hooks/useUser";
+import { ShoppingCart } from "lucide-react";
+import type { Product } from "@/schemas/product";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils/cn";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { defaultVariant, handleWhatsAppPurchase } from "@/lib/variant";
+import { useConfig } from "@/providers/store-provider";
+import { useCart } from "@/providers/cart-provider";
+import { useState } from "react";
 
 interface VariantSelectionProps {
-    product: ProductLite;
+    product: Product;
 }
 
 export const ProductVariantActions: React.FC<VariantSelectionProps> = ({ product }) => {
+    const [added, setAdded] = useState(false);
     const outOfStock = !product.in_stock;
-    const { isAdded, handleAddToCart, selectedVariant, handleWhatsAppPurchase } = useProductVariant(product);
-    const { data } = useSuspenseQuery(wishlistQueryOptions());
-    const inWishlist = !!data?.wishlists?.find((wishlist) => wishlist.product_id === product.id);
-    const { mutate: createWishlist } = useUserCreateWishlist();
-    const { mutate: deleteWishlist } = useUserDeleteWishlist();
+    const { whatsapp } = useConfig();
+    const variant = defaultVariant(product);
+    const { addToCart } = useCart();
 
-    const addWishlist = async () => createWishlist(product.id);
-    const removeWishlist = async () => deleteWishlist(product.id);
+    const onWhatsApp = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleWhatsAppPurchase(variant, product.slug, whatsapp!);
+    };
 
     return (
         <div className="flex items-center gap-2">
-            <Button
-                onClick={(e) => {
-                    e.stopPropagation();
-                    inWishlist ? removeWishlist() : addWishlist();
-                }}
-                className={cn("rounded-xl h-12 w-12", inWishlist && "text-success")}
-                size="icon"
-                variant="outline"
-            >
-                <Heart className="w-6 h-6 text-current" />
-            </Button>
-
-            <Button
-                className="shrink-0 w-12 h-12 rounded-xl"
-                disabled={!selectedVariant || outOfStock}
-                size="icon"
-                variant="outline"
-                onClick={handleWhatsAppPurchase}
-            >
+            <Button className="shrink-0 w-12 h-12 rounded-xl" disabled={!variant || outOfStock} size="icon" variant="outline" onClick={onWhatsApp}>
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M18.1225 14.9458C17.8183 14.7895 16.3033 14.0473 16.0215 13.9469C15.7397 13.8409 15.5332 13.7907 15.3295 14.1032C15.123 14.4129 14.5371 15.102 14.3529 15.3113C14.1744 15.5178 13.993 15.5429 13.6889 15.3894C11.8808 14.4854 10.695 13.7767 9.50361 11.7315C9.18832 11.1874 9.8189 11.2265 10.4076 10.0518C10.5081 9.84534 10.4578 9.66956 10.3797 9.51331C10.3016 9.35706 9.68776 7.84478 9.43106 7.22815C9.18274 6.62826 8.92604 6.71197 8.7391 6.70081C8.56053 6.68965 8.35684 6.68965 8.15037 6.68965C7.9439 6.68965 7.61187 6.76777 7.33006 7.0719C7.04825 7.38161 6.25305 8.12659 6.25305 9.63887C6.25305 11.1511 7.35517 12.616 7.50584 12.8225C7.66209 13.0289 9.67381 16.1316 12.7625 17.4681C14.7157 18.3107 15.4802 18.3833 16.4567 18.2382C17.051 18.1489 18.2759 17.496 18.5298 16.7734C18.7837 16.0535 18.7837 15.4369 18.7084 15.3085C18.6331 15.1718 18.4266 15.0937 18.1225 14.9458Z"
@@ -56,22 +41,27 @@ export const ProductVariantActions: React.FC<VariantSelectionProps> = ({ product
             </Button>
 
             <Button
-                onClick={!outOfStock ? handleAddToCart : undefined}
+                onClick={(event) => {
+                    event.preventDefault();
+                    addToCart(variant.id, 1);
+                    setAdded(true);
+                    window.setTimeout(() => setAdded(false), 1600);
+                }}
                 disabled={outOfStock}
                 className={cn(
                     "flex-1 h-12 px-6 rounded-xl",
                     outOfStock
                         ? "bg-muted text-muted-foreground cursor-not-allowed"
-                        : isAdded
-                        ? "bg-success text-success-foreground"
-                        : "bg-foreground text-background hover:opacity-90"
+                        : added
+                          ? "bg-success text-success-foreground"
+                          : "bg-foreground text-background hover:opacity-90"
                 )}
                 variant="outline"
                 size="lg"
             >
                 {outOfStock ? (
                     "Out of stock"
-                ) : isAdded ? (
+                ) : added ? (
                     "Added to cart"
                 ) : (
                     <>
