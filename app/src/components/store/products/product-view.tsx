@@ -8,7 +8,6 @@ import type { ProductLite, ProductVariantLite } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useUpdateVariant } from "@/hooks/useProduct";
 import { ClientOnly, useRouteContext } from "@tanstack/react-router";
-import { useProductVariant } from "@/hooks/useProductVariant";
 import { ProductVariantActions } from "@/components/products/product-variant-actions";
 import ShareButton from "@/components/share";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
@@ -23,9 +22,9 @@ const ProductView: React.FC<Props> = ({ product }) => {
     const confirmState = useOverlayTriggerState({});
     const [imageLoaded, setImageLoaded] = useState<boolean>(false);
     const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
-    const { outOfStock } = useProductVariant(product);
+    const outOfStock = !product.in_stock
     const isNew = useMemo(() => !!product?.is_new, [product]);
-    const [selectedVariant, setSelectedVariant] = useState<ProductVariantLite | undefined>(product.variants?.[0]);
+    const [selectedVariant] = useState<ProductVariantLite | undefined>(product.variants?.[0]);
 
     const { isAdmin } = useRouteContext({ strict: false });
     const updateVariant = useUpdateVariant(false);
@@ -126,13 +125,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         <div className="rounded-xl border border-border overflow-hidden">
                             {product.variants?.map((v) => (
                                 <div key={v.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-3 border-b border-border last:border-0">
-                                    <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                                        <span>SKU: {v.sku}</span>
-                                        <span>Inventory: {v.inventory}</span>
-                                        <span className={v.inventory > 0 ? "text-emerald-500" : "text-destructive"}>
-                                            {v.inventory > 0 ? "In stock" : "Out of stock"}
-                                        </span>
-                                    </div>
                                     {v.inventory > 0 && (
                                         <ConfirmDrawer
                                             open={confirmState.isOpen}
@@ -156,26 +148,13 @@ const ProductView: React.FC<Props> = ({ product }) => {
                     ) : null}
                 </ClientOnly>
 
-                <ProductVariantSelection product={product} onVariantChange={setSelectedVariant} />
+                <ProductVariantSelection product={product} selectedVariant={selectedVariant} />
 
                 <ProductVariantActions product={product} />
 
                 <div className="pt-4 border-t border-border">
                     <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-2">Description</p>
                     <p className="text-sm text-muted-foreground leading-relaxed">{product.description}</p>
-                </div>
-
-                <div className="rounded-xl border border-border bg-card divide-y divide-border">
-                    <div className="flex justify-between px-4 py-3 text-sm">
-                        <span className="text-muted-foreground">SKU</span>
-                        <span className="font-medium">{product.sku}</span>
-                    </div>
-                    <div className="flex justify-between px-4 py-3 text-sm">
-                        <span className="text-muted-foreground">Availability</span>
-                        <span className={`font-medium ${!outOfStock ? "text-success" : "text-destructive"}`}>
-                            {!outOfStock ? "In stock" : "Out of stock"}
-                        </span>
-                    </div>
                 </div>
             </div>
         </div>

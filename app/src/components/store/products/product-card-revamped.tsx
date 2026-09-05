@@ -32,8 +32,9 @@ type FitMode = "cover" | "contain";
 const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick }) => {
     const [fitMode, setFitMode] = useState<FitMode>("cover");
     const [mediaLoaded, setMediaLoaded] = useState<boolean>(false);
-    const { priceInfo, handleAddToCart, handleWhatsAppPurchase, outOfStock, loading } = useProductCardVariant(product);
+    const { priceInfo, handleAddToCart, handleWhatsAppPurchase, loading } = useProductCardVariant(product);
     const { minPrice, maxCompareAtPrice, hasDiscount, maxDiscountPercent } = priceInfo;
+    const outOfStock = !product.in_stock
 
     const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
         const { naturalWidth, naturalHeight } = e.currentTarget;
@@ -64,13 +65,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick }
     const onAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        if (!outOfStock) handleAddToCart();
+        if (product.in_stock) handleAddToCart();
     };
 
     const onWhatsApp = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        if (!outOfStock) handleWhatsAppPurchase();
+        if (product.in_stock) handleWhatsAppPurchase();
     };
 
     return (

@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 
 from app.models.category import Category
 from app.models.collection import Collection
@@ -66,6 +66,11 @@ class ProductLite(BaseModel):
     variants: Optional[List[ProductVariant]] = None
     active: Optional[bool] = True
     is_new: Optional[bool] = False
+
+    @computed_field
+    @property
+    def in_stock(self) -> bool:
+        return any(v.inventory > 0 for v in self.variants or [])
 
     class Config:
         from_attributes = True

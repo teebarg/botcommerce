@@ -21,11 +21,6 @@ export const useProductCardVariant = (product: ProductSearch) => {
         [product?.variants]
     );
 
-    const outOfStock = useMemo(
-        () => !product?.variants?.length || product.variants.every((v) => v.inventory <= 0),
-        [product?.variants]
-    );
-
     const priceInfo = useMemo(() => {
         const variants = product?.variants ?? [];
         const prices = variants.map((v) => v.price);
@@ -74,5 +69,5 @@ export const useProductCardVariant = (product: ProductSearch) => {
         markFirstWhatsAppMessageSent();
     };
 
-    return { priceInfo, outOfStock, handleAddToCart, handleWhatsAppPurchase, loading };
+    return { priceInfo, handleAddToCart, handleWhatsAppPurchase, loading };
 };

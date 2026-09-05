@@ -12,7 +12,8 @@ interface VariantSelectionProps {
 }
 
 export const ProductVariantActions: React.FC<VariantSelectionProps> = ({ product }) => {
-    const { isAdded, handleAddToCart, outOfStock, selectedVariant, handleWhatsAppPurchase } = useProductVariant(product);
+    const outOfStock = !product.in_stock;
+    const { isAdded, handleAddToCart, selectedVariant, handleWhatsAppPurchase } = useProductVariant(product);
     const { data } = useSuspenseQuery(wishlistQueryOptions());
     const inWishlist = !!data?.wishlists?.find((wishlist) => wishlist.product_id === product.id);
     const { mutate: createWishlist } = useUserCreateWishlist();
@@ -28,10 +29,7 @@ export const ProductVariantActions: React.FC<VariantSelectionProps> = ({ product
                     e.stopPropagation();
                     inWishlist ? removeWishlist() : addWishlist();
                 }}
-                className={cn(
-                    "rounded-xl h-12 w-12",
-                    inWishlist && "text-success"
-                )}
+                className={cn("rounded-xl h-12 w-12", inWishlist && "text-success")}
                 size="icon"
                 variant="outline"
             >
@@ -65,8 +63,8 @@ export const ProductVariantActions: React.FC<VariantSelectionProps> = ({ product
                     outOfStock
                         ? "bg-muted text-muted-foreground cursor-not-allowed"
                         : isAdded
-                            ? "bg-success text-success-foreground"
-                            : "bg-foreground text-background hover:opacity-90"
+                        ? "bg-success text-success-foreground"
+                        : "bg-foreground text-background hover:opacity-90"
                 )}
                 variant="outline"
                 size="lg"

@@ -268,6 +268,5 @@ export const useProductVariant = (product: ProductLite | ProductSearch) => {
         priceInfo,
         loading,
         isAdded,
-        outOfStock: product?.variants?.length == 0 || product?.variants?.every((v) => v.inventory <= 0),
     };
 };

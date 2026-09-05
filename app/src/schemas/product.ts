@@ -70,6 +70,7 @@ export const ProductLiteSchema = z.object({
     variants: z.array(ProductVariantLiteSchema).optional(),
     active: z.boolean(),
     is_new: z.boolean().optional(),
+    in_stock: z.boolean()
 });
 
 export const ProductVariantSchema = z.object({
