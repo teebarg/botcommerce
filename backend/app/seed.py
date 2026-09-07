@@ -267,30 +267,6 @@ async def seed_faqs():
 
 
 # ---------------------------------------------------------------------------
-# Shared collections (needs products to exist first)
-# ---------------------------------------------------------------------------
-
-async def seed_shared_collections(products):
-    logger.info("Seeding shared collections...")
-    for col in [
-        {"title": "Summer Sale", "slug": "summer-sale", "description": "Summer Sale"},
-        {"title": "New Arrivals", "slug": "new-arrivals", "description": "New Arrivals"},
-    ]:
-        await db.sharedcollection.upsert(
-            where={"slug": col["slug"]},
-            data={
-                "create": {
-                    **col,
-                    "is_active": True,
-                    "products": {"connect": [{"id": p.id} for p in products]},
-                    "created_at": datetime.now(timezone.utc),
-                },
-                "update": {},
-            },
-        )
-
-
-# ---------------------------------------------------------------------------
 # Reviews & favorites (needs users + products)
 # ---------------------------------------------------------------------------
 
@@ -426,7 +402,6 @@ async def seed():
     await seed_coupons()
     await seed_carousel_banners()
     await seed_faqs()
-    await seed_shared_collections(products)
     await seed_reviews_and_favorites(users, products)
     await seed_cart_and_order(users, products)
 

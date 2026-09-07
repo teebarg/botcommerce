@@ -249,21 +249,6 @@ product_tags = Table(
 )
 
 
-shared_collection_products = Table(
-    "SharedCollectionProducts",
-    Base.metadata,
-    Column(
-        "A",
-        ForeignKey("products.id", ondelete="CASCADE"),
-        primary_key=True,
-    ),
-    Column(
-        "B",
-        ForeignKey("shared_collections.id", ondelete="CASCADE"),
-        primary_key=True,
-    ),
-)
-
 coupon_allowed_user = Table(
     "_CouponAllowedUser",
     Base.metadata,
@@ -874,11 +859,6 @@ class Product(Base):
     favorites: Mapped[list["Favorite"]] = relationship(
         back_populates="product",
         cascade="all, delete-orphan",
-    )
-
-    shared_collections: Mapped[list["SharedCollection"]] = relationship(
-        secondary=shared_collection_products,
-        back_populates="products",
     )
 
     __table_args__ = (
@@ -1992,114 +1972,6 @@ class Favorite(Base):
             text("created_at DESC"),
         ),
     )
-
-
-# ============================================================
-# SharedCollection
-# ============================================================
-
-
-class SharedCollection(Base):
-    __tablename__ = "shared_collections"
-
-    id: Mapped[int] = mapped_column(
-        Integer,
-        primary_key=True,
-        autoincrement=True,
-    )
-
-    title: Mapped[str] = mapped_column(
-        String(255),
-        nullable=False,
-    )
-
-    slug: Mapped[str] = mapped_column(
-        String(255),
-        unique=True,
-        nullable=False,
-    )
-
-    description: Mapped[str | None] = mapped_column(Text)
-
-    is_active: Mapped[bool] = mapped_column(
-        Boolean,
-        nullable=False,
-        server_default="true",
-    )
-
-    view_count: Mapped[int] = mapped_column(
-        Integer,
-        nullable=False,
-        server_default="0",
-    )
-
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        server_default=func.now(),
-        nullable=False,
-    )
-
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        server_default=func.now(),
-        onupdate=func.now(),
-        nullable=False,
-    )
-
-    products: Mapped[list["Product"]] = relationship(
-        secondary=shared_collection_products,
-        back_populates="shared_collections",
-    )
-
-    views: Mapped[list["SharedCollectionView"]] = relationship(
-        back_populates="shared_collection",
-        cascade="all, delete-orphan",
-    )
-
-
-# ============================================================
-# SharedCollectionView
-# ============================================================
-
-
-class SharedCollectionView(Base):
-    __tablename__ = "shared_collection_views"
-
-    id: Mapped[int] = mapped_column(
-        Integer,
-        primary_key=True,
-        autoincrement=True,
-    )
-
-    shared_collection_id: Mapped[int] = mapped_column(
-        ForeignKey(
-            "shared_collections.id",
-            ondelete="CASCADE",
-        ),
-        nullable=False,
-    )
-
-    user_id: Mapped[int | None] = mapped_column(
-        ForeignKey(
-            "users.id",
-            ondelete="CASCADE",
-        ),
-    )
-
-    ip_address: Mapped[str | None] = mapped_column(String)
-    user_agent: Mapped[str | None] = mapped_column(String)
-
-    timestamp: Mapped[datetime] = mapped_column(
-        DateTime,
-        server_default=func.now(),
-        nullable=False,
-    )
-
-    shared_collection: Mapped["SharedCollection"] = relationship(
-        back_populates="views",
-    )
-
-    user: Mapped["User | None"] = relationship()
 
 
 # ============================================================

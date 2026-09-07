@@ -122,11 +122,6 @@ const storeItems = [
         icon: LayoutGrid,
     },
     {
-        title: "Catalogs",
-        url: "/admin/catalog",
-        icon: LayoutGrid,
-    },
-    {
         title: "Coupons",
         url: "/admin/coupons",
         icon: Tag,

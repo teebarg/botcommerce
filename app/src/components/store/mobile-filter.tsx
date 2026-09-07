@@ -6,7 +6,7 @@ import { useOverlayTriggerState } from "react-stately";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRouterState } from "@tanstack/react-router";
-import { FilterSidebarLogic, FilterSidebarRef } from "./catalog/filter-sidebar-logic";
+import { FilterSidebarLogic, FilterSidebarRef } from "./filter-sidebar-logic";
 import { useSearch } from "@tanstack/react-router";
 
 interface MobileFilterProps {}

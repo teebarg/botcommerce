@@ -15,7 +15,7 @@ import { PageLoader } from "@/components/generic/page-loader";
 
 interface Props {
     data?: Category[];
-    isPending: boolean
+    isPending: boolean;
 }
 
 const CategoryImage: React.FC<{ image: string | undefined; categoryId: number }> = ({ image, categoryId }) => {
@@ -84,7 +84,7 @@ const CategoryTree: React.FC<Props> = ({ data, isPending }) => {
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                         <div>
                             <h1 className="text-lg font-semibold">Product Categories</h1>
-                            <p className="text-muted-foreground mb-2 text-sm">Organize and manage your product catalog with ease</p>
+                            <p className="text-muted-foreground mb-2 text-sm">Organize and manage your products with ease</p>
                             <Badge variant="accent">{isPending ? "..." : categories?.length || 0} Categories</Badge>
                         </div>
                         <SheetDrawer
@@ -107,15 +107,8 @@ const CategoryTree: React.FC<Props> = ({ data, isPending }) => {
                     <div className="sticky top-16 z-10 bg-background space-y-2">
                         {hasChanges && (
                             <div className="flex items-center justify-between gap-4 bg-secondary rounded-xl px-4 py-2.5">
-                                <p className="text-xs text-muted-foreground">
-                                    You have unsaved order changes
-                                </p>
-                                <Button
-                                    size="sm"
-                                    disabled={reorderCategories.isPending}
-                                    onClick={saveOrder}
-                                    className="gap-1.5 shrink-0"
-                                >
+                                <p className="text-xs text-muted-foreground">You have unsaved order changes</p>
+                                <Button size="sm" disabled={reorderCategories.isPending} onClick={saveOrder} className="gap-1.5 shrink-0">
                                     <Save className="w-3.5 h-3.5" />
                                     {reorderCategories.isPending ? "Saving…" : "Save order"}
                                 </Button>
@@ -130,28 +123,27 @@ const CategoryTree: React.FC<Props> = ({ data, isPending }) => {
                             description="Start organizing your products by creating your first category."
                             icon={FileImage}
                         />
-                    ) : categories.map((category: Category, idx: number) => (
-                        <div
-                            key={idx}
-                            className="bg-card flex items-center gap-4 py-3 px-2 rounded-xl"
-                        >
-                            <CategoryImage categoryId={category.id} image={category.image} />
-                            <div className="flex-1 min-w-0 flex justify-between gap-4">
-                                <div className="min-w-0 flex-1">
-                                    <h3 className="font-semibold truncate">{category.name}</h3>
-                                    <Badge variant={category.is_active ? "success" : "destructive"}>
-                                        {category.is_active ? "Active" : "Inactive"}
-                                    </Badge>
+                    ) : (
+                        categories.map((category: Category, idx: number) => (
+                            <div key={idx} className="bg-card flex items-center gap-4 py-3 px-2 rounded-xl">
+                                <CategoryImage categoryId={category.id} image={category.image} />
+                                <div className="flex-1 min-w-0 flex justify-between gap-4">
+                                    <div className="min-w-0 flex-1">
+                                        <h3 className="font-semibold truncate">{category.name}</h3>
+                                        <Badge variant={category.is_active ? "success" : "destructive"}>
+                                            {category.is_active ? "Active" : "Inactive"}
+                                        </Badge>
+                                    </div>
+                                    <CategoryAction
+                                        categoriesLength={categories?.length}
+                                        category={category}
+                                        index={idx}
+                                        onOrderChange={moveCategory}
+                                    />
                                 </div>
-                                <CategoryAction
-                                    categoriesLength={categories?.length}
-                                    category={category}
-                                    index={idx}
-                                    onOrderChange={moveCategory}
-                                />
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
             </div>
         </React.Fragment>

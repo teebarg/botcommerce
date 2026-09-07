@@ -721,7 +721,7 @@ async def run_agent(
             ]
 
             if any(kw in reason.lower() for kw in NON_ESCALATION_KEYWORDS):
-                reply = "I couldn't find that item in our catalog. Could you describe it differently or check the name?"
+                reply = "I couldn't find that item in our collection. Could you describe it differently or check the name?"
             else:
                 high_risk: bool = any(
                     word in reason.lower()
