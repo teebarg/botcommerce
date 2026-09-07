@@ -1,109 +1,123 @@
-import { useState, useEffect, useRef } from "react";
-import { ImagePlus, Video, Check } from "lucide-react";
+import { ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useBulkUploadImages } from "@/hooks/useGallery";
 import SheetDrawer from "@/components/sheet-drawer";
 import { ProductImageUploader } from "./product-image-uploader";
 import { useOverlayTriggerState } from "react-stately";
 
 declare global {
-    interface Window { cloudinary: any; }
+    interface Window {
+        cloudinary: any;
+    }
 }
 
 export function GalleryImagesUpload() {
     const uploadState = useOverlayTriggerState({});
-    const [imageUrls, setImageUrls] = useState<string[]>([]);
-    const [isCloudinaryLoaded, setIsCloudinaryLoaded] = useState(false);
-    const [openingType, setOpeningType] = useState<"image" | "video" | null>(null);
-    const imageWidgetRef = useRef<any>(null);
-    const videoWidgetRef = useRef<any>(null);
-    const { mutateAsync: bulkUpload, isPending } = useBulkUploadImages();
+    // const [imageUrls, setImageUrls] = useState<string[]>([]);
+    // const [isCloudinaryLoaded, setIsCloudinaryLoaded] = useState(false);
+    // const [openingType, setOpeningType] = useState<"image" | "video" | null>(null);
+    // const imageWidgetRef = useRef<any>(null);
+    // const videoWidgetRef = useRef<any>(null);
+    // const { mutateAsync: bulkUpload, isPending } = useBulkUploadImages();
 
-    useEffect(() => {
-        if (window.cloudinary) { setIsCloudinaryLoaded(true); return; }
-        const script = document.createElement("script");
-        script.src = "https://upload-widget.cloudinary.com/global/all.js";
-        script.async = true;
-        script.onload = () => setIsCloudinaryLoaded(true);
-        document.body.appendChild(script);
-        return () => { document.body.removeChild(script); };
-    }, []);
+    // useEffect(() => {
+    //     if (window.cloudinary) {
+    //         setIsCloudinaryLoaded(true);
+    //         return;
+    //     }
+    //     const script = document.createElement("script");
+    //     script.src = "https://upload-widget.cloudinary.com/global/all.js";
+    //     script.async = true;
+    //     script.onload = () => setIsCloudinaryLoaded(true);
+    //     document.body.appendChild(script);
+    //     return () => {
+    //         document.body.removeChild(script);
+    //     };
+    // }, []);
 
-    useEffect(() => {
-        if (!isCloudinaryLoaded || imageWidgetRef.current) return;
-        const uploadCallback = (error: any, result: any) => {
-            if (error) return;
-            if (result?.event === "success") setImageUrls((prev) => [...prev, result.info.secure_url]);
-            if (result?.event === "close") setOpeningType(null);
-        };
-        imageWidgetRef.current = window.cloudinary.createUploadWidget(
-            { cloudName: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME, uploadPreset: "shop_test", clientAllowedFormats: ["image"], multiple: true },
-            uploadCallback
-        );
-        videoWidgetRef.current = window.cloudinary.createUploadWidget(
-            { cloudName: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME, uploadPreset: "shop_test_video", clientAllowedFormats: ["video"], multiple: true, maxFileSize: 2000000 },
-            uploadCallback
-        );
-    }, [isCloudinaryLoaded]);
+    // useEffect(() => {
+    //     if (!isCloudinaryLoaded || imageWidgetRef.current) return;
+    //     const uploadCallback = (error: any, result: any) => {
+    //         if (error) return;
+    //         if (result?.event === "success") setImageUrls((prev) => [...prev, result.info.secure_url]);
+    //         if (result?.event === "close") setOpeningType(null);
+    //     };
+    //     imageWidgetRef.current = window.cloudinary.createUploadWidget(
+    //         { cloudName: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME, uploadPreset: "shop_test", clientAllowedFormats: ["image"], multiple: true },
+    //         uploadCallback
+    //     );
+    //     videoWidgetRef.current = window.cloudinary.createUploadWidget(
+    //         {
+    //             cloudName: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME,
+    //             uploadPreset: "shop_test_video",
+    //             clientAllowedFormats: ["video"],
+    //             multiple: true,
+    //             maxFileSize: 2000000,
+    //         },
+    //         uploadCallback
+    //     );
+    // }, [isCloudinaryLoaded]);
 
-    const openImageUpload = () => { if (!imageWidgetRef.current) return; setOpeningType("image"); imageWidgetRef.current.open(); };
-    const openVideoUpload = () => { if (!videoWidgetRef.current) return; setOpeningType("video"); videoWidgetRef.current.open(); };
-    const onComplete = async () => { await bulkUpload({ urls: imageUrls }); setImageUrls([]); };
+    // const openImageUpload = () => {
+    //     if (!imageWidgetRef.current) return;
+    //     setOpeningType("image");
+    //     imageWidgetRef.current.open();
+    // };
+    // const openVideoUpload = () => {
+    //     if (!videoWidgetRef.current) return;
+    //     setOpeningType("video");
+    //     videoWidgetRef.current.open();
+    // };
+    // const onComplete = async () => {
+    //     await bulkUpload({ urls: imageUrls });
+    //     setImageUrls([]);
+    // };
 
     return (
-        <div className="flex items-center gap-1.5 shrink-0">
-            <Button
-                size="sm"
-                variant="ghost"
-                className="border border-border text-muted-foreground hover:text-foreground gap-1.5"
-                disabled={!isCloudinaryLoaded || openingType === "image"}
-                onClick={openImageUpload}
-            >
-                <ImagePlus className="h-4 w-4" />
-                {openingType === "image" ? "Opening..." : "Images"}
-            </Button>
-            <Button
-                size="sm"
-                variant="ghost"
-                className="border border-border text-muted-foreground hover:text-foreground gap-1.5"
-                disabled={!isCloudinaryLoaded || openingType === "video"}
-                onClick={openVideoUpload}
-            >
-                <Video className="h-4 w-4" />
-                {openingType === "video" ? "Opening..." : "Videos"}
-            </Button>
-            <SheetDrawer
-                open={uploadState.isOpen}
-                title="Upload Images"
-                trigger={
-                    <Button
-                        size="sm"
-                        variant="ghost"
-                        className="border border-border text-muted-foreground hover:text-foreground gap-1.5"
-                        disabled={!isCloudinaryLoaded || openingType === "image"}
-                    >
-                        <ImagePlus className="h-4 w-4" />
-                        New Images
-                    </Button>
-                }
-                onOpenChange={uploadState.setOpen}
-            >
-                <div className="pt-6 pb-12 px-2">
-                    <ProductImageUploader onComplete={uploadState.close} />
-                </div>
-            </SheetDrawer>
-            {imageUrls.length > 0 && (
-                <Button
-                    size="sm"
-                    variant="ghost"
-                    className="bg-success text-success-foreground gap-1.5"
-                    disabled={isPending}
-                    onClick={onComplete}
-                >
-                    <Check className="h-4 w-4" />
-                    {isPending ? "Saving..." : `Save ${imageUrls.length}`}
+        <SheetDrawer
+            open={uploadState.isOpen}
+            title="Upload Images"
+            trigger={
+                <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground gap-1.5">
+                    <ImagePlus className="h-4 w-4" />
+                    Images
                 </Button>
-            )}
-        </div>
+            }
+            onOpenChange={uploadState.setOpen}
+        >
+            <div className="pt-6 pb-12 px-2">
+                <ProductImageUploader onComplete={uploadState.close} />
+            </div>
+        </SheetDrawer>
     );
+
+    // return (
+    //     <div className="flex items-center gap-1.5 shrink-0">
+    //         <Button
+    //             size="sm"
+    //             variant="ghost"
+    //             className="border border-border text-muted-foreground hover:text-foreground gap-1.5"
+    //             disabled={!isCloudinaryLoaded || openingType === "image"}
+    //             onClick={openImageUpload}
+    //         >
+    //             <ImagePlus className="h-4 w-4" />
+    //             {openingType === "image" ? "Opening..." : "Images"}
+    //         </Button>
+    //         <Button
+    //             size="sm"
+    //             variant="ghost"
+    //             className="border border-border text-muted-foreground hover:text-foreground gap-1.5"
+    //             disabled={!isCloudinaryLoaded || openingType === "video"}
+    //             onClick={openVideoUpload}
+    //         >
+    //             <Video className="h-4 w-4" />
+    //             {openingType === "video" ? "Opening..." : "Videos"}
+    //         </Button>
+    //         {imageUrls.length > 0 && (
+    //             <Button size="sm" variant="ghost" className="bg-success text-success-foreground gap-1.5" disabled={isPending} onClick={onComplete}>
+    //                 <Check className="h-4 w-4" />
+    //                 {isPending ? "Saving..." : `Save ${imageUrls.length}`}
+    //             </Button>
+    //         )}
+    //     </div>
+    // );
 }

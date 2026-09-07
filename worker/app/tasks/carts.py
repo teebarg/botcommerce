@@ -7,6 +7,7 @@ from app.db import session_factory
 
 logger = get_logger(__name__)
 
+
 async def process_abandoned_carts(ctx, cart_ids: list[int]) -> dict:
     """
     arq job: referral cashback processing.
@@ -22,11 +23,15 @@ async def process_abandoned_carts(ctx, cart_ids: list[int]) -> dict:
                     continue
 
                 if not cart.user:
-                    logger.warning(f"cart {cart_id} has no associated user, skipping notification")
+                    logger.warning(
+                        f"cart {cart_id} has no associated user, skipping notification"
+                    )
                     continue
 
                 if not cart.email and not cart.user.email:
-                    logger.warning(f"cart {cart_id} has no email address, skipping notification")
+                    logger.warning(
+                        f"cart {cart_id} has no email address, skipping notification"
+                    )
                     continue
 
                 cart_data = {
@@ -43,23 +48,26 @@ async def process_abandoned_carts(ctx, cart_ids: list[int]) -> dict:
                             "quantity": item.quantity,
                             "price": item.variant.price,
                             "image": item.image,
-                            "slug": item.slug
+                            "slug": item.slug,
                         }
                         for item in cart.items
                     ],
-                    "updated_at": cart.updated_at
+                    "updated_at": cart.updated_at,
                 }
             except Exception as e:
                 logger.error(f"An error occurred: {e}")
                 raise e
-
-            await notification_srv.send(
-                AbandonedCartEvent(
-                    cart_data=cart_data,
-                    customer_email=cart.email or cart.user.email,
-                    user_name=cart.user.first_name or cart.user.username,
-                ),
-                channels=[Channel.EMAIL, Channel.SLACK],
-            )
-
+            try:
+                logger.debug("[Abandoned Cart] - Sending notifications......")
+                await notification_srv.send(
+                    AbandonedCartEvent(
+                        cart_data=cart_data,
+                        customer_email=cart.email or cart.user.email,
+                        user_name=cart.user.first_name or cart.user.username,
+                    ),
+                    channels=[Channel.EMAIL, Channel.SLACK],
+                )
+            except Exception as e:
+                logger.error(f"An error occurred sendng abandoned email: {e}")
+                raise e
     return {"status": "ok"}
