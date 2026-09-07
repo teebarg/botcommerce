@@ -1,4 +1,4 @@
-import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useSearch } from "@tanstack/react-router";
 import { ChevronDown } from "lucide-react";
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +26,7 @@ type DraftFilters = {
     sizes: Set<string>;
     ages: Set<string>;
     categories: Set<string>;
+    collections: Set<string>;
     sort: "min_price:asc" | "min_price:desc" | "id:desc";
     minPrice: string;
     maxPrice: string;
@@ -38,6 +39,7 @@ const DEFAULT_DRAFT = {
     sizes: new Set<string>(),
     ages: new Set<string>(),
     categories: new Set<string>(),
+    collections: new Set<string>(),
     minPrice: DEFAULT_MIN_PRICE,
     maxPrice: DEFAULT_MAX_PRICE,
     width: "",
@@ -76,7 +78,6 @@ const normalizePriceValues = (minStr: string, maxStr: string) => {
 
 export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose }, ref) => {
     const search = useSearch({ strict: false });
-    const navigate = useNavigate();
     const { updateQuery } = useUpdateQuery();
     const filters = useMemo(() => {
         return {
@@ -84,6 +85,7 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
             sizes: new Set(search.sizes?.toString()?.split(",").filter(Boolean)),
             ages: new Set(search.ages?.split(",").filter(Boolean)),
             categories: new Set(search.cat_ids?.split(",").filter(Boolean)),
+            collections: typeof search.collections === "string" ? search.collections : undefined,
             minPrice: search.min_price?.toString() ?? `${DEFAULT_MIN_PRICE}`,
             maxPrice: search.max_price?.toString() ?? `${DEFAULT_MAX_PRICE}`,
             width: search.width?.toString() ?? "",
@@ -170,6 +172,7 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
             { key: "sizes", value: [...draft.sizes].join(",") },
             { key: "ages", value: [...draft.ages].join(",") },
             { key: "cat_ids", value: [...draft.categories].join(",") },
+            { key: "collections", value: draft.collections },
             { key: "min_price", value: minPrice },
             { key: "max_price", value: maxPrice },
             { key: "width", value: draft.width },
@@ -184,6 +187,7 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
             sizes: new Set(),
             ages: new Set(),
             categories: new Set(),
+            collections: "",
             minPrice: DEFAULT_DRAFT.minPrice.toString(),
             maxPrice: DEFAULT_DRAFT.maxPrice.toString(),
             width: "",
@@ -205,10 +209,7 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
                     <Badge
                         key={collection.id}
                         className="cursor-pointer py-1 text-sm"
-                        onClick={() => {
-                            navigate({ to: `/collections/${collection.slug}` });
-                            onClose?.();
-                        }}
+                        onClick={() => setDraft({ ...draft, collections: collection.slug })}
                     >
                         {collection.name}
                     </Badge>

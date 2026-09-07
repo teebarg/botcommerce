@@ -16,6 +16,7 @@ type Filters = {
     sizes: string;
     colors: string;
     cat_ids: string;
+    collections: string;
     sort: "min_price:asc" | "min_price:desc" | "id:desc";
     width: string | undefined;
     length: string | undefined;
@@ -28,6 +29,7 @@ const DEFAULTS: Filters = {
     sizes: "",
     colors: "",
     cat_ids: "",
+    collections: "",
     sort: "id:desc",
     width: undefined,
     length: undefined,
@@ -41,6 +43,7 @@ function parseFilters(search: Record<string, unknown>): Filters {
         sizes: search.sizes as string,
         colors: search.colors as string,
         cat_ids: search.cat_ids as string,
+        collections: search.collections as string,
         sort: search.sort as "min_price:asc" | "min_price:desc" | "id:desc",
         width: search.width as string,
         length: search.length as string,
@@ -55,6 +58,7 @@ function countActiveFilters(filters: Filters): number {
     if (filters.sizes && filters.sizes !== DEFAULTS.sizes) count++;
     if (filters.colors && filters.colors !== DEFAULTS.colors) count++;
     if (filters.cat_ids && filters.cat_ids !== DEFAULTS.cat_ids) count++;
+    if (filters.collections && filters.collections !== DEFAULTS.collections) count++;
     if (filters.sort && filters.sort !== DEFAULTS.sort) count++;
     if (filters.width && filters.width !== DEFAULTS.width) count++;
     if (filters.length && filters.length !== DEFAULTS.length) count++;

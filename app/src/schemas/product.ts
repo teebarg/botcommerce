@@ -147,13 +147,13 @@ export const FeedQuerySchema = z.object({
     search: z.string().optional(),
     sort: z.enum(["min_price:asc", "min_price:desc", "id:desc"]).optional(),
     cat_ids: z.string().optional(),
+    collections: z.string().optional(),
     sizes: z.string().optional(),
     ages: z.string().optional(),
     width: z.coerce.number().optional(),
     length: z.coerce.number().optional(),
     min_price: z.coerce.number().optional(),
     max_price: z.coerce.number().optional(),
-    collections: z.string().optional(),
     cursor: z.string().optional(),
 });
 
