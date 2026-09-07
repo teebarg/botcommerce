@@ -1,7 +1,9 @@
 import asyncio
 import json
 import logging
+
 import asyncpg
+
 from app.config import settings
 from app.tasks.products import clean_up_dangling
 

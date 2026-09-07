@@ -5,10 +5,16 @@ from fastapi import Depends
 from app.core.dependencies.cache import ArqDep, CacheDep
 from app.core.dependencies.cart import CartDep
 from app.core.dependencies.product import ProductDep
-from app.core.dependencies.services import CouponDep, SettingsDep, StorageDep
+from app.core.dependencies.services import CouponDep, SettingsDep
 from app.prisma_client import DbDep
 from app.services.order import OrderService
+from app.services.payment import PaymentService
 
+
+def get_payment_service(db: DbDep, queue: ArqDep, cache_srv: CacheDep, product_srv: ProductDep) -> PaymentService:
+    return PaymentService(db=db, queue=queue, cache_srv=cache_srv, product_srv=product_srv)
+
+PaymentDep = Annotated[PaymentService, Depends(get_payment_service)]
 
 def get_order_service(
     queue: ArqDep,
@@ -17,8 +23,9 @@ def get_order_service(
     cart_srv: CartDep,
     coupon_srv: CouponDep,
     product_srv: ProductDep,
-    storage_srv: StorageDep,
-    settings_srv: SettingsDep) -> OrderService:
+    settings_srv: SettingsDep,
+    payment_srv: PaymentDep,
+    ) -> OrderService:
     return OrderService(
         db=db,
         cart_srv=cart_srv,
@@ -27,7 +34,7 @@ def get_order_service(
         settings_srv=settings_srv,
         cache_srv=cache_srv,
         queue=queue,
-        storage_srv=storage_srv
+        payment_srv=payment_srv
     )
 
 OrderDep = Annotated[OrderService, Depends(get_order_service)]

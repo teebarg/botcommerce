@@ -1,5 +1,6 @@
 from core.config import BaseAppSettings
 
+
 class Settings(BaseAppSettings):
     API_BASE_URL: str = "http://backend:8000"
     PORT: int = 10000

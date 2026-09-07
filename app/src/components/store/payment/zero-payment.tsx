@@ -1,14 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { useCompleteCart } from "@/hooks/useCart";
+import { usePlaceOrder } from "@/hooks/useCart";
 
 export function ZeroPayment() {
-    const completeCart = useCompleteCart();
+    const completeCart = usePlaceOrder();
 
     const onPaymentCompleted = async () => {
-        completeCart.mutate({
-            payment_status: "SUCCESS",
-            status: "PENDING",
-        });
+        completeCart.mutate();
     };
 
     return (

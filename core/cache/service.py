@@ -25,7 +25,7 @@ class CacheInvalidationService:
                     }
                 })
                 
-        print(f"Purging specific cache keys: {purge_files}")
+        logger.debug(f"Purging specific cache keys: {purge_files}")
         
         try:
             async with httpx.AsyncClient(timeout=3.0) as client:
@@ -39,6 +39,6 @@ class CacheInvalidationService:
                 if not data.get("success"):
                     logger.warning(f"Cloudflare API rejected purge request: {data.get('errors')}")
                 else:
-                    print("Cloudflare variant-specific purge accepted successfully!")
+                    logger.debug("Cloudflare variant-specific purge accepted successfully!")
         except httpx.HTTPError as e:
             logger.warning(f"Cloudflare purge failed: {e}")

@@ -1,19 +1,38 @@
 import uuid
-from typing import Optional, List
-from fastapi import APIRouter, HTTPException, Query, BackgroundTasks, Request, Depends, UploadFile, File
-from app.models.generic import Message, ImageBulkDelete
-from app.models.product import ProductImageMetadata, ImagesBulkUpdate, ProductImageBulkUrls
-from app.models.gallery import PaginatedGalleryImages
-from app.core.permissions import require_admin
-from app.core.dependencies.product import ProductDep
-from app.core.dependencies.gallery import GalleryDep
-from app.core.dependencies.services import StorageDep
+from typing import List, Optional
+
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    File,
+    HTTPException,
+    Query,
+    Request,
+    UploadFile,
+)
+
+from app.core.config import settings
 from app.core.dependencies.cache import ArqDep
+from app.core.dependencies.gallery import GalleryDep
+from app.core.dependencies.product import ProductDep
+from app.core.dependencies.services import StorageDep
+from app.core.logging import get_logger
+from app.core.permissions import require_admin
+from app.models.gallery import PaginatedGalleryImages
+from app.models.generic import ImageBulkDelete, Message
+from app.models.product import (
+    ImagesBulkUpdate,
+    ProductImageBulkUrls,
+    ProductImageMetadata,
+)
 from app.prisma_client import DbDep
 from app.services.cache import cacheable
-from app.services.storage import StorageProvider, ALLOWED_CONTENT_TYPES, MAX_FILE_SIZE_BYTES
-from app.core.config import settings
-from app.core.logging import get_logger
+from app.services.storage import (
+    ALLOWED_CONTENT_TYPES,
+    MAX_FILE_SIZE_BYTES,
+    StorageProvider,
+)
 
 logger = get_logger(__name__)
 
@@ -134,7 +153,7 @@ async def upload_gallery_images(
 async def bulk_delete_gallery_images(
     db: DbDep,
     srv: GalleryDep,
-    Product_srv: ProductDep,
+    product_srv: ProductDep,
     payload: ImageBulkDelete,
     background_tasks: BackgroundTasks,
 ):
@@ -149,7 +168,7 @@ async def bulk_delete_gallery_images(
         srv.process_bulk_delete_task,
         payload=payload,
         remove_storage_fn=srv.storage.remove_images,
-        delete_index_fn=Product_srv.delete_product_index
+        delete_index_fn=product_srv.delete_product_index
     )
     await srv.ws_manager.broadcast_to_all({"status": "processing"}, "bulk_action")
     return {"success": True, "message": f"Deleting {len(images)} images..."}
@@ -164,7 +183,7 @@ async def create_image_metadata(
     background_tasks: BackgroundTasks,
 ):
     product_id = await srv.create_metadata(image_id, payload)
-    background_tasks.add_task(product_srv.invalidate, id=product_id)
+    background_tasks.add_task(product_srv.index_product, id=product_id)
     return {"success": True}
 
 
@@ -177,7 +196,7 @@ async def update_image_metadata(
     background_tasks: BackgroundTasks,
 ):
     product_id = await srv.update_metadata(image_id, payload)
-    background_tasks.add_task(product_srv.invalidate, id=product_id)
+    background_tasks.add_task(product_srv.index_product, product_id=product_id)
     return {"success": True}
 
 
@@ -207,7 +226,7 @@ async def bulk_update_products(
         srv.handle_bulk_update_images,
         payload=payload,
         images=images,
-        index_products_fn=product_srv.invalidate_all
+        index_products_fn=product_srv.index_products
     )
 
     return {"message": f"Updating {len(images)} products..."}

@@ -1,16 +1,23 @@
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, Request, BackgroundTasks
+
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from prisma.errors import PrismaError
-from app.models.category import Category, CategoryCreate, CategoryUpdate, BulkOrderUpdate
-from app.models.product import CategoryWithProducts
-from app.models.generic import Message, ImageUpload
-from app.core.utils import slugify
-from app.core.logging import get_logger
-from app.core.permissions import require_admin
-from app.services.cache import cacheable
+
 from app.core.dependencies.product import ProductDep
 from app.core.dependencies.services import CategoryDep, StorageDep
+from app.core.logging import get_logger
+from app.core.permissions import require_admin
+from app.core.utils import slugify
+from app.models.category import (
+    BulkOrderUpdate,
+    Category,
+    CategoryCreate,
+    CategoryUpdate,
+)
+from app.models.generic import ImageUpload, Message
+from app.models.product import CategoryWithProducts
 from app.prisma_client import DbDep
+from app.services.cache import cacheable
 
 logger = get_logger(__name__)
 
@@ -31,8 +38,7 @@ async def get_home_categories_products(request: Request, db: DbDep, product_srv:
     )
 
     for category in categories:
-        category.products = [product_srv._prepare_product_data_for_indexing(product) for product in category.products]
-
+        category.products = [product_srv.product_to_search_document(product) for product in category.products]
     return categories
 
 @router.get("/")

@@ -21,6 +21,7 @@ function RouteComponent() {
     const { data, error, isPending } = useQuery({
         queryKey: ["payment", "verify", reference],
         queryFn: () => api.get<Order>(`/payment/verify/${reference}`),
+        enabled: !!reference,
     });
 
     if (isPending) {
@@ -30,9 +31,10 @@ function RouteComponent() {
     if (error) {
         toast.error("your card was declined, try another payment method");
         navigate({ to: "/checkout" });
+        return;
     }
 
-    if (data?.payment_status === "SUCCESS") {
+    if (data) {
         queryClient.invalidateQueries({ queryKey: ["cart"] });
         navigate({ to: `/order/confirmed/${data?.order_number}` });
     }

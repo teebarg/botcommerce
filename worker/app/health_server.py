@@ -1,6 +1,8 @@
 import http.server
 import socketserver
+
 from app.config import settings
+
 
 class HealthCheckHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):

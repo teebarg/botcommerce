@@ -1,16 +1,12 @@
-import re
-from pydantic import BaseModel, EmailStr
-from prisma.enums import PaymentMethod, ShippingMethod
-from typing import Optional
-from enum import Enum
 from datetime import datetime
-from app.models.product import ProductVariant
-from app.lib.validation import PhoneNumber
+from typing import Optional
 
-class CartStatus(str, Enum):
-    ACTIVE = "ACTIVE"
-    ABANDONED = "ABANDONED"
-    CONVERTED = "CONVERTED"
+from prisma.enums import CartStatus, PaymentMethod, ShippingMethod
+from pydantic import BaseModel, EmailStr
+
+from app.lib.validation import PhoneNumber
+from app.models.product import ProductVariant
+
 
 class CartAddress(BaseModel):
     id: Optional[int] = None
@@ -33,7 +29,7 @@ class CartUpdate(BaseModel):
     billing_address: Optional[CartAddress] = None
     email: Optional[EmailStr] = None
     phone: PhoneNumber = None
-    shipping_method: Optional[ShippingMethod] = None
+    shipping_method: Optional[int] = None
     payment_method: Optional[PaymentMethod] = None
     status: Optional[CartStatus] = None
 

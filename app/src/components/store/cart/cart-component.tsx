@@ -5,13 +5,12 @@ import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 import { useCart } from "@/providers/cart-provider";
 import { ShoppingBag, ShoppingCart } from "lucide-react";
-import { useCartSummary } from "@/hooks/useCartSummary";
 import { cn } from "@/utils/cn";
 
 const CartComponent: React.FC = () => {
     const state = useOverlayTriggerState({});
     const { cart } = useCart();
-    const { totalItems } = useCartSummary();
+    const { cartCount } = useCart();
 
     return (
         <Overlay
@@ -20,14 +19,14 @@ const CartComponent: React.FC = () => {
             title={
                 <>
                     <ShoppingBag className="w-5 h-5 text-primary" />
-                    <span className="text-base">{`Your Cart (${totalItems})`}</span>
+                    <span className="text-base">{`Your Cart (${cartCount})`}</span>
                 </>
             }
             trigger={
-                <Button size="icon" variant="ghost" className={cn(totalItems > 0 && "text-accent")}>
+                <Button size="icon" variant="ghost" className={cn(cartCount > 0 && "text-accent")}>
                     <ShoppingCart className="w-7 h-7" />
                     <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center font-medium">
-                        {totalItems}
+                        {cartCount}
                     </span>
                 </Button>
             }

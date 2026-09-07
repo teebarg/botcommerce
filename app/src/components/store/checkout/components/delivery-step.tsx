@@ -28,7 +28,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
             return;
         }
         setSelectedDeliveryMethod(item);
-        updateCartDetails.mutate({ shipping_method: item.method, shipping_fee: item.amount });
+        updateCartDetails.mutate({ shipping_method: item.id, shipping_fee: item.amount });
     };
 
     const handleContinue = () => {
@@ -68,24 +68,16 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
                                     <Truck className="h-5 w-5" />
                                 )}
                                 <div className="flex-1 text-left">
-                                    <h3 className="font-semibold text-md">
-                                        {option.name}
-                                    </h3>
+                                    <h3 className="font-semibold text-md">{option.name}</h3>
                                     <p className="text-muted-foreground text-xs">{option.duration}</p>
                                 </div>
-                                <p className="font-semibold">
-                                    {option.amount === 0 ? "Free" : currency(option.amount)}
-                                </p>
+                                <p className="font-semibold">{option.amount === 0 ? "Free" : currency(option.amount)}</p>
                             </div>
                         </RadioGroupItem>
                     ))}
                 </RadioGroup>
-                {cart?.shipping_method === "PICKUP" && (
-                    <PickupCard />
-                )}
-                {["STANDARD", "EXPRESS"].includes(cart?.shipping_method ?? "") && (
-                    <AddressStep address={cart.shipping_address} />
-                )}
+                {cart?.shipping_method === "PICKUP" && <PickupCard />}
+                {["STANDARD", "EXPRESS"].includes(cart?.shipping_method ?? "") && <AddressStep address={cart.shipping_address} />}
             </div>
             <div className="sheet-footer sticky bottom-0">
                 <Button

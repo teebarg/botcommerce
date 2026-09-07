@@ -1,19 +1,38 @@
-import uuid
 import json
+import uuid
 from typing import List, Optional
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Query, BackgroundTasks, Response, Request
+
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    File,
+    HTTPException,
+    Query,
+    Request,
+    Response,
+    UploadFile,
+)
+
 from app.core.config import settings
-from app.core.logging import get_logger
-from app.services.cache import cacheable, DEFAULT_EXPIRATION
+from app.core.dependencies.cache import ArqDep
+from app.core.dependencies.product import ProductDep
+from app.core.dependencies.services import StorageDep
 from app.core.deps import CurrentUser, UserDep
-from app.models.generic import Message
-from app.models.product import ProductLite, VariantWithStatus, SearchProducts, FeedProducts, IndexProducts, ReviewStatus
+from app.core.logging import get_logger
 from app.core.permissions import require_admin
 from app.lib.cache import set_public_cache
-from app.core.dependencies.product import ProductDep, SearchDep
-from app.core.dependencies.cache import ArqDep
-from app.core.dependencies.services import StorageDep
+from app.models.generic import Message
+from app.models.product import (
+    FeedProducts,
+    IndexProducts,
+    Product,
+    ReviewStatus,
+    SearchProducts,
+    VariantWithStatus,
+)
 from app.prisma_client import DbDep
+from app.services.cache import DEFAULT_EXPIRATION, cacheable
 from app.services.storage import ALLOWED_CONTENT_TYPES, MAX_FILE_SIZE_BYTES
 
 logger = get_logger(__name__)
@@ -55,7 +74,7 @@ async def get_recommendations(
 @router.get("/feed")
 @cacheable(key_prefix="products:list", tags=["products"], cdn_ttl=600, cdn_swr=60)
 async def feed(
-    request: Request, srv: ProductDep, search: str = "", sort: str = "id:desc",
+    request: Request, srv: ProductDep, search: str = "", sort: str | None = None,
     cat_ids: str = Query(default=""), collections: str = Query(default=""),
     max_price: int = Query(default=50000, gt=0), min_price: int = Query(default=1, gt=0),
     sizes: str = Query(default=""), ages: str = Query(default=""),
@@ -97,7 +116,7 @@ async def search(
 
 
 @router.get("/{slug}")
-async def read(request: Request, slug: str, srv: ProductDep) -> ProductLite:
+async def read(request: Request, slug: str, srv: ProductDep) -> Product:
     set_public_cache(request, edge_ttl=86400, swr=600)
     cache_key: str = f"product:{slug}"
     cached = await srv.cache_srv.redis.get(cache_key)
@@ -108,7 +127,7 @@ async def read(request: Request, slug: str, srv: ProductDep) -> ProductLite:
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    new_product = ProductLite.validate(product)
+    new_product = Product.validate(product)
     await srv.cache_srv.set_with_tags(
         key=cache_key,
         value=new_product,
@@ -144,30 +163,20 @@ async def update_variant(
 
 
 @router.post("/configure-filterable-attributes")
-async def configure_filterable_attributes(search_srv: SearchDep) -> Message:
+async def configure_filterable_attributes(srv: ProductDep) -> Message:
     try:
-        search_srv.update_settings()
-        return Message(message="Filterable attributes updated successfully.")
+        await srv.search_engine.configure_index()
+        return Message(message="Filterable attributes updated.")
     except Exception as e:
         logger.error(f"Error updating attributes: {e}")
         raise HTTPException(status_code=500, detail="Configuration task error.")
 
 
-@router.get("/search/clear-index", dependencies=[Depends(require_admin)])
-async def config_clear_index(search_srv: SearchDep):
+@router.get("/search/clear-index")
+async def config_clear_index(srv: ProductDep):
     try:
-        await search_srv.clear_index(settings.MEILI_PRODUCTS_INDEX)
+        await srv.search_engine.clear()
         return {"message": "Index cleared"}
-    except Exception as e:
-        logger.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.post("/search/delete-index", dependencies=[Depends(require_admin)])
-async def config_delete_index(index_name: str, search_srv: SearchDep):
-    try:
-        search_srv.delete_index(index_name)
-        return {"message": "Index dropped"}
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=500, detail=str(e))
@@ -176,7 +185,7 @@ async def config_delete_index(index_name: str, search_srv: SearchDep):
 @router.post("/reindex")
 async def reindex_products(srv: ProductDep, background_tasks: BackgroundTasks) -> Message:
     try:
-        background_tasks.add_task(srv.invalidate_all)
+        background_tasks.add_task(srv.index_all_products)
         return Message(message="Re-indexing task enqueued...........")
     except Exception as e:
         logger.error(e)

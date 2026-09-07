@@ -16,7 +16,22 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from core.db.base import Base
-from core.db.models.base import User, Cart, Coupon, OrderItem, OrderTimeline, Payment, ShippingMethod, shipping_method_enum, OrderStatus, PaymentStatus, payment_status_enum, payment_method_enum, order_status_enum, PaymentMethod
+from core.db.models.base import (
+    Cart,
+    Coupon,
+    OrderItem,
+    OrderStatus,
+    OrderTimeline,
+    Payment,
+    PaymentMethod,
+    PaymentStatus,
+    ShippingMethod,
+    User,
+    order_status_enum,
+    payment_method_enum,
+    payment_status_enum,
+    shipping_method_enum,
+)
 
 if TYPE_CHECKING:
     from core.db.models.models import Address

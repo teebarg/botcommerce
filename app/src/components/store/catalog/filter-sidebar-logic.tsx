@@ -26,7 +26,7 @@ type DraftFilters = {
     sizes: Set<string>;
     ages: Set<string>;
     categories: Set<string>;
-    sort: "min_variant_price:asc"| "min_variant_price:desc" | "id:desc" | "created_at:desc";
+    sort: "min_price:asc" | "min_price:desc" | "id:desc";
     minPrice: string;
     maxPrice: string;
     width: string;
@@ -34,7 +34,7 @@ type DraftFilters = {
 };
 
 const DEFAULT_DRAFT = {
-    sort: "id:desc",
+    sort: "",
     sizes: new Set<string>(),
     ages: new Set<string>(),
     categories: new Set<string>(),
@@ -80,7 +80,7 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
     const { updateQuery } = useUpdateQuery();
     const filters = useMemo(() => {
         return {
-            sort: search.sort ?? "id:desc",
+            sort: search.sort,
             sizes: new Set(search.sizes?.toString()?.split(",").filter(Boolean)),
             ages: new Set(search.ages?.split(",").filter(Boolean)),
             categories: new Set(search.cat_ids?.split(",").filter(Boolean)),
@@ -104,8 +104,6 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
         age: true,
         waistLength: true,
     });
-
-    const [sort, setSort] = useState(() => search?.sort || "id:desc");
 
     const [priceMinInput, setPriceMinInput] = useState<string>(filters.minPrice);
     const [priceMaxInput, setPriceMaxInput] = useState<string>(filters.maxPrice);
@@ -297,15 +295,15 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <div className="pt-2">
-                        <RadioGroup value={sort} onValueChange={setSort} className="gap-1">
+                        <RadioGroup value={draft.sort} onValueChange={(e) => setDraft({ ...draft, sort: e })} className="gap-1">
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem id={priceLowId} value="min_variant_price:asc" />
+                                <RadioGroupItem id={priceLowId} value="min_price:asc" />
                                 <Label className="text-sm" htmlFor={priceLowId}>
                                     Price: Low to High
                                 </Label>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem id={priceHighId} value="min_variant_price:desc" />
+                                <RadioGroupItem id={priceHighId} value="min_price:desc" />
                                 <Label className="text-sm" htmlFor={priceHighId}>
                                     Price: High to Low
                                 </Label>
@@ -365,10 +363,11 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
                             <button
                                 key={size}
                                 onClick={() => onToggleSize(size)}
-                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${draft.sizes.has(size)
+                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                                    draft.sizes.has(size)
                                         ? "bg-primary text-primary-foreground"
                                         : "bg-secondary text-secondary-foreground hover:bg-muted"
-                                    }`}
+                                }`}
                             >
                                 {size}
                             </button>

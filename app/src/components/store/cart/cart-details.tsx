@@ -29,7 +29,8 @@ const CartDetails: React.FC<Props> = ({ onClose, cart }) => {
                     <p className="bg-card text-card-foreground p-2 rounded-lg flex gap-2 mx-2">
                         <Info />
                         <span className="text-sm">
-                            <span className="font-semibold">{`Your items aren’t reserved`}</span>, {`checkout quickly to make sure you don’t miss out.`}
+                            <span className="font-semibold">{`Your items aren’t reserved`}</span>,{" "}
+                            {`checkout quickly to make sure you don’t miss out.`}
                         </span>
                     </p>
                     <div className="flex-1 bg-card overflow-y-auto rounded-xl my-4 mx-2">
@@ -37,7 +38,7 @@ const CartDetails: React.FC<Props> = ({ onClose, cart }) => {
                             <CartItemComponent key={item.variant_id} item={item} />
                         ))}
                     </div>
-                    <CartSummary cart={cart!} showSecured={true} className="rounded-none border-none" />
+                    <CartSummary showSecured={true} className="rounded-none border-none" />
                 </>
             )}
         </div>

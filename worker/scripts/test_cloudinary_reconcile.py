@@ -15,7 +15,7 @@ import asyncpg
 import cloudinary
 
 from app.config import settings
-from app.tasks.cloudinary_reconcile import find_orphaned_cloudinary_assets  # adjust import path
+from app.tasks.cloudinary_reconcile import find_orphaned_cloudinary_assets
 
 logging.basicConfig(level=logging.INFO)
 

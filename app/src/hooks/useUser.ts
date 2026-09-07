@@ -2,14 +2,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { fetchUserFn, updateAppSessionFn } from "@/server/users.server";
 import { api } from "@/utils/api";
-import { Session, User, Wishlist } from "@/schemas";
-import { queryOptions } from '@tanstack/react-query'
+import { Message, Session, User, WishItem, Wishlist } from "@/schemas";
+import { queryOptions } from "@tanstack/react-query";
 
-export const authQueryOptions = () => queryOptions({
-    queryKey: ["session"],
-    queryFn: () => fetchUserFn(),
-    staleTime: 5 * 60 * 1000,
-})
+export const authQueryOptions = () =>
+    queryOptions({
+        queryKey: ["session"],
+        queryFn: () => fetchUserFn(),
+        staleTime: 5 * 60 * 1000,
+    });
 
 export const useUpdateUser = () => {
     return useMutation({
@@ -74,13 +75,29 @@ export const wishlistQueryOptions = () =>
 export const useUserCreateWishlist = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (product_id: number) => await api.post<Wishlist>("/users/wishlist", { product_id }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products", "wishlist"] });
-            toast.success("Wishlist created successfully");
+        mutationFn: async (product_id: number) => await api.post<WishItem>("/users/wishlist", { product_id }),
+        onMutate: async (product_id: number) => {
+            await queryClient.cancelQueries({ queryKey: ["products", "wishlist"] });
+            const previous = queryClient.getQueryData<Wishlist>(["products", "wishlist"]);
+            queryClient.setQueryData<Wishlist>(["products", "wishlist"], (old) => {
+                if (!old) return old;
+                const placeholder: WishItem = {
+                    id: -product_id,
+                    product_id: product_id,
+                    product: { id: product_id } as WishItem["product"],
+                };
+                return [placeholder, ...old];
+            });
+            return { previous };
         },
-        onError: (error) => {
-            toast.error("Failed to create wishlist" + error);
+        onError: (error, _product_id, context) => {
+            if (context?.previous) {
+                queryClient.setQueryData(["products", "wishlist"], context.previous);
+            }
+            toast.error(`Failed to add to wishlist: ${error.message}`);
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ["products", "wishlist"] });
         },
     });
 };
@@ -88,13 +105,24 @@ export const useUserCreateWishlist = () => {
 export const useUserDeleteWishlist = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (id: number) => await api.delete<Wishlist>(`/users/wishlist/${id}`),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products", "wishlist"] });
-            toast.success("Wishlist deleted successfully");
+        mutationFn: async (product_id: number) => await api.delete<Message>(`/users/wishlist/${product_id}`),
+        onMutate: async (product_id: number) => {
+            await queryClient.cancelQueries({ queryKey: ["products", "wishlist"] });
+            const previous = queryClient.getQueryData<Wishlist>(["products", "wishlist"]);
+            queryClient.setQueryData<Wishlist>(["products", "wishlist"], (old) => {
+                if (!old) return old;
+                return old.filter((w) => w.product.id !== product_id);
+            });
+            return { previous };
         },
-        onError: (error) => {
-            toast.error("Failed to delete wishlist" + error);
+        onError: (error, _product_id, context) => {
+            if (context?.previous) {
+                queryClient.setQueryData(["products", "wishlist"], context.previous);
+            }
+            toast.error(`Failed to remove from wishlist: ${error.message}`);
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ["products", "wishlist"] });
         },
     });
 };

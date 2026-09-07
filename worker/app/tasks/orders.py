@@ -1,21 +1,19 @@
-from app.db import session_factory
-from app.security import call_internal_backend
-
+from core.db.models.base import OrderStatus
+from core.logging import get_logger
 from core.notifications import Channel, OrderCreated
-from core.repositories.order_repository import OrderRepository
-from core.repositories.cart_repository import CartRepository
-from core.repositories.user_repository import UserRepository
-from core.repositories.order_timeline_repository import OrderTimelineRepository
-from core.repositories.wallet_txn_repository import WalletTransactionRepository
 from core.notifications.events.payment_receipt import PaymentReceipt
 from core.notifications.events.referral_cashback import ReferralCashback
-from core.db.models.base import CartStatus, OrderStatus
+from core.repositories.order_repository import OrderRepository
+from core.repositories.order_timeline_repository import OrderTimelineRepository
+from core.repositories.user_repository import UserRepository
+from core.repositories.wallet_txn_repository import WalletTransactionRepository
 
+from app.db import session_factory
+from app.security import call_internal_backend
 from app.services.generic import build_and_upload_invoice
 
-from core.logging import get_logger
-
 logger = get_logger(__name__)
+
 
 async def process_referral(ctx, order_id: int) -> dict:
     """
@@ -43,21 +41,31 @@ async def process_referral(ctx, order_id: int) -> dict:
                 return
 
             if not order.coupon_code:
-                logger.debug(f"[process_referral] Order {order.order_number} has no coupon code, skipping")
+                logger.debug(
+                    f"[process_referral] Order {order.order_number} has no coupon code, skipping"
+                )
                 return
-           
+
             coupon_owner = await user_repo.get_one(referral_code=order.coupon_code)
             if not coupon_owner:
-                logger.debug(f"[process_referral] Coupon owner not found in the system, skipping")
+                logger.debug(
+                    "[process_referral] Coupon owner not found in the system, skipping"
+                )
                 return
 
             if coupon_owner.id == order.user_id:
-                logger.debug(f"Order {order.order_number} used owner's own referral code — no cashback issued")
+                logger.debug(
+                    f"Order {order.order_number} used owner's own referral code — no cashback issued"
+                )
                 return
 
-            existing = await wallet_txn_repo.get_one(reference_id=order.order_number, type="CASHBACK")
+            existing = await wallet_txn_repo.get_one(
+                reference_id=order.order_number, type="CASHBACK"
+            )
             if existing:
-                logger.debug(f"Referral cashback already issued for order {order.order_number}, skipping")
+                logger.debug(
+                    f"Referral cashback already issued for order {order.order_number}, skipping"
+                )
                 return
 
             # result = await wallet_txn_repo.upsert(
@@ -85,9 +93,14 @@ async def process_referral(ctx, order_id: int) -> dict:
                 },
             )
 
-            await user_repo.increment_wallet_balance(coupon_owner.id, order.discount_amount)
+            await user_repo.increment_wallet_balance(
+                coupon_owner.id, order.discount_amount
+            )
             await session.commit()
-            await call_internal_backend(path=f"/internal/invalidate", json_body={"tags": [f"wallet:{coupon_owner.id}"]})
+            await call_internal_backend(
+                path="/internal/invalidate",
+                json_body={"tags": [f"wallet:{coupon_owner.id}"]},
+            )
         except Exception as e:
             logger.error(f"An error occurred: {e}")
             raise e
@@ -96,7 +109,7 @@ async def process_referral(ctx, order_id: int) -> dict:
         ReferralCashback(
             order=order,
             customer_email=coupon_owner.email,
-            referral=coupon_owner.first_name
+            referral=coupon_owner.first_name,
         ),
         channels=[Channel.EMAIL],
     )
@@ -108,7 +121,6 @@ async def order_created(ctx, order_id: int) -> dict:
     async with session_factory() as session:
         try:
             order_repo = OrderRepository(session)
-            cart_repo = CartRepository(session)
             order_timeline_repo = OrderTimelineRepository(session)
             order = await order_repo.get_by_id(
                 id=order_id,
@@ -132,7 +144,6 @@ async def order_created(ctx, order_id: int) -> dict:
                 },
             )
 
-            await cart_repo.update(order.cart_id, {"status": CartStatus.CONVERTED})
             await session.commit()
         except Exception as e:
             logger.error(f"An error occurred: {e}")
@@ -144,12 +155,9 @@ async def order_created(ctx, order_id: int) -> dict:
             customer_email=order.user.email,
             first_name=order.user.first_name,
             last_name=order.user.last_name,
-            total=order.total
+            total=order.total,
         ),
-        channels=[
-            Channel.EMAIL,
-            Channel.SLACK
-        ],
+        channels=[Channel.EMAIL, Channel.SLACK],
     )
     return {"status": "ok"}
 

@@ -1,16 +1,26 @@
-from fastapi import APIRouter, HTTPException, Query, Request, Depends
 from typing import List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+
 from app.core.dependencies.services import CatalogDep
 from app.core.deps import UserDep
-from app.models.generic import Message
 from app.core.logging import get_logger
-from app.core.utils import slugify, get_client_ip
-from app.services.websocket import manager
-from app.models.catalog import Catalog, Catalogs, CatalogView, CursorPaginatedCatalog, CatalogCreate, CatalogUpdate, CatalogBulkAdd
 from app.core.permissions import require_admin
-from app.services.cache import cacheable
-from app.models.product import ProductSearch, SearchVariant
+from app.core.utils import get_client_ip, slugify
+from app.models.catalog import (
+    Catalog,
+    CatalogBulkAdd,
+    CatalogCreate,
+    Catalogs,
+    CatalogUpdate,
+    CatalogView,
+    CursorPaginatedCatalog,
+)
+from app.models.generic import Message
+from app.models.product import ProductSearch
 from app.prisma_client import DbDep
+from app.services.cache import cacheable
+from app.services.websocket import manager
 
 logger = get_logger(__name__)
 
@@ -94,7 +104,7 @@ async def search(
     formatted_products = []
     for p in sliced_products:
         variant_list = [
-            SearchVariant(
+            ProductSearch(
                 id=v.id,
                 price=v.price,
                 old_price=v.old_price,
@@ -108,11 +118,6 @@ async def search(
             for v in p.variants
         ]
 
-        # Determine overall product stock status based on variant availability
-        product_status = "OUT OF STOCK"
-        if any(v.status == "IN_STOCK" and v.inventory > 0 for v in p.variants):
-            product_status = "IN STOCK"
-
         formatted_products.append(
             ProductSearch(
                 id=p.id,
@@ -120,7 +125,7 @@ async def search(
                 sku=p.sku,
                 slug=p.slug,
                 image=p.images[0].image if len(p.images) > 0 else p.image,
-                status=product_status,
+                in_stock=any(v.inventory > 0 for v in p.variants),
                 variants=variant_list,
                 active=p.active,
                 is_new=p.is_new

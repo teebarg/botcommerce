@@ -1,8 +1,10 @@
 import asyncio
+import json
+
 import asyncpg
 from google import genai
 from google.genai import types
-import json
+
 from app.config import settings
 from app.logger import logger
 
@@ -76,7 +78,7 @@ async def update_product_embeddings(ctx, product_id: str, text_to_embed: str) ->
             LIMIT 10;
         """
 
-        logger.info(f"🎯 Calculating top 10 neighbors using native database vector layers...")
+        logger.info("🎯 Calculating top 10 neighbors using native database vector layers...")
         top_neighbors = await conn.fetch(similarity_query, p_id)
         top_10_ids = [str(row["id"]) for row in top_neighbors]
 

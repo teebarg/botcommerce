@@ -73,12 +73,17 @@ async def add_cache_headers(
 
     return response
 
+
 async def purge_cdn_urls(*paths: str) -> None:
     """Purge exact URLs from Cloudflare's edge cache, accounting for Vary: Origin."""
     origins: list[str] = [
         settings.FRONTEND_HOST,  # Frontend browser
         settings.DOMAIN,  # FastAPI docs / direct api
     ]
+
+    if not settings.is_production:
+        logger.debug("Skipping cloudfare purge locally.")
+        return
 
     # Build the specific cache keys Cloudflare is tracking
     purge_files = []
@@ -87,7 +92,7 @@ async def purge_cdn_urls(*paths: str) -> None:
         for origin in origins:
             purge_files.append({"url": url, "headers": {"Origin": origin}})
 
-    print(f"Purging specific cache keys: {purge_files}")
+    logger.debug(f"Purging specific cache keys: {purge_files}")
 
     try:
         async with httpx.AsyncClient(timeout=3.0) as client:
@@ -105,6 +110,6 @@ async def purge_cdn_urls(*paths: str) -> None:
                     f"Cloudflare API rejected purge request: {data.get('errors')}"
                 )
             else:
-                print("Cloudflare variant-specific purge accepted successfully!")
+                logger.debug("Cloudflare variant-specific purge accepted successfully!")
     except httpx.HTTPError as e:
         logger.warning(f"Cloudflare purge failed: {e}")

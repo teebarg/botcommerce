@@ -60,9 +60,9 @@ async function executeRequest<T>(endpoint: string, options: RequestOptions = {})
         throw redirect({ to: "/forbidden" });
     }
 
-    if (response.status === 404) {
-        throw notFound();
-    }
+    // if (response.status === 404) {
+    //     throw notFound();
+    // }
 
     if (response.status === 401) {
         throw redirect({

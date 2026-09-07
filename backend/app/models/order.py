@@ -1,10 +1,13 @@
-from typing import Optional
-from pydantic import BaseModel, EmailStr
-from prisma.enums import PaymentMethod, ShippingMethod, OrderStatus, PaymentStatus
 from datetime import datetime
+from typing import Optional
+
+from prisma.enums import OrderStatus, PaymentMethod, PaymentStatus, ShippingMethod
+from pydantic import BaseModel, EmailStr
+
+from app.models.address import Address
 from app.models.product import ProductVariant
 from app.models.user import MiniUser
-from app.models.address import Address
+
 
 class OrderItemLite(BaseModel):
     id: int

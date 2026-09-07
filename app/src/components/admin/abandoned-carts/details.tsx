@@ -6,10 +6,10 @@ import { ReminderButton } from "./reminder-button";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Overlay from "@/components/overlay";
-import type { AbandonedCart } from "@/schemas";
 import { currency } from "@/utils";
 import { useImpersonateUser } from "@/hooks/useUser";
 import ImageLightbox from "@/components/image-lightbox";
+import { AbandonedCart } from "@/schemas/abandoned-cart";
 
 interface AbandonedCartDetailsDialogProps {
     cart: AbandonedCart | null;
@@ -28,7 +28,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
 
     const handleImpersonation = async () => {
         try {
-            if (!cart?.user?.id) return;
+            if (!cart?.user) return;
             await impersonateUser.mutateAsync(cart?.user?.id);
             toast.loading("Impersonating.........");
             window.location.reload();
@@ -41,12 +41,8 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
         <Overlay
             open={state.isOpen}
             sheetClassName="min-w-[30vw]"
-            title={<div className="py-1.5">{cart.status !== "CONVERTED" && <ReminderButton id={cart.id} />}</div>}
-            trigger={
-                <Button onClick={state.open}>
-                    View Details
-                </Button>
-            }
+            title={<div className="py-1.5">{<ReminderButton id={cart.id} />}</div>}
+            trigger={<Button onClick={state.open}>View Details</Button>}
             onOpenChange={state.setOpen}
         >
             <div className="flex-1 flex flex-col overflow-hidden">
@@ -98,12 +94,12 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                             {cart.items.map((item) => (
                                 <div key={item.id} className="flex items-center gap-4 px-4 py-2 rounded-lg border bg-card">
                                     <div className="w-16 h-16 rounded-lg overflow-hidden border bg-muted shrink-0">
-                                        <ImageLightbox url={item?.image} alt={item.name} />
+                                        <ImageLightbox url={item?.image || ""} alt={item.name || ""} />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h4 className="font-medium mb-1 text-sm truncate">{item.name}</h4>
                                         <p className="text-xs text-muted-foreground mt-0.5">
-                                            {item.quantity} × {currency(item.price)}
+                                            {item.quantity} × {currency(item.variant?.price || 0)}
                                         </p>
                                     </div>
                                 </div>
@@ -113,10 +109,6 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Subtotal</span>
                                 <span className="font-medium">{currency(cart.subtotal)}</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Tax</span>
-                                <span className="font-medium">{currency(cart.tax)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Shipping</span>

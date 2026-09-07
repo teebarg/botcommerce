@@ -69,6 +69,10 @@ ignore = [
     "B008",  # do not perform function calls in argument defaults
     "W191",  # indentation contains tabs
     "B904",  # Allow raising exceptions without from e, for HTTPException
+    "UP045", # use | instead of Optional
+    "C901",  # long fuction name
+    "UP006", # suppress Lint
+    "UP035", # suppress Lint
 ]
 
 [tool.ruff.lint.pyupgrade]

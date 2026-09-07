@@ -51,7 +51,7 @@ export const useAddToCart = () => {
             return { previousCart };
         },
         onSuccess: () => {
-            toast.success("Added to cart", { duration: 1000 });
+            queryClient.invalidateQueries({ queryKey: ["cart"] });
         },
         onError: (error: any, variables, context) => {
             if (context?.previousCart) {
@@ -90,6 +90,7 @@ export const useChangeCartQuantity = () => {
         },
         onSuccess: () => {
             toast.success("Cart updated");
+            queryClient.invalidateQueries({ queryKey: ["cart"] });
         },
         onError: (error: any, variables, context) => {
             if (context?.previousCart) {
@@ -101,10 +102,12 @@ export const useChangeCartQuantity = () => {
 };
 
 export const useUpdateCartDetails = () => {
+    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (update: CartUpdate) => await api.put<Cart>("/cart/", update),
         onSuccess: () => {
             toast.success("Cart details updated");
+            queryClient.invalidateQueries({ queryKey: ["cart"] });
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to update cart details");
@@ -113,10 +116,12 @@ export const useUpdateCartDetails = () => {
 };
 
 export const useDeleteCartItem = () => {
+    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (item_id: number) => await api.delete<Message>(`/cart/items/${item_id}`),
         onSuccess: () => {
             toast.success("Item removed from cart");
+            queryClient.invalidateQueries({ queryKey: ["cart"] });
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to remove item");
@@ -124,18 +129,22 @@ export const useDeleteCartItem = () => {
     });
 };
 
-export const useCompleteCart = () => {
-    const navigate = useNavigate();
+export const usePlaceOrder = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (complete: CartComplete) => await api.post<Order>("/order/", complete),
+        mutationFn: async () => await api.post<Order>("/order/"),
         onSuccess: async (data) => {
-            window.location.href = `/order/confirmed/${data?.order_number}`;
             queryClient.invalidateQueries({ queryKey: ["cart"] });
+            if (data.payment_method == "BANK_TRANSFER") {
+                window.location.href = `/order/confirmed/${data?.order_number}`;
+                return;
+            }
+
+            const payment: any = await api.post(`/payment/initialize/${data.id}`);
+            window.location.href = payment?.authorization_url;
         },
         onError: (error: any) => {
-            navigate({ to: "/cart" }); // send them back
             toast.error(error.message || "Failed to place order");
         },
     });

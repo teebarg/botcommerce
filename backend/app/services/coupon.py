@@ -76,10 +76,10 @@ class CouponService:
         # Validate cart requirements
         if cart:
             cart_items = await self.db.cartitem.find_many(
-                where={"cart_id": cart.id}
+                where={"cart_id": cart.id}, include={"variant": True}
             )
 
-            current_subtotal = sum(item.price * item.quantity for item in cart_items)
+            current_subtotal = sum(item.variant.price * item.quantity for item in cart_items)
 
             if coupon.min_cart_value:
                 if current_subtotal < coupon.min_cart_value:

@@ -1,8 +1,10 @@
-from typing import List, Optional, Literal
-from pydantic import BaseModel, Field
-from prisma.enums import ProductStatus
-from app.models.collection import Collection
+from typing import List, Optional
+
+from pydantic import BaseModel, Field, computed_field
+
 from app.models.category import Category
+from app.models.collection import Collection
+
 
 class ProductImage(BaseModel):
     id: int
@@ -14,11 +16,10 @@ class ProductImage(BaseModel):
 
 class ProductVariant(BaseModel):
     id: int
-    sku: str
-    status: ProductStatus
+    sku: Optional[str] = None
     price: float
     old_price: Optional[float] = 0.0
-    inventory: int
+    inventory: int = 0
     age: Optional[str] = None
     size: Optional[str] = None
     color: Optional[str] = None
@@ -55,7 +56,7 @@ class ReviewCreate(BaseModel):
     rating: int = Field(..., ge=1, le=5, description="Rating must be between 1 and 5")
 
 
-class ProductLite(BaseModel):
+class Product(BaseModel):
     id: int
     name: Optional[str] = None
     sku: Optional[str] = None
@@ -63,24 +64,15 @@ class ProductLite(BaseModel):
     description: Optional[str] = None
     images: Optional[List[ProductImage]] = []
     variants: Optional[List[ProductVariant]] = None
-    active: Optional[bool] = True
-    is_new: Optional[bool] = False
-
-    class Config:
-        from_attributes = True
-
-
-class Product(BaseModel):
-    id: int
-    name: Optional[str] = None
-    sku: Optional[str] = None
-    slug: str
-    description: Optional[str] = None
-    variants: Optional[List[ProductVariant]] = None
     categories: Optional[List[Category]] = []
     collections: Optional[List[Collection]] = []
     active: Optional[bool] = True
     is_new: Optional[bool] = False
+
+    @computed_field
+    @property
+    def in_stock(self) -> bool:
+        return any(v.inventory > 0 for v in self.variants or [])
 
     class Config:
         from_attributes = True
@@ -95,17 +87,6 @@ class SearchCollection(BaseModel):
     name: Optional[str] = None
     slug: str
 
-class SearchVariant(BaseModel):
-    id: int
-    price: Optional[float] = 0
-    old_price: Optional[float] = 0
-    inventory: int = 0
-    size: Optional[str] = None
-    color: Optional[str] = None
-    width: Optional[int] = None
-    length: Optional[int] = None
-    age: Optional[str] = None
-
 class ProductSearch(BaseModel):
     id: int
     name: Optional[str] = None
@@ -113,8 +94,8 @@ class ProductSearch(BaseModel):
     slug: str
     image: Optional[str] = None
     images: Optional[List[str]] = []
-    status: Literal["IN STOCK", "OUT OF STOCK"] = "IN STOCK"
-    variants: Optional[List[SearchVariant]] = []
+    in_stock: bool = True
+    variants: Optional[List[ProductVariant]] = []
     active: Optional[bool] = True
     is_new: Optional[bool] = False
 

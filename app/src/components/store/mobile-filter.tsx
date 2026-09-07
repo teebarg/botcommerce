@@ -9,14 +9,14 @@ import { useRouterState } from "@tanstack/react-router";
 import { FilterSidebarLogic, FilterSidebarRef } from "./catalog/filter-sidebar-logic";
 import { useSearch } from "@tanstack/react-router";
 
-interface MobileFilterProps { }
+interface MobileFilterProps {}
 
 type Filters = {
     ages: string;
     sizes: string;
     colors: string;
     cat_ids: string;
-    sort: "min_variant_price:asc" | "min_variant_price:desc" | "id:desc" | "created_at:desc";
+    sort: "min_price:asc" | "min_price:desc" | "id:desc";
     width: string | undefined;
     length: string | undefined;
     max_price: string | undefined;
@@ -41,7 +41,7 @@ function parseFilters(search: Record<string, unknown>): Filters {
         sizes: search.sizes as string,
         colors: search.colors as string,
         cat_ids: search.cat_ids as string,
-        sort: search.sort as "id:desc" | "created_at:desc",
+        sort: search.sort as "min_price:asc" | "min_price:desc" | "id:desc",
         width: search.width as string,
         length: search.length as string,
         max_price: search.max_price as string,
@@ -63,7 +63,7 @@ function countActiveFilters(filters: Filters): number {
     return count;
 }
 
-const MobileFilter: React.FC<MobileFilterProps> = ({ }) => {
+const MobileFilter: React.FC<MobileFilterProps> = ({}) => {
     const { location } = useRouterState();
     const filterState = useOverlayTriggerState({});
     const sidebarRef = useRef<FilterSidebarRef>(null);

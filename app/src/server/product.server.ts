@@ -1,6 +1,6 @@
 import { api } from "@/utils/api";
 import { createServerFn } from "@tanstack/react-start";
-import { type ProductFeed, type ProductLite, CategoriesWithProducts, FeedQuerySchema, ProductSearch, SearchCatalog } from "@/schemas";
+import { type ProductFeed, type Product, CategoriesWithProducts, FeedQuerySchema, ProductSearch, SearchCatalog } from "@/schemas";
 import { z } from "zod";
 
 interface IndexProducts {
@@ -26,7 +26,7 @@ export const getProductFeedFn = createServerFn()
 export const getProductFn = createServerFn({ method: "GET" })
     .inputValidator((d: string) => d)
     .handler(async ({ data }) => {
-        return await api.get<ProductLite>(`/product/${data}`);
+        return await api.get<Product>(`/product/${data}`);
     });
 
 export const getCatalogFeedFn = createServerFn()

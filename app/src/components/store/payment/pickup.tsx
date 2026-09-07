@@ -1,6 +1,6 @@
 import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useCompleteCart } from "@/hooks/useCart";
+import { usePlaceOrder } from "@/hooks/useCart";
 import { currency } from "@/utils";
 
 interface PickupProps {
@@ -10,13 +10,10 @@ interface PickupProps {
 }
 
 const Pickup: React.FC<PickupProps> = ({ amount, canContinue }) => {
-    const completeCart = useCompleteCart();
+    const completeCart = usePlaceOrder();
 
     const onPaymentCompleted = async () => {
-        completeCart.mutate({
-            payment_status: "PENDING",
-            status: "PENDING",
-        });
+        completeCart.mutate();
     };
 
     return (
