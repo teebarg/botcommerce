@@ -6,10 +6,6 @@ export const activeVariants = (product: ProductSearch | Product) => product?.var
 
 export const variantAvailable = (variant: ProductVariant) => variant.inventory > 0;
 
-export const productInStock = (product: ProductSearch | Product) => activeVariants(product)?.some(variantAvailable) || false;
-
-export const hasVariantChoice = (product: ProductSearch | Product) => product && activeVariants(product).length > 1;
-
 export function defaultVariant(product: ProductSearch | Product): ProductVariant {
     const active = activeVariants(product);
     return active.find(variantAvailable) ?? active[0] ?? product.variants?.[0]!;
@@ -29,18 +25,6 @@ export function variantLabel(variant: ProductVariant) {
             .map(([label, value]) => `${label}: ${value}`)
             .join(" · ") || variant.sku
     );
-}
-
-export function priceRange(product: ProductSearch | Product) {
-    const prices = activeVariants(product).map((variant) => variant.price);
-    const min = Math.min(...prices);
-    const max = Math.max(...prices);
-
-    return { min, max, isRange: min !== max };
-}
-
-export function lowStock(variant: ProductVariant) {
-    return variant.inventory > 0 && variant.inventory <= 5;
 }
 
 export function getPriceInfo(product: ProductSearch | Product) {

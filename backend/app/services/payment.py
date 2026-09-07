@@ -91,7 +91,6 @@ class PaymentService:
         return await self.record_success(reference=data["reference"])
 
     async def record_success(self, reference: str):
-        print("🚀 ~ PaymentService ~ record_success ~ reference:", reference)
         payment = await self.db.payment.find_first(
             where={"reference": reference},
             include={"order": True},
