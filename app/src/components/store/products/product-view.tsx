@@ -3,7 +3,6 @@ import { useState, useEffect, useMemo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { currency } from "@/utils";
-import { ProductVariantSelection } from "@/components/products/product-variant-selection";
 import type { Product, ProductImage, ProductVariant } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useUpdateVariant } from "@/hooks/useProduct";
@@ -92,19 +91,23 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         />
                     ))}
                 </div> */}
+                {images.length > 1 && (
+                    <>
+                        <button
+                            onClick={() => setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length)}
+                            className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background/90 border border-border flex items-center justify-center hover:bg-background transition-colors"
+                        >
+                            <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={() => setCurrentImageIndex((prev) => (prev + 1) % product.images.length)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background/90 border border-border flex items-center justify-center hover:bg-background transition-colors"
+                        >
+                            <ChevronRight className="w-4 h-4" />
+                        </button>
+                    </>
+                )}
 
-                <button
-                    onClick={() => setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length)}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background/90 border border-border flex items-center justify-center hover:bg-background transition-colors"
-                >
-                    <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                    onClick={() => setCurrentImageIndex((prev) => (prev + 1) % product.images.length)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background/90 border border-border flex items-center justify-center hover:bg-background transition-colors"
-                >
-                    <ChevronRight className="w-4 h-4" />
-                </button>
                 {images.length > 1 ? (
                     <div className="mt-1 flex gap-1.5 overflow-x-auto">
                         {images.map((image: ProductImage, index: number) => (
@@ -170,8 +173,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         </div>
                     ) : null}
                 </ClientOnly>
-
-                <ProductVariantSelection product={product} variant={variant} />
 
                 <ProductVariantActions product={product} />
 
