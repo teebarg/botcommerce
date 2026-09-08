@@ -1,4 +1,4 @@
-from core.notifications import Channel, ContactForm, NewsletterEvent, BulkPurchaseEvent
+from core.notifications import BulkPurchaseEvent, Channel, ContactForm, NewsletterEvent
 
 
 async def contact_form(ctx, name: str, email: str, phone: str, message: str):

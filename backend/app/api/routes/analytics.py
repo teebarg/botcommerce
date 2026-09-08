@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any
+
 from fastapi import APIRouter, BackgroundTasks
 from pydantic import BaseModel
+
 from app.core.dependencies.cache import CacheDep
 
 router = APIRouter()
@@ -19,6 +21,10 @@ FUNNELS: dict[str, list[str]] = {
         "push_subscribed",
         "push_sync_failed",
         "push_subscribe_failed",
+        "push_message_delivered",
+        "push_message_opened",
+        "push_message_clicked",
+        "push_message_dismissed",
     ],
     "sales": [
         "product_viewed",
@@ -33,9 +39,11 @@ FUNNELS: dict[str, list[str]] = {
 
 COUNTER_TTL_SECONDS: int = 30 * 24 * 60 * 60
 
+
 def _total_key(event: str) -> str:
     return f"analytics:event:{event}:total"
- 
+
+
 def _daily_key(event: str, date_str: str) -> str:
     return f"analytics:event:{event}:{date_str}"
 
@@ -49,7 +57,9 @@ class EventIn(BaseModel):
 
 
 @router.post("/event", status_code=204)
-async def record_event(payload: EventIn, cache_srv: CacheDep, background_tasks: BackgroundTasks):
+async def record_event(
+    payload: EventIn, cache_srv: CacheDep, background_tasks: BackgroundTasks
+):
     async def log_event():
         try:
             date_str: str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
@@ -62,6 +72,7 @@ async def record_event(payload: EventIn, cache_srv: CacheDep, background_tasks: 
         except Exception:
             pass
         return
+
     background_tasks.add_task(log_event)
 
 
@@ -75,11 +86,11 @@ async def funnel(cache_srv: CacheDep, name: str):
     events: list[str] | None = FUNNELS.get(name)
     if not events:
         return {"error": f"Unknown funnel '{name}'. Known funnels: {list(FUNNELS)}"}
- 
+
     keys: list[str] = [_total_key(e) for e in events]
     values = await cache_srv.redis.mget(keys)
     counts = {event: int(v or 0) for event, v in zip(events, values)}
- 
+
     steps = []
     for i, event in enumerate(events):
         step = {"event": event, "count": counts[event]}
@@ -89,32 +100,36 @@ async def funnel(cache_srv: CacheDep, name: str):
                 round(counts[event] / prev_count, 3) if prev_count else None
             )
         steps.append(step)
- 
+
     first, last = counts[events[0]], counts[events[-1]]
     return {
         "funnel": name,
         "steps": steps,
         "overall_conversion": round(last / first, 3) if first else None,
     }
- 
- 
+
+
 @router.get("/funnel/{name}/daily")
 async def funnel_daily(cache_srv: CacheDep, name: str, days: int = 7):
     """Per-day counts for the named funnel (max 30 — older days expire)."""
     events: list[str] | None = FUNNELS.get(name)
     if not events:
         return {"error": f"Unknown funnel '{name}'. Known funnels: {list(FUNNELS)}"}
- 
+
     today = datetime.now(timezone.utc).date()
-    dates: list[str] = [(today - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(days)]
- 
+    dates: list[str] = [
+        (today - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(days)
+    ]
+
     result = []
     for date_str in dates:
         keys: list[str] = [_daily_key(e, date_str) for e in events]
         values = await cache_srv.redis.mget(keys)
-        result.append({
-            "date": date_str,
-            "counts": {event: int(v or 0) for event, v in zip(events, values)},
-        })
- 
+        result.append(
+            {
+                "date": date_str,
+                "counts": {event: int(v or 0) for event, v in zip(events, values)},
+            }
+        )
+
     return result

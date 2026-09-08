@@ -11,9 +11,7 @@ const OFFLINE_SHELL = "/";
 precacheAndRoute(self.__WB_MANIFEST);
 
 registerRoute(
-    ({ request, url }) =>
-        request.destination === "script" &&
-        (url.pathname.includes(".lazy-") || url.pathname.includes("/assets/")),
+    ({ request, url }) => request.destination === "script" && (url.pathname.includes(".lazy-") || url.pathname.includes("/assets/")),
     new StaleWhileRevalidate({ cacheName: "route-chunks" })
 );
 
@@ -94,20 +92,19 @@ self.addEventListener("push", (event) => {
     const options = {
         body: data.body,
         icon: "/pr-logo.png",
-        image: data.imageUrl ?? "/promo-banner.webp",
+        // image: data.imageUrl ?? "/promo-banner.webp",
+        image: "/promo-banner.webp",
         badge: "/pr-logo.png",
         vibrate: [200, 100, 200],
         requireInteraction: true,
-        tag: data.tag || "general-alert", 
-        renotify: true,               
+        tag: data.tag || "general-alert",
+        renotify: true,
         actions: [
             { action: "view", title: "View" },
             { action: "dismiss", title: "Dismiss" },
         ],
         data: {
             url: data?.data?.actionUrl ?? data?.path ?? "/",
-            subscriberId: data.subscriberId,
-            notificationId: data.notificationId,
             title: data.title,
             body: data.body,
             receivedAt: Date.now(),
@@ -121,13 +118,7 @@ self.addEventListener("push", (event) => {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    subscriberId: data.subscriberId,
-                    notificationId: data.notificationId,
-                    eventType: "DELIVERED",
-                    title: data.title,
-                    body: data.body,
-                    deliveredAt: new Date().toISOString(),
-                    timestamp: new Date().toISOString(),
+                    event: "push_message_delivered",
                 }),
             }).catch((err) => console.error("Failed to send push event:", err)),
         ])
@@ -137,19 +128,14 @@ self.addEventListener("push", (event) => {
 self.addEventListener("notificationclick", (event) => {
     const info = event.notification.data;
     const action = event.action;
-    const eventType = action === "view" ? "OPENED" : "DISMISSED";
+    const eventType = action === "view" ? "push_message_opened" : "push_message_dismissed";
 
     event.waitUntil(
         fetch(`${API_BASE}/api/push-event`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                subscriberId: info.subscriberId,
-                notificationId: info.notificationId,
-                eventType,
-                title: info.title,
-                body: info.body,
-                timestamp: new Date().toISOString(),
+                event: eventType,
             }),
         }).catch(() => {})
     );
@@ -168,12 +154,7 @@ self.addEventListener("notificationclose", (event) => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                subscriberId: info.subscriberId,
-                notificationId: info.notificationId,
-                eventType: "CLICKED",
-                title: info.title,
-                body: info.body,
-                timestamp: new Date().toISOString(),
+                event: "push_message_clicked",
             }),
         }).catch(() => {})
     );

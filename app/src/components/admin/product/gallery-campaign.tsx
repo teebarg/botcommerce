@@ -35,7 +35,6 @@ const GalleryCampaign: React.FC<Props> = ({ image }) => {
         }
 
         sendPushNotification({
-            notificationId: generateUUID(),
             title,
             body,
             image,

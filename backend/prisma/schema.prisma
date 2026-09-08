@@ -20,6 +20,7 @@ enum AddressType {
 
 enum OrderStatus {
   PENDING
+  CONFIRMED
   PROCESSING
   SHIPPED
   OUT_FOR_DELIVERY
@@ -550,7 +551,6 @@ model User {
   carts                      Cart[]
   activity_logs              ActivityLog[]
   interactions               UserInteraction[]
-  preferences                UserPreference[]
   coupons                    Coupon[]          @relation("CouponAllowedUser")
   referral_code              String?           @unique
   wallet_balance             Float             @default(0) @db.DoublePrecision
@@ -593,18 +593,6 @@ model ShopSettings {
   updated_at DateTime         @updatedAt
 
   @@map("shop_settings")
-}
-
-model BankDetails {
-  id             Int      @id @default(autoincrement())
-  bank_name      String   @db.VarChar(255)
-  account_name   String   @db.VarChar(255)
-  account_number String   @unique @db.VarChar(255)
-  is_active      Boolean  @default(true)
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
-
-  @@map("bank_details")
 }
 
 model Conversation {
@@ -656,22 +644,6 @@ model FAQ {
   @@map("faqs")
 }
 
-model CarouselBanner {
-  id          Int      @id @default(autoincrement())
-  title       String
-  subtitle    String?
-  description String?  @db.Text
-  buttonText  String?
-  image       String?  @db.VarChar(255)
-  link        String?
-  order       Int      @default(0)
-  is_active   Boolean  @default(true)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  @@map("carousel_banners")
-}
-
 model DeliveryOption {
   id          Int            @id @default(autoincrement())
   name        String         @unique @db.VarChar(255)
@@ -705,23 +677,6 @@ model UserInteraction {
   @@index([user_id, type, timestamp(sort: Desc)])
   @@index([product_id, type, timestamp(sort: Desc)])
   @@map("user_interactions")
-}
-
-model UserPreference {
-  id          Int      @id @default(autoincrement())
-  user_id     Int
-  category    String? // Make nullable for brand-only preferences
-  brand       String?
-  priceRange  String?
-  score       Float    @default(1.0)
-  source      String   @default("implicit") // "explicit", "implicit", "inferred"
-  confidence  Float    @default(0.5) // How confident we are in this preference
-  lastUpdated DateTime @default(now()) @updatedAt
-
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@unique([user_id, category, brand])
-  @@map("user_preferences")
 }
 
 model PushSubscription {

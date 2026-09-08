@@ -2,12 +2,12 @@ import asyncio
 import json
 from dataclasses import dataclass
 from typing import TypedDict
-
-from app.core.logging import get_logger
-from pywebpush import WebPushException, webpush
 from urllib.parse import urlparse
 
+from pywebpush import WebPushException, webpush
+
 from app.core.config import settings
+from app.core.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -27,7 +27,6 @@ class Notification(TypedDict):
     path: str
     data: dict | None
     image: str | None
-    notificationId: str | None
 
 
 @dataclass
@@ -48,8 +47,6 @@ def _build_payload(subscriber: Subscriber, notification: Notification) -> str:
         "path": notification.get("path", "/collections"),
         "data": notification.get("data"),
         "imageUrl": notification.get("image"),
-        "notificationId": notification.get("notificationId"),
-        "subscriberId": subscriber.get("id"),
     })
 
 

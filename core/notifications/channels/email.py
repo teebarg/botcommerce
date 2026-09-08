@@ -1,14 +1,17 @@
-from core.notifications.filters import normalize_image
-from core.notifications.filters import format_naira
-from core.notifications.filters import format_date
+from email.message import EmailMessage
 from pathlib import Path
 
 import aiosmtplib
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from core.notifications.filters import discount
-from email.message import EmailMessage
-from core.notifications.base import Mail
+
 from core.logging import get_logger
+from core.notifications.base import Mail
+from core.notifications.filters import (
+    discount,
+    format_date,
+    format_naira,
+    normalize_image,
+)
 
 logger = get_logger(__name__)
 
@@ -68,14 +71,14 @@ class EmailChannel:
             logger.debug("Skipping email send to guest.com address: %s", mail.to)
             return
 
-        kwargs = dict(
-            hostname=self.host,
-            port=self.port,
-            start_tls=self.start_tls,
-        )
+        kwargs = {
+            "hostname": self.host,
+            "port": self.port,
+            "start_tls": self.start_tls,
+        }
 
         if self.username and self.password:
             kwargs["username"] = self.username
             kwargs["password"] = self.password
 
-        res = await aiosmtplib.send(message, **kwargs)
+        await aiosmtplib.send(message, **kwargs)

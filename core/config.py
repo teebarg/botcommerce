@@ -55,6 +55,8 @@ class BaseAppSettings(BaseSettings):
 
     SLACK_WEBHOOK_URL: str = ""
 
+    VAPID_PRIVATE_KEY: str = ""
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

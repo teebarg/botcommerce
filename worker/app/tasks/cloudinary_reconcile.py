@@ -28,7 +28,7 @@ IMAGE_SOURCES = [
 CLOUDINARY_URL_RE = re.compile(r"/upload/[^/]+/(.+)\.[a-zA-Z0-9]+$")
 
 
-def _extract_public_id(url: str) -> Optional[str]:
+def _extract_public_id(url: str) -> str | None:
     if not url or "res.cloudinary.com" not in url:
         return None
     match = CLOUDINARY_URL_RE.search(url)

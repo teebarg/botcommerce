@@ -13,10 +13,7 @@ export function track(event: string, meta: Record<string, unknown> = {}) {
     });
 
     try {
-        const sent = navigator.sendBeacon?.(
-            `${baseURL}/api${ENDPOINT}`,
-            new Blob([payload], { type: "application/json" })
-        );
+        const sent = navigator.sendBeacon?.(`${baseURL}/api${ENDPOINT}`, new Blob([payload], { type: "application/json" }));
 
         if (!sent) {
             fetch(`${baseURL}/api${ENDPOINT}`, {
@@ -24,12 +21,7 @@ export function track(event: string, meta: Record<string, unknown> = {}) {
                 headers: { "Content-Type": "application/json" },
                 body: payload,
                 keepalive: true,
-            }).catch(() => {
-                // Analytics failures should never surface to the user.
             });
         }
-    } catch {
-        // Never let tracking break the app.
-    }
+    } catch {}
 }
-

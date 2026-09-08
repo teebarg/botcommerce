@@ -90,21 +90,8 @@ export const useDeleteChat = () => {
 
 export const useSendPushNotification = () => {
     return useMutation({
-        mutationFn: async ({
-            title,
-            body,
-            image,
-            path,
-            notificationId,
-        }: {
-            title: string;
-            body: string;
-            image?: string;
-            path?: string;
-            notificationId: string;
-        }) =>
+        mutationFn: async ({ title, body, image, path }: { title: string; body: string; image?: string; path?: string }) =>
             await api.post<Message>("/notification/push", {
-                notificationId,
                 title,
                 body,
                 image,

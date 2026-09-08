@@ -1,10 +1,11 @@
 import asyncio
+import logging
 from datetime import datetime, timezone
 
 import bcrypt
 from faker import Faker
+
 from prisma import Prisma
-import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -242,17 +243,6 @@ async def seed_coupons():
         )
 
 
-async def seed_carousel_banners():
-    logger.info("Seeding carousel banners...")
-    await db.carouselbanner.delete_many()
-    await db.carouselbanner.create_many(
-        data=[
-            {"title": "Summer Sale", "subtitle": "Up to 30% off", "buttonText": "Shop Now", "link": "/collections/summer-sale", "order": 1, "is_active": True},
-            {"title": "New Arrivals", "subtitle": "Fresh drops weekly", "buttonText": "Explore", "link": "/collections/new-arrivals", "order": 2, "is_active": True},
-        ]
-    )
-
-
 async def seed_faqs():
     logger.info("Seeding FAQs...")
     for faq in [
@@ -400,7 +390,6 @@ async def seed():
     await seed_shop_settings()
     await seed_delivery_options()
     await seed_coupons()
-    await seed_carousel_banners()
     await seed_faqs()
     await seed_reviews_and_favorites(users, products)
     await seed_cart_and_order(users, products)

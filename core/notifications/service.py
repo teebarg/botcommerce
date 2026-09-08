@@ -10,6 +10,7 @@ from core.notifications.base import (
 )
 from core.notifications.channels import (
     EmailChannel,
+    PushChannel,
     SlackChannel,
 )
 
@@ -22,11 +23,13 @@ class NotificationService:
         *,
         email: EmailChannel,
         slack: SlackChannel,
+        push: PushChannel,
         # whatsapp: Optional[WhatsAppChannel],
         shop_settings: dict[str, str],
     ):
         self.email = email
         self.slack = slack
+        self.push = push
         # self.whatsapp = whatsapp
         self.shop_settings = shop_settings
 
@@ -56,6 +59,13 @@ class NotificationService:
                     tasks.append(
                         self.slack.send(
                             notification.to_slack()
+                        )
+                    )
+
+                case Channel.PUSH:
+                    tasks.append(
+                        self.push.send(
+                            notification.to_push()
                         )
                     )
 
@@ -93,3 +103,4 @@ class NotificationService:
                 )
 
             raise errors[0]
+        return results

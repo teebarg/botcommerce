@@ -4,6 +4,7 @@ from pathlib import Path
 from core.config import settings
 from core.notifications.channels import (
     EmailChannel,
+    PushChannel,
     SlackChannel,
 )
 from core.notifications.service import NotificationService
@@ -26,6 +27,10 @@ def create_notification_service(shop_settings) -> NotificationService:
         ),
         slack=SlackChannel(
             webhook_url=settings.SLACK_WEBHOOK_URL,
+        ),
+        push=PushChannel(
+            vapid_private_key=settings.VAPID_PRIVATE_KEY,
+            vapid_claims_sub=f"mailto:{settings.CONTACT_EMAIL}"
         ),
         # whatsapp=WhatsAppChannel(
         #     access_token=settings.WHATSAPP_ACCESS_TOKEN,
