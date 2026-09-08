@@ -115,10 +115,10 @@ interface ShareUIProps {
     text?: string;
 }
 
-export function ShareUI({ trigger, handleNativeShare, targetUrl = "", text = "Check out these products in our catalog" }: ShareUIProps) {
+export function ShareUI({ trigger, handleNativeShare, targetUrl = "", text = "Check out these products" }: ShareUIProps) {
     const state = useOverlayTriggerState({});
     const { location } = useRouterState();
-    const filterRoutes = ["/collections", "/search", "/admin/catalog", "/products"];
+    const filterRoutes = ["/collections", "/search", "/products"];
 
     const show = filterRoutes.some((route) => location.pathname.startsWith(route));
 
@@ -126,7 +126,7 @@ export function ShareUI({ trigger, handleNativeShare, targetUrl = "", text = "Ch
         try {
             await navigator.clipboard.writeText(targetUrl);
             toast.success("Link copied to clipboard!");
-            state.close()
+            state.close();
         } catch (error: any) {
             toast.error("Copy Failed", {
                 description: "Unable to copy URL to clipboard.",
@@ -155,7 +155,7 @@ export function ShareUI({ trigger, handleNativeShare, targetUrl = "", text = "Ch
         if (shareUrl) {
             window.open(shareUrl, "_blank", "width=600,height=400");
         }
-        state.close()
+        state.close();
     };
 
     if (!show) {

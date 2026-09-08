@@ -1,11 +1,11 @@
+from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import PlainTextResponse, RedirectResponse
-from starlette.middleware.cors import CORSMiddleware
+
+import app.tools.orders
+import app.tools.products
 from app.server import mcp
 
-import app.tools.products
-import app.tools.orders
-import app.tools.catalog
 
 @mcp.custom_route("/health", methods=["GET"])
 async def health_check(request: Request) -> PlainTextResponse:

@@ -11,17 +11,6 @@ const PagSchema = z.object({
     total_pages: z.number(),
 });
 
-export const DBCatalogSchema = z.object({
-    id: z.number(),
-    title: z.string(),
-    slug: z.string(),
-    description: z.string().optional(),
-    view_count: z.number(),
-    products_count: z.number().optional(),
-    is_active: z.boolean(),
-    created_at: z.string().optional(),
-});
-
 export const CategorySchema = z.object({
     id: z.number(),
     name: z.string(),
@@ -121,22 +110,6 @@ export const ProductSearchSchema = z.object({
     in_stock: z.boolean(),
 });
 
-export const CatalogSchema = z.object({
-    id: z.number(),
-    title: z.string(),
-    slug: z.string(),
-    description: z.string().optional(),
-    products: z.array(ProductSearchSchema),
-    products_count: z.number(),
-    view_count: z.number(),
-    is_active: z.boolean(),
-    created_at: z.string(),
-});
-
-export const PaginatedCatalogSchema = PagSchema.extend({
-    catalogs: z.array(CatalogSchema),
-});
-
 export const PaginatedProductSearchSchema = PagSchema.extend({
     products: z.array(ProductSearchSchema),
 });
@@ -152,17 +125,6 @@ export const WishItemSchema = z.object({
     id: z.number(),
     product_id: z.number(),
     product: ProductSchema,
-});
-
-export const SearchCatalogSchema = z.object({
-    title: z.string(),
-    description: z.string().optional(),
-    view_count: z.number(),
-    is_active: z.boolean(),
-    products: z.array(ProductSearchSchema),
-    limit: z.number(),
-    total_count: z.number(),
-    next_cursor: z.number().optional(),
 });
 
 export const PaginatedProductImagesSchema = CursorSchema.extend({
@@ -181,21 +143,17 @@ export const CategoriesProductsSchema = z.object({
     products: z.array(ProductSearchSchema),
 });
 
-export const CatalogQuerySchema = z.object({
-    cursor: z.string().optional(),
-});
-
 export const FeedQuerySchema = z.object({
     search: z.string().optional(),
     sort: z.enum(["min_price:asc", "min_price:desc", "id:desc"]).optional(),
     cat_ids: z.string().optional(),
+    collections: z.string().optional(),
     sizes: z.string().optional(),
     ages: z.string().optional(),
     width: z.coerce.number().optional(),
     length: z.coerce.number().optional(),
     min_price: z.coerce.number().optional(),
     max_price: z.coerce.number().optional(),
-    collections: z.string().optional(),
     cursor: z.string().optional(),
 });
 
@@ -216,7 +174,6 @@ export type CategoriesWithProducts = z.infer<typeof CategoriesProductsSchema>;
 
 export type SearchCategory = z.infer<typeof SearchCategorySchema>;
 export type SearchCollection = z.infer<typeof SearchCollectionSchema>;
-export type DBCatalog = z.infer<typeof DBCatalogSchema>;
 
 export type Product = z.infer<typeof ProductSchema>;
 export type ProductSearch = z.infer<typeof ProductSearchSchema>;
@@ -234,9 +191,5 @@ export type ProductVariant = z.infer<typeof ProductVariantSchema>;
 export type ImageLite = z.infer<typeof ImageLiteSchema>;
 export type GalleryImage = z.infer<typeof GalleryImageSchema>;
 export type PaginatedGalleryImages = z.infer<typeof PaginatedGalleryImagesSchema>;
-
-export type Catalog = z.infer<typeof CatalogSchema>;
-export type SearchCatalog = z.infer<typeof SearchCatalogSchema>;
-export type PaginatedCatalog = z.infer<typeof PaginatedCatalogSchema>;
 
 export type ReviewStatus = z.infer<typeof ReviewStatusSchema>;

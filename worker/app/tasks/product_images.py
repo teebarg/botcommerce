@@ -98,7 +98,7 @@ async def optimize_product_image(
     await call_internal_backend(
         path="/internal/invalidate",
         label="Invalidate",
-        json_body={"tags": ["products", "catalog", "gallery"]},
+        json_body={"tags": ["products", "gallery"]},
     )
 
     _delete_with_retry(storage=storage, key=storage_key)

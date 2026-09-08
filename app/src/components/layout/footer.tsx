@@ -107,7 +107,7 @@ export default function Footer() {
                                             <li key={idx}>
                                                 <LocalizedClientLink
                                                     className="text-sm hover:text-primary transition-colors"
-                                                    href={`/collections/${c.slug}`}
+                                                    href={`/collections?collections=${c.slug}`}
                                                 >
                                                     {c.name}
                                                 </LocalizedClientLink>

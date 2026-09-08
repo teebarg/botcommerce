@@ -26,7 +26,7 @@ router = APIRouter()
 @router.get("/home/products", tags=["products"])
 @cacheable(
     key_prefix="products:home",
-    tags=["products", "catalog"],
+    tags=["products"],
     cdn_ttl=600, cdn_swr=60
 )
 async def get_home_categories_products(request: Request, db: DbDep, product_srv: ProductDep) -> list[CategoryWithProducts]:

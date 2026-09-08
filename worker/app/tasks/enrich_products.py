@@ -1,9 +1,11 @@
 import json
-from app.services.image_enrichment import get_enrichment
+
 from app.logger import logger
+from app.services.image_enrichment import get_enrichment
+
 
 async def enrich_products(ctx) -> str:
-    logger.info("⏰ [Automated Cron] Beginning 6-hour database catalog validation sweep...")
+    logger.info("⏰ [Automated Cron] Beginning 6-hour database validation sweep...")
     pool = ctx['db_pool']
     redis = ctx['redis']
     try:

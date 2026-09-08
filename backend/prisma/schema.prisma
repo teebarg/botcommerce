@@ -211,28 +211,27 @@ model Collection {
 }
 
 model Product {
-  id                 Int                @id @default(autoincrement())
-  name               String?            @db.VarChar(255)
-  slug               String             @unique @db.VarChar(255)
-  sku                String             @unique
-  description        String?
-  features           Json?              @db.JsonB
-  image              String?            @db.VarChar(255)
-  active             Boolean            @default(true)
-  is_new             Boolean            @default(false)
-  variants           ProductVariant[]
-  ratings            Float?             @default(0)
-  categories         Category[]         @relation("ProductCategories")
-  collections        Collection[]       @relation("ProductCollections")
-  brand              Brand?             @relation(fields: [brand_id], references: [id], onDelete: SetNull)
-  brand_id           Int?
-  embedding          Json?              @db.JsonB
-  tags               Tag[]              @relation("ProductTags")
-  images             ProductImage[]
-  reviews            Review[]
-  favorites          Favorite[]
-  user_interactions  UserInteraction[]
-  shared_collections SharedCollection[] @relation("SharedCollectionProducts")
+  id                Int               @id @default(autoincrement())
+  name              String?           @db.VarChar(255)
+  slug              String            @unique @db.VarChar(255)
+  sku               String            @unique
+  description       String?
+  features          Json?             @db.JsonB
+  image             String?           @db.VarChar(255)
+  active            Boolean           @default(true)
+  is_new            Boolean           @default(false)
+  variants          ProductVariant[]
+  ratings           Float?            @default(0)
+  categories        Category[]        @relation("ProductCategories")
+  collections       Collection[]      @relation("ProductCollections")
+  brand             Brand?            @relation(fields: [brand_id], references: [id], onDelete: SetNull)
+  brand_id          Int?
+  embedding         Json?             @db.JsonB
+  tags              Tag[]             @relation("ProductTags")
+  images            ProductImage[]
+  reviews           Review[]
+  favorites         Favorite[]
+  user_interactions UserInteraction[]
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -556,11 +555,10 @@ model User {
   referral_code              String?           @unique
   wallet_balance             Float             @default(0) @db.DoublePrecision
 
-  Conversation         Conversation[]
-  SharedCollectionView SharedCollectionView[]
-  CouponUsage          CouponUsage[]
-  PushSubscription     PushSubscription[]
-  walletTxns           WalletTransaction[]
+  Conversation     Conversation[]
+  CouponUsage      CouponUsage[]
+  PushSubscription PushSubscription[]
+  walletTxns       WalletTransaction[]
 
   created_at DateTime?    @default(now())
   updated_at DateTime?    @updatedAt
@@ -724,34 +722,6 @@ model UserPreference {
 
   @@unique([user_id, category, brand])
   @@map("user_preferences")
-}
-
-model SharedCollection {
-  id                   Int                    @id @default(autoincrement())
-  title                String                 @db.VarChar(255)
-  slug                 String                 @unique @db.VarChar(255)
-  description          String?                @db.Text
-  products             Product[]              @relation("SharedCollectionProducts")
-  is_active            Boolean                @default(true)
-  view_count           Int                    @default(0)
-  created_at           DateTime               @default(now())
-  updated_at           DateTime               @updatedAt
-  SharedCollectionView SharedCollectionView[]
-
-  @@map("shared_collections")
-}
-
-model SharedCollectionView {
-  id                   Int              @id @default(autoincrement())
-  shared_collection    SharedCollection @relation(fields: [shared_collection_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  shared_collection_id Int
-  user_id              Int?
-  user                 User?            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  ip_address           String?
-  user_agent           String?
-  timestamp            DateTime         @default(now())
-
-  @@map("shared_collection_views")
 }
 
 model PushSubscription {

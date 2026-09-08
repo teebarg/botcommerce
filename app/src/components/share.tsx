@@ -7,14 +7,14 @@ interface ShareButtonProps {
     text?: string;
 }
 
-export default function ShareButton({ text = "Check out these products in our catalog" }: ShareButtonProps) {
+export default function ShareButton({ text = "Check out these products in our collection" }: ShareButtonProps) {
     const location = useLocation();
     const handleNativeShare = async () => {
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: "Product Catalog",
-                    text: "Check out these products in our catalog",
+                    title: "Product",
+                    text: "Check out these products",
                     url: location.url,
                 });
             } catch (error: any) {

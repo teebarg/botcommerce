@@ -403,7 +403,6 @@ class ProductService:
                 "collections": True,
                 "images": True,
                 "variants": True,
-                "shared_collections": True,
             },
         )
 
@@ -423,7 +422,6 @@ class ProductService:
                     "collections": True,
                     "images": True,
                     "variants": True,
-                    "shared_collections": True,
                 },
             )
 
@@ -529,7 +527,7 @@ class ProductService:
             await self.search_engine.delete(document_ids=product_ids)
             keys: list[str] = [f"product:{id}" for id in product_ids]
             await self.cache_srv.invalidate(
-                tags=["products", "catalog", "stats-trends", "gallery"] + keys
+                tags=["products", "stats-trends", "gallery"] + keys
             )
         except Exception as e:
             logger.error(f"Error deleting products {product_ids} from index: {e}")
@@ -557,7 +555,7 @@ class ProductService:
 
             await self.cdn_srv.purge_cloudfare(*cloudfare_paths)
             await self.cache_srv.invalidate(
-                *slug_tags, tags=["products", "catalog", "gallery"]
+                *slug_tags, tags=["products", "gallery"]
             )
         except Exception as e:
             logger.error(str(e))
@@ -579,7 +577,7 @@ class ProductService:
                 await self.search_engine.index(documents)
             await self.cdn_srv.purge_cloudfare(*cloudfare_paths)
             await self.cache_srv.invalidate(
-                *slug_tags, tags=["products", "catalog", "gallery"]
+                *slug_tags, tags=["products", "gallery"]
             )
         except Exception as e:
             logger.error(str(e))

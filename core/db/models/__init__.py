@@ -1,7 +1,7 @@
 # from core.db.models.order_model import Order
 from core.db.models.base import (
-    Base,
     Address,
+    Base,
     Brand,
     Cart,
     CartItem,
@@ -18,16 +18,14 @@ from core.db.models.base import (
     ProductImage,
     ProductVariant,
     Review,
-    SharedCollection,
-    SharedCollectionView,
     Tag,
     User,
     WalletTransaction,
 )
 
 __all__ = [
-    "Base",
     "Address",
+    "Base",
     "Brand",
     "Cart",
     "CartItem",
@@ -44,8 +42,6 @@ __all__ = [
     "ProductImage",
     "ProductVariant",
     "Review",
-    "SharedCollection",
-    "SharedCollectionView",
     "Tag",
     "User",
     "WalletTransaction",

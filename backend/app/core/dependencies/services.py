@@ -4,7 +4,6 @@ from fastapi import Depends
 
 from app.core.dependencies.cache import ArqDep, CacheDep, CdnDep
 from app.prisma_client import DbDep
-from app.services.catalog import CatalogService
 from app.services.categories import CategoryService
 from app.services.chat import ConversationService
 from app.services.collections import CollectionService
@@ -24,9 +23,6 @@ def get_storage_service() -> MediaStorageService:
 
 def get_shop_settings_service(db: DbDep, cache_srv: CacheDep, cdn_srv: CdnDep) -> ShopSettingsService:
     return ShopSettingsService(db=db, cache_srv=cache_srv, cdn_srv=cdn_srv)
-
-def get_catalog_service(cache_srv: CacheDep, db: DbDep) -> CatalogService:
-    return CatalogService(db=db, cache_srv=cache_srv)
 
 def get_conversation_service(db: DbDep):
     return ConversationService(db=db)
@@ -48,7 +44,6 @@ def get_review_service(cache_srv: CacheDep, cdn_srv: CdnDep) -> ReviewService:
 
 ConversationDep = Annotated[ConversationService, Depends(get_conversation_service)]
 SettingsDep = Annotated[ShopSettingsService, Depends(get_shop_settings_service)]
-CatalogDep = Annotated[CatalogService, Depends(get_catalog_service)]
 StorageDep = Annotated[MediaStorageService, Depends(get_storage_service)]
 CouponDep = Annotated[CouponService, Depends(get_coupon_service)]
 CategoryDep = Annotated[CategoryService, Depends(get_category_service)]

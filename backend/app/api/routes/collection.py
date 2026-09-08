@@ -17,9 +17,18 @@ from app.services.cache import cacheable
 
 router = APIRouter()
 
+
 @router.get("/")
-@cacheable(key_prefix="collections", key_builder=lambda query: query if query else "all", tags=["collections"], cdn_ttl=604800, cdn_swr=86400)
-async def index(request: Request, db: DbDep, query: str = "") -> Optional[list[Collection]]:
+@cacheable(
+    key_prefix="collections",
+    key_builder=lambda query: query if query else "all",
+    tags=["collections"],
+    cdn_ttl=604800,
+    cdn_swr=86400,
+)
+async def index(
+    request: Request, db: DbDep, query: str = ""
+) -> Optional[list[Collection]]:
     """
     Retrieve collections with Redis caching.
     """
@@ -28,43 +37,32 @@ async def index(request: Request, db: DbDep, query: str = "") -> Optional[list[C
         where_clause = {
             "OR": [
                 {"name": {"contains": query, "mode": "insensitive"}},
-                {"slug": {"contains": query, "mode": "insensitive"}}
+                {"slug": {"contains": query, "mode": "insensitive"}},
             ]
         }
-    return await db.collection.find_many(where=where_clause, order={"created_at": "desc"})
+    return await db.collection.find_many(
+        where=where_clause, order={"created_at": "desc"}
+    )
 
 
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create(create_data: CollectionCreate, db: DbDep, srv: CollectionDep, bg_tasks: BackgroundTasks) -> Collection:
+async def create(
+    create_data: CollectionCreate,
+    db: DbDep,
+    srv: CollectionDep,
+    bg_tasks: BackgroundTasks,
+) -> Collection:
     """
     Create new collection.
     """
     try:
         collection = await db.collection.create(
-            data={
-                **create_data.model_dump(),
-                "slug": slugify(create_data.name)
-            }
+            data={**create_data.model_dump(), "slug": slugify(create_data.name)}
         )
         bg_tasks.add_task(srv.invalidate)
         return collection
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-
-
-@router.get("/{slug}")
-@cacheable(key_prefix="collection", key_builder=lambda slug: slug, cdn_ttl=604800, cdn_swr=86400)
-async def get_by_slug(request: Request, db: DbDep, slug: str) -> Collection:
-    """
-    Get a collection by its slug.
-    """
-    collection = await db.collection.find_unique(
-        where={"slug": slug}
-    )
-    if not collection:
-        raise HTTPException(status_code=404, detail="Collection not found")
-
-    return collection
 
 
 @router.patch("/{id}", dependencies=[Depends(require_admin)])
@@ -73,21 +71,18 @@ async def update(
     db: DbDep,
     srv: CollectionDep,
     update_data: CollectionUpdate,
-    bg_tasks: BackgroundTasks
+    bg_tasks: BackgroundTasks,
 ) -> Collection:
     """
     Update a collection.
     """
-    existing = await db.collection.find_unique(
-        where={"id": id}
-    )
+    existing = await db.collection.find_unique(where={"id": id})
     if not existing:
         raise HTTPException(status_code=404, detail="Collection not found")
 
     try:
         update = await db.collection.update(
-            where={"id": id},
-            data=update_data.model_dump()
+            where={"id": id}, data=update_data.model_dump()
         )
         bg_tasks.add_task(srv.invalidate, slug=update.slug)
         return update
@@ -96,13 +91,13 @@ async def update(
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete(id: int, db: DbDep, srv: CollectionDep, bg_tasks: BackgroundTasks) -> Message:
+async def delete(
+    id: int, db: DbDep, srv: CollectionDep, bg_tasks: BackgroundTasks
+) -> Message:
     """
     Delete a collection.
     """
-    existing = await db.collection.find_unique(
-        where={"id": id}
-    )
+    existing = await db.collection.find_unique(where={"id": id})
     if not existing:
         raise HTTPException(status_code=404, detail="Collection not found")
 

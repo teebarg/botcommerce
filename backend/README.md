@@ -12,7 +12,7 @@ A comprehensive, modern e-commerce backend built with **FastAPI**, **Prisma**, a
 
 ### Core E-commerce
 
-- **Product Management**: Catalog, categories, brands, collections, variants
+- **Product Management**: categories, brands, collections, variants
 - **Order Processing**: Cart management, checkout, order tracking, status updates
 - **User Management**: Authentication, profiles, addresses, wallet system
 - **Payment Integration**: Multiple payment gateways, transaction processing
