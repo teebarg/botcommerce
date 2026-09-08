@@ -85,7 +85,7 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
             sizes: new Set(search.sizes?.toString()?.split(",").filter(Boolean)),
             ages: new Set(search.ages?.split(",").filter(Boolean)),
             categories: new Set(search.cat_ids?.split(",").filter(Boolean)),
-            collections: typeof search.collections === "string" ? search.collections : undefined,
+            collections: new Set(typeof search.collections === "string" ? search.collections.split(",").filter(Boolean) : []),
             minPrice: search.min_price?.toString() ?? `${DEFAULT_MIN_PRICE}`,
             maxPrice: search.max_price?.toString() ?? `${DEFAULT_MAX_PRICE}`,
             width: search.width?.toString() ?? "",
@@ -127,7 +127,7 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
 
     const toggleDraftSet = (key: keyof DraftFilters) => (value: string) => {
         setDraft((prev) => {
-            const next = new Set(prev[key]);
+            const next = new Set(prev[key] as Set<string>);
 
             next.has(value) ? next.delete(value) : next.add(value);
 
@@ -141,6 +141,7 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
     const onToggleSize = toggleDraftSet("sizes");
     const onToggleAge = toggleDraftSet("ages");
     const onToggleCategory = toggleDraftSet("categories");
+    const onToggleCollection = toggleDraftSet("collections");
 
     const debouncedNormalizeRef = useMemo(
         () =>
@@ -172,7 +173,7 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
             { key: "sizes", value: [...draft.sizes].join(",") },
             { key: "ages", value: [...draft.ages].join(",") },
             { key: "cat_ids", value: [...draft.categories].join(",") },
-            { key: "collections", value: draft.collections },
+            { key: "collections", value: [...draft.collections].join(",") },
             { key: "min_price", value: minPrice },
             { key: "max_price", value: maxPrice },
             { key: "width", value: draft.width },
@@ -187,7 +188,7 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
             sizes: new Set(),
             ages: new Set(),
             categories: new Set(),
-            collections: "",
+            collections: new Set(),
             minPrice: DEFAULT_DRAFT.minPrice.toString(),
             maxPrice: DEFAULT_DRAFT.maxPrice.toString(),
             width: "",
@@ -205,15 +206,22 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
     return (
         <div className="space-y-6">
             <div className="flex flex-wrap gap-2">
-                {collections?.map((collection) => (
-                    <Badge
-                        key={collection.id}
-                        className="cursor-pointer py-1 text-sm"
-                        onClick={() => setDraft({ ...draft, collections: collection.slug })}
-                    >
-                        {collection.name}
-                    </Badge>
-                ))}
+                {collections?.map((collection) => {
+                    const isSelected = draft.collections.has(collection.slug);
+                    return (
+                        <Badge
+                            key={collection.id}
+                            className={`cursor-pointer py-1 text-sm transition-colors ${
+                                isSelected
+                                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                                    : "bg-secondary text-secondary-foreground hover:bg-muted"
+                            }`}
+                            onClick={() => onToggleCollection(collection.slug)}
+                        >
+                            {collection.name}
+                        </Badge>
+                    );
+                })}
             </div>
             <Collapsible open={openSections.categories} onOpenChange={() => toggleSection("categories")}>
                 <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
