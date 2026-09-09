@@ -39,6 +39,7 @@ class NotificationService:
         channels: Sequence[Channel],
     ) -> None:
         tasks = []
+        ordered_channels = []
 
         for channel in channels:
             match channel:
@@ -54,6 +55,7 @@ class NotificationService:
                         tasks.append(
                             self.email.send(mail)
                         )
+                        ordered_channels.append(channel)
 
                 case Channel.SLACK:
                     tasks.append(
@@ -61,6 +63,7 @@ class NotificationService:
                             notification.to_slack()
                         )
                     )
+                    ordered_channels.append(channel)
 
                 case Channel.PUSH:
                     tasks.append(
@@ -68,6 +71,7 @@ class NotificationService:
                             notification.to_push()
                         )
                     )
+                    ordered_channels.append(channel)
 
                 # case Channel.WHATSAPP:
                 #     tasks.append(
@@ -82,7 +86,7 @@ class NotificationService:
                     )
 
         if not tasks:
-            return
+            return {}
 
         results = await asyncio.gather(
             *tasks,
@@ -103,4 +107,4 @@ class NotificationService:
                 )
 
             raise errors[0]
-        return results
+        return dict(zip(ordered_channels, results))

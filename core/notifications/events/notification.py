@@ -14,7 +14,7 @@ class PushEvent(Notification):
     subscriptions: list[PushSubscription]
     title: str
     body: str
-    path: str | None = None
+    path: str | None = "/collections"
     imageUrl: str | None = None
     data: dict[str, Any] = None
 

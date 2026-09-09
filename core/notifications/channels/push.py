@@ -94,5 +94,4 @@ class PushChannel:
             *(self.send_one(details=push, subscription=sub) for sub in push.subscriptions),
             return_exceptions=True,
         )
-        print("🚀 ~ PushChannel ~ send ~ results:", results)
         return [result if isinstance(result, Exception) else None for result in results]

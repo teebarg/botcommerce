@@ -62,13 +62,7 @@ const config = defineConfig({
                     "assets/styles-*.css",
                     "assets/*.woff2",
                 ],
-                globIgnores: [
-                    "**/node_modules/**/*",
-                    "assets/account*",
-                    "assets/_adminLayout*",
-                    "assets/admin.*",
-                    "**/*.lazy-*.js",
-                ],
+                globIgnores: ["**/node_modules/**/*", "assets/account*", "assets/_adminLayout*", "assets/admin.*", "**/*.lazy-*.js"],
             },
             devOptions: {
                 enabled: false,
@@ -78,7 +72,7 @@ const config = defineConfig({
     ],
     resolve: {
         alias: {
-            'next/navigation': 'unenv/runtime/mock/proxy',
+            "next/navigation": "unenv/runtime/mock/proxy",
         },
     },
     build: {
@@ -88,7 +82,7 @@ const config = defineConfig({
             output: {
                 experimentalMinChunkSize: 5000,
                 manualChunks(id) {
-                    const filepath = id.replace(/\\/g, '/');
+                    const filepath = id.replace(/\\/g, "/");
                     if (filepath.includes("node_modules")) {
                         if (filepath.includes("lucide-react")) return "icons";
                         if (filepath.includes("@radix-ui")) return "radix";

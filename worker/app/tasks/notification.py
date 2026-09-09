@@ -26,22 +26,22 @@ async def process_push_notification(ctx, payload: dict, subscription_ids: list[s
                 ],
                 title=payload["title"],
                 body=payload["body"],
+                path=payload.get("path", "/collections"),
+                imageUrl=payload.get("imageUrl", None),
+                data=payload.get("data", {}),
             ),
             channels=[Channel.PUSH],
         )
-        for result in results:
-            if result is not None:
-               print([(type(r).__name__, type(r).__module__) for r in results if r is not None])
+        push_results = results.get(Channel.PUSH, [])
 
         expired_ids = [
             row["id"]
-            for row, result in zip(rows, results)
+            for row, result in zip(rows, push_results)
             if isinstance(result, PushSubscriptionExpired)
         ]
-        print("🚀 ~ process_push_notification ~ expired_ids:", expired_ids)
 
-        # if expired_ids:
-        #     await conn.execute(
-        #         "DELETE FROM push_subscriptions WHERE id = ANY($1::text[])",
-        #         expired_ids,
-        #     )
+        if expired_ids:
+            await conn.execute(
+                "DELETE FROM push_subscriptions WHERE id = ANY($1::text[])",
+                expired_ids,
+            )

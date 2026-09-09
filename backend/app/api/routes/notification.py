@@ -22,7 +22,7 @@ class PushEventSchema(BaseModel):
 class PushMessageSchema(BaseModel):
     title: str
     body: str
-    image: Optional[str] = None
+    imageUrl: Optional[str] = None
     path: Optional[str] = None
 
 
@@ -49,13 +49,7 @@ async def create_push_event(queue: ArqDep, data: PushEventSchema) -> Message:
 
 
 @router.post("/push-fcm")
-async def push_fcm(queue: ArqDep, db: DbDep, data: FCMIn, user: UserDep) -> Message:
-    await queue.enqueue_job(
-        "fcm",
-        endpoint=data.endpoint,
-        p256dh=data.p256dh,
-        auth=data.auth,
-    )
+async def push_fcm(db: DbDep, data: FCMIn, user: UserDep) -> Message:
     try:
         await db.pushsubscription.upsert(
             where={"endpoint": data.endpoint},
