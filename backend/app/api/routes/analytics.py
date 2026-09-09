@@ -50,7 +50,6 @@ def _daily_key(event: str, date_str: str) -> str:
 
 class EventIn(BaseModel):
     event: str
-    session_id: str
     url: str | None = None
     meta: dict[str, Any] | None = None
     ts: str | None = None

@@ -88,6 +88,7 @@ self.addEventListener("push", (event) => {
     } catch (err) {
         return;
     }
+    console.log("🚀 ~ data:", data);
 
     const options = {
         body: data.body,
