@@ -10,23 +10,6 @@ from core.notifications.base import Push, PushSubscription
 
 logger = get_logger(__name__)
 
-
-# @dataclass
-# class PushSubscription:
-#     endpoint: str
-#     p256dh: str
-#     auth: str
-
-
-# @dataclass
-# class Push:
-#     subscription: PushSubscription
-#     title: str
-#     body: str
-#     url: str | None = None
-#     icon: str | None = None
-#     data: dict[str, Any] = field(default_factory=dict)
-
 @dataclass
 class PushDetails:
     title: str
@@ -94,13 +77,13 @@ class PushChannel:
                 )
             except WebPushException as exc:
                 status = exc.response.status_code if exc.response is not None else None
- 
+
                 if status in (404, 410):
                     logger.info(
                         "Push subscription gone (%s): %s", status, subscription.endpoint
                     )
                     raise PushSubscriptionExpired(subscription) from exc
- 
+
                 logger.error("Push send failed (%s): %s", status, exc)
                 raise
 

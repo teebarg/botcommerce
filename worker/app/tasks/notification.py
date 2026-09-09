@@ -32,11 +32,6 @@ async def process_push_notification(ctx, payload: dict, subscription_ids: list[s
         for result in results:
             if result is not None:
                print([(type(r).__name__, type(r).__module__) for r in results if r is not None])
-        # test = zip(rows, results)
-        # for row, result in test:
-        #     print(row)
-        #     print(result)
-        #     print("....................")
 
         expired_ids = [
             row["id"]
