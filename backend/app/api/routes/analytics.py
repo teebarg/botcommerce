@@ -5,8 +5,12 @@ from fastapi import APIRouter, BackgroundTasks
 from pydantic import BaseModel
 
 from app.core.dependencies.cache import CacheDep
+from app.core.logging import get_logger
+from app.models.generic import Message
 
 router = APIRouter()
+
+logger = get_logger(__name__)
 
 FUNNELS: dict[str, list[str]] = {
     "push": [
@@ -55,7 +59,7 @@ class EventIn(BaseModel):
     ts: str | None = None
 
 
-@router.post("/event", status_code=204)
+@router.post("/event")
 async def record_event(
     payload: EventIn, cache_srv: CacheDep, background_tasks: BackgroundTasks
 ):
@@ -68,11 +72,12 @@ async def record_event(
                 pipe.incr(daily_key)
                 pipe.expire(daily_key, COUNTER_TTL_SECONDS)
                 await pipe.execute()
-        except Exception:
+        except Exception as e:
+            logger.error(f"Error recording event: {e}")
             pass
-        return
 
     background_tasks.add_task(log_event)
+    return Message(message="success")
 
 
 @router.get("/funnel/{name}")

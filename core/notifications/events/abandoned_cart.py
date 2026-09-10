@@ -43,7 +43,7 @@ class AbandonedCartEvent(Notification):
             path=self.path or "/collections",
             imageUrl=self.imageUrl,
             data={
-                "actionUrl": "/collections",
+                "actionUrl": self.path or "/collections",
             },
         )
 

@@ -1,10 +1,8 @@
-from typing import Any
-
-from sqlalchemy.orm import selectinload
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
-from core.db.models.base import Cart, CartItem, ProductVariant, Product
+from core.db.models.base import Cart, CartItem, Product, ProductVariant
 from core.repositories.base_repository import BaseRepository
 
 

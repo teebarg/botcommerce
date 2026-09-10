@@ -8,9 +8,7 @@ export const Route = createFileRoute("/api/push-event")({
         handlers: {
             POST: async ({ request }) => {
                 const data = await request.json();
-                console.log("🚀 ~ data:", data);
                 const result = await tryCatch(api.post<Message>("/analytics/event", data));
-                console.log("🚀 ~ result:", result);
                 return Response.json(result);
             },
         },

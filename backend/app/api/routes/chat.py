@@ -1,17 +1,25 @@
-from fastapi import APIRouter, HTTPException, Query, Request, Depends
-from prisma.enums import ConversationStatus
-from typing import Optional
-from app.models.chat import ChatCloseRequest, PaginatedChats, Chat, ChatRequest, ChatHandoffRequest
-from app.models.generic import Message
-from app.services.websocket import manager
-from app.core.deps import CurrentUser
 from datetime import datetime
-from app.core.permissions import require_admin
-from app.core.dependencies.services import ConversationDep
-from app.services.cache import cacheable
+from typing import Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from prisma.enums import ConversationStatus
+
 from app.core.dependencies.cache import CacheDep
-from app.prisma_client import DbDep
+from app.core.dependencies.services import ConversationDep
+from app.core.deps import CurrentUser
 from app.core.logging import get_logger
+from app.core.permissions import require_admin
+from app.models.chat import (
+    Chat,
+    ChatCloseRequest,
+    ChatHandoffRequest,
+    ChatRequest,
+    PaginatedChats,
+)
+from app.models.generic import Message
+from app.prisma_client import DbDep
+from app.services.cache import cacheable
+from app.services.websocket import manager
 
 logger = get_logger(__name__)
 

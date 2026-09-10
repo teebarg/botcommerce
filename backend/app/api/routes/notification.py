@@ -1,8 +1,6 @@
-from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter
-from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 
 from app.core.dependencies.cache import ArqDep
@@ -10,13 +8,6 @@ from app.core.deps import UserDep
 from app.core.logging import get_logger
 from app.models.generic import Message
 from app.prisma_client import DbDep
-
-
-class PushEventSchema(BaseModel):
-    userAgent: Optional[str] = None
-    deliveredAt: Optional[datetime] = None
-    title: Optional[str] = None
-    body: Optional[str] = None
 
 
 class PushMessageSchema(BaseModel):
@@ -35,17 +26,6 @@ class FCMIn(BaseModel):
 logger = get_logger(__name__)
 
 router = APIRouter()
-
-
-@router.post("/push-event")
-async def create_push_event(queue: ArqDep, data: PushEventSchema) -> Message:
-    try:
-        await queue.enqueue_job(
-            "push_event_analytics", data=jsonable_encoder(data, exclude_none=True)
-        )
-    except Exception as e:
-        logger.error(f"Error creating push event: {e}")
-    return Message(message="success")
 
 
 @router.post("/push-fcm")

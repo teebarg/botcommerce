@@ -1,10 +1,8 @@
-import { notFound, redirect } from "@tanstack/react-router";
+import { redirect } from "@tanstack/react-router";
 
 const isServer = typeof window === "undefined";
 
-export const baseURL = isServer
-    ? (process.env.API_URL || "http://backend:8000")
-    : (import.meta.env.VITE_API_URL || "https://api.shop.localhost");
+export const baseURL = isServer ? process.env.API_URL || "http://backend:8000" : import.meta.env.VITE_API_URL || "https://api.shop.localhost";
 
 type RequestOptions = RequestInit & {
     params?: Record<string, string | number | boolean | null | undefined | object | unknown>;
@@ -44,7 +42,7 @@ async function executeRequest<T>(endpoint: string, options: RequestOptions = {})
 
             const host = serverReq.headers.get("host");
             if (host) headersInstance.set("Host", host);
-          }
+        }
     } else {
         // Client-side execution context parameters
         restOptions.credentials = "include";
@@ -59,10 +57,6 @@ async function executeRequest<T>(endpoint: string, options: RequestOptions = {})
     if (response.status === 403) {
         throw redirect({ to: "/forbidden" });
     }
-
-    // if (response.status === 404) {
-    //     throw notFound();
-    // }
 
     if (response.status === 401) {
         throw redirect({
@@ -88,8 +82,7 @@ async function executeRequest<T>(endpoint: string, options: RequestOptions = {})
 }
 
 export const api = {
-    get: <T>(endpoint: string, options?: RequestOptions) =>
-        executeRequest<T>(endpoint, { ...options, method: "GET" }),
+    get: <T>(endpoint: string, options?: RequestOptions) => executeRequest<T>(endpoint, { ...options, method: "GET" }),
 
     post: <T>(endpoint: string, data?: unknown, options?: RequestOptions) =>
         executeRequest<T>(endpoint, { ...options, method: "POST", body: JSON.stringify(data) }),
@@ -100,6 +93,5 @@ export const api = {
     put: <T>(endpoint: string, data?: unknown, options?: RequestOptions) =>
         executeRequest<T>(endpoint, { ...options, method: "PUT", body: JSON.stringify(data) }),
 
-    delete: <T>(endpoint: string, options?: RequestOptions) =>
-        executeRequest<T>(endpoint, { ...options, method: "DELETE" }),
+    delete: <T>(endpoint: string, options?: RequestOptions) => executeRequest<T>(endpoint, { ...options, method: "DELETE" }),
 };

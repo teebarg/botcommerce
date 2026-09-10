@@ -192,15 +192,11 @@ export default function PushPermission() {
             if (perm != "granted") return;
 
             const registration = await navigator.serviceWorker.ready;
-            console.log("🚀 ~ subscribeToPush ~ registration:", registration);
-            const key = urlBase64ToUint8Array(import.meta.env.VITE_VAPID_PUBLIC_KEY);
-            console.log(key.length, key[0]); // expect 65, 4
             const sub = await registration.pushManager.subscribe({
                 userVisibleOnly: true,
                 // @ts-expect-error -- Suppress TS2322 for BufferSource mismatch
                 applicationServerKey: urlBase64ToUint8Array(import.meta.env.VITE_VAPID_PUBLIC_KEY!),
             });
-            console.log("🚀 ~ subscribeToPush ~ sub:", sub);
 
             const synced = await syncSubscriptionToBackend(sub);
             if (!synced) {
@@ -209,7 +205,6 @@ export default function PushPermission() {
             }
             track("push_subscribed");
         } catch (err) {
-            console.log("🚀 ~ subscribeToPush ~ err:", err);
             track("push_subscribe_failed", { message: err instanceof Error ? err.message : String(err) });
             toast.error("Couldn't turn on notifications. Please try again.");
         } finally {

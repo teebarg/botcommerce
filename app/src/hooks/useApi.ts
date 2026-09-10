@@ -65,7 +65,7 @@ export const useChatHandOff = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["chats"] });
-            toast.success("Chat handed off successfully");
+            toast.success("chat handed off");
         },
         onError: (error) => {
             toast.error("Failed to handoff chat" + error);
@@ -80,7 +80,7 @@ export const useDeleteChat = () => {
         mutationFn: async (id: number) => await api.delete<Message>(`/chat/${id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["chats"] });
-            toast.success("Chat deleted successfully");
+            toast.success("chat deleted");
         },
         onError: (error) => {
             toast.error("Failed to delete chat" + error);
@@ -90,15 +90,15 @@ export const useDeleteChat = () => {
 
 export const useSendPushNotification = () => {
     return useMutation({
-        mutationFn: async ({ title, body, image, path }: { title: string; body: string; image?: string; path?: string }) =>
+        mutationFn: async ({ title, body, imageUrl, path }: { title: string; body: string; imageUrl?: string; path?: string }) =>
             await api.post<Message>("/notification/push", {
                 title,
                 body,
-                image,
+                imageUrl,
                 path,
             }),
         onSuccess: () => {
-            toast.success("Push notification sent successfully");
+            toast.success("push message sent");
         },
         onError: (error) => {
             toast.error("Failed to send push notification" + error);
