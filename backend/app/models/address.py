@@ -1,7 +1,9 @@
 from datetime import datetime
+
 from pydantic import BaseModel, Field
-from prisma.enums import AddressType
-from app.lib.validation import PhoneNumber, RequiredString, OptionalString
+
+from app.lib.validation import OptionalString, PhoneNumber, RequiredString
+
 
 class Address(BaseModel):
     id: int
@@ -9,7 +11,6 @@ class Address(BaseModel):
     last_name: str | None
     address_1: str
     address_2: str | None
-    address_type: AddressType | None
     label: str | None
     state: str | None
     phone: str | None
@@ -19,7 +20,6 @@ class Address(BaseModel):
         from_attributes = True
 
 class AddressBase(BaseModel):
-    address_type: AddressType | None = None
     label: OptionalString = Field(default=None, max_length=255)
     address_2: OptionalString = Field(default=None, max_length=1255)
     last_name: OptionalString = Field(default=None, max_length=255)

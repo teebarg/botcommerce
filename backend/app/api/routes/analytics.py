@@ -31,13 +31,8 @@ FUNNELS: dict[str, list[str]] = {
         "push_message_dismissed",
     ],
     "sales": [
-        "product_viewed",
         "product_added_to_cart",
-        "cart_viewed",
         "checkout_started",
-        "checkout_address_submitted",
-        "checkout_payment_submitted",
-        "order_placed",
     ],
 }
 

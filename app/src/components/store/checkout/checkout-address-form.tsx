@@ -23,7 +23,6 @@ const CheckoutAddressForm: React.FC<Props> = ({ onClose }) => {
     const form = useForm<FormValues>({
         resolver: zodResolver(addressSchema),
         defaultValues: {
-            address_type: "HOME",
             first_name: "",
             last_name: "",
             address_1: "",

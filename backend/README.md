@@ -23,7 +23,7 @@ A comprehensive, modern e-commerce backend built with **FastAPI**, **Prisma**, a
 - **Real-time Notifications**: WebSockets, push notifications, email alerts
 - **Search & Discovery**: MeiliSearch integration, advanced filtering
 - **Content Management**: CMS, galleries, FAQs
-- **Analytics & Insights**: User interactions, activity tracking
+- **Analytics & Insights**: Activity tracking
 - **Multi-vendor Support**: Brand management, store settings
 - **Coupon System**: Discount codes, promotions, loyalty programs
 

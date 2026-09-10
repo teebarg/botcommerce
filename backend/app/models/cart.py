@@ -12,7 +12,6 @@ class CartAddress(BaseModel):
     id: Optional[int] = None
     first_name: str
     last_name: str
-    address_type: Optional[str]
     label: Optional[str] = None
     address_1: str
     address_2: Optional[str] = None
@@ -26,7 +25,6 @@ class CartItemCreate(BaseModel):
 class CartUpdate(BaseModel):
     shipping_fee: Optional[float] = None
     shipping_address: Optional[CartAddress] = None
-    billing_address: Optional[CartAddress] = None
     email: Optional[EmailStr] = None
     phone: PhoneNumber = None
     shipping_method: Optional[int] = None

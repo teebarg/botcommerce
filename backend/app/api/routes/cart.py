@@ -203,7 +203,6 @@ async def update_cart(
                 )
 
             update_data["shipping_address"] = {"connect": {"id": address.id}}
-            update_data["billing_address"] = {"connect": {"id": address.id}}
 
             await srv.cache_srv.invalidate(
                 tags=[f"addresses:{user.id if user else 'guest'}"]

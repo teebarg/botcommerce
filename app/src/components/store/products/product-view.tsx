@@ -1,5 +1,5 @@
 import type React from "react";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { currency } from "@/utils";
@@ -11,7 +11,6 @@ import { ProductVariantActions } from "@/components/products/product-variant-act
 import ShareButton from "@/components/share";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { useOverlayTriggerState } from "react-stately";
-import { track } from "@/lib/analytics";
 import { defaultVariant } from "@/lib/variant";
 import { WishlistButton } from "./WishlistButton";
 import { ProductImage as ProductImageComponent } from "./ProductImage";
@@ -53,10 +52,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
             })
             .finally(() => confirmState.close());
     };
-
-    useEffect(() => {
-        track("product_viewed", { product_id: product.id });
-    }, [product.id]);
 
     return (
         <div className="max-w-6xl mx-auto w-full md:py-8 md:px-4 md:grid md:grid-cols-2 md:gap-8 md:items-start">

@@ -59,7 +59,6 @@ async def seed_users():
             data={
                 "user_id": user.id,
                 "label": "Home",
-                "address_type": "HOME",
                 "first_name": u["first_name"],
                 "last_name": u["last_name"],
                 "address_1": fake.street_address(),
@@ -310,7 +309,6 @@ async def seed_cart_and_order(users, products):
                 "subtotal": variant_a.price,
                 "total": variant_a.price,
                 "shipping_address_id": address.id,
-                "billing_address_id": address.id,
             },
             "update": {"status": "ACTIVE"},
         },
@@ -337,7 +335,6 @@ async def seed_cart_and_order(users, products):
                 "user_id": customer.id,
                 "email": customer.email,
                 "shipping_address_id": address.id,
-                "billing_address_id": address.id,
                 "subtotal": variant_b.price,
                 "tax": round(variant_b.price * 0.075, 2),
                 "shipping_fee": 3000,

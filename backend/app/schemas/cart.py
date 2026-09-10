@@ -36,7 +36,6 @@ class CartAddress(BaseModel):
     id: Optional[int] = None
     first_name: str
     last_name: str
-    address_type: Optional[str]
     label: Optional[str] = None
     address_1: str
     address_2: Optional[str] = None
