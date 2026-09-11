@@ -8,7 +8,7 @@ export const useDeleteActivity = () => {
         mutationFn: async (id: number) => await api.delete<void>(`/activities/${id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["activities"] })
-            toast.success("Activity deleted successfully");
+            toast.success("Activity deleted");
         },
         onError: (error) => {
             toast.error("Failed " + error);

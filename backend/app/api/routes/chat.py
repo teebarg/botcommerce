@@ -48,7 +48,7 @@ async def admin_chat(payload: ChatRequest, db: DbDep, cache: CacheDep, srv: Conv
     customer = await cache.get(f"chat_user:{payload.conversation_uuid}")
     if not customer:
         logger.warning(f"No customer connected for conversation {payload.conversation_uuid}")
-        return Message(message="message sent successfully")
+        return Message(message="message sent")
 
     customer = customer.decode() if isinstance(customer, bytes) else customer
 
@@ -58,7 +58,7 @@ async def admin_chat(payload: ChatRequest, db: DbDep, cache: CacheDep, srv: Conv
         message_type="chat",
     )
 
-    return Message(message="message sent successfully")
+    return Message(message="message sent")
 
 
 @router.post("/")
@@ -83,7 +83,7 @@ async def customer_chat(payload: ChatRequest, db: DbDep, cache: CacheDep, srv: C
         message_type="chat",
     )
 
-    return Message(message="message sent successfully")
+    return Message(message="message sent")
 
 
 @router.post("/handoff", dependencies=[Depends(require_admin)])
@@ -108,7 +108,7 @@ async def handoff(payload: ChatHandoffRequest, db: DbDep, cache: CacheDep, user:
         message_type="chat",
     )
 
-    return Message(message="Handoff request sent successfully")
+    return Message(message="Handoff request sent")
 
 @router.get("/", dependencies=[Depends(require_admin)])
 @cacheable(key_prefix="chats", tags=["chats"])
@@ -165,7 +165,7 @@ async def delete_chat(id: int, db: DbDep, cache: CacheDep) -> Message:
         await tx.message.delete_many(where={"conversation_id": id})
         await tx.conversation.delete(where={"id": id})
         await cache.invalidate(f"chat:{id}", tags=["chats"])
-        return {"message": "conversation deleted successfully"}
+        return {"message": "conversation deleted"}
 
 
 @router.post("/status")
@@ -179,4 +179,4 @@ async def status(payload: ChatCloseRequest, db: DbDep, cache: CacheDep, srv: Con
 
     await cache.invalidate(f"chat:{payload.conversation_uuid}", tags=["chats"])
 
-    return Message(message="Chat status updated successfully")
+    return Message(message="Chat status updated")

@@ -63,6 +63,6 @@ async def delete_activity(id: int, db: DbDep, user: CurrentUser, cache: CacheDep
 
         await db.activitylog.delete(where=whereQuery)
         await cache.invalidate(f"activity:{user.id}", tags=["activities"])
-        return Message(message="Activity deleted successfully")
+        return Message(message="Activity deleted")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

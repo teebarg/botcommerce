@@ -46,7 +46,7 @@ const PaymentLoading: React.FC = () => {
                     <div className="flex flex-col">
                         <ProcessStep
                             title="Payment received"
-                            description="Your payment has been successfully received"
+                            description="Your payment has been received"
                             status="completed"
                             isLast={false}
                         />

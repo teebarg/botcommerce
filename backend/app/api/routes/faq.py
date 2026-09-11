@@ -88,4 +88,4 @@ async def delete_faq(db: DbDep, cache: CacheDep, id: int)-> Message:
 
     await db.faq.delete(where={"id": id})
     await cache.invalidate(tags=["faqs"])
-    return Message(message="FAQ deleted successfully")
+    return Message(message="FAQ deleted")

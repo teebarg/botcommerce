@@ -18,7 +18,7 @@ class OrderCreated(Notification):
     total: float
 
     def to_email(self) -> Mail:
-        header_title = "Your order has been created successfully"
+        header_title = "Your order has been created"
         template_name = "paid_invoice.html"
 
         if self.order.payment_method == "CASH_ON_DELIVERY":

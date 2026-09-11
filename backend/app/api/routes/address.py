@@ -135,7 +135,7 @@ async def delete(id: int, db: DbDep, user: CurrentUser, cache: CacheDep) -> Mess
 
         await cache.invalidate(tags=[f"addresses:{user.id}"])
 
-        return Message(message="Address deleted successfully")
+        return Message(message="Address deleted")
     except PrismaError as e:
         logger.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e))

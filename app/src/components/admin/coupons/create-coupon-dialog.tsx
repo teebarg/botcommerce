@@ -62,7 +62,7 @@ export const CreateCouponDialog = () => {
             await createMutation.mutateAsync(backendData);
 
             toast.success("Coupon Created", {
-                description: `"${data.code}" has been created successfully`,
+                description: `"${data.code}" has been created`,
             });
 
             form.reset();

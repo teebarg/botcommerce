@@ -71,7 +71,7 @@ function RouteComponent() {
 
             return;
         }
-        toast.success("Profile updated successfully");
+        toast.success("Profile updated");
         setEditingSection(null);
         setIsPending(false);
     };

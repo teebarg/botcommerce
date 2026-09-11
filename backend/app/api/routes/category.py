@@ -88,7 +88,7 @@ async def reorder_categories(data: BulkOrderUpdate, db: DbDep, srv: CategoryDep,
                         data={"display_order": category_update.display_order}
                     )
             bg_tasks.add_task(srv.invalidate)
-            return {"message": "categories reordered successfully"}
+            return {"message": "categories reordered"}
         except Exception as e:
             logger.error(f"Failed to reorder categories: {str(e)}")
             raise HTTPException(status_code=400, detail=str(e))
@@ -99,7 +99,7 @@ async def update(
     id: int,
     update_data: CategoryUpdate,
     db: DbDep,
-    srv: CategoryDep, 
+    srv: CategoryDep,
     bg_tasks: BackgroundTasks
 ) -> Category:
     """
@@ -135,7 +135,7 @@ async def delete(id: int, db: DbDep, srv: CategoryDep, bg_tasks: BackgroundTasks
     try:
         await db.category.delete(where={"id": id})
         bg_tasks.add_task(srv.invalidate)
-        return Message(message="Category deleted successfully")
+        return Message(message="Category deleted")
     except PrismaError as e:
         logger.error(f"Failed to delete category: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -193,7 +193,7 @@ async def delete_image(id: int, db: DbDep, srv: CategoryDep, storage_srv: Storag
             data={"image": None}
         )
         bg_tasks.add_task(srv.invalidate)
-        return Message(message="Category image deleted successfully")
+        return Message(message="Category image deleted")
 
     except Exception as e:
         logger.error(f"Failed to delete image: {str(e)}")

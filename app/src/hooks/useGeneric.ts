@@ -9,7 +9,7 @@ export const useSyncShopDetails = () => {
     return useMutation({
         mutationFn: async (input: Record<string, string>) => await api.patch<ShopSettings>("/shop-settings/", input),
         onSuccess: () => {
-            toast.success("Shop details synced successfully");
+            toast.success("Shop details synced");
         },
         onError: (error) => {
             toast.error("Failed to sync shop details" + error.message);
@@ -21,7 +21,7 @@ export const useSubscribeNewsletter = () => {
     return useMutation({
         mutationFn: async (data: { email: string }) => await api.post<Message>(`/newsletter`, data),
         onSuccess: () => {
-            toast.success("Successfully subscribed to newsletter");
+            toast.success("subscribed to newsletter");
         },
         onError: (error) => {
             toast.error("Failed to subscribe to newsletter" + error);
@@ -33,7 +33,7 @@ export const useContactForm = () => {
     return useMutation({
         mutationFn: async (data: ContactFormValues) => await api.post<Message>("/contact-form", data),
         onSuccess: () => {
-            toast.success("Successfully sent message");
+            toast.success("message sent");
         },
         onError: (error) => {
             toast.error("Failed to send message" + error);

@@ -34,7 +34,7 @@ export const useDeleteUser = () => {
     return useMutation({
         mutationFn: async (id: number) => await api.delete<User>(`/users/${id}`),
         onSuccess: () => {
-            toast.success("User deleted successfully");
+            toast.success("User deleted");
         },
         onError: (error) => {
             toast.error("Failed to delete user" + error);

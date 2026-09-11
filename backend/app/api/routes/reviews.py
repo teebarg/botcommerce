@@ -208,6 +208,6 @@ async def delete(id: int, db: DbDep, srv: ReviewDep, bg_tasks: BackgroundTasks) 
             where={"id": id}
         )
         bg_tasks.add_task(srv.invalidate)
-        return Message(message="Review deleted successfully")
+        return Message(message="Review deleted")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

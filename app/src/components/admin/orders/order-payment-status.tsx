@@ -15,7 +15,7 @@ interface PaymentStatusManagerProps {
 
 const statusConfig: Record<PaymentStatus, { icon: React.ElementType; label: string; description: string }> = {
     PENDING: { icon: Clock, label: "Pending", description: "Payment is being processed" },
-    SUCCESS: { icon: CheckCircle, label: "Paid", description: "Payment completed successfully" },
+    SUCCESS: { icon: CheckCircle, label: "Paid", description: "Payment completed" },
     FAILED: { icon: X, label: "Failed", description: "Payment was unsuccessful" },
     REFUNDED: { icon: RotateCcw, label: "Refunded", description: "Payment has been refunded" },
 };

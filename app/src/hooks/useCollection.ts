@@ -16,7 +16,7 @@ export const useCreateCollection = () => {
     return useMutation({
         mutationFn: async (data: CollectionFormValues) => await api.post<Collection>("/collection/", data),
         onSuccess: () => {
-            toast.success("Collection created successfully");
+            toast.success("collection created");
         },
         onError: (error) => {
             toast.error("Failed to create collection" + error);
@@ -28,7 +28,7 @@ export const useUpdateCollection = () => {
     return useMutation({
         mutationFn: async ({ id, data }: { id: number; data: CollectionFormValues }) => await api.patch<Collection>(`/collection/${id}`, data),
         onSuccess: () => {
-            toast.success("Collection updated successfully");
+            toast.success("collection updated");
         },
         onError: (error) => {
             toast.error("Failed to update collection" + error);
@@ -40,7 +40,7 @@ export const useDeleteCollection = () => {
     return useMutation({
         mutationFn: async (id: number) => await api.delete<Collection>(`/collection/${id}`),
         onSuccess: () => {
-            toast.success("Collection deleted successfully");
+            toast.success("collection deleted");
         },
         onError: (error) => {
             toast.error("Failed to delete collection" + error);

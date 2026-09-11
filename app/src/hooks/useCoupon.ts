@@ -34,7 +34,7 @@ export const useUpdateCoupon = () => {
     return useMutation({
         mutationFn: async ({ id, data }: UpdateCouponInput) => await api.patch<Coupon>(`/coupon/${id}`, data),
         onSuccess: () => {
-            toast.success("Coupon updated successfully");
+            toast.success("coupon updated");
         },
         onError: (error: any) => {
             toast.error("Failed to update coupon: " + (error?.message || "Unknown error"));
@@ -46,7 +46,7 @@ export const useDeleteCoupon = () => {
     return useMutation({
         mutationFn: async (id: number) => await api.delete<void>(`/coupon/${id}`),
         onSuccess: () => {
-            toast.success("Coupon deleted successfully");
+            toast.success("coupon deleted");
         },
         onError: (error: any) => {
             toast.error("Failed to delete coupon: " + (error?.message || "Unknown error"));
@@ -61,7 +61,7 @@ export const useApplyCoupon = () => {
         mutationFn: async (code: string) => await api.post<Coupon>("/coupon/apply", null, { params: { code } }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cart"] });
-            toast.success("Coupon applied successfully");
+            toast.success("coupon applied");
         },
         onError: (error: any) => {
             const message = error?.message || "Failed to apply coupon";
@@ -79,7 +79,7 @@ export const useRemoveCoupon = () => {
         mutationFn: async () => await api.post<void>("/coupon/remove"),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cart"] });
-            toast.success("Coupon removed successfully");
+            toast.success("coupon removed");
         },
         onError: (error: any) => {
             toast.error(error?.message || "Failed to remove coupon");

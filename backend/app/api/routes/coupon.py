@@ -132,7 +132,7 @@ async def delete_coupon(id: int, srv: CouponDep, db: DbDep, cache: CacheDep):
     try:
         await db.coupon.delete(where={"id": id})
         await cache.invalidate(tags=["coupons"])
-        return {"message": "Coupon deleted successfully"}
+        return {"message": "Coupon deleted"}
     except PrismaError as e:
         logger.error(f"Error deleting coupon: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -162,7 +162,7 @@ async def apply_coupon(
 
     await srv.apply_coupon_to_cart(coupon, cart)
     await cache.invalidate(tags=["abandoned-carts", "coupons"])
-    return Message(message="Coupon applied successfully")
+    return Message(message="Coupon applied")
 
 
 @router.post("/remove", response_model=dict)
@@ -188,7 +188,7 @@ async def remove_coupon(
 
     await cache.invalidate(tags=["abandoned-carts", "coupons"])
 
-    return {"message": "Coupon removed successfully"}
+    return {"message": "Coupon removed"}
 
 
 @router.post("/{id}/assign", dependencies=[Depends(require_admin)])
@@ -208,7 +208,7 @@ async def assign_coupon(id: int, srv: CouponDep, db: DbDep, cache: CacheDep, use
         await db.coupon.update(where={"id": id}, data=update_data)
 
         await cache.invalidate(tags=["coupons"])
-        return {"message": f"Coupon shared with {len(user_ids)} user(s) successfully"}
+        return {"message": f"Coupon shared with {len(user_ids)} user(s)"}
     except PrismaError as e:
         logger.error(f"Error sharing coupon: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

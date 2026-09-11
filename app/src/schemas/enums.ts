@@ -11,7 +11,6 @@ export const MessageSenderSchema = z.enum(["USER", "BOT", "SYSTEM"]);
 export const SortBySchema = z.enum(["newest", "oldest", "highest", "lowest"]);
 
 export type DiscountType = z.infer<typeof DiscountTypeSchema>;
-export type CartStatus = z.infer<typeof CartStatusSchema>;
 export type PaymentStatus = z.infer<typeof PaymentStatusSchema>;
 export type ShippingMethod = z.infer<typeof ShippingMethodSchema>;
 export type Role = z.infer<typeof RoleSchema>;

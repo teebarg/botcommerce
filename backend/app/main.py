@@ -170,13 +170,13 @@ async def contact_form(queue: ArqDep, data: ContactFormCreate):
         "contact_form",
         name=data.name, email=data.email, phone=data.phone or "", message=data.message
     )
-    return {"message": "Message sent successfully"}
+    return {"message": "Message sent"}
 
 
 @app.post("/api/newsletter")
 async def newsletter(queue: ArqDep, data: NewsletterCreate):
     await queue.enqueue_job("process_newsletter", email=data.email)
-    return {"message": "Email sent successfully"}
+    return {"message": "Email sent"}
 
 
 @app.post("/api/bulk-purchase")
@@ -185,7 +185,7 @@ async def bulk_purchase(queue: ArqDep, data: BulkPurchaseCreate):
         "process_bulk_purchase",
         name=data.name, email=data.email, phone=data.phone or "", message=data.message, bulkType=data.bulkType, quantity=data.quantity,
     )
-    return {"message": "Bulk purchase inquiry submitted successfully"}
+    return {"message": "Bulk purchase inquiry submitted"}
 
 
 class ErrorPayload(BaseModel):
@@ -212,7 +212,7 @@ async def log_error(payload: ErrorPayload, request: Request, background_tasks: B
     async def send_slack_task():
         logger.critical(slack_message)
     background_tasks.add_task(send_slack_task)
-    return {"message": "Error logged successfully"}
+    return {"message": "Error logged"}
 
 
 @app.get("/api/sitemap.xml", response_class=Response)

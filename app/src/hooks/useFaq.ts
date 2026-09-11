@@ -8,7 +8,7 @@ export const useCreateFaq = () => {
     return useMutation({
         mutationFn: async (data: FaqFormValues) => api.post<Message>("/faq/", data),
         onSuccess: () => {
-            toast.success("FAQ created successfully");
+            toast.success("FAQ created");
         },
         onError: (error) => {
             toast.error("Failed to create FAQ" + error);
@@ -20,7 +20,7 @@ export const useUpdateFaq = () => {
     return useMutation({
         mutationFn: async ({ id, data }: { id: number; data: FaqFormValues }) => await api.patch<Message>(`/faq/${id}`, data),
         onSuccess: () => {
-            toast.success("FAQ updated successfully");
+            toast.success("FAQ updated");
         },
         onError: (error) => {
             toast.error("Failed to update FAQ" + error);
@@ -32,7 +32,7 @@ export const useDeleteFaq = () => {
     return useMutation({
         mutationFn: async (id: number) => await api.delete<FAQ>(`/faq/${id}`),
         onSuccess: () => {
-            toast.success("FAQ deleted successfully");
+            toast.success("FAQ deleted");
         },
         onError: (error) => {
             toast.error("Failed to delete FAQ" + error);

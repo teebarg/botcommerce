@@ -124,7 +124,7 @@ async def delete_cart_item(
 
     await db.cartitem.delete(where={"id": item_id})
     await srv.touch(cart_id=cart.id)
-    return {"message": "Item removed from cart successfully"}
+    return {"message": "Item removed from cart"}
 
 
 @router.put("/items/{item_id}", response_model=CartItem)
@@ -208,8 +208,6 @@ async def update_cart(
                 tags=[f"addresses:{user.id if user else 'guest'}"]
             )
 
-        if cart_update.status is not None:
-            update_data["status"] = cart_update.status
         if cart_update.email is not None:
             update_data["email"] = cart_update.email
         if cart_update.phone is not None:
@@ -255,7 +253,7 @@ async def apply_wallet(
         )
 
     await srv.apply_wallet_balance(cart=cart, user=user)
-    return Message(message="Wallet balance applied successfully")
+    return Message(message="Wallet balance applied")
 
 
 @router.post("/remove-wallet")

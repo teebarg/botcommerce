@@ -57,7 +57,7 @@ function RouteComponent() {
     useWebSocketMessage((msg) => {
         if (msg.type === "image_upload") {
             if (msg.status === "completed") {
-                toast.success("Products uploaded successfully");
+                toast.success("Products uploaded");
                 setIsLoading(false);
             } else if (msg.status === "processing" && !isLoading) {
                 setIsLoading(true);
@@ -72,7 +72,7 @@ function RouteComponent() {
             if (msg.status === "completed") {
                 toast.success("Requested Action Completed", {
                     id: BULK_ACTION_TOAST_ID,
-                    description: "Data updated successfully"
+                    description: "Data updated"
                 });
                 setSelectionMode(false);
                 setSelectedImages(new Set());

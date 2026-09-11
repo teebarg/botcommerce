@@ -182,7 +182,7 @@ async def delete(id: int, db: DbDep, cache_srv: CacheDep) -> Message:
     try:
         await db.user.delete(where={"id": id})
         await cache_srv.invalidate(tags=["users"])
-        return Message(message="User deleted successfully")
+        return Message(message="User deleted")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
@@ -230,6 +230,6 @@ async def remove_wishlist_item(
             where={"user_id_product_id": {"user_id": user.id, "product_id": product_id}}
         )
         await cache.invalidate(tags=[f"wishlist:{user.id}"])
-        return Message(message="Product deleted successfully")
+        return Message(message="Product deleted")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

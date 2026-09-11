@@ -15,7 +15,7 @@ export const useCreateCategory = () => {
     return useMutation({
         mutationFn: async (data: CategoryFormValues) => await api.post<Category>("/category/", data),
         onSuccess: () => {
-            toast.success("Category created successfully");
+            toast.success("category created");
         },
         onError: (error) => {
             toast.error("Failed to create category" + error);
@@ -27,7 +27,7 @@ export const useUpdateCategory = () => {
     return useMutation({
         mutationFn: async ({ id, data }: { id: number; data: CategoryFormValues }) => await api.patch<Category>(`/category/${id}`, data),
         onSuccess: () => {
-            toast.success("Category updated successfully");
+            toast.success("category updated");
         },
         onError: (error) => {
             toast.error("Failed to update category" + error);
@@ -39,7 +39,7 @@ export const useDeleteCategory = () => {
     return useMutation({
         mutationFn: async (id: number) => await api.delete<Category>(`/category/${id}`),
         onSuccess: () => {
-            toast.success("Category deleted successfully");
+            toast.success("category deleted");
         },
         onError: (error) => {
             toast.error("Failed to delete category" + error);
@@ -52,7 +52,7 @@ export const useReorderCategories = () => {
         mutationFn: async (data: { id: number; display_order: number }[]) =>
             await api.patch<Category>(`/category/reorder`, { categories: data }),
         onSuccess: () => {
-            toast.success("Category reordered successfully");
+            toast.success("category reordered");
         },
         onError: (error) => {
             toast.error("Failed to reorder category" + error);

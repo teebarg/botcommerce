@@ -17,7 +17,7 @@ export const useCreateAddress = () => {
     return useMutation({
         mutationFn: async (input: any) => await api.post<Address>("/address/", input),
         onSuccess: () => {
-            toast.success("Address successfully created");
+            toast.success("address created");
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to create address");
@@ -31,7 +31,7 @@ export const useUpdateAddress = () => {
         mutationFn: async ({ id, input }: { id: number; input: any }) => await api.patch<Address>(`/address/${id}`, input),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cart"] })
-            toast.success("Address successfully updated");
+            toast.success("address updated");
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to update address");
@@ -45,7 +45,6 @@ export const useDeleteAddress = () => {
         mutationFn: async (id: number) => await api.delete<Message>(`/address/${id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cart"] })
-            toast.success("Address successfully deleted");
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to delete address");
