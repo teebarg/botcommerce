@@ -1,10 +1,5 @@
-from datetime import datetime, timedelta
-import uuid
-from app.db import session_factory
-from core.notifications import Channel, TestCreated, Welcome
-from core.repositories.coupon_repository import CouponRepository
-from core.repositories.user_repository import UserRepository
 from core.logging import get_logger
+from core.notifications import Channel, TestCreated
 
 logger = get_logger(__name__)
 

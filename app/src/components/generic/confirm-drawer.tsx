@@ -38,7 +38,9 @@ const ConfirmDrawer: React.FC<Props> = ({
 }) => {
     const { isMobile } = useMediaQuery()
 
-    const handleConfirm = async () => {
+    const handleConfirm = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         onConfirm?.();
     };
 

@@ -45,7 +45,7 @@ function RouteComponent() {
         const toastId = toast.loading("Deleting coupon...");
         try {
             await deleteMutation.mutateAsync(id);
-            toast.success("Coupon deleted successfully", { id: toastId });
+            toast.success("Coupon deleted", { id: toastId });
         } catch (error) { }
     };
 

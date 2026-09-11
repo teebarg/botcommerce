@@ -195,7 +195,6 @@ class OrderService:
                 data={
                     "coupon_id": None,
                     "coupon_code": None,
-                    "shipping_fee": 0,
                     "discount_amount": 0,
                 },
             )
@@ -308,4 +307,4 @@ class OrderService:
                 logger.error(f"Failed to invalidate caches/reindex after return: {e}")
 
         background_tasks.add_task(invalidate_caches)
-        return {"message": "Item returned successfully"}
+        return {"message": "Item returned"}

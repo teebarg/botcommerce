@@ -1,8 +1,7 @@
-from typing import Optional
-from core.config import settings
-from datetime import datetime
 from dataclasses import dataclass
+from datetime import datetime
 
+from core.config import settings
 from core.notifications.base import (
     Mail,
     Notification,
@@ -17,7 +16,7 @@ class BulkPurchaseEvent(Notification):
     phone: str
     message: str
     bulkType: str
-    quantity: Optional[str]
+    quantity: str | None
 
     def to_email(self) -> Mail:
         return Mail(

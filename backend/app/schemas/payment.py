@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class PaymentInitialize(BaseModel):
     authorization_url: str
     reference: str

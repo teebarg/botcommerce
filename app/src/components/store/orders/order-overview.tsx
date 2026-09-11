@@ -45,11 +45,7 @@ export default function OrderOverview({ order }: { order: Order }) {
                         {isPending ? "Pending transfer" : "Completed"}
                     </span>
                 </div>
-                {isPending && (
-                    <p className="text-xs text-muted-foreground mt-2">
-                        Your order will be processed once we receive your bank transfer payment.
-                    </p>
-                )}
+                {isPending && <p className="text-xs text-muted-foreground mt-2">Your order will be processed once we receive your payment.</p>}
             </div>
         </div>
     );

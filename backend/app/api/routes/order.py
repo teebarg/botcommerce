@@ -121,7 +121,7 @@ async def delete_order(db: DbDep, srv: OrderDep, order_id: int):
 
     await db.order.delete(where={"id": order_id})
     await srv.cache_srv.invalidate(tags=["orders", f"order:{order.order_number}"])
-    return {"message": "Order deleted successfully"}
+    return {"message": "Order deleted"}
 
 
 @router.patch("/{id}/status", dependencies=[Depends(require_admin)])
@@ -203,7 +203,7 @@ async def return_item(
             item_id=payload.item_id,
             background_tasks=background_tasks,
         )
-        return Message(message="Item returned successfully")
+        return Message(message="Item returned")
     except HTTPException:
         raise
     except Exception as e:

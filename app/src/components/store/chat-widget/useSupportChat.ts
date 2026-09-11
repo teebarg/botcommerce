@@ -48,8 +48,12 @@ const saveHistory = (messages: ChatMessage[]) => {
     }
 };
 
-function getChatSessionId(): string {
-    if (typeof window === "undefined") return generateUUID();
+function getExistingChatSessionId(): string | null {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(CHAT_SESSION_KEY);
+}
+
+function ensureChatSessionId(): string {
     let id = localStorage.getItem(CHAT_SESSION_KEY);
     if (!id) {
         id = generateUUID();
@@ -66,12 +70,15 @@ export const useSupportChat = () => {
     const [isTyping, setIsTyping] = useState<boolean>(false);
     const [humanConnected, setHumanConnected] = useState<boolean>(false);
 
-    const [hadExistingSession] = useState<boolean>(
-        () => typeof window !== "undefined" && !!localStorage.getItem(CHAT_SESSION_KEY)
-    );
-    const sessionId = useMemo(() => getChatSessionId(), []);
+    // sessionId now tracks localStorage state directly, rather than being minted on mount.
+    const [sessionId, setSessionId] = useState<string | null>(() => getExistingChatSessionId());
+    const hadExistingSession = sessionId !== null;
 
-    const { data: dbHistory, isLoading: historyLoading } = useChat(sessionId, {
+    const {
+        data: dbHistory,
+        isLoading: historyLoading,
+        isError: historyError,
+    } = useChat(sessionId ?? "", {
         enabled: hadExistingSession,
     });
 
@@ -82,15 +89,27 @@ export const useSupportChat = () => {
         return loading || isTyping || (messages.at(-1)?.metadata?.escalated && messages.at(-1)?.sender == "BOT");
     }, [loading, isTyping, messages]);
 
+    const resetSession = useCallback(() => {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(CHAT_SESSION_KEY);
+        setSessionId(null);
+        setMessages(WELCOME_MESSAGES);
+    }, []);
+
     useEffect(() => {
         if (!hadExistingSession) return;
         if (historyLoading) return;
 
+        // Session id was persisted but the backend has no record of it
+        // (expired / cleaned up). Treat exactly like an inactive conversation.
+        if (historyError) {
+            resetSession();
+            return;
+        }
+
         if (dbHistory) {
             if (dbHistory.status != ConversationStatus.ACTIVE) {
-                localStorage.removeItem(STORAGE_KEY);
-                localStorage.removeItem(CHAT_SESSION_KEY);
-                setMessages(WELCOME_MESSAGES);
+                resetSession();
                 return;
             }
             const messagesToSet = dbHistory.messages.length > 0 ? [...WELCOME_MESSAGES, ...dbHistory.messages] : WELCOME_MESSAGES;
@@ -98,7 +117,7 @@ export const useSupportChat = () => {
             saveHistory(messagesToSet);
             setHumanConnected(dbHistory.human_connected);
         }
-    }, [hadExistingSession, historyLoading, dbHistory]);
+    }, [hadExistingSession, historyLoading, historyError, dbHistory, resetSession]);
 
     useEffect(() => {
         if (lastWsMessage?.type != "chat") return;
@@ -130,11 +149,9 @@ export const useSupportChat = () => {
         const conversationUuid = localStorage.getItem(CHAT_SESSION_KEY);
         if (!conversationUuid) return;
         closeChat.mutateAsync({ conversationUuid, status: ConversationStatus.ABANDONED }).then(() => {
-            localStorage.removeItem(STORAGE_KEY);
-            localStorage.removeItem(CHAT_SESSION_KEY);
-            setMessages(WELCOME_MESSAGES);
+            resetSession();
         });
-    }, [closeChat]);
+    }, [closeChat, resetSession]);
 
     const handleSendMessage = async (text: string, _file?: File) => {
         if (humanConnected) {
@@ -160,6 +177,9 @@ export const useSupportChat = () => {
 
     const sendMessage = useCallback(
         async (text: string, _file?: File) => {
+            const activeSessionId = ensureChatSessionId();
+            setSessionId(activeSessionId);
+
             const userMsg: ChatMessage = {
                 id: Date.now(),
                 sender: "USER",
@@ -176,7 +196,7 @@ export const useSupportChat = () => {
                     body: JSON.stringify({
                         type: "message",
                         message: text,
-                        session_id: sessionId,
+                        session_id: activeSessionId,
                         customer_id: isAuthenticated ? userId : null,
                         app_session_id: getSessionId(),
                     }),
@@ -218,11 +238,14 @@ export const useSupportChat = () => {
                 setIsTyping(false);
             }
         },
-        [addMessage, sessionId, isAuthenticated, userId]
+        [addMessage, isAuthenticated, userId]
     );
 
     const sendFormSubmission = useCallback(
         async (formType: string, formData: any) => {
+            const activeSessionId = ensureChatSessionId();
+            setSessionId(activeSessionId);
+
             const userMsg: ChatMessage = {
                 id: Date.now(),
                 sender: "USER",
@@ -238,7 +261,7 @@ export const useSupportChat = () => {
                         type: "form_submission",
                         form_type: formType,
                         data: formData,
-                        session_id: sessionId,
+                        session_id: activeSessionId,
                         customer_id: isAuthenticated ? userId : null,
                         app_session_id: getSessionId(),
                     }),
@@ -276,7 +299,7 @@ export const useSupportChat = () => {
                 setLoading(false);
             }
         },
-        [addMessage, sessionId, isAuthenticated, userId]
+        [addMessage, isAuthenticated, userId]
     );
 
     return {

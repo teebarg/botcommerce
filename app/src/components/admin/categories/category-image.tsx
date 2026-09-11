@@ -29,7 +29,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
                     return;
                 }
 
-                toast.success("Image deleted successfully");
+                toast.success("Image deleted");
                 onClose?.();
             } catch (error) {
                 toast.error(`Error - ${error as string}`);
@@ -73,7 +73,7 @@ const CategoryImageManager: React.FC<ProductImageManagerProps> = ({ categoryId, 
                             return;
                         }
 
-                        toast.success("Image uploaded successfully", { id: toastId });
+                        toast.success("Image uploaded", { id: toastId });
                         onClose?.();
                     } catch (error) {
                         toast.error(`Error - ${error as string}`, { id: toastId });

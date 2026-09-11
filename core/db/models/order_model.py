@@ -74,14 +74,6 @@ class Order(Base):
         nullable=True,
     )
 
-    billing_address_id: Mapped[int | None] = mapped_column(
-        ForeignKey(
-            "addresses.id",
-            ondelete="SET NULL",
-        ),
-        nullable=True,
-    )
-
     email: Mapped[str | None] = mapped_column(
         String,
         nullable=True,
@@ -200,11 +192,6 @@ class Order(Base):
     shipping_address: Mapped["Address | None"] = relationship(
         "Address",
         foreign_keys=[shipping_address_id],
-    )
-
-    billing_address: Mapped["Address | None"] = relationship(
-        "Address",
-        foreign_keys=[billing_address_id],
     )
 
     coupon: Mapped["Coupon | None"] = relationship(

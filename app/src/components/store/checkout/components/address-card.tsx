@@ -14,8 +14,6 @@ interface AddressItemProp {
     isDefault?: boolean;
 }
 
-const typeLabel = (type: string) => (type === "home" ? "home" : type === "office" ? "work" : type || "other");
-
 export const AddressCard: React.FC<AddressItemProp> = ({ address, isDefault }) => {
     const state = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
@@ -41,7 +39,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, isDefault }) =
                                 isDefault ? "bg-accent text-accent-foreground" : "bg-secondary text-muted-foreground font-medium"
                             )}
                         >
-                            {isDefault ? "default" : typeLabel(address.address_type)}
+                            {isDefault ? "default" : address.label}
                         </span>
                     </div>
                     <p className="text-muted-foreground text-xs truncate mt-0.5">
@@ -59,12 +57,7 @@ export const AddressCard: React.FC<AddressItemProp> = ({ address, isDefault }) =
                         open={state.isOpen}
                         title="Address"
                         trigger={
-                            <Button
-                                size="iconOnly"
-                                variant="ghost"
-                                className="text-muted-foreground"
-                                onClick={(e) => e.stopPropagation()}
-                            >
+                            <Button size="iconOnly" variant="ghost" className="text-muted-foreground" onClick={(e) => e.stopPropagation()}>
                                 <Edit3 />
                             </Button>
                         }

@@ -22,7 +22,6 @@ from app.api.routes import (
     product,
     reviews,
     shop_settings,
-    user_interaction,
     users,
     wallet,
     websocket,
@@ -56,9 +55,6 @@ api_router.include_router(
     shop_settings.router, prefix="/shop-settings", tags=["shop-settings"]
 )
 api_router.include_router(delivery.router, prefix="/delivery", tags=["delivery"])
-api_router.include_router(
-    user_interaction.router, prefix="/user-interactions", tags=["user-interactions"]
-)
 api_router.include_router(coupon.router, prefix="/coupon", tags=["coupon"])
 api_router.include_router(wallet.router, prefix="/wallet", tags=["wallet"])
 api_router.include_router(internal.router, prefix="/internal", tags=["internal"])

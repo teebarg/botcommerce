@@ -14,9 +14,9 @@ from app.core.dependencies.cart import CartDep
 from app.core.deps import CurrentUser, UserDep
 from app.core.logging import get_logger
 from app.models.cart import (
+    Cart,
     CartItem,
     CartItemCreate,
-    CartLite,
     CartUpdate,
 )
 from app.models.generic import Message
@@ -124,7 +124,7 @@ async def delete_cart_item(
 
     await db.cartitem.delete(where={"id": item_id})
     await srv.touch(cart_id=cart.id)
-    return {"message": "Item removed from cart successfully"}
+    return {"message": "Item removed from cart"}
 
 
 @router.put("/items/{item_id}", response_model=CartItem)
@@ -169,7 +169,7 @@ async def update_cart(
     srv: CartDep,
     background_tasks: BackgroundTasks,
     _cart_id: Annotated[str | None, Cookie()] = None,
-) -> CartLite:
+) -> Cart:
     cart = await srv.get_active_cart(
         cart_number=_cart_id, user_id=user.id if user else None
     )
@@ -203,14 +203,11 @@ async def update_cart(
                 )
 
             update_data["shipping_address"] = {"connect": {"id": address.id}}
-            update_data["billing_address"] = {"connect": {"id": address.id}}
 
             await srv.cache_srv.invalidate(
                 tags=[f"addresses:{user.id if user else 'guest'}"]
             )
 
-        if cart_update.status is not None:
-            update_data["status"] = cart_update.status
         if cart_update.email is not None:
             update_data["email"] = cart_update.email
         if cart_update.phone is not None:
@@ -256,7 +253,7 @@ async def apply_wallet(
         )
 
     await srv.apply_wallet_balance(cart=cart, user=user)
-    return Message(message="Wallet balance applied successfully")
+    return Message(message="Wallet balance applied")
 
 
 @router.post("/remove-wallet")

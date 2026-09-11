@@ -27,7 +27,6 @@ const AddressForm: React.FC<AddressFormProps> = ({ mode, address, onClose }) => 
     const form = useForm<AddressFormValues>({
         resolver: zodResolver(addressSchema),
         defaultValues: {
-            address_type: address?.address_type ?? "HOME",
             first_name: address?.first_name ?? "",
             last_name: address?.last_name ?? "",
             address_1: address?.address_1 ?? "",
@@ -42,7 +41,6 @@ const AddressForm: React.FC<AddressFormProps> = ({ mode, address, onClose }) => 
     useEffect(() => {
         if (mode === "edit" && address) {
             form.reset({
-                address_type: address.address_type ?? "HOME",
                 first_name: address.first_name ?? "",
                 last_name: address.last_name ?? "",
                 address_1: address.address_1 ?? "",
@@ -81,33 +79,6 @@ const AddressForm: React.FC<AddressFormProps> = ({ mode, address, onClose }) => 
         <Form {...form}>
             <form className="flex-1 flex flex-col overflow-hidden" onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="overflow-y-auto flex-1 px-4 pb-4 space-y-4">
-                    {mode === "create" && (
-                        <FormField
-                            control={form.control}
-                            name="address_type"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Address Type</FormLabel>
-                                    <Select value={field.value} onValueChange={field.onChange}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select type" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="HOME">Home</SelectItem>
-                                            <SelectItem value="WORK">Work</SelectItem>
-                                            <SelectItem value="BILLING">Billing</SelectItem>
-                                            <SelectItem value="SHIPPING">Shipping</SelectItem>
-                                            <SelectItem value="OTHER">Other</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    )}
-
                     <div className="grid grid-cols-2 gap-x-2">
                         <FormField
                             control={form.control}

@@ -1,17 +1,25 @@
-from fastapi import APIRouter, HTTPException, Query, Request, Depends
-from prisma.enums import ConversationStatus
-from typing import Optional
-from app.models.chat import ChatCloseRequest, PaginatedChats, Chat, ChatRequest, ChatHandoffRequest
-from app.models.generic import Message
-from app.services.websocket import manager
-from app.core.deps import CurrentUser
 from datetime import datetime
-from app.core.permissions import require_admin
-from app.core.dependencies.services import ConversationDep
-from app.services.cache import cacheable
+from typing import Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from prisma.enums import ConversationStatus
+
 from app.core.dependencies.cache import CacheDep
-from app.prisma_client import DbDep
+from app.core.dependencies.services import ConversationDep
+from app.core.deps import CurrentUser
 from app.core.logging import get_logger
+from app.core.permissions import require_admin
+from app.models.chat import (
+    Chat,
+    ChatCloseRequest,
+    ChatHandoffRequest,
+    ChatRequest,
+    PaginatedChats,
+)
+from app.models.generic import Message
+from app.prisma_client import DbDep
+from app.services.cache import cacheable
+from app.services.websocket import manager
 
 logger = get_logger(__name__)
 
@@ -40,7 +48,7 @@ async def admin_chat(payload: ChatRequest, db: DbDep, cache: CacheDep, srv: Conv
     customer = await cache.get(f"chat_user:{payload.conversation_uuid}")
     if not customer:
         logger.warning(f"No customer connected for conversation {payload.conversation_uuid}")
-        return Message(message="message sent successfully")
+        return Message(message="message sent")
 
     customer = customer.decode() if isinstance(customer, bytes) else customer
 
@@ -50,7 +58,7 @@ async def admin_chat(payload: ChatRequest, db: DbDep, cache: CacheDep, srv: Conv
         message_type="chat",
     )
 
-    return Message(message="message sent successfully")
+    return Message(message="message sent")
 
 
 @router.post("/")
@@ -75,7 +83,7 @@ async def customer_chat(payload: ChatRequest, db: DbDep, cache: CacheDep, srv: C
         message_type="chat",
     )
 
-    return Message(message="message sent successfully")
+    return Message(message="message sent")
 
 
 @router.post("/handoff", dependencies=[Depends(require_admin)])
@@ -100,7 +108,7 @@ async def handoff(payload: ChatHandoffRequest, db: DbDep, cache: CacheDep, user:
         message_type="chat",
     )
 
-    return Message(message="Handoff request sent successfully")
+    return Message(message="Handoff request sent")
 
 @router.get("/", dependencies=[Depends(require_admin)])
 @cacheable(key_prefix="chats", tags=["chats"])
@@ -157,7 +165,7 @@ async def delete_chat(id: int, db: DbDep, cache: CacheDep) -> Message:
         await tx.message.delete_many(where={"conversation_id": id})
         await tx.conversation.delete(where={"id": id})
         await cache.invalidate(f"chat:{id}", tags=["chats"])
-        return {"message": "conversation deleted successfully"}
+        return {"message": "conversation deleted"}
 
 
 @router.post("/status")
@@ -171,4 +179,4 @@ async def status(payload: ChatCloseRequest, db: DbDep, cache: CacheDep, srv: Con
 
     await cache.invalidate(f"chat:{payload.conversation_uuid}", tags=["chats"])
 
-    return Message(message="Chat status updated successfully")
+    return Message(message="Chat status updated")

@@ -12,6 +12,7 @@ from core.notifications.events import (
     NewsletterEvent,
     OrderCreated,
     PaymentReceipt,
+    PushEvent,
     ReferralCashback,
     TestCreated,
     Welcome,
@@ -31,9 +32,10 @@ __all__ = [
     "NotificationService",
     "OrderCreated",
     "PaymentReceipt",
+    "PushEvent",
     "ReferralCashback",
     "SlackMessage",
     "TestCreated",
     "Welcome",
-    "WhatsAppMessage",
+    "WhatsAppMessage"
 ]

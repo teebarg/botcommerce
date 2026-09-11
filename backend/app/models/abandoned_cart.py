@@ -37,8 +37,3 @@ class AbandonedCartSchema(BaseModel):
 
     class Config:
         from_attributes = True
-
-class PaginatedAbandonedCarts(BaseModel):
-    items: List[AbandonedCartSchema]
-    next_cursor: Optional[int] = None
-    limit: int

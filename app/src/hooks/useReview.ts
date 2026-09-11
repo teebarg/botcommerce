@@ -27,7 +27,7 @@ export const useCreateReview = () => {
         mutationFn: async (input: CreateReviewInput) => await api.post<Review>("/reviews/", input),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["reviews"] });
-            toast.success("Review successfully created");
+            toast.success("Review created");
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to create review");
@@ -42,7 +42,7 @@ export const useUpdateReview = () => {
         mutationFn: async ({ id, input }: UpdateReviewPayload) => await api.patch<Review>(`/reviews/${id}`, input),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["reviews"] });
-            toast.success("Review successfully updated");
+            toast.success("Review updated");
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to update review");
@@ -56,7 +56,7 @@ export const useDeleteReview = () => {
         mutationFn: async (id: number) => await api.delete<Message>(`/reviews/${id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["reviews"] });
-            toast.success("Review successfully deleted");
+            toast.success("Review deleted");
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to delete review");

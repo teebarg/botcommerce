@@ -5,6 +5,8 @@ from typing import Any
 from core.notifications.base import (
     Mail,
     Notification,
+    Push,
+    PushSubscription,
     SlackMessage,
 )
 
@@ -26,6 +28,22 @@ class AbandonedCartEvent(Notification):
                 "cart": self.cart_data,
                 "header_title": "You left something in your cart",
                 "current_year": datetime.now().year,
+            },
+        )
+
+    def to_push(self) -> Push:
+        return Push(
+            subscription=PushSubscription(
+                endpoint=self.endpoint,
+                p256dh=self.p256dh,
+                auth=self.auth,
+            ),
+            title=self.title,
+            body=self.body,
+            path=self.path or "/collections",
+            imageUrl=self.imageUrl,
+            data={
+                "actionUrl": self.path or "/collections",
             },
         )
 

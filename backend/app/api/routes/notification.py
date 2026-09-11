@@ -1,8 +1,6 @@
-from datetime import datetime
-from typing import Literal, Optional
+from typing import Optional
 
 from fastapi import APIRouter
-from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 
 from app.core.dependencies.cache import ArqDep
@@ -12,21 +10,10 @@ from app.models.generic import Message
 from app.prisma_client import DbDep
 
 
-class PushEventSchema(BaseModel):
-    notificationId: str
-    subscriberId: Optional[str] = None
-    eventType: Literal["DELIVERED", "OPENED", "CLICKED", "DISMISSED"]
-    userAgent: Optional[str] = None
-    deliveredAt: Optional[datetime] = None
-    title: Optional[str] = None
-    body: Optional[str] = None
-
-
 class PushMessageSchema(BaseModel):
-    notificationId: str
     title: str
     body: str
-    image: Optional[str] = None
+    imageUrl: Optional[str] = None
     path: Optional[str] = None
 
 
@@ -41,25 +28,8 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 
-@router.post("/push-event")
-async def create_push_event(queue: ArqDep, data: PushEventSchema) -> Message:
-    try:
-        await queue.enqueue_job(
-            "push_event_analytics", data=jsonable_encoder(data, exclude_none=True)
-        )
-    except Exception as e:
-        logger.error(f"Error creating push event: {e}")
-    return Message(message="success")
-
-
 @router.post("/push-fcm")
-async def push_fcm(queue: ArqDep, db: DbDep, data: FCMIn, user: UserDep) -> Message:
-    await queue.enqueue_job(
-        "fcm",
-        endpoint=data.endpoint,
-        p256dh=data.p256dh,
-        auth=data.auth,
-    )
+async def push_fcm(db: DbDep, data: FCMIn, user: UserDep) -> Message:
     try:
         await db.pushsubscription.upsert(
             where={"endpoint": data.endpoint},
@@ -84,10 +54,14 @@ async def push_fcm(queue: ArqDep, db: DbDep, data: FCMIn, user: UserDep) -> Mess
 
 
 @router.post("/push")
-async def send_push_notification(queue: ArqDep, payload: PushMessageSchema) -> Message:
+async def send_push_notification(queue: ArqDep, db: DbDep, payload: PushMessageSchema) -> Message:
     try:
-        # subscriptions = await db.pushsubscription.find_many()
-        await queue.enqueue_job("push_notification", payload=payload)
+        subscription_ids = await db.pushsubscription.find_many()
+        await queue.enqueue_job(
+            "process_push_notification",
+            payload=payload.model_dump(),
+            subscription_ids=[s.id for s in subscription_ids],
+        )
         return Message(message="success")
     except Exception as e:
         logger.error(f"Failed to send push notifications: {str(e)}")

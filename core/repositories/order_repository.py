@@ -60,11 +60,6 @@ class OrderRepository(BaseRepository[Order]):
                 selectinload(Order.shipping_address)
             )
 
-        if include.get("billing_address"):
-            stmt = stmt.options(
-                selectinload(Order.billing_address)
-            )
-
         result = await self.session.execute(stmt)
 
         return result.scalar_one_or_none()
@@ -112,11 +107,6 @@ class OrderRepository(BaseRepository[Order]):
         if include.get("shipping_address"):
             stmt = stmt.options(
                 selectinload(Order.shipping_address)
-            )
-
-        if include.get("billing_address"):
-            stmt = stmt.options(
-                selectinload(Order.billing_address)
             )
 
         result = await self.session.execute(stmt)

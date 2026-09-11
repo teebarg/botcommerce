@@ -1,17 +1,18 @@
 from fastapi import APIRouter, HTTPException, Request
 from prisma.errors import PrismaError
+
+from app.core.dependencies.cache import CacheDep
 from app.core.deps import CurrentUser
+from app.core.logging import get_logger
 from app.models.address import (
     Address,
-    Addresses,
     AddressCreate,
+    Addresses,
     AddressUpdate,
 )
 from app.models.generic import Message
-from app.core.logging import get_logger
-from app.services.cache import cacheable
-from app.core.dependencies.cache import CacheDep
 from app.prisma_client import DbDep
+from app.services.cache import cacheable
 
 logger = get_logger(__name__)
 
@@ -127,7 +128,6 @@ async def delete(id: int, db: DbDep, user: CurrentUser, cache: CacheDep) -> Mess
                     where={"id": cart.id},
                     data={
                         "shipping_address": { "disconnect": {"id": id}},
-                        "billing_address": { "disconnect": {"id": id}}
                     }
                 )
 
@@ -135,7 +135,7 @@ async def delete(id: int, db: DbDep, user: CurrentUser, cache: CacheDep) -> Mess
 
         await cache.invalidate(tags=[f"addresses:{user.id}"])
 
-        return Message(message="Address deleted successfully")
+        return Message(message="Address deleted")
     except PrismaError as e:
         logger.error(e)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e))

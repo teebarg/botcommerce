@@ -38,7 +38,7 @@ const DeliveryItem: React.FC<{ option: DeliveryOption }> = ({ option }) => {
         const { error } = await tryCatch<Message>(api.delete<Message>(`/delivery/${option.id}`));
 
         if (!error) {
-            toast.success("Delivery option deleted successfully");
+            toast.success("delivery option deleted");
             deleteState.close();
         }
         setIsPending(false);

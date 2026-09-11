@@ -1,5 +1,6 @@
 import re
 from typing import Optional
+
 from pydantic import AfterValidator, BeforeValidator
 from typing_extensions import Annotated
 

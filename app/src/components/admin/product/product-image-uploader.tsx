@@ -45,7 +45,7 @@ export function ProductImageUploader({
                 }
 
                 toast.success(
-                    files.length > 1 ? "Images uploaded successfully" : "Image uploaded successfully",
+                    files.length > 1 ? "Images uploaded" : "Image uploaded",
                     { id: toastId }
                 );
                 onComplete?.();

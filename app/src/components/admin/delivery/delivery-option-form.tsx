@@ -57,7 +57,7 @@ export default function DeliveryOptionForm({ onClose, initialData }: DeliveryOpt
             return;
         }
 
-        toast.success(`${initialData ? "Updated" : "Created"} delivery option successfully`);
+        toast.success(`delivery option ${initialData ? "updated" : "created"}`);
         onClose();
     };
 

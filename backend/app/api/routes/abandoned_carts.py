@@ -6,7 +6,6 @@ from app.core.dependencies.cache import ArqDep
 from app.core.dependencies.cart import CartDep
 from app.core.permissions import require_admin
 from app.schemas.cart import CartListResponse, CartResponse
-from app.services.cache import cacheable
 
 router = APIRouter()
 

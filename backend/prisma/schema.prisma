@@ -10,16 +10,9 @@ datasource db {
 }
 
 // Enums for consistent data values
-enum AddressType {
-  HOME
-  WORK
-  BILLING
-  SHIPPING
-  OTHER
-}
-
 enum OrderStatus {
   PENDING
+  CONFIRMED
   PROCESSING
   SHIPPED
   OUT_FOR_DELIVERY
@@ -98,13 +91,6 @@ enum ConversationStatus {
   ABANDONED
 }
 
-enum InteractionType {
-  VIEW     @map("view")
-  PURCHASE @map("purchase")
-  CART_ADD @map("cart_add")
-  WISHLIST @map("wishlist")
-}
-
 enum MessageSender {
   USER
   BOT
@@ -139,24 +125,21 @@ model ActivityLog {
 
 // Address Model
 model Address {
-  id           Int         @id @default(autoincrement())
-  user         User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  user_id      Int
-  label        String?
-  address_type AddressType @default(HOME)
-  first_name   String?
-  last_name    String?
-  address_1    String
-  address_2    String?
-  city         String?
-  state        String?
-  phone        String?
-  is_billing   Boolean     @default(false)
+  id         Int     @id @default(autoincrement())
+  user       User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id    Int
+  label      String?
+  first_name String?
+  last_name  String?
+  address_1  String
+  address_2  String?
+  city       String?
+  state      String?
+  phone      String?
+  is_billing Boolean @default(false)
 
   shipping_orders Order[] @relation("ShippingAddress")
-  billing_orders  Order[] @relation("BillingAddress")
   shipping_carts  Cart[]  @relation("ShippingCartAddress")
-  billing_carts   Cart[]  @relation("BillingCartAddress")
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -211,27 +194,26 @@ model Collection {
 }
 
 model Product {
-  id                Int               @id @default(autoincrement())
-  name              String?           @db.VarChar(255)
-  slug              String            @unique @db.VarChar(255)
-  sku               String            @unique
-  description       String?
-  features          Json?             @db.JsonB
-  image             String?           @db.VarChar(255)
-  active            Boolean           @default(true)
-  is_new            Boolean           @default(false)
-  variants          ProductVariant[]
-  ratings           Float?            @default(0)
-  categories        Category[]        @relation("ProductCategories")
-  collections       Collection[]      @relation("ProductCollections")
-  brand             Brand?            @relation(fields: [brand_id], references: [id], onDelete: SetNull)
-  brand_id          Int?
-  embedding         Json?             @db.JsonB
-  tags              Tag[]             @relation("ProductTags")
-  images            ProductImage[]
-  reviews           Review[]
-  favorites         Favorite[]
-  user_interactions UserInteraction[]
+  id          Int              @id @default(autoincrement())
+  name        String?          @db.VarChar(255)
+  slug        String           @unique @db.VarChar(255)
+  sku         String           @unique
+  description String?
+  features    Json?            @db.JsonB
+  image       String?          @db.VarChar(255)
+  active      Boolean          @default(true)
+  is_new      Boolean          @default(false)
+  variants    ProductVariant[]
+  ratings     Float?           @default(0)
+  categories  Category[]       @relation("ProductCategories")
+  collections Collection[]     @relation("ProductCollections")
+  brand       Brand?           @relation(fields: [brand_id], references: [id], onDelete: SetNull)
+  brand_id    Int?
+  embedding   Json?            @db.JsonB
+  tags        Tag[]            @relation("ProductTags")
+  images      ProductImage[]
+  reviews     Review[]
+  favorites   Favorite[]
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -338,8 +320,6 @@ model Order {
 
   shipping_address    Address? @relation("ShippingAddress", fields: [shipping_address_id], references: [id], onDelete: SetNull)
   shipping_address_id Int?
-  billing_address     Address? @relation("BillingAddress", fields: [billing_address_id], references: [id], onDelete: SetNull)
-  billing_address_id  Int?
 
   email           String?
   phone           String?
@@ -495,8 +475,6 @@ model Cart {
 
   shipping_address    Address? @relation("ShippingCartAddress", fields: [shipping_address_id], references: [id], onDelete: SetNull)
   shipping_address_id Int?
-  billing_address     Address? @relation("BillingCartAddress", fields: [billing_address_id], references: [id], onDelete: SetNull)
-  billing_address_id  Int?
 
   created_at DateTime  @default(now())
   updated_at DateTime? @updatedAt // Used to detect abandoned carts
@@ -530,15 +508,15 @@ model CartItem {
 
 // User Model
 model User {
-  id                         Int               @id @default(autoincrement())
-  clerk_id                   String?           @unique
-  email                      String            @unique
+  id                         Int           @id @default(autoincrement())
+  clerk_id                   String?       @unique
+  email                      String        @unique
   phone                      String?
   hashed_password            String
   first_name                 String?
   last_name                  String?
-  status                     Status            @default(PENDING)
-  role                       Role              @default(CUSTOMER)
+  status                     Status        @default(PENDING)
+  role                       Role          @default(CUSTOMER)
   image                      String?
   email_verified             DateTime?
   email_verification_token   String?
@@ -549,20 +527,17 @@ model User {
   favorites                  Favorite[]
   carts                      Cart[]
   activity_logs              ActivityLog[]
-  interactions               UserInteraction[]
-  preferences                UserPreference[]
-  coupons                    Coupon[]          @relation("CouponAllowedUser")
-  referral_code              String?           @unique
-  wallet_balance             Float             @default(0) @db.DoublePrecision
+  coupons                    Coupon[]      @relation("CouponAllowedUser")
+  referral_code              String?       @unique
+  wallet_balance             Float         @default(0) @db.DoublePrecision
 
   Conversation     Conversation[]
   CouponUsage      CouponUsage[]
   PushSubscription PushSubscription[]
   walletTxns       WalletTransaction[]
 
-  created_at DateTime?    @default(now())
-  updated_at DateTime?    @updatedAt
-  EvalResult EvalResult[]
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
 
   @@index([first_name, last_name, email])
   @@map("users")
@@ -593,18 +568,6 @@ model ShopSettings {
   updated_at DateTime         @updatedAt
 
   @@map("shop_settings")
-}
-
-model BankDetails {
-  id             Int      @id @default(autoincrement())
-  bank_name      String   @db.VarChar(255)
-  account_name   String   @db.VarChar(255)
-  account_number String   @unique @db.VarChar(255)
-  is_active      Boolean  @default(true)
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
-
-  @@map("bank_details")
 }
 
 model Conversation {
@@ -656,22 +619,6 @@ model FAQ {
   @@map("faqs")
 }
 
-model CarouselBanner {
-  id          Int      @id @default(autoincrement())
-  title       String
-  subtitle    String?
-  description String?  @db.Text
-  buttonText  String?
-  image       String?  @db.VarChar(255)
-  link        String?
-  order       Int      @default(0)
-  is_active   Boolean  @default(true)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  @@map("carousel_banners")
-}
-
 model DeliveryOption {
   id          Int            @id @default(autoincrement())
   name        String         @unique @db.VarChar(255)
@@ -684,44 +631,6 @@ model DeliveryOption {
   updated_at  DateTime       @updatedAt
 
   @@map("delivery_options")
-}
-
-model UserInteraction {
-  id         Int             @id @default(autoincrement())
-  user_id    Int
-  product_id Int
-  type       InteractionType
-  timestamp  DateTime        @default(now())
-  metadata   Json? // Additional context (time spent, etc.)
-
-  user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@index([user_id, timestamp])
-  @@index([product_id, timestamp])
-  @@index([user_id, type])
-  @@index([product_id, type])
-  @@index([timestamp])
-  @@index([user_id, type, timestamp(sort: Desc)])
-  @@index([product_id, type, timestamp(sort: Desc)])
-  @@map("user_interactions")
-}
-
-model UserPreference {
-  id          Int      @id @default(autoincrement())
-  user_id     Int
-  category    String? // Make nullable for brand-only preferences
-  brand       String?
-  priceRange  String?
-  score       Float    @default(1.0)
-  source      String   @default("implicit") // "explicit", "implicit", "inferred"
-  confidence  Float    @default(0.5) // How confident we are in this preference
-  lastUpdated DateTime @default(now()) @updatedAt
-
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@unique([user_id, category, brand])
-  @@map("user_preferences")
 }
 
 model PushSubscription {
@@ -796,8 +705,6 @@ model EvalResult {
   stacktrace String? @db.Text
 
   created_at DateTime @default(now())
-
-  user User? @relation(fields: [customer_id], references: [id], onDelete: SetNull)
 
   @@index([session_id])
   @@index([customer_id])

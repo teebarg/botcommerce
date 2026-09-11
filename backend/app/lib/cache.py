@@ -110,6 +110,6 @@ async def purge_cdn_urls(*paths: str) -> None:
                     f"Cloudflare API rejected purge request: {data.get('errors')}"
                 )
             else:
-                logger.debug("Cloudflare variant-specific purge accepted successfully!")
+                logger.debug("Cloudflare variant-specific purge accepted")
     except httpx.HTTPError as e:
         logger.warning(f"Cloudflare purge failed: {e}")

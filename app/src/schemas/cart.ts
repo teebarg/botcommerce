@@ -1,16 +1,7 @@
 import { z } from "zod";
-import {
-    ShippingMethodSchema,
-    PaymentMethodSchema,
-    type CartStatus,
-    type PaymentMethod,
-    type OrderStatus,
-    type PaymentStatus,
-    CartStatusSchema,
-} from "./enums";
+import { ShippingMethodSchema, PaymentMethodSchema, type PaymentMethod, CartStatusSchema } from "./enums";
 import { ProductVariantSchema } from "./product";
 import { type Address, AddressSchema } from "./address";
-import { CursorSchema } from "./common";
 import { UserMiniSchema } from "./user";
 
 export const CartItemSchema = z.object({
@@ -46,7 +37,6 @@ export const CartSchema = z.object({
     shipping_address: AddressSchema.optional(),
     shipping_method: ShippingMethodSchema.optional(),
     payment_method: PaymentMethodSchema.optional(),
-    created_at: z.string(),
 });
 
 export const AbandonedCartSchema = z.object({
@@ -64,28 +54,14 @@ export const AbandonedCartSchema = z.object({
     created_at: z.string(),
 });
 
-export const PaginatedAbandonedCartsSchema = CursorSchema.extend({
-    items: z.array(AbandonedCartSchema),
-});
-
 export type CartItem = z.infer<typeof CartItemSchema>;
 export type Cart = z.infer<typeof CartSchema>;
 export type AbandonedCart = z.infer<typeof AbandonedCartSchema>;
-export type PaginatedAbandonedCarts = z.infer<typeof PaginatedAbandonedCartsSchema>;
 
 export type CartUpdate = {
-    status?: CartStatus;
     shipping_address?: Omit<Address, "id"> & { id?: number };
     email?: string;
     phone?: string;
-    billing_address?: Omit<Address, "id">;
     shipping_method?: number;
     payment_method?: PaymentMethod;
-    shipping_fee?: number;
-};
-
-export type CartComplete = {
-    coupon_id?: number;
-    status?: OrderStatus;
-    payment_status?: PaymentStatus;
 };

@@ -104,6 +104,6 @@ async def delete(
     try:
         await db.collection.delete(where={"id": id})
         bg_tasks.add_task(srv.invalidate, slug=existing.slug)
-        return Message(message="Collection deleted successfully")
+        return Message(message="Collection deleted")
     except PrismaError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

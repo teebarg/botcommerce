@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Optional
 
 from prisma.enums import CartStatus, PaymentMethod, ShippingMethod
@@ -12,7 +11,6 @@ class CartAddress(BaseModel):
     id: Optional[int] = None
     first_name: str
     last_name: str
-    address_type: Optional[str]
     label: Optional[str] = None
     address_1: str
     address_2: Optional[str] = None
@@ -24,14 +22,11 @@ class CartItemCreate(BaseModel):
     quantity: int
 
 class CartUpdate(BaseModel):
-    shipping_fee: Optional[float] = None
     shipping_address: Optional[CartAddress] = None
-    billing_address: Optional[CartAddress] = None
     email: Optional[EmailStr] = None
     phone: PhoneNumber = None
     shipping_method: Optional[int] = None
     payment_method: Optional[PaymentMethod] = None
-    status: Optional[CartStatus] = None
 
 class CartItemBase(BaseModel):
     variant_id: int
@@ -56,26 +51,6 @@ class Cart(BaseModel):
     shipping_method: Optional[ShippingMethod]
     shipping_address_id: Optional[int] = None
     shipping_address: Optional[CartAddress]
-    total: float = 0
-    subtotal: float = 0
-    tax: float = 0
-    shipping_fee: float = 0
-    discount_amount: float = 0
-    wallet_used: float = 0
-    coupon_code: Optional[str]
-    coupon_id: Optional[int]
-    created_at: datetime
-
-class CartLite(BaseModel):
-    id: int
-    user_id: Optional[int]
-    cart_number: Optional[str]
-    email: Optional[str]
-    phone: Optional[str]
-    status: Optional[CartStatus]
-    payment_method: Optional[PaymentMethod] = None
-    shipping_method: Optional[ShippingMethod]
-    shipping_address_id: Optional[int] = None
     total: float = 0
     subtotal: float = 0
     tax: float = 0

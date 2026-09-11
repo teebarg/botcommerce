@@ -54,7 +54,7 @@ export const useBulkUploadImages = () => {
     return useMutation({
         mutationFn: async (payload: BulkUploadInput) => await api.post<Message>("/gallery/bulk-upload", { urls: payload.urls }),
         onSuccess: () => {
-            toast.success("Bulk image URLs saved successfully");
+            toast.success("images saved");
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to save bulk image URLs");

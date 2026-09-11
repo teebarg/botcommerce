@@ -133,29 +133,32 @@ export default function PushPermission() {
         };
     }, []);
 
-    const syncSubscriptionToBackend = useCallback(async (sub: PushSubscription) => {
-        if (isSyncing) return false;
-        setIsSyncing(true);
-        const subscriptionData = {
-            endpoint: sub.endpoint,
-            p256dh: sub.toJSON().keys?.p256dh || "",
-            auth: sub.toJSON().keys?.auth || "",
-        };
+    const syncSubscriptionToBackend = useCallback(
+        async (sub: PushSubscription) => {
+            if (isSyncing) return false;
+            setIsSyncing(true);
+            const subscriptionData = {
+                endpoint: sub.endpoint,
+                p256dh: sub.toJSON().keys?.p256dh || "",
+                auth: sub.toJSON().keys?.auth || "",
+            };
 
-        const { error } = await tryCatch(api.post<Message>("/notification/push-fcm", subscriptionData));
+            const { error } = await tryCatch(api.post<Message>("/notification/push-fcm", subscriptionData));
 
-        if (error) {
-            toast.error(error);
+            if (error) {
+                toast.error(error);
+                setIsSyncing(false);
+                return false;
+            }
+
+            storeSubscriptionKeys(sub);
+            setSubscription(sub);
+            localStorage.setItem("push_synced", "true");
             setIsSyncing(false);
-            return false;
-        }
-
-        storeSubscriptionKeys(sub);
-        setSubscription(sub);
-        localStorage.setItem("push_synced", "true");
-        setIsSyncing(false);
-        return true;
-    }, [isSyncing]);
+            return true;
+        },
+        [isSyncing]
+    );
 
     const checkSubscription = useCallback(async () => {
         if (isChecking) return;
@@ -186,7 +189,7 @@ export default function PushPermission() {
             setPermission(perm);
             track(perm === "granted" ? "push_permission_granted" : "push_permission_denied");
 
-            if (perm !== "granted") return;
+            if (perm != "granted") return;
 
             const registration = await navigator.serviceWorker.ready;
             const sub = await registration.pushManager.subscribe({
@@ -198,7 +201,6 @@ export default function PushPermission() {
             const synced = await syncSubscriptionToBackend(sub);
             if (!synced) {
                 track("push_sync_failed");
-                // syncSubscriptionToBackend already surfaced a toast
                 return;
             }
             track("push_subscribed");
@@ -294,12 +296,8 @@ export default function PushPermission() {
                             <div className="absolute -inset-1 rounded-2xl border border-accent/30" />
                         </div>
                     </div>
-                    <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1.5">
-                        Notifications
-                    </p>
-                    <h2 className="text-lg font-semibold leading-snug">
-                        Be first to know when a new bale drops
-                    </h2>
+                    <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1.5">Notifications</p>
+                    <h2 className="text-lg font-semibold leading-snug">Be first to know when a new bale drops</h2>
                     <p className="text-sm text-muted-foreground leading-relaxed mt-1.5">
                         Turn on notifications so you don&apos;t miss the good pieces before they&apos;re gone.
                     </p>

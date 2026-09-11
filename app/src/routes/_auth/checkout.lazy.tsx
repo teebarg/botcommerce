@@ -22,7 +22,7 @@ function RouteComponent() {
 
     useEffect(() => {
         if (!cart) return;
-        track("checkout_started", { cart_id: cart.cart_number, value: cart.total })
+        track("checkout_started", { cart_id: cart.cart_number, value: cart.total });
     }, [cart]);
 
     if (error) {

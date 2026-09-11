@@ -6,30 +6,28 @@ from datetime import datetime
 from typing import Any
 
 from sqlalchemy import (
-    BigInteger,
     Boolean,
+    Column,
     DateTime,
     Enum,
-    Enum as SAEnum,
     Float,
     ForeignKey,
     Index,
     Integer,
     String,
+    Table,
     Text,
     UniqueConstraint,
     func,
     text,
-    Table,
-    Column,
+)
+from sqlalchemy import (
+    Enum as SAEnum,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from core.db.models.enums import ShopSettingsType
-
-
-
 
 # ============================================================
 # Base
@@ -43,14 +41,6 @@ class Base(DeclarativeBase):
 # ============================================================
 # Enums
 # ============================================================
-
-
-class AddressType(str, enum.Enum):
-    HOME = "HOME"
-    WORK = "WORK"
-    BILLING = "BILLING"
-    SHIPPING = "SHIPPING"
-    OTHER = "OTHER"
 
 
 class OrderStatus(str, enum.Enum):
@@ -127,13 +117,6 @@ class WalletTransactionType(str, enum.Enum):
 # ============================================================
 # PostgreSQL enum helpers
 # ============================================================
-
-
-address_type_enum = SAEnum(
-    AddressType,
-    name="AddressType",
-    native_enum=True,
-)
 
 order_status_enum = SAEnum(
     OrderStatus,
@@ -470,12 +453,6 @@ class Address(Base):
 
     label: Mapped[str | None] = mapped_column(String)
 
-    address_type: Mapped[AddressType] = mapped_column(
-        address_type_enum,
-        nullable=False,
-        server_default="HOME",
-    )
-
     first_name: Mapped[str | None] = mapped_column(String)
     last_name: Mapped[str | None] = mapped_column(String)
 
@@ -515,11 +492,6 @@ class Address(Base):
     shipping_orders: Mapped[list["Order"]] = relationship(
         foreign_keys="Order.shipping_address_id",
         back_populates="shipping_address",
-    )
-
-    billing_orders: Mapped[list["Order"]] = relationship(
-        foreign_keys="Order.billing_address_id",
-        back_populates="billing_address",
     )
 
     __table_args__ = (
@@ -1139,13 +1111,6 @@ class Order(Base):
         ),
     )
 
-    billing_address_id: Mapped[int | None] = mapped_column(
-        ForeignKey(
-            "addresses.id",
-            ondelete="SET NULL",
-        ),
-    )
-
     email: Mapped[str | None] = mapped_column(String)
     phone: Mapped[str | None] = mapped_column(String)
 
@@ -1242,11 +1207,6 @@ class Order(Base):
     shipping_address: Mapped["Address | None"] = relationship(
         foreign_keys=[shipping_address_id],
         back_populates="shipping_orders",
-    )
-
-    billing_address: Mapped["Address | None"] = relationship(
-        foreign_keys=[billing_address_id],
-        back_populates="billing_orders",
     )
 
     order_items: Mapped[list["OrderItem"]] = relationship(
@@ -1781,13 +1741,6 @@ class Cart(Base):
     )
 
     shipping_address_id: Mapped[int | None] = mapped_column(
-        ForeignKey(
-            "addresses.id",
-            ondelete="SET NULL",
-        ),
-    )
-
-    billing_address_id: Mapped[int | None] = mapped_column(
         ForeignKey(
             "addresses.id",
             ondelete="SET NULL",

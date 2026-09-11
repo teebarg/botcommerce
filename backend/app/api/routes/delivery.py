@@ -78,4 +78,4 @@ async def delete(db: DbDep, srv: DeliveryDep, id: int, bg_tasks: BackgroundTasks
 
     await db.deliveryoption.delete(where={"id": id})
     bg_tasks.add_task(srv.invalidate)
-    return Message(message="Delivery option deleted successfully")
+    return Message(message="Delivery option deleted")
