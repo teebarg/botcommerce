@@ -14,9 +14,9 @@ from app.core.dependencies.cart import CartDep
 from app.core.deps import CurrentUser, UserDep
 from app.core.logging import get_logger
 from app.models.cart import (
+    Cart,
     CartItem,
     CartItemCreate,
-    CartLite,
     CartUpdate,
 )
 from app.models.generic import Message
@@ -169,7 +169,7 @@ async def update_cart(
     srv: CartDep,
     background_tasks: BackgroundTasks,
     _cart_id: Annotated[str | None, Cookie()] = None,
-) -> CartLite:
+) -> Cart:
     cart = await srv.get_active_cart(
         cart_number=_cart_id, user_id=user.id if user else None
     )

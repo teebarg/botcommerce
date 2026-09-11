@@ -1,13 +1,5 @@
 import { z } from "zod";
-import {
-    ShippingMethodSchema,
-    PaymentMethodSchema,
-    type CartStatus,
-    type PaymentMethod,
-    type OrderStatus,
-    type PaymentStatus,
-    CartStatusSchema,
-} from "./enums";
+import { ShippingMethodSchema, PaymentMethodSchema, type PaymentMethod, type OrderStatus, type PaymentStatus, CartStatusSchema } from "./enums";
 import { ProductVariantSchema } from "./product";
 import { type Address, AddressSchema } from "./address";
 import { CursorSchema } from "./common";
@@ -74,13 +66,11 @@ export type AbandonedCart = z.infer<typeof AbandonedCartSchema>;
 export type PaginatedAbandonedCarts = z.infer<typeof PaginatedAbandonedCartsSchema>;
 
 export type CartUpdate = {
-    status?: CartStatus;
     shipping_address?: Omit<Address, "id"> & { id?: number };
     email?: string;
     phone?: string;
     shipping_method?: number;
     payment_method?: PaymentMethod;
-    shipping_fee?: number;
 };
 
 export type CartComplete = {
