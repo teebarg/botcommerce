@@ -9,10 +9,10 @@ import Overlay from "@/components/overlay";
 import { currency } from "@/utils";
 import { useImpersonateUser } from "@/hooks/useUser";
 import ImageLightbox from "@/components/image-lightbox";
-import { AbandonedCart } from "@/schemas/abandoned-cart";
+import { Cart } from "@/schemas";
 
 interface AbandonedCartDetailsDialogProps {
-    cart: AbandonedCart | null;
+    cart: Cart | null;
 }
 
 export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogProps) => {
@@ -135,8 +135,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                                     <Clock className="h-4 w-4" />
                                     <span className="text-sm">Abandoned</span>
                                 </div>
-                                <p className="font-medium">{formatDistanceToNow(new Date(cart.created_at), { addSuffix: true })}</p>
-                                <p className="text-xs text-muted-foreground mt-1">{new Date(cart.created_at).toLocaleString()}</p>
+                                <p className="font-medium">{formatDistanceToNow(new Date(cart.updated_at), { addSuffix: true })}</p>
                             </div>
                         </div>
                     </div>

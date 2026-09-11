@@ -24,22 +24,20 @@ export const PaginatedWalletTxnsSchema = CursorSchema.extend({
     txns: z.array(WalletTxnSchema),
 });
 
-export const UserSchema = z
-    .object({
-        id: z.number(),
-        first_name: z.string(),
-        last_name: z.string().optional(),
-        phone: z.string().optional(),
-        email: z.string().email(),
-        emailVerified: z.string(),
-        status: z.enum(["PENDING", "ACTIVE", "INACTIVE"]),
-        hashed_password: z.string(),
-        image: z.string().optional(),
-        role: z.enum(["ADMIN", "CUSTOMER"]),
-        referral_code: z.string().optional(),
-        wallet_balance: z.number(),
-        created_at: z.string(),
-    });
+export const UserSchema = z.object({
+    id: z.number(),
+    first_name: z.string(),
+    last_name: z.string().optional(),
+    phone: z.string().optional(),
+    email: z.string().email(),
+    emailVerified: z.string(),
+    status: z.enum(["PENDING", "ACTIVE", "INACTIVE"]),
+    image: z.string().optional(),
+    role: z.enum(["ADMIN", "CUSTOMER"]),
+    referral_code: z.string().optional(),
+    wallet_balance: z.number(),
+    created_at: z.string(),
+});
 
 export const PaginatedUsersSchema = CursorSchema.extend({
     items: z.array(UserSchema),

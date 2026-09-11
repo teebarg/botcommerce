@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from prisma.enums import CartStatus, PaymentMethod, ShippingMethod
@@ -59,6 +60,7 @@ class Cart(BaseModel):
     wallet_used: float = 0
     coupon_code: Optional[str]
     coupon_id: Optional[int]
+    update_at: datetime
 
 class SendAbandonedCartReminders(BaseModel):
     hours_threshold: int
