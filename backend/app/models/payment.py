@@ -1,5 +1,6 @@
+from prisma.enums import PaymentMethod, PaymentStatus
 from pydantic import BaseModel
-from prisma.enums import PaymentStatus, PaymentMethod
+
 
 class Payment(BaseModel):
     id: int

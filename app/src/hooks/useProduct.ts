@@ -1,6 +1,6 @@
 import { useQuery, useMutation, queryOptions, keepPreviousData } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { Message, PaginatedProductSearch, ProductVariant } from "@/schemas";
+import type { Message, ProductFeed, ProductVariant } from "@/schemas";
 import { api } from "@/utils/api";
 import { getCategoriesProductsFn, getIndexProductsFn } from "@/server/product.server";
 
@@ -13,7 +13,7 @@ type SearchParams = {
 export const useProductSearch = (params: SearchParams, enabled: boolean = false) => {
     return useQuery({
         queryKey: ["products", "search", params],
-        queryFn: async () => await api.get<PaginatedProductSearch>("/product/", { params }),
+        queryFn: async () => await api.get<ProductFeed>("/product/", { params }),
         placeholderData: keepPreviousData,
         enabled,
     });

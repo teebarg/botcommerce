@@ -2,7 +2,7 @@ import { z } from "zod";
 import { ShippingMethodSchema, PaymentMethodSchema, type PaymentMethod } from "./enums";
 import { ProductVariantSchema } from "./product";
 import { type Address, AddressSchema } from "./address";
-import { UserMiniSchema } from "./user";
+import { UserLiteSchema } from "./user";
 
 export const CartItemSchema = z.object({
     id: z.number(),
@@ -18,7 +18,7 @@ export const CartSchema = z.object({
     id: z.number(),
     cart_number: z.string(),
     user_id: z.number().optional(),
-    user: UserMiniSchema.optional(),
+    user: UserLiteSchema.optional(),
     email: z.string().email().optional(),
     phone: z
         .string()

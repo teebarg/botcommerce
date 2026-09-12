@@ -1,8 +1,11 @@
-from pydantic import BaseModel, Field
-from typing import Optional, List
 from datetime import datetime
-from prisma.enums import DiscountType, CouponScope
+from typing import List, Optional
+
+from prisma.enums import CouponScope, DiscountType
+from pydantic import BaseModel, Field
+
 from app.models.user import User
+
 
 class CouponUsage(BaseModel):
     id: int
