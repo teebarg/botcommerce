@@ -1,6 +1,7 @@
 from app.services.cache import CacheService
 from app.services.cdn import CdnService
 
+
 class DeliveryService:
     def __init__(self, cache_srv: CacheService, cdn_srv: CdnService):
         self.cache_srv = cache_srv

@@ -1,5 +1,7 @@
 from fastapi import HTTPException
+
 from prisma import Prisma
+
 
 class ConversationService:
     def __init__(self, db: Prisma):
