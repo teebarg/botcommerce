@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Optional
 
 from prisma.enums import PaymentMethod, ShippingMethod
@@ -62,7 +61,6 @@ class CartResponse(BaseModel):
     cart_number: str
     user_id: Optional[int] = None
     user: Optional[UserModel] = None
-    status: str
     email: Optional[str] = None
     phone: Optional[str] = None
     total: float
@@ -78,7 +76,6 @@ class CartResponse(BaseModel):
     coupon_code: Optional[str] = None
     coupon_id: Optional[int]
     items: list[CartItemResponse] = []
-    created_at: datetime
 
 
 class CartListResponse(BaseModel):

@@ -1,7 +1,9 @@
 from typing import Annotated
+
+from arq.connections import ArqRedis
 from fastapi import Depends, Request
 from redis.asyncio import Redis
-from arq.connections import ArqRedis
+
 from app.services.cache import CacheService
 from app.services.cdn import CdnService
 

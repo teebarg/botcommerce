@@ -4,13 +4,6 @@ import { ProductStatusSchema } from "./enums";
 import { CursorSchema } from "./common";
 import { booleanParam } from "./search-schemas";
 
-const PagSchema = z.object({
-    skip: z.number(),
-    limit: z.number(),
-    total_count: z.number(),
-    total_pages: z.number(),
-});
-
 export const CategorySchema = z.object({
     id: z.number(),
     name: z.string(),
@@ -85,18 +78,6 @@ export const PaginatedGalleryImagesSchema = CursorSchema.extend({
     items: z.array(GalleryImageSchema),
 });
 
-export const SearchCollectionSchema = z.object({
-    id: z.number(),
-    name: z.string(),
-    slug: z.string(),
-});
-
-export const SearchCategorySchema = z.object({
-    id: z.number(),
-    name: z.string(),
-    slug: z.string(),
-});
-
 export const ProductSearchSchema = z.object({
     id: z.number(),
     name: z.string(),
@@ -108,10 +89,6 @@ export const ProductSearchSchema = z.object({
     active: z.boolean(),
     is_new: z.boolean().optional(),
     in_stock: z.boolean(),
-});
-
-export const PaginatedProductSearchSchema = PagSchema.extend({
-    products: z.array(ProductSearchSchema),
 });
 
 export const ProductFeedSchema = z.object({
@@ -172,12 +149,8 @@ export type FeedQuery = z.infer<typeof FeedQuerySchema>;
 export type GalleryQuery = z.infer<typeof GalleryQuerySchema>;
 export type CategoriesWithProducts = z.infer<typeof CategoriesProductsSchema>;
 
-export type SearchCategory = z.infer<typeof SearchCategorySchema>;
-export type SearchCollection = z.infer<typeof SearchCollectionSchema>;
-
 export type Product = z.infer<typeof ProductSchema>;
 export type ProductSearch = z.infer<typeof ProductSearchSchema>;
-export type PaginatedProductSearch = z.infer<typeof PaginatedProductSearchSchema>;
 export type ProductFeed = z.infer<typeof ProductFeedSchema>;
 
 export type Category = z.infer<typeof CategorySchema>;

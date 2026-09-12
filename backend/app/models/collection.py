@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -22,11 +23,3 @@ class CollectionCreate(BaseModel):
 class CollectionUpdate(BaseModel):
     name: Optional[str] = None
     is_active: Optional[bool] = None
-
-
-class Collections(BaseModel):
-    collections: list[Collection]
-    skip: int
-    limit: int
-    total_count: int
-    total_pages: int

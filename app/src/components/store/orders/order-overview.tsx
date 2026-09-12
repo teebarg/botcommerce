@@ -1,9 +1,10 @@
-import { CheckCircle, Package, Clock, RefreshCw, X, Truck } from "lucide-react";
+import { CheckCircle, Package, Clock, RefreshCw, X, Truck, Check } from "lucide-react";
 import { Order, OrderStatus } from "@/schemas";
 import { formatDate } from "@/utils";
 
 const statusConfig: Record<OrderStatus, { icon: typeof Clock; label: string }> = {
     [OrderStatus.PENDING]: { icon: Clock, label: "Pending" },
+    [OrderStatus.CONFIRMED]: { icon: Check, label: "Confirmed" },
     [OrderStatus.PROCESSING]: { icon: RefreshCw, label: "Processing" },
     [OrderStatus.SHIPPED]: { icon: Package, label: "Shipped" },
     [OrderStatus.OUT_FOR_DELIVERY]: { icon: Truck, label: "Out for delivery" },

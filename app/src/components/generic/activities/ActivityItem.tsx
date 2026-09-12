@@ -1,6 +1,6 @@
 import type React from "react";
 import { formatDistanceToNow } from "date-fns";
-import { Download, Trash2, FileSpreadsheet, AlertCircle, CheckCircle2, RefreshCw } from "lucide-react";
+import { Download, Trash2, FileSpreadsheet, AlertCircle, RefreshCw } from "lucide-react";
 import type { Activity } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,9 +10,7 @@ import { useOverlayTriggerState } from "react-stately";
 
 const ActivityTypeIcon = ({ type, isSuccess }: { type: string; isSuccess: boolean }) => {
     if (type === "PRODUCT_EXPORT") {
-        return isSuccess
-            ? <FileSpreadsheet className="text-emerald-600" size={16} />
-            : <AlertCircle className="text-red-500" size={16} />;
+        return isSuccess ? <FileSpreadsheet className="text-emerald-600" size={16} /> : <AlertCircle className="text-red-500" size={16} />;
     }
     return <RefreshCw className="text-blue-500" size={16} />;
 };
@@ -26,9 +24,7 @@ const StatusBadge = ({ isSuccess, activityType }: { isSuccess: boolean; activity
 
 const accentClass = (type: string, isSuccess: boolean) => {
     if (type === "PRODUCT_EXPORT") {
-        return isSuccess
-            ? "border-l-[3px] border-l-emerald-500 rounded-l-none"
-            : "border-l-[3px] border-l-red-500 rounded-l-none";
+        return isSuccess ? "border-l-[3px] border-l-emerald-500 rounded-l-none" : "border-l-[3px] border-l-red-500 rounded-l-none";
     }
     return "border-l-[3px] border-l-blue-500 rounded-l-none";
 };
@@ -42,17 +38,13 @@ export const ActivityItem: React.FC<{ activity: Activity }> = ({ activity }) => 
     };
 
     return (
-        <div
-            className={`bg-card border border-border ${accentClass(activity.activity_type, activity.is_success)} p-4 sm:p-5 mt-0 md:mt-2.5`}
-        >
+        <div className={`bg-card border border-border ${accentClass(activity.activity_type, activity.is_success)} p-4 sm:p-5 mt-0 md:mt-2.5`}>
             <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                     <ActivityTypeIcon isSuccess={activity.is_success} type={activity.activity_type} />
                     <StatusBadge activityType={activity.activity_type} isSuccess={activity.is_success} />
                 </div>
-                <p className="text-xs text-muted-foreground">
-                    {formatDistanceToNow(new Date(activity.created_at), { addSuffix: true })}
-                </p>
+                <p className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(activity.created_at), { addSuffix: true })}</p>
             </div>
 
             <p className="text-sm font-medium leading-snug">{activity.description}</p>
