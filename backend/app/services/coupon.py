@@ -1,10 +1,12 @@
 from datetime import datetime, timezone
 from typing import Optional
+
 from fastapi import HTTPException
 from prisma.enums import DiscountType
-from app.models.coupon import Coupon
-from app.models.cart import Cart
+
 from app.core.logging import get_logger
+from app.models.cart import Cart
+from app.models.coupon import Coupon
 from app.prisma_client import Prisma
 
 logger = get_logger(__name__)

@@ -1,8 +1,11 @@
-from pydantic import BaseModel
-from prisma.enums import ConversationStatus
 from datetime import datetime
 from typing import Optional
+
+from prisma.enums import ConversationStatus
+from pydantic import BaseModel
+
 from app.models.user import MiniUser
+
 
 class ChatMessage(BaseModel):
     id: int

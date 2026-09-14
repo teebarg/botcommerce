@@ -1,7 +1,9 @@
+import json
+import time
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, status
+
 from app.core.logging import logger
-import json, time
 from app.services.websocket import manager
 
 router = APIRouter()

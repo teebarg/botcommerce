@@ -32,7 +32,7 @@ CUSTOMERS = [
 
 async def seed_users():
     logger.info("Seeding users...")
-    hashed_password = bcrypt.hashpw("password123".encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    hashed_password = bcrypt.hashpw(b"password123", bcrypt.gensalt()).decode("utf-8")
 
     users = {}
     for u in CUSTOMERS:

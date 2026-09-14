@@ -1,6 +1,3 @@
-import json
-from typing import Any
-
 from prisma.models import ShopSettings
 
 from app.services.cache import CacheService
@@ -32,20 +29,6 @@ class ShopSettingsService:
             await self.cache_srv.redis.set(self._cache_key(key), setting.value, ex=self.CACHE_EXPIRATION)
             return setting.value
         return None
-
-    async def set(self, key: str, value: str, type_: str = "SHOP_DETAIL"):
-        """
-        Upsert a setting and refresh Redis
-        """
-        setting = await self.db.shopsettings.upsert(
-            where={"key": key},
-            data={
-                "create": {"key": key, "value": value, "type": type_},
-                "update": {"value": value},
-            },
-        )
-        await self.cache_srv.redis.set(self._cache_key(key), value, ex=self.CACHE_EXPIRATION)
-        return setting
 
     async def get_all(self) -> list[ShopSettings]:
         return await self.db.shopsettings.find_many(order={"key": "asc"})

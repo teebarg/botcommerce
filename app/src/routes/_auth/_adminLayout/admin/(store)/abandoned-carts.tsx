@@ -12,7 +12,7 @@ import { PageLoader } from "@/components/generic/page-loader";
 import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
 import { z } from "zod";
 import { useDeferredValue, useMemo, useState } from "react";
-import { AbandonedCart } from "@/schemas/abandoned-cart";
+import { Cart } from "@/schemas";
 
 export const Route = createFileRoute("/_auth/_adminLayout/admin/(store)/abandoned-carts")({
     validateSearch: z.object({
@@ -93,7 +93,7 @@ function RouteComponent() {
                             onLoadMore={fetchNextPage}
                             hasMore={hasNextPage}
                             isLoading={isFetchingNextPage}
-                            renderItem={(item: AbandonedCart) => <AbandonedCartCard key={item.id} cart={item} />}
+                            renderItem={(item: Cart) => <AbandonedCartCard key={item.id} cart={item} />}
                         />
                     ) : (
                         <EmptyState title="No abandoned cart found" description="Please adjust the time range or search query" />

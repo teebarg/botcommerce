@@ -5,21 +5,15 @@ import { ReminderButton } from "./reminder-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { currency, timeAgo } from "@/utils";
-import { useSendCartReminder } from "@/hooks/useAbandonedCart";
 import ImageDisplay from "@/components/image-display";
-import { AbandonedCart, CartItem } from "@/schemas/abandoned-cart";
+import { Cart, CartItem } from "@/schemas";
 
 interface AbandonedCartCardProps {
-    cart: AbandonedCart;
+    cart: Cart;
 }
 
 export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
-    const sendReminderMutation = useSendCartReminder();
     const email = cart.email || cart.user?.email;
-
-    const handleSendReminder = () => {
-        sendReminderMutation.mutate(cart.id);
-    };
 
     return (
         <Card className="hover:shadow-lg border-l-4 border-l-primary/50">
@@ -78,7 +72,7 @@ export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
 
                         <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
                             <Clock className="h-4 w-4" />
-                            <span>Abandoned {formatDistanceToNow(new Date(cart.created_at), { addSuffix: true })}</span>
+                            <span>Abandoned {formatDistanceToNow(new Date(cart.updated_at), { addSuffix: true })}</span>
                         </div>
                     </div>
 

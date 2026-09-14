@@ -65,7 +65,7 @@
     --background-image-gradient-primary: var(--gradient-primary);
     --background-image-gradient-action: var(--gradient-action);
 
-    --aspect-gallery: 4 / 5;
+    --aspect-gallery: 4 / 5.6;
 
     --container-8xl: 88rem;
     --container-sxl: 82rem;

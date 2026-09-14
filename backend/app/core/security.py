@@ -2,6 +2,7 @@
 import hashlib
 import hmac
 import time
+
 from fastapi import Header, HTTPException, Request
 from passlib.context import CryptContext
 
@@ -70,6 +71,6 @@ async def verify_internal_signature(
 def verify_extension_secret(x_extension_secret: str = Header(..., alias="X-Extension-Secret")):
     if x_extension_secret != settings.EXTENSION_SECRET_KEY:
         raise HTTPException(
-            status_code=403, 
+            status_code=403,
             detail="Forbidden: Invalid or missing extension header"
         )

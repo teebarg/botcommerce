@@ -77,16 +77,6 @@ class Product(BaseModel):
     class Config:
         from_attributes = True
 
-class SearchCategory(BaseModel):
-    id: int
-    name: Optional[str] = None
-    slug: str
-
-class SearchCollection(BaseModel):
-    id: int
-    name: Optional[str] = None
-    slug: str
-
 class ProductSearch(BaseModel):
     id: int
     name: Optional[str] = None
@@ -104,13 +94,6 @@ class FeedProducts(BaseModel):
     total_count: int
     limit: int
     next_cursor: str | None
-
-class SearchProducts(BaseModel):
-    products: List[ProductSearch]
-    skip: int
-    limit: int
-    total_count: int
-    total_pages: int
 
 class IndexProducts(BaseModel):
     featured: List[ProductSearch]

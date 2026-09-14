@@ -28,7 +28,6 @@ from app.models.product import (
     IndexProducts,
     Product,
     ReviewStatus,
-    SearchProducts,
     VariantWithStatus,
 )
 from app.prisma_client import DbDep
@@ -99,20 +98,12 @@ async def get_index_products(request: Request, srv: ProductDep) -> IndexProducts
 async def search(
     request: Request, srv: ProductDep, search: str = "",
     collections: str = Query(default=""),
-    skip: int = Query(default=0, ge=0), limit: int = Query(default=20, le=100),
-) -> SearchProducts:
-    res = await srv.get_discovery_feed(
+    cursor: Optional[str] = Query(default=None), limit: int = Query(default=20, le=100),
+) -> FeedProducts:
+    return await srv.get_discovery_feed(
         search=search, sort="id:desc", collections=collections,
-        limit=limit, cursor=None, skip_offset=skip
+        limit=limit, cursor=cursor
     )
-
-    total_count = res["total_count"]
-    total_pages = (total_count // limit) + (total_count % limit > 0)
-
-    return {
-        "products": res["products"], "skip": skip,
-        "limit": limit, "total_count": total_count, "total_pages": total_pages
-    }
 
 
 @router.get("/{slug}")

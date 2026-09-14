@@ -1,7 +1,10 @@
-from typing import Optional
-from pydantic import BaseModel, Field
-from app.models.user import User
 from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel, Field
+
+from app.models.user import User
+
 
 class ReviewBase(BaseModel):
     id: int

@@ -1,8 +1,7 @@
 import { toast } from "sonner";
 import { api } from "@/utils/api";
-import { Message } from "@/schemas";
+import { CartListResponse, Message } from "@/schemas";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { AbandonedCart, AbandonedCartListResponse } from "@/schemas/abandoned-cart";
 
 const PAGE_SIZE = 20;
 
@@ -10,7 +9,7 @@ export function useAbandonedCarts(search: string) {
     return useInfiniteQuery({
         queryKey: ["abandoned-carts", { search }],
         queryFn: ({ pageParam = 0 }) =>
-            api.get<AbandonedCartListResponse>("/abandoned-carts/", { params: { skip: pageParam, limit: PAGE_SIZE, search: search || undefined } }),
+            api.get<CartListResponse>("/abandoned-carts/", { params: { skip: pageParam, limit: PAGE_SIZE, search: search || undefined } }),
         initialPageParam: 0,
         getNextPageParam: (lastPage) => (lastPage.has_more ? lastPage.skip + lastPage.limit : undefined),
     });
@@ -19,7 +18,7 @@ export function useAbandonedCarts(search: string) {
 export function useDeleteAbandonedCart() {
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: (id: number) => api.delete<AbandonedCart>(`/abandoned-carts/${id}`),
+        mutationFn: (id: number) => api.delete<Message>(`/abandoned-carts/${id}`),
         onSuccess: () => qc.invalidateQueries({ queryKey: ["abandoned-carts"] }),
     });
 }

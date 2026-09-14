@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from app.core.dependencies.cache import ArqDep
 from app.core.dependencies.cart import CartDep
 from app.core.permissions import require_admin
+from app.models.generic import Message
 from app.schemas.cart import CartListResponse, CartResponse
 
 router = APIRouter()
@@ -37,12 +38,13 @@ async def get_abandoned_cart(id: int, srv: CartDep):
     return await srv._with_computed_totals(cart)
 
 
-@router.delete("/{id}", status_code=204)
+@router.delete("/{id}")
 async def delete_abandoned_cart(id: int, srv: CartDep):
     existing = await srv.get_by_id(id)
     if not existing:
         raise HTTPException(status_code=404, detail="Cart not found")
     await srv.delete(id)
+    return Message(message="card deleted")
 
 
 @router.post("/send-reminders", dependencies=[Depends(require_admin)])
