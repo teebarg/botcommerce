@@ -23,6 +23,14 @@ class FCMIn(BaseModel):
     auth: str
 
 
+class EmailCampaignSchema(BaseModel):
+    subject: str
+    heading: str | None = None
+    intro: str | None = None
+    hero_image: str | None = None
+    product_ids: list[str]
+
+
 logger = get_logger(__name__)
 
 router = APIRouter()
@@ -65,4 +73,23 @@ async def send_push_notification(queue: ArqDep, db: DbDep, payload: PushMessageS
         return Message(message="success")
     except Exception as e:
         logger.error(f"Failed to send push notifications: {str(e)}")
+        return Message(message="failed")
+
+
+@router.post("/email-campaign")
+async def send_email_campaign(
+    queue: ArqDep, db: DbDep, payload: EmailCampaignSchema
+) -> Message:
+    try:
+        await queue.enqueue_job(
+            "process_email_campaign",
+            subject=payload.subject,
+            heading=payload.heading,
+            intro=payload.intro,
+            hero_image=payload.hero_image,
+            product_ids=payload.product_ids,
+        )
+        return Message(message="success")
+    except Exception as e:
+        logger.error(f"Failed to enqueue email campaign: {str(e)}")
         return Message(message="failed")

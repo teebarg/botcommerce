@@ -1,11 +1,13 @@
-from datetime import datetime, timedelta
 import uuid
-from app.security import call_internal_backend
+from datetime import datetime, timedelta
+
 from core.logging import get_logger
 from core.notifications import Channel, Welcome
 from core.repositories.coupon_repository import CouponRepository
 from core.repositories.user_repository import UserRepository
+
 from app.db import session_factory
+from app.security import call_internal_backend
 
 logger = get_logger(__name__)
 

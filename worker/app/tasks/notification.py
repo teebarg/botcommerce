@@ -1,6 +1,9 @@
-from core.notifications import Channel, PushEvent
-from core.notifications.base import PushSubscription
+from core.logging import get_logger
+from core.notifications import Channel, Mail, PushEvent
+from core.notifications.base import CampaignProduct, PushSubscription
 from core.notifications.channels.push import PushSubscriptionExpired
+
+logger = get_logger(__name__)
 
 
 async def process_push_notification(ctx, payload: dict, subscription_ids: list[str]):
@@ -45,3 +48,71 @@ async def process_push_notification(ctx, payload: dict, subscription_ids: list[s
                 "DELETE FROM push_subscriptions WHERE id = ANY($1::text[])",
                 expired_ids,
             )
+
+async def process_email_campaign(
+    ctx,
+    subject: str,
+    heading: str | None,
+    intro: str | None,
+    hero_image: str | None,
+    product_ids: list[str],
+) -> None:
+    email_channel = ctx["email_channel"]
+    pool = ctx["db_pool"]
+
+    async with pool.acquire() as conn:
+        product_rows = await conn.fetch(
+            """
+            SELECT name, image, price, discount_price, url
+            FROM products
+            WHERE id = ANY($1::text[])
+            """,
+            product_ids,
+        )
+
+        recipient_rows = await conn.fetch(
+            """
+            SELECT id, email
+            FROM customers
+            WHERE subscribed_to_marketing = true
+            """,
+        )
+
+    products = [
+        CampaignProduct(
+            name=row["name"],
+            image=row["image"],
+            price=row["price"],
+            discount_price=row["discount_price"],
+            url=row["url"],
+        )
+        for row in product_rows
+    ]
+
+    mails = [
+        Mail(
+            to=row["email"],
+            subject=subject,
+            template="marketing_campaign.html",
+            data={
+                "subject": subject,
+                "heading": heading,
+                "intro": intro,
+                "hero_image": hero_image,
+                "products": products,
+                "unsubscribe_url": f"/unsubscribe?customer_id={row['id']}",
+            },
+        )
+        for row in recipient_rows
+    ]
+
+    results = await email_channel.send_many(mails)
+
+    failures = [
+        (row["email"], result)
+        for row, result in zip(recipient_rows, results)
+        if result is not None
+    ]
+
+    if failures:
+        logger.warning("Email campaign had %d failed sends", len(failures))

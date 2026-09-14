@@ -1,3 +1,4 @@
+import asyncio
 from email.message import EmailMessage
 from pathlib import Path
 
@@ -27,6 +28,7 @@ class EmailChannel:
         sender: str,
         template_dir: str | Path,
         start_tls: bool = True,
+        max_concurrency: int = 5,
     ):
         self.host = host
         self.port = port
@@ -34,6 +36,7 @@ class EmailChannel:
         self.password = password
         self.sender = sender
         self.start_tls = start_tls
+        self._semaphore = asyncio.Semaphore(max_concurrency)
 
         self.templates = Environment(
             loader=FileSystemLoader(str(template_dir)),
@@ -47,7 +50,7 @@ class EmailChannel:
             "normalize_image": normalize_image,
         })
 
-    async def send(self, mail: Mail) -> None:
+    async def send_one(self, mail: Mail) -> None:
         template = self.templates.get_template(mail.template)
         html = template.render(**mail.data)
 
@@ -81,4 +84,21 @@ class EmailChannel:
             kwargs["username"] = self.username
             kwargs["password"] = self.password
 
-        await aiosmtplib.send(message, **kwargs)
+        async with self._semaphore:
+            await aiosmtplib.send(message, **kwargs)
+
+        # await aiosmtplib.send(message, **kwargs)
+
+
+    async def send(self, mails: list[Mail]) -> list[Exception | None]:
+        """Send to many recipients concurrently (bounded by max_concurrency).
+ 
+        One recipient's failure never blocks or cancels the others. Returns a
+        list positionally aligned with `mails`: None for a successful send,
+        otherwise the exception raised for that recipient.
+        """
+        results = await asyncio.gather(
+            *(self.send(mail) for mail in mails),
+            return_exceptions=True,
+        )
+        return [result if isinstance(result, Exception) else None for result in results]

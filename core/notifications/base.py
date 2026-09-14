@@ -22,6 +22,14 @@ class Mail:
     cc: str | list[str] | None = None
 
 @dataclass
+class CampaignProduct:
+    name: str
+    image: str
+    price: int
+    url: str
+    discount_price: int | None = None
+
+@dataclass
 class PushSubscription:
     endpoint: str
     p256dh: str
