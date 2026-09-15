@@ -30,6 +30,17 @@ def format_naira(value: int) -> str:
 def normalize_image(image: str) -> str:
     return image.replace("mp4", "webp")
 
+def product_discount(original_price: float, current_price: float) -> int:
+    """Percentage off, rounded to the nearest whole number.
+
+    discount(5000, 4000) -> 20
+    """
+    if not original_price or original_price <= current_price:
+        return 0
+
+    pct = (original_price - current_price) / original_price * 100
+    return round(pct)
+
 
 def format_image(image: str) -> str:
     return image

@@ -28,7 +28,7 @@ class EmailCampaignSchema(BaseModel):
     heading: str | None = None
     intro: str | None = None
     hero_image: str | None = None
-    product_ids: list[str]
+    product_ids: list[int]
 
 
 logger = get_logger(__name__)

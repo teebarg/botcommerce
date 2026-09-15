@@ -3,6 +3,7 @@ from typing import Any
 
 from core.notifications import Mail
 from core.notifications.base import (
+    Mails,
     Notification,
     Push,
     PushSubscription,
@@ -18,7 +19,7 @@ class PushEvent(Notification):
     imageUrl: str | None = None
     data: dict[str, Any] = None
 
-    def to_email(self) -> Mail:
+    def to_email(self) -> Mails:
         return 
     
 
@@ -31,3 +32,23 @@ class PushEvent(Notification):
             imageUrl=self.imageUrl,
             data=self.data,
         )
+
+
+@dataclass(frozen=True)
+class CampaignEvent(Notification):
+    receipients: list[str]
+    subject: str
+    template: str
+    data: dict[str, Any] = None
+
+    def to_email(self) -> Mails:
+        return Mails(
+            receipients=self.receipients,
+            mail=Mail(
+                to="",
+                subject=self.subject,
+                template=self.template,
+                data=self.data
+            )
+        )
+    

@@ -1,5 +1,5 @@
 from core.logging import get_logger
-from core.notifications import Channel, Mail, PushEvent
+from core.notifications import CampaignEvent, Channel, PushEvent
 from core.notifications.base import CampaignProduct, PushSubscription
 from core.notifications.channels.push import PushSubscriptionExpired
 
@@ -49,6 +49,7 @@ async def process_push_notification(ctx, payload: dict, subscription_ids: list[s
                 expired_ids,
             )
 
+
 async def process_email_campaign(
     ctx,
     subject: str,
@@ -56,16 +57,24 @@ async def process_email_campaign(
     intro: str | None,
     hero_image: str | None,
     product_ids: list[str],
+    trust_note: str | None = None,
+    cta_text: str | None = "Shop Now",
+    cta_url: str | None = "/cllections",
+    eyebrow: str | None = "",
+    preheader: str | None = ""
 ) -> None:
-    email_channel = ctx["email_channel"]
+    notification_srv = ctx["notification_srv"]
     pool = ctx["db_pool"]
 
     async with pool.acquire() as conn:
         product_rows = await conn.fetch(
             """
-            SELECT name, image, price, discount_price, url
-            FROM products
-            WHERE id = ANY($1::text[])
+            SELECT DISTINCT ON (p.id)
+                p.id, p.name, p.image, p.slug, pv.price, pv.old_price
+            FROM products p
+            JOIN product_variants pv ON pv.product_id = p.id
+            WHERE p.id = ANY($1::int[])
+            ORDER BY p.id, pv.price ASC
             """,
             product_ids,
         )
@@ -73,25 +82,27 @@ async def process_email_campaign(
         recipient_rows = await conn.fetch(
             """
             SELECT id, email
-            FROM customers
-            WHERE subscribed_to_marketing = true
+            FROM users
+            WHERE status = 'active'
+            LIMIT 1
             """,
         )
+        print("🚀 ~ process_email_campaign ~ recipient_rows:", recipient_rows)
 
     products = [
         CampaignProduct(
-            name=row["name"],
-            image=row["image"],
+            name=row["name"] or "",
+            image=row["image"] or "",
             price=row["price"],
-            discount_price=row["discount_price"],
-            url=row["url"],
+            old_price=row["old_price"],
+            url=f"/products/{row['slug']}",
         )
         for row in product_rows
     ]
 
-    mails = [
-        Mail(
-            to=row["email"],
+    results = await notification_srv.send(
+        CampaignEvent(
+            receipients=[row["email"] for row in recipient_rows],
             subject=subject,
             template="marketing_campaign.html",
             data={
@@ -99,18 +110,24 @@ async def process_email_campaign(
                 "heading": heading,
                 "intro": intro,
                 "hero_image": hero_image,
+                "preheader": preheader,        # new — short, ~90 char inbox preview text
+                "eyebrow": eyebrow,            # new — optional, e.g. "48 HOURS ONLY"
+                "cta_url": cta_url,            # new — e.g. link to your collection page
+                "cta_text": cta_text,          # new — defaults to "Shop Now"
+                "trust_note": trust_note,      # new — e.g. "Free delivery on orders over ₦X"
                 "products": products,
-                "unsubscribe_url": f"/unsubscribe?customer_id={row['id']}",
-            },
-        )
-        for row in recipient_rows
-    ]
-
-    results = await email_channel.send_many(mails)
+                "unsubscribe_url": "/unsubscribe",
+            }
+        ),
+        channels=[Channel.EMAIL],
+    )
+    print("🚀 ~ process_email_campaign ~ results:", results)
+    mail_results = results.get(Channel.EMAIL, [])
+    print("🚀 ~ process_email_campaign ~ results:", mail_results)
 
     failures = [
         (row["email"], result)
-        for row, result in zip(recipient_rows, results)
+        for row, result in zip(recipient_rows, mail_results)
         if result is not None
     ]
 

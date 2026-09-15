@@ -44,16 +44,16 @@ class NotificationService:
         for channel in channels:
             match channel:
                 case Channel.EMAIL:
-                    mail = notification.to_email()
+                    mail_data = notification.to_email()
 
-                    if mail:
-                        mail.data = {
+                    if mail_data:
+                        mail_data.mail.data = {
                             "shop": self.shop_settings,
-                            **mail.data,
+                            **mail_data.mail.data,
                         }
 
                         tasks.append(
-                            self.email.send(mail)
+                            self.email.send(mail_data)
                         )
                         ordered_channels.append(channel)
 
