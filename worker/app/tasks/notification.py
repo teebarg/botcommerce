@@ -120,11 +120,11 @@ async def process_email_campaign(
                 "heading": heading,
                 "intro": intro,
                 "hero_image": hero_image,
-                "preheader": preheader,        # new — short, ~90 char inbox preview text
-                "eyebrow": eyebrow,            # new — optional, e.g. "48 HOURS ONLY"
-                "cta_url": cta_url,            # new — e.g. link to your collection page
-                "cta_text": cta_text,          # new — defaults to "Shop Now"
-                "trust_note": trust_note,      # new — e.g. "Free delivery on orders over ₦X"
+                "preheader": preheader,
+                "eyebrow": eyebrow,
+                "cta_url": cta_url,
+                "cta_text": cta_text,
+                "trust_note": trust_note,
                 "products": products,
                 "unsubscribe_url": "/unsubscribe",
                 "urgency_text": urgency_text,

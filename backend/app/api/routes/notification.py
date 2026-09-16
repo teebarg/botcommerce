@@ -95,6 +95,13 @@ async def send_email_campaign(
             intro=payload.intro,
             hero_image=payload.hero_image,
             product_ids=payload.product_ids,
+            trust_note=payload.trust_note,
+            cta_text=payload.cta_text,
+            cta_url=payload.cta_url,
+            eyebrow=payload.eyebrow,
+            preheader=payload.preheader,
+            urgency_text=payload.urgency_text,
+            trust_badges=payload.trust_badges,
         )
         return Message(message="success")
     except Exception as e:
