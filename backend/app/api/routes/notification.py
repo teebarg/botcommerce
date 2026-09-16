@@ -1,7 +1,7 @@
 from typing import Optional
 
 from fastapi import APIRouter
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.core.dependencies.cache import ArqDep
 from app.core.deps import UserDep
@@ -35,7 +35,7 @@ class EmailCampaignSchema(BaseModel):
     eyebrow: str | None = ""
     preheader: str | None = ""
     urgency_text: str | None = "🔥 FLASH SALE — 48 HOURS ONLY"
-    trust_badges: list[str] = None
+    trust_badges: list[str] = Field( default_factory=list )
 
 
 logger = get_logger(__name__)
