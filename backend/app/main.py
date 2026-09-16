@@ -139,6 +139,7 @@ async def test_arq(queue: ArqDep) -> dict[str, Any]:
     #     "user_register",
     #     user_id=1,
     # )
+    await queue.enqueue_job("process_test_email")
     return {"message": "ok"}
 
 

@@ -86,11 +86,8 @@ class EmailChannel:
             kwargs["username"] = self.username
             kwargs["password"] = self.password
 
-        print(kwargs)
-
         async with self._semaphore:
-            res = await aiosmtplib.send(message, **kwargs)
-            print("🚀 ~ EmailChannel ~ send_one ~ res:", res)
+            await aiosmtplib.send(message, **kwargs)
 
 
     async def send(self, payload: Mails) -> list[Exception | None]:
@@ -100,10 +97,8 @@ class EmailChannel:
         list positionally aligned with `mails`: None for a successful send,
         otherwise the exception raised for that recipient.
         """
-        print("🚀 ~ EmailChannel ~ send ~ payload:", payload)
         results = await asyncio.gather(
             *(self.send_one(mail=payload.mail, receipient=user) for user in payload.receipients),
             return_exceptions=True,
         )
-        print("🚀 ~ EmailChannel ~ send ~ results:", results)
         return [result if isinstance(result, Exception) else None for result in results]

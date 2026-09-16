@@ -4,6 +4,7 @@ from datetime import datetime
 from core.config import settings
 from core.notifications.base import (
     Mail,
+    Mails,
     Notification,
     SlackMessage,
 )
@@ -18,21 +19,24 @@ class BulkPurchaseEvent(Notification):
     bulkType: str
     quantity: str | None
 
-    def to_email(self) -> Mail:
-        return Mail(
-            to=settings.CONTACT_EMAIL,
-            subject="New Bulk Purchase Inquiry",
-            template="bulk_purchase.html",
-            data={
-                "name": self.name,
-                "email": self.email,
-                "phone": self.phone,
-                "bulkType": self.bulkType,
-                "quantity": self.quantity or "Not specified",
-                "message": self.message or "No additional details provided",
-                "header_title": "New enquiry on bulk purchase",
-                "current_year": datetime.now().year,
-            },
+    def to_email(self) -> Mails:
+        return Mails(
+            receipients=[settings.CONTACT_EMAIL],
+            mail=Mail(
+                to=settings.CONTACT_EMAIL,
+                subject="New Bulk Purchase Inquiry",
+                template="bulk_purchase.html",
+                data={
+                    "name": self.name,
+                    "email": self.email,
+                    "phone": self.phone,
+                    "bulkType": self.bulkType,
+                    "quantity": self.quantity or "Not specified",
+                    "message": self.message or "No additional details provided",
+                    "header_title": "New enquiry on bulk purchase",
+                    "current_year": datetime.now().year,
+                },
+            ),
         )
 
     def to_slack(self) -> SlackMessage:

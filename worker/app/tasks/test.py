@@ -3,7 +3,7 @@ from core.notifications import Channel, TestCreated
 
 logger = get_logger(__name__)
 
-async def test_email(ctx):
+async def process_test_email(ctx):
     notification_srv = ctx["notification_srv"]
     await notification_srv.send(
         TestCreated(

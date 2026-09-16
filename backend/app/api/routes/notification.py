@@ -29,6 +29,13 @@ class EmailCampaignSchema(BaseModel):
     intro: str | None = None
     hero_image: str | None = None
     product_ids: list[int]
+    trust_note: str | None = None
+    cta_text: str | None = "Shop Now"
+    cta_url: str | None = "/collections"
+    eyebrow: str | None = ""
+    preheader: str | None = ""
+    urgency_text: str | None = "🔥 FLASH SALE — 48 HOURS ONLY"
+    trust_badges: list[str] = None
 
 
 logger = get_logger(__name__)

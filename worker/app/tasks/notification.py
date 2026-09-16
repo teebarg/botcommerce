@@ -59,10 +59,14 @@ async def process_email_campaign(
     product_ids: list[str],
     trust_note: str | None = None,
     cta_text: str | None = "Shop Now",
-    cta_url: str | None = "/cllections",
+    cta_url: str | None = "/collections",
     eyebrow: str | None = "",
-    preheader: str | None = ""
+    preheader: str | None = "",
+    urgency_text: str | None = "🔥 FLASH SALE — 48 HOURS ONLY",
+    trust_badges: list[str] = None
 ) -> None:
+    if trust_badges is None:
+        trust_badges = ["🚚 Free delivery", "↩ Easy returns", "🔒 Secure checkout"]
     notification_srv = ctx["notification_srv"]
     pool = ctx["db_pool"]
 
@@ -70,9 +74,16 @@ async def process_email_campaign(
         product_rows = await conn.fetch(
             """
             SELECT DISTINCT ON (p.id)
-                p.id, p.name, p.image, p.slug, pv.price, pv.old_price
+                p.id, p.name, p.slug, pv.price, pv.old_price, img.image AS image
             FROM products p
             JOIN product_variants pv ON pv.product_id = p.id
+            LEFT JOIN LATERAL (
+                SELECT pi.image
+                FROM product_images pi
+                WHERE pi.product_id = p.id
+                ORDER BY pi.order ASC
+                LIMIT 1
+            ) img ON TRUE
             WHERE p.id = ANY($1::int[])
             ORDER BY p.id, pv.price ASC
             """,
@@ -87,7 +98,6 @@ async def process_email_campaign(
             LIMIT 1
             """,
         )
-        print("🚀 ~ process_email_campaign ~ recipient_rows:", recipient_rows)
 
     products = [
         CampaignProduct(
@@ -117,13 +127,13 @@ async def process_email_campaign(
                 "trust_note": trust_note,      # new — e.g. "Free delivery on orders over ₦X"
                 "products": products,
                 "unsubscribe_url": "/unsubscribe",
+                "urgency_text": urgency_text,
+                "trust_badges": trust_badges,
             }
         ),
         channels=[Channel.EMAIL],
     )
-    print("🚀 ~ process_email_campaign ~ results:", results)
     mail_results = results.get(Channel.EMAIL, [])
-    print("🚀 ~ process_email_campaign ~ results:", mail_results)
 
     failures = [
         (row["email"], result)

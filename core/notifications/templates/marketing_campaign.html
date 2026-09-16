@@ -28,14 +28,52 @@
         text-decoration: none;
       }
 
+      /* Footer */
+      .footer {
+        /* background-color: #1a1a1a; */
+        background-color: #fafafa;
+        padding: 20px;
+        text-align: center;
+        color: #4b5563;
+        font-size: 12px;
+      }
+
+      .footer a {
+        color: #4285f4;
+        text-decoration: none;
+        margin: 0 5px;
+      }
+
+      .unsubscribe {
+        font-size: 11px;
+        color: #666;
+      }
+
+      .text-gray-100 {
+        color: #f3f4f6;
+      }
+
+      .text-gray-500 {
+        color: #6b7280;
+      }
+
+      .text-gray-600 {
+        color: #4b5563;
+      }
+
+      .text-gray-900 {
+        color: #111827;
+      }
+
       @media only screen and (max-width: 600px) {
         .container {
           width: 100% !important;
         }
 
-        .stack-col {
+        .product-card {
           display: block !important;
           width: 100% !important;
+          margin-right: 0 !important;
         }
 
         .hero-heading {
@@ -43,7 +81,7 @@
           line-height: 30px !important;
         }
 
-        .product-image {
+        .full-width-img {
           width: 100% !important;
           height: auto !important;
         }
@@ -57,7 +95,6 @@
   </head>
 
   <body style="margin: 0; padding: 0; background-color: #f2f2f2">
-    <!-- Preheader: shown in inbox preview, hidden in the email body -->
     {% if preheader %}
     <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all">
       {{ preheader }}
@@ -72,7 +109,7 @@
       style="background-color: #f2f2f2"
     >
       <tr>
-        <td align="center" style="padding: 32px 16px">
+        <td align="center" style="padding: 24px 16px">
           <table
             role="presentation"
             class="container"
@@ -81,11 +118,37 @@
             cellspacing="0"
             style="width: 600px; max-width: 600px; background-color: #ffffff"
           >
+            <!-- Urgency strip -->
+            {% if urgency_text %}
+            <tr>
+              <td
+                align="center"
+                style="
+                  background-color: #e63946;
+                  padding: 10px 24px;
+                  font-family: Arial, sans-serif;
+                "
+              >
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 13px;
+                    font-weight: bold;
+                    letter-spacing: 0.5px;
+                    color: #ffffff;
+                  "
+                >
+                  {{ urgency_text }}
+                </p>
+              </td>
+            </tr>
+            {% endif %}
+
             <!-- Brand header -->
             <tr>
               <td
                 align="center"
-                style="padding: 24px 32px; border-bottom: 1px solid #f0f0f0"
+                style="padding: 20px 32px; border-bottom: 1px solid #f0f0f0"
               >
                 {% if shop and shop.logo %}
                 <img
@@ -98,8 +161,8 @@
                 <span
                   style="
                     font-family: Arial, sans-serif;
-                    font-size: 18px;
-                    font-weight: bold;
+                    font-size: 20px;
+                    font-weight: 900;
                     letter-spacing: 0.5px;
                     color: #111111;
                   "
@@ -118,7 +181,7 @@
                   src="{{ hero_image | normalize_image }}"
                   alt=""
                   width="600"
-                  class="product-image"
+                  class="full-width-img"
                   style="width: 100%; height: auto"
                 />
                 {% endif %}
@@ -135,26 +198,35 @@
                 "
               >
                 {% if eyebrow %}
-                <p
-                  style="
-                    margin: 0 0 8px 0;
-                    font-size: 12px;
-                    font-weight: bold;
-                    letter-spacing: 1.5px;
-                    text-transform: uppercase;
-                    color: #c0392b;
-                  "
+                <table
+                  role="presentation"
+                  cellpadding="0"
+                  cellspacing="0"
+                  style="margin: 0 auto 14px auto; background-color: #e63946"
                 >
-                  {{ eyebrow }}
-                </p>
+                  <tr>
+                    <td
+                      style="
+                        padding: 6px 16px;
+                        font-size: 12px;
+                        font-weight: bold;
+                        letter-spacing: 1.5px;
+                        text-transform: uppercase;
+                        color: #ffffff;
+                      "
+                    >
+                      {{ eyebrow }}
+                    </td>
+                  </tr>
+                </table>
                 {% endif %}
                 <h1
                   class="hero-heading"
                   style="
                     margin: 0;
-                    font-size: 28px;
-                    line-height: 34px;
-                    font-weight: bold;
+                    font-size: 30px;
+                    line-height: 36px;
+                    font-weight: 900;
                     color: #111111;
                   "
                 >
@@ -178,21 +250,56 @@
             {% if cta_url %}
             <tr>
               <td align="center" style="padding: 24px 40px 8px 40px">
-                <a
-                  href="{{ cta_url }}"
-                  style="
-                    display: inline-block;
-                    background-color: #111111;
-                    color: #ffffff;
-                    font-family: Arial, sans-serif;
-                    font-size: 15px;
-                    font-weight: bold;
-                    padding: 14px 36px;
-                    border-radius: 4px;
-                  "
+                <table role="presentation" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="background-color: #e63946; border-radius: 30px">
+                      <a
+                        href="{{shop.frontend_host}}{{ cta_url }}"
+                        style="
+                          display: inline-block;
+                          color: #ffffff;
+                          font-family: Arial, sans-serif;
+                          font-size: 15px;
+                          font-weight: bold;
+                          padding: 15px 40px;
+                        "
+                      >
+                        {{ cta_text or "Shop Now" }}
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            {% endif %}
+
+            <!-- Trust badges -->
+            {% if trust_badges %}
+            <tr>
+              <td style="padding: 28px 40px 8px 40px">
+                <table
+                  role="presentation"
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
                 >
-                  {{ cta_text or "Shop Now" }}
-                </a>
+                  <tr>
+                    {% for badge in trust_badges %}
+                    <td
+                      align="center"
+                      style="
+                        font-family: Arial, sans-serif;
+                        font-size: 12px;
+                        font-weight: bold;
+                        color: #111111;
+                        padding: 0 4px;
+                      "
+                    >
+                      {{ badge }}
+                    </td>
+                    {% endfor %}
+                  </tr>
+                </table>
               </td>
             </tr>
             {% endif %}
@@ -206,165 +313,164 @@
               </td>
             </tr>
 
-            <!-- Products -->
+            <!-- Products: 2 columns via inline-block divs (not table cells — table-cell display
+               overrides are unreliable on mobile clients, divs stack correctly everywhere) -->
             <tr>
-              <td class="px" style="padding: 8px 40px 8px 40px">
-                <table
-                  role="presentation"
-                  width="100%"
-                  cellpadding="0"
-                  cellspacing="0"
+              <td class="px" style="padding: 24px 24px 8px 24px; font-size: 0">
+                {%- for product in products -%}
+                <div
+                  class="product-card"
+                  style="display:inline-block; vertical-align:top; width:48%; {% if loop.index0 % 2 == 0 %}margin-right:4%;{% endif %} margin-bottom:20px; font-size:14px; text-align:left;"
                 >
-                  {% for product in products %}
-                  <tr>
-                    <td
-                      style="padding: 24px 0; {% if not loop.last %}border-bottom: 1px solid #f0f0f0;{% endif %}"
-                    >
-                      <table
-                        role="presentation"
-                        width="100%"
-                        cellpadding="0"
-                        cellspacing="0"
-                      >
-                        <tr>
-                          <td
-                            width="120"
-                            valign="top"
-                            style="position: relative"
-                          >
-                            <a href="{{ product.url }}">
-                              <img
-                                src="{{ product.image | normalize_image }}"
-                                alt="{{ product.name }}"
-                                width="112"
-                                height="112"
-                                style="
-                                  width: 112px;
-                                  height: 112px;
-                                  border-radius: 6px;
-                                  object-fit: cover;
-                                  background-color: #f5f5f5;
-                                "
-                              />
-                            </a>
-                            {% if product.old_price and product.old_price >
-                            product.price %}
-                            <table
-                              role="presentation"
-                              cellpadding="0"
-                              cellspacing="0"
-                              style="
-                                position: absolute;
-                                top: 6px;
-                                left: 6px;
-                                background-color: #c0392b;
-                                border-radius: 3px;
-                              "
-                            >
-                              <tr>
-                                <td
-                                  style="
-                                    padding: 3px 7px;
-                                    font-family: Arial, sans-serif;
-                                    font-size: 11px;
-                                    font-weight: bold;
-                                    color: #ffffff;
-                                  "
-                                >
-                                  - {{ product.old_price |
-                                  product_discount(product.price) }}%
-                                </td>
-                              </tr>
-                            </table>
-                            {% endif %}
-                          </td>
-                          <td
-                            valign="top"
+                  <table
+                    role="presentation"
+                    width="100%"
+                    cellpadding="0"
+                    cellspacing="0"
+                    style="
+                      border: 1px solid #eeeeee;
+                      border-radius: 10px;
+                      overflow: hidden;
+                    "
+                  >
+                    <tr>
+                      <td style="position: relative">
+                        <a href="{{shop.frontend_host}}{{ product.url }}">
+                          <img
+                            src="{{ product.image | normalize_image }}"
+                            alt="{{ product.name }}"
+                            width="268"
+                            class="full-width-img"
                             style="
-                              padding-left: 20px;
-                              font-family: Arial, sans-serif;
+                              width: 100%;
+                              height: 160px;
+                              object-fit: cover;
+                              background-color: #f5f5f5;
                             "
+                          />
+                        </a>
+                        {% if product.old_price and product.old_price >
+                        product.price %}
+                        <table
+                          role="presentation"
+                          cellpadding="0"
+                          cellspacing="0"
+                          style="
+                            position: absolute;
+                            top: 10px;
+                            left: 10px;
+                            background-color: #e63946;
+                            border-radius: 20px;
+                          "
+                        >
+                          <tr>
+                            <td
+                              style="
+                                padding: 5px 12px;
+                                font-family: Arial, sans-serif;
+                                font-size: 12px;
+                                font-weight: bold;
+                                color: #ffffff;
+                              "
+                            >
+                              -{{ product.old_price |
+                              product_discount(product.price) }}%
+                            </td>
+                          </tr>
+                        </table>
+                        {% endif %}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td
+                        style="
+                          padding: 14px 14px 18px 14px;
+                          font-family: Arial, sans-serif;
+                        "
+                      >
+                        <p
+                          style="
+                            margin: 0 0 6px 0;
+                            font-size: 14px;
+                            font-weight: bold;
+                            color: #111111;
+                            line-height: 18px;
+                          "
+                        >
+                          <a
+                            href="{{shop.frontend_host}}{{ product.url }}"
+                            style="color: #111111"
+                            >{{ product.name }}</a
                           >
-                            <p
-                              style="
-                                margin: 0 0 6px 0;
-                                font-size: 16px;
-                                font-weight: bold;
-                                color: #111111;
-                              "
-                            >
-                              <a href="{{ product.url }}" style="color: #111111"
-                                >{{ product.name }}</a
-                              >
-                            </p>
-                            <p style="margin: 0 0 14px 0; font-size: 15px">
-                              {% if product.old_price and product.old_price >
-                              product.price %}
-                              <span
-                                style="
-                                  text-decoration: line-through;
-                                  color: #999999;
-                                  margin-right: 8px;
-                                "
-                                >{{ product.old_price | naira }}</span
-                              >
-                              <span style="color: #c0392b; font-weight: bold"
-                                >{{ product.price | naira }}</span
-                              >
-                              {% else %}
-                              <span style="color: #111111; font-weight: bold"
-                                >{{ product.price | naira }}</span
-                              >
-                              {% endif %}
-                            </p>
-                            <a
-                              href="{{ product.url }}"
-                              style="
-                                display: inline-block;
-                                font-size: 13px;
-                                font-weight: bold;
-                                color: #111111;
-                                border: 1px solid #111111;
-                                padding: 9px 18px;
-                                border-radius: 4px;
-                              "
-                            >
-                              View item
-                            </a>
-                          </td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </table>
+                        </p>
+                        <p style="margin: 0 0 12px 0; font-size: 14px">
+                          {% if product.old_price and product.old_price >
+                          product.price %}
+                          <span
+                            style="
+                              text-decoration: line-through;
+                              color: #999999;
+                              margin-right: 6px;
+                            "
+                            >{{ product.old_price | naira }}</span
+                          >
+                          <span style="color: #e63946; font-weight: bold"
+                            >{{ product.price | naira }}</span
+                          >
+                          {% else %}
+                          <span style="color: #111111; font-weight: bold"
+                            >{{ product.price | naira }}</span
+                          >
+                          {% endif %}
+                        </p>
+                        <a
+                          href="{{shop.frontend_host}}{{ product.url }}"
+                          style="
+                            display: block;
+                            text-align: center;
+                            font-size: 12px;
+                            font-weight: bold;
+                            color: #111111;
+                            border: 1.5px solid #111111;
+                            border-radius: 20px;
+                            padding: 8px 0;
+                          "
+                        >
+                          Shop now
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+                {%- endfor -%}
               </td>
             </tr>
 
             {% if cta_url %}
             <tr>
-              <td align="center" style="padding: 8px 40px 40px 40px">
-                <a
-                  href="{{ cta_url }}"
-                  style="
-                    display: inline-block;
-                    background-color: #111111;
-                    color: #ffffff;
-                    font-family: Arial, sans-serif;
-                    font-size: 15px;
-                    font-weight: bold;
-                    padding: 14px 36px;
-                    border-radius: 4px;
-                  "
-                >
-                  {{ cta_text or "Shop the full collection" }}
-                </a>
+              <td align="center" style="padding: 16px 40px 40px 40px">
+                <table role="presentation" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="background-color: #e63946; border-radius: 30px">
+                      <a
+                        href="{{shop.frontend_host}}{{ cta_url }}"
+                        style="
+                          display: inline-block;
+                          color: #ffffff;
+                          font-family: Arial, sans-serif;
+                          font-size: 15px;
+                          font-weight: bold;
+                          padding: 15px 40px;
+                        "
+                      >
+                        {{ cta_text or "Shop the full collection" }}
+                      </a>
+                    </td>
+                  </tr>
+                </table>
               </td>
             </tr>
-            {% endif %}
-
-            <!-- Trust / social proof -->
-            {% if trust_note %}
+            {% endif %} {% if trust_note %}
             <tr>
               <td
                 align="center"
@@ -380,70 +486,79 @@
             </tr>
             {% endif %}
 
-            <!-- Footer -->
+            <!-- Customer Support Section -->
             <tr>
               <td
-                style="
-                  background-color: #fafafa;
-                  padding: 28px 40px;
-                  font-family: Arial, sans-serif;
-                  border-top: 1px solid #f0f0f0;
-                "
+                class="footer"
+                style="padding: 20px 40px 0; text-align: center"
               >
-                <table
-                  role="presentation"
-                  cellpadding="0"
-                  cellspacing="0"
-                  style="margin: 0 auto 16px auto"
-                >
-                  <tr>
-                    <td style="padding: 0 5px">
-                      <a
-                        href="https://web.facebook.com/profile/{{ shop.facebook }}"
-                        target="_blank"
-                        style="color: #64748b; text-decoration: none"
-                        >Facebook</a
-                      >
-                    </td>
-                    <td style="padding: 0 5px">
-                      <a
-                        href="https://www.tiktok.com/@{{ shop.tiktok }}"
-                        target="_blank"
-                        style="color: #64748b; text-decoration: none"
-                        >Tiktok</a
-                      >
-                    </td>
-                    <td style="padding: 0 5px">
-                      <a
-                        href="https://www.instagram.com/{{ shop.instagram }}/"
-                        target="_blank"
-                        style="color: #64748b; text-decoration: none"
-                        >Instagram</a
-                      >
-                    </td>
-                  </tr>
-                </table>
-
-                <p
+                <h3
                   style="
-                    margin: 0 0 4px 0;
-                    font-size: 12px;
-                    line-height: 18px;
-                    color: #999999;
-                    text-align: center;
+                    margin: 0;
+                    color: #1e293b;
+                    font-size: 14px;
+                    font-weight: 600;
                   "
                 >
-                  {% if shop and shop.address %}{{ shop.address }} &middot; {%
-                  endif %} You're receiving this because you subscribed to
-                  marketing emails{% if shop and shop.name %} from {{ shop.name
-                  }}{% endif %}.
+                  Need Help?
+                </h3>
+                <p
+                  style="
+                    margin: 0 0 10px 0;
+                    color: #64748b;
+                    font-size: 12px;
+                    line-height: 1.5;
+                  "
+                >
+                  Our support team is ready to assist you with any questions.
                 </p>
-                <p style="margin: 0; font-size: 12px; text-align: center">
-                  <a
-                    href="{{ unsubscribe_url }}"
-                    style="color: #999999; text-decoration: underline"
-                    >Unsubscribe</a
+                <a
+                  href="mailto:{{ shop.contact_email }}"
+                  style="
+                    color: #4a6cf7;
+                    text-decoration: none;
+                    font-weight: 600;
+                  "
+                  >{{ shop.contact_email }}</a
+                >
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td class="footer">
+                <p style="margin-bottom: 10px">
+                  <a href="{{ shop.frontend_host }}">Shop</a> |
+                  <a href="{{ shop.frontend_host }}/about">About Us</a> |
+                  <a href="{{ shop.frontend_host }}/support">Contact</a> |
+                  <a href="{{ shop.frontend_host }}/faqs">FAQs</a>
+                </p>
+                <p style="margin-bottom: 5px">
+                  Follow us:
+                  <a href="https://web.facebook.com/profile/{{ facebook }}"
+                    >Facebook</a
                   >
+                  |
+                  <a href="https://www.instagram.com/{{ instagram }}/"
+                    >Instagram</a
+                  >
+                  | <a href="https://www.tiktok.com/@{{ tiktok }}">Tiktok</a>
+                </p>
+                <p style="margin-bottom: 2px">
+                  © {{ current_year|default('2026') }} {{ shop.shop_name }}, All
+                  Rights Reserved
+                </p>
+                <p style="margin-bottom: 2px" class="unsubscribe">
+                  This email was sent to you because you signed up to receive
+                  updates. If you do not wish to receive these emails,
+                  <a
+                    href="{{shop.frontend_host}}/unsubscribe"
+                    style="color: #4285f4"
+                    >unsubscribe</a
+                  >.
+                </p>
+                <p class="unsubscribe">
+                  {{ shop.shop_name }}, {{ shop.address }}
                 </p>
               </td>
             </tr>

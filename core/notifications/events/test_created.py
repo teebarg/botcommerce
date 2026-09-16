@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from core.notifications.base import (
     Mail,
+    Mails,
     Notification,
     SlackMessage,
     WhatsAppMessage,
@@ -12,14 +13,17 @@ from core.notifications.base import (
 class TestCreated(Notification):
     email: str
 
-    def to_email(self) -> Mail:
-        return Mail(
-            to=self.email,
-            subject="Notification system test",
-            template="test_created.html",
-            data={
-                "message": "Notification system is working!",
-            },
+    def to_email(self) -> Mails:
+        return Mails(
+            receipients=[self.email],
+            mail=Mail(
+                to=self.email,
+                subject="Notification system test",
+                template="test_created.html",
+                data={
+                    "message": "Notification system is working!",
+                },
+            ),
         )
 
     def to_slack(self) -> SlackMessage:
