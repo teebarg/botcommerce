@@ -94,7 +94,6 @@ async def process_email_campaign(
             SELECT id, email
             FROM users
             WHERE status = 'active'
-            LIMIT 1
             """,
         )
 
