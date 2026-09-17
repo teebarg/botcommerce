@@ -1,3 +1,4 @@
+import asyncio
 from email.message import EmailMessage
 from pathlib import Path
 
@@ -5,12 +6,13 @@ import aiosmtplib
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from core.logging import get_logger
-from core.notifications.base import Mail
+from core.notifications.base import Mail, Mails
 from core.notifications.filters import (
     discount,
     format_date,
     format_naira,
     normalize_image,
+    product_discount,
 )
 
 logger = get_logger(__name__)
@@ -27,6 +29,7 @@ class EmailChannel:
         sender: str,
         template_dir: str | Path,
         start_tls: bool = True,
+        max_concurrency: int = 5,
     ):
         self.host = host
         self.port = port
@@ -34,6 +37,7 @@ class EmailChannel:
         self.password = password
         self.sender = sender
         self.start_tls = start_tls
+        self._semaphore = asyncio.Semaphore(max_concurrency)
 
         self.templates = Environment(
             loader=FileSystemLoader(str(template_dir)),
@@ -45,16 +49,17 @@ class EmailChannel:
             "discount": discount,
             "naira": format_naira,
             "normalize_image": normalize_image,
+            "product_discount": product_discount
         })
 
-    async def send(self, mail: Mail) -> None:
+    async def send_one(self, receipient: str, mail: Mail) -> None:
         template = self.templates.get_template(mail.template)
         html = template.render(**mail.data)
 
         message = EmailMessage()
 
         message["From"] = self.sender
-        message["To"] = mail.to
+        message["To"] = receipient
         message["Subject"] = mail.subject
 
         if mail.cc:
@@ -67,8 +72,8 @@ class EmailChannel:
 
         message.add_alternative(html, subtype="html")
 
-        if mail.to.lower().endswith("@guest.com"):
-            logger.debug("Skipping email send to guest.com address: %s", mail.to)
+        if receipient.lower().endswith("@guest.com"):
+            logger.debug("Skipping email send to guest.com address: %s", receipient)
             return
 
         kwargs = {
@@ -81,4 +86,19 @@ class EmailChannel:
             kwargs["username"] = self.username
             kwargs["password"] = self.password
 
-        await aiosmtplib.send(message, **kwargs)
+        async with self._semaphore:
+            await aiosmtplib.send(message, **kwargs)
+
+
+    async def send(self, payload: Mails) -> list[Exception | None]:
+        """Send to many recipients concurrently (bounded by max_concurrency).
+ 
+        One recipient's failure never blocks or cancels the others. Returns a
+        list positionally aligned with `mails`: None for a successful send,
+        otherwise the exception raised for that recipient.
+        """
+        results = await asyncio.gather(
+            *(self.send_one(mail=payload.mail, receipient=user) for user in payload.receipients),
+            return_exceptions=True,
+        )
+        return [result if isinstance(result, Exception) else None for result in results]

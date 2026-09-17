@@ -8,6 +8,7 @@ from core.notifications.base import (
 from core.notifications.events import (
     AbandonedCartEvent,
     BulkPurchaseEvent,
+    CampaignEvent,
     ContactForm,
     NewsletterEvent,
     OrderCreated,
@@ -24,6 +25,7 @@ from core.notifications.service import (
 __all__ = [
     "AbandonedCartEvent",
     "BulkPurchaseEvent",
+    "CampaignEvent",
     "Channel",
     "ContactForm",
     "Mail",
@@ -37,5 +39,5 @@ __all__ = [
     "SlackMessage",
     "TestCreated",
     "Welcome",
-    "WhatsAppMessage"
+    "WhatsAppMessage",
 ]

@@ -1,9 +1,12 @@
-import { Trash2, Edit3, X } from "lucide-react";
+import { Trash2, Edit3, X, MessageSquare } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { BulkImageSheetForm } from "./bulk-image-form-sheet";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
+import { EmailCampaignComposer } from "./EmailCampaignComposer";
+import { api } from "@/utils/api";
+import { toast } from "sonner";
 
 interface ProductBulkActionsProps {
     selectedCount: number;
@@ -14,8 +17,16 @@ interface ProductBulkActionsProps {
     isLoading?: boolean;
 }
 
-export const ProductBulkActions = ({ selectedCount, selectedImageIds, onDelete, onClearSelection, isLoading }: ProductBulkActionsProps) => {
+export const ProductBulkActions = ({
+    selectedCount,
+    selectedImageIds,
+    selectedProductIds,
+    onDelete,
+    onClearSelection,
+    isLoading,
+}: ProductBulkActionsProps) => {
     const editState = useOverlayTriggerState({});
+    const campaignState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
 
     if (selectedCount === 0) return null;
@@ -41,6 +52,29 @@ export const ProductBulkActions = ({ selectedCount, selectedImageIds, onDelete, 
                 onOpenChange={editState.setOpen}
             >
                 {editState.isOpen && <BulkImageSheetForm imageIds={selectedImageIds} onClose={editState.close} />}
+            </Overlay>
+
+            <Overlay
+                open={campaignState.isOpen}
+                title="Campaign"
+                sheetClassName="sm:max-w-7xl"
+                trigger={
+                    <Button className="rounded-full" size="sm" variant="ghost" onClick={campaignState.open}>
+                        <MessageSquare className="h-4 w-4" />
+                        <span className="hidden sm:inline text-xs">Campaign</span>
+                    </Button>
+                }
+                onOpenChange={campaignState.setOpen}
+            >
+                {campaignState.isOpen && (
+                    <EmailCampaignComposer
+                        productIds={selectedProductIds || []}
+                        onSubmit={async (payload) => {
+                            await api.post("/notification/email-campaign", payload);
+                            toast.success("campaign sent");
+                        }}
+                    />
+                )}
             </Overlay>
 
             <ConfirmDrawer

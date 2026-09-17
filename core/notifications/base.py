@@ -15,11 +15,18 @@ class Channel(StrEnum):
 
 @dataclass
 class Mail:
-    to: str
     subject: str
     template: str
     data: dict[str, Any] = field(default_factory=dict)
     cc: str | list[str] | None = None
+
+@dataclass
+class CampaignProduct:
+    name: str
+    image: str
+    price: float
+    old_price: float | None = None
+    url: str = ""
 
 @dataclass
 class PushSubscription:
@@ -38,6 +45,12 @@ class Push:
     data: dict[str, Any] = field(default_factory=dict)
 
 
+@dataclass
+class Mails:
+    receipients: list[str]
+    mail: Mail
+
+
 @dataclass(frozen=True)
 class SlackMessage:
     message: str
@@ -51,7 +64,7 @@ class WhatsAppMessage:
 
 class Notification(ABC):
     @abstractmethod
-    def to_email(self) -> Mail:
+    def to_email(self) -> Mails:
         raise NotImplementedError
 
     def to_slack(self) -> SlackMessage | None:

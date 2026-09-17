@@ -1,7 +1,43 @@
-<!DOCTYPE html>
-<html>
-<body>
-    <h1>Notification Test</h1>
-    <p>{{ message }}</p>
-</body>
-</html>
+{% extends "partials/layout.html" %} {% block content %}
+<!-- Main Content Section -->
+<tr>
+  <td
+    style="padding: 40px 30px; background-color: #ffffff"
+    class="mobile-padding"
+  >
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <!-- Intro Text -->
+      <tr>
+        <td
+          style="
+            color: #333333;
+            font-family:
+              -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Arial,
+              sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            padding-bottom: 30px;
+          "
+        >
+          This is a test email
+        </td>
+      </tr>
+      <tr>
+        <td
+          style="
+            color: #333333;
+            font-family:
+              -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Arial,
+              sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            padding-bottom: 30px;
+          "
+        >
+          {{ message }}
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>
+{% endblock %}

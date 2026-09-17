@@ -284,6 +284,9 @@
         padding-top: var(--sat);
         padding-bottom: var(--sab);
     }
+    .inputClass {
+        @apply w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5
+    }
     iframe[data-test="uw-iframe"] {
         top: var(--sat) !important;
         bottom: var(--sab) !important;

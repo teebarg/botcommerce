@@ -1,5 +1,7 @@
 from typing import Annotated, AsyncGenerator
+
 from fastapi import Depends
+
 from prisma import Prisma
 
 prisma = Prisma(auto_register=True)

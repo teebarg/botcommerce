@@ -4,6 +4,7 @@ from typing import Any
 
 from core.notifications.base import (
     Mail,
+    Mails,
     Notification,
     Push,
     PushSubscription,
@@ -17,18 +18,20 @@ class AbandonedCartEvent(Notification):
     user_name: str | None
     customer_email: str
 
-    def to_email(self) -> Mail:
-        return Mail(
-            to=self.customer_email,
-            subject="You left something in your cart",
-            template="abandoned_cart.html",
-            data={
-                "user_name": self.user_name or "Customer",
-                "user_email": self.customer_email,
-                "cart": self.cart_data,
-                "header_title": "You left something in your cart",
-                "current_year": datetime.now().year,
-            },
+    def to_email(self) -> Mails:
+        return Mails(
+            receipients=[self.customer_email],
+            mail=Mail(
+                subject="You left something in your cart",
+                template="abandoned_cart.html",
+                data={
+                    "user_name": self.user_name or "Customer",
+                    "user_email": self.customer_email,
+                    "cart": self.cart_data,
+                    "header_title": "You left something in your cart",
+                    "current_year": datetime.now().year,
+                },
+            ),
         )
 
     def to_push(self) -> Push:

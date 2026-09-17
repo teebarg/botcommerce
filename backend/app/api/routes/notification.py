@@ -1,7 +1,7 @@
 from typing import Optional
 
 from fastapi import APIRouter
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.core.dependencies.cache import ArqDep
 from app.core.deps import UserDep
@@ -21,6 +21,20 @@ class FCMIn(BaseModel):
     endpoint: str
     p256dh: str
     auth: str
+
+
+class EmailCampaignSchema(BaseModel):
+    subject: str
+    heading: str | None = None
+    intro: str | None = None
+    hero_image: str | None = None
+    product_ids: list[int]
+    cta_text: str | None = "Shop Now"
+    cta_url: str | None = "/collections"
+    eyebrow: str | None = ""
+    preheader: str | None = ""
+    urgency_text: str | None = "🔥 FLASH SALE — 48 HOURS ONLY"
+    trust_badges: list[str] = Field(default_factory=list)
 
 
 logger = get_logger(__name__)
@@ -54,7 +68,9 @@ async def push_fcm(db: DbDep, data: FCMIn, user: UserDep) -> Message:
 
 
 @router.post("/push")
-async def send_push_notification(queue: ArqDep, db: DbDep, payload: PushMessageSchema) -> Message:
+async def send_push_notification(
+    queue: ArqDep, db: DbDep, payload: PushMessageSchema
+) -> Message:
     try:
         subscription_ids = await db.pushsubscription.find_many()
         await queue.enqueue_job(
@@ -65,4 +81,27 @@ async def send_push_notification(queue: ArqDep, db: DbDep, payload: PushMessageS
         return Message(message="success")
     except Exception as e:
         logger.error(f"Failed to send push notifications: {str(e)}")
+        return Message(message="failed")
+
+
+@router.post("/email-campaign")
+async def send_email_campaign(queue: ArqDep, payload: EmailCampaignSchema) -> Message:
+    try:
+        await queue.enqueue_job(
+            "process_email_campaign",
+            subject=payload.subject,
+            heading=payload.heading,
+            intro=payload.intro,
+            hero_image=payload.hero_image,
+            product_ids=payload.product_ids,
+            cta_text=payload.cta_text,
+            cta_url=payload.cta_url,
+            eyebrow=payload.eyebrow,
+            preheader=payload.preheader,
+            urgency_text=payload.urgency_text,
+            trust_badges=payload.trust_badges,
+        )
+        return Message(message="success")
+    except Exception as e:
+        logger.error(f"Failed to enqueue email campaign: {str(e)}")
         return Message(message="failed")
