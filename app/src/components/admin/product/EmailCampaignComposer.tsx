@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 type EmailCampaignPayload = {
     subject: string;
@@ -6,7 +6,6 @@ type EmailCampaignPayload = {
     intro?: string | null;
     hero_image?: string | null;
     product_ids: number[];
-    trust_note?: string | null;
     cta_text?: string | null;
     cta_url?: string | null;
     eyebrow?: string | null;
@@ -16,30 +15,29 @@ type EmailCampaignPayload = {
 };
 
 type Props = {
-    imageIds: number[];
+    productIds: number[];
     onSubmit: (payload: EmailCampaignPayload) => Promise<void>;
 };
 
 const DEFAULT_CAMPAIGN: EmailCampaignPayload = {
-    subject: "",
-    heading: "",
-    intro: "",
-    hero_image: "",
+    subject: "New pieces you'll want to wear ✨",
+    heading: "Your next favourite look is here",
+    intro: "Fresh styles have landed. Discover pieces selected to make getting dressed a little more exciting.",
+    hero_image: "https://pub-e7d3df4a168347b9910579887d7331bb.r2.dev/products/36eb40d4-opt-29630efb.webp",
     product_ids: [],
-    trust_note: "Nationwide delivery across Nigeria • Secure checkout",
     cta_text: "Shop Now",
     cta_url: "/collections",
-    eyebrow: "",
-    preheader: "",
-    urgency_text: "",
-    trust_badges: ["Nationwide Delivery", "Secure Checkout"],
+    eyebrow: "NEW ARRIVALS",
+    preheader: "Fresh styles just landed. Discover your next favourite piece.",
+    urgency_text: "🔥 FLASH SALE — 48 HOURS ONLY",
+    trust_badges: ["🚚 Nationwide delivery", "↩ Easy returns", "🔒 Secure checkout"],
 };
 
-export function EmailCampaignComposer({ imageIds, onSubmit }: Props) {
+export function EmailCampaignComposer({ productIds, onSubmit }: Props) {
     const [form, setForm] = useState<EmailCampaignPayload>(DEFAULT_CAMPAIGN);
 
     const [submitting, setSubmitting] = useState(false);
-    const [showPreview, setShowPreview] = useState(true);
+    const [showPreview, setShowPreview] = useState(false);
 
     function updateField<K extends keyof EmailCampaignPayload>(field: K, value: EmailCampaignPayload[K]) {
         setForm((current) => ({
@@ -81,7 +79,7 @@ export function EmailCampaignComposer({ imageIds, onSubmit }: Props) {
             return;
         }
 
-        if (form.product_ids.length === 0) {
+        if (productIds.length === 0) {
             return;
         }
 
@@ -90,11 +88,11 @@ export function EmailCampaignComposer({ imageIds, onSubmit }: Props) {
         try {
             await onSubmit({
                 ...form,
+                product_ids: productIds,
                 subject: form.subject.trim(),
                 heading: form.heading?.trim() || null,
                 intro: form.intro?.trim() || null,
                 hero_image: form.hero_image?.trim() || null,
-                trust_note: form.trust_note?.trim() || null,
                 cta_text: form.cta_text?.trim() || "Shop Now",
                 cta_url: form.cta_url?.trim() || "/collections",
                 eyebrow: form.eyebrow?.trim() || "",
@@ -108,11 +106,8 @@ export function EmailCampaignComposer({ imageIds, onSubmit }: Props) {
     }
 
     return (
-        <div className="grid min-h-screen grid-cols-1 bg-zinc-50 lg:grid-cols-[minmax(0,1fr)_560px]">
-            {/* =========================================================
-          EDITOR
-      ========================================================== */}
-            <main className="border-r border-zinc-200 bg-white">
+        <div className="grid min-h-screen grid-cols-1 bg-zinc-50 lg:grid-cols-2">
+            <main className="border-r border-zinc-200 bg-white max-h-[95vh] overflow-auto flex-1">
                 <div className="sticky top-0 z-20 border-b border-zinc-200 bg-white/95 backdrop-blur">
                     <div className="flex items-center justify-between px-6 py-4">
                         <div>
@@ -130,10 +125,7 @@ export function EmailCampaignComposer({ imageIds, onSubmit }: Props) {
                     </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="mx-auto max-w-3xl space-y-8 p-6">
-                    {/* =====================================================
-              CAMPAIGN
-          ====================================================== */}
+                <form onSubmit={handleSubmit} className="mx-auto max-w-3xl space-y-8 px-6 pt-6">
                     <section>
                         <SectionTitle title="Campaign" description="The main content customers will see in their inbox." />
 
@@ -201,9 +193,6 @@ export function EmailCampaignComposer({ imageIds, onSubmit }: Props) {
                         </div>
                     </section>
 
-                    {/* =====================================================
-              HERO
-          ====================================================== */}
                     <section>
                         <SectionTitle title="Hero image" description="Use a wide editorial image for the top of the email." />
 
@@ -231,9 +220,6 @@ export function EmailCampaignComposer({ imageIds, onSubmit }: Props) {
                         )}
                     </section>
 
-                    {/* =====================================================
-              CTA
-          ====================================================== */}
                     <section>
                         <SectionTitle title="Call to action" description="Where you want customers to go after reading the email." />
 
@@ -258,22 +244,9 @@ export function EmailCampaignComposer({ imageIds, onSubmit }: Props) {
                         </div>
                     </section>
 
-                    {/* =====================================================
-              TRUST
-          ====================================================== */}
                     <section>
                         <SectionTitle title="Trust & reassurance" description="Small details that help customers feel confident shopping." />
-
                         <div className="space-y-5">
-                            <Field label="Trust note">
-                                <input
-                                    value={form.trust_note ?? ""}
-                                    onChange={(event) => updateField("trust_note", event.target.value)}
-                                    placeholder="Nationwide delivery across Nigeria • Secure checkout"
-                                    className="inputClass"
-                                />
-                            </Field>
-
                             <Field label="Trust badges">
                                 <div className="space-y-2">
                                     {(form.trust_badges ?? []).map((badge, index) => (
@@ -303,20 +276,17 @@ export function EmailCampaignComposer({ imageIds, onSubmit }: Props) {
                         </div>
                     </section>
 
-                    {/* =====================================================
-              SUBMIT
-          ====================================================== */}
                     <div className="sticky bottom-0 -mx-6 border-t border-zinc-200 bg-white/95 px-6 py-4 backdrop-blur">
                         <div className="flex items-center justify-between gap-4">
                             <div className="text-sm text-zinc-500">
-                                {form.product_ids.length} product
-                                {form.product_ids.length === 1 ? "" : "s"} selected
+                                {productIds.length} product
+                                {productIds.length === 1 ? "" : "s"} selected
                             </div>
 
                             <button
                                 type="submit"
-                                disabled={submitting || !form.subject.trim() || form.product_ids.length === 0}
-                                className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
+                                disabled={submitting || !form.subject.trim() || productIds.length === 0}
+                                className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
                             >
                                 {submitting ? "Sending..." : "Send Campaign"}
                             </button>
@@ -325,14 +295,21 @@ export function EmailCampaignComposer({ imageIds, onSubmit }: Props) {
                 </form>
             </main>
 
-            {/* =========================================================
-          LIVE PREVIEW
-      ========================================================== */}
             <aside className={`bg-zinc-100 ${showPreview ? "block" : "hidden"} lg:block`}>
                 <div className="sticky top-0 h-screen overflow-y-auto">
-                    <div className="border-b border-zinc-200 bg-white px-6 py-4">
-                        <p className="text-sm font-semibold text-zinc-900">Email Preview</p>
-                        <p className="text-xs text-zinc-500">Approximate customer view</p>
+                    <div className="flex items-center justify-between border-b border-zinc-200 bg-white px-6 py-4">
+                        <div>
+                            <p className="text-sm font-semibold text-zinc-900">Email Preview</p>
+                            <p className="text-xs text-zinc-500">Approximate customer view</p>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={() => setShowPreview((value) => !value)}
+                            className="rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 lg:hidden"
+                        >
+                            {showPreview ? "Edit" : "Preview"}
+                        </button>
                     </div>
 
                     <div className="p-5">
@@ -371,13 +348,6 @@ export function EmailCampaignComposer({ imageIds, onSubmit }: Props) {
                                 </a>
                             </div>
 
-                            {/* Trust */}
-                            {form.trust_note && (
-                                <div className="border-y border-zinc-100 bg-zinc-50 px-5 py-4 text-center">
-                                    <p className="text-[10px] text-zinc-500">{form.trust_note}</p>
-                                </div>
-                            )}
-
                             {/* Trust badges */}
                             {(form.trust_badges ?? []).length > 0 && (
                                 <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 px-5 py-5">
@@ -389,7 +359,6 @@ export function EmailCampaignComposer({ imageIds, onSubmit }: Props) {
                                 </div>
                             )}
 
-                            {/* Footer */}
                             <div className="border-t border-zinc-100 px-5 py-7 text-center">
                                 <p className="text-[10px] text-zinc-400">Shop &nbsp;·&nbsp; About &nbsp;·&nbsp; Contact &nbsp;·&nbsp; FAQs</p>
 

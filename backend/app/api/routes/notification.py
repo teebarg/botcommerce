@@ -29,13 +29,12 @@ class EmailCampaignSchema(BaseModel):
     intro: str | None = None
     hero_image: str | None = None
     product_ids: list[int]
-    trust_note: str | None = None
     cta_text: str | None = "Shop Now"
     cta_url: str | None = "/collections"
     eyebrow: str | None = ""
     preheader: str | None = ""
     urgency_text: str | None = "🔥 FLASH SALE — 48 HOURS ONLY"
-    trust_badges: list[str] = Field( default_factory=list )
+    trust_badges: list[str] = Field(default_factory=list)
 
 
 logger = get_logger(__name__)
@@ -69,7 +68,9 @@ async def push_fcm(db: DbDep, data: FCMIn, user: UserDep) -> Message:
 
 
 @router.post("/push")
-async def send_push_notification(queue: ArqDep, db: DbDep, payload: PushMessageSchema) -> Message:
+async def send_push_notification(
+    queue: ArqDep, db: DbDep, payload: PushMessageSchema
+) -> Message:
     try:
         subscription_ids = await db.pushsubscription.find_many()
         await queue.enqueue_job(
@@ -84,9 +85,7 @@ async def send_push_notification(queue: ArqDep, db: DbDep, payload: PushMessageS
 
 
 @router.post("/email-campaign")
-async def send_email_campaign(
-    queue: ArqDep, db: DbDep, payload: EmailCampaignSchema
-) -> Message:
+async def send_email_campaign(queue: ArqDep, payload: EmailCampaignSchema) -> Message:
     try:
         await queue.enqueue_job(
             "process_email_campaign",
@@ -95,7 +94,6 @@ async def send_email_campaign(
             intro=payload.intro,
             hero_image=payload.hero_image,
             product_ids=payload.product_ids,
-            trust_note=payload.trust_note,
             cta_text=payload.cta_text,
             cta_url=payload.cta_url,
             eyebrow=payload.eyebrow,

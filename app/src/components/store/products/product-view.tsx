@@ -54,30 +54,31 @@ const ProductView: React.FC<Props> = ({ product }) => {
     };
 
     return (
-        <div className="max-w-6xl mx-auto w-full md:py-8 md:px-4 md:grid md:grid-cols-2 md:gap-8 md:items-start">
-            <div className="relative aspect-square md:aspect-gallery md:rounded-2xl md:overflow-hidden md:sticky md:top-16">
-                {!imageLoaded && <img src="/placeholder.jpg" alt="placeholder" className="absolute inset-0 w-full h-full object-cover" />}
-                <img
-                    key={currentImageIndex}
-                    src={product.images?.[currentImageIndex]?.image || "/placeholder.jpg"}
-                    alt={product.name}
-                    data-loaded={imageLoaded}
-                    decoding="async"
-                    loading="lazy"
-                    onLoad={() => setImageLoaded(true)}
-                    className={`w-full h-full object-cover transition-opacity duration-300 opacity-0 data-[loaded=true]:opacity-100 ${
-                        outOfStock ? "opacity-60 grayscale" : ""
-                    }`}
-                />
-                {product.in_stock && <WishlistButton productId={product.id} className="absolute right-3 top-3" />}
+        <div className="max-w-6xl mx-auto w-full md:py-8 md:px-4 md:grid md:grid-cols-2 md:gap-12 md:items-start">
+            <div>
+                <div className="relative aspect-square md:aspect-gallery md:rounded-xl md:overflow-hidden md:sticky md:top-16">
+                    {!imageLoaded && <img src="/placeholder.jpg" alt="placeholder" className="absolute inset-0 w-full h-full object-cover" />}
+                    <img
+                        key={currentImageIndex}
+                        src={product.images?.[currentImageIndex]?.image || "/placeholder.jpg"}
+                        alt={product.name}
+                        data-loaded={imageLoaded}
+                        decoding="async"
+                        loading="lazy"
+                        onLoad={() => setImageLoaded(true)}
+                        className={`w-full h-full object-cover transition-opacity duration-300 opacity-0 data-[loaded=true]:opacity-100 ${
+                            outOfStock ? "opacity-60 grayscale" : ""
+                        }`}
+                    />
+                    {product.in_stock && <WishlistButton productId={product.id} className="absolute right-3 top-3" />}
 
-                {product?.is_new && (
-                    <span className="absolute top-4 left-4 md:top-6 md:left-6 px-3 py-1 bg-foreground text-background text-xs font-semibold rounded-full">
-                        New
-                    </span>
-                )}
+                    {product?.is_new && (
+                        <span className="absolute top-4 left-4 md:top-6 md:left-6 px-3 py-1 bg-foreground text-background text-xs font-semibold rounded-full">
+                            New
+                        </span>
+                    )}
 
-                {/* <div className="absolute inset-x-0 bottom-4 flex justify-center gap-1.5">
+                    {/* <div className="absolute inset-x-0 bottom-4 flex justify-center gap-1.5">
                     {product.images?.map((_, idx) => (
                         <button
                             key={idx}
@@ -86,23 +87,23 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         />
                     ))}
                 </div> */}
-                {images.length > 1 && (
-                    <>
-                        <button
-                            onClick={() => setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length)}
-                            className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background/90 border border-border flex items-center justify-center hover:bg-background transition-colors"
-                        >
-                            <ChevronLeft className="w-4 h-4" />
-                        </button>
-                        <button
-                            onClick={() => setCurrentImageIndex((prev) => (prev + 1) % product.images.length)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background/90 border border-border flex items-center justify-center hover:bg-background transition-colors"
-                        >
-                            <ChevronRight className="w-4 h-4" />
-                        </button>
-                    </>
-                )}
-
+                    {images.length > 1 && (
+                        <>
+                            <button
+                                onClick={() => setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length)}
+                                className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background/90 border border-border flex items-center justify-center hover:bg-background transition-colors"
+                            >
+                                <ChevronLeft className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => setCurrentImageIndex((prev) => (prev + 1) % product.images.length)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background/90 border border-border flex items-center justify-center hover:bg-background transition-colors"
+                            >
+                                <ChevronRight className="w-4 h-4" />
+                            </button>
+                        </>
+                    )}
+                </div>
                 {images.length > 1 ? (
                     <div className="mt-1 flex gap-1.5 overflow-x-auto">
                         {images.map((image: ProductImage, index: number) => (
@@ -113,7 +114,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                 aria-label={`View image ${index + 1}`}
                                 className={cn("shrink-0 border", index === currentImageIndex ? "border-foreground" : "border-border")}
                             >
-                                <ProductImageComponent src={image.image} alt="" className="h-20 w-16" />
+                                <ProductImageComponent src={image.image} alt="" className="h-20 w-16 md:h-40 md:w-32" />
                             </button>
                         ))}
                     </div>

@@ -6,6 +6,7 @@ import Overlay from "@/components/overlay";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { EmailCampaignComposer } from "./EmailCampaignComposer";
 import { api } from "@/utils/api";
+import { toast } from "sonner";
 
 interface ProductBulkActionsProps {
     selectedCount: number;
@@ -16,7 +17,14 @@ interface ProductBulkActionsProps {
     isLoading?: boolean;
 }
 
-export const ProductBulkActions = ({ selectedCount, selectedImageIds, onDelete, onClearSelection, isLoading }: ProductBulkActionsProps) => {
+export const ProductBulkActions = ({
+    selectedCount,
+    selectedImageIds,
+    selectedProductIds,
+    onDelete,
+    onClearSelection,
+    isLoading,
+}: ProductBulkActionsProps) => {
     const editState = useOverlayTriggerState({});
     const campaignState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
@@ -49,7 +57,7 @@ export const ProductBulkActions = ({ selectedCount, selectedImageIds, onDelete, 
             <Overlay
                 open={campaignState.isOpen}
                 title="Campaign"
-                sheetClassName="max-w-[5xl]"
+                sheetClassName="sm:max-w-7xl"
                 trigger={
                     <Button className="rounded-full" size="sm" variant="ghost" onClick={campaignState.open}>
                         <MessageSquare className="h-4 w-4" />
@@ -60,9 +68,10 @@ export const ProductBulkActions = ({ selectedCount, selectedImageIds, onDelete, 
             >
                 {campaignState.isOpen && (
                     <EmailCampaignComposer
-                        imageIds={selectedImageIds}
+                        productIds={selectedProductIds || []}
                         onSubmit={async (payload) => {
                             await api.post("/notification/email-campaign", payload);
+                            toast.success("campaign sent");
                         }}
                     />
                 )}
