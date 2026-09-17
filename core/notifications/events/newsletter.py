@@ -16,11 +16,9 @@ class NewsletterEvent(Notification):
         return Mails(
             receipients=[self.customer_email],
             mail=Mail(
-                to=self.customer_email,
                 subject="Welcome to our newsletter",
                 template="newsletter.html",
                 data={
-                    "unsubscribe_link": "",
                     "current_year": datetime.now().year,
                 },
             ),

@@ -17,9 +17,8 @@ class Welcome(Notification):
 
     def to_email(self) -> Mails:
         return Mails(
-            receipients=[self.customer_email],
+            receipients=[self.email_to],
             mail=Mail(
-                to=self.email_to,
                 subject="Welcome!",
                 template="welcome.html",
                 data={

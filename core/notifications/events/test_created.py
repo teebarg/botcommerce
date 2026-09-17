@@ -17,7 +17,6 @@ class TestCreated(Notification):
         return Mails(
             receipients=[self.email],
             mail=Mail(
-                to=self.email,
                 subject="Notification system test",
                 template="test_created.html",
                 data={

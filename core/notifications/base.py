@@ -15,7 +15,6 @@ class Channel(StrEnum):
 
 @dataclass
 class Mail:
-    to: str
     subject: str
     template: str
     data: dict[str, Any] = field(default_factory=dict)

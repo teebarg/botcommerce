@@ -19,7 +19,6 @@ class ReferralCashback(Notification):
         return Mails(
             receipients=[self.customer_email],
             mail=Mail(
-                to=self.customer_email,
                 subject="You just got paid!",
                 template="referral_cashback.html",
                 data={

@@ -45,7 +45,6 @@ class CampaignEvent(Notification):
         return Mails(
             receipients=self.receipients,
             mail=Mail(
-                to="",
                 subject=self.subject,
                 template=self.template,
                 data=self.data

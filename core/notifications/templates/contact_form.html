@@ -1,4 +1,6 @@
-{% include "partials/header.html" %}
+{% extends "partials/layout.html" %}
+
+{% block content %}
 <tr>
     <td style="padding: 20px">
         <h2 style="font-size: 14px; margin: 0 0 5px 0; color: #333333">Hello Admin,</h2>
@@ -24,4 +26,4 @@
         </div>
     </td>
 </tr>
-{% include "partials/footer.html" %}
+{% endblock %}

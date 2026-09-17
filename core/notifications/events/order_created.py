@@ -37,7 +37,6 @@ class OrderCreated(Notification):
         return Mails(
             receipients=[self.customer_email],
             mail=Mail(
-                to=self.customer_email,
                 subject=f"Order {self.order.order_number} received",
                 template=template_name,
                 data={
@@ -62,14 +61,3 @@ class OrderCreated(Notification):
                 f"*Total:* ₦{self.total:,.2f}"
             )
         )
-
-    # def to_whatsapp(self) -> WhatsAppMessage:
-    #     return WhatsAppMessage(
-    #         to=self.customer_phone,
-    #         message=(
-    #             "🛍️ New Order\n"
-    #             f"Order: {self.order.order_number}\n"
-    #             f"Customer: {self.first_name} {self.last_name}\n"
-    #             f"Total: ₦{self.total:,.2f}"
-    #         ),
-    #     )

@@ -23,7 +23,6 @@ class BulkPurchaseEvent(Notification):
         return Mails(
             receipients=[settings.CONTACT_EMAIL],
             mail=Mail(
-                to=settings.CONTACT_EMAIL,
                 subject="New Bulk Purchase Inquiry",
                 template="bulk_purchase.html",
                 data={

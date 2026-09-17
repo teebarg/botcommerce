@@ -22,7 +22,6 @@ class AbandonedCartEvent(Notification):
         return Mails(
             receipients=[self.customer_email],
             mail=Mail(
-                to=self.customer_email,
                 subject="You left something in your cart",
                 template="abandoned_cart.html",
                 data={

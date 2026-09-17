@@ -316,15 +316,11 @@ export function EmailCampaignComposer({ productIds, onSubmit }: Props) {
                         <div className="mx-auto max-w-[600px] overflow-hidden rounded-xl bg-white shadow-sm">
                             {/* Email header */}
                             <div className="border-b border-zinc-100 px-5 py-6 text-center">
-                                <a href="#" className="text-xl font-bold tracking-[0.15em] text-zinc-900">
-                                    YOUR STORE
-                                </a>
+                                <p className="text-xl font-bold tracking-[0.15em] text-zinc-900">YOUR STORE</p>
                             </div>
 
-                            {/* Hero */}
                             {form.hero_image && <img src={form.hero_image} alt="" className="aspect-[2/1] w-full object-cover" />}
 
-                            {/* Content */}
                             <div className="px-7 py-8 text-center">
                                 {form.eyebrow && <p className="mb-3 text-[10px] font-bold tracking-[0.2em] text-zinc-500">{form.eyebrow}</p>}
 
@@ -336,19 +332,17 @@ export function EmailCampaignComposer({ productIds, onSubmit }: Props) {
 
                                 <p className="mt-4 text-sm leading-6 text-zinc-500">{form.intro || "Your campaign introduction will appear here."}</p>
 
-                                <a href="#" className="mt-6 inline-block bg-zinc-900 px-6 py-3 text-xs font-bold uppercase tracking-wide text-white">
+                                <p className="mt-6 inline-block bg-zinc-900 px-6 py-3 text-xs font-bold uppercase tracking-wide text-white">
                                     {form.cta_text || "Shop Now"}
-                                </a>
+                                </p>
                             </div>
 
-                            {/* Bottom CTA */}
                             <div className="px-5 py-8 text-center">
-                                <a href="#" className="inline-block bg-zinc-900 px-6 py-3 text-xs font-bold uppercase tracking-wide text-white">
+                                <p className="inline-block bg-zinc-900 px-6 py-3 text-xs font-bold uppercase tracking-wide text-white">
                                     {form.cta_text || "Shop Now"}
-                                </a>
+                                </p>
                             </div>
 
-                            {/* Trust badges */}
                             {(form.trust_badges ?? []).length > 0 && (
                                 <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 px-5 py-5">
                                     {(form.trust_badges ?? []).filter(Boolean).map((badge, index) => (
@@ -377,10 +371,6 @@ export function EmailCampaignComposer({ productIds, onSubmit }: Props) {
         </div>
     );
 }
-
-/* =============================================================
-   SMALL UI COMPONENTS
-============================================================= */
 
 function SectionTitle({ title, description }: { title: string; description: string }) {
     return (

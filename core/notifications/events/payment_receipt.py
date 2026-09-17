@@ -19,7 +19,6 @@ class PaymentReceipt(Notification):
         return Mails(
             receipients=[self.customer_email],
             mail=Mail(
-                to=self.customer_email,
                 subject=f"Receipt for order {self.order.order_number}",
                 template="payment_receipt.html",
                 data={

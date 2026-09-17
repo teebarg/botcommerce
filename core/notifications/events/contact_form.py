@@ -21,7 +21,6 @@ class ContactForm(Notification):
         return Mails(
             receipients=[settings.CONTACT_EMAIL],
             mail=Mail(
-                to=settings.CONTACT_EMAIL,
                 subject="New Contact Email",
                 template="contact_form.html",
                 data={
