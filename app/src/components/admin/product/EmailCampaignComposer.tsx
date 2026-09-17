@@ -314,7 +314,6 @@ export function EmailCampaignComposer({ productIds, onSubmit }: Props) {
 
                     <div className="p-5">
                         <div className="mx-auto max-w-[600px] overflow-hidden rounded-xl bg-white shadow-sm">
-                            {/* Email header */}
                             <div className="border-b border-zinc-100 px-5 py-6 text-center">
                                 <p className="text-xl font-bold tracking-[0.15em] text-zinc-900">YOUR STORE</p>
                             </div>
