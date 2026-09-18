@@ -24,11 +24,7 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 @router.get("/home/products", tags=["products"])
-@cacheable(
-    key_prefix="products:home",
-    tags=["products"],
-    cdn_ttl=600, cdn_swr=60
-)
+@cacheable(key_prefix="products:categories", tags=["products"], cdn_ttl=600, cdn_swr=60, expire=1800)
 async def get_home_categories_products(request: Request, db: DbDep, product_srv: ProductDep) -> list[CategoryWithProducts]:
     categories = await db.category.find_many(
         where={"is_active": True},
