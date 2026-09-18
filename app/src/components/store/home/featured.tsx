@@ -10,7 +10,7 @@ export default function Featured() {
             title="Featured"
             subtitle="Our featured collection"
             products={data?.featured}
-            href="/collections/featured"
+            href="/collections/?collections=featured"
         />
     );
 }

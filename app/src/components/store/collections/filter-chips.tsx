@@ -10,10 +10,7 @@ type FilterDef = {
     label: string;
     icon?: React.ComponentType<{ className?: string }>;
     isActive: (pathname: string, search: Record<string, string>) => boolean;
-} & (
-    | { to: "/collections"; params?: never; search?: Record<string, number> }
-    | { to: "/collections/$slug"; params: { slug: string }; search?: never }
-);
+} & { to: "/collections"; params?: never; search?: Record<string, number | string> };
 
 const FILTERS: FilterDef[] = [
     // {
@@ -28,17 +25,17 @@ const FILTERS: FilterDef[] = [
         id: "trending",
         label: "Trending",
         icon: Flame,
-        to: "/collections/$slug",
-        params: { slug: "trending" },
-        isActive: (pathname, _) => pathname == "/collections/trending",
+        to: "/collections",
+        search: { collections: "trending" },
+        isActive: (pathname, _) => pathname == "/collections/?collections=trending",
     },
     {
         id: "new-arrivals",
         label: "New arrivals",
         icon: Sparkles,
-        to: "/collections/$slug",
-        params: { slug: "new-arrivals" },
-        isActive: (pathname, _) => pathname == "/collections/new-arrivals",
+        to: "/collections",
+        search: { collections: "new-arrivals" },
+        isActive: (pathname, _) => pathname == "/collections/?collections=new-arrivals",
     },
     {
         id: "under-1k",
@@ -71,15 +68,7 @@ const FilterChips = () => {
             {FILTERS.map(({ id, label, icon: Icon, to, params, search: linkSearch, isActive }) => {
                 const active = isActive(pathname, search);
                 return (
-                    <Link
-                        key={id}
-                        role="tab"
-                        aria-selected={active}
-                        to={to}
-                        params={params}
-                        search={linkSearch}
-                        className={chipCn(active)}
-                    >
+                    <Link key={id} role="tab" aria-selected={active} to={to} params={params} search={linkSearch} className={chipCn(active)}>
                         {Icon && <Icon className="w-3.5 h-3.5" />}
                         {label}
                     </Link>

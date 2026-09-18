@@ -241,7 +241,7 @@ export function EmailCampaignComposer({ productIds, onSubmit }: Props) {
                                 <input
                                     value={form.cta_url ?? ""}
                                     onChange={(event) => updateField("cta_url", event.target.value)}
-                                    placeholder="/collections/new-arrivals"
+                                    placeholder="/collections/?collections=new-arrivals"
                                     className="inputClass"
                                 />
                             </Field>

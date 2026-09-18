@@ -44,7 +44,7 @@ const NoProductsFound = ({ searchQuery = "", onClearSearch = () => {}, onGoHome 
 
                     <div className="flex flex-wrap justify-center gap-2">
                         {collections?.slice(0, 4).map((collection: Collection, idx: number) => (
-                            <BtnLink key={idx} aria-label={collection.name} href={`/collections/${collection.name}`}>
+                            <BtnLink key={idx} aria-label={collection.name} href={`/collections/?collections=${collection.name}`}>
                                 {collection.name}
                             </BtnLink>
                         ))}

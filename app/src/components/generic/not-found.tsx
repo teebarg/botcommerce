@@ -26,8 +26,8 @@ interface NotFoundProps {
 
 const DEFAULT_LINKS: QuickLink[] = [
     { to: "/collections", label: "Collections" },
-    { to: "/collections/trending", label: "Trending" },
-    { to: "/collections/new-arrivals", label: "New arrivals" },
+    { to: "/collections/?collections=trending", label: "Trending" },
+    { to: "/collections/?collections=new-arrivals", label: "New arrivals" },
     { to: "/contact", label: "Contact" },
 ];
 
