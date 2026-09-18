@@ -1,19 +1,20 @@
-from typing import Union, List, Literal, Optional
-import urllib.parse
-import re
 import base64
+import re
+import urllib.parse
 import uuid
+from typing import List, Literal, Optional
+
+import boto3
 import cloudinary
 import cloudinary.uploader
-import boto3
 from botocore.config import Config as BotoConfig
 from botocore.exceptions import ClientError
 from fastapi import HTTPException
-from supabase import create_client, Client
+from supabase import Client, create_client
+
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.models.generic import ImageUpload
-from app.core.logging import logger
 
 logger = get_logger(__name__)
 
@@ -221,7 +222,7 @@ class MediaStorageService:
 
     # ------------------------------------------------------------------
 
-    async def remove_images(self, images: Union[str, List[str]]) -> list[str]:
+    async def remove_images(self, images: str | List[str]) -> list[str]:
         """Returns list of image URLs that failed to delete from storage."""
         if isinstance(images, str):
             images = [images]
