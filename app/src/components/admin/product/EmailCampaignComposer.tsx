@@ -1,4 +1,7 @@
+import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useOverlayTriggerState } from "react-stately";
 
 type EmailCampaignPayload = {
     subject: string;
@@ -34,6 +37,7 @@ const DEFAULT_CAMPAIGN: EmailCampaignPayload = {
 };
 
 export function EmailCampaignComposer({ productIds, onSubmit }: Props) {
+    const confirmState = useOverlayTriggerState({});
     const [form, setForm] = useState<EmailCampaignPayload>(DEFAULT_CAMPAIGN);
 
     const [submitting, setSubmitting] = useState(false);
@@ -72,8 +76,7 @@ export function EmailCampaignComposer({ productIds, onSubmit }: Props) {
         }));
     }
 
-    async function handleSubmit(event: React.FormEvent) {
-        event.preventDefault();
+    async function handleSubmit() {
 
         if (!form.subject.trim()) {
             return;
@@ -102,6 +105,7 @@ export function EmailCampaignComposer({ productIds, onSubmit }: Props) {
             });
         } finally {
             setSubmitting(false);
+            confirmState.close()
         }
     }
 
@@ -283,13 +287,26 @@ export function EmailCampaignComposer({ productIds, onSubmit }: Props) {
                                 {productIds.length === 1 ? "" : "s"} selected
                             </div>
 
-                            <button
-                                type="submit"
-                                disabled={submitting || !form.subject.trim() || productIds.length === 0}
-                                className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-                            >
-                                {submitting ? "Sending..." : "Send Campaign"}
-                            </button>
+                            <ConfirmDrawer
+                                open={confirmState.isOpen}
+                                onOpenChange={confirmState.setOpen}
+                                trigger={
+                                    <Button
+                                        className="rounded-full text-destructive bg-destructive/10 hover:bg-destructive/15 font-medium"
+                                        size="sm"
+                                        variant="ghost"
+                                        disabled={submitting || !form.subject.trim() || productIds.length === 0}
+                                    >
+                                        {submitting ? "Sending..." : "Send Campaign"}
+                                    </Button>
+                                }
+                                onClose={confirmState.close}
+                                onConfirm={handleSubmit}
+                                title="Send Campaign"
+                                description="Are you sure you want to send this email campaign?"
+                                isLoading={submitting}
+                                variant="default"
+                            />
                         </div>
                     </div>
                 </form>

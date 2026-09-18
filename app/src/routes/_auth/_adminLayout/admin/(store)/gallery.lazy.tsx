@@ -102,12 +102,7 @@ function RouteComponent() {
 
     const handleBulkDelete = async () => {
         if (selectedImages.size === 0) return;
-
-        try {
-            await bulkDeleteImages({ imageIds: Array.from(selectedImages) });
-        } catch (error) {
-            toast.error("Failed to delete images", { description: "Failed to delete images, contact support" });
-        }
+        await bulkDeleteImages({ imageIds: Array.from(selectedImages) });
     };
 
     const handleDelete = async (id: number) => {

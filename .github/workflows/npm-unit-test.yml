@@ -1,12 +1,13 @@
 name: Frontend Unit Test
 on:
-    pull_request:
-        types: [opened, synchronize, reopened]
-        paths:
-            - "**.js"
-            - "**.ts"
-            - "**.jsx"
-            - "**.tsx"
+    workflow_dispatch:
+    # pull_request:
+    #     types: [opened, synchronize, reopened]
+    #     paths:
+    #         - "**.js"
+    #         - "**.ts"
+    #         - "**.jsx"
+    #         - "**.tsx"
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

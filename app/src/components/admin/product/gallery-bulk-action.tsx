@@ -29,6 +29,14 @@ export const ProductBulkActions = ({
     const campaignState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
 
+    const handleDelete = async () => {
+        try {
+            await onDelete?.();
+        } finally {
+            deleteState.close();
+        }
+    };
+
     if (selectedCount === 0) return null;
 
     return (
@@ -92,7 +100,7 @@ export const ProductBulkActions = ({
                     </Button>
                 }
                 onClose={deleteState.close}
-                onConfirm={onDelete}
+                onConfirm={handleDelete}
                 title="Delete Products"
                 description="Are you sure you want to delete these products?"
                 isLoading={isLoading}

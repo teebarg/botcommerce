@@ -154,6 +154,7 @@ async def bulk_delete_gallery_images(
     db: DbDep,
     srv: GalleryDep,
     product_srv: ProductDep,
+    storage_srv: StorageDep,
     payload: ImageBulkDelete,
     background_tasks: BackgroundTasks,
 ):
@@ -167,7 +168,7 @@ async def bulk_delete_gallery_images(
     background_tasks.add_task(
         srv.process_bulk_delete_task,
         payload=payload,
-        remove_storage_fn=srv.storage.remove_images,
+        remove_storage_fn=storage_srv.remove_images,
         delete_index_fn=product_srv.delete_product_index
     )
     await srv.ws_manager.broadcast_to_all({"status": "processing"}, "bulk_action")

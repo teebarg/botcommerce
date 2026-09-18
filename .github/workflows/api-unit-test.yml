@@ -1,9 +1,10 @@
 name: Api Unit Test
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    paths:
-      - '**.py'
+  # pull_request:
+  #   types: [opened, synchronize, reopened]
+  #   paths:
+  #     - '**.py'
+  workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
