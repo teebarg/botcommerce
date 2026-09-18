@@ -244,7 +244,7 @@ async def generate_sitemap(request: Request, db: DbDep):
     for collection in collections:
         url = SubElement(urlset, "url")
         SubElement(
-            url, "loc").text = f"{base_url}/collections/{collection['slug']}"
+            url, "loc").text = f"{base_url}/collections/?collections={collection['slug']}"
 
     for category in categories:
         url = SubElement(urlset, "url")

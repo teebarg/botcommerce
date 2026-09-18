@@ -10,7 +10,7 @@ export default function NewArrivals() {
             title="New arrivals"
             subtitle="Just landed this week"
             products={data?.arrival}
-            href="/collections/new-arrivals"
+            href="/collections/?collections=new-arrivals"
         />
     );
 }

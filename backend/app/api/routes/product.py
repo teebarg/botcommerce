@@ -45,7 +45,7 @@ async def get_google_merchant_feed(request: Request, srv: ProductDep, target: st
 
 
 @router.get("/{product_id}/review-status")
-@cacheable(key_prefix="review-status", key_builder=lambda product_id: product_id)
+@cacheable(key_prefix="review-status", key_builder=lambda product_id: product_id, cdn_ttl=600, cdn_swr=60, expire=1800)
 async def get_review_status(request: Request, product_id: int, user: UserDep, srv: ProductDep) -> ReviewStatus:
     if not user:
         return ReviewStatus(has_purchased=False, has_reviewed=False)
@@ -55,14 +55,14 @@ async def get_review_status(request: Request, product_id: int, user: UserDep, sr
 
 
 @router.get("/{id}/similar")
-@cacheable(key_prefix="similar", tags=lambda id: ["products"])
+@cacheable(key_prefix="similar", tags=lambda id: ["products"], cdn_ttl=600, cdn_swr=60, expire=1800)
 async def recommend(request: Request, srv: ProductDep, id: int, limit: int = Query(default=20, le=100)):
     items = await srv.get_similar_products(product_id=id, limit=limit)
     return {"similar": items}
 
 
 @router.get("/recommend")
-@cacheable(key_prefix="products:recommendation", tags=["products"])
+@cacheable(key_prefix="products:recommendation", tags=["products"], cdn_ttl=600, cdn_swr=60, expire=1800)
 async def get_recommendations(
     request: Request, srv: ProductDep, user: CurrentUser, limit: int = Query(default=20, le=100),
 ):
@@ -71,7 +71,7 @@ async def get_recommendations(
 
 
 @router.get("/feed")
-@cacheable(key_prefix="products:list", tags=["products"], cdn_ttl=600, cdn_swr=60)
+@cacheable(key_prefix="products:list", tags=["products"], cdn_ttl=600, cdn_swr=60, expire=1800)
 async def feed(
     request: Request, srv: ProductDep, search: str = "", sort: str | None = None,
     cat_ids: str = Query(default=""), collections: str = Query(default=""),
@@ -88,13 +88,13 @@ async def feed(
 
 
 @router.get("/index-products")
-@cacheable(key_prefix="products", key_builder="collections", tags=["products"], cdn_ttl=600, cdn_swr=60)
+@cacheable(key_prefix="products", key_builder="collections", tags=["products"], cdn_ttl=600, cdn_swr=60, expire=1800)
 async def get_index_products(request: Request, srv: ProductDep) -> IndexProducts:
     return await srv.query_collection_index()
 
 
 @router.get("/")
-@cacheable(key_prefix="products:search", tags=["products"], cdn_ttl=600, cdn_swr=60)
+@cacheable(key_prefix="products:search", tags=["products"], cdn_ttl=600, cdn_swr=60, expire=1800)
 async def search(
     request: Request, srv: ProductDep, search: str = "",
     collections: str = Query(default=""),
