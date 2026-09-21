@@ -1,5 +1,4 @@
 import type React from "react";
-import { formatDistanceToNow } from "date-fns";
 import { Download, Trash2, FileSpreadsheet, AlertCircle, RefreshCw } from "lucide-react";
 import type { Activity } from "@/schemas";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useDeleteActivity } from "@/hooks/useActivities";
 import { ConfirmDrawer } from "../confirm-drawer";
 import { useOverlayTriggerState } from "react-stately";
+import { timeAgo } from "@/utils";
 
 const ActivityTypeIcon = ({ type, isSuccess }: { type: string; isSuccess: boolean }) => {
     if (type === "PRODUCT_EXPORT") {
@@ -44,7 +44,7 @@ export const ActivityItem: React.FC<{ activity: Activity }> = ({ activity }) => 
                     <ActivityTypeIcon isSuccess={activity.is_success} type={activity.activity_type} />
                     <StatusBadge activityType={activity.activity_type} isSuccess={activity.is_success} />
                 </div>
-                <p className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(activity.created_at), { addSuffix: true })}</p>
+                <p className="text-xs text-muted-foreground">{timeAgo(activity.created_at)}</p>
             </div>
 
             <p className="text-sm font-medium leading-snug">{activity.description}</p>

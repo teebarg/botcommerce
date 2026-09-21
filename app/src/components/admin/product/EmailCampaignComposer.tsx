@@ -304,6 +304,7 @@ export function EmailCampaignComposer({ productIds, onSubmit }: Props) {
                                 onConfirm={handleSubmit}
                                 title="Send Campaign"
                                 description="Are you sure you want to send this email campaign?"
+                                confirmText="Send"
                                 isLoading={submitting}
                                 variant="default"
                             />
