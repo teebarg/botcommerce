@@ -60,6 +60,7 @@ class CartService:
             coupon_id=cart.coupon_id,
             items=cart.items,
             created_at=cart.created_at,
+            updated_at=cart.updated_at,
         )
 
     async def touch(self, cart_id: int) -> None:

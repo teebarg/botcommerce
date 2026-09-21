@@ -1,11 +1,11 @@
 import type React from "react";
-import { formatDistanceToNow } from "date-fns";
 import { AlertCircle, Clock, Download, FileSpreadsheet, RefreshCw, Trash2 } from "lucide-react";
 import { useConfig } from "@/providers/store-provider";
 import type { Activity } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useDeleteActivity } from "@/hooks/useActivities";
+import { timeAgo } from "@/utils";
 
 interface Props {
     activities?: Activity[];
@@ -73,7 +73,7 @@ const ActivityViewItem: React.FC<{ activity: Activity }> = ({ activity }) => {
                 </div>
 
                 <p className="text-xs text-muted-foreground mb-2">
-                    {shop_name} · {formatDistanceToNow(new Date(activity.created_at), { addSuffix: true })}
+                    {shop_name} · {timeAgo(activity.created_at)}
                 </p>
 
                 {activity.activity_type === "PRODUCT_EXPORT" && activity.is_success && activity.action_download_url && (

@@ -1,5 +1,4 @@
 import { Clock, Mail, Package } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
 import { AbandonedCartDetailsDialog } from "./details";
 import { ReminderButton } from "./reminder-button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -72,7 +71,7 @@ export const AbandonedCartCard = ({ cart }: AbandonedCartCardProps) => {
 
                         <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
                             <Clock className="h-4 w-4" />
-                            <span>Abandoned {formatDistanceToNow(new Date(cart.updated_at), { addSuffix: true })}</span>
+                            <span>Abandoned {timeAgo(cart.updated_at)}</span>
                         </div>
                     </div>
 

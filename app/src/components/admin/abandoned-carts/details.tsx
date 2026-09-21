@@ -1,12 +1,11 @@
 import { Clock, Package, Copy, User, ExternalLink } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import { useOverlayTriggerState } from "react-stately";
 import { ReminderButton } from "./reminder-button";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Overlay from "@/components/overlay";
-import { currency } from "@/utils";
+import { currency, timeAgo } from "@/utils";
 import { useImpersonateUser } from "@/hooks/useUser";
 import ImageLightbox from "@/components/image-lightbox";
 import { Cart } from "@/schemas";
@@ -135,7 +134,7 @@ export const AbandonedCartDetailsDialog = ({ cart }: AbandonedCartDetailsDialogP
                                     <Clock className="h-4 w-4" />
                                     <span className="text-sm">Abandoned</span>
                                 </div>
-                                <p className="font-medium">{formatDistanceToNow(new Date(cart.updated_at), { addSuffix: true })}</p>
+                                <p className="font-medium">{timeAgo(cart.updated_at)}</p>
                             </div>
                         </div>
                     </div>
