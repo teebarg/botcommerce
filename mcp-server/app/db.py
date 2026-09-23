@@ -1,5 +1,7 @@
 import asyncpg
+
 from app.config import settings
+
 
 class Database:
     def __init__(self):
@@ -22,5 +24,6 @@ class Database:
         if self.pool is None:
             raise RuntimeError("Database not initialized.")
         return self.pool
+
 
 db = Database()

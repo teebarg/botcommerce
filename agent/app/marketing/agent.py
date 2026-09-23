@@ -49,6 +49,7 @@ async def generate_notification_copy(products: list[dict]) -> dict:
             SystemMessage(content=_MARKETING_SYSTEM_PROMPT),
             HumanMessage(content=prompt),
         ])
+        logger.debug("[Credit] - LLM Credit used by llm in [generate_notification_copy]")
 
         content = resp.content
         if isinstance(content, list):

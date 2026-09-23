@@ -1,37 +1,41 @@
-import jwt
 import time
+
+import jwt
 import requests
+from langchain_classic.tools import tool
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
-from langchain_classic.tools import tool
-from app.rag.qdrant_client import search_collection
+
 from app.config import settings
-from app.mcp_tools import get_mcp_tools
 from app.logging import get_logger
+
+# from app.mcp_tools import get_mcp_tools
+from app.rag.qdrant_client import search_collection
 
 logger = get_logger(__name__)
 
 
 def _make_http_session() -> requests.Session:
     session = requests.Session()
-    
+
     retry_strategy = Retry(
-        total=3,                        # retry 3 times
-        backoff_factor=0.5,             # wait 0.5s, 1s, 2s between retries
+        total=3,  # retry 3 times
+        backoff_factor=0.5,  # wait 0.5s, 1s, 2s between retries
         status_forcelist=[429, 500, 502, 503, 504],  # retry on these status codes
         allowed_methods=["GET", "POST"],
     )
-    
+
     adapter = HTTPAdapter(
         max_retries=retry_strategy,
         pool_connections=10,
         pool_maxsize=20,
     )
-    
+
     session.mount("http://", adapter)
     session.mount("https://", adapter)
-    
+
     return session
+
 
 _http_session = _make_http_session()
 
@@ -67,6 +71,7 @@ def _shop_request(method: str, path: str, **kwargs) -> dict:
     except Exception as e:
         logger.error(f"[ShopAPI] Unexpected error: {e}")
         return {"error": str(e)}
+
 
 @tool
 def search_faqs(query: str) -> str:
@@ -124,6 +129,36 @@ def check_stock(product_slug: str) -> str:
         return f"✅ Slug '{product_slug}' is **in stock** (1 unit available)."
 
     return f"❌ Slug '{product_slug}' is currently **out of stock**."
+
+
+@tool
+def search_products(query: str):
+    """
+    Search for products in the store repository based on a text query.Use this tool when the user is looking for available items, browsing products,
+    or asking if a specific type of merchandise is in stock.Args:
+
+    query (str): The search keyword, product name, or category to look up.Returns:
+    dict/list: A collection of product objects matching the query, containing details
+    like IDs, names, prices, and availability.
+    """
+    result = _shop_request("GET", "/api/product/", params={"search": query})
+    print("🚀 ~ search_products ~ result:", result)
+    return result
+
+
+@tool
+def check_order_status(order_number: str):
+    """
+    Retrieve the current fulfillment, tracking, and delivery status of a specific customer order.Use this tool when a user asks about their package location, shipping status, delivery ETA,
+    or wants to verify the state of a previously placed order.Args:
+    order_number (str): The unique order identification string (e.g., "#12345" or "12345").
+    The function automatically handles leading hash symbols and spacing.Returns:
+    dict: The order details including status (e.g., 'Pending', 'Shipped', 'Delivered'),
+    tracking numbers, and item breakdowns.
+    """
+    result = _shop_request("GET", f"/api/order/{order_number.strip().lstrip('#').upper()}")
+    print("🚀 ~ check_order_status ~ result:", result)
+    return result
 
 
 @tool
@@ -216,7 +251,17 @@ def shop_guide(topic: str) -> str:
         "or would you like me to connect you with our support team?"
     )
 
+
 async def get_all_tools() -> list:
-    mcp_tools = await get_mcp_tools()  # search_products, check_order_status, check_stock
-    local_tools = [search_faqs, search_policies, escalate_to_human, shop_guide]
-    return mcp_tools + local_tools
+    # mcp_tools = await get_mcp_tools()  # search_products, check_order_status, check_stock
+    local_tools = [
+        search_products,
+        check_order_status,
+        check_stock,
+        search_faqs,
+        search_policies,
+        escalate_to_human,
+        shop_guide,
+    ]
+    print("🚀 ~ get_all_tools ~ local_tools:", local_tools)
+    return local_tools

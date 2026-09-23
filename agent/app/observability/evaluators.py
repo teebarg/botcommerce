@@ -61,6 +61,7 @@ async def evaluate_response_quality(
             SystemMessage(content=_QUALITY_SYSTEM),
             HumanMessage(content=prompt),
         ])
+        logger.debug("[Credit] - LLM Credit used by llm in [evaluate_response_quality]")
         text: str = resp.content.strip()
 
         corr_match = re.search(r"CORRECTNESS:\s*(\d)", text)
@@ -232,6 +233,7 @@ async def evaluate_context_relevance(
             SystemMessage(content=system),
             HumanMessage(content=results_text),
         ])
+        logger.debug("[Credit] - LLM Credit used by llm in [evaluate_context_relevance]")
         text = resp.content.strip()
         r_match    = re.search(r"RELEVANCE:\s*(\d)", text)
         note_match = re.search(r"NOTES:\s*(.+)", text)

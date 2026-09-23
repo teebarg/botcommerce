@@ -2,14 +2,12 @@
 LangGraph customer support agent.
 """
 import asyncio
-import time as _time
-from app.logging import get_logger
-from app.observability.tracing import record_llm_generation
 import json
 import re
+import time as _time
 import uuid
-from typing import Annotated, Literal
 from enum import Enum
+from typing import Annotated, Literal, TypedDict
 
 from langchain_core.messages import (
     AIMessage,
@@ -24,14 +22,14 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
 from redis.asyncio import Redis
-from typing import TypedDict
 
 from app.agent.memory import load_messages_from_redis, save_messages_to_redis
-from app.agent.tools import get_all_tools
+from app.agent.tools import escalate_to_human, get_all_tools
 from app.config import get_llm
+from app.logging import get_logger
+from app.observability.tracing import record_llm_generation, record_tool_span
+from app.utilities.classifier import _classify_message
 from app.utils import _notify_slack_escalation
-from app.agent.tools import escalate_to_human
-from app.observability.tracing import record_tool_span
 
 logger = get_logger(__name__)
 
@@ -136,23 +134,6 @@ _CONTACT_UPDATE_RE = re.compile(
     r"(update.{0,15}(contact|address|email|phone)|change.{0,15}(address|email|phone|details))",
     re.IGNORECASE,
 )
-
-async def _classify_message(message: str) -> MessageIntent:
-    """
-    Regex handles obvious cases first to avoid the LLM call entirely.
-    """
-    msg = message.strip()
-
-    if _ESCALATION_RE.search(msg):
-        return MessageIntent.ESCALATION_REQUEST
-    if _COMPLAINT_RE.search(msg):
-        return MessageIntent.COMPLAINT
-    if _CONTACT_UPDATE_RE.search(msg):
-        return MessageIntent.CONTACT_UPDATE
-    if _CONVERSATIONAL_PATTERNS.search(msg):
-        return MessageIntent.CONVERSATION
-
-    return MessageIntent.NORMAL
 
 
 def _extract_tools_called(messages: list) -> list[dict]:
@@ -323,6 +304,7 @@ async def build_graph():
         try:
             _t0 = _time.monotonic()
             response = await llm_with_tools.ainvoke(prompt)
+            logger.debug("[Credit] - LLM Credit used by llm_with_tools in [build_graph]")
             response = _repair_tool_call(response)
             _llm_ms = (_time.monotonic() - _t0) * 1000
 
@@ -359,6 +341,7 @@ async def build_graph():
                     minimal_prompt.append(last_human)
                 try:
                     response = await llm_with_tools.ainvoke(minimal_prompt)
+                    logger.debug("[Credit] - LLM Credit used by llm_with_tools in retry with tools succeeded [call_model]")
                     logger.debug("[Agent] Retry with tools succeeded")
                 except Exception:
                     logger.warning("[Agent] Retrying without tools")
@@ -640,6 +623,7 @@ async def run_agent(
         resp = await llm.ainvoke(
             [SystemMessage(content=SYSTEM_PROMPT), *history, HumanMessage(content=message)]
         )
+        logger.debug("[Credit] - LLM Credit used by llm in message conversation [run_agent]")
 
         reply: str = _extract_text_content(resp.content).strip()
         await save_messages_to_redis(
@@ -694,6 +678,7 @@ async def run_agent(
     try:
         graph = await get_graph()
         final_state = await graph.ainvoke(initial_state, config=RunnableConfig(tags=[session_id]))
+        logger.debug("[Credit] - LLM Credit used by graph in [run_agent]")
 
         reply = ""
         for msg in reversed(final_state["messages"]):

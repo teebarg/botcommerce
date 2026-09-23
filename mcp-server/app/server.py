@@ -1,6 +1,9 @@
 from contextlib import asynccontextmanager
+
 from fastmcp import FastMCP
+
 from app.db import db
+
 
 @asynccontextmanager
 async def lifespan(app):
@@ -11,5 +14,6 @@ async def lifespan(app):
 
     await db.disconnect()
     print("Database closed")
+
 
 mcp = FastMCP(name="Revoque MCP Server", lifespan=lifespan)

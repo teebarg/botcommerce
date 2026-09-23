@@ -1,7 +1,9 @@
 from datetime import datetime, timezone
-from app.logging import get_logger
+
 import httpx
+
 from app.config import settings
+from app.logging import get_logger
 
 logger = get_logger(__name__)
 
