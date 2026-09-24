@@ -1,0 +1,366 @@
+[
+  {
+    "id": "prod_001",
+    "category": "product_search",
+    "messages": ["Do you have any red dresses?"],
+    "expected_tools": ["search_products"],
+    "expected_escalation": false,
+    "notes": "Basic product search by color + type"
+  },
+  {
+    "id": "prod_002",
+    "category": "product_search",
+    "messages": ["Show me men's shirts under 10000 naira"],
+    "expected_tools": ["search_products"],
+    "expected_escalation": false,
+    "notes": "Product search with gender + price constraint"
+  },
+  {
+    "id": "prod_003",
+    "category": "product_search",
+    "messages": ["I'm looking for Ankara styles for women"],
+    "expected_tools": ["search_products"],
+    "expected_escalation": false,
+    "notes": "Nigerian fashion specific (Ankara)"
+  },
+  {
+    "id": "prod_004",
+    "category": "product_search",
+    "messages": ["Got any sneakers in size 42?"],
+    "expected_tools": ["search_products"],
+    "expected_escalation": false,
+    "notes": "Size-specific product search"
+  },
+  {
+    "id": "prod_005",
+    "category": "product_search",
+    "messages": ["What new arrivals do you have?"],
+    "expected_tools": ["search_products"],
+    "expected_escalation": false,
+    "notes": "New arrivals query"
+  },
+  {
+    "id": "prod_006",
+    "category": "product_search",
+    "messages": ["Do you sell bags and accessories?"],
+    "expected_tools": ["search_products"],
+    "expected_escalation": false,
+    "notes": "Category level search"
+  },
+  {
+    "id": "prod_007",
+    "category": "product_search",
+    "messages": ["Show me something nice for a wedding"],
+    "expected_tools": ["search_products"],
+    "expected_escalation": false,
+    "notes": "Vague / occasion-based search — agent should still search"
+  },
+  {
+    "id": "nosell_001",
+    "category": "we_dont_sell",
+    "messages": ["Do you sell iPhones?"],
+    "expected_tools": [],
+    "expected_escalation": false,
+    "notes": "Off-category electronics — should not search or should clearly say we are a fashion store"
+  },
+  {
+    "id": "nosell_002",
+    "category": "we_dont_sell",
+    "messages": ["Can I buy laptops here?"],
+    "expected_tools": [],
+    "expected_escalation": false,
+    "notes": "Electronics — redirect to fashion"
+  },
+  {
+    "id": "nosell_003",
+    "category": "we_dont_sell",
+    "messages": ["Do you have any food items or groceries?"],
+    "expected_tools": [],
+    "expected_escalation": false,
+    "notes": "Completely unrelated category"
+  },
+  {
+    "id": "order_001",
+    "category": "order_tracking",
+    "messages": ["Where is my order ORD-C0B7CD56?"],
+    "expected_tools": ["check_order_status"],
+    "expected_escalation": false,
+    "notes": "Order tracking with valid-looking number"
+  },
+  {
+    "id": "order_002",
+    "category": "order_tracking",
+    "messages": ["Track my order please"],
+    "expected_tools": [],
+    "expected_escalation": false,
+    "notes": "Missing order number — agent should ask for it, not call the tool yet"
+  },
+  {
+    "id": "order_003",
+    "category": "order_tracking",
+    "messages": ["What's the status of order number ORD-12345?"],
+    "expected_tools": ["check_order_status"],
+    "expected_escalation": false,
+    "notes": "Explicit order status request"
+  },
+  {
+    "id": "order_004",
+    "category": "order_tracking",
+    "messages": [
+      "I want to track my order",
+      "The order number is ORD-C0B7CD56"
+    ],
+    "expected_tools": ["check_order_status"],
+    "expected_escalation": false,
+    "notes": "Multi-turn: first ask for number, then provide it"
+  },
+  {
+    "id": "policy_001",
+    "category": "policies",
+    "messages": ["What is your return policy?"],
+    "expected_tools": ["search_policies"],
+    "expected_escalation": false,
+    "notes": "Returns policy"
+  },
+  {
+    "id": "policy_002",
+    "category": "policies",
+    "messages": ["How long does shipping take?"],
+    "expected_tools": ["search_policies"],
+    "expected_escalation": false,
+    "notes": "Shipping / delivery policy"
+  },
+  {
+    "id": "policy_003",
+    "category": "policies",
+    "messages": ["Do you offer free shipping?"],
+    "expected_tools": ["search_policies", "shop_guide"],
+    "expected_escalation": false,
+    "notes": "Shipping cost / free shipping"
+  },
+  {
+    "id": "faq_001",
+    "category": "faqs",
+    "messages": ["How do I place an order?"],
+    "expected_tools": ["search_faqs", "shop_guide"],
+    "expected_escalation": false,
+    "notes": "Checkout / how-to"
+  },
+  {
+    "id": "faq_002",
+    "category": "faqs",
+    "messages": ["What payment methods do you accept?"],
+    "expected_tools": ["search_faqs", "shop_guide"],
+    "expected_escalation": false,
+    "notes": "Payment methods"
+  },
+  {
+    "id": "faq_003",
+    "category": "faqs",
+    "messages": ["How can I reset my password?"],
+    "expected_tools": ["search_faqs", "shop_guide"],
+    "expected_escalation": false,
+    "notes": "Account help"
+  },
+  {
+    "id": "stock_001",
+    "category": "stock",
+    "messages": ["Is the red Ankara dress still in stock?"],
+    "expected_tools": ["search_products", "check_stock"],
+    "expected_escalation": false,
+    "notes": "May need search first then stock check"
+  },
+  {
+    "id": "escalation_001",
+    "category": "escalation",
+    "messages": ["I want to speak to a human agent"],
+    "expected_tools": [],
+    "expected_escalation": true,
+    "notes": "Explicit human request — should trigger form / escalation path"
+  },
+  {
+    "id": "escalation_002",
+    "category": "escalation",
+    "messages": ["Connect me to a real person please"],
+    "expected_tools": [],
+    "expected_escalation": true,
+    "notes": "Human request variant"
+  },
+  {
+    "id": "escalation_003",
+    "category": "escalation",
+    "messages": ["This is fraud! Someone used my card without permission"],
+    "expected_tools": ["escalate_to_human"],
+    "expected_escalation": true,
+    "notes": "High-risk fraud — should escalate"
+  },
+  {
+    "id": "escalation_004",
+    "category": "escalation",
+    "messages": ["I will take legal action and report you to the authorities"],
+    "expected_tools": ["escalate_to_human"],
+    "expected_escalation": true,
+    "notes": "Legal threat — high risk escalation"
+  },
+  {
+    "id": "escalation_005",
+    "category": "escalation",
+    "messages": ["I want a chargeback on this order"],
+    "expected_tools": ["escalate_to_human"],
+    "expected_escalation": true,
+    "notes": "Chargeback language"
+  },
+  {
+    "id": "complaint_001",
+    "category": "complaint",
+    "messages": ["I received the wrong item and I'm very unhappy"],
+    "expected_tools": [],
+    "expected_escalation": false,
+    "notes": "Complaint — should trigger complaint form path, not full escalation"
+  },
+  {
+    "id": "edge_001",
+    "category": "edge_case",
+    "messages": ["hi"],
+    "expected_tools": [],
+    "expected_escalation": false,
+    "notes": "Simple greeting — conversational shortcut"
+  },
+  {
+    "id": "edge_002",
+    "category": "edge_case",
+    "messages": ["Who are you?"],
+    "expected_tools": [],
+    "expected_escalation": false,
+    "notes": "Identity question"
+  },
+  {
+    "id": "edge_003",
+    "category": "edge_case",
+    "messages": ["Tell me a joke"],
+    "expected_tools": [],
+    "expected_escalation": false,
+    "notes": "Off-topic — should politely decline and redirect"
+  },
+  {
+    "id": "edge_004",
+    "category": "edge_case",
+    "messages": ["What is the capital of Nigeria?"],
+    "expected_tools": [],
+    "expected_escalation": false,
+    "notes": "General knowledge off-topic"
+  },
+  {
+    "id": "edge_005",
+    "category": "edge_case",
+    "messages": [""],
+    "expected_tools": [],
+    "expected_escalation": false,
+    "notes": "Empty message edge case"
+  },
+  {
+    "id": "multi_001",
+    "category": "multi_turn",
+    "messages": [
+      "Do you have any black trousers?",
+      "What about in size 34?"
+    ],
+    "expected_tools": ["search_products"],
+    "expected_escalation": false,
+    "notes": "Follow-up refinement of product search"
+  },
+  {
+    "id": "multi_002",
+    "category": "multi_turn",
+    "messages": [
+      "I ordered something last week",
+      "Can you check the status? Order is ORD-C0B7CD56"
+    ],
+    "expected_tools": ["check_order_status"],
+    "expected_escalation": false,
+    "notes": "Multi-turn order tracking"
+  },
+  {
+    "id": "multi_003",
+    "category": "multi_turn",
+    "messages": [
+      "What is your shipping policy?",
+      "Does it apply to Lagos only or nationwide?"
+    ],
+    "expected_tools": ["search_policies"],
+    "expected_escalation": false,
+    "notes": "Follow-up on policy"
+  },
+  {
+    "id": "stock_002",
+    "category": "stock",
+    "messages": ["Is pin down available?"],
+    "expected_tools": ["search_products"],
+    "expected_escalation": false,
+    "notes": "Specific product name search (from your test endpoint)"
+  },
+  {
+    "id": "policy_004",
+    "category": "policies",
+    "messages": ["Can I return an item if it doesn't fit?"],
+    "expected_tools": ["search_policies"],
+    "expected_escalation": false,
+    "notes": "Returns eligibility"
+  },
+  {
+    "id": "faq_004",
+    "category": "faqs",
+    "messages": ["How do discounts and loyalty points work?"],
+    "expected_tools": ["shop_guide", "search_faqs"],
+    "expected_escalation": false,
+    "notes": "Promotions / loyalty"
+  },
+  {
+    "id": "prod_008",
+    "category": "product_search",
+    "messages": ["I need something for a baby boy"],
+    "expected_tools": ["search_products"],
+    "expected_escalation": false,
+    "notes": "Kids / baby category"
+  },
+  {
+    "id": "edge_006",
+    "category": "edge_case",
+    "messages": ["Thanks, that was helpful"],
+    "expected_tools": [],
+    "expected_escalation": false,
+    "notes": "Closing / thanks"
+  },
+  {
+    "id": "escalation_006",
+    "category": "escalation",
+    "messages": ["Contact support"],
+    "expected_tools": [],
+    "expected_escalation": true,
+    "notes": "Short support request"
+  },
+  {
+    "id": "prod_009",
+    "category": "product_search",
+    "messages": ["Any native wear for men?"],
+    "expected_tools": ["search_products"],
+    "expected_escalation": false,
+    "notes": "Nigerian native / traditional wear"
+  },
+  {
+    "id": "order_005",
+    "category": "order_tracking",
+    "messages": ["My package has not arrived and it's been 2 weeks. Order ORD-C0B7CD56"],
+    "expected_tools": ["check_order_status"],
+    "expected_escalation": false,
+    "notes": "Delayed delivery complaint with order number — still use tool first"
+  },
+  {
+    "id": "edge_007",
+    "category": "edge_case",
+    "messages": ["Are you a real person or a bot?"],
+    "expected_tools": [],
+    "expected_escalation": false,
+    "notes": "Identity probe — system prompt says never reveal AI"
+  }
+]

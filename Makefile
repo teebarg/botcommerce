@@ -243,6 +243,12 @@ test-standalone:
 	$(DOCKER_COMPOSE) exec worker uv run python scripts/test_standalone.py
 
 
+# Agent tests
+.PHONY: smoke-test
+smoke-test:
+	$(DOCKER_COMPOSE) exec agent uv run python -m scripts.run_offline_eval --limit 1
+
+
 # ==========================================
 # Interactive Systems Help Desk Documentation
 # ==========================================
