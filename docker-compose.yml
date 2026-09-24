@@ -119,6 +119,8 @@ services:
     build:
       context: .
       dockerfile: mcp-server/Dockerfile.dev
+    environment:
+      - DATABASE_URL=postgres://admin:password@postgres:5432/shop
     networks:
       - dev-net
     labels:
