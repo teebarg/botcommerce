@@ -1,20 +1,28 @@
-from app.logging import get_logger
-from qdrant_client import QdrantClient
-from qdrant_client.models import (
-    Distance, VectorParams, PointStruct, Filter,
-    FieldCondition, MatchValue
-)
+import os
+import uuid
+
 # from sentence_transformers import SentenceTransformer
 from functools import lru_cache
-from typing import Optional
-import uuid
 from pathlib import Path
+from typing import Optional
+
 from fastembed import TextEmbedding
-import os
+from qdrant_client import QdrantClient
+from qdrant_client.models import (
+    Distance,
+    FieldCondition,
+    Filter,
+    MatchValue,
+    PointStruct,
+    VectorParams,
+)
+
+from app.logging import get_logger
 
 logger = get_logger(__name__)
 
-MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+# MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+MODEL_NAME = "BAAI/bge-small-en-v1.5"
 # MODEL_NAME = "all-MiniLM-L6-v2"
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -79,6 +87,18 @@ def ensure_collection(collection_name: str) -> None:
         logger.debug(f"Collection already exists: {collection_name}")
 
 
+def reload_collection(collection_key: str, documents: list[dict]) -> int:
+    """Full refresh: wipe the collection and reload from source of truth."""
+    collection_name = COLLECTIONS[collection_key]
+    client = get_qdrant_client()
+
+    if client.collection_exists(collection_name):
+        client.delete_collection(collection_name)
+    ensure_collection(collection_name)
+
+    return upsert_documents(collection_key, documents)
+
+
 def upsert_documents(collection_key: str, documents: list[dict]) -> int:
     """
     Embed and upsert documents into Qdrant.
@@ -117,7 +137,7 @@ def search_collection(
     collection_key: str,
     query: str,
     top_k: int = 5,
-    score_threshold: float = 0.5,
+    score_threshold: float = 0.45,
     filters: Optional[dict] = None,
 ) -> list[dict]:
     """
@@ -129,8 +149,12 @@ def search_collection(
     model = get_embedding_model()
     client = get_qdrant_client()
 
+    BGE_QUERY_PREFIX = "Represent this sentence for searching relevant passages: "
+
+    query_vector = list(model.embed([BGE_QUERY_PREFIX + query]))[0].tolist()
+
     # query_vector = model.encode(query).tolist()
-    query_vector = list(model.embed([query]))[0].tolist()
+    # query_vector = list(model.embed([query]))[0].tolist()
 
     # Build optional filter (e.g. filter by category)
     qdrant_filter = None

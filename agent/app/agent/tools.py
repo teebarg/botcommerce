@@ -1,3 +1,4 @@
+import json
 import time
 
 import jwt
@@ -8,8 +9,6 @@ from urllib3.util.retry import Retry
 
 from app.config import settings
 from app.logging import get_logger
-
-# from app.mcp_tools import get_mcp_tools
 from app.rag.qdrant_client import search_collection
 
 logger = get_logger(__name__)
@@ -82,7 +81,7 @@ def search_faqs(query: str) -> str:
     - General store questions not related to a specific order
     Input: the customer's question as-is.
     """
-    results = search_collection("faqs", query, top_k=2, score_threshold=0.5)
+    results = search_collection("faqs", query, top_k=5)
     if not results:
         return "No FAQ entry found for that question."
 
@@ -103,7 +102,7 @@ def search_policies(query: str) -> str:
     - Warranty coverage
     Input: what policy information the customer needs.
     """
-    results = search_collection("policies", query, top_k=2, score_threshold=0.45)
+    results = search_collection("policies", query, top_k=5)
     if not results:
         return "No relevant policy information found."
     return "Here's our relevant policy:\n\n" + "\n\n---\n\n".join(r["text"] for r in results)
@@ -132,18 +131,32 @@ def check_stock(product_slug: str) -> str:
 
 
 @tool
-def search_products(query: str):
+def search_products(query: str) -> str:
     """
-    Search for products in the store repository based on a text query.Use this tool when the user is looking for available items, browsing products,
-    or asking if a specific type of merchandise is in stock.Args:
+    Search the product catalog for items matching a customer's query.
+    Use when the customer asks about:
+    - Availability of a specific item, style, or category (e.g. "do you have any denim jackets?")
+    - Product details, price, or stock for something they're browsing
+    - Recommendations based on a description ("something for a wedding", "cheap sneakers under 10k")
+    Do NOT use for questions about an existing order — use the order lookup tool for that.
+    Input: the customer's query as-is, e.g. "red ankara dress" or "do you sell bags?"
+    """
+    results = search_collection("products", query, top_k=5)
 
-    query (str): The search keyword, product name, or category to look up.Returns:
-    dict/list: A collection of product objects matching the query, containing details
-    like IDs, names, prices, and availability.
-    """
-    result = _shop_request("GET", "/api/product/", params={"search": query})
-    print("🚀 ~ search_products ~ result:", result)
-    return result
+    products = [
+        {
+            "id": r.get("product_id"),
+            "name": r.get("name") or "Unnamed product",
+            "sku": r.get("sku"),
+            "image": r.get("image"),
+            "variants": r.get("variants") or [],
+            "active": True,
+            "is_new": bool(r.get("is_new", False)),
+        }
+        for r in results
+    ]
+
+    return json.dumps({"products": products})
 
 
 @tool
@@ -253,7 +266,6 @@ def shop_guide(topic: str) -> str:
 
 
 async def get_all_tools() -> list:
-    # mcp_tools = await get_mcp_tools()  # search_products, check_order_status, check_stock
     local_tools = [
         search_products,
         check_order_status,
@@ -263,5 +275,4 @@ async def get_all_tools() -> list:
         escalate_to_human,
         shop_guide,
     ]
-    print("🚀 ~ get_all_tools ~ local_tools:", local_tools)
     return local_tools

@@ -108,33 +108,6 @@ class MessageIntent(str, Enum):
     CONTACT_UPDATE = "contact_update"
     NORMAL = "normal"
 
-_CONVERSATIONAL_PATTERNS = re.compile(
-    r"^\s*(hi+|hey+|hello+|howdy|good\s*(morning|afternoon|evening)|"
-    r"who are you|what are you|are you (a |an )?(bot|ai|robot|human|person|agent)|"
-    r"what('?s| is) your name|tell me about yourself|"
-    r"thanks?|thank you|cheers|ok(ay)?|great|awesome|bye|goodbye|"
-    r"help|what can you do|how can you help|"
-    r"(good[,.]?\s+)?(what (do you sell|can you help|do you (have|carry|offer|sell)))|"
-    r"what('?s| is) (in stock|available|on (sale|offer)))\s*[?!.]*\s*$",
-    re.IGNORECASE,
-)
-_ESCALATION_RE = re.compile(
-    r"(speak (to|with) (a )?human|talk (to|with) (a )?human|human agent|call me"
-    r"|need (a |to speak with )?(human|agent)|connect me"
-    r"|(speak|talk|chat|connect).{0,20}(human|agent|person|someone|representative)"
-    r"|(need|want).{0,20}(human|agent|real person)"
-    r"|contact support|contact (an? )?(agent|team|us)|reach (out|support)|get (help|support))",
-    re.IGNORECASE,
-)
-_COMPLAINT_RE = re.compile(
-    r"(complain|bad experience|wrong item|damaged|overcharged|poor service|unsatisfied)",
-    re.IGNORECASE,
-)
-_CONTACT_UPDATE_RE = re.compile(
-    r"(update.{0,15}(contact|address|email|phone)|change.{0,15}(address|email|phone|details))",
-    re.IGNORECASE,
-)
-
 
 def _extract_tools_called(messages: list) -> list[dict]:
     """Extract tool calls made this turn as [{name, args, result_preview}]."""
