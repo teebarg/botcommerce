@@ -1,7 +1,9 @@
 from datetime import datetime, timezone
-from app.logging import get_logger
+
 import httpx
+
 from app.config import settings
+from app.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -57,3 +59,7 @@ async def _notify_slack_escalation(
                 logger.warning(f"[Escalation] Slack returned {resp.status_code}: {resp.text}")
     except Exception as exc:
         logger.error(f"[Escalation] Slack notification failed: {exc}")
+        
+def _log_step(msg: str, indent: int = 0) -> None:
+    prefix = "  " * indent
+    logger.debug(f"[Agent] {prefix}{msg}")

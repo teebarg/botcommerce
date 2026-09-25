@@ -1,7 +1,9 @@
 import asyncpg
 from core.db.engine import create_engine
 from core.db.session import create_session_factory
+
 from app.config import settings
+
 
 class Database:
     def __init__(self):

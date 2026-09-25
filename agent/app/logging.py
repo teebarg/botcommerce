@@ -102,6 +102,11 @@ LOGGING_CONFIG = {
             "level": "DEBUG",
             "propagate": False,
         },
+        "semantic_router.utils.logger": {
+            "handlers": ["console"],
+            "level": "ERROR",  # Force-suppress anything lower than an absolute system crash
+            "propagate": False,
+        },
     },
 }
 

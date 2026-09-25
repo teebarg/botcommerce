@@ -1,24 +1,29 @@
 import dataclasses
 import time
-from app.logging import get_logger
-from app.agent.eval_config import SUPPORT_EVAL_CONFIG
-from fastapi import FastAPI, BackgroundTasks, Request
-from fastapi.middleware.cors import CORSMiddleware
-import redis.asyncio as redis
 from contextlib import asynccontextmanager
 
-from app.schemas.models import ChatRequest, ChatResponse, IngestRequest, HealthResponse
-from app.agent.agent_graph import run_agent
-from app.config import get_model_name, get_llm, settings
-from app.utils import _notify_slack_escalation
-from app.customer_support.db import is_human_connected, save_message_db, mark_escalated, ensure_conversation_exists
-from app.agent.memory import save_messages_to_redis, load_messages_from_redis, clear_session
-from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
+import redis.asyncio as redis
+from fastapi import BackgroundTasks, FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 
-from app.observability.tracing import start_turn_trace, end_turn_trace
+from app.agent.agent_graph import run_agent
+from app.agent.eval_config import SUPPORT_EVAL_CONFIG
+from app.agent.memory import clear_session, load_messages_from_redis, save_messages_to_redis
+from app.config import get_llm, get_model_name, settings
+from app.customer_support.db import (
+    ensure_conversation_exists,
+    is_human_connected,
+    mark_escalated,
+    save_message_db,
+)
+from app.deps import RedisDep
+from app.logging import get_logger
 from app.observability.eval_runner import run_eval_pipeline
 from app.observability.langfuse_client import flush_langfuse
-from app.deps import RedisDep
+from app.observability.tracing import end_turn_trace, start_turn_trace
+from app.schemas.models import ChatRequest, ChatResponse, HealthResponse, IngestRequest
+from app.utils import _notify_slack_escalation
 
 logger = get_logger(__name__)
 
@@ -32,6 +37,7 @@ async def lifespan(app: FastAPI):
     app.state.redis = redis.from_url(settings.REDIS_URL, decode_responses=True, max_connections=10)
     try:
         from app.rag.qdrant_client import get_embedding_model
+
         get_embedding_model()  # loads and caches the model
         logger.debug("✅ Embedding model loaded")
     except Exception as e:
@@ -59,18 +65,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-async def persist_turn_to_db(session_id: str, user_msg: str, ai_msg: str, user_metadata: dict, ai_metadata: dict) -> None:
+
+async def persist_turn_to_db(
+    session_id: str, user_msg: str, ai_msg: str, user_metadata: dict, ai_metadata: dict
+) -> None:
     """Saves both messages using the UPSERT-safe function."""
     try:
-        await save_message_db(session_id=session_id, role="USER", content=user_msg, metadata=user_metadata)
-        await save_message_db(session_id=session_id, role="BOT", content=ai_msg, metadata=ai_metadata)
+        await save_message_db(
+            session_id=session_id, role="USER", content=user_msg, metadata=user_metadata
+        )
+        await save_message_db(
+            session_id=session_id, role="BOT", content=ai_msg, metadata=ai_metadata
+        )
         logger.debug(f"💾 Persisted turn for session {session_id} to DB")
     except Exception as e:
         logger.error(f"❌ Background DB Persistence Error: {e}")
 
 
 @app.post("/chat", tags=["Chat"])
-async def chat(request: Request, redis: RedisDep, payload: ChatRequest, background_tasks: BackgroundTasks) -> ChatResponse:
+async def chat(
+    request: Request, redis: RedisDep, payload: ChatRequest, background_tasks: BackgroundTasks
+) -> ChatResponse:
     """
     Main chat endpoint.
 
@@ -78,11 +93,16 @@ async def chat(request: Request, redis: RedisDep, payload: ChatRequest, backgrou
     - Automatically routes to RAG or API tools
     - Returns whether the conversation was escalated to a human
     """
-    logger.debug("Starting agent chat...................................................................................")
+    logger.debug(
+        "Starting agent chat..................................................................................."
+    )
     MAX_MESSAGE_LENGTH = 1000
 
     if payload.message and len(payload.message) > MAX_MESSAGE_LENGTH:
-        return ChatResponse(reply="Your message is too long. Please keep it under 1000 characters.", session_id=payload.session_id)
+        return ChatResponse(
+            reply="Your message is too long. Please keep it under 1000 characters.",
+            session_id=payload.session_id,
+        )
 
     connection_key = payload.customer_id or payload.app_session_id
     await redis.set(f"chat_user:{payload.session_id}", str(connection_key))
@@ -90,7 +110,9 @@ async def chat(request: Request, redis: RedisDep, payload: ChatRequest, backgrou
     if payload.customer_id is None:
         await redis.set(f"chat_session:{connection_key}", payload.session_id)
 
-    await ensure_conversation_exists(conversation_uuid=payload.session_id, customer_id=payload.customer_id)
+    await ensure_conversation_exists(
+        conversation_uuid=payload.session_id, customer_id=payload.customer_id
+    )
 
     if payload.type == "form_submission":
         if payload.form_type == "escalation_details":
@@ -111,7 +133,7 @@ async def chat(request: Request, redis: RedisDep, payload: ChatRequest, backgrou
             await mark_escalated(conversation_uuid=payload.session_id)
 
             user_msg = "User provided response"
-            reply="Thank you. A human support agent will contact you shortly."
+            reply = "Thank you. A human support agent will contact you shortly."
 
             background_tasks.add_task(
                 persist_turn_to_db,
@@ -119,7 +141,7 @@ async def chat(request: Request, redis: RedisDep, payload: ChatRequest, backgrou
                 user_msg=user_msg,
                 ai_msg=reply,
                 ai_metadata={"escalated": True},
-                user_metadata={"reason": reason}
+                user_metadata={"reason": reason},
             )
 
             return ChatResponse(
@@ -145,17 +167,23 @@ async def chat(request: Request, redis: RedisDep, payload: ChatRequest, backgrou
             )
 
             user_msg = "User provided response"
-            reply=(
+            reply = (
                 "Thanks, I've sent your request to our support team. "
                 "They’ll get back to you within 24 hours. "
                 "If you'd like, I can still help with anything else in the meantime."
             )
 
-            history: list[BaseMessage] = await load_messages_from_redis(redis=redis, session_id=payload.session_id)
+            history: list[BaseMessage] = await load_messages_from_redis(
+                redis=redis, session_id=payload.session_id
+            )
             await save_messages_to_redis(
                 redis=redis,
                 session_id=payload.session_id,
-                messages=history + [HumanMessage(content=user_msg), AIMessage(content="Complaint request received and sent to support team")],
+                messages=history
+                + [
+                    HumanMessage(content=user_msg),
+                    AIMessage(content="Complaint request received and sent to support team"),
+                ],
             )
 
             background_tasks.add_task(
@@ -164,7 +192,7 @@ async def chat(request: Request, redis: RedisDep, payload: ChatRequest, backgrou
                 user_msg=user_msg,
                 ai_msg=reply,
                 ai_metadata={"complaint_sent": True},
-                user_metadata={"reason": reason}
+                user_metadata={"reason": reason},
             )
 
             return ChatResponse(
@@ -174,7 +202,9 @@ async def chat(request: Request, redis: RedisDep, payload: ChatRequest, backgrou
             )
 
     if await is_human_connected(payload.session_id):
-        await save_message_db(session_id=payload.session_id, content=payload.message or "", role="USER")
+        await save_message_db(
+            session_id=payload.session_id, content=payload.message or "", role="USER"
+        )
         return ChatResponse(
             reply="You're connected with a support agent. They'll respond shortly.",
             session_id=payload.session_id,
@@ -191,7 +221,9 @@ async def chat(request: Request, redis: RedisDep, payload: ChatRequest, backgrou
     turn_count = await redis.incr(f"rate:{payload.session_id}")
     await redis.expire(f"rate:{payload.session_id}", 60)
     if turn_count > 10:  # 10 messages per minute per session
-        return ChatResponse(reply="Please slow down — try again in a moment.", session_id=payload.session_id)
+        return ChatResponse(
+            reply="Please slow down — try again in a moment.", session_id=payload.session_id
+        )
 
     try:
         result = await run_agent(
@@ -201,18 +233,23 @@ async def chat(request: Request, redis: RedisDep, payload: ChatRequest, backgrou
             customer_id=payload.customer_id,
         )
     except Exception as e:
-        logger.error(f"[Chat Api] Unhandled error for session {payload.session_id}: {e}", exc_info=True)
-        return ChatResponse(reply="Something went wrong on my end. Please try again.", session_id=payload.session_id)
-
+        logger.error(
+            f"[Chat Api] Unhandled error for session {payload.session_id}: {e}", exc_info=True
+        )
+        return ChatResponse(
+            reply="Something went wrong on my end. Please try again.", session_id=payload.session_id
+        )
 
     _latency_ms = (time.monotonic() - _t_start) * 1000
 
-    trace.update(metadata={
-        "latency_ms": round(_latency_ms, 1),
-        "iterations": result.get("_iterations", 0),
-        "intent": result.get("_intent", "normal"),
-        "had_tools": bool(result.get("_tools_called")),
-    })
+    trace.update(
+        metadata={
+            "latency_ms": round(_latency_ms, 1),
+            "iterations": result.get("_iterations", 0),
+            "intent": result.get("_intent", "normal"),
+            "had_tools": bool(result.get("_tools_called")),
+        }
+    )
 
     end_turn_trace(
         span=turn_span,
@@ -236,7 +273,7 @@ async def chat(request: Request, redis: RedisDep, payload: ChatRequest, backgrou
             "quick_replies": result.get("quick_replies"),
             "form": result.get("form"),
         },
-        user_metadata={}
+        user_metadata={},
     )
 
     if settings.OBSERVABILITY_ENABLED:
@@ -286,6 +323,7 @@ async def health_check(redis: RedisDep) -> HealthResponse:
 
     try:
         from app.rag.qdrant_client import get_qdrant_client
+
         client = get_qdrant_client()
         client.get_collections()
         checks["qdrant"] = "ok"
@@ -319,23 +357,22 @@ async def root():
         "docs": "/docs",
     }
 
+
 @app.post("/clear-collections", tags=["System"])
 async def clear_collection():
     from app.rag.qdrant_client import delete_collection
+
     for collection in ["products", "faqs", "policies"]:
         delete_collection(collection)
-    return {
-        "status": "ok"
-    }
+    return {"status": "ok"}
+
 
 @app.get("/test-micro", tags=["System"])
-async def test_micro():
+async def test_micro(search: str):
     # from app.agent.tools import _shop_request
     from app.rag.qdrant_client import search_collection
+
     # result = _shop_request("GET", "/api/order/ORD-C0B7CD56")
     # result = search_collection("faqs", "How do I place an order", top_k=3, score_threshold=0.45)
-    result = search_collection("products", "pin downs", top_k=3, score_threshold=0.45)
-    return {
-        "result": result,
-        "status": "ok"
-    }
+    result = search_collection("products", search, top_k=3)
+    return {"result": result, "status": "ok"}

@@ -1,15 +1,14 @@
 """
 LangGraph customer support agent.
 """
+
 import asyncio
-import time as _time
-from app.logging import get_logger
-from app.observability.tracing import record_llm_generation
 import json
 import re
+import time as _time
 import uuid
-from typing import Annotated, Literal
 from enum import Enum
+from typing import Annotated, Literal, TypedDict
 
 from langchain_core.messages import (
     AIMessage,
@@ -24,14 +23,14 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
 from redis.asyncio import Redis
-from typing import TypedDict
 
 from app.agent.memory import load_messages_from_redis, save_messages_to_redis
-from app.agent.tools import get_all_tools
+from app.agent.tools import escalate_to_human, get_all_tools
 from app.config import get_llm
-from app.utils import _notify_slack_escalation
-from app.agent.tools import escalate_to_human
-from app.observability.tracing import record_tool_span
+from app.logging import get_logger
+from app.observability.tracing import record_llm_generation, record_tool_span
+from app.utilities.classifier import _classify_message
+from app.utils import _log_step, _notify_slack_escalation
 
 logger = get_logger(__name__)
 
@@ -67,6 +66,8 @@ SYSTEM_PROMPT = """You are Seun, a warm and helpful customer support agent for T
   Acknowledge the results naturally in one or two sentences. Vary your phrasing every time.
 - If results clearly don't match what the customer asked for, tell them we don't carry that item and suggest an alternative in one sentence.
 - If the customer asks for something completely unrelated to fashion, do NOT search. Say we are a fashion store and ask if you can help with clothing.
+- If the customer asks a follow-up about size, color, price, stock, or variants after a previous product search, treat it as a continuation. 
+  Prefer searching again with the combined information rather than asking “which item?”.
 
 ## Order Tracking
 - NEVER assume or guess an order number.
@@ -110,81 +111,50 @@ class MessageIntent(str, Enum):
     CONTACT_UPDATE = "contact_update"
     NORMAL = "normal"
 
-_CONVERSATIONAL_PATTERNS = re.compile(
-    r"^\s*(hi+|hey+|hello+|howdy|good\s*(morning|afternoon|evening)|"
-    r"who are you|what are you|are you (a |an )?(bot|ai|robot|human|person|agent)|"
-    r"what('?s| is) your name|tell me about yourself|"
-    r"thanks?|thank you|cheers|ok(ay)?|great|awesome|bye|goodbye|"
-    r"help|what can you do|how can you help|"
-    r"(good[,.]?\s+)?(what (do you sell|can you help|do you (have|carry|offer|sell)))|"
-    r"what('?s| is) (in stock|available|on (sale|offer)))\s*[?!.]*\s*$",
-    re.IGNORECASE,
-)
-_ESCALATION_RE = re.compile(
-    r"(speak (to|with) (a )?human|talk (to|with) (a )?human|human agent|call me"
-    r"|need (a |to speak with )?(human|agent)|connect me"
-    r"|(speak|talk|chat|connect).{0,20}(human|agent|person|someone|representative)"
-    r"|(need|want).{0,20}(human|agent|real person)"
-    r"|contact support|contact (an? )?(agent|team|us)|reach (out|support)|get (help|support))",
-    re.IGNORECASE,
-)
-_COMPLAINT_RE = re.compile(
-    r"(complain|bad experience|wrong item|damaged|overcharged|poor service|unsatisfied)",
-    re.IGNORECASE,
-)
-_CONTACT_UPDATE_RE = re.compile(
-    r"(update.{0,15}(contact|address|email|phone)|change.{0,15}(address|email|phone|details))",
-    re.IGNORECASE,
-)
-
-async def _classify_message(message: str) -> MessageIntent:
-    """
-    Regex handles obvious cases first to avoid the LLM call entirely.
-    """
-    msg = message.strip()
-
-    if _ESCALATION_RE.search(msg):
-        return MessageIntent.ESCALATION_REQUEST
-    if _COMPLAINT_RE.search(msg):
-        return MessageIntent.COMPLAINT
-    if _CONTACT_UPDATE_RE.search(msg):
-        return MessageIntent.CONTACT_UPDATE
-    if _CONVERSATIONAL_PATTERNS.search(msg):
-        return MessageIntent.CONVERSATION
-
-    return MessageIntent.NORMAL
-
 
 def _extract_tools_called(messages: list) -> list[dict]:
     """Extract tool calls made this turn as [{name, args, result_preview}]."""
     tools = []
     for msg in messages:
         if isinstance(msg, ToolMessage):
-            tools.append({
-                "name": msg.name or "unknown",
-                "result_preview": str(msg.content)[:200],
-            })
+            tools.append(
+                {
+                    "name": msg.name or "unknown",
+                    "result_preview": str(msg.content)[:200],
+                }
+            )
     return tools
 
+
 MAX_TURNS = 5
+
 
 def _build_persistable_history(
     prev_history: list[BaseMessage],
     current_human_msg: str,
     final_reply: str,
     called_search: bool,
+    products: list[dict] | None = None,
 ) -> list[BaseMessage]:
     """
     Product search turns are stateless — never persisted.
     All other turns (orders, policies, general chat) are kept up to MAX_TURNS.
     """
-    if called_search:
-        return prev_history
-
-    updated = prev_history + [
-        HumanMessage(content=current_human_msg),
-        AIMessage(content=final_reply),
-    ]
+    if called_search and products:
+        names = [p.get("name", "") for p in products[:4] if p.get("name")]
+        summary = (
+            f'[Previous product search for: "{current_human_msg}". '
+            f"Top results: {', '.join(names) or 'none'}]"
+        )
+        updated = prev_history + [
+            HumanMessage(content=current_human_msg),
+            AIMessage(content=summary),  # summary, not the real reply
+        ]
+    else:
+        updated = prev_history + [
+            HumanMessage(content=current_human_msg),
+            AIMessage(content=final_reply),
+        ]
 
     max_messages = MAX_TURNS * 2
     if len(updated) > max_messages:
@@ -192,11 +162,13 @@ def _build_persistable_history(
 
     return updated
 
+
 # Prompt sanitizer
 _REACT_RE = re.compile(
     r"^(Thought:|Action:|Action Input:|Observation:|Final Answer:)",
     re.MULTILINE,
 )
+
 
 def _sanitize_prompt(messages: list) -> list:
     """Strip old ReAct-style messages that cause XML tool call output."""
@@ -210,17 +182,41 @@ def _sanitize_prompt(messages: list) -> list:
 
 
 # Verbose logger
-def _log_thought(state: AgentState) -> None:
+def _log_thought2(state: AgentState) -> None:
     """Log the model's decision AFTER it responds (AIMessage is now in state)."""
     last = state["messages"][-1]
-    if isinstance(last, AIMessage):
-        if last.tool_calls:
-            logger.debug(f"[Thought] (iter {state.get('iterations', '?')}) "
-                        f"Calling {len(last.tool_calls)} tool(s):")
-            for tc in last.tool_calls:
-                logger.debug(f"  → {tc['name']}  args={tc['args']}")
-        else:
-            logger.debug(f"[Final Answer] {str(last.content)[:200]}")
+    if not isinstance(last, AIMessage):
+        return
+
+    if last.tool_calls:
+        for tc in last.tool_calls:
+            _log_step(
+                f"Decision   → Call tool: {tc['name']}({tc['args']})",
+                1,
+            )
+    else:
+        content_preview = str(last.content)[:120].replace("\n", " ")
+        _log_step("Decision   → Final Answer", 1)
+        _log_step(f'Reply      → "{content_preview}..."', 1)
+
+
+def _log_thought(state: AgentState) -> None:
+    """Log the model's decision in a clear way."""
+    last = state["messages"][-1]
+    if not isinstance(last, AIMessage):
+        return
+
+    if last.tool_calls:
+        for tc in last.tool_calls:
+            args_str = str(tc.get("args", {}))
+            if len(args_str) > 120:
+                args_str = args_str[:117] + "..."
+            _log_step(f"Decision   → Call tool: {tc['name']}({args_str})", 1)
+    else:
+        content = str(last.content).replace("\n", " ").strip()
+        preview = content[:140] + ("..." if len(content) > 140 else "")
+        _log_step("Decision   → Final Answer", 1)
+        _log_step(f'Reply      → "{preview}"', 1)
 
 
 def _log_observations(state: AgentState) -> None:
@@ -230,11 +226,12 @@ def _log_observations(state: AgentState) -> None:
         if not isinstance(msg, ToolMessage):
             break
         batch.append(msg)
-    for msg in reversed(batch):          # log in forward order
-        preview = str(msg.content)[:300]
-        if len(str(msg.content)) > 300:
+
+    for msg in reversed(batch):
+        preview = str(msg.content).replace("\n", " ")[:150]
+        if len(str(msg.content)) > 150:
             preview += "..."
-        logger.debug(f"[Observation] ({msg.name}) {preview}")
+        _log_step(f"Tool       → {msg.name} | {preview}", 1)
 
 
 # Tool Call Repair
@@ -242,6 +239,7 @@ _TOOL_JSON_RE = re.compile(
     r'\{\s*"(?:type"\s*:\s*"function"\s*,\s*)?"name"\s*:\s*"(?P<name>[^"]+)"\s*,\s*"(?:arguments|parameters)"\s*:\s*(?P<args>\{.*\})\s*\}',
     re.DOTALL,
 )
+
 
 def _repair_tool_call(response: AIMessage) -> AIMessage:
     """
@@ -280,9 +278,9 @@ def _repair_tool_call(response: AIMessage) -> AIMessage:
 def _sanitize_loaded_history(messages: list[BaseMessage]) -> list[BaseMessage]:
     """Drop any ToolMessages or AIMessage tool-calls that survived serialisation."""
     return [
-        m for m in messages
-        if not isinstance(m, ToolMessage)
-        and not (isinstance(m, AIMessage) and m.tool_calls)
+        m
+        for m in messages
+        if not isinstance(m, ToolMessage) and not (isinstance(m, AIMessage) and m.tool_calls)
     ]
 
 
@@ -293,12 +291,14 @@ async def build_graph():
     llm_with_tools = llm.bind_tools(tools)
 
     async def call_model(state: AgentState) -> dict:
-        if state.get("iterations", 0) == 0:
-            first_human = next(
-                (m for m in reversed(state["messages"]) if isinstance(m, HumanMessage)), None
-            )
-            if first_human:
-                logger.debug(f"[Human Message] {first_human.content}")
+        iteration = state.get("iterations", 0) + 1
+        _log_step(f"Graph      → iteration {iteration}", 1)
+        # if state.get("iterations", 0) == 0:
+        #     first_human = next(
+        #         (m for m in reversed(state["messages"]) if isinstance(m, HumanMessage)), None
+        #     )
+        # if first_human:
+        #     logger.debug(f"[Human Message] {first_human.content}")
 
         system = SYSTEM_PROMPT
         if state.get("customer_id"):
@@ -323,22 +323,30 @@ async def build_graph():
         try:
             _t0 = _time.monotonic()
             response = await llm_with_tools.ainvoke(prompt)
-            response = _repair_tool_call(response)
             _llm_ms = (_time.monotonic() - _t0) * 1000
 
             usage = (
-                getattr(response, "usage_metadata", None)      # LangChain standard
-                or getattr(response, "response_metadata", {}).get("token_usage", {})  # Groq fallback
+                getattr(response, "usage_metadata", None)  # LangChain standard
+                or getattr(response, "response_metadata", {}).get(
+                    "token_usage", {}
+                )  # Groq fallback
                 or {}
             )
-            _prompt_tokens     = usage.get("input_tokens") or usage.get("prompt_tokens") or 0
+            _prompt_tokens = usage.get("input_tokens") or usage.get("prompt_tokens") or 0
             _completion_tokens = usage.get("output_tokens") or usage.get("completion_tokens") or 0
+            total_tokens = _prompt_tokens + _completion_tokens
 
-            _usage = getattr(response, "usage_metadata", None) or {}
+            _log_step(
+                f"LLM call   → {iteration} | {_llm_ms:.0f}ms | ~{total_tokens} tokens",
+                1,
+            )
+            response = _repair_tool_call(response)
+
+            # _usage = getattr(response, "usage_metadata", None) or {}
             record_llm_generation(
                 model=getattr(llm_with_tools, "model_name", "unknown"),
-                prompt_tokens=_usage.get("input_tokens", 0),
-                completion_tokens=_usage.get("output_tokens", 0),
+                prompt_tokens=_prompt_tokens,
+                completion_tokens=_completion_tokens,
                 latency_ms=_llm_ms,
                 input_messages=[str(m.content)[:200] for m in prompt],
                 output_text=str(response.content)[:500],
@@ -350,6 +358,7 @@ async def build_graph():
             logger.error(f"[Agent] LLM error: {err}")
 
             if "tool_use_failed" in err or "Failed to call a function" in err:
+                _log_step("Retry      → tool call failed, trying minimal prompt", 1)
                 last_human = next(
                     (m for m in reversed(state["messages"]) if isinstance(m, HumanMessage)),
                     None,
@@ -358,16 +367,41 @@ async def build_graph():
                 if last_human:
                     minimal_prompt.append(last_human)
                 try:
+                    _t0 = _time.monotonic()
                     response = await llm_with_tools.ainvoke(minimal_prompt)
-                    logger.debug("[Agent] Retry with tools succeeded")
-                except Exception:
-                    logger.warning("[Agent] Retrying without tools")
+                    _llm_ms = (_time.monotonic() - _t0) * 1000
+
+                    usage = (
+                        getattr(response, "usage_metadata", None)
+                        or getattr(response, "response_metadata", {}).get("token_usage", {})
+                        or {}
+                    )
+                    _prompt_tokens = usage.get("input_tokens") or usage.get("prompt_tokens") or 0
+                    _completion_tokens = (
+                        usage.get("output_tokens") or usage.get("completion_tokens") or 0
+                    )
+                    total_tokens = _prompt_tokens + _completion_tokens
+
+                    _log_step(
+                        f"LLM call   → {state.get('iterations', 0) + 1} (retry) | {_llm_ms:.0f}ms | ~{total_tokens} tokens",
+                        1,
+                    )
+                    _log_step("Retry      → succeeded", 1)
+
+                    response = _repair_tool_call(response)
+
+                except Exception as retry_exc:
+                    _log_step(f"Retry      → failed again: {retry_exc}", 1)
                     raise
             else:
                 raise
 
         new_iterations = state.get("iterations", 0) + 1
-        updated_state = {**state, "messages": state["messages"] + [response], "iterations": new_iterations}
+        updated_state = {
+            **state,
+            "messages": state["messages"] + [response],
+            "iterations": new_iterations,
+        }
         _log_thought(updated_state)
 
         return {
@@ -376,7 +410,7 @@ async def build_graph():
             "complaint_sent": state.get("complaint_sent", False),
             "sources": list[str](state.get("sources", [])),
             "iterations": new_iterations,
-            "prompt_tokens":     state.get("prompt_tokens", 0)     + _prompt_tokens,
+            "prompt_tokens": state.get("prompt_tokens", 0) + _prompt_tokens,
             "completion_tokens": state.get("completion_tokens", 0) + _completion_tokens,
         }
 
@@ -384,7 +418,7 @@ async def build_graph():
 
     async def process_tool_results(state: AgentState) -> dict:
         messages = list(state["messages"])
-        
+
         last_ai_tool_call_ids: set[str] = set()
         for msg in reversed(messages):
             if isinstance(msg, AIMessage) and msg.tool_calls:
@@ -392,9 +426,9 @@ async def build_graph():
                 break
 
         current_batch = [
-            m for m in messages
-            if isinstance(m, ToolMessage)
-            and m.tool_call_id in last_ai_tool_call_ids
+            m
+            for m in messages
+            if isinstance(m, ToolMessage) and m.tool_call_id in last_ai_tool_call_ids
         ]
 
         _log_observations(state)
@@ -403,6 +437,8 @@ async def build_graph():
         escalated: bool = state.get("escalated", False)
 
         for msg in current_batch:
+            preview = str(msg.content)[:150].replace("\n", " ")
+            _log_step(f"Tool       → {msg.name} | {preview}...", 1)
             if msg.name in ("search_products", "search_faqs", "search_policies"):
                 label = msg.name.replace("search_", "").replace("_", " ").title()
                 if label not in sources:
@@ -427,11 +463,10 @@ async def build_graph():
             "escalated": escalated,
         }
 
-
     MAX_CALLS_PER_TURN = {
-        "search_products":    1,  # tool instructs model not to retry
+        "search_products": 1,  # tool instructs model not to retry
         "check_order_status": 1,  # either found or not
-        "check_stock":        1,  # either in stock or not
+        "check_stock": 1,  # either in stock or not
     }
 
     def should_continue(state: AgentState) -> Literal["tools", "end"]:
@@ -453,8 +488,7 @@ async def build_graph():
         current_turn_msgs = state["messages"][last_human_idx:]
 
         times_called = sum(
-            1 for m in current_turn_msgs
-            if isinstance(m, ToolMessage) and m.name == last_tool_name
+            1 for m in current_turn_msgs if isinstance(m, ToolMessage) and m.name == last_tool_name
         )
 
         max_allowed = MAX_CALLS_PER_TURN.get(last_tool_name, 2)
@@ -481,6 +515,7 @@ async def build_graph():
 _graph = None
 _graph_lock = asyncio.Lock()
 
+
 async def get_graph():
     global _graph
     if _graph is None:
@@ -488,6 +523,7 @@ async def get_graph():
             if _graph is None:  # double-checked, avoids rebuilding under concurrent requests
                 _graph = await build_graph()
     return _graph
+
 
 def _mcp_result_to_dict(content) -> dict | None:
     """
@@ -535,17 +571,18 @@ def _extract_orders(messages: list) -> dict | None:
             return data.get("order")
     return None
 
+
 # Quick replies
 _QUICK_REPLIES: dict[str, list[str]] = {
-    "awaiting_input":       [],
-    "product_search":       ["Check stock", "See other options", "How to order", "Contact support"],
-    "order_status":         ["Track another order", "Request refund", "Contact support"],
-    "refund":               ["Check refund status", "Track my order", "Contact support"],
-    "policy":               ["Track my order", "Browse products", "Contact support"],
-    "escalated":            [],
-    "complaint_sent":       [],
-    "greeting":             ["Track my order", "Browse products", "View policies"],
-    "default":              ["Track my order", "Browse products", "Contact support"],
+    "awaiting_input": [],
+    "product_search": ["Check stock", "See other options", "How to order", "Contact support"],
+    "order_status": ["Track another order", "Request refund", "Contact support"],
+    "refund": ["Check refund status", "Track my order", "Contact support"],
+    "policy": ["Track my order", "Browse products", "Contact support"],
+    "escalated": [],
+    "complaint_sent": [],
+    "greeting": ["Track my order", "Browse products", "View policies"],
+    "default": ["Track my order", "Browse products", "Contact support"],
 }
 
 _AWAITING_INPUT_PATTERNS = re.compile(
@@ -557,6 +594,7 @@ _AWAITING_INPUT_PATTERNS = re.compile(
     r"could you (tell|let) me)",
     re.IGNORECASE,
 )
+
 
 def _get_quick_replies(
     user_message: str,
@@ -625,28 +663,49 @@ async def run_agent(
 
     if not session_id:
         session_id = str(uuid.uuid4())
+    _log_step(f'▶ Session {session_id} | "{message[:80]}"')
 
-    logger.debug(f"[Agent] Session: {session_id} | Customer: {customer_id} | Message: {message[:80] if len(message) > 80 else message}")
+    # logger.debug(
+    #     f"[Agent] Session: {session_id} | Customer: {customer_id} | Message: {message[:80] if len(message) > 80 else message}"
+    # )
 
     history: list[BaseMessage] = await load_messages_from_redis(redis=redis, session_id=session_id)
     history = _sanitize_loaded_history(history)
 
     intent: str = await _classify_message(message)
-    logger.debug(f"[Router] intent={intent} for message='{message[:60]}'")
+    _log_step(f"Intent     → {intent}", 1)
 
     if intent == MessageIntent.CONVERSATION:
-        logger.debug("[Agent] Conversational shortcut")
+        _log_step("Path       → Conversational shortcut (no tools)", 1)
+
         llm = get_llm()
+        _t0 = _time.monotonic()
         resp = await llm.ainvoke(
             [SystemMessage(content=SYSTEM_PROMPT), *history, HumanMessage(content=message)]
         )
+        _llm_ms = (_time.monotonic() - _t0) * 1000
+
+        # Extract token usage if available
+        usage = (
+            getattr(resp, "usage_metadata", None)
+            or getattr(resp, "response_metadata", {}).get("token_usage", {})
+            or {}
+        )
+        prompt_tokens = usage.get("input_tokens") or usage.get("prompt_tokens") or 0
+        completion_tokens = usage.get("output_tokens") or usage.get("completion_tokens") or 0
+        total_tokens = prompt_tokens + completion_tokens
+
+        _log_step(f"LLM call   → 1 (shortcut) | {_llm_ms:.0f}ms | ~{total_tokens} tokens", 1)
 
         reply: str = _extract_text_content(resp.content).strip()
+        _log_step(f'Reply      → "{reply[:140]}{"..." if len(reply) > 140 else ""}"', 1)
+
         await save_messages_to_redis(
             redis=redis,
             session_id=session_id,
             messages=history + [HumanMessage(content=message), AIMessage(content=reply)],
         )
+
         quick_replies: list[str] = _get_quick_replies(
             user_message=message,
             agent_reply=reply,
@@ -656,7 +715,14 @@ async def run_agent(
             called_order=False,
             complaint_sent=False,
         )
-        return {"reply": reply, "session_id": session_id, "quick_replies": quick_replies}
+
+        _log_step(f"◀ Done | 1 LLM call (shortcut) | tokens≈{total_tokens} | session={session_id}")
+
+        return {
+            "reply": reply,
+            "session_id": session_id,
+            "quick_replies": quick_replies,
+        }
 
     if intent == MessageIntent.ESCALATION_REQUEST:
         return {
@@ -688,7 +754,7 @@ async def run_agent(
         "iterations": 0,
         "prompt_tokens": 0,
         "completion_tokens": 0,
-        "complaint_sent": False
+        "complaint_sent": False,
     }
 
     try:
@@ -703,9 +769,12 @@ async def run_agent(
 
         if not reply:
             last_search = next(
-                (m for m in reversed(final_state["messages"])
-                if isinstance(m, ToolMessage) and m.name == "search_products"),
-                None
+                (
+                    m
+                    for m in reversed(final_state["messages"])
+                    if isinstance(m, ToolMessage) and m.name == "search_products"
+                ),
+                None,
             )
             if last_search:
                 reply = "Here are some options I found for you! Let me know if anything catches your eye. 😊"
@@ -716,8 +785,14 @@ async def run_agent(
             reason: str = reply.replace("ESCALATION_REQUIRED:", "").strip()
 
             NON_ESCALATION_KEYWORDS: list[str] = [
-                "not found", "no results", "couldn't find", "don't sell",
-                "unavailable", "out of stock", "no matching", "pin down",
+                "not found",
+                "no results",
+                "couldn't find",
+                "don't sell",
+                "unavailable",
+                "out of stock",
+                "no matching",
+                "pin down",
             ]
 
             if any(kw in reason.lower() for kw in NON_ESCALATION_KEYWORDS):
@@ -730,7 +805,9 @@ async def run_agent(
 
                 if high_risk:
                     await escalate_to_human({"reason": reason})
-                    await _notify_slack_escalation(session_id=session_id, customer_id=customer_id, reason=reason)
+                    await _notify_slack_escalation(
+                        session_id=session_id, customer_id=customer_id, reason=reason
+                    )
                     return {
                         "reply": "A human specialist has been alerted and will assist you shortly.",
                         "session_id": session_id,
@@ -750,31 +827,32 @@ async def run_agent(
 
         current_turn_msgs = final_state["messages"][last_human_idx:]
         called_search: bool = any(
-            isinstance(m, ToolMessage) and m.name == "search_products"
-            for m in current_turn_msgs
+            isinstance(m, ToolMessage) and m.name == "search_products" for m in current_turn_msgs
         )
         called_check_order_status: bool = any(
-            isinstance(m, ToolMessage) and m.name == "check_order_status"
-            for m in current_turn_msgs
+            isinstance(m, ToolMessage) and m.name == "check_order_status" for m in current_turn_msgs
         )
 
         tools_called: list[dict] = _extract_tools_called(current_turn_msgs)
 
         products = _extract_products(final_state["messages"]) if called_search else []
-        extracted_order = _extract_orders(final_state["messages"]) if called_check_order_status else None
+        extracted_order = (
+            _extract_orders(final_state["messages"]) if called_check_order_status else None
+        )
 
         clean_history = _build_persistable_history(
             prev_history=history,
             current_human_msg=message,
             final_reply=reply,
             called_search=called_search,
+            products=products,
         )
         await save_messages_to_redis(redis=redis, session_id=session_id, messages=clean_history)
 
         sources = final_state.get("sources", [])
         escalated = final_state.get("escalated", False)
 
-        llm = get_llm()
+        # llm = get_llm()
         quick_replies = _get_quick_replies(
             user_message=message,
             agent_reply=reply,
@@ -783,6 +861,13 @@ async def run_agent(
             called_search=called_search,
             called_order=called_check_order_status,
             complaint_sent=final_state.get("complaint_sent", False),
+        )
+
+        total_llm_calls = final_state.get("iterations", 0)  # or track it properly
+        _log_step(
+            f"◀ Done | {total_llm_calls} LLM call(s) | "
+            f"tokens={final_state.get('prompt_tokens', 0) + final_state.get('completion_tokens', 0)} | "
+            f"session={session_id}"
         )
 
         return {
