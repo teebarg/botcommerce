@@ -1,5 +1,13 @@
 [
   {
+    "id": "prod_fail_20260924_07",
+    "category": "product_search",
+    "messages": ["Do you have any black trousers?", "What about in size 34?"],
+    "expected_tools": ["search_products"],
+    "expected_escalation": false,
+    "notes": "Production failure: On the follow-up about size, agent forgot previous context and searched for completely different items."
+  },
+  {
     "id": "prod_001",
     "category": "product_search",
     "messages": ["Do you have any red dresses?"],
@@ -211,6 +219,14 @@
     "notes": "Chargeback language"
   },
   {
+    "id": "complaint_0001",
+    "category": "complaint",
+    "messages": ["Make a complaint"],
+    "expected_tools": [],
+    "expected_escalation": false,
+    "notes": "Complaint — should trigger complaint form path, not full escalation"
+  },
+  {
     "id": "complaint_001",
     "category": "complaint",
     "messages": ["I received the wrong item and I'm very unhappy"],
@@ -261,10 +277,7 @@
   {
     "id": "multi_001",
     "category": "multi_turn",
-    "messages": [
-      "Do you have any black trousers?",
-      "What about in size 34?"
-    ],
+    "messages": ["Do you have any black trousers?", "What about in size 34?"],
     "expected_tools": ["search_products"],
     "expected_escalation": false,
     "notes": "Follow-up refinement of product search"
@@ -350,7 +363,9 @@
   {
     "id": "order_005",
     "category": "order_tracking",
-    "messages": ["My package has not arrived and it's been 2 weeks. Order ORD-C0B7CD56"],
+    "messages": [
+      "My package has not arrived and it's been 2 weeks. Order ORD-C0B7CD56"
+    ],
     "expected_tools": ["check_order_status"],
     "expected_escalation": false,
     "notes": "Delayed delivery complaint with order number — still use tool first"

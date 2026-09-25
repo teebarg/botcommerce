@@ -38,7 +38,8 @@ complaint_route = Route(
     utterances=[
         "i want to complain", "bad experience", "wrong item received",
         "my package was damaged", "i was overcharged", "poor customer service",
-        "unsatisfied with my order", "this is unacceptable", "broken product"
+        "unsatisfied with my order", "this is unacceptable", "broken product", "complain", "complaint",
+        "make a complaint", "file a complaint", "wrong item", "unsatisfied", "unhappy with"
     ]
 )
 

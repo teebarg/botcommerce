@@ -248,6 +248,21 @@ test-standalone:
 smoke-test:
 	$(DOCKER_COMPOSE) exec agent uv run python -m scripts.run_offline_eval --limit 1
 
+smkprod:
+	$(DOCKER_COMPOSE) exec agent uv run python -m scripts.run_offline_eval --category product_search --limit 1
+
+smkesc:
+	$(DOCKER_COMPOSE) exec agent uv run python -m scripts.run_offline_eval --category escalation --limit 1
+
+smkcom:
+	$(DOCKER_COMPOSE) exec agent uv run python -m scripts.run_offline_eval --category complaint --limit 1
+
+smkmt:
+	$(DOCKER_COMPOSE) exec agent uv run python -m scripts.run_offline_eval --category multi_turn --limit 1
+
+smkwds:
+	$(DOCKER_COMPOSE) exec agent uv run python -m scripts.run_offline_eval --category we_dont_sell --limit 1
+
 
 # ==========================================
 # Interactive Systems Help Desk Documentation

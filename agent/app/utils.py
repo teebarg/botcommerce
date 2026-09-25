@@ -59,3 +59,7 @@ async def _notify_slack_escalation(
                 logger.warning(f"[Escalation] Slack returned {resp.status_code}: {resp.text}")
     except Exception as exc:
         logger.error(f"[Escalation] Slack notification failed: {exc}")
+        
+def _log_step(msg: str, indent: int = 0) -> None:
+    prefix = "  " * indent
+    logger.debug(f"[Agent] {prefix}{msg}")
