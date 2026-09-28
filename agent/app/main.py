@@ -34,7 +34,7 @@ async def lifespan(app: FastAPI):
     Runs on startup: pre-load the embedding model so the first request isn't slow.
     """
     logger.debug("🚀 Pre-loading embedding model...")
-    app.state.redis = redis.from_url(settings.REDIS_URL, decode_responses=True, max_connections=10)
+    app.state.redis = redis.from_url(settings.BROKER_URL, decode_responses=True, max_connections=10)
     try:
         from app.rag.qdrant_client import get_embedding_model
 
@@ -332,7 +332,7 @@ async def health_check(redis: RedisDep) -> HealthResponse:
         logger.error(f"error: {str(e)[:50]}")
 
     try:
-        redis.ping()
+        await redis.ping()
         checks["redis"] = "ok"
     except Exception as e:
         checks["redis"] = "error"
@@ -348,7 +348,7 @@ async def delete_session(session_id: str):
     await clear_session(redis=redis, session_id=session_id)
     return {"status": "cleared", "session_id": session_id}
 
-
+@app.head("/", tags=["System"])
 @app.get("/", tags=["System"])
 async def root():
     return {

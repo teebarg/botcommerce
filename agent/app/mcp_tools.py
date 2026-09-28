@@ -1,4 +1,5 @@
 from langchain_mcp_adapters.client import MultiServerMCPClient
+
 from app.config import settings
 
 mcp_client = MultiServerMCPClient({

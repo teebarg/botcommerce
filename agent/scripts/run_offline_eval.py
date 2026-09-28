@@ -402,7 +402,7 @@ async def main(args: argparse.Namespace) -> None:
     print(f"Model provider: {settings.LLM_PROVIDER}")
 
     redis_client = redis.from_url(
-        settings.REDIS_URL,
+        settings.BROKER_URL,
         decode_responses=True,
         max_connections=5,
     )

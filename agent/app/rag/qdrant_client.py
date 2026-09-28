@@ -23,7 +23,6 @@ logger = get_logger(__name__)
 
 # MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 MODEL_NAME = "BAAI/bge-small-en-v1.5"
-# MODEL_NAME = "all-MiniLM-L6-v2"
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 LOCAL_MODELS = str(BASE_DIR / "models")

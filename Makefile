@@ -196,7 +196,7 @@ run-agent-local:
 		--platform linux/amd64 \
 		--network dev-net \
 		-p 8001:8000 \
-		--env-file agent/.env \
+		--env-file agent/.env.prod \
 		$(AGENT_IMAGE):$(IMAGE_TAG) \
 		uvicorn app.main:app --host 0.0.0.0 --port 8000
 

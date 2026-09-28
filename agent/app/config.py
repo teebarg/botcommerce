@@ -1,6 +1,7 @@
-from pydantic_settings import BaseSettings
-from pydantic import Field
 from functools import lru_cache
+
+from pydantic import Field
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -17,7 +18,7 @@ class Settings(BaseSettings):
     QDRANT_API_KEY: str = Field(alias="QDRANT_API_KEY")
 
     OLLAMA_URL: str = Field(default="http://localhost:11434")
-    REDIS_URL: str = Field(default="redis://localhost:6379")
+    BROKER_URL: str = Field(default="redis://localhost:6379")
 
     API_BASE_URL: str = Field(default="http://localhost:8000")
 

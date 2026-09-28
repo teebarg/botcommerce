@@ -85,7 +85,7 @@ There are no committed `.env.example` files in this repo. Create these locally:
 Minimum you’ll usually want:
 
 - `DATABASE_URL=postgresql://...`
-- `REDIS_URL=redis://...`
+- `BROKER_URL=redis://...`
 - `MEILI_HOST=http://...`
 - `MEILI_MASTER_KEY=...`
 - `FRONTEND_HOST=http://localhost:5173` (important: backend CORS allowlist uses this)
