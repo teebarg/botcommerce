@@ -66,7 +66,7 @@ SYSTEM_PROMPT = """You are Seun, a warm and helpful customer support agent for T
   Acknowledge the results naturally in one or two sentences. Vary your phrasing every time.
 - If results clearly don't match what the customer asked for, tell them we don't carry that item and suggest an alternative in one sentence.
 - If the customer asks for something completely unrelated to fashion, do NOT search. Say we are a fashion store and ask if you can help with clothing.
-- If the customer asks a follow-up about size, color, price, stock, or variants after a previous product search, treat it as a continuation. 
+- If the customer asks a follow-up about size, color, price, stock, or variants after a previous product search, treat it as a continuation.
   Prefer searching again with the combined information rather than asking “which item?”.
 
 ## Order Tracking
@@ -182,24 +182,6 @@ def _sanitize_prompt(messages: list) -> list:
 
 
 # Verbose logger
-def _log_thought2(state: AgentState) -> None:
-    """Log the model's decision AFTER it responds (AIMessage is now in state)."""
-    last = state["messages"][-1]
-    if not isinstance(last, AIMessage):
-        return
-
-    if last.tool_calls:
-        for tc in last.tool_calls:
-            _log_step(
-                f"Decision   → Call tool: {tc['name']}({tc['args']})",
-                1,
-            )
-    else:
-        content_preview = str(last.content)[:120].replace("\n", " ")
-        _log_step("Decision   → Final Answer", 1)
-        _log_step(f'Reply      → "{content_preview}..."', 1)
-
-
 def _log_thought(state: AgentState) -> None:
     """Log the model's decision in a clear way."""
     last = state["messages"][-1]
@@ -293,12 +275,6 @@ async def build_graph():
     async def call_model(state: AgentState) -> dict:
         iteration = state.get("iterations", 0) + 1
         _log_step(f"Graph      → iteration {iteration}", 1)
-        # if state.get("iterations", 0) == 0:
-        #     first_human = next(
-        #         (m for m in reversed(state["messages"]) if isinstance(m, HumanMessage)), None
-        #     )
-        # if first_human:
-        #     logger.debug(f"[Human Message] {first_human.content}")
 
         system = SYSTEM_PROMPT
         if state.get("customer_id"):
@@ -342,7 +318,6 @@ async def build_graph():
             )
             response = _repair_tool_call(response)
 
-            # _usage = getattr(response, "usage_metadata", None) or {}
             record_llm_generation(
                 model=getattr(llm_with_tools, "model_name", "unknown"),
                 prompt_tokens=_prompt_tokens,
@@ -665,10 +640,6 @@ async def run_agent(
         session_id = str(uuid.uuid4())
     _log_step(f'▶ Session {session_id} | "{message[:80]}"')
 
-    # logger.debug(
-    #     f"[Agent] Session: {session_id} | Customer: {customer_id} | Message: {message[:80] if len(message) > 80 else message}"
-    # )
-
     history: list[BaseMessage] = await load_messages_from_redis(redis=redis, session_id=session_id)
     history = _sanitize_loaded_history(history)
 
@@ -852,7 +823,6 @@ async def run_agent(
         sources = final_state.get("sources", [])
         escalated = final_state.get("escalated", False)
 
-        # llm = get_llm()
         quick_replies = _get_quick_replies(
             user_message=message,
             agent_reply=reply,
@@ -863,7 +833,7 @@ async def run_agent(
             complaint_sent=final_state.get("complaint_sent", False),
         )
 
-        total_llm_calls = final_state.get("iterations", 0)  # or track it properly
+        total_llm_calls = final_state.get("iterations", 0)
         _log_step(
             f"◀ Done | {total_llm_calls} LLM call(s) | "
             f"tokens={final_state.get('prompt_tokens', 0) + final_state.get('completion_tokens', 0)} | "

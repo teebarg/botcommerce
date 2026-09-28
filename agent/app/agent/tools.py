@@ -170,7 +170,6 @@ def check_order_status(order_number: str):
     tracking numbers, and item breakdowns.
     """
     result = _shop_request("GET", f"/api/order/{order_number.strip().lstrip('#').upper()}")
-    print("🚀 ~ check_order_status ~ result:", result)
     return result
 
 

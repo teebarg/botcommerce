@@ -75,16 +75,6 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
             else:
                 price: str = f"₦{r['min_price']:.2f} – ₦{r['max_price']:.2f}"
 
-        # variants_summary: str = " | ".join(filter(None, [
-        #     f"Sizes: {r['sizes']}"    if r["sizes"]  else None,
-        #     f"Colors: {r['colors']}"  if r["colors"] else None,
-        #     f"Waists: {r['widths']}"  if r["widths"] else None,
-        #     f"Lengths: {r['lengths']}" if r["lengths"] else None,
-        #     f"Price: {price}"         if price else None,
-        #     f"{r['in_stock_variants']}/{r['total_variants']} variants in stock"
-        #                                     if r["total_variants"] else None,
-        # ]))
-
         text: str = " ".join(filter(None, [
             r['name'],
             r['categories'] if r["categories"] else None,
@@ -108,9 +98,8 @@ async def load_products(conn: asyncpg.Connection) -> list[dict]:
             "description": r["description"] or "",
             "category": r["categories"] or "",
             "is_new": r["is_new"],
-            # "variants_summary": variants_summary,
             "price": price,
-            "variants": variants,   # [{"id", "price", "old_price", "inventory"}, ...]
+            "variants": variants,
             "type": "product",
         })
 
