@@ -9,7 +9,8 @@
         "venv",
         ".env",
         "dist",
-        "build"
+        "build",
+        "results"
     ],
     "include": [
         "**/*.py",

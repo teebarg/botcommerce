@@ -1,13 +1,15 @@
+import time
+
 import httpx
 import jwt
-import time
+
 from app.config import settings
 
 
 class BackendClient:
     def __init__(self):
         self.client = httpx.AsyncClient(
-            base_url=settings.BACKEND_URL,
+            base_url=settings.API_BASE_URL,
             timeout=30,
             transport=httpx.AsyncHTTPTransport(retries=3),  # httpx equivalent of your urllib3 Retry
         )

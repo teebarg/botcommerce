@@ -1,8 +1,11 @@
 from __future__ import annotations
+
 import asyncio
 import uuid
+
 from celery import Celery
 from celery.schedules import crontab
+
 from app.config import get_model_name, settings
 from app.logging import get_logger
 
@@ -10,8 +13,8 @@ logger = get_logger(__name__)
 
 celery_app = Celery(
     "marketing",
-    broker=settings.REDIS_URL,
-    backend=settings.REDIS_URL,
+    broker=settings.BROKER_URL,
+    backend=settings.BROKER_URL,
 )
 
 celery_app.conf.beat_schedule = {

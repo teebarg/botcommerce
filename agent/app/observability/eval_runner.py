@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from typing import Any
+from dataclasses import dataclass, field
+from typing import Any, Callable
 
 from app.logging import get_logger
+from app.observability.db import save_eval_result
 from app.observability.evaluators import (
     evaluate_context_relevance,
     evaluate_escalation_accuracy,
@@ -10,10 +12,7 @@ from app.observability.evaluators import (
     evaluate_response_quality,
     evaluate_tool_accuracy,
 )
-from app.observability.db import save_eval_result
 from app.observability.tracing import score_trace
-from dataclasses import dataclass, field
-from typing import Callable
 
 logger = get_logger(__name__)
 
@@ -26,13 +25,13 @@ class AgentEvalConfig:
 
     # Optional custom evaluators — each returns (score, note)
     # If not provided, falls back to the generic ones
-    tool_accuracy_fn:       Callable | None = None
+    tool_accuracy_fn: Callable | None = None
     escalation_accuracy_fn: Callable | None = None
 
     # Which tools count as retrieval (for context relevance eval)
-    retrieval_tools: list[str] = field(default_factory=lambda: [
-        "search_products", "search_faqs", "search_policies"
-    ])
+    retrieval_tools: list[str] = field(
+        default_factory=lambda: ["search_products", "search_faqs", "search_policies"]
+    )
 
     # Which tools are expected for which intent patterns
     # list of (compiled regex, expected tool name)
@@ -54,7 +53,7 @@ async def run_eval_pipeline(
     agent_reply: str,
     escalated: bool,
     sources: list[str],
-    tools_called: list[dict],   # list of {name, args, result_preview}
+    tools_called: list[dict],  # list of {name, args, result_preview}
     latency_ms: float,
     prompt_tokens: int,
     completion_tokens: int,
@@ -67,54 +66,61 @@ async def run_eval_pipeline(
     Run all evaluators, persist to Postgres, push scores to Langfuse.
     """
     try:
-        #1. Response quality (LLM judge)
+        # 1. Response quality (LLM judge)
         rq_score, rq_note = await evaluate_response_quality(
             user_message, agent_reply, llm, tools_called
         )
 
-        #2. Tool accuracy (rule-based)
+        # 2. Tool accuracy (rule-based)
         if config.tool_accuracy_fn:
             ta_score, ta_note = await config.tool_accuracy_fn(
                 user_message, tools_called, agent_reply
             )
         else:
             ta_score, ta_note = await evaluate_tool_accuracy(
-                user_message, tools_called, agent_reply,
+                user_message,
+                tools_called,
+                agent_reply,
                 tool_expectations=config.tool_expectations,
             )
 
-        #3. Escalation accuracy
+        # 3. Escalation accuracy
         if config.escalation_accuracy_fn:
             ea_score, ea_note = await config.escalation_accuracy_fn(
                 user_message, agent_reply, escalated, tools_called
             )
         else:
             ea_score, ea_note = await evaluate_escalation_accuracy(
-                user_message, agent_reply, escalated, tools_called,
+                user_message,
+                agent_reply,
+                escalated,
+                tools_called,
                 routine_patterns=config.routine_patterns,
                 high_risk_patterns=config.high_risk_patterns,
             )
 
-        #4. Latency
+        # 4. Latency
         lat_score, lat_note = evaluate_latency(latency_ms)
-        gr_score,  gr_note  = 0.0, "[Eval] groundedness: Awaiting Implementation"
-        cr_score,  cr_note  = await evaluate_context_relevance(user_message=user_message, tools_called=tools_called, llm=llm)
+        gr_score, gr_note = 0.0, "[Eval] groundedness: Awaiting Implementation"
+        cr_score, cr_note = await evaluate_context_relevance(
+            user_message=user_message, tools_called=tools_called, llm=llm
+        )
 
         scores = {
-            "response_quality":    rq_score,
-            "tool_accuracy":       ta_score,
+            "response_quality": rq_score,
+            "tool_accuracy": ta_score,
             "escalation_accuracy": ea_score,
-            "latency":             lat_score,
-            "groundedness":        gr_score,
-            "context_relevance":   cr_score,
+            "latency": lat_score,
+            "groundedness": gr_score,
+            "context_relevance": cr_score,
         }
         notes = {
-            "response_quality":    rq_note,
-            "tool_accuracy":       ta_note,
+            "response_quality": rq_note,
+            "tool_accuracy": ta_note,
             "escalation_accuracy": ea_note,
-            "latency":             lat_note,
-            "groundedness":        gr_note,
-            "context_relevance":   cr_note,
+            "latency": lat_note,
+            "groundedness": gr_note,
+            "context_relevance": cr_note,
         }
 
         logger.debug(

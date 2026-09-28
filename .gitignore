@@ -3,7 +3,6 @@ backend-context.md
 agent-context.md
 mcp-context.md
 
-agent/models
 meilisearch-data
 
 .DS_Store
@@ -60,3 +59,15 @@ worker/__pycache__/
 *.pyo
 *.pyd
 .uv/
+
+
+# Agent
+agent/.venv/
+agent/.uv/
+agent/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.uv/
+agent/models
+agent/results

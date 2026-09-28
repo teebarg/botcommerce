@@ -101,7 +101,7 @@ Set these in your Render service settings:
 | `GOOGLE_API_KEY` | From Google AI Studio |
 | `QDRANT_URL` | From cloud.qdrant.io |
 | `QDRANT_API_KEY` | From cloud.qdrant.io |
-| `REDIS_URL` | From Render Redis service |
+| `BROKER_URL` | From Render Redis service |
 | `API_BASE_URL` | Your shop API URL |
 | `LANGFUSE_SECRET_KEY` | From Langfuse dashboard |
 | `LANGFUSE_PUBLIC_KEY` | From Langfuse dashboard |
