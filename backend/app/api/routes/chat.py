@@ -144,7 +144,6 @@ async def index(
 
 
 @router.get("/{uid}")
-@cacheable(key_prefix="chat", key_builder=lambda uid: uid)
 async def get_chat(request: Request, db: DbDep, uid: str) -> Chat:
     """Get a chat and all its messages"""
     chat = await db.conversation.find_unique(where={"conversation_uuid": uid}, include={"messages": {"orderBy": {"id": "asc"}}})
