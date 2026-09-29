@@ -72,6 +72,8 @@ services:
       - BROKER_URL=redis://redis:6379/0
       - UV_LINK_MODE=copy
       - PYTHONPATH=/app
+    env_file:
+      - ./agent/.env
     volumes:
       - ./worker/app:/app/app
       - ./core:/app/core

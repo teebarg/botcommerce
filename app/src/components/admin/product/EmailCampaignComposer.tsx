@@ -26,7 +26,7 @@ const DEFAULT_CAMPAIGN: EmailCampaignPayload = {
     subject: "New pieces you'll want to wear ✨",
     heading: "Your next favourite look is here",
     intro: "Fresh styles have landed. Discover pieces selected to make getting dressed a little more exciting.",
-    hero_image: "https://pub-e7d3df4a168347b9910579887d7331bb.r2.dev/products/36eb40d4-opt-29630efb.webp",
+    hero_image: "https://jjozjybtoxqquawcnpir.supabase.co/storage/v1/object/public/campaign-images/jumpsuit_banner.jpg",
     product_ids: [],
     cta_text: "Shop Now",
     cta_url: "/collections",
@@ -146,6 +146,15 @@ export function EmailCampaignComposer({ productIds, onSubmit }: Props) {
                                 <p className="mt-1 text-right text-xs text-zinc-400">{form.subject.length}/120</p>
                             </Field>
 
+                            <Field label="Heading">
+                                <input
+                                    value={form.heading ?? ""}
+                                    onChange={(event) => updateField("heading", event.target.value)}
+                                    placeholder="Your next favourite look is here"
+                                    className="inputClass"
+                                />
+                            </Field>
+
                             <Field label="Preheader" hint="Short text shown next to the subject in the inbox.">
                                 <input
                                     value={form.preheader ?? ""}
@@ -175,15 +184,6 @@ export function EmailCampaignComposer({ productIds, onSubmit }: Props) {
                                     />
                                 </Field>
                             </div>
-
-                            <Field label="Heading">
-                                <input
-                                    value={form.heading ?? ""}
-                                    onChange={(event) => updateField("heading", event.target.value)}
-                                    placeholder="Your next favourite look is here"
-                                    className="inputClass"
-                                />
-                            </Field>
 
                             <Field label="Intro">
                                 <textarea
