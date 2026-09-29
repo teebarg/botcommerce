@@ -52,7 +52,7 @@ async def process_test_campaign(ctx):
         for row in product_rows
     ]
 
-    results = await notification_srv.send(
+    await notification_srv.send(
         CampaignEvent(
             receipients=["HNEW771740d18b7f64abecb636@send.emltest.uk", "teebarg01@gmail.com"],
             subject="The One-Piece Wonder Your Wardrobe Needs ⚡ 20% Off All Jumpsuits",
@@ -74,5 +74,3 @@ async def process_test_campaign(ctx):
         ),
         channels=[Channel.EMAIL],
     )
-    mail_results = results.get(Channel.EMAIL, [])
-    print("🚀 ~ process_test_campaign ~ mail_results:", mail_results)
