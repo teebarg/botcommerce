@@ -1,11 +1,12 @@
 from typing import Optional
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
 from app.core.dependencies.cache import ArqDep
 from app.core.deps import UserDep
 from app.core.logging import get_logger
+from app.core.permissions import require_admin
 from app.models.generic import Message
 from app.prisma_client import DbDep
 
@@ -67,7 +68,7 @@ async def push_fcm(db: DbDep, data: FCMIn, user: UserDep) -> Message:
     return Message(message="success")
 
 
-@router.post("/push")
+@router.post("/push", dependencies=[Depends(require_admin)])
 async def send_push_notification(
     queue: ArqDep, db: DbDep, payload: PushMessageSchema
 ) -> Message:
@@ -83,8 +84,7 @@ async def send_push_notification(
         logger.error(f"Failed to send push notifications: {str(e)}")
         return Message(message="failed")
 
-
-@router.post("/email-campaign")
+@router.post("/email-campaign", dependencies=[Depends(require_admin)])
 async def send_email_campaign(queue: ArqDep, payload: EmailCampaignSchema) -> Message:
     try:
         await queue.enqueue_job(

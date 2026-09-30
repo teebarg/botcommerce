@@ -38,7 +38,7 @@ async def get_abandoned_cart(id: int, srv: CartDep):
     return await srv._with_computed_totals(cart)
 
 
-@router.delete("/{id}")
+@router.delete("/{id}", dependencies=[Depends(require_admin)])
 async def delete_abandoned_cart(id: int, srv: CartDep):
     existing = await srv.get_by_id(id)
     if not existing:

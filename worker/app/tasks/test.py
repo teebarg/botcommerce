@@ -54,7 +54,7 @@ async def process_test_campaign(ctx):
 
     await notification_srv.send(
         CampaignEvent(
-            receipients=["HNEW771740d18b7f64abecb636@send.emltest.uk", "teebarg01@gmail.com"],
+            receipients=["teebarg01@gmail.com"],
             subject="The One-Piece Wonder Your Wardrobe Needs ⚡ 20% Off All Jumpsuits",
             template="marketing_campaign.html",
             data={

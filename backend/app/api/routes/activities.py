@@ -1,11 +1,13 @@
-from fastapi import APIRouter, HTTPException, Depends, Query, Request
-from prisma.errors import PrismaError
 from typing import List
-from app.core.deps import CurrentUser
-from app.models.generic import Message
-from app.models.activities import PaginatedActivities, Activity
-from app.core.permissions import require_admin
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from prisma.errors import PrismaError
+
 from app.core.dependencies.cache import CacheDep
+from app.core.deps import CurrentUser
+from app.core.permissions import require_admin
+from app.models.activities import Activity, PaginatedActivities
+from app.models.generic import Message
 from app.prisma_client import DbDep
 from app.services.cache import cacheable
 
