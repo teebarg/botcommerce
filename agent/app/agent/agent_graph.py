@@ -24,6 +24,7 @@ from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
 from redis.asyncio import Redis
 
+from app.agent.classifier import ProductionECommerceRouter
 from app.agent.memory import load_messages_from_redis, save_messages_to_redis
 from app.agent.tools import escalate_to_human, get_all_tools
 from app.config import get_llm
@@ -110,6 +111,9 @@ class MessageIntent(str, Enum):
     CONVERSATION = "conversation"
     CONTACT_UPDATE = "contact_update"
     NORMAL = "normal"
+
+
+router = ProductionECommerceRouter()
 
 
 def _extract_tools_called(messages: list) -> list[dict]:
@@ -643,7 +647,9 @@ async def run_agent(
     history: list[BaseMessage] = await load_messages_from_redis(redis=redis, session_id=session_id)
     history = _sanitize_loaded_history(history)
 
-    intent: str = await _classify_message(message)
+    # intent: str = await _classify_message(message)
+    intent: str = router.classify(message)
+    print("🚀 ~ run_agent ~ intent:", intent)
     _log_step(f"Intent     → {intent}", 1)
 
     if intent == MessageIntent.CONVERSATION:

@@ -27,6 +27,10 @@ dependencies = [
     "langchain-mcp-adapters>=0.3.0",
     "mcp>=1.28.0",
     "semantic-router>=0.1.7",
+    "numpy>=1.26.4",
+    "datasets>=2.18.0",
+    "scikit-learn>=1.9.1",
+    "joblib>=1.6.0",
 ]
 
 [project.optional-dependencies]
