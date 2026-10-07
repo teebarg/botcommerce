@@ -25,14 +25,14 @@ from fastembed import TextEmbedding
 class MessageIntent(str, Enum):
     """
     Supported intent categories driving downstream state-machine routing.
-    
+
     Attributes:
         CONVERSATION: Casual chit-chat, bot identity, non-transactional chatter.
         PRODUCT_INQUIRY: Browsing catalog, category requests, availability checks.
         PRODUCT_DETAILS: Queries regarding specific item attributes (price, size, material).
         POLICY: Static FAQ queries (payment options, delivery rates, return rules).
         ORDER_ISSUE: Order tracking, missing packages, delivery status (triggers DB lookup).
-        CHECKOUT: Active purchasing intent, placing an order, adding items to cart.
+        FAQ: Active purchasing intent, placing an order, adding items to cart.
         COMPLAINT: Customer dissatisfaction, post-purchase grievances, bad service reports.
         ESCALATION_REQUEST: Explicit requests for human agent support.
         NORMAL: Off-topic or non-catalog queries outside scope.
@@ -42,7 +42,6 @@ class MessageIntent(str, Enum):
     PRODUCT_DETAILS = "product_details"
     POLICY = "policy"
     ORDER_ISSUE = "order_issue"
-    CHECKOUT = "checkout"
     COMPLAINT = "complaint"
     ESCALATION_REQUEST = "escalation_request"
     NORMAL = "normal"
@@ -61,7 +60,7 @@ class ProductionECommerceRouter:
 
     def __init__(self):
         """Initialize the embedding model, compile regex patterns, and index vector anchors."""
-        
+
         # Initialize light, high-throughput sentence transformer
         self.encoder = TextEmbedding(model_name="BAAI/bge-small-en-v1.5")
 
@@ -75,7 +74,8 @@ class ProductionECommerceRouter:
             r"\bdey\b": "is",
             r"\bwan\b": "want to",
             r"\bno\s+get\b": "dont have",
-            r"\bnever\s+reach\b": "never arrived",  # Preserves pattern for order tracking rules
+            # Preserves pattern for order tracking rules
+            r"\bnever\s+reach\b": "never arrived",
             r"\bwhen\s+e\s+reach\b": "on delivery",  # Normalizes delivery timing slang
             r"\breach\b": "arrive",
             r"\btoo\s+cost\b": "too expensive",
@@ -93,7 +93,7 @@ class ProductionECommerceRouter:
         # Used to reject queries asking for items outside the fashion catalog.
         self.off_topic_items = {
             "house", "houses", "phone", "phones", "laptop", "laptops",
-            "electronics", "food", "furniture", "wig", "wigs", "car"
+            "electronics", "food", "furniture", "wig", "wigs", "car", "land"
         }
 
         # ----------------------------------------------------------------------
@@ -193,7 +193,11 @@ class ProductionECommerceRouter:
             MessageIntent.CONVERSATION: [
                 "hello hi hey good morning", "do you have a boyfriend", "i dont have money",
                 "i am broke", "can we be friends", "how old are you", "are you married",
-                "where do you live", "what is your favorite color", "i love you"
+                "where do you live", "what is your favorite color", "i love you",
+                "hey there", "howdy", "who are you?", "what is your name?", "thanks", "thank you",
+                "bye", "goodbye", "what can you do?", "how can you help me?", "can you be my gf",
+                "will you marry me", "are you single", "do you like me", "tell me a joke",
+                "let's be friends", "how body", "how far", "you good"
             ],
             MessageIntent.PRODUCT_INQUIRY: [
                 "show me your tops", "do you sell gowns", "what clothes do you sell",
@@ -205,14 +209,18 @@ class ProductionECommerceRouter:
                 "do you have this in black", "is size 12 available", "what material is this",
                 "is this true to size", "how much does it cost"
             ],
-            MessageIntent.CHECKOUT: [
+            MessageIntent.POLICY: [
                 "how do i place an order", "how do i checkout",
                 "can i order through whatsapp", "how do i add this to my cart", "i want to complete purchase"
             ],
             MessageIntent.COMPLAINT: [
                 "i am furious and angry", "terrible experience unacceptable customer service",
                 "this item is broken and ruined", "overcharged bad customer support",
-                "i am not happy with my order", "very disappointed with order quality"
+                "i am not happy with my order", "very disappointed with order quality",
+                "i want to complain", "bad experience", "wrong item received", "my package was damaged",
+                "i was overcharged", "poor customer service", "unsatisfied with my order", 
+                "this is unacceptable", "broken product", "complain", "complaint", "make a complaint", 
+                "file a complaint", "wrong item", "unsatisfied", "unhappy with"
             ]
         }
 

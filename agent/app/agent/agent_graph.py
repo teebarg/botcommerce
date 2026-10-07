@@ -26,11 +26,10 @@ from redis.asyncio import Redis
 
 from app.agent.classifier import ProductionECommerceRouter
 from app.agent.memory import load_messages_from_redis, save_messages_to_redis
-from app.agent.tools import escalate_to_human, get_all_tools
+from app.agent.tools import escalate_to_human, get_all_tools, search_faqs, search_products
 from app.config import get_llm
 from app.logging import get_logger
 from app.observability.tracing import record_llm_generation, record_tool_span
-from app.utilities.classifier import _classify_message
 from app.utils import _log_step, _notify_slack_escalation
 
 logger = get_logger(__name__)
@@ -110,7 +109,10 @@ class MessageIntent(str, Enum):
     COMPLAINT = "complaint"
     CONVERSATION = "conversation"
     CONTACT_UPDATE = "contact_update"
+    POLICY = "policy"
     NORMAL = "normal"
+    PRODUCT_INQUIRY = "product_inquiry"
+    PRODUCT_DETAILS = "product_details"
 
 
 router = ProductionECommerceRouter()
@@ -649,8 +651,134 @@ async def run_agent(
 
     # intent: str = await _classify_message(message)
     intent: str = router.classify(message)
-    print("🚀 ~ run_agent ~ intent:", intent)
     _log_step(f"Intent     → {intent}", 1)
+
+    if intent in (MessageIntent.PRODUCT_INQUIRY, MessageIntent.PRODUCT_DETAILS):
+        _log_step(f"Path       → Direct Product Search shortcut ({intent})", 1)
+
+        _t0 = _time.monotonic()
+        search_results = search_products.invoke({"query": message})
+        _tool_ms = (_time.monotonic() - _t0) * 1000
+        _log_step(f"Product Tool → Executed direct search | {_tool_ms:.0f}ms", 1)
+
+        products = _mcp_result_to_dict(search_results).get("products", [])
+
+        # 2. Synthesize response with LLM using the retrieved context
+        synthesis_prompt = (
+            "You are Seun, a warm customer support agent for Thriftbyoba, a Nigerian online fashion store.\n"
+            "The product search has ALREADY been completed. Do NOT output function calls or JSON.\n"
+            "Acknowledge the search results naturally in 1-2 friendly sentences using Nigerian Naira (₦).\n"
+            "Do NOT list the product details line-by-line, as they are rendered directly as UI cards.\n\n"
+            f"--- SEARCH RESULTS ---\n{json.dumps(search_results)}\n----------------------"
+        )
+
+        llm = get_llm()
+        _t1 = _time.monotonic()
+        resp = await llm.ainvoke([
+            SystemMessage(content=synthesis_prompt),
+            *history,
+            HumanMessage(content=message),
+        ])
+        _llm_ms = (_time.monotonic() - _t1) * 1000
+
+        reply: str = _extract_text_content(resp.content).strip()
+
+        # 3. Persist history using product history builder
+        clean_history = _build_persistable_history(
+            prev_history=history,
+            current_human_msg=message,
+            final_reply=reply,
+            called_search=True,
+            products=products,
+        )
+        await save_messages_to_redis(redis=redis, session_id=session_id, messages=clean_history)
+
+        quick_replies = _get_quick_replies(
+            user_message=message,
+            agent_reply=reply,
+            sources=["Products"],
+            escalated=False,
+            called_search=True,
+            called_order=False,
+            complaint_sent=False,
+        )
+
+        return {
+            "reply": reply,
+            "session_id": session_id,
+            "sources": ["Products"],
+            "products": products,
+            "quick_replies": quick_replies,
+        }
+
+    if intent == MessageIntent.POLICY:
+        _log_step("Path       → Policy / FAQ shortcut (Direct Tool Execution)", 1)
+
+        # 1. Execute tool directly as a standard function (No LLM tool decision pass)
+        _t0 = _time.monotonic()
+        faq_data = search_faqs.invoke({"query": message})
+        _tool_ms = (_time.monotonic() - _t0) * 1000
+        _log_step(f"FAQ Tool   → Executed direct search | {_tool_ms:.0f}ms", 1)
+
+        # 2. Build a grounded prompt with retrieved Q&A context
+        policy_system_prompt = (
+            "You are a helpful e-commerce customer support assistant.\n"
+            "Answer the user's question concisely based ONLY on the provided FAQ context.\n"
+            "If the context doesn't fully answer it, provide what is available politely.\n\n"
+            f"--- RETRIEVED FAQ CONTEXT ---\n{faq_data}\n-----------------------------"
+        )
+
+        llm = get_llm()
+        _t1 = _time.monotonic()
+        resp = await llm.ainvoke(
+            [
+                SystemMessage(content=policy_system_prompt),
+                *history,
+                HumanMessage(content=message),
+            ]
+        )
+        _llm_ms = (_time.monotonic() - _t1) * 1000
+
+        # Token metadata extraction
+        usage = (
+            getattr(resp, "usage_metadata", None)
+            or getattr(resp, "response_metadata", {}).get("token_usage", {})
+            or {}
+        )
+        prompt_tokens = usage.get("input_tokens") or usage.get("prompt_tokens") or 0
+        completion_tokens = usage.get("output_tokens") or usage.get("completion_tokens") or 0
+        total_tokens = prompt_tokens + completion_tokens
+
+        _log_step(f"LLM call   → 1 (synthesis pass) | {_llm_ms:.0f}ms | ~{total_tokens} tokens", 1)
+
+        reply: str = _extract_text_content(resp.content).strip()
+        _log_step(f'Reply      → "{reply[:140]}{"..." if len(reply) > 140 else ""}"', 1)
+
+        # Persist interaction history
+        await save_messages_to_redis(
+            redis=redis,
+            session_id=session_id,
+            messages=history + [HumanMessage(content=message), AIMessage(content=reply)],
+        )
+
+        quick_replies: list[str] = _get_quick_replies(
+            user_message=message,
+            agent_reply=reply,
+            sources=["faqs"],
+            escalated=False,
+            called_search=True,
+            called_order=False,
+            complaint_sent=False,
+        )
+
+        _log_step(f"◀ Done | 1 LLM call (FAQ shortcut) | tokens≈{total_tokens} | session={session_id}")
+
+        return {
+            "reply": reply,
+            "session_id": session_id,
+            "quick_replies": quick_replies,
+        }
+
 
     if intent == MessageIntent.CONVERSATION:
         _log_step("Path       → Conversational shortcut (no tools)", 1)
