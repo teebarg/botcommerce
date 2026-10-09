@@ -200,7 +200,7 @@ class ProductionECommerceRouter:
             MessageIntent.PRODUCT_INQUIRY: [
                 "show me your tops", "do you sell gowns", "what clothes do you sell",
                 "what is in stock", "show me new arrivals", "any gowns available",
-                "looking for a party dress", "do you have anything in my size"
+                "looking for a party dress", "do you have anything in my size", "do you have shoes?"
             ],
             MessageIntent.PRODUCT_DETAILS: [
                 "is this available", "how much is this", "what is the price",
