@@ -5,17 +5,6 @@ from semantic_router import Route
 from semantic_router.encoders import FastEmbedEncoder
 from semantic_router.routers import SemanticRouter
 
-_CONVERSATIONAL_PATTERNS = re.compile(
-    r"^\s*(hi+|hey+|hello+|howdy|good\s*(morning|afternoon|evening)|"
-    r"who are you|what are you|are you (a |an )?(bot|ai|robot|human|person|agent)|"
-    r"what('?s| is) your name|tell me about yourself|"
-    r"thanks?|thank you|cheers|ok(ay)?|great|awesome|bye|goodbye|"
-    r"help|what can you do|how can you help|"
-    r"(good[,.]?\s+)?(what (do you sell|can you help|do you (have|carry|offer|sell)))|"
-    r"what('?s| is) (in stock|available|on (sale|offer)))\s*[?!.]*\s*$",
-    re.IGNORECASE,
-)
-
 
 class MessageIntent(str, Enum):
     ESCALATION_REQUEST = "escalation_request"

@@ -26,7 +26,7 @@ dependencies = [
     "pywebpush==2.3.0",
     "langchain-mcp-adapters>=0.3.0",
     "mcp>=1.28.0",
-    "semantic-router>=0.1.7",
+    "numpy>=1.26.4",
 ]
 
 [project.optional-dependencies]

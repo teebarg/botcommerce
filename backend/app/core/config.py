@@ -107,9 +107,6 @@ class Settings(BaseSettings):
     CLOUDFLARE_R2_SECRET_ACCESS_KEY: str = ""
     CLOUDFLARE_R2_PUBLIC_URL: str = ""
 
-    VERCEL_API_TOKEN: str = ""
-    VERCEL_PROJECT_ID: str = ""
-
     CF_API_TOKEN: str = ""
     CF_ZONE_ID: str = ""
 

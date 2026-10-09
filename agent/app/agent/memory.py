@@ -1,5 +1,5 @@
 import json
-from app.logging import get_logger
+
 from langchain_core.messages import (
     AIMessage,
     BaseMessage,
@@ -8,6 +8,8 @@ from langchain_core.messages import (
     ToolMessage,
 )
 from redis.asyncio import Redis
+
+from app.logging import get_logger
 
 logger = get_logger(__name__)
 

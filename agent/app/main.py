@@ -3,11 +3,12 @@ import time
 from contextlib import asynccontextmanager
 
 import redis.asyncio as redis
-from fastapi import BackgroundTasks, FastAPI, Request
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 
 from app.agent.agent_graph import run_agent
+from app.agent.classifier import ProductionECommerceRouter
 from app.agent.eval_config import SUPPORT_EVAL_CONFIG
 from app.agent.memory import clear_session, load_messages_from_redis, save_messages_to_redis
 from app.config import get_llm, get_model_name, settings
@@ -27,6 +28,8 @@ from app.utils import _notify_slack_escalation
 
 logger = get_logger(__name__)
 
+router_instance: ProductionECommerceRouter = None
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -34,7 +37,9 @@ async def lifespan(app: FastAPI):
     Runs on startup: pre-load the embedding model so the first request isn't slow.
     """
     logger.debug("🚀 Pre-loading embedding model...")
-    app.state.redis = redis.from_url(settings.BROKER_URL, decode_responses=True, max_connections=10)
+    app.state.redis = redis.from_url(
+        settings.BROKER_URL, decode_responses=True, max_connections=10)
+
     try:
         from app.rag.qdrant_client import get_embedding_model
 
@@ -93,9 +98,7 @@ async def chat(
     - Automatically routes to RAG or API tools
     - Returns whether the conversation was escalated to a human
     """
-    logger.debug(
-        "Starting agent chat..................................................................................."
-    )
+    logger.debug("Starting agent chat.............................................................")
     MAX_MESSAGE_LENGTH = 1000
 
     if payload.message and len(payload.message) > MAX_MESSAGE_LENGTH:
@@ -182,7 +185,8 @@ async def chat(
                 messages=history
                 + [
                     HumanMessage(content=user_msg),
-                    AIMessage(content="Complaint request received and sent to support team"),
+                    AIMessage(
+                        content="Complaint request received and sent to support team"),
                 ],
             )
 
@@ -291,7 +295,8 @@ async def chat(
             prompt_tokens=result.get("_prompt_tokens", 0),
             completion_tokens=result.get("_completion_tokens", 0),
             llm=get_llm(),
-            config=dataclasses.replace(SUPPORT_EVAL_CONFIG, model_name=get_model_name()),
+            config=dataclasses.replace(
+                SUPPORT_EVAL_CONFIG, model_name=get_model_name()),
             error=None,
             stacktrace=None,
         )
@@ -347,6 +352,7 @@ async def delete_session(session_id: str):
     """Clear a session's conversation memory."""
     await clear_session(redis=redis, session_id=session_id)
     return {"status": "cleared", "session_id": session_id}
+
 
 @app.head("/", tags=["System"])
 @app.get("/", tags=["System"])

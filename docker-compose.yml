@@ -114,7 +114,7 @@ services:
       - /app/.venv
       - uva-cache:/root/.cache/uv
     depends_on:
-      mcp-server:
+      backend:
         condition: service_healthy
 
   mcp-server:
