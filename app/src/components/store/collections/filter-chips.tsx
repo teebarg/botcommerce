@@ -27,7 +27,7 @@ const FILTERS: FilterDef[] = [
         icon: Flame,
         to: "/collections",
         search: { collections: "trending" },
-        isActive: (pathname, _) => pathname == "/collections/?collections=trending",
+        isActive: (pathname, _) => pathname == "/collections?collections=trending",
     },
     {
         id: "new-arrivals",
@@ -35,7 +35,7 @@ const FILTERS: FilterDef[] = [
         icon: Sparkles,
         to: "/collections",
         search: { collections: "new-arrivals" },
-        isActive: (pathname, _) => pathname == "/collections/?collections=new-arrivals",
+        isActive: (pathname, _) => pathname == "/collections?collections=new-arrivals",
     },
     {
         id: "under-1k",

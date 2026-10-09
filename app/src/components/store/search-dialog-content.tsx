@@ -54,7 +54,7 @@ export default function SearchDialogContent({ isOpen, close, placeholder = "Sear
             return updated;
         });
         close();
-        navigate({ to: `/collections/?search=${encodeURIComponent(newSearchTerm)}` });
+        navigate({ to: `/collections?search=${encodeURIComponent(newSearchTerm)}` });
     };
 
     const hasResults = query.trim() && !!data?.products?.length;
