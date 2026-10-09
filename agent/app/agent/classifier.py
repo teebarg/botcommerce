@@ -32,7 +32,6 @@ class MessageIntent(str, Enum):
         PRODUCT_DETAILS: Queries regarding specific item attributes (price, size, material).
         POLICY: Static FAQ queries (payment options, delivery rates, return rules).
         ORDER_ISSUE: Order tracking, missing packages, delivery status (triggers DB lookup).
-        FAQ: Active purchasing intent, placing an order, adding items to cart.
         COMPLAINT: Customer dissatisfaction, post-purchase grievances, bad service reports.
         ESCALATION_REQUEST: Explicit requests for human agent support.
         NORMAL: Off-topic or non-catalog queries outside scope.
@@ -61,11 +60,10 @@ class ProductionECommerceRouter:
     def __init__(self):
         """Initialize the embedding model, compile regex patterns, and index vector anchors."""
 
-        # Initialize light, high-throughput sentence transformer
         self.encoder = TextEmbedding(model_name="BAAI/bge-small-en-v1.5")
 
         # ----------------------------------------------------------------------
-        # 1. Slang & Pidgin Normalization Map
+        # Slang & Pidgin Normalization Map
         # ----------------------------------------------------------------------
         # Maps local vernacular to standardized English prior to pattern evaluation.
         # Order matters: higher specificity regex rules should appear before general ones.
@@ -88,7 +86,7 @@ class ProductionECommerceRouter:
         }
 
         # ----------------------------------------------------------------------
-        # 2. Out-of-Scope Product Category Guard
+        # Out-of-Scope Product Category Guard
         # ----------------------------------------------------------------------
         # Used to reject queries asking for items outside the fashion catalog.
         self.off_topic_items = {
@@ -97,7 +95,7 @@ class ProductionECommerceRouter:
         }
 
         # ----------------------------------------------------------------------
-        # 3. Deterministic Regex Rules (Ordered by Priority)
+        # Deterministic Regex Rules (Ordered by Priority)
         # ----------------------------------------------------------------------
 
         # Tier 1: General Product Discovery & Catalog Browsing
@@ -185,7 +183,7 @@ class ProductionECommerceRouter:
         ]
 
         # ----------------------------------------------------------------------
-        # 4. Dense Vector Reference Anchors (Tier 8 Fallback)
+        # Dense Vector Reference Anchors (Tier 8 Fallback)
         # ----------------------------------------------------------------------
         # Carefully curated reference phrases used for similarity search when
         # queries pass all regex tiers without matching.
@@ -262,7 +260,6 @@ class ProductionECommerceRouter:
         Returns:
             MessageIntent: Target intent classification enum.
         """
-        # Step 0: Preprocess and normalize text
         clean_msg = self._normalize(message)
 
         # Tier 1: Check Product Inquiry Patterns
@@ -312,9 +309,7 @@ class ProductionECommerceRouter:
                 best_score = score
                 best_intent = intent
 
-        # Assign matched intent if vector similarity exceeds threshold (0.58)
         if best_score > 0.58:
             return best_intent
 
-        # Fallback for unrecognized/off-topic inputs
         return MessageIntent.NORMAL

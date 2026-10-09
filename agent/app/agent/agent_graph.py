@@ -649,7 +649,6 @@ async def run_agent(
     history: list[BaseMessage] = await load_messages_from_redis(redis=redis, session_id=session_id)
     history = _sanitize_loaded_history(history)
 
-    # intent: str = await _classify_message(message)
     intent: str = router.classify(message)
     _log_step(f"Intent     → {intent}", 1)
 
@@ -663,7 +662,6 @@ async def run_agent(
 
         products = _mcp_result_to_dict(search_results).get("products", [])
 
-        # 2. Synthesize response with LLM using the retrieved context
         synthesis_prompt = (
             "You are Seun, a warm customer support agent for Thriftbyoba, a Nigerian online fashion store.\n"
             "The product search has ALREADY been completed. Do NOT output function calls or JSON.\n"
@@ -683,7 +681,6 @@ async def run_agent(
 
         reply: str = _extract_text_content(resp.content).strip()
 
-        # 3. Persist history using product history builder
         clean_history = _build_persistable_history(
             prev_history=history,
             current_human_msg=message,
@@ -714,13 +711,11 @@ async def run_agent(
     if intent == MessageIntent.POLICY:
         _log_step("Path       → Policy / FAQ shortcut (Direct Tool Execution)", 1)
 
-        # 1. Execute tool directly as a standard function (No LLM tool decision pass)
         _t0 = _time.monotonic()
         faq_data = search_faqs.invoke({"query": message})
         _tool_ms = (_time.monotonic() - _t0) * 1000
         _log_step(f"FAQ Tool   → Executed direct search | {_tool_ms:.0f}ms", 1)
 
-        # 2. Build a grounded prompt with retrieved Q&A context
         policy_system_prompt = (
             "You are a helpful e-commerce customer support assistant.\n"
             "Answer the user's question concisely based ONLY on the provided FAQ context.\n"
@@ -754,7 +749,6 @@ async def run_agent(
         reply: str = _extract_text_content(resp.content).strip()
         _log_step(f'Reply      → "{reply[:140]}{"..." if len(reply) > 140 else ""}"', 1)
 
-        # Persist interaction history
         await save_messages_to_redis(
             redis=redis,
             session_id=session_id,
