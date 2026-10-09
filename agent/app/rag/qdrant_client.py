@@ -21,7 +21,6 @@ from app.logging import get_logger
 
 logger = get_logger(__name__)
 
-# MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 MODEL_NAME = "BAAI/bge-small-en-v1.5"
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent

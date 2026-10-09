@@ -9,6 +9,5 @@ cache_dir: str = os.environ.get("FASTEMBED_CACHE_PATH", "/app/models")
 os.makedirs(cache_dir, exist_ok=True)
 
 print(f"Downloading model to {cache_dir}...")
-# TextEmbedding("sentence-transformers/all-MiniLM-L6-v2", cache_dir=cache_dir)
 TextEmbedding("BAAI/bge-small-en-v1.5", cache_dir=cache_dir)
 print("Done.")
