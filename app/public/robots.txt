@@ -10,6 +10,9 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+User-agent: meta-externalagent
+Disallow: /
+
 User-agent: *
 Allow: /
 
