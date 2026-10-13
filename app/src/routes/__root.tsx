@@ -116,6 +116,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                         window.addEventListener('beforeinstallprompt', (e) => {
                             e.preventDefault();
                             window.deferredPrompt = e;
+                            console.log("🚀 ~ RootDocument ~ window.deferredPrompt:", window.deferredPrompt)
                             // Dispatch a custom event so React can "wake up" and see it
                             window.dispatchEvent(new CustomEvent('pwa-install-available'));
                         });

@@ -1,4 +1,5 @@
 import json
+import secrets
 import uuid
 from typing import List, Optional
 
@@ -13,6 +14,7 @@ from fastapi import (
     Response,
     UploadFile,
 )
+from pydantic import BaseModel, Field
 
 from app.core.config import settings
 from app.core.dependencies.cache import ArqDep
@@ -282,3 +284,54 @@ async def upload_product_images(
             except Exception as cleanup_err:
                 logger.error(f"Rollback cleanup failed for {filename}: {cleanup_err}")
         raise HTTPException(status_code=500, detail="Failed to upload product images") from e
+
+class CampaignIn(BaseModel):
+    title: str = Field(min_length=1, max_length=80)
+    product_ids: list[int] = Field(min_length=1, max_length=100)
+
+@router.post("/admin/campaigns")
+async def create_campaign(body: CampaignIn, srv: ProductDep):
+    redis = srv.cache_srv.redis
+    code = secrets.token_urlsafe(6)  # ~8 chars, unguessable
+    payload = {"title": body.title, "product_ids": body.product_ids}
+    await redis.set(f"campaign:{code}", json.dumps(payload))   # no TTL
+    await redis.sadd("campaigns:index", code)                  # so admin can list them
+    return {"code": code, "url": f"{settings.FRONTEND_HOST}/album/{code}"}
+
+@router.get("/campaigns/{code}")
+async def get_campaign(code: str, srv: ProductDep):
+    redis = srv.cache_srv.redis
+    raw = await redis.get(f"campaign:{code}")
+    if not raw:
+        raise HTTPException(404)
+    data = json.loads(raw)
+    print("🚀 ~ get_campaign ~ data:", data)
+    ids = [int(i) for i in data["product_ids"]]
+    products = await srv.get_by_ids(ids)  # your existing query
+    print("🚀 ~ get_campaign ~ products:", products)
+    by_id = {p.id: p for p in products}
+
+    items = []
+    for pid in ids:  # keep the admin's order
+        p = by_id.get(pid)
+        if not p:
+            continue  # deleted or inactive, skip silently
+
+        variants = p.variants or []
+        in_stock = [v for v in variants if v.status == "IN_STOCK"]
+        pool = in_stock or variants
+
+        items.append({
+            "id": p.id,
+            "name": p.name,
+            "slug": p.slug,
+            "price": min((v.price for v in pool), default=None),
+            "status": "IN_STOCK" if in_stock else (variants[0].status if variants else "OUT_OF_STOCK"),
+            "image": p.image or (p.images[0].image if p.images else None),
+        })
+
+    return {"title": data["title"], "products": items}
+    # by_id = {p["id"]: p for p in products}
+    # ordered = [by_id[i] for i in data["product_ids"] if i in by_id]  # keep admin's order, drop missing
+    # return {"title": data["title"], "products": ordered}
+    return {"title": data["title"], "products": products}

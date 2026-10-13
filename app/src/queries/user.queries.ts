@@ -1,4 +1,4 @@
-import { getProductFeedFn, getProductFn } from "@/server/product.server";
+import { getCampaignFn, getProductFeedFn, getProductFn } from "@/server/product.server";
 import { getMeFn } from "@/server/users.server";
 import { type InfiniteData, infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import type { FeedQuery, ProductFeed } from "@/schemas";
@@ -37,4 +37,11 @@ export const productQuery = (slug: string) =>
     queryOptions({
         queryKey: ["product", slug],
         queryFn: () => getProductFn({ data: slug }),
+    });
+
+
+export const campaignQuery = (slug: string) =>
+    queryOptions({
+        queryKey: ["campaign", slug],
+        queryFn: () => getCampaignFn({ data: slug }),
     });

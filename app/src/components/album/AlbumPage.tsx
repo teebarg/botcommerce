@@ -4,10 +4,14 @@ import ProductCard from "@/components/album/ProductCard";
 import ProductGridItem from "@/components/album/ProductGridItem";
 import SelectionBar from "@/components/album/SelectionBar";
 import SelectionReview from "@/components/album/SelectionReview";
-import { products } from "@/data/products";
 import { albumConfig } from "@/data/albumConfig";
+import type { Campaign } from "@/server/product.server";
 
-export default function AlbumPage() {
+interface AlbumPageProps {
+    data: Campaign;
+}
+
+export default function AlbumPage({ data }: AlbumPageProps) {
     const [view, setView] = useState("list"); // 'list' | 'grid'
     const [selectedIds, setSelectedIds] = useState(() => new Set());
     const [reviewOpen, setReviewOpen] = useState(false);
@@ -30,8 +34,8 @@ export default function AlbumPage() {
         });
     };
 
-    const selectedProducts = products.filter((p) => selectedIds.has(p.id));
-    const total = selectedProducts.reduce((sum, p) => sum + p.price, 0);
+    const selectedProducts = data.products.filter((p) => selectedIds.has(p.id));
+    const total = selectedProducts.reduce((sum, p) => sum + (p.price ?? 0), 0);
 
     return (
         <div className="min-h-screen">
@@ -68,13 +72,13 @@ export default function AlbumPage() {
             <main className="mx-auto max-w-md">
                 {view === "list" ? (
                     <div className="space-y-12p">
-                        {products.map((p) => (
+                        {data.products.map((p) => (
                             <ProductCard key={p.id} product={p} isSelected={selectedIds.has(p.id)} onToggle={toggleSelect} />
                         ))}
                     </div>
                 ) : (
                     <div className="grid grid-cols-2 gap-3">
-                        {products.map((p) => (
+                        {data.products.map((p) => (
                             <ProductGridItem
                                 key={p.id}
                                 product={p}

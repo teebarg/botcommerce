@@ -5,18 +5,12 @@ import { currency } from "@/utils";
 import { albumConfig } from "@/data/albumConfig";
 import { Button } from "../ui/button";
 import { useConfig } from "@/providers/store-provider";
-
-export interface Product {
-    id: string | number;
-    name: string;
-    price: number;
-    image: string;
-}
+import { CampaignProduct } from "@/server/product.server";
 
 export interface SelectionReviewProps {
     open: boolean;
     onClose: () => void;
-    selectedProducts: Product[];
+    selectedProducts: CampaignProduct[];
     onRemove: (id: string | number) => void;
     onClear: () => void;
 }
@@ -36,10 +30,10 @@ export default function SelectionReview({ open, onClose, selectedProducts, onRem
     const { whatsapp } = useConfig();
     const [submitted, setSubmitted] = useState<boolean>(false);
 
-    const total = selectedProducts.reduce((sum, p) => sum + p.price, 0);
+    const total = selectedProducts.reduce((sum, p) => sum + (p.price ?? 0), 0);
 
     const buildWhatsAppMessage = (): string => {
-        const lines = selectedProducts.map((p) => `• ${p.name} — ${currency(p.price)}`);
+        const lines = selectedProducts.map((p) => `• ${p.name} — ${currency(p.price ?? 0)}`);
         return `Hello ${albumConfig.title}!\n\nI'd like to order:\n${lines.join("\n")}\n\n` + `Total: ${currency(total)}\n\n`;
     };
 
@@ -47,7 +41,7 @@ export default function SelectionReview({ open, onClose, selectedProducts, onRem
         e.preventDefault();
 
         const order: SubmittedOrder = {
-            items: selectedProducts.map((p) => ({ id: p.id, name: p.name, price: p.price })),
+            items: selectedProducts.map((p) => ({ id: p.id, name: p.name, price: p.price ?? 0 })),
             total,
         };
         console.log("Order submitted:", order);
@@ -115,7 +109,7 @@ export default function SelectionReview({ open, onClose, selectedProducts, onRem
                                         </div>
                                         <div className="flex-1">
                                             <p className="font-serif text-base">{p.name}</p>
-                                            <p className="font-mono text-sm text-muted-foreground">{currency(p.price)}</p>
+                                            <p className="font-mono text-sm text-muted-foreground">{currency(p.price ?? 0)}</p>
                                         </div>
                                         <Button aria-label="Remove item" onClick={() => onRemove(p.id)} variant="ghost" size="iconOnly">
                                             <Trash2 className="h-6 w-6" />
