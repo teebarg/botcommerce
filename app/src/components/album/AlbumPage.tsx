@@ -1,11 +1,11 @@
 import React, { useState, useCallback } from "react";
-import { LayoutGrid, Rows3 } from "lucide-react";
+import { LayoutGrid, Rows3, ShoppingBag } from "lucide-react";
 import ProductCard from "@/components/album/ProductCard";
 import ProductGridItem from "@/components/album/ProductGridItem";
 import SelectionBar from "@/components/album/SelectionBar";
 import SelectionReview from "@/components/album/SelectionReview";
-import { albumConfig } from "@/data/albumConfig";
 import type { Campaign } from "@/server/product.server";
+import { Link } from "@tanstack/react-router";
 
 interface AlbumPageProps {
     data: Campaign;
@@ -16,7 +16,7 @@ export default function AlbumPage({ data }: AlbumPageProps) {
     const [selectedIds, setSelectedIds] = useState(() => new Set());
     const [reviewOpen, setReviewOpen] = useState(false);
 
-    const toggleSelect = useCallback((id) => {
+    const toggleSelect = useCallback((id: number) => {
         setSelectedIds((prev) => {
             const next = new Set(prev);
             if (next.has(id)) next.delete(id);
@@ -25,7 +25,7 @@ export default function AlbumPage({ data }: AlbumPageProps) {
         });
     }, []);
 
-    const handleOpenFromGrid = (id) => {
+    const handleOpenFromGrid = (id: number) => {
         setView("list");
         // wait for list view to render, then scroll to the product
         requestAnimationFrame(() => {
@@ -41,10 +41,12 @@ export default function AlbumPage({ data }: AlbumPageProps) {
         <div className="min-h-screen">
             {/* Header */}
             <header className="sticky top-0 z-30 border-b border-muted glass">
-                <div className="mx-auto flex max-w-md items-center justify-between py-3 px-5">
-                    <div>
-                        <h1 className="font-serif text-lg leading-none tracking-tight">{albumConfig.title}</h1>
-                    </div>
+                <div className="mx-auto flex max-w-md items-center justify-between py-2 px-0.5">
+                    <Link to="/" className="active:scale-95 transition-transform">
+                        <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-xs shadow-primary/20">
+                            <ShoppingBag className="w-4.5 h-4.5 text-white" />
+                        </div>
+                    </Link>
                     <div className="flex items-center gap-1 rounded-full border p-1">
                         <button
                             onClick={() => setView("list")}
@@ -69,9 +71,9 @@ export default function AlbumPage({ data }: AlbumPageProps) {
             </header>
 
             {/* Body */}
-            <main className="mx-auto max-w-md">
+            <main className="mx-auto max-w-lg">
                 {view === "list" ? (
-                    <div className="space-y-12p">
+                    <div>
                         {data.products.map((p) => (
                             <ProductCard key={p.id} product={p} isSelected={selectedIds.has(p.id)} onToggle={toggleSelect} />
                         ))}

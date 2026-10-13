@@ -1,8 +1,3 @@
-const WIX_MEDIA_HOSTS: Record<string, string> = {
-    "media.base44.com": "/images/public/",
-    "static.wixstatic.com": "/media/",
-};
-
 export const DEFAULT_TRANSFORM_WIDTH = 1024;
 
 // Using "as const" gives us exact type literals instead of generic strings
@@ -64,40 +59,6 @@ export function getImagePreviewClassName(
         .filter((token) => !["inline-block", "relative"].includes(token) || !baselineClasses.has(token) || sourceClasses.has(token))
         .join(" ");
 }
-
-/** Returns transform metadata only for canonical public Wix image URLs. */
-export function parseWixMediaUrl(src: string): ParsedWixMedia | null {
-    try {
-      const url = new URL(src)
-      if (
-        url.protocol !== "https:" ||
-        url.username ||
-        url.password ||
-        (url.port && url.port !== "443")
-      ) {
-        return null
-      }
-  
-      const pathPrefix = WIX_MEDIA_HOSTS[url.hostname]
-      if (!pathPrefix) return null
-  
-      const transformed = url.pathname.match(/^(.*)\/v1\/(?:fill|fit)\/[^/]+\/[^/]+$/i)
-      const basePath = transformed ? transformed[1] : url.pathname
-      const filename = basePath.split("/").pop()
-      if (
-        !basePath.startsWith(pathPrefix) ||
-        !filename ||
-        !/\.[a-z0-9]+$/i.test(filename) ||
-        /\.svg$/i.test(filename)
-      ) {
-        return null
-      }
-  
-      return { baseUrl: `${url.origin}${basePath}`, filename }
-    } catch {
-      return null
-    }
-  }
 
 const clampDim = (n: number): number => Math.min(Math.max(Math.round(n), 1), MAX_DIMENSION);
 const clamp01 = (n: number): number => Math.min(1, Math.max(0, n));

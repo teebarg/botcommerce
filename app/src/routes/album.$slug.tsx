@@ -14,9 +14,19 @@ export const Route = createFileRoute("/album/$slug")({
             throw notFound();
         }
     },
+    head: () => ({
+        meta: [
+            { title: "Shared fashion album — Occasion Edit" },
+            { name: "description", content: "Browse and select pieces from a shared Occasion Edit fashion album." },
+            { property: "og:title", content: "Shared fashion album — Occasion Edit" },
+            { property: "og:description", content: "Browse and select pieces from a shared Occasion Edit fashion album." },
+            { property: "og:type", content: "website" },
+            { name: "twitter:card", content: "summary_large_image" },
+        ],
+    }),
     component: RouteComponent,
     notFoundComponent: () => {
-        console.log("🚀 ~ notFoundComponent ~ notFoundComponent:")
+        console.log("🚀 ~ notFoundComponent ~ notFoundComponent:");
         return (
             <NotFound
                 eyebrow="Product unavailable"
@@ -32,6 +42,6 @@ export const Route = createFileRoute("/album/$slug")({
 
 function RouteComponent() {
     const { campaign } = Route.useLoaderData();
-    console.log("🚀 ~ RouteComponent ~ campaign:", campaign)
+    console.log("🚀 ~ RouteComponent ~ campaign:", campaign);
     return <AlbumPage data={campaign} />;
 }

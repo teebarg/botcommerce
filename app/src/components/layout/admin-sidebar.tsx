@@ -18,6 +18,7 @@ import {
     ShoppingCart,
     Tag,
     ShoppingBag,
+    GalleryThumbnails,
 } from "lucide-react";
 import { useRouteContext } from "@tanstack/react-router";
 
@@ -100,6 +101,11 @@ const storeItems = [
         title: "Abandoned Carts",
         url: "/admin/abandoned-carts",
         icon: ShoppingCart,
+    },
+    {
+        title: "Albums",
+        url: "/admin/albums",
+        icon: GalleryThumbnails,
     },
     {
         title: "Orders",

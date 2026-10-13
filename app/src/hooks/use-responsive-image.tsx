@@ -5,7 +5,6 @@ import { DEFAULT_TRANSFORM_WIDTH, getImagePreviewClassName } from "@/lib/image-h
 
 export interface ParsedImageSource {
     baseUrl: string;
-    // Add other properties that your parseWixMediaUrl function returns if needed
 }
 
 export interface FocalPoint {

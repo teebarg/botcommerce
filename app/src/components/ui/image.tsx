@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ResponsiveImage } from "@/components/ui/responsive-image";
-import { getOriginalImageUrl, IMAGE_LOAD_MODE, nextImageLoadMode, parseWixMediaUrl } from "@/lib/image-helpers";
+import { getOriginalImageUrl, IMAGE_LOAD_MODE, nextImageLoadMode } from "@/lib/image-helpers";
 
 type ImageLoadMode = (typeof IMAGE_LOAD_MODE)[keyof typeof IMAGE_LOAD_MODE];
 
@@ -26,11 +26,12 @@ interface LoadState {
     mode: ImageLoadMode;
 }
 
-const FALLBACK_IMAGE_URL = "https://static.wixstatic.com/media/12d367_4f26ccd17f8f4e3a8958306ea08c2332~mv2.png";
+const baseUrl = typeof window === "undefined" ? process.env.BASE_URL : import.meta.env.VITE_BASE_URL;
+
+const FALLBACK_IMAGE_URL = `${baseUrl}/placeholder.jpg`
 
 /**
- * Image with built-in Wix Media Platform support: canonical public images on
- * media.base44.com and static.wixstatic.com/media are resized to the rendered
+ * Image with built-in Wix Media Platform support: canonical public images are resized to the rendered
  * container per device pixel ratio and served as AVIF/WebP when supported; `fittingType="fill"`
  * crops server-side, optionally anchored at a focal point. Other URLs render
  * as a plain <img>. Failed transforms retry the original URL; only a broken
@@ -65,9 +66,8 @@ const Image = React.forwardRef<HTMLImageElement, ImageProps>(
             });
 
         React.useEffect(() => setPreviewSource(null), [source]);
-
-        const parsedSource = src && src !== FALLBACK_IMAGE_URL ? parseWixMediaUrl(src) : null;
-        const initialMode = parsedSource ? IMAGE_LOAD_MODE.OPTIMIZED : IMAGE_LOAD_MODE.ORIGINAL;
+        const parsedSource = src && src !== FALLBACK_IMAGE_URL ? null : null;
+        const initialMode = IMAGE_LOAD_MODE.ORIGINAL;
 
         const [loadState, setLoadState] = React.useState<LoadState>({ src, mode: initialMode });
         const mode = loadState.src === src ? loadState.mode : initialMode;
