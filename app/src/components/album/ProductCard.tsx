@@ -3,7 +3,7 @@ import LazyImage from "./LazyImage";
 export default function ProductCard({ product, isSelected, onToggle }: { product: any; isSelected: boolean; onToggle: (id: number) => void }) {
     return (
         <section id={`product-${product.id}`} className="scroll-mt-20 animate-in fade-in slide-in-from-bottom-2 duration-500">
-            <div className="relative">
+            <div onClick={() => onToggle(product.id)} className="relative">
                 <LazyImage src={product.image} alt={product.name} aspect="4/5" />
 
                 <button

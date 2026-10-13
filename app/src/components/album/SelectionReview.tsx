@@ -33,7 +33,7 @@ export default function SelectionReview({ open, onClose, selectedProducts, onRem
 
     const handleClose = () => {
         setSubmitted(false);
-        onClear();
+        // onClear();
         onClose();
     };
 
@@ -79,22 +79,12 @@ export default function SelectionReview({ open, onClose, selectedProducts, onRem
                         <span className="font-mono text-xl font-semibold">{currency(total)}</span>
                     </div>
 
-                    <Button
-                        onClick={() => openWhatsApp()}
-                        disabled={selectedProducts.length === 0}
-                        className="w-full rounded-full text-base py-3.5"
-                        variant="inverse"
-                        size="lg"
-                    >
-                        Submit Selection
-                    </Button>
-
                     <button
                         onClick={openWhatsApp}
                         className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3.5 font-medium text-white transition-transform active:scale-95"
                     >
                         <MessageCircle className="h-5 w-5" />
-                        Open WhatsApp
+                        Submit
                     </button>
                 </>
             </div>

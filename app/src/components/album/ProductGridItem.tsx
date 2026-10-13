@@ -1,5 +1,6 @@
 import { currency } from "@/utils";
 import LazyImage from "./LazyImage";
+import { Badge } from "@/components/ui/badge";
 
 export default function ProductGridItem({ product, isSelected, onToggle, onOpen }) {
     return (
@@ -19,9 +20,7 @@ export default function ProductGridItem({ product, isSelected, onToggle, onOpen 
                 >
                     {isSelected ? "✓" : "+"}
                 </button>
-            </div>
-            <div className="mt-2 px-0.5">
-                <p className="font-mono text-xs font-semibold text-stone-700">{currency(product.price)}</p>
+                <Badge className="absolute top-2 left-0.5" variant="accent">{currency(product.price)}</Badge>
             </div>
         </div>
     );

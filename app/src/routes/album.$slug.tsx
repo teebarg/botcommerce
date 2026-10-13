@@ -26,7 +26,6 @@ export const Route = createFileRoute("/album/$slug")({
     }),
     component: RouteComponent,
     notFoundComponent: () => {
-        console.log("🚀 ~ notFoundComponent ~ notFoundComponent:");
         return (
             <NotFound
                 eyebrow="Product unavailable"
@@ -42,6 +41,5 @@ export const Route = createFileRoute("/album/$slug")({
 
 function RouteComponent() {
     const { campaign } = Route.useLoaderData();
-    console.log("🚀 ~ RouteComponent ~ campaign:", campaign);
     return <AlbumPage data={campaign} />;
 }

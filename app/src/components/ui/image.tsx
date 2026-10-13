@@ -6,7 +6,7 @@ type ImageLoadMode = (typeof IMAGE_LOAD_MODE)[keyof typeof IMAGE_LOAD_MODE];
 
 export interface ImageProps extends Omit<React.ComponentPropsWithRef<"img">, "src"> {
     src?: string | null;
-    fittingType?: "fill" | "fit" | string; // Adjust based on your valid Wix fitting types
+    fittingType?: "fill" | "fit" | string;
     originWidth?: number;
     originHeight?: number;
     focalPointX?: number;

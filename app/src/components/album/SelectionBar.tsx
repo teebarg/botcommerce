@@ -1,7 +1,15 @@
 import { currency } from "@/utils";
 import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
-export default function SelectionBar({ count, total, onReview }) {
+interface SelectionBarProps {
+    count: number;
+    total: number;
+    onClear: () => void;
+    onReview: () => void;
+}
+
+export default function SelectionBar({ count, total, onReview, onClear }: SelectionBarProps) {
     if (count === 0) return null;
 
     return (
@@ -13,7 +21,20 @@ export default function SelectionBar({ count, total, onReview }) {
                     </span>
                     <span className="font-mono text-lg font-semibold">{currency(total)}</span>
                 </div>
-                <Button onClick={onReview} className="rounded-full font-medium" variant="inverse" size="md">Review Selection</Button>
+                <div className="flex items-center gap-2">
+                    <Button onClick={onReview} className="rounded-full font-medium" variant="inverse" size="md">
+                        Review Selection
+                    </Button>
+                    <div className="w-px h-5 bg-border mx-1" />
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        className="rounded-full text-muted-foreground hover:text-foreground hover:bg-muted h-8 w-8"
+                        onClick={onClear}
+                    >
+                        <X className="h-6 w-6" />
+                    </Button>
+                </div>
             </div>
         </div>
     );

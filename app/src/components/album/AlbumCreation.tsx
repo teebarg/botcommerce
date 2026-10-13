@@ -1,12 +1,10 @@
 import { api } from "@/utils/api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { type FormEvent, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Check, Copy, ExternalLink, Share2 } from "lucide-react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 
 export type AlbumRecord = {
     code: string;
@@ -21,24 +19,11 @@ interface AlbumCreationProps {
 }
 
 export function AlbumCreation({ onClose, productIds }: AlbumCreationProps) {
-    console.log("productIds", productIds);
-    const queryClient = useQueryClient();
     const navigate = useNavigate();
-    const [createFormOpen, setCreateFormOpen] = useState(false);
     const [title, setTitle] = useState("");
     const [createdAlbum, setCreatedAlbum] = useState<AlbumRecord | null>(null);
     const [creating, setCreating] = useState(false);
     const [copied, setCopied] = useState(false);
-
-    // const createAlbum = useMutation({
-    //     mutationFn: async (cartId: number) => await api.post<{}>(`/abandoned-carts/${cartId}/send-reminder`),
-    //     onSuccess: () => {
-    //         toast.success("Recovery email sent");
-    //     },
-    //     onError: (error: any) => {
-    //         toast.error(error.message || "Failed to send recovery email");
-    //     },
-    // });
 
     async function createAlbum(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -51,7 +36,6 @@ export function AlbumCreation({ onClose, productIds }: AlbumCreationProps) {
             const record: AlbumRecord = { ...result, title: cleanTitle, product_ids: productIds };
             // window.localStorage.setItem(albumStorageKey(result.code), JSON.stringify(record));
             setCreatedAlbum(record);
-            setCreateFormOpen(false);
             setCopied(false);
         } finally {
             setCreating(false);
@@ -132,67 +116,35 @@ export function AlbumCreation({ onClose, productIds }: AlbumCreationProps) {
                             >
                                 Facebook
                             </a>
-                            <a
-                                className="text-primary underline underline-offset-4"
-                                href={`https://twitter.com/intent/tweet?text=${encodedShareText}&url=${encodedUrl}`}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                X
-                            </a>
-                            <Button
-                                variant="link"
-                                className="h-auto p-0 text-sm"
-                                onClick={() => {
-                                    setCreatedAlbum(null);
-                                    setCreateFormOpen(false);
-                                }}
-                            >
-                                Create another
-                            </Button>
                         </div>
                     </section>
                 ) : (
                     <>
-                        <div className="mb-6 flex items-end justify-between gap-4">
+                        <div className="flex items-end justify-between gap-4">
                             <span className="shrink-0 pb-1 text-xs text-muted-foreground">{productIds.length} selected</span>
                         </div>
 
-                        <div className="sticky bottom-0 mt-8 border-t border-border bg-background/95 py-4 backdrop-blur-md">
-                            {!createFormOpen ? (
-                                <Button
-                                    type="button"
-                                    className="h-11 w-full sm:w-auto"
-                                    disabled={productIds.length === 0}
-                                    onClick={() => {
-                                        setTitle("");
-                                        setCreateFormOpen(true);
-                                    }}
-                                >
-                                    Create album · {productIds.length} {productIds.length === 1 ? "piece" : "pieces"}
+                        <div className="sticky bottom-0 mt-2 border-t border-border bg-background/95 py-4 backdrop-blur-md">
+                            <form className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-end" onSubmit={createAlbum}>
+                                <div className="space-y-2">
+                                    <Label htmlFor="album-title">Album title</Label>
+                                    <Input
+                                        id="album-title"
+                                        autoFocus
+                                        required
+                                        maxLength={80}
+                                        value={title}
+                                        onChange={(event) => setTitle(event.target.value)}
+                                        placeholder="e.g. Office pant trousers"
+                                    />
+                                </div>
+                                <Button type="button" size="lg" variant="outline" onClick={onClose}>
+                                    Cancel
                                 </Button>
-                            ) : (
-                                <form className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-end" onSubmit={createAlbum}>
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="album-title">Album title</Label>
-                                        <Input
-                                            id="album-title"
-                                            autoFocus
-                                            required
-                                            maxLength={80}
-                                            value={title}
-                                            onChange={(event) => setTitle(event.target.value)}
-                                            placeholder="e.g. Sunday in Lagos"
-                                        />
-                                    </div>
-                                    <Button type="button" variant="outline" className="h-11" onClick={() => setCreateFormOpen(false)}>
-                                        Cancel
-                                    </Button>
-                                    <Button type="submit" className="h-11" disabled={!title.trim() || creating}>
-                                        {creating ? "Creating…" : "Create and share"}
-                                    </Button>
-                                </form>
-                            )}
+                                <Button type="submit" size="lg" disabled={!title.trim() || creating}>
+                                    {creating ? "Creating…" : "Create and share"}
+                                </Button>
+                            </form>
                         </div>
                     </>
                 )}

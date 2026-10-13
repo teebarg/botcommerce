@@ -39,7 +39,6 @@ export default function AlbumPage({ data }: AlbumPageProps) {
 
     return (
         <div className="min-h-screen">
-            {/* Header */}
             <header className="sticky top-0 z-30 border-b border-muted glass">
                 <div className="mx-auto flex max-w-md items-center justify-between py-2 px-0.5">
                     <Link to="/" className="active:scale-95 transition-transform">
@@ -70,7 +69,6 @@ export default function AlbumPage({ data }: AlbumPageProps) {
                 </div>
             </header>
 
-            {/* Body */}
             <main className="mx-auto max-w-lg">
                 {view === "list" ? (
                     <div>
@@ -79,7 +77,7 @@ export default function AlbumPage({ data }: AlbumPageProps) {
                         ))}
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2">
                         {data.products.map((p) => (
                             <ProductGridItem
                                 key={p.id}
@@ -93,7 +91,7 @@ export default function AlbumPage({ data }: AlbumPageProps) {
                 )}
             </main>
 
-            <SelectionBar count={selectedIds.size} total={total} onReview={() => setReviewOpen(true)} />
+            <SelectionBar count={selectedIds.size} total={total} onReview={() => setReviewOpen(true)} onClear={() => setSelectedIds(new Set())} />
 
             <SelectionReview
                 open={reviewOpen}

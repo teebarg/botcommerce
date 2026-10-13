@@ -52,7 +52,7 @@ export const ProductBulkActions = ({
 
             <Overlay
                 open={albumState.isOpen}
-                title="Bulk Products Update"
+                title="Create Album"
                 trigger={
                     <Button className="rounded-full" size="sm" variant="ghost" onClick={albumState.open}>
                         <GalleryThumbnails className="h-4 w-4" />
