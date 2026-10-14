@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { LayoutGrid, Rows3, ShoppingBag } from "lucide-react";
 import ProductCard from "@/components/album/ProductCard";
 import ProductGridItem from "@/components/album/ProductGridItem";

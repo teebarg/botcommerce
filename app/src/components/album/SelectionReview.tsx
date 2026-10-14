@@ -21,7 +21,7 @@ export default function SelectionReview({ open, onClose, selectedProducts, onRem
     const total = selectedProducts.reduce((sum, p) => sum + (p.price ?? 0), 0);
 
     const buildWhatsAppMessage = (): string => {
-        const lines = selectedProducts.map((p) => `• ${p.name} — ${currency(p.price ?? 0)}\n  ${frontend_host}/products/${p.slug}`);
+        const lines = selectedProducts.map((p) => `• ${frontend_host}/products/${p.slug}`);
         return `I'd like to order:\n\n${lines.join("\n")}\n\n` + `Total: ${currency(total)}\n\n`;
     };
 
@@ -33,7 +33,6 @@ export default function SelectionReview({ open, onClose, selectedProducts, onRem
 
     const handleClose = () => {
         setSubmitted(false);
-        // onClear();
         onClose();
     };
 

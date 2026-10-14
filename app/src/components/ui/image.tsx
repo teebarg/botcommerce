@@ -1,6 +1,10 @@
 import * as React from "react";
-import { ResponsiveImage } from "@/components/ui/responsive-image";
-import { getOriginalImageUrl, IMAGE_LOAD_MODE, nextImageLoadMode } from "@/lib/image-helpers";
+import { baseURL } from "@/utils/api";
+
+const IMAGE_LOAD_MODE = {
+    ORIGINAL: "original",
+    FALLBACK: "fallback",
+} as const;
 
 type ImageLoadMode = (typeof IMAGE_LOAD_MODE)[keyof typeof IMAGE_LOAD_MODE];
 
@@ -26,17 +30,8 @@ interface LoadState {
     mode: ImageLoadMode;
 }
 
-const baseUrl = typeof window === "undefined" ? process.env.BASE_URL : import.meta.env.VITE_BASE_URL;
+const FALLBACK_IMAGE_URL = `${baseURL}/placeholder.jpg`;
 
-const FALLBACK_IMAGE_URL = `${baseUrl}/placeholder.jpg`
-
-/**
- * Image with built-in Wix Media Platform support: canonical public images are resized to the rendered
- * container per device pixel ratio and served as AVIF/WebP when supported; `fittingType="fill"`
- * crops server-side, optionally anchored at a focal point. Other URLs render
- * as a plain <img>. Failed transforms retry the original URL; only a broken
- * original swaps to the generic fallback image.
- */
 const Image = React.forwardRef<HTMLImageElement, ImageProps>(
     (
         {
@@ -57,16 +52,7 @@ const Image = React.forwardRef<HTMLImageElement, ImageProps>(
         const preview = previewSource?.source === source ? previewSource : null;
         const src = preview ? preview.value : source;
 
-        const replaceSource = (value: string, className?: string) =>
-            setPreviewSource({
-                source,
-                value,
-                className,
-                sourceClassName: originalClassName,
-            });
-
         React.useEffect(() => setPreviewSource(null), [source]);
-        const parsedSource = src && src !== FALLBACK_IMAGE_URL ? null : null;
         const initialMode = IMAGE_LOAD_MODE.ORIGINAL;
 
         const [loadState, setLoadState] = React.useState<LoadState>({ src, mode: initialMode });
@@ -77,10 +63,9 @@ const Image = React.forwardRef<HTMLImageElement, ImageProps>(
         }, [src, initialMode]);
 
         const handleError = (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
-            if (mode === IMAGE_LOAD_MODE.FALLBACK) return;
-            const nextMode = nextImageLoadMode(mode);
+            const nextMode = IMAGE_LOAD_MODE.FALLBACK;
             setLoadState({ src, mode: nextMode });
-            if (nextMode === IMAGE_LOAD_MODE.FALLBACK) onError?.(event);
+            onError?.(event);
         };
 
         const currentClassName = preview && preview.sourceClassName === originalClassName ? preview.className : originalClassName;
@@ -99,35 +84,9 @@ const Image = React.forwardRef<HTMLImageElement, ImageProps>(
             return <img ref={ref} src={FALLBACK_IMAGE_URL} {...imageProps} data-empty-image="" />;
         }
 
-        // A failed transform retries the underlying original as a plain image.
-        // Only a failure of that original advances to the generic fallback.
-        const parsed = mode === IMAGE_LOAD_MODE.OPTIMIZED ? parsedSource : null;
-
-        if (!parsed) {
-            const isErrorMode = mode === IMAGE_LOAD_MODE.FALLBACK;
-            const imageSrc = isErrorMode ? FALLBACK_IMAGE_URL : getOriginalImageUrl(src, parsedSource);
-            return <img ref={ref} src={imageSrc} {...imageProps} data-error-image={isErrorMode ? "" : undefined} />;
-        }
-
-        const focalPoint = typeof focalPointX === "number" && typeof focalPointY === "number" ? { x: focalPointX, y: focalPointY } : undefined;
-
-        // Origin dimensions are optional — when known they stabilize layout via
-        // the wrapper's aspect-ratio before the image loads.
-        const aspectRatio = originWidth && originHeight ? `${originWidth} / ${originHeight}` : undefined;
-
-        return (
-            <ResponsiveImage
-                ref={ref}
-                src={src}
-                parsed={parsed}
-                onSourceChange={replaceSource}
-                fittingType={fittingType}
-                focalPoint={focalPoint}
-                quality={quality}
-                aspectRatio={aspectRatio}
-                {...imageProps}
-            />
-        );
+        const isErrorMode = mode === IMAGE_LOAD_MODE.FALLBACK;
+        const imageSrc = isErrorMode ? FALLBACK_IMAGE_URL : src;
+        return <img ref={ref} src={imageSrc} {...imageProps} data-error-image={isErrorMode ? "" : undefined} />;
     }
 );
 

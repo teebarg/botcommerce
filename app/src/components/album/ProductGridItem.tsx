@@ -34,7 +34,7 @@ export default function ProductGridItem({ product, isSelected, onToggle, onOpen 
                     </button>
                 )}
 
-                <Badge className="absolute top-2 left-0.5" variant="accent">
+                <Badge className="absolute top-2 left-2" variant="accent">
                     {currency(product.price)}
                 </Badge>
 

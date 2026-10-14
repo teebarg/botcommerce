@@ -21,6 +21,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import ImpersonationBanner from "@/components/impersonation-banner";
 import { SafeAreaDebug } from "@/components/safe-area-debug";
 import { authQueryOptions } from "@/hooks/useUser";
+import { baseURL } from "@/utils/api";
 const PushPermission = lazy(() => import("@/components/push-permission"));
 
 interface RouterContext extends AppSession {
@@ -46,7 +47,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         };
     },
     head: ({ loaderData }) => {
-        const baseUrl = import.meta.env.VITE_BASE_URL;
         const title = loaderData?.config?.shop_name ?? "";
         const description = loaderData?.config?.shop_description ?? "";
 
@@ -59,7 +59,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
                 ...seo({
                     title,
                     description,
-                    url: `${baseUrl}`,
+                    url: `${baseURL}`,
                     image: "/default-og.png",
                     name: title,
                 }),

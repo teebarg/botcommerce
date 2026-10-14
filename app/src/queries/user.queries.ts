@@ -38,10 +38,3 @@ export const productQuery = (slug: string) =>
         queryKey: ["product", slug],
         queryFn: () => getProductFn({ data: slug }),
     });
-
-
-export const campaignQuery = (slug: string) =>
-    queryOptions({
-        queryKey: ["campaign", slug],
-        queryFn: () => getCampaignFn({ data: slug }),
-    });
