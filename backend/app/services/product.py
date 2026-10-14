@@ -66,6 +66,9 @@ class ProductService:
     async def get(self, id: int):
         return await self.db.product.find_unique(where={"id": id})
 
+    async def get_by_ids(self, ids: list[int]):
+        return await self.db.product.find_many(where={"id": {"in": ids}}, include={"variants": True, "images": True})
+
     async def get_by_slug(self, slug: str):
         return await self.db.product.find_unique(
             where={"slug": slug}, include={"variants": True, "images": True}

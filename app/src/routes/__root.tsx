@@ -21,6 +21,8 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import ImpersonationBanner from "@/components/impersonation-banner";
 import { SafeAreaDebug } from "@/components/safe-area-debug";
 import { authQueryOptions } from "@/hooks/useUser";
+import { baseURL } from "@/utils/api";
+
 const PushPermission = lazy(() => import("@/components/push-permission"));
 
 interface RouterContext extends AppSession {
@@ -46,7 +48,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         };
     },
     head: ({ loaderData }) => {
-        const baseUrl = import.meta.env.VITE_BASE_URL;
         const title = loaderData?.config?.shop_name ?? "";
         const description = loaderData?.config?.shop_description ?? "";
 
@@ -59,7 +60,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
                 ...seo({
                     title,
                     description,
-                    url: `${baseUrl}`,
+                    url: `${baseURL}`,
                     image: "/default-og.png",
                     name: title,
                 }),
@@ -110,6 +111,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover" />
                 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+                <link rel="manifest" href="/manifest.webmanifest" />
                 <script
                     dangerouslySetInnerHTML={{
                         __html: `

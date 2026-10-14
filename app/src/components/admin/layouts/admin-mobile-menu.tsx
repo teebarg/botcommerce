@@ -15,6 +15,7 @@ import {
     Star,
     ShoppingCart,
     Tag,
+    GalleryThumbnails,
 } from "lucide-react";
 import { useLocation } from "@tanstack/react-router";
 import LocalizedClientLink from "@/components/ui/link";
@@ -33,6 +34,7 @@ const AdminMobileMenu: React.FC = () => {
         { id: "categories", label: "Categories", icon: <Layers size={20} />, href: "/admin/categories" },
         { id: "collections", label: "Collections", icon: <LayoutGrid size={20} />, href: "/admin/collections" },
         { id: "abandoned-carts", label: "Abandoned Carts", icon: <ShoppingCart size={20} />, href: "/admin/abandoned-carts" },
+        { id: "albums", label: "Albums", icon: <GalleryThumbnails size={20} />, href: "/admin/albums" },
         { id: "reviews", label: "Reviews", icon: <Star size={20} />, href: "/admin/reviews" },
         { id: "coupons", label: "Coupons", icon: <Tag size={20} />, href: "/admin/coupons" },
         { id: "settings", label: "Settings", icon: <Settings size={20} />, href: "/admin/settings" },

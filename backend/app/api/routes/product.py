@@ -1,4 +1,5 @@
 import json
+import secrets
 import uuid
 from typing import List, Optional
 
@@ -13,6 +14,7 @@ from fastapi import (
     Response,
     UploadFile,
 )
+from pydantic import BaseModel, Field
 
 from app.core.config import settings
 from app.core.dependencies.cache import ArqDep
@@ -282,3 +284,88 @@ async def upload_product_images(
             except Exception as cleanup_err:
                 logger.error(f"Rollback cleanup failed for {filename}: {cleanup_err}")
         raise HTTPException(status_code=500, detail="Failed to upload product images") from e
+
+class CampaignIn(BaseModel):
+    title: str = Field(min_length=1, max_length=80)
+    product_ids: list[int] = Field(min_length=1, max_length=100)
+
+
+def _s(v):
+    return v.decode() if isinstance(v, bytes) else v
+
+@router.post("/admin/campaigns", dependencies=[Depends(require_admin)])
+async def create_campaign(body: CampaignIn, srv: ProductDep):
+    redis = srv.cache_srv.redis
+    code = secrets.token_urlsafe(6)  # ~8 chars, unguessable
+    payload = {"title": body.title, "product_ids": body.product_ids}
+    await redis.set(f"campaign:{code}", json.dumps(payload))   # no TTL
+    await redis.sadd("campaigns:index", code)                  # so admin can list them
+    return {"code": code, "url": f"{settings.FRONTEND_HOST}/album/{code}"}
+
+@router.get("/campaigns/{code}")
+async def get_campaign(code: str, srv: ProductDep):
+    redis = srv.cache_srv.redis
+    raw = await redis.get(f"campaign:{code}")
+    if not raw:
+        raise HTTPException(404)
+    data = json.loads(raw)
+    ids = [int(i) for i in data["product_ids"]]
+    products = await srv.get_by_ids(ids)  # your existing query
+    by_id = {p.id: p for p in products}
+
+    items = []
+    for pid in ids:  # keep the admin's order
+        p = by_id.get(pid)
+        if not p:
+            continue  # deleted or inactive, skip silently
+
+        variants = p.variants or []
+        in_stock = [v for v in variants if v.status == "IN_STOCK"]
+        pool = in_stock or variants
+
+        items.append({
+            "id": p.id,
+            "name": p.name,
+            "slug": p.slug,
+            "price": min((v.price for v in pool), default=None),
+            "status": "IN_STOCK" if in_stock else (variants[0].status if variants else "OUT_OF_STOCK"),
+            "image": p.image or (p.images[0].image if p.images else None),
+        })
+
+    return {"title": data["title"], "products": items}
+
+@router.get("/admin/campaigns", dependencies=[Depends(require_admin)])
+async def list_campaigns(srv: ProductDep):
+    redis = srv.cache_srv.redis
+    codes = [_s(c) for c in await redis.smembers("campaigns:index")]
+    if not codes:
+        return {"campaigns": []}
+
+    raws = await redis.mget([f"campaign:{c}" for c in codes])
+
+    campaigns, stale = [], []
+    for code, raw in zip(codes, raws):
+        if not raw:
+            stale.append(code)  # key is gone but still in the index
+            continue
+        data = json.loads(raw)
+        campaigns.append({
+            "code": code,
+            "title": data["title"],
+            "product_count": len(data["product_ids"]),
+            "url": f"{settings.FRONTEND_HOST}/album/{code}",
+        })
+
+    if stale:
+        await redis.srem("campaigns:index", *stale)  # self-heal the index
+    return campaigns
+
+
+@router.delete("/admin/campaigns/{code}", dependencies=[Depends(require_admin)])
+async def delete_campaign(code: str, srv: ProductDep):
+    redis = srv.cache_srv.redis
+    deleted = await redis.delete(f"campaign:{code}")
+    await redis.srem("campaigns:index", code)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+    return Message(message="successful")

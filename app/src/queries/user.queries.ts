@@ -1,4 +1,4 @@
-import { getProductFeedFn, getProductFn } from "@/server/product.server";
+import { getCampaignFn, getProductFeedFn, getProductFn } from "@/server/product.server";
 import { getMeFn } from "@/server/users.server";
 import { type InfiniteData, infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import type { FeedQuery, ProductFeed } from "@/schemas";

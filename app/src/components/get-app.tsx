@@ -37,7 +37,6 @@ const GetApp: React.FC = () => {
         };
         const onOnline = () => setIsOffline(false);
         const onOffline = () => setIsOffline(true);
-
         window.addEventListener("beforeinstallprompt", handler);
         window.addEventListener("pwa-install-available", manualHandler);
         window.addEventListener("online", onOnline);

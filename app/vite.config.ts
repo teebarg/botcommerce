@@ -33,7 +33,7 @@ const config = defineConfig({
             strategies: "injectManifest",
             srcDir: "src",
             filename: "sw.js",
-            registerType: "prompt",
+            registerType: "autoUpdate",
             outDir: "public",
             injectRegister: "auto",
             includeAssets: ["robots.txt", "favicon.ico", "favicon-32x32.png", "favicon-16x16.png", "icon.png", "placeholder.jpg", "pr-logo.png"],

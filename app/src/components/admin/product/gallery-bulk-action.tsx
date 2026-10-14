@@ -1,4 +1,4 @@
-import { Trash2, Edit3, X, MessageSquare } from "lucide-react";
+import { Trash2, Edit3, X, MessageSquare, GalleryThumbnails } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { BulkImageSheetForm } from "./bulk-image-form-sheet";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { EmailCampaignComposer } from "./EmailCampaignComposer";
 import { api } from "@/utils/api";
 import { toast } from "sonner";
+import { AlbumCreation } from "@/components/album/AlbumCreation";
 
 interface ProductBulkActionsProps {
     selectedCount: number;
@@ -26,6 +27,7 @@ export const ProductBulkActions = ({
     isLoading,
 }: ProductBulkActionsProps) => {
     const editState = useOverlayTriggerState({});
+    const albumState = useOverlayTriggerState({});
     const campaignState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
 
@@ -47,6 +49,20 @@ export const ProductBulkActions = ({
             <span className="text-xs text-muted-foreground px-2 mr-1 whitespace-nowrap">{selectedCount} selected</span>
 
             <div className="w-px h-4 bg-border" />
+
+            <Overlay
+                open={albumState.isOpen}
+                title="Create Album"
+                trigger={
+                    <Button className="rounded-full" size="sm" variant="ghost" onClick={albumState.open}>
+                        <GalleryThumbnails className="h-4 w-4" />
+                        <span className="hidden sm:inline text-xs">Create Album</span>
+                    </Button>
+                }
+                onOpenChange={albumState.setOpen}
+            >
+                {albumState.isOpen && <AlbumCreation productIds={selectedProductIds || []} onClose={albumState.close} />}
+            </Overlay>
 
             <Overlay
                 open={editState.isOpen}

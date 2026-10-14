@@ -27,3 +27,23 @@ export const getProductFn = createServerFn({ method: "GET" })
     .handler(async ({ data }) => {
         return await api.get<Product>(`/product/${data}`);
     });
+
+export interface CampaignProduct {
+    id: number;
+    name: string;
+    slug: string;
+    price: number | null;
+    status: string;
+    image: string;
+}
+
+export interface Campaign {
+    title: string;
+    products: CampaignProduct[];
+}
+
+export const getCampaignFn = createServerFn({ method: "GET" })
+    .inputValidator((d: string) => d)
+    .handler(async ({ data }) => {
+        return await api.get<Campaign>(`/product/campaigns/${data}`);
+    });

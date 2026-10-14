@@ -5,6 +5,7 @@ import z from "zod";
 const ConfigTypeSchema = z.object({
     shop_name: z.string().optional(),
     shop_email: z.string().optional(),
+    frontend_host: z.string().optional(),
     shop_description: z.string().optional(),
     address: z.string().optional(),
     contact_email: z.string().optional(),
