@@ -39,8 +39,8 @@ export default function AlbumPage({ data }: AlbumPageProps) {
 
     return (
         <div className="min-h-screen">
-            <header className="sticky top-0 z-30 border-b border-muted glass">
-                <div className="mx-auto flex max-w-md items-center justify-between py-2 px-0.5">
+            <header className="sticky top-[var(--sat)] z-30 border-b border-muted glass">
+                <div className="mx-auto flex max-w-lg items-center justify-between p-2">
                     <Link to="/" className="active:scale-95 transition-transform">
                         <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-xs shadow-primary/20">
                             <ShoppingBag className="w-4.5 h-4.5 text-white" />
@@ -69,7 +69,7 @@ export default function AlbumPage({ data }: AlbumPageProps) {
                 </div>
             </header>
 
-            <main className="mx-auto max-w-lg">
+            <main className="mx-auto max-w-xl w-full">
                 {view === "list" ? (
                     <div>
                         {data.products.map((p) => (

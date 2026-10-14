@@ -26,8 +26,8 @@ export default function ProductGridItem({ product, isSelected, onToggle, onOpen 
                             onToggle(product.id);
                         }}
                         aria-label={isSelected ? "Remove from selection" : "Add to selection"}
-                        className={`absolute top-2 right-2 flex h-9 w-9 items-center justify-center rounded-full border text-base backdrop-blur-md transition-all duration-300 ${
-                            isSelected ? "border-white bg-white text-stone-900" : "border-white/40 bg-black/20 text-white"
+                        className={`absolute top-2 right-2 flex h-9 w-9 items-center justify-center rounded-full text-base backdrop-blur-md transition-all duration-300 ${
+                            isSelected ? "bg-emerald-800 text-white shadow-md" : "border border-white/40 bg-black/20 text-white"
                         }`}
                     >
                         {isSelected ? "✓" : "+"}

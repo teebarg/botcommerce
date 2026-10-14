@@ -114,9 +114,9 @@ function RouteComponent() {
     };
 
     return (
-        <div className="px-2 py-4">
+        <div className="py-4">
             <GalleryImagesUpload />
-            <div className="glass sticky top-[calc(var(--sat)+var(--admin-nav-height))] z-40 -mx-2 p-2 mb-4 flex items-center justify-between border-b border-border">
+            <div className="glass sticky top-[calc(var(--sat)+var(--admin-nav-height))] z-40 p-2 flex items-center justify-between border-b border-border">
                 <div className="flex items-center gap-0.5 bg-muted rounded-lg p-0.5">
                     <Button
                         size="icon"
@@ -157,7 +157,7 @@ function RouteComponent() {
             ) : items.length > 0 ? (
                 <InfiniteResourceList
                     className={cn(
-                        "mb-8 w-full grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2",
+                        "space-y-0 mb-8 w-full grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 sm:gap-2",
                         viewMode === "grid" ? "" : "grid-cols-1"
                     )}
                     items={items}

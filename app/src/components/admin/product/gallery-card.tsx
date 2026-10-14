@@ -52,7 +52,7 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, onCl
     return (
         <div
             className={cn(
-                "relative w-full aspect-gallery overflow-hidden bg-secondary border border-border rounded-1xl transition-all duration-200 shadow-xs hover:shadow-md",
+                "relative w-full aspect-gallery overflow-hidden bg-secondary transition-all duration-200 shadow-xs hover:shadow-md",
                 selectionMode ? "cursor-pointer" : "cursor-default",
                 isSelected ? "ring-2 ring-primary ring-offset-1" : ""
             )}
