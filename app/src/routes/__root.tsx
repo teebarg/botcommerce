@@ -22,6 +22,7 @@ import ImpersonationBanner from "@/components/impersonation-banner";
 import { SafeAreaDebug } from "@/components/safe-area-debug";
 import { authQueryOptions } from "@/hooks/useUser";
 import { baseURL } from "@/utils/api";
+
 const PushPermission = lazy(() => import("@/components/push-permission"));
 
 interface RouterContext extends AppSession {
