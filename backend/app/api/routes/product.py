@@ -293,7 +293,7 @@ class CampaignIn(BaseModel):
 def _s(v):
     return v.decode() if isinstance(v, bytes) else v
 
-@router.post("/admin/campaigns")
+@router.post("/admin/campaigns", dependencies=[Depends(require_admin)])
 async def create_campaign(body: CampaignIn, srv: ProductDep):
     redis = srv.cache_srv.redis
     code = secrets.token_urlsafe(6)  # ~8 chars, unguessable
@@ -334,7 +334,7 @@ async def get_campaign(code: str, srv: ProductDep):
 
     return {"title": data["title"], "products": items}
 
-@router.get("/admin/campaigns")
+@router.get("/admin/campaigns", dependencies=[Depends(require_admin)])
 async def list_campaigns(srv: ProductDep):
     redis = srv.cache_srv.redis
     codes = [_s(c) for c in await redis.smembers("campaigns:index")]
@@ -361,7 +361,7 @@ async def list_campaigns(srv: ProductDep):
     return campaigns
 
 
-@router.delete("/admin/campaigns/{code}")
+@router.delete("/admin/campaigns/{code}", dependencies=[Depends(require_admin)])
 async def delete_campaign(code: str, srv: ProductDep):
     redis = srv.cache_srv.redis
     deleted = await redis.delete(f"campaign:{code}")
