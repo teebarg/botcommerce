@@ -1,5 +1,5 @@
 import * as React from "react";
-import { baseURL } from "@/utils/api";
+import { APP_URL } from "@/utils";
 
 const IMAGE_LOAD_MODE = {
     ORIGINAL: "original",
@@ -30,7 +30,7 @@ interface LoadState {
     mode: ImageLoadMode;
 }
 
-const FALLBACK_IMAGE_URL = `${baseURL}/placeholder.jpg`;
+const FALLBACK_IMAGE_URL = `${APP_URL}/placeholder.jpg`;
 
 const Image = React.forwardRef<HTMLImageElement, ImageProps>(
     (

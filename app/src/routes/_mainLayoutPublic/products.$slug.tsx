@@ -3,7 +3,7 @@ import { seo } from "@/utils/seo";
 import { productQuery } from "@/queries/user.queries";
 import NotFound from "@/components/generic/not-found";
 import ProductPageLoader from "@/components/store/products/product-page-loader";
-import { baseURL } from "@/utils/api";
+import { APP_URL } from "@/utils";
 
 export const Route = createFileRoute("/_mainLayoutPublic/products/$slug")({
     loader: async ({ context: { queryClient }, params: { slug } }) => {
@@ -36,14 +36,14 @@ export const Route = createFileRoute("/_mainLayoutPublic/products/$slug")({
             links: [
                 {
                     rel: 'canonical',
-                    href: `${baseURL}/products/${product.slug}`,
+                    href: `${APP_URL}/products/${product.slug}`,
                 },
             ],
             meta: [
                 ...seo({
                     title,
                     description: product.description || "",
-                    url: `${baseURL}/products/${product.slug}`,
+                    url: `${APP_URL}/products/${product.slug}`,
                     image: product.images?.[0]?.image,
                     name: title,
                 }),

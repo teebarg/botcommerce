@@ -14,14 +14,13 @@ import { InvalidateProvider } from "@/providers/invalidate-provider";
 import PageTransitionLoader from "@/components/generic/page-transition-loader";
 import PWABadge from "@/PWAbadge";
 import { AppSession } from "@/utils/session";
-import { getSessionId } from "@/utils";
+import { APP_URL, getSessionId } from "@/utils";
 import { Analytics } from "@vercel/analytics/react";
 import { useSettingsQuery } from "@/hooks/useGeneric";
 import { lazy, Suspense, useEffect, useState } from "react";
 import ImpersonationBanner from "@/components/impersonation-banner";
 import { SafeAreaDebug } from "@/components/safe-area-debug";
 import { authQueryOptions } from "@/hooks/useUser";
-import { baseURL } from "@/utils/api";
 
 const PushPermission = lazy(() => import("@/components/push-permission"));
 
@@ -60,7 +59,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
                 ...seo({
                     title,
                     description,
-                    url: `${baseURL}`,
+                    url: APP_URL,
                     image: "/default-og.png",
                     name: title,
                 }),

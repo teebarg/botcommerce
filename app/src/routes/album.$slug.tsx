@@ -1,7 +1,7 @@
 import AlbumPage from "@/components/album/AlbumPage";
 import NotFound from "@/components/generic/not-found";
 import { getCampaignFn } from "@/server/product.server";
-import { baseURL } from "@/utils/api";
+import { APP_URL } from "@/utils";
 import { queryOptions } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
@@ -40,7 +40,7 @@ export const Route = createFileRoute("/album/$slug")({
                 { property: "og:title", content: title },
                 { property: "og:description", content: description },
                 { property: "og:type", content: "website" },
-                { property: "og:url", content: `${baseURL}/album/${params.slug}` },
+                { property: "og:url", content: `${APP_URL}/album/${params.slug}` },
                 ...(image
                     ? [
                           { property: "og:image", content: image },
