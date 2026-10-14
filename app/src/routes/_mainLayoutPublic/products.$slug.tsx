@@ -45,7 +45,6 @@ export const Route = createFileRoute("/_mainLayoutPublic/products/$slug")({
                     description: product.description || "",
                     url: `${APP_URL}/products/${product.slug}`,
                     image: product.images?.[0]?.image,
-                    name: title,
                 }),
             ],
         };

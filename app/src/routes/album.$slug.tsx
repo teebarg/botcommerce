@@ -2,6 +2,7 @@ import AlbumPage from "@/components/album/AlbumPage";
 import NotFound from "@/components/generic/not-found";
 import { getCampaignFn } from "@/server/product.server";
 import { APP_URL } from "@/utils";
+import { seo } from "@/utils/seo";
 import { queryOptions } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
@@ -31,26 +32,13 @@ export const Route = createFileRoute("/album/$slug")({
             ? `${count} piece${count === 1 ? "" : "s"} picked for you. Tap to browse and select.`
             : "Browse and select pieces from fashion album.";
 
-        const image = campaign?.products?.[0]?.image;
-
         return {
-            meta: [
-                { title },
-                { name: "description", content: description },
-                { property: "og:title", content: title },
-                { property: "og:description", content: description },
-                { property: "og:type", content: "website" },
-                { property: "og:url", content: `${APP_URL}/album/${params.slug}` },
-                ...(image
-                    ? [
-                          { property: "og:image", content: image },
-                          { property: "og:image:width", content: "1200" },
-                          { property: "og:image:height", content: "630" },
-                          { name: "twitter:image", content: image },
-                      ]
-                    : []),
-                { name: "twitter:card", content: "summary_large_image" },
-            ],
+            meta: seo({
+                title,
+                description,
+                url: `${APP_URL}/album/${params.slug}`,
+                image: campaign?.products?.[0]?.image,
+            }),
         };
     },
     component: RouteComponent,
