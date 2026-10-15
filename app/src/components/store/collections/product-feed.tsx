@@ -54,6 +54,7 @@ export function ProductFeed({ params }: Props) {
     if (products.length === 0) {
         return <NoProductsFound />;
     }
+
     return (
         <>
             <div className="mb-3 flex items-center justify-between gap-2 px-2">
