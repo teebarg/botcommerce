@@ -1,0 +1,71 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { ProductSearch } from "@/schemas/product";
+import { defaultVariant, getPriceInfo, variantLabel } from "@/lib/variant";
+
+/** Minimal snapshot saved to storage: enough to build the WhatsApp message, nothing heavy. */
+export type SelectedItem = {
+    id: number;
+    slug: string;
+    name: string;
+    price: number;
+    label?: string;
+};
+
+const STORAGE_KEY = "quick-order:v1";
+const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // drop selections nobody came back to within a week
+
+export function toSelectedItem(p: ProductSearch): SelectedItem {
+    return {
+        id: p.id,
+        slug: p.slug,
+        name: p.name,
+        price: getPriceInfo(p).minPrice,
+        label: variantLabel(defaultVariant(p)) || undefined,
+    };
+}
+
+function load(): SelectedItem[] {
+    try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [];
+        const { savedAt, items } = JSON.parse(raw);
+        if (!Array.isArray(items) || Date.now() - savedAt > MAX_AGE_MS) return [];
+        return items.filter((i: SelectedItem) => typeof i?.id === "number" && typeof i?.slug === "string");
+    } catch {
+        return [];
+    }
+}
+
+/**
+ * Selection that survives refreshes until it is cleared (e.g. after sending to WhatsApp).
+ * Starts empty and hydrates after mount so server and client render the same HTML.
+ */
+export function useQuickOrderSelection() {
+    const [items, setItems] = useState<SelectedItem[]>([]);
+    const [hydrated, setHydrated] = useState(false);
+
+    useEffect(() => {
+        setItems(load());
+        setHydrated(true);
+    }, []);
+
+    // Only write after hydrating, otherwise the initial empty state would wipe what was saved
+    useEffect(() => {
+        if (!hydrated) return;
+        try {
+            if (items.length === 0) window.localStorage.removeItem(STORAGE_KEY);
+            else window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ savedAt: Date.now(), items }));
+        } catch {
+            /* storage blocked (private mode, quota): selection still works for this visit */
+        }
+    }, [items, hydrated]);
+
+    const toggle = useCallback((item: SelectedItem) => {
+        setItems((prev) => (prev.some((i) => i.id === item.id) ? prev.filter((i) => i.id !== item.id) : [...prev, item]));
+    }, []);
+
+    const clear = useCallback(() => setItems([]), []);
+    const ids = useMemo(() => new Set(items.map((i) => i.id)), [items]);
+
+    return { items, ids, toggle, clear };
+}

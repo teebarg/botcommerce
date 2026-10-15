@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { X, Trash2, MessageCircle } from "lucide-react";
-import LazyImage from "./LazyImage";
+import LazyImage from "@/components/LazyImage";
 import { currency } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { useConfig } from "@/providers/store-provider";

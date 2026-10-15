@@ -1,44 +1,69 @@
 import type React from "react";
+import { useEffect, useRef } from "react";
+import { Link } from "@tanstack/react-router";
 import { Home, Search, User } from "lucide-react";
 import StoreMenuComp from "./store-mobile-menu-drawer";
 import { CartComponent } from "@/components/store/cart/cart-component";
-import LocalizedClientLink from "@/components/ui/link";
+import { TAB_ITEM_CLASS, TabIcon } from "./TabIcon";
+
+interface NavLink {
+    icon: React.ElementType;
+    label: string;
+    href: string;
+    exact?: boolean;
+}
+
+const NAV: NavLink[] = [
+    { icon: Home, label: "Home", href: "/", exact: true }, // exact, otherwise "/" would match every page
+    { icon: Search, label: "Shop", href: "/collections" },
+    { icon: User, label: "Account", href: "/account" },
+];
 
 const ButtonNav = () => {
-    interface NavLink {
-        icon: React.ReactNode;
-        label: string;
-        href: string;
-    }
+    const navRef = useRef<HTMLElement>(null);
 
-    const nav: NavLink[] = [
-        { icon: <Home className="h-7 w-7" />, label: "Home", href: "/" },
-        { icon: <Search className="h-7 w-7" />, label: "Shop", href: "/collections" },
-        { icon: <User className="h-7 w-7" />, label: "Account", href: "/account" },
-    ];
+    // Publish the nav's real height (safe-area included) as --bottom-nav-h so other fixed bars,
+    // like the quick-order bar, can sit above it. It reads 0 when the nav is hidden.
+    useEffect(() => {
+        const el = navRef.current;
+        if (!el) return;
+        const root = document.documentElement;
+        const update = () => root.style.setProperty("--bottom-nav-h", `${el.offsetHeight}px`);
+        update();
+        const observer = new ResizeObserver(update);
+        observer.observe(el);
+        return () => {
+            observer.disconnect();
+            root.style.removeProperty("--bottom-nav-h");
+        };
+    }, []);
 
     return (
         <nav
-            className="md:hidden fixed bottom-0 inset-x-0 z-40 glass shadow-xl flex items-center justify-between px-8 pt-3 text-2xs"
-            style={{ paddingBottom: `calc(var(--sab) + 12px)` }}
+            ref={navRef}
+            aria-label="Main"
+            className="md:hidden [html[data-quick-order]_&]:hidden fixed bottom-0 inset-x-0 z-40 glass shadow-xl"
+            style={{ paddingBottom: `calc(var(--sab) + 8px)` }}
         >
-            {nav.map((item: NavLink, idx: number) => (
-                <div key={idx} className="flex flex-col items-center">
-                    <LocalizedClientLink
-                        active="bg-gradient-primary text-white rounded-xl"
-                        className="p-1.5"
-                        href={item.href}
-                    >
-                        {item.icon}
-                    </LocalizedClientLink>
-                    {item.label}
-                </div>
-            ))}
-            <div className="flex flex-col items-center gap-1">
-                <CartComponent />
-                Cart
-            </div>
-            <StoreMenuComp />
+            <ul className="flex items-stretch justify-around px-2 pt-2">
+                {NAV.map(({ icon: Icon, label, href, exact }) => (
+                    <li key={href} className="min-w-0 flex-1">
+                        {/* The whole item is the link: tapping the label works too. TanStack's Link adds aria-current="page" when active. */}
+                        <Link to={href} activeOptions={{ exact }} preload={false} className={TAB_ITEM_CLASS}>
+                            <TabIcon>
+                                <Icon className="h-7 w-7" />
+                            </TabIcon>
+                            {label}
+                        </Link>
+                    </li>
+                ))}
+                <li className="min-w-0 flex-1">
+                    <CartComponent variant="tab" />
+                </li>
+                <li className="min-w-0 flex-1">
+                    <StoreMenuComp />
+                </li>
+            </ul>
         </nav>
     );
 };
