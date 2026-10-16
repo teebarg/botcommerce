@@ -54,6 +54,8 @@ export const useSettingsQuery = () =>
     queryOptions({
         queryKey: ["shop-settings", "config"],
         queryFn: () => getShopSettingsFn(),
+        staleTime: 1000 * 60 * 60 * 12, // 12 hours
+        gcTime: 1000 * 60 * 60 * 24 * 2, // 2 days
     });
 
 export interface CreateShopSettingInput {

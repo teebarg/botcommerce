@@ -60,7 +60,7 @@ export function QuickOrderBar({ items, onRemove, onClear, onSent }: QuickOrderBa
     return (
         <div
             ref={barRef}
-            className="fixed inset-x-0 bottom-[calc(var(--bottom-nav-h,0px)_*_var(--chrome-visible,1))] z-30 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-md transition-[bottom] duration-300 motion-reduce:transition-none md:pb-[max(0.75rem,env(safe-area-inset-bottom))] [html[data-quick-order]_&]:pb-[max(0.75rem,env(safe-area-inset-bottom))] [html[data-chrome-hidden]_&]:pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+            className="fixed inset-x-0 bottom-[calc(var(--bottom-nav-h,0px)_*_var(--chrome-visible,1))] z-30 border-t border-border bg-background/95 px-4 py-3 transition-[bottom] duration-300 motion-reduce:transition-none md:pb-[max(0.75rem,env(safe-area-inset-bottom))] [html[data-quick-order]_&]:pb-[max(0.75rem,env(safe-area-inset-bottom))] [html[data-chrome-hidden]_&]:pb-[max(0.75rem,env(safe-area-inset-bottom))]"
         >
             <div className="mx-auto max-w-6xl">
                 {expanded && (

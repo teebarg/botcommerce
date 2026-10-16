@@ -61,7 +61,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, 
                     <span
                         aria-hidden
                         className={cn(
-                            "absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-md transition-all duration-200",
+                            "absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-200",
                             selected ? "bg-emerald-800 text-white shadow-md" : "border-white/50 bg-black/25 text-white"
                         )}
                     >

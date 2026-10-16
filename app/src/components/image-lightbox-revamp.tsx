@@ -103,7 +103,7 @@ export function ImageLightbox({
     return (
         <div
             ref={containerRef}
-            className="fixed inset-0 z-50 flex flex-col bg-black/95 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex flex-col bg-black/95"
             role="dialog"
             aria-modal="true"
             aria-label="Image lightbox"
@@ -114,7 +114,7 @@ export function ImageLightbox({
                 </div>
                 <button
                     onClick={() => onOpenChange(false)}
-                    className="rounded-full p-2 text-white/70 transition-colors hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/50"
+                    className="rounded-full p-2 text-white/70 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
                     aria-label="Close lightbox"
                 >
                     <X className="h-6 w-6" />
@@ -124,7 +124,7 @@ export function ImageLightbox({
             <div className="relative flex flex-1 items-center justify-center overflow-hidden px-4 sm:px-12">
                 <button
                     onClick={goToPrevious}
-                    className="absolute left-2 z-10 rounded-full bg-white/10 p-2 text-white/80 backdrop-blur-md transition-colors hover:bg-white/20 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/50 sm:left-4 sm:p-3"
+                    className="absolute left-2 z-10 rounded-full bg-white/10 p-2 text-white/80 transition-colors hover:bg-white/20 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/50 sm:left-4 sm:p-3"
                     aria-label="Previous image"
                 >
                     <ChevronLeft className="h-6 w-6 sm:h-8 sm:w-8" />
@@ -145,7 +145,7 @@ export function ImageLightbox({
 
                 <button
                     onClick={goToNext}
-                    className="absolute right-2 z-10 rounded-full bg-white/10 p-2 text-white/80 backdrop-blur-md transition-colors hover:bg-white/20 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/50 sm:right-4 sm:p-3"
+                    className="absolute right-2 z-10 rounded-full bg-white/10 p-2 text-white/80 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 sm:right-4 sm:p-3"
                     aria-label="Next image"
                 >
                     <ChevronRight className="h-6 w-6 sm:h-8 sm:w-8" />

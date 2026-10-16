@@ -3,14 +3,13 @@
         "filePath": "../frontend-context.md"
     },
     "include": [
-        "src/**/*.{ts,tsx,js,jsx,mdx}"
+        "src/**/*.{ts,tsx,js,jsx,mdx,css}"
     ],
     "ignore": {
         "useGitignore": true,
         "useDefaultPatterns": true,
         "customPatterns": [
             ".git",
-            ".env",
             ".next",
             "node_modules",
             "out",
