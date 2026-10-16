@@ -15,6 +15,8 @@ services:
         condition: service_healthy
     networks:
       - dev-net
+    ports:
+      - "5100:3000"
     labels:
       - traefik.enable=true
       - traefik.docker.network=dev-net

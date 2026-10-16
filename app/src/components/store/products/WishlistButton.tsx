@@ -28,7 +28,7 @@ export function WishlistButton({ productId, className }: { productId: number; cl
             onClick={handleClick}
             disabled={isPending}
             className={cn(
-                "grid h-9 w-9 shrink-0 place-items-center rounded-full border border-border/70 bg-card/90 backdrop-blur-sm transition-colors duration-300 hover:border-foreground/30",
+                "grid h-9 w-9 shrink-0 place-items-center rounded-full border border-border/70 bg-card/90 transition-colors duration-300 hover:border-foreground/30",
                 className
             )}
         >

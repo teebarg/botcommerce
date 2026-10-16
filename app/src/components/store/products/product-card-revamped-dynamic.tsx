@@ -62,7 +62,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, 
                         aria-hidden
                         className={cn(
                             "absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-md transition-all duration-200",
-                            selected ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-white/50 bg-black/25 text-white"
+                            selected ? "bg-emerald-800 text-white shadow-md" : "border-white/50 bg-black/25 text-white"
                         )}
                     >
                         {selected ? <Check className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
@@ -77,7 +77,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, 
                             e.preventDefault();
                             onClick();
                         }}
-                        className="absolute bottom-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm"
+                        className="absolute bottom-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white"
                     >
                         <Maximize2 className="h-4 w-4" />
                     </button>
