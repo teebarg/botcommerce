@@ -32,7 +32,10 @@ const StoreNavbar = () => {
     }, []);
 
     return (
-        <header ref={navRef} className="fixed top-0 inset-x-0 z-50 w-full glass">
+        <header
+            ref={navRef}
+            className="fixed top-0 inset-x-0 z-50 w-full glass transition-transform duration-300 motion-reduce:transition-none max-md:[html[data-chrome-hidden]_&]:-translate-y-full"
+        >
             <div className="w-full max-w-7xl mx-auto px-2">
                 <div className="flex md:hidden items-center justify-between py-2.5 pt-[calc(var(--sat)+10px)] w-full gap-2">
                     <div className="flex items-center gap-1.5 shrink-0">
@@ -58,7 +61,9 @@ const StoreNavbar = () => {
                                 >
                                     <span className="text-xs font-display font-medium text-primary-foreground whitespace-nowrap">Checkout</span>
                                     <span className="w-[3px] h-[3px] rounded-full bg-primary-foreground/40 shrink-0" />
-                                    <span className="text-xs font-medium text-primary-foreground/75 whitespace-nowrap">{currency(cart?.subtotal ?? 0)}</span>
+                                    <span className="text-xs font-medium text-primary-foreground/75 whitespace-nowrap">
+                                        {currency(cart?.subtotal ?? 0)}
+                                    </span>
                                     <span className="w-6 h-6 rounded-full bg-primary-foreground/15 flex items-center justify-center shrink-0">
                                         <ArrowRight className="w-3.5 h-3.5 text-primary-foreground animate-icon-bounce" />
                                     </span>

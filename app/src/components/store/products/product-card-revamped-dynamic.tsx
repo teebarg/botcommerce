@@ -90,7 +90,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, 
                         </Badge>
                     )}
                     <div className="flex items-start gap-1.5">
-                        <span className="text-white text-lg font-medium drop-shadow-sm">{currency(minPrice)}</span>
+                        <span className="text-white text-lg sm:text-xl font-medium drop-shadow-sm">{currency(minPrice)}</span>
                         {!outOfStock && hasDiscount && (
                             <span className="bg-destructive text-destructive-foreground text-2xs font-medium px-1 py-0.5 rounded-full">
                                 -{maxDiscountPercent}% off

@@ -60,7 +60,7 @@ export function QuickOrderBar({ items, onRemove, onClear, onSent }: QuickOrderBa
     return (
         <div
             ref={barRef}
-            className="fixed inset-x-0 bottom-[var(--bottom-nav-h,0px)] z-30 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-md md:pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+            className="fixed inset-x-0 bottom-[calc(var(--bottom-nav-h,0px)_*_var(--chrome-visible,1))] z-30 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-md transition-[bottom] duration-300 motion-reduce:transition-none md:pb-[max(0.75rem,env(safe-area-inset-bottom))] [html[data-quick-order]_&]:pb-[max(0.75rem,env(safe-area-inset-bottom))] [html[data-chrome-hidden]_&]:pb-[max(0.75rem,env(safe-area-inset-bottom))]"
         >
             <div className="mx-auto max-w-6xl">
                 {expanded && (
@@ -99,14 +99,13 @@ export function QuickOrderBar({ items, onRemove, onClear, onSent }: QuickOrderBa
                         </ul>
                     </div>
                 )}
-
                 <div className="flex items-center gap-3">
                     <button
                         type="button"
                         onClick={() => setExpanded((v) => !v)}
                         aria-expanded={expanded}
                         aria-controls="quick-order-list"
-                        className="min-w-0 flex-1 rounded-lg py-1 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="min-w-0 flex-1 rounded-lg py-1 text-left outline-none"
                     >
                         <span className="flex items-center gap-1 text-sm font-medium">
                             {items.length} selected

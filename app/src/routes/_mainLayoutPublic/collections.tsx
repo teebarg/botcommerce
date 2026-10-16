@@ -9,6 +9,7 @@ import { PageLoader } from "@/components/generic/page-loader";
 import { ProductFeed } from "@/components/store/collections/product-feed";
 import { Suspense } from "react";
 import { productFeedInfiniteQuery } from "@/queries/user.queries";
+import { useAutoHideChrome } from "@/hooks/useAutoHideChrome";
 
 export const Route = createFileRoute("/_mainLayoutPublic/collections")({
     validateSearch: FeedQuerySchema,
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/_mainLayoutPublic/collections")({
 function RouteComponent() {
     const search = Route.useSearch();
     const sidebarRef = useRef<FilterSidebarRef>(null);
+    useAutoHideChrome({ enabled: true });
 
     return (
         <div className="max-w-8xl mx-auto w-full py-2">

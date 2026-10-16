@@ -42,7 +42,7 @@ const ButtonNav = () => {
         <nav
             ref={navRef}
             aria-label="Main"
-            className="md:hidden [html[data-quick-order]_&]:hidden fixed bottom-0 inset-x-0 z-40 glass shadow-xl"
+            className="md:hidden [html[data-quick-order]_&]:hidden fixed bottom-0 inset-x-0 z-40 glass shadow-xl transition-transform duration-300 motion-reduce:transition-none [html[data-chrome-hidden]_&]:translate-y-full"
             style={{ paddingBottom: `calc(var(--sab) + 8px)` }}
         >
             <ul className="flex items-stretch justify-around px-2 pt-2">
