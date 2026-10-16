@@ -2,17 +2,17 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ProductSearch } from "@/schemas/product";
 import { defaultVariant, getPriceInfo, variantLabel } from "@/lib/variant";
 
-/** Minimal snapshot saved to storage: enough to build the WhatsApp message, nothing heavy. */
 export type SelectedItem = {
     id: number;
     slug: string;
     name: string;
     price: number;
     label?: string;
+    image?: string;
 };
 
 const STORAGE_KEY = "quick-order:v1";
-const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // drop selections nobody came back to within a week
+const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // keep for a week
 
 export function toSelectedItem(p: ProductSearch): SelectedItem {
     return {
@@ -21,6 +21,7 @@ export function toSelectedItem(p: ProductSearch): SelectedItem {
         name: p.name,
         price: getPriceInfo(p).minPrice,
         label: variantLabel(defaultVariant(p)) || undefined,
+        image: p.image || undefined,
     };
 }
 
@@ -64,8 +65,12 @@ export function useQuickOrderSelection() {
         setItems((prev) => (prev.some((i) => i.id === item.id) ? prev.filter((i) => i.id !== item.id) : [...prev, item]));
     }, []);
 
+    const remove = useCallback((id: number) => {
+        setItems((prev) => prev.filter((i) => i.id !== id));
+    }, []);
+
     const clear = useCallback(() => setItems([]), []);
     const ids = useMemo(() => new Set(items.map((i) => i.id)), [items]);
 
-    return { items, ids, toggle, clear };
+    return { items, ids, toggle, remove, clear };
 }
