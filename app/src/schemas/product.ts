@@ -132,6 +132,8 @@ export const FeedQuerySchema = z.object({
     min_price: z.coerce.number().optional(),
     max_price: z.coerce.number().optional(),
     cursor: z.string().optional(),
+    mode: z.literal("quick").optional().catch(undefined),
+    view: z.enum(["list", "grid"]).optional().catch(undefined),
 });
 
 export const GalleryQuerySchema = z.object({

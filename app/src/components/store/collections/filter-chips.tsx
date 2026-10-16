@@ -60,7 +60,7 @@ const FilterChips = () => {
 
     return (
         <div
-            className="flex gap-1 z-50 overflow-x-auto -mx-2 md:mx-0 px-2 md:px-0 py-3.5 scrollbar-hide sticky glass"
+            className="flex gap-1 z-50 overflow-x-auto px-2 md:px-0 py-3.5 scrollbar-hide sticky glass"
             style={{ top: "var(--nav-height)" }}
             role="tablist"
             aria-label="Discovery filters"

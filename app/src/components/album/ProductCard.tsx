@@ -1,6 +1,6 @@
 import { currency } from "@/utils";
 import { Badge } from "@/components/ui/badge";
-import LazyImage from "./LazyImage";
+import LazyImage from "@/components/LazyImage";
 
 export default function ProductCard({ product, isSelected, onToggle }: { product: any; isSelected: boolean; onToggle: (id: number) => void }) {
     const outOfStock = product.status === "OUT_OF_STOCK";

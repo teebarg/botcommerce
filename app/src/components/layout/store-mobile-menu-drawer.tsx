@@ -1,15 +1,14 @@
 import { useEffect } from "react";
 import { useOverlayTriggerState } from "react-stately";
-import { MenuIcon } from "lucide-react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
 import { Link, useLocation, useRouteContext } from "@tanstack/react-router";
 import { cn } from "@/utils/cn";
 import type React from "react";
-import { CreditCard, Heart, Home, LayoutGrid, User2, User as UserIcon } from "lucide-react";
+import { CreditCard, Heart, Home, LayoutGrid, MenuIcon, User2, User as UserIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UserDropdown } from "@/components/user-dropdown";
+import { TAB_ITEM_CLASS, TabIcon } from "./TabIcon";
 
 interface NavLinkProp {
     href: string;
@@ -40,12 +39,12 @@ const StoreMenuComp: React.FC = () => {
     return (
         <Drawer open={state.isOpen} onOpenChange={state.setOpen}>
             <DrawerTrigger asChild>
-                <div aria-label="Menu" className="flex flex-col items-center gap-1">
-                    <Button size="icon" variant="ghost">
+                <button type="button" data-status={state.isOpen ? "active" : undefined} className={TAB_ITEM_CLASS}>
+                    <TabIcon>
                         <MenuIcon className="h-7 w-7" />
-                    </Button>
-                    <p className="text-xs">Menu</p>
-                </div>
+                    </TabIcon>
+                    Menu
+                </button>
             </DrawerTrigger>
             <DrawerContent aria-describedby={undefined} className="drawer-safe">
                 <DrawerHeader className="sr-only">

@@ -1,5 +1,5 @@
 import { currency } from "@/utils";
-import LazyImage from "./LazyImage";
+import LazyImage from "@/components/LazyImage";
 import { Badge } from "@/components/ui/badge";
 
 interface ProductGridItemProps {

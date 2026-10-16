@@ -24,7 +24,7 @@ function RouteComponent() {
     const sidebarRef = useRef<FilterSidebarRef>(null);
 
     return (
-        <div className="max-w-8xl mx-auto w-full py-2 px-1">
+        <div className="max-w-8xl mx-auto w-full py-2">
             <div className="flex gap-6">
                 <aside className="h-[calc(100vh-6rem)] w-80 hidden md:flex flex-col overflow-hidden sticky top-24">
                     <div className="w-full pb-2">
@@ -42,7 +42,7 @@ function RouteComponent() {
                         </Button>
                     </div>
                 </aside>
-                <main className="w-full flex-1 relative px-1 rounded-xl">
+                <main className="w-full flex-1 relative rounded-xl">
                     <FilterChips />
                     <Suspense fallback={<PageLoader variant="grid" />}>
                         <ProductFeed params={{ ...search }} />

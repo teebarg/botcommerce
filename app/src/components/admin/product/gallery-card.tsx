@@ -54,7 +54,6 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, onCl
             className={cn(
                 "relative w-full aspect-gallery overflow-hidden bg-secondary transition-all duration-200 shadow-xs hover:shadow-md",
                 selectionMode ? "cursor-pointer" : "cursor-default",
-                isSelected ? "ring-2 ring-primary ring-offset-1" : ""
             )}
             onClick={() => (selectionMode ? onSelectionChange?.(image.id, !isSelected) : onClick?.(image.id))}
         >

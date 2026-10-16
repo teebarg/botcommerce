@@ -55,8 +55,8 @@ export const ChatBubble = () => {
             {!isOpen && (
                 <button
                     onClick={() => setIsOpen(true)}
-                    className="fixed right-5 z-50 w-14 h-14 rounded-full bg-primary shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
-                    style={{ boxShadow: "0 0 30px hsl(350 89% 60% / 0.4)", bottom: "calc(90px + var(--sab))" }}
+                    className="fixed left-5 md:left-auto md:right-5 z-50 w-14 h-14 rounded-full bg-primary shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
+                    style={{ boxShadow: "0 0 30px hsl(350 89% 60% / 0.4)", bottom: "calc(var(--bottom-nav-h, 0px) + var(--quick-bar-h, 0px) + 1rem)" }}
                 >
                     <MessageCircle className="w-6 h-6 text-primary-foreground" />
                     <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-destructive" />

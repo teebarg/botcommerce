@@ -1,5 +1,5 @@
 import { useSearch } from "@tanstack/react-router";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, MessageCircle } from "lucide-react";
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -12,6 +12,8 @@ import { useCollections } from "@/hooks/useCollection";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import { currency, debounce } from "@/utils";
 import { AGE_OPTIONS, DEFAULT_MAX_PRICE, DEFAULT_MIN_PRICE, SIZE_OPTIONS } from "@/utils/constants";
+import { cn } from "@/utils/cn";
+import { useFeedUi } from "@/hooks/useFeedUi";
 
 export interface FilterSidebarRef {
     apply: () => void;
@@ -78,6 +80,7 @@ const normalizePriceValues = (minStr: string, maxStr: string) => {
 
 export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose }, ref) => {
     const search = useSearch({ strict: false });
+    const { quick, setQuick } = useFeedUi();
     const { updateQuery } = useUpdateQuery();
     const filters = useMemo(() => {
         return {
@@ -205,6 +208,18 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
 
     return (
         <div className="space-y-6">
+            <button
+                type="button"
+                onClick={() => setQuick(!quick)}
+                aria-pressed={quick}
+                className={cn(
+                    "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                    quick ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background text-foreground"
+                )}
+            >
+                <MessageCircle className="h-4 w-4" />
+                {quick ? "Quick order: on" : "Order via WhatsApp"}
+            </button>
             <div className="flex flex-wrap gap-2">
                 {collections?.map((collection) => {
                     const isSelected = draft.collections.has(collection.slug);

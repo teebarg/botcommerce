@@ -128,4 +128,6 @@ export const initializeAppSession = () => {
 const isServer = typeof window === "undefined";
 export const APP_URL = isServer ? process.env.BASE_URL || "http://localhost:5173" : import.meta.env.VITE_BASE_URL || "http://localhost:5173";
 
+export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export { currency, debounce, omit, generateId, timeAgo, formatDate };
