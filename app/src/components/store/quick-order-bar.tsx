@@ -4,8 +4,7 @@ import { currency } from "@/utils";
 import { SelectedItem } from "@/hooks/useQuickOrderSelection";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/utils/cn";
-
-const WHATSAPP_NUMBER = String(import.meta.env.VITE_WHATSAPP_NUMBER ?? "").replace(/\D/g, "");
+import { useConfig } from "@/providers/store-provider";
 
 interface QuickOrderBarProps {
     items: SelectedItem[];
@@ -24,6 +23,7 @@ function buildMessage(items: SelectedItem[], origin: string): string {
 }
 
 export function QuickOrderBar({ items, onRemove, onClear, onSent }: QuickOrderBarProps) {
+    const { whatsapp } = useConfig();
     const [expanded, setExpanded] = useState(false);
     const barRef = useRef<HTMLDivElement>(null);
     const hasItems = items.length > 0;
@@ -52,7 +52,7 @@ export function QuickOrderBar({ items, onRemove, onClear, onSent }: QuickOrderBa
 
     function sendToWhatsApp() {
         const text = buildMessage(items, window.location.origin);
-        const base = WHATSAPP_NUMBER ? `https://wa.me/${WHATSAPP_NUMBER}` : "https://wa.me/";
+        const base = whatsapp ? `https://wa.me/${whatsapp}` : "https://wa.me/";
         window.open(`${base}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
         onSent();
     }

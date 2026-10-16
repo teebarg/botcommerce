@@ -46,8 +46,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, 
         return (
             <div
                 onClick={(e) => {
-                    if (!selectable) return;
-                    // Quick-order mode: the whole card is a select toggle, never a navigation
                     e.preventDefault();
                     if (!outOfStock) onSelect?.();
                 }}

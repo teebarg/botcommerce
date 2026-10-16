@@ -2,7 +2,6 @@ import React, { Suspense } from "react";
 import ButtonNav from "@/components/layout/bottom-navbar";
 import { ChatBubble } from "@/components/store/chat-widget/ChatBubble";
 import StoreNavbar from "@/components/layout/shop-header";
-import FloatingActionDeck from "@/components/store/collections/floating-deck";
 import { LazyInView } from "@/components/LazyInView";
 const Footer = React.lazy(() => import("@/components/layout/footer"));
 
@@ -23,7 +22,6 @@ export function StoreLayoutShell({ children }: StoreLayoutShellProps) {
                 </Suspense>
             </LazyInView>
             <ChatBubble />
-            <FloatingActionDeck />
             <ButtonNav />
         </div>
     );

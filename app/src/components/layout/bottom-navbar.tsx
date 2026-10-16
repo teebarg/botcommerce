@@ -14,7 +14,7 @@ interface NavLink {
 }
 
 const NAV: NavLink[] = [
-    { icon: Home, label: "Home", href: "/", exact: true }, // exact, otherwise "/" would match every page
+    { icon: Home, label: "Home", href: "/", exact: true },
     { icon: Search, label: "Shop", href: "/collections" },
     { icon: User, label: "Account", href: "/account" },
 ];
@@ -48,7 +48,6 @@ const ButtonNav = () => {
             <ul className="flex items-stretch justify-around px-2 pt-2">
                 {NAV.map(({ icon: Icon, label, href, exact }) => (
                     <li key={href} className="min-w-0 flex-1">
-                        {/* The whole item is the link: tapping the label works too. TanStack's Link adds aria-current="page" when active. */}
                         <Link to={href} activeOptions={{ exact }} preload={false} className={TAB_ITEM_CLASS}>
                             <TabIcon>
                                 <Icon className="h-7 w-7" />

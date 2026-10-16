@@ -37,10 +37,6 @@ function load(): SelectedItem[] {
     }
 }
 
-/**
- * Selection that survives refreshes until it is cleared (e.g. after sending to WhatsApp).
- * Starts empty and hydrates after mount so server and client render the same HTML.
- */
 export function useQuickOrderSelection() {
     const [items, setItems] = useState<SelectedItem[]>([]);
     const [hydrated, setHydrated] = useState(false);

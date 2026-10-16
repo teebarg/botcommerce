@@ -11,6 +11,7 @@ import { QuickOrderBar } from "../quick-order-bar";
 import { cn } from "@/utils/cn";
 import { toSelectedItem, useQuickOrderSelection } from "@/hooks/useQuickOrderSelection";
 import { FloatingViewToggle } from "../floating-view-toggle";
+import FloatingActionDeck from "./floating-deck";
 
 const HIDE_NAV_WHILE_SELECTING = true;
 
@@ -59,6 +60,7 @@ export function ProductFeed({ params }: Props) {
     return (
         <>
             <FloatingViewToggle view={view} onChange={setView} />
+            <FloatingActionDeck />
             <div className={cn(quick && selectedItems.length > 0 && "pb-[calc(6rem+var(--bottom-nav-h,0px))]")}>
                 <InfiniteList hasMore={!!hasNextPage} isLoading={isFetchingNextPage} onLoadMore={fetchNextPage}>
                     <div

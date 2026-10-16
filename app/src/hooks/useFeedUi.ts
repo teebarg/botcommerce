@@ -15,7 +15,6 @@ export function useFeedUi() {
     const navigate = useNavigate();
 
     const quick = search.mode === "quick";
-    // Quick mode defaults to one column; normal mode keeps today's 2-column grid
     const view: FeedView = search.view ?? (quick ? "list" : "grid");
 
     const update = useCallback(

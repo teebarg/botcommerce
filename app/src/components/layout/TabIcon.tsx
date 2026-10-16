@@ -2,9 +2,6 @@ import type { ReactNode } from "react";
 import { cn } from "@/utils/cn";
 
 /**
- * Shared look for every item in the mobile bottom nav (links AND buttons), so they all
- * behave the same: the whole item (icon + label) is one tap target, at least 48px tall.
- *
  * Active state is driven by `data-status="active"`:
  *  - TanStack Router's <Link> sets it automatically (plus aria-current="page")
  *  - buttons (Cart, Menu) set it themselves while their overlay is open
