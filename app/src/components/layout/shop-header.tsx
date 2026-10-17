@@ -34,10 +34,10 @@ const StoreNavbar = () => {
     return (
         <header
             ref={navRef}
-            className="fixed top-0 inset-x-0 z-50 w-full glass transition-transform duration-300 motion-reduce:transition-none max-md:[html[data-chrome-hidden]_&]:-translate-y-full"
+            className="sticky top-[var(--sat)] inset-x-0 z-50 w-full glass transition-transform duration-300 motion-reduce:transition-none max-md:[html[data-chrome-hidden]_&]:-translate-y-full"
         >
             <div className="w-full max-w-7xl mx-auto px-2">
-                <div className="flex md:hidden items-center justify-between py-2.5 pt-[calc(var(--sat)+10px)] w-full gap-2">
+                <div className="flex md:hidden items-center justify-between py-2.5 w-full gap-2">
                     <div className="flex items-center gap-1.5 shrink-0">
                         <BackButton />
                         <Link to="/" className="active:scale-95 transition-transform">

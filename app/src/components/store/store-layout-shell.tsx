@@ -13,7 +13,7 @@ export function StoreLayoutShell({ children }: StoreLayoutShellProps) {
     return (
         <div className="flex flex-col min-h-screen">
             <StoreNavbar />
-            <main className="flex-1 flex flex-col pt-[var(--nav-height)] pb-8">
+            <main className="flex-1 flex flex-col pb-8">
                 {children}
             </main>
             <LazyInView>
