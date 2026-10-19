@@ -65,8 +65,8 @@ export function ProductFeed({ params }: Props) {
                 <InfiniteList hasMore={!!hasNextPage} isLoading={isFetchingNextPage} onLoadMore={fetchNextPage}>
                     <div
                         className={cn(
-                            "grid md:grid-cols-3 lg:grid-cols-4 md:gap-2",
-                            quick ? " sm:gap-1.5" : "gap-1.5",
+                            "grid md:grid-cols-3 lg:grid-cols-4",
+                            quick ? "" : "gap-1.5 md:gap-2",
                             view === "list" ? "grid-cols-1" : "grid-cols-2"
                         )}
                     >
