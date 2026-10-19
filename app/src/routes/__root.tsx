@@ -161,7 +161,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 />
                 {import.meta.env.MODE !== "production" && (
                     <>
-                        <ReactQueryDevtools buttonPosition="top-left" initialIsOpen={false} />
+                        {/* <ReactQueryDevtools buttonPosition="top-left" initialIsOpen={false} /> */}
                         <SafeAreaDebug />
                     </>
                 )}

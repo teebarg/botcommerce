@@ -85,7 +85,7 @@ export function GalleryImagesUpload() {
             onOpenChange={uploadState.setOpen}
         >
             <div className="pt-6 pb-12 px-2">
-                <ProductImageUploader onComplete={uploadState.close} />
+                <ProductImageUploader maxFiles={20} onComplete={uploadState.close} />
             </div>
         </SheetDrawer>
     );
