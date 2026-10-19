@@ -13,7 +13,7 @@ function RouteComponent() {
             <AdminSidebar />
             <main className="flex-1 flex flex-col">
                 <AdminNavbar />
-                <div className="flex-1 flex flex-col">
+                <div className="flex-1 flex flex-col pb-[var(--sab)]">
                     <Outlet />
                 </div>
             </main>

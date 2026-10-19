@@ -61,7 +61,7 @@ const FilterChips = () => {
     return (
         <div
             className="flex gap-1 z-50 overflow-x-auto px-2 md:px-0 py-3.5 scrollbar-hide sticky glass transition-transform duration-300 motion-reduce:transition-none max-md:[html[data-chrome-hidden]_&]:-translate-y-[calc(100%+var(--nav-height))]"
-            style={{ top: "calc(var(--nav-height) + var(--sat))" }}
+            style={{ top: "var(--nav-height)" }}
             role="tablist"
             aria-label="Discovery filters"
         >

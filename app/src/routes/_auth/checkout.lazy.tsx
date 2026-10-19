@@ -29,9 +29,9 @@ function RouteComponent() {
         return <ServerError error={error.message} scenario="checkout" stack={error.stack} />;
     }
     return (
-        <div className="max-w-7xl mx-auto w-full flex flex-col overflow-hidden">
-            <header className="sticky h-16 top-0 z-50 bg-background/60 flex justify-between items-center border-b border-border px-2.5 shrink-0">
-                <div className="flex items-center gap-2">
+        <div className="max-w-7xl mx-auto w-full flex flex-col overflow-hidden h-svh">
+            <header className="sticky top-0 pt-[var(--sat)] z-50 bg-background/60 flex justify-between items-center border-b border-border px-2.5 shrink-0">
+                <div className="flex items-center gap-2 py-2">
                     <BackButton />
                     <h1 className="text-lg font-bold">Checkout</h1>
                 </div>
@@ -56,7 +56,7 @@ function RouteComponent() {
                     icon={ShoppingCart}
                 />
             ) : (
-                <main className="flex overflow-hidden h-sc">
+                <main className="flex overflow-hidden">
                     <CheckoutFlow cart={cart} />
                     <CheckoutSummary cart={cart} />
                 </main>

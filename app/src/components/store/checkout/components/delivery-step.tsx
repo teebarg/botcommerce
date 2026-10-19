@@ -79,7 +79,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ cart, onComplete }) => {
                 {cart?.shipping_method === "PICKUP" && <PickupCard />}
                 {["STANDARD", "EXPRESS"].includes(cart?.shipping_method ?? "") && <AddressStep address={cart.shipping_address} />}
             </div>
-            <div className="sheet-footer sticky bottom-0">
+            <div className="sheet-footer sticky bottom-0 !pb-[calc(var(--sab)+1rem)]">
                 <Button
                     size="lg"
                     onClick={handleContinue}

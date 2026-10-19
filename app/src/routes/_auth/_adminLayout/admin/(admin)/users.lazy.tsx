@@ -31,13 +31,13 @@ function RouteComponent() {
     });
 
     return (
-        <div className="px-2 py-4 max-w-5xl">
+        <div className="px-2 py-2 max-w-5xl">
             <div>
                 <h3 className="text-xl font-semibold">Customers view</h3>
                 <p className="text-sm text-muted-foreground">Manage your customers.</p>
             </div>
             <div>
-                <div className="sticky flex items-center justify-between glass top-[calc(var(--sat)+var(--admin-nav-height))] -mx-2 z-40 p-2">
+                <div className="sticky flex items-center justify-between glass top-[var(--admin-nav-height)] -mx-2 mt-2 z-40 p-2">
                     <div className="relative rounded-md">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <Search className="text-muted-foreground" size={18} />

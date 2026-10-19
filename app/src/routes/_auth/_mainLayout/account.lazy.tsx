@@ -18,7 +18,10 @@ function RouteComponent() {
     const { isAuthenticated } = Route.useRouteContext();
     return (
         <div className="flex-1">
-            <div className="glass md:hidden sticky z-20 top-[var(--nav-height)]">
+            <div
+                className="glass md:hidden sticky z-20"
+                style={{ top: "calc(var(--nav-height) + var(--sat))" }}
+            >
                 <ul className="grid grid-cols-5 px-2 py-1">
                     {navLinks.map((link, idx: number) => (
                         <li key={idx}>

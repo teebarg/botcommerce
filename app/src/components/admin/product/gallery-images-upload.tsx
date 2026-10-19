@@ -77,7 +77,7 @@ export function GalleryImagesUpload() {
             open={uploadState.isOpen}
             title="Upload Images"
             trigger={
-                <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground gap-1.5 ml-2">
+                <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground gap-1.5 ml-2 mb-2">
                     <ImagePlus className="h-4 w-4" />
                     Images
                 </Button>

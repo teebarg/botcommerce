@@ -54,7 +54,7 @@ export default function NotFound({
     };
 
     return (
-        <div className={cn("bg-background flex items-center justify-center p-4", variant == "full" ? "h-vhc" : "h-auto py-12", className)}>
+        <div className={cn("bg-background flex items-center justify-center p-4", variant == "full" ? "" : "h-auto py-12", className)}>
             <div className="max-w-md w-full text-center">
                 {Icon && (
                     <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-secondary flex items-center justify-center">
