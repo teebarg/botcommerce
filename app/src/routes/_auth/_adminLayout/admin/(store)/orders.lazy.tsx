@@ -27,7 +27,7 @@ function RouteComponent() {
                 <h1 className="text-xl font-medium">Order view</h1>
                 <p className="text-muted-foreground text-sm">Manage your orders.</p>
             </div>
-            <div className="sticky glass top-[calc(var(--sat)+var(--admin-nav-height))] z-40 -mx-2 p-2">
+            <div className="sticky glass top-[var(--admin-nav-height)] z-40 -mx-2 p-2">
                 <OrderFilters />
             </div>
             <div className="mt-2">

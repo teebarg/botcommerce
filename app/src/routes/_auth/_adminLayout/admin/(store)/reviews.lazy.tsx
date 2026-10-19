@@ -31,7 +31,7 @@ function RouteComponent() {
                 <h1 className="text-lg font-semibold">Reviews</h1>
                 <p className="text-muted-foreground text-sm">Manage your product reviews</p>
             </div>
-            <div className="glass sticky top-[calc(var(--sat)+var(--admin-nav-height))] z-40 -mx-2 p-2 mt-4 mb-2">
+            <div className="glass sticky top-[var(--admin-nav-height)] z-40 -mx-2 p-2 mt-4 mb-2">
                 <Input
                     className="bg-card"
                     placeholder="Search reviews..."

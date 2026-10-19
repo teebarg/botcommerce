@@ -24,8 +24,8 @@ const AdminNavbar = () => {
     }, []);
 
     return (
-        <header ref={navRef} className="sticky top-[var(--sat)] z-50 w-full glass">
-            <div className="flex items-center justify-between h-16 w-full max-w-[1440px] mx-auto px-4 gap-4">
+        <header ref={navRef} className="sticky top-0 z-50 w-full glass pt-[var(--sat)]">
+            <div className="flex items-center justify-between w-full max-w-[1440px] mx-auto py-3 px-4 gap-4">
                 <div className="flex items-center gap-4">
                     <div className="hidden sm:block">
                         <LocalizedClientLink href="/admin">

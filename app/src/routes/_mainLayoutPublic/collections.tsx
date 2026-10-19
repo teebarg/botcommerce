@@ -26,7 +26,7 @@ function RouteComponent() {
     useAutoHideChrome({ enabled: true });
 
     return (
-        <div className="max-w-8xl mx-auto w-full py-2">
+        <div className="max-w-8xl mx-auto w-full">
             <div className="flex gap-6">
                 <aside className="h-[calc(100vh-6rem)] w-80 hidden md:flex flex-col overflow-hidden sticky top-24">
                     <div className="w-full pb-2">
