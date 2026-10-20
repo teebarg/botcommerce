@@ -3,7 +3,7 @@ import time
 from contextlib import asynccontextmanager
 
 import redis.asyncio as redis
-from fastapi import BackgroundTasks, FastAPI, HTTPException, Request, status
+from fastapi import BackgroundTasks, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 

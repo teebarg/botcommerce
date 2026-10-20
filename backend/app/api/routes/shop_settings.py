@@ -37,7 +37,9 @@ async def create_setting(
     existing = await srv.get_by_key(payload.key)
     if existing:
         raise HTTPException(status_code=409, detail="Key already exists")
-    return await srv.create(payload.key, payload.value)
+    data = await srv.create(payload.key, payload.value)
+    await srv.invalidate()
+    return data
 
 
 @router.patch("/{id}", dependencies=[Depends(require_admin)])
@@ -47,7 +49,9 @@ async def update_setting(
     existing = await srv.get_by_id(id)
     if not existing:
         raise HTTPException(status_code=404, detail="Setting not found")
-    return await srv.update(id, payload.value)
+    data = await srv.update(id, payload.value)
+    await srv.invalidate()
+    return data
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)], status_code=204)
@@ -56,3 +60,4 @@ async def delete_setting(id: int, srv: SettingsDep):
     if not existing:
         raise HTTPException(status_code=404, detail="Setting not found")
     await srv.delete(id)
+    await srv.invalidate()
