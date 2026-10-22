@@ -10,8 +10,6 @@ const brandStyles = {
     telegram: "bg-[#2aabee] text-neutral-950",
 } as const;
 
-
-/** The big order buttons. `solid` is the main action, `outline` is the alternative. */
 export function ActionLink({
     href,
     brand,
@@ -28,7 +26,8 @@ export function ActionLink({
     return (
         <a
             href={href}
-            className={`flex min-h-18 items-center gap-3.5 rounded-2xl px-4.5 py-3.5 transition-transform active:scale-[0.985] ${focusRing} ${brandStyles[brand]}`}
+            className={`flex min-h-18 items-center gap-3.5 rounded-2xl px-4.5 py-2 transition-transform active:scale-[0.985] ${focusRing} ${brandStyles[brand]}`}
+            target="_blank"
         >
             <Icon className="size-7 flex-none" strokeWidth={2} />
             <span className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -40,16 +39,16 @@ export function ActionLink({
     );
 }
 
-/** Quieter full-width link used for the store. */
 export function GhostLink({ href, icon: Icon, children }: { href: string; icon: IconType; children: ReactNode }) {
     return (
         <a
             href={href}
             className={`flex min-h-13 items-center gap-3 rounded-[18px] border border-line-strong px-[18px] transition-transform active:scale-[0.985] ${focusRing}`}
+            target="_blank"
         >
             <Icon className="size-[22px] flex-none" />
             <span className="flex-1 text-base font-semibold">{children}</span>
-            <ChevronIcon className="size-5 flex-none text-muted" />
+            <ChevronIcon className="size-5 flex-none text-muted-foreground" />
         </a>
     );
 }

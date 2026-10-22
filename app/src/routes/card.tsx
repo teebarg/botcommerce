@@ -28,26 +28,26 @@ export const Route = createFileRoute("/card")({
 function LinkPage() {
     const { shop_name, shop_description, facebook, instagram, tiktok, telegram, whatsapp, frontend_host, shop_email } = useConfig();
     return (
-        <main className="flex min-h-dvh justify-center px-4 pt-5 pb-7">
+        <main className="flex min-h-dvh justify-center px-4 pt-4">
             <div className="flex w-full max-w-[440px] flex-col gap-3">
                 {/* Business card */}
-                <section className="flex flex-col gap-4 rounded-3xl border border-line bg-card p-5">
+                <section className="flex flex-col gap-4 rounded-3xl border border-line bg-card p-4">
                     <div className="flex items-center gap-3.5">
-                        <div className="flex size-16 flex-none items-center justify-center rounded-2xl bg-accent font-display text-[28px] font-bold text-accent-foreground">
+                        <div className="flex size-14 flex-none items-center justify-center rounded-2xl bg-accent font-display text-[28px] font-bold text-accent-foreground">
                             TH
                         </div>
-                        <div className="flex min-w-0 flex-col gap-1">
-                            <h1 className="truncate font-display text-[26px] leading-[1.1] font-bold">{shop_name}</h1>
+                        <div className="flex min-w-0 flex-col">
+                            <h1 className="truncate font-display text-2xl leading-[1.1] font-bold">{shop_name}</h1>
                             <p className="line-clamp-2 text-sm text-muted-foreground">{shop_description}</p>
                         </div>
                     </div>
 
-                    <p className="flex items-center gap-2 text-[13px] text-muted-foreground">
+                    <p className="flex items-center gap-2 text-xs text-muted-foreground">
                         <span className="size-2 flex-none rounded-full bg-emerald-500" />
                         Online now · replies in 2mins
                     </p>
 
-                    <dl className="grid grid-cols-3 gap-2 border-t border-line pt-3.5">
+                    <dl className="grid grid-cols-3 gap-2 border-t border-line pt-2.5">
                         {[
                             { value: "[2k+]", label: "orders delivered" },
                             { value: "[4.9/5]", label: "customer rating" },
@@ -67,7 +67,7 @@ function LinkPage() {
                     href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(whatsappMessage)}`}
                     icon={WhatsAppIcon}
                     title="Order on WhatsApp"
-                    hint="Fastest way to buy. Chat with a real person."
+                    hint="Fastest way to buy."
                 />
                 <ActionLink
                     brand="telegram"
@@ -93,7 +93,7 @@ function LinkPage() {
                     <SocialRow href={`mailto:${shop_email}`} icon={MailIcon} label="Email us" handle={shop_email} />
                 </nav>
 
-                <p className="mt-2 text-center text-xs leading-snug text-muted-foreground">'Nationwide delivery</p>
+                {/* <p className="mt-2 text-center text-xs leading-snug text-muted-foreground">Nationwide delivery</p> */}
             </div>
         </main>
     );
