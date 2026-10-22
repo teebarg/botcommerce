@@ -60,7 +60,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
                     title,
                     description,
                     url: APP_URL,
-                    image: "/default-og.png",
+                    image: `${APP_URL}/brand.jpg`,
                 }),
             ],
             links: [

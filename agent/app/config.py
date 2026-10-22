@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     env: str = Field(default="development", alias="ENV")
     DATABASE_URL: str = ""
     SECRET_KEY: str = "specialsecret"
-    
+
     LLM_PROVIDER: str = Field(default="groq", alias="LLM_PROVIDER")
     CEREBRAS_API_KEY: str = Field(default="", alias="CEREBRAS_API_KEY")
     GOOGLE_API_KEY: str = Field(default="")
@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     agent_max_iterations: int = Field(default=6, alias="AGENT_MAX_ITERATIONS")
     agent_verbose: bool = Field(default=True, alias="AGENT_VERBOSE")
 
-    MCP_SERVER_URL: str ="http://mcp:8787/mcp"
+    MCP_SERVER_URL: str = "http://mcp:8787/mcp"
 
     LANGFUSE_SECRET_KEY: str = ""
     LANGFUSE_PUBLIC_KEY: str = ""
@@ -44,13 +44,16 @@ class Settings(BaseSettings):
 def get_settings() -> Settings:
     return Settings()
 
+
 settings = get_settings()
+
 
 def get_llm():
     provider: str = settings.LLM_PROVIDER
 
     if provider == "gemini":
         from langchain_google_genai import ChatGoogleGenerativeAI
+
         return ChatGoogleGenerativeAI(
             model="gemini-2.5-flash",
             google_api_key=settings.GOOGLE_API_KEY,
@@ -59,6 +62,7 @@ def get_llm():
         )
     elif provider == "cerebras":
         from langchain_cerebras import ChatCerebras
+
         return ChatCerebras(
             model="gpt-oss-120b",
             cerebras_api_key=settings.CEREBRAS_API_KEY,
@@ -66,13 +70,17 @@ def get_llm():
         )
     elif provider == "ollama":
         from langchain_ollama import ChatOllama
+
         return ChatOllama(
-            model="qwen2.5:3b",
+            model="qwen2.5:7b",
             base_url=settings.OLLAMA_URL,
             temperature=0,
+            keep_alive="30m",  # or "24h" or -1 (forever)
+            num_ctx=4096,
         )
     else:
         from langchain_groq import ChatGroq
+
         return ChatGroq(
             model="openai/gpt-oss-120b",
             groq_api_key=settings.GROQ_API_KEY,
@@ -86,8 +94,8 @@ def get_model_name() -> str:
     """Extract the actual model name from whichever LLM is active."""
     llm = get_llm()
     return (
-        getattr(llm, "model",       None) or  # Groq, Cerebras, Ollama
-        getattr(llm, "model_name",  None) or  # Gemini, older LangChain
-        getattr(llm, "model_id",    None) or
-        settings.LLM_PROVIDER
+        getattr(llm, "model", None)  # Groq, Cerebras, Ollama
+        or getattr(llm, "model_name", None)  # Gemini, older LangChain
+        or getattr(llm, "model_id", None)
+        or settings.LLM_PROVIDER
     )
