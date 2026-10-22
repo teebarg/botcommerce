@@ -10,12 +10,30 @@ import { ProductFeed } from "@/components/store/collections/product-feed";
 import { Suspense } from "react";
 import { productFeedInfiniteQuery } from "@/queries/user.queries";
 import { useAutoHideChrome } from "@/hooks/useAutoHideChrome";
+import { APP_URL } from "@/utils";
+import { seo } from "@/utils/seo";
 
 export const Route = createFileRoute("/_mainLayoutPublic/collections")({
     validateSearch: FeedQuerySchema,
     beforeLoad: ({ search }) => ({ search }),
     loader: ({ context: { queryClient, search } }) => {
         return queryClient.fetchInfiniteQuery(productFeedInfiniteQuery(search));
+    },
+    head: ({ loaderData, match }) => {
+        const shopName = match.context.config.shop_name
+        const firstPage = loaderData?.pages?.[0];
+        const firstProduct = firstPage?.products?.[0];
+        const rawImage = firstProduct?.image || firstProduct?.images?.[0];
+        return {
+            meta: [
+                ...seo({
+                    title: `Product Album | ${shopName}`,
+                    description: "Browse our full product collection.",
+                    url: `${APP_URL}/collections`,
+                    image: rawImage,
+                }),
+            ],
+        };
     },
     component: RouteComponent,
 });
