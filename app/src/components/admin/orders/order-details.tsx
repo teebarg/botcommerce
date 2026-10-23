@@ -1,5 +1,5 @@
 import type React from "react";
-import { Truck, Calendar, ShieldAlert, PackageCheck, Download, RefreshCw, Package, XCircle, RotateCcw } from "lucide-react";
+import { Truck, Calendar, ShieldAlert, PackageCheck, Download, RefreshCw, Package, XCircle, RotateCcw, CheckIcon } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import OrderProcessingAction from "./order-processing-actions";
 import { OrderStatusBadge } from "./order-status-badge";
@@ -31,6 +31,11 @@ function getDotColor(status: string) {
 }
 
 const orderStatusMap: Record<OrderStatus, { icon: ReactElement; label: string; color: string }> = {
+    [OrderStatus.CONFIRMED]: {
+        icon: <CheckIcon className="h-5 w-5 text-white" />,
+        label: "Confirmed",
+        color: "bg-emerald-800",
+    },
     [OrderStatus.PENDING]: {
         icon: <ShieldAlert className="h-5 w-5 text-white" />,
         label: "Pending",

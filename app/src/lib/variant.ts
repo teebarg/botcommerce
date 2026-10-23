@@ -14,7 +14,6 @@ export function defaultVariant(product: ProductSearch | Product): ProductVariant
 export function variantLabel(variant: ProductVariant) {
     const fields = [
         ["S", variant.size],
-        ["Color", variant.color],
         ["W", variant.width],
         ["L", variant.length],
         ["Age", variant.age],
