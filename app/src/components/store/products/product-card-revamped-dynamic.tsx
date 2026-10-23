@@ -30,6 +30,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, 
     const priceInfo = useMemo(() => getPriceInfo(product), [product]);
     const { minPrice, maxCompareAtPrice, hasDiscount, maxDiscountPercent } = priceInfo;
     const outOfStock = !product.in_stock;
+    const showDiscountBadge = !outOfStock && hasDiscount;
 
     const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
         const { naturalWidth, naturalHeight } = e.currentTarget;
@@ -91,7 +92,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, 
                     )}
                     <div className="flex items-start gap-1.5">
                         <span className="text-white text-lg sm:text-xl font-medium drop-shadow-sm">{currency(minPrice)}</span>
-                        {!outOfStock && hasDiscount && (
+                        {showDiscountBadge && (
                             <span className="bg-destructive text-destructive-foreground text-2xs font-medium px-1 py-0.5 rounded-full">
                                 -{maxDiscountPercent}% off
                             </span>
@@ -135,13 +136,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, 
                     />
                 </div>
 
-                {!outOfStock && hasDiscount && (
+                {showDiscountBadge && (
                     <span className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-2xs font-medium px-2 py-1 rounded-full">
                         -{maxDiscountPercent}%
                     </span>
                 )}
                 {product?.is_new && (
-                    <Badge variant="success" className="absolute top-10 left-2 w-fit uppercase tracking-wider" type="sm">
+                    <Badge
+                        variant="success"
+                        className={cn("absolute left-2 w-fit uppercase tracking-wider", showDiscountBadge ? "top-10" : "top-2")}
+                        type="sm"
+                    >
                         New
                     </Badge>
                 )}
@@ -173,7 +178,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, 
                     )}
                     <div className="flex items-start gap-1.5">
                         <span className="text-white text-lg font-medium drop-shadow-sm">{currency(minPrice)}</span>
-                        {!outOfStock && hasDiscount && <span className="text-white/55 text-xs line-through">{currency(maxCompareAtPrice)}</span>}
+                        {showDiscountBadge && <span className="text-white/55 text-xs line-through">{currency(maxCompareAtPrice)}</span>}
                     </div>
                 </div>
             </div>
