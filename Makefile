@@ -12,7 +12,7 @@ DOCKER_COMPOSE = docker compose -p $(PROJECT_SLUG)
 MODE ?= core
 
 ifeq ($(MODE),all)
-SERVICES := frontend backend agent mcp-server worker
+SERVICES := frontend backend agent worker
 else
 SERVICES := frontend backend worker
 endif

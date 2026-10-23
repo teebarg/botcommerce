@@ -73,8 +73,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick }
                         -{maxDiscountPercent}%
                     </span>
                 )}
-                {!outOfStock && !hasDiscount && product.is_new && (
-                    <span className="absolute top-2 left-2 bg-emerald-500 text-white text-2xs font-medium px-2 py-1 rounded-full">New</span>
+                {product?.is_new && (
+                    <Badge variant="success" className="absolute top-10 left-2 w-fit uppercase tracking-wider" type="sm">
+                        New
+                    </Badge>
                 )}
 
                 {product.in_stock && <WishlistButton productId={product.id} className="absolute right-2.5 top-2.5 sm:right-3 sm:top-3" />}
@@ -97,19 +99,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick }
                     )}
                 >
                     <div className="sr-only">{product.name}</div>
-                    {product?.is_new && (
-                        <Badge variant="destructive" className="w-fit uppercase tracking-wider" type="sm">
-                            New
-                        </Badge>
-                    )}
                     {variantLabel(variant) && (
                         <Badge variant="accent" className="w-fit uppercase tracking-wider" type="sm">
                             {variantLabel(variant)}
                         </Badge>
                     )}
-                    <div className="flex items-baseline gap-1.5">
+                    <div className="flex items-start gap-1.5">
                         <span className="text-white text-lg font-medium drop-shadow-sm">{currency(minPrice)}</span>
-                        {!outOfStock && hasDiscount && <span className="text-white/55 text-sm line-through">{currency(maxCompareAtPrice)}</span>}
+                        {!outOfStock && hasDiscount && <span className="text-white/55 text-xs line-through">{currency(maxCompareAtPrice)}</span>}
                     </div>
                 </div>
             </div>
