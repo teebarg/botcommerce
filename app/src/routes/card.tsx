@@ -84,7 +84,7 @@ function LinkPage() {
                 />
                 <ActionLink
                     brand="telegram"
-                    href={telegram}
+                    href={inTikTok ? `tg://resolve?domain=${telegram}` : `https://t.me/${telegram}`}
                     icon={TelegramIcon}
                     title="Order on Telegram"
                     hint="Prefer Telegram? Message us there."

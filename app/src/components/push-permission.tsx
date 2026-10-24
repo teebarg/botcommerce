@@ -10,6 +10,22 @@ import { track } from "@/lib/analytics";
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000;
 const INITIAL_DELAY_DURATION = 20 * 1000;
 
+// In-app browsers (TikTok, Instagram, Facebook, ...) can't grant push permission.
+const IN_APP_BROWSER_PATTERN = /musical_ly|BytedanceWebview|TikTok|trill|Instagram|FBAN|FBAV|FB_IAB|Snapchat|Line\//i;
+
+function isInAppBrowser(): boolean {
+    return IN_APP_BROWSER_PATTERN.test(navigator.userAgent);
+}
+
+function isPushSupported(): boolean {
+    return "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+}
+
+/** True only in a real browser that can actually turn push notifications on. */
+function canUsePush(): boolean {
+    return !isInAppBrowser() && isPushSupported();
+}
+
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
     const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
@@ -96,9 +112,13 @@ export default function PushPermission() {
     useEffect(() => {
         setIsMounted(true);
 
-        if ("Notification" in window) {
-            setPermission(Notification.permission);
+        // In-app browsers and browsers without push support: never show the prompt.
+        if (!canUsePush()) {
+            setIsDismissed(true);
+            return;
         }
+
+        setPermission(Notification.permission);
 
         if (localStorage.getItem("push_synced") === "true") {
             setIsDismissed(true);
@@ -161,7 +181,7 @@ export default function PushPermission() {
     );
 
     const checkSubscription = useCallback(async () => {
-        if (isChecking) return;
+        if (isChecking || !canUsePush()) return;
         setIsChecking(true);
         try {
             const registration = await navigator.serviceWorker?.ready;
@@ -240,7 +260,7 @@ export default function PushPermission() {
     async function handleOptIn() {
         track("push_cta_clicked");
 
-        if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+        if (!canUsePush()) {
             track("push_unsupported_browser");
             toast.error("Notifications aren't supported in this browser.");
             return;

@@ -23,23 +23,51 @@ logger = get_logger(__name__)
 
 router = APIRouter()
 
+
 @router.get("/home/products", tags=["products"])
-@cacheable(key_prefix="products:categories", tags=["products"], cdn_ttl=600, cdn_swr=60, expire=1800)
-async def get_home_categories_products(request: Request, db: DbDep, product_srv: ProductDep) -> list[CategoryWithProducts]:
+@cacheable(
+    key_prefix="products:categories",
+    tags=["products"],
+    cdn_ttl=600,
+    cdn_swr=60,
+    expire=1800,
+)
+async def get_home_categories_products(
+    request: Request, db: DbDep, product_srv: ProductDep
+) -> list[CategoryWithProducts]:
     categories = await db.category.find_many(
         where={"is_active": True},
         order={"display_order": "asc"},
-        include={"products": {"include": {"variants": True, "images": True}, "take": 6, "orderBy": {"id": "desc"}}},
-        take=4
+        include={
+            "products": {
+                "include": {"variants": True, "images": True},
+                "take": 6,
+                "orderBy": {"id": "desc"},
+            }
+        },
+        take=4,
     )
 
     for category in categories:
-        category.products = [product_srv.product_to_search_document(product) for product in category.products]
+        category.products = [
+            product_srv.product_to_search_document(product)
+            for product in category.products
+        ]
     return categories
 
+
 @router.get("/")
-@cacheable(key_prefix="categories", key_builder=lambda query: query if query else "all", tags=["categories"], cdn_ttl=604800, cdn_swr=86400)
-async def index(request: Request, db: DbDep, query: str = "") -> Optional[list[Category]]:
+@cacheable(
+    key_prefix="categories",
+    key_builder=lambda query: query if query else "all",
+    tags=["categories"],
+    expire=86400,
+    cdn_ttl=3600,
+    cdn_swr=86400,
+)
+async def index(
+    request: Request, db: DbDep, query: str = ""
+) -> Optional[list[Category]]:
     """
     Retrieve all categories.
     """
@@ -48,7 +76,7 @@ async def index(request: Request, db: DbDep, query: str = "") -> Optional[list[C
         where_clause = {
             "OR": [
                 {"name": {"contains": query, "mode": "insensitive"}},
-                {"slug": {"contains": query, "mode": "insensitive"}}
+                {"slug": {"contains": query, "mode": "insensitive"}},
             ]
         }
     return await db.category.find_many(
@@ -56,8 +84,11 @@ async def index(request: Request, db: DbDep, query: str = "") -> Optional[list[C
         order={"display_order": "asc"},
     )
 
+
 @router.post("/", dependencies=[Depends(require_admin)])
-async def create(data: CategoryCreate, db: DbDep, srv: CategoryDep, bg_tasks: BackgroundTasks) -> Category:
+async def create(
+    data: CategoryCreate, db: DbDep, srv: CategoryDep, bg_tasks: BackgroundTasks
+) -> Category:
     """
     Create new category.
     """
@@ -72,16 +103,20 @@ async def create(data: CategoryCreate, db: DbDep, srv: CategoryDep, bg_tasks: Ba
 
 
 @router.patch("/reorder", dependencies=[Depends(require_admin)])
-async def reorder_categories(data: BulkOrderUpdate, db: DbDep, srv: CategoryDep, bg_tasks: BackgroundTasks) -> Message:
+async def reorder_categories(
+    data: BulkOrderUpdate, db: DbDep, srv: CategoryDep, bg_tasks: BackgroundTasks
+) -> Message:
     """Update display order for categories"""
     async with db.tx() as tx:
         try:
             for category_update in data.categories:
-                category = await tx.category.find_unique(where={"id": category_update.id})
+                category = await tx.category.find_unique(
+                    where={"id": category_update.id}
+                )
                 if category:
                     await tx.category.update(
                         where={"id": category_update.id},
-                        data={"display_order": category_update.display_order}
+                        data={"display_order": category_update.display_order},
                     )
             bg_tasks.add_task(srv.invalidate)
             return {"message": "categories reordered"}
@@ -96,7 +131,7 @@ async def update(
     update_data: CategoryUpdate,
     db: DbDep,
     srv: CategoryDep,
-    bg_tasks: BackgroundTasks
+    bg_tasks: BackgroundTasks,
 ) -> Category:
     """
     Update a category and invalidate cache.
@@ -107,8 +142,7 @@ async def update(
 
     try:
         update = await db.category.update(
-            where={"id": id},
-            data=update_data.model_dump(exclude_unset=True)
+            where={"id": id}, data=update_data.model_dump(exclude_unset=True)
         )
         bg_tasks.add_task(srv.invalidate)
         return update
@@ -118,13 +152,13 @@ async def update(
 
 
 @router.delete("/{id}", dependencies=[Depends(require_admin)])
-async def delete(id: int, db: DbDep, srv: CategoryDep, bg_tasks: BackgroundTasks) -> Message:
+async def delete(
+    id: int, db: DbDep, srv: CategoryDep, bg_tasks: BackgroundTasks
+) -> Message:
     """
     Delete a category.
     """
-    existing = await db.category.find_unique(
-        where={"id": id}
-    )
+    existing = await db.category.find_unique(where={"id": id})
     if not existing:
         raise HTTPException(status_code=404, detail="Category not found")
 
@@ -138,13 +172,18 @@ async def delete(id: int, db: DbDep, srv: CategoryDep, bg_tasks: BackgroundTasks
 
 
 @router.patch("/{id}/image", dependencies=[Depends(require_admin)])
-async def add_image(id: int, db: DbDep, srv: CategoryDep, image_data: ImageUpload, storage_srv: StorageDep, bg_tasks: BackgroundTasks) -> Category:
+async def add_image(
+    id: int,
+    db: DbDep,
+    srv: CategoryDep,
+    image_data: ImageUpload,
+    storage_srv: StorageDep,
+    bg_tasks: BackgroundTasks,
+) -> Category:
     """
     Add an image to a category.
     """
-    category = await db.category.find_unique(
-        where={"id": id}
-    )
+    category = await db.category.find_unique(where={"id": id})
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
 
@@ -152,28 +191,28 @@ async def add_image(id: int, db: DbDep, srv: CategoryDep, image_data: ImageUploa
         image_url: str = storage_srv.upload(bucket="images", data=image_data)
 
         updated_category = await db.category.update(
-            where={"id": id},
-            data={"image": image_url}
+            where={"id": id}, data={"image": image_url}
         )
         bg_tasks.add_task(srv.invalidate)
         return updated_category
 
     except Exception as e:
         logger.error(f"Failed to upload image: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to upload image: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to upload image: {str(e)}")
 
 
 @router.delete("/{id}/image", dependencies=[Depends(require_admin)])
-async def delete_image(id: int, db: DbDep, srv: CategoryDep, storage_srv: StorageDep, bg_tasks: BackgroundTasks) -> Message:
+async def delete_image(
+    id: int,
+    db: DbDep,
+    srv: CategoryDep,
+    storage_srv: StorageDep,
+    bg_tasks: BackgroundTasks,
+) -> Message:
     """
     Delete the image of a category.
     """
-    category = await db.category.find_unique(
-        where={"id": id}
-    )
+    category = await db.category.find_unique(where={"id": id})
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
 
@@ -184,16 +223,10 @@ async def delete_image(id: int, db: DbDep, srv: CategoryDep, storage_srv: Storag
         file_path = category.image.split("/storage/v1/object/public/images/")[1]
         storage_srv.delete_image(bucket="images", file_path=file_path)
 
-        await db.category.update(
-            where={"id": id},
-            data={"image": None}
-        )
+        await db.category.update(where={"id": id}, data={"image": None})
         bg_tasks.add_task(srv.invalidate)
         return Message(message="Category image deleted")
 
     except Exception as e:
         logger.error(f"Failed to delete image: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to delete image: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to delete image: {str(e)}")

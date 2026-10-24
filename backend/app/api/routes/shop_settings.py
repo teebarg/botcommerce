@@ -19,8 +19,8 @@ router = APIRouter()
     key_prefix="shop-settings",
     key_builder="config",
     tags=["shop-settings"],
-    expire=259200,
-    cdn_ttl=3600,
+    expire=86400,
+    cdn_ttl=300,
     cdn_swr=86400,
 )
 async def index(request: Request, db: DbDep) -> dict[str, Any]:
