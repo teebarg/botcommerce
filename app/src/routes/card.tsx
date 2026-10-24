@@ -1,5 +1,6 @@
 import { BagIcon, FacebookIcon, InstagramIcon, MailIcon, TelegramIcon, TikTokIcon, WhatsAppIcon } from "@/components/card/icons";
 import { ActionLink, GhostLink, SocialRow } from "@/components/card/links";
+import { useTikTokBrowser } from "@/hooks/useTikTokBrowser";
 import { useConfig } from "@/providers/store-provider";
 import { APP_URL } from "@/utils";
 import { seo } from "@/utils/seo";
@@ -27,9 +28,17 @@ export const Route = createFileRoute("/card")({
 
 function LinkPage() {
     const { shop_name, shop_description, facebook, instagram, tiktok, telegram, whatsapp, frontend_host, shop_email } = useConfig();
+    const inTikTok = useTikTokBrowser();
     return (
         <main className="flex min-h-dvh justify-center px-4 pt-[calc(var(--sat)+16px)]">
             <div className="flex w-full max-w-[440px] flex-col gap-3">
+                {/* TikTok's browser blocks app hand-off: tell people how to get out of it */}
+                {inTikTok && (
+                    <p role="note" className="rounded-2xl border border-border bg-muted px-4 py-3 text-[13px] leading-snug">
+                        <span className="font-medium">Button not opening the app?</span> Tap the <span className="font-medium">⋯</span> menu at the
+                        top of the screen, then <span className="font-medium">Open in browser</span>.
+                    </p>
+                )}
                 {/* Business card */}
                 <section className="flex flex-col gap-4 rounded-3xl border border-line bg-card p-4">
                     <div className="flex items-center gap-3.5">
@@ -64,7 +73,11 @@ function LinkPage() {
                 {/* Main actions: straight into the chat apps */}
                 <ActionLink
                     brand="whatsapp"
-                    href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(whatsappMessage)}`}
+                    href={
+                        inTikTok
+                            ? `whatsapp://send?phone=${whatsapp}&text=${encodeURIComponent(whatsappMessage)}`
+                            : `https://wa.me/${whatsapp}?text=${encodeURIComponent(whatsappMessage)}`
+                    }
                     icon={WhatsAppIcon}
                     title="Order on WhatsApp"
                     hint="Fastest way to buy."
