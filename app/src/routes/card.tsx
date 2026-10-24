@@ -28,7 +28,7 @@ export const Route = createFileRoute("/card")({
 function LinkPage() {
     const { shop_name, shop_description, facebook, instagram, tiktok, telegram, whatsapp, frontend_host, shop_email } = useConfig();
     return (
-        <main className="flex min-h-dvh justify-center px-4 pt-4">
+        <main className="flex min-h-dvh justify-center px-4 pt-[calc(var(--sat)+16px)]">
             <div className="flex w-full max-w-[440px] flex-col gap-3">
                 {/* Business card */}
                 <section className="flex flex-col gap-4 rounded-3xl border border-line bg-card p-4">
