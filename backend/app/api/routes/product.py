@@ -35,6 +35,7 @@ from app.models.product import (
 from app.prisma_client import DbDep
 from app.services.cache import DEFAULT_EXPIRATION, cacheable
 from app.services.storage import ALLOWED_CONTENT_TYPES, MAX_FILE_SIZE_BYTES
+from prisma.fields import Json
 
 logger = get_logger(__name__)
 
@@ -139,8 +140,15 @@ async def update_variant(
     if not existing_variant:
         raise HTTPException(status_code=404, detail="Variant not found")
 
-    update_fields = ["price", "old_price", "inventory", "size", "color", "width", "length", "age"]
-    update_data = {f: getattr(variant, f) for f in update_fields if getattr(variant, f, None) is not None}
+    update_fields = ["price", "old_price", "inventory", "size", "color", "width", "length", "age", "attributes"]
+    update_data = {
+        f: getattr(variant, f)
+        for f in update_fields
+        if getattr(variant, f, None) is not None
+    }
+
+    if "attributes" in update_data:
+        update_data["attributes"] = Json(update_data["attributes"])
 
     if "inventory" in update_data:
         update_data["status"] = "IN_STOCK" if update_data["inventory"] > 0 else "OUT_OF_STOCK"

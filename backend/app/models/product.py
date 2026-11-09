@@ -14,9 +14,16 @@ class ProductImage(BaseModel):
     class Config:
         from_attributes = True
 
+class ProductOption(BaseModel):
+    name: str = Field(..., min_length=1, max_length=80)
+    values: List[str] = Field(..., min_length=1)
+
+
 class ProductVariant(BaseModel):
     id: int
+    product_id: Optional[int] = None
     sku: Optional[str] = None
+    status: Optional[str] = None
     price: float
     old_price: Optional[float] = 0.0
     inventory: int = 0
@@ -25,6 +32,7 @@ class ProductVariant(BaseModel):
     color: Optional[str] = None
     width: Optional[int] = None
     length: Optional[int] = None
+    attributes: dict[str, str] = Field(default_factory=dict)
 
     class Config:
         from_attributes = True
@@ -39,6 +47,7 @@ class VariantWithStatus(BaseModel):
     width: Optional[int] = None
     length: Optional[int] = None
     age: Optional[str] = None
+    attributes: Optional[dict[str, str]] = None
 
 class ProductCreate(BaseModel):
     name: Optional[str] = Field(None)
@@ -64,6 +73,7 @@ class Product(BaseModel):
     description: Optional[str] = None
     images: Optional[List[ProductImage]] = []
     variants: Optional[List[ProductVariant]] = None
+    options: List[ProductOption] = Field(default_factory=list)
     categories: Optional[List[Category]] = []
     collections: Optional[List[Collection]] = []
     active: Optional[bool] = True
@@ -101,6 +111,7 @@ class IndexProducts(BaseModel):
     trending: List[ProductSearch]
 
 class ProductImageMetadata(ProductCreate):
+    options: Optional[List[ProductOption]] = None
     variants: Optional[List[VariantWithStatus]] = None
 
 class ImageMetadata(BaseModel):

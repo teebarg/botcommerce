@@ -11,19 +11,27 @@ export function defaultVariant(product: ProductSearch | Product): ProductVariant
     return active.find(variantAvailable) ?? active[0] ?? product.variants?.[0]!;
 }
 
-export function variantLabel(variant: ProductVariant) {
-    const fields = [
-        ["S", variant.size],
-        ["W", variant.width],
-        ["L", variant.length],
-        ["Age", variant.age],
-    ];
-    return (
-        fields
-            .filter(([, value]) => value !== null && value !== undefined && value !== "")
-            .map(([label, value]) => `${label}: ${value}`)
-            .join(" · ") || variant.sku
+export function variantAttributes(variant: ProductVariant): Record<string, string> {
+    if (variant.attributes && Object.keys(variant.attributes).length > 0) {
+        return variant.attributes;
+    }
+
+    // Legacy fallback for variants created before custom attributes were introduced.
+    return Object.fromEntries(
+        [
+            ["Size", variant.size],
+            ["Color", variant.color],
+            ["Width", variant.width],
+            ["Length", variant.length],
+            ["Age", variant.age],
+        ].filter(([, value]) => value !== null && value !== undefined && value !== "").map(([key, value]) => [key, String(value)]),
     );
+}
+
+export function variantLabel(variant: ProductVariant) {
+    const attributes = variantAttributes(variant);
+    const details = Object.entries(attributes).map(([name, value]) => `${name}: ${value}`);
+    return details.join(" · ") || variant.sku;
 }
 
 export function getPriceInfo(product: ProductSearch | Product) {

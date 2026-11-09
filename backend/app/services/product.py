@@ -447,6 +447,7 @@ class ProductService:
             "sku": product.sku,
             "active": product.active,
             "is_new": getattr(product, "is_new", False),
+            "options": getattr(product, "options", None) or [],
             "random_score": random.random(),
         }
 
@@ -482,6 +483,8 @@ class ProductService:
         variants = [
             {
                 "id": v.id,
+                "sku": v.sku,
+                "product_id": v.product_id,
                 "price": v.price,
                 "old_price": v.old_price,
                 "inventory": v.inventory,
@@ -490,6 +493,7 @@ class ProductService:
                 "age": v.age,
                 "width": v.width,
                 "length": v.length,
+                "attributes": getattr(v, "attributes", None) or {},
                 "status": v.status,
             }
             for v in (product.variants or [])

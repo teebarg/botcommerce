@@ -4,6 +4,7 @@ import type { GalleryImage } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/utils/cn";
 import { useState } from "react";
+import { variantAttributes } from "@/lib/variant";
 
 interface GalleryCardProps {
     image: GalleryImage;
@@ -22,13 +23,7 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, onCl
     const variants = product?.variants || [];
     const item = product?.variants?.[0];
 
-    const attributes = [
-        item?.size && `Size: ${item.size}`,
-        item?.color && `Color: ${item.color}`,
-        item?.width && `W: ${item.width}`,
-        item?.length && `L: ${item.length}`,
-        item?.age && `Age: ${item.age}`,
-    ].filter(Boolean);
+    const attributes = item ? Object.entries(variantAttributes(item)).map(([name, value]) => `${name}: ${value}`) : [];
 
     const [mediaLoaded, setMediaLoaded] = useState<boolean>(false);
     const [fitMode, setFitMode] = useState<FitMode>("cover");

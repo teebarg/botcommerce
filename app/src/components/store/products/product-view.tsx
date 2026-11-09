@@ -2,7 +2,6 @@ import type React from "react";
 import { useState, useMemo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
-import { currency } from "@/utils";
 import type { Product, ProductImage, ProductVariant } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { useUpdateVariant } from "@/hooks/useProduct";
@@ -11,7 +10,6 @@ import { ProductVariantActions } from "@/components/products/product-variant-act
 import ShareButton from "@/components/share";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
 import { useOverlayTriggerState } from "react-stately";
-import { defaultVariant } from "@/lib/variant";
 import { WishlistButton } from "./WishlistButton";
 import { ProductImage as ProductImageComponent } from "./ProductImage";
 import { cn } from "@/utils/cn";
@@ -25,7 +23,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
     const [imageLoaded, setImageLoaded] = useState<boolean>(false);
     const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
     const outOfStock = !product.in_stock;
-    const variant = useMemo(() => defaultVariant(product), [product]);
     const images = useMemo(() => product.images, [product]);
 
     const { isAdmin } = useRouteContext({ strict: false });
@@ -129,14 +126,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                             <ShareButton text="Check out this product!" />
                         </div>
                     </div>
-                    {variant && (
-                        <div className="flex items-baseline gap-2 mt-1.5">
-                            <span className="text-2xl font-semibold text-foreground">{currency(variant?.price)}</span>
-                            {variant?.old_price > variant?.price && (
-                                <span className="text-sm text-muted-foreground line-through">{currency(variant?.old_price)}</span>
-                            )}
-                        </div>
-                    )}
+
                 </div>
 
                 <ClientOnly>
@@ -170,7 +160,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                     ) : null}
                 </ClientOnly>
 
-                <ProductVariantActions product={product} />
+                <ProductVariantActions key={product.id} product={product} />
 
                 <div className="pt-4 border-t border-border">
                     <p className="text-xs font-medium tracking-widest uppercase text-muted-foreground mb-2">Description</p>

@@ -200,6 +200,7 @@ model Product {
   sku         String           @unique
   description String?
   features    Json?            @db.JsonB
+  options     Json             @default("[]") @db.JsonB
   image       String?          @db.VarChar(255)
   active      Boolean          @default(true)
   is_new      Boolean          @default(false)
@@ -238,6 +239,7 @@ model ProductVariant {
   width       Int?
   length      Int?
   age         String?
+  attributes  Json          @default("{}") @db.JsonB
   order_items OrderItem[]
   cart_items  CartItem[] // Added relation to CartItem
   created_at  DateTime      @default(now())

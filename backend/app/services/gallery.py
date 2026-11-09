@@ -15,6 +15,7 @@ from app.models.product import (
 )
 from app.prisma_client import Prisma
 from app.services.cache import CacheService
+from prisma.fields import Json
 
 logger = get_logger(__name__)
 
@@ -38,6 +39,37 @@ class GalleryService:
             data["inventory"] = payload.inventory
             data["status"] = "IN_STOCK" if payload.inventory > 0 else "OUT_OF_STOCK"
         return data
+
+    @staticmethod
+    def _validate_dynamic_variants(payload: ProductImageMetadata) -> None:
+        if payload.options is None or not payload.options:
+            return
+        if not payload.variants:
+            raise HTTPException(status_code=400, detail="Generate at least one variant for the configured attributes")
+
+        names = [option.name.strip() for option in payload.options]
+        if any(not name for name in names) or len({name.casefold() for name in names}) != len(names):
+            raise HTTPException(status_code=400, detail="Attribute names must be non-empty and unique")
+
+        normalized_values: dict[str, set[str]] = {}
+        for option, name in zip(payload.options, names):
+            values = [value.strip() for value in option.values]
+            if any(not value for value in values) or len(set(values)) != len(values):
+                raise HTTPException(status_code=400, detail=f"Values for {name} must be non-empty and unique")
+            normalized_values[name] = set(values)
+
+        seen_combinations: set[tuple[tuple[str, str], ...]] = set()
+        for variant in payload.variants or []:
+            attributes = variant.attributes or {}
+            combination = tuple(sorted(attributes.items()))
+            if combination in seen_combinations:
+                raise HTTPException(status_code=400, detail="Duplicate variant combination")
+            seen_combinations.add(combination)
+            if set(attributes) != set(normalized_values):
+                raise HTTPException(status_code=400, detail="Every variant must contain a value for each product attribute")
+            for name, value in attributes.items():
+                if value not in normalized_values[name]:
+                    raise HTTPException(status_code=400, detail=f"Invalid {name} value: {value}")
 
     @staticmethod
     def _build_relation_data(category_ids=None, collection_ids=None) -> dict[str, Any]:
@@ -115,7 +147,7 @@ class GalleryService:
                 pi.id, pi.image, pi."order", pi.product_id,
                 p.id AS p_id, p.sku AS p_sku, p.name AS p_name,
                 p.description AS p_description, p.slug AS p_slug,
-                p.active AS p_active, p.is_new AS p_is_new,
+                p.active AS p_active, p.is_new AS p_is_new, p.options AS p_options,
                 COALESCE(
                     JSON_AGG(
                         DISTINCT JSONB_BUILD_OBJECT(
@@ -126,7 +158,7 @@ class GalleryService:
                     ) FILTER (WHERE pi2.id IS NOT NULL),
                     '[]'
                 ) AS images,
-                COALESCE(JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('id', pv.id, 'sku', pv.sku, 'product_id', pv.product_id, 'price', pv.price, 'old_price', pv.old_price, 'inventory', pv.inventory, 'status', pv.status, 'size', pv.size, 'color', pv.color, 'width', pv.width, 'length', pv.length, 'age', pv.age)) FILTER (WHERE pv.id IS NOT NULL), '[]') AS variants,
+                COALESCE(JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('id', pv.id, 'sku', pv.sku, 'product_id', pv.product_id, 'price', pv.price, 'old_price', pv.old_price, 'inventory', pv.inventory, 'status', pv.status, 'size', pv.size, 'color', pv.color, 'width', pv.width, 'length', pv.length, 'age', pv.age, 'attributes', pv.attributes)) FILTER (WHERE pv.id IS NOT NULL), '[]') AS variants,
                 COALESCE(JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('id', pc.id, 'name', pc.name, 'slug', pc.slug)) FILTER (WHERE pc.id IS NOT NULL), '[]') AS categories,
                 COALESCE(JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('id', col.id, 'name', col.name, 'slug', col.slug)) FILTER (WHERE col.id IS NOT NULL), '[]') AS collections
             FROM "product_images" pi
@@ -168,6 +200,7 @@ class GalleryService:
                     "slug": img["p_slug"],
                     "active": img["p_active"],
                     "is_new": img["p_is_new"],
+                    "options": img["p_options"] or [],
                     "categories": img["categories"],
                     "collections": img["collections"],
                     "variants": img["variants"],
@@ -255,6 +288,7 @@ class GalleryService:
             await self.ws_manager.broadcast_to_all({"status": "failed", "error": str(e)}, "bulk_action")
 
     async def create_metadata(self, image_id: int, payload: ProductImageMetadata) -> int:
+        self._validate_dynamic_variants(payload)
         if not payload.name:
             raise HTTPException(status_code=400, detail="Product name is required")
 
@@ -278,6 +312,11 @@ class GalleryService:
                     "description": payload.description,
                     "active": True,
                     "is_new": payload.is_new if payload.is_new is not None else False,
+                    "options": [option.model_dump() for option in payload.options] if payload.options is not None else [],
+                    "options": Json(
+                        [option.model_dump() for option in payload.options]
+                        if payload.options is not None else []
+                    ),
                     "image": existing_image.image,
                     **self._build_relation_data(payload.category_ids, payload.collection_ids)
                 }
@@ -292,9 +331,10 @@ class GalleryService:
                             "inventory": v.inventory, "product_id": product.id,
                             "status": "IN_STOCK" if v.inventory > 0 else "OUT_OF_STOCK",
                             "size": v.size, "color": v.color, "width": v.width, "length": v.length, "age": v.age,
+                            "attributes": Json(v.attributes or {}),
                         })
                     await asyncio.gather(*[_create_variant(v) for v in payload.variants])
-                await self.cache_srv.invalidate(tags=["stats-trends"])
+                await self.cache_srv.invalidate(tags=["stats-trends", "products", f"product:{product.id}"])
                 return product.id
         except HTTPException:
             raise
@@ -303,6 +343,7 @@ class GalleryService:
             raise HTTPException(status_code=500, detail=str(e))
 
     async def update_metadata(self, image_id: int, payload: ProductImageMetadata) -> int:
+        self._validate_dynamic_variants(payload)
         existing_image = await self.db.productimage.find_unique(where={"id": image_id})
         if not existing_image:
             raise HTTPException(status_code=404, detail="Image not found")
@@ -329,25 +370,47 @@ class GalleryService:
                     update_data["active"] = payload.active
                 if payload.is_new is not None:
                     update_data["is_new"] = payload.is_new
+                if payload.options is not None:
+                    update_data["options"] = Json(
+                        [option.model_dump() for option in payload.options]
+                    )
 
                 if update_data:
                     await tx.product.update(where={"id": existing_image.product_id}, data=update_data)
 
-                if payload.variants:
+                if payload.variants is not None:
+                    existing_variants = await tx.productvariant.find_many(
+                        where={"product_id": existing_image.product_id},
+                    )
+                    existing_ids = {existing.id for existing in existing_variants}
+                    submitted_ids = {v.id for v in payload.variants if v.id is not None}
+                    if not submitted_ids.issubset(existing_ids):
+                        raise HTTPException(status_code=400, detail="A variant does not belong to this product")
+                    for existing in existing_variants:
+                        if existing.id not in submitted_ids:
+                            # Keep historical cart/order foreign keys intact; retire removed combinations.
+                            await tx.productvariant.update(
+                                where={"id": existing.id},
+                                data={"inventory": 0, "status": "OUT_OF_STOCK"},
+                            )
+
                     async def _upsert_variant(v):
                         v_data = {
                             "price": v.price, "old_price": v.old_price, "inventory": v.inventory,
                             "status": "IN_STOCK" if v.inventory > 0 else "OUT_OF_STOCK",
                             "size": v.size, "color": v.color, "width": v.width, "length": v.length, "age": v.age,
                         }
+                        if v.attributes is not None:
+                            v_data["attributes"] = Json(v.attributes or {})
                         if v.id:
                             await tx.productvariant.update(where={"id": v.id}, data=v_data)
                         else:
                             await tx.productvariant.create(data={
-                                **v_data, "product_id": existing_image.product_id,
-                                "sku": generate_sku(), "image": existing_image.image
+                                **v_data, "product_id": existing_image.product_id, "sku": generate_sku()
                             })
                     await asyncio.gather(*[_upsert_variant(v) for v in payload.variants])
+
+                await self.cache_srv.invalidate(tags=["products", f"product:{existing_image.product_id}"])
                 return existing_image.product_id
         except HTTPException:
             raise
