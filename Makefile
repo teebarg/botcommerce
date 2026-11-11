@@ -267,7 +267,7 @@ smkwds:
 # scripts
 .PHONY: run-script
 run-script:
-	$(DOCKER_COMPOSE) exec backend uv run python scripts/$(script_name).py
+	$(DOCKER_COMPOSE) exec backend uv run python scripts/$(script).py
 
 
 # ==========================================

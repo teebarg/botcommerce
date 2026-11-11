@@ -1,6 +1,7 @@
 import { Trash2, Edit3, X, MessageSquare, GalleryThumbnails } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { BulkImageSheetForm } from "./bulk-image-form-sheet";
+import { BulkAddVariantsSheet } from "./bulk-add-variants-sheet";
 import { Button } from "@/components/ui/button";
 import Overlay from "@/components/overlay";
 import { ConfirmDrawer } from "@/components/generic/confirm-drawer";
@@ -27,6 +28,7 @@ export const ProductBulkActions = ({
     isLoading,
 }: ProductBulkActionsProps) => {
     const editState = useOverlayTriggerState({});
+    const variantsState = useOverlayTriggerState({});
     const albumState = useOverlayTriggerState({});
     const campaignState = useOverlayTriggerState({});
     const deleteState = useOverlayTriggerState({});
@@ -77,6 +79,23 @@ export const ProductBulkActions = ({
             >
                 {editState.isOpen && <BulkImageSheetForm imageIds={selectedImageIds} onClose={editState.close} />}
             </Overlay>
+
+            {Boolean(selectedProductIds?.length) && (
+                <Overlay
+                    open={variantsState.isOpen}
+                    title="Bulk Add Variants"
+                    sheetClassName="sm:max-w-3xl"
+                    trigger={
+                        <Button className="rounded-full" size="sm" variant="ghost" onClick={variantsState.open}>
+                            <Edit3 className="h-4 w-4" />
+                            <span className="hidden sm:inline text-xs">Add Variants</span>
+                        </Button>
+                    }
+                    onOpenChange={variantsState.setOpen}
+                >
+                    {variantsState.isOpen && <BulkAddVariantsSheet productIds={selectedProductIds || []} onClose={variantsState.close} />}
+                </Overlay>
+            )}
 
             <Overlay
                 open={campaignState.isOpen}
