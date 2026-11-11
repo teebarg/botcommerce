@@ -133,6 +133,19 @@ class ImagesBulkUpdate(BaseModel):
     image_ids: List[int]
     data: ImageMetadata
 
+
+class BulkVariantValue(BaseModel):
+    attributes: dict[str, str]
+    price: float = Field(..., gt=0)
+    old_price: Optional[float] = 0.0
+    inventory: int = Field(..., ge=0)
+
+
+class BulkAddProductVariants(BaseModel):
+    product_ids: List[int] = Field(..., min_length=1)
+    options: List[ProductOption] = Field(..., min_length=1)
+    variants: List[BulkVariantValue] = Field(..., min_length=1)
+
 class ProductImageBulkUrls(BaseModel):
     urls: list[str]
 

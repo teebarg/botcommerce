@@ -1,4 +1,5 @@
 import asyncio
+import json
 import random
 from typing import Any, Dict, List, Optional
 
@@ -6,10 +7,12 @@ from fastapi import HTTPException
 
 from app.core.logging import get_logger
 from app.core.utils import generate_sku, slugify
+from app.core.variants import attributes_key, live_variants
 from app.models.gallery import PaginatedGalleryImages
 from app.models.generic import ImageBulkDelete
 from app.models.product import (
     ImagesBulkUpdate,
+    BulkAddProductVariants,
     ProductImageBulkUrls,
     ProductImageMetadata,
 )
@@ -185,6 +188,20 @@ class GalleryService:
         has_more = len(images) > limit
         items = images[:limit]
 
+        def _json(value, default):
+            if isinstance(value, str):
+                try:
+                    return json.loads(value)
+                except ValueError:
+                    return default
+            return value if value is not None else default
+
+        def _visible_variants(img) -> list:
+            return live_variants({
+                "variants": _json(img["variants"], []),
+                "options": _json(img["p_options"], []),
+            })
+
         shaped = [
             {
                 "id": img["id"],
@@ -203,7 +220,7 @@ class GalleryService:
                     "options": img["p_options"] or [],
                     "categories": img["categories"],
                     "collections": img["collections"],
-                    "variants": img["variants"],
+                    "variants": _visible_variants(img),
                 } if img["p_id"] else None,
             } for img in items
         ]
@@ -312,7 +329,6 @@ class GalleryService:
                     "description": payload.description,
                     "active": True,
                     "is_new": payload.is_new if payload.is_new is not None else False,
-                    "options": [option.model_dump() for option in payload.options] if payload.options is not None else [],
                     "options": Json(
                         [option.model_dump() for option in payload.options]
                         if payload.options is not None else []
@@ -386,29 +402,56 @@ class GalleryService:
                     submitted_ids = {v.id for v in payload.variants if v.id is not None}
                     if not submitted_ids.issubset(existing_ids):
                         raise HTTPException(status_code=400, detail="A variant does not belong to this product")
+
+                    # A combination submitted without an id may match a variant that was removed
+                    # earlier (same attributes). Reuse that row instead of creating a duplicate.
+                    removed_by_key = {}
                     for existing in existing_variants:
-                        if existing.id not in submitted_ids:
+                        key = attributes_key(existing.attributes)
+                        if key and existing.id not in submitted_ids:
+                            removed_by_key.setdefault(key, existing)
+
+                    kept_ids = set(submitted_ids)
+                    targets = []
+                    for v in payload.variants:
+                        target_id = v.id
+                        if target_id is None:
+                            match = removed_by_key.get(attributes_key(v.attributes))
+                            if match and match.id not in kept_ids:
+                                target_id = match.id
+                                kept_ids.add(match.id)
+                        targets.append((target_id, v))
+
+                    for existing in existing_variants:
+                        if existing.id not in kept_ids:
                             # Keep historical cart/order foreign keys intact; retire removed combinations.
+                            # They are hidden because their attributes no longer fit the product options.
                             await tx.productvariant.update(
                                 where={"id": existing.id},
                                 data={"inventory": 0, "status": "OUT_OF_STOCK"},
                             )
 
-                    async def _upsert_variant(v):
+                    async def _upsert_variant(target_id, v):
                         v_data = {
                             "price": v.price, "old_price": v.old_price, "inventory": v.inventory,
                             "status": "IN_STOCK" if v.inventory > 0 else "OUT_OF_STOCK",
-                            "size": v.size, "color": v.color, "width": v.width, "length": v.length, "age": v.age,
                         }
+                        # The old size/color/width/length/age columns are being retired.
+                        # Only write them when the caller actually sends them, so a save
+                        # from the new form does not wipe existing values.
+                        for legacy_field in ("size", "color", "width", "length", "age"):
+                            legacy_value = getattr(v, legacy_field, None)
+                            if legacy_value is not None:
+                                v_data[legacy_field] = legacy_value
                         if v.attributes is not None:
                             v_data["attributes"] = Json(v.attributes or {})
-                        if v.id:
-                            await tx.productvariant.update(where={"id": v.id}, data=v_data)
+                        if target_id:
+                            await tx.productvariant.update(where={"id": target_id}, data=v_data)
                         else:
                             await tx.productvariant.create(data={
                                 **v_data, "product_id": existing_image.product_id, "sku": generate_sku()
                             })
-                    await asyncio.gather(*[_upsert_variant(v) for v in payload.variants])
+                    await asyncio.gather(*[_upsert_variant(target_id, v) for target_id, v in targets])
 
                 await self.cache_srv.invalidate(tags=["products", f"product:{existing_image.product_id}"])
                 return existing_image.product_id
@@ -465,6 +508,97 @@ class GalleryService:
                         await tx.productvariant.update(where={"id": first_variant_id}, data=v_data)
 
         await self.cache_srv.invalidate(tags=["stats-trends"])
+
+    async def bulk_add_product_variants(self, payload: BulkAddProductVariants) -> dict[str, Any]:
+        """Apply a shared variant structure while preserving matching variants per product."""
+        names = [option.name.strip() for option in payload.options]
+        if any(not name for name in names) or len({name.casefold() for name in names}) != len(names):
+            raise HTTPException(status_code=400, detail="Attribute names must be non-empty and unique")
+
+        option_values: dict[str, set[str]] = {}
+        for option, name in zip(payload.options, names):
+            values = [value.strip() for value in option.values]
+            if not values or any(not value for value in values) or len(values) != len(set(values)):
+                raise HTTPException(status_code=400, detail=f"Values for {name} must be non-empty and unique")
+            option_values[name] = set(values)
+
+        submitted: dict[tuple[tuple[str, str], ...], Any] = {}
+        for variant in payload.variants:
+            attrs = variant.attributes
+            if set(attrs) != set(names) or any(value not in option_values[name] for name, value in attrs.items()):
+                raise HTTPException(status_code=400, detail="Variant combinations do not match the configured attributes")
+            key = tuple(sorted(attrs.items()))
+            if key in submitted:
+                raise HTTPException(status_code=400, detail="Duplicate variant combination")
+            submitted[key] = variant
+
+        expected_count = 1
+        for values in option_values.values():
+            expected_count *= len(values)
+            if expected_count > 500:
+                raise HTTPException(status_code=400, detail="A maximum of 500 variant combinations is allowed")
+        if len(submitted) != expected_count:
+            raise HTTPException(status_code=400, detail="Generate every combination for the configured attributes")
+
+        product_ids = list(dict.fromkeys(payload.product_ids))
+        products = await self.db.product.find_many(
+            where={"id": {"in": product_ids}}, include={"variants": True}
+        )
+        products_by_id = {product.id: product for product in products}
+        missing = [product_id for product_id in product_ids if product_id not in products_by_id]
+        if missing:
+            raise HTTPException(status_code=404, detail=f"Products not found: {missing}")
+
+        try:
+            async with self.db.tx(timeout=60000) as tx:
+                for product_id in product_ids:
+                    product = products_by_id[product_id]
+                    existing_by_key = {}
+                    for existing in product.variants or []:
+                        attrs = existing.attributes or {}
+                        if attrs:
+                            existing_by_key[tuple(sorted(attrs.items()))] = existing
+
+                    await tx.product.update(
+                        where={"id": product_id},
+                        data={"options": Json([option.model_dump() for option in payload.options])},
+                    )
+                    for key, value in submitted.items():
+                        existing = existing_by_key.get(key)
+                        if existing:
+                            # Keep the product's own price, stock and variant ID for existing combinations.
+                            await tx.productvariant.update(
+                                where={"id": existing.id},
+                                data={"attributes": Json(value.attributes)},
+                            )
+                        else:
+                            await tx.productvariant.create(data={
+                                "product_id": product_id,
+                                "sku": generate_sku(),
+                                "price": value.price,
+                                "old_price": value.old_price or 0,
+                                "inventory": value.inventory,
+                                "status": "IN_STOCK" if value.inventory > 0 else "OUT_OF_STOCK",
+                                "attributes": Json(value.attributes),
+                            })
+
+                    # Retire unmatched dynamic and legacy variants without breaking historical references.
+                    matched_ids = {variant.id for key, variant in existing_by_key.items() if key in submitted}
+                    for existing in product.variants or []:
+                        if existing.id not in matched_ids:
+                            await tx.productvariant.update(
+                                where={"id": existing.id},
+                                data={"inventory": 0, "status": "OUT_OF_STOCK"},
+                            )
+        except HTTPException:
+            raise
+        except Exception as exc:
+            logger.exception("Bulk variant configuration failed")
+            raise HTTPException(status_code=500, detail="Unable to apply variants to selected products") from exc
+
+        await self.cache_srv.invalidate(tags=["products", "stats-trends", *[f"product:{pid}" for pid in product_ids]])
+        await self.invalidate()
+        return {"success": True, "updated_count": len(product_ids), "product_ids": product_ids}
 
     async def handle_bulk_update_images(self, payload: ImagesBulkUpdate, images, index_products_fn) -> None:
         failed_ids = []

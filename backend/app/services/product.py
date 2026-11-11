@@ -13,6 +13,7 @@ from app.core.config import settings
 from app.core.logging import get_logger
 from app.core.search.meilisearch import MeilisearchEngine
 from app.core.utils import url_to_list
+from app.core.variants import live_variants
 from app.models.product import Product
 from app.services.cache import CacheService, cacheable
 from app.services.cdn import CdnService
@@ -66,13 +67,22 @@ class ProductService:
     async def get(self, id: int):
         return await self.db.product.find_unique(where={"id": id})
 
+    @staticmethod
+    def _hide_removed_variants(product):
+        """Drop variants whose choices were removed from the product."""
+        if product is not None and product.variants:
+            product.variants = live_variants(product)
+        return product
+
     async def get_by_ids(self, ids: list[int]):
-        return await self.db.product.find_many(where={"id": {"in": ids}}, include={"variants": True, "images": True})
+        products = await self.db.product.find_many(where={"id": {"in": ids}}, include={"variants": True, "images": True})
+        return [self._hide_removed_variants(p) for p in products]
 
     async def get_by_slug(self, slug: str):
-        return await self.db.product.find_unique(
+        product = await self.db.product.find_unique(
             where={"slug": slug}, include={"variants": True, "images": True}
         )
+        return self._hide_removed_variants(product)
 
     async def check_review_status(
         self, user_id: int, product_id: int
@@ -143,7 +153,7 @@ class ProductService:
                 break
 
             for prod in products:
-                for variant in prod.variants:
+                for variant in live_variants(prod):
                     item = ET.SubElement(channel, "item")
                     ET.SubElement(item, "g:id").text = variant.sku
 
@@ -496,7 +506,7 @@ class ProductService:
                 "attributes": getattr(v, "attributes", None) or {},
                 "status": v.status,
             }
-            for v in (product.variants or [])
+            for v in live_variants(product)
         ]
         product_dict["variants"] = variants
 

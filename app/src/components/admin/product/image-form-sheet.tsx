@@ -1,11 +1,10 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
     FileText,
     Package,
     Plus,
     Tag,
     Trash2,
-    WandSparkles,
     Info,
     X,
 } from "lucide-react";
@@ -43,7 +42,6 @@ type EditableVariant = {
     price: number;
     old_price: number;
     inventory: number;
-    selected: boolean;
 };
 
 type FormProduct = Omit<
@@ -64,17 +62,11 @@ const MAX_VARIANTS = 500;
 
 const COMMON_ATTRIBUTES = [
     "Size",
-    "Shoe Size",
-    "Clothing Size",
-    "Colour",
-    "Volume",
-    "Weight",
-    "Storage",
-    "Material",
+    "Color",
     "Age",
     "Length",
+    "Waist",
     "Width",
-    "Capacity",
 ];
 
 let uidCounter = 0;
@@ -185,9 +177,33 @@ function sanitizeOptions(options: ProductOption[]): ProductOption[] {
     return result;
 }
 
+// A variant is "removed" when its attributes no longer fit the product options
+// (e.g. the choice "Red" was deleted). Removed variants stay in the database for
+// order history, but the form and the store must ignore them.
+function fitsOptions(
+    attributes: Record<string, string>,
+    options: ProductOption[],
+) {
+    const normalized = normalize(attributes);
+    if (!options.length) return Object.keys(normalized).length === 0;
+
+    const allowed = new Map(
+        options.map((option) => [
+            option.name.trim().toLowerCase(),
+            new Set(option.values.map((value) => value.trim().toLowerCase())),
+        ]),
+    );
+
+    const names = Object.keys(normalized);
+    return (
+        names.length === allowed.size &&
+        names.every((name) => allowed.get(name)?.has(normalized[name]))
+    );
+}
+
 // Builds the starting options and variants for the form.
-// If the API doesn't return options (or returns only some of them),
-// they are rebuilt from the attributes of the saved variants.
+// The saved product options are the source of truth. Options are only rebuilt
+// from variant attributes for older products that never saved any options.
 function buildInitialState(product?: Product): {
     options: ProductOption[];
     variants: EditableVariant[];
@@ -208,7 +224,7 @@ function buildInitialState(product?: Product): {
         }))
         .filter((option) => option.name) as ProductOption[];
 
-    const variants: EditableVariant[] = (
+    const saved: EditableVariant[] = (
         (product?.variants ?? []) as any[]
     ).map((variant) => ({
         uid: makeUid(),
@@ -218,7 +234,6 @@ function buildInitialState(product?: Product): {
         price: Number(variant.price) || 0,
         old_price: Number(variant.old_price) || 0,
         inventory: Number(variant.inventory) || 0,
-        selected: true,
     }));
 
     const options: ProductOption[] = savedOptions.map((option) => ({
@@ -226,41 +241,38 @@ function buildInitialState(product?: Product): {
         values: [...option.values],
     }));
 
-    for (const variant of variants) {
-        for (const [name, value] of Object.entries(variant.attributes)) {
-            let option = options.find(
-                (item) => item.name.toLowerCase() === name.toLowerCase(),
-            );
+    if (!options.length) {
+        for (const variant of saved) {
+            for (const [name, value] of Object.entries(variant.attributes)) {
+                let option = options.find(
+                    (item) => item.name.toLowerCase() === name.toLowerCase(),
+                );
 
-            if (!option) {
-                option = { name, values: [] } as ProductOption;
-                options.push(option);
-            }
+                if (!option) {
+                    option = { name, values: [] } as ProductOption;
+                    options.push(option);
+                }
 
-            if (
-                !option.values.some(
-                    (item) => item.toLowerCase() === value.toLowerCase(),
-                )
-            ) {
-                option.values.push(value);
+                if (
+                    !option.values.some(
+                        (item) => item.toLowerCase() === value.toLowerCase(),
+                    )
+                ) {
+                    option.values.push(value);
+                }
             }
         }
     }
 
+    const cleanOptions = sanitizeOptions(options);
+    const live = saved.filter((variant) =>
+        fitsOptions(variant.attributes, cleanOptions),
+    );
+    const reconciled = reconcileVariants(cleanOptions, live);
+
     return {
-        options: sanitizeOptions(options),
-        variants: variants.length
-            ? variants
-            : [
-                {
-                    uid: makeUid(),
-                    attributes: {},
-                    price: 0,
-                    old_price: 0,
-                    inventory: 0,
-                    selected: true,
-                },
-            ],
+        options: cleanOptions,
+        variants: reconciled.ok ? reconciled.variants : live,
     };
 }
 
@@ -288,6 +300,129 @@ function buildCombinations(
         },
         [{}],
     );
+}
+
+type ReconcileResult =
+    | {
+        ok: true;
+        variants: EditableVariant[];
+        added: number;
+        removed: number;
+        removedStock: number;
+    }
+    | { ok: false; error: string };
+
+// The combinations list is always exactly what the options produce.
+// Matching combinations keep their id, price and stock. Pure function: no state.
+function reconcileVariants(
+    options: ProductOption[],
+    previous: EditableVariant[],
+): ReconcileResult {
+    if (options.length === 0) {
+        const base =
+            previous.find((item) => !Object.keys(item.attributes).length) ??
+            previous[0];
+
+        return {
+            ok: true,
+            added: base ? 0 : 1,
+            removed: Math.max(0, previous.length - 1),
+            removedStock: previous
+                .filter((item) => item !== base)
+                .reduce((sum, item) => sum + item.inventory, 0),
+            variants: [
+                {
+                    uid: base?.uid ?? makeUid(),
+                    id: base?.id,
+                    sku: base?.sku,
+                    attributes: {},
+                    price: base?.price ?? 0,
+                    old_price: base?.old_price ?? 0,
+                    inventory: base?.inventory ?? 0,
+                },
+            ],
+        };
+    }
+
+    const total = options.reduce(
+        (count, option) => count * option.values.length,
+        1,
+    );
+    if (total > MAX_VARIANTS) {
+        return {
+            ok: false,
+            error: `That would create ${total} combinations. The most allowed is ${MAX_VARIANTS}. Remove some choices first.`,
+        };
+    }
+
+    const combinations = buildCombinations(options);
+    if (!combinations.length) {
+        return {
+            ok: false,
+            error: "Each option needs a name and at least one choice.",
+        };
+    }
+
+    const existing = previous.map((variant) => ({
+        variant,
+        key: combinationKey(variant.attributes),
+        norm: normalize(variant.attributes),
+    }));
+    const claimed = new Set<number>();
+    let added = 0;
+
+    // Pass 1: exact matches keep id, price and stock.
+    const exact: (EditableVariant | null)[] = combinations.map((attributes) => {
+        const key = combinationKey(attributes);
+        const idx = existing.findIndex(
+            (item, i) => !claimed.has(i) && item.key === key,
+        );
+        if (idx === -1) return null;
+        claimed.add(idx);
+        return { ...existing[idx].variant, attributes };
+    });
+
+    // Pass 2: everything else. Covers adding an option to an existing
+    // product (the old row moves to the first new combination) and new choices.
+    const variants: EditableVariant[] = combinations.map((attributes, i) => {
+        const match = exact[i];
+        if (match) return match;
+
+        const norm = normalize(attributes);
+        const related = (item: (typeof existing)[number]) =>
+            isSubset(item.norm, norm) || isSubset(norm, item.norm);
+
+        const freeIdx = existing.findIndex(
+            (item, idx) => !claimed.has(idx) && related(item),
+        );
+        if (freeIdx !== -1) {
+            claimed.add(freeIdx);
+            return { ...existing[freeIdx].variant, attributes };
+        }
+
+        const template = existing.find(related)?.variant;
+        added += 1;
+        return {
+            uid: makeUid(),
+            attributes,
+            price: template?.price ?? 0,
+            old_price: template?.old_price ?? 0,
+            inventory: 0,
+        };
+    });
+
+    const dropped = existing.filter((_, idx) => !claimed.has(idx));
+
+    return {
+        ok: true,
+        variants,
+        added,
+        removed: dropped.length,
+        removedStock: dropped.reduce(
+            (sum, item) => sum + item.variant.inventory,
+            0,
+        ),
+    };
 }
 
 const describeVariant = (attributes: Record<string, string>, separator: string) =>
@@ -335,7 +470,6 @@ export function ImageSheetForm({
     const [initial] = useState(() => buildInitialState(currentProduct));
 
     const [options, setOptions] = useState<ProductOption[]>(initial.options);
-
     const [variants, setVariants] = useState<EditableVariant[]>(
         initial.variants,
     );
@@ -346,15 +480,13 @@ export function ImageSheetForm({
     const [draftValues, setDraftValues] = useState<string[]>([]);
     const [valueInputs, setValueInputs] = useState<Record<number, string>>({});
 
-    const [hasGenerated, setHasGenerated] = useState(
-        initial.options.length > 0 ||
-        (currentProduct?.variants?.length ?? 0) > 0,
-    );
+    // "Set for all" shortcuts in step 2. They only fill the rows on screen.
+    const [allPrice, setAllPrice] = useState("");
+    const [allQuantity, setAllQuantity] = useState("");
 
-    // Shown inside step 2 (result of generating).
-    const [generationMessage, setGenerationMessage] = useState("");
-    // Shown inside step 1 right next to the option builder, so errors like
-    // "already exists" are visible where the admin is working.
+    // Shown in step 2 after every change to the options.
+    const [changeMessage, setChangeMessage] = useState("");
+    // Shown in step 1 next to the option builder, where the admin is working.
     const [optionMessage, setOptionMessage] = useState("");
 
     const isCustomAttribute = selectedAttribute === "custom";
@@ -362,15 +494,6 @@ export function ImageSheetForm({
     const attributeName = isCustomAttribute
         ? customAttributeName.trim()
         : selectedAttribute.trim();
-
-    const totalVariants = useMemo(() => {
-        if (!options.length) return 1;
-
-        return options.reduce(
-            (count, option) => count * option.values.length,
-            1,
-        );
-    }, [options]);
 
     const invalidOptions =
         options.length > 0 &&
@@ -393,36 +516,25 @@ export function ImageSheetForm({
             ).size !== options.length
         );
 
-    // Single source of truth for "why can't I generate?".
-    const generateBlockReason = invalidOptions
-        ? "Check your options. Each option needs a name and at least one unique choice."
-        : totalVariants > MAX_VARIANTS
-            ? `Too many combinations (${totalVariants}). Reduce the choices to ${MAX_VARIANTS} or fewer.`
-            : "";
-
-    const selectedVariants = variants.filter(
-        (variant) => variant.selected,
-    );
-
+    // A combination with quantity 0 is just "out of stock", so it doesn't need
+    // its own price. It borrows the price of another combination on save.
     const isVariantInvalid = (variant: EditableVariant) =>
-        !Number.isFinite(variant.price) ||
-        variant.price < 2 ||
+        (variant.inventory > 0 &&
+            (!Number.isFinite(variant.price) || variant.price < 2)) ||
         !Number.isFinite(variant.inventory) ||
         variant.inventory < 0 ||
         !Number.isInteger(variant.inventory);
 
-    const invalidVariantCount = selectedVariants.filter(isVariantInvalid)
-        .length;
+    const invalidVariantCount = variants.filter(isVariantInvalid).length;
 
-    const invalidVariants = invalidVariantCount > 0;
+    const fallbackPrice = variants.find((variant) => variant.price >= 2)?.price;
 
     const isDisabled =
         !product.name?.trim() ||
         invalidOptions ||
         variants.length === 0 ||
-        !hasGenerated ||
-        selectedVariants.length === 0 ||
-        invalidVariants;
+        invalidVariantCount > 0 ||
+        fallbackPrice === undefined;
 
     // Tell the admin exactly why Save is disabled.
     const saveBlockers: string[] = [];
@@ -431,16 +543,12 @@ export function ImageSheetForm({
         saveBlockers.push(
             "Each option needs a name and unique, non-empty choices.",
         );
-    if (!hasGenerated)
-        saveBlockers.push(
-            "You changed the options. Tap “Regenerate combinations” first.",
-        );
-    if (hasGenerated && selectedVariants.length === 0)
-        saveBlockers.push("Select at least one combination.");
     if (invalidVariantCount > 0)
         saveBlockers.push(
-            `${invalidVariantCount} selected item(s) need a price of ₦2 or more.`,
+            `${invalidVariantCount} item(s) with stock need a price of ₦2 or more.`,
         );
+    if (invalidVariantCount === 0 && fallbackPrice === undefined)
+        saveBlockers.push("Enter a price for at least one combination.");
 
     const updateProductField = (
         field: keyof FormProduct,
@@ -451,13 +559,43 @@ export function ImageSheetForm({
         );
     };
 
-    // Keep existing variants until the admin explicitly regenerates them.
-    // This prevents losing data while editing attribute values.
-    const updateOptions = (nextOptions: ProductOption[]) => {
+    const describeChange = (result: {
+        added: number;
+        removed: number;
+        removedStock: number;
+    }) => {
+        const parts: string[] = [];
+        if (result.added > 0) {
+            parts.push(
+                `${result.added} new combination${result.added === 1 ? "" : "s"} added. Enter ${result.added === 1 ? "its" : "their"} price and quantity below.`,
+            );
+        }
+        if (result.removed > 0) {
+            parts.push(
+                `${result.removed} combination${result.removed === 1 ? "" : "s"} removed` +
+                (result.removedStock > 0
+                    ? `. ${result.removedStock} item${result.removedStock === 1 ? "" : "s"} in stock will no longer be sold.`
+                    : "."),
+            );
+        }
+        return parts.join(" ");
+    };
+
+    // Every change to the options updates the combinations list straight away.
+    // Returns false (and changes nothing) when the change is not allowed.
+    const updateOptions = (nextOptions: ProductOption[]): boolean => {
+        const result = reconcileVariants(nextOptions, variants);
+
+        if ("error" in result) {
+            setOptionMessage(result.error);
+            return false;
+        }
+
         setOptions(nextOptions);
-        setHasGenerated(false);
-        setGenerationMessage("");
+        setVariants(result.variants);
         setOptionMessage("");
+        setChangeMessage(describeChange(result));
+        return true;
     };
 
     const addDraftValue = () => {
@@ -520,17 +658,20 @@ export function ImageSheetForm({
             return;
         }
 
-        updateOptions([...options, { name, values: [...values] }]);
-
-        resetAttributeBuilder();
+        if (updateOptions([...options, { name, values: [...values] }])) {
+            resetAttributeBuilder();
+        }
     };
 
     const removeOption = (index: number) => {
-        updateOptions(
-            options.filter((_, optionIndex) => optionIndex !== index),
-        );
-        // valueInputs is keyed by index, so it must be cleared when indexes shift.
-        setValueInputs({});
+        if (
+            updateOptions(
+                options.filter((_, optionIndex) => optionIndex !== index),
+            )
+        ) {
+            // valueInputs is keyed by index, so it must be cleared when indexes shift.
+            setValueInputs({});
+        }
     };
 
     const addOptionValue = (index: number) => {
@@ -549,7 +690,7 @@ export function ImageSheetForm({
             return;
         }
 
-        updateOptions(
+        const changed = updateOptions(
             options.map((item, optionIndex) =>
                 optionIndex === index
                     ? {
@@ -560,143 +701,34 @@ export function ImageSheetForm({
             ),
         );
 
-        setValueInputs((previous) => ({
-            ...previous,
-            [index]: "",
-        }));
+        if (changed) {
+            setValueInputs((previous) => ({
+                ...previous,
+                [index]: "",
+            }));
+        }
     };
 
     const removeOptionValue = (
         optionIndex: number,
         value: string,
     ) => {
+        const remaining = options[optionIndex].values.filter(
+            (item) => item !== value,
+        );
+
+        // An option with no choices left is removed completely.
+        if (remaining.length === 0) {
+            removeOption(optionIndex);
+            return;
+        }
+
         updateOptions(
             options.map((option, index) =>
                 index === optionIndex
-                    ? {
-                        ...option,
-                        values: option.values.filter(
-                            (item) => item !== value,
-                        ),
-                    }
+                    ? { ...option, values: remaining }
                     : option,
             ),
-        );
-    };
-
-    // Generate from the latest options state.
-    // Matching variants keep their IDs, prices, stock and selection.
-    const generateVariants = () => {
-        setGenerationMessage("");
-
-        if (options.length === 0) {
-            setVariants((previous) => {
-                const base =
-                    previous.find(
-                        (item) => !Object.keys(item.attributes).length,
-                    ) ?? previous[0];
-
-                return [
-                    {
-                        uid: base?.uid ?? makeUid(),
-                        id: base?.id,
-                        sku: base?.sku,
-                        attributes: {},
-                        price: base?.price ?? 0,
-                        old_price: base?.old_price ?? 0,
-                        inventory: base?.inventory ?? 0,
-                        selected: true,
-                    },
-                ];
-            });
-            setHasGenerated(true);
-            return;
-        }
-
-        if (generateBlockReason) {
-            setGenerationMessage(generateBlockReason);
-            return;
-        }
-
-        const combinations = buildCombinations(options);
-
-        if (!combinations.length) {
-            setGenerationMessage(
-                "No combinations could be created. Check your options and try again.",
-            );
-            return;
-        }
-
-        const existing = variants.map((variant) => ({
-            variant,
-            key: combinationKey(variant.attributes),
-            norm: normalize(variant.attributes),
-        }));
-
-        const claimed = new Set<number>();
-
-        // Pass 1: exact matches keep id, price and stock.
-        const results: (EditableVariant | null)[] = combinations.map(
-            (attributes) => {
-                const key = combinationKey(attributes);
-                const idx = existing.findIndex(
-                    (item, i) => !claimed.has(i) && item.key === key,
-                );
-                if (idx === -1) return null;
-                claimed.add(idx);
-                return { ...existing[idx].variant, attributes };
-            },
-        );
-
-        // Pass 2: combinations with no exact match. This covers adding a new
-        // option to an existing product, or removing one.
-        const generated: EditableVariant[] = combinations.map(
-            (attributes, i) => {
-                const exact = results[i];
-                if (exact) return exact;
-
-                const norm = normalize(attributes);
-                const related = (item: (typeof existing)[number]) =>
-                    isSubset(item.norm, norm) || isSubset(norm, item.norm);
-
-                // Take over an unclaimed old variant (keeps id and stock)
-                const freeIdx = existing.findIndex(
-                    (item, idx) => !claimed.has(idx) && related(item),
-                );
-                if (freeIdx !== -1) {
-                    claimed.add(freeIdx);
-                    return { ...existing[freeIdx].variant, attributes };
-                }
-
-                // Otherwise copy only the price from a related variant
-                const template = existing.find(related)?.variant;
-
-                return {
-                    uid: makeUid(),
-                    attributes,
-                    price: template?.price ?? 0,
-                    old_price: template?.old_price ?? 0,
-                    inventory: 0,
-                    selected: true,
-                };
-            },
-        );
-
-        const keptCount = generated.filter((item) => item.id).length;
-        const newCount = generated.length - keptCount;
-        const removedCount = existing.filter(
-            (_, idx) => !claimed.has(idx),
-        ).length;
-
-        setVariants(generated);
-        setHasGenerated(true);
-        setGenerationMessage(
-            `${generated.length} combinations: ${keptCount} kept with their existing price and stock, ${newCount} new` +
-            (removedCount > 0 ? `, ${removedCount} old removed` : "") +
-            ". " +
-            (newCount > 0
-                ? "Set quantity (and price if empty) for the new ones in step 3."
-                : ""),
         );
     };
 
@@ -711,13 +743,22 @@ export function ImageSheetForm({
         );
     };
 
-    const toggleAllVariants = (checked: boolean) => {
+    const applyPriceToAll = () => {
+        const price = Number(allPrice);
+        if (!Number.isFinite(price) || price < 2) return;
         setVariants((previous) =>
-            previous.map((variant) => ({
-                ...variant,
-                selected: checked,
-            })),
+            previous.map((variant) => ({ ...variant, price })),
         );
+        setAllPrice("");
+    };
+
+    const applyQuantityToAll = () => {
+        const quantity = Number.parseInt(allQuantity, 10);
+        if (!Number.isFinite(quantity) || quantity < 0) return;
+        setVariants((previous) =>
+            previous.map((variant) => ({ ...variant, inventory: quantity })),
+        );
+        setAllQuantity("");
     };
 
     const handleSubmit = async () => {
@@ -739,9 +780,9 @@ export function ImageSheetForm({
                 name: option.name.trim(),
                 values: option.values.map((value) => value.trim()),
             })),
-            variants: selectedVariants.map((variant) => ({
+            variants: variants.map((variant) => ({
                 id: variant.id,
-                price: variant.price,
+                price: variant.price >= 2 ? variant.price : fallbackPrice,
                 old_price: variant.old_price || 0,
                 inventory: variant.inventory,
                 attributes: variant.attributes,
@@ -760,8 +801,6 @@ export function ImageSheetForm({
             // the admin doesn't lose their work.
         }
     };
-
-    const allSelected = variants.every((variant) => variant.selected);
 
     return (
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -1152,7 +1191,7 @@ export function ImageSheetForm({
                     </Card>
                 </section>
 
-                {/* STEP 2: GENERATE AND SELECT */}
+                {/* STEP 2: PRICE AND STOCK */}
                 <section className="space-y-3">
                     <div>
                         <div className="flex items-center gap-2">
@@ -1160,345 +1199,242 @@ export function ImageSheetForm({
                                 2
                             </span>
                             <h3 className="text-base font-semibold">
-                                Choose the combinations you sell
+                                Set price and stock
                             </h3>
                         </div>
                         <p className="mt-1 text-sm text-muted-foreground">
-                            We will put the choices together. Remove anything
-                            you don't sell.
+                            {options.length > 0
+                                ? "Every combination of your choices is listed here. Leave the quantity at 0 for any you don't have. It will show as out of stock and needs no price."
+                                : "Enter the price and how many you have."}
                         </p>
                     </div>
 
                     <Card className="space-y-3 p-3 sm:p-4">
-                        {options.length > 0 ? (
-                            <>
-                                <div className="rounded-lg bg-muted/50 p-3">
-                                    {options.map((option) => (
-                                        <p
-                                            key={option.name}
-                                            className="text-sm"
-                                        >
-                                            <strong>{option.name}:</strong>{" "}
-                                            {option.values.join(", ")}
-                                        </p>
-                                    ))}
-                                    <p className="mt-2 text-xs text-muted-foreground">
-                                        {totalVariants} possible combinations.
-                                    </p>
-                                </div>
-
-                                <Button
-                                    type="button"
-                                    className="h-12 w-full"
-                                    disabled={!!generateBlockReason}
-                                    onClick={generateVariants}
-                                >
-                                    <WandSparkles className="h-4 w-4" />
-                                    {hasGenerated
-                                        ? "Regenerate combinations"
-                                        : "Generate combinations"}
-                                </Button>
-
-                                {generateBlockReason && (
-                                    <p className="text-sm text-destructive">
-                                        {generateBlockReason}
-                                    </p>
-                                )}
-                            </>
-                        ) : (
-                            <>
-                                <p className="text-sm text-muted-foreground">
-                                    This product has no options. It will have
-                                    one default combination.
-                                </p>
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    className="h-11 w-full"
-                                    onClick={generateVariants}
-                                >
-                                    Use one price and stock
-                                </Button>
-                            </>
-                        )}
-
-                        {generationMessage && (
+                        {changeMessage && (
                             <p className="rounded-lg bg-muted p-3 text-sm">
-                                {generationMessage}
+                                {changeMessage}
                             </p>
                         )}
 
-                        {hasGenerated && variants.length > 0 && (
-                            <div className="space-y-3 border-t pt-3">
-                                <div className="flex flex-wrap items-center justify-between gap-2">
-                                    <div>
-                                        <p className="font-semibold">
-                                            Select what you actually sell
-                                        </p>
-                                        <p className="text-xs text-muted-foreground">
-                                            Untick combinations you don't
-                                            have.
-                                        </p>
-                                    </div>
-
-                                    <Button
-                                        type="button"
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() =>
-                                            toggleAllVariants(!allSelected)
-                                        }
-                                    >
-                                        {allSelected
-                                            ? "Untick all"
-                                            : "Select all"}
-                                    </Button>
-                                </div>
-
-                                <div className="space-y-2">
-                                    {variants.map((variant) => (
-                                        <label
-                                            key={variant.uid}
-                                            className={`flex min-h-14 cursor-pointer items-center gap-3 rounded-lg border p-3 ${variant.selected
-                                                ? "border-primary/50 bg-primary/5"
-                                                : "bg-muted/20 opacity-70"
-                                                }`}
-                                        >
-                                            <Checkbox
-                                                checked={variant.selected}
-                                                onCheckedChange={(checked) =>
-                                                    updateVariant(variant.uid, {
-                                                        selected:
-                                                            checked === true,
-                                                    })
-                                                }
-                                            />
-
-                                            <span className="min-w-0 flex-1 text-sm font-medium">
-                                                {describeVariant(
-                                                    variant.attributes,
-                                                    " · ",
-                                                )}
-                                            </span>
-
-                                            <span className="shrink-0 text-xs text-muted-foreground">
-                                                {variant.selected
-                                                    ? "Selling"
-                                                    : "Not selling"}
-                                            </span>
-                                        </label>
-                                    ))}
-                                </div>
-
-                                <p className="rounded-lg bg-primary/5 p-3 text-sm">
-                                    <strong>
-                                        {selectedVariants.length}
-                                    </strong>{" "}
-                                    selected out of {variants.length}.
-                                </p>
-                            </div>
-                        )}
-                    </Card>
-                </section>
-
-                {/* STEP 3: PRICE AND STOCK */}
-                {hasGenerated && variants.length > 0 && (
-                    <section className="space-y-3">
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
-                                    3
-                                </span>
-                                <h3 className="text-base font-semibold">
-                                    Set price and stock
-                                </h3>
-                            </div>
-                            <p className="mt-1 text-sm text-muted-foreground">
-                                Enter the price and how many you have for each
-                                selected combination.
+                        <div className="flex items-center justify-between gap-2">
+                            <p className="text-sm font-semibold">
+                                {options.length > 0
+                                    ? `${variants.length} combination${variants.length === 1 ? "" : "s"}`
+                                    : "1 item"}
                             </p>
+                            <span className="text-xs text-muted-foreground">
+                                Prices in ₦
+                            </span>
                         </div>
 
-                        <Card className="space-y-3 p-3 sm:p-4">
-                            {selectedVariants.length === 0 ? (
-                                <p className="rounded-lg bg-muted/50 p-4 text-sm text-muted-foreground">
-                                    Select at least one combination above.
+                        {variants.length > 1 && (
+                            <div className="grid gap-3 rounded-xl border border-dashed p-3 sm:grid-cols-2">
+                                <div className="space-y-1">
+                                    <Label className="text-xs" htmlFor="all-price">
+                                        Same price for all (₦)
+                                    </Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            id="all-price"
+                                            type="number"
+                                            inputMode="decimal"
+                                            min="2"
+                                            step="1"
+                                            className="h-11"
+                                            placeholder="e.g. 5000"
+                                            value={allPrice}
+                                            onChange={(event) =>
+                                                setAllPrice(event.target.value)
+                                            }
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            className="h-11 shrink-0"
+                                            disabled={Number(allPrice) < 2}
+                                            onClick={applyPriceToAll}
+                                        >
+                                            Apply
+                                        </Button>
+                                    </div>
+                                </div>
+                                <div className="space-y-1">
+                                    <Label className="text-xs" htmlFor="all-quantity">
+                                        Same quantity for all
+                                    </Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            id="all-quantity"
+                                            type="number"
+                                            inputMode="numeric"
+                                            min="0"
+                                            step="1"
+                                            className="h-11"
+                                            placeholder="e.g. 10"
+                                            value={allQuantity}
+                                            onChange={(event) =>
+                                                setAllQuantity(event.target.value)
+                                            }
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            className="h-11 shrink-0"
+                                            disabled={
+                                                allQuantity.trim() === "" ||
+                                                Number.parseInt(allQuantity, 10) < 0
+                                            }
+                                            onClick={applyQuantityToAll}
+                                        >
+                                            Apply
+                                        </Button>
+                                    </div>
+                                </div>
+                                <p className="text-xs text-muted-foreground sm:col-span-2">
+                                    Fills every combination below. You can still change each one.
                                 </p>
-                            ) : (
-                                <>
-                                    <div className="flex items-center justify-between gap-2">
-                                        <p className="text-sm font-semibold">
-                                            {selectedVariants.length} items to
-                                            price
-                                        </p>
-                                        <span className="text-xs text-muted-foreground">
-                                            Prices in ₦
+                            </div>
+                        )}
+
+                        <div className="space-y-3">
+                            {variants.map((variant) => (
+                                <div
+                                    key={variant.uid}
+                                    className={cn(
+                                        "space-y-3 rounded-xl border p-3",
+                                        !variant.id &&
+                                        !!currentProduct?.id &&
+                                        "border-amber-400 bg-amber-50/50 dark:bg-amber-950/20",
+                                    )}
+                                >
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div>
+                                            <p className="text-sm font-semibold">
+                                                {describeVariant(
+                                                    variant.attributes,
+                                                    " / ",
+                                                )}
+                                            </p>
+                                            {variant.sku && (
+                                                <p className="mt-1 text-xs text-muted-foreground">
+                                                    SKU: {variant.sku}
+                                                </p>
+                                            )}
+                                            {!variant.id &&
+                                                !!currentProduct?.id && (
+                                                    <p className="mt-1 text-xs font-medium text-amber-700 dark:text-amber-300">
+                                                        New. Enter price and quantity.
+                                                    </p>
+                                                )}
+                                        </div>
+                                        <span
+                                            className={cn(
+                                                "shrink-0 rounded-full px-2 py-1 text-xs font-medium text-white",
+                                                variant.inventory === 0
+                                                    ? "bg-destructive"
+                                                    : "bg-emerald-800",
+                                            )}
+                                        >
+                                            {variant.inventory === 0
+                                                ? "Out of stock"
+                                                : `Stock: ${variant.inventory}`}
                                         </span>
                                     </div>
 
-                                    <div className="space-y-3">
-                                        {selectedVariants.map((variant) => (
-                                            <div
-                                                key={variant.uid}
-                                                className="space-y-3 rounded-xl border p-3"
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="space-y-1">
+                                            <Label
+                                                className="text-xs"
+                                                htmlFor={`price-${variant.uid}`}
                                             >
-                                                <div className="flex items-start justify-between gap-2">
-                                                    <div>
-                                                        <p className="text-sm font-semibold">
-                                                            {describeVariant(
-                                                                variant.attributes,
-                                                                " / ",
-                                                            )}
-                                                        </p>
-                                                        {variant.sku && (
-                                                            <p className="mt-1 text-xs text-muted-foreground">
-                                                                SKU:{" "}
-                                                                {variant.sku}
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                    <span className={cn(
-                                                        "shrink-0 text-xs font-medium rounded-full bg-muted px-2 py-1 text-white",
-                                                        variant.inventory === 0
-                                                            ? "bg-destructive"
-                                                            : "bg-emerald-800",
-                                                    )}>
-                                                        Stock:{" "}
-                                                        {variant.inventory}
-                                                    </span>
-                                                </div>
+                                                Price (₦)
+                                            </Label>
+                                            <Input
+                                                id={`price-${variant.uid}`}
+                                                type="number"
+                                                inputMode="decimal"
+                                                min="2"
+                                                step="1"
+                                                className={`h-11 ${variant.inventory > 0 && variant.price < 2 ? "border-destructive" : ""}`}
+                                                value={variant.price || ""}
+                                                placeholder={variant.inventory > 0 ? "e.g. 5000" : "Not needed"}
+                                                onChange={(event) =>
+                                                    updateVariant(variant.uid, {
+                                                        price:
+                                                            Number(
+                                                                event.target.value,
+                                                            ) || 0,
+                                                    })
+                                                }
+                                            />
+                                        </div>
 
-                                                <div className="grid grid-cols-2 gap-3">
-                                                    <div className="space-y-1">
-                                                        <Label
-                                                            className="text-xs"
-                                                            htmlFor={`price-${variant.uid}`}
-                                                        >
-                                                            Price (₦)
-                                                        </Label>
-                                                        <Input
-                                                            id={`price-${variant.uid}`}
-                                                            type="number"
-                                                            inputMode="decimal"
-                                                            min="2"
-                                                            step="1"
-                                                            className={`h-11 ${variant.price < 2 ? "border-destructive" : ""}`}
-                                                            value={
-                                                                variant.price ||
-                                                                ""
-                                                            }
-                                                            placeholder="e.g. 5000"
-                                                            onChange={(event) =>
-                                                                updateVariant(
-                                                                    variant.uid,
-                                                                    {
-                                                                        price:
-                                                                            Number(
-                                                                                event
-                                                                                    .target
-                                                                                    .value,
-                                                                            ) ||
-                                                                            0,
-                                                                    },
-                                                                )
-                                                            }
-                                                        />
-                                                    </div>
-
-                                                    <div className="space-y-1">
-                                                        <Label
-                                                            className="text-xs"
-                                                            htmlFor={`stock-${variant.uid}`}
-                                                        >
-                                                            Quantity
-                                                        </Label>
-                                                        <Input
-                                                            id={`stock-${variant.uid}`}
-                                                            type="number"
-                                                            inputMode="numeric"
-                                                            min="0"
-                                                            step="1"
-                                                            className="h-11"
-                                                            value={
-                                                                variant.inventory
-                                                            }
-                                                            onChange={(event) =>
-                                                                updateVariant(
-                                                                    variant.uid,
-                                                                    {
-                                                                        inventory:
-                                                                            Math.max(
-                                                                                0,
-                                                                                Number.parseInt(
-                                                                                    event
-                                                                                        .target
-                                                                                        .value,
-                                                                                    10,
-                                                                                ) ||
-                                                                                0,
-                                                                            ),
-                                                                    },
-                                                                )
-                                                            }
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                <details className="text-sm">
-                                                    <summary className="cursor-pointer text-muted-foreground">
-                                                        Add previous price
-                                                        (optional)
-                                                    </summary>
-                                                    <div className="mt-2 space-y-1">
-                                                        <Label
-                                                            className="text-xs"
-                                                            htmlFor={`old-price-${variant.uid}`}
-                                                        >
-                                                            Previous price (₦)
-                                                        </Label>
-                                                        <Input
-                                                            id={`old-price-${variant.uid}`}
-                                                            type="number"
-                                                            inputMode="decimal"
-                                                            min="0"
-                                                            step="1"
-                                                            className="h-11"
-                                                            value={
-                                                                variant.old_price ||
-                                                                ""
-                                                            }
-                                                            placeholder="Optional"
-                                                            onChange={(event) =>
-                                                                updateVariant(
-                                                                    variant.uid,
-                                                                    {
-                                                                        old_price:
-                                                                            Number(
-                                                                                event
-                                                                                    .target
-                                                                                    .value,
-                                                                            ) ||
-                                                                            0,
-                                                                    },
-                                                                )
-                                                            }
-                                                        />
-                                                    </div>
-                                                </details>
-                                            </div>
-                                        ))}
+                                        <div className="space-y-1">
+                                            <Label
+                                                className="text-xs"
+                                                htmlFor={`stock-${variant.uid}`}
+                                            >
+                                                Quantity
+                                            </Label>
+                                            <Input
+                                                id={`stock-${variant.uid}`}
+                                                type="number"
+                                                inputMode="numeric"
+                                                min="0"
+                                                step="1"
+                                                className="h-11"
+                                                value={variant.inventory}
+                                                onChange={(event) =>
+                                                    updateVariant(variant.uid, {
+                                                        inventory: Math.max(
+                                                            0,
+                                                            Number.parseInt(
+                                                                event.target.value,
+                                                                10,
+                                                            ) || 0,
+                                                        ),
+                                                    })
+                                                }
+                                            />
+                                        </div>
                                     </div>
 
-                                    <div className="rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
-                                        <Info className="mr-1 inline h-3.5 w-3.5" />
-                                        A quantity of zero means the
-                                        combination is out of stock.
-                                    </div>
-                                </>
-                            )}
-                        </Card>
-                    </section>
-                )}
+                                    <details className="text-sm">
+                                        <summary className="cursor-pointer text-muted-foreground">
+                                            Add previous price (optional)
+                                        </summary>
+                                        <div className="mt-2 space-y-1">
+                                            <Label
+                                                className="text-xs"
+                                                htmlFor={`old-price-${variant.uid}`}
+                                            >
+                                                Previous price (₦)
+                                            </Label>
+                                            <Input
+                                                id={`old-price-${variant.uid}`}
+                                                type="number"
+                                                inputMode="decimal"
+                                                min="0"
+                                                step="1"
+                                                className="h-11"
+                                                value={variant.old_price || ""}
+                                                placeholder="Optional"
+                                                onChange={(event) =>
+                                                    updateVariant(variant.uid, {
+                                                        old_price:
+                                                            Number(
+                                                                event.target.value,
+                                                            ) || 0,
+                                                    })
+                                                }
+                                            />
+                                        </div>
+                                    </details>
+                                </div>
+                            ))}
+                        </div>
+                    </Card>
+                </section>
             </div>
 
             {/* WHY SAVE IS DISABLED */}

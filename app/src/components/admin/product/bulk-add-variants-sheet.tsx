@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Plus, Trash2, WandSparkles, X } from "lucide-react";
+import { Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,7 +12,15 @@ import type { ProductOption } from "@/schemas";
 
 type EditableVariant = { attributes: Record<string, string>; price: number; old_price: number; inventory: number };
 const MAX_VARIANTS = 500;
-const COMMON_ATTRIBUTES = ["Size", "Colour", "Color", "Width", "Length", "Age", "Volume", "Material"];
+const COMMON_ATTRIBUTES = [
+    "Size",
+    "Color",
+    "Width",
+    "Age",
+    "Length",
+    "Waist",
+    
+];
 const keyOf = (attributes: Record<string, string>) => Object.entries(attributes).sort(([a], [b]) => a.localeCompare(b)).map(([key, value]) => `${key}:${value}`).join("|");
 
 function buildCombinations(options: ProductOption[]) {
@@ -27,7 +35,6 @@ export function BulkAddVariantsSheet({ productIds, onClose }: Props) {
     const [attributeName, setAttributeName] = useState("");
     const [valueDraft, setValueDraft] = useState("");
     const [variants, setVariants] = useState<EditableVariant[]>([]);
-    const [generated, setGenerated] = useState(false);
     const [confirmSharedStructure, setConfirmSharedStructure] = useState(false);
     const [defaultPrice, setDefaultPrice] = useState(0);
     const [defaultOldPrice, setDefaultOldPrice] = useState(0);
@@ -35,38 +42,48 @@ export function BulkAddVariantsSheet({ productIds, onClose }: Props) {
 
     const attributeChoices = useMemo(() => Array.from(new Set([...COMMON_ATTRIBUTES, ...options.map((option) => option.name)])), [options]);
     const combinationCount = options.reduce((total, option) => total * option.values.length, 1);
+    const optionsComplete = options.length > 0 && options.every((option) => option.values.length > 0);
+    // The list always matches the options. It is only out of date while an
+    // attribute has no values yet or there are too many combinations.
+    const inSync = optionsComplete && combinationCount <= MAX_VARIANTS && variants.length === combinationCount;
+
+    // Every change to the attributes updates the combinations straight away.
+    // Matching combinations keep what was already entered; new ones start from the "set for all" values.
+    const rebuild = (nextOptions: ProductOption[]) => {
+        setOptions(nextOptions);
+        const complete = nextOptions.length > 0 && nextOptions.every((option) => option.values.length > 0);
+        const count = nextOptions.reduce((total, option) => total * option.values.length, 1);
+        if (!complete || count > MAX_VARIANTS) return;
+        const old = new Map(variants.map((variant) => [keyOf(variant.attributes), variant]));
+        setVariants(buildCombinations(nextOptions).map((attributes) => old.get(keyOf(attributes)) ?? ({ attributes, price: defaultPrice, old_price: defaultOldPrice, inventory: defaultInventory })));
+    };
     const addValue = (raw = valueDraft) => {
         const values = raw.split(/[\n,]/).map((value) => value.trim()).filter(Boolean);
         if (!values.length || !attributeName) return;
-        setOptions((previous) => previous.map((option) => option.name === attributeName ? { ...option, values: Array.from(new Set([...option.values, ...values])) } : option));
+        rebuild(options.map((option) => option.name === attributeName ? { ...option, values: Array.from(new Set([...option.values, ...values])) } : option));
         setValueDraft("");
-        setGenerated(false);
     };
     const addAttribute = () => {
         if (!attributeName || options.some((option) => option.name === attributeName)) return;
-        setOptions((previous) => [...previous, { name: attributeName, values: [] }]);
+        rebuild([...options, { name: attributeName, values: [] }]);
     };
     const removeAttribute = (name: string) => {
-        setOptions((previous) => previous.filter((option) => option.name !== name));
+        rebuild(options.filter((option) => option.name !== name));
         if (attributeName === name) setAttributeName("");
-        setGenerated(false);
     };
     const removeValue = (name: string, value: string) => {
-        setOptions((previous) => previous.map((option) => option.name === name ? { ...option, values: option.values.filter((item) => item !== value) } : option));
-        setGenerated(false);
+        rebuild(options.map((option) => option.name === name ? { ...option, values: option.values.filter((item) => item !== value) } : option));
     };
-    const generate = () => {
-        if (!options.length || options.some((option) => !option.values.length) || combinationCount > MAX_VARIANTS) return;
-        const old = new Map(variants.map((variant) => [keyOf(variant.attributes), variant]));
-        setVariants(buildCombinations(options).map((attributes) => old.get(keyOf(attributes)) ?? ({ attributes, price: defaultPrice, old_price: defaultOldPrice, inventory: defaultInventory })));
-        setGenerated(true);
-    };
+    // "Set for all": fills every row now and is used for rows added later.
+    const setForAll = (patch: Partial<EditableVariant>) => setVariants((previous) => previous.map((variant) => ({ ...variant, ...patch })));
     const updateVariant = (index: number, patch: Partial<EditableVariant>) => setVariants((previous) => previous.map((variant, i) => i === index ? { ...variant, ...patch } : variant));
-    const canSubmit = generated && confirmSharedStructure && variants.length > 0 && variants.every((variant) => variant.price > 0 && variant.inventory >= 0);
+    // A combination with quantity 0 is just out of stock, so it needs no price of its own.
+    const fallbackPrice = variants.find((variant) => variant.price > 0)?.price;
+    const canSubmit = inSync && confirmSharedStructure && fallbackPrice !== undefined && variants.every((variant) => variant.inventory >= 0 && (variant.inventory === 0 || variant.price > 0));
 
     const submit = async () => {
         try {
-            await mutateAsync({ productIds, input: { options, variants } });
+            await mutateAsync({ productIds, input: { options, variants: variants.map((variant) => ({ ...variant, price: variant.price > 0 ? variant.price : (fallbackPrice as number) })) } });
             toast.success(`Variant structure applied to ${productIds.length} products`);
             onClose();
         } catch {
@@ -98,20 +115,21 @@ export function BulkAddVariantsSheet({ productIds, onClose }: Props) {
                     ))}
                 </Card>
                 <Card className="space-y-3 p-3 sm:p-4">
-                    <div><h3 className="font-semibold">2. Generate combinations</h3><p className="text-xs text-muted-foreground">{combinationCount} possible combinations · Maximum {MAX_VARIANTS}.</p></div>
+                    <div><h3 className="font-semibold">2. Set price and stock for all</h3><p className="text-xs text-muted-foreground">{combinationCount} combinations · Maximum {MAX_VARIANTS}. Typing here fills every combination below. You can still change each one.</p></div>
                     <div className="grid grid-cols-3 gap-2">
-                        <div className="space-y-1"><Label className="text-xs">Default price (₦)</Label><Input type="number" min="1" value={defaultPrice || ""} onChange={(event) => setDefaultPrice(Number(event.target.value) || 0)} /></div>
-                        <div className="space-y-1"><Label className="text-xs">Old price (₦)</Label><Input type="number" min="0" value={defaultOldPrice || ""} onChange={(event) => setDefaultOldPrice(Number(event.target.value) || 0)} /></div>
-                        <div className="space-y-1"><Label className="text-xs">Default stock</Label><Input type="number" min="0" value={defaultInventory} onChange={(event) => setDefaultInventory(Math.max(0, Math.trunc(Number(event.target.value) || 0)))} /></div>
+                        <div className="space-y-1"><Label className="text-xs">Price for all (₦)</Label><Input type="number" min="1" value={defaultPrice || ""} onChange={(event) => { const value = Number(event.target.value) || 0; setDefaultPrice(value); setForAll({ price: value }); }} /></div>
+                        <div className="space-y-1"><Label className="text-xs">Old price for all (₦)</Label><Input type="number" min="0" value={defaultOldPrice || ""} onChange={(event) => { const value = Number(event.target.value) || 0; setDefaultOldPrice(value); setForAll({ old_price: value }); }} /></div>
+                        <div className="space-y-1"><Label className="text-xs">Stock for all</Label><Input type="number" min="0" value={defaultInventory} onChange={(event) => { const value = Math.max(0, Math.trunc(Number(event.target.value) || 0)); setDefaultInventory(value); setForAll({ inventory: value }); }} /></div>
                     </div>
-                    <Button type="button" onClick={generate} disabled={!options.length || options.some((option) => !option.values.length) || combinationCount > MAX_VARIANTS}><WandSparkles className="mr-2 h-4 w-4" />Generate variants</Button>
+                    {!optionsComplete && <p className="text-xs text-destructive">Add at least one value to every attribute.</p>}
+                    {optionsComplete && combinationCount > MAX_VARIANTS && <p className="text-xs text-destructive">Too many combinations. Remove some values.</p>}
                 </Card>
-                {generated && <Card className="space-y-3 p-3 sm:p-4">
-                    <div><h3 className="font-semibold">3. Review variant defaults</h3><p className="text-xs text-muted-foreground">These values are used for new combinations. Existing matching variants retain their own price and inventory.</p></div>
+                {inSync && <Card className="space-y-3 p-3 sm:p-4">
+                    <div><h3 className="font-semibold">3. Review combinations</h3><p className="text-xs text-muted-foreground">Leave the stock at 0 for combinations you don't have. They show as out of stock and need no price. Existing matching variants keep their own price and stock.</p></div>
                     {variants.map((variant, index) => <div key={keyOf(variant.attributes)} className="space-y-2 rounded-lg border p-3">
                         <div className="flex flex-wrap gap-1.5">{Object.entries(variant.attributes).map(([name, value]) => <span key={name} className="rounded-full bg-muted px-2 py-1 text-xs">{name}: {value}</span>)}</div>
                         <div className="grid grid-cols-3 gap-2">
-                            <div className="space-y-1"><Label className="text-xs">Price (₦)</Label><Input type="number" min="1" value={variant.price || ""} onChange={(event) => updateVariant(index, { price: Number(event.target.value) || 0 })} /></div>
+                            <div className="space-y-1"><Label className="text-xs">Price (₦)</Label><Input type="number" min="1" placeholder={variant.inventory > 0 ? "" : "Not needed"} value={variant.price || ""} onChange={(event) => updateVariant(index, { price: Number(event.target.value) || 0 })} /></div>
                             <div className="space-y-1"><Label className="text-xs">Old price</Label><Input type="number" min="0" value={variant.old_price || ""} onChange={(event) => updateVariant(index, { old_price: Number(event.target.value) || 0 })} /></div>
                             <div className="space-y-1"><Label className="text-xs">Stock</Label><Input type="number" min="0" value={variant.inventory} onChange={(event) => updateVariant(index, { inventory: Math.max(0, Math.trunc(Number(event.target.value) || 0)) })} /></div>
                         </div>
