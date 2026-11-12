@@ -1,51 +1,32 @@
 import type React from "react";
 import { useMemo, useState } from "react";
 import { ShoppingCart, Minus, Plus, MessageCircle } from "lucide-react";
-import type { Product, ProductVariant, CartItem } from "@/schemas";
+import type { Product, CartItem } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils/cn";
 import { defaultVariant, handleWhatsAppPurchase, variantAttributes } from "@/lib/variant";
 import { useConfig } from "@/providers/store-provider";
 import { useCart } from "@/providers/cart-provider";
-import { currency } from "@/utils";
 import { Badge } from "@/components/ui/badge";
+import { VariantPicker, useVariantSelection } from "./variant-picker";
+import { PriceLabel } from "../store/price-label";
 
 interface VariantSelectionProps {
     product: Product;
 }
 
-const matchesAttributes = (variant: ProductVariant, selected: Record<string, string>, optionNames: string[], except?: string) => {
-    const attributes = variantAttributes(variant);
-    return Object.entries(selected).every(([name, value]) => !optionNames.includes(name) || name === except || attributes[name] === value);
-};
-
 export const ProductVariantActions: React.FC<VariantSelectionProps> = ({ product }) => {
     const { cart, updateQuantity, addToCart } = useCart();
     const { whatsapp } = useConfig();
     const initialVariant = defaultVariant(product);
-    const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>(() => initialVariant ? variantAttributes(initialVariant) : {});
+    const { options, variants, selected: selectedAttributes, select: selectAttribute, selectedVariant } = useVariantSelection(product, initialVariant);
     const [added, setAdded] = useState(false);
-    const options = product.options ?? [];
-    const optionNames = options.map((option) => option.name);
-    const variants = product.variants ?? [];
-
-    const selectedVariant = useMemo(() => {
-        if (!options.length) return initialVariant;
-        return variants.find((variant) => {
-            const attributes = variantAttributes(variant);
-            return options.every((option) => selectedAttributes[option.name] && attributes[option.name] === selectedAttributes[option.name]);
-        }) ?? null;
-    }, [initialVariant, options, selectedAttributes, variants]);
 
     const itemInCart = useMemo(
         () => selectedVariant ? cart?.items?.find((item: CartItem) => item.variant.id === selectedVariant.id) : undefined,
         [cart, selectedVariant],
     );
     const outOfStock = !selectedVariant || selectedVariant.inventory <= 0;
-
-    const selectAttribute = (name: string, value: string) => {
-        setSelectedAttributes((previous) => ({ ...previous, [name]: value }));
-    };
 
     const onWhatsApp = (event: React.MouseEvent) => {
         event.preventDefault();
@@ -55,40 +36,7 @@ export const ProductVariantActions: React.FC<VariantSelectionProps> = ({ product
 
     return (
         <div className="space-y-5">
-            {options.map((option) => (
-                <div key={option.name} className="space-y-2">
-                    <div className="flex items-center justify-between gap-2">
-                        <p className="text-sm font-medium">{option.name}</p>
-                        <span className="text-xs text-muted-foreground">{selectedAttributes[option.name] ?? "Select an option"}</span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        {option.values.map((value) => {
-                            const available = variants.some((variant) =>
-                                variant.inventory > 0 &&
-                                variantAttributes(variant)[option.name] === value &&
-                                matchesAttributes(variant, selectedAttributes, optionNames, option.name),
-                            );
-                            const selected = selectedAttributes[option.name] === value;
-                            return (
-                                <button
-                                    key={value}
-                                    type="button"
-                                    disabled={!available}
-                                    onClick={() => selectAttribute(option.name, value)}
-                                    aria-pressed={selected}
-                                    className={cn(
-                                        "min-w-12 rounded-lg border px-3 py-2 text-sm transition-colors",
-                                        selected ? "border-foreground bg-foreground text-background" : "border-border bg-background hover:border-foreground",
-                                        !available && "cursor-not-allowed opacity-35 line-through",
-                                    )}
-                                >
-                                    {value}
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-            ))}
+            <VariantPicker options={options} variants={variants} selected={selectedAttributes} onSelect={selectAttribute} />
 
             {selectedVariant ? (
                 <div className="rounded-xl border border-border bg-card p-4">
@@ -98,8 +46,7 @@ export const ProductVariantActions: React.FC<VariantSelectionProps> = ({ product
                             <p className="mt-0.5 text-xs text-muted-foreground">{Object.entries(variantAttributes(selectedVariant)).map(([name, value]) => `${name}: ${value}`).join(" · ") || `SKU: ${selectedVariant.sku}`}</p>
                         </div>
                         <div className="text-right">
-                            <p className="text-base font-semibold">{currency(selectedVariant.price)}</p>
-                            {!!selectedVariant.old_price && selectedVariant.old_price > selectedVariant.price && <p className="text-xs text-muted-foreground line-through">{currency(selectedVariant.old_price)}</p>}
+                            <PriceLabel variant={selectedVariant} tone="dark" size="lg" />
                         </div>
                     </div>
                     <div className="mt-3 flex items-center justify-between">

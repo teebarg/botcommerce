@@ -93,6 +93,7 @@ export const ProductSearchSchema = z.object({
     image: z.string(),
     images: z.array(z.string()),
     variants: z.array(ProductVariantSchema).nullable(),
+    options: z.array(ProductOptionSchema).nullable().optional(),
     active: z.boolean(),
     is_new: z.boolean().optional(),
     in_stock: z.boolean(),

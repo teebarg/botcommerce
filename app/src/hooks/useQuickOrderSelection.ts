@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { ProductSearch } from "@/schemas/product";
-import { defaultVariant, getPriceInfo, variantLabel } from "@/lib/variant";
+import type { ProductSearch, ProductVariant } from "@/schemas/product";
+import { defaultVariant, variantLabel } from "@/lib/variant";
 
 export type SelectedItem = {
     id: number;
+    variantId: number;
     slug: string;
     name: string;
     price: number;
@@ -11,16 +12,17 @@ export type SelectedItem = {
     image?: string;
 };
 
-const STORAGE_KEY = "quick-order:v1";
+const STORAGE_KEY = "quick-order:v2";
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // keep for a week
 
-export function toSelectedItem(p: ProductSearch): SelectedItem {
+export function toSelectedItem(p: ProductSearch, variant: ProductVariant = defaultVariant(p)): SelectedItem {
     return {
         id: p.id,
+        variantId: variant.id,
         slug: p.slug,
         name: p.name,
-        price: getPriceInfo(p).minPrice,
-        label: variantLabel(defaultVariant(p)) || undefined,
+        price: variant.price,
+        label: variantLabel(variant) || undefined,
         image: p.image || undefined,
     };
 }
@@ -31,7 +33,7 @@ function load(): SelectedItem[] {
         if (!raw) return [];
         const { savedAt, items } = JSON.parse(raw);
         if (!Array.isArray(items) || Date.now() - savedAt > MAX_AGE_MS) return [];
-        return items.filter((i: SelectedItem) => typeof i?.id === "number" && typeof i?.slug === "string");
+        return items.filter((i: SelectedItem) => typeof i?.id === "number" && typeof i?.variantId === "number" && typeof i?.slug === "string");
     } catch {
         return [];
     }
@@ -58,15 +60,16 @@ export function useQuickOrderSelection() {
     }, [items, hydrated]);
 
     const toggle = useCallback((item: SelectedItem) => {
-        setItems((prev) => (prev.some((i) => i.id === item.id) ? prev.filter((i) => i.id !== item.id) : [...prev, item]));
+        setItems((prev) => (prev.some((i) => i.variantId === item.variantId) ? prev.filter((i) => i.variantId !== item.variantId) : [...prev, item]));
     }, []);
 
-    const remove = useCallback((id: number) => {
-        setItems((prev) => prev.filter((i) => i.id !== id));
+    const remove = useCallback((variantId: number) => {
+        setItems((prev) => prev.filter((i) => i.variantId !== variantId));
     }, []);
 
     const clear = useCallback(() => setItems([]), []);
     const ids = useMemo(() => new Set(items.map((i) => i.id)), [items]);
+    const variantIds = useMemo(() => new Set(items.map((i) => i.variantId)), [items]);
 
-    return { items, ids, toggle, remove, clear };
+    return { items, ids, variantIds, toggle, remove, clear };
 }
