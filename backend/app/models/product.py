@@ -99,11 +99,22 @@ class ProductSearch(BaseModel):
     active: Optional[bool] = True
     is_new: Optional[bool] = False
 
+class AvailableFilterValue(BaseModel):
+    value: str
+    count: int
+
+
+class AvailableFilter(BaseModel):
+    name: str
+    values: List[AvailableFilterValue]
+
+
 class FeedProducts(BaseModel):
     products: List[ProductSearch]
     total_count: int
     limit: int
     next_cursor: str | None
+    available_filters: List[AvailableFilter] = Field(default_factory=list)
 
 class IndexProducts(BaseModel):
     featured: List[ProductSearch]

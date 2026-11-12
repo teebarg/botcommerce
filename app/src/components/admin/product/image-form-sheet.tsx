@@ -939,7 +939,7 @@ export function ImageSheetForm({
                             </h3>
                         </div>
                         <p className="mt-1 text-sm text-muted-foreground">
-                            Add sizes, colours, volumes or any other choices.
+                            Add sizes, colors, volumes or any other choices.
                         </p>
                     </div>
 
@@ -1038,8 +1038,8 @@ export function ImageSheetForm({
                                         : "Add your first option"}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                    For example: Size, Colour, Volume or
-                                    Storage.
+                                    For example: Size, Color, Volume or
+                                    Width.
                                 </p>
                             </div>
 

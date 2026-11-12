@@ -99,11 +99,22 @@ export const ProductSearchSchema = z.object({
     in_stock: z.boolean(),
 });
 
+export const AvailableFilterValueSchema = z.object({
+    value: z.string(),
+    count: z.number(),
+});
+
+export const AvailableFilterSchema = z.object({
+    name: z.string(),
+    values: z.array(AvailableFilterValueSchema),
+});
+
 export const ProductFeedSchema = z.object({
     products: z.array(ProductSearchSchema),
-    next_cursor: z.string(),
+    next_cursor: z.string().nullable(),
     limit: z.number(),
     total_count: z.number(),
+    available_filters: z.array(AvailableFilterSchema).default([]),
 });
 
 export const WishItemSchema = z.object({
@@ -137,6 +148,7 @@ export const FeedQuerySchema = z.object({
     ages: z.string().optional(),
     width: z.coerce.number().optional(),
     length: z.coerce.number().optional(),
+    attribute_filters: z.string().optional(),
     min_price: z.coerce.number().optional(),
     max_price: z.coerce.number().optional(),
     cursor: z.string().optional(),

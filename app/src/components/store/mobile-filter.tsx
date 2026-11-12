@@ -22,6 +22,7 @@ type Filters = {
     length: string | undefined;
     max_price: string | undefined;
     min_price: string | undefined;
+    attribute_filters: string | undefined;
 };
 
 const DEFAULTS: Filters = {
@@ -33,8 +34,9 @@ const DEFAULTS: Filters = {
     sort: "id:desc",
     width: undefined,
     length: undefined,
-    max_price: undefined,
-    min_price: undefined,
+    max_price: "50000",
+    min_price: "1",
+    attribute_filters: undefined,
 };
 
 function parseFilters(search: Record<string, unknown>): Filters {
@@ -44,11 +46,12 @@ function parseFilters(search: Record<string, unknown>): Filters {
         colors: search.colors as string,
         cat_ids: search.cat_ids as string,
         collections: search.collections as string,
-        sort: search.sort as "min_price:asc" | "min_price:desc" | "id:desc",
+        sort: (search.sort as "min_price:asc" | "min_price:desc" | "id:desc") || "id:desc",
         width: search.width as string,
         length: search.length as string,
         max_price: search.max_price as string,
         min_price: search.min_price as string,
+        attribute_filters: search.attribute_filters as string,
     };
 }
 
@@ -64,6 +67,14 @@ function countActiveFilters(filters: Filters): number {
     if (filters.length && filters.length !== DEFAULTS.length) count++;
     if (filters.max_price && filters.max_price !== DEFAULTS.max_price) count++;
     if (filters.min_price && filters.min_price !== DEFAULTS.min_price) count++;
+    if (filters.attribute_filters) {
+        try {
+            const selected = JSON.parse(filters.attribute_filters) as Record<string, unknown>;
+            count += Object.values(selected).filter((values) => Array.isArray(values) && values.length > 0).length;
+        } catch {
+            // Ignore malformed legacy query values.
+        }
+    }
     return count;
 }
 

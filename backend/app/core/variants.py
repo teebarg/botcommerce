@@ -42,8 +42,38 @@ def variant_fits_options(attributes: dict | None, options: Iterable[Any] | None)
     return all(value in option_values[name] for name, value in normalized.items())
 
 
+def _legacy_variant_attributes(variant: Any, options: Iterable[Any] | None) -> dict[str, str]:
+    """Reconstruct option attributes for pre-attributes variants during migration."""
+    legacy_fields = {
+        "size": "size",
+        "color": "color",
+        "colour": "color",
+        "age": "age",
+        "width": "width",
+        "waist": "width",
+        "length": "length",
+    }
+    option_names = {_norm(_get(option, "name")): _get(option, "name") for option in options or []}
+    attributes: dict[str, str] = {}
+    for normalized_name, legacy_field in legacy_fields.items():
+        option_name = option_names.get(normalized_name)
+        value = _get(variant, legacy_field)
+        if option_name and value is not None and str(value).strip():
+            attributes[str(option_name)] = str(value).strip()
+    return attributes
+
+
 def live_variants(product: Any) -> list[Any]:
     """The variants of `product` that should be visible to admins and customers."""
     variants = _get(product, "variants") or []
     options = _get(product, "options") or []
-    return [v for v in variants if variant_fits_options(_get(v, "attributes"), options)]
+    live = []
+    for variant in variants:
+        attributes = _get(variant, "attributes") or {}
+        # Legacy variants may still have their values only in the retired columns.
+        # Reconstruct only known legacy option names so removed/custom options remain excluded.
+        if not attributes and options:
+            attributes = _legacy_variant_attributes(variant, options)
+        if variant_fits_options(attributes, options):
+            live.append(variant)
+    return live

@@ -23,6 +23,7 @@ REQUIRED_FILTERABLES: list[str] = [
     "widths",
     "lengths",
     "in_stock",
+    "attribute_facets",
 ]
 REQUIRED_SORTABLES: list[str] = [
     "id",

@@ -21,6 +21,7 @@ export function normalizeFeedQuery(search?: FeedQuery) {
         ages: search?.ages ?? null,
         width: search?.width ?? null,
         length: search?.length ?? null,
+        attribute_filters: search?.attribute_filters ?? null,
         cursor: search?.cursor ?? null,
     } as const;
 }
