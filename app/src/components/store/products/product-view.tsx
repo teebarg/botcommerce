@@ -53,7 +53,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
     return (
         <div className="max-w-6xl mx-auto w-full md:py-8 md:px-4 md:grid md:grid-cols-2 md:gap-12 md:items-start">
             <div>
-                <div className="relative aspect-square md:aspect-gallery md:rounded-xl md:overflow-hidden md:sticky md:top-16">
+                <div className="relative aspect-square md:aspect-gallery md:rounded-xl md:overflow-hidden md:sticky md:top-16 max-h-[50rem]">
                     {!imageLoaded && <img src="/placeholder.jpg" alt="placeholder" className="absolute inset-0 w-full h-full object-cover" />}
                     <img
                         key={currentImageIndex}
@@ -75,15 +75,6 @@ const ProductView: React.FC<Props> = ({ product }) => {
                         </span>
                     )}
 
-                    {/* <div className="absolute inset-x-0 bottom-4 flex justify-center gap-1.5">
-                    {product.images?.map((_, idx) => (
-                        <button
-                            key={idx}
-                            onClick={() => setCurrentImageIndex(idx)}
-                            className={`h-1.5 rounded-full transition-all ${idx === currentImageIndex ? "bg-white w-6" : "bg-white/50 w-1.5"}`}
-                        />
-                    ))}
-                </div> */}
                     {images.length > 1 && (
                         <>
                             <button
@@ -111,7 +102,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                 aria-label={`View image ${index + 1}`}
                                 className={cn("shrink-0 border", index === currentImageIndex ? "border-foreground" : "border-border")}
                             >
-                                <ProductImageComponent src={image.image} alt="" className="h-20 w-16 md:h-40 md:w-32" />
+                                <ProductImageComponent src={image.image} alt="" className="h-20 w-16 md:h-36 md:w-28" />
                             </button>
                         ))}
                     </div>

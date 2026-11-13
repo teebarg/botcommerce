@@ -1,10 +1,10 @@
 import { GalleryCardActions } from "./gallery-card-actions";
-import { currency } from "@/utils";
 import type { GalleryImage } from "@/schemas";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/utils/cn";
-import { useState } from "react";
-import { variantAttributes } from "@/lib/variant";
+import { useMemo, useState } from "react";
+import { getPriceInfo } from "@/lib/variant";
+import { PriceLabel } from "@/components/store/price-label";
 
 interface GalleryCardProps {
     image: GalleryImage;
@@ -21,9 +21,31 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, onCl
 
     const product = image.product;
     const variants = product?.variants || [];
-    const item = product?.variants?.[0];
+    const priceInfo = useMemo(() => getPriceInfo({ variants }), [product]);
 
-    const attributes = item ? Object.entries(variantAttributes(item)).map(([name, value]) => `${name}: ${value}`) : [];
+    const attributeLabels = useMemo(() => {
+        const attributes = product?.variants?.flatMap(
+            (variant) => Object.entries(variant.attributes ?? {})
+        ) ?? [];
+
+        const grouped = new Map<string, Set<string>>();
+
+        for (const [key, value] of attributes) {
+            if (value == null || value === "") continue;
+
+            if (!grouped.has(key)) {
+                grouped.set(key, new Set());
+            }
+
+            grouped.get(key)!.add(String(value));
+        }
+
+        return Array.from(grouped, ([key, values]) => ({
+            name: key,
+            values: Array.from(values),
+        }));
+    }, [product?.variants]);
+    const attributes = attributeLabels.map(({ name, values }) => `${name}: ${values.join(", ")}`);
 
     const [mediaLoaded, setMediaLoaded] = useState<boolean>(false);
     const [fitMode, setFitMode] = useState<FitMode>("cover");
@@ -114,17 +136,12 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, onCl
             {(variants.length > 0 || combined.length > 0) && (
                 <div className="absolute bottom-0 inset-x-0 z-10 pointer-events-none">
                     <div className="bg-gradient-to-t from-black/85 via-black/50 to-transparent pt-8 pb-2 px-2.5">
-                        <div className="flex items-end justify-between gap-2">
-                            {variants.length > 0 && (
-                                <div className="flex gap-1">
-                                    <span className="text-sm font-semibold text-white drop-shadow-sm">{currency(variants?.[0]?.price || 0)}</span>
-                                    {variants?.[0]?.old_price > 0 && (
-                                        <span className="text-xs text-white line-through">{currency(variants?.[0]?.old_price || 0)}</span>
-                                    )}
-                                </div>
+                        <div>
+                            {variants && variants.length > 0 && (
+                                <PriceLabel info={priceInfo} tone="light" size="lg" />
                             )}
                             {combined.length > 0 && (
-                                <div className="flex flex-wrap justify-end gap-1 max-w-[65%]">
+                                <div className="flex flex-wrap gap-1">
                                     {combined.slice(0, 3).map((attr, i) => (
                                         <span key={i} className="text-[9px] font-medium text-white/90 bg-white/15 px-1.5 py-0.5 rounded-xs">
                                             {attr}

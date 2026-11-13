@@ -49,7 +49,7 @@ export function variantLabel(variant: ProductVariant) {
         .filter(([, value]) => value != null && String(value).trim() !== "")
         .map(([name, value]) => `${name}: ${String(value).trim()}`);
 
-    return details.join(" · ");
+    return details.join(" | ");
 }
 
 export type PriceInfo = ReturnType<typeof getPriceInfo>;

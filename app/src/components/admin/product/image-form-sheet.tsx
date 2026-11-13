@@ -480,10 +480,6 @@ export function ImageSheetForm({
     const [draftValues, setDraftValues] = useState<string[]>([]);
     const [valueInputs, setValueInputs] = useState<Record<number, string>>({});
 
-    // "Set for all" shortcuts in step 2. They only fill the rows on screen.
-    const [allPrice, setAllPrice] = useState("");
-    const [allQuantity, setAllQuantity] = useState("");
-
     // Shown in step 2 after every change to the options.
     const [changeMessage, setChangeMessage] = useState("");
     // Shown in step 1 next to the option builder, where the admin is working.
@@ -741,24 +737,6 @@ export function ImageSheetForm({
                 variant.uid === uid ? { ...variant, ...patch } : variant,
             ),
         );
-    };
-
-    const applyPriceToAll = () => {
-        const price = Number(allPrice);
-        if (!Number.isFinite(price) || price < 2) return;
-        setVariants((previous) =>
-            previous.map((variant) => ({ ...variant, price })),
-        );
-        setAllPrice("");
-    };
-
-    const applyQuantityToAll = () => {
-        const quantity = Number.parseInt(allQuantity, 10);
-        if (!Number.isFinite(quantity) || quantity < 0) return;
-        setVariants((previous) =>
-            previous.map((variant) => ({ ...variant, inventory: quantity })),
-        );
-        setAllQuantity("");
     };
 
     const handleSubmit = async () => {
@@ -1226,75 +1204,6 @@ export function ImageSheetForm({
                                 Prices in ₦
                             </span>
                         </div>
-
-                        {variants.length > 1 && (
-                            <div className="grid gap-3 rounded-xl border border-dashed p-3 sm:grid-cols-2">
-                                <div className="space-y-1">
-                                    <Label className="text-xs" htmlFor="all-price">
-                                        Same price for all (₦)
-                                    </Label>
-                                    <div className="flex gap-2">
-                                        <Input
-                                            id="all-price"
-                                            type="number"
-                                            inputMode="decimal"
-                                            min="2"
-                                            step="1"
-                                            className="h-11"
-                                            placeholder="e.g. 5000"
-                                            value={allPrice}
-                                            onChange={(event) =>
-                                                setAllPrice(event.target.value)
-                                            }
-                                        />
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            className="h-11 shrink-0"
-                                            disabled={Number(allPrice) < 2}
-                                            onClick={applyPriceToAll}
-                                        >
-                                            Apply
-                                        </Button>
-                                    </div>
-                                </div>
-                                <div className="space-y-1">
-                                    <Label className="text-xs" htmlFor="all-quantity">
-                                        Same quantity for all
-                                    </Label>
-                                    <div className="flex gap-2">
-                                        <Input
-                                            id="all-quantity"
-                                            type="number"
-                                            inputMode="numeric"
-                                            min="0"
-                                            step="1"
-                                            className="h-11"
-                                            placeholder="e.g. 10"
-                                            value={allQuantity}
-                                            onChange={(event) =>
-                                                setAllQuantity(event.target.value)
-                                            }
-                                        />
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            className="h-11 shrink-0"
-                                            disabled={
-                                                allQuantity.trim() === "" ||
-                                                Number.parseInt(allQuantity, 10) < 0
-                                            }
-                                            onClick={applyQuantityToAll}
-                                        >
-                                            Apply
-                                        </Button>
-                                    </div>
-                                </div>
-                                <p className="text-xs text-muted-foreground sm:col-span-2">
-                                    Fills every combination below. You can still change each one.
-                                </p>
-                            </div>
-                        )}
 
                         <div className="space-y-3">
                             {variants.map((variant) => (
