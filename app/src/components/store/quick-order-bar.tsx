@@ -214,13 +214,12 @@ export function QuickOrderBar({
                             {currency(total)}
                         </span>
                     </button>
-
                     <Button
                         size="lg"
                         onClick={sendToWhatsApp}
-                        className="transition-transform duration-150 active:scale-[0.97]"
+                        className="bg-emerald-700 text-white hover:bg-emerald-600 border-0 shadow-sm transition-all duration-200 active:scale-[0.97]"
                     >
-                        <MessageCircle />
+                        <MessageCircle className="h-5 w-5" />
                         Send to WhatsApp
                     </Button>
                 </div>
