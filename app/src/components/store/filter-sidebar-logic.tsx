@@ -1,4 +1,5 @@
 import { useSearch } from "@tanstack/react-router";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { ChevronDown, MessageCircle } from "lucide-react";
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -11,9 +12,11 @@ import { useCategories } from "@/hooks/useCategories";
 import { useCollections } from "@/hooks/useCollection";
 import { useUpdateQuery } from "@/hooks/useUpdateQuery";
 import { currency, debounce } from "@/utils";
-import { AGE_OPTIONS, DEFAULT_MAX_PRICE, DEFAULT_MIN_PRICE, SIZE_OPTIONS } from "@/utils/constants";
+import { DEFAULT_MAX_PRICE, DEFAULT_MIN_PRICE } from "@/utils/constants";
 import { cn } from "@/utils/cn";
 import { useFeedUi } from "@/hooks/useFeedUi";
+import { productFeedInfiniteQuery } from "@/queries/user.queries";
+import type { FeedQuery } from "@/schemas";
 
 export interface FilterSidebarRef {
     apply: () => void;
@@ -24,187 +27,195 @@ interface Props {
     onClose?: () => void;
 }
 
-type DraftFilters = {
-    sizes: Set<string>;
-    ages: Set<string>;
-    categories: Set<string>;
-    collections: Set<string>;
-    sort: "min_price:asc" | "min_price:desc" | "id:desc";
-    minPrice: string;
-    maxPrice: string;
-    width: string;
-    length: string;
+type AvailableFilter = {
+    name: string;
+    values: { value: string; count: number }[];
 };
 
-const DEFAULT_DRAFT = {
-    sort: "",
-    sizes: new Set<string>(),
-    ages: new Set<string>(),
-    categories: new Set<string>(),
-    collections: new Set<string>(),
-    minPrice: DEFAULT_MIN_PRICE,
-    maxPrice: DEFAULT_MAX_PRICE,
-    width: "",
-    length: "",
+const EMPTY_AVAILABLE_FILTERS: AvailableFilter[] = [];
+
+type DraftFilters = {
+    attributes: Record<string, Set<string>>;
+    categories: Set<string>;
+    collections: Set<string>;
+    sort: "min_price:asc" | "min_price:desc" | "id:desc" | "";
+    minPrice: string;
+    maxPrice: string;
 };
 
 const PRICE_MIN_BOUND = DEFAULT_MIN_PRICE;
 const PRICE_MAX_BOUND = DEFAULT_MAX_PRICE;
 
 const normalizePriceValues = (minStr: string, maxStr: string) => {
-    const parse = (v: string): number | null => {
-        if (!v) return null;
-        const parsed = Number(v);
-        if (!Number.isFinite(parsed)) return null;
-        return Math.trunc(parsed);
+    const parse = (value: string): number | null => {
+        if (!value) return null;
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? Math.trunc(parsed) : null;
     };
+    const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+    const min = parse(minStr);
+    const max = parse(maxStr);
+    const minPrice = min == null ? "" : String(clamp(min, PRICE_MIN_BOUND, PRICE_MAX_BOUND));
+    let maxPrice = max == null ? "" : String(clamp(max, PRICE_MIN_BOUND, PRICE_MAX_BOUND));
+    if (minPrice && maxPrice && Number(maxPrice) < Number(minPrice)) maxPrice = minPrice;
+    return { minPrice, maxPrice };
+};
 
-    const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max);
-
-    const minParsed = parse(minStr);
-    const maxParsed = parse(maxStr);
-
-    const minNormalized = minParsed == null ? "" : clamp(minParsed, PRICE_MIN_BOUND, PRICE_MAX_BOUND).toString();
-    const maxNormalized = maxParsed == null ? "" : clamp(maxParsed, PRICE_MIN_BOUND, PRICE_MAX_BOUND).toString();
-
-    if (minNormalized !== "" && maxNormalized !== "") {
-        const minNum = Number(minNormalized);
-        let maxNum = Number(maxNormalized);
-        if (maxNum < minNum) maxNum = minNum; // enforce max >= min
-
-        return { minPrice: minNum.toString(), maxPrice: maxNum.toString() };
+const parseAttributeFilters = (value?: string): Record<string, Set<string>> => {
+    if (!value) return {};
+    try {
+        const parsed = JSON.parse(value) as Record<string, unknown>;
+        return Object.fromEntries(
+            Object.entries(parsed)
+                .filter(([, values]) => Array.isArray(values))
+                .map(([name, values]) => [name, new Set((values as unknown[]).map(String))])
+        );
+    } catch {
+        return {};
     }
+};
 
-    return { minPrice: minNormalized, maxPrice: maxNormalized };
+const getLegacyAttributeDraft = (
+    availableFilters: AvailableFilter[],
+    search: Record<string, unknown>,
+): Record<string, Set<string>> => {
+    const result = parseAttributeFilters(typeof search.attribute_filters === "string" ? search.attribute_filters : undefined);
+    const legacy = [
+        { params: "sizes", names: ["size"] },
+        { params: "ages", names: ["age"] },
+        { params: "width", names: ["width", "waist"] },
+        { params: "length", names: ["length"] },
+    ];
+
+    for (const item of legacy) {
+        const raw = search[item.params] == null ? "" : String(search[item.params]);
+        const values = raw.split(",").map((value) => value.trim()).filter(Boolean);
+        if (!values.length) continue;
+        const matchingNames = availableFilters
+            .filter((filter) => item.names.includes(filter.name.trim().toLocaleLowerCase()))
+            .map((filter) => filter.name);
+        const names = matchingNames.length ? matchingNames : [item.names[0][0].toUpperCase() + item.names[0].slice(1)];
+        for (const name of names) {
+            result[name] = new Set([...(result[name] ?? []), ...values]);
+        }
+    }
+    return result;
+};
+
+const getColorValue = (value: string) => {
+    const normalized = value.trim().toLowerCase();
+    const colors: Record<string, string> = {
+        black: "#171717", white: "#ffffff", red: "#dc2626", blue: "#2563eb", navy: "#1e3a8a",
+        green: "#16a34a", yellow: "#eab308", orange: "#ea580c", pink: "#ec4899", purple: "#9333ea",
+        brown: "#92400e", grey: "#9ca3af", gray: "#9ca3af", cream: "#f5f0dc", beige: "#d6c2a1",
+    };
+    return colors[normalized] ?? (normalized.startsWith("#") ? normalized : undefined);
 };
 
 export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose }, ref) => {
-    const search = useSearch({ strict: false });
+    const search = useSearch({ strict: false }) as Record<string, unknown>;
     const { quick, setQuick } = useFeedUi();
     const { updateQuery } = useUpdateQuery();
-    const filters = useMemo(() => {
-        return {
-            sort: search.sort,
-            sizes: new Set(search.sizes?.toString()?.split(",").filter(Boolean)),
-            ages: new Set(search.ages?.split(",").filter(Boolean)),
-            categories: new Set(search.cat_ids?.split(",").filter(Boolean)),
-            collections: new Set(typeof search.collections === "string" ? search.collections.split(",").filter(Boolean) : []),
-            minPrice: search.min_price?.toString() ?? `${DEFAULT_MIN_PRICE}`,
-            maxPrice: search.max_price?.toString() ?? `${DEFAULT_MAX_PRICE}`,
-            width: search.width?.toString() ?? "",
-            length: search.length?.toString() ?? "",
-        };
-    }, [search]);
-
-    const [draft, setDraft] = useState(filters);
     const { data: categories } = useCategories();
     const { data: collections } = useCollections();
+    const feedQuery = useMemo(() => ({ ...search }) as FeedQuery, [search]);
+    const { data: feedData } = useInfiniteQuery(productFeedInfiniteQuery(feedQuery));
+    const availableFilters = feedData?.pages?.[0]?.available_filters ?? EMPTY_AVAILABLE_FILTERS;
 
-    const [openSections, setOpenSections] = useState({
-        categories: true,
-        price: true,
-        sort: true,
-        size: true,
-        color: true,
-        age: true,
-        waistLength: true,
+    const filters = useMemo<DraftFilters>(() => ({
+        sort: (search.sort as DraftFilters["sort"]) || "",
+        attributes: getLegacyAttributeDraft(availableFilters, search),
+        categories: new Set(typeof search.cat_ids === "string" ? search.cat_ids.split(",").filter(Boolean) : []),
+        collections: new Set(typeof search.collections === "string" ? search.collections.split(",").filter(Boolean) : []),
+        minPrice: search.min_price?.toString() ?? `${DEFAULT_MIN_PRICE}`,
+        maxPrice: search.max_price?.toString() ?? `${DEFAULT_MAX_PRICE}`,
+    }), [search, availableFilters]);
+
+    const [draft, setDraft] = useState<DraftFilters>(filters);
+    const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+        categories: true, price: true, sort: true,
     });
-
-    const [priceMinInput, setPriceMinInput] = useState<string>(filters.minPrice);
-    const [priceMaxInput, setPriceMaxInput] = useState<string>(filters.maxPrice);
-
+    const [priceMinInput, setPriceMinInput] = useState(filters.minPrice);
+    const [priceMaxInput, setPriceMaxInput] = useState(filters.maxPrice);
     const priceLowId = useId();
     const priceHighId = useId();
     const priceNewestId = useId();
 
     useEffect(() => {
-        // Keep the input fields in sync if the underlying search params change
+        setDraft(filters);
         setPriceMinInput(filters.minPrice);
         setPriceMaxInput(filters.maxPrice);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filters.minPrice, filters.maxPrice]);
+    }, [filters]);
 
-    const toggleSection = (section: keyof typeof openSections) => {
-        setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
+    const toggleSection = (section: string) => {
+        setOpenSections((previous) => ({ ...previous, [section]: !(previous[section] ?? true) }));
     };
 
-    const toggleDraftSet = (key: keyof DraftFilters) => (value: string) => {
-        setDraft((prev) => {
-            const next = new Set(prev[key] as Set<string>);
-
+    const toggleAttribute = (name: string, value: string) => {
+        setDraft((previous) => {
+            const next = new Set(previous.attributes[name] ?? []);
             next.has(value) ? next.delete(value) : next.add(value);
-
-            return {
-                ...prev,
-                [key]: next,
-            };
+            const attributes = { ...previous.attributes };
+            if (next.size) attributes[name] = next;
+            else delete attributes[name];
+            return { ...previous, attributes };
         });
     };
 
-    const onToggleSize = toggleDraftSet("sizes");
-    const onToggleAge = toggleDraftSet("ages");
-    const onToggleCategory = toggleDraftSet("categories");
-    const onToggleCollection = toggleDraftSet("collections");
-
-    const debouncedNormalizeRef = useMemo(
-        () =>
-            debounce((minStr: string, maxStr: string) => {
-                const { minPrice, maxPrice } = normalizePriceValues(minStr, maxStr);
-                setDraft((prev) => ({ ...prev, minPrice, maxPrice }));
-                setPriceMinInput(minPrice);
-                setPriceMaxInput(maxPrice);
-            }, 300),
-        []
-    );
-
-    const handlePriceMinChange = (next: string) => {
-        const cleaned = next === "" ? "" : next.replace(/[^\d]/g, "");
-        setPriceMinInput(cleaned);
-        debouncedNormalizeRef(cleaned, priceMaxInput);
+    const toggleSet = (key: "categories" | "collections", value: string) => {
+        setDraft((previous) => {
+            const next = new Set(previous[key]);
+            next.has(value) ? next.delete(value) : next.add(value);
+            return { ...previous, [key]: next };
+        });
     };
 
-    const handlePriceMaxChange = (next: string) => {
-        const cleaned = next === "" ? "" : next.replace(/[^\d]/g, "");
-        setPriceMaxInput(cleaned);
-        debouncedNormalizeRef(priceMinInput, cleaned);
+    const debouncedNormalize = useMemo(() => debounce((min: string, max: string) => {
+        const normalized = normalizePriceValues(min, max);
+        setDraft((previous) => ({ ...previous, ...normalized }));
+        setPriceMinInput(normalized.minPrice);
+        setPriceMaxInput(normalized.maxPrice);
+    }, 300), []);
+
+    const handlePriceChange = (which: "min" | "max", value: string) => {
+        const cleaned = value.replace(/[^\d]/g, "");
+        if (which === "min") setPriceMinInput(cleaned);
+        else setPriceMaxInput(cleaned);
+        debouncedNormalize(which === "min" ? cleaned : priceMinInput, which === "max" ? cleaned : priceMaxInput);
     };
 
     const apply = () => {
-        const { minPrice, maxPrice } = normalizePriceValues(priceMinInput, priceMaxInput);
+        const price = normalizePriceValues(priceMinInput, priceMaxInput);
+        const attributes = Object.fromEntries(
+            Object.entries(draft.attributes)
+                .map(([name, values]) => [name, [...values]])
+                .filter(([, values]) => (values as string[]).length > 0)
+        );
         updateQuery([
             { key: "sort", value: draft.sort },
-            { key: "sizes", value: [...draft.sizes].join(",") },
-            { key: "ages", value: [...draft.ages].join(",") },
+            { key: "attribute_filters", value: Object.keys(attributes).length ? JSON.stringify(attributes) : "" },
+            // Keep legacy parameters readable by older links/consumers; dynamic selections
+            // are now represented by attribute_filters.
+            { key: "sizes", value: "" }, { key: "ages", value: "" },
+            { key: "width", value: "" }, { key: "length", value: "" },
             { key: "cat_ids", value: [...draft.categories].join(",") },
             { key: "collections", value: [...draft.collections].join(",") },
-            { key: "min_price", value: minPrice },
-            { key: "max_price", value: maxPrice },
-            { key: "width", value: draft.width },
-            { key: "length", value: draft.length },
+            { key: "min_price", value: price.minPrice },
+            { key: "max_price", value: price.maxPrice },
         ]);
         onClose?.();
     };
 
     const clear = () => {
         setDraft({
-            sort: DEFAULT_DRAFT.sort,
-            sizes: new Set(),
-            ages: new Set(),
-            categories: new Set(),
-            collections: new Set(),
-            minPrice: DEFAULT_DRAFT.minPrice.toString(),
-            maxPrice: DEFAULT_DRAFT.maxPrice.toString(),
-            width: "",
-            length: "",
+            sort: "", attributes: {}, categories: new Set(), collections: new Set(),
+            minPrice: String(DEFAULT_MIN_PRICE), maxPrice: String(DEFAULT_MAX_PRICE),
         });
-        setPriceMinInput(DEFAULT_DRAFT.minPrice.toString());
-        setPriceMaxInput(DEFAULT_DRAFT.maxPrice.toString());
+        setPriceMinInput(String(DEFAULT_MIN_PRICE));
+        setPriceMaxInput(String(DEFAULT_MAX_PRICE));
     };
 
-    useImperativeHandle(ref, () => ({
-        apply,
-        clear,
-    }));
+    useImperativeHandle(ref, () => ({ apply, clear }));
 
     return (
         <div className="space-y-6">
@@ -212,212 +223,116 @@ export const FilterSidebarLogic = forwardRef<FilterSidebarRef, Props>(({ onClose
                 type="button"
                 onClick={() => setQuick(!quick)}
                 aria-pressed={quick}
-                className={cn(
-                    "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
-                    quick ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background text-foreground"
-                )}
+                className={cn("flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors", quick ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background text-foreground")}
             >
                 <MessageCircle className="h-4 w-4" />
                 {quick ? "Quick order: on" : "Order via WhatsApp"}
             </button>
+
             <div className="flex flex-wrap gap-2">
-                {collections?.map((collection) => {
-                    const isSelected = draft.collections.has(collection.slug);
-                    return (
-                        <Badge
-                            key={collection.id}
-                            className={`cursor-pointer py-1 text-sm transition-colors ${
-                                isSelected
-                                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                                    : "bg-secondary text-secondary-foreground hover:bg-muted"
-                            }`}
-                            onClick={() => onToggleCollection(collection.slug)}
-                        >
-                            {collection.name}
-                        </Badge>
-                    );
-                })}
+                {collections?.map((collection) => (
+                    <Badge key={collection.id} className={`cursor-pointer py-1 text-sm transition-colors ${draft.collections.has(collection.slug) ? "bg-primary text-primary-foreground hover:bg-primary/90" : "bg-secondary text-secondary-foreground hover:bg-muted"}`} onClick={() => toggleSet("collections", collection.slug)}>
+                        {collection.name}
+                    </Badge>
+                ))}
             </div>
-            <Collapsible open={openSections.categories} onOpenChange={() => toggleSection("categories")}>
+
+            <Collapsible open={openSections.categories ?? true} onOpenChange={() => toggleSection("categories")}>
                 <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
                     <span className="font-medium">Categories</span>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${openSections.categories ? "rotate-180" : ""}`} />
+                    <ChevronDown className={`h-4 w-4 transition-transform ${openSections.categories ?? true ? "rotate-180" : ""}`} />
                 </CollapsibleTrigger>
                 <CollapsibleContent className="max-h-52 overflow-auto">
                     <div className="space-y-2 pt-2">
                         {categories?.map((category) => (
                             <div key={category.id} className="flex items-center space-x-2">
-                                <Checkbox
-                                    id={`cat-${category.id}`}
-                                    checked={draft.categories.has(category.slug)}
-                                    onCheckedChange={() => onToggleCategory(category.slug)}
-                                />
-                                <Label htmlFor={`cat-${category.id}`} className="text-sm cursor-pointer flex-1">
-                                    {category.name}
-                                </Label>
+                                <Checkbox id={`cat-${category.id}`} checked={draft.categories.has(category.slug)} onCheckedChange={() => toggleSet("categories", category.slug)} />
+                                <Label htmlFor={`cat-${category.id}`} className="flex-1 cursor-pointer text-sm">{category.name}</Label>
                             </div>
                         ))}
                     </div>
                 </CollapsibleContent>
             </Collapsible>
-            {/* Price Range */}
-            <Collapsible open={openSections.price} onOpenChange={() => toggleSection("price")}>
+
+            <Collapsible open={openSections.price ?? true} onOpenChange={() => toggleSection("price")}>
                 <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
                     <span className="font-medium">Price Range</span>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${openSections.price ? "rotate-180" : ""}`} />
+                    <ChevronDown className={`h-4 w-4 transition-transform ${openSections.price ?? true ? "rotate-180" : ""}`} />
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                    <div className="pt-4 px-1">
-                        <div className="space-y-3">
-                            <div className="flex items-start gap-3">
-                                <div className="flex-1">
-                                    <Input
-                                        label="Min"
-                                        inputMode="numeric"
-                                        placeholder="1"
-                                        min={PRICE_MIN_BOUND}
-                                        max={PRICE_MAX_BOUND}
-                                        step={1}
-                                        type="text"
-                                        value={priceMinInput}
-                                        onChange={(e) => handlePriceMinChange(e.target.value)}
-                                    />
-                                </div>
-                                <div className="flex-1">
-                                    <Input
-                                        label="Max"
-                                        inputMode="numeric"
-                                        placeholder={`${PRICE_MAX_BOUND.toLocaleString()}`}
-                                        min={PRICE_MIN_BOUND}
-                                        max={PRICE_MAX_BOUND}
-                                        step={1}
-                                        type="text"
-                                        value={priceMaxInput}
-                                        onChange={(e) => handlePriceMaxChange(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="flex justify-between text-sm text-muted-foreground">
-                                <span>{draft.minPrice ? currency(Number(draft.minPrice)) : "Any"}</span>
-                                <span>{draft.maxPrice ? currency(Number(draft.maxPrice)) : "Any"}</span>
-                            </div>
-
-                            <p className="text-xs text-muted-foreground">
-                                Min must be at least {PRICE_MIN_BOUND}. Max must be at most {PRICE_MAX_BOUND.toLocaleString()}. Max must be greater
-                                than or equal to Min.
-                            </p>
+                    <div className="space-y-3 px-1 pt-4">
+                        <div className="flex items-start gap-3">
+                            <div className="flex-1"><Input label="Min" inputMode="numeric" placeholder="1" value={priceMinInput} onChange={(event) => handlePriceChange("min", event.target.value)} /></div>
+                            <div className="flex-1"><Input label="Max" inputMode="numeric" placeholder={PRICE_MAX_BOUND.toLocaleString()} value={priceMaxInput} onChange={(event) => handlePriceChange("max", event.target.value)} /></div>
                         </div>
+                        <div className="flex justify-between text-sm text-muted-foreground">
+                            <span>{draft.minPrice ? currency(Number(draft.minPrice)) : "Any"}</span>
+                            <span>{draft.maxPrice ? currency(Number(draft.maxPrice)) : "Any"}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">Min must be at least {PRICE_MIN_BOUND}. Max must be at most {PRICE_MAX_BOUND.toLocaleString()}.</p>
                     </div>
                 </CollapsibleContent>
             </Collapsible>
 
-            <Collapsible open={openSections.sort} onOpenChange={() => toggleSection("sort")}>
+            <Collapsible open={openSections.sort ?? true} onOpenChange={() => toggleSection("sort")}>
                 <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
                     <span className="font-medium">Sort By</span>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${openSections.sort ? "rotate-180" : ""}`} />
+                    <ChevronDown className={`h-4 w-4 transition-transform ${openSections.sort ?? true ? "rotate-180" : ""}`} />
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <div className="pt-2">
-                        <RadioGroup value={draft.sort} onValueChange={(e) => setDraft({ ...draft, sort: e })} className="gap-1">
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem id={priceLowId} value="min_price:asc" />
-                                <Label className="text-sm" htmlFor={priceLowId}>
-                                    Price: Low to High
-                                </Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem id={priceHighId} value="min_price:desc" />
-                                <Label className="text-sm" htmlFor={priceHighId}>
-                                    Price: High to Low
-                                </Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem id={priceNewestId} value="id:desc" />
-                                <Label className="text-sm" htmlFor={priceNewestId}>
-                                    Newest
-                                </Label>
-                            </div>
+                        <RadioGroup value={draft.sort} onValueChange={(value) => setDraft((previous) => ({ ...previous, sort: value as DraftFilters["sort"] }))} className="gap-1">
+                            <div className="flex items-center space-x-2"><RadioGroupItem id={priceLowId} value="min_price:asc" /><Label className="text-sm" htmlFor={priceLowId}>Price: Low to High</Label></div>
+                            <div className="flex items-center space-x-2"><RadioGroupItem id={priceHighId} value="min_price:desc" /><Label className="text-sm" htmlFor={priceHighId}>Price: High to Low</Label></div>
+                            <div className="flex items-center space-x-2"><RadioGroupItem id={priceNewestId} value="id:desc" /><Label className="text-sm" htmlFor={priceNewestId}>Newest</Label></div>
                         </RadioGroup>
                     </div>
                 </CollapsibleContent>
             </Collapsible>
 
-            <Collapsible open={openSections.waistLength} onOpenChange={() => toggleSection("waistLength")}>
-                <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
-                    <span className="font-medium">Waist * Length</span>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${openSections.waistLength ? "rotate-180" : ""}`} />
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                    <div className="flex gap-2 pt-2">
-                        <div className="flex-1">
-                            <Input
-                                label="Waist"
-                                inputMode="numeric"
-                                placeholder="35"
-                                step={1}
-                                type="text"
-                                value={draft.width}
-                                onChange={(e) => setDraft({ ...draft, width: e.target.value })}
-                            />
-                        </div>
-                        <div className="flex-1">
-                            <Input
-                                label="Length"
-                                inputMode="numeric"
-                                placeholder="42"
-                                step={1}
-                                type="text"
-                                value={draft.length}
-                                onChange={(e) => setDraft({ ...draft, length: e.target.value })}
-                            />
-                        </div>
-                    </div>
-                </CollapsibleContent>
-            </Collapsible>
-
-            <Collapsible open={openSections.size} onOpenChange={() => toggleSection("size")}>
-                <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
-                    <span className="font-medium">Sizes</span>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${openSections.size ? "rotate-180" : ""}`} />
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                    <div className="flex flex-wrap gap-2 pt-2">
-                        {SIZE_OPTIONS.map((size) => (
-                            <button
-                                key={size}
-                                onClick={() => onToggleSize(size)}
-                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                                    draft.sizes.has(size)
-                                        ? "bg-primary text-primary-foreground"
-                                        : "bg-secondary text-secondary-foreground hover:bg-muted"
-                                }`}
-                            >
-                                {size}
-                            </button>
-                        ))}
-                    </div>
-                </CollapsibleContent>
-            </Collapsible>
-
-            <Collapsible open={openSections.age} onOpenChange={() => toggleSection("age")}>
-                <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
-                    <span className="font-medium">Age Group</span>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${openSections.age ? "rotate-180" : ""}`} />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="max-h-48 overflow-auto">
-                    <div className="space-y-2 pt-2">
-                        {AGE_OPTIONS.map((age: string) => (
-                            <div key={age} className="flex items-center space-x-2">
-                                <Checkbox id={`age-${age}`} checked={draft.ages.has(age)} onCheckedChange={() => onToggleAge(age)} />
-                                <Label htmlFor={`age-${age}`} className="text-sm cursor-pointer">
-                                    {age}
-                                </Label>
-                            </div>
-                        ))}
-                    </div>
-                </CollapsibleContent>
-            </Collapsible>
+            {availableFilters.map((filter) => {
+                const selected = draft.attributes[filter.name] ?? new Set<string>();
+                const isColour = ["colour", "color"].includes(filter.name.trim().toLowerCase());
+                const useChips = filter.values.length <= 12 && filter.name.trim().toLowerCase() !== "age group";
+                const sectionKey = `attribute:${filter.name.toLocaleLowerCase()}`;
+                const isOpen = openSections[sectionKey] ?? true;
+                return (
+                    <Collapsible key={filter.name.toLocaleLowerCase()} open={isOpen} onOpenChange={() => toggleSection(sectionKey)}>
+                        <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
+                            <span className="font-medium">{filter.name}</span>
+                            <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className={useChips ? "" : "max-h-52 overflow-auto"}>
+                            {useChips ? (
+                                <div className="flex flex-wrap gap-2 pt-2">
+                                    {filter.values.map(({ value, count }) => {
+                                        const color = isColour ? getColorValue(value) : undefined;
+                                        const active = selected.has(value);
+                                        return (
+                                            <button key={value} type="button" aria-pressed={active} onClick={() => toggleAttribute(filter.name, value)} className={cn("inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors", active ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-muted")}>
+                                                {isColour && <span className="h-3 w-3 rounded-full border border-black/15" style={{ backgroundColor: color ?? "transparent" }} />}
+                                                <span>{value}</span><span className={cn("text-[10px]", active ? "text-primary-foreground/75" : "text-muted-foreground")}>({count})</span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <div className="space-y-2 pt-2">
+                                    {filter.values.map(({ value, count }) => {
+                                        const id = `attr-${sectionKey}-${value}`;
+                                        return (
+                                            <div key={value} className="flex items-center space-x-2">
+                                                <Checkbox id={id} checked={selected.has(value)} onCheckedChange={() => toggleAttribute(filter.name, value)} />
+                                                <Label htmlFor={id} className="flex flex-1 cursor-pointer items-center justify-between text-sm"><span>{value}</span><span className="text-xs text-muted-foreground">{count}</span></Label>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </CollapsibleContent>
+                    </Collapsible>
+                );
+            })}
         </div>
     );
 });

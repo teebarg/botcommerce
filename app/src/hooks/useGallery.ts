@@ -61,3 +61,16 @@ export const useBulkUploadImages = () => {
         },
     });
 };
+
+
+type BulkAddVariantsInput = { productIds: number[]; input: { options: unknown[]; variants: unknown[] } };
+
+export const useBulkAddProductVariants = () => {
+    return useMutation({
+        mutationFn: async ({ productIds, input }: BulkAddVariantsInput) =>
+            await api.post<Message>("/gallery/bulk-add-variants", { product_ids: productIds, ...input }),
+        onError: (error: any) => {
+            toast.error(error.message || "Failed to apply variants to selected products");
+        },
+    });
+};

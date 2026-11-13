@@ -1,21 +1,21 @@
+import { ProductBulkActions } from "@/components/admin/product/gallery-bulk-action";
+import { GalleryCard } from "@/components/admin/product/gallery-card";
+import { GalleryImagesUpload } from "@/components/admin/product/gallery-images-upload";
+import EmptyState from "@/components/generic/empty";
+import { PageLoader } from "@/components/generic/page-loader";
+import { ImageLightbox, useLightbox } from "@/components/image-lightbox-revamp";
+import { InfiniteResourceList } from "@/components/InfiniteResourceList";
+import { Button } from "@/components/ui/button";
+import { useBulkDeleteGalleryImages } from "@/hooks/useGallery";
+import { useInfiniteResource } from "@/hooks/useInfiniteResource";
+import { type GalleryImage, PaginatedGalleryImages } from "@/schemas";
+import { api } from "@/utils/api";
+import { cn } from "@/utils/cn";
 import { createLazyFileRoute } from "@tanstack/react-router";
+import { LayoutDashboard, RectangleVertical } from "lucide-react";
+import { useWebSocketMessage } from "pulsews";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { LayoutDashboard, RectangleVertical } from "lucide-react";
-import { GalleryCard } from "@/components/admin/product/gallery-card";
-import { ProductBulkActions } from "@/components/admin/product/gallery-bulk-action";
-import { GalleryImagesUpload } from "@/components/admin/product/gallery-images-upload";
-import { useBulkDeleteGalleryImages } from "@/hooks/useGallery";
-import { cn } from "@/utils/cn";
-import { Button } from "@/components/ui/button";
-import { type GalleryImage, PaginatedGalleryImages } from "@/schemas";
-import { useWebSocketMessage } from "pulsews";
-import { InfiniteResourceList } from "@/components/InfiniteResourceList";
-import { useInfiniteResource } from "@/hooks/useInfiniteResource";
-import { api } from "@/utils/api";
-import { PageLoader } from "@/components/generic/page-loader";
-import EmptyState from "@/components/generic/empty";
-import { ImageLightbox, useLightbox } from "@/components/image-lightbox-revamp";
 
 export const Route = createLazyFileRoute("/_auth/_adminLayout/admin/(store)/gallery")({
     component: RouteComponent,
@@ -69,11 +69,15 @@ function RouteComponent() {
                 toast.loading("Processing...", { id: BULK_ACTION_TOAST_ID, description: "Bulk image deletion in progress." });
             }
 
-            if (msg.status === "completed") {
-                toast.success("Requested Action Completed", {
-                    id: BULK_ACTION_TOAST_ID,
-                    description: "Data updated"
-                });
+            if (msg.status === "completed" || msg.status === "partial") {
+                if (msg.status === "completed") {
+                    toast.success("Bulk update completed", { id: BULK_ACTION_TOAST_ID, description: "Selected products were updated." });
+                } else {
+                    toast.error("Bulk update partially completed", {
+                        id: BULK_ACTION_TOAST_ID,
+                        description: `${msg.failed_ids?.length ?? 0} selected images had update errors. Check the server logs before retrying.`,
+                    });
+                }
                 setSelectionMode(false);
                 setSelectedImages(new Set());
                 setIsLoading(false);
@@ -96,8 +100,8 @@ function RouteComponent() {
     };
 
     const handleClick = (id: number) => {
-        setSelectedImageId(id)
-        setOpen(true)
+        setSelectedImageId(id);
+        setOpen(true);
     };
 
     const handleBulkDelete = async () => {
@@ -156,10 +160,7 @@ function RouteComponent() {
                 <PageLoader variant="grid" />
             ) : items.length > 0 ? (
                 <InfiniteResourceList
-                    className={cn(
-                        "space-y-0 mb-8 w-full grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5",
-                        viewMode === "grid" ? "" : "grid-cols-1"
-                    )}
+                    className={cn("space-y-0 mb-8 w-full grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5", viewMode === "grid" ? "" : "grid-cols-1")}
                     items={items}
                     onLoadMore={fetchNextPage}
                     hasMore={hasNextPage}
@@ -185,6 +186,22 @@ function RouteComponent() {
                     selectedCount={selectedImages.size}
                     selectedImageIds={Array.from(selectedImages)}
                     selectedProductIds={selectedProductIds}
+                    selectedProducts={Array.from(
+                        new Map(
+                            items
+                                .filter((img) => selectedImages.has(img.id) && img.product_id)
+                                .map((img) => [
+                                    img.product_id!,
+                                    {
+                                        id: img.product_id!,
+                                        name: img.product?.name || `Product #${img.product_id}`,
+                                        imageId: img.id,
+                                        options: img.product?.options ?? [],
+                                        variants: img.product?.variants ?? [],
+                                    },
+                                ])
+                        ).values()
+                    )}
                     onClearSelection={() => setSelectedImages(new Set())}
                     onDelete={handleBulkDelete}
                 />

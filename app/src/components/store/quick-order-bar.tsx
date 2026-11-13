@@ -8,7 +8,7 @@ import { useConfig } from "@/providers/store-provider";
 
 interface QuickOrderBarProps {
     items: SelectedItem[];
-    onRemove: (id: number) => void;
+    onRemove: (variantId: number) => void;
     onClear: () => void;
     onSent: () => void;
 }
@@ -73,7 +73,7 @@ export function QuickOrderBar({ items, onRemove, onClear, onSent }: QuickOrderBa
                         </div>
                         <ul className="max-h-[40vh] divide-y divide-border overflow-y-auto overscroll-contain">
                             {items.map((item) => (
-                                <li key={item.id} className="flex items-center gap-3 py-2">
+                                <li key={item.variantId} className="flex items-center gap-3 py-2">
                                     {item.image ? (
                                         <img src={item.image} alt="" loading="lazy" className="h-14 w-11 shrink-0 rounded-md bg-muted object-cover" />
                                     ) : (
@@ -88,7 +88,7 @@ export function QuickOrderBar({ items, onRemove, onClear, onSent }: QuickOrderBa
                                     </div>
                                     <button
                                         type="button"
-                                        onClick={() => onRemove(item.id)}
+                                        onClick={() => onRemove(item.variantId)}
                                         aria-label={`Remove ${item.name}`}
                                         className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                                     >

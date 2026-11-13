@@ -1,5 +1,6 @@
 import asyncio
 import base64
+import json
 import random
 import xml.etree.ElementTree as ET
 from collections import Counter
@@ -13,12 +14,42 @@ from app.core.config import settings
 from app.core.logging import get_logger
 from app.core.search.meilisearch import MeilisearchEngine
 from app.core.utils import url_to_list
+from app.core.variants import live_variants
 from app.models.product import Product
 from app.services.cache import CacheService, cacheable
 from app.services.cdn import CdnService
 from prisma import Prisma
 
 logger = get_logger(__name__)
+
+
+def _normalise_attribute_name(value: Any) -> str:
+    return str(value or "").strip().casefold()
+
+
+def _facet_token(name: str, value: str) -> str:
+    """Stable, Meilisearch-safe token for an attribute/value pair."""
+    payload = json.dumps(
+        [_normalise_attribute_name(name), str(value).strip().casefold()],
+        ensure_ascii=False, separators=(",", ":"),
+    ).encode("utf-8")
+    return "attr_" + base64.urlsafe_b64encode(payload).decode("ascii").rstrip("=")
+
+
+def _decode_facet_token(token: str) -> tuple[str, str] | None:
+    try:
+        encoded = token.removeprefix("attr_")
+        payload = base64.urlsafe_b64decode(encoded + "=" * (-len(encoded) % 4))
+        name_key, value_key = json.loads(payload.decode("utf-8"))
+        name = str(name_key).title()
+        value = str(value_key).strip()
+        if value in {"xxs", "xs", "s", "m", "l", "xl", "xxl", "xxxl", "xxxxl"}:
+            value = value.upper()
+        else:
+            value = value.title()
+        return name, value
+    except (ValueError, TypeError, UnicodeDecodeError, json.JSONDecodeError):
+        return None
 
 PRODUCT_ATTRIBUTES: list[str] = [
     "id",
@@ -66,13 +97,22 @@ class ProductService:
     async def get(self, id: int):
         return await self.db.product.find_unique(where={"id": id})
 
+    @staticmethod
+    def _hide_removed_variants(product):
+        """Drop variants whose choices were removed from the product."""
+        if product is not None and product.variants:
+            product.variants = live_variants(product)
+        return product
+
     async def get_by_ids(self, ids: list[int]):
-        return await self.db.product.find_many(where={"id": {"in": ids}}, include={"variants": True, "images": True})
+        products = await self.db.product.find_many(where={"id": {"in": ids}}, include={"variants": True, "images": True})
+        return [self._hide_removed_variants(p) for p in products]
 
     async def get_by_slug(self, slug: str):
-        return await self.db.product.find_unique(
+        product = await self.db.product.find_unique(
             where={"slug": slug}, include={"variants": True, "images": True}
         )
+        return self._hide_removed_variants(product)
 
     async def check_review_status(
         self, user_id: int, product_id: int
@@ -143,7 +183,7 @@ class ProductService:
                 break
 
             for prod in products:
-                for variant in prod.variants:
+                for variant in live_variants(prod):
                     item = ET.SubElement(channel, "item")
                     ET.SubElement(item, "g:id").text = variant.sku
 
@@ -313,11 +353,60 @@ class ProductService:
         if next_offset < total_count and len(hits) == limit:
             next_cursor = self._encode_cursor(str(next_offset))
 
+        available_filters: list[dict[str, Any]] = []
+        if offset == 0:
+            # Facets are deliberately calculated without attribute selections. This keeps
+            # the choices for a section visible while the customer changes that section.
+            facet_filters = self._build_search_filters_list(kwargs, include_attribute_filters=False, include_legacy_attributes=False)
+            facet_params: Dict[str, Any] = {
+                "limit": 1,
+                "attributesToRetrieve": ["id"],
+                "facets": ["attribute_facets"],
+            }
+            if facet_filters:
+                facet_params["filter"] = " AND ".join(facet_filters)
+            try:
+                facet_result = await self.search_engine.search_index(search, facet_params)
+                distribution = (facet_result.get("facetDistribution") or {}).get("attribute_facets") or {}
+                grouped: dict[str, dict[str, Any]] = {}
+                for token, count in distribution.items():
+                    decoded = _decode_facet_token(token)
+                    if not decoded:
+                        continue
+                    name, value = decoded
+                    name_key = _normalise_attribute_name(name)
+                    section = grouped.setdefault(name_key, {"name": name, "values": []})
+                    section["values"].append({"value": value, "count": int(count)})
+
+                size_order = {value: index for index, value in enumerate(("xxs", "xs", "s", "m", "l", "xl", "xxl", "xxxl", "xxxxl"))}
+
+                def sort_values(item: dict[str, Any], section_name: str) -> tuple[Any, ...]:
+                    value = str(item["value"]).strip()
+                    if _normalise_attribute_name(section_name) in {"size"}:
+                        key = value.casefold()
+                        if key in size_order:
+                            return (0, size_order[key], key)
+                        try:
+                            return (1, float(value), key)
+                        except ValueError:
+                            pass
+                    try:
+                        return (0, float(value), value.casefold())
+                    except ValueError:
+                        return (1, value.casefold())
+
+                available_filters = sorted(grouped.values(), key=lambda section: section["name"].casefold())
+                for section in available_filters:
+                    section["values"].sort(key=lambda item, name=section["name"]: sort_values(item, name))
+            except Exception:
+                logger.exception("Unable to retrieve product filter facets")
+
         return {
             "products": hits,
             "limit": limit,
             "total_count": total_count,
             "next_cursor": next_cursor,
+            "available_filters": available_filters,
         }
 
     async def query_collection_index(self) -> dict:
@@ -350,31 +439,51 @@ class ProductService:
                 kw.get("ages"),
                 kw.get("width"),
                 kw.get("length"),
+                kw.get("attribute_filters"),
                 kw.get("sort"),
                 kw.get("min_price", 1) != 1,
                 kw.get("max_price", 50000) != 50000,
             ]
         )
 
-    def _build_search_filters_list(self, kw) -> list[str]:
-        filters = []
+    def _build_search_filters_list(
+        self, kw, *, include_attribute_filters: bool = True, include_legacy_attributes: bool = True
+    ) -> list[str]:
+        filters: list[str] = []
         if kw.get("cat_ids"):
             filters.append(f"categories.slug IN {url_to_list(kw['cat_ids'])}")
         if kw.get("collections"):
             filters.append(f"collections.slug IN [{kw['collections']}]")
         if kw.get("min_price") is not None:
-            filters.append(f"min_price >= {kw['min_price']}")
+            # A product matches when its available price range overlaps the requested range.
+            filters.append(f"max_price >= {kw['min_price']}")
         if kw.get("max_price") is not None:
-            filters.append(f"max_price <= {kw['max_price']}")
+            filters.append(f"min_price <= {kw['max_price']}")
         filters.append(f"active = {str(kw.get('active', True)).lower()}")
-        if kw.get("sizes"):
-            filters.append(f"sizes IN [{kw['sizes']}]")
-        if kw.get("ages"):
-            filters.append(f"ages IN {url_to_list(kw['ages'])}")
-        if kw.get("width"):
-            filters.append(f"widths IN [{kw['width']}]")
-        if kw.get("length"):
-            filters.append(f"lengths IN [{kw['length']}]")
+
+        if include_legacy_attributes:
+            if kw.get("sizes"):
+                filters.append(f"sizes IN {url_to_list(kw['sizes'])}")
+            if kw.get("ages"):
+                filters.append(f"ages IN {url_to_list(kw['ages'])}")
+            if kw.get("width"):
+                filters.append(f"widths IN {url_to_list(kw['width'])}")
+            if kw.get("length"):
+                filters.append(f"lengths IN {url_to_list(kw['length'])}")
+
+        if include_attribute_filters and kw.get("attribute_filters"):
+            try:
+                selected = json.loads(kw["attribute_filters"])
+            except (TypeError, json.JSONDecodeError):
+                selected = {}
+            if isinstance(selected, dict):
+                for name, values in selected.items():
+                    if not isinstance(name, str) or not isinstance(values, list):
+                        continue
+                    tokens = [_facet_token(name, str(value)) for value in values if str(value).strip()]
+                    if tokens:
+                        quoted = ", ".join(json.dumps(token) for token in tokens)
+                        filters.append(f"attribute_facets IN [{quoted}]")
         return filters
 
     def _encode_cursor(self, value: str) -> str:
@@ -447,6 +556,7 @@ class ProductService:
             "sku": product.sku,
             "active": product.active,
             "is_new": getattr(product, "is_new", False),
+            "options": getattr(product, "options", None) or [],
             "random_score": random.random(),
         }
 
@@ -482,6 +592,8 @@ class ProductService:
         variants = [
             {
                 "id": v.id,
+                "sku": v.sku,
+                "product_id": v.product_id,
                 "price": v.price,
                 "old_price": v.old_price,
                 "inventory": v.inventory,
@@ -490,36 +602,70 @@ class ProductService:
                 "age": v.age,
                 "width": v.width,
                 "length": v.length,
+                "attributes": getattr(v, "attributes", None) or {},
                 "status": v.status,
             }
-            for v in (product.variants or [])
+            for v in live_variants(product)
         ]
         product_dict["variants"] = variants
 
-        sizes, colors, ages, widths, lengths = [], [], [], [], []
-        for v in variants:
-            if v.get("size"):
-                sizes.append(v["size"])
-            if v.get("color"):
-                colors.append(v["color"])
-            if v.get("age"):
-                ages.append(v["age"])
-            if v.get("width"):
-                widths.append(v["width"])
-            if v.get("length"):
-                lengths.append(v["length"])
+        # Filter facets and price bounds describe variants customers can buy now.
+        in_stock_variants = [v for v in variants if (v.get("inventory") or 0) > 0]
+        attribute_groups = [
+            {"names": ("size"), "legacy": "size", "field": "sizes", "facet_name": "Size"},
+            {"names": ("colour", "color"), "legacy": "color", "field": "colors", "facet_name": "Color"},
+            {"names": ("age",), "legacy": "age", "field": "ages", "facet_name": "Age"},
+            {"names": ("width", "waist"), "legacy": "width", "field": "widths", "facet_name": "Width"},
+            {"names": ("length",), "legacy": "length", "field": "lengths", "facet_name": "Length"},
+        ]
+        legacy_values: dict[str, list[Any]] = {
+            "sizes": [], "colors": [], "ages": [], "widths": [], "lengths": [],
+        }
+        attribute_facets: set[str] = set()
 
-        product_dict["sizes"] = sizes
-        product_dict["colors"] = colors
-        product_dict["ages"] = ages
-        product_dict["widths"] = widths
-        product_dict["lengths"] = lengths
+        for variant in in_stock_variants:
+            attributes = variant.get("attributes") or {}
+            normalized_attributes = {_normalise_attribute_name(k): v for k, v in attributes.items()}
+            for name, value in attributes.items():
+                if value is None or not str(value).strip():
+                    continue
+                attribute_facets.add(_facet_token(str(name).strip(), str(value).strip()))
 
-        variant_prices = [v["price"] for v in variants if v.get("price") is not None]
+            # Keep the old filter fields populated for old URLs and clients. Prefer
+            # any matching attribute key; use the legacy column only when none exists.
+            for group in attribute_groups:
+                attribute_values = [
+                    normalized_attributes[name]
+                    for name in group["names"]
+                    if normalized_attributes.get(name) is not None
+                    and str(normalized_attributes[name]).strip()
+                ]
+                if attribute_values:
+                    values = attribute_values
+                else:
+                    legacy_value = variant.get(group["legacy"])
+                    values = [legacy_value] if legacy_value is not None and str(legacy_value).strip() else []
+                    if values:
+                        # Legacy-only products still contribute a dynamic choice.
+                        attribute_facets.add(_facet_token(group["facet_name"], str(legacy_value)))
+
+                for value in values:
+                    if group["field"] in {"widths", "lengths"}:
+                        try:
+                            numeric_value = float(value)
+                            value = int(numeric_value) if numeric_value.is_integer() else numeric_value
+                        except (TypeError, ValueError):
+                            pass
+                    if value not in legacy_values[group["field"]]:
+                        legacy_values[group["field"]].append(value)
+
+        product_dict.update(legacy_values)
+        product_dict["attribute_facets"] = sorted(attribute_facets)
+
+        variant_prices = [v["price"] for v in in_stock_variants if v.get("price") is not None]
         product_dict["min_price"] = min(variant_prices) if variant_prices else 0
         product_dict["max_price"] = max(variant_prices) if variant_prices else 0
-
-        product_dict["in_stock"] = any(v["inventory"] > 0 for v in variants)
+        product_dict["in_stock"] = bool(in_stock_variants)
 
         return product_dict
 

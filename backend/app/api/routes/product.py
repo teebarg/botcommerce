@@ -35,6 +35,7 @@ from app.models.product import (
 from app.prisma_client import DbDep
 from app.services.cache import DEFAULT_EXPIRATION, cacheable
 from app.services.storage import ALLOWED_CONTENT_TYPES, MAX_FILE_SIZE_BYTES
+from prisma.fields import Json
 
 logger = get_logger(__name__)
 
@@ -80,12 +81,14 @@ async def feed(
     max_price: int = Query(default=50000, gt=0), min_price: int = Query(default=1, gt=0),
     sizes: str = Query(default=""), ages: str = Query(default=""),
     width: str = Query(default=""), length: str = Query(default=""),
+    attribute_filters: str = Query(default=""),
     limit: int = Query(default=40, le=100), active: bool = Query(default=True),
     cursor: Optional[str] = Query(default=None),
 ) -> FeedProducts:
     return await srv.get_discovery_feed(
         search=search, sort=sort, cat_ids=cat_ids, collections=collections,
-        max_price=max_price, min_price=min_price, sizes=sizes, ages=ages, width=width, length=length, limit=limit, active=active, cursor=cursor
+        max_price=max_price, min_price=min_price, sizes=sizes, ages=ages, width=width, length=length,
+        attribute_filters=attribute_filters, limit=limit, active=active, cursor=cursor
     )
 
 
@@ -139,8 +142,15 @@ async def update_variant(
     if not existing_variant:
         raise HTTPException(status_code=404, detail="Variant not found")
 
-    update_fields = ["price", "old_price", "inventory", "size", "color", "width", "length", "age"]
-    update_data = {f: getattr(variant, f) for f in update_fields if getattr(variant, f, None) is not None}
+    update_fields = ["price", "old_price", "inventory", "size", "color", "width", "length", "age", "attributes"]
+    update_data = {
+        f: getattr(variant, f)
+        for f in update_fields
+        if getattr(variant, f, None) is not None
+    }
+
+    if "attributes" in update_data:
+        update_data["attributes"] = Json(update_data["attributes"])
 
     if "inventory" in update_data:
         update_data["status"] = "IN_STOCK" if update_data["inventory"] > 0 else "OUT_OF_STOCK"

@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ImageLightbox, useLightbox } from "@/components/image-lightbox-revamp";
 import { useFeedUi } from "@/hooks/useFeedUi";
 import { QuickOrderBar } from "../quick-order-bar";
+import { OptionsSheet } from "../products/options-sheet";
 import { cn } from "@/utils/cn";
 import { toSelectedItem, useQuickOrderSelection } from "@/hooks/useQuickOrderSelection";
 import { FloatingViewToggle } from "../floating-view-toggle";
@@ -25,7 +26,8 @@ export function ProductFeed({ params }: Props) {
     const [selectedProduct, setSelectedProduct] = useState<ProductSearch | null>(null);
     const { quick, view, setView } = useFeedUi();
 
-    const { items, ids, toggle, remove, clear } = useQuickOrderSelection();
+    const { items, ids, variantIds, toggle, remove, clear } = useQuickOrderSelection();
+    const [choosingProduct, setChoosingProduct] = useState<ProductSearch | null>(null);
 
     const products: ProductSearch[] = data.pages.flatMap((page) => page.products);
 
@@ -34,7 +36,9 @@ export function ProductFeed({ params }: Props) {
         return items.flatMap((item) => {
             const live = liveById.get(item.id);
             if (!live) return [item];
-            return live.in_stock ? [toSelectedItem(live)] : [];
+            // Refresh price and label from the exact variant, and drop it if it sold out.
+            const variant = live.variants?.find((v) => v.id === item.variantId);
+            return variant && variant.inventory > 0 ? [toSelectedItem(live, variant)] : [];
         });
     }, [items, products]);
 
@@ -65,8 +69,8 @@ export function ProductFeed({ params }: Props) {
                 <InfiniteList hasMore={!!hasNextPage} isLoading={isFetchingNextPage} onLoadMore={fetchNextPage}>
                     <div
                         className={cn(
-                            "grid md:grid-cols-3 lg:grid-cols-4",
-                            quick ? "" : "gap-1.5 md:gap-2",
+                            "grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+                            quick ? "" : "gap-1",
                             view === "list" ? "grid-cols-1" : "grid-cols-2"
                         )}
                     >
@@ -78,12 +82,22 @@ export function ProductFeed({ params }: Props) {
                                 selectable={quick}
                                 selected={ids.has(product.id)}
                                 onSelect={() => toggle(toSelectedItem(product))}
+                                onChoose={() => setChoosingProduct(product)}
                             />
                         ))}
                     </div>
                 </InfiniteList>
             </div>
             {quick && <QuickOrderBar items={selectedItems} onRemove={remove} onClear={clear} onSent={clear} />}
+            <OptionsSheet
+                product={choosingProduct}
+                open={!!choosingProduct}
+                onOpenChange={(next) => !next && setChoosingProduct(null)}
+                confirmLabel="Add to selection"
+                showWhatsApp={false}
+                selectedIds={variantIds}
+                onConfirm={(variant) => choosingProduct && toggle(toSelectedItem(choosingProduct, variant))}
+            />
             <ImageLightbox
                 images={selectedProduct?.images?.map((i: string, idx: number) => ({ id: idx, image: i })) || []}
                 open={open}

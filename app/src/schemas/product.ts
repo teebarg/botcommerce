@@ -27,13 +27,18 @@ export const ImageLiteSchema = z.object({
     order: z.number(),
 });
 
+export const ProductOptionSchema = z.object({
+    name: z.string(),
+    values: z.array(z.string()),
+});
+
 export const ProductVariantSchema = z.object({
     id: z.number(),
-    sku: z.string(),
-    product_id: z.number(),
-    status: ProductStatusSchema,
+    sku: z.string().nullable().optional(),
+    product_id: z.number().optional(),
+    status: ProductStatusSchema.optional(),
     price: z.number(),
-    old_price: z.number(),
+    old_price: z.number().nullable().optional(),
     inventory: z.number(),
     size: z.string().nullable().optional(),
     color: z.string().nullable().optional(),
@@ -41,6 +46,7 @@ export const ProductVariantSchema = z.object({
     length: z.number().nullable().optional(),
     age: z.string().nullable().optional(),
     is_new: z.boolean().optional(),
+    attributes: z.record(z.string(), z.string()).nullable().optional(),
 });
 
 export const ProductSchema = z.object({
@@ -51,6 +57,7 @@ export const ProductSchema = z.object({
     description: z.string(),
     images: z.array(ImageLiteSchema),
     variants: z.array(ProductVariantSchema).optional(),
+    options: z.array(ProductOptionSchema).nullable().optional(),
     categories: z.array(CategorySchema),
     collections: z.array(CollectionSchema),
     active: z.boolean(),
@@ -86,16 +93,28 @@ export const ProductSearchSchema = z.object({
     image: z.string(),
     images: z.array(z.string()),
     variants: z.array(ProductVariantSchema).nullable(),
+    options: z.array(ProductOptionSchema).nullable().optional(),
     active: z.boolean(),
     is_new: z.boolean().optional(),
     in_stock: z.boolean(),
 });
 
+export const AvailableFilterValueSchema = z.object({
+    value: z.string(),
+    count: z.number(),
+});
+
+export const AvailableFilterSchema = z.object({
+    name: z.string(),
+    values: z.array(AvailableFilterValueSchema),
+});
+
 export const ProductFeedSchema = z.object({
     products: z.array(ProductSearchSchema),
-    next_cursor: z.string(),
+    next_cursor: z.string().nullable(),
     limit: z.number(),
     total_count: z.number(),
+    available_filters: z.array(AvailableFilterSchema).default([]),
 });
 
 export const WishItemSchema = z.object({
@@ -129,6 +148,7 @@ export const FeedQuerySchema = z.object({
     ages: z.string().optional(),
     width: z.coerce.number().optional(),
     length: z.coerce.number().optional(),
+    attribute_filters: z.string().optional(),
     min_price: z.coerce.number().optional(),
     max_price: z.coerce.number().optional(),
     cursor: z.string().optional(),
@@ -163,6 +183,7 @@ export type Wishlist = WishItem[];
 
 export type ProductImage = z.infer<typeof ProductImageSchema>;
 export type ProductVariant = z.infer<typeof ProductVariantSchema>;
+export type ProductOption = z.infer<typeof ProductOptionSchema>;
 export type ImageLite = z.infer<typeof ImageLiteSchema>;
 export type GalleryImage = z.infer<typeof GalleryImageSchema>;
 export type PaginatedGalleryImages = z.infer<typeof PaginatedGalleryImagesSchema>;

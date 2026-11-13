@@ -8,6 +8,7 @@ from app.core.dependencies.cache import CacheDep
 from app.core.deps import CurrentUser, UserDep
 from app.core.permissions import require_admin
 from app.core.security import get_password_hash
+from app.core.variants import live_variants
 from app.models.generic import Message
 from app.models.user import (
     GuestUserCreate,
@@ -200,6 +201,9 @@ async def read_wishlist(request: Request, db: DbDep, user: UserDep) -> list[Wish
         order={"created_at": "desc"},
         include={"product": {"include": {"images": True, "variants": True}}},
     )
+    for item in items:
+        if item.product and item.product.variants:
+            item.product.variants = live_variants(item.product)
     return items
 
 

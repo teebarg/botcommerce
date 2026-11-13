@@ -1,34 +1,34 @@
 import type React from "react";
 import type { ProductSearch } from "@/schemas/product";
 import { Link } from "@tanstack/react-router";
-import { currency } from "@/utils";
 import { cn } from "@/utils/cn";
 import { Badge } from "@/components/ui/badge";
 import { useMemo, useState } from "react";
 import { Check, Maximize2, Plus } from "lucide-react";
 import { AddToCartButton } from "./AddToCartButton";
-import { defaultVariant, getPriceInfo, variantLabel } from "@/lib/variant";
+import { defaultVariant, getPriceInfo, productOptions, variantLabel } from "@/lib/variant";
 import { WishlistButton } from "./WishlistButton";
 import LazyImage from "@/components/LazyImage";
+import { PriceLabel } from "../price-label";
 
 interface ProductCardProps {
     product: ProductSearch;
     className?: string;
     /** Opens the image lightbox */
     onClick?: () => void;
-    /** Quick-order mode: tapping the card selects it instead of opening the product */
     selectable?: boolean;
     selected?: boolean;
     onSelect?: () => void;
+    onChoose?: () => void;
 }
 
 type FitMode = "cover" | "contain";
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, selectable = false, selected = false, onSelect }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, selectable = false, selected = false, onSelect, onChoose }) => {
     const [fitMode, setFitMode] = useState<FitMode>("cover");
     const [mediaLoaded, setMediaLoaded] = useState<boolean>(false);
     const priceInfo = useMemo(() => getPriceInfo(product), [product]);
-    const { minPrice, maxCompareAtPrice, hasDiscount, maxDiscountPercent } = priceInfo;
+    const { hasDiscount, discountLabel } = priceInfo;
     const outOfStock = !product.in_stock;
     const showDiscountBadge = !outOfStock && hasDiscount;
 
@@ -42,13 +42,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, 
     };
 
     const variant = useMemo(() => defaultVariant(product), [product]);
+    const hasChoices = productOptions(product).length > 0 && (product.variants?.length ?? 0) > 1;
 
     if (selectable) {
         return (
             <div
                 onClick={(e) => {
                     e.preventDefault();
-                    if (!outOfStock) onSelect?.();
+                    if (outOfStock) return;
+                    if (hasChoices) onChoose?.();
+                    else onSelect?.();
                 }}
                 className={outOfStock ? "relative opacity-60 grayscale" : "relative"}
             >
@@ -91,11 +94,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, 
                         </Badge>
                     )}
                     <div className="flex items-start gap-1.5">
-                        <span className="text-white text-lg sm:text-xl font-medium drop-shadow-sm">{currency(minPrice)}</span>
+                        <PriceLabel info={priceInfo} tone="light" size="lg" />
                         {showDiscountBadge && (
-                            <span className="bg-destructive text-destructive-foreground text-2xs font-medium px-1 py-0.5 rounded-full">
-                                -{maxDiscountPercent}% off
-                            </span>
+                            <span className="bg-destructive text-destructive-foreground text-2xs font-medium px-1 py-0.5 rounded-full">{discountLabel}</span>
                         )}
                     </div>
                 </div>
@@ -138,7 +139,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, 
 
                 {showDiscountBadge && (
                     <span className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-2xs font-medium px-2 py-1 rounded-full">
-                        -{maxDiscountPercent}%
+                        {discountLabel}
                     </span>
                 )}
                 {product?.is_new && (
@@ -171,14 +172,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, 
                     )}
                 >
                     <div className="sr-only">{product.name}</div>
-                    {variantLabel(variant) && (
+                    {variantLabel(variant) && !hasChoices && (
                         <Badge variant="accent" className="w-fit uppercase tracking-wider" type="sm">
                             {variantLabel(variant)}
                         </Badge>
                     )}
                     <div className="flex items-start gap-1.5">
-                        <span className="text-white text-lg font-medium drop-shadow-sm">{currency(minPrice)}</span>
-                        {showDiscountBadge && <span className="text-white/55 text-xs line-through">{currency(maxCompareAtPrice)}</span>}
+                        <PriceLabel info={priceInfo} tone="light" />
                     </div>
                 </div>
             </div>
