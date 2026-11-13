@@ -13,6 +13,7 @@ import { useOverlayTriggerState } from "react-stately";
 import { WishlistButton } from "./WishlistButton";
 import { ProductImage as ProductImageComponent } from "./ProductImage";
 import { cn } from "@/utils/cn";
+import { variantLabel } from "@/lib/variant";
 
 interface Props {
     product: Product;
@@ -134,7 +135,7 @@ const ProductView: React.FC<Props> = ({ product }) => {
                                             onOpenChange={confirmState.setOpen}
                                             trigger={
                                                 <Button size="sm" variant="destructive" className="rounded-full">
-                                                    Mark out of stock
+                                                    Mark out of stock ({variantLabel(v)})
                                                 </Button>
                                             }
                                             onClose={confirmState.close}

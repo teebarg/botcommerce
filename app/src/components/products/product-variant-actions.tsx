@@ -1,6 +1,6 @@
 import type React from "react";
 import { useMemo, useState } from "react";
-import { ShoppingCart, Minus, Plus, MessageCircle } from "lucide-react";
+import { ShoppingCart, Minus, Plus } from "lucide-react";
 import type { Product, CartItem } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils/cn";
@@ -10,6 +10,7 @@ import { useCart } from "@/providers/cart-provider";
 import { Badge } from "@/components/ui/badge";
 import { VariantPicker, useVariantSelection } from "./variant-picker";
 import { PriceLabel } from "../store/price-label";
+import { WhatsAppIcon } from "../card/icons";
 
 interface VariantSelectionProps {
     product: Product;
@@ -70,9 +71,15 @@ export const ProductVariantActions: React.FC<VariantSelectionProps> = ({ product
             )}
 
             <div className="flex items-center gap-2">
-                <Button className="h-12 w-12 shrink-0 rounded-xl" disabled={outOfStock} size="icon" variant="outline" onClick={onWhatsApp} aria-label="Order through WhatsApp">
-                    <MessageCircle className="h-5 w-5" />
-                </Button>
+                <button
+                    type="button"
+                    onClick={onWhatsApp}
+                    disabled={outOfStock}
+                    aria-label="Order through WhatsApp"
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-success transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                    <WhatsAppIcon className="h-7 w-7 text-success-foreground" />
+                </button>
                 <Button
                     onClick={(event) => {
                         event.preventDefault();

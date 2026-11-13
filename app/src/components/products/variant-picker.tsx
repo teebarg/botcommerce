@@ -45,8 +45,7 @@ interface VariantPickerProps {
 
 export function VariantPicker({ options, variants, selected, onSelect }: VariantPickerProps) {
     const optionNames = options.map((option) => option.name);
-    console.log("VariantPicker options:", options, "variants:", variants, "selected:", selected);
-    if (!options.length || options.length < 2) return null;
+    if (!options.length || options.length < 1) return null;
 
     return (
         <div className="space-y-5">
@@ -76,7 +75,7 @@ export function VariantPicker({ options, variants, selected, onSelect }: Variant
                                     aria-pressed={isSelected}
                                     title={available ? undefined : "Out of stock"}
                                     className={cn(
-                                        "inline-flex min-h-11 min-w-12 items-center justify-center gap-2 rounded-xl border px-3.5 text-sm font-medium transition-all duration-150",
+                                        "inline-flex min-h-10 min-w-12 items-center justify-center gap-2 rounded-xl border px-3.5 text-sm font-medium transition-all duration-150",
                                         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 motion-safe:active:scale-95",
                                         isSelected ? "border-foreground bg-foreground text-background shadow-sm" : "border-border bg-background hover:border-foreground",
                                         !available && "cursor-not-allowed opacity-40 line-through",
