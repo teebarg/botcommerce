@@ -15,8 +15,6 @@ const LOW_STOCK = 5;
 
 const joinNames = (names: string[]) => names.map((name) => name.toLowerCase()).join(" and ");
 
-// Opens from the card. The customer picks every option first, so nothing is
-// added to the cart that they did not choose. Remounts on open, so it starts fresh.
 function OptionsSheetBody({ product, onAdded }: { product: ProductSearch; onAdded: () => void }) {
     const { addToCart } = useCart();
     const { whatsapp } = useConfig();
@@ -114,7 +112,6 @@ export function AddToCartButton({ product, productVariant }: { product: ProductS
     };
 
     const anyInStock = (product.variants ?? []).some(variantAvailable);
-    // More than one thing to choose from: the customer must pick before anything is added.
     const needsChoice = productOptions(product).length > 0 && (product.variants?.length ?? 0) > 1;
 
     if (!selected || !anyInStock) {
@@ -129,7 +126,6 @@ export function AddToCartButton({ product, productVariant }: { product: ProductS
 
     if (needsChoice) {
         return (
-            // The sheet renders in a portal, but React events still bubble to the card's link. Stop them here.
             <div className="py-2 px-2.5" onClick={(event) => event.stopPropagation()}>
                 <Button
                     onClick={(event) => {

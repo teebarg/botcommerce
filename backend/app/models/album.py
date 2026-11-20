@@ -33,9 +33,6 @@ class AlbumSummary(BaseModel):
 
 
 class AlbumProduct(ProductSearch):
-    """ProductSearch plus the saved options, so the storefront card can offer
-    a variant picker for products with several sizes/colours."""
-
     options: List[ProductOption] = Field(default_factory=list)
 
 

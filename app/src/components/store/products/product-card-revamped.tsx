@@ -5,9 +5,10 @@ import { cn } from "@/utils/cn";
 import { Badge } from "@/components/ui/badge";
 import { useMemo, useState } from "react";
 import { AddToCartButton } from "./AddToCartButton";
-import { defaultVariant, getPriceInfo, productOptions, variantLabel } from "@/lib/variant";
+import { defaultVariant, getPriceInfo, productOptions } from "@/lib/variant";
 import { WishlistButton } from "./WishlistButton";
 import { PriceLabel } from "../price-label";
+import { useProductAttributes } from "@/hooks/useProductAttributes";
 
 interface ProductCardProps {
     product: ProductSearch;
@@ -18,6 +19,7 @@ interface ProductCardProps {
 type FitMode = "cover" | "contain";
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick }) => {
+    const { attributes } = useProductAttributes(product?.variants);
     const [fitMode, setFitMode] = useState<FitMode>("cover");
     const [mediaLoaded, setMediaLoaded] = useState<boolean>(false);
     const priceInfo = useMemo(() => getPriceInfo(product), [product]);
@@ -105,10 +107,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick }
                     )}
                 >
                     <div className="sr-only">{product.name}</div>
-                    {variantLabel(variant) && !hasChoices && (
-                        <Badge variant="accent" className="w-fit uppercase tracking-wider" type="sm">
-                            {variantLabel(variant)}
-                        </Badge>
+                    {!hasChoices && (
+                        <div className="flex flex-wrap gap-1">
+                            {attributes.slice(0, 3).map((attr: string, i: number) => (
+                                <span key={i} className="text-[9px] font-medium text-white/90 bg-white/15 px-1.5 py-0.5 rounded-xs">
+                                    {attr}
+                                </span>
+                            ))}
+                            {attributes.length > 3 && <span className="text-[9px] font-medium text-white/70 px-1">+{attributes.length - 3}</span>}
+                        </div>
                     )}
                     <div className="flex items-start gap-1.5">
                         <PriceLabel info={priceInfo} tone="light" />
