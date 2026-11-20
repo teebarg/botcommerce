@@ -1,4 +1,4 @@
-import { Trash2, Edit3, X, MessageSquare, GalleryThumbnails } from "lucide-react";
+import { Trash2, Edit3, X, MessageSquare, Layers, Album } from "lucide-react";
 import { useOverlayTriggerState } from "react-stately";
 import { BulkImageSheetForm } from "./bulk-image-form-sheet";
 import { BulkAddVariantsSheet } from "./bulk-add-variants-sheet";
@@ -57,7 +57,7 @@ export const ProductBulkActions = ({
                 title="Create Album"
                 trigger={
                     <Button className="rounded-full" size="sm" variant="ghost" onClick={albumState.open}>
-                        <GalleryThumbnails className="h-4 w-4" />
+                        <Album className="h-4 w-4" />
                         <span className="hidden sm:inline text-xs">Create Album</span>
                     </Button>
                 }
@@ -87,7 +87,7 @@ export const ProductBulkActions = ({
                     sheetClassName="sm:max-w-3xl"
                     trigger={
                         <Button className="rounded-full" size="sm" variant="ghost" onClick={variantsState.open}>
-                            <Edit3 className="h-4 w-4" />
+                            <Layers className="h-4 w-4" />
                             <span className="hidden sm:inline text-xs">Add Variants</span>
                         </Button>
                     }

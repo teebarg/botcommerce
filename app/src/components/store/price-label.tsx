@@ -36,12 +36,12 @@ export function PriceLabel({ info, variant, tone = "dark", size = "md", classNam
         <div className={cn("flex flex-wrap items-baseline gap-x-1.5", className)}>
             {showFrom && <span className={cn(s.from, t.muted)}>From</span>}
             <span className={cn(s.price, t.price, "font-semibold tabular-nums tracking-tight", soldOut && "opacity-60")}>{currency(data.minPrice)}</span>
-            {showOld && (
+            {/* {showOld && (
                 <s className={cn(s.old, t.muted, "tabular-nums")}>
                     <span className="sr-only">was </span>
                     {currency(data.cheapestCompareAtPrice)}
                 </s>
-            )}
+            )} */}
         </div>
     );
 }

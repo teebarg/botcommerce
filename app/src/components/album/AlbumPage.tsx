@@ -1,29 +1,49 @@
-import { useState, useCallback } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { LayoutGrid, Rows3, ShoppingBag } from "lucide-react";
-import ProductCard from "@/components/album/ProductCard";
 import ProductGridItem from "@/components/album/ProductGridItem";
-import SelectionBar from "@/components/album/SelectionBar";
-import SelectionReview from "@/components/album/SelectionReview";
 import type { Campaign } from "@/server/product.server";
 import { Link } from "@tanstack/react-router";
+import { ProductSearch } from "@/schemas";
+import ProductCard from "@/components/store/products/product-card-revamped-dynamic";
+import { toSelectedItem, useQuickOrderSelection } from "@/hooks/useQuickOrderSelection";
+import { QuickOrderBar } from "@/components/store/quick-order-bar";
+import { OptionsSheet } from "@/components/store/products/options-sheet";
+import { useFeedUi } from "@/hooks/useFeedUi";
+import NoProductsFound from "@/components/store/products/no-products";
 
 interface AlbumPageProps {
     data: Campaign;
 }
 
 export default function AlbumPage({ data }: AlbumPageProps) {
-    const [view, setView] = useState("list"); // 'list' | 'grid'
-    const [selectedIds, setSelectedIds] = useState(() => new Set());
-    const [reviewOpen, setReviewOpen] = useState(false);
+    const { view, setView } = useFeedUi({
+        defaultView: "list",
+    });
+    const { items, ids, variantIds, toggle, remove, clear } = useQuickOrderSelection();
+    const [choosingProduct, setChoosingProduct] = useState<ProductSearch | null>(null);
 
-    const toggleSelect = useCallback((id: number) => {
-        setSelectedIds((prev) => {
-            const next = new Set(prev);
-            if (next.has(id)) next.delete(id);
-            else next.add(id);
-            return next;
+    const products: ProductSearch[] = data.products;
+
+    const selectedItems = useMemo(() => {
+        const liveById = new Map(products.map((p) => [p.id, p]));
+        return items.flatMap((item) => {
+            const live = liveById.get(item.id);
+            if (!live) return [item];
+            // Refresh price and label from the exact variant, and drop it if it sold out.
+            const variant = live.variants?.find((v) => v.id === item.variantId);
+            return variant && variant.inventory > 0 ? [toSelectedItem(live, variant)] : [];
         });
-    }, []);
+    }, [items, products]);
+
+    const hideNav = selectedItems.length > 0;
+    useEffect(() => {
+        if (!hideNav) return;
+        const root = document.documentElement;
+        root.dataset.quickOrder = "selecting";
+        return () => {
+            delete root.dataset.quickOrder;
+        };
+    }, [hideNav]);
 
     const handleOpenFromGrid = (id: number) => {
         setView("list");
@@ -34,8 +54,9 @@ export default function AlbumPage({ data }: AlbumPageProps) {
         });
     };
 
-    const selectedProducts = data.products.filter((p) => selectedIds.has(p.id));
-    const total = selectedProducts.reduce((sum, p) => sum + (p.price ?? 0), 0);
+    if (products.length === 0) {
+        return <NoProductsFound />;
+    }
 
     return (
         <div className="min-h-screen">
@@ -50,18 +71,16 @@ export default function AlbumPage({ data }: AlbumPageProps) {
                         <button
                             onClick={() => setView("list")}
                             aria-label="Single column view"
-                            className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
-                                view === "list" ? "bg-foreground text-background" : "text-muted-foreground"
-                            }`}
+                            className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${view === "list" ? "bg-foreground text-background" : "text-muted-foreground"
+                                }`}
                         >
                             <Rows3 className="h-4 w-4" />
                         </button>
                         <button
                             onClick={() => setView("grid")}
                             aria-label="Grid view"
-                            className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
-                                view === "grid" ? "bg-foreground text-background" : "text-muted-foreground"
-                            }`}
+                            className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${view === "grid" ? "bg-foreground text-background" : "text-muted-foreground"
+                                }`}
                         >
                             <LayoutGrid className="h-4 w-4" />
                         </button>
@@ -72,8 +91,15 @@ export default function AlbumPage({ data }: AlbumPageProps) {
             <main className="mx-auto max-w-xl w-full">
                 {view === "list" ? (
                     <div>
-                        {data.products.map((p) => (
-                            <ProductCard key={p.id} product={p} isSelected={selectedIds.has(p.id)} onToggle={toggleSelect} />
+                        {data.products.map((product: ProductSearch) => (
+                            <ProductCard
+                                key={product.id}
+                                product={product}
+                                selectable={true}
+                                selected={ids.has(product.id)}
+                                onSelect={() => toggle(toSelectedItem(product))}
+                                onChoose={() => setChoosingProduct(product)}
+                            />
                         ))}
                     </div>
                 ) : (
@@ -82,8 +108,8 @@ export default function AlbumPage({ data }: AlbumPageProps) {
                             <ProductGridItem
                                 key={p.id}
                                 product={p}
-                                isSelected={selectedIds.has(p.id)}
-                                onToggle={toggleSelect}
+                                isSelected={ids.has(p.id)}
+                                onToggle={() => toggle(toSelectedItem(p))}
                                 onOpen={() => handleOpenFromGrid(p.id)}
                             />
                         ))}
@@ -91,14 +117,15 @@ export default function AlbumPage({ data }: AlbumPageProps) {
                 )}
             </main>
 
-            <SelectionBar count={selectedIds.size} total={total} onReview={() => setReviewOpen(true)} onClear={() => setSelectedIds(new Set())} />
-
-            <SelectionReview
-                open={reviewOpen}
-                onClose={() => setReviewOpen(false)}
-                selectedProducts={selectedProducts}
-                onRemove={(id) => toggleSelect(id)}
-                onClear={() => setSelectedIds(new Set())}
+            <QuickOrderBar items={selectedItems} onRemove={remove} onClear={clear} onSent={clear} />
+            <OptionsSheet
+                product={choosingProduct}
+                open={!!choosingProduct}
+                onOpenChange={(next) => !next && setChoosingProduct(null)}
+                confirmLabel="Add to selection"
+                showWhatsApp={false}
+                selectedIds={variantIds}
+                onConfirm={(variant) => choosingProduct && toggle(toSelectedItem(choosingProduct, variant))}
             />
         </div>
     );

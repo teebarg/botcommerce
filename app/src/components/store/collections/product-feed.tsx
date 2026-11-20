@@ -7,14 +7,12 @@ import NoProductsFound from "@/components/store/products/no-products";
 import { useEffect, useMemo, useState } from "react";
 import { ImageLightbox, useLightbox } from "@/components/image-lightbox-revamp";
 import { useFeedUi } from "@/hooks/useFeedUi";
-import { QuickOrderBar } from "../quick-order-bar";
-import { OptionsSheet } from "../products/options-sheet";
+import { QuickOrderBar } from "@/components/store/quick-order-bar";
+import { OptionsSheet } from "@/components/store/products/options-sheet";
 import { cn } from "@/utils/cn";
 import { toSelectedItem, useQuickOrderSelection } from "@/hooks/useQuickOrderSelection";
 import { FloatingViewToggle } from "../floating-view-toggle";
 import FloatingActionDeck from "./floating-deck";
-
-const HIDE_NAV_WHILE_SELECTING = true;
 
 interface Props {
     params?: FeedQuery;
@@ -42,7 +40,7 @@ export function ProductFeed({ params }: Props) {
         });
     }, [items, products]);
 
-    const hideNav = HIDE_NAV_WHILE_SELECTING && quick && selectedItems.length > 0;
+    const hideNav = quick && selectedItems.length > 0;
     useEffect(() => {
         if (!hideNav) return;
         const root = document.documentElement;

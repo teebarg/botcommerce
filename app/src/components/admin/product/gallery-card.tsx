@@ -5,6 +5,7 @@ import { cn } from "@/utils/cn";
 import { useMemo, useState } from "react";
 import { getPriceInfo } from "@/lib/variant";
 import { PriceLabel } from "@/components/store/price-label";
+import { useProductAttributes } from "@/hooks/useProductAttributes";
 
 interface GalleryCardProps {
     image: GalleryImage;
@@ -22,30 +23,7 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, onCl
     const product = image.product;
     const variants = product?.variants || [];
     const priceInfo = useMemo(() => getPriceInfo({ variants }), [product]);
-
-    const attributeLabels = useMemo(() => {
-        const attributes = product?.variants?.flatMap(
-            (variant) => Object.entries(variant.attributes ?? {})
-        ) ?? [];
-
-        const grouped = new Map<string, Set<string>>();
-
-        for (const [key, value] of attributes) {
-            if (value == null || value === "") continue;
-
-            if (!grouped.has(key)) {
-                grouped.set(key, new Set());
-            }
-
-            grouped.get(key)!.add(String(value));
-        }
-
-        return Array.from(grouped, ([key, values]) => ({
-            name: key,
-            values: Array.from(values),
-        }));
-    }, [product?.variants]);
-    const attributes = attributeLabels.map(({ name, values }) => `${name}: ${values.join(", ")}`);
+    const { attributes } = useProductAttributes(product?.variants);
 
     const [mediaLoaded, setMediaLoaded] = useState<boolean>(false);
     const [fitMode, setFitMode] = useState<FitMode>("cover");
@@ -91,7 +69,6 @@ export function GalleryCard({ image, isSelected = false, onSelectionChange, onCl
                 />
             </div>
 
-            {/* Top status overlays */}
             <div className="absolute top-2 left-2 grid gap-1.5 z-10 pointer-events-none">
                 {isOutOfStock && (
                     <Badge variant="destructive" type="sm">

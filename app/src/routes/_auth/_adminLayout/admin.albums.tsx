@@ -31,11 +31,11 @@ function CampaignsAdminPage() {
 
     const { data, isLoading, isFetching, error, refetch } = useQuery({
         queryKey: QUERY_KEY,
-        queryFn: () => api.get<Campaign[]>("/product/admin/campaigns"),
+        queryFn: () => api.get<Campaign[]>("/album/"),
     });
 
     const remove = useMutation({
-        mutationFn: (code: string) => api.delete(`/product/admin/campaigns/${code}`),
+        mutationFn: (code: string) => api.delete(`/album/${code}`),
         onSuccess: (_, code) => {
             queryClient.setQueryData<Campaign[]>(QUERY_KEY, (old) => old?.filter((c) => c.code !== code));
             setTarget(null);

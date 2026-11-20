@@ -4,6 +4,7 @@ from app.api.routes import (
     abandoned_carts,
     activities,
     address,
+    album,
     analytics,
     auth,
     base,
@@ -32,6 +33,7 @@ api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 api_router.include_router(activities.router, prefix="/activities", tags=["activities"])
 api_router.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
 api_router.include_router(address.router, prefix="/address", tags=["address"])
+api_router.include_router(album.router, prefix="/album", tags=["album"])
 api_router.include_router(base.router, prefix="", tags=["base"])
 api_router.include_router(
     abandoned_carts.router, prefix="/abandoned-carts", tags=["abandoned-carts"]

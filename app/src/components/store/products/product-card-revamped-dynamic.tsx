@@ -6,15 +6,15 @@ import { Badge } from "@/components/ui/badge";
 import { useMemo, useState } from "react";
 import { Check, Maximize2, Plus } from "lucide-react";
 import { AddToCartButton } from "./AddToCartButton";
-import { defaultVariant, getPriceInfo, productOptions, variantLabel } from "@/lib/variant";
+import { defaultVariant, getPriceInfo, productOptions } from "@/lib/variant";
 import { WishlistButton } from "./WishlistButton";
 import LazyImage from "@/components/LazyImage";
 import { PriceLabel } from "../price-label";
+import { useProductAttributes } from "@/hooks/useProductAttributes";
 
 interface ProductCardProps {
     product: ProductSearch;
     className?: string;
-    /** Opens the image lightbox */
     onClick?: () => void;
     selectable?: boolean;
     selected?: boolean;
@@ -25,6 +25,7 @@ interface ProductCardProps {
 type FitMode = "cover" | "contain";
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, selectable = false, selected = false, onSelect, onChoose }) => {
+    const { attributes } = useProductAttributes(product?.variants);
     const [fitMode, setFitMode] = useState<FitMode>("cover");
     const [mediaLoaded, setMediaLoaded] = useState<boolean>(false);
     const priceInfo = useMemo(() => getPriceInfo(product), [product]);
@@ -47,13 +48,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, 
     if (selectable) {
         return (
             <div
+                id={`product-${product.id}`}
                 onClick={(e) => {
                     e.preventDefault();
                     if (outOfStock) return;
                     if (hasChoices) onChoose?.();
                     else onSelect?.();
                 }}
-                className={outOfStock ? "relative opacity-60 grayscale" : "relative"}
+                className={cn("relative scroll-mt-20 animate-in fade-in slide-in-from-bottom-2 duration-500", outOfStock ? "opacity-60 grayscale" : "")}
             >
                 <LazyImage src={product.image} alt={product.name} aspect="4/5" />
                 {outOfStock && (
@@ -89,15 +91,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, 
                 <div className={cn("absolute bottom-0 inset-x-0 pt-4 pb-2 px-2 bg-gradient-to-t from-black/70 to-transparent")}>
                     <div className="sr-only">{product.name}</div>
                     {product?.is_new && (
-                        <Badge variant="destructive" className="w-fit uppercase tracking-wider" type="sm">
+                        <Badge variant="success" className="w-fit uppercase tracking-wider" type="sm">
                             New
                         </Badge>
                     )}
-                    <div className="flex items-start gap-1.5">
+                    <div className="flex items-start gap-1.5 mt-2">
                         <PriceLabel info={priceInfo} tone="light" size="lg" />
                         {showDiscountBadge && (
                             <span className="bg-destructive text-destructive-foreground text-2xs font-medium px-1 py-0.5 rounded-full">{discountLabel}</span>
                         )}
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                        {attributes.slice(0, 3).map((attr: string, i: number) => (
+                            <span key={i} className="text-[9px] font-medium text-white/90 bg-white/15 px-1.5 py-0.5 rounded-xs">
+                                {attr}
+                            </span>
+                        ))}
+                        {attributes.length > 3 && <span className="text-[9px] font-medium text-white/70 px-1">+{attributes.length - 3}</span>}
                     </div>
                 </div>
             </div>
@@ -172,11 +182,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className, onClick, 
                     )}
                 >
                     <div className="sr-only">{product.name}</div>
-                    {variantLabel(variant) && !hasChoices && (
-                        <Badge variant="accent" className="w-fit uppercase tracking-wider" type="sm">
-                            {variantLabel(variant)}
-                        </Badge>
-                    )}
+                    <div className="flex flex-wrap gap-1">
+                        {!hasChoices && attributes.slice(0, 3).map((attr: string, i: number) => (
+                            <span key={i} className="text-[9px] font-medium text-white/90 bg-white/15 px-1.5 py-0.5 rounded-xs">
+                                {attr}
+                            </span>
+                        ))}
+                        {attributes.length > 3 && <span className="text-[9px] font-medium text-white/70 px-1">+{attributes.length - 3}</span>}
+                    </div>
                     <div className="flex items-start gap-1.5">
                         <PriceLabel info={priceInfo} tone="light" />
                     </div>

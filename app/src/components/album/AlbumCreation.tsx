@@ -1,5 +1,5 @@
 import { api } from "@/utils/api";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { type FormEvent, useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -42,7 +42,7 @@ export function AlbumCreation({ onClose, productIds }: AlbumCreationProps) {
         setCreating(true);
         setError("");
         try {
-            const result = await api.post<{ code: string; url: string }>(`/product/admin/campaigns`, { title: cleanTitle, product_ids: productIds });
+            const result = await api.post<{ code: string; url: string }>(`/album/`, { title: cleanTitle, product_ids: productIds });
             const record: AlbumRecord = { ...result, title: cleanTitle, product_ids: productIds };
             setCreatedAlbum(record);
             setMessage(defaultMessage(cleanTitle, productIds.length));
@@ -168,8 +168,8 @@ export function AlbumCreation({ onClose, productIds }: AlbumCreationProps) {
                         </div>
 
                         <div className="sticky bottom-0 mt-2 border-t border-border bg-background/95 py-4 backdrop-blur-md">
-                            <form className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-end" onSubmit={createAlbum}>
-                                <div className="space-y-2">
+                            <form className="grid gap-3 grid-cols-2" onSubmit={createAlbum}>
+                                <div className="space-y-2 col-span-2">
                                     <Label htmlFor="album-title">Album title</Label>
                                     <Input
                                         id="album-title"
