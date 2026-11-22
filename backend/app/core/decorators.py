@@ -1,10 +1,11 @@
-import time
 import re
-from fastapi import HTTPException, Request
+import time
 from collections.abc import Callable
 from functools import wraps
-from typing import Callable, TypeVar, ParamSpec
+from typing import Callable, ParamSpec, TypeVar
+
 from app.core.logging import get_logger
+from fastapi import HTTPException, Request
 
 logger = get_logger(__name__)
 
@@ -42,17 +43,21 @@ def limit(rate_string: str):
     def decorator(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
-            request: Request = kwargs["request"]
-            if not request:
+            request: Request | None = kwargs.get("request")
+            if request is None:
                 raise ValueError("FastAPI Request not found")
 
             redis = request.app.state.redis
-            client_ip = request.client.host
+            client_ip = request.client.host if request.client else "unknown"
             key: str = f"rate_limit:{client_ip}:{func.__name__}"
 
-            current_count = await redis.incr(key)
-
-            if current_count == 1:
+            # INCR + TTL in one round trip; set the expiry whenever the key has none, so a
+            # crash between INCR and EXPIRE can never leave a counter that never resets.
+            async with redis.pipeline(transaction=True) as pipe:
+                pipe.incr(key)
+                pipe.ttl(key)
+                current_count, ttl = await pipe.execute()
+            if ttl < 0:
                 await redis.expire(key, period_seconds)
 
             if current_count > max_requests:
