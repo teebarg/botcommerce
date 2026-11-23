@@ -13,7 +13,6 @@ from prisma.enums import PaymentStatus
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.core.search.meilisearch import MeilisearchEngine
-from app.core.utils import url_to_list
 from app.core.variants import live_variants
 from app.models.product import Product
 from app.services.cache import CacheService, cacheable
@@ -34,6 +33,16 @@ def _facet_token(name: str, value: str) -> str:
         ensure_ascii=False, separators=(",", ":"),
     ).encode("utf-8")
     return "attr_" + base64.urlsafe_b64encode(payload).decode("ascii").rstrip("=")
+
+
+def _meili_list(raw: str) -> str:
+    """Comma-separated user input -> a safely quoted Meilisearch list literal.
+
+    Values are JSON-quoted, so a stray quote can no longer break out of the filter
+    expression (e.g. to add an `OR` and surface inactive products).
+    """
+    items = [item.strip() for item in str(raw).split(",") if item.strip()]
+    return "[" + ", ".join(json.dumps(item) for item in items) + "]"
 
 
 def _decode_facet_token(token: str) -> tuple[str, str] | None:
@@ -286,10 +295,10 @@ class ProductService:
         recommendation_scores = Counter()
         seen = set(product_ids)
 
-        for pid in product_ids:
-            similar_ids = await self.cache_srv.redis.lrange(
-                f"product:{pid}:similar", 0, -1
-            )
+        all_similar = await asyncio.gather(
+            *(self.cache_srv.redis.lrange(f"product:{pid}:similar", 0, -1) for pid in product_ids)
+        )
+        for similar_ids in all_similar:
             for sid in similar_ids:
                 if sid not in seen:
                     recommendation_scores[sid] += 1
@@ -338,6 +347,11 @@ class ProductService:
             [sort or "id:desc"] if disable_random_feed else ["random_score:asc"]
         )
 
+        # Facets don't depend on the main result, so run both searches concurrently.
+        facet_task = (
+            asyncio.create_task(self._fetch_available_filters(kwargs, search)) if offset == 0 else None
+        )
+
         try:
             res = await self.search_engine.search_index(
                 search if disable_random_feed else "", search_params
@@ -345,6 +359,8 @@ class ProductService:
             hits = res["hits"]
             total_count = res["estimatedTotalHits"]
         except Exception as e:
+            if facet_task:
+                facet_task.cancel()
             logger.error(f"Meilisearch cluster error: {e}")
             raise HTTPException(status_code=502, detail="Search service unavailable")
 
@@ -353,53 +369,7 @@ class ProductService:
         if next_offset < total_count and len(hits) == limit:
             next_cursor = self._encode_cursor(str(next_offset))
 
-        available_filters: list[dict[str, Any]] = []
-        if offset == 0:
-            # Facets are deliberately calculated without attribute selections. This keeps
-            # the choices for a section visible while the customer changes that section.
-            facet_filters = self._build_search_filters_list(kwargs, include_attribute_filters=False, include_legacy_attributes=False)
-            facet_params: Dict[str, Any] = {
-                "limit": 1,
-                "attributesToRetrieve": ["id"],
-                "facets": ["attribute_facets"],
-            }
-            if facet_filters:
-                facet_params["filter"] = " AND ".join(facet_filters)
-            try:
-                facet_result = await self.search_engine.search_index(search, facet_params)
-                distribution = (facet_result.get("facetDistribution") or {}).get("attribute_facets") or {}
-                grouped: dict[str, dict[str, Any]] = {}
-                for token, count in distribution.items():
-                    decoded = _decode_facet_token(token)
-                    if not decoded:
-                        continue
-                    name, value = decoded
-                    name_key = _normalise_attribute_name(name)
-                    section = grouped.setdefault(name_key, {"name": name, "values": []})
-                    section["values"].append({"value": value, "count": int(count)})
-
-                size_order = {value: index for index, value in enumerate(("xxs", "xs", "s", "m", "l", "xl", "xxl", "xxxl", "xxxxl"))}
-
-                def sort_values(item: dict[str, Any], section_name: str) -> tuple[Any, ...]:
-                    value = str(item["value"]).strip()
-                    if _normalise_attribute_name(section_name) in {"size"}:
-                        key = value.casefold()
-                        if key in size_order:
-                            return (0, size_order[key], key)
-                        try:
-                            return (1, float(value), key)
-                        except ValueError:
-                            pass
-                    try:
-                        return (0, float(value), value.casefold())
-                    except ValueError:
-                        return (1, value.casefold())
-
-                available_filters = sorted(grouped.values(), key=lambda section: section["name"].casefold())
-                for section in available_filters:
-                    section["values"].sort(key=lambda item, name=section["name"]: sort_values(item, name))
-            except Exception:
-                logger.exception("Unable to retrieve product filter facets")
+        available_filters = await facet_task if facet_task else []
 
         return {
             "products": hits,
@@ -408,6 +378,56 @@ class ProductService:
             "next_cursor": next_cursor,
             "available_filters": available_filters,
         }
+
+    async def _fetch_available_filters(self, kwargs: dict, search: str) -> list[dict[str, Any]]:
+        """Facet choices for the filter UI. Never raises: filters are optional."""
+        available_filters: list[dict[str, Any]] = []
+        # Facets are deliberately calculated without attribute selections. This keeps
+        # the choices for a section visible while the customer changes that section.
+        facet_filters = self._build_search_filters_list(kwargs, include_attribute_filters=False, include_legacy_attributes=False)
+        facet_params: Dict[str, Any] = {
+            "limit": 1,
+            "attributesToRetrieve": ["id"],
+            "facets": ["attribute_facets"],
+        }
+        if facet_filters:
+            facet_params["filter"] = " AND ".join(facet_filters)
+        try:
+            facet_result = await self.search_engine.search_index(search, facet_params)
+            distribution = (facet_result.get("facetDistribution") or {}).get("attribute_facets") or {}
+            grouped: dict[str, dict[str, Any]] = {}
+            for token, count in distribution.items():
+                decoded = _decode_facet_token(token)
+                if not decoded:
+                    continue
+                name, value = decoded
+                name_key = _normalise_attribute_name(name)
+                section = grouped.setdefault(name_key, {"name": name, "values": []})
+                section["values"].append({"value": value, "count": int(count)})
+
+            size_order = {value: index for index, value in enumerate(("xxs", "xs", "s", "m", "l", "xl", "xxl", "xxxl", "xxxxl"))}
+
+            def sort_values(item: dict[str, Any], section_name: str) -> tuple[Any, ...]:
+                value = str(item["value"]).strip()
+                if _normalise_attribute_name(section_name) in {"size"}:
+                    key = value.casefold()
+                    if key in size_order:
+                        return (0, size_order[key], key)
+                    try:
+                        return (1, float(value), key)
+                    except ValueError:
+                        pass
+                try:
+                    return (0, float(value), value.casefold())
+                except ValueError:
+                    return (1, value.casefold())
+
+            available_filters = sorted(grouped.values(), key=lambda section: section["name"].casefold())
+            for section in available_filters:
+                section["values"].sort(key=lambda item, name=section["name"]: sort_values(item, name))
+        except Exception:
+            logger.exception("Unable to retrieve product filter facets")
+        return available_filters
 
     async def query_collection_index(self) -> dict:
         collections = ["trending", "new-arrivals", "featured"]
@@ -451,25 +471,25 @@ class ProductService:
     ) -> list[str]:
         filters: list[str] = []
         if kw.get("cat_ids"):
-            filters.append(f"categories.slug IN {url_to_list(kw['cat_ids'])}")
+            filters.append(f"categories.slug IN {_meili_list(kw['cat_ids'])}")
         if kw.get("collections"):
-            filters.append(f"collections.slug IN [{kw['collections']}]")
+            filters.append(f"collections.slug IN {_meili_list(kw['collections'])}")
         if kw.get("min_price") is not None:
             # A product matches when its available price range overlaps the requested range.
-            filters.append(f"max_price >= {kw['min_price']}")
+            filters.append(f"max_price >= {int(kw['min_price'])}")
         if kw.get("max_price") is not None:
-            filters.append(f"min_price <= {kw['max_price']}")
+            filters.append(f"min_price <= {int(kw['max_price'])}")
         filters.append(f"active = {str(kw.get('active', True)).lower()}")
 
         if include_legacy_attributes:
             if kw.get("sizes"):
-                filters.append(f"sizes IN {url_to_list(kw['sizes'])}")
+                filters.append(f"sizes IN {_meili_list(kw['sizes'])}")
             if kw.get("ages"):
-                filters.append(f"ages IN {url_to_list(kw['ages'])}")
+                filters.append(f"ages IN {_meili_list(kw['ages'])}")
             if kw.get("width"):
-                filters.append(f"widths IN {url_to_list(kw['width'])}")
+                filters.append(f"widths IN {_meili_list(kw['width'])}")
             if kw.get("length"):
-                filters.append(f"lengths IN {url_to_list(kw['length'])}")
+                filters.append(f"lengths IN {_meili_list(kw['length'])}")
 
         if include_attribute_filters and kw.get("attribute_filters"):
             try:
@@ -560,27 +580,23 @@ class ProductService:
             "random_score": random.random(),
         }
 
-        product_dict["categories"] = (
-            [
-                {
-                    "id": category.id,
-                    "name": category.name,
-                    "slug": category.slug,
-                }
-                for category in product.categories or  []
-            ],
-        )
+        product_dict["categories"] = [
+            {
+                "id": category.id,
+                "name": category.name,
+                "slug": category.slug,
+            }
+            for category in product.categories or []
+        ]
 
-        product_dict["collections"] = (
-            [
-                {
-                    "id": collection.id,
-                    "name": collection.name,
-                    "slug": collection.slug,
-                }
-                for collection in product.collections or []
-            ],
-        )
+        product_dict["collections"] = [
+            {
+                "id": collection.id,
+                "name": collection.name,
+                "slug": collection.slug,
+            }
+            for collection in product.collections or []
+        ]
 
         images = [
             img.image
@@ -612,7 +628,7 @@ class ProductService:
         # Filter facets and price bounds describe variants customers can buy now.
         in_stock_variants = [v for v in variants if (v.get("inventory") or 0) > 0]
         attribute_groups = [
-            {"names": ("size"), "legacy": "size", "field": "sizes", "facet_name": "Size"},
+            {"names": ("size",), "legacy": "size", "field": "sizes", "facet_name": "Size"},
             {"names": ("colour", "color"), "legacy": "color", "field": "colors", "facet_name": "Color"},
             {"names": ("age",), "legacy": "age", "field": "ages", "facet_name": "Age"},
             {"names": ("width", "waist"), "legacy": "width", "field": "widths", "facet_name": "Width"},

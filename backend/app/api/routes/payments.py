@@ -60,11 +60,15 @@ async def paystack_webhook(
         raise HTTPException(status_code=403, detail="Invalid signature")
 
     payload = await request.json()
-    if payload["event"] == "charge.success":
+    if payload.get("event") == "charge.success":
         data = payload["data"]
-        await payment_srv.record_success(
-            reference=data["reference"],
-        )
+        try:
+            await payment_srv.record_success(
+                reference=data["reference"],
+                paid_kobo=data.get("amount"),
+            )
+        except HTTPException as e:
+            logger.error(f"Paystack webhook not applied for {data.get('reference')}: {e.detail}")
 
     return {"status": "received"}
 

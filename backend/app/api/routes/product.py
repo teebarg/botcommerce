@@ -46,7 +46,7 @@ async def get_google_merchant_feed(request: Request, srv: ProductDep, target: st
 
 
 @router.get("/{product_id}/review-status")
-@cacheable(key_prefix="review-status", key_builder=lambda product_id: product_id, cdn_ttl=600, cdn_swr=60, expire=1800)
+@cacheable(key_prefix="review-status", key_builder=lambda product_id, user: f"{product_id}:{user.id if user else 'anon'}", expire=120)
 async def get_review_status(request: Request, product_id: int, user: UserDep, srv: ProductDep) -> ReviewStatus:
     if not user:
         return ReviewStatus(has_purchased=False, has_reviewed=False)
@@ -63,7 +63,7 @@ async def recommend(request: Request, srv: ProductDep, id: int, limit: int = Que
 
 
 @router.get("/recommend")
-@cacheable(key_prefix="products:recommendation", tags=["products"], cdn_ttl=600, cdn_swr=60, expire=1800)
+@cacheable(key_prefix="products:recommendation", key_builder=lambda user, limit: f"{user.id}:{limit}", tags=["products"], expire=1800)
 async def get_recommendations(
     request: Request, srv: ProductDep, user: CurrentUser, limit: int = Query(default=20, le=100),
 ):
@@ -80,13 +80,13 @@ async def feed(
     sizes: str = Query(default=""), ages: str = Query(default=""),
     width: str = Query(default=""), length: str = Query(default=""),
     attribute_filters: str = Query(default=""),
-    limit: int = Query(default=40, le=100), active: bool = Query(default=True),
+    limit: int = Query(default=40, le=100),
     cursor: Optional[str] = Query(default=None),
 ) -> FeedProducts:
     return await srv.get_discovery_feed(
         search=search, sort=sort, cat_ids=cat_ids, collections=collections,
         max_price=max_price, min_price=min_price, sizes=sizes, ages=ages, width=width, length=length,
-        attribute_filters=attribute_filters, limit=limit, active=active, cursor=cursor
+        attribute_filters=attribute_filters, limit=limit, active=True, cursor=cursor
     )
 
 
@@ -173,7 +173,7 @@ async def configure_filterable_attributes(srv: ProductDep) -> Message:
         raise HTTPException(status_code=500, detail="Configuration task error.")
 
 
-@router.get("/search/clear-index")
+@router.post("/search/clear-index", dependencies=[Depends(require_admin)])
 async def config_clear_index(srv: ProductDep):
     try:
         await srv.search_engine.clear()

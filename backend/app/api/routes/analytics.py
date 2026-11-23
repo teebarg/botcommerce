@@ -1,11 +1,13 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from fastapi import APIRouter, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
 from pydantic import BaseModel
 
+from app.core.decorators import limit
 from app.core.dependencies.cache import CacheDep
 from app.core.logging import get_logger
+from app.core.permissions import require_admin
 from app.models.generic import Message
 
 router = APIRouter()
@@ -38,6 +40,8 @@ FUNNELS: dict[str, list[str]] = {
 
 COUNTER_TTL_SECONDS: int = 30 * 24 * 60 * 60
 
+ALLOWED_EVENTS: frozenset[str] = frozenset(e for events in FUNNELS.values() for e in events)
+
 
 def _total_key(event: str) -> str:
     return f"analytics:event:{event}:total"
@@ -55,9 +59,13 @@ class EventIn(BaseModel):
 
 
 @router.post("/event")
+@limit("120/minute")
 async def record_event(
-    payload: EventIn, cache_srv: CacheDep, background_tasks: BackgroundTasks
+    request: Request, payload: EventIn, cache_srv: CacheDep, background_tasks: BackgroundTasks
 ):
+    if payload.event not in ALLOWED_EVENTS:
+        return Message(message="success")  # ignore silently; don't create keys for unknown events
+
     async def log_event():
         try:
             date_str: str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
@@ -75,7 +83,7 @@ async def record_event(
     return Message(message="success")
 
 
-@router.get("/funnel/{name}")
+@router.get("/funnel/{name}", dependencies=[Depends(require_admin)])
 async def funnel(cache_srv: CacheDep, name: str):
     """
     All-time counts per event in the named funnel (see FUNNELS above),
@@ -108,8 +116,8 @@ async def funnel(cache_srv: CacheDep, name: str):
     }
 
 
-@router.get("/funnel/{name}/daily")
-async def funnel_daily(cache_srv: CacheDep, name: str, days: int = 7):
+@router.get("/funnel/{name}/daily", dependencies=[Depends(require_admin)])
+async def funnel_daily(cache_srv: CacheDep, name: str, days: int = Query(default=7, ge=1, le=30)):
     """Per-day counts for the named funnel (max 30 — older days expire)."""
     events: list[str] | None = FUNNELS.get(name)
     if not events:
@@ -120,14 +128,17 @@ async def funnel_daily(cache_srv: CacheDep, name: str, days: int = 7):
         (today - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(days)
     ]
 
+    # One MGET for every day instead of one round trip per day.
+    all_keys: list[str] = [_daily_key(e, d) for d in dates for e in events]
+    values = await cache_srv.redis.mget(all_keys)
+
     result = []
-    for date_str in dates:
-        keys: list[str] = [_daily_key(e, date_str) for e in events]
-        values = await cache_srv.redis.mget(keys)
+    for day_index, date_str in enumerate(dates):
+        chunk = values[day_index * len(events) : (day_index + 1) * len(events)]
         result.append(
             {
                 "date": date_str,
-                "counts": {event: int(v or 0) for event, v in zip(events, values)},
+                "counts": {event: int(v or 0) for event, v in zip(events, chunk)},
             }
         )
 

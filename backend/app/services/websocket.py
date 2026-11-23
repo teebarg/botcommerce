@@ -10,6 +10,7 @@ class InMemoryWebSocketManager:
         self.heartbeats: Dict[str, Dict] = {}
         self.idle_timeout = timedelta(seconds=idle_timeout_seconds)
         self.cleanup_task = None
+        self._sessions_task: Optional[asyncio.Task] = None
 
     async def start(self) -> None:
         """Start background tasks (like idle cleanup)."""
@@ -56,7 +57,8 @@ class InMemoryWebSocketManager:
         }
 
         try:
-            await self.connections[user_id].send_json(message)
+            # A stalled client must not hold up everyone else's broadcast.
+            await asyncio.wait_for(self.connections[user_id].send_json(message), timeout=5)
             return True
         except WebSocketDisconnect:
             await self.disconnect(user_id)
@@ -73,12 +75,12 @@ class InMemoryWebSocketManager:
             "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
-        sent = 0
-        for user_id in list(self.connections.keys()):
-            if await self.send_to_user(user_id, message, message_type=message_type):
-                sent += 1
-
-        return sent
+        user_ids = list(self.connections.keys())
+        results = await asyncio.gather(
+            *(self.send_to_user(user_id, message, message_type=message_type) for user_id in user_ids),
+            return_exceptions=True,
+        )
+        return sum(1 for r in results if r is True)
 
     def get_connected_users(self) -> list:
         return list(self.connections.keys())
@@ -100,9 +102,33 @@ class InMemoryWebSocketManager:
                 logger.error(f"Failed to update heartbeat field {field} for user {user_id}: {e}")
 
 
+    def schedule_sessions_broadcast(self, delay: float = 2.0) -> None:
+        """Coalesce bursts of connect/disconnect events into one broadcast. Building the
+        session list is O(connections), so doing it per event is O(n^2) under load."""
+        if self._sessions_task and not self._sessions_task.done():
+            return
+        self._sessions_task = asyncio.create_task(self._delayed_sessions_broadcast(delay))
+
+    async def _delayed_sessions_broadcast(self, delay: float) -> None:
+        await asyncio.sleep(delay)
+        try:
+            await self.broadcast_sessions()
+        except Exception as e:
+            logger.error(f"Failed to broadcast sessions: {e}")
+
     async def broadcast_sessions(self):
+        """Online-users list (emails, current pages) goes to admin connections only."""
+        admin_ids = [
+            uid for uid, data in self.heartbeats.items()
+            if isinstance(data, dict) and data.get("is_admin") and uid in self.connections
+        ]
+        if not admin_ids:
+            return
+
         sessions = []
         for key, data in self.heartbeats.items():
+            if not isinstance(data, dict):
+                continue
             sessions.append({
                 "id": key,
                 "type": data.get("type", "guest"),
@@ -112,7 +138,10 @@ class InMemoryWebSocketManager:
                 "last_seen": int(time.time()) - int(data.get("updated_at", 0))
             })
 
-        await manager.broadcast_to_all({"users": sessions}, "online-users")
+        await asyncio.gather(
+            *(self.send_to_user(uid, {"users": sessions}, "online-users") for uid in admin_ids),
+            return_exceptions=True,
+        )
 
     async def promote_connection(self, old_id: str, new_id: str, metadata: Dict) -> bool:
         if old_id not in self.connections:

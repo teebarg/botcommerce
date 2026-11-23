@@ -4,7 +4,7 @@ import { Users, UserCheck, Eye, TrendingUp } from "lucide-react";
 import UserCounter from "@/components/admin/online/UserCounter";
 import ActivityIndicator from "@/components/admin/online/ActivityIndicator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useWebSocketMessage } from "pulsews";
+import { useWebSocketMessage } from "@/providers/realtime-provider";
 import OnlineAvatar from "@/components/admin/online/OnlineAvatar";
 
 interface OnlineSession {

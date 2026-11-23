@@ -97,7 +97,7 @@ class OrderService:
 
         orders = await self.db.order.find_many(
             where=where,
-            order={"created_at": sort},
+            order=[{"created_at": sort}, {"id": sort}],  # id breaks created_at ties so cursors are stable
             skip=1 if cursor else 0,
             take=limit + 1,
             cursor={"id": cursor} if cursor else None,
@@ -138,42 +138,60 @@ class OrderService:
                 detail=f"Some items in your cart are out of stock and must be removed before checkout: {names}",
             )
 
+        # Stock check at checkout (the real decrement happens, guarded, when payment succeeds).
+        short_items = [
+            item.name or "Unnamed item"
+            for item in cart.items
+            if item.variant is None or (item.variant.inventory or 0) < item.quantity
+        ]
+        if short_items:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Not enough stock for: {', '.join(short_items)}. Please reduce the quantity or remove them.",
+            )
+
         cart_totals = await self.cart_srv.calculate_totals(cart=cart)
-        async with self.db.tx() as tx:
-            data: dict[str, Any] = {
-                "order_number": f"ORD{uuid.uuid4().hex[:10].upper()}",
-                "email": cart.email or email,
-                "phone": cart.phone,
-                "shipping_fee": cart.shipping_fee,
-                "subtotal": cart_totals["subtotal"],
-                "tax": cart_totals["tax"],
-                "discount_amount": cart_totals["discount_amount"],
-                "total": cart_totals["total"],
-                "wallet_used": cart.wallet_used,
-                "shipping_method": cart.shipping_method,
-                "payment_method": cart.payment_method,
-                "cart": {"connect": {"id": cart.id}},
-                "user": {"connect": {"id": user_id}},
-                "order_items": {
-                    "create": [
-                        {
-                            "name": item.name,
-                            "image": item.image,
-                            "variant": {"connect": {"id": item.variant_id}},
-                            "quantity": item.quantity,
-                            "price": item.variant.price,
-                        }
-                        for item in cart.items or []
-                    ]
-                },
-            }
+        if cart_totals is None:
+            raise HTTPException(status_code=500, detail="Could not calculate your order total. Please try again.")
 
-            if cart.coupon_id:
-                data["coupon"] = {"connect": {"id": cart.coupon_id}}
-                data["coupon_code"] = cart.coupon_code
+        wallet_only = cart.payment_method == "WALLET" and (cart.total or 0) <= 0
 
-            if cart.shipping_address_id:
-                data["shipping_address"] = {"connect": {"id": cart.shipping_address_id}}
+        try:
+            async with self.db.tx() as tx:
+                data: dict[str, Any] = {
+                    "order_number": f"ORD{uuid.uuid4().hex[:10].upper()}",
+                    "email": cart.email or email,
+                    "phone": cart.phone,
+                    "shipping_fee": cart.shipping_fee,
+                    "subtotal": cart_totals["subtotal"],
+                    "tax": cart_totals["tax"],
+                    "discount_amount": cart_totals["discount_amount"],
+                    "total": cart_totals["total"],
+                    "wallet_used": cart.wallet_used,
+                    "shipping_method": cart.shipping_method,
+                    "payment_method": cart.payment_method,
+                    "cart": {"connect": {"id": cart.id}},
+                    "user": {"connect": {"id": user_id}},
+                    "order_items": {
+                        "create": [
+                            {
+                                "name": item.name,
+                                "image": item.image,
+                                "variant": {"connect": {"id": item.variant_id}},
+                                "quantity": item.quantity,
+                                "price": item.variant.price,
+                            }
+                            for item in cart.items or []
+                        ]
+                    },
+                }
+
+                if cart.coupon_id:
+                    data["coupon"] = {"connect": {"id": cart.coupon_id}}
+                    data["coupon_code"] = cart.coupon_code
+
+                if cart.shipping_address_id:
+                    data["shipping_address"] = {"connect": {"id": cart.shipping_address_id}}
 
             try:
                 new_order = await tx.order.create(data=data)
@@ -208,22 +226,37 @@ class OrderService:
                     "payment_method": new_order.payment_method,
                 }
             )
-            await self.queue.enqueue_job("order_created", order_id=new_order.id)
-
-            if cart.payment_method == "WALLET" and (cart.total or 0) <= 0:
-                await self.payment_srv.record_success(
-                    reference=f"WALLET-{new_order.order_number}",
-                )
 
             if cart.coupon_id:
                 await self.coupon_srv.increment_coupon_usage(
                     coupon_id=cart.coupon_id,
                     user_id=user_id,
-                    discount_amount=cart.discount_amount,
+                    discount_amount=cart_totals["discount_amount"],
+                    tx=tx,
+                )
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"Failed to create order for cart {cart.cart_number}: {e}", exc_info=True)
+            raise HTTPException(status_code=500, detail="We couldn't place your order. Please try again.")
+
+        # Everything below runs after the commit, so a worker can never see a half-written order
+        # and a slow queue/cache call never holds the transaction open.
+        try:
+            await self.queue.enqueue_job("order_created", order_id=new_order.id)
+        except Exception as e:
+            logger.error(f"Order {new_order.order_number} created but 'order_created' job was not queued: {e}")
+
+        if wallet_only:
+            try:
+                await self.payment_srv.record_success(reference=f"WALLET-{new_order.order_number}")
+            except Exception as e:
+                logger.critical(
+                    f"Wallet-only order {new_order.order_number} was created but could not be marked paid: {e}"
                 )
 
-            await self.cache_srv.invalidate(tags=["orders", "stats-trends"])
-            return new_order
+        await self.cache_srv.invalidate(tags=["orders", "stats-trends"])
+        return new_order
 
     async def return_order_item(
         self, order_id: int, item_id: int, background_tasks: BackgroundTasks
@@ -248,19 +281,12 @@ class OrderService:
         quantity = order_item.quantity
 
         async with self.db.tx() as tx:
-            if variant_id is not None:
-                variant = await tx.productvariant.find_unique(where={"id": variant_id})
-                if variant and order_item.order.payment_status == "SUCCESS":
-                    new_inventory = (variant.inventory or 0) + quantity
-                    await tx.productvariant.update(
-                        where={"id": variant_id},
-                        data={
-                            "inventory": new_inventory,
-                            "status": "IN_STOCK"
-                            if new_inventory > 0
-                            else variant.status,
-                        },
-                    )
+            if variant_id is not None and order_item.order.payment_status == "SUCCESS":
+                # Atomic increment (a read-then-write here would lose concurrent sales/returns).
+                await tx.productvariant.update_many(
+                    where={"id": variant_id},
+                    data={"inventory": {"increment": quantity}, "status": "IN_STOCK"},
+                )
 
             await tx.orderitem.delete(where={"id": item_id})
 
@@ -273,12 +299,24 @@ class OrderService:
 
             tax_rate_str = await self.settings_srv.get("tax_rate")
             tax_rate = float(tax_rate_str or 0)
-            new_tax: float = new_subtotal * (tax_rate / 100.0)
-            new_total: float = new_subtotal + new_tax + float(order.shipping_fee or 0)
+            # Mirror checkout's maths: tax applies after the discount, and wallet money already
+            # paid is deducted from the total. (A refund for the difference is a business decision
+            # this code does not make; the order timeline records the return.)
+            new_discount: float = min(float(order.discount_amount or 0), new_subtotal)
+            taxable: float = new_subtotal - new_discount
+            new_tax: float = round(taxable * (tax_rate / 100.0), 2)
+            new_total: float = round(
+                max(taxable + new_tax + float(order.shipping_fee or 0) - float(order.wallet_used or 0), 0.0), 2
+            )
 
             updated_order = await tx.order.update(
                 where={"id": order_id},
-                data={"subtotal": new_subtotal, "tax": new_tax, "total": new_total},
+                data={
+                    "subtotal": new_subtotal,
+                    "discount_amount": new_discount,
+                    "tax": new_tax,
+                    "total": new_total,
+                },
             )
 
             try:
@@ -292,14 +330,13 @@ class OrderService:
                 )
             except Exception as e:
                 logger.error(f"Failed to append order timeline for return: {e}")
-            await self.cache_srv.invalidate(f"order:{order_id}", tags=["orders"])
 
         async def invalidate_caches() -> None:
             try:
                 await self.cache_srv.invalidate(
                     f"order:{order_id}",
                     f"order-timeline:{order_id}",
-                    tags=["orders", f"wallet:{order.user.id}"],
+                    tags=["orders", f"order:{order_item.order.order_number}", f"wallet:{order_item.order.user_id}"],
                 )
                 if order_item.variant and order_item.variant.product_id:
                     await self.product_srv.index_product(product_id=order_item.variant.product_id)
